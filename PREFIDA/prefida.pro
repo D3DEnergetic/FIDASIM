@@ -443,10 +443,7 @@ PRO prefida,input_pro
 	;;CALL DEVICE ROUTINES THAT GET BEAM GEOMETRY, FIDA DIAGNOSTIC INFO, PROFILES, and the grid in flux coord.
 	CALL_PROCEDURE, strlowcase(inputs.device)+'_routines',inputs,grid, nbi, fida, profiles, equil,err
 	if err eq 1 then goto,GET_OUT
-;	help,nbi,/str
-;	help,fida,/str
-;	help,profiles,/str
-;	help,equil,/str
+
 	;;BEAM PRE PROCESSING
 	prepare_beam,inputs,nbi,rot_mat
 	if rot_mat.err eq 1 then begin
@@ -471,7 +468,19 @@ PRO prefida,input_pro
 	;;PLOTTING PLANE VIEW BEAMS AND CHORDS
 	window,0 & wset,0
 	loadct,39,/silent
-	plot,[0],[0],/nodata,xrange=[1.1*min(grid.xx),0.9*max(grid.xx)],yrange=[0.9*min(grid.yy),1.1*max(grid.yy)],$
+
+	;;GET PROPER RANGES
+	xmin=min(grid.xx) & ymin=min(grid.yy) & zmin=min(grid.zz)
+	xmax=max(grid.xx) & ymax=max(grid.yy) & zmax=max(grid.zz)
+	if xmin lt 0 then xmin1=1.1*xmin else xmin1=0.9*xmin
+	if xmax lt 0 then xmax1=0.9*xmax else xmax1=1.1*xmax
+	if ymin lt 0 then ymin1=1.1*ymin else ymin1=0.9*ymin
+	if ymax lt 0 then ymax1=0.9*ymax else ymax1=1.1*ymax
+	if zmin lt 0 then zmin1=1.1*zmin else zmin1=0.9*zmin
+	if zmax lt 0 then zmax1=0.9*zmax else zmax1=1.1*zmax
+	x_range=[xmin1,xmax1] & y_range=[ymin1,ymax1] & z_range=[zmin1,zmax1]
+
+	plot,[0],[0],/nodata,xrange=x_range,yrange=y_range,$
 		color=0,background=255,title='PLANE VIEW',xtitle='X [cm]',ytitle='Y [cm]'
 	for i=0,grid.nx-1 do begin
 		oplot,[grid.xx[i],grid.xx[i]],[grid.yy[0],grid.yy[-1]],color=0
@@ -492,7 +501,7 @@ PRO prefida,input_pro
 
 	;;PLOT CROSS SECTION BEAM AND CHORDS 
 	window,1 & wset,1
-	plot,[0],[0],/nodata,xrange=[1.1*min(grid.xx),0.9*max(grid.xx)],yrange=[1.1*min(grid.zz),1.1*max(grid.zz)],$
+	plot,[0],[0],/nodata,xrange=x_range,yrange=z_range,$
 		color=0,background=255,title='POLODIAL VIEW',xtitle='X [cm]',ytitle='Z [cm]'
 	for i=0,grid.nx-1 do begin
 		oplot,[grid.xx[i],grid.xx[i]],[grid.zz[0],grid.zz[-1]],color=0

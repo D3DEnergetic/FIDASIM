@@ -124,7 +124,7 @@ FUNCTION d3d_chords,inputs
 	nchan=n_elements(xlos)
 
 	;;SAVE IF FIDA STRUCTURE
-	fida={nchan:nchan,xlos:xlos,ylos:ylos,zlos:zlos,xhead:xhead,yhead:yhead,zhead:zhead,$
+	fida={nchan:nchan,xmid:xlos,ymid:ylos,zmid:zlos,xlens:xhead,ylens:yhead,zlens:zhead,$
 		  sigma_pi_ratio:1.0,headsize:replicate(1.0,nchan)}
 	return,fida
 END

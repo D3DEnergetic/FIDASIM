@@ -1,7 +1,4 @@
 PRO rotate_uvw,uvw,Arot,Brot,Crot,updown,xyz
-;  A2rot=reform(Arot[0,*,*])
-;  B2rot=reform(Brot[0,*,*])
-;  C2rot=reform(Crot[0,*,*])
   ;;rotate uvz by alpa alround z axis
   if updown lt 0 then qrz=MATRIX_MULTIPLY(Arot,uvw)
   if updown ge 0 then qrz=MATRIX_MULTIPLY(Brot,uvw)
@@ -169,8 +166,8 @@ PRO prepare_fida,grid,fida,weight,los,err
 	weight  = replicate(0.d0,nx,ny,nz,fida.nchan)
 	print, 'nchan:', fida.nchan
 	for chan=0, fida.nchan-1 do  begin
-		xyzhead = [fida.xhead[chan],fida.yhead[chan],fida.zhead[chan]]
-        xyzlos  = [fida.xlos[chan], fida.ylos[chan], fida.zlos[chan]]
+		xyzhead = [fida.xlens[chan],fida.ylens[chan],fida.zlens[chan]]
+        xyzlos  = [fida.xmid[chan], fida.ymid[chan], fida.zmid[chan]]
         vi    = xyzlos-xyzhead
         dummy = max(abs(vi),ic)
         nstep = fix(700./grid.dr[ic])
@@ -489,7 +486,7 @@ PRO prefida,input_pro
 		oplot,[grid.xx[0],grid.xx[-1]],[grid.yy[i],grid.yy[i]],color=0
 	endfor	
 	for i=0,n_elements(los)-1 do begin
-		oplot,[fida.xlos[los[i]],fida.xhead[los[i]]] ,[fida.ylos[los[i]],fida.yhead[los[i]]] ,color=50
+		oplot,[fida.xmid[los[i]],fida.xlens[los[i]]] ,[fida.ymid[los[i]],fida.ylens[los[i]]] ,color=50
 	endfor
 	ii=inputs.isource[0]
 	uvw_ray=[-1.d0,0.d0,0.d0]*1000.
@@ -510,7 +507,7 @@ PRO prefida,input_pro
 		oplot,[grid.xx[0],grid.xx[-1]],[grid.zz[i],grid.zz[i]],color=0
 	endfor	
 	for i=0,n_elements(los)-1 do begin
-		oplot,[fida.xlos[los[i]],fida.xhead[los[i]]] ,[fida.zlos[los[i]],fida.zhead[los[i]]] ,color=50
+		oplot,[fida.xmid[los[i]],fida.xlens[los[i]]] ,[fida.zmid[los[i]],fida.zlens[los[i]]] ,color=50
 	endfor
 
 
@@ -631,13 +628,13 @@ PRO prefida,input_pro
 		openw, lun, file, /get_lun
 		writeu,lun , long(n_elements(los))
 		for chan=0,n_elements(los)-1 do begin
-			writeu,lun, double(fida.xhead[los[chan]])
-			writeu,lun, double(fida.yhead[los[chan]])
-			writeu,lun, double(fida.zhead[los[chan]])
+			writeu,lun, double(fida.xlens[los[chan]])
+			writeu,lun, double(fida.ylens[los[chan]])
+			writeu,lun, double(fida.zlens[los[chan]])
 			writeu,lun, double(fida.headsize[los[chan]]) ;; headsize is used for NPA
-			writeu,lun, double(fida.xlos[los[chan]])
-			writeu,lun, double(fida.ylos[los[chan]])
-			writeu,lun, double(fida.zlos[los[chan]])
+			writeu,lun, double(fida.xmid[los[chan]])
+			writeu,lun, double(fida.ymid[los[chan]])
+			writeu,lun, double(fida.zmid[los[chan]])
 		endfor
 		writeu,lun , double(fida.sigma_pi_ratio)
 		for i=0,inputs.nx-1 do begin

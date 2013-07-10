@@ -29,12 +29,12 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;** Structure <88d87f8>, 9 tags, length=800, data length=792, refs=1:
 	;;   SIGMA_PI_RATIO  DOUBLE          0.90000000 ;;COULD BE ARRAY
 	;;   NCHAN           LONG                15
-	;;   XLOS            DOUBLE    Array[15]
-	;;   YLOS            DOUBLE    Array[15]
-	;;   ZLOS            DOUBLE    Array[15]
-	;;   XHEAD           DOUBLE    Array[15]
-	;;   YHEAD           DOUBLE    Array[15]
-	;;   ZHEAD           DOUBLE    Array[15]
+	;;   XMID            DOUBLE    Array[15]
+	;;   YMID            DOUBLE    Array[15]
+	;;   ZMID            DOUBLE    Array[15]
+	;;   XLENS           DOUBLE    Array[15]
+	;;   YLENS           DOUBLE    Array[15]
+	;;   ZLENS           DOUBLE    Array[15]
 	;;   HEADSIZE        FLOAT     Array[15]
 
 	;; profiles structure
@@ -73,12 +73,12 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 
   	fida={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES
 		 nchan:nchan,$				  		;;NUMBER OF CHANNELS
-		 xlos:xlos,$						;;X POS. OF LINE OF SIGHT [cm]
-		 ylos:ylos,$						;;Y POS. OF LINE OF SIGHT [cm]
-         zlos:zlos,$						;;Z POS. OF LINE OF SIGHT [cm]
-		 xhead:xhead,$						;;X POS. OF HEAD [cm]
-		 yhead:yhead,$						;;Y POS. OF HEAD [cm]
- 		 zhead:zhead,$						;;Z POS. OF HEAD [cm]
+		 xmid:xmid,$						;;X POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
+		 ymid:ymid,$						;;Y POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
+         zmid:zmid,$						;;Z POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
+		 xlens:xlens,$						;;X POS. OF LENS [cm]
+		 ylens:ylens,$						;;Y POS. OF LENS [cm]
+ 		 zlens:zlens,$						;;Z POS. OF LENS [cm]
   		 headsize:headsize}					;;SIZE OF HEAD
 
 	profiles={time:time,$					;;SHOT TIME

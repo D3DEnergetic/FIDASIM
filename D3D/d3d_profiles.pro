@@ -5,10 +5,10 @@ FUNCTION d3d_profiles,inputs
     ;;** Structure <83e8518>, 7 tags, length=5768, data length=5764, refs=1:
     ;;   TIME            FLOAT           4.42000
     ;;   RHO             DOUBLE    Array[120]
-    ;;   TI              DOUBLE    Array[120]
-    ;;   VTOR            DOUBLE    Array[120]
-    ;;   TE              DOUBLE    Array[120]
-    ;;   DENE            DOUBLE    Array[120]
+    ;;   TI              DOUBLE    Array[120] [eV]
+    ;;   VTOR            DOUBLE    Array[120] [m/s]
+    ;;   TE              DOUBLE    Array[120] [eV]
+    ;;   DENE            DOUBLE    Array[120] [m^-3]
     ;;   ZEFF            DOUBLE    Array[120]
 
 
@@ -56,6 +56,6 @@ FUNCTION d3d_profiles,inputs
 	vtor_rho=tor_rot_str.rho_tor_rot
 
 	;;SAVE IN PROFILE STRUCTURE
-	profiles={time:inputs.time,rho:dene_rho,te:te,ti:ti,vtor:vtor,dene:dene,zeff:zeff}
+	profiles={time:inputs.time,rho:dene_rho,te:te,ti:ti,vtor:vtor,dene:dene,zeff:zeff,err:0}
 	return,profiles
 END

@@ -422,7 +422,10 @@ PRO prefida,input_pro
 	CALL_PROCEDURE,input_pro,inputs
 ;	help,inputs,/str
 
-	;;MAKE DIRECTORY IF IT DOESNT EXIST
+	;;MAKE DIRECTORIES IF THEY DONT EXIST
+	if file_test(inputs.result_dir,/directory) eq 0 then begin
+		spawn,'mkdir '+inputs.result_dir
+	endif
 	if file_test(inputs.result_dir+inputs.runid,/directory) eq 0 then begin
 		spawn,'mkdir '+inputs.result_dir+inputs.runid
 	endif

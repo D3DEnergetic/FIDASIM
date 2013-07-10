@@ -24,10 +24,13 @@ make DEBUG=y #Turns off all optimizations and OpenMP. Turns on bounds checking a
 make USE_OPENMP=n #Turns off OpenMP but leaves other optimizations. Default: y
 
 make PROFILE=y #Turns on gprof profiling. Turns off OpenMP. Default: n
+<<<<<<< HEAD
 
 make USE_MPI=y #Turns on MPI parallelization. Default: n
 
 make ARCH=<TARGET> #Compile code optimized for <TARGET> e.g. ARCH=haswell/CORE-AVX2/native. Options differ depending on compiler. Generated code may not run on different architectures. Default: n
+=======
+>>>>>>> Initial Commit
 ```
 
 ## Profiling

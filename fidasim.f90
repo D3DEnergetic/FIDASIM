@@ -5,8 +5,8 @@
 module application
   implicit none
   !!                      Indizes of the different components:
-  character(100)        :: result_dir
-  character(100)        :: root_dir
+  character(120)        :: result_dir
+  character(120)        :: root_dir
   integer , parameter   :: fida_type = 1 ! fida spectra/density
   integer , parameter   :: nbif_type = 2 ! full energy NBI spectra/density
   integer , parameter   :: nbih_type = 3 ! half energy NBI spectra/density
@@ -211,7 +211,7 @@ module application
 contains  
   !****************************************************************************
   subroutine read_inputs
-    character(100)   :: filename
+    character(120)   :: filename
     integer(long) :: i,j,k
     real(double)    :: dummr
     integer(long)   :: dummi 
@@ -219,7 +219,7 @@ contains
     filename=trim(adjustl(result_dir))//"/inputs.dat"
     open(66,file=filename)
     read(66,*) !# FIDASIM input file created...
-    read(66,"(A100)") root_dir
+    read(66,"(A120)") root_dir
     read(66,*) inputs%shot_number
     read(66,*) inputs%time
     read(66,*) inputs%runid
@@ -336,12 +336,12 @@ contains
   end subroutine read_inputs
   !****************************************************************************
  subroutine read_los
-    character(100)  :: filename
+    character(120)  :: filename
     integer(long) :: i, j, k,ichan
     !filename="RESULTS/"//trim(adjustl(inputs%runid))//"/los.bin" 
     filename=trim(adjustl(result_dir))//"/los.bin"
     print*,'---- loading detector information ----'
-    open(66,file=filename,access='stream')
+    open(66,form='unformatted',file=filename,access='stream')
     read(66)spec%nchan
     allocate(spec%xyzhead(spec%nchan,3))
     allocate(spec%xyzlos(spec%nchan,3))
@@ -377,11 +377,11 @@ contains
 
   !***************************************************************************!
   subroutine read_plasma
-    character(100)          :: filename
+    character(120)          :: filename
     integer(long) :: Nx,Ny,Nz,i, j, k 
     filename=trim(adjustl(result_dir))//"/plasma.bin"
     print*,'---- loading plasma data from ', filename
-    open(66,file=filename,access='stream')
+    open(66,form='unformatted',file=filename,access='stream')
     read(66)Nx
     read(66)Ny
     read(66)Nz
@@ -404,13 +404,13 @@ contains
   end subroutine read_plasma
   !****************************************************************************
   subroutine read_atomic
-    character(100)  :: filename
+    character(120)  :: filename
     integer(long) :: n,m !! initial/final state
     integer(long) :: ie,iti !! energy/ti index
     integer(long) :: nlev
     !-------------------Deuterium EXCITATION/IONIZATION/CX TABLE------
     filename=trim(adjustl(root_dir))//"TABLES/qptable.bin"
-    open(66,file=filename,access='stream')
+    open(66,form='unformatted',file=filename,access="stream")
     read(66) atomic%nr_ti_qp
     read(66) atomic%d_ti_qp
     read(66) atomic%nr_eb_qp
@@ -432,7 +432,7 @@ contains
     ! H(+) + H(n) --> H(m) + H(+)
     ! energy in keV/amu
     filename=trim(adjustl(root_dir))//"TABLES/neuttable.bin"
-    open(66,file=filename,access='stream')
+    open(66,form='unformatted',file=filename,access='stream')
     read(66) atomic%nr_eb_neut
     read(66) atomic%d_eb_neut
     read(66) nlev
@@ -448,8 +448,8 @@ contains
     close(66)
     !-------------------ELECTRON EXCITATION/IONIZATION TABLE--------
     filename=trim(adjustl(root_dir))//"TABLES/qetable.bin"
-    open(66,file=filename,access='stream')
-   read(66) atomic%nr_te_qe
+    open(66,form='unformatted',file=filename,access='stream')
+    read(66) atomic%nr_te_qe
     read(66) atomic%d_te_qe
     read(66) atomic%nr_eb_qe
     read(66) atomic%d_eb_qe
@@ -475,7 +475,7 @@ contains
          filename=trim(adjustl(root_dir))//"TABLES/qctable.bin" 
     if(inputs%impurity_charge.eq.7) &
          filename=trim(adjustl(root_dir))//"TABLES/qntable.bin"
-    open(66,file=filename,access='stream')
+    open(66,form='unformatted',file=filename,access='stream')
     read(66) atomic%nr_ti_qi
     read(66) atomic%d_ti_qi
     read(66) atomic%nr_eb_qi
@@ -515,7 +515,7 @@ contains
   !****************************************************************************
   !-------------------FASTION DISTRIBUTION FUNCTION ----------------------
   subroutine read_fbm
-    character(100)  :: filename
+    character(120)  :: filename
     integer(long) :: i,j,k
     !! sub_grid
     integer(long) :: l,m,n,nxsub,nysub,nzsub
@@ -527,7 +527,7 @@ contains
     real(float), dimension(:,:,:), allocatable :: transp_fbm   
     filename=trim(adjustl(result_dir))//"/transp_fbm.bin"
     print*,'---- loading fast ion distribution function ----'
-    open(66,file=filename,access='stream')
+    open(66,form='unformatted',file=filename,access='stream')
     read(66) transp_nzones
     allocate(transp_r(transp_nzones))
     do i=1,transp_nzones
@@ -604,9 +604,9 @@ contains
 
   subroutine write_neutrals
     integer(long) :: i,j,k,n 
-    character(100)  :: filename
+    character(120)  :: filename
     filename=trim(adjustl(result_dir))//"/neutrals.bin"    
-    open (66, file =filename,access='stream')
+    open (66,form='unformatted', file =filename,access='stream')
     write(66)real(inputs%shot_number,float )
     write(66)real(inputs%time)
     write(66)real(grid%Nx,float)
@@ -632,10 +632,10 @@ contains
 
   subroutine write_npa
     integer(long) :: i
-    character(100)  :: filename
+    character(120)  :: filename
     npa%wght(:)=npa%wght(:)/(pi*npa%size(1)**2)
     filename=trim(adjustl(result_dir))//"/npa.bin"      
-    open (66, file =filename,access='stream')
+    open (66,form='unformatted', file =filename,access='stream')
     write(66)real(inputs%shot_number,float )
     write(66)real(inputs%time,float)
     write(66)real(npa%counter, float)
@@ -657,7 +657,7 @@ contains
   
   subroutine write_nbi_halo_spectra
     integer(long)  :: i,j,k,ichan
-    character(100)  :: filename
+    character(120)  :: filename
     real(float), dimension(:)  , allocatable :: lambda_arr
     !! ------------------------ calculate wavelength array ------------------ !!
     allocate(lambda_arr(spec%nlambda))
@@ -697,7 +697,7 @@ contains
 
  subroutine write_fida_spectra
     integer(long)  :: i,j,k,ichan
-    character(100)  :: filename
+    character(120)  :: filename
     real(float), dimension(:)  , allocatable :: lambda_arr
     !! ------------------------ calculate wavelength array ------------------ !!
     allocate(lambda_arr(spec%nlambda))
@@ -733,11 +733,11 @@ contains
 
   subroutine read_neutrals
     integer(long) :: i,j,k,n 
-    character(100)  :: filename
+    character(120)  :: filename
     real(float) :: fdummi
     print*,'---- load neutrals RESULTS/neutrals.bin ----' 
     filename=trim(adjustl(result_dir))//"/neutrals.bin" 
-    open (66, file =filename,access='stream')
+    open (66,form='unformatted', file =filename,access='stream')
     read(66)fdummi
     read(66)fdummi
     read(66)fdummi
@@ -2735,7 +2735,7 @@ contains
   !----------- Calculation of weight functions----------------------------------
   !*****************************************************************************
   subroutine weight_function
-    real(double)                   :: radius
+      real(double)                   :: radius
     real(double)                   :: photons !! photon flux 
     real(double), dimension(nlevs) :: fdens,hdens,tdens,halodens
     real(double), dimension(3)     :: bvec,avec,cvec,evec,vrot,los_vec
@@ -2766,11 +2766,11 @@ contains
     integer(long),dimension(3)           :: ac  !!actual cell
     real(double), dimension(3)           :: pos !! position of mean cell
     integer(long)                        :: cc 
-    real(double),dimension(  grid%ntrack) :: wght   !! radiation wght per cell 
-    real(double),dimension(  grid%ntrack) :: los_wght !! los wght 
-    real(double),dimension(grid%nx,grid%ny,grid%nz,grid%ntrack) :: los_weight !! los wght
+    real(double),dimension(  grid%nx*grid%ny*grid%nz) :: wght   !! radiation wght per cell 
+    real(double),dimension(  grid%nx*grid%ny*grid%nz) :: los_wght !! los wght 
+    real(double),dimension(grid%nx,grid%ny,grid%nz,spec%nchan) :: los_weight !! los wght
     integer(long)                          :: ichan
-    character(100)                         :: filename
+    character(120)                         :: filename
     !! length through cloud of neutrals
     real(double), dimension(3,grid%ntrack) :: pos_out
     real(double), dimension(3)             :: pos_edge
@@ -2814,7 +2814,7 @@ contains
   
     !! Open file for the outputs
     filename=trim(adjustl(result_dir))//"/weight_function.bin" 
-    open (66, file =filename,access='stream')
+    open (66,form='unformatted', file =filename,access='stream')
     write(66)real(inputs%shot_number,float)
     write(66)real(inputs%time,float)
     write(66)real(inputs%ichan_wght,float) 
@@ -2863,7 +2863,7 @@ contains
              do k=1,grid%nz
                 if(los_weight(i,j,k,ichan).gt.0.)then
                    cc=cc+1
-                   los_wght(cc)=los_weight(i,j,k,ichan)
+		   los_wght(cc)=los_weight(i,j,k,ichan)
                    !! determine mean values like the halo density along LOS
                    wght(cc)=dble(cell(i,j,k)%neut_dens(nbif_type,3)   &
                         + cell(i,j,k)%neut_dens(nbih_type,3) &
@@ -3038,7 +3038,7 @@ contains
     deallocate(phiarr)
     deallocate(wav_arr)
     deallocate(central_wavel)
-    deallocate(wfunct)
+    deallocate(wfunct)    
   end subroutine weight_function
 end module application
 !*****************************************************************************
@@ -3076,7 +3076,7 @@ program fidasim
   enddo
 
 
-  if(inputs%load_neutrals.eq.1)then
+  if(inputs%load_neutrals.eq.1) then
      call read_neutrals()
   else
      !! -------------------------- ndmc (NBI)----------------------------- !! 
@@ -3086,7 +3086,7 @@ program fidasim
      !! calculate level of bremsstrahlung
      if(inputs%nospec.eq.0) call bremsstrahlung
      !! do the HALO calcualtion only if enough markers are defined!
-     if(inputs%nr_halo.gt.100)then
+     if(inputs%nr_halo.gt.100) then
         !! -------------------------- DCX (Direct charge exchange) ---------- !!
         call date_and_time (values=time_arr)
         print*, 'dcx:    ' ,time_arr(5:7)
@@ -3101,7 +3101,7 @@ program fidasim
       if(inputs%nospec.eq.0) call write_nbi_halo_spectra()
   endif
   !! ---------------- FIDA (main FIDA/NPA simultaion)--------------------- !!
-  if(inputs%nofida.eq.0)then    
+  if(inputs%nofida.eq.0) then    
      call date_and_time (values=time_arr)
      print*, 'da main:    ' ,time_arr(5:7)
      call read_fbm

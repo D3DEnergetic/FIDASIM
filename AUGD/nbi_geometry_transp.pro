@@ -139,7 +139,8 @@ PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
              , focy: double(foclra)     , focz: double(foclza) $
              , divy: double(divra)      , divz: double(divza) $
              , bmwidra:double(bmwidra)  , bmwidza:double(bmwidza)  $
-             , xyz_src: xyz_src  }
+             , xyz_src: xyz_src $  
+			 , xyz_pos: xyz_pos}
     
 
 ;==========
@@ -183,7 +184,7 @@ PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
 
 
   if not(keyword_set(ps)) then  window,2,colors=15,xsize=1200,ysize=400
- plot,[0.],/nodata,xrange=[00,900],yrange=zran,xtit='X [cm]',ytit='Z [cm]' $
+ plot,[0.],/nodata,xrange=[-800.,800.],yrange=zran,xtit='X [cm]',ytit='Z [cm]' $
       ,/isotropic
  oplot,[0.],[0.],psym=1,thick=2
  x_torus=[-rmaj-rmin,-rmaj,-rmaj+rmin,rmaj-rmin,rmaj,rmaj+rmin]
@@ -193,12 +194,12 @@ PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
     if (ABS(x_torus(jj)) eq rmaj) then sty=3
          oplot,[x_torus(jj),x_torus(jj)],[y_torus(0),y_torus(1)],linestyle=sty
       endfor
- for ii=0,3 do begin
+ for ii=0,7 do begin
     oplot,[xyz_pos[ii,0]],[xyz_pos[ii,2]] ,psym=1
     oplot,[xyz_pos[ii,0],xyz_src[ii,0]] $
           ,[xyz_pos[ii,2],xyz_src[ii,2]],color=254
     oplot,[xyz_pos[ii,0],xyz_plasma[ii,0]] $
-          ,[xyz_pos[ii,2],xyz_plasma[ii,2]],color=254    
+          ,[xyz_pos[ii,2],xyz_plasma[ii,2]],color=154    
     oplot,[xyz_src[ii,0]], [xyz_src[ii,2]],color=1,psym=4
     
     ;; plot rays

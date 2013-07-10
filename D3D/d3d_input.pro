@@ -8,8 +8,8 @@ shot=142114												;; Shot Number
 time=1.090 												;; Time 
 runid='142114B08'   									;; runid of FIDASIM
 device='D3D'											;; D3D,NSTX,AUGD,MAST
-install_dir='/u/stagnerl/FIDASIM2/'						;; Location of fidasim code and executable
-result_dir='/u/stagnerl/FIDASIM2/RESULTS/'  			;; Location where results will be stored /RESULTS/runid directory will be created
+install_dir='/u/stagnerl/FIDASIM/'						;; Location of fidasim code and executable
+result_dir='/u/stagnerl/FIDASIM/RESULTS/D3D/'  			;; Location where results will be stored /RESULTS/runid directory will be created
 profile_dir='/u/stagnerl/GAPROFILES/'					;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
 
 ;;----------------------------------------------------

@@ -1,4 +1,4 @@
-!+ This file contains the main routines for FIDASIM {!../VERSION!}
+    !+ This file contains the main routines for FIDASIM {!../VERSION!}
 module libfida
 !+ Main FIDASIM library
 USE H5LT !! High level HDF5 Interface
@@ -138,6 +138,32 @@ type InterpolCoeffs2D
         !+ Coefficient for z(i+1,j+1) term
 end type InterpolCoeffs2D
 
+type InterpolCoeffs3D
+    !+ 3D Cylindrical Interpolation Coefficients and indices
+    integer :: i = 0
+        !+ Index of R before `xout`
+    integer :: j = 0
+        !+ Index of Phi before `yout`
+    integer :: k = 0
+        !+ Index of Z before `zout`
+    real(Float64) :: b111 = 0.d0
+        !+ Coefficient for z(i,j,k) term
+    real(Float64) :: b121 = 0.d0
+        !+ Coefficient for z(i,j+1,k) term
+    real(Float64) :: b112 = 0.d0
+        !+ Coefficient for z(i,j,k+1) term
+    real(Float64) :: b122 = 0.d0
+        !+ Coefficient for z(i,j+1,k+1) term
+    real(Float64) :: b211 = 0.d0
+        !+ Coefficient for z(i+1,j,k) term
+    real(Float64) :: b212 = 0.d0
+        !+ Coefficient for z(i+1,j,k+1) term
+    real(Float64) :: b221 = 0.d0
+        !+ Coefficient for z(i+1,j+1,k) term
+    real(Float64) :: b222 = 0.d0
+        !+ Coefficient for z(i+1,j+1,k+1) term
+end type InterpolCoeffs3D
+
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
     integer(Int32) :: nx
@@ -198,21 +224,29 @@ type BeamGrid
 end type BeamGrid
 
 type InterpolationGrid
-    !+ Defines a 2D R-Z grid for interpolating plasma parameters and fields
+    !+ Defines a 3D R-Z-phi grid for interpolating plasma parameters and fields
     integer(Int32) :: nr
         !+ Number of Radii
+    integer(Int32) :: nphi
+        !+ Number of phi values
     integer(Int32) :: nz
         !+ Number of Z values
     real(Float64)  :: dr
         !+ Radial spacing [cm]
+    real(Float64)  :: dphi
+        !+ Angular spacing [rad]
     real(Float64)  :: dz
         !+ Vertical spacing [cm]
     real(Float64)  :: da
         !+ Grid element area [\(cm^2\)]
-    integer(Int32) :: dims(2)
+    real(Float64)  :: dv
+        !+ Grid element volume [\(cm^2\)]
+    integer(Int32) :: dims(3)
         !+ Dimension of the interpolation grid
     real(Float64), dimension(:),   allocatable :: r
         !+ Radii values [cm]
+    real(Float64), dimension(:),   allocatable :: phi
+        !+ Angular values [rad]
     real(Float64), dimension(:),   allocatable :: z
         !+ Z values [cm]
     real(Float64), dimension(:,:), allocatable :: r2d
@@ -261,6 +295,8 @@ type, extends( Profiles ) :: LocalProfiles
         !+ Plasma rotation in beam grid coordinates
     type(InterpolCoeffs2D) :: c
         !+ Linear Interpolation Coefficients and indicies for interpolation at `pos`
+    type(InterpolCoeffs3D) :: b
+        !+ Cylindrical Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalProfiles
 
 type EMFields
@@ -279,14 +315,20 @@ type EMFields
         !+ Vertical electric field [V/m]
     real(Float64) :: dbr_dr = 0.d0
         !+ Radial derivative of the radial magnetic field [T/m]
+    real(Float64) :: dbr_dphi = 0.d0
+        !+ Angular derivative of the radial magnetic field [T/m]
     real(Float64) :: dbr_dz = 0.d0
         !+ Vertical derivative of the radial magnetic field [T/m]
     real(Float64) :: dbt_dr = 0.d0
         !+ Radial derivative of the torodial magnetic field [T/m]
+    real(Float64) :: dbt_dphi = 0.d0
+        !+ Angular derivative of the torodial magnetic field [T/m]
     real(Float64) :: dbt_dz = 0.d0
         !+ Vertical derivative of the torodial magnetic field [T/m]
     real(Float64) :: dbz_dr = 0.d0
         !+ Radial derivative of the radial magnetic field [T/m]
+    real(Float64) :: dbz_dphi = 0.d0
+        !+ Angular derivative of the radial magnetic field [T/m]
     real(Float64) :: dbz_dz = 0.d0
         !+ Vertical derivative of the vertical magnetic field [T/m]
 end type EMFields
@@ -315,26 +357,30 @@ type, extends( EMFields ) :: LocalEMFields
         !+ Direction of electric field in beam grid coordinates
     type(InterpolCoeffs2D) :: c
         !+ Linear Interpolation Coefficients and indicies for interpolation at `pos`
+    type(InterpolCoeffs3D) :: b
+        !+ Cylindrical Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalEMFields
 
 type Equilibrium
     !+MHD Equilbrium
-    type(EMFields), dimension(:,:), allocatable :: fields
+    type(EMFields), dimension(:,:,:), allocatable :: fields
         !+ Electro-magnetic fields at points defined in [[libfida:inter_grid]]
-    type(Profiles), dimension(:,:), allocatable :: plasma
+    type(Profiles), dimension(:,:,:), allocatable :: plasma
         !+ Plasma parameters at points defined in [[libfida:inter_grid]]
-    real(Float64), dimension(:,:), allocatable  :: mask
+    real(Float64), dimension(:,:,:), allocatable  :: mask
         !+ Indicates whether fields and plasma are well-defined at points defined in [[libfida:inter_grid]]
 end type Equilibrium
 
 type FastIonDistribution
-    !+ Defines a Guiding Center Fast-ion Distribution Function: F(E,p,R,Z)
+    !+ Defines a Guiding Center Fast-ion Distribution Function: F(E,p,R,Z,Phi)
     integer(Int32) :: nenergy
         !+ Number of energies
     integer(Int32) :: npitch
         !+ Number of pitches
     integer(Int32) :: nr
         !+ Number of radii
+    integer(Int32) :: nphi
+        !+ Number of phi values
     integer(Int32) :: nz
         !+ Number of z values
     real(Float64)  :: dE
@@ -343,6 +389,8 @@ type FastIonDistribution
         !+ Pitch spacing
     real(Float64)  :: dr
         !+ Radial spacing [cm]
+    real(Float64)  :: dphi
+        !+ Angular spacing [rad]
     real(Float64)  :: dz
         !+ Z spacing [cm]
     real(Float64)  :: emin
@@ -367,10 +415,12 @@ type FastIonDistribution
         !+ Radius [cm]
     real(Float64), dimension(:), allocatable       :: z
         !+ Z [cm]
-    real(Float64), dimension(:,:), allocatable     :: denf
-        !+ Fast-ion density defined on the [[libfida:inter_grid]]: denf(R,Z)
-    real(Float64), dimension(:,:,:,:), allocatable :: f
-        !+ Fast-ion distribution function defined on the [[libfida:inter_grid]]: F(E,p,R,Z)
+    real(Float64), dimension(:), allocatable       :: phi
+        !+ Angles [rad]
+    real(Float64), dimension(:,:,:), allocatable     :: denf
+        !+ Fast-ion density defined on the [[libfida:inter_grid]]: denf(R,Z,Phi)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: f
+        !+ Fast-ion distribution function defined on the [[libfida:inter_grid]]: F(E,p,R,Z,Phi)
 end type FastIonDistribution
 
 type FastIon
@@ -379,6 +429,8 @@ type FastIon
         !+ Indicates whether the fast-ion crosses the [[libfida:beam_grid]]
     real(Float64)  :: r = 0.d0
         !+ Radial position of fast-ion [cm]
+    real(Float64)  :: phi = 0.d0
+        !+ Angular position of fast-ion [rad]
     real(Float64)  :: z = 0.d0
         !+ Vertical position of fast-ion [cm]
     real(Float64)  :: phi_enter = 0.d0
@@ -409,6 +461,8 @@ type FastIonParticles
         !+ Number of particles
     integer(Int32) :: nclass = 1
         !+ Number of orbit classes
+    logical :: axisym = .True.
+        !+ Indicates whether distribution function is axisymmetric
     type(FastIon), dimension(:), allocatable :: fast_ion
         !+ Fast-ion particles
 end type FastIonParticles
@@ -777,8 +831,8 @@ type NeutronRate
     !+ Neutron storage structure
     real(Float64), dimension(:), allocatable :: rate
         !+ Neutron rate: rate(orbit_type) [neutrons/sec]
-    real(Float64), dimension(:,:,:,:), allocatable :: weight
-        !+ Neutron rate weight: weight(E,p,R,Z)
+    real(Float64), dimension(:,:,:,:,:), allocatable :: weight
+        !+ Neutron rate weight: weight(E,p,R,Z,Phi)
 end type NeutronRate
 
 type NeutralDensity
@@ -1006,15 +1060,17 @@ interface operator(/)
 end interface
 
 interface interpol_coeff
-    !+ Calculates linear interpolation coefficients
+    !+ Calculates interpolation coefficients
     module procedure interpol1D_coeff, interpol1D_coeff_arr
     module procedure interpol2D_coeff, interpol2D_coeff_arr
+    module procedure cyl_interpol3D_coeff, cyl_interpol3D_coeff_arr
 end interface
 
 interface interpol
-    !+ Performs linear/bilinear interpolation
+    !+ Performs linear/bilinear/cylindrical interpolation
     module procedure interpol1D_arr
     module procedure interpol2D_arr, interpol2D_2D_arr
+    module procedure interpol3D_arr, interpol3D_2D_arr
 end interface
 
 !! definition of the structures:
@@ -1117,6 +1173,7 @@ subroutine fast_ion_assign(p1, p2)
     p1%cross_grid = p2%cross_grid
     p1%r          = p2%r
     p1%z          = p2%z
+    p1%phi        = p2%phi
     p1%phi_enter  = p2%phi_enter
     p1%delta_phi  = p2%delta_phi
     p1%energy     = p2%energy
@@ -2565,9 +2622,9 @@ subroutine read_equilibrium
     !+ Reads in the interpolation grid, plasma parameters, and fields
     !+ and stores the quantities in [[libfida:inter_grid]] and [[libfida:equil]]
     integer(HID_T) :: fid, gid
-    integer(HSIZE_T), dimension(2) :: dims
+    integer(HSIZE_T), dimension(3) :: dims
 
-    integer :: impc, ic, ir, iz, it, ind(2)
+    integer :: impc, ic, ir, iz, iphi, it, ind(3)
     type(LocalProfiles) :: plasma
     real(Float64) :: photons
     real(Float64), dimension(nlevs) :: rates, denn, rates_avg
@@ -2576,8 +2633,8 @@ subroutine read_equilibrium
     integer :: n = 50
     logical :: path_valid
 
-    integer, dimension(:,:), allocatable :: p_mask, f_mask
-    real(Float64), dimension(:,:), allocatable :: denn2d
+    integer, dimension(:,:,:), allocatable :: p_mask, f_mask
+    real(Float64), dimension(:,:,:), allocatable :: denn3d
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -2591,36 +2648,46 @@ subroutine read_equilibrium
     !!Read in interpolation grid
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nr", inter_grid%nr, error)
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nz", inter_grid%nz, error)
-    inter_grid%dims = [inter_grid%nr, inter_grid%nz]
+    call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", inter_grid%nphi, error)
 
-    allocate(inter_grid%r(inter_grid%nr),inter_grid%z(inter_grid%nz))
+    inter_grid%dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
+
+    allocate(inter_grid%r(inter_grid%nr),inter_grid%z(inter_grid%nz),inter_grid%phi(inter_grid%nphi))
     allocate(inter_grid%r2d(inter_grid%nr,inter_grid%nz))
     allocate(inter_grid%z2d(inter_grid%nr,inter_grid%nz))
-    allocate(p_mask(inter_grid%nr,inter_grid%nz))
-    allocate(f_mask(inter_grid%nr,inter_grid%nz))
-    allocate(denn2d(inter_grid%nr,inter_grid%nz))
-    denn2d = 0.d0
+    allocate(p_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
+    allocate(f_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
+    allocate(denn3d(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
 
-    dims = [inter_grid%nr, inter_grid%nz]
+    dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
+
     call h5ltread_dataset_double_f(gid, "/plasma/r", inter_grid%r, dims(1:1), error)
     call h5ltread_dataset_double_f(gid, "/plasma/z", inter_grid%z, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/plasma/phi", inter_grid%phi, dims(3:3), error)
     call h5ltread_dataset_double_f(gid, "/plasma/r2d", inter_grid%r2d, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/z2d", inter_grid%z2d, dims, error)
 
     inter_grid%dr = abs(inter_grid%r(2)-inter_grid%r(1))
     inter_grid%dz = abs(inter_grid%z(2)-inter_grid%z(1))
     inter_grid%da = inter_grid%dr*inter_grid%dz
+    if (inter_grid%nphi .eq. 1) then
+        inter_grid%dphi = 2*pi
+    else
+        inter_grid%dphi = abs(inter_grid%phi(2)-inter_grid%phi(1))
+    endif
+    inter_grid%dv = inter_grid%dr*inter_grid%dphi*inter_grid%dz
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Interpolation grid settings ----'
         write(*,'(T2,"Nr: ",i3)') inter_grid%nr
+        write(*,'(T2,"Nphi: ",i3)') inter_grid%nphi
         write(*,'(T2,"Nz: ",i3)') inter_grid%nz
         write(*,'(T2,"dA: ", f5.2," [cm^2]")') inter_grid%da
         write(*,*) ''
     endif
 
     !!Read in plasma parameters
-    allocate(equil%plasma(inter_grid%nr,inter_grid%nz))
+    allocate(equil%plasma(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
 
     call h5ltread_dataset_double_f(gid, "/plasma/dene", equil%plasma%dene, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/te", equil%plasma%te, dims, error)
@@ -2657,9 +2724,9 @@ subroutine read_equilibrium
 
     call h5ltpath_valid_f(fid, "/plasma/denn", .True., path_valid, error)
     if(path_valid) then
-        call h5ltread_dataset_double_f(gid, "/plasma/denn", denn2d, dims, error)
-        where(denn2d.lt.0.0)
-            denn2d = 0.0
+        call h5ltread_dataset_double_f(gid, "/plasma/denn", denn3d, dims, error)
+        where(denn3d.lt.0.0)
+            denn3d = 0.0
         endwhere
     else
         if((inputs%calc_pnpa + inputs%calc_pfida + inputs%calc_cold).gt.0) then
@@ -2673,15 +2740,14 @@ subroutine read_equilibrium
         inputs%calc_cold = 0
     endif
 
-    loop_over_cells: do ic=1, inter_grid%nr*inter_grid%nz
+    loop_over_cells: do ic=1, inter_grid%nr*inter_grid%nz*inter_grid%nphi
         call ind2sub(inter_grid%dims,ic,ind)
-        ir = ind(1) ; iz = ind(2)
-        if(p_mask(ir,iz).lt.0.5) cycle loop_over_cells
-        if(denn2d(ir,iz).le.0.0) cycle loop_over_cells
-        plasma = equil%plasma(ir,iz)
+        ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
+        if(p_mask(ir,iz,iphi).lt.0.5) cycle loop_over_cells
+        if(denn3d(ir,iz,iphi).le.0.0) cycle loop_over_cells
+        plasma = equil%plasma(ir,iz,iphi)
         plasma%vrot = [plasma%vr, plasma%vt, plasma%vz]
         plasma%in_plasma = .True.
-
         rates_avg = 0.0
         do it=1,n
             rates = 0.0
@@ -2692,7 +2758,7 @@ subroutine read_equilibrium
             rates_avg = rates_avg + rates/n
         enddo
         if(sum(rates_avg).le.0.0) cycle loop_over_cells
-        equil%plasma(ir,iz)%denn = denn2d(ir,iz)*(rates_avg)/sum(rates_avg)
+        equil%plasma(ir,iz,iphi)%denn = denn3d(ir,iz,iphi)*(rates_avg)/sum(rates_avg)
     enddo loop_over_cells
 
     !!Close PLASMA group
@@ -2701,7 +2767,7 @@ subroutine read_equilibrium
     !!Open FIELDS group
     call h5gopen_f(fid, "/fields", gid, error)
 
-    allocate(equil%fields(inter_grid%nr,inter_grid%nz))
+    allocate(equil%fields(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
 
     !!Read in electromagnetic fields
     call h5ltread_dataset_double_f(gid, "/fields/br", equil%fields%br, dims, error)
@@ -2713,9 +2779,12 @@ subroutine read_equilibrium
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
 
     !!Calculate B field derivatives
-    call deriv(inter_grid%r, inter_grid%z, equil%fields%br, equil%fields%dbr_dr, equil%fields%dbr_dz)
-    call deriv(inter_grid%r, inter_grid%z, equil%fields%bt, equil%fields%dbt_dr, equil%fields%dbt_dz)
-    call deriv(inter_grid%r, inter_grid%z, equil%fields%bz, equil%fields%dbz_dr, equil%fields%dbz_dz)
+    call deriv(inter_grid%r, inter_grid%phi, inter_grid%z, equil%fields%br, &
+        equil%fields%dbr_dr, equil%fields%dbr_dphi, equil%fields%dbr_dz)
+    call deriv(inter_grid%r, inter_grid%phi, inter_grid%z, equil%fields%bt, &
+        equil%fields%dbt_dr, equil%fields%dbt_dphi, equil%fields%dbt_dz)
+    call deriv(inter_grid%r, inter_grid%phi, inter_grid%z, equil%fields%bz, &
+        equil%fields%dbz_dr, equil%fields%dbz_dphi, equil%fields%dbz_dz)
 
     !!Close FIELDS group
     call h5gclose_f(gid, error)
@@ -2726,9 +2795,10 @@ subroutine read_equilibrium
     !!Close HDF5 interface
     call h5close_f(error)
 
-    allocate(equil%mask(inter_grid%nr,inter_grid%nz))
+    allocate(equil%mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     equil%mask = 0.d0
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
+    where (p_mask.eq.1) equil%mask = 1.d0
     if (sum(equil%mask).le.0.d0) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
@@ -2745,7 +2815,7 @@ subroutine read_f(fid, error)
     integer, intent(out)          :: error
         !+ Error code
 
-    integer(HSIZE_T), dimension(4) :: dims
+    integer(HSIZE_T), dimension(5) :: dims
     real(Float64) :: dummy(1), denp_tot
     integer :: ir
 
@@ -2757,31 +2827,51 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_int_scalar_f(fid,"/npitch", fbm%npitch, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
+    call h5ltread_dataset_int_scalar_f(fid,"/nphi", fbm%nphi, error)
 
-    if((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)) then
+    if(((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)).or.(fbm%nphi.ne.inter_grid%nphi)) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
         endif
         stop
     endif
 
-    allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz))
-    allocate(fbm%denf(fbm%nr, fbm%nz))
-    allocate(fbm%f(fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz))
+    if (fbm%nphi .eq. 1) then
+        allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz), fbm%phi(1))
+        allocate(fbm%denf(fbm%nr, fbm%nz,1))
+        allocate(fbm%f(fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz,1))
+    else
+        allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz), fbm%phi(fbm%nphi))
+        allocate(fbm%denf(fbm%nr, fbm%nz, fbm%nphi))
+        allocate(fbm%f(fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz, fbm%nphi))
+    endif
 
-    dims = [fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz]
+    if (fbm%nphi .eq. 1) then
+        dims = [fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz, 1]
+        call h5ltread_dataset_double_f(fid, "/denf",fbm%denf, dims(3:4), error)
+        call h5ltread_dataset_double_f(fid, "/f", fbm%f, dims(1:4), error)
+    else
+        dims = [fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz, fbm%nphi]
+        call h5ltread_dataset_double_f(fid, "/denf",fbm%denf, dims(3:5), error)
+        call h5ltread_dataset_double_f(fid, "/f", fbm%f, dims(1:5), error)
+    endif
     call h5ltread_dataset_double_f(fid, "/energy", fbm%energy, dims(1:1), error)
     call h5ltread_dataset_double_f(fid, "/pitch", fbm%pitch, dims(2:2), error)
     call h5ltread_dataset_double_f(fid, "/r", fbm%r, dims(3:3), error)
     call h5ltread_dataset_double_f(fid, "/z", fbm%z, dims(4:4), error)
-    call h5ltread_dataset_double_f(fid, "/denf",fbm%denf, dims(3:4), error)
-    call h5ltread_dataset_double_f(fid, "/f", fbm%f, dims, error)
+    call h5ltread_dataset_double_f(fid, "/phi", fbm%phi, dims(5:5), error)
+
     equil%plasma%denf = fbm%denf
 
     fbm%dE = abs(fbm%energy(2) - fbm%energy(1))
     fbm%dp = abs(fbm%pitch(2) - fbm%pitch(1))
     fbm%dr = abs(fbm%r(2) - fbm%r(1))
     fbm%dz = abs(fbm%z(2) - fbm%z(1))
+    if (inter_grid%nphi .eq. 1) then
+        fbm%dphi = 2*pi
+    else
+        fbm%dphi = abs(fbm%phi(2)-fbm%phi(1))
+    endif
 
     dummy = minval(fbm%energy)
     fbm%emin = dummy(1)
@@ -2796,8 +2886,8 @@ subroutine read_f(fid, error)
 
     denp_tot = 0.0
     do ir=1,fbm%nr
-        fbm%n_tot = fbm%n_tot + 2*pi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:))*fbm%r(ir)
-        denp_tot = denp_tot + 2*pi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:)%denp)*fbm%r(ir)
+        fbm%n_tot = fbm%n_tot + fbm%dphi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:,:))*fbm%r(ir)
+        denp_tot = denp_tot + fbm%dphi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:,:)%denp)*fbm%r(ir)
     enddo
 
     if(fbm%n_tot.ge.denp_tot) then
@@ -2811,7 +2901,7 @@ subroutine read_f(fid, error)
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z)"
+        write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z,Phi)"
         write(*,'(T2,"Nenergy = ",i3)') fbm%nenergy
         write(*,'(T2,"Npitch  = ",i3)') fbm%npitch
         write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")') fbm%emin,fbm%emax
@@ -2830,14 +2920,14 @@ subroutine read_mc(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(1) :: dims
-    integer(Int32) :: i,j,ii,ir,iz
-    real(Float64) :: phi,phi_enter,phi_exit,delta_phi
-    real(Float64), dimension(3) :: uvw,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
+    integer(Int32) :: i,j,ii,ir,iz,iphi,nphi
+    real(Float64) :: phi,phi_enter,phi_exit,delta_phi,xp,yp,zp
+    real(Float64), dimension(3) :: uvw,xyz,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
     integer(Int32), dimension(1) :: minpos
     real(Float64), dimension(:), allocatable :: weight
     type(LocalEMFields) :: fields
     integer :: cnt,num
-    logical :: inp
+    logical :: inp,path_valid
     character(len=32) :: dist_type_name = ''
 
     if(inputs%verbose.ge.1) then
@@ -2853,6 +2943,11 @@ subroutine read_mc(fid, error)
     dims(1) = particles%nparticle
     call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
+    call h5ltpath_valid_f(fid, "/phi", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(fid, "/phi", particles%fast_ion%phi, dims, error)
+        particles%axisym = .False.
+    endif
     call h5ltread_dataset_int_f(fid, "/class", particles%fast_ion%class, dims, error)
 
     if(any(particles%fast_ion%class.le.0)) then
@@ -2893,39 +2988,66 @@ subroutine read_mc(fid, error)
     cnt=0
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
-    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &
-    !$OMP& delta_phi,phi_enter,phi_exit,C_xyz)
+    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,minpos,fields,uvw,phi,ri,vi, &
+    !$OMP& delta_phi,phi_enter,phi_exit,C_xyz,xyz,xp,yp,zp)
     particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
         endif
-        uvw = [particles%fast_ion(i)%r, 0.d0, particles%fast_ion(i)%z]
+
+        !! Bound fast_ion(i)%phi between 0 and 2*pi
+        do while (particles%fast_ion(i)%phi .gt. 2*pi)
+            particles%fast_ion(i)%phi = particles%fast_ion(i)%phi - 2*pi
+        enddo
+        do while (particles%fast_ion(i)%phi .lt. 0.0)
+            particles%fast_ion(i)%phi = particles%fast_ion(i)%phi + 2*pi
+        enddo
+
+        if(particles%axisym) then
+            uvw = [particles%fast_ion(i)%r, 0.d0 , particles%fast_ion(i)%z]
+        else
+            xp = particles%fast_ion(i)%r * cos(particles%fast_ion(i)%phi)
+            yp = particles%fast_ion(i)%r * sin(particles%fast_ion(i)%phi)
+            zp = particles%fast_ion(i)%z
+            uvw = [xp,yp,zp]
+        endif
         call in_plasma(uvw,inp,machine_coords=.True.)
         if(.not.inp) cycle particle_loop
 
-        phi_enter = 0.0
-        phi_exit = 0.0
-        dum = [0.d0, 0.d0, particles%fast_ion(i)%z]
-        call uvw_to_xyz(dum, C_xyz)
-        call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(i)%r,phi_enter,phi_exit)
-        delta_phi = phi_exit-phi_enter
-        if(delta_phi.gt.0) then
-            particles%fast_ion(i)%cross_grid = .True.
+        if(particles%axisym) then
+            phi_enter = 0.0
+            phi_exit = 0.0
+            dum = [0.d0, 0.d0, particles%fast_ion(i)%z]
+            call uvw_to_xyz(dum, C_xyz)
+            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(i)%r,phi_enter,phi_exit)
+            delta_phi = phi_exit-phi_enter
+            if(delta_phi.gt.0) then
+                particles%fast_ion(i)%cross_grid = .True.
+            else
+                particles%fast_ion(i)%cross_grid = .False.
+                delta_phi = 2*pi
+            endif
+            particles%fast_ion(i)%phi_enter = phi_enter
+            particles%fast_ion(i)%delta_phi = delta_phi
+            particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
         else
-            particles%fast_ion(i)%cross_grid = .False.
-            delta_phi = 2*pi
+            call uvw_to_xyz(uvw,xyz)
+            particles%fast_ion(i)%cross_grid = in_grid(xyz)
+            particles%fast_ion(i)%phi_enter = particles%fast_ion(i)%phi
+            particles%fast_ion(i)%delta_phi = 2*pi
+            particles%fast_ion(i)%weight = weight(i)/beam_grid%dv
         endif
-        particles%fast_ion(i)%phi_enter = phi_enter
-        particles%fast_ion(i)%delta_phi = delta_phi
-        particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
 
         minpos = minloc(abs(inter_grid%r - particles%fast_ion(i)%r))
         ir = minpos(1)
+        minpos = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi))
+        iphi = minpos(1)
         minpos = minloc(abs(inter_grid%z - particles%fast_ion(i)%z))
         iz = minpos(1)
+
         !$OMP ATOMIC UPDATE
-        equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + weight(i) / &
-                                   (2*pi*particles%fast_ion(i)%r*inter_grid%da)
+        equil%plasma(ir,iz,iphi)%denf = equil%plasma(ir,iz,iphi)%denf + weight(i) / &
+                                   (particles%fast_ion(i)%r*inter_grid%dv)
         !$OMP END ATOMIC
         cnt=cnt+1
     enddo particle_loop
@@ -4324,7 +4446,7 @@ subroutine write_neutrons
     !+ Writes [[libfida:neutron]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
-    integer(HSIZE_T), dimension(4) :: dim4
+    integer(HSIZE_T), dimension(5) :: dim5
     integer :: error
 
     character(charlim) :: filename
@@ -4360,12 +4482,13 @@ subroutine write_neutrons
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
         call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
         call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
-        dim4 = shape(neutron%weight)
-        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, neutron%weight, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(1:1), fbm%energy, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(2:2), fbm%pitch, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim4(3:3), fbm%r, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim4(4:4), fbm%z, error)
+        dim5 = shape(neutron%weight)
+        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 5, dim5, neutron%weight, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim5(1:1), fbm%energy, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim5(2:2), fbm%pitch, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim5(3:3), fbm%r, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim5(4:4), fbm%z, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/phi", 1, dim5(5:5), fbm%phi, error)
 
         call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
              "Number of energy values", error)
@@ -4376,7 +4499,7 @@ subroutine write_neutrons
         call h5ltset_attribute_string_f(fid,"/nz", "description", &
              "Number of Z values", error)
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
-             "Neutron Weight Function: weight(E,p,R,Z), rate = sum(f*weight)", error)
+             "Neutron Weight Function: weight(E,p,R,Z,Phi), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","neutrons*cm^3*dE*dp/fast-ion*s", error)
 
         call h5ltset_attribute_string_f(fid,"/energy","description", &
@@ -5905,6 +6028,159 @@ subroutine interpol2D_coeff_arr(x,y,xout,yout,c,err)
 
 end subroutine interpol2D_coeff_arr
 
+subroutine cyl_interpol3D_coeff(rmin,dr,nr,phimin,dphi,nphi,zmin,dz,nz,rout,phiout,zout,c,err)
+    !+ Cylindrical interpolation coefficients and indicies for a 3D grid
+    real(Float64), intent(in)           :: rmin
+        !+ Minimum R
+    real(Float64), intent(in)           :: dr
+        !+ R spacing
+    integer, intent(in)                 :: nr
+        !+ Number of R points
+    real(Float64), intent(in)           :: phimin
+        !+ Minimum phi
+    real(Float64), intent(in)           :: dphi
+        !+ Phi spacing
+    integer, intent(in)                 :: nphi
+        !+ Number of phi points
+    real(Float64), intent(in)           :: zmin
+        !+ Minimum Z
+    real(Float64), intent(in)           :: dz
+        !+ Z spacing
+    integer, intent(in)                 :: nz
+        !+ Number of Z points
+    real(Float64), intent(in)           :: rout
+        !+ R value to interpolate
+    real(Float64), intent(in)           :: phiout
+        !+ Phi value to interpolate
+    real(Float64), intent(in)           :: zout
+        !+ Z value to interpolate
+    type(InterpolCoeffs3D), intent(out) :: c
+        !+ Interpolation Coefficients
+    integer, intent(out), optional      :: err
+        !+ Error code
+
+    type(InterpolCoeffs2D) :: b
+    real(Float64) :: r1, r2, phi1, phi2, z1, z2, rp, phip, zp, dV
+    real(Float64) :: phi
+    integer :: i, j, k, err_status
+
+    !! Bound phiout between 0 and 2*pi
+    phi = phiout
+    do while (phi .gt. 2*pi)
+        phi = phi - 2*pi
+    enddo
+
+    do while (phi .lt. 0.0)
+        phi = phi + 2*pi
+    enddo
+
+    err_status = 1
+    rp = max(rout,rmin)
+    phip = max(phi,phimin)
+    zp = max(zout,zmin)
+    i = floor((rp-rmin)/dr)+1
+    j = floor((zp-zmin)/dz)+1
+    k = floor((phip-phimin)/dphi)+1
+
+    if (nphi .eq. 1) then
+        call interpol2D_coeff(rmin, dr, nr, zmin, dz, nz, rout, zout, b, err_status)
+        c%b111 = b%b11
+        c%b121 = b%b12
+        c%b221 = b%b22
+        c%b211 = b%b21
+        c%b212 = 0
+        c%b222 = 0
+        c%b122 = 0
+        c%b112 = 0
+        c%i = b%i
+        c%j = b%j
+        c%k = 1
+    else
+        if ((((i.gt.0).and.(i.le.(nr-1))).and.((k.gt.0).and.(k.le.(nphi-1)))).and.((j.gt.0).and.(j.le.(nz-1)))) then
+            r1 = rmin + (i-1)*dr
+            r2 = r1 + dr
+            phi1 = phimin + (k-1)*dphi
+            phi2 = phi1 + dphi
+            z1 = zmin + (j-1)*dz
+            z2 = z1 + dz
+            dV = ((r2**2 - r1**2) * (phi2 - phi1) * (z2 - z1))
+
+            !! Both volume elements have a factor of 1/2 that cancels out
+            c%b111 = ((r2**2 - rp**2) * (phi2 - phip) * (z2 - zp)) / dV
+            c%b121 = ((r2**2 - rp**2) * (phi2 - phip) * (zp - z1)) / dV
+            c%b221 = ((rp**2 - r1**2) * (phi2 - phip) * (zp - z1)) / dV
+            c%b211 = ((rp**2 - r1**2) * (phi2 - phip) * (z2 - zp)) / dV
+            c%b212 = ((rp**2 - r1**2) * (phip - phi1) * (z2 - zp)) / dV
+            c%b222 = ((rp**2 - r1**2) * (phip - phi1) * (zp - z1)) / dV
+            c%b122 = ((r2**2 - rp**2) * (phip - phi1) * (zp - z1)) / dV
+            c%b112 = ((r2**2 - rp**2) * (phip - phi1) * (z2 - zp)) / dV
+            c%i = i
+            c%j = j
+            c%k = k
+            err_status = 0
+        endif
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine cyl_interpol3D_coeff
+
+subroutine cyl_interpol3D_coeff_arr(r,phi,z,rout,phiout,zout,c,err)
+    !+ Cylindrical interpolation coefficients and indicies for a 3D grid
+    real(Float64), dimension(:), intent(in) :: r
+        !+ R values
+    real(Float64), dimension(:), intent(in) :: phi
+        !+ Phi values
+    real(Float64), dimension(:), intent(in) :: z
+        !+ Z values
+    real(Float64), intent(in)               :: rout
+        !+ R value to interpolate
+    real(Float64), intent(in)               :: phiout
+        !+ Phi value to interpolate
+    real(Float64), intent(in)               :: zout
+        !+ Z value to interpolate
+    type(InterpolCoeffs3D), intent(out)     :: c
+        !+ Cylindrical Interpolation Coefficients
+    integer, intent(out), optional          :: err
+        !+ Error code
+
+    type(InterpolCoeffs2D) :: b
+    real(Float64) :: rmin, phimin, zmin, dr, dphi, dz
+    integer :: sr, sphi, sz, err_status
+
+    err_status = 1
+    sr = size(r)
+    sphi = size(phi)
+    sz = size(z)
+
+    rmin = r(1)
+    zmin = z(1)
+    dr = abs(r(2)-r(1))
+    dz = abs(z(2)-z(1))
+
+    if (sphi .eq. 1) then
+        call interpol2D_coeff(rmin, dr, sr, zmin, dz, sz, rout, zout, b, err_status)
+        c%b111 = b%b11
+        c%b121 = b%b12
+        c%b221 = b%b22
+        c%b211 = b%b21
+        c%b212 = 0
+        c%b222 = 0
+        c%b122 = 0
+        c%b112 = 0
+        c%i = b%i
+        c%j = b%j
+        c%k = 1
+    else
+        phimin = phi(1)
+        dphi = abs(phi(2)-phi(1))
+        call cyl_interpol3D_coeff(rmin, dr, sr, phimin, dphi, sphi, zmin, dz, sz, rout, phiout, zout, c, err_status)
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine cyl_interpol3D_coeff_arr
+
 subroutine interpol1D_arr(x, y, xout, yout, err, coeffs)
     !+ Performs linear interpolation on a uniform 1D grid y(x)
     real(Float64), dimension(:), intent(in)      :: x
@@ -6026,6 +6302,136 @@ subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err, coeffs)
 
 end subroutine interpol2D_2D_arr
 
+subroutine interpol3D_arr(r, phi, z, d, rout, phiout, zout, dout, err, coeffs)
+    !+ Performs cylindrical interpolation on a 3D grid f(r,phi,z)
+    real(Float64), dimension(:), intent(in) :: r
+        !+ R values
+    real(Float64), dimension(:), intent(in) :: phi
+        !+ Phi values
+    real(Float64), dimension(:), intent(in) :: z
+        !+ Z values
+    real(Float64), dimension(:,:,:), intent(in) :: d
+        !+ Values at r,phi,z: d(r,phi,z)
+    real(Float64), intent(in)               :: rout
+        !+ R value to interpolate
+    real(Float64), intent(in)               :: phiout
+        !+ Phi value to interpolate
+    real(Float64), intent(in)               :: zout
+        !+ Z value to interpolate
+    real(Float64), intent(out)                :: dout
+        !+ Interpolant: d(rout,phiout,zout)
+    integer, intent(out), optional          :: err
+        !+ Error code
+    type(InterpolCoeffs3D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
+
+    type(InterpolCoeffs3D) :: b
+    integer :: i, j, k, k2, err_status
+    integer :: nphi
+
+    err_status = 1
+    nphi = size(phi)
+    if(present(coeffs)) then
+        b = coeffs
+        if(nphi .eq. 1) then
+            b%b212 = 0
+            b%b222 = 0
+            b%b122 = 0
+            b%b112 = 0
+            b%k = 1
+        endif
+        err_status = 0
+    else
+        call interpol_coeff(r,phi,z,rout,phiout,zout,b,err)
+    endif
+
+
+    if(err_status.eq.0) then
+        i = b%i
+        j = b%j
+        k = b%k
+        if(nphi .eq. 1) then
+            k2 = min(k+1,nphi)
+        else
+            k2 = k+1
+        endif
+
+        dout = b%b111*d(i,j,k) + b%b121*d(i,j+1,k) + &
+            b%b112*d(i,j,k2) + b%b122*d(i,j+1,k2) + &
+            b%b211*d(i+1,j,k) + b%b221*d(i+1,j+1,k) + &
+            b%b212*d(i+1,j,k2) + b%b222*d(i+1,j+1,k2)
+    else
+        dout = 0.d0
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine interpol3D_arr
+
+subroutine interpol3D_2D_arr(r, phi, z, f, rout, phiout, zout, fout, err, coeffs)
+    !+ Performs cylindrical interpolation on a 3D grid of 2D arrays
+    !+ f(:,:,r,phi,z)
+    real(Float64), dimension(:), intent(in) :: r
+        !+ R values
+    real(Float64), dimension(:), intent(in) :: phi
+        !+ Phi values
+    real(Float64), dimension(:), intent(in) :: z
+        !+ Z values
+    real(Float64), dimension(:,:,:,:,:), intent(in) :: f
+        !+ Values at r,phi,z: f(:,:,x,y)
+    real(Float64), intent(in)               :: rout
+        !+ R value to interpolate
+    real(Float64), intent(in)               :: phiout
+        !+ Phi value to interpolate
+    real(Float64), intent(in)               :: zout
+        !+ Z value to interpolate
+    real(Float64), dimension(:,:), intent(out)    :: fout
+        !+ Interpolant: f(:,:,rout,phiout,zout)
+    integer, intent(out), optional          :: err
+        !+ Error code
+    type(InterpolCoeffs3D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
+
+    type(InterpolCoeffs3D) :: b
+    integer :: i, j, k, k2, err_status
+    integer :: nphi
+
+    err_status = 1
+    if(present(coeffs)) then
+        b = coeffs
+        if(nphi .eq. 1) then
+            b%b212 = 0
+            b%b222 = 0
+            b%b122 = 0
+            b%b112 = 0
+            b%k = 1
+        endif
+        err_status = 0
+    else
+        call interpol_coeff(r,phi,z,rout,phiout,zout,b,err)
+    endif
+
+    if(err_status.eq.0) then
+        i = b%i
+        j = b%j
+        k = b%k
+        if(nphi .eq. 1) then
+            k2 = min(k+1,nphi)
+        else
+            k2 = k+1
+        endif
+        fout = b%b111*f(:,:,i,j,k) + b%b121*f(:,:,i,j+1,k) + &
+            b%b112*f(:,:,i,j,k2) + b%b122*f(:,:,i,j+1,k2) + &
+            b%b211*f(:,:,i+1,j,k) + b%b221*f(:,:,i+1,j+1,k) + &
+            b%b212*f(:,:,i+1,j,k2) + b%b222*f(:,:,i+1,j+1,k2)
+    else
+        fout = 0.0
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine interpol3D_2D_arr
+
 !=============================================================================
 !-------------------------Profiles and Fields Routines------------------------
 !=============================================================================
@@ -6038,16 +6444,16 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
         !+ Indicates whether plasma parameters and fields are valid/known
     logical, intent(in), optional           :: machine_coords
         !+ Indicates that xyz is in machine coordinates
-    type(InterpolCoeffs2D), intent(out), optional      :: coeffs
+    type(InterpolCoeffs3D), intent(out), optional      :: coeffs
         !+ Linear Interpolation coefficients used in calculation
     real(Float64), dimension(3), intent(out), optional :: uvw_out
         !+ Position in machine coordinates
 
     real(Float64), dimension(3) :: uvw
-    type(InterpolCoeffs2D) :: c
-    real(Float64) :: R, W, mask
+    type(InterpolCoeffs3D) :: b
+    real(Float64) :: R, phi, W, mask
     logical :: mc
-    integer :: i, j, err
+    integer :: i, j, k, k2, err
 
     err = 1
     mc = .False.
@@ -6062,23 +6468,30 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
 
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
-
+    phi = atan2(uvw(2),uvw(1))
     !! Interpolate mask value
-    call interpol_coeff(inter_grid%r, inter_grid%z, R, W, c, err)
+    call interpol_coeff(inter_grid%r, inter_grid%phi, inter_grid%z, R, phi, W, b, err)
 
     inp = .False.
     if(err.eq.0) then
-        i = c%i
-        j = c%j
-        mask = c%b11*equil%mask(i,j)   + c%b12*equil%mask(i,j+1) + &
-               c%b21*equil%mask(i+1,j) + c%b22*equil%mask(i+1,j+1)
-
+        i = b%i
+        j = b%j
+        k = b%k
+        if(inter_grid%nphi .eq. 1) then
+            k2 = min(k+1,inter_grid%nphi)
+        else
+            k2 = k+1
+        endif
+        mask = b%b111*equil%mask(i,j,k) + b%b112*equil%mask(i,j,k2) + &
+            b%b121*equil%mask(i,j+1,k) + b%b122*equil%mask(i,j+1,k2) + &
+            b%b211*equil%mask(i+1,j,k) + b%b212*equil%mask(i+1,j,k2) + &
+            b%b221*equil%mask(i+1,j+1,k) + b%b222*equil%mask(i+1,j+1,k2)
         if((mask.ge.0.5).and.(err.eq.0)) then
             inp = .True.
         endif
     endif
 
-    if(present(coeffs)) coeffs = c
+    if(present(coeffs)) coeffs = b
     if(present(uvw_out)) uvw_out = uvw
 
 end subroutine in_plasma
@@ -6093,10 +6506,10 @@ subroutine get_plasma(plasma, pos, ind)
         !+ [[libfida:beam_grid]] indices
 
     logical :: inp
-    type(InterpolCoeffs2D) :: coeffs
+    type(InterpolCoeffs3D) :: coeffs
     real(Float64), dimension(3) :: xyz, uvw, vrot_uvw
     real(Float64) :: phi, s, c
-    integer :: i, j
+    integer :: i, j, k, k2
 
     plasma%in_plasma = .False.
 
@@ -6108,9 +6521,17 @@ subroutine get_plasma(plasma, pos, ind)
         phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
         j = coeffs%j
+        k = coeffs%k
+        if(inter_grid%nphi .eq. 1) then
+            k2 = min(k+1,inter_grid%nphi)
+        else
+            k2 = k+1
+        endif
 
-        plasma = coeffs%b11*equil%plasma(i,j)   + coeffs%b12*equil%plasma(i,j+1) + &
-                 coeffs%b21*equil%plasma(i+1,j) + coeffs%b22*equil%plasma(i+1,j+1)
+        plasma = coeffs%b111*equil%plasma(i,j,k) + coeffs%b121*equil%plasma(i,j+1,k) + &
+            coeffs%b112*equil%plasma(i,j,k2) + coeffs%b122*equil%plasma(i,j+1,k2) + &
+            coeffs%b211*equil%plasma(i+1,j,k) + coeffs%b221*equil%plasma(i+1,j+1,k) + &
+            coeffs%b212*equil%plasma(i+1,j,k2) + coeffs%b222*equil%plasma(i+1,j+1,k2)
 
         s = sin(phi) ; c = cos(phi)
         vrot_uvw(1) = plasma%vr*c - plasma%vt*s
@@ -6120,7 +6541,7 @@ subroutine get_plasma(plasma, pos, ind)
         plasma%pos = xyz
         plasma%uvw = uvw
         plasma%in_plasma = .True.
-        plasma%c = coeffs
+        plasma%b = coeffs
     endif
 
 end subroutine get_plasma
@@ -6171,8 +6592,8 @@ subroutine get_fields(fields, pos, ind, machine_coords)
     real(Float64), dimension(3) :: uvw_bfield, uvw_efield
     real(Float64), dimension(3) :: xyz_bfield, xyz_efield
     real(Float64) :: phi, s, c
-    type(InterpolCoeffs2D) :: coeffs
-    integer :: i, j
+    type(InterpolCoeffs3D) :: coeffs
+    integer :: i, j, k, k2
 
     fields%in_plasma = .False.
 
@@ -6187,9 +6608,17 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
         j = coeffs%j
+        k = coeffs%k
+        if(inter_grid%nphi .eq. 1) then
+            k2 = min(k+1,inter_grid%nphi)
+        else
+            k2 = k+1
+        endif
 
-        fields = coeffs%b11*equil%fields(i,j) + coeffs%b12*equil%fields(i,j+1) + &
-                 coeffs%b21*equil%fields(i+1,j) + coeffs%b22*equil%fields(i+1,j+1)
+        fields = coeffs%b111*equil%fields(i,j,k) + coeffs%b121*equil%fields(i,j+1,k) + &
+            coeffs%b112*equil%fields(i,j,k2) + coeffs%b122*equil%fields(i,j+1,k2) + &
+            coeffs%b211*equil%fields(i+1,j,k) + coeffs%b221*equil%fields(i+1,j+1,k) + &
+            coeffs%b212*equil%fields(i+1,j,k2) + coeffs%b222*equil%fields(i+1,j+1,k2)
 
         phi = atan2(uvw(2),uvw(1))
         s = sin(phi) ; c = cos(phi)
@@ -6223,7 +6652,7 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         fields%uvw = uvw
         fields%in_plasma = .True.
         fields%machine_coords = mc
-        fields%c = coeffs
+        fields%b = coeffs
     endif
 
 end subroutine get_fields
@@ -6238,16 +6667,16 @@ subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
-    type(InterpolCoeffs2D), intent(in), optional       :: coeffs
+    type(InterpolCoeffs3D), intent(in), optional       :: coeffs
         !+ Precomputed Linear Interpolation Coefficients
 
     real(Float64), dimension(3) :: xyz, uvw
-    real(Float64) :: R, Z
+    real(Float64) :: R, Z, Phi
     integer :: err
 
     if(present(coeffs)) then
-        call interpol(fbm%r, fbm%z, fbm%f, R, Z, fbeam, err, coeffs)
-        call interpol(fbm%r, fbm%z, fbm%denf, R, Z, denf, err, coeffs)
+        call interpol(fbm%r, fbm%phi, fbm%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
+        call interpol(fbm%r, fbm%phi, fbm%z, fbm%denf, R, Phi, Z, denf, err, coeffs)
     else
         if(present(ind)) call get_position(ind,xyz)
         if(present(pos)) xyz = pos
@@ -6256,9 +6685,10 @@ subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
         call xyz_to_uvw(xyz,uvw)
         R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
         Z = uvw(3)
+        Phi = atan2(uvw(2),uvw(1))
 
-        call interpol(fbm%r, fbm%z, fbm%f, R, Z, fbeam, err)
-        call interpol(fbm%r, fbm%z, fbm%denf, R, Z, denf, err)
+        call interpol(fbm%r, fbm%phi, fbm%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
+        call interpol(fbm%r, fbm%phi, fbm%z, fbm%denf, R, Phi, Z, denf, err, coeffs)
     endif
 
 end subroutine get_distribution
@@ -6276,14 +6706,14 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
-    type(InterpolCoeffs2D), intent(in), optional       :: coeffs
+    type(InterpolCoeffs3D), intent(in), optional       :: coeffs
         !+ Precomputed Linear Interpolation Coefficients
 
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam
     integer(Int32), dimension(2) :: epi
     integer(Int32), dimension(1) :: dummy
-    real(Float64) :: R, Z
+    real(Float64) :: R, Phi, Z
     real(Float64) :: dE, dp
     integer :: err
 
@@ -6296,7 +6726,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
 
     if((dE.le.fbm%dE).and.(dp.le.fbm%dp)) then
         if(present(coeffs)) then
-            call interpol(inter_grid%r, inter_grid%z, fbm%f, R, Z, fbeam, err, coeffs)
+            call interpol(inter_grid%r, inter_grid%phi, inter_grid%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
         else
             if(present(ind)) call get_position(ind,xyz)
             if(present(pos)) xyz = pos
@@ -6305,8 +6735,9 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
             call xyz_to_uvw(xyz,uvw)
             R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
             Z = uvw(3)
+            Phi = atan2(uvw(2),uvw(1))
 
-            call interpol(inter_grid%r, inter_grid%z, fbm%f, R, Z, fbeam, err)
+            call interpol(inter_grid%r, inter_grid%phi, inter_grid%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
         endif
         denf = fbeam(epi(1),epi(2))
     else
@@ -7395,11 +7826,12 @@ subroutine gyro_step(vi, fields, r_gyro)
         term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
         grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
                     fields%b_abs
-        grad_B(2) = 0.0
+        grad_B(2) = (fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi + fields%bz*fields%dbz_dphi)/&
+                    fields%b_abs
         grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
                     fields%b_abs
         rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
-        rg_rtz(2) = 0.0
+        rg_rtz(2) = -rg_uvw(1)*sin(phi) + rg_uvw(2)*cos(phi)
         rg_rtz(3) = rg_uvw(3)
         term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
         r_gyro = r_gyro * (1.0 - term1 - term2)
@@ -7507,7 +7939,7 @@ subroutine mc_fastion(ind,fields,eb,ptch,denf)
     call get_fields(fields,pos=rg)
     if(.not.fields%in_plasma) return
 
-    call get_distribution(fbeam,denf,pos=rg, coeffs=fields%c)
+    call get_distribution(fbeam,denf,pos=rg, coeffs=fields%b)
     call randind(fbeam,ep_ind)
     call randu(randomu3)
     eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
@@ -8675,7 +9107,7 @@ end subroutine pfida_f
 
 subroutine fida_mc
     !+ Calculate Active FIDA emission using a Monte Carlo Fast-ion distribution
-    integer :: iion,iphi,nphi
+    integer :: iion,igamma,ngamma
     type(FastIon) :: fast_ion
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
@@ -8697,22 +9129,27 @@ subroutine fida_mc
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
-    nphi = ceiling(dble(inputs%n_fida)/particles%nparticle)
+    ngamma = ceiling(dble(inputs%n_fida)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
     !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
-        phi_loop: do iphi=1,nphi
-            !! Pick random torodial angle
-            call randu(randomu)
-            phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-            s = sin(phi) ; c = cos(phi)
+        gamma_loop: do igamma=1,ngamma
+            if(particles%axisym) then
+                !! Pick random toroidal angle
+                call randu(randomu)
+                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+            else
+                phi = fast_ion%phi
+            endif
+            s = sin(phi)
+            c = cos(phi)
 
             !! Calculate position in machine coordinates
             uvw(1) = fast_ion%r*c
@@ -8738,15 +9175,15 @@ subroutine fida_mc
 
             !! Track particle through grid
             call track(ri, vi, tracks, ntrack, los_intersect)
-            if(.not.los_intersect) cycle phi_loop
-            if(ntrack.eq.0)cycle phi_loop
+            if(.not.los_intersect) cycle gamma_loop
+            if(ntrack.eq.0)cycle gamma_loop
 
             !! Calculate CX probability
             call get_beam_cx_rate(tracks(1)%ind,ri,vi,beam_ion,neut_types,rates)
-            if(sum(rates).le.0.)cycle phi_loop
+            if(sum(rates).le.0.)cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            states=rates*fast_ion%weight/nphi
+            states=rates*fast_ion%weight/ngamma
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
@@ -8756,7 +9193,7 @@ subroutine fida_mc
 
                 call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class)
             enddo loop_along_track
-        enddo phi_loop
+        enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
@@ -8768,7 +9205,7 @@ end subroutine fida_mc
 
 subroutine pfida_mc
     !+ Calculate Passive FIDA emission using a Monte Carlo Fast-ion distribution
-    integer :: iion,iphi,nphi
+    integer :: iion,igamma,ngamma
     type(FastIon) :: fast_ion
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
@@ -8789,22 +9226,27 @@ subroutine pfida_mc
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
-    nphi = ceiling(dble(inputs%n_pfida)/particles%nparticle)
+    ngamma = ceiling(dble(inputs%n_pfida)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
     !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
-        phi_loop: do iphi=1,nphi
-            !! Pick random torodial angle
-            call randu(randomu)
-            phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-            s = sin(phi) ; c = cos(phi)
+        gamma_loop: do igamma=1,ngamma
+            if(particles%axisym) then
+                !! Pick random toroidal angle
+                call randu(randomu)
+                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+            else
+                phi = fast_ion%phi
+            endif
+            s = sin(phi)
+            c = cos(phi)
 
             !! Calculate position in machine coordinates
             uvw(1) = fast_ion%r*c
@@ -8830,16 +9272,16 @@ subroutine pfida_mc
 
             !! Track particle through grid
             call track(ri, vi, tracks, ntrack, los_intersect)
-            if(.not.los_intersect) cycle phi_loop
-            if(ntrack.eq.0)cycle phi_loop
+            if(.not.los_intersect) cycle gamma_loop
+            if(ntrack.eq.0) cycle gamma_loop
 
             !! Calculate CX probability
             call get_plasma(plasma, pos=ri)
             call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
-            if(sum(rates).le.0.)cycle phi_loop
+            if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            states=rates*fast_ion%weight/nphi
+            states=rates*fast_ion%weight/ngamma
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
@@ -8849,7 +9291,7 @@ subroutine pfida_mc
 
                 call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class,passive=.True.)
             enddo loop_along_track
-        enddo phi_loop
+        enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
@@ -9094,7 +9536,7 @@ end subroutine pnpa_f
 
 subroutine npa_mc
     !+ Calculate Active NPA flux using a Monte Carlo fast-ion distribution
-    integer :: iion,iphi,nphi,npart
+    integer :: iion,igamma,ngamma,npart
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
     real(Float64), dimension(3) :: ri, rf, rg, vi
@@ -9111,22 +9553,27 @@ subroutine npa_mc
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
 
-    nphi = ceiling(dble(inputs%n_npa)/particles%nparticle)
+    ngamma = ceiling(dble(inputs%n_npa)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it, &
+    !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it, &
     !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
-        if(fast_ion%vabs.eq.0)cycle loop_over_fast_ions
+        if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
-        phi_loop: do iphi=1,nphi
-            !! Pick random torodial angle
-            call randu(randomu)
-            phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-            s = sin(phi) ; c = cos(phi)
+        gamma_loop: do igamma=1,ngamma
+            if(particles%axisym) then
+                !! Pick random toroidal angle
+                call randu(randomu)
+                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+            else
+                phi = fast_ion%phi
+            endif
+            s = sin(phi)
+            c = cos(phi)
 
             !! Calculate position in machine coordinates
             uvw(1) = fast_ion%r*c
@@ -9169,7 +9616,7 @@ subroutine npa_mc
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        states=rates*fast_ion%weight/nphi
+                        states=rates*fast_ion%weight/ngamma
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
@@ -9202,17 +9649,17 @@ subroutine npa_mc
 
                 !! Check if particle hits a NPA detector
                 call hit_npa_detector(ri, vi ,det, rf)
-                if(det.eq.0) cycle phi_loop
+                if(det.eq.0) cycle gamma_loop
 
                 !! Get beam grid indices at ri
                 call get_indices(ri,ind)
 
                 !! Calculate CX probability with beam and halo neutrals
                 call get_beam_cx_rate(ind,ri,vi,beam_ion,neut_types,rates)
-                if(sum(rates).le.0.) cycle phi_loop
+                if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                states=rates*fast_ion%weight/nphi
+                states=rates*fast_ion%weight/ngamma
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
@@ -9221,7 +9668,7 @@ subroutine npa_mc
                 flux = sum(states)*beam_grid%dv
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class)
             endif
-        enddo phi_loop
+        enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
@@ -9239,7 +9686,7 @@ end subroutine npa_mc
 
 subroutine pnpa_mc
     !+ Calculate Passive NPA flux using a Monte Carlo fast-ion distribution
-    integer :: iion,iphi,nphi,npart
+    integer :: iion,igamma,ngamma,npart
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
     real(Float64), dimension(3) :: ri, rf, rg, vi
@@ -9256,22 +9703,27 @@ subroutine pnpa_mc
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
 
-    nphi = ceiling(dble(inputs%n_pnpa)/particles%nparticle)
+    ngamma = ceiling(dble(inputs%n_pnpa)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
+    !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
     !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
-        if(fast_ion%vabs.eq.0)cycle loop_over_fast_ions
+        if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
-        phi_loop: do iphi=1,nphi
-            !! Pick random torodial angle
-            call randu(randomu)
-            phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-            s = sin(phi) ; c = cos(phi)
+        gamma_loop: do igamma=1,ngamma
+            if(particles%axisym) then
+                !! Pick random toroidal angle
+                call randu(randomu)
+                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+            else
+                phi = fast_ion%phi
+            endif
+            s = sin(phi)
+            c = cos(phi)
 
             !! Calculate position in machine coordinates
             uvw(1) = fast_ion%r*c
@@ -9315,7 +9767,7 @@ subroutine pnpa_mc
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        states=rates*fast_ion%weight/nphi
+                        states=rates*fast_ion%weight/ngamma
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
@@ -9348,7 +9800,7 @@ subroutine pnpa_mc
 
                 !! Check if particle hits a NPA detector
                 call hit_npa_detector(ri, vi ,det, rf)
-                if(det.eq.0) cycle phi_loop
+                if(det.eq.0) cycle gamma_loop
 
                 !! Get beam grid indices at ri
                 call get_indices(ri,ind)
@@ -9356,10 +9808,10 @@ subroutine pnpa_mc
                 !! Calculate CX probability with beam and halo neutrals
                 call get_plasma(plasma, pos=ri)
                 call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
-                if(sum(rates).le.0.) cycle phi_loop
+                if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                states=rates*fast_ion%weight/nphi
+                states=rates*fast_ion%weight/ngamma
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
@@ -9368,7 +9820,7 @@ subroutine pnpa_mc
                 flux = sum(states)*beam_grid%dv
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class,passive=.True.)
             endif
-        enddo phi_loop
+        enddo gamma_loop
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
@@ -9386,7 +9838,7 @@ end subroutine pnpa_mc
 
 subroutine neutron_f
     !+ Calculate neutron emission rate using a fast-ion distribution function F(E,p,r,z)
-    integer :: ir, iz, ie, ip, iphi, nphi
+    integer :: ir, iphi, iz, ie, ip, igamma, ngamma
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: eb,pitch,r,z
@@ -9396,52 +9848,54 @@ subroutine neutron_f
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square, factor
 
-    allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz))
+    allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
     neutron%weight = 0.d0
 
-    nphi = 20
+    ngamma = 20
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
-    !$OMP& ir,iz,ie,ip,iphi,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel)
+    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel)
     z_loop: do iz = istart, fbm%nz, istep
         r_loop: do ir=1, fbm%nr
-            !! Calculate position
-            uvw(1) = fbm%r(ir)
-            uvw(2) = 0.d0
-            uvw(3) = fbm%z(iz)
-            call uvw_to_xyz(uvw, rg)
+            phi_loop: do iphi = 1, fbm%nphi
+                !! Calculate position
+                uvw(1) = fbm%r(ir)*cos(fbm%phi(iphi))
+                uvw(2) = fbm%r(ir)*sin(fbm%phi(iphi))
+                uvw(3) = fbm%z(iz)
+                call uvw_to_xyz(uvw, rg)
 
-            !! Get fields
-            call get_fields(fields,pos=rg)
-            if(.not.fields%in_plasma) cycle r_loop
+                !! Get fields
+                call get_fields(fields,pos=rg)
+                if(.not.fields%in_plasma) cycle r_loop
 
-            factor = 2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/nphi
-            !! Loop over energy/pitch/phi
-            pitch_loop: do ip = 1, fbm%npitch
-                pitch = fbm%pitch(ip)
-                energy_loop: do ie =1, fbm%nenergy
-                    eb = fbm%energy(ie)
-                    gyro_loop: do iphi=1, nphi
-                        call gyro_correction(fields,eb,pitch,ri,vi)
+                factor = fbm%dphi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/ngamma
+                !! Loop over energy/pitch/phi
+                pitch_loop: do ip = 1, fbm%npitch
+                    pitch = fbm%pitch(ip)
+                    energy_loop: do ie =1, fbm%nenergy
+                        eb = fbm%energy(ie)
+                        gyro_loop: do igamma=1, ngamma
+                            call gyro_correction(fields,eb,pitch,ri,vi)
 
-                        !! Get plasma parameters at particle position
-                        call get_plasma(plasma,pos=ri)
-                        if(.not.plasma%in_plasma) cycle gyro_loop
+                            !! Get plasma parameters at particle position
+                            call get_plasma(plasma,pos=ri)
+                            if(.not.plasma%in_plasma) cycle gyro_loop
 
-                        !! Calculate effective beam energy
-                        vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
-                        erel = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
+                            !! Calculate effective beam energy
+                            vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                            erel = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
 
-                        !! Get neutron production rate
-                        call get_neutron_rate(plasma, erel, rate)
-                        neutron%weight(ie,ip,ir,iz) = neutron%weight(ie,ip,ir,iz) &
-                                                    + rate*factor
-                        rate = rate*fbm%f(ie,ip,ir,iz)*factor
+                            !! Get neutron production rate
+                            call get_neutron_rate(plasma, erel, rate)
+                            neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
+                                                        + rate*factor
+                            rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
 
-                        !! Store neutrons
-                        call store_neutrons(rate)
-                    enddo gyro_loop
-                enddo energy_loop
-            enddo pitch_loop
+                            !! Store neutrons
+                            call store_neutrons(rate)
+                        enddo gyro_loop
+                    enddo energy_loop
+                enddo pitch_loop
+            enddo phi_loop
         enddo r_loop
     enddo z_loop
     !$OMP END PARALLEL DO
@@ -9477,6 +9931,7 @@ subroutine neutron_mc
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square
+    real(Float64)  :: phi, s, c
 
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') particles%nparticle
@@ -9484,15 +9939,21 @@ subroutine neutron_mc
 
     rate=0.0
     nphi = 20
-    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg, &
+    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg,s,c, &
     !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,iphi)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions
 
-        !! Calculate position
-        uvw(1) = fast_ion%r
-        uvw(2) = 0.0
+        !! Calculate position in machine coordinates
+        if(particles%axisym) then
+            phi = 0.d0
+        else
+            phi = fast_ion%phi
+        endif
+        s = sin(phi) ; c = cos(phi)
+        uvw(1) = fast_ion%r*c
+        uvw(2) = fast_ion%r*s
         uvw(3) = fast_ion%z
 
         if(inputs%dist_type.eq.2) then
@@ -9699,7 +10160,7 @@ subroutine fida_weights_mc
 
             fbm_denf = 0.0
             if (inputs%dist_type.eq.1) then
-                call get_ep_denf(energy,pitch,fbm_denf,coeffs=fields%c)
+                call get_ep_denf(energy,pitch,fbm_denf,coeffs=fields%b)
             endif
 
             !! Find the particles path through the beam grid
@@ -9862,7 +10323,7 @@ subroutine fida_weights_los
                         if (inputs%dist_type.eq.1) then
                             do ipitch=1,inputs%np_wght
                                 do ienergy=1,inputs%ne_wght
-                                    call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,coeffs=fields_cell%c)
+                                    call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,coeffs=fields_cell%b)
                                     mean_f(ienergy,ipitch) = mean_f(ienergy,ipitch) + wght*denf
                                 enddo
                             enddo

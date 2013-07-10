@@ -33,6 +33,18 @@ FUNCTION test_profiles,filename,grid,flux
     w=where(flux le max_flux) ;where we have profiles
     mask[w] = 1
 
+    rows = n_elements(dene[0,*])
+    cols = n_elements(dene[*,0])
+    dene=rebin(dene,cols,rows,grid.nphi)
+    denn=rebin(denn,cols,rows,grid.nphi)
+    mask=rebin(mask,cols,rows,grid.nphi)
+    te=rebin(te,cols,rows,grid.nphi)
+    ti=rebin(ti,cols,rows,grid.nphi)
+    vt=rebin(vt,cols,rows,grid.nphi)
+    vr=rebin(vr,cols,rows,grid.nphi)
+    vz=rebin(vz,cols,rows,grid.nphi)
+    zeff=rebin(zeff,cols,rows,grid.nphi)
+
     ;;SAVE IN PROFILE STRUCTURE
 	profiles={time:1.d0,data_source:filename,mask:mask, $
               te:te,ti:ti,vr:vr,vt:vt,vz:vz,dene:dene,zeff:zeff,denn:denn}

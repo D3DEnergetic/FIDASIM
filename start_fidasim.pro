@@ -73,6 +73,7 @@ pro start_fidasim
   dalpha_inputs,inputs
   ;; start the f90 routine
   result_dir = inputs.root_dir + 'RESULTS/' + inputs.fidasim_runid
+  spawn, 'module load intel'
   spawn, root_dir+'fidasim '+result_dir
 
 

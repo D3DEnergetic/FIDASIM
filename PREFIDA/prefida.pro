@@ -6,7 +6,7 @@ PRO rotate_uvw,uvw,Arot,Brot,Crot,updown,xyz
   xyz=MATRIX_MULTIPLY(Crot,qrz)
 END
 
-PRO make_fida_grid,inputs,output,err
+PRO make_fida_grid,inputs,grid,err
 
 	err=1
 
@@ -54,7 +54,7 @@ PRO make_fida_grid,inputs,output,err
 	r_grid=sqrt(xc^2+yc^2)
 	phi_grid=atan(yc,xc)
 	
-	output={nx:nx,ny:ny,nz:nz,x:x,y:y,z:z,xx:xx,yy:yy,zz:zz,xc:xc,yc:yc,zc:zc,xxc:xxc,yyc:yyc,zzc:zzc,$
+	grid={nx:nx,ny:ny,nz:nz,x:x,y:y,z:z,xx:xx,yy:yy,zz:zz,xc:xc,yc:yc,zc:zc,xxc:xxc,yyc:yyc,zzc:zzc,$
 			dx:dx,dy:dy,dz:dz,dr:dr,drmin:drmin,dv:dv,ng:ng,r_grid:r_grid,phi_grid:phi_grid}
 	err=0	
 	GET_OUT:

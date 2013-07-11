@@ -1,7 +1,11 @@
 FUNCTION d3d_equil,inputs,grid
 
     g=readg(inputs.shot,inputs.time*1000,RUNID=inputs.equil,status=gerr)
-    if gerr ne 1 then goto,GET_OUT
+    if gerr ne 1 then begin
+		print,'READG FAILED'
+		equil={err:1}
+		goto,GET_OUT
+	endif
     rhogrid=rho_rz(g,grid.r_grid,grid.zc)
 
 	calculate_bfield,bp,br,bphi,bz,g
@@ -39,7 +43,7 @@ FUNCTION d3d_equil,inputs,grid
 		e[0,l]=cph*ecylr
 		e[1,l]=sph*ecylr
 	endfor
-	equil={rho_grid:rhogrid,b:b,e:e}
+	equil={rho_grid:rhogrid,b:b,e:e,err:0}
 	GET_OUT:
 	return,equil
 END

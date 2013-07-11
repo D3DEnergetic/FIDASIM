@@ -6,9 +6,9 @@ PRO rotate_uvw,uvw,Arot,Brot,Crot,updown,xyz
   xyz=MATRIX_MULTIPLY(Crot,qrz)
 END
 
-PRO make_fida_grid,inputs,output
+PRO make_fida_grid,inputs,output,err
 
-	output={err:1}
+	err=1
 
 	if inputs.rotate gt 2*!DPI then begin
 		print,'Angle must be in radians'
@@ -55,8 +55,8 @@ PRO make_fida_grid,inputs,output
 	phi_grid=atan(yc,xc)
 	
 	output={nx:nx,ny:ny,nz:nz,x:x,y:y,z:z,xx:xx,yy:yy,zz:zz,xc:xc,yc:yc,zc:zc,xxc:xxc,yyc:yyc,zzc:zzc,$
-			dx:dx,dy:dy,dz:dz,dr:dr,drmin:drmin,dv:dv,ng:ng,r_grid:r_grid,phi_grid:phi_grid,err:0}
-	
+			dx:dx,dy:dy,dz:dz,dr:dr,drmin:drmin,dv:dv,ng:ng,r_grid:r_grid,phi_grid:phi_grid}
+	err=0	
 	GET_OUT:
 END
 
@@ -164,7 +164,7 @@ PRO prepare_fida,grid,fida,weight,los,err
     ;;CALCULATE WEIGHTS
 	err_arr=dblarr(fida.nchan)
 	weight  = replicate(0.d0,nx,ny,nz,fida.nchan)
-	print, 'nchan:', fida.nchan
+;	print, 'nchan:', fida.nchan
 	for chan=0, fida.nchan-1 do  begin
 		xyzhead = [fida.xlens[chan],fida.ylens[chan],fida.zlens[chan]]
         xyzlos  = [fida.xmid[chan], fida.ymid[chan], fida.zmid[chan]]
@@ -172,9 +172,9 @@ PRO prepare_fida,grid,fida,weight,los,err
         dummy = max(abs(vi),ic)
         nstep = fix(700./grid.dr[ic])
         vi    = vi/sqrt(vi[0]^2+vi[1]^2+vi[2]^2) ;; unit vector
-        if chan eq fida.nchan-1 then begin
-        	print, vi
-        endif
+;        if chan eq fida.nchan-1 then begin
+;       	print, vi
+;        endif
         xyz_pos = xyzhead
       ; find first grid cell
         for i=0,nstep do begin
@@ -198,12 +198,12 @@ PRO prepare_fida,grid,fida,weight,los,err
                  	weight[cell[0,jj],cell[1,jj],cell[2,jj],chan]=tcell[jj]
               	endfor
            	endif else begin
-             	print, 'LOS only crosses one cell!'
+             	print, 'WARNING: CHANNEL #'+strtrim(string(chan),1)+' ONLY CROSSES ONE CELL!'
 				err_arr[chan]=1
            	endelse
         endif else begin
-        	print, 'LOS does not cross the simulation grid!'
-           	print,'chan: ', chan
+;        	print, 'LOS does not cross the simulation grid!'
+;          	print,'chan: ', chan
 			err_arr[chan]=1
         endelse
 	endfor
@@ -217,20 +217,25 @@ PRO prepare_fida,grid,fida,weight,los,err
 		print,'NO LINES OF SIGHT CROSSED THE SIMULATION GRID'
 		err=1
 	endif else begin
+		print,strtrim(string(nw),1)+' OUT OF '+strtrim(string(fida.nchan),1)+' CHORDS CROSSED THE SIMULATION GRID'
 		weight=weight[*,*,*,los]
 		err=0
 	endelse
 END
 
-PRO transp_fbeam,inputs,grid,denf
+PRO transp_fbeam,inputs,grid,denf,err
 
   !P.charsize=1.
   !P.background=255 & !P.color=0
 ;  doplot=1
-  print, 'reading fast ion distribution function from transp output'
+;  print, 'reading fast ion distribution function from transp output'
   cdftest=findfile(inputs.cdf_file)
-  print, '======================='
-  if cdftest[0] ne '' then  print, " * Found file: ", inputs.cdf_file
+;  print, '======================='
+  if cdftest[0] eq '' then begin
+	print,'ERROR: '+inputs.cdf_file+' WAS NOT FOUND'
+	err=1
+	goto,GET_OUT
+  endif
   cdfid=NCDF_Open(inputs.cdf_file,/nowrite)
   ;; Retrieve signals
   ;; --------------------------------------------------------
@@ -247,11 +252,9 @@ PRO transp_fbeam,inputs,grid,denf
   ncdf_varget, cdfid,'ZSURF', zsurf    ; flux surface
   NCDF_Close,cdfid
   ;; ----------- Check the time
-  print, ' CDF file time:',cdf_time 
   if abs(inputs.time-cdf_time) gt 0.02 then begin
-     print, 'Time of CDF file and simulation disagree!'
-     ;print, '".c" to proceed anyway'
-     ;stop    
+	 print, ' CDF file time:',cdf_time 
+     print, 'WARNING: Time of CDF file and simulation disagree!'
   endif     
   ;;-------------Convert eV-> keV
   energy=energy*1.0d-3          ;; fidasim needs energy in kev  
@@ -264,8 +267,8 @@ PRO transp_fbeam,inputs,grid,denf
   ;; of d_omega/4PI, one has to multiply by 0.5!
   fbm=fbm*0.5
   ;;------------Cut off energy
-  print,'EMIN: ',inputs.emin
-  print,'EMAX: ',inputs.emax
+;  print,'EMIN: ',inputs.emin
+;  print,'EMAX: ',inputs.emax
   w=where(energy ge inputs.emin and energy le inputs.emax)
   energy=energy[w]     
   fbm=fbm[w,*,*]
@@ -273,7 +276,6 @@ PRO transp_fbeam,inputs,grid,denf
   if nind gt 0. then fbm[index]=0.d0
 
   ;;-----------store distribution funciton in binary file
-  print,inputs.result_dir+inputs.runid
   file =inputs.result_dir+inputs.runid+'/transp_fbm.bin'
   sz=size(FBM)
   nenergy=sz(1)
@@ -300,7 +302,7 @@ PRO transp_fbeam,inputs,grid,denf
   endfor
   close,lun
   free_lun, lun
-  print, 'TRANSP distribution in: '+file
+  print, 'TRANSP distribution stored in BINARY: '+file
 
   ;;----------Determine fast-ion density averaged over pitch and energy
   dE      = energy[2] - energy[1]
@@ -348,14 +350,14 @@ PRO transp_fbeam,inputs,grid,denf
        endfor      
      endfor
   endfor 
-  
+  err=0
+  GET_OUT:
 END
 
-PRO map_profiles,inputs,grid,equil,profiles,plasma
+PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	;;-------------------------------------------------
 	;; MAP kinetic profiles on FIDASIM grid
 	;;------------------------------------------------- 
-	print, 'time:' ,inputs.time    
 
 	;;Electron density
 	dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid)>0. ;[1/cm^3]
@@ -368,14 +370,18 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma
 
 	;;Proton density
 	denp = dene-inputs.impurity_charge*deni
-	print,total(denp)
-	print,total(deni)/total(denp)*100. ,'percent of impurities'
+;	print,total(deni)/total(denp)*100. ,' percent of impurities'
 	
 	;;Fast-ion density
 	if keyword_set(inputs.nofida) then begin
     	denf=dene*0.d0
   	endif else begin
-     	transp_fbeam,inputs,grid,denf
+     	transp_fbeam,inputs,grid,denf,terr
+		if terr eq 1 then begin
+			print,'ERROR: FAILED TO MAP FAST ION DENSITY'
+			err=1
+			goto,GET_OUT
+		endif
   	endelse
  
 	;;Electron temperature
@@ -385,9 +391,10 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma
 	;;Ion temperature   
 	ti = 1.d-3 * interpol(profiles.ti,profiles.rho,equil.rho_grid)>0. ;keV
 	if max(ti) gt 10. or max(te) gt 10. then begin
+		print, 'WARNING:'
+		print, 'Electron or Ion temperature greater than 10 keV'
 		print, 'Look at the tables, they might only consider'
-		print, 'temperatures until 10keV!'
-		err=1
+		print, 'temperatures less than 10keV!'
 	endif
 
 	;;Plasma rotation	
@@ -403,7 +410,9 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma
 	;;-------SAVE-------
 	plasma={rho_grid:equil.rho_grid, b:equil.b,e:equil.e,ab:inputs.ab,ai:inputs.ai,te:te, $
 			ti:ti,vtor:vtor,vrot:vrot,dene:dene,denp:denp,deni:deni,denf:denf $
-			,zeff:zeff} 
+			,zeff:zeff}
+	err=0
+	GET_OUT: 
 END
 
 PRO prefida,input_pro
@@ -434,33 +443,44 @@ PRO prefida,input_pro
 	!path = !path + ":" + expand_path(inputs.install_dir)
 
 	;;MAKE FIDA GRID
-	make_fida_grid,inputs,grid
-	if grid.err eq 1 then goto,GET_OUT
+	make_fida_grid,inputs,grid,err
+	if err eq 1 then begin
+		print,'GRID CREATION FAILED. EXITING...'
+		goto,GET_OUT
+	endif else err=0
 
 	;;CALL DEVICE ROUTINES THAT GET BEAM GEOMETRY, FIDA DIAGNOSTIC INFO, PROFILES, and the grid in flux coord.
 	CALL_PROCEDURE, strlowcase(inputs.device)+'_routines',inputs,grid, nbi, fida, profiles, equil,err
-	if err eq 1 then goto,GET_OUT
+	if err eq 1 then begin
+		print, 'DEVICE ROUTINES FAILED. EXITING...'
+		goto,GET_OUT
+	endif else err=0
 
 	;;BEAM PRE PROCESSING
 	prepare_beam,inputs,nbi,rot_mat
 	if rot_mat.err eq 1 then begin
-		print,'BEAM PREPROCESSING FAILED'
+		print,'BEAM PREPROCESSING FAILED. EXITING...'
 		goto, GET_OUT
-	endif
+	endif else err=0
 
 	;;FIDA PRE PROCESSING 
 	if inputs.no_spectra ne 1 then begin
 		prepare_fida,grid,fida,weight,los,err
 		if err eq 1 then begin
-			print,'FIDA PREPROCESSING FAILED'
+			print,'FIDA PREPROCESSING FAILED. EXITING...'
 			goto, GET_OUT
 		endif
 	endif else begin
+		err=0
 		weight=replicate(0.d0,inputs.nx,inputs.ny,inputs.nz,1)
 	endelse
 
 	;;MAP PROFILES ONTO GRID
-	map_profiles,inputs,grid,equil,profiles,plasma
+	map_profiles,inputs,grid,equil,profiles,plasma,err
+	if err eq 1 then begin
+		print,'PROFILE MAPPING FAILED'
+		goto,GET_OUT
+	endif else err=0
 	
 	;;PLOTTING PLANE VIEW BEAMS AND CHORDS
 	window,0 & wset,0
@@ -593,6 +613,7 @@ PRO prefida,input_pro
 		endfor 
 	endfor
 	close,55
+	print, 'Inputs stored in data file: '+file
 
 	;;WRITE PLASMA PARAMETERS TO BINARY
 	file =inputs.result_dir+inputs.runid+'/plasma.bin'
@@ -619,7 +640,7 @@ PRO prefida,input_pro
 	endfor
 	close,lun
 	free_lun, lun
-	print, 'plasma parameters stored in BINARY: '+file
+	print, 'Plasma parameters stored in BINARY: '+file
 
 	;;WRITE LINE OF SIGHT (LOS) INFORMATION TO BINARY
 	if inputs.no_spectra ne 1 then begin
@@ -659,7 +680,8 @@ PRO prefida,input_pro
 	print,''
 	print, 'To run FIDASIM run the following command'
 	print, inputs.install_dir+'fidasim '+inputs.result_dir+inputs.runid
-
+	print,''
+	print,''
 	GET_OUT:
 END
 

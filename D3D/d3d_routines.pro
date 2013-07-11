@@ -6,6 +6,8 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 					   equil,$			;;OUTPUT: MAGNETIC GRID STRUCTURE
 					   err				;;OUTPUT: ERROR STATUS ERR=1 == SOMETHING WENT WRONG
 
+	err=0
+
 	;;GET BEAM GEOMETRY
 	nbi=d3d_beams(inputs)
 	
@@ -14,10 +16,19 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 
 	;;GET PROFILES
 	profiles=d3d_profiles(inputs)
+	if profiles.err eq 1 then begin
+		print,'FAILED TO GET PROFILES'
+		err=1
+		goto,GET_OUT
+	endif
 
 	;;GET E&M FIELDS AT GRID POINTS
 	equil=d3d_equil(inputs,grid)
+	if profiles.err eq 1 then begin
+		print,'FAILED TO GET EQUILIBRIUM'
+		err=1
+		goto,GET_OUT
+	endif
 
-	err=0	
 	GET_OUT:
 END 

@@ -24,38 +24,48 @@ FUNCTION d3d_profiles,inputs
 	ti_string=dir+'dti'+profile_str
 	imp_string=dir+'dimp'+profile_str+'_Carbon'
 	vtor_string=dir+'dtrot'+profile_str
-
-	;;RESTORE DENSITY
-	restore,ne_string
-;	help,ne_str,/str
-	dene=ne_str.dens*10.0d^(19.0d) ;;m^-3
-	dene_rho=ne_str.rho_dens
-
-	;;RESTORE ELECTRON TEMPERATURE
-	restore,te_string
-;	help,te_str,/str
-	te=te_str.te*10.0d^(3.0d) ;;eV
-	te_rho=te_str.rho_te
 	
-	;;RESTORE ION TEMPERATURE
-	restore,ti_string
-;	help,ti_str,/str
-	ti=ti_str.ti*10.0d^(3.0d) ;;eV
-	ti_rho=ti_str.rho_ti
+	;;CHECK IF FILES EXIST
+	file_array=[ne_string,te_string,ti_string,imp_string,vtor_string]
+	err_array=dblarr(n_elements(file_array))
+	for i=0,n_elements(file_array)-1 do begin
+		if file_test(file_array[i]) eq 0 then begin
+			print,file_array[i]+' does not exist: Exiting'
+			err_array[i]=1
+		endif
+	endfor
+	w=where(err_array eq 1 ,nw)
+	if nw ne 0 then begin
+		print,'FATAL ERROR'
+		profiles={err:1}
+	endif else begin
+		;;RESTORE DENSITY
+		restore,ne_string
+		dene=ne_str.dens*10.0d^(19.0d) ;;m^-3
+		dene_rho=ne_str.rho_dens
 	
-	;;RESTORE ZEFF
-	restore,imp_string
-;	help,impdens_str,/str
-	zeff=impdens_str.zeff
-	zeff_rho=impdens_str.rho_imp
+		;;RESTORE ELECTRON TEMPERATURE
+		restore,te_string
+		te=te_str.te*10.0d^(3.0d) ;;eV
+		te_rho=te_str.rho_te
+		
+		;;RESTORE ION TEMPERATURE
+		restore,ti_string
+		ti=ti_str.ti*10.0d^(3.0d) ;;eV
+		ti_rho=ti_str.rho_ti
+	
+		;;RESTORE ZEFF
+		restore,imp_string
+		zeff=impdens_str.zeff
+		zeff_rho=impdens_str.rho_imp
 
-	;;RESTORE VTOR
-	restore,vtor_string
-;	help,tor_rot_str,/str
-	vtor=tor_rot_str.tor_rot_local*tor_rot_str.r_tor_rot ;;m/s
-	vtor_rho=tor_rot_str.rho_tor_rot
-
-	;;SAVE IN PROFILE STRUCTURE
-	profiles={time:inputs.time,rho:dene_rho,te:te,ti:ti,vtor:vtor,dene:dene,zeff:zeff,err:0}
+		;;RESTORE VTOR
+		restore,vtor_string
+		vtor=tor_rot_str.tor_rot_local*tor_rot_str.r_tor_rot ;;m/s
+		vtor_rho=tor_rot_str.rho_tor_rot
+	
+		;;SAVE IN PROFILE STRUCTURE
+		profiles={time:inputs.time,rho:dene_rho,te:te,ti:ti,vtor:vtor,dene:dene,zeff:zeff,err:0}
+	endelse
 	return,profiles
 END

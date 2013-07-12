@@ -7,8 +7,8 @@ pro impurity_table,low_res=low_res,qimp=qimp,plot=plot,ps=ps
    neb=10001
    nti=201 
    if keyword_set(low_res) then begin
-      neb=101
-      nti=21
+      neb=501
+      nti=101
    endif
 
   ;; arrays of eb and ti

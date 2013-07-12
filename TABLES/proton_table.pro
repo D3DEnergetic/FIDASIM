@@ -9,8 +9,8 @@ pro proton_table,low_res=low_res,plot=plot,ps=ps
   neb=10001
   nti=201
   if keyword_set(low_res) then begin
-     neb=101
-     nti=21
+     neb=501
+     nti=101
   endif
   
   ;; arrays of eb and ti

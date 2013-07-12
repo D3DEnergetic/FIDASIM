@@ -1,5 +1,5 @@
 ;;This input file is a procedure so name this file accordingly
-PRO test_input,inputs                                   ;; Name of this file without .pro
+PRO input_template,inputs                                   ;; Name of this file without .pro
 
 ;;-----------------------------------------------------
 ;;				PREFIDA INPUT FILE

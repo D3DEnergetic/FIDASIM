@@ -10,10 +10,10 @@ PRO make_fida_grid,inputs,grid,err
 
 	err=1
 
-	if inputs.rotate gt 2*!DPI then begin
-		print,'Angle must be in radians'
-		goto, GET_OUT
-	endif
+;	if inputs.rotate gt 2*!DPI then begin
+;		print,'Angle must be in radians'
+;		goto, GET_OUT
+;	endif
 
 	nx=inputs.nx
 	ny=inputs.ny
@@ -66,7 +66,7 @@ PRO prepare_beam,inputs,nbi,rot_mat
 	rot_mat={err:1}
 	isource=inputs.isource
 
-	if nbi.pinj[isource] le 0. then begin
+	if nbi.pinj le 0. then begin
 		print, 'the selected source nr',isource,' is not on!'
 		goto, GET_OUT
 	endif
@@ -481,55 +481,9 @@ PRO prefida,input_pro
 		print,'PROFILE MAPPING FAILED'
 		goto,GET_OUT
 	endif else err=0
-	
-	;;PLOTTING PLANE VIEW BEAMS AND CHORDS
-	window,0 & wset,0
-	loadct,39,/silent
 
-	;;GET PROPER RANGES
-	xmin=min(grid.xx) & ymin=min(grid.yy) & zmin=min(grid.zz)
-	xmax=max(grid.xx) & ymax=max(grid.yy) & zmax=max(grid.zz)
-	if xmin lt 0 then xmin1=1.1*xmin else xmin1=0.9*xmin
-	if xmax lt 0 then xmax1=0.9*xmax else xmax1=1.1*xmax
-	if ymin lt 0 then ymin1=1.1*ymin else ymin1=0.9*ymin
-	if ymax lt 0 then ymax1=0.9*ymax else ymax1=1.1*ymax
-	if zmin lt 0 then zmin1=1.1*zmin else zmin1=0.9*zmin
-	if zmax lt 0 then zmax1=0.9*zmax else zmax1=1.1*zmax
-	x_range=[xmin1,xmax1] & y_range=[ymin1,ymax1] & z_range=[zmin1,zmax1]
-
-	plot,[0],[0],/nodata,xrange=x_range,yrange=y_range,$
-		color=0,background=255,title='PLANE VIEW',xtitle='X [cm]',ytitle='Y [cm]'
-	for i=0,grid.nx-1 do begin
-		oplot,[grid.xx[i],grid.xx[i]],[grid.yy[0],grid.yy[-1]],color=0
-	endfor	
-	for i=0,grid.ny-1 do begin
-		oplot,[grid.xx[0],grid.xx[-1]],[grid.yy[i],grid.yy[i]],color=0
-	endfor	
-	for i=0,n_elements(los)-1 do begin
-		oplot,[fida.xmid[los[i]],fida.xlens[los[i]]] ,[fida.ymid[los[i]],fida.ylens[los[i]]] ,color=50
-	endfor
-	ii=inputs.isource[0]
-	uvw_ray=[-1.d0,0.d0,0.d0]*1000.
-    updown=1
-    rotate_uvw,uvw_ray,rot_mat.Arot,rot_mat.Brot,rot_mat.Crot,updown $
-              ,xyz_ray
-    oplot,[nbi.xyz_src[ii,0],nbi.xyz_src[ii,0]+xyz_ray[0]] $
-         ,[nbi.xyz_src[ii,1],nbi.xyz_src[ii,1]+xyz_ray[1]],thick=2,color=230
-
-	;;PLOT CROSS SECTION BEAM AND CHORDS 
-	window,1 & wset,1
-	plot,[0],[0],/nodata,xrange=x_range,yrange=z_range,$
-		color=0,background=255,title='POLODIAL VIEW',xtitle='X [cm]',ytitle='Z [cm]'
-	for i=0,grid.nx-1 do begin
-		oplot,[grid.xx[i],grid.xx[i]],[grid.zz[0],grid.zz[-1]],color=0
-	endfor	
-	for i=0,grid.nz-1 do begin
-		oplot,[grid.xx[0],grid.xx[-1]],[grid.zz[i],grid.zz[i]],color=0
-	endfor	
-	for i=0,n_elements(los)-1 do begin
-		oplot,[fida.xmid[los[i]],fida.xlens[los[i]]] ,[fida.zmid[los[i]],fida.zlens[los[i]]] ,color=50
-	endfor
-
+        ;; Plot grid, beam, sightlines, and equilibrium
+	CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,rot_mat
 
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
@@ -545,6 +499,9 @@ PRO prefida,input_pro
 	printf,55, inputs.nofida,f='(i2,"             # only NBI+HALO")'
 	printf,55, inputs.npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
+        printf,55,inputs.guidingcenter,f='(i2,"             # 0 for full-orbit F")'
+        printf,55,inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
+
 	printf,55, inputs.calc_wght,f='(i2,"             # calculate wght function")'
 	printf,55,'# weight function settings:'
 	printf,55, inputs.nr_wght,f='(i9,"      # number velocities")'
@@ -592,14 +549,14 @@ PRO prefida,input_pro
 	printf,55,nbi.divz[0,ii],f='(1f10.7,"     #divergence z of full comp")'
 	printf,55,nbi.divz[1,ii],f='(1f10.7,"     #divergence z of half comp")'
 	printf,55,nbi.divz[2,ii],f='(1f10.7,"     #divergence z of third comp")'
-	printf,55,nbi.focy[ii],f='(1f9.4,"      # focal length in y")' 
-	printf,55,nbi.focz[ii],f='(1f9.4,"      # focal length in z")' 
-	printf,55,nbi.einj[ii],f='(1f9.4,"      # injected energy [keV]")' 
-	printf,55,nbi.pinj[ii],f='(1f9.4,"      # injected power [MW]")'  
+	printf,55,nbi.focy[ii],f='(1f10.2,"      # focal length in y")' 
+	printf,55,nbi.focz[ii],f='(1f10.2,"      # focal length in z")' 
+	printf,55,nbi.einj,f='(1f9.4,"      # injected energy [keV]")' 
+	printf,55,nbi.pinj,f='(1f9.4,"      # injected power [MW]")'  
 	printf,55,'# Species-mix (Particles):'
-	printf,55 ,nbi.full[ii],f='(1f9.6,"      # full energy")' 
-	printf,55 ,nbi.half[ii],f='(1f9.6,"      # half energy")'  
-	printf,55 ,nbi.third[ii],f='(1f9.6,"      # third energy")' 
+	printf,55 ,nbi.full,f='(1f9.6,"      # full energy")' 
+	printf,55 ,nbi.half,f='(1f9.6,"      # half energy")'  
+	printf,55 ,nbi.third,f='(1f9.6,"      # third energy")' 
 	printf,55, '#position of NBI source in xyz coords:'
 	printf,55,nbi.xyz_src[ii,0],f='(1f9.4,"      # x [cm]")' 
 	printf,55,nbi.xyz_src[ii,1],f='(1f9.4,"      # y [cm]")' 
@@ -678,7 +635,7 @@ PRO prefida,input_pro
 
 	print,''
 	print,''
-	print, 'To run FIDASIM run the following command'
+	print, 'To run FIDASIM use the following command'
 	print, inputs.install_dir+'fidasim '+inputs.result_dir+inputs.runid
 	print,''
 	print,''

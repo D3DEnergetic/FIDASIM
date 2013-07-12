@@ -219,7 +219,7 @@ contains
     integer(long)   :: dummi 
     print*,'---- loading inputs -----' 
     filename=trim(adjustl(result_dir))//"/inputs.dat"
-    open(66,file=filename)
+    open(66,form='formatted',file=filename)
     read(66,*) !# FIDASIM input file created...
     read(66,"(A120)") root_dir
     read(66,*) inputs%shot_number
@@ -475,7 +475,6 @@ print*,'zeff:  ',mzeff
     real(double) :: vb
     real(double), dimension(:)  , allocatable :: brems
     filename=trim(adjustl(result_dir))//"/bremsstrahlung.bin"
-!    filename="/u/heidbrin/FIDASIM2/RESULTS/28746A01/bremsstrahlung.bin"
     print*,'---- loading bremsstrahlung data from ', filename
     open(66,form='unformatted',file=filename,access='stream')
     allocate(brems(spec%nlambda))

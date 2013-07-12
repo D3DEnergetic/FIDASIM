@@ -415,7 +415,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	GET_OUT: 
 END
 
-PRO prefida,input_pro
+PRO prefida,input_pro,plot=plot
 
 	COMPILE_OPT DEFINT32
 
@@ -482,9 +482,11 @@ PRO prefida,input_pro
 		goto,GET_OUT
 	endif else err=0
 
-        ;; Plot grid, beam, sightlines, and equilibrium
-	CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,rot_mat
-
+    ;; Plot grid, beam, sightlines, and equilibrium
+	if keyword_set(plot) then begin
+		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,rot_mat
+	endif
+	help,nbi,fida,grid,equil,plasma,/str
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file
@@ -499,9 +501,8 @@ PRO prefida,input_pro
 	printf,55, inputs.nofida,f='(i2,"             # only NBI+HALO")'
 	printf,55, inputs.npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
-        printf,55,inputs.guidingcenter,f='(i2,"             # 0 for full-orbit F")'
-        printf,55,inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
-
+    printf,55, inputs.guidingcenter,f='(i2,"             # 0 for full-orbit F")'
+    printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
 	printf,55, inputs.calc_wght,f='(i2,"             # calculate wght function")'
 	printf,55,'# weight function settings:'
 	printf,55, inputs.nr_wght,f='(i9,"      # number velocities")'

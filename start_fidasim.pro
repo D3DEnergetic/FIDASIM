@@ -20,7 +20,7 @@ pro start_fidasim
 
 
   user=+GETENV('USER')
-  root_dir='/u/'+user+'/FIDASIM2/'
+  root_dir='/u/'+user+'/FIDASIM/'
 
 
   !Path = !path+ ':'+root_dir+'AUGD/'
@@ -73,14 +73,15 @@ pro start_fidasim
   dalpha_inputs,inputs
   ;; start the f90 routine
   result_dir = inputs.root_dir + 'RESULTS/' + inputs.fidasim_runid
-  spawn, 'module load intel'
-  spawn, root_dir+'fidasim '+result_dir
+  print, result_dir
+;  spawn, 'module load intel'
+;  spawn, root_dir+'fidasim '+result_dir
 
 
   ;; plot the spectra
-  plot_fidasim_spectra
+;  plot_fidasim_spectra
   ;; plot the neutral densities
-  plot_fidasim_neutrals,/loga
+;  plot_fidasim_neutrals,/loga
 
 end
 

@@ -24,7 +24,12 @@ emax=100.  												;; maximum energy used from the distribution function
 ;; Beam/FIDA/EQUILIBRIUM Selection
 ;;-----------------------------------------------------
 isource=2     											;; Beam source index (FIDASIM only simulates on NBI source)
+einj=0.                 ;; [keV] If 0, get data from MDS+
+pinj=0.                 ;; [MW] If 0, get data from MDS+
+
 fida_diag='CFR'   										;; Name of the FIDA diag
+
+gfile=''                ;; If empty, use MDS+; otherwise, filename
 equil='EQH'												;; Name of equilibrium. Ex. for D3D EFIT02
 
 ;;-----------------------------------------------------
@@ -56,11 +61,6 @@ ydim2=-10.												;; Maximum y value
 zdim1=-75.												;; Minimum z value
 zdim2=75.												;; Maximum z value
 
-origin=[0,0,0]											;; If using different a coordinate system, this is the origin 
-														;; in machine coordinates of the new system
-
-rotate=0.0												;; Rotation angle in radians from +x about z axis that transforms machine
-														;; coordinates to the new system. Rotations about x or y not supported
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
@@ -81,24 +81,28 @@ wavel_end_wght=663.   									;; Maximum wavelength
 ;;-------------------------------------------------
 ;; Simulation switches
 ;;-------------------------------------------------
-npa=[0]   												;; (0 or 1) If 0 do a simulation for NPA
-no_spectra=[0]   										;; (0 or 1) If 1 then no spectra are calculated
-nofida=[0]    											;; (0 or 1) If 1 then no fast-ions are simulated
-calc_wght=[1]  											;; (0 or 1) If 1 then weight functions are calculated
-load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing 
-														;; neutrals.bin file located in runid directory
+npa=[1]                     ;; (0 or 1) If 0 do a simulation for NPA
+no_spectra=[0]              ;; (0 or 1) If 1 then no spectra are calculated
+nofida=[0]                  ;; (0 or 1) If 1 then no fast-ions are simulated
+f90brems=[1]                ;; (0 or 1) If 0 use the IDL bremstrahlung calculation
+guidingcenter=[1]           ;; (0 or 1) Use 1 for guiding center distribution functs.
+calc_wght=[0]               ;; (0 or 1) If 1 then weight functions are calculated
+load_neutrals=[0]           ;; (0 or 1) If 1 then the neutral density is loaded from an existing 
+                            ;; neutrals.bin file located in runid directory	
 
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
 
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
-		cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,isource:isource,fida_diag:fida_diag,equil:equil,btipsign:btipsign,$
-		ab:ab,ai:ai,impurity_charge:impurity_charge,lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,$
-		dlambda:dlambda,nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-		origin:origin,rotate:rotate,nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
-        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
-		wavel_end_wght:wavel_end_wght,npa:npa,no_spectra:no_spectra,nofida:nofida,calc_wght:calc_wght,$
-		load_neutrals:load_neutrals}
+       cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax, $
+       isource:isource,einj:einj,pinj:pinj,fida_diag:fida_diag,gfile:gfile,equil:equil,$
+       btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
+       lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
+       nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
+       nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+       emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
+       wavel_end_wght:wavel_end_wght,npa:npa,no_spectra:no_spectra,nofida:nofida, $
+       f90brems:f90brems,guidingcenter:guidingcenter,calc_wght:calc_wght,load_neutrals:load_neutrals}
 
 END

@@ -1,5 +1,5 @@
-PRO d3d_input,inputs                                    
-
+PRO d3d_input,inputs                                   
+user=+GETENV('USER')
 ;;-----------------------------------------------------
 ;;				PREFIDA INPUT FILE
 ;;-----------------------------------------------------
@@ -7,14 +7,14 @@ shot=142114											;; Shot Number
 time=1.090 		        							;; Time (s) 
 runid='142114B08'   								;; runid of FIDASIM
 device='D3D'										;; D3D,NSTX,AUGD,MAST
-install_dir='/u/stagnerl/FIDASIM/'		   			;; Location of fidasim code and executable
-result_dir='/u/stagnerl/FIDASIM/RESULTS/D3D/'  	;; Location where results will be stored result_dir/runid directory will be created
-profile_dir='/u/stagnerl/GAPROFILES/'              	;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
+install_dir='/u/'+user+'/FIDASIM/'		   			;; Location of fidasim code and executable
+result_dir='/u/'+user+'/FIDASIM/RESULTS/D3D/'  	;; Location where results will be stored result_dir/runid directory will be created
+profile_dir='/u/'+user+'/GAPROFILES/'              	;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
 
 ;;----------------------------------------------------
 ;; Fast-ion distribution function from transp
 ;;----------------------------------------------------
-cdf_file='/u/stagnerl/GAPROFILES/142114/142114B08_fi_1.cdf'  ;; CDF file from transp with the distribution funciton
+cdf_file='/u/'+user+'/GAPROFILES/142114/142114B08_fi_1.cdf'  ;; CDF file from transp with the distribution funciton
 emin=0.                                                      ;; minimum energy used from the distribution function
 emax=100.        										     ;; maximum energy used from the distribution function
 

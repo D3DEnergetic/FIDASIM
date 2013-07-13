@@ -219,7 +219,7 @@ contains
     integer(long)   :: dummi 
     print*,'---- loading inputs -----' 
     filename=trim(adjustl(result_dir))//"/inputs.dat"
-    open(66,form='formatted',file=filename)
+    open(66,file=filename)
     read(66,*) !# FIDASIM input file created...
     read(66,"(A120)") root_dir
     read(66,*) inputs%shot_number
@@ -345,7 +345,7 @@ contains
     !filename="RESULTS/"//trim(adjustl(inputs%runid))//"/los.bin" 
     filename=trim(adjustl(result_dir))//"/los.bin"
     print*,'---- loading detector information ----'
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
     read(66)spec%nchan
     allocate(spec%xyzhead(spec%nchan,3))
     allocate(spec%xyzlos(spec%nchan,3))
@@ -398,7 +398,7 @@ mzeff=0.d0
 
     filename=trim(adjustl(result_dir))//"/plasma.bin"
     print*,'---- loading plasma data from ', filename
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
     read(66)Nx
     read(66)Ny
     read(66)Nz
@@ -475,8 +475,9 @@ print*,'zeff:  ',mzeff
     real(double) :: vb
     real(double), dimension(:)  , allocatable :: brems
     filename=trim(adjustl(result_dir))//"/bremsstrahlung.bin"
+!    filename="/u/heidbrin/FIDASIM2/RESULTS/28746A01/bremsstrahlung.bin"
     print*,'---- loading bremsstrahlung data from ', filename
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
     allocate(brems(spec%nlambda))
     do i = 1,spec%nchan
       read(66) vb
@@ -493,7 +494,7 @@ print*,'zeff:  ',mzeff
     integer(long) :: nlev
     !-------------------Deuterium EXCITATION/IONIZATION/CX TABLE------
     filename=trim(adjustl(root_dir))//"TABLES/qptable.bin"
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
     read(66) atomic%nr_ti_qp
     read(66) atomic%d_ti_qp
     read(66) atomic%nr_eb_qp
@@ -515,7 +516,7 @@ print*,'zeff:  ',mzeff
     ! H(+) + H(n) --> H(m) + H(+)
     ! energy in keV/amu
     filename=trim(adjustl(root_dir))//"TABLES/neuttable.bin"
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
     read(66) atomic%nr_eb_neut
     read(66) atomic%d_eb_neut
     read(66) nlev
@@ -531,7 +532,7 @@ print*,'zeff:  ',mzeff
     close(66)
     !-------------------ELECTRON EXCITATION/IONIZATION TABLE--------
     filename=trim(adjustl(root_dir))//"TABLES/qetable.bin"
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
    read(66) atomic%nr_te_qe
     read(66) atomic%d_te_qe
     read(66) atomic%nr_eb_qe
@@ -558,7 +559,7 @@ print*,'zeff:  ',mzeff
          filename=trim(adjustl(root_dir))//"TABLES/qctable.bin" 
     if(inputs%impurity_charge.eq.7) &
          filename=trim(adjustl(root_dir))//"TABLES/qntable.bin"
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
     read(66) atomic%nr_ti_qi
     read(66) atomic%d_ti_qi
     read(66) atomic%nr_eb_qi
@@ -610,7 +611,7 @@ print*,'zeff:  ',mzeff
     real(float), dimension(:,:,:), allocatable :: transp_fbm   
     filename=trim(adjustl(result_dir))//"/transp_fbm.bin"
     print*,'---- loading fast ion distribution function ----'
-    open(66,form='unformatted',file=filename,access='stream')
+    open(66,file=filename,access='stream')
     read(66) transp_nzones
     allocate(transp_r(transp_nzones))
     do i=1,transp_nzones
@@ -689,7 +690,7 @@ print*,'zeff:  ',mzeff
     integer(long) :: i,j,k,n 
     character(120)  :: filename
     filename=trim(adjustl(result_dir))//"/neutrals.bin"    
-    open (66, form='unformatted',file =filename,access='stream')
+    open (66, file =filename,access='stream')
     write(66)real(inputs%shot_number,float )
     write(66)real(inputs%time)
     write(66)real(grid%Nx,float)
@@ -718,7 +719,7 @@ print*,'zeff:  ',mzeff
     character(120)  :: filename
     npa%wght(:)=npa%wght(:)/(pi*npa%size(1)**2)
     filename=trim(adjustl(result_dir))//"/npa.bin"      
-    open (66, form='unformatted',file =filename,access='stream')
+    open (66, file =filename,access='stream')
     write(66)real(inputs%shot_number,float )
     write(66)real(inputs%time,float)
     write(66)real(npa%counter, float)
@@ -820,7 +821,7 @@ print*,'zeff:  ',mzeff
     real(float) :: fdummi
     print*,'---- load neutrals RESULTS/neutrals.bin ----' 
     filename=trim(adjustl(result_dir))//"/neutrals.bin" 
-    open (66, form='unformatted',file =filename,access='stream')
+    open (66, file =filename,access='stream')
     read(66)fdummi
     read(66)fdummi
     read(66)fdummi
@@ -2939,7 +2940,7 @@ print*,'zeff:  ',mzeff
   
     !! Open file for the outputs
     filename=trim(adjustl(result_dir))//"/weight_function.bin" 
-    open (66,form='unformatted', file =filename,access='stream')
+    open (66, file =filename,access='stream')
     write(66)real(inputs%shot_number,float)
     write(66)real(inputs%time,float)
     write(66)real(inputs%ichan_wght,float) 

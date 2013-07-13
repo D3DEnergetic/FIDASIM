@@ -8,14 +8,14 @@ shot=28746L												;; Shot Number
 time=4.42  												;; Time 
 runid='28746A01'   										;; runid of FIDASIM
 device='AUGD'											;; D3D,NSTX,AUGD,MAST
-install_dir='/u/stagnerl/FIDASIM/'						;; Location of fidasim code and executable
-result_dir='/u/stagnerl/FIDASIM/RESULTS/AUGD/'  		;; Location where results will be stored /RESULTS/runid directory will be created
+install_dir='/u/lstagner/FIDASIM/'						;; Location of fidasim code and executable
+result_dir='/u/lstagner/FIDASIM/RESULTS/AUGD/'  		;; Location where results will be stored /RESULTS/runid directory will be created
 profile_dir='/u/stagnerl/GAPROFILES/'					;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
 
 ;;----------------------------------------------------
 ;; Fast-ion distribution function from transp
 ;;----------------------------------------------------
-cdf_file='/u/stagnerl/FIDASIM/TEST/28746A01_fi_1.cdf'  ;; CDF file from transp with the distribution funciton
+cdf_file='/u/lstagner/FIDASIM/TEST/28746A01_fi_1.cdf'  ;; CDF file from transp with the distribution funciton
 emin=0.    												;; minimum energy used from the distribution function
 emax=100.  												;; maximum energy used from the distribution function
 

@@ -20,7 +20,7 @@ pro start_fidasim
 
 
   user=+GETENV('USER')
-  root_dir='/u/'+user+'/FIDASIM2/' ;Default directory
+  root_dir='/u/'+user+'/FIDASIM/' ;Default directory
   ;root_dir='/p/nstxusr/nstx-users/dliu/FIDAsim_fortran/Gieiger20130222/FIDASIM2/'; D. Liu's directory
 
 
@@ -47,7 +47,7 @@ pro start_fidasim
            ,emin:0. $  ;; minimum energy used from the distribution function
            ,emax:100. $;; maximum energy used from the distribution function
            ,guidingcenter:[1] $ ;; 0 for full-orbit distribution function
-           ,f90brems:[0] $ ;; 0 reads IDL v.b.
+           ,f90brems:[1] $ ;; 0 reads IDL v.b.
            ,load_neutrals:[0] $ ;; if 1 then the neutral density (prefida) is loaded from an existing neutrals.bin file
                        ;; dimensions for the simulation grid
            ,dx:dx,dy:dy,dz:dz,nx:nx,ny:ny,nz:nz,xx:xx,yy:yy,zz:zz $

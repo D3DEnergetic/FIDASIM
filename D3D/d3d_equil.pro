@@ -18,8 +18,8 @@ FUNCTION d3d_equil,inputs,grid
 		endif
 	endelse
 
-    rhogrid=rho_rz(g,grid.r_grid,grid.zc)
-
+    rhogrid=rho_rz(g,grid.r_grid/100.,grid.zc/100.)
+		
 	calculate_bfield,bp,br,bphi,bz,g
 ;	help,bp,br,bphi,bz
 	;; Get radial electric field on efit's grid from potential

@@ -9,7 +9,7 @@ PRO augd_routines,inputs,grid,nbi,fida,profiles,equil,err
   nbi_geometry_transp,nbgeom
 ;  help,nbgeom,/str
   help,einj,pinj
-  nbi={einj:einj[inputs.isource],pinj:pinj[inputs.isource],full:ffull,half:fhalf,third:fthird,$
+  nbi={einj:double(einj[inputs.isource]),pinj:pinj[inputs.isource],full:double(ffull),half:double(fhalf),third:double(fthird),$
 	   xyz_src:nbgeom.xyz_src,xyz_pos:nbgeom.xyz_pos,$
 	   bmwidra:nbgeom.bmwidra,bmwidza:nbgeom.bmwidza,$
 	   divy:nbgeom.divy,divz:nbgeom.divz,focy:nbgeom.focy,focz:nbgeom.focz}

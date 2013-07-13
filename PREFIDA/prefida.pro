@@ -360,17 +360,17 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	;;------------------------------------------------- 
 
 	;;Electron density
-	dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid)>0. ;[1/cm^3]
+	dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid) > 0. ;[1/cm^3]
 
 	;;Zeff
-	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid)>0
+	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 0
 
 	;;Impurity density
 	deni = (zeff-1.)/(inputs.impurity_charge*(inputs.impurity_charge-1))*dene
 
 	;;Proton density
 	denp = dene-inputs.impurity_charge*deni
-;	print,total(deni)/total(denp)*100. ,' percent of impurities'
+	print,total(deni)/total(denp)*100. ,' percent of impurities'
 	
 	;;Fast-ion density
 	if keyword_set(inputs.nofida) then begin
@@ -389,7 +389,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	if min(te) lt 0 then te[where(te lt 0.)]=0.d0 
 	
 	;;Ion temperature   
-	ti = 1.d-3 * interpol(profiles.ti,profiles.rho,equil.rho_grid)>0. ;keV
+	ti = 1.d-3 * interpol(profiles.ti,profiles.rho,equil.rho_grid) > 0. ;keV
 	if max(ti) gt 10. or max(te) gt 10. then begin
 		print, 'WARNING:'
 		print, 'Electron or Ion temperature greater than 10 keV'
@@ -486,7 +486,7 @@ PRO prefida,input_pro,plot=plot
 	if keyword_set(plot) then begin
 		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,rot_mat
 	endif
-	help,nbi,fida,grid,equil,plasma,/str
+;	help,nbi,fida,grid,equil,plasma,/str
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file
@@ -579,9 +579,9 @@ PRO prefida,input_pro,plot=plot
 	writeu,lun , long(inputs.nx)
 	writeu,lun , long(inputs.ny)
 	writeu,lun , long(inputs.nz)
-	for ix=0,inputs.nx-1 do begin
-		for iy=0,inputs.ny-1 do begin
-			for iz=0,inputs.nz-1 do begin
+	for ix=0L,inputs.nx-1 do begin
+		for iy=0L,inputs.ny-1 do begin
+			for iz=0L,inputs.nz-1 do begin
 				i=ix+inputs.nx*iy+inputs.nx*inputs.ny*iz
 				writeu,lun $
 				, double(plasma.te[i])     , double(plasma.ti[i])    $

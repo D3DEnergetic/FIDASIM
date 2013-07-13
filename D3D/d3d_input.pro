@@ -63,9 +63,9 @@ zdim2=50.			;; Maximum z value
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
-nr_fida=50000   		;; FIDA
+nr_fida=5000   			;; FIDA
 nr_ndmc=1000 			;; Beam emission
-nr_halo=50000   		;; Halo contribution
+nr_halo=5000	   		;; Halo contribution
 
 ;;--------------------------------------------------
 ;; Calculation of the weight function
@@ -80,7 +80,7 @@ wavel_end_wght=663.   		;; Maximum wavelength
 ;;-------------------------------------------------
 ;; Simulation switches
 ;;-------------------------------------------------
-npa=[1]   					;; (0 or 1) If 0 do a simulation for NPA
+npa=[0]   					;; (0 or 1) If 1 do a simulation for NPA
 no_spectra=[0]   			;; (0 or 1) If 1 then no spectra are calculated
 nofida=[0]    				;; (0 or 1) If 1 then no fast-ions are simulated
 f90brems=[1]                ;; (0 or 1) If 0 use the IDL bremstrahlung calculation

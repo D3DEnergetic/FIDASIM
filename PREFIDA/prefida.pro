@@ -71,8 +71,8 @@ PRO prepare_beam,inputs,nbi,rot_mat
 		goto, GET_OUT
 	endif
 
-	xs=nbi.xyz_src[isource,0] & ys=nbi.xyz_src[isource,1] & zs=nbi.xyz_src[isource,2]
-	xp=nbi.xyz_pos[isource,0] & yp=nbi.xyz_pos[isource,1] & zp=nbi.xyz_pos[isource,2]
+	xs=nbi.xyz_src[0] & ys=nbi.xyz_src[1] & zs=nbi.xyz_src[2]
+	xp=nbi.xyz_pos[0] & yp=nbi.xyz_pos[1] & zp=nbi.xyz_pos[2]
 
 	dis=sqrt( (xs-xp)^2.0d +(ys-yp)^2.0d + (zs-zp)^2.0d)
 	BETA=asin((zp-zs)/dis)
@@ -486,7 +486,7 @@ PRO prefida,input_pro,plot=plot
 	if keyword_set(plot) then begin
 		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,rot_mat
 	endif
-;	help,nbi,fida,grid,equil,plasma,/str
+	help,nbi,fida,grid,equil,plasma,/str
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file
@@ -544,14 +544,14 @@ PRO prefida,input_pro,plot=plot
 	printf,55, nbi.BMWIDZA,f='(1f9.4,"      # NBI half width vertical")'
 	ii=inputs.isource[0]
 	printf,55, ii,f='(1i2,"             # Nr of NBI")'
-	printf,55,nbi.divy[0,ii],f='(1f10.7,"     #divergence y of full comp")'
-	printf,55,nbi.divy[1,ii],f='(1f10.7,"     #divergence y of half comp")'
-	printf,55,nbi.divy[2,ii],f='(1f10.7,"     #divergence y of third comp")'
-	printf,55,nbi.divz[0,ii],f='(1f10.7,"     #divergence z of full comp")'
-	printf,55,nbi.divz[1,ii],f='(1f10.7,"     #divergence z of half comp")'
-	printf,55,nbi.divz[2,ii],f='(1f10.7,"     #divergence z of third comp")'
-	printf,55,nbi.focy[ii],f='(1f10.2,"      # focal length in y")' 
-	printf,55,nbi.focz[ii],f='(1f10.2,"      # focal length in z")' 
+	printf,55,nbi.divy[0],f='(1f10.7,"     #divergence y of full comp")'
+	printf,55,nbi.divy[1],f='(1f10.7,"     #divergence y of half comp")'
+	printf,55,nbi.divy[2],f='(1f10.7,"     #divergence y of third comp")'
+	printf,55,nbi.divz[0],f='(1f10.7,"     #divergence z of full comp")'
+	printf,55,nbi.divz[1],f='(1f10.7,"     #divergence z of half comp")'
+	printf,55,nbi.divz[2],f='(1f10.7,"     #divergence z of third comp")'
+	printf,55,nbi.focy,f='(1f10.2,"      # focal length in y")' 
+	printf,55,nbi.focz,f='(1f10.2,"      # focal length in z")' 
 	printf,55,nbi.einj,f='(1f9.4,"      # injected energy [keV]")' 
 	printf,55,nbi.pinj,f='(1f9.4,"      # injected power [MW]")'  
 	printf,55,'# Species-mix (Particles):'
@@ -559,9 +559,9 @@ PRO prefida,input_pro,plot=plot
 	printf,55 ,nbi.half,f='(1f9.6,"      # half energy")'  
 	printf,55 ,nbi.third,f='(1f9.6,"      # third energy")' 
 	printf,55, '#position of NBI source in xyz coords:'
-	printf,55,nbi.xyz_src[ii,0],f='(1f9.4,"      # x [cm]")' 
-	printf,55,nbi.xyz_src[ii,1],f='(1f9.4,"      # y [cm]")' 
-	printf,55,nbi.xyz_src[ii,2],f='(1f9.4,"      # z [cm]")' 
+	printf,55,nbi.xyz_src[0],f='(1f9.4,"      # x [cm]")' 
+	printf,55,nbi.xyz_src[1],f='(1f9.4,"      # y [cm]")' 
+	printf,55,nbi.xyz_src[2],f='(1f9.4,"      # z [cm]")' 
 	printf,55,'# 3 rotation matrizes 3x3'
 	for j=0,2 do begin
 	for k=0,2 do begin

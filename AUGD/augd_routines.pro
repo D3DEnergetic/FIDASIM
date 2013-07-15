@@ -8,12 +8,12 @@ PRO augd_routines,inputs,grid,nbi,fida,profiles,equil,err
 
   nbi_geometry_transp,nbgeom
 ;  help,nbgeom,/str
-  help,einj,pinj
-  nbi={einj:double(einj[inputs.isource]),pinj:pinj[inputs.isource],full:double(ffull),half:double(fhalf),third:double(fthird),$
-	   xyz_src:nbgeom.xyz_src,xyz_pos:nbgeom.xyz_pos,$
+  nbi={einj:double(einj[inputs.isource]),pinj:pinj[inputs.isource],full:double(ffull[inputs.isource]),$
+	   half:double(fhalf[inputs.isource]),third:double(fthird[inputs.isource]),$
+	   xyz_src:reform(nbgeom.xyz_src[inputs.isource,*]),xyz_pos:reform(nbgeom.xyz_pos[inputs.isource,*]),$
 	   bmwidra:nbgeom.bmwidra,bmwidza:nbgeom.bmwidza,$
-	   divy:nbgeom.divy,divz:nbgeom.divz,focy:nbgeom.focy,focz:nbgeom.focz}
-
+	   divy:nbgeom.divy[*,inputs.isource],divz:nbgeom.divz[*,inputs.isource],focy:nbgeom.focy[inputs.isource],focz:nbgeom.focz[inputs.isource]}
+  help,nbi,/str
   restore,'/u/'+user+'/FIDASIM/TEST/fida_diag.idl'
   sigma_pi_ratio=0.5d0
   if inputs.shot gt 27500 then sigma_pi_ratio=0.9d0

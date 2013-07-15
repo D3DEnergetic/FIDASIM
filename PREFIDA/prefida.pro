@@ -30,6 +30,7 @@ PRO make_fida_grid,inputs,grid,err
   	dy= (ydim2-ydim1) / double(ny)
   	dz= (zdim2-zdim1) / double(nz)
 	ng=long(nx)*long(ny)*long(nz)     ;; nr of cells
+
   	;;cell borders
   	xx=dx*dindgen(nx)+xdim1
   	yy=dy*dindgen(ny)+ydim1
@@ -426,7 +427,6 @@ PRO prefida,input_pro,plot=plot
 
 	;;CALL INPUT PROCEDURE/FILE
 	CALL_PROCEDURE,input_pro,inputs
-;	help,inputs,/str
 
 	;;MAKE DIRECTORIES IF THEY DONT EXIST
 	if file_test(inputs.result_dir,/directory) eq 0 then begin
@@ -486,7 +486,7 @@ PRO prefida,input_pro,plot=plot
 	if keyword_set(plot) then begin
 		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,rot_mat
 	endif
-	help,nbi,fida,grid,equil,plasma,/str
+
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file

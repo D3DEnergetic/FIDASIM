@@ -7,52 +7,52 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 					   err				;;OUTPUT: ERROR STATUS ERR=1 == SOMETHING WENT WRONG
 
 	
-	;;IN THIS SECTION YOU CAN USE WHATEVER ROUTINES YOU WANT SO LONG AS YOU DEFINE THE OUTPUTS AS FOLLOWS
+	;;IN THIS SECTION YOU CAN USE WHATEVER ROUTINES 
+	;;YOU WANT SO LONG AS YOU DEFINE THE OUTPUT STRUCTURES
+	;;CONTAIN AT LEAST THE FOLLOWING TAGS
 	
-	;; nbi structure (8 == number of beams)
-	;;** Structure <8394cd8>, 13 tags, length=1104, data length=1104, refs=1:
-	;;   EINJ            FLOAT     Array[8]
-	;;   PINJ            DOUBLE    Array[8]
-	;;   FULL            FLOAT     Array[8]
-	;;   HALF            FLOAT     Array[8]
-	;;   THIRD           FLOAT     Array[8]
-	;;   XYZ_SRC         DOUBLE    Array[8, 3]
-	;;   XYZ_POS         DOUBLE    Array[8, 3]
-	;;   BMWIDRA         DOUBLE           11.000000
-	;;   BMWIDZA         DOUBLE           25.000000
-	;;   DIVY            DOUBLE    Array[3, 8]
-	;;   DIVZ            DOUBLE    Array[3, 8]
-	;;   FOCY            DOUBLE    Array[8]
-	;;   FOCZ            DOUBLE    Array[8]
+	;;** Structure <10d7c568>, 13 tags, length=168, data length=164, refs=1:
+	;;   EINJ            DOUBLE           74.369202
+	;;   PINJ            DOUBLE           2.0655587
+	;;   FULL            DOUBLE          0.53365599
+	;;   HALF            DOUBLE          0.27345340
+	;;   THIRD           DOUBLE          0.19289061
+	;;   XYZ_SRC         DOUBLE    Array[3]
+	;;   XYZ_POS         DOUBLE    Array[3]
+	;;   BMWIDRA         DOUBLE           6.0000000
+	;;   BMWIDZA         DOUBLE           24.000000
+	;;   DIVY            DOUBLE    Array[3]
+	;;   DIVZ            DOUBLE    Array[3]
+	;;   FOCY            FLOAT            1.e+06
+	;;   FOCZ            DOUBLE           1000.0000
 
-	;; fida structure (15 == number of chords/channels)
-	;;** Structure <88d87f8>, 9 tags, length=800, data length=792, refs=1:
-	;;   SIGMA_PI_RATIO  DOUBLE          0.90000000 ;;COULD BE ARRAY
-	;;   NCHAN           LONG                15
-	;;   XMID            DOUBLE    Array[15]
-	;;   YMID            DOUBLE    Array[15]
-	;;   ZMID            DOUBLE    Array[15]
-	;;   XLENS           DOUBLE    Array[15]
-	;;   YLENS           DOUBLE    Array[15]
-	;;   ZLENS           DOUBLE    Array[15]
-	;;   HEADSIZE        FLOAT     Array[15]
+	;;** Structure <10d7aeb8>, 9 tags, length=288, data length=288, refs=1:
+	;;   NCHAN           LONG                10
+	;;   XMID            FLOAT     Array[10]
+	;;   YMID            FLOAT     Array[10]
+	;;   ZMID            FLOAT     Array[10]
+	;;   XLENS           FLOAT     Array[10]
+	;;   YLENS           FLOAT     Array[10]
+	;;   ZLENS           FLOAT     Array[10]
+	;;   SIGMA_PI_RATIO  FLOAT           1.00000
+	;;   HEADSIZE        FLOAT     Array[10]
 
-	;; profiles structure
-	;;** Structure <83e8518>, 7 tags, length=5768, data length=5764, refs=1:
-	;;   TIME            FLOAT           4.42000
-	;;   RHO             DOUBLE    Array[120]
-	;;   TI              DOUBLE    Array[120] [eV]
-	;;   VTOR            DOUBLE    Array[120] [m/s]
-	;;   TE              DOUBLE    Array[120] [eV]
-	;;   DENE            DOUBLE    Array[120] [m^-3]
-	;;   ZEFF            DOUBLE    Array[120]
-	
-	;; equil structure (3 == x,y,z components
-	;;** Structure <83e79e8>, 2 tags, length=3360000, data length=3360000, refs=1:
+	;;** Structure <10dc9e28>, 5 tags, length=3380784, data length=3380772, refs=1:
 	;;   RHO_GRID        FLOAT     Array[120000]
-	;;   B               DOUBLE    Array[3, 120000]
-	;;   E               DOUBLE    Array[3, 120000]
+	;;   B               FLOAT     Array[3, 120000]
+	;;   E               FLOAT     Array[3, 120000]
 
+	
+	;;** Structure <10d955b8>, 8 tags, length=3648, data length=3642, refs=1:
+	;;   TIME            FLOAT           1.09000
+	;;   RHO             FLOAT     Array[101]
+	;;   TE              DOUBLE    Array[101]
+	;;   TI              DOUBLE    Array[101]
+	;;   VTOR            FLOAT     Array[101]
+	;;   DENE            DOUBLE    Array[101]
+	;;   ZEFF            FLOAT     Array[101]
+
+	;;FOR CONVINIENCE HERE ARE THE MINIMUM STRUCTURE DEFINITIONS
 	equil={rho_grid:rho_grid,$	   			;;FIDA GRID IN MAGNETIC FLUX COORDINATES (RHO)
 			  b:b,$					   		;;MAGNETIC FIELD COMPONENTS AT GRID POINTS
 			  e:e}							;;ELECTRIC FIELD COMPONENTS AT GRID POINTS

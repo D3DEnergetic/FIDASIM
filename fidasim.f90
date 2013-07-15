@@ -163,6 +163,8 @@ module application
      integer(long) :: nofida
      integer(long) :: load_neutrals
      integer(long) :: npa 
+     integer(long) :: guidingcenter  !! 0 for full-orbit F
+     integer(long) :: f90brems       !! 0 to use IDL v.b.
      integer(long) :: calc_wght
      !! Plasma parameters
      integer(long) :: impurity_charge
@@ -217,7 +219,7 @@ contains
     integer(long)   :: dummi 
     print*,'---- loading inputs -----' 
     filename=trim(adjustl(result_dir))//"/inputs.dat"
-    open(66,file=filename)
+    open(66,form='formatted',file=filename)
     read(66,*) !# FIDASIM input file created...
     read(66,"(A120)") root_dir
     read(66,*) inputs%shot_number
@@ -229,6 +231,8 @@ contains
     read(66,*) inputs%nofida
     read(66,*) inputs%npa
     read(66,*) inputs%load_neutrals
+    read(66,*) inputs%guidingcenter
+    read(66,*) inputs%f90brems
     read(66,*) inputs%calc_wght
     read(66,*) !# weight function settings
     read(66,*) inputs%nr_wght
@@ -379,6 +383,19 @@ contains
   subroutine read_plasma
     character(120)          :: filename
     integer(long) :: Nx,Ny,Nz,i, j, k 
+
+real(double) :: mte,mti,mdene,mdeni,mvrot,mb,me,mrho,mdenf,mzeff
+mte=0.d0
+mti=0.d0
+mdene=0.d0
+mdeni=0.d0
+mvrot=0.d0
+mb=0.d0
+me=0.d0
+mrho=0.d0
+mdenf=0.d0
+mzeff=0.d0
+
     filename=trim(adjustl(result_dir))//"/plasma.bin"
     print*,'---- loading plasma data from ', filename
     open(66,form='unformatted',file=filename,access='stream')
@@ -401,7 +418,73 @@ contains
        enddo
     enddo
     close(66)
+    do i = 1,Nx
+       do j = 1,Ny
+          do k = 1,Nz
+if(cell(i,j,k)%plasma%te .gt. mte) then 
+  mte=cell(i,j,k)%plasma%te
+endif
+if(cell(i,j,k)%plasma%ti .gt. mti) then 
+  mti=cell(i,j,k)%plasma%ti
+endif
+if(cell(i,j,k)%plasma%dene .gt. mdene) then 
+  mdene=cell(i,j,k)%plasma%dene
+endif
+if(cell(i,j,k)%plasma%deni .gt. mdeni) then 
+  mdeni=cell(i,j,k)%plasma%deni
+endif
+if(cell(i,j,k)%plasma%vrot(1) .gt. mvrot) then 
+  mvrot=cell(i,j,k)%plasma%vrot(1)
+endif
+if(cell(i,j,k)%plasma%b(1) .gt. mb) then 
+  mb=cell(i,j,k)%plasma%b(1)
+endif
+if(cell(i,j,k)%plasma%e(1) .gt. me) then 
+  me=cell(i,j,k)%plasma%e(1)
+endif
+if(cell(i,j,k)%rho .gt. mrho) then 
+  mrho=cell(i,j,k)%rho
+endif
+if(cell(i,j,k)%plasma%denf .gt. mdenf) then 
+  mdenf=cell(i,j,k)%plasma%denf
+endif
+if(cell(i,j,k)%plasma%zeff .gt. mzeff) then 
+  mzeff=cell(i,j,k)%plasma%zeff
+endif
+          enddo
+       enddo
+    enddo
+
+print*,'Te:    ',mte
+print*,'Ti:    ',mti
+print*,'dene:  ',mdene
+print*,'deni:  ',mdeni
+print*,'vrot:  ',mvrot
+print*,'B:     ',mb
+print*,'E:     ',me
+print*,'rho:   ',mrho
+print*,'denf:  ',mdenf
+print*,'zeff:  ',mzeff
+
   end subroutine read_plasma
+  !****************************************************************************
+  ! Read vb written by IDL routine  WWH 6/2013
+  subroutine read_bremsstrahlung
+    character(120)          :: filename
+    integer(long) :: i
+    real(double) :: vb
+    real(double), dimension(:)  , allocatable :: brems
+    filename=trim(adjustl(result_dir))//"/bremsstrahlung.bin"
+    print*,'---- loading bremsstrahlung data from ', filename
+    open(66,form='unformatted',file=filename,access='stream')
+    allocate(brems(spec%nlambda))
+    do i = 1,spec%nchan
+      read(66) vb
+      spec%spectra(:,i,brems_type)=vb
+    enddo
+    close(66)
+    deallocate(brems)
+  end subroutine read_bremsstrahlung
   !****************************************************************************
   subroutine read_atomic
     character(120)  :: filename
@@ -410,7 +493,7 @@ contains
     integer(long) :: nlev
     !-------------------Deuterium EXCITATION/IONIZATION/CX TABLE------
     filename=trim(adjustl(root_dir))//"TABLES/qptable.bin"
-    open(66,form='unformatted',file=filename,access="stream")
+    open(66,form='unformatted',file=filename,access='stream')
     read(66) atomic%nr_ti_qp
     read(66) atomic%d_ti_qp
     read(66) atomic%nr_eb_qp
@@ -449,7 +532,7 @@ contains
     !-------------------ELECTRON EXCITATION/IONIZATION TABLE--------
     filename=trim(adjustl(root_dir))//"TABLES/qetable.bin"
     open(66,form='unformatted',file=filename,access='stream')
-    read(66) atomic%nr_te_qe
+   read(66) atomic%nr_te_qe
     read(66) atomic%d_te_qe
     read(66) atomic%nr_eb_qe
     read(66) atomic%d_eb_qe
@@ -606,7 +689,7 @@ contains
     integer(long) :: i,j,k,n 
     character(120)  :: filename
     filename=trim(adjustl(result_dir))//"/neutrals.bin"    
-    open (66,form='unformatted', file =filename,access='stream')
+    open (66, form='unformatted',file =filename,access='stream')
     write(66)real(inputs%shot_number,float )
     write(66)real(inputs%time)
     write(66)real(grid%Nx,float)
@@ -635,7 +718,7 @@ contains
     character(120)  :: filename
     npa%wght(:)=npa%wght(:)/(pi*npa%size(1)**2)
     filename=trim(adjustl(result_dir))//"/npa.bin"      
-    open (66,form='unformatted', file =filename,access='stream')
+    open (66, form='unformatted',file =filename,access='stream')
     write(66)real(inputs%shot_number,float )
     write(66)real(inputs%time,float)
     write(66)real(npa%counter, float)
@@ -737,7 +820,7 @@ contains
     real(float) :: fdummi
     print*,'---- load neutrals RESULTS/neutrals.bin ----' 
     filename=trim(adjustl(result_dir))//"/neutrals.bin" 
-    open (66,form='unformatted', file =filename,access='stream')
+    open (66, form='unformatted',file =filename,access='stream')
     read(66)fdummi
     read(66)fdummi
     read(66)fdummi
@@ -1025,6 +1108,7 @@ contains
     ri(1)=grid%xx(ac(1))+ grid%dr(1)*randomu(1)
     ri(2)=grid%yy(ac(2))+ grid%dr(2)*randomu(2) 
     ri(3)=grid%zz(ac(3))+ grid%dr(3)*randomu(3)  
+    if (inputs%guidingcenter) then  ! WWH 
     B=cell(ac(1),ac(2),ac(3))%plasma%B(:) 
     one_over_omega=inputs%ab*mass_u/(dot_product(B,B)*e0)*1.d-2    
     vxB(1)= (vi(2) * B(3) - vi(3) * B(2))
@@ -1032,6 +1116,7 @@ contains
     vxB(3)= (vi(1) * B(2) - vi(2) * B(1))
     r_gyro(:)=vxB(:)*one_over_omega
     ri(:)=ri(:)-r_gyro(:) !! '-'because v x B is towards the gyrocenter    
+    end if   ! WWH
   end subroutine mc_start
 
 
@@ -2123,6 +2208,9 @@ contains
             - sum(qi(:,n)) &
             - sum(qe(:,n))
     enddo
+    !! WWH  Add Hutchinson's truncation correction
+    matrix(nlevs,nlevs)=10.*matrix(nlevs,nlevs)
+
 
     call eigen(matrix, eigvec, eigval)
     call matinv(eigvec, eigvec_inv)
@@ -2393,6 +2481,9 @@ contains
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox !! approx. density
     real(double)                           :: papprox_tot
     real(double)                           :: nlaunch !! Number of markers
+    real(double)                          :: launch  !! float number of markers
+    real(double)                          :: remainder !! used in nlaunch
+    real(double),dimension(1)             :: randomu1 !! used in nlaunch
     papprox=0.d0
     papprox_tot=0.d0
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
@@ -2414,9 +2505,18 @@ contains
     loop_along_x: do i = 1, grid%Nx
        loop_along_y:    do j = 1,grid%Ny
           loop_along_z:     do k = 1, grid%Nz
-             if(papprox(i,j,k).le.0.d0) cycle loop_along_z 
+             !if(papprox(i,j,k).le.0.d0) cycle loop_along_z 
              !! -----Decide how many markers to follow in this cell--------!!
-             nlaunch = int(inputs%nr_dcx * papprox(i,j,k)/papprox_tot + 1.)
+             !! WWH --- Treat fractions more accurately
+             call randu(randomu1)
+             launch=inputs%nr_dcx*papprox(i,j,k)/papprox_tot
+             nlaunch=int(launch)
+             remainder=launch-nlaunch
+             if (randomu1(1) .le. remainder) then
+               nlaunch=nlaunch+1
+             endif
+             if (nlaunch .lt. 1) cycle loop_along_z
+             !nlaunch = int(inputs%nr_dcx * papprox(i,j,k)/papprox_tot + 1.)
              !! ------------- loop over the markers ---------------------- !!
              loop_over_dcx: do idcx=1,int(nlaunch)
                 ac=(/i,j,k/)
@@ -2492,6 +2592,9 @@ contains
     integer(long)                           :: hh !! counters
     real(float)                             :: dcx_dens, halo_iteration_dens
     real(double)                            :: nlaunch !! Number of markers
+    real(double)                          :: launch  !! float number of markers
+    real(double)                          :: remainder !! used in nlaunch
+    real(double),dimension(1)             :: randomu1 !! used in nlaunch
     dcx_dens=0.d0
     do i=1,grid%Nx 
        do j=1,grid%Ny 
@@ -2527,9 +2630,19 @@ contains
        loop_along_x: do i = 1, grid%Nx
           loop_along_y:    do j = 1, grid%Ny
              loop_along_z:     do k = 1, grid%Nz
-                if(papprox(i,j,k)*inputs%nr_halo.le.1.d23) cycle loop_along_z 
+                ! if(papprox(i,j,k)*inputs%nr_halo.le.1.d23) cycle loop_along_z 
+                if(papprox(i,j,k).le.0.d0) cycle loop_along_z
                 !! ------Decide how many markers to follow in this cell-------!!
-                nlaunch= int(inputs%nr_halo * papprox(i,j,k)/papprox_tot + 1.)
+               !! WWH --- Treat fractions more accurately
+               call randu(randomu1)
+               launch=inputs%nr_halo*papprox(i,j,k)/papprox_tot
+               nlaunch=int(launch)
+               remainder=launch-nlaunch
+               if (randomu1(1) .le. remainder) then
+                 nlaunch=nlaunch+1
+               endif
+               if (nlaunch .lt. 1) cycle loop_along_z
+                !nlaunch= int(inputs%nr_halo * papprox(i,j,k)/papprox_tot + 1.)
                 !! ------------- loop over the markers ---------------------- !!
                 loop_over_halos: do ihalo=1,int(nlaunch)
                    ac=(/i,j,k/)
@@ -2542,7 +2655,7 @@ contains
                    call track(vihalo(:), ri(:),tcell,icell,pos,ncell)
                    if(ncell.eq.0)cycle loop_over_halos
                    !! ---------------- calculate CX probability --------------!!
-                   ac=icell(:,1) !! new actual cell maybe due to gyro orbit!
+                   ac=icell(:,1) 
                    prob=0.d0
                    !CX with HALO neutrals
                    denn(:)=dble(cell(ac(1),ac(2),ac(3))%neut_dens(s1type,:))
@@ -2616,6 +2729,9 @@ contains
     integer(long),dimension(3)            :: npa_cell! cell where npa is reached
     real(double)                          :: papprox_tot 
     real(double)                          :: nlaunch !! Number of markers
+    real(double)                          :: launch  !! float number of markers
+    real(double)                          :: remainder !! used in nlaunch
+    real(double),dimension(1)             :: randomu !! used in nlaunch
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
     papprox=0.d0
     papprox_tot=0.d0
@@ -2644,7 +2760,16 @@ contains
           loop_along_z:     do k = 1, grid%Nz
              if(papprox(i,j,k).le.0.d0) cycle loop_along_z 
              !! -----Decide how many markers to follow in this cell------- !!
-             nlaunch= int(inputs%nr_fida * papprox(i,j,k)/papprox_tot + 1.)
+             !! WWH --- Treat fractions more accurately
+             call randu(randomu)
+             launch=inputs%nr_fida*papprox(i,j,k)/papprox_tot
+             nlaunch=int(launch)
+             remainder=launch-nlaunch
+             if (randomu(1) .le. remainder) then
+               nlaunch=nlaunch+1
+             endif
+             if (nlaunch .lt. 1) cycle loop_along_z
+             !nlaunch= int(inputs%nr_fida * papprox(i,j,k)/papprox_tot + 1.)
              !! ------------- loop over the markers ---------------------- !!
              loop_over_fast_ions: do iion=1,int(nlaunch)
                 ac=(/i,j,k/)
@@ -3042,7 +3167,7 @@ contains
   end subroutine weight_function
 end module application
 !*****************************************************************************
-!-----------Main proagramm ---------------------------------------------------
+!-----------Main program ---------------------------------------------------
 !*****************************************************************************
 program fidasim
   use application
@@ -3075,18 +3200,22 @@ program fidasim
      enddo
   enddo
 
+  !! calculate level of bremsstrahlung
+  if(inputs%f90brems.eq.1) then
+    call bremsstrahlung
+  else
+    call read_bremsstrahlung
+  endif
 
-  if(inputs%load_neutrals.eq.1) then
+  if(inputs%load_neutrals.eq.1)then
      call read_neutrals()
   else
      !! -------------------------- ndmc (NBI)----------------------------- !! 
      call date_and_time (values=time_arr)
      print*, 'ndmc:    ' ,time_arr(5:7)
      call ndmc
-     !! calculate level of bremsstrahlung
-     if(inputs%nospec.eq.0) call bremsstrahlung
      !! do the HALO calcualtion only if enough markers are defined!
-     if(inputs%nr_halo.gt.100) then
+     if(inputs%nr_halo.gt.100)then
         !! -------------------------- DCX (Direct charge exchange) ---------- !!
         call date_and_time (values=time_arr)
         print*, 'dcx:    ' ,time_arr(5:7)
@@ -3101,7 +3230,7 @@ program fidasim
       if(inputs%nospec.eq.0) call write_nbi_halo_spectra()
   endif
   !! ---------------- FIDA (main FIDA/NPA simultaion)--------------------- !!
-  if(inputs%nofida.eq.0) then    
+  if(inputs%nofida.eq.0)then    
      call date_and_time (values=time_arr)
      print*, 'da main:    ' ,time_arr(5:7)
      call read_fbm
@@ -3174,5 +3303,6 @@ program fidasim
      deallocate(npa%fpos) 
      deallocate(npa%wght)
   endif
+
 end program fidasim
  

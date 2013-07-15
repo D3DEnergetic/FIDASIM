@@ -1,8 +1,8 @@
 pro start_fidasim  
   ;Definition of the simulation grid in machine coordinates
-  nx=40
-  ny=60
-  nz=50
+  nx=30
+  ny=45
+  nz=45
   xdim1=100  
   xdim2=220 
   ydim1=-190 
@@ -20,7 +20,8 @@ pro start_fidasim
 
 
   user=+GETENV('USER')
-  root_dir='/u/'+user+'/FIDASIM2/'
+  root_dir='/u/'+user+'/FIDASIM/' ;Default directory
+  ;root_dir='/p/nstxusr/nstx-users/dliu/FIDAsim_fortran/Gieiger20130222/FIDASIM2/'; D. Liu's directory
 
 
   !Path = !path+ ':'+root_dir+'AUGD/'
@@ -45,6 +46,8 @@ pro start_fidasim
            ,cdf_file:'TEST/28746A01_fi_1.cdf' $ ;; CDF file from transp with the distribution funciton
            ,emin:0. $  ;; minimum energy used from the distribution function
            ,emax:100. $;; maximum energy used from the distribution function
+           ,guidingcenter:[1] $ ;; 0 for full-orbit distribution function
+           ,f90brems:[1] $ ;; 0 reads IDL v.b.
            ,load_neutrals:[0] $ ;; if 1 then the neutral density (prefida) is loaded from an existing neutrals.bin file
                        ;; dimensions for the simulation grid
            ,dx:dx,dy:dy,dz:dz,nx:nx,ny:ny,nz:nz,xx:xx,yy:yy,zz:zz $
@@ -56,11 +59,11 @@ pro start_fidasim
            ,zdim1:zdim1 $
            ,zdim2:zdim2 $
                       ;; Number of Monte Carlo particles
-           ,nr_fida:50000 $  ;; FIDA
+           ,nr_fida:5000 $  ;; FIDA
            ,nr_ndmc:1000 $  ;; Beam emission
-           ,nr_halo:50000 $  ;; Halo contribution
+           ,nr_halo:5000 $  ;; Halo contribution
                       ;; Calculation of the weight function:
-           ,calc_wght:[1] $ ;; if 1 then weight functions are calculated
+           ,calc_wght:[0] $ ;; if 1 then weight functions are calculated
            ,nr_wght:40 $  ;; Nr. of Pitches, energyies and gyro angles 
            ,emax_wght:100 $ ;; maximum energy
            ,ichan_wght:-1 $ ;; -1 for all channels, otherwise a given channel
@@ -73,7 +76,8 @@ pro start_fidasim
   dalpha_inputs,inputs
   ;; start the f90 routine
   result_dir = inputs.root_dir + 'RESULTS/' + inputs.fidasim_runid
-  spawn, 'module load intel'
+
+  spawn,'module load intel'
   spawn, root_dir+'fidasim '+result_dir
 
 

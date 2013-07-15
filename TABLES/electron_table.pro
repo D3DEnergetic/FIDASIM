@@ -7,7 +7,7 @@ pro electron_table,low_res=low_res,plot=plot,ps=ps
   neb=21
   nte=10001 
   if keyword_set(low_res) then begin
-     neb=21
+     neb=501
      nte=101
   endif
   

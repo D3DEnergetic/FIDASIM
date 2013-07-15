@@ -20,11 +20,11 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 		print,'FAILED TO GET PROFILES'
 		err=1
 		goto,GET_OUT
-	endif
+        endif
 
 	;;GET E&M FIELDS AT GRID POINTS
 	equil=d3d_equil(inputs,grid)
-	if profiles.err eq 1 then begin
+	if equil.err eq 1 then begin
 		print,'FAILED TO GET EQUILIBRIUM'
 		err=1
 		goto,GET_OUT

@@ -151,6 +151,8 @@ pro dalpha_inputs,inputs,profiles
   printf,55,inputs.nofida,f='(i2,"             # only NBI+HALO")'
   printf,55,inputs.npa          ,f='(i2,"             # NPA simulation")'
   printf,55,inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
+  printf,55,inputs.guidingcenter,f='(i2,"             # 0 for full-orbit F")'
+  printf,55,inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
   printf,55,inputs.calc_wght,f='(i2,"             # calculate wght function")'
   printf,55,'# weight function settings:'
   printf,55,inputs.nr_wght,f='(i9,"      # number velocities")'

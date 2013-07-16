@@ -10,10 +10,10 @@ PRO make_fida_grid,inputs,grid,err
 
 	err=1
 
-;	if inputs.rotate gt 2*!DPI then begin
-;		print,'Angle must be in radians'
-;		goto, GET_OUT
-;	endif
+	if inputs.alpha gt 2*!DPI or inputs.beta gt 2*!DPI then begin
+		print,'Angles must be in radians'
+		goto, GET_OUT
+	endif
 
 	nx=inputs.nx
 	ny=inputs.ny
@@ -78,7 +78,9 @@ PRO prepare_beam,inputs,nbi,rot_mat
 	dis=sqrt( (xs-xp)^2.0d +(ys-yp)^2.0d + (zs-zp)^2.0d)
 	BETA=asin((zp-zs)/dis)
 	ALPHA=atan((yp-ys),(xp-xs))-!DPI
-
+	print,'BEAM ROTATION ANGLES AS DEFINED BY fidasim.f90'
+	print,'ALPHA: '+strtrim(string(ALPHA),1)+' [rad]'
+	print,'BETA:  '+strtrim(string(BETA),1)+' [rad]'
 	zero=0.d0
 	one=1.d0
 	;;transformation matrix to rotate on NBI box axis by ALPHA

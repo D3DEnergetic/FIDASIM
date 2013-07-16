@@ -36,8 +36,8 @@ x_range=[xmin1,xmax1] & y_range=[ymin1,ymax1]
     updown=1
     rotate_uvw,uvw_ray,rot_mat.Arot,rot_mat.Brot,rot_mat.Crot,updown $
               ,xyz_ray
-    oplot,[nbi.xyz_src[ii,0],nbi.xyz_src[ii,0]+xyz_ray[0]] $
-         ,[nbi.xyz_src[ii,1],nbi.xyz_src[ii,1]+xyz_ray[1]],thick=2,color=230
+    oplot,[nbi.xyz_src[0],nbi.xyz_src[0]+xyz_ray[0]] $
+         ,[nbi.xyz_src[1],nbi.xyz_src[1]+xyz_ray[1]],thick=2,color=230
 
 w=where(g.bdry[0,*] gt 0.)
 rmin=100.*min(g.bdry[0,w]) & rmax=100.*max(g.bdry[0,w])

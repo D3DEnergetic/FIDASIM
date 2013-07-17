@@ -61,6 +61,27 @@ PRO make_fida_grid,inputs,grid,err
 	GET_OUT:
 END
 
+PRO make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
+    zero=0.d0
+    one=1.d0
+    ;;transformation matrix to rotate on NBI box axis by ALPHA
+    Arot=dblarr(3,3)
+    Arot[0,0]= cos(BETA)   & Arot[0,1]= zero    & Arot[0,2]= sin(BETA)
+    Arot[1,0]= zero        & Arot[1,1]= one     & Arot[1,2]= zero
+    Arot[2,0]=-sin(BETA)   & Arot[2,1]= zero    & Arot[2,2]= cos(BETA)
+    ;; transformation matrix to rotate in vertical direction by beta
+    Brot=dblarr(3,3)
+    Brot[0,0]= cos(BETA)   & Brot[0,1]= zero    & Brot[0,2]= sin(BETA)
+    Brot[1,0]= zero        & Brot[1,1]= one     & Brot[1,2]= zero
+    Brot[2,0]=-sin(BETA)   & Brot[2,1]= zero    & Brot[2,2]= cos(BETA)
+	;; Arot and Brot are exactly the same. I dont know why Ben Gieger had it
+	;; but it will stay for now
+    ;; transformation matrix to rotate towards the xy-coordinate system
+    Crot=dblarr(3,3)
+    Crot[0,0]= cos(ALPHA) & Crot[0,1]=-sin(ALPHA) & Crot[0,2]= zero
+    Crot[1,0]= sin(ALPHA) & Crot[1,1]= cos(ALPHA) & Crot[1,2]= zero
+    Crot[2,0]= zero	  & Crot[2,1]= zero	  & Crot[2,2]= one
+END
 	
 PRO prepare_beam,inputs,nbi,rot_mat
 	
@@ -78,27 +99,14 @@ PRO prepare_beam,inputs,nbi,rot_mat
 	dis=sqrt( (xs-xp)^2.0d +(ys-yp)^2.0d + (zs-zp)^2.0d)
 	BETA=asin((zp-zs)/dis)
 	ALPHA=atan((yp-ys),(xp-xs))-!DPI
+
 	print,'BEAM ROTATION ANGLES AS DEFINED BY fidasim.f90'
 	print,'ALPHA: '+strtrim(string(ALPHA),1)+' [rad]'
 	print,'BETA:  '+strtrim(string(BETA),1)+' [rad]'
-	zero=0.d0
-	one=1.d0
-	;;transformation matrix to rotate on NBI box axis by ALPHA
-	Arot=dblarr(3,3)
-	Arot[0,0]= cos(BETA)   & Arot[0,1]= zero    & Arot[0,2]= sin(BETA)
-	Arot[1,0]= zero        & Arot[1,1]= one     & Arot[1,2]= zero
-	Arot[2,0]=-sin(BETA)   & Arot[2,1]= zero    & Arot[2,2]= cos(BETA)
-	;; transformation matrix to rotate in vertical direction by beta
-	Brot=dblarr(3,3)
-	Brot[0,0]= cos(BETA)   & Brot[0,1]= zero    & Brot[0,2]= sin(BETA)
-	Brot[1,0]= zero        & Brot[1,1]= one     & Brot[1,2]= zero
-	Brot[2,0]=-sin(BETA)   & Brot[2,1]= zero    & Brot[2,2]= cos(BETA)
-	;; transformation matrix to rotate towards the xy-coordinate system
-	Crot=dblarr(3,3)
-	Crot[0,0]= cos(ALPHA) & Crot[0,1]=-sin(ALPHA) & Crot[0,2]= zero
-	Crot[1,0]= sin(ALPHA) & Crot[1,1]= cos(ALPHA) & Crot[1,2]= zero
-	Crot[2,0]= zero       & Crot[2,1]= zero       & Crot[2,2]= one
-	
+
+	;;MAKE ROTATION MATRICES 
+	make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
+
 	rot_mat={isource:isource,alpha:ALPHA,beta:BETA,Arot:Arot,Brot:Brot,Crot:Crot,err:0}
 	GET_OUT:
 END

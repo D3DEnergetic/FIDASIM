@@ -136,7 +136,8 @@ PRO prepare_beam,inputs,nbi,nbgeom
 	print,'BEAM SOURCE POSITION:'
 	print,xyz_src
 	print,'BEAM ROTATION ANGLES AS DEFINED BY fidasim.f90'
-	print,'ALPHA:'
+	print,'IF THE ANGLES ARE ZERO THEN THE GRID IS ALIGNED WITH THE BEAM'
+	print,'ALPHA: '
 	print,ALPHA,FORMAT='(F20.10)'
 	print,'BETA:'
 	print,BETA,FORMAT='(F20.10)'

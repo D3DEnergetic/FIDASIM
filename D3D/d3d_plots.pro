@@ -45,7 +45,7 @@ PRO d3d_plots,inputs,grid, nbi, fida, equil,rot_mat
             yrange=100.*[min(g.lim[1,*]),max(g.lim[1,*])],$
 		color=0,background=255,title='ELEVATION',xtitle='R [cm]',ytitle='Z [cm]'
 
-	oplot,grid.r_grid,grid.wc,psym=3  
+	oplot,grid.r_grid,grid.wc,psym=3,color=0  
 ; Lines of sight
 for i=0,fida.nchan-1 do begin
   if fida.zlens[i] ne fida.zmid[i] then begin

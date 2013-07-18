@@ -57,12 +57,12 @@ beta=0.0			;; rotation about the y axis after rotation about z axis
 nx=40				;; Number of cells in x direction
 ny=60				;; Number of cells in y direction
 nz=50				;; Number of cells in z direction
-xdim1=-500.			;; Minimum x value
-xdim2=-430.			;; Maximum x value
-ydim1=-15.			;; Minimum y value
-ydim2=15.			;; Maximum y value
-zdim1=-50.			;; Minimum z value
-zdim2=50.			;; Maximum z value
+xdim1=-520.			;; Minimum x value
+xdim2=-420.			;; Maximum x value
+ydim1=-40.			;; Minimum y value
+ydim2=40.			;; Maximum y value
+zdim1=-40.			;; Minimum z value
+zdim2=40.			;; Maximum z value
 
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles

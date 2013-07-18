@@ -204,7 +204,7 @@ PRO los_track,coords,xyz_los_vec,xyspt,tcell,cell,ncell
 	ncell=m-1
 END
 
-PRO prepare_fida,inputs,grid,fida,weight,los,err
+PRO prepare_fida,inputs,grid,fida,chords
 
 	nx=grid.nx
 	ny=grid.ny
@@ -281,6 +281,8 @@ PRO prepare_fida,inputs,grid,fida,weight,los,err
 		weight=weight[*,*,*,los]
 		err=0
 	endelse
+	chords={nchan:fida.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:fida.sigma_pi_ratio,$
+			xmid:xmid,ymid:ymid,zmid:zmid,headsize:fida.headsize,los:los,weight:weight,err:err}
 END
 
 PRO transp_fbeam,inputs,grid,denf,err
@@ -368,9 +370,9 @@ PRO transp_fbeam,inputs,grid,denf,err
   dE      = energy[2] - energy[1]
   dpitch  = pitch[2]  - pitch[1]
   fdens=total(reform(total(fbm,1)),1)*dE*dpitch
-
-
-  ;; ------map fdens on FIDASIM grid and sort out
+;  help,fdens,r2d,z2d
+;  plot,r2d,fdens,color=0,background=255 
+ ;; ------map fdens on FIDASIM grid and sort out
   ;; ------points outside the separatrix
   ;;------Determine FIDAsim grid to map distribution function
   r_grid=fltarr(inputs.nx,inputs.ny,inputs.nz)
@@ -380,16 +382,16 @@ PRO transp_fbeam,inputs,grid,denf,err
         for k=0L,inputs.nz-1 do begin
            jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
            r_grid[i,j,k]=grid.r_grid[jj]
-		   z_grid[i,j,k]=grid.wc[jj]
+;		   z_grid[i,j,k]=grid.wc[jj]
        endfor      
      endfor
   endfor 
   f3d=dblarr(inputs.nx,inputs.ny,inputs.nz)*0.d0
   if ngrid le 220 then width=6. else width=4.
   for j=0L,inputs.ny-1 do begin
-     rout=reform(r_grid[*,j,0])
+	 rout=reform(r_grid[*,j,0])
 	 zout=grid.zzc[*]
-;     zout=reform(z_grid[*,j,0])
+;	 zout=reform(z_grid[i,j,*])
      TRIANGULATE, r2d, z2d, tr     
      fdens2=griddata(r2d,z2d,fdens,xout=rout,yout=zout $
                      ,/grid,/SHEPARDS,triangles=tr)
@@ -467,7 +469,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	vrot[1,*] =   cos(grid.phi_grid)*vtor
 	vrot[2,*] =   0.d0 
 
-	;;Rotate vector quanties to beam coordinates 
+	;;Rotate vector quantities to beam coordinates 
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
 	rotate_uvw,vrot,Arot,Brot,Crot,1,vrot_xyz ;;machine basis to beam basis
 	rotate_uvw,equil.b,Arot,Brot,Crot,1,b_xyz
@@ -533,14 +535,15 @@ PRO prefida,input_pro,plot=plot
 
 	;;FIDA PRE PROCESSING 
 	if inputs.no_spectra ne 1 then begin
-		prepare_fida,inputs,grid,fida,weight,los,err
-		if err eq 1 then begin
+		prepare_fida,inputs,grid,fida,chords
+		if chords.err eq 1 then begin
 			print,'FIDA PREPROCESSING FAILED. EXITING...'
 			goto, GET_OUT
 		endif
 	endif else begin
 		err=0
 		weight=replicate(0.d0,inputs.nx,inputs.ny,inputs.nz,1)
+		chords={weight:weight,err:err}
 	endelse
 
 	;;MAP PROFILES ONTO GRID
@@ -670,25 +673,25 @@ PRO prefida,input_pro,plot=plot
 
 	;;WRITE LINE OF SIGHT (LOS) INFORMATION TO BINARY
 	if inputs.no_spectra ne 1 then begin
-		detector={ det:fida  , weight:weight }
 		file =inputs.result_dir+inputs.runid+'/los.bin'
+		los=chords.los
 		openw, lun, file, /get_lun
 		writeu,lun , long(n_elements(los))
 		for chan=0L,n_elements(los)-1 do begin
-			writeu,lun, double(fida.xlens[los[chan]])
-			writeu,lun, double(fida.ylens[los[chan]])
-			writeu,lun, double(fida.zlens[los[chan]])
-			writeu,lun, double(fida.headsize[los[chan]]) ;; headsize is used for NPA
-			writeu,lun, double(fida.xmid[los[chan]])
-			writeu,lun, double(fida.ymid[los[chan]])
-			writeu,lun, double(fida.zmid[los[chan]])
+			writeu,lun, double(chords.xlens[los[chan]])
+			writeu,lun, double(chords.ylens[los[chan]])
+			writeu,lun, double(chords.zlens[los[chan]])
+			writeu,lun, double(chords.headsize[los[chan]]) ;; headsize is used for NPA
+			writeu,lun, double(chords.xmid[los[chan]])
+			writeu,lun, double(chords.ymid[los[chan]])
+			writeu,lun, double(chords.zmid[los[chan]])
 		endfor
-		writeu,lun , double(fida.sigma_pi_ratio)
+		writeu,lun , double(chords.sigma_pi_ratio)
 		for i=0L,inputs.nx-1 do begin
 			for j=0L,inputs.ny-1 do begin
 				for k=0L,inputs.nz-1 do begin
 					for chan=0L,n_elements(los)-1 do begin
-						writeu ,lun , float(weight[i,j,k,chan])
+						writeu ,lun , float(chords.weight[i,j,k,chan])
 					endfor
 				endfor
 			endfor
@@ -696,11 +699,7 @@ PRO prefida,input_pro,plot=plot
 		close,lun
 		free_lun, lun
 		print, 'LOS parameters stored in BINARY: '+file
-	endif else begin
-		det={xhead:0.,yhead:0.,zhead:0., headsize:0. $
-			,nchan:1,xlos:[0.],ylos:[0.],zlos:[0.]}
-		detector={det:det,weight:replicate(0.d0,inputs.nx,inputs.ny,inputs.nz,1) }
-	endelse
+	endif
 
 	print,''
 	print,''

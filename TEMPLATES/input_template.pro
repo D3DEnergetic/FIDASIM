@@ -61,7 +61,6 @@ origin=[0,0,0]											;; If using different a coordinate system, this is the 
 
 alpha=0.0												;; Rotation angle in radians from +x about z axis that transforms machine
 														;; coordinates to the new system. Rotations about x or y not supported
-beta=0.0												;; Rotation angle in radians about y axis (KEEP SET AT ZERO)
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
@@ -97,7 +96,7 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
 		cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,isource:isource,fida_diag:fida_diag,equil:equil,btipsign:btipsign,$
 		ab:ab,ai:ai,impurity_charge:impurity_charge,lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,$
 		dlambda:dlambda,nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-		origin:origin,alpha:alpha,beta:beta,nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+		origin:origin,alpha:alpha,beta:0.0,nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
 		wavel_end_wght:wavel_end_wght,npa:npa,no_spectra:no_spectra,nofida:nofida,calc_wght:calc_wght,$
 		load_neutrals:load_neutrals}

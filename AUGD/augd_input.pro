@@ -63,7 +63,6 @@ zdim2=75.												;; Maximum z value
 
 origin=[0.,0.,0.]
 alpha=0.0
-beta=0.0
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
@@ -103,7 +102,7 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
        btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
        lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
        nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-       origin:origin,alpha:alpha,beta:beta,nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+       origin:origin,alpha:alpha,beta:0.0,nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
        wavel_end_wght:wavel_end_wght,npa:npa,no_spectra:no_spectra,nofida:nofida, $
        f90brems:f90brems,guidingcenter:guidingcenter,calc_wght:calc_wght,load_neutrals:load_neutrals}

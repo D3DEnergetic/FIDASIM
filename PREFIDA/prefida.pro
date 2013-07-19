@@ -14,7 +14,6 @@ PRO rotate_points,x,y,z,Arot,Brot,Crot,xp,yp,zp
     zp=transpose(xyz_p[2,*])
 END
 
-
 PRO make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
     zero=0.d0
     one=1.d0

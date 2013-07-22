@@ -1,19 +1,50 @@
-PRO rotate_uvw,uvw,Arot,Brot,Crot,updown,xyz
-  ;;rotate uvz by alpa alround z axis
-  if updown lt 0 then qrz=MATRIX_MULTIPLY(Arot,uvw)
-  if updown ge 0 then qrz=MATRIX_MULTIPLY(Brot,uvw)
-  ;; rotate qrz_ray by phi_box on xyz_coordinates
-  xyz=MATRIX_MULTIPLY(Crot,qrz)
+PRO rotate_uvw,uvw,Arot,Brot,Crot,updown,xyz 	
+	;;rotate uvz by alpa alround z axis
+  	if updown lt 0 then qrz=MATRIX_MULTIPLY(Arot,uvw)
+  	if updown ge 0 then qrz=MATRIX_MULTIPLY(Brot,uvw)
+  	;; rotate qrz_ray by phi_box on xyz_coordinates
+  	xyz=MATRIX_MULTIPLY(Crot,qrz)
+END
+
+PRO rotate_points,x,y,z,Arot,Brot,Crot,xp,yp,zp
+	xyz=transpose([[x],[y],[z]])
+    rotate_uvw,xyz,Arot,Brot,Crot,1,xyz_p
+    xp=transpose(xyz_p[0,*])
+    yp=transpose(xyz_p[1,*])
+    zp=transpose(xyz_p[2,*])
+END
+
+PRO make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
+    zero=0.d0
+    one=1.d0
+    ;;transformation matrix to rotate on NBI box axis by ALPHA
+    Arot=dblarr(3,3)
+    Arot[0,0]= cos(BETA)   & Arot[0,1]= zero    & Arot[0,2]= sin(BETA)
+    Arot[1,0]= zero        & Arot[1,1]= one     & Arot[1,2]= zero
+    Arot[2,0]=-sin(BETA)   & Arot[2,1]= zero    & Arot[2,2]= cos(BETA)
+    ;; transformation matrix to rotate in vertical direction by beta
+    Brot=dblarr(3,3)
+    Brot[0,0]= cos(BETA)   & Brot[0,1]= zero    & Brot[0,2]= sin(BETA)
+    Brot[1,0]= zero        & Brot[1,1]= one     & Brot[1,2]= zero
+    Brot[2,0]=-sin(BETA)   & Brot[2,1]= zero    & Brot[2,2]= cos(BETA)
+	;; Arot and Brot are exactly the same. I dont know why Ben Gieger had it
+	;; but it will stay for now
+    ;; transformation matrix to rotate towards the xy-coordinate system
+    Crot=dblarr(3,3)
+    Crot[0,0]= cos(ALPHA) & Crot[0,1]=-sin(ALPHA) & Crot[0,2]= zero
+    Crot[1,0]= sin(ALPHA) & Crot[1,1]= cos(ALPHA) & Crot[1,2]= zero
+    Crot[2,0]= zero 	  & Crot[2,1]= zero	      & Crot[2,2]= one
 END
 
 PRO make_fida_grid,inputs,grid,err
 
 	err=1
 
-;	if inputs.rotate gt 2*!DPI then begin
-;		print,'Angle must be in radians'
-;		goto, GET_OUT
-;	endif
+	if inputs.alpha gt 2*!DPI or inputs.beta gt 2*!DPI then begin
+		print,'Angles must be in radians'
+		goto, GET_OUT
+	endif
+	make_rot_mat,inputs.alpha,inputs.beta,Arot,Brot,Crot
 
 	nx=inputs.nx
 	ny=inputs.ny
@@ -45,24 +76,41 @@ PRO make_fida_grid,inputs,grid,err
 	;; Put the basic grid into 1D array (useful for libkk routines)
 	x=dblarr(ng) & y=dblarr(ng) & z=dblarr(ng)
 
-	for i=0L,nx-1 do for j=0,ny-1 do for k=0,nz-1 do begin
+	for i=0L,nx-1 do for j=0L,ny-1 do for k=0L,nz-1 do begin
 		l=i+nx*j+nx*ny*k
 		x[l]=xx[i] & y[l]=yy[j] & z[l]=zz[k]
 	end
 
 	;; Make the corresponding grid center arrays
 	xc=x+0.5d0*dx & yc=y+0.5d0*dy & zc=z+0.5d0*dz
-	r_grid=sqrt(xc^2+yc^2)
-	phi_grid=atan(yc,xc)
 	
+	;;Rotate all grid points to machine coordinates
+	rotate_points,x,y,z,Arot,Brot,Crot,u,v,w
+;	rotate_points,xx,yy,zz,Arot,Brot,Crot,uu,vv,ww
+	rotate_points,xc,yc,zc,Arot,Brot,Crot,uc,vc,wc
+;	rotate_points,xxc,yyc,zzc,Arot,Brot,Crot,uuc,vvc,wwc
+	
+	;;Change origin for rotated points
+	u+=inputs.origin[0] & uc+=inputs.origin[0]
+	v+=inputs.origin[1] & vc+=inputs.origin[1] 
+	w+=inputs.origin[2] & wc+=inputs.origin[2]
+	
+	r_grid=sqrt(uc^2+vc^2)
+	phi_grid=atan(vc,uc)
+;	plot,xc,yc,psym=2,color=0,background=255
+;    uvw_ray=[-1.d0,0.d0,0.d0]*1000.
+;    rotate_uvw,uvw_ray,Arot,Brot,Crot,1,xyz_ray
+;    oplot,[inputs.origin[0],inputs.origin[0]+xyz_ray[0]] $
+;         ,[inputs.origin[1],inputs.origin[1]+xyz_ray[1]],thick=2,color=230
+
 	grid={nx:nx,ny:ny,nz:nz,x:x,y:y,z:z,xx:xx,yy:yy,zz:zz,xc:xc,yc:yc,zc:zc,xxc:xxc,yyc:yyc,zzc:zzc,$
-			dx:dx,dy:dy,dz:dz,dr:dr,drmin:drmin,dv:dv,ng:ng,r_grid:r_grid,phi_grid:phi_grid}
+			dx:dx,dy:dy,dz:dz,dr:dr,drmin:drmin,dv:dv,ng:ng,u:u,v:v,w:w,$
+			uc:uc,vc:vc,wc:wc,r_grid:r_grid,phi_grid:phi_grid}
 	err=0	
 	GET_OUT:
 END
-
 	
-PRO prepare_beam,inputs,nbi,rot_mat
+PRO prepare_beam,inputs,nbi,nbgeom
 	
 	rot_mat={err:1}
 	isource=inputs.isource
@@ -71,33 +119,32 @@ PRO prepare_beam,inputs,nbi,rot_mat
 		print, 'the selected source nr',isource,' is not on!'
 		goto, GET_OUT
 	endif
+	uvw_src=nbi.xyz_src-inputs.origin
+	uvw_pos=nbi.xyz_pos-inputs.origin
 
-	xs=nbi.xyz_src[0] & ys=nbi.xyz_src[1] & zs=nbi.xyz_src[2]
-	xp=nbi.xyz_pos[0] & yp=nbi.xyz_pos[1] & zp=nbi.xyz_pos[2]
+	make_rot_mat,-inputs.alpha,inputs.beta,Drot,Erot,Frot
+    rotate_uvw,uvw_src,Drot,Erot,Frot,1,xyz_src ;;rotate from machine to beam coordinates
+    rotate_uvw,uvw_pos,Drot,Erot,Frot,1,xyz_pos
+	
+	xs=xyz_src[0] & ys=xyz_src[1] & zs=xyz_src[2]
+	xp=xyz_pos[0] & yp=xyz_pos[1] & zp=xyz_pos[2]
 
 	dis=sqrt( (xs-xp)^2.0d +(ys-yp)^2.0d + (zs-zp)^2.0d)
-	BETA=asin((zp-zs)/dis)
-	ALPHA=atan((yp-ys),(xp-xs))-!DPI
+	BETA=double(asin((zp-zs)/dis))
+	ALPHA=double(atan((yp-ys),(xp-xs))-!DPI)
+	print,'BEAM SOURCE POSITION:'
+	print,xyz_src
+	print,'BEAM ROTATION ANGLES AS DEFINED BY fidasim.f90'
+	print,'IF THE ANGLES ARE ZERO THEN THE GRID IS ALIGNED WITH THE BEAM'
+	print,'ALPHA: '
+	print,ALPHA,FORMAT='(F20.10)'
+	print,'BETA:'
+	print,BETA,FORMAT='(F20.10)'
 
-	zero=0.d0
-	one=1.d0
-	;;transformation matrix to rotate on NBI box axis by ALPHA
-	Arot=dblarr(3,3)
-	Arot[0,0]= cos(BETA)   & Arot[0,1]= zero    & Arot[0,2]= sin(BETA)
-	Arot[1,0]= zero        & Arot[1,1]= one     & Arot[1,2]= zero
-	Arot[2,0]=-sin(BETA)   & Arot[2,1]= zero    & Arot[2,2]= cos(BETA)
-	;; transformation matrix to rotate in vertical direction by beta
-	Brot=dblarr(3,3)
-	Brot[0,0]= cos(BETA)   & Brot[0,1]= zero    & Brot[0,2]= sin(BETA)
-	Brot[1,0]= zero        & Brot[1,1]= one     & Brot[1,2]= zero
-	Brot[2,0]=-sin(BETA)   & Brot[2,1]= zero    & Brot[2,2]= cos(BETA)
-	;; transformation matrix to rotate towards the xy-coordinate system
-	Crot=dblarr(3,3)
-	Crot[0,0]= cos(ALPHA) & Crot[0,1]=-sin(ALPHA) & Crot[0,2]= zero
-	Crot[1,0]= sin(ALPHA) & Crot[1,1]= cos(ALPHA) & Crot[1,2]= zero
-	Crot[2,0]= zero       & Crot[2,1]= zero       & Crot[2,2]= one
-	
-	rot_mat={isource:isource,alpha:ALPHA,beta:BETA,Arot:Arot,Brot:Brot,Crot:Crot,err:0}
+	;;MAKE ROTATION MATRICES 
+	make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
+
+	nbgeom={isource:isource,alpha:ALPHA,beta:BETA,Arot:Arot,Brot:Brot,Crot:Crot,xyz_src:xyz_src,xyz_pos:xyz_pos,err:0}
 	GET_OUT:
 END
 
@@ -157,7 +204,7 @@ PRO los_track,coords,xyz_los_vec,xyspt,tcell,cell,ncell
 	ncell=m-1
 END
 
-PRO prepare_fida,grid,fida,weight,los,err
+PRO prepare_fida,inputs,grid,fida,chords
 
 	nx=grid.nx
 	ny=grid.ny
@@ -166,9 +213,21 @@ PRO prepare_fida,grid,fida,weight,los,err
 	err_arr=dblarr(fida.nchan)
 	weight  = replicate(0.d0,nx,ny,nz,fida.nchan)
 ;	print, 'nchan:', fida.nchan
-	for chan=0, fida.nchan-1 do  begin
-		xyzhead = [fida.xlens[chan],fida.ylens[chan],fida.zlens[chan]]
-        xyzlos  = [fida.xmid[chan], fida.ymid[chan], fida.zmid[chan]]
+
+	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
+	ulens=fida.xlens-inputs.origin[0] & umid=fida.xmid-inputs.origin[0]
+	vlens=fida.ylens-inputs.origin[1] & vmid=fida.ymid-inputs.origin[1]
+	wlens=fida.zlens-inputs.origin[2] & wmid=fida.zmid-inputs.origin[2]
+
+	rotate_points,ulens,vlens,wlens,Arot,Brot,Crot,xlens,ylens,zlens
+	rotate_points,umid,vmid,wmid,Arot,Brot,Crot,xmid,ymid,zmid
+	
+	for chan=0L, fida.nchan-1 do  begin
+		xyzhead = [xlens[chan],ylens[chan],zlens[chan]]
+        xyzlos  = [xmid[chan], ymid[chan], zmid[chan]]
+;		print,xyzlos	
+;		plot,[xmid[chan],xlens[chan]],[zmid[chan],zlens[chan]],color=0,background=255,xrange=[-600,-300],yrange=[-55.,55.]
+;		oplot,grid.xc,grid.zc,psym=3,color=0
         vi    = xyzlos-xyzhead
         dummy = max(abs(vi),ic)
         nstep = fix(700./grid.dr[ic])
@@ -178,7 +237,7 @@ PRO prepare_fida,grid,fida,weight,los,err
 ;        endif
         xyz_pos = xyzhead
       ; find first grid cell
-        for i=0,nstep do begin
+        for i=0L,nstep do begin
         	xyz_pos[0] = xyz_pos[0] + grid.dr[ic] * vi[0]/abs(vi[ic])
            	xyz_pos[1] = xyz_pos[1] + grid.dr[ic] * vi[1]/abs(vi[ic])
            	xyz_pos[2] = xyz_pos[2] + grid.dr[ic] * vi[2]/abs(vi[ic])
@@ -193,7 +252,7 @@ PRO prepare_fida,grid,fida,weight,los,err
         if i lt nstep then begin
         	los_track,grid,vi,xyz_pos,tcell,cell,ncell
            	if ncell gt 1 then begin
-            	for jj=0,ncell-1 do begin
+            	for jj=0L,ncell-1 do begin
                 	if finite(tcell[jj]) eq 0 then stop
                 	;;  tcell is the length of the track (cm) as v is 1cm/s
                  	weight[cell[0,jj],cell[1,jj],cell[2,jj],chan]=tcell[jj]
@@ -222,6 +281,8 @@ PRO prepare_fida,grid,fida,weight,los,err
 		weight=weight[*,*,*,los]
 		err=0
 	endelse
+	chords={nchan:fida.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:fida.sigma_pi_ratio,$
+			xmid:xmid,ymid:ymid,zmid:zmid,headsize:fida.headsize,los:los,weight:weight,err:err}
 END
 
 PRO transp_fbeam,inputs,grid,denf,err
@@ -284,19 +345,19 @@ PRO transp_fbeam,inputs,grid,denf,err
   ngrid=sz(3)
   openw, lun, file, /get_lun
   writeu,lun , long(ngrid)
-  for i=0,ngrid-1 do writeu ,lun , float(r2d[i])
-  for i=0,ngrid-1 do writeu ,lun , float(z2d[i])
+  for i=0L,ngrid-1 do writeu ,lun , float(r2d[i])
+  for i=0L,ngrid-1 do writeu ,lun , float(z2d[i])
   writeu,lun , long(nenergy)
   writeu,lun , double(inputs.emin)
   writeu,lun , double(inputs.emax)
-  for i=0,nenergy-1 do writeu ,lun , double(energy[i])
+  for i=0L,nenergy-1 do writeu ,lun , double(energy[i])
   writeu,lun , long(npitch)
   writeu,lun , double(pitch[0])
   writeu,lun , double(pitch[npitch-1])
-  for i=0,npitch-1 do writeu ,lun , double(pitch[i])
-  for i=0,nenergy-1 do begin
-     for j=0,npitch-1 do begin
-        for k=0,ngrid-1 do begin    
+  for i=0L,npitch-1 do writeu ,lun , double(pitch[i])
+  for i=0L,nenergy-1 do begin
+     for j=0L,npitch-1 do begin
+        for k=0L,ngrid-1 do begin    
            writeu ,lun , float(FBM[i,j,k]/max(FBM[*,*,k])) ;; normalized
         endfor
      endfor
@@ -309,25 +370,28 @@ PRO transp_fbeam,inputs,grid,denf,err
   dE      = energy[2] - energy[1]
   dpitch  = pitch[2]  - pitch[1]
   fdens=total(reform(total(fbm,1)),1)*dE*dpitch
-
-
-  ;; ------map fdens on FIDASIM grid and sort out
+;  help,fdens,r2d,z2d
+;  plot,r2d,fdens,color=0,background=255 
+ ;; ------map fdens on FIDASIM grid and sort out
   ;; ------points outside the separatrix
   ;;------Determine FIDAsim grid to map distribution function
   r_grid=fltarr(inputs.nx,inputs.ny,inputs.nz)
+  z_grid=r_grid
   for i=0L,inputs.nx-1 do begin
      for j=0L,inputs.ny-1 do begin
         for k=0L,inputs.nz-1 do begin
            jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
-          r_grid[i,j,k]=grid.r_grid[jj]
+           r_grid[i,j,k]=grid.r_grid[jj]
+;		   z_grid[i,j,k]=grid.wc[jj]
        endfor      
      endfor
   endfor 
   f3d=dblarr(inputs.nx,inputs.ny,inputs.nz)*0.d0
   if ngrid le 220 then width=6. else width=4.
-  for j=0,inputs.ny-1 do begin
-     rout=reform(r_grid[*,j,0])
-     zout=grid.zzc[*]
+  for j=0L,inputs.ny-1 do begin
+	 rout=reform(r_grid[*,j,0])
+	 zout=grid.zzc[*]
+;	 zout=reform(z_grid[i,j,*])
      TRIANGULATE, r2d, z2d, tr     
      fdens2=griddata(r2d,z2d,fdens,xout=rout,yout=zout $
                      ,/grid,/SHEPARDS,triangles=tr)
@@ -405,12 +469,18 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	vrot[1,*] =   cos(grid.phi_grid)*vtor
 	vrot[2,*] =   0.d0 
 
+	;;Rotate vector quantities to beam coordinates 
+	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
+	rotate_uvw,vrot,Arot,Brot,Crot,1,vrot_xyz ;;machine basis to beam basis
+	rotate_uvw,equil.b,Arot,Brot,Crot,1,b_xyz
+	rotate_uvw,equil.e,Arot,Brot,Crot,1,e_xyz
+	
 	;; test if there are NANs or Infinites in the input profiels
 	index=where(finite([ti,te,dene,denp,zeff,denp,deni]) eq 0,nind)
 	if nind gt 0 then stop
 	;;-------SAVE-------
-	plasma={rho_grid:equil.rho_grid, b:equil.b,e:equil.e,ab:inputs.ab,ai:inputs.ai,te:te, $
-			ti:ti,vtor:vtor,vrot:vrot,dene:dene,denp:denp,deni:deni,denf:denf $
+	plasma={rho_grid:equil.rho_grid, b:b_xyz,e:e_xyz,ab:inputs.ab,ai:inputs.ai,te:te, $
+			ti:ti,vtor:vtor,vrot:vrot_xyz,dene:dene,denp:denp,deni:deni,denf:denf $
 			,zeff:zeff}
 	err=0
 	GET_OUT: 
@@ -457,22 +527,23 @@ PRO prefida,input_pro,plot=plot
 	endif else err=0
 
 	;;BEAM PRE PROCESSING
-	prepare_beam,inputs,nbi,rot_mat
-	if rot_mat.err eq 1 then begin
+	prepare_beam,inputs,nbi,nbgeom
+	if nbgeom.err eq 1 then begin
 		print,'BEAM PREPROCESSING FAILED. EXITING...'
 		goto, GET_OUT
 	endif else err=0
 
 	;;FIDA PRE PROCESSING 
 	if inputs.no_spectra ne 1 then begin
-		prepare_fida,grid,fida,weight,los,err
-		if err eq 1 then begin
+		prepare_fida,inputs,grid,fida,chords
+		if chords.err eq 1 then begin
 			print,'FIDA PREPROCESSING FAILED. EXITING...'
 			goto, GET_OUT
 		endif
 	endif else begin
 		err=0
 		weight=replicate(0.d0,inputs.nx,inputs.ny,inputs.nz,1)
+		chords={weight:weight,err:err}
 	endelse
 
 	;;MAP PROFILES ONTO GRID
@@ -484,7 +555,7 @@ PRO prefida,input_pro,plot=plot
 
     ;; Plot grid, beam, sightlines, and equilibrium
 	if keyword_set(plot) then begin
-		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,rot_mat
+		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,nbgeom
 	endif
 
 	;;WRITE FIDASIM INPUT FILES
@@ -559,15 +630,15 @@ PRO prefida,input_pro,plot=plot
 	printf,55 ,nbi.half,f='(1f9.6,"      # half energy")'  
 	printf,55 ,nbi.third,f='(1f9.6,"      # third energy")' 
 	printf,55, '#position of NBI source in xyz coords:'
-	printf,55,nbi.xyz_src[0],f='(1f9.4,"      # x [cm]")' 
-	printf,55,nbi.xyz_src[1],f='(1f9.4,"      # y [cm]")' 
-	printf,55,nbi.xyz_src[2],f='(1f9.4,"      # z [cm]")' 
+	printf,55,nbgeom.xyz_src[0],f='(1f9.4,"      # x [cm]")' 
+	printf,55,nbgeom.xyz_src[1],f='(1f9.4,"      # y [cm]")' 
+	printf,55,nbgeom.xyz_src[2],f='(1f9.4,"      # z [cm]")' 
 	printf,55,'# 3 rotation matrizes 3x3'
 	for j=0,2 do begin
-	for k=0,2 do begin
-			printf,55 ,rot_mat.Arot[j,k] ;; rotation in the top-down view plane
-			printf,55 ,rot_mat.Brot[j,k] ;; vertical rotation
-			printf,55 ,rot_mat.Crot[j,k] ;; vertical rotation
+		for k=0,2 do begin
+			printf,55 ,nbgeom.Arot[j,k] ;; rotation in the top-down view plane
+			printf,55 ,nbgeom.Brot[j,k] ;; vertical rotation
+			printf,55 ,nbgeom.Crot[j,k] ;; vertical rotation
 		endfor 
 	endfor
 	close,55
@@ -602,25 +673,25 @@ PRO prefida,input_pro,plot=plot
 
 	;;WRITE LINE OF SIGHT (LOS) INFORMATION TO BINARY
 	if inputs.no_spectra ne 1 then begin
-		detector={ det:fida  , weight:weight }
 		file =inputs.result_dir+inputs.runid+'/los.bin'
+		los=chords.los
 		openw, lun, file, /get_lun
 		writeu,lun , long(n_elements(los))
-		for chan=0,n_elements(los)-1 do begin
-			writeu,lun, double(fida.xlens[los[chan]])
-			writeu,lun, double(fida.ylens[los[chan]])
-			writeu,lun, double(fida.zlens[los[chan]])
-			writeu,lun, double(fida.headsize[los[chan]]) ;; headsize is used for NPA
-			writeu,lun, double(fida.xmid[los[chan]])
-			writeu,lun, double(fida.ymid[los[chan]])
-			writeu,lun, double(fida.zmid[los[chan]])
+		for chan=0L,n_elements(los)-1 do begin
+			writeu,lun, double(chords.xlens[los[chan]])
+			writeu,lun, double(chords.ylens[los[chan]])
+			writeu,lun, double(chords.zlens[los[chan]])
+			writeu,lun, double(chords.headsize[los[chan]]) ;; headsize is used for NPA
+			writeu,lun, double(chords.xmid[los[chan]])
+			writeu,lun, double(chords.ymid[los[chan]])
+			writeu,lun, double(chords.zmid[los[chan]])
 		endfor
-		writeu,lun , double(fida.sigma_pi_ratio)
-		for i=0,inputs.nx-1 do begin
-			for j=0,inputs.ny-1 do begin
-				for k=0,inputs.nz-1 do begin
-					for chan=0,n_elements(los)-1 do begin
-						writeu ,lun , float(weight[i,j,k,chan])
+		writeu,lun , double(chords.sigma_pi_ratio)
+		for i=0L,inputs.nx-1 do begin
+			for j=0L,inputs.ny-1 do begin
+				for k=0L,inputs.nz-1 do begin
+					for chan=0L,n_elements(los)-1 do begin
+						writeu ,lun , float(chords.weight[i,j,k,chan])
 					endfor
 				endfor
 			endfor
@@ -628,11 +699,7 @@ PRO prefida,input_pro,plot=plot
 		close,lun
 		free_lun, lun
 		print, 'LOS parameters stored in BINARY: '+file
-	endif else begin
-		det={xhead:0.,yhead:0.,zhead:0., headsize:0. $
-			,nchan:1,xlos:[0.],ylos:[0.],zlos:[0.]}
-		detector={det:det,weight:replicate(0.d0,inputs.nx,inputs.ny,inputs.nz,1) }
-	endelse
+	endif
 
 	print,''
 	print,''

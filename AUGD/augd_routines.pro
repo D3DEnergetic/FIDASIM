@@ -13,12 +13,12 @@ PRO augd_routines,inputs,grid,nbi,fida,profiles,equil,err
 	   xyz_src:reform(nbgeom.xyz_src[inputs.isource,*]),xyz_pos:reform(nbgeom.xyz_pos[inputs.isource,*]),$
 	   bmwidra:nbgeom.bmwidra,bmwidza:nbgeom.bmwidza,$
 	   divy:nbgeom.divy[*,inputs.isource],divz:nbgeom.divz[*,inputs.isource],focy:nbgeom.focy[inputs.isource],focz:nbgeom.focz[inputs.isource]}
-
+  
   restore,'/u/'+user+'/FIDASIM/TEST/fida_diag.idl'
   sigma_pi_ratio=0.5d0
   if inputs.shot gt 27500 then sigma_pi_ratio=0.9d0
   fida={sigma_pi_ratio:sigma_pi_ratio,nchan:det.nchan,xmid:det.xlos,ymid:det.ylos,$
 		zmid:det.zlos,xlens:det.xhead,ylens:det.yhead,zlens:det.zhead,headsize:det.headsize}
-
+ 
   err=0
 END

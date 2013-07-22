@@ -50,15 +50,18 @@ dlambda= (lambdamax-lambdamin)/double(nlambda)	;; Wavelength seperation
 ;;---------------------------------------------------
 ;; Define FIDASIM grid in machine coordinates(x,y,z)
 ;;---------------------------------------------------
+origin=[-180.16373,600.82700,0.0]
+alpha=-4.6020171774D 	;; rotation about z axis
+
 nx=40				;; Number of cells in x direction
 ny=60				;; Number of cells in y direction
 nz=50				;; Number of cells in z direction
-xdim1=-150.			;; Minimum x value
-xdim2=-110.			;; Maximum x value
-ydim1=80.			;; Minimum y value
-ydim2=190.			;; Maximum y value
-zdim1=-50.			;; Minimum z value
-zdim2=50.			;; Maximum z value
+xdim1=-520.			;; Minimum x value
+xdim2=-420.			;; Maximum x value
+ydim1=-40.			;; Minimum y value
+ydim2=40.			;; Maximum y value
+zdim1=-40.			;; Minimum z value
+zdim2=40.			;; Maximum z value
 
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
@@ -97,7 +100,7 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
        cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax, $
        isource:isource,einj:einj,pinj:pinj,fida_diag:fida_diag,gfile:gfile,equil:equil,$
        btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
-       lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
+       lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,origin:origin,alpha:alpha,beta:0.0,$
        nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
        nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$

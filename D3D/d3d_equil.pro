@@ -18,7 +18,7 @@ FUNCTION d3d_equil,inputs,grid
 		endif
 	endelse
 
-    rhogrid=rho_rz(g,grid.r_grid/100.,grid.zc/100.)
+    rhogrid=rho_rz(g,grid.r_grid/100.,grid.wc/100.)
 		
 	calculate_bfield,bp,br,bphi,bz,g
 ;	help,bp,br,bphi,bz
@@ -43,7 +43,7 @@ FUNCTION d3d_equil,inputs,grid
 	b=fltarr(3,grid.ng) & e=fltarr(3,grid.ng)
 	for l=0l,grid.ng-1 do begin
 		rgrid=(.01*grid.r_grid[l] - g.r[0])/(g.r[1]-g.r[0]) ; in grid units
-		zgrid=(.01*grid.zc[l] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
+		zgrid=(.01*grid.wc[l] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
 		bcylr=interpolate(br,[rgrid],[zgrid])
 		ecylr=interpolate(er,[rgrid],[zgrid])
 		bcylphi=interpolate(bphi,[rgrid],[zgrid])

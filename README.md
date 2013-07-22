@@ -2,6 +2,8 @@
 FIDASIM is a code that models the signal that is produced by charge-exchange reactions between fast-ions and injected neutral beams in tokamak plasmas. 
 
 # How to Install 
+Warning! The following procedure creates a directory named FIDASIM. This will overwrite any directory also named FIDASIM. Take necessary precautions. 
+
 ## DIII-D
 On venus
 

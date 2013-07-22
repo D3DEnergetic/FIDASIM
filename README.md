@@ -4,27 +4,37 @@ FIDASIM is a code that models the signal that is produced by charge-exchange rea
 # How to Install 
 ## DIII-D
 On venus
-	git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
-	cd FIDASIM
+
+    git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
+    cd FIDASIM
+
 To compile the stable version run 
-	git checkout master
-	make -f makefile_d3d
+
+    git checkout master
+    make -f makefile_d3d
+
 else to compile the development version run
-	git checkout development
-	make -f makefile_d3d
+
+    git checkout development
+    make -f makefile_d3d
 
 ## NSTX-U
 On portal
-	module load git
-	module load intel
-	git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
-	cd FIDASIM
+
+    module load git
+    module load intel
+    git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
+    cd FIDASIM
+
 To compile the stable version run 
-	git checkout master
-	make -f makefile_nstx
+
+    git checkout master
+    make -f makefile_nstx
+
 else to compile the development version run
-	git checkout development
-	make -f makefile_nstx
+
+    git checkout development
+    make -f makefile_nstx
 	
 ## References
 

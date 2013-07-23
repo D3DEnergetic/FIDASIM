@@ -1,4 +1,4 @@
-PRO d3d_plots,inputs,grid, nbi, fida, equil,rot_mat
+PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 
 	g=equil.g
 
@@ -66,4 +66,13 @@ end
 oplot,100.*g.bdry[0,*],100.*g.bdry[1,*],color=150
 oplot,100.*g.lim[0,*],100.*g.lim[1,*],color=0
 
+  window,2 & wset,2
+  !p.multi=[0,2,2,0,1]
+  plot,equil.rho_grid,plasma.te,psym=3,color=0,background=255,title='Te and Ti',xtitle='rho',ytitle='keV'
+  oplot,equil.rho_grid,plasma.ti,psym=3,color=50
+  plot,equil.rho_grid,plasma.dene,psym=3,color=0,background=255,title='electron density',xtitle='rho',ytitle='cm^-3'
+  plot,equil.rho_grid,plasma.zeff,psym=3,color=0,background=255,title='zeff',xtitle='rho',ytitle='zeff'
+  vrot=sqrt(plasma.vrot[0,*]^2.0 + plasma.vrot[1,*]^2.0 + plasma.vrot[2,*]^2.0)
+  plot,equil.rho_grid,vrot,psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
+  !p.multi=0
 end

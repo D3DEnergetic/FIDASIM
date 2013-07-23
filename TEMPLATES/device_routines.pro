@@ -44,7 +44,6 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 
 	
 	;;** Structure <10d955b8>, 8 tags, length=3648, data length=3642, refs=1:
-	;;   TIME            FLOAT           1.09000
 	;;   RHO             FLOAT     Array[101]
 	;;   TE              DOUBLE    Array[101]
 	;;   TI              DOUBLE    Array[101]

@@ -86,9 +86,7 @@ PRO make_fida_grid,inputs,grid,err
 	
 	;;Rotate all grid points to machine coordinates
 	rotate_points,x,y,z,Arot,Brot,Crot,u,v,w
-;	rotate_points,xx,yy,zz,Arot,Brot,Crot,uu,vv,ww
 	rotate_points,xc,yc,zc,Arot,Brot,Crot,uc,vc,wc
-;	rotate_points,xxc,yyc,zzc,Arot,Brot,Crot,uuc,vvc,wwc
 	
 	;;Change origin for rotated points
 	u+=inputs.origin[0] & uc+=inputs.origin[0]
@@ -424,15 +422,19 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	;; MAP kinetic profiles on FIDASIM grid
 	;;------------------------------------------------- 
 
+	rhomax=max(profiles.rho)
+	ww=where(equil.rho_grid gt rhomax)
 	;;Electron density
 	dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid) > 0. ;[1/cm^3]
+	dene[ww]=0.0
 
 	;;Zeff
-	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 0
+	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 1.0
+	zeff[ww]=1.0
 
 	;;Impurity density
 	deni = (zeff-1.)/(inputs.impurity_charge*(inputs.impurity_charge-1))*dene
-
+	
 	;;Proton density
 	denp = dene-inputs.impurity_charge*deni
 	print,total(deni)/total(denp)*100. ,' percent of impurities'
@@ -450,7 +452,8 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
   	endelse
  
 	;;Electron temperature
-	te = 1.d-3 * interpol(profiles.te,profiles.rho,equil.rho_grid) > 0 ;keV
+	te = 1.d-3 * interpol(profiles.te,profiles.rho,equil.rho_grid) > 0. ;keV
+	te[ww]=0.0
 	if min(te) lt 0 then te[where(te lt 0.)]=0.d0 
 	
 	;;Ion temperature   
@@ -461,9 +464,11 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 		print, 'Look at the tables, they might only consider'
 		print, 'temperatures less than 10keV!'
 	endif
+	ti[ww]=0.0
 
 	;;Plasma rotation	
 	vtor      =   1.d2* interpol(profiles.vtor,profiles.rho,equil.rho_grid) ; [cm/s]  
+	vtor[ww]  =   profiles.vtor[-1]
 	vrot      =   fltarr(3,grid.ng)
 	vrot[0,*] = - sin(grid.phi_grid)*vtor 
 	vrot[1,*] =   cos(grid.phi_grid)*vtor
@@ -555,7 +560,7 @@ PRO prefida,input_pro,plot=plot
 
     ;; Plot grid, beam, sightlines, and equilibrium
 	if keyword_set(plot) then begin
-		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,nbgeom
+		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,nbgeom,plasma
 	endif
 
 	;;WRITE FIDASIM INPUT FILES

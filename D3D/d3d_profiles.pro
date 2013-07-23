@@ -3,7 +3,6 @@ FUNCTION d3d_profiles,inputs
 
     ;; profiles structure
     ;;** Structure <83e8518>, 7 tags, length=5768, data length=5764, refs=1:
-    ;;   TIME            FLOAT           4.42000
     ;;   RHO             DOUBLE    Array[120]
     ;;   TI              DOUBLE    Array[120] [eV]
     ;;   VTOR            DOUBLE    Array[120] [m/s]
@@ -63,9 +62,19 @@ FUNCTION d3d_profiles,inputs
 		restore,vtor_string
 		vtor=tor_rot_str.tor_rot_local*tor_rot_str.r_tor_rot ;;m/s
 		vtor_rho=tor_rot_str.rho_tor_rot
-	
+		
+		;;INTERPOLATE SO THAT ALL USE THE SAME RHO
+		maxrho=min([dene_rho[-1],te_rho[-1],ti_rho[-1],zeff_rho[-1],vtor_rho[-1]])
+		rho=maxrho*dindgen(121)/121.0
+
+		dene=interpol(dene,dene_rho,rho) > 0.0
+		te=interpol(te,te_rho,rho) > 0.0 
+		ti=interpol(ti,ti_rho,rho) > 0.0 
+		zeff=interpol(zeff,zeff_rho,rho) > 1.0
+		vtor=interpol(vtor,vtor_rho,rho) 
+
 		;;SAVE IN PROFILE STRUCTURE
-		profiles={time:inputs.time,rho:dene_rho,te:te,ti:ti,vtor:vtor,dene:dene,zeff:zeff,err:0}
+		profiles={rho:rho,te:te,ti:ti,vtor:vtor,dene:dene,zeff:zeff,err:0}
 	endelse
 	return,profiles
 END

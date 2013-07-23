@@ -1,6 +1,6 @@
-FUNCTION d3d_chords,inputs
+FUNCTION d3d_chords,shot,fida_diag
 
-
+	fida_diag=strupcase(fida_diag)
     ;; fida structure (15 == number of chords/channels)
     ;;** Structure <88d87f8>, 9 tags, length=800, data length=792, refs=1:
     ;;   SIGMA_PI_RATIO  DOUBLE          0.90000000 ;;COULD BE ARRAY
@@ -59,7 +59,7 @@ FUNCTION d3d_chords,inputs
 	zmid4=[0.0]
 
 	;;fida_yadong
-	if inputs.shot le 143721 then begin
+	if shot le 143721 then begin
 		xmid5=[-128.4,-129.3,-130.0,-130.8,-131.3,-131.9,-132.7,-128.9,-131.0,-133.2]
 		ymid5=[120.9,129.1,135.1,142.2,147.2,152.4,160.2,125.1,144.9,165.2]
 		nchan5=n_elements(xmid5)
@@ -116,7 +116,7 @@ FUNCTION d3d_chords,inputs
 	endelse
 
  ;; SELECT THE VIEWS
-    CASE (inputs.fida_diag) OF
+    CASE (fida_diag) OF
       'VERTICAL': begin
         xlos=xmid5
         ylos=ymid5
@@ -144,7 +144,16 @@ FUNCTION d3d_chords,inputs
         zhead=zlens4
         nchan=n_elements(xlos)
        end
-;      'NPA': npa_setup,det,inputs.fida_diag ;
+      'ALL': begin
+		xlos=[xmid1,xmid2,xmid3,xmid4,xmid5,xmid6]
+		ylos=[ymid1,ymid2,ymid3,ymid4,ymid5,ymid6]
+		zlos=[zmid1,zmid2,zmid3,zmid4,zmid5,zmid6]
+		xhead=[xlens1,xlens2,xlens3,xlens4,xlens5,xlens6]
+		yhead=[ylens1,ylens2,ylens3,ylens4,ylens5,ylens6]
+		zhead=[zlens1,zlens2,zlens3,zlens4,zlens5,zlens6]
+		nchan=n_elements(xlos)
+	   end
+;      'NPA': npa_setup,det,fida_diag ;
        ELSE: BEGIN
          PRINT, '% Diagnostic unknown'
          STOP
@@ -152,7 +161,7 @@ FUNCTION d3d_chords,inputs
        ENDCASE
 
 	;;SAVE IN FIDA STRUCTURE
-	fida={nchan:nchan,xmid:xlos,ymid:ylos,zmid:zlos,xlens:xhead,ylens:yhead,zlens:zhead,$
+	fida={nchan:nchan,diag:fida_diag,xmid:xlos,ymid:ylos,zmid:zlos,xlens:xhead,ylens:yhead,zlens:zhead,$
 		  sigma_pi_ratio:1.0,headsize:replicate(1.0,nchan)}
 	return,fida
 END

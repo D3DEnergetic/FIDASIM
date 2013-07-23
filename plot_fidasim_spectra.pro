@@ -48,7 +48,7 @@ pro oplot_transp,zz,xx,yy,emax,thick,pos
 end
 
 
-pro plot_fidasim_spectra,ps=ps,product=product
+pro plot_fidasim_spectra,ps=ps,product=product,runid=runid
  ;; PLOT SETTINGS
   linthick=1.
   loadct,39    ;green=150;blue=50;yellow=200;red=254;black=0;white=255

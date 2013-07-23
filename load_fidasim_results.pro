@@ -6,6 +6,7 @@ pro load_fidasim_results,results,result_dir,only_inputs=only_inputs
   
   sdum=''
   idum=1
+  ldum=1L
   fdum=1.d0
   transp_runid=''
   fidasim_runid=''
@@ -13,7 +14,7 @@ pro load_fidasim_results,results,result_dir,only_inputs=only_inputs
   openr,55,input_file
   readf,55,sdum                 ;& print, sdum
   readf,55,sdum                 ;& print, sdum
-  readf,55,idum & shot=long(idum) & print,'shot: ',  shot
+  readf,55,ldum & shot=ldum & print,'shot: ',  shot
   readf,55,fdum & time=float(fdum) & print,'time: ', time
   readf,55,fidasim_runid
   readf,55,diag 
@@ -23,6 +24,8 @@ pro load_fidasim_results,results,result_dir,only_inputs=only_inputs
   readf,55,idum & nofida=idum               
   readf,55,idum & npa=idum      ;& print, 'npa: ', npa
   readf,55,idum & load_neutrals=idum
+  readf,55,idum & guidingcenter=idum
+  readf,55,idum & f90brems=idum
   readf,55,idum & calc_wght=idum
   readf,55,sdum;'# weight function settings:'
   readf,55,sdum;inputs.nr_wght,f='(i9,"      # number velocities")'
@@ -90,7 +93,7 @@ pro load_fidasim_results,results,result_dir,only_inputs=only_inputs
           , transp_runid:transp_runid $
           , fidasim_runid:fidasim_runid $
           , nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
-          , nofida:nofida,load_neutrals:load_neutrals,calc_wght:calc_wght $
+          , nofida:nofida,load_neutrals:load_neutrals,guidingcenter:guidingcenter,f90brems:f90brems,calc_wght:calc_wght $
           , nx:nx, ny:ny, nz:nz $
           , x0:xx[0],x1:xx[nx-1]+dx $
           , y0:yy[0],y1:yy[ny-1]+dy $

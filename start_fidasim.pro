@@ -82,9 +82,9 @@ pro start_fidasim
 
 
   ;; plot the spectra
-  plot_fidasim_spectra
+  plot_fidasim_spectra,runid=result_dir
   ;; plot the neutral densities
-  plot_fidasim_neutrals,/loga
+  plot_fidasim_neutrals,result_dir,/loga
 
 end
 

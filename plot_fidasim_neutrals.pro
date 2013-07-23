@@ -1,4 +1,4 @@
-pro plot_fidasim_neutrals,ps=ps,only_halo=only_halo,only_beam=only_beam,loga=loga
+pro plot_fidasim_neutrals,path,ps=ps,only_halo=only_halo,only_beam=only_beam,loga=loga
   nlevs=15.
   linthick=1.
   set_plot,'X' & device, decomposed=0
@@ -21,11 +21,11 @@ pro plot_fidasim_neutrals,ps=ps,only_halo=only_halo,only_beam=only_beam,loga=log
   !P.background=255 & !P.color=0 &  !p.multi=0 
 
 
-  path=dialog_pickfile(path='RESULTS/',/directory)
+;  path=dialog_pickfile(path='RESULTS/',/directory)
 
-  runid=strsplit(path,'/',/extract,count=nid)
-  print, runid
-  runid=runid[nid-1]
+;  runid=strsplit(path,'/',/extract,count=nid)
+;  print, runid
+;  runid=runid[nid-1]
   
   load_fidasim_results, fidasim,path
   shot=fidasim.inputs.shot

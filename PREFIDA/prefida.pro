@@ -430,7 +430,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 
 	;;Zeff
 	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 1.0
-	zeff[ww]=1.0
+	zeff[ww]=profiles.zeff[-1]
 
 	;;Impurity density
 	deni = (zeff-1.)/(inputs.impurity_charge*(inputs.impurity_charge-1))*dene

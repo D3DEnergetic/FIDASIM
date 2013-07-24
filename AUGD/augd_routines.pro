@@ -4,7 +4,7 @@ PRO augd_routines,inputs,grid,nbi,fida,profiles,equil,err
   restore,'/u/'+user+'/FIDASIM/TEST/load_transp_profiles.idl'
   restore,'/u/'+user+'/FIDASIM/TEST/load_bfield.idl'
   
-  equil={rho_grid:rhotf,b:b,e:b*0}
+  equil={rho_grid:rhotf,rho_chords:{rhos:0,ds:0},b:b,e:b*0}
 
   nbi_geometry_transp,nbgeom
 

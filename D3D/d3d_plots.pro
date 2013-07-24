@@ -22,9 +22,10 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 		color=0,background=255,title='PLANE VIEW',xtitle='X [cm]',ytitle='Y [cm]'
 	oplot,grid.uc,grid.vc,psym=3,color=0
 
-	for i=0,fida.nchan-1 do begin
-		oplot,[fida.xmid[i],fida.xlens[i]] ,[fida.ymid[i],fida.ylens[i]] ,color=50
-	endfor
+  for i=0,fida.nchan-1 do $
+   oplot,fida.xlens[i]+[0,2*(fida.xlos[i]-fida.xlens[i])],$
+         fida.ylens[i]+[0,2*(fida.ylos[i]-fida.ylens[i])],$
+          color=50
 
 	src=nbi.xyz_src
 	pos=(nbi.xyz_pos-nbi.xyz_src)*1000+nbi.xyz_src
@@ -48,18 +49,18 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 	oplot,grid.r_grid,grid.wc,psym=3,color=0  
 ; Lines of sight
 for i=0,fida.nchan-1 do begin
-  if fida.zlens[i] ne fida.zmid[i] then begin
-    z=(fida.zlens[i]-fida.zmid[i])*findgen(101)/100.+fida.zmid[i]
-    x=(fida.xlens[i]-fida.xmid[i])*(z-fida.zmid[i])/ $
-      (fida.zlens[i]-fida.zmid[i]) + fida.xmid[i]
-    y=(fida.ylens[i]-fida.ymid[i])*(z-fida.zmid[i])/ $
-      (fida.zlens[i]-fida.zmid[i]) + fida.ymid[i]
+  if fida.zlos[i] ne fida.zlens[i] then begin
+    z=(fida.zlos[i]-fida.zlens[i])*findgen(201)/100.+fida.zlens[i]
+    x=(fida.xlos[i]-fida.xlens[i])*(z-fida.zlens[i])/ $
+      (fida.zlos[i]-fida.zlens[i]) + fida.xlens[i]
+    y=(fida.ylos[i]-fida.ylens[i])*(z-fida.zlens[i])/ $
+      (fida.zlos[i]-fida.zlens[i]) + fida.ylens[i]
     oplot,sqrt(x^2+y^2),z,color=50
   end else begin 
-    y=(fida.ylens[i]-fida.ymid[i])*findgen(101)/100.+fida.ymid[i]
-    x=(fida.xlens[i]-fida.xmid[i])*(y-fida.ymid[i])/ $
-      (fida.ylens[i]-fida.ymid[i]) + fida.ymid[i]
-    oplot,sqrt(x^2+y^2),replicate(fida.zlens[i],101),color=50
+    y=(fida.ylos[i]-fida.ylens[i])*findgen(201)/100.+fida.ylens[i]
+    x=(fida.xlos[i]-fida.xlens[i])*(y-fida.ylens[i])/ $
+      (fida.ylos[i]-fida.ylens[i]) + fida.ylens[i]
+    oplot,sqrt(x^2+y^2),replicate(fida.zlens[i],201),color=50
   end
 end
 ; Equilibrium

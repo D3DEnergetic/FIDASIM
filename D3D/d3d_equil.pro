@@ -1,4 +1,33 @@
-FUNCTION d3d_equil,inputs,grid
+FUNCTION sinterpol,v,x,u,sortt=sortt,_extra=_extra
+    if n_elements(sortt) lt 1 then sortt=0
+
+    if sortt then begin
+        ind=sort(X)
+    endif else begin
+        ind=lindgen(n_elements(x))
+    endelse
+
+
+    return,interpol(v[ind],x[ind],u,_extra=_extra)
+END
+
+FUNCTION interpolatexy,x,y,z,xu,yu,_extra=_extra
+
+	;takes in vectors of x and y coordinates for z(x,y) data set
+	;interpolates z onto (xu,yu) coordinates has same keywords as 
+	;interpolate
+
+
+	indx=sinterpol(indgen(n_elements(x)),x,xu,sortt=1)
+	indy=sinterpol(indgen(n_elements(y)),y,yu,sortt=1)
+
+	int=interpolate(z,indx,indy,_extra=_extra)
+
+	return,int
+
+END
+
+FUNCTION d3d_equil,inputs,grid,det
 
 	equil={err:1}
 	;; Get eqdsk
@@ -18,8 +47,8 @@ FUNCTION d3d_equil,inputs,grid
 		endif
 	endelse
 
-    rhogrid=rho_rz(g,grid.r_grid/100.,grid.wc/100.)
-		
+    rhogrid=rho_rz(g,grid.r_grid/100.,grid.wc/100.,/do_linear)
+
 	calculate_bfield,bp,br,bphi,bz,g
 ;	help,bp,br,bphi,bz
 	;; Get radial electric field on efit's grid from potential
@@ -55,7 +84,39 @@ FUNCTION d3d_equil,inputs,grid
 		e[0,l]=cph*ecylr
 		e[1,l]=sph*ecylr
 	endfor
-	equil={g:g,rho_grid:rhogrid,b:b,e:e,err:0}
+
+	if inputs.f90brems eq 0 then begin
+		;;GET RHO VALUES ALONG LINE OF SIGHT
+		ds=.3    ; step size (cm)
+	    ns=4000  ; maximum number of steps
+
+	    ;; Sightlines
+	    nchan=det.nchan
+	    x0=det.xlens   ; cm
+	    y0=det.ylens
+	    z0=det.zlens
+	    v=fltarr(3,nchan)
+	    for i=0,nchan-1 do begin
+	        v[0,i]=det.xlos[i]-x0[i]
+	        v[1,i]=det.ylos[i]-y0[i]
+	        v[2,i]=det.zlos[i]-z0[i]
+	        v[*,i]=v[*,i]/sqrt(v[0,i]^2+v[1,i]^2+v[2,i]^2)
+	    endfor
+		rhospath=dblarr(ns,nchan)
+	    for i=0,nchan-1 do begin
+	        ;equations for lines in x,y,z are
+	        x=x0[i] + v[0,i]*ds*findgen(ns)  ; cm
+	        y=y0[i] + v[1,i]*ds*findgen(ns)
+	        z=z0[i] + v[2,i]*ds*findgen(ns)
+	
+	        rmajvals=(x^2.+y^2.)^.5  ; major radii of all points along ray
+			rhospath[*,i]=rho_rz(g,rmajvals/100.,z/100.,/do_linear)
+	    endfor  ; channel loop
+
+		rho_chords={rhos:rhospath,ds:ds}
+	endif else rho_chords={rhos:0,ds:0}
+
+	equil={g:g,rho_grid:rhogrid,rho_chords:rho_chords,b:b,e:e,err:0}
 	GET_OUT:
 	return,equil
 END

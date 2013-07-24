@@ -213,27 +213,27 @@ PRO prepare_fida,inputs,grid,fida,chords
 ;	print, 'nchan:', fida.nchan
 
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
-	ulens=fida.xlens-inputs.origin[0] & umid=fida.xmid-inputs.origin[0]
-	vlens=fida.ylens-inputs.origin[1] & vmid=fida.ymid-inputs.origin[1]
-	wlens=fida.zlens-inputs.origin[2] & wmid=fida.zmid-inputs.origin[2]
+	ulens=fida.xlens-inputs.origin[0] & ulos=fida.xlos-inputs.origin[0]
+	vlens=fida.ylens-inputs.origin[1] & vlos=fida.ylos-inputs.origin[1]
+	wlens=fida.zlens-inputs.origin[2] & wlos=fida.zlos-inputs.origin[2]
 
 	rotate_points,ulens,vlens,wlens,Arot,Brot,Crot,xlens,ylens,zlens
-	rotate_points,umid,vmid,wmid,Arot,Brot,Crot,xmid,ymid,zmid
+	rotate_points,ulos,vlos,wlos,Arot,Brot,Crot,xlos,ylos,zlos
 	
 	for chan=0L, fida.nchan-1 do  begin
-		xyzhead = [xlens[chan],ylens[chan],zlens[chan]]
-        xyzlos  = [xmid[chan], ymid[chan], zmid[chan]]
+		xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
+        xyzlos  = [xlos[chan], ylos[chan], zlos[chan]]
 ;		print,xyzlos	
-;		plot,[xmid[chan],xlens[chan]],[zmid[chan],zlens[chan]],color=0,background=255,xrange=[-600,-300],yrange=[-55.,55.]
+;		plot,[xlos[chan],xlens[chan]],[zlos[chan],zlens[chan]],color=0,background=255,xrange=[-600,-300],yrange=[-55.,55.]
 ;		oplot,grid.xc,grid.zc,psym=3,color=0
-        vi    = xyzlos-xyzhead
+        vi    = xyzlos-xyzlens
         dummy = max(abs(vi),ic)
         nstep = fix(700./grid.dr[ic])
         vi    = vi/sqrt(vi[0]^2+vi[1]^2+vi[2]^2) ;; unit vector
 ;        if chan eq fida.nchan-1 then begin
 ;       	print, vi
 ;        endif
-        xyz_pos = xyzhead
+        xyz_pos = xyzlens
       ; find first grid cell
         for i=0L,nstep do begin
         	xyz_pos[0] = xyz_pos[0] + grid.dr[ic] * vi[0]/abs(vi[ic])
@@ -280,7 +280,7 @@ PRO prepare_fida,inputs,grid,fida,chords
 		err=0
 	endelse
 	chords={nchan:fida.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:fida.sigma_pi_ratio,$
-			xmid:xmid,ymid:ymid,zmid:zmid,headsize:fida.headsize,los:los,weight:weight,err:err}
+			xlos:xlos,ylos:ylos,zlos:zlos,headsize:fida.headsize,los:los,weight:weight,err:err}
 END
 
 PRO transp_fbeam,inputs,grid,denf,err
@@ -491,6 +491,91 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	GET_OUT: 
 END
 
+FUNCTION sinterpol,v,x,u,sortt=sortt,_extra=_extra
+	if n_elements(sortt) lt 1 then sortt=0
+
+	if sortt then begin
+		ind=sort(X)
+	endif else begin
+		ind=lindgen(n_elements(x))
+	endelse
+
+
+	return,interpol(v[ind],x[ind],u,_extra=_extra)
+END
+
+PRO brems,result_dir,det,profiles,equil
+; Calculates visible bremsstrahlung along FIDA sightlines
+; WWH 6/2013
+
+; INPUT
+; result_dir directory to write output
+; det	     structure with detector lines of sight
+; profiles   structure with plasma profiles vs. rho
+
+; OUTPUT
+; file with the surface radiance (ph/s-m2-nm-sr) for
+; each sightline
+
+;*******************************************************************
+;*****************************************
+	; Plasma parameters
+	rho=profiles.rho
+	te=profiles.te              ; eV
+	dene=profiles.dene*1.e-6    ; cm^-3
+	zeff=profiles.zeff
+	
+	; Require non-zero values for te and ne
+	w=where(te le 0. or dene le 0.,nw)
+	if nw gt 0 then begin
+		rho=rho[0:w[0]-1]
+		te=te[0:w[0]-1]
+		dene=dene[0:w[0]-1]
+		zeff=zeff[0:w[0]-1]
+	endif
+	w=where(zeff lt 1.,nw) & if nw gt 0 then zeff[w]=1.
+	w=where(zeff gt 6.,nw) & if nw gt 0 then zeff[w]=6.
+	rhomax=max(rho,nr) & nr+=1
+
+	;**********************************************
+	; Constants in calculation
+	lambda=6561.	; average wavelength (Angstroms)
+	h_planck=4.135667e-15  ; [eV/s]
+	c0=2.9979e8 ; [m/s]
+	
+	; Visible bremsstrahlung emissivity versus rho
+	gaunt=5.542-(3.108-alog(te/1000.))*(0.6905-0.1323/zeff)
+	emisrho=10.*7.57d-9*gaunt*dene^2*zeff/(lambda*sqrt(te)) $
+               *exp(-h_planck*c0/(lambda*te))
+
+	;***********************************************
+	;NOW do line integration to get surface radiance
+	;***********************************************
+	nchan=det.nchan
+	vbline=replicate(0.,nchan)
+
+	for i=0,nchan-1 do begin
+		rhospath=equil.rho_chords.rhos[*,i]
+		rhospath=rhospath[where(finite(rhospath))]
+        vbepath=sinterpol(emisrho,rho,rhospath,/sort)
+        wgtr1=where(rhospath ge rhomax,nwgtr1)
+        ;set emission at radii outside of max rho to zero
+        if nwgtr1 ge 0 then vbepath[wgtr1]=0.0
+		vbline[i]=total(vbepath)*equil.rho_chords.ds*0.01   ; (ph/s-m2-nm-sr)
+	endfor  ; channel loop
+
+	;--------------------------------
+	; Save results
+
+	print,vbline
+	file =result_dir+'/bremsstrahlung.bin'
+	openw, lun, file, /get_lun
+	for i=0,nchan-1 do writeu,lun, double(vbline[i])
+	close,lun
+	free_lun,lun
+	print, 'Bremsstrahlung stored in BINARY: '+file
+END
+
 PRO prefida,input_pro,plot=plot
 
 	COMPILE_OPT DEFINT32
@@ -557,6 +642,10 @@ PRO prefida,input_pro,plot=plot
 		print,'PROFILE MAPPING FAILED'
 		goto,GET_OUT
 	endif else err=0
+
+    ;; Calculate bremsstrahlung if desired
+	if inputs.f90brems eq 0 then $
+		brems,inputs.result_dir+inputs.runid,fida,profiles,equil
 
     ;; Plot grid, beam, sightlines, and equilibrium
 	if keyword_set(plot) then begin
@@ -687,9 +776,9 @@ PRO prefida,input_pro,plot=plot
 			writeu,lun, double(chords.ylens[los[chan]])
 			writeu,lun, double(chords.zlens[los[chan]])
 			writeu,lun, double(chords.headsize[los[chan]]) ;; headsize is used for NPA
-			writeu,lun, double(chords.xmid[los[chan]])
-			writeu,lun, double(chords.ymid[los[chan]])
-			writeu,lun, double(chords.zmid[los[chan]])
+			writeu,lun, double(chords.xlos[los[chan]])
+			writeu,lun, double(chords.ylos[los[chan]])
+			writeu,lun, double(chords.zlos[los[chan]])
 		endfor
 		writeu,lun , double(chords.sigma_pi_ratio)
 		for i=0L,inputs.nx-1 do begin

@@ -39,10 +39,14 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 
 	;;** Structure <10dc9e28>, 5 tags, length=3380784, data length=3380772, refs=1:
 	;;   RHO_GRID        FLOAT     Array[120000]
+	;;	 RHO_CHORDS		 STRUC	   STRUCTURE
 	;;   B               FLOAT     Array[3, 120000]
 	;;   E               FLOAT     Array[3, 120000]
 
-	
+	;;** Structure <10dc9e28>, 5 tags, length=3380784, data length=3380772, refs=1:
+	;;   RHOS			 DOUBLE    Array[4000,10] ;;10 = number of channels
+	;;   DS				 FLOAT 	   0.30000		  ;;Step size in cm
+
 	;;** Structure <10d955b8>, 8 tags, length=3648, data length=3642, refs=1:
 	;;   RHO             FLOAT     Array[101]
 	;;   TE              DOUBLE    Array[101]
@@ -53,8 +57,9 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 
 	;;FOR CONVINIENCE HERE ARE THE MINIMUM STRUCTURE DEFINITIONS
 	equil={rho_grid:rho_grid,$	   			;;FIDA GRID IN MAGNETIC FLUX COORDINATES (RHO)
-			  b:b,$					   		;;MAGNETIC FIELD COMPONENTS AT GRID POINTS
-			  e:e}							;;ELECTRIC FIELD COMPONENTS AT GRID POINTS
+		   rho_chords:rho_chords,$			;;STRUCTURE CONTAINING AN ARRAY OF RHO VALUES AND STEP SIZE IN [cm]
+		   b:b,$					   		;;MAGNETIC FIELD COMPONENTS AT GRID POINTS
+		   e:e }							;;ELECTRIC FIELD COMPONENTS AT GRID POINTS
 
 	nbi={einj:einj,$				   		;;BEAM INJECTION ENERGY [keV]
 		 pinj:pinj,$				   		;;BEAM INJECTION POWER  [MW]

@@ -219,7 +219,7 @@ PRO prepare_fida,inputs,grid,fida,chords
 
 	rotate_points,ulens,vlens,wlens,Arot,Brot,Crot,xlens,ylens,zlens
 	rotate_points,ulos,vlos,wlos,Arot,Brot,Crot,xlos,ylos,zlos
-	
+
 	for chan=0L, fida.nchan-1 do  begin
 		xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
         xyzlos  = [xlos[chan], ylos[chan], zlos[chan]]

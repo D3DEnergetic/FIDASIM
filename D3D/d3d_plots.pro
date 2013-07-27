@@ -19,17 +19,17 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 	x_range=[xmin1,xmax1] & y_range=[ymin1,ymax1] & z_range=[zmin1,zmax1]
 
 	plot,[0],[0],/nodata,xrange=x_range,yrange=y_range,$
-		color=0,background=255,title='PLANE VIEW',xtitle='X [cm]',ytitle='Y [cm]'
+		color=0,background=255,title='PLANE VIEW',xtitle='U [cm]',ytitle='V [cm]'
 	oplot,grid.uc,grid.vc,psym=3,color=0
 
-  for i=0,fida.nchan-1 do $
-   oplot,fida.xlens[i]+[0,2*(fida.xlos[i]-fida.xlens[i])],$
-         fida.ylens[i]+[0,2*(fida.ylos[i]-fida.ylens[i])],$
-          color=50
+	for i=0,fida.nchan-1 do $
+		oplot,fida.xlens[i]+[0,2*(fida.xlos[i]-fida.xlens[i])],$
+        fida.ylens[i]+[0,2*(fida.ylos[i]-fida.ylens[i])],$
+        color=50
 
 	src=nbi.xyz_src
 	pos=(nbi.xyz_pos-nbi.xyz_src)*1000+nbi.xyz_src
-    oplot,[src[0],pos[0]],[src[1],pos[1]],thick=2,color=230
+	oplot,[src[0],pos[0]],[src[1],pos[1]],thick=2,color=230
 
 	w=where(g.bdry[0,*] gt 0.)
 	rmin=100.*min(g.bdry[0,w]) & rmax=100.*max(g.bdry[0,w])
@@ -39,41 +39,83 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 	oplot,rmaxis*cos(phi),rmaxis*sin(phi),color=150,linestyle=2
 	oplot,rmax*cos(phi),rmax*sin(phi),color=150
 
-;----------------------------------------------
+	;----------------------------------------------
 	;;PLOT CROSS SECTION BEAM AND CHORDS 
 	window,1 & wset,1
 	plot,[0],[0],/nodata,xrange=[rmin,rmax], $
             yrange=100.*[min(g.lim[1,*]),max(g.lim[1,*])],$
-		color=0,background=255,title='ELEVATION',xtitle='R [cm]',ytitle='Z [cm]'
+			color=0,background=255,title='ELEVATION',xtitle='R [cm]',ytitle='Z [cm]'
 
 	oplot,grid.r_grid,grid.wc,psym=3,color=0  
-; Lines of sight
-for i=0,fida.nchan-1 do begin
-  if fida.zlos[i] ne fida.zlens[i] then begin
-    z=(fida.zlos[i]-fida.zlens[i])*findgen(201)/100.+fida.zlens[i]
-    x=(fida.xlos[i]-fida.xlens[i])*(z-fida.zlens[i])/ $
-      (fida.zlos[i]-fida.zlens[i]) + fida.xlens[i]
-    y=(fida.ylos[i]-fida.ylens[i])*(z-fida.zlens[i])/ $
-      (fida.zlos[i]-fida.zlens[i]) + fida.ylens[i]
-    oplot,sqrt(x^2+y^2),z,color=50
-  end else begin 
-    y=(fida.ylos[i]-fida.ylens[i])*findgen(201)/100.+fida.ylens[i]
-    x=(fida.xlos[i]-fida.xlens[i])*(y-fida.ylens[i])/ $
-      (fida.ylos[i]-fida.ylens[i]) + fida.ylens[i]
-    oplot,sqrt(x^2+y^2),replicate(fida.zlens[i],201),color=50
-  end
-end
-; Equilibrium
-oplot,100.*g.bdry[0,*],100.*g.bdry[1,*],color=150
-oplot,100.*g.lim[0,*],100.*g.lim[1,*],color=0
+	; Lines of sight
+	for i=0,fida.nchan-1 do begin
+		if fida.zlos[i] ne fida.zlens[i] then begin
+			z=(fida.zlos[i]-fida.zlens[i])*findgen(201)/100.+fida.zlens[i]
+			x=(fida.xlos[i]-fida.xlens[i])*(z-fida.zlens[i])/ $
+			  (fida.zlos[i]-fida.zlens[i]) + fida.xlens[i]
+			y=(fida.ylos[i]-fida.ylens[i])*(z-fida.zlens[i])/ $
+			  (fida.zlos[i]-fida.zlens[i]) + fida.ylens[i]
+			oplot,sqrt(x^2+y^2),z,color=50
+		endif else begin 
+    		y=(fida.ylos[i]-fida.ylens[i])*findgen(201)/100.+fida.ylens[i]
+    		x=(fida.xlos[i]-fida.xlens[i])*(y-fida.ylens[i])/ $
+      		  (fida.ylos[i]-fida.ylens[i]) + fida.ylens[i]
+		    oplot,sqrt(x^2+y^2),replicate(fida.zlens[i],201),color=50
+		endelse
+	endfor
 
-  window,2 & wset,2
-  !p.multi=[0,2,2,0,1]
-  plot,equil.rho_grid,plasma.te,psym=3,color=0,background=255,title='Te and Ti',xtitle='rho',ytitle='keV'
-  oplot,equil.rho_grid,plasma.ti,psym=3,color=50
-  plot,equil.rho_grid,plasma.dene,psym=3,color=0,background=255,title='electron density',xtitle='rho',ytitle='cm^-3'
-  plot,equil.rho_grid,plasma.zeff,psym=3,color=0,background=255,title='zeff',xtitle='rho',ytitle='zeff'
-  vrot=sqrt(plasma.vrot[0,*]^2.0 + plasma.vrot[1,*]^2.0 + plasma.vrot[2,*]^2.0)
-  plot,equil.rho_grid,vrot,psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
-  !p.multi=0
+	; Equilibrium
+	oplot,100.*g.bdry[0,*],100.*g.bdry[1,*],color=150
+	oplot,100.*g.lim[0,*],100.*g.lim[1,*],color=0
+
+	window,2 & wset,2
+	!p.multi=[0,2,2,0,1]
+	plot,equil.rho_grid,plasma.te,psym=3,color=0,background=255,title='Te and Ti',xtitle='rho',ytitle='keV'
+ 	oplot,equil.rho_grid,plasma.ti,psym=3,color=50
+ 	plot,equil.rho_grid,plasma.dene,psym=3,color=0,background=255,title='electron density',xtitle='rho',ytitle='cm^-3'
+  	plot,equil.rho_grid,plasma.zeff,psym=3,color=0,background=255,title='zeff',xtitle='rho',ytitle='zeff'
+  	vrot=sqrt(plasma.vrot[0,*]^2.0 + plasma.vrot[1,*]^2.0 + plasma.vrot[2,*]^2.0)
+  	plot,equil.rho_grid,vrot,psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
+  	!p.multi=0
+
+    bfieldu=dblarr(grid.nx,grid.ny,grid.nz)
+    bfieldv=bfieldu & bfieldw=bfieldu
+	denf=bfieldu 
+	vrotu=bfieldu & vrotv=bfieldu & vrotw=bfieldu
+    uvals=bfieldu & vvals=bfieldu
+	
+	for i=0L,grid.nx-1 do for j=0L,grid.ny-1 do for k=0L,grid.nz-1 do begin
+		l=i+grid.nx*j+grid.nx*grid.ny*k
+		;;FAST ION DENSITY
+		denf[i,j,k]=plasma.denf[l]
+
+		;;MAGNETIC FIELD
+		bfieldu[i,j,k]=equil.b[0,l]
+		bfieldv[i,j,k]=equil.b[1,l]
+		bfieldw[i,j,k]=equil.b[2,l]
+
+		;;PLASM ROTATION
+		vrotu[i,j,k]=plasma.vrot_uvw[0,l]
+		vrotv[i,j,k]=plasma.vrot_uvw[1,l]
+		vrotw[i,j,k]=plasma.vrot_uvw[2,1]
+		uvals[i,j,k]=grid.uc[l]
+		vvals[i,j,k]=grid.vc[l]
+    endfor
+	ind=long(grid.nz/2.0)
+
+    bu=reform(bfieldu[*,*,ind],grid.nx*grid.ny)
+    bv=reform(bfieldv[*,*,ind],grid.nx*grid.ny)
+	vu=reform(vrotu[*,*,ind],grid.nx*grid.ny)
+	vv=reform(vrotv[*,*,ind],grid.nx*grid.ny)
+    uvals1=reform(uvals[*,*,ind],grid.nx*grid.ny)
+    vvals1=reform(vvals[*,*,ind],grid.nx*grid.ny)
+    bfield=vector(bu,bv,uvals1,vvals1,auto_color=1,rgb_table=39,head_angle=20,$
+				  title='Magnetic Field',xtitle='U [cm]',ytitle='V [cm]')
+
+	vrotfield=vector(vu,vv,uvals1,vvals1,auto_color=1,rgb_table=39,head_angle=20,$
+				     title='Plasma Rotation',xtitle='U [cm]',ytitle='V [cm]')
+
+	window,3 & wset,3 
+	contour,denf[*,*,ind],uvals[*,*,ind],vvals[*,*,ind],/fill,nlevels=60,$
+		    title='Fast Ion Density',xtitle='U [cm]',ytitle='V [cm]'
 end

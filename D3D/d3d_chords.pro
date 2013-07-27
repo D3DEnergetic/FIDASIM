@@ -101,7 +101,7 @@ FUNCTION d3d_chords,shot,fida_diag
 		zmid5=replicate(0.0,nchan5)
 		xlens5=replicate(-142.55,nchan5)
         ylens5=replicate( 142.55,nchan5)
-        zlens5=replicate( 152.00,nchan5)
+        zlens5=replicate(-152.00,nchan5)
 
         xmid6=replicate(0.0,nchan5) & ymid6=xmid5
         zmid6=replicate(0.0,nchan5)

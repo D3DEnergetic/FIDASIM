@@ -318,15 +318,7 @@ pro dalpha_inputs,inputs,profiles
   close,lun
   free_lun, lun
   print, 'plasma parameters stored in BINARY: '+file  
-
  
-
-
-
-
-
-
-
   ;;-----------------------------------------------------------
   ;;FIDA diagnositc ----- Detector vectors, weights and spectra
   ;;-----------------------------------------------------------

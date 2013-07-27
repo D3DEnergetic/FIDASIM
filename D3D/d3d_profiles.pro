@@ -60,9 +60,8 @@ FUNCTION d3d_profiles,inputs
 
 		;;RESTORE VTOR
 		restore,vtor_string
-		vtor=tor_rot_str.tor_rot_local*tor_rot_str.r_tor_rot ;;m/s
-		vtor_rho=tor_rot_str.rho_tor_rot
-		
+		vtor=tor_rot_str.tor_rot_local ;rad/s
+		vtor_rho=tor_rot_str.rho_tor_rot		
 		;;INTERPOLATE SO THAT ALL USE THE SAME RHO
 		maxrho=min([dene_rho[-1],te_rho[-1],ti_rho[-1],zeff_rho[-1],vtor_rho[-1]])
 		rho=maxrho*dindgen(121)/121.0

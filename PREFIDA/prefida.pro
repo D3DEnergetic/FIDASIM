@@ -130,10 +130,9 @@ PRO prepare_beam,inputs,nbi,nbgeom
 	dis=sqrt( (xs-xp)^2.0d +(ys-yp)^2.0d + (zs-zp)^2.0d)
 	BETA=double(asin((zp-zs)/dis))
 	ALPHA=double(atan((yp-ys),(xp-xs))-!DPI)
-	print,'BEAM SOURCE POSITION:'
-	print,xyz_src
+	print,'BEAM CROSSOVER POINT:'
+	print,xyz_pos
 	print,'BEAM ROTATION ANGLES AS DEFINED BY fidasim.f90'
-	print,'IF THE ANGLES ARE ZERO THEN THE GRID IS ALIGNED WITH THE BEAM'
 	print,'ALPHA: '
 	print,ALPHA,FORMAT='(F20.10)'
 	print,'BETA:'
@@ -285,136 +284,135 @@ END
 
 PRO transp_fbeam,inputs,grid,denf,err
 
-  !P.charsize=1.
-  !P.background=255 & !P.color=0
-;  doplot=1
-;  print, 'reading fast ion distribution function from transp output'
-  cdftest=findfile(inputs.cdf_file)
-;  print, '======================='
-  if cdftest[0] eq '' then begin
-	print,'ERROR: '+inputs.cdf_file+' WAS NOT FOUND'
-	err=1
-	goto,GET_OUT
-  endif
-  cdfid=NCDF_Open(inputs.cdf_file,/nowrite)
-  ;; Retrieve signals
-  ;; --------------------------------------------------------
-  ncdf_varget, cdfid,'TRANSP_RUNID', runid
-  ncdf_varget, cdfid,'TIME' , cdf_time    
-  ncdf_varget, cdfid,'R2D'  , r2d     ; rposition of cells
-  ncdf_varget, cdfid,'Z2D'  , z2d     ;zposition of cells
-  ncdf_varget, cdfid,'BMVOL', bmvol   ; plasma volume
-  ncdf_varget, cdfid,'E_D_NBI', energy ; central values
-  ncdf_varget, cdfid,'A_D_NBI', pitch  ; central values
-  ncdf_varget, cdfid,'F_D_NBI', FBM    ; fast-ion distribution function
-  ncdf_varget, cdfid,'NTOT_D_NBI',ntot ; total number of fast ions
-  ncdf_varget, cdfid,'RSURF', rsurf    ; flux surface
-  ncdf_varget, cdfid,'ZSURF', zsurf    ; flux surface
-  NCDF_Close,cdfid
-  ;; ----------- Check the time
-  if abs(inputs.time-cdf_time) gt 0.02 then begin
-	 print, ' CDF file time:',cdf_time 
-     print, 'WARNING: Time of CDF file and simulation disagree!'
-  endif     
-  ;;-------------Convert eV-> keV
-  energy=energy*1.0d-3          ;; fidasim needs energy in kev  
-  fbm=fbm*1.0d3                 ;; now, this needs to be corrected
-  ;; as we now calculate with fast-ions/omega/keV/cm^3
-                                ;;------------Convert d_omega --> pitch
-  ;; Fast-ion distribution is given as a function of cm^3, energy
-  ;; and d_omega/4Pi. omega is the solild angle in 3D velocity space. In
-  ;; order to transform this to a function depending on pitch instead
-  ;; of d_omega/4PI, one has to multiply by 0.5!
-  fbm=fbm*0.5
-  ;;------------Cut off energy
-;  print,'EMIN: ',inputs.emin
-;  print,'EMAX: ',inputs.emax
-  w=where(energy ge inputs.emin and energy le inputs.emax)
-  energy=energy[w]     
-  fbm=fbm[w,*,*]
-  index=where(fbm lt 0.,nind) 
-  if nind gt 0. then fbm[index]=0.d0
-
-  ;;-----------store distribution funciton in binary file
-  file =inputs.result_dir+inputs.runid+'/transp_fbm.bin'
-  sz=size(FBM)
-  nenergy=sz(1)
-  npitch=sz(2)
-  ngrid=sz(3)
-  openw, lun, file, /get_lun
-  writeu,lun , long(ngrid)
-  for i=0L,ngrid-1 do writeu ,lun , float(r2d[i])
-  for i=0L,ngrid-1 do writeu ,lun , float(z2d[i])
-  writeu,lun , long(nenergy)
-  writeu,lun , double(inputs.emin)
-  writeu,lun , double(inputs.emax)
-  for i=0L,nenergy-1 do writeu ,lun , double(energy[i])
-  writeu,lun , long(npitch)
-  writeu,lun , double(pitch[0])
-  writeu,lun , double(pitch[npitch-1])
-  for i=0L,npitch-1 do writeu ,lun , double(pitch[i])
-  for i=0L,nenergy-1 do begin
-     for j=0L,npitch-1 do begin
-        for k=0L,ngrid-1 do begin    
-           writeu ,lun , float(FBM[i,j,k]/max(FBM[*,*,k])) ;; normalized
-        endfor
-     endfor
-  endfor
-  close,lun
-  free_lun, lun
-  print, 'TRANSP distribution stored in BINARY: '+file
-
-  ;;----------Determine fast-ion density averaged over pitch and energy
-  dE      = energy[2] - energy[1]
-  dpitch  = pitch[2]  - pitch[1]
-  fdens=total(reform(total(fbm,1)),1)*dE*dpitch
-;  help,fdens,r2d,z2d
-;  plot,r2d,fdens,color=0,background=255 
- ;; ------map fdens on FIDASIM grid and sort out
-  ;; ------points outside the separatrix
-  ;;------Determine FIDAsim grid to map distribution function
-  r_grid=fltarr(inputs.nx,inputs.ny,inputs.nz)
-  z_grid=r_grid
-  for i=0L,inputs.nx-1 do begin
-     for j=0L,inputs.ny-1 do begin
-        for k=0L,inputs.nz-1 do begin
-           jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
-           r_grid[i,j,k]=grid.r_grid[jj]
-;		   z_grid[i,j,k]=grid.wc[jj]
-       endfor      
-     endfor
-  endfor 
-  f3d=dblarr(inputs.nx,inputs.ny,inputs.nz)*0.d0
-  if ngrid le 220 then width=6. else width=4.
-  for j=0L,inputs.ny-1 do begin
-	 rout=reform(r_grid[*,j,0])
-	 zout=grid.zzc[*]
-;	 zout=reform(z_grid[i,j,*])
-     TRIANGULATE, r2d, z2d, tr     
-     fdens2=griddata(r2d,z2d,fdens,xout=rout,yout=zout $
-                     ,/grid,/SHEPARDS,triangles=tr)
-     for i=0L,inputs.nx-1 do begin
-        for k=0L,inputs.nz-1 do begin
-           r=rout[i]
-           z=zout[k]
-           a=sqrt((z2d-z)^2+(r2d-r)^2)
-           amin=min(a)
-           ;; only write fdens2 if it is close to r2d,z2d grid
-           if amin le width then f3d[i,j,k]=fdens2[i,k]         
-        endfor
-     endfor 
-  endfor
-  denf=dblarr(grid.ng)*0.d0   
-  for i=0L,inputs.nx-1 do begin
-     for j=0L,inputs.ny-1 do begin
-        for k=0L,inputs.nz-1 do begin
-           jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
-           denf[jj]=f3d[i,j,k] >0.
-       endfor      
-     endfor
-  endfor 
-  err=0
-  GET_OUT:
+	!P.charsize=1.
+	!P.background=255 & !P.color=0
+	;doplot=1
+	;print, 'reading fast ion distribution function from transp output'
+	cdftest=findfile(inputs.cdf_file)
+	;print, '======================='
+	if cdftest[0] eq '' then begin
+		print,'ERROR: '+inputs.cdf_file+' WAS NOT FOUND'
+		err=1
+		goto,GET_OUT
+	endif
+	cdfid=NCDF_Open(inputs.cdf_file,/nowrite)
+	;; Retrieve signals
+	;; --------------------------------------------------------
+	ncdf_varget, cdfid,'TRANSP_RUNID', runid
+	ncdf_varget, cdfid,'TIME' , cdf_time    
+	ncdf_varget, cdfid,'R2D'  , r2d     ; rposition of cells
+	ncdf_varget, cdfid,'Z2D'  , z2d     ;zposition of cells
+	ncdf_varget, cdfid,'BMVOL', bmvol   ; plasma volume
+	ncdf_varget, cdfid,'E_D_NBI', energy ; central values
+	ncdf_varget, cdfid,'A_D_NBI', pitch  ; central values
+	ncdf_varget, cdfid,'F_D_NBI', FBM    ; fast-ion distribution function
+	ncdf_varget, cdfid,'NTOT_D_NBI',ntot ; total number of fast ions
+	ncdf_varget, cdfid,'RSURF', rsurf    ; flux surface
+	ncdf_varget, cdfid,'ZSURF', zsurf    ; flux surface
+	NCDF_Close,cdfid
+	;; ----------- Check the time
+	if abs(inputs.time-cdf_time) gt 0.02 then begin
+		print, ' CDF file time:',cdf_time 
+		print, 'WARNING: Time of CDF file and simulation disagree!'
+	endif     
+	;;-------------Convert eV-> keV
+	energy=energy*1.0d-3          ;; fidasim needs energy in kev  
+	fbm=fbm*1.0d3                 ;; now, this needs to be corrected
+	;; as we now calculate with fast-ions/omega/keV/cm^3 
+	;;------------Convert d_omega --> pitch
+	;; Fast-ion distribution is given as a function of cm^3, energy
+	;; and d_omega/4Pi. omega is the solild angle in 3D velocity space. In
+	;; order to transform this to a function depending on pitch instead
+	;; of d_omega/4PI, one has to multiply by 0.5!
+	fbm=fbm*0.5
+	;;------------Cut off energy
+	;print,'EMIN: ',inputs.emin
+	;print,'EMAX: ',inputs.emax
+	w=where(energy ge inputs.emin and energy le inputs.emax)
+	energy=energy[w]     
+	fbm=fbm[w,*,*]
+	index=where(fbm lt 0.,nind) 
+	if nind gt 0. then fbm[index]=0.d0
+	
+	;;-----------store distribution funciton in binary file
+	file =inputs.result_dir+inputs.runid+'/transp_fbm.bin'
+	sz=size(FBM)
+	nenergy=sz(1)
+	npitch=sz(2)
+	ngrid=sz(3)
+	openw, lun, file, /get_lun
+	writeu,lun , long(ngrid)
+	for i=0L,ngrid-1 do writeu ,lun , float(r2d[i])
+	for i=0L,ngrid-1 do writeu ,lun , float(z2d[i])
+	writeu,lun , long(nenergy)
+	writeu,lun , double(inputs.emin)
+	writeu,lun , double(inputs.emax)
+	for i=0L,nenergy-1 do writeu ,lun , double(energy[i])
+	writeu,lun , long(npitch)
+	writeu,lun , double(pitch[0])
+	writeu,lun , double(pitch[npitch-1])
+	for i=0L,npitch-1 do writeu ,lun , double(pitch[i])
+	for i=0L,nenergy-1 do begin
+		for j=0L,npitch-1 do begin
+			for k=0L,ngrid-1 do begin    
+				writeu ,lun , float(FBM[i,j,k]/max(FBM[*,*,k])) ;; normalized
+			endfor
+		endfor
+	endfor
+	close,lun
+	free_lun, lun
+	print, 'TRANSP distribution stored in BINARY: '+file
+	
+	;;----------Determine fast-ion density averaged over pitch and energy
+	dE      = energy[2] - energy[1]
+	dpitch  = pitch[2]  - pitch[1]
+	fdens=total(reform(total(fbm,1)),1)*dE*dpitch
+	;help,fdens,r2d,z2d
+	;plot,r2d,fdens,color=0,background=255 
+	;; ------map fdens on FIDASIM grid and sort out
+	;; ------points outside the separatrix
+	;;------Determine FIDAsim grid to map distribution function
+	r_grid=fltarr(inputs.nx,inputs.ny,inputs.nz)
+	z_grid=r_grid
+	for i=0L,inputs.nx-1 do begin
+		for j=0L,inputs.ny-1 do begin
+			for k=0L,inputs.nz-1 do begin
+				jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
+				r_grid[i,j,k]=grid.r_grid[jj]
+				;z_grid[i,j,k]=grid.wc[jj]
+			endfor      
+		endfor
+	endfor 
+	f3d=dblarr(inputs.nx,inputs.ny,inputs.nz)*0.d0
+	if ngrid le 220 then width=6. else width=4.
+	for j=0L,inputs.ny-1 do begin
+		rout=reform(r_grid[*,j,0])
+		zout=grid.zzc[*]
+		;zout=reform(z_grid[i,j,*])
+		TRIANGULATE, r2d, z2d, tr     
+		fdens2=griddata(r2d,z2d,fdens,xout=rout,yout=zout,/grid,/SHEPARDS,triangles=tr)
+		for i=0L,inputs.nx-1 do begin
+			for k=0L,inputs.nz-1 do begin
+				r=rout[i]
+				z=zout[k]
+				a=sqrt((z2d-z)^2+(r2d-r)^2)
+				amin=min(a)
+				;; only write fdens2 if it is close to r2d,z2d grid
+				if amin le width then f3d[i,j,k]=fdens2[i,k]         
+			endfor
+		endfor 
+	endfor
+	denf=dblarr(grid.ng)*0.d0   
+	for i=0L,inputs.nx-1 do begin
+		for j=0L,inputs.ny-1 do begin
+			for k=0L,inputs.nz-1 do begin
+				jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
+				denf[jj]=f3d[i,j,k] >0.
+			endfor      
+		endfor
+	endfor 
+	err=0
+	GET_OUT:
 END
 
 PRO map_profiles,inputs,grid,equil,profiles,plasma,err
@@ -423,7 +421,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	;;------------------------------------------------- 
 
 	rhomax=max(profiles.rho)
-	ww=where(equil.rho_grid gt rhomax)
+	ww=where(equil.rho_grid gt rhomax,nww)
 	;;Electron density
 	dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid) > 0. ;[1/cm^3]
 	dene[ww]=0.0
@@ -467,8 +465,8 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	ti[ww]=0.0
 
 	;;Plasma rotation	
-	vtor      =   1.d2* interpol(profiles.vtor,profiles.rho,equil.rho_grid) ; [cm/s]  
-	vtor[ww]  =   profiles.vtor[-1]
+	vtor      =   interpol(profiles.vtor,profiles.rho,equil.rho_grid)*grid.r_grid ; [cm/s]  
+	vtor[ww]  =   replicate(profiles.vtor[-1],nww)*grid.r_grid[ww]
 	vrot      =   fltarr(3,grid.ng)
 	vrot[0,*] = - sin(grid.phi_grid)*vtor 
 	vrot[1,*] =   cos(grid.phi_grid)*vtor
@@ -485,7 +483,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	if nind gt 0 then stop
 	;;-------SAVE-------
 	plasma={rho_grid:equil.rho_grid, b:b_xyz,e:e_xyz,ab:inputs.ab,ai:inputs.ai,te:te, $
-			ti:ti,vtor:vtor,vrot:vrot_xyz,dene:dene,denp:denp,deni:deni,denf:denf $
+			ti:ti,vtor:vtor,vrot:vrot_xyz,vrot_uvw:vrot,dene:dene,denp:denp,deni:deni,denf:denf $
 			,zeff:zeff}
 	err=0
 	GET_OUT: 
@@ -505,20 +503,20 @@ FUNCTION sinterpol,v,x,u,sortt=sortt,_extra=_extra
 END
 
 PRO brems,result_dir,det,profiles,equil
-; Calculates visible bremsstrahlung along FIDA sightlines
-; WWH 6/2013
+	;; Calculates visible bremsstrahlung along FIDA sightlines
+	;; WWH 6/2013
 
-; INPUT
-; result_dir directory to write output
-; det	     structure with detector lines of sight
-; profiles   structure with plasma profiles vs. rho
+	;; INPUT
+	;; result_dir directory to write output
+	;; det	     structure with detector lines of sight
+	;; profiles   structure with plasma profiles vs. rho
 
-; OUTPUT
-; file with the surface radiance (ph/s-m2-nm-sr) for
-; each sightline
+	;; OUTPUT
+	;; file with the surface radiance (ph/s-m2-nm-sr) for
+	;; each sightline
 
-;*******************************************************************
-;*****************************************
+	;*******************************************************************
+	;*****************************************
 	; Plasma parameters
 	rho=profiles.rho
 	te=profiles.te              ; eV

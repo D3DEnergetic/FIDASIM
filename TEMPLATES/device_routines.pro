@@ -88,7 +88,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	profiles={time:time,$					;;SHOT TIME
 			  rho:rho,$						;;RHO VALUES
 			  ti:ti,$						;;ION TEMPERATURE [eV]
-			  vtor:vtor,$					;;TORODIAL VELOCITY [m/s]
+			  vtor:vtor,$					;;TORODIAL ANGULAR VELOCITY [rad/s]
 			  te:te,$						;;ELECTRON TEMPERATURE [eV]
 			  dene:dene,$					;;ELECTRON DENSITY [m^-3]
 			  zeff:zeff}					;;ZEFF

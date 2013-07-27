@@ -1,8 +1,8 @@
 pro start_fidasim  
   ;Definition of the simulation grid in machine coordinates
-  nx=30
-  ny=45
-  nz=45
+  nx=40
+  ny=60
+  nz=50
   xdim1=100  
   xdim2=220 
   ydim1=-190 
@@ -77,14 +77,14 @@ pro start_fidasim
   ;; start the f90 routine
   result_dir = inputs.root_dir + 'RESULTS/' + inputs.fidasim_runid
 
-  spawn,'module load intel'
-  spawn, root_dir+'fidasim '+result_dir
+;  spawn,'module load intel'
+;  spawn, root_dir+'fidasim '+result_dir
 
 
   ;; plot the spectra
-  plot_fidasim_spectra,runid=result_dir
+;  plot_fidasim_spectra,runid=result_dir
   ;; plot the neutral densities
-  plot_fidasim_neutrals,result_dir,/loga
+;  plot_fidasim_neutrals,result_dir,/loga
 
 end
 

@@ -5,7 +5,7 @@ FUNCTION d3d_profiles,inputs
     ;;** Structure <83e8518>, 7 tags, length=5768, data length=5764, refs=1:
     ;;   RHO             DOUBLE    Array[120]
     ;;   TI              DOUBLE    Array[120] [eV]
-    ;;   VTOR            DOUBLE    Array[120] [m/s]
+    ;;   VTOR            DOUBLE    Array[120] [rad/s]
     ;;   TE              DOUBLE    Array[120] [eV]
     ;;   DENE            DOUBLE    Array[120] [m^-3]
     ;;   ZEFF            DOUBLE    Array[120]

@@ -74,8 +74,11 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
  	oplot,equil.rho_grid,plasma.ti,psym=3,color=50
  	plot,equil.rho_grid,plasma.dene,psym=3,color=0,background=255,title='electron density',xtitle='rho',ytitle='cm^-3'
   	plot,equil.rho_grid,plasma.zeff,psym=3,color=0,background=255,title='zeff',xtitle='rho',ytitle='zeff'
-  	vrot=sqrt(plasma.vrot[0,*]^2.0 + plasma.vrot[1,*]^2.0 + plasma.vrot[2,*]^2.0)
-  	plot,equil.rho_grid,vrot,psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
+	
+  	vrotx=transpose(plasma.vrot[0,*])
+  	vroty=transpose(plasma.vrot[1,*])
+  	vrotz=transpose(plasma.vrot[2,*])
+  	plot,equil.rho_grid,sqrt(vrotx^2.0 + vroty^2.0 + vrotz^2.0),psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
   	!p.multi=0
 
     bfieldu=dblarr(grid.nx,grid.ny,grid.nz)

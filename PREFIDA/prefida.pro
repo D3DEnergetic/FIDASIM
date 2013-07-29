@@ -424,11 +424,12 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	ww=where(equil.rho_grid gt rhomax,nww)
 	;;Electron density
 	dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid) > 0. ;[1/cm^3]
-	dene[ww]=0.0
+	dene[ww]=0.001*1d13
 
 	;;Zeff
 	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 1.0
-	zeff[ww]=profiles.zeff[-1]
+;	zeff[ww]=profiles.zeff[-1]
+	zeff[ww]=1.0
 
 	;;Impurity density
 	deni = (zeff-1.)/(inputs.impurity_charge*(inputs.impurity_charge-1))*dene
@@ -450,23 +451,22 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
   	endelse
  
 	;;Electron temperature
-	te = 1.d-3 * interpol(profiles.te,profiles.rho,equil.rho_grid) > 0. ;keV
-	te[ww]=0.0
-	if min(te) lt 0 then te[where(te lt 0.)]=0.d0 
+	te = 1.d-3 * interpol(profiles.te,profiles.rho,equil.rho_grid) > 0.001 ;keV
+	te[ww]=0.001
 	
 	;;Ion temperature   
-	ti = 1.d-3 * interpol(profiles.ti,profiles.rho,equil.rho_grid) > 0. ;keV
+	ti = 1.d-3 * interpol(profiles.ti,profiles.rho,equil.rho_grid) > 0.001 ;keV
 	if max(ti) gt 10. or max(te) gt 10. then begin
 		print, 'WARNING:'
 		print, 'Electron or Ion temperature greater than 10 keV'
 		print, 'Look at the tables, they might only consider'
 		print, 'temperatures less than 10keV!'
 	endif
-	ti[ww]=0.0
+	ti[ww]=0.001
 
 	;;Plasma rotation	
 	vtor      =   interpol(profiles.vtor,profiles.rho,equil.rho_grid)*grid.r_grid ; [cm/s]  
-	vtor[ww]  =   replicate(profiles.vtor[-1],nww)*grid.r_grid[ww]
+	vtor[ww]  =   replicate(0.0,nww)*grid.r_grid[ww]
 	vrot      =   fltarr(3,grid.ng)
 	vrot[0,*] = - sin(grid.phi_grid)*vtor 
 	vrot[1,*] =   cos(grid.phi_grid)*vtor

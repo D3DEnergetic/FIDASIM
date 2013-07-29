@@ -2,6 +2,31 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 
 	g=equil.g
 
+    bfieldu=dblarr(grid.nx,grid.ny,grid.nz)
+    bfieldv=bfieldu & bfieldw=bfieldu
+	denf=bfieldu 
+	vrotu=bfieldu & vrotv=bfieldu & vrotw=bfieldu
+    uvals=bfieldu & vvals=bfieldu
+	
+	for i=0L,grid.nx-1 do for j=0L,grid.ny-1 do for k=0L,grid.nz-1 do begin
+		l=i+grid.nx*j+grid.nx*grid.ny*k
+		;;FAST ION DENSITY
+		denf[i,j,k]=plasma.denf[l]
+
+		;;MAGNETIC FIELD
+		bfieldu[i,j,k]=equil.b[0,l]
+		bfieldv[i,j,k]=equil.b[1,l]
+		bfieldw[i,j,k]=equil.b[2,l]
+
+		;;PLASM ROTATION
+		vrotu[i,j,k]=plasma.vrot_uvw[0,l]
+		vrotv[i,j,k]=plasma.vrot_uvw[1,l]
+		vrotw[i,j,k]=plasma.vrot_uvw[2,1]
+		uvals[i,j,k]=grid.uc[l]
+		vvals[i,j,k]=grid.vc[l]
+    endfor
+	ind=long(grid.nz/2.0)
+
 	;;PLOTTING PLANE VIEW BEAMS AND CHORDS
 	window,0 & wset,0
 	loadct,39,/silent
@@ -18,9 +43,10 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 
 	x_range=[xmin1,xmax1] & y_range=[ymin1,ymax1] & z_range=[zmin1,zmax1]
 
-	plot,[0],[0],/nodata,xrange=x_range,yrange=y_range,$
-		color=0,background=255,title='PLANE VIEW',xtitle='U [cm]',ytitle='V [cm]'
+	contour,denf[*,*,ind],uvals[*,*,ind],vvals[*,*,ind],/fill,nlevels=60 $
+		,xrange=x_range,yrange=y_range,title='PLANE VIEW',xtitle='U [cm]',ytitle='V [cm]',color=0
 	oplot,grid.uc,grid.vc,psym=3,color=0
+
 
 	for i=0,fida.nchan-1 do $
 		oplot,fida.xlens[i]+[0,2*(fida.xlos[i]-fida.xlens[i])],$
@@ -47,6 +73,7 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 			color=0,background=255,title='ELEVATION',xtitle='R [cm]',ytitle='Z [cm]'
 
 	oplot,grid.r_grid,grid.wc,psym=3,color=0  
+
 	; Lines of sight
 	for i=0,fida.nchan-1 do begin
 		if fida.zlos[i] ne fida.zlens[i] then begin
@@ -81,31 +108,6 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
   	plot,equil.rho_grid,sqrt(vrotx^2.0 + vroty^2.0 + vrotz^2.0),psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
   	!p.multi=0
 
-    bfieldu=dblarr(grid.nx,grid.ny,grid.nz)
-    bfieldv=bfieldu & bfieldw=bfieldu
-	denf=bfieldu 
-	vrotu=bfieldu & vrotv=bfieldu & vrotw=bfieldu
-    uvals=bfieldu & vvals=bfieldu
-	
-	for i=0L,grid.nx-1 do for j=0L,grid.ny-1 do for k=0L,grid.nz-1 do begin
-		l=i+grid.nx*j+grid.nx*grid.ny*k
-		;;FAST ION DENSITY
-		denf[i,j,k]=plasma.denf[l]
-
-		;;MAGNETIC FIELD
-		bfieldu[i,j,k]=equil.b[0,l]
-		bfieldv[i,j,k]=equil.b[1,l]
-		bfieldw[i,j,k]=equil.b[2,l]
-
-		;;PLASM ROTATION
-		vrotu[i,j,k]=plasma.vrot_uvw[0,l]
-		vrotv[i,j,k]=plasma.vrot_uvw[1,l]
-		vrotw[i,j,k]=plasma.vrot_uvw[2,1]
-		uvals[i,j,k]=grid.uc[l]
-		vvals[i,j,k]=grid.vc[l]
-    endfor
-	ind=long(grid.nz/2.0)
-
     bu=reform(bfieldu[*,*,ind],grid.nx*grid.ny)
     bv=reform(bfieldv[*,*,ind],grid.nx*grid.ny)
 	vu=reform(vrotu[*,*,ind],grid.nx*grid.ny)
@@ -117,8 +119,4 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 
 	vrotfield=vector(vu,vv,uvals1,vvals1,auto_color=1,rgb_table=39,head_angle=20,$
 				     title='Plasma Rotation',xtitle='U [cm]',ytitle='V [cm]')
-
-	window,3 & wset,3 
-	contour,denf[*,*,ind],uvals[*,*,ind],vvals[*,*,ind],/fill,nlevels=60,$
-		    title='Fast Ion Density',xtitle='U [cm]',ytitle='V [cm]'
 end

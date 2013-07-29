@@ -26,7 +26,7 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 		vvals[i,j,k]=grid.vc[l]
     endfor
 	ind=long(grid.nz/2.0)
-
+	!p.multi=0
 	;;PLOTTING PLANE VIEW BEAMS AND CHORDS
 	window,0 & wset,0
 	loadct,39,/silent
@@ -106,7 +106,6 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
   	vroty=transpose(plasma.vrot[1,*])
   	vrotz=transpose(plasma.vrot[2,*])
   	plot,equil.rho_grid,sqrt(vrotx^2.0 + vroty^2.0 + vrotz^2.0),psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
-  	!p.multi=0
 
     bu=reform(bfieldu[*,*,ind],grid.nx*grid.ny)
     bv=reform(bfieldv[*,*,ind],grid.nx*grid.ny)
@@ -119,4 +118,6 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 
 	vrotfield=vector(vu,vv,uvals1,vvals1,auto_color=1,rgb_table=39,head_angle=20,$
 				     title='Plasma Rotation',xtitle='U [cm]',ytitle='V [cm]')
-end
+  	!p.multi=0
+
+END

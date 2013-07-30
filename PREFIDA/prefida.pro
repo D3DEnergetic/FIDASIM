@@ -477,7 +477,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	rotate_uvw,vrot,Arot,Brot,Crot,1,vrot_xyz ;;machine basis to beam basis
 	rotate_uvw,equil.b,Arot,Brot,Crot,1,b_xyz
 	rotate_uvw,equil.e,Arot,Brot,Crot,1,e_xyz
-	
+
 	;; test if there are NANs or Infinites in the input profiels
 	index=where(finite([ti,te,dene,denp,zeff,denp,deni]) eq 0,nind)
 	if nind gt 0 then stop

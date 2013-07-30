@@ -106,13 +106,16 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
   	vroty=transpose(plasma.vrot[1,*])
   	vrotz=transpose(plasma.vrot[2,*])
   	plot,equil.rho_grid,sqrt(vrotx^2.0 + vroty^2.0 + vrotz^2.0),psym=3,color=0,background=255,title='vtor',xtitle='rho',ytitle='cm/s'
-
-    bu=reform(bfieldu[*,*,ind],grid.nx*grid.ny)
-    bv=reform(bfieldv[*,*,ind],grid.nx*grid.ny)
-	vu=reform(vrotu[*,*,ind],grid.nx*grid.ny)
-	vv=reform(vrotv[*,*,ind],grid.nx*grid.ny)
-    uvals1=reform(uvals[*,*,ind],grid.nx*grid.ny)
-    vvals1=reform(vvals[*,*,ind],grid.nx*grid.ny)
+	
+	;;PLOT VECTOR FIELDS
+	nnx=long(grid.nx/2) & nny=long(grid.ny/2)
+	indx=2*lindgen(nnx) & indy=2*lindgen(nny)
+    bu=reform(bfieldu[indx,indy,ind],nnx*nny)
+    bv=reform(bfieldv[indx,indy,ind],nnx*nny)
+	vu=reform(vrotu[indx,indy,ind],nnx*nny)
+	vv=reform(vrotv[indx,indy,ind],nnx*nny)
+    uvals1=reform(uvals[indx,indy,ind],nnx*nny)
+    vvals1=reform(vvals[indx,indy,ind],nnx*nny)
     bfield=vector(bu,bv,uvals1,vvals1,auto_color=1,rgb_table=39,head_angle=20,$
 				  title='Magnetic Field',xtitle='U [cm]',ytitle='V [cm]')
 

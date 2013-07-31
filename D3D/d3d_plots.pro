@@ -97,9 +97,12 @@ PRO d3d_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 
 	window,2 & wset,2
 	!p.multi=[0,2,2,0,1]
-	plot,equil.rho_grid,plasma.te,psym=3,color=0,background=255,title='Te and Ti',xtitle='rho',ytitle='keV'
+	plot,equil.rho_grid,plasma.te,psym=3,color=0,background=255,title='Te (black) Ti (blue)',xtitle='rho',ytitle='keV'
  	oplot,equil.rho_grid,plasma.ti,psym=3,color=50
- 	plot,equil.rho_grid,plasma.dene,psym=3,color=0,background=255,title='electron density',xtitle='rho',ytitle='cm^-3'
+ 	plot,equil.rho_grid,plasma.dene,psym=3,color=0,background=255,title='n_e (black) n_imp (blue) n_ion (green) n_f (red)',xtitle='rho',ytitle='cm^-3'
+	oplot,equil.rho_grid,plasma.deni,psym=3,color=50
+	oplot,equil.rho_grid,plasma.denp,psym=3,color=150
+	oplot,equil.rho_grid,plasma.denf,psym=3,color=250
   	plot,equil.rho_grid,plasma.zeff,psym=3,color=0,background=255,title='zeff',xtitle='rho',ytitle='zeff'
 	
   	vrotx=transpose(plasma.vrot[0,*])

@@ -110,7 +110,7 @@ END
 	
 PRO prepare_beam,inputs,nbi,nbgeom
 	
-	rot_mat={err:1}
+	nbgeom={err:1}
 	isource=inputs.isource
 
 	if nbi.pinj le 0. then begin
@@ -564,8 +564,7 @@ PRO brems,result_dir,det,profiles,equil
 
 	;--------------------------------
 	; Save results
-
-	print,vbline
+	;--------------------------------
 	file =result_dir+'/bremsstrahlung.bin'
 	openw, lun, file, /get_lun
 	for i=0,nchan-1 do writeu,lun, double(vbline[i])

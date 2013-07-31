@@ -66,7 +66,7 @@ alpha=0.0D
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
-nr_fida=5000	   										;; FIDA
+nr_fida=500000	   										;; FIDA
 nr_ndmc=1000 											;; Beam emission
 nr_halo=5000   	 										;; Halo contribution
 

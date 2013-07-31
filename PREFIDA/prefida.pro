@@ -467,6 +467,9 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	;;Plasma rotation	
 	vtor      =   interpol(profiles.vtor,profiles.rho,equil.rho_grid)*grid.r_grid ; [cm/s]  
 	vtor[ww]  =   replicate(0.0,nww)*grid.r_grid[ww]
+;	vtor      =   1.d2 * interpol(profiles.vtor,profiles.rho,equil.rho_grid) ; [cm/s]  
+;	vtor[ww]  =   replicate(0.0,nww)
+
 	vrot      =   fltarr(3,grid.ng)
 	vrot[0,*] = - sin(grid.phi_grid)*vtor 
 	vrot[1,*] =   cos(grid.phi_grid)*vtor

@@ -15,12 +15,12 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 	fida=d3d_chords(inputs.shot,inputs.fida_diag)
 
 	;;GET PROFILES
-	profiles=d3d_profiles(inputs)
+	profiles=d3d_profiles(inputs,/save)
 	if profiles.err eq 1 then begin
 		print,'FAILED TO GET PROFILES'
 		err=1
 		goto,GET_OUT
-        endif
+	endif
 
 	;;GET E&M FIELDS AT GRID POINTS
 	equil=d3d_equil(inputs,grid,fida)

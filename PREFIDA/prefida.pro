@@ -449,7 +449,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 			goto,GET_OUT
 		endif
   	endelse
- 
+
 	;;Electron temperature
 	te = 1.d-3 * interpol(profiles.te,profiles.rho,equil.rho_grid) > 0.001 ;keV
 	te[ww]=0.001
@@ -485,7 +485,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	index=where(finite([ti,te,dene,denp,zeff,denp,deni]) eq 0,nind)
 	if nind gt 0 then stop
 	;;-------SAVE-------
-	plasma={rho_grid:equil.rho_grid, b:b_xyz,e:e_xyz,ab:inputs.ab,ai:inputs.ai,te:te, $
+	plasma={rho_grid:equil.rho_grid,b:b_xyz,e:e_xyz,ab:inputs.ab,ai:inputs.ai,te:te, $
 			ti:ti,vtor:vtor,vrot:vrot_xyz,vrot_uvw:vrot,dene:dene,denp:denp,deni:deni,denf:denf $
 			,zeff:zeff}
 	err=0

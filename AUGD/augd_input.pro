@@ -29,7 +29,7 @@ pinj=0.                 ;; [MW] If 0, get data from MDS+
 
 fida_diag='CFR'   										;; Name of the FIDA diag
 
-gfile=''                ;; If empty, use MDS+; otherwise, filename
+gfile=''								                ;; If empty, use MDS+; otherwise, filename
 equil='EQH'												;; Name of equilibrium. Ex. for D3D EFIT02
 
 ;;-----------------------------------------------------

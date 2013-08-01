@@ -1,5 +1,5 @@
 ;;RESTORES PROFILES FROM GAPROFILES SAVE FILES LOCATED IN INPUTS.PROFILE_DIR DIRECTORY
-FUNCTION d3d_profiles,inputs
+FUNCTION d3d_profiles,inputs,save=save
 
     ;; profiles structure
     ;;** Structure <83e8518>, 7 tags, length=5768, data length=5764, refs=1:
@@ -75,5 +75,6 @@ FUNCTION d3d_profiles,inputs
 		;;SAVE IN PROFILE STRUCTURE
 		profiles={rho:rho,te:te,ti:ti,vtor:vtor,dene:dene,zeff:zeff,err:0}
 	endelse
+	if keyword_set(save) then save,profiles,filename=inputs.runid+'_profiles.sav'
 	return,profiles
 END

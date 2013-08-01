@@ -28,7 +28,7 @@ FUNCTION d3d_beams,inputs
 
 ;	focy=replicate(1d33,nsources)      ; horizontal focal length
 ;	(infinity)
-    focy=replicate(999999.9,nsources) ; so f90 can read input 
+    focy=replicate(999999.9d0,nsources) ; so f90 can read input 
 	focz=replicate(1000d0,nsources)      ; vertical focal length is 10 m
 	divy=replicate(8.73d-3,3,nsources)    ; horizontal divergence in radians
 	divz=replicate(2.27d-2,3,nsources)

@@ -116,7 +116,7 @@ FUNCTION d3d_equil,inputs,grid,det
 		rho_chords={rhos:rhospath,ds:ds}
 	endif else rho_chords={rhos:0,ds:0}
 
-	equil={g:g,rho_grid:rhogrid,rho_chords:rho_chords,b:b,e:e,err:0}
+	equil={g:g,rho_grid:rhogrid,rho_chords:rho_chords,b:double(b),e:double(e),err:0}
 	GET_OUT:
 	return,equil
 END

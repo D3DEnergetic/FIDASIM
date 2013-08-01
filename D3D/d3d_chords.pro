@@ -161,7 +161,8 @@ FUNCTION d3d_chords,shot,fida_diag
        ENDCASE
 
 	;;SAVE IN FIDA STRUCTURE
-	fida={nchan:nchan,diag:fida_diag,xlos:xlos,ylos:ylos,zlos:zlos,xlens:xhead,ylens:yhead,zlens:zhead,$
-		  sigma_pi_ratio:1.0,headsize:replicate(0.0,nchan)}
+	fida={nchan:nchan,diag:fida_diag,xlos:double(xlos),ylos:double(ylos),zlos:double(zlos),$
+		  xlens:double(xhead),ylens:double(yhead),zlens:double(zhead),$
+		  sigma_pi_ratio:1.d0,headsize:replicate(0.0,nchan)}
 	return,fida
 END

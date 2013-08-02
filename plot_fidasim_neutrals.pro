@@ -217,7 +217,7 @@ pro plot_fidasim_neutrals,path,ps=ps,only_halo=only_halo,only_beam=only_beam,log
   ztit='Z [m]'
   rtit='R [m]'
   xmar=[8.0,9.]
-  rran=[.8,2.5]
+  rran=[0,2.5]
   zran=[-1.,1.]
 
   title='XY-integrated density [1/cm^2]' 

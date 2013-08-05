@@ -1,18 +1,16 @@
 @all_tables.pro
-pro proton_table,low_res=low_res,plot=plot,ps=ps
+pro proton_table,plot=plot,ps=ps
   print,'Calcuation of the proton table!'
+  nmax=12                    ;; number of quantum states
+  nmax_red=6                 ;; reduced number of quantum states whereby the 
+                             ;; states upto nmax are taken into account 
+                             ;; as loss mechanism!
+  maxeb=400.d0  ;; maximum energy in table [kev]
+  maxti=20.d0   ;; maximum ion temperature in table [kev]         
+  neb=401       ;; table size
+  nti=101       ;; table size
 
-  nmax=12                    ; number of quantum states
-  maxeb=1000.d0              ;[kev]
-  maxti=20.d0                ;[kev]
 
-  neb=10001
-  nti=201
-  if keyword_set(low_res) then begin
-     neb=501
-     nti=101
-  endif
-  
   ;; arrays of eb and ti
   ebarr=maxeb*dindgen(neb)/(neb-1.)
   tiarr=maxti*dindgen(nti)/(nti-1.)
@@ -126,23 +124,33 @@ pro proton_table,low_res=low_res,plot=plot,ps=ps
         endfor
      endfor
   endfor
+  ;; ---------------------------------------
+  ;; ----- STORE DATE INTO BINARY FILES ----
+  ;; ---------------------------------------
+  file='qptable_full.bin'
+  openw, lun, file, /get_lun
+  writeu,lun, long(nti)
+  writeu,lun, double(dti)
+  writeu,lun, long(neb)
+  writeu,lun, double(deb) 
+  writeu,lun, long(nmax)   
+  writeu,lun, double(qp)
+  close,lun
+  free_lun, lun
+  ;; ------- STORE DATE WITH REDUCED N-LEVELS ----
+  reduce_table,qp,neb,nti,nmax_red,qp_red
   file='qptable.bin'
   openw, lun, file, /get_lun
   writeu,lun, long(nti)
   writeu,lun, double(dti)
   writeu,lun, long(neb)
   writeu,lun, double(deb) 
-  writeu,lun, long(nmax) 
-  for n=0,nmax-1 do begin
-     for m=0,nmax do begin
-        for ie=0,neb-1 do begin   
-           for iti=0,nti-1 do begin       
-              writeu, lun, float(qp[m,n,ie,iti])
-           endfor
-        endfor
-     endfor
-  endfor
+  writeu,lun, long(nmax_red)   
+  writeu,lun, double(qp_red)
   close,lun
   free_lun, lun
+
+
+
   print, 'proton table written to:', file
 end

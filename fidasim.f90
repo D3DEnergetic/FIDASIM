@@ -109,10 +109,10 @@ module application
      integer(long)                                 :: nr_te_qe
      integer(long)                                 :: nr_ti_neut
      !! TABLES
-     real(float), dimension(:,:,:,:) , allocatable :: qp 
-     real(float), dimension(:,:,:,:) , allocatable :: qi
-     real(float), dimension(:,:,:,:) , allocatable :: qe
-     real(float), dimension(:,:,:)   , allocatable :: neut
+     real(double), dimension(:,:,:,:) , allocatable :: qp 
+     real(double), dimension(:,:,:,:) , allocatable :: qi
+     real(double), dimension(:,:,:,:) , allocatable :: qe
+     real(double), dimension(:,:,:)   , allocatable :: neut
      real(double),dimension(:,:)     , allocatable :: einstein
   end type atomic_type
   type distri_type
@@ -467,6 +467,7 @@ print*,'denf:  ',mdenf
 print*,'zeff:  ',mzeff
 
   end subroutine read_plasma
+
   !****************************************************************************
   ! Read vb written by IDL routine  WWH 6/2013
   subroutine read_bremsstrahlung
@@ -485,12 +486,27 @@ print*,'zeff:  ',mzeff
     close(66)
     deallocate(brems)
   end subroutine read_bremsstrahlung
+
   !****************************************************************************
   subroutine read_atomic
     character(120)  :: filename
-    integer(long) :: n,m !! initial/final state
-    integer(long) :: ie,iti !! energy/ti index
-    integer(long) :: nlev
+    integer         :: n,m !! initial/final state
+    integer         :: ie,iti !! energy/ti index
+    integer(long)   :: nlev
+
+   !-------------------ELECTRON EXCITATION/IONIZATION TABLE--------
+    filename=trim(adjustl(root_dir))//"TABLES/qetable.bin"
+    open(66,form='unformatted',file=filename,access='stream')
+    read(66) atomic%nr_te_qe
+    read(66) atomic%d_te_qe
+    read(66) atomic%nr_eb_qe
+    read(66) atomic%d_eb_qe
+    read(66) nlev
+    if(nlev.ne.nlevs) stop 'stop at "read atomics qetable"'
+    allocate(atomic%qe(nlevs+1,nlevs,atomic%nr_eb_qe,atomic%nr_te_qe))
+    read(66) atomic%qe(:,:,:,:)
+    close(66)
+
     !-------------------Deuterium EXCITATION/IONIZATION/CX TABLE------
     filename=trim(adjustl(root_dir))//"TABLES/qptable.bin"
     open(66,form='unformatted',file=filename,access='stream')
@@ -499,18 +515,15 @@ print*,'zeff:  ',mzeff
     read(66) atomic%nr_eb_qp
     read(66) atomic%d_eb_qp
     read(66) nlev
-    if(nlev.ne.nlevt) stop 'stop at "read atomics qptable"'
-    allocate(atomic%qp(nlevt+1,nlevt,atomic%nr_eb_qp,atomic%nr_ti_qp))
-    do n=1,nlevt !! lower level
-       do m=1,nlevt+1 !! upper level
-          do ie=1,atomic%nr_eb_qp
-             do iti=1,atomic%nr_ti_qp
-                read(66) atomic%qp(m,n,ie,iti)
-             enddo
-          enddo
-       enddo
-    enddo
+    if(nlev.ne.nlevs)then
+       print*, atomic%nr_ti_qp,atomic%d_ti_qp, atomic%nr_eb_qp,atomic%d_eb_qp
+       print*, nlev,nlevs
+       stop 'stop at "read qptable"'
+    endif
+    allocate(atomic%qp(nlevs+1,nlevs,atomic%nr_eb_qp,atomic%nr_ti_qp))
+    read(66) atomic%qp(:,:,:,:)
     close(66)
+
     !------------------ m-resolved CHARGE EXCHANGE cross-sections  ---
     ! H(+) + H(n) --> H(m) + H(+)
     ! energy in keV/amu
@@ -519,36 +532,11 @@ print*,'zeff:  ',mzeff
     read(66) atomic%nr_eb_neut
     read(66) atomic%d_eb_neut
     read(66) nlev
-    if(nlev.ne.nlevt) stop 'stop at "read atomics" neut_rates'
-    allocate(atomic%neut(nlevt,nlevt,atomic%nr_eb_neut))
-    do ie=1,atomic%nr_eb_neut
-       do n=1,nlevt !! lower level
-          do m=1,nlevt !! upper level
-                read(66) atomic%neut(m,n,ie)
-          enddo
-       enddo
-    enddo
+    if(nlev.ne.nlevs) stop 'stop at read tables (neut_rates)'
+    allocate(atomic%neut(nlevs,nlevs,atomic%nr_eb_neut))
+    read(66) atomic%neut(:,:,:)
     close(66)
-    !-------------------ELECTRON EXCITATION/IONIZATION TABLE--------
-    filename=trim(adjustl(root_dir))//"TABLES/qetable.bin"
-    open(66,form='unformatted',file=filename,access='stream')
-   read(66) atomic%nr_te_qe
-    read(66) atomic%d_te_qe
-    read(66) atomic%nr_eb_qe
-    read(66) atomic%d_eb_qe
-    read(66) nlev
-    if(nlev.ne.nlevt) stop 'stop at "read atomics qetable"'
-    allocate(atomic%qe(nlevt+1,nlevt,atomic%nr_eb_qe,atomic%nr_te_qe))
-    do n=1,nlevt !! lower level
-       do m=1,nlevt+1 !! upper level
-          do ie=1,atomic%nr_eb_qe
-             do iti=1,atomic%nr_te_qe
-                read(66) atomic%qe(m,n,ie,iti)
-             enddo
-          enddo
-       enddo
-    enddo
-    close(66)
+
     !-------------------Impurity EXCITATION/IONIZATION/CX TABLE--------
    if(inputs%impurity_charge.lt.5.or.inputs%impurity_charge.gt.7) &
          stop 'wrong impurity charge!'
@@ -564,18 +552,11 @@ print*,'zeff:  ',mzeff
     read(66) atomic%nr_eb_qi
     read(66) atomic%d_eb_qi
     read(66) nlev
-    if(nlev.ne.nlevt) stop 'stop at "read atomics qptable"'
-    allocate(atomic%qi(nlevt+1,nlevt,atomic%nr_eb_qi,atomic%nr_ti_qi))
-    do n=1,nlevt !! lower level
-       do m=1,nlevt+1 !! upper level
-          do ie=1,atomic%nr_eb_qi
-             do iti=1,atomic%nr_ti_qi
-                read(66) atomic%qi(m,n,ie,iti)
-             enddo
-          enddo
-       enddo
-    enddo
+    if(nlev.ne.nlevs) stop 'stop at "read atomics qptable"'
+    allocate(atomic%qi(nlevs+1,nlevs,atomic%nr_eb_qi,atomic%nr_ti_qi))
+    read(66) atomic%qi(:,:,:,:)
     close(66)
+
     !-------------------EINSTEIN COEFFICIENTS ----------------------
     filename='TABLES/einstein.dat'
     filename=trim(adjustl(root_dir))//"TABLES/einstein.dat"
@@ -583,18 +564,17 @@ print*,'zeff:  ',mzeff
     read(66,*)! 
     read(66,*)!
     read(66,*) nlev
-    if(nlev.ne.nlevt) stop 'stop at "read atomics"'
-    allocate(atomic%einstein(nlevt,nlevt))
-    do n=1,nlevt !! lower level
-       do m=1,nlevt  !! upper level
+    if(nlev.ne.nlevs) stop 'stop at "read atomics"'
+    allocate(atomic%einstein(nlevs,nlevs))
+    do n=1,nlevs !! lower level
+       do m=1,nlevs  !! upper level
           read(66,*)atomic%einstein(m,n) 
        enddo
     enddo
     close(66)
 
-
-
   end subroutine read_atomic
+
   !****************************************************************************
   !-------------------FASTION DISTRIBUTION FUNCTION ----------------------
   subroutine read_fbm
@@ -2102,6 +2082,27 @@ print*,'zeff:  ',mzeff
     b = y
   end subroutine matinv
 
+  subroutine table_interp(coef_matrix,deb,dti,ebi,tii,eb,ti,interp_out)
+    !! bilinear interpolation of the effective rate coefficient tables !!
+    real(double),dimension(:,:,:,:), intent(in) :: coef_matrix ! (m,n,eb,ti)
+    real(double),                intent(in)     :: deb, dti ! eb and ti grid
+    integer,                    intent(in)      :: ebi, tii    ! lower indices
+    real(double),                intent(in)     :: eb, ti      ! desired values
+    real(double),dimension(nlevs+1,nlevs),intent(out) :: interp_out  ! output 
+    real(double), dimension(nlevs+1,nlevs)      :: c00, c10, c01, c11, c0, c1
+    real(double)    :: eb0, ti0
+    eb0=(ebi-1)*deb
+    ti0=(tii-1)*dti
+    c00 = coef_matrix(:,:,ebi  ,tii  )
+    c10 = coef_matrix(:,:,ebi+1,tii  )
+    c01 = coef_matrix(:,:,ebi  ,tii+1)
+    c11 = coef_matrix(:,:,ebi+1,tii+1)
+    !linear interpolation between C00 and C10 to find C0, C01 and C11 to find C1
+    c0  = c00 + (c10 - c00) * (eb - eb0) / deb
+    c1  = c01 + (c11 - c01) * (eb - eb0) / deb
+    interp_out=( c0  + (c1  - c0) * (ti - ti0) / dti)
+  end subroutine table_interp
+
   subroutine colrad(ac,vn,dt,states,photons,neut_type,nlaunch)
     !colrad solves the collisional-radiative balance equations
     real(double) , dimension(:),  intent(in)   :: vn  !!velocitiy (cm/s)
@@ -2174,33 +2175,34 @@ print*,'zeff:  ',mzeff
     !! - DEUTERIUM ions (Impact excitation/ionization,charge exchange)
     vnet_square=dot_product(vn-vrot,vn-vrot)          ![cm/s]
     eb=v_to_E*inputs%ab*vnet_square ![kev]
-    !! rates  for impact ionization,excitation,deexcitation
-    !! and charge exchange are computed for a maxwell distribution of thermal 
-    !! deuterium ions!
-    !! DEUTERIUM
-    ebi= int(eb/atomic%d_eb_qp+0.5)+1   
-!    ebi= int(eb/atomic%d_eb_qp)+1   
-    if(ebi.gt.atomic%nr_eb_qp) ebi=atomic%nr_eb_qp
-    tii= int(ti/atomic%d_ti_qp+0.5)+1
-!    tii= int(ti/atomic%d_ti_qp)+1
-    if(tii.gt.atomic%nr_ti_qp)stop 'Ti out of range of qptable!'
-    qp=dble(atomic%qp(:,:,ebi,tii))*denp ![1/s]
+
+    !! DEUTERIUM (Impact excitation/ionization,charge exchange)
+    ebi= floor(eb/atomic%d_eb_qp)+1   
+    if(ebi.ge.atomic%nr_eb_qp)stop 'Eb out of range of qptable!'
+    tii= floor(ti/atomic%d_ti_qp)+1
+    if(tii.ge.atomic%nr_ti_qp)stop 'Ti out of range of qptable!'
+    call table_interp(atomic%qp(:,:,:,:),atomic%d_eb_qp,atomic%d_ti_qp &
+         ,ebi,tii,eb,ti,qp)
+    qp=qp*denp ![1/s]  
+
     !! IMPURITIES
-    ebi= int(eb/atomic%d_eb_qi+0.5)+1   
-!    ebi= int(eb/atomic%d_eb_qi)+1   
-    if(ebi.gt.atomic%nr_eb_qi) ebi=atomic%nr_eb_qi
-    tii= int(ti/atomic%d_ti_qi+0.5)+1
-!    tii= int(ti/atomic%d_ti_qi)+1
-    if(tii.gt.atomic%nr_ti_qi)stop 'Ti out of range of qitable!'
-    qi=dble(atomic%qi(:,:,ebi,tii))*deni ![1/s]   
+    ebi= floor(eb/atomic%d_eb_qi)+1   
+    if(ebi.ge.atomic%nr_eb_qi)stop 'Eb out of range of qitable!'
+    tii= floor(ti/atomic%d_ti_qi)+1
+    if(tii.ge.atomic%nr_ti_qi)stop 'Ti out of range of qitable!'
+    call table_interp(atomic%qi(:,:,:,:),atomic%d_eb_qi,atomic%d_ti_qi &
+         ,ebi,tii,eb,ti,qi)
+    qi=qi*deni ![1/s]  
+
     !! ELECTRONS
-    ebi= int(eb/atomic%d_eb_qe+0.5)+1   
-!    ebi= int(eb/atomic%d_eb_qe)+1   
-    if(ebi.gt.atomic%nr_eb_qe) ebi=atomic%nr_eb_qe
-    tei= int(te/atomic%d_te_qe+0.5)+1
-!    tei= int(te/atomic%d_te_qe)+1
-    if(tei.gt.atomic%nr_te_qe) stop 'Te out of range of qetable!'
-    qe=dble(atomic%qe(:,:,ebi,tei))*dene ![1/s]
+    ebi= floor(eb/atomic%d_eb_qe)+1   
+    if(ebi.ge.atomic%nr_eb_qe)stop 'Eb out of range of qetable!'
+    tei= floor(te/atomic%d_te_qe)+1
+    if(tei.ge.atomic%nr_te_qe)stop 'Te out of range of qetable!'
+    call table_interp(atomic%qe(:,:,:,:),atomic%d_eb_qe,atomic%d_te_qe &
+         ,ebi,tei,eb,te,qe)
+    qe=qe*dene ![1/s]  
+
     !! - Write off-diagnonal elements (populating transitions) - !!
     matrix=atomic%einstein(1:nlevs,1:nlevs)  &     
          +              qp(1:nlevs,1:nlevs)  &

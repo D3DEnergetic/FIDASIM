@@ -37,7 +37,7 @@ module application
        , 729.d0, 1936.d0, 5490.d0, 1936.d0, 729.d0, 2304.d0, 1681.d0/)
   integer(long), dimension(1) :: minpos  !! dummy array to determine minloc
   !!Numerical Settings
-  integer(long),parameter:: nlevt=12       !!nr of tabulated states 
+  integer(long),parameter:: nlevt=6       !!nr of tabulated states 
   integer(long),parameter:: nlevs=6        !!nr of simulated quantum states  
   real(double),parameter :: nr_halo_neutrate=20. !! to average halo neut-rate 
   real(double)           :: colrad_threshold !! to speed up simulation!
@@ -521,9 +521,9 @@ print*,'zeff:  ',mzeff
     read(66) nlev
     if(nlev.ne.nlevt) stop 'stop at "read atomics" neut_rates'
     allocate(atomic%neut(nlevt,nlevt,atomic%nr_eb_neut))
-    do n=1,nlevt !! lower level
-       do m=1,nlevt !! upper level
-          do ie=1,atomic%nr_eb_neut
+    do ie=1,atomic%nr_eb_neut
+       do n=1,nlevt !! lower level
+          do m=1,nlevt !! upper level
                 read(66) atomic%neut(m,n,ie)
           enddo
        enddo
@@ -2179,20 +2179,26 @@ print*,'zeff:  ',mzeff
     !! deuterium ions!
     !! DEUTERIUM
     ebi= int(eb/atomic%d_eb_qp+0.5)+1   
+!    ebi= int(eb/atomic%d_eb_qp)+1   
     if(ebi.gt.atomic%nr_eb_qp) ebi=atomic%nr_eb_qp
     tii= int(ti/atomic%d_ti_qp+0.5)+1
+!    tii= int(ti/atomic%d_ti_qp)+1
     if(tii.gt.atomic%nr_ti_qp)stop 'Ti out of range of qptable!'
     qp=dble(atomic%qp(:,:,ebi,tii))*denp ![1/s]
     !! IMPURITIES
     ebi= int(eb/atomic%d_eb_qi+0.5)+1   
+!    ebi= int(eb/atomic%d_eb_qi)+1   
     if(ebi.gt.atomic%nr_eb_qi) ebi=atomic%nr_eb_qi
     tii= int(ti/atomic%d_ti_qi+0.5)+1
+!    tii= int(ti/atomic%d_ti_qi)+1
     if(tii.gt.atomic%nr_ti_qi)stop 'Ti out of range of qitable!'
     qi=dble(atomic%qi(:,:,ebi,tii))*deni ![1/s]   
     !! ELECTRONS
     ebi= int(eb/atomic%d_eb_qe+0.5)+1   
+!    ebi= int(eb/atomic%d_eb_qe)+1   
     if(ebi.gt.atomic%nr_eb_qe) ebi=atomic%nr_eb_qe
     tei= int(te/atomic%d_te_qe+0.5)+1
+!    tei= int(te/atomic%d_te_qe)+1
     if(tei.gt.atomic%nr_te_qe) stop 'Te out of range of qetable!'
     qe=dble(atomic%qe(:,:,ebi,tei))*dene ![1/s]
     !! - Write off-diagnonal elements (populating transitions) - !!

@@ -1,5 +1,5 @@
 pro einstein_table
-  nmax=12
+  nmax=6
   ;;-------------------EINSTEIN-----------------------------------------
   ;; Einstein coefficients arranged in form ein[m,n]
   ;; n: initial state (upper one)

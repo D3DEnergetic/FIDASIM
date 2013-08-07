@@ -10,8 +10,8 @@ pro write_tables
   endif
 
   einstein_table
-  proton_table,low_res=low_res
-  electron_table,low_res=low_res
-  impurity_table,qimp=6 ,low_res=low_res;; for carbon
-  neut_rates,low_res=low_res
+  proton_table
+  electron_table
+  impurity_table,qimp=6 ;; for carbon
+  neut_table
 end

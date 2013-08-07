@@ -2217,7 +2217,7 @@ print*,'zeff:  ',mzeff
             - sum(qe(:,n))
     enddo
     !! WWH  Add Hutchinson's truncation correction
-    matrix(nlevs,nlevs)=10.*matrix(nlevs,nlevs)
+!    matrix(nlevs,nlevs)=10.*matrix(nlevs,nlevs)
 
 
     call eigen(matrix, eigvec, eigval)

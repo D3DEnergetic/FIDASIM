@@ -15,7 +15,7 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 	fida=d3d_chords(inputs.shot,inputs.fida_diag)
 
 	;;GET PROFILES
-	profiles=d3d_profiles(inputs,/save)
+	profiles=d3d_profiles(inputs)
 	if profiles.err eq 1 then begin
 		print,'FAILED TO GET PROFILES'
 		err=1

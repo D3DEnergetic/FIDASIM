@@ -1,15 +1,14 @@
 @all_tables.pro
-pro impurity_table,low_res=low_res,qimp=qimp,plot=plot,ps=ps
-   nmax=12                    ; number of quantum states
-   maxeb=1000.d0               ;[kev]
-   maxti=20.d0                ;[kev]
+pro impurity_table,qimp=qimp,plot=plot,ps=ps
+  nmax=12                 ;; number of quantum states
+  nmax_red=6              ;; reduced number of quantum states whereby the 
+                          ;; states upto nmax are taken into account 
+                          ;; as loss mechanism!
+  maxeb=400.d0  ;; maximum energy in table [kev]
+  maxti=20.d0   ;; maximum ion temperature in table [kev]         
+  neb=201       ;; table size
+  nti=51        ;; table size
 
-   neb=10001
-   nti=201 
-   if keyword_set(low_res) then begin
-      neb=501
-      nti=101
-   endif
 
   ;; arrays of eb and ti
   ebarr=maxeb*dindgen(neb)/(neb-1.)
@@ -113,23 +112,25 @@ pro impurity_table,low_res=low_res,qimp=qimp,plot=plot,ps=ps
   endif
 
 
-
   if qimp eq 5 then begin 
      aimp=10.8
      file='qbtable.bin'
+     file_full='qbtable_full.bin'
   endif
   if qimp eq 6 then begin 
      aimp=12.0
      file='qctable.bin'
+     file_full='qctable_full.bin'
   endif
   if qimp eq 7 then begin 
      aimp=14.0
      file='qntable.bin'
+     file_full='qntable_full.bin'
   endif
   ab = 2.
   qi=fltarr(nmax+1,nmax,neb,nti) 
   for ie=0,neb-1 do begin
-     print, ie
+     if ie mod 10 eq 0 then print, ie, ' of ',neb-1
      eb=ebarr[ie]
      for iti=0L,nti-1 do begin  
         ti=tiarr[iti]
@@ -154,23 +155,27 @@ pro impurity_table,low_res=low_res,qimp=qimp,plot=plot,ps=ps
         endfor
      endfor
   endfor
-  
-
-  openw, lun, file, /get_lun
+  ;; ---------------------------------------
+  ;; ----- STORE DATE INTO BINARY FILES ----
+  ;; ---------------------------------------
+  openw, lun, file_full, /get_lun
   writeu,lun, long(nti)
   writeu,lun, double(dti)
   writeu,lun, long(neb)
   writeu,lun, double(deb) 
   writeu,lun, long(nmax) 
-  for n=0,nmax-1 do begin
-     for m=0,nmax do begin
-        for ie=0,neb-1 do begin   
-           for iti=0,nti-1 do begin       
-              writeu, lun, float(qi[m,n,ie,iti])
-           endfor
-        endfor
-     endfor
-  endfor
+  writeu,lun, double(qi)
+  close,lun
+  free_lun, lun
+  ;; ------- STORE DATE WITH REDUCED N-LEVELS ----
+  reduce_table,qi,neb,nti,nmax_red,qi_red
+  openw, lun, file, /get_lun
+  writeu,lun, long(nti)
+  writeu,lun, double(dti)
+  writeu,lun, long(neb)
+  writeu,lun, double(deb) 
+  writeu,lun, long(nmax_red) 
+  writeu,lun, double(qi_red)
   close,lun
   free_lun, lun
   print, 'impurity table written to:', file

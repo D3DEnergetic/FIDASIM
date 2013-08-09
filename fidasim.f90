@@ -1088,7 +1088,7 @@ print*,'zeff:  ',mzeff
     ri(1)=grid%xx(ac(1))+ grid%dr(1)*randomu(1)
     ri(2)=grid%yy(ac(2))+ grid%dr(2)*randomu(2) 
     ri(3)=grid%zz(ac(3))+ grid%dr(3)*randomu(3)  
-    if (inputs%guidingcenter) then  ! WWH 
+    if (inputs%guidingcenter.eq.1) then  ! WWH 
     B=cell(ac(1),ac(2),ac(3))%plasma%B(:) 
     one_over_omega=inputs%ab*mass_u/(dot_product(B,B)*e0)*1.d-2    
     vxB(1)= (vi(2) * B(3) - vi(3) * B(2))
@@ -1264,7 +1264,7 @@ print*,'zeff:  ',mzeff
     do i = low, high
        s = scal(i)
        do j = 0, n-1  
-	  eivec(i,j) = eivec(i,j) * s
+            eivec(i,j) = eivec(i,j) * s
        enddo
     enddo
     do i = low-1, 0, -1
@@ -1374,14 +1374,14 @@ print*,'zeff:  ',mzeff
     !*====================================================================*
     do i = 0, n-1
        do k = 0, n-1 
-	  h(i,k) = ZERO
+          h(i,k) = ZERO
        enddo
        h(i,i) = ONE
     enddo
     do i = high - 1, low+1, -1
        j = perm(i)
        do k = i + 1, high 
-	  h(k,i) = mat(k,i-1)
+          h(k,i) = mat(k,i-1)
        enddo
        if (i.ne.j) then
           do k = i, high
@@ -1605,7 +1605,7 @@ print*,'zeff:  ',mzeff
     j = n-1
     do while (j>=low)
        if(j<=high)then
-	  m =j 
+          m =j 
        else 
           j = high
        endif
@@ -1713,7 +1713,7 @@ print*,'zeff:  ',mzeff
           enddo
 10        if(ll.ne.999)then 
              l=ll 
-	  else 
+          else 
              l=0          !restore l
           endif
           x = h(en,en)
@@ -1990,7 +1990,7 @@ print*,'zeff:  ',mzeff
              enddo
              k=k+1
           endif
-	  k=k+1 
+          k=k+1 
         enddo !while k<=n-1
         print*, 'norm:', norm
         stop
@@ -2209,7 +2209,7 @@ print*,'zeff:  ',mzeff
          +              qi(1:nlevs,1:nlevs)  &
          +              qe(1:nlevs,1:nlevs)
     !! - Write diagonal elements (depopulating transitions) - !!
-    do n=1,nlevs 	            
+    do n=1,nlevs         
        matrix(n,n)=&
             - sum(atomic%einstein(:,n)) &
             - sum(qp(:,n)) &
@@ -2996,7 +2996,7 @@ print*,'zeff:  ',mzeff
              do k=1,grid%nz
                 if(los_weight(i,j,k,ichan).gt.0.)then
                    cc=cc+1
-		   los_wght(cc)=los_weight(i,j,k,ichan)
+                   los_wght(cc)=los_weight(i,j,k,ichan)
                    !! determine mean values like the halo density along LOS
                    wght(cc)=dble(cell(i,j,k)%neut_dens(nbif_type,3)   &
                         + cell(i,j,k)%neut_dens(nbih_type,3) &

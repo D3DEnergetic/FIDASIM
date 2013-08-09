@@ -20,7 +20,8 @@ module application
   integer , parameter   :: float     = kind(1.e0)
   integer , parameter   :: double    = kind(1.d0) 
   real(double),parameter :: ONE=1.d0,TWO=2.d0,ZERO=0.d0
-  real(double),parameter :: XMACH_EPS=2.22d-16,MAXIT=50
+  real(double),parameter :: XMACH_EPS=2.22d-16
+  integer , parameter   :: MAXIT=50
   !!                      Physical units:
   real(double),parameter:: mass_u    = 1.6605402d-27  ! [kg]
   real(double),parameter:: e0        = 1.60217733d-19 ! [C]
@@ -127,7 +128,7 @@ module application
      integer(long) :: npitch
   end type distri_type
   type spec_type
-     real(float), dimension(:,:,:),allocatable :: spectra
+     real(double), dimension(:,:,:),allocatable :: spectra
      real(double),dimension(:,:),  allocatable :: xyzlos
      real(double),dimension(:,:),  allocatable :: xyzhead
      real(double),dimension(:),    allocatable :: headsize
@@ -215,8 +216,6 @@ contains
   subroutine read_inputs
     character(120)   :: filename
     integer(long) :: i,j,k
-    real(double)    :: dummr
-    integer(long)   :: dummi 
     print*,'---- loading inputs -----' 
     filename=trim(adjustl(result_dir))//"/inputs.dat"
     open(66,form='formatted',file=filename)
@@ -491,7 +490,6 @@ print*,'zeff:  ',mzeff
   subroutine read_atomic
     character(120)  :: filename
     integer         :: n,m !! initial/final state
-    integer         :: ie,iti !! energy/ti index
     integer(long)   :: nlev
 
    !-------------------ELECTRON EXCITATION/IONIZATION TABLE--------
@@ -719,7 +717,7 @@ print*,'zeff:  ',mzeff
   end subroutine write_npa
   
   subroutine write_nbi_halo_spectra
-    integer(long)  :: i,j,k,ichan
+    integer(long)  :: i,ichan
     character(120)  :: filename
     real(float), dimension(:)  , allocatable :: lambda_arr
     !! ------------------------ calculate wavelength array ------------------ !!
@@ -759,7 +757,7 @@ print*,'zeff:  ',mzeff
   end subroutine write_nbi_halo_spectra
 
  subroutine write_fida_spectra
-    integer(long)  :: i,j,k,ichan
+    integer(long)  :: i,ichan
     character(120)  :: filename
     real(float), dimension(:)  , allocatable :: lambda_arr
     !! ------------------------ calculate wavelength array ------------------ !!
@@ -852,14 +850,14 @@ print*,'zeff:  ',mzeff
     iy=IA*(iy-k*IQ)-IR*k !period 231 − 2.
     if (iy < 0) iy=iy+IM
     ran=am*ior(iand(IM,ieor(ix,iy)),1) !Combine the two generators
-  end function ran  
+  end function ran 
   subroutine randn(randomn)
     !!Box Mueller Method to calculate normal distribution
     real(double), dimension(:), intent(inout):: randomn
     integer(long)                            :: idum
     integer(long)                            :: nran
     integer(long)                            :: i
-    real(float)                              :: x1,x2,w  
+    real(double)                              :: x1,x2,w  
     randomn=0.d0
     idum=1
     nran=size(randomn)
@@ -898,7 +896,6 @@ print*,'zeff:  ',mzeff
   subroutine randseed(seed)
     integer(long), intent(in) :: seed
     integer(long)             :: idum 
-    integer(long)             :: nran
     real(float)               :: dummy
     idum=seed*(-1)
     !$OMP CRITICAL(randomC)
@@ -1017,7 +1014,6 @@ print*,'zeff:  ',mzeff
     real(double), dimension(3), intent(out)   :: vnbi  !! velocity [cm/s]
     real(double), dimension(3), intent(out), optional :: rnbi  !! postition
     integer(long)                :: jj, updown
-    real(double)                 :: a_dx, a_dy, a_dz
     real(double), dimension(3)   :: uvw_pos    !! Start position on ion source
     real(double), dimension(3)   :: xyz_pos    !! Start position on ion source
     real(double), dimension(3)   :: uvw_ray    !! NBI veloicity in uvw coords
@@ -2127,7 +2123,7 @@ print*,'zeff:  ',mzeff
     real(double),   dimension(nlevs,nlevs)  :: eigvec, eigvec_inv
     real(double),   dimension(nlevs)        :: eigval, coef
     real(double),   dimension(nlevs)        :: exp_eigval_dt 
-    real(float),    dimension(nlevs)        :: dens !! Density of neutrals 
+    real(double),    dimension(nlevs)        :: dens !! Density of neutrals 
     integer(long)                           :: n !! counter 
     photons=0.d0
     !! --------------- Check if inputs are valid for colrad -------------- !!
@@ -2429,8 +2425,8 @@ print*,'zeff:  ',mzeff
   !-----------Bremsstrahlung ---------------------------------------------------
   !*****************************************************************************
   subroutine bremsstrahlung
-    integer(long)     :: i,j,k,ichan,ilam   !! indices of cells
-    real(double)      :: ne,zeff,te,lam,gaunt
+    integer(long)     :: i,j,k,ichan   !! indices of cells
+    real(double)      :: ne,zeff,te,gaunt
     real(double), dimension(:)  , allocatable :: lambda_arr,brems
     !! ------------------------ calculate wavelength array ------------------ !!
     print*, 'calculate the bremsstrahung!'
@@ -2476,7 +2472,6 @@ print*,'zeff:  ',mzeff
     real(double), dimension(nlevs)         :: denn    !!  neutral dens (n=1-4)
     real(double), dimension(nlevs)         :: prob    !!  Prob. for CX 
     real(double), dimension(3)             :: vnbi    !! Velocity of NBIneutrals
-    integer(long)                          :: in      !! index neut rates
     real(double), dimension(nlevs)         :: rates   !! Rate coefficiants forCX
     !! Collisiional radiative model along track
     real(double), dimension(nlevs)         :: states  !! Density of n-states
@@ -2598,7 +2593,7 @@ print*,'zeff:  ',mzeff
     real(double)                           :: papprox_tot 
     !! Halo iteration
     integer(long)                           :: hh !! counters
-    real(float)                             :: dcx_dens, halo_iteration_dens
+    real(double)                             :: dcx_dens, halo_iteration_dens
     real(double)                            :: nlaunch !! Number of markers
     real(double)                          :: launch  !! float number of markers
     real(double)                          :: remainder !! used in nlaunch
@@ -2703,7 +2698,7 @@ print*,'zeff:  ',mzeff
           enddo
        enddo
        if(halo_iteration_dens/dcx_dens.gt.1)exit iterations
-       inputs%nr_halo=inputs%nr_dcx*halo_iteration_dens/dcx_dens
+       inputs%nr_halo=floor(inputs%nr_dcx*halo_iteration_dens/dcx_dens)
        if(inputs%nr_halo.lt.inputs%nr_dcx*0.01)exit iterations
     enddo iterations    
   end subroutine halo
@@ -2729,7 +2724,7 @@ print*,'zeff:  ',mzeff
     real(double), dimension(  grid%ntrack):: tcell   !! time per cell
     integer(long),dimension(3,grid%ntrack):: icell   !! index of cells
     real(double), dimension(3,grid%ntrack):: pos     !! mean position in cell
-    integer(long)                         :: jj,kk      !! counter along track
+    integer(long)                         :: jj     !! counter along track
     real(double)                          :: photons !! photon flux 
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox !! approx. density
     real(double)                          :: dray !! (for NPA)
@@ -2872,7 +2867,7 @@ print*,'zeff:  ',mzeff
     real(double)                   :: photons !! photon flux 
     real(double), dimension(nlevs) :: fdens,hdens,tdens,halodens
     real(double), dimension(3)     :: bvec,avec,cvec,evec,vrot,los_vec
-    real(double)                   :: bvec_abs,theta
+    real(double)                   :: theta
     real(double)                   :: ti,te,dene,denp,deni,length
     real(double)                   :: rad,max_wght
     integer(long)                  :: nwav
@@ -2883,10 +2878,8 @@ print*,'zeff:  ',mzeff
     real(double)                   :: sinus
     real(double),dimension(3)      :: vi,vi_norm
     real(double)                   :: vabs
-    real(double),dimension(3)      :: efield
     real(double),dimension(9)      :: intens !!intensity vector
     real(double),dimension(9)      :: wavel  !!wavelength vector [A)
-    real(double),dimension(3)      :: vn  ! vi in m/s
    !! Determination of the CX probability
     real(double),dimension(3)      :: vnbi_f,vnbi_h,vnbi_t !! Velocity of NBI neutrals 
     real(double),dimension(3)      :: vhalo  !! v of halo neutral
@@ -2913,7 +2906,7 @@ print*,'zeff:  ',mzeff
     integer(long),dimension(3,grid%ntrack) :: icell  !! index of cells
     real(double)                           :: wght2
     !! DEFINE wavelength array
-    nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
+    nwav=floor((inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght)
     allocate(wav_arr(nwav+1))
     allocate(central_wavel(nwav+1))
     print*,nwav,' wavelengths to be simulated!'
@@ -3182,7 +3175,7 @@ program fidasim
   implicit none 
   integer(long), dimension(8)              :: time_arr,time_start,time_end !Time array
   integer(4)                               :: seed     !seed random generators
-  integer(long)                            :: i,j,k,n,los
+  integer(long)                            :: i,j,k
   integer(long)                            :: hour,minu,sec
 
   !! measure time

@@ -960,7 +960,7 @@ print*,'zeff:  ',mzeff
     vi=0.
     do while (reject)
        call randu(randomu3)
-       eb   = distri%emax  *randomu3(1)
+       eb   = distri%emin +(distri%emax - distri%emin) *randomu3(1)
        ptch= -1.d0 + 2.d0 *randomu3(2) 
        minpos=minloc(abs(eb   - distri%energy))  
        ienergy= minpos(1)

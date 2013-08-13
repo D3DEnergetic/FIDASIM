@@ -308,7 +308,7 @@ pro plot_fidasim_spectra,ps=ps,product=product,runid=runid
                            +strtrim(string(ichan+1,f='(i2)'),2) $
                            +'_'+strtrim(string(ii+1),2) $
                            +'.eps'
-                 endif else  wset,1
+                 endif else  wset,0
                  prod=replicate(0.,fidasim.wfunct.nen,fidasim.wfunct.npitch)
                  for ie=0,fidasim.wfunct.nen-1 do begin
                     for ip=0,fidasim.wfunct.npitch-1 do begin
@@ -375,7 +375,7 @@ pro plot_fidasim_spectra,ps=ps,product=product,runid=runid
                +'chan'+strtrim(string(ichan+1,f='(i2)'),2) $
                +'.eps' else window,3
      xran=[647,665]
-     yran=[[1.e13],1.e19]
+     yran=[[1.e15],1.e18]
      plot, [0.],/nodata,xran=xran,yran=yran,/xsty $
            , ytit='Intensity [Ph/(s m^2 nm sr)]', xtit='lambda [nm]' $
            ,xthick=linthick,ythick=linthick,/ylog,color=0
@@ -409,9 +409,9 @@ pro plot_fidasim_spectra,ps=ps,product=product,runid=runid
      if not keyword_set(ps) then read,dummy
      
   endfor   ;; loop over channels
-  
-  
-  
+  wspec=fidasim.wfunct.central_wavel
+  spec=fidasim.spec
+  save,spec,radiance,wspec,filename='spec.sav'
   
   if keyword_set(ps) then device, /close
 end

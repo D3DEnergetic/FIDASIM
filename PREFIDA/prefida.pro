@@ -6,12 +6,24 @@ PRO rotate_uvw,uvw,Arot,Brot,Crot,updown,xyz
   	xyz=MATRIX_MULTIPLY(Crot,qrz)
 END
 
-PRO rotate_points,x,y,z,Arot,Brot,Crot,xp,yp,zp
+PRO rotate_points,x0,y0,z0,Arot,Brot,Crot,xp,yp,zp
+	if size(x0,/n_dimensions) ne 1 then begin
+		x=reform(x0,n_elements(x0))
+		y=reform(y0,n_elements(y0))
+		z=reform(z0,n_elements(z0))
+	endif else begin
+		x=x0 & y=y0 & z=z0
+	endelse
 	xyz=transpose([[x],[y],[z]])
     rotate_uvw,xyz,Arot,Brot,Crot,1,xyz_p
     xp=transpose(xyz_p[0,*])
     yp=transpose(xyz_p[1,*])
     zp=transpose(xyz_p[2,*])
+    if size(x0,/n_dimensions) ne 1 then begin
+		xp=reform(xp,size(x0,/dimensions)
+		yp=reform(yp,size(y0,/dimensions)
+		zp=reform(zp,size(z0,/dimensions)
+	endif
 END
 
 PRO make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
@@ -79,7 +91,7 @@ PRO make_fida_grid,inputs,grid,err
 	for i=0L,nx-1 do for j=0L,ny-1 do for k=0L,nz-1 do begin
 		l=i+nx*j+nx*ny*k
 		x[l]=xx[i] & y[l]=yy[j] & z[l]=zz[k]
-	end
+	endfor
 
 	;; Make the corresponding grid center arrays
 	xc=x+0.5d0*dx & yc=y+0.5d0*dy & zc=z+0.5d0*dz
@@ -93,17 +105,18 @@ PRO make_fida_grid,inputs,grid,err
 	v+=inputs.origin[1] & vc+=inputs.origin[1] 
 	w+=inputs.origin[2] & wc+=inputs.origin[2]
 	
-	r_grid=sqrt(uc^2+vc^2)
-	phi_grid=atan(vc,uc)
-;	plot,xc,yc,psym=2,color=0,background=255
-;    uvw_ray=[-1.d0,0.d0,0.d0]*1000.
-;    rotate_uvw,uvw_ray,Arot,Brot,Crot,1,xyz_ray
-;    oplot,[inputs.origin[0],inputs.origin[0]+xyz_ray[0]] $
-;         ,[inputs.origin[1],inputs.origin[1]+xyz_ray[1]],thick=2,color=230
-
+	rgrid=sqrt(uc^2+vc^2)
+	phigrid=atan(vc,uc)
+	
+	r_grid=dblarr(nx,ny,nz) & phi_grid=dblarr(nx,ny,nz) & w_grid=dblarr(nx,ny,nz)
+	for i=0L,nx-1 do for j=0L,ny-1 do for k=0L,nz-1 do begin
+		l=i+nx*j+nx*ny*k
+		r_grid[i,j,k]=rgrid[l] & phi_grid[i,j,k]=phigrid[l] & w_grid[i,j,k]=wc[l]
+	endfor
+	
 	grid={nx:nx,ny:ny,nz:nz,x:x,y:y,z:z,xx:xx,yy:yy,zz:zz,xc:xc,yc:yc,zc:zc,xxc:xxc,yyc:yyc,zzc:zzc,$
 			dx:dx,dy:dy,dz:dz,dr:dr,drmin:drmin,dv:dv,ng:ng,u:u,v:v,w:w,$
-			uc:uc,vc:vc,wc:wc,r_grid:r_grid,phi_grid:phi_grid}
+			uc:uc,vc:vc,wc:wc,r_grid:r_grid,phi_grid:phi_grid,w_grid:w_grid}
 	err=0	
 	GET_OUT:
 END
@@ -279,7 +292,7 @@ PRO prepare_fida,inputs,grid,fida,chords
 		err=0
 	endelse
 	chords={nchan:fida.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:fida.sigma_pi_ratio,$
-			xlos:xlos,ylos:ylos,zlos:zlos,headsize:fida.headsize,los:los,weight:weight,err:err}
+			xlos:xlos,ylos:ylos,zlos:zlos,headsize:fida.headsize,opening_angle:fida.opening_angle,los:los,weight:weight,err:err}
 END
 
 PRO transp_fbeam,inputs,grid,denf,err
@@ -310,6 +323,18 @@ PRO transp_fbeam,inputs,grid,denf,err
 	ncdf_varget, cdfid,'RSURF', rsurf    ; flux surface
 	ncdf_varget, cdfid,'ZSURF', zsurf    ; flux surface
 	NCDF_Close,cdfid
+	ngrid=n_elements(r2d)
+	;;================================
+	;; get tranpped -passing boundary
+	;;================================
+	rmin=fltarr(ngrid)
+	for i=0,ngrid -1 do begin
+		dummy=min((rsurf-r2d[i])^2+(zsurf-z2d[i])^2,index)
+		index = array_indices(rsurf, index)
+		rmin[i]=min(rsurf[*,index[1]])
+    endfor
+	pitch_boundary=sqrt(1.-rmin[*]/r2d[*])
+	
 	;; ----------- Check the time
 	if abs(inputs.time-cdf_time) gt 0.02 then begin
 		print, ' CDF file time:',cdf_time 
@@ -324,93 +349,79 @@ PRO transp_fbeam,inputs,grid,denf,err
 	;; and d_omega/4Pi. omega is the solild angle in 3D velocity space. In
 	;; order to transform this to a function depending on pitch instead
 	;; of d_omega/4PI, one has to multiply by 0.5!
-	fbm=fbm*0.5
-	;;------------Cut off energy
-	;print,'EMIN: ',inputs.emin
-	;print,'EMAX: ',inputs.emax
-	w=where(energy ge inputs.emin and energy le inputs.emax)
-	energy=energy[w]     
-	fbm=fbm[w,*,*]
-	index=where(fbm lt 0.,nind) 
-	if nind gt 0. then fbm[index]=0.d0
+	fbm*=0.5  
+	;; make sure that fbm is >=0:
+	fbm>=0.
+	;;loading finished
+
+	;; TRANSP defines the pitch along the current direction. In
+	;; contrast, FIDASIM uses pitch along the B-field! Therefore,
+	;; reverse the pitch coordinate in fbm!
+	npitch=n_elements(pitch)
+	index=npitch-(indgen(npitch)+1)
+	fbm[*,*,*]=fbm[*,index,*]
+	;;----------- select energy range -------
+	index=where(energy ge inputs.emin and energy le inputs.emax,nenergy)
+	energy=energy[index]     
+	fbm=fbm[index,*,*]
+	dE      = energy[2] - energy[1]
+	emin=(float(energy[0])         - float(0.5*dE))>0.
+	emax=float(energy[nenergy-1]) + float(0.5*dE)
+	print, 'Energy min/max:', emin,emax
+	;; --------- select Pitch range --------
+	index=where(pitch ge inputs.pmin and pitch le inputs.pmax,npitch)
+	pitch=pitch[index] 
+	fbm=fbm[*,index,*]   
+	dP  = abs(pitch[2]  - pitch[1])
+	pmin=(float(pitch[0])       - float(0.5*dP))>(-1)
+	pmax=(float(pitch[npitch-1])+ float(0.5*dP))<1
+	print, 'Pitch min/max:', pmin,pmax
 	
 	;;-----------store distribution funciton in binary file
 	file =inputs.result_dir+inputs.runid+'/transp_fbm.bin'
-	sz=size(FBM)
-	nenergy=sz(1)
-	npitch=sz(2)
-	ngrid=sz(3)
 	openw, lun, file, /get_lun
+	writeu,lun , strmid(inputs.cdf_file,strlen(inputs.cdf_file)-17,17)
+	writeu,lun , double(cdf_time)
+	;; SPATIAL GRID
 	writeu,lun , long(ngrid)
-	for i=0L,ngrid-1 do writeu ,lun , float(r2d[i])
-	for i=0L,ngrid-1 do writeu ,lun , float(z2d[i])
+	writeu,lun , double(r2d[*])
+	writeu,lun , double(z2d[*])
+	writeu,lun , double(bmvol[*])
+	;; ENERGY GRID
 	writeu,lun , long(nenergy)
-	writeu,lun , double(inputs.emin)
-	writeu,lun , double(inputs.emax)
-	for i=0L,nenergy-1 do writeu ,lun , double(energy[i])
+	writeu,lun , double(emin)
+	writeu,lun , double(emax)
+	writeu,lun , double(energy[*])
+	;; PITCH GRID
 	writeu,lun , long(npitch)
-	writeu,lun , double(pitch[0])
-	writeu,lun , double(pitch[npitch-1])
-	for i=0L,npitch-1 do writeu ,lun , double(pitch[i])
-	for i=0L,nenergy-1 do begin
-		for j=0L,npitch-1 do begin
-			for k=0L,ngrid-1 do begin    
-				writeu ,lun , float(FBM[i,j,k]/max(FBM[*,*,k])) ;; normalized
-			endfor
-		endfor
-	endfor
+	writeu,lun , double(pmin)
+	writeu,lun , double(pmax)
+	writeu,lun , double(pitch[*])
+	writeu,lun , double(FBM[*,*,*]) 
 	close,lun
-	free_lun, lun
-	print, 'TRANSP distribution stored in BINARY: '+file
+	free_lun, lun 
+	print, 'TRANSP distribution in: '+file
 	
-	;;----------Determine fast-ion density averaged over pitch and energy
-	dE      = energy[2] - energy[1]
-	dpitch  = pitch[2]  - pitch[1]
-	fdens=total(reform(total(fbm,1)),1)*dE*dpitch
 	;help,fdens,r2d,z2d
 	;plot,r2d,fdens,color=0,background=255 
 	;; ------map fdens on FIDASIM grid and sort out
 	;; ------points outside the separatrix
-	;;------Determine FIDAsim grid to map distribution function
-	r_grid=fltarr(inputs.nx,inputs.ny,inputs.nz)
-	z_grid=r_grid
-	for i=0L,inputs.nx-1 do begin
-		for j=0L,inputs.ny-1 do begin
-			for k=0L,inputs.nz-1 do begin
-				jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
-				r_grid[i,j,k]=grid.r_grid[jj]
-				;z_grid[i,j,k]=grid.wc[jj]
-			endfor      
-		endfor
-	endfor 
-	f3d=dblarr(inputs.nx,inputs.ny,inputs.nz)*0.d0
+	fdens=total(reform(total(fbm,1)),1)*dE*dP
+	denf=dblarr(grid.nx,grid.ny,grid.nz)*0.d0
 	if ngrid le 220 then width=6. else width=4.
-	for j=0L,inputs.ny-1 do begin
-		rout=reform(r_grid[*,j,0])
+	for j=0L,grid.ny-1 do begin
+		rout=reform(grid.r_grid[*,j,0])
 		zout=grid.zzc[*]
-		;zout=reform(z_grid[i,j,*])
-		TRIANGULATE, r2d, z2d, tr     
+		TRIANGULATE, r2d, z2d, tr
 		fdens2=griddata(r2d,z2d,fdens,xout=rout,yout=zout,/grid,/SHEPARDS,triangles=tr)
 		for i=0L,inputs.nx-1 do begin
 			for k=0L,inputs.nz-1 do begin
-				r=rout[i]
-				z=zout[k]
-				a=sqrt((z2d-z)^2+(r2d-r)^2)
-				amin=min(a)
+				a=sqrt((z2d-zout[k])^2+(r2d-rout[i])^2)
 				;; only write fdens2 if it is close to r2d,z2d grid
-				if amin le width then f3d[i,j,k]=fdens2[i,k]         
+				if min(a) le width then denf[i,j,k]=fdens2[i,k] >0.           
 			endfor
-		endfor 
-	endfor
-	denf=dblarr(grid.ng)*0.d0   
-	for i=0L,inputs.nx-1 do begin
-		for j=0L,inputs.ny-1 do begin
-			for k=0L,inputs.nz-1 do begin
-				jj=i+inputs.nx*j+inputs.nx*inputs.ny*k
-				denf[jj]=f3d[i,j,k] >0.
-			endfor      
 		endfor
-	endfor 
+	endfor
 	err=0
 	GET_OUT:
 END
@@ -439,15 +450,15 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	print,total(deni)/total(denp)*100. ,' percent of impurities'
 	
 	;;Fast-ion density
-	if keyword_set(inputs.nofida) then begin
-    	denf=dene*0.d0
-  	endif else begin
+	if inputs.sim_fida ne 0 and inputs.nr_fast gt 1 then begin
      	transp_fbeam,inputs,grid,denf,terr
 		if terr eq 1 then begin
 			print,'ERROR: FAILED TO MAP FAST ION DENSITY'
 			err=1
 			goto,GET_OUT
 		endif
+  	endif else begin
+		denf=dene*0.d0
   	endelse
 
 	;;Electron temperature
@@ -456,7 +467,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	
 	;;Ion temperature   
 	ti = 1.d-3 * interpol(profiles.ti,profiles.rho,equil.rho_grid) > 0.001 ;keV
-	if max(ti) gt 10. or max(te) gt 10. then begin
+	if max(ti) gt 20. or max(te) gt 20. then begin
 		print, 'WARNING:'
 		print, 'Electron or Ion temperature greater than 10 keV'
 		print, 'Look at the tables, they might only consider'
@@ -467,27 +478,28 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	;;Plasma rotation	
 	vtor      =   interpol(profiles.vtor,profiles.rho,equil.rho_grid)*grid.r_grid ; [cm/s]  
 	vtor[ww]  =   replicate(0.0,nww)*grid.r_grid[ww]
-;	vtor      =   1.d2 * interpol(profiles.vtor,profiles.rho,equil.rho_grid) ; [cm/s]  
-;	vtor[ww]  =   replicate(0.0,nww)
 
-	vrot      =   fltarr(3,grid.ng)
-	vrot[0,*] = - sin(grid.phi_grid)*vtor 
-	vrot[1,*] =   cos(grid.phi_grid)*vtor
-	vrot[2,*] =   0.d0 
+	vrotu = - sin(grid.phi_grid)*vtor 
+	vrotv =   cos(grid.phi_grid)*vtor
+	vrotw =   0.d0 
 
 	;;Rotate vector quantities to beam coordinates 
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
-	rotate_uvw,vrot,Arot,Brot,Crot,1,vrot_xyz ;;machine basis to beam basis
-	rotate_uvw,equil.b,Arot,Brot,Crot,1,b_xyz
-	rotate_uvw,equil.e,Arot,Brot,Crot,1,e_xyz
+	rotate_points,vrotu,vrotv,vrotw,Arot,Brot,Crot,vrotx,vroty,vrotz ;;machine basis to beam basis
+	rotate_points,equil.bu,equil.bv,equil.bw,Arot,Brot,Crot,bx,by,bz
+	rotate_points,equil.eu,equil.ev,equil.ew,Arot,Brot,Crot,ex,ey,ez
 
 	;; test if there are NANs or Infinites in the input profiels
 	index=where(finite([ti,te,dene,denp,zeff,denp,deni]) eq 0,nind)
 	if nind gt 0 then stop
 	;;-------SAVE-------
-	plasma={rho_grid:equil.rho_grid,b:b_xyz,e:e_xyz,ab:inputs.ab,ai:inputs.ai,te:te, $
-			ti:ti,vtor:vtor,vrot:vrot_xyz,vrot_uvw:vrot,dene:dene,denp:denp,deni:deni,denf:denf $
-			,zeff:zeff}
+	plasma={rho_grid:equil.rho_grid,$
+			bx:bx,by:by,bz:bz,ex:ex,ey:ey,ez:ez,$
+			bu:equil.bu,bv:equil.bv,bw:equil.bw,eu:equil.eu,ev:equil.ev,ew:equil.ew,$
+			ab:inputs.ab,ai:inputs.ai,$
+			vrotx:vrotx,vroty:vroty,vrotz:vrotz,$
+			vrotu:vrotu,vrotv:vrotv,vrotw:vrotw,$
+			te:te,ti:ti,vtor:vtor,dene:dene,denp:denp,deni:deni,denf:denf,zeff:zeff}
 	err=0
 	GET_OUT: 
 END
@@ -655,15 +667,15 @@ PRO prefida,input_pro,plot=plot
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file
-	printf,55,'# FIDASIM input file created: ', systime()
+	printf,55,'# FIDASIM input file created: ', systime(),' Version 2.1'
 	printf,55, inputs.install_dir
 	printf,55, inputs.shot         ,f='(i6,"         # shotnumber")'  
 	printf,55, inputs.time,f='(1f8.5,"       # time")'
 	printf,55, inputs.runid
-	printf,55,' ',inputs.fida_diag, '           # diagnostic'
-	printf,55,'# general settings:'
-	printf,55, inputs.no_spectra,f='(i2,"             # no spectra")'
-	printf,55, inputs.nofida,f='(i2,"             # only NBI+HALO")'
+	printf,55,' ',inputs.diag, '           # diagnostic'
+	printf,55,inputs.calc_birth,f='(i2,"             # calculate birth profile")'
+	printf,55,inputs.calc_spec,f='(i2,"             # calculate spectra")'
+	printf,55,inputs.ps,f='(i2,"             # plot ps output")'
 	printf,55, inputs.npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
     printf,55, inputs.guidingcenter,f='(i2,"             # 0 for full-orbit F")'
@@ -677,7 +689,7 @@ PRO prefida,input_pro,plot=plot
 	printf,55, inputs.wavel_start_wght,f='(1f12.5,"       # wavel_start")'
 	printf,55, inputs.wavel_end_wght,f='(1f12.5,"       # wavel_end")'
 	printf,55,'# Monte Carlo settings:'
-	printf,55, inputs.nr_fida,f='(i9,"      # number of FIDA mc particles")'  
+	printf,55, inputs.nr_fast,f='(i9,"      # number of FIDA mc particles")'  
 	printf,55, inputs.nr_ndmc,f='(i9,"      # number of NBI mc particles")' 
 	printf,55, inputs.nr_halo,f='(i9,"      # number of HALO mc particles")'
 	printf,55, inputs.impurity_charge,f='(i2,"             # Impurity charge")'
@@ -744,29 +756,29 @@ PRO prefida,input_pro,plot=plot
 	writeu,lun , long(inputs.nx)
 	writeu,lun , long(inputs.ny)
 	writeu,lun , long(inputs.nz)
-	for ix=0L,inputs.nx-1 do begin
-		for iy=0L,inputs.ny-1 do begin
-			for iz=0L,inputs.nz-1 do begin
-				i=ix+inputs.nx*iy+inputs.nx*inputs.ny*iz
-				writeu,lun $
-				, double(plasma.te[i])     , double(plasma.ti[i])    $
-				, double(plasma.dene[i])   , double(plasma.denp[i])  $
-				, double(plasma.deni[i])   , double(plasma.vrot[0,i])$
-				, double(plasma.vrot[1,i]) , double(plasma.vrot[2,i])$
-				, double(plasma.b[0,i])    , double(plasma.b[1,i])   $
-				, double(plasma.b[2,i])    , double(plasma.e[0,i])   $
-				, double(plasma.e[1,i])    , double(plasma.e[2,i])   $
-				, double(plasma.rho_grid[i]),double(plasma.denf[i])  $
-				, double(plasma.zeff[i])
-			endfor
-		endfor
-	endfor
+	writeu,lun , double(plasma.te)
+	writeu,lun , double(plasma.ti)
+	writeu,lun , double(plasma.dene)
+	writeu,lun , double(plasma.denp)
+	writeu,lun , double(plasma.deni)
+	writeu,lun , double(plasma.denf)
+	writeu,lun , double(plasma.vrotx)
+	writeu,lun , double(plasma.vroty)
+	writeu,lun , double(plasma.vrotz)
+	writeu,lun , double(plasma.zeff)
+	writeu,lun , double(plasma.bx)
+	writeu,lun , double(plasma.by)
+	writeu,lun , double(plasma.bz)
+	writeu,lun , double(plasma.ex)
+	writeu,lun , double(plasma.ey)
+	writeu,lun , double(plasma.ez)
+	writeu,lun , double(plasma.rho_grid)
 	close,lun
 	free_lun, lun
 	print, 'Plasma parameters stored in BINARY: '+file
 
 	;;WRITE LINE OF SIGHT (LOS) INFORMATION TO BINARY
-	if inputs.no_spectra ne 1 then begin
+	if inputs.calc_spec ne 1 then begin
 		file =inputs.result_dir+inputs.runid+'/los.bin'
 		los=chords.los
 		openw, lun, file, /get_lun
@@ -775,21 +787,14 @@ PRO prefida,input_pro,plot=plot
 			writeu,lun, double(chords.xlens[los[chan]])
 			writeu,lun, double(chords.ylens[los[chan]])
 			writeu,lun, double(chords.zlens[los[chan]])
-			writeu,lun, double(chords.headsize[los[chan]]) ;; headsize is used for NPA
 			writeu,lun, double(chords.xlos[los[chan]])
 			writeu,lun, double(chords.ylos[los[chan]])
 			writeu,lun, double(chords.zlos[los[chan]])
+			writeu,lun, double(chords.headsize[los[chan]]) ;; headsize is used for NPA
+			writeu,lun, double(chords.opening_angle[los[chan]])
+			writeu,lun, double(chords.sigma_pi_ratio[los[chan]])
 		endfor
-		writeu,lun , double(chords.sigma_pi_ratio)
-		for i=0L,inputs.nx-1 do begin
-			for j=0L,inputs.ny-1 do begin
-				for k=0L,inputs.nz-1 do begin
-					for chan=0L,n_elements(los)-1 do begin
-						writeu ,lun , float(chords.weight[i,j,k,chan])
-					endfor
-				endfor
-			endfor
-		endfor
+  		writeu,lun , double(chords.weight[*,*,*,*])
 		close,lun
 		free_lun, lun
 		print, 'LOS parameters stored in BINARY: '+file

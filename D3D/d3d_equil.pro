@@ -1,32 +1,3 @@
-FUNCTION sinterpol,v,x,u,sortt=sortt,_extra=_extra
-    if n_elements(sortt) lt 1 then sortt=0
-
-    if sortt then begin
-        ind=sort(X)
-    endif else begin
-        ind=lindgen(n_elements(x))
-    endelse
-
-
-    return,interpol(v[ind],x[ind],u,_extra=_extra)
-END
-
-FUNCTION interpolatexy,x,y,z,xu,yu,_extra=_extra
-
-	;takes in vectors of x and y coordinates for z(x,y) data set
-	;interpolates z onto (xu,yu) coordinates has same keywords as 
-	;interpolate
-
-
-	indx=sinterpol(indgen(n_elements(x)),x,xu,sortt=1)
-	indy=sinterpol(indgen(n_elements(y)),y,yu,sortt=1)
-
-	int=interpolate(z,indx,indy,_extra=_extra)
-
-	return,int
-
-END
-
 FUNCTION d3d_equil,inputs,grid,det
 
 	equil={err:1}
@@ -47,10 +18,10 @@ FUNCTION d3d_equil,inputs,grid,det
 		endif
 	endelse
 
-    rhogrid=rho_rz(g,grid.r_grid/100.,grid.wc/100.,/do_linear)
+    rhogrid=rho_rz(g,grid.r_grid/100.,grid.w_grid/100.,/do_linear)
 
 	calculate_bfield,bp,br,bphi,bz,g
-;	help,bp,br,bphi,bz
+;	help,bp,br,bphi,bz1
 	;; Get radial electric field on efit's grid from potential
 	;; epoten is on a grid of equally spaced points in psi from g.ssimag to g.ssibry
 	dpsi=(g.ssibry-g.ssimag)/(n_elements(g.epoten)-1)
@@ -66,23 +37,25 @@ FUNCTION d3d_equil,inputs,grid,det
 	endfor
 	; E = - grad(Phi)    EFIT units should be V/m
 	er=-(shift(epot,-1,0) - shift(epot,1,0))/(g.r[2]-g.r[0])
-	ez=-(shift(epot,0,-1) - shift(epot,0,1))/(g.z[2]-g.z[0])
+	ez1=-(shift(epot,0,-1) - shift(epot,0,1))/(g.z[2]-g.z[0])
 	
 	;; Interpolate cylindrical fields onto (x,y,z) mesh then rotate vectors
-	b=fltarr(3,grid.ng) & e=fltarr(3,grid.ng)
-	for l=0l,grid.ng-1 do begin
-		rgrid=(.01*grid.r_grid[l] - g.r[0])/(g.r[1]-g.r[0]) ; in grid units
-		zgrid=(.01*grid.wc[l] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
+	bx=dblarr(grid.nx,grid.ny,grid.nz) & by=bx & bz=bx
+	ex=dblarr(grid.nx,grid.ny,grid.nz) & ey=ex & ez=ex	
+	
+	for i=0L,grid.nx-1 do for j=0L,grid.ny-1 do for k=0L,grid.nz-1 do begin
+		rgrid=(.01*grid.r_grid[i,j,k] - g.r[0])/(g.r[1]-g.r[0]) ; in grid units
+		zgrid=(.01*grid.w_grid[i,j,k] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
 		bcylr=interpolate(br,[rgrid],[zgrid])
 		ecylr=interpolate(er,[rgrid],[zgrid])
 		bcylphi=interpolate(bphi,[rgrid],[zgrid])
-		e[2,l]=interpolate(ez,[rgrid],[zgrid])
-		b[2,l]=interpolate(bz,[rgrid],[zgrid])
-		cph=cos(grid.phi_grid[l]) & sph=sin(grid.phi_grid[l])
-		b[0,l]=(cph*bcylr - sph*bcylphi)
-		b[1,l]=(sph*bcylr + cph*bcylphi)
-		e[0,l]=cph*ecylr
-		e[1,l]=sph*ecylr
+		ez[i,j,k]=interpolate(ez1,[rgrid],[zgrid])
+		bz[i,j,k]=interpolate(bz1,[rgrid],[zgrid])
+		cph=cos(grid.phi_grid[i,j,k]) & sph=sin(grid.phi_grid[i,j,k])
+		bx[i,j,k]=(cph*bcylr - sph*bcylphi)
+		by[i,j,k]=(sph*bcylr + cph*bcylphi)
+		ex[i,j,k]=cph*ecylr
+		ey[i,j,k]=sph*ecylr
 	endfor
 	
 	if inputs.f90brems eq 0 then begin
@@ -116,7 +89,7 @@ FUNCTION d3d_equil,inputs,grid,det
 		rho_chords={rhos:rhospath,ds:ds}
 	endif else rho_chords={rhos:0,ds:0}
 
-	equil={g:g,rho_grid:rhogrid,rho_chords:rho_chords,b:double(b),e:double(e),err:0}
+	equil={g:g,rho_grid:rhogrid,rho_chords:rho_chords,bx:bx,by:by,bz:bz,ex:ex,ey:ey,ez:ez,err:0}
 	GET_OUT:
 	return,equil
 END

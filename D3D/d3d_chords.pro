@@ -163,6 +163,6 @@ FUNCTION d3d_chords,shot,fida_diag
 	;;SAVE IN FIDA STRUCTURE
 	fida={nchan:nchan,diag:fida_diag,xlos:double(xlos),ylos:double(ylos),zlos:double(zlos),$
 		  xlens:double(xhead),ylens:double(yhead),zlens:double(zhead),$
-		  sigma_pi_ratio:1.d0,headsize:replicate(0.0,nchan)}
+		  sigma_pi_ratio:replicate(1.d0,nchan),headsize:replicate(0.0,nchan),opening_angle:replicate(0.0,nchan)}
 	return,fida
 END

@@ -20,7 +20,7 @@ FUNCTION d3d_equil,inputs,grid,det
 
     rhogrid=rho_rz(g,grid.r_grid/100.,grid.w_grid/100.,/do_linear)
 
-	calculate_bfield,bp,br,bphi,bz,g
+	calculate_bfield,bp,br,bphi,bz1,g
 ;	help,bp,br,bphi,bz1
 	;; Get radial electric field on efit's grid from potential
 	;; epoten is on a grid of equally spaced points in psi from g.ssimag to g.ssibry

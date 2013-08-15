@@ -12,7 +12,7 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 	nbi=d3d_beams(inputs)
 	
 	;;GET CHORD GEOMETRY
-	fida=d3d_chords(inputs.shot,inputs.fida_diag)
+	fida=d3d_chords(inputs.shot,inputs.diag)
 
 	;;GET PROFILES
 	profiles=d3d_profiles(inputs)

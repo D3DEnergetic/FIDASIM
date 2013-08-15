@@ -20,9 +20,9 @@ PRO rotate_points,x0,y0,z0,Arot,Brot,Crot,xp,yp,zp
     yp=transpose(xyz_p[1,*])
     zp=transpose(xyz_p[2,*])
     if size(x0,/n_dimensions) ne 1 then begin
-		xp=reform(xp,size(x0,/dimensions)
-		yp=reform(yp,size(y0,/dimensions)
-		zp=reform(zp,size(z0,/dimensions)
+		xp=reform(xp,size(x0,/dimensions))
+		yp=reform(yp,size(y0,/dimensions))
+		zp=reform(zp,size(z0,/dimensions))
 	endif
 END
 
@@ -108,15 +108,21 @@ PRO make_fida_grid,inputs,grid,err
 	rgrid=sqrt(uc^2+vc^2)
 	phigrid=atan(vc,uc)
 	
-	r_grid=dblarr(nx,ny,nz) & phi_grid=dblarr(nx,ny,nz) & w_grid=dblarr(nx,ny,nz)
+	r_grid=dblarr(nx,ny,nz) & phi_grid=r_grid
+	w_grid=dblarr(nx,ny,nz) & u_grid=w_grid & v_grid=w_grid
+	z_grid=dblarr(nx,ny,nz) & x_grid=z_grid & y_grid=z_grid
 	for i=0L,nx-1 do for j=0L,ny-1 do for k=0L,nz-1 do begin
 		l=i+nx*j+nx*ny*k
-		r_grid[i,j,k]=rgrid[l] & phi_grid[i,j,k]=phigrid[l] & w_grid[i,j,k]=wc[l]
+		r_grid[i,j,k]=rgrid[l] & phi_grid[i,j,k]=phigrid[l]
+		u_grid[i,j,k]=uc[l] & v_grid[i,j,k]=vc[l] & w_grid[i,j,k]=wc[l]
+		x_grid[i,j,k]=xc[l] & y_grid[i,j,k]=yc[l] & z_grid[i,j,k]=zc[l]
 	endfor
 	
 	grid={nx:nx,ny:ny,nz:nz,x:x,y:y,z:z,xx:xx,yy:yy,zz:zz,xc:xc,yc:yc,zc:zc,xxc:xxc,yyc:yyc,zzc:zzc,$
 			dx:dx,dy:dy,dz:dz,dr:dr,drmin:drmin,dv:dv,ng:ng,u:u,v:v,w:w,$
-			uc:uc,vc:vc,wc:wc,r_grid:r_grid,phi_grid:phi_grid,w_grid:w_grid}
+			uc:uc,vc:vc,wc:wc,r_grid:r_grid,phi_grid:phi_grid,$
+			w_grid:w_grid,v_grid:v_grid,u_grid:u_grid,$
+			x_grid:x_grid,y_grid:y_grid,z_grid:z_grid}
 	err=0	
 	GET_OUT:
 END
@@ -481,13 +487,13 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 
 	vrotu = - sin(grid.phi_grid)*vtor 
 	vrotv =   cos(grid.phi_grid)*vtor
-	vrotw =   0.d0 
+	vrotw =   0.d0*vrotu 
 
 	;;Rotate vector quantities to beam coordinates 
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
 	rotate_points,vrotu,vrotv,vrotw,Arot,Brot,Crot,vrotx,vroty,vrotz ;;machine basis to beam basis
-	rotate_points,equil.bu,equil.bv,equil.bw,Arot,Brot,Crot,bx,by,bz
-	rotate_points,equil.eu,equil.ev,equil.ew,Arot,Brot,Crot,ex,ey,ez
+	rotate_points,equil.bx,equil.by,equil.bz,Arot,Brot,Crot,bx,by,bz
+	rotate_points,equil.ex,equil.ey,equil.ez,Arot,Brot,Crot,ex,ey,ez
 
 	;; test if there are NANs or Infinites in the input profiels
 	index=where(finite([ti,te,dene,denp,zeff,denp,deni]) eq 0,nind)
@@ -495,7 +501,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	;;-------SAVE-------
 	plasma={rho_grid:equil.rho_grid,$
 			bx:bx,by:by,bz:bz,ex:ex,ey:ey,ez:ez,$
-			bu:equil.bu,bv:equil.bv,bw:equil.bw,eu:equil.eu,ev:equil.ev,ew:equil.ew,$
+			bu:equil.bx,bv:equil.by,bw:equil.bz,eu:equil.ex,ev:equil.ey,ew:equil.ez,$
 			ab:inputs.ab,ai:inputs.ai,$
 			vrotx:vrotx,vroty:vroty,vrotz:vrotz,$
 			vrotu:vrotu,vrotv:vrotv,vrotw:vrotw,$
@@ -636,7 +642,7 @@ PRO prefida,input_pro,plot=plot
 	endif else err=0
 
 	;;FIDA PRE PROCESSING 
-	if inputs.no_spectra ne 1 then begin
+	if inputs.calc_spec eq 1 then begin
 		prepare_fida,inputs,grid,fida,chords
 		if chords.err eq 1 then begin
 			print,'FIDA PREPROCESSING FAILED. EXITING...'

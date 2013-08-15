@@ -670,6 +670,10 @@ PRO prefida,input_pro,plot=plot
 		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,nbgeom,plasma
 	endif
 
+	;;SAVE STRUCTURES 
+	file = inputs.result_dir+inputs.runid+'/'+inputs.runid+'.sav'
+	save,inputs,grid,profiles,fida,nbi,equil,nbgeom,chords,plasma,filename=file
+
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file

@@ -10,56 +10,74 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;IN THIS SECTION YOU CAN USE WHATEVER ROUTINES 
 	;;YOU WANT SO LONG AS YOU DEFINE THE OUTPUT STRUCTURES
 	;;CONTAIN AT LEAST THE FOLLOWING TAGS
-	
-	;;** Structure <10d7c568>, 13 tags, length=168, data length=164, refs=1:
-	;;   EINJ            DOUBLE           74.369202
-	;;   PINJ            DOUBLE           2.0655587
-	;;   FULL            DOUBLE          0.53365599
-	;;   HALF            DOUBLE          0.27345340
-	;;   THIRD           DOUBLE          0.19289061
-	;;   XYZ_SRC         DOUBLE    Array[3]
-	;;   XYZ_POS         DOUBLE    Array[3]
-	;;   BMWIDRA         DOUBLE           6.0000000
-	;;   BMWIDZA         DOUBLE           24.000000
-	;;   DIVY            DOUBLE    Array[3]
-	;;   DIVZ            DOUBLE    Array[3]
-	;;   FOCY            FLOAT            1.e+06
-	;;   FOCZ            DOUBLE           1000.0000
 
-	;;** Structure <10d7aeb8>, 9 tags, length=288, data length=288, refs=1:
-	;;   NCHAN           LONG                10
-	;;   XMID            FLOAT     Array[10]
-	;;   YMID            FLOAT     Array[10]
-	;;   ZMID            FLOAT     Array[10]
-	;;   XLENS           FLOAT     Array[10]
-	;;   YLENS           FLOAT     Array[10]
-	;;   ZLENS           FLOAT     Array[10]
-	;;   SIGMA_PI_RATIO  FLOAT           1.00000
-	;;   HEADSIZE        FLOAT     Array[10]
+	;;	IDL> help,fida 
+	;;	** Structure <1d447c48>, 11 tags, length=728, data length=724, refs=1:
+	;;	   NCHAN           LONG                11
+	;;	   DIAG            STRING    'OBLIQUE'
+	;;	   XLOS            DOUBLE    Array[11]
+	;;	   YLOS            DOUBLE    Array[11]
+	;;	   ZLOS            DOUBLE    Array[11]
+	;;	   XLENS           DOUBLE    Array[11]
+	;;	   YLENS           DOUBLE    Array[11]
+	;;	   ZLENS           DOUBLE    Array[11]
+	;;	   SIGMA_PI_RATIO  DOUBLE    Array[11]
+	;;	   HEADSIZE        FLOAT     Array[11]
+	;;	   OPENING_ANGLE   FLOAT     Array[11]
 
-	;;** Structure <10dc9e28>, 5 tags, length=3380784, data length=3380772, refs=1:
-	;;   RHO_GRID        FLOAT     Array[120000]
-	;;	 RHO_CHORDS		 STRUC	   STRUCTURE
-	;;   B               FLOAT     Array[3, 120000]
-	;;   E               FLOAT     Array[3, 120000]
+	;;	IDL> help,equil
+	;;	** Structure <1d474638>, 10 tags, length=6636160, data length=6636138, refs=1:
+	;;	   RHO_GRID        FLOAT     Array[40, 60, 50]
+	;;	   RHO_CHORDS      STRUCT    -> <Anonymous> Array[1]
+	;;	   BX              DOUBLE    Array[40, 60, 50]
+	;;	   BY              DOUBLE    Array[40, 60, 50]
+	;;	   BZ              DOUBLE    Array[40, 60, 50]
+	;;	   EX              DOUBLE    Array[40, 60, 50]
+	;;	   EY              DOUBLE    Array[40, 60, 50]
+	;;	   EZ              DOUBLE    Array[40, 60, 50]
+	;;	   ERR             INT              0
 
-	;;** Structure <10dc9e28>, 5 tags, length=3380784, data length=3380772, refs=1:
-	;;   RHOS			 DOUBLE    Array[4000,10] ;;10 = number of channels
-	;;   DS				 FLOAT 	   0.30000		  ;;Step size in cm
+	;;	IDL> help,equil.rho_chords
+	;;	** Structure <1d48bf08>, 2 tags, length=352008, data length=352004, refs=2:
+	;;	   RHOS            DOUBLE    Array[4000, 11]
+	;;	   DS              FLOAT          0.300000
+	;;
 
-	;;** Structure <10d955b8>, 8 tags, length=3648, data length=3642, refs=1:
-	;;   RHO             FLOAT     Array[101]
-	;;   TE              DOUBLE    Array[101]
-	;;   TI              DOUBLE    Array[101]
-	;;   VTOR            FLOAT     Array[101]
-	;;   DENE            DOUBLE    Array[101]
-	;;   ZEFF            FLOAT     Array[101]
+	;;	IDL> help,profiles
+	;;	** Structure <1d475698>, 7 tags, length=5816, data length=5810, refs=1:
+	;;	   RHO             DOUBLE    Array[121]
+	;;	   TE              DOUBLE    Array[121]
+	;;	   TI              DOUBLE    Array[121]
+	;;	   VTOR            DOUBLE    Array[121]
+	;;	   DENE            DOUBLE    Array[121]
+	;;	   ZEFF            DOUBLE    Array[121]
+	;;	   ERR             INT              0
+
+	;;	IDL> help,nbi
+	;;	** Structure <1d475af8>, 13 tags, length=168, data length=168, refs=1:
+	;;	   EINJ            DOUBLE           80.775734
+	;;	   PINJ            DOUBLE           2.4117758
+	;;	   FULL            DOUBLE          0.54850105
+	;;	   HALF            DOUBLE          0.28972649
+	;;	   THIRD           DOUBLE          0.16177245
+	;;	   XYZ_SRC         DOUBLE    Array[3]
+	;;	   XYZ_POS         DOUBLE    Array[3]
+	;;	   BMWIDRA         DOUBLE           6.0000000
+	;;	   BMWIDZA         DOUBLE           24.000000
+	;;	   DIVY            DOUBLE    Array[3]
+	;;	   DIVZ            DOUBLE    Array[3]
+	;;	   FOCY            DOUBLE           999999.90
+	;;	   FOCZ            DOUBLE           1000.0000
 
 	;;FOR CONVINIENCE HERE ARE THE MINIMUM STRUCTURE DEFINITIONS
 	equil={rho_grid:rho_grid,$	   			;;FIDA GRID IN MAGNETIC FLUX COORDINATES (RHO)
 		   rho_chords:rho_chords,$			;;STRUCTURE CONTAINING AN ARRAY OF RHO VALUES AND STEP SIZE IN [cm]
-		   b:b,$					   		;;MAGNETIC FIELD COMPONENTS AT GRID POINTS
-		   e:e }							;;ELECTRIC FIELD COMPONENTS AT GRID POINTS
+		   bx:bx,$					   		;;X MAGNETIC FIELD COMPONENT AT GRID POINTS
+		   by:by,$					   		;;Y MAGNETIC FIELD COMPONENT AT GRID POINTS
+		   bz:bz,$					   		;;Z MAGNETIC FIELD COMPONENT AT GRID POINTS
+		   ex:ex,$							;;X ELECTRIC FIELD COMPONENT AT GRID POINTS
+		   ey:ey,$							;;Y ELECTRIC FIELD COMPONENT AT GRID POINTS
+		   ez:ez }							;;Z ELECTRIC FIELD COMPONENT AT GRID POINTS
 
 	nbi={einj:einj,$				   		;;BEAM INJECTION ENERGY [keV]
 		 pinj:pinj,$				   		;;BEAM INJECTION POWER  [MW]
@@ -83,7 +101,8 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 		 xlens:xlens,$						;;X POS. OF LENS [cm]
 		 ylens:ylens,$						;;Y POS. OF LENS [cm]
  		 zlens:zlens,$						;;Z POS. OF LENS [cm]
-  		 headsize:headsize}					;;SIZE OF HEAD
+  		 headsize:headsize,$				;;SIZE OF HEAD
+		 opening_angle:opening_angle}		;;OPENING ANGLE
 
 	profiles={time:time,$					;;SHOT TIME
 			  rho:rho,$						;;RHO VALUES

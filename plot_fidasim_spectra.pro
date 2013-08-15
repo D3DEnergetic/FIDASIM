@@ -245,9 +245,6 @@ pro plot_fidasim_spectra,ps=ps,path=path
      if not keyword_set(ps) then read,dummy
   endfor ;; loop over channels
   if keyword_set(ps) then device, /close
-  wspec=fidasim.wfunct.central_wavel
-  spec=fidasim.spec
-  save,spec,radiance,wspec,filename='spec.sav'
   
 end
 

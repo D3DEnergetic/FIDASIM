@@ -2,14 +2,17 @@ FUNCTION d3d_equil,inputs,grid,det
 
 	equil={err:1}
 	;; Get eqdsk
-	if inputs.gfile ne '' then begin
-		gfiletest=findfile(inputs.gfile)
-		if gfiletest[0] eq '' then begin 
-			print,'FATAL ERROR in D3D_EQUIL: gfile ', inputs.gfile, ' not found'
-			goto,GET_OUT
-		endif
-		g=readg(inputs.gfile) 
+    time_str='00000'+strtrim(string(long(inputs.time*1000)),1)
+    time_str=strmid(time_str,4,/reverse_offset)
+    shot_str=strtrim(string(inputs.shot),1)
+    profile_str=shot_str+'.'+time_str
+    gfile=inputs.profile_dir+shot_str+'/g'+profile_str
+	gfiletest=findfile(gfile)
+	if gfiletest ne '' then begin
+		print,'RESTORING EQUILIBRIUM FROM GFILE'
+		g=readg(gfile) 
 	endif else begin
+		print,'FETCHING EQUILIBRIUM FROM MDS+'
 		g=readg(inputs.shot,inputs.time*1000,RUNID=inputs.equil,status=gerr)
 		if gerr ne 1 then begin
 			print,'READG FAILED'

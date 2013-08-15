@@ -485,6 +485,14 @@ pro load_fidasim_results,results,result_dir_in $
   endif else npa={npaipos:0}
 
 
+  ;;---------------------------------------------------
+  ;; READ TRANSP FBM FILE STORED IN RESULTS DIRECTORY
+  ;;---------------------------------------------------
+  if not keyword_set(no_fbm) then begin
+     read_fbm,result_dir,fbm_struct,pitch_sign_convention 
+  endif else begin
+     fbm_struct = {not_loaded:0}
+  endelse
 
   ;; -----------------------------------------------------------------
   ;; ----------------- LOAD THE WEIGHT FUNCTION ----------------------
@@ -495,7 +503,7 @@ pro load_fidasim_results,results,result_dir_in $
     openr, 55,  file
     readu,55 , idum & shot       = idum
     readu,55 , fdum & time       = fdum 
-    readu,55 , idum & ichan_wght = idum  & print,'chan selection:',ichan_wght
+    readu,55 , idum & ichan_wght = idum
     readu,55 , idum & nen        = idum
     readu,55 , fdum & dE     = fdum
     readu,55 , idum & npitch = idum
@@ -524,26 +532,102 @@ pro load_fidasim_results,results,result_dir_in $
     ;now revert to more common convention (to current) -> - sign.
     pitcharr*=pitch_sign_convention
     emax=max(energyarr)+0.5*dE
+
+  	shot=inputs.shot
+  	time=inputs.time
+  	if inputs.calc_wght eq 1 then begin
+     	wfunct=weight_tot
+     	fbm=fbm_struct
+     	nen_transp=n_elements(fbm.energy)
+     	npitch_transp=n_elements(fbm.pitch) 
+     	dE_transp=fbm.energy[1]-fbm.energy[0]
+     	dpitch_transp=abs(fbm.pitch[1]-fbm.pitch[0])
+     	radiance= fltarr(nchan,nwav)
+     	fbm_tot = fltarr(nchan,nwav)
+     	mean_fbm= fltarr(nen_transp,npitch_transp,nchan)
+  	endif    ;;Calculate synthetic spectra
+
+    for ichan=0, los.nchan-1 do begin
+     rlos=sqrt(los.xyzlos[ichan,0]^2 + $
+               los.xyzlos[ichan,1]^2)/100. ;m
+     zlos=los.xyzlos[ichan,2]/100. ;[m]
+     if inputs.calc_wght eq 1 then begin
+        if ichan_wght ne ichan and $
+           ichan_wght gt 0 then continue
+        ;; ------------------------------------------
+        ;;------------ CALCUATE mean value of fbm----
+        ;; ------------------------------------------
+        rad=0.d0
+        for i=0,coords.nx-1 do begin
+           for j=0,coords.ny-1 do begin
+              for k=0,coords.nz-1 do begin
+                 los_wght=detector.weight[i,j,k,ichan]
+                 if los_wght gt 0. then begin
+                    ;; determine mean values like the halo density along LOS
+                    wght=(  neutrals.fdens[i,j,k,2] + $
+                            neutrals.hdens[i,j,k,2] + $
+                            neutrals.tdens[i,j,k,2] + $
+                            neutrals.halodens[i,j,k,2]) * los_wght
+                    rad=rad+wght
+                    
+                    rrc=sqrt(coords.xxc[i]^2+coords.yyc[j]^2)
+                    zzc=coords.zzc[k]
+                    dr=2.       ;[cm]
+                    dz=2.       ;[cm]
+                    dummy=min((fbm.r2d-rrc+dr)^2+(fbm.z2d-zzc+dz)^2,fbm_index1)
+                    dummy=min((fbm.r2d-rrc-dr)^2+(fbm.z2d-zzc+dz)^2,fbm_index2)
+                    dummy=min((fbm.r2d-rrc+dr)^2+(fbm.z2d-zzc-dz)^2,fbm_index3)
+                    dummy=min((fbm.r2d-rrc-dr)^2+(fbm.z2d-zzc-dz)^2,fbm_index4)
+                    dummy=min((fbm.r2d-rrc)^2+(fbm.z2d-zzc)^2,fbm_index5)
+                    mean_fbm[*,*,ichan] = mean_fbm[*,*,ichan] + ( $
+                                       fbm.fbm[*,*,fbm_index1] + $
+                                       fbm.fbm[*,*,fbm_index2] + $
+                                       fbm.fbm[*,*,fbm_index3] + $
+                                       fbm.fbm[*,*,fbm_index4] + $
+                                       fbm.fbm[*,*,fbm_index5])/5.*wght 
+                 endif
+              endfor
+           endfor
+        endfor
+        mean_fbm[*,*,ichan]=mean_fbm[*,*,ichan]/rad
+        ;;------------------------------------------------------------
+        ;; map FBM on the energy and pitch grid of the weight function
+        ;;------------------------------------------------------------
+        mean_fbm2=fltarr(nen,npitch)
+        for ie=0,nen-1 do begin
+           dummy=min(abs(fbm.energy-energyarr[ie]),eindex)
+           for ip=0,npitch-1 do begin
+              dummy=min(abs(fbm.pitch-pitcharr[ip]),pindex)
+              mean_fbm2[ie,ip]=mean_fbm[eindex,pindex,ichan]
+              ;;[fast_ion/cm^3/dP/dE]
+           endfor
+        endfor
+        ;;------------------------------------------------------------
+        ;; ------ CALCULATE SYNTHETIC SPECTRA AND PROFIELES ----------
+        ;;------------------------------------------------------------
+        for ii=0,nwav-1 do begin
+           ;; PRODUCT with fast-ion distribution funciton
+           prod=replicate(0.,nen,npitch)
+           for ie=0,nen-1 do begin
+              for ip=0,npitch-1 do begin
+                 prod[ie,ip]=mean_fbm2[ie,ip]*wfunct[ichan,ii,ie,ip]
+                 ;;--> [ph/(s cm^2 dP keV)]
+              endfor
+           endfor
+           radiance[ichan,ii]=total(prod[*,*])*dE * $
+                              dpitch/(4.d0*!pi)*1.d4 / $
+                              dwav ;;--> [ph/(s m^2 sr nm)]
+        endfor
+     endif
+  endfor ;; loop over channels
+
     wfunct={nchan:nchan,ichan_wght:ichan_wght,nen:nen $
             ,dE:dE,emax:emax,emin:0.,npitch:npitch,dpitch:dpitch   $
             ,nwav:nwav,dwav:dwav,wavel_start:wavel_start,wavel_end:wavel_end   $
-            ,central_wavel:central_wavel,energyarr:energyarr,pitcharr:pitcharr $
+            ,central_wavel:central_wavel,wght_spec:transpose(radiance),energyarr:energyarr,pitcharr:pitcharr $
             ,weight_tot:weight_tot   $
             ,angle:angle,radius:radius}
  endif else wfunct={ichan_wght:0}
-
-
-
-
-  ;;---------------------------------------------------
-  ;; READ TRANSP FBM FILE STORED IN RESULTS DIRECTORY
-  ;;---------------------------------------------------
-  if not keyword_set(no_fbm) then begin
-     read_fbm,result_dir,fbm_struct,pitch_sign_convention 
-  endif else begin
-     fbm_struct = {not_loaded:0}
-  endelse
-
 
 
   ;; birth profile

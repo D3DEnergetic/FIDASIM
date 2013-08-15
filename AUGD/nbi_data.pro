@@ -13,6 +13,7 @@ pro nbi_data,inputs,einj,pinj,full,half,third,doplot=doplot,ps=ps
 ;=============================
 ; Get power
 ;=============================
+  libdefine
   tbeg=0.
   tend=10.
   name='PNIQ    '
@@ -113,25 +114,28 @@ pro nbi_data,inputs,einj,pinj,full,half,third,doplot=doplot,ps=ps
   
   part_mix1=fltarr(3)
   part_mix2=fltarr(3)
-  
-  part_mix1(0)=power_mix1(2)/(power_mix1(2)+2.*power_mix1(1)+3.*power_mix1(0))
-  part_mix1(1)=2.*power_mix1(1)/(power_mix1(2) $
-                                 +2.*power_mix1(1) $
-                                 +3.*power_mix1(0))
-  part_mix1(2)=3.*power_mix1(0)/(power_mix1(2) $
-                                 +2.*power_mix1(1) $
-                                 +3.*power_mix1(0)) 
-  
-  part_mix2(0)=power_mix2(2)/(power_mix2(2) $
-                              +2.*power_mix2(1)$
-                              +3.*power_mix2(0))
-  part_mix2(1)=2.*power_mix2(1)/(power_mix2(2) $
-                                 +2.*power_mix2(1) $
+  if total(power_mix1) gt 0 then begin
+     part_mix1(0)=   power_mix1(2)/(power_mix1(2) $
+                                    +2.*power_mix1(1) $
+                                    +3.*power_mix1(0))
+     part_mix1(1)=2.*power_mix1(1)/(power_mix1(2) $
+                                    +2.*power_mix1(1) $
+                                    +3.*power_mix1(0))
+     part_mix1(2)=3.*power_mix1(0)/(power_mix1(2) $
+                                    +2.*power_mix1(1) $
+                                    +3.*power_mix1(0)) 
+  endif
+  if total(power_mix2) gt 0 then begin
+     part_mix2(0)=power_mix2(2)/(power_mix2(2) $
+                                 +2.*power_mix2(1)$
                                  +3.*power_mix2(0))
-  part_mix2(2)=3.*power_mix2(0)/(power_mix2(2) $
-                                 +2.*power_mix2(1) $
-                                 +3.*power_mix2(0)) 
-  
+     part_mix2(1)=2.*power_mix2(1)/(power_mix2(2) $
+                                    +2.*power_mix2(1) $
+                                    +3.*power_mix2(0))
+     part_mix2(2)=3.*power_mix2(0)/(power_mix2(2) $
+                                    +2.*power_mix2(1) $
+                                    +3.*power_mix2(0)) 
+  endif
   full=[part_mix1(0), part_mix1(0), part_mix1(0), part_mix1(0), $
         part_mix2(0), part_mix2(0), part_mix2(0), part_mix2(0) ]
 
@@ -141,10 +145,9 @@ pro nbi_data,inputs,einj,pinj,full,half,third,doplot=doplot,ps=ps
   third=[part_mix1(2), part_mix1(2), part_mix1(2), part_mix1(2), $
          part_mix2(2), part_mix2(2), part_mix2(2), part_mix2(2) ]
  
-
-  print, ''
-  print, 'particle mix full:', full[[2,5]]
-  print, 'particle mix half:', half[[2,5]]
-  print, 'particle mix third:',third[[2,5]]
-  print, ''
+  ;; print, ''
+  ;; print, 'particle mix full:', full[[2,5]]
+  ;; print, 'particle mix half:', half[[2,5]]
+  ;; print, 'particle mix third:',third[[2,5]]
+  ;; print, ''
 end

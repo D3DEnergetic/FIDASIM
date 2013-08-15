@@ -1,4 +1,4 @@
-pro start_fidasim  
+pro start_birthsim  
   
   shot=28746
   time=4.421
@@ -12,10 +12,8 @@ pro start_fidasim
   !Path = !path+ ':'+root_dir
   
 
- ;; cfr_setup,shot,det
-;;  save,filename='TEST/cfr_setup.idl',det
-  restore,'TEST/cfr_setup.idl'
-  
+  det={xhead:0.,yhead:0.,zhead:0., headsize:0. $
+       ,nchan:0,xlos:[0.],ylos:[0.],zlos:[0.]}
 
   
   ;Definition of the simulation grid in machine coordinates
@@ -44,11 +42,11 @@ pro start_fidasim
            ,equil_exp:'AUGD',equil_diag:'EQH',equil_ed:0 $
            ,rhostr:'rho_tor' $    ;; use input profiles als rho_pol or rho_tor
            ,root_dir:root_dir $
-           ,fidasim_runid:string(shot,f='(i5)')+'fidasim' $;;runid of F90FIDASIM
+           ,fidasim_runid:string(shot,f='(i5)')+'birthsim' $;runid of F90FIDASIM
            ,isource:[2] $     ;; Beam source 
                       ;; Number of Monte Carlo particles
            ,nr_ndmc:5000 $  ;; Beam emission
-           ,nr_halo:50000 $ ;; Halo contribution
+           ,nr_halo:0 $ ;; Halo contribution
             ;; dimensions for the simulation grid
            ,dx:dx,dy:dy,dz:dz,nx:nx,ny:ny,nz:nz,xx:xx,yy:yy,zz:zz $
            ,rotate:[0] $
@@ -56,23 +54,23 @@ pro start_fidasim
            ,ydim1:ydim1 ,ydim2:ydim2 $
            ,zdim1:zdim1 ,zdim2:zdim2 $
            ;; Diagnostic settings
-           ,diag:'CFR' $     ;; name of the FIDA diag
+           ,diag:'' $     ;; name of the FIDA diag
            ,det:det $
            ,npa:[0] $           ;; do a simulation for NPA
-           ,calc_spec:[1] $     ;; if 1 then no spectra are calculated
+           ,calc_spec:[0] $     ;; if 1 then no spectra are calculated
            ,cdf_file:'TEST/28746A01_fi_1.cdf' $
            ,load_neutrals:[0] $ ;; load density from  existing file
-           ,calc_birth: [0]   $ ;; calculate birth profile
+           ,calc_birth: [1]   $ ;; calculate birth profile
            ;; FIDA/NPA simulation
-           ,nr_fast:100000   $ ;; FIDA
-           ,simfa:[1]        $ ;; simualte fast-ions
+           ,nr_fast:0   $ ;; FIDA
+           ,simfa:[0]        $ ;; simualte fast-ions
            ;; Fast-ion distribution function
            ,emin:0.   $ ;; minimum energy in FBM
            ,emax:100. $ ;; maximum energy in FBM
            ,pmin:-1.  $ ;; minimum pitch in FBM
            ,pmax:1.   $ ;; maximum pitch in FBM
            ;; weight functions:
-           ,calc_wght:[1]    $ ;; if 1 then weight functions are calculated
+           ,calc_wght:[0]    $ ;; if 1 then weight functions are calculated
            ,nr_wght:50       $ ;; Nr. of Pitches, energyies and gyro angles 
            ,ichan_wght:-1 $  ;; -1 for all channels, otherwise a given channel
            ,emax_wght:100. $ ;; maximum energy of weights
@@ -96,9 +94,7 @@ pro start_fidasim
   spawn, root_dir+'fidasim '+result_dir
 
   ;; plot the spectra
-  plot_fidasim_spectra,path=result_dir
-  ;; plot the neutral densities
-  plot_fidasim_neutrals,path=result_dir,/loga
+  plot_birth,path=result_dir
 
 end
 

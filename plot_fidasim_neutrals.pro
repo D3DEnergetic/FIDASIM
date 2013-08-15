@@ -1,4 +1,4 @@
-pro plot_fidasim_neutrals,path,ps=ps,only_halo=only_halo,only_beam=only_beam,loga=loga
+pro plot_fidasim_neutrals,ps=ps,path=path,only_halo=only_halo,only_beam=only_beam,loga=loga
   nlevs=15.
   linthick=1.
   set_plot,'X' & device, decomposed=0
@@ -20,13 +20,10 @@ pro plot_fidasim_neutrals,path,ps=ps,only_halo=only_halo,only_beam=only_beam,log
   tvlct,0,0,0,0
   !P.background=255 & !P.color=0 &  !p.multi=0 
 
-
-;  path=dialog_pickfile(path='RESULTS/',/directory)
-
-;  runid=strsplit(path,'/',/extract,count=nid)
-;  print, runid
-;  runid=runid[nid-1]
-  
+  if not keyword_set(path) then $
+     path=dialog_pickfile(path='RESULTS/',/directory)
+  runid=strsplit(path,'/',/extract,count=nid)
+  runid=runid[nid-1]
   load_fidasim_results, fidasim,path
   shot=fidasim.inputs.shot
 
@@ -68,7 +65,7 @@ pro plot_fidasim_neutrals,path,ps=ps,only_halo=only_halo,only_beam=only_beam,log
   for ix=0,nx-1 do begin
      for iy=0,ny-1 do begin
         for iz=0,nz-1 do begin
-           if fidasim.plasma.rho[ix,iy,iz] gt 1. then  $
+           if fidasim.plasma.rho_grid[ix,iy,iz] gt 1. then  $
               tot_dens_plasma[ix,iy,iz]=0.
         endfor
      endfor
@@ -217,7 +214,7 @@ pro plot_fidasim_neutrals,path,ps=ps,only_halo=only_halo,only_beam=only_beam,log
   ztit='Z [m]'
   rtit='R [m]'
   xmar=[8.0,9.]
-  rran=[0,2.5]
+  rran=[.8,2.5]
   zran=[-1.,1.]
 
   title='XY-integrated density [1/cm^2]' 

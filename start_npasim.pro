@@ -1,4 +1,4 @@
-pro start_fidasim  
+pro start_npasim  
   
   shot=28746
   time=4.421
@@ -12,10 +12,7 @@ pro start_fidasim
   !Path = !path+ ':'+root_dir
   
 
- ;; cfr_setup,shot,det
-;;  save,filename='TEST/cfr_setup.idl',det
-  restore,'TEST/cfr_setup.idl'
-  
+  npa_setup,det
 
   
   ;Definition of the simulation grid in machine coordinates
@@ -44,7 +41,7 @@ pro start_fidasim
            ,equil_exp:'AUGD',equil_diag:'EQH',equil_ed:0 $
            ,rhostr:'rho_tor' $    ;; use input profiles als rho_pol or rho_tor
            ,root_dir:root_dir $
-           ,fidasim_runid:string(shot,f='(i5)')+'fidasim' $;;runid of F90FIDASIM
+           ,fidasim_runid:string(shot,f='(i5)')+'npasim' $ ;;runid of F90FIDASIM
            ,isource:[2] $     ;; Beam source 
                       ;; Number of Monte Carlo particles
            ,nr_ndmc:5000 $  ;; Beam emission
@@ -56,10 +53,10 @@ pro start_fidasim
            ,ydim1:ydim1 ,ydim2:ydim2 $
            ,zdim1:zdim1 ,zdim2:zdim2 $
            ;; Diagnostic settings
-           ,diag:'CFR' $     ;; name of the FIDA diag
+           ,diag:'NPA' $     ;; name of the FIDA diag
            ,det:det $
-           ,npa:[0] $           ;; do a simulation for NPA
-           ,calc_spec:[1] $     ;; if 1 then no spectra are calculated
+           ,npa:[1] $           ;; do a simulation for NPA
+           ,calc_spec:[0] $     ;; if 1 then no spectra are calculated
            ,cdf_file:'TEST/28746A01_fi_1.cdf' $
            ,load_neutrals:[0] $ ;; load density from  existing file
            ,calc_birth: [0]   $ ;; calculate birth profile
@@ -72,7 +69,7 @@ pro start_fidasim
            ,pmin:-1.  $ ;; minimum pitch in FBM
            ,pmax:1.   $ ;; maximum pitch in FBM
            ;; weight functions:
-           ,calc_wght:[1]    $ ;; if 1 then weight functions are calculated
+           ,calc_wght:[0]    $ ;; if 1 then weight functions are calculated
            ,nr_wght:50       $ ;; Nr. of Pitches, energyies and gyro angles 
            ,ichan_wght:-1 $  ;; -1 for all channels, otherwise a given channel
            ,emax_wght:100. $ ;; maximum energy of weights
@@ -96,10 +93,7 @@ pro start_fidasim
   spawn, root_dir+'fidasim '+result_dir
 
   ;; plot the spectra
-  plot_fidasim_spectra,path=result_dir
-  ;; plot the neutral densities
-  plot_fidasim_neutrals,path=result_dir,/loga
-
+  plot_npa,path=result_dir
 end
 
 

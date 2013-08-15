@@ -479,7 +479,7 @@ contains
     allocate(brems(spec%nlambda))
     do i = 1,spec%nchan
       read(66) vb
-      spec%spectra(:,i,brems_type)=vb
+      result%spectra(:,i,brems_type)=vb
     enddo
     close(66)
     deallocate(brems)
@@ -3138,7 +3138,7 @@ program fidasim
   !! -----------------------------------------------------------------------
   !! --------------- CALCULATE/LOAD the BEAM and HALO DENSITY---------------
   !! -----------------------------------------------------------------------
-  if(inputs%load_neutrals.eq.1)then
+  if(inputs%load_neutrals.eq.1) then
      call read_neutrals()
   else
      !! ----------- ndmc (neutral density monte carlo ---------------- !! 
@@ -3150,12 +3150,13 @@ program fidasim
         call write_birth_profile()
      endif
      !! calculate level of bremsstrahlung
-     if(inputs%calc_spec.eq.1)then
+     if(inputs%calc_spec.eq.1) then
         if(inputs%f90brems.eq.1) then
            call bremsstrahlung
         else
            call read_bremsstrahlung
-     endif
+        end if
+     end if
      !! do the HALO calcualtion only if enough markers are defined!
      if(inputs%nr_halo.gt.10)then
         !! -------------------------- DCX (Direct charge exchange) ---------- !!

@@ -156,7 +156,7 @@ PRO nbi_geometry_transp,nbgeom, doplt=doplt,do_oplot_tor=do_oplot_tor $
              , focy: double(foclra)     , focz: double(foclza) $
              , divy: double(divra)      , divz: double(divza) $
              , bmwidra:double(bmwidra)  , bmwidza:double(bmwidza)  $
-             , xyz_src: xyz_src  }
+             , xyz_src: xyz_src, xyz_pos: xyz_pos  }
     
 
 ;==========

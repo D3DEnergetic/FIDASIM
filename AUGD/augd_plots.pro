@@ -35,8 +35,8 @@ PRO augd_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 	;----------------------------------------------
 	;;PLOT CROSS SECTION BEAM AND CHORDS 
 	window,1 & wset,1
-	plot,[0],[0],/nodata,xrange=[rmin,rmax], $
-            yrange=100.*[min(g.lim[1,*]),max(g.lim[1,*])],$
+	plot,[0],[0],/nodata,xrange=[0,300.], $
+            yrange=100.*[-1,1],$
 			color=0,background=255,title='ELEVATION',xtitle='R [cm]',ytitle='Z [cm]'
 
 	oplot,grid.r_grid,grid.w_grid,psym=3,color=0  

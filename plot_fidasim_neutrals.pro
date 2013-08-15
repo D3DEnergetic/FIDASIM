@@ -293,6 +293,5 @@ pro plot_fidasim_neutrals,ps=ps,path=path,only_halo=only_halo,only_beam=only_bea
   
   
   if keyword_set(ps) then device, /close
-  stop
 end                             ;of programm
 

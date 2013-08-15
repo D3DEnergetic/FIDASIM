@@ -523,7 +523,7 @@ FUNCTION sinterpol,v,x,u,sortt=sortt,_extra=_extra
 	return,interpol(v[ind],x[ind],u,_extra=_extra)
 END
 
-PRO brems,result_dir,det,profiles,equil
+PRO brems,inputs,det,profiles,equil
 	;; Calculates visible bremsstrahlung along FIDA sightlines
 	;; WWH 6/2013
 
@@ -580,13 +580,13 @@ PRO brems,result_dir,det,profiles,equil
         wgtr1=where(rhospath ge rhomax,nwgtr1)
         ;set emission at radii outside of max rho to zero
         if nwgtr1 ge 0 then vbepath[wgtr1]=0.0
-		vbline[i]=total(vbepath)*equil.rho_chords.ds*0.01   ; (ph/s-m2-nm-sr)
+		vbline[i]=total(vbepath)*equil.rho_chords.ds*0.001*inputs.dlambda*(4*!DPI)*1.d-4   ; (ph/s-m2-bin)
 	endfor  ; channel loop
 
 	;--------------------------------
 	; Save results
 	;--------------------------------
-	file =result_dir+'/bremsstrahlung.bin'
+	file =inputs.result_dir+inputs.runid+'/bremsstrahlung.bin'
 	openw, lun, file, /get_lun
 	for i=0,nchan-1 do writeu,lun, double(vbline[i])
 	close,lun
@@ -663,7 +663,7 @@ PRO prefida,input_pro,plot=plot
 
     ;; Calculate bremsstrahlung if desired
 	if inputs.f90brems eq 0 then $
-		brems,inputs.result_dir+inputs.runid,fida,profiles,equil
+		brems,inputs,fida,profiles,equil
 
     ;; Plot grid, beam, sightlines, and equilibrium
 	if keyword_set(plot) then begin
@@ -784,7 +784,7 @@ PRO prefida,input_pro,plot=plot
 	print, 'Plasma parameters stored in BINARY: '+file
 
 	;;WRITE LINE OF SIGHT (LOS) INFORMATION TO BINARY
-	if inputs.calc_spec ne 1 then begin
+	if inputs.calc_spec eq 1 or inputs.npa eq 1 then begin
 		file =inputs.result_dir+inputs.runid+'/los.bin'
 		los=chords.los
 		openw, lun, file, /get_lun

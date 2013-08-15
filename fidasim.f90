@@ -265,6 +265,8 @@ contains
     read(66,*) !# this was nofida...is now ps
     read(66,*) inputs%npa
     read(66,*) inputs%load_neutrals
+	read(66,*) inputs%guidingcenter
+    read(66,*) inputs%f90brems
     read(66,*) inputs%calc_wght
     read(66,*) !# weight function settings
     read(66,*) inputs%nr_wght
@@ -588,7 +590,7 @@ contains
     real(double), dimension(:,:,:), allocatable :: transp_fbm   
     filename=trim(adjustl(result_dir))//"/transp_fbm.bin"
     print*,'---- loading fast ion distribution function ----'
-    open(66,file=filename,access='stream')
+    open(66,form='unformatted',file=filename,access='stream')
     read(66) cdf_file
     read(66) cdf_time
     read(66) nzones
@@ -666,7 +668,7 @@ contains
     integer         :: i,j,k,p 
     character(100)  :: filename
     filename=trim(adjustl(result_dir))//"/birth.bin"    
-    open (66, file =filename,access='stream')
+    open (66, form='unformatted',file =filename,access='stream')
     write(66)real(inputs%shot_number,float )
     write(66)real(inputs%time)
     write(66)real(grid%Nx,float)
@@ -2848,7 +2850,7 @@ contains
   
     !! Open file for the outputs
     filename=trim(adjustl(result_dir))//"/weight_function.bin" 
-    open (66, file =filename,access='stream')
+    open (66,form='unformatted', file =filename,access='stream')
     write(66)inputs%shot_number
     write(66)real(inputs%time,float)
     write(66)inputs%ichan_wght 

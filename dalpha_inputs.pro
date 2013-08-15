@@ -77,7 +77,7 @@ pro dalpha_inputs,inputs,profiles
   BTIPsign=-1.d0              ; Bt and Ip are in the opposite direction   
   ab=2.01410178d0             ; atomic mass of beam [u]
   ai=2.01410178d0             ; atomic mass of hydrogenic plasma ions [u]
-  impurity_charge=5           ; 5: BORON, 6: carbon, 7: Nitrogen               
+  impurity_charge=6           ; 5: BORON, 6: carbon, 7: Nitrogen               
   ;;------------------------------------------------
   ;; Wavelength grid  
   lambdamin=6470.d0           ; minimum wavelength of wavelength grid[A] 
@@ -161,6 +161,8 @@ pro dalpha_inputs,inputs,profiles
   printf,55,inputs.ps,f='(i2,"             # plot ps output")'
   printf,55,inputs.npa          ,f='(i2,"             # NPA simulation")'
   printf,55,inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
+  printf,55, inputs.guidingcenter,f='(i2,"             # 0 for full-orbit F")'
+  printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
   printf,55,inputs.calc_wght,f='(i2,"             # calculate wght function")'
   printf,55,'# weight function settings:'
   printf,55,inputs.nr_wght,f='(i9,"      # number velocities")'

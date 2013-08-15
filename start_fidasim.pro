@@ -5,7 +5,7 @@ pro start_fidasim
 
 
   user=+GETENV('USER')
-  root_dir='/u/'+user+'/FIDASIM2/'
+  root_dir='/u/'+user+'/FIDASIM/'
 
   !Path = !path+ ':'+root_dir+'AUGD/'
   !Path = !path+ ':'+root_dir+'LIB/'
@@ -62,7 +62,9 @@ pro start_fidasim
            ,calc_spec:[1] $     ;; if 1 then no spectra are calculated
            ,cdf_file:'TEST/28746A01_fi_1.cdf' $
            ,load_neutrals:[0] $ ;; load density from  existing file
-           ,calc_birth: [0]   $ ;; calculate birth profile
+		   ,guidingcenter:[1] $ ;; 0 for full-orbit distribution function
+		   ,f90brems:[1] $ ;; 0 reads IDL v.b.
+		   ,calc_birth: [0]   $ ;; calculate birth profile
            ;; FIDA/NPA simulation
            ,nr_fast:100000   $ ;; FIDA
            ,simfa:[1]        $ ;; simualte fast-ions
@@ -92,13 +94,13 @@ pro start_fidasim
   ;; ----------------------------------------------------------
   dalpha_inputs,inputs,iprof
   ;; start the f90 routine
-  result_dir = inputs.root_dir + 'RESULTS/' + inputs.fidasim_runid
-  spawn, root_dir+'fidasim '+result_dir
+;  result_dir = inputs.root_dir + 'RESULTS/' + inputs.fidasim_runid
+;  spawn, root_dir+'fidasim '+result_dir
 
   ;; plot the spectra
-  plot_fidasim_spectra,path=result_dir
+;  plot_fidasim_spectra,path=result_dir
   ;; plot the neutral densities
-  plot_fidasim_neutrals,path=result_dir,/loga
+;  plot_fidasim_neutrals,path=result_dir,/loga
 
 end
 

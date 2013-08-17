@@ -574,16 +574,26 @@ pro load_fidasim_results,results,result_dir_in $
                             neutrals.tdens[i,j,k,2] + $
                             neutrals.halodens[i,j,k,2]) * los_wght
                     rad=rad+wght
-                    
-                    rrc=sqrt(coords.xxc[i]^2+coords.yyc[j]^2)
-                    zzc=coords.zzc[k]
+					xsub = coords.xxc[i] & ysub = coords.yyc[j] & zsub = coords.zzc[k]
+
+					xsub2 =  cos(inputs.alpha)*(cos(inputs.beta)*xsub + sin(inputs.beta)*zsub) $
+                              - sin(inputs.alpha)*ysub + inputs.origin[0]
+
+                    ysub2 =  sin(inputs.alpha)*(cos(inputs.beta)*xsub + sin(inputs.beta)*zsub) $
+                              + cos(inputs.alpha)*ysub + inputs.origin[1]
+
+                    zzc = -sin(inputs.beta)*xsub + cos(inputs.beta)*zsub + inputs.origin[2]
+
+                    rrc=sqrt(xsub2^2+ysub2^2)
+
                     dr=2.       ;[cm]
                     dz=2.       ;[cm]
-                    dummy=min((fbm.r2d-rrc+dr)^2+(fbm.z2d-zzc+dz)^2,fbm_index1)
-                    dummy=min((fbm.r2d-rrc-dr)^2+(fbm.z2d-zzc+dz)^2,fbm_index2)
-                    dummy=min((fbm.r2d-rrc+dr)^2+(fbm.z2d-zzc-dz)^2,fbm_index3)
-                    dummy=min((fbm.r2d-rrc-dr)^2+(fbm.z2d-zzc-dz)^2,fbm_index4)
-                    dummy=min((fbm.r2d-rrc)^2+(fbm.z2d-zzc)^2,fbm_index5)
+
+                    dummy=min((fbm.r2d-rrc+dr)^2.+(fbm.z2d-zzc+dz)^2.,fbm_index1)
+                    dummy=min((fbm.r2d-rrc-dr)^2.+(fbm.z2d-zzc+dz)^2.,fbm_index2)
+                    dummy=min((fbm.r2d-rrc+dr)^2.+(fbm.z2d-zzc-dz)^2.,fbm_index3)
+                    dummy=min((fbm.r2d-rrc-dr)^2.+(fbm.z2d-zzc-dz)^2.,fbm_index4)
+                    dummy=min((fbm.r2d-rrc)^2.+(fbm.z2d-zzc)^2.,fbm_index5)
                     mean_fbm[*,*,ichan] = mean_fbm[*,*,ichan] + ( $
                                        fbm.fbm[*,*,fbm_index1] + $
                                        fbm.fbm[*,*,fbm_index2] + $

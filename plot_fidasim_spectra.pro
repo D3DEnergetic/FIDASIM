@@ -113,8 +113,20 @@ pro plot_fidasim_spectra,ps=ps,path=path
                             fidasim.neutrals.halodens[i,j,k,2]) * los_wght
                     rad=rad+wght
                     
-                    rrc=sqrt(fidasim.coords.xxc[i]^2+fidasim.coords.yyc[j]^2)
-                    zzc=fidasim.coords.zzc[k]
+                    xsub = fidasim.coords.xxc[i] & ysub = fidasim.coords.yyc[j] & zsub = fidasim.coords.zzc[k]
+					alpha=fidasim.inputs.alpha & beta=fidasim.inputs.beta & origin=fidasim.inputs.origin
+
+                    xsub2 =  cos(alpha)*(cos(beta)*xsub + sin(beta)*zsub) $
+                              - sin(alpha)*ysub + origin[0]
+
+                    ysub2 =  sin(alpha)*(cos(beta)*xsub + sin(beta)*zsub) $
+                              + cos(alpha)*ysub + origin[1]
+
+                    zzc = -sin(beta)*xsub + cos(beta)*zsub + origin[2]
+
+                    rrc=sqrt(xsub2^2+ysub2^2)
+
+
                     dr=2.       ;[cm]
                     dz=2.       ;[cm]
                     dummy=min((fbm.r2d-rrc+dr)^2+(fbm.z2d-zzc+dz)^2,fbm_index1)

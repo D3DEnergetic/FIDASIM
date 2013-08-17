@@ -381,7 +381,7 @@ PRO transp_fbeam,inputs,grid,denf,err
 	dP  = abs(pitch[2]  - pitch[1])
 	pmin=(float(pitch[0])       - float(0.5*dP))>(-1)
 	pmax=(float(pitch[npitch-1])+ float(0.5*dP))<1
-	print, 'Pitch min/max:', pmin,pmax
+	print, 'Pitch  min/max:', pmin,pmax
 	
 	;;-----------store distribution funciton in binary file
 	file =inputs.result_dir+inputs.runid+'/transp_fbm.bin'
@@ -413,21 +413,22 @@ PRO transp_fbeam,inputs,grid,denf,err
 	;; ------map fdens on FIDASIM grid and sort out
 	;; ------points outside the separatrix
 	fdens=total(reform(total(fbm,1)),1)*dE*dP
-	denf=dblarr(grid.nx,grid.ny,grid.nz)*0.d0
+	a=dblarr(grid.ng)
 	if ngrid le 220 then width=6. else width=4.
-	for j=0L,grid.ny-1 do begin
-		rout=reform(grid.r_grid[*,j,0])
-		zout=grid.zzc[*]
-		TRIANGULATE, r2d, z2d, tr
-		fdens2=griddata(r2d,z2d,fdens,xout=rout,yout=zout,/grid,/SHEPARDS,triangles=tr)
-		for i=0L,inputs.nx-1 do begin
-			for k=0L,inputs.nz-1 do begin
-				a=sqrt((z2d-zout[k])^2+(r2d-rout[i])^2)
-				;; only write fdens2 if it is close to r2d,z2d grid
-				if min(a) le width then denf[i,j,k]=fdens2[i,k] >0.           
-			endfor
-		endfor
-	endfor
+	rout=reform(grid.r_grid,grid.ng)
+	zout=reform(grid.w_grid,grid.ng)
+	TRIANGULATE, r2d, z2d, tr
+	fdens2=griddata(r2d,z2d,fdens,xout=rout,yout=zout,/linear,triangles=tr)
+
+	;;set negative values to zero
+	fdens2=fdens2 >0.
+
+	;; only write fdens2 if it is close to r2d,z2d grid 
+	;;(this produced empty spots so i turned it off)
+;	for i=0L,grid.ng-1 do a[i]=min(sqrt((z2d-zout[i])^2+(r2d-rout[i])^2))
+;	ww=where(a gt width,nw)
+;	if nw ne 0 then fdens2[ww]=0.
+	denf=reform(fdens2,grid.nx,grid.ny,grid.nz)
 	err=0
 	GET_OUT:
 END
@@ -490,7 +491,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	vrotw =   0.d0*vrotu 
 
 	;;Rotate vector quantities to beam coordinates 
-	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
+	make_rot_mat,-inputs.alpha,-inputs.beta,Arot,Brot,Crot
 	rotate_points,vrotu,vrotv,vrotw,Arot,Brot,Crot,vrotx,vroty,vrotz ;;machine basis to beam basis
 	rotate_points,equil.bx,equil.by,equil.bz,Arot,Brot,Crot,bx,by,bz
 	rotate_points,equil.ex,equil.ey,equil.ez,Arot,Brot,Crot,ex,ey,ez
@@ -518,7 +519,6 @@ FUNCTION sinterpol,v,x,u,sortt=sortt,_extra=_extra
 	endif else begin
 		ind=lindgen(n_elements(x))
 	endelse
-
 
 	return,interpol(v[ind],x[ind],u,_extra=_extra)
 END
@@ -672,7 +672,7 @@ PRO prefida,input_pro,plot=plot
 
 	;;SAVE STRUCTURES 
 	file = inputs.result_dir+inputs.runid+'/'+inputs.runid+'.sav'
-	save,inputs,grid,profiles,fida,nbi,equil,nbgeom,chords,plasma,filename=file
+	save,inputs,grid,profiles,fida,nbi,equil,nbgeom,chords,plasma,filename=file,/compress
 
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
@@ -688,7 +688,6 @@ PRO prefida,input_pro,plot=plot
 	printf,55,inputs.ps,f='(i2,"             # plot ps output")'
 	printf,55, inputs.npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
-    printf,55, inputs.guidingcenter,f='(i2,"             # 0 for full-orbit F")'
     printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
 	printf,55, inputs.calc_wght,f='(i2,"             # calculate wght function")'
 	printf,55,'# weight function settings:'
@@ -714,6 +713,11 @@ PRO prefida,input_pro,plot=plot
 	printf,55, inputs.lambdamin,f='(1f9.3,"      # lambda min")'
 	printf,55, inputs.lambdamax,f='(1f9.3,"      # lambda max")'
 	printf,55,'# simulation grid: '
+	printf,55, inputs.origin[0],f='(1D,"      # x position of origin [cm]")' 
+	printf,55, inputs.origin[1],f='(1D,"      # y position of origin [cm]")' 
+	printf,55, inputs.origin[2],f='(1D,"      # z position of origin [cm]")' 
+	printf,55, inputs.alpha,f='(1D,"            # alpha")'
+	printf,55, inputs.beta,f='(1D,"            # beta")'
 	printf,55, inputs.nx,f='(1i3,"            # nx")'
 	printf,55, inputs.ny,f='(1i3,"            # ny")'
 	printf,55, inputs.nz,f='(1i3,"            # nz")'  

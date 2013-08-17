@@ -100,13 +100,16 @@ module application
      real(double), dimension(3,3) :: Crot 
   end type nbi_type
   type grid_type
-     real(double), dimension(3) :: dr    !! dx, dy, dz
-     real(double)               :: drmin !! min(dx,dy,dz)
-     real(double)               :: dv    !! volume of cells
-     integer(long)              :: Nx    !! Nr. of cells in x direction
-     integer(long)              :: Ny    !! Nr. of cells in y direction
-     integer(long)              :: Nz    !! Nr. of cells in z direction
-     integer(long)              :: ntrack!! Maximum Nr. of cells for tracking
+	 real(double), dimension(3) :: origin !! origin
+	 real(double)               :: alpha  !! rotation about z
+	 real(double)				:: beta   !! rotation about y/tilt
+     real(double), dimension(3) :: dr     !! dx, dy, dz
+     real(double)               :: drmin  !! min(dx,dy,dz)
+     real(double)               :: dv     !! volume of cells
+     integer(long)              :: Nx     !! Nr. of cells in x direction
+     integer(long)              :: Ny     !! Nr. of cells in y direction
+     integer(long)              :: Nz     !! Nr. of cells in z direction
+     integer(long)              :: ntrack !! Maximum Nr. of cells for tracking
      real(double), dimension(:), allocatable        :: xx,xxc
      real(double), dimension(:), allocatable        :: yy,yyc 
      real(double), dimension(:), allocatable        :: zz,zzc
@@ -196,7 +199,6 @@ module application
      !! general settings
      integer(long) :: calc_spec
      integer(long) :: load_neutrals
-     integer(long) :: guidingcenter  !! 0 for full-orbit F
      integer(long) :: f90brems       !! 0 to use IDL v.b.
      integer(long) :: npa 
      integer(long) :: calc_wght
@@ -265,7 +267,6 @@ contains
     read(66,*) !# this was nofida...is now ps
     read(66,*) inputs%npa
     read(66,*) inputs%load_neutrals
-	read(66,*) inputs%guidingcenter
     read(66,*) inputs%f90brems
     read(66,*) inputs%calc_wght
     read(66,*) !# weight function settings
@@ -292,7 +293,12 @@ contains
     read(66,*) spec%lambdamin
     read(66,*) spec%lambdamax
     spec%dlambda=(spec%lambdamax-spec%lambdamin)/spec%nlambda
-    read(66,*) !# simulation grid: 
+    read(66,*) !# simulation grid:
+    read(66,*) grid%origin(1)
+    read(66,*) grid%origin(2)
+    read(66,*) grid%origin(3)
+    read(66,*) grid%alpha 
+    read(66,*) grid%beta 
     read(66,*) grid%Nx 
     read(66,*) grid%Ny      
     read(66,*) grid%Nz
@@ -583,7 +589,7 @@ contains
     !! sub_grid
     integer         :: l,m,n,nxsub,nysub,nzsub
     real(double)    :: dxsub,dysub,dzsub
-    real(double)    :: xsub, ysub, rsub, zsub
+    real(double)    :: xsub, ysub,rsub,zsub,xsub2,ysub2,zsub2
     !! for transp input grid
     integer(long)   :: nzones
     real(double), dimension(:), allocatable     :: transp_r,transp_z,transp_vol
@@ -645,9 +651,15 @@ contains
                       do n=1,nzsub
                          xsub=grid%xx(i)+(l-0.5d0)*dxsub
                          ysub=grid%yy(j)+(m-0.5d0)*dysub
-                         rsub=sqrt(xsub**2+ysub**2)
                          zsub=grid%zz(k)+(n-0.5d0)*dzsub
-                         minpos=minloc((transp_r-rsub)**2+(transp_z-zsub)**2)
+						 !!transform into machine coordinates
+						 xsub2 =  cos(grid%alpha)*(cos(grid%beta)*xsub + sin(grid%beta)*zsub) &
+							  - sin(grid%alpha)*ysub + grid%origin(1)
+						 ysub2 =  sin(grid%alpha)*(cos(grid%beta)*xsub + sin(grid%beta)*zsub) & 
+							  + cos(grid%alpha)*ysub + grid%origin(2)
+						 zsub2 = -sin(grid%beta)*xsub + cos(grid%beta)*zsub + grid%origin(3)
+                    	 rsub=sqrt(xsub2**2+ysub2**2)
+                         minpos=minloc((transp_r-rsub)**2+(transp_z-zsub2)**2)
                          cell(i,j,k)%fbm(:,:)= cell(i,j,k)%fbm(:,:) &
                               + transp_fbm(:,:,minpos(1))
                       enddo
@@ -1038,16 +1050,16 @@ contains
     ri(1)=grid%xx(ac(1))+ grid%dr(1)*randomu(1)
     ri(2)=grid%yy(ac(2))+ grid%dr(2)*randomu(2) 
     ri(3)=grid%zz(ac(3))+ grid%dr(3)*randomu(3)  
-    if (inputs%guidingcenter.eq.1) then  ! WWH 
-      b_abs=cell(ac(1),ac(2),ac(3))%plasma%b_abs
-      b_norm=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:) 
-      one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2    
-      vxB(1)= (vi(2) * b_norm(3) - vi(3) * b_norm(2))
-      vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
-      vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
-      r_gyro(:)=vxB(:)*one_over_omega
-      ri(:)=ri(:)-r_gyro(:) !! '-'because v x B is towards the gyrocenter
-    endif    
+
+	!! this parts corrects for the fact that we are using gyro-center dist.
+    b_abs=cell(ac(1),ac(2),ac(3))%plasma%b_abs
+    b_norm=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:) 
+    one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2    
+    vxB(1)= (vi(2) * b_norm(3) - vi(3) * b_norm(2))
+    vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
+    vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
+    r_gyro(:)=vxB(:)*one_over_omega
+    ri(:)=ri(:)-r_gyro(:) !! '-'because v x B is towards the gyrocenter    
   end subroutine mc_start
 
 

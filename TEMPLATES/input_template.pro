@@ -64,8 +64,8 @@ origin=[0.,0.,0.]	;; If using different a coordinate system, this is the origin
 					;; in machine coordinates of the new system
 
 alpha=0.0		    ;; Rotation angle in radians from +x about z axis that transforms machine
-					;; coordinates to the new system. Rotations about x or y not supported
-
+					;; coordinates to the new system. 
+beta=0.0			;; Rotation about +y axis
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
@@ -91,7 +91,6 @@ calc_spec=[1]   										;; (0 or 1) If 1 then spectra is calculated
 sim_fida=[1]											;; (0 or 1) if 1 then the FIDA spectra is calculated
 calc_birth=[1]    										;; (0 or 1) If 1 then the birth profile is calculated
 f90brems=[0]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
-guidingcenter=[1]           							;; (0 or 1) Use 1 for guiding center distribution functs.
 calc_wght=[1]  											;; (0 or 1) If 1 then weight functions are calculated
 load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing 
 														;; neutrals.bin file located in runid directory
@@ -105,9 +104,9 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
 	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
 	    lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
 	    nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-		origin:origin,alpha:alpha,beta:0.0,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+		origin:origin,alpha:alpha,beta:beta,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
 		wavel_end_wght:wavel_end_wght,npa:npa,calc_spec:calc_spec,sim_fida:sim_fida,calc_birth:calc_birth,calc_wght:calc_wght,$
-		f90brems:f90brems,guidingcenter:guidingcenter,load_neutrals:load_neutrals,ps:ps}
+		f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
 
 END

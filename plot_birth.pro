@@ -248,6 +248,5 @@ pro plot_birth,ps=ps,path=path
   endfor
   close,55
   if fidasim.inputs.ps eq 1 then device,/close
-  stop
 end                             ;of programm
 

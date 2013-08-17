@@ -109,7 +109,6 @@ pro load_fidasim_results,results,result_dir_in $
   readf,55,idum & ps           = idum
   readf,55,idum & npa          = idum      ;& print, 'npa: ', npa
   readf,55,idum & load_neutrals= idum
-  readf,55,idum & guidingcenter=idum
   readf,55,idum & f90brems=idum
   readf,55,idum & calc_wght    = idum
   readf,55,string_dum;'# weight function settings:'
@@ -131,6 +130,12 @@ pro load_fidasim_results,results,result_dir_in $
   readf,55,fdum & ai=fdum       ;& print, 'ai: ', ai
   readf,55,fdum & ab=fdum       ;& print, 'ab: ', ai
   for i=0,4 do readf,55,string_dum
+  origin=fltarr(3)
+  for i=0,2 do begin 
+	readf,55,fdum & origin[i]=fdum
+  endfor
+  readf,55,ddum & alpha=ddum
+  readf,55,ddum & beta=ddum
   readf,55,idum & nx=idum       ;& print, 'nx: ', nx
   readf,55,idum & ny=idum       ;& print, 'ny: ', ny
   readf,55,idum & nz=idum       ;& print, 'nz: ', nz
@@ -210,7 +215,7 @@ pro load_fidasim_results,results,result_dir_in $
           , nx:nx, ny:ny, nz:nz $
           , x0:xx[0],x1:xx[nx-1]+dx $
           , y0:yy[0],y1:yy[ny-1]+dy $
-          , z0:zz[0],z1:zz[nz-1]+dz, rhostr:rhostr, isource:isource}
+          , z0:zz[0],z1:zz[nz-1]+dz, rhostr:rhostr, isource:isource,origin:origin,alpha:alpha,beta:beta}
   if keyword_set(only_inputs) then begin
      results={inputs:inputs}
      return

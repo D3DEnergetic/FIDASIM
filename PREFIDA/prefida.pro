@@ -674,6 +674,12 @@ PRO prefida,input_pro,plot=plot
 	file = inputs.result_dir+inputs.runid+'/'+inputs.runid+'.sav'
 	save,inputs,grid,profiles,fida,nbi,equil,nbgeom,chords,plasma,filename=file,/compress
 
+	;;COPY INPUT PROCEDURE TO RESULT DIRECTORY
+	file_info=ROUTINE_INFO(input_pro,/source)
+	FILE_COPY,file_info.path,$
+		      inputs.result_dir+inputs.runid+'/'+input_pro+'.pro',$
+			  /overwrite
+
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file

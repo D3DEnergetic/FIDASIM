@@ -678,7 +678,7 @@ PRO prefida,input_pro,plot=plot
 	file_info=ROUTINE_INFO(input_pro,/source)
 	FILE_COPY,file_info.path,$
 		      inputs.result_dir+inputs.runid+'/'+input_pro+'.pro',$
-			  /overwrite
+			  /overwrite,/allow_same
 
 	;;WRITE FIDASIM INPUT FILES
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
@@ -689,9 +689,9 @@ PRO prefida,input_pro,plot=plot
 	printf,55, inputs.time,f='(1f8.5,"       # time")'
 	printf,55, inputs.runid
 	printf,55,' ',inputs.diag, '           # diagnostic'
-	printf,55,inputs.calc_birth,f='(i2,"             # calculate birth profile")'
-	printf,55,inputs.calc_spec,f='(i2,"             # calculate spectra")'
-	printf,55,inputs.ps,f='(i2,"             # plot ps output")'
+	printf,55, inputs.calc_birth,f='(i2,"             # calculate birth profile")'
+	printf,55, inputs.calc_spec,f='(i2,"             # calculate spectra")'
+	printf,55, inputs.ps,f='(i2,"             # plot ps output")'
 	printf,55, inputs.npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
     printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
@@ -741,58 +741,76 @@ PRO prefida,input_pro,plot=plot
 	printf,55, nbi.BMWIDZA,f='(1f9.4,"      # NBI half width vertical")'
 	ii=inputs.isource[0]
 	printf,55, ii,f='(1i2,"             # Nr of NBI")'
-	printf,55,nbi.divy[0],f='(1f10.7,"     #divergence y of full comp")'
-	printf,55,nbi.divy[1],f='(1f10.7,"     #divergence y of half comp")'
-	printf,55,nbi.divy[2],f='(1f10.7,"     #divergence y of third comp")'
-	printf,55,nbi.divz[0],f='(1f10.7,"     #divergence z of full comp")'
-	printf,55,nbi.divz[1],f='(1f10.7,"     #divergence z of half comp")'
-	printf,55,nbi.divz[2],f='(1f10.7,"     #divergence z of third comp")'
-	printf,55,nbi.focy,f='(1f10.2,"      # focal length in y")' 
-	printf,55,nbi.focz,f='(1f10.2,"      # focal length in z")' 
-	printf,55,nbi.einj,f='(1f9.4,"      # injected energy [keV]")' 
-	printf,55,nbi.pinj,f='(1f9.4,"      # injected power [MW]")'  
+	printf,55, nbi.divy[0],f='(1f10.7,"     #divergence y of full comp")'
+	printf,55, nbi.divy[1],f='(1f10.7,"     #divergence y of half comp")'
+	printf,55, nbi.divy[2],f='(1f10.7,"     #divergence y of third comp")'
+	printf,55, nbi.divz[0],f='(1f10.7,"     #divergence z of full comp")'
+	printf,55, nbi.divz[1],f='(1f10.7,"     #divergence z of half comp")'
+	printf,55, nbi.divz[2],f='(1f10.7,"     #divergence z of third comp")'
+	printf,55, nbi.focy,f='(1f10.2,"      # focal length in y")' 
+	printf,55, nbi.focz,f='(1f10.2,"      # focal length in z")' 
+	printf,55, nbi.einj,f='(1f9.4,"      # injected energy [keV]")' 
+	printf,55, nbi.pinj,f='(1f9.4,"      # injected power [MW]")'  
 	printf,55,'# Species-mix (Particles):'
-	printf,55 ,nbi.full,f='(1f9.6,"      # full energy")' 
-	printf,55 ,nbi.half,f='(1f9.6,"      # half energy")'  
-	printf,55 ,nbi.third,f='(1f9.6,"      # third energy")' 
-	printf,55, '#position of NBI source in xyz coords:'
-	printf,55,nbgeom.xyz_src[0],f='(1f9.4,"      # x [cm]")' 
-	printf,55,nbgeom.xyz_src[1],f='(1f9.4,"      # y [cm]")' 
-	printf,55,nbgeom.xyz_src[2],f='(1f9.4,"      # z [cm]")' 
+	printf,55, nbi.full,f='(1f9.6,"      # full energy")' 
+	printf,55, nbi.half,f='(1f9.6,"      # half energy")'  
+	printf,55, nbi.third,f='(1f9.6,"      # third energy")' 
+	printf,55,'#position of NBI source in xyz coords:'
+	printf,55, nbgeom.xyz_src[0],f='(1f9.4,"      # x [cm]")' 
+	printf,55, nbgeom.xyz_src[1],f='(1f9.4,"      # y [cm]")' 
+	printf,55, nbgeom.xyz_src[2],f='(1f9.4,"      # z [cm]")' 
 	printf,55,'# 3 rotation matrizes 3x3'
 	for j=0,2 do begin
 		for k=0,2 do begin
-			printf,55 ,nbgeom.Arot[j,k] ;; rotation in the top-down view plane
-			printf,55 ,nbgeom.Brot[j,k] ;; vertical rotation
-			printf,55 ,nbgeom.Crot[j,k] ;; vertical rotation
+			printf,55, nbgeom.Arot[j,k] ;; rotation in the top-down view plane
+			printf,55, nbgeom.Brot[j,k] ;; vertical rotation
+			printf,55, nbgeom.Crot[j,k] ;; vertical rotation
 		endfor 
 	endfor
 	close,55
 	print, 'Inputs stored in data file: '+file
 
+	;;WRITE GRID TO BINARY
+	file =inputs.result_dir+inputs.runid+'/grid.bin'
+	openw,lun,file,/get_lun
+	writeu,lun, long(inputs.nx)
+	writeu,lun, long(inputs.ny)
+	writeu,lun, long(inputs.nz)
+	writeu,lun, double(grid.u_grid)
+	writeu,lun, double(grid.v_grid)
+	writeu,lun, double(grid.w_grid)
+	writeu,lun, double(grid.r_grid)
+	writeu,lun, double(grid.phi_grid)
+	writeu,lun, double(grid.x_grid)
+	writeu,lun, double(grid.y_grid)
+	writeu,lun, double(grid.z_grid)
+	close,lun
+	free_lun,lun
+	print, 'Grid stored in BINARY: '+file
+
 	;;WRITE PLASMA PARAMETERS TO BINARY
 	file =inputs.result_dir+inputs.runid+'/plasma.bin'
 	openw, lun, file, /get_lun
-	writeu,lun , long(inputs.nx)
-	writeu,lun , long(inputs.ny)
-	writeu,lun , long(inputs.nz)
-	writeu,lun , double(plasma.te)
-	writeu,lun , double(plasma.ti)
-	writeu,lun , double(plasma.dene)
-	writeu,lun , double(plasma.denp)
-	writeu,lun , double(plasma.deni)
-	writeu,lun , double(plasma.denf)
-	writeu,lun , double(plasma.vrotx)
-	writeu,lun , double(plasma.vroty)
-	writeu,lun , double(plasma.vrotz)
-	writeu,lun , double(plasma.zeff)
-	writeu,lun , double(plasma.bx)
-	writeu,lun , double(plasma.by)
-	writeu,lun , double(plasma.bz)
-	writeu,lun , double(plasma.ex)
-	writeu,lun , double(plasma.ey)
-	writeu,lun , double(plasma.ez)
-	writeu,lun , double(plasma.rho_grid)
+	writeu,lun, long(inputs.nx)
+	writeu,lun, long(inputs.ny)
+	writeu,lun, long(inputs.nz)
+	writeu,lun, double(plasma.te)
+	writeu,lun, double(plasma.ti)
+	writeu,lun, double(plasma.dene)
+	writeu,lun, double(plasma.denp)
+	writeu,lun, double(plasma.deni)
+	writeu,lun, double(plasma.denf)
+	writeu,lun, double(plasma.vrotx)
+	writeu,lun, double(plasma.vroty)
+	writeu,lun, double(plasma.vrotz)
+	writeu,lun, double(plasma.zeff)
+	writeu,lun, double(plasma.bx)
+	writeu,lun, double(plasma.by)
+	writeu,lun, double(plasma.bz)
+	writeu,lun, double(plasma.ex)
+	writeu,lun, double(plasma.ey)
+	writeu,lun, double(plasma.ez)
+	writeu,lun, double(plasma.rho_grid)
 	close,lun
 	free_lun, lun
 	print, 'Plasma parameters stored in BINARY: '+file

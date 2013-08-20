@@ -1,4 +1,4 @@
-PRO augd_routines,inputs,grid,nbi,fida,profiles,equil,err
+PRO augd_routines,inputs,grid,nbi,chords,profiles,equil,err
   user=+GETENV('USER')
 
   ;;GET PROFILES
@@ -35,7 +35,7 @@ PRO augd_routines,inputs,grid,nbi,fida,profiles,equil,err
 	restore,'/u/'+user+'/FIDASIM/TEST/cfr_setup.idl'
   endelse
 
-  fida={sigma_pi_ratio:det.sigma_pi,nchan:det.nchan,xlos:det.xlos,ylos:det.ylos,$
+  chords={sigma_pi_ratio:det.sigma_pi,nchan:det.nchan,xlos:det.xlos,ylos:det.ylos,$
 		zlos:det.zlos,xlens:det.xhead,ylens:det.yhead,zlens:det.zhead,$
 		opening_angle:det.npa.opening_angle,headsize:det.npa.headsize}
 

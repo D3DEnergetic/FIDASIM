@@ -220,25 +220,25 @@ PRO los_track,coords,xyz_los_vec,xyspt,tcell,cell,ncell
 	ncell=m-1
 END
 
-PRO prepare_fida,inputs,grid,fida,chords
+PRO prepare_fida,inputs,grid,chords,fida
 
 	nx=grid.nx
 	ny=grid.ny
 	nz=grid.nz
     ;;CALCULATE WEIGHTS
-	err_arr=dblarr(fida.nchan)
-	weight  = replicate(0.d0,nx,ny,nz,fida.nchan)
+	err_arr=dblarr(chords.nchan)
+	weight  = replicate(0.d0,nx,ny,nz,chords.nchan)
 ;	print, 'nchan:', fida.nchan
 
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
-	ulens=fida.xlens-inputs.origin[0] & ulos=fida.xlos-inputs.origin[0]
-	vlens=fida.ylens-inputs.origin[1] & vlos=fida.ylos-inputs.origin[1]
-	wlens=fida.zlens-inputs.origin[2] & wlos=fida.zlos-inputs.origin[2]
+	ulens=chords.xlens-inputs.origin[0] & ulos=chords.xlos-inputs.origin[0]
+	vlens=chords.ylens-inputs.origin[1] & vlos=chords.ylos-inputs.origin[1]
+	wlens=chords.zlens-inputs.origin[2] & wlos=chords.zlos-inputs.origin[2]
 
 	rotate_points,ulens,vlens,wlens,Arot,Brot,Crot,xlens,ylens,zlens
 	rotate_points,ulos,vlos,wlos,Arot,Brot,Crot,xlos,ylos,zlos
 
-	for chan=0L, fida.nchan-1 do  begin
+	for chan=0L, chords.nchan-1 do  begin
 		xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
         xyzlos  = [xlos[chan], ylos[chan], zlos[chan]]
 ;		print,xyzlos	
@@ -248,7 +248,7 @@ PRO prepare_fida,inputs,grid,fida,chords
         dummy = max(abs(vi),ic)
         nstep = fix(700./grid.dr[ic])
         vi    = vi/sqrt(vi[0]^2+vi[1]^2+vi[2]^2) ;; unit vector
-;        if chan eq fida.nchan-1 then begin
+;        if chan eq chords.nchan-1 then begin
 ;       	print, vi
 ;        endif
         xyz_pos = xyzlens
@@ -293,12 +293,12 @@ PRO prepare_fida,inputs,grid,fida,chords
 		print,'NO LINES OF SIGHT CROSSED THE SIMULATION GRID'
 		err=1
 	endif else begin
-		print,strtrim(string(nw),1)+' OUT OF '+strtrim(string(fida.nchan),1)+' CHORDS CROSSED THE SIMULATION GRID'
+		print,strtrim(string(nw),1)+' OUT OF '+strtrim(string(chords.nchan),1)+' CHORDS CROSSED THE SIMULATION GRID'
 		weight=weight[*,*,*,los]
 		err=0
 	endelse
-	chords={nchan:fida.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:fida.sigma_pi_ratio,$
-			xlos:xlos,ylos:ylos,zlos:zlos,headsize:fida.headsize,opening_angle:fida.opening_angle,los:los,weight:weight,err:err}
+	fida={nchan:chords.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:chords.sigma_pi_ratio,$
+			xlos:xlos,ylos:ylos,zlos:zlos,headsize:chords.headsize,opening_angle:chords.opening_angle,los:los,weight:weight,err:err}
 END
 
 PRO transp_fbeam,inputs,grid,denf,err
@@ -628,7 +628,7 @@ PRO prefida,input_pro,plot=plot
 	endif else err=0
 
 	;;CALL DEVICE ROUTINES THAT GET BEAM GEOMETRY, FIDA DIAGNOSTIC INFO, PROFILES, and the grid in flux coord.
-	CALL_PROCEDURE, strlowcase(inputs.device)+'_routines',inputs,grid, nbi, fida, profiles, equil,err
+	CALL_PROCEDURE, strlowcase(inputs.device)+'_routines',inputs,grid, nbi, chords, profiles, equil,err
 	if err eq 1 then begin
 		print, 'DEVICE ROUTINES FAILED. EXITING...'
 		goto,GET_OUT
@@ -643,15 +643,15 @@ PRO prefida,input_pro,plot=plot
 
 	;;FIDA PRE PROCESSING 
 	if inputs.calc_spec eq 1 then begin
-		prepare_fida,inputs,grid,fida,chords
-		if chords.err eq 1 then begin
+		prepare_fida,inputs,grid,chords,fida
+		if fida.err eq 1 then begin
 			print,'FIDA PREPROCESSING FAILED. EXITING...'
 			goto, GET_OUT
 		endif
 	endif else begin
 		err=0
 		weight=replicate(0.d0,inputs.nx,inputs.ny,inputs.nz,1)
-		chords={weight:weight,err:err}
+		fida={weight:weight,err:err}
 	endelse
 
 	;;MAP PROFILES ONTO GRID
@@ -663,16 +663,16 @@ PRO prefida,input_pro,plot=plot
 
     ;; Calculate bremsstrahlung if desired
 	if inputs.f90brems eq 0 then $
-		brems,inputs,fida,profiles,equil
+		brems,inputs,chords,profiles,equil
 
     ;; Plot grid, beam, sightlines, and equilibrium
 	if keyword_set(plot) then begin
-		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, fida, equil,nbgeom,plasma
+		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, chords, equil,nbgeom,plasma
 	endif
 
 	;;SAVE STRUCTURES 
 	file = inputs.result_dir+inputs.runid+'/'+inputs.runid+'.sav'
-	save,inputs,grid,profiles,fida,nbi,equil,nbgeom,chords,plasma,filename=file,/compress
+	save,inputs,grid,profiles,chords,nbi,equil,nbgeom,fida,plasma,filename=file,/compress
 
 	;;COPY INPUT PROCEDURE TO RESULT DIRECTORY
 	file_info=ROUTINE_INFO(input_pro,/source)
@@ -818,24 +818,24 @@ PRO prefida,input_pro,plot=plot
 	;;WRITE LINE OF SIGHT (LOS) INFORMATION TO BINARY
 	if inputs.calc_spec eq 1 or inputs.npa eq 1 then begin
 		file =inputs.result_dir+inputs.runid+'/los.bin'
-		los=chords.los
+		los=fida.los
 		openw, lun, file, /get_lun
 		writeu,lun , long(n_elements(los))
 		for chan=0L,n_elements(los)-1 do begin
-			writeu,lun, double(chords.xlens[los[chan]])
-			writeu,lun, double(chords.ylens[los[chan]])
-			writeu,lun, double(chords.zlens[los[chan]])
-			writeu,lun, double(chords.xlos[los[chan]])
-			writeu,lun, double(chords.ylos[los[chan]])
-			writeu,lun, double(chords.zlos[los[chan]])
-			writeu,lun, double(chords.headsize[los[chan]]) ;; headsize is used for NPA
-			writeu,lun, double(chords.opening_angle[los[chan]])
-			writeu,lun, double(chords.sigma_pi_ratio[los[chan]])
+			writeu,lun, double(fida.xlens[los[chan]])
+			writeu,lun, double(fida.ylens[los[chan]])
+			writeu,lun, double(fida.zlens[los[chan]])
+			writeu,lun, double(fida.xlos[los[chan]])
+			writeu,lun, double(fida.ylos[los[chan]])
+			writeu,lun, double(fida.zlos[los[chan]])
+			writeu,lun, double(fida.headsize[los[chan]]) ;; headsize is used for NPA
+			writeu,lun, double(fida.opening_angle[los[chan]])
+			writeu,lun, double(fida.sigma_pi_ratio[los[chan]])
 		endfor
 		writeu,lun , long(grid.nx)
 		writeu,lun , long(grid.ny)
 		writeu,lun , long(grid.nz)
-  		writeu,lun , double(chords.weight[*,*,*,*])
+  		writeu,lun , double(fida.weight[*,*,*,*])
 		close,lun
 		free_lun, lun
 		print, 'LOS parameters stored in BINARY: '+file

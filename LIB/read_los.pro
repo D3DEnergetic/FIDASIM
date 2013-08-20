@@ -6,7 +6,7 @@ PRO read_los,file,los
     sdum=''
 
 	if file_test(file) then begin
-        nx=0L
+		nx=0L
 		ny=0L
 		nz=0L
 		openr, 55, file

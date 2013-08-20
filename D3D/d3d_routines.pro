@@ -1,7 +1,7 @@
 ;;RENAME TO "DEVICE"_ROUTINES I.E. D3D_ROUTINES AND RENAME FILE ACCORDINGLY
 PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 					   nbi,$ 			;;OUTPUT: NEUTRAL BEAM INJECTION INFO STRUCTURE
-					   fida,$ 			;;OUTPUT: FIDA DIAGNOSTIC INFO STRUCTURE
+					   chords,$ 		;;OUTPUT: CHORDS INFO STRUCTURE
 					   profiles,$		;;OUTPUT: PROFILES STRUCTURE
 					   equil,$			;;OUTPUT: MAGNETIC GRID STRUCTURE
 					   err				;;OUTPUT: ERROR STATUS ERR=1 == SOMETHING WENT WRONG
@@ -12,7 +12,7 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 	nbi=d3d_beams(inputs)
 	
 	;;GET CHORD GEOMETRY
-	fida=d3d_chords(inputs.shot,inputs.diag)
+	chords=d3d_chords(inputs.shot,inputs.diag)
 
 	;;GET PROFILES
 	profiles=d3d_profiles(inputs)
@@ -23,7 +23,7 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 	endif
 
 	;;GET E&M FIELDS AT GRID POINTS
-	equil=d3d_equil(inputs,grid,fida)
+	equil=d3d_equil(inputs,grid,chords)
 	if equil.err eq 1 then begin
 		print,'FAILED TO GET EQUILIBRIUM'
 		err=1

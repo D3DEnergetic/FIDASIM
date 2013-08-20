@@ -40,8 +40,8 @@ PRO plot_neutrals,path=path,halo=halo,beam=beam
 	r_range=[0.8*min(grid.r_grid),1.2*max(grid.r_grid)]
 
 	loadct,39,/silent
-	!p.multi=[0,2,1,0,1]
-	window,0 & wset,0
+	!p.multi=[0,3,1,0,1]
+	window,0,xsize=1200,ysize=400
 	ind=long(grid.nz/2.)
 	contour,dens[*,*,ind],grid.u_grid[*,*,ind],grid.v_grid[*,*,ind],/fill,nlevels=60 $
 		   ,title='PLANE VIEW',xtitle='U [cm]',ytitle='V [cm]'$
@@ -49,10 +49,17 @@ PRO plot_neutrals,path=path,halo=halo,beam=beam
     oplot,grid.u_grid,grid.v_grid,psym=3,color=0
 
 	ind=long(grid.ny/2.)
-	contour,reform(dens[*,ind,*]),abs(reform(grid.x_grid[*,ind,*])),reform(grid.z_grid[*,ind,*]),/fill,nlevels=60 $
+	contour,reform(dens[*,ind,*]),reform(grid.x_grid[*,ind,*]),reform(grid.z_grid[*,ind,*]),/fill,nlevels=60 $
            ,title='BEAM VIEW',xtitle='X [cm]',ytitle='Z [cm]'$
 		   ,color=0,background=255
-    oplot,abs(grid.x_grid[*,ind,*]),grid.z_grid[*,ind,*],psym=3,color=0
+    oplot,grid.x_grid[*,ind,*],grid.z_grid[*,ind,*],psym=3,color=0
+	
+	ind=long(grid.nx/2.)
+    contour,dens[ind,*,*],grid.y_grid[ind,*,*],grid.z_grid[ind,*,*],/fill,nlevels=60 $
+           ,title='BEAM VIEW',xtitle='Y [cm]',ytitle='Z [cm]'$
+           ,color=0,background=255
+    oplot,grid.y_grid[ind,*,*],grid.z_grid[ind,*,*],psym=3,color=0
+
 
 	GET_OUT:
 END

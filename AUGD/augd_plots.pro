@@ -1,4 +1,4 @@
-PRO augd_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
+PRO augd_plots,inputs,grid,nbi,chords,equil,nbgeom,plasma
 
 	ind=long(grid.nz/2.0)
 	!p.multi=0
@@ -23,9 +23,9 @@ PRO augd_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 	oplot,grid.u_grid,grid.v_grid,psym=3,color=0
 
 
-	for i=0,fida.nchan-1 do $
-		oplot,fida.xlens[i]+[0,2*(fida.xlos[i]-fida.xlens[i])],$
-        fida.ylens[i]+[0,2*(fida.ylos[i]-fida.ylens[i])],$
+	for i=0,chords.nchan-1 do $
+		oplot,chords.xlens[i]+[0,2*(chords.xlos[i]-chords.xlens[i])],$
+        chords.ylens[i]+[0,2*(chords.ylos[i]-chords.ylens[i])],$
         color=50
 
 	src=nbi.xyz_src
@@ -42,19 +42,19 @@ PRO augd_plots,inputs,grid,nbi,fida,equil,nbgeom,plasma
 	oplot,grid.r_grid,grid.w_grid,psym=3,color=0  
 
 	; Lines of sight
-	for i=0,fida.nchan-1 do begin
-		if fida.zlos[i] ne fida.zlens[i] then begin
-			z=(fida.zlos[i]-fida.zlens[i])*findgen(201)/100.+fida.zlens[i]
-			x=(fida.xlos[i]-fida.xlens[i])*(z-fida.zlens[i])/ $
-			  (fida.zlos[i]-fida.zlens[i]) + fida.xlens[i]
-			y=(fida.ylos[i]-fida.ylens[i])*(z-fida.zlens[i])/ $
-			  (fida.zlos[i]-fida.zlens[i]) + fida.ylens[i]
+	for i=0,chords.nchan-1 do begin
+		if chords.zlos[i] ne chords.zlens[i] then begin
+			z=(chords.zlos[i]-chords.zlens[i])*findgen(201)/100.+chords.zlens[i]
+			x=(chords.xlos[i]-chords.xlens[i])*(z-chords.zlens[i])/ $
+			  (chords.zlos[i]-chords.zlens[i]) + chords.xlens[i]
+			y=(chords.ylos[i]-chords.ylens[i])*(z-chords.zlens[i])/ $
+			  (chords.zlos[i]-chords.zlens[i]) + chords.ylens[i]
 			oplot,sqrt(x^2+y^2),z,color=50
 		endif else begin 
-    		y=(fida.ylos[i]-fida.ylens[i])*findgen(201)/100.+fida.ylens[i]
-    		x=(fida.xlos[i]-fida.xlens[i])*(y-fida.ylens[i])/ $
-      		  (fida.ylos[i]-fida.ylens[i]) + fida.ylens[i]
-		    oplot,sqrt(x^2+y^2),replicate(fida.zlens[i],201),color=50
+    		y=(chords.ylos[i]-chords.ylens[i])*findgen(201)/100.+chords.ylens[i]
+    		x=(chords.xlos[i]-chords.xlens[i])*(y-chords.ylens[i])/ $
+      		  (chords.ylos[i]-chords.ylens[i]) + chords.ylens[i]
+		    oplot,sqrt(x^2+y^2),replicate(chords.zlens[i],201),color=50
 		endelse
 	endfor
 

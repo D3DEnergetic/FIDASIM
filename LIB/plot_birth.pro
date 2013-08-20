@@ -4,10 +4,13 @@ pro plot_birth,ps=ps,path=path
   ;; wirtten by Benedikt Geiger 2013
   if not keyword_set(path) then $
      path=dialog_pickfile(path='RESULTS/',/directory)
+
   runid=strsplit(path,'/',/extract,count=nid)
   runid=runid[nid-1]
-  load_fidasim_results,fidasim,path
-  birth_dens=fidasim.birth_dens
+
+  load_results,path,fidasim
+  birth_dens=fidasim.birth.birth_dens
+
   ;;[fast-ions/s/grid_cell/energy_bin/pitch_bin]
   sz=size(birth_dens)
   nx=sz[1]
@@ -15,6 +18,7 @@ pro plot_birth,ps=ps,path=path
   nz=sz[3]
   nenergy=sz[4]
   npitch=sz[5]
+
   Efull=fidasim.inputs.einj 
   energyarr=[efull,efull/2.,efull/3.]
   pitcharr=dindgen(npitch)/(npitch)*2.-1.
@@ -38,91 +42,11 @@ pro plot_birth,ps=ps,path=path
   print, 'total number of deposited fast/ions per second: ', total(birth_dens)
 ;;  -----------------------------------------
 
-  contour,total(total(total(birth_dens,5),4),3),fidasim.coords.xxc $
-          ,fidasim.coords.yyc,/isotropic $
+  contour,total(total(total(birth_dens,5),4),3),fidasim.grid.x_grid[*,*,0] $
+          ,fidasim.grid.y_grid[*,*,0],/isotropic $
           ,c_colors=(dindgen(20)+1.)*11,nlevels=20 $
           ,xtit='X [cm]',ytit='Y [cm]',/fill
   xyouts,0.3,0.8,'Birth profile',/norm
-  ;; ----------------------------------------------------------
-  ;; -----------  Map the BIRTH_DENS on R,Z GRID -------------
-  ;; ----------------------------------------------------------
-  nr=(fidasim.coords.nx+fidasim.coords.ny)/2.
-  nz=fidasim.coords.nz
-  rrc_grid=fidasim.coords.rrc_grid
-  rrc=(dindgen(nr)/(nr-1.)*(max(rrc_grid)-min(rrc_grid))+min(rrc_grid))
-  birth_dens_rz=fltarr(nr,nz,nenergy,npitch)
-  for i=0L,fidasim.coords.nx-1 do begin
-     for j=0,fidasim.coords.ny-1 do begin
-        for k=0,fidasim.coords.nz-1 do begin
-           dummy=min(abs(sqrt(fidasim.coords.xxc[i]^2 $
-                              +fidasim.coords.yyc[j]^2)-rrc[*]),index)
-           birth_dens_rz[index,k,*,*]+= birth_dens[i,j,k,*,*]
-        endfor
-     endfor 
-  endfor
-  ;; Conversion from [fast-ions/s/grid_cell/energy_bin/pitch_bin] to
-  ;; [fast-ions/s/cm^2/energy_bin/pitch_bin]:
-  dr=rrc[1]-rrc[0]
-  dz=fidasim.coords.zzc[1]-fidasim.coords.zzc[0]
-  birth_dens_rz=birth_dens_rz/dr/dz
-
-
-
-  ;; --------------------------------------------------------------
-  ;; ---------- Plot Birth density as a function of R an Z --------
-  ;; --------------------------------------------------------------
-  if fidasim.inputs.ps eq 1 then device, filename='PLOTS/birth_dens_rz_'    $
-                                        + string(fidasim.inputs.shot,f='(i5)') $
-                                        + '.eps' $ 
-  else window,1,xsize=600,ysize=500
-  ;; integrate over pitch and energy
-  zplot=total(total(birth_dens_rz[*,*,*,*],4),3) ;; [fast-ions/s/cm^2]
-  ma=max(zplot,/nan)
-  nlevels=20
-  c_colors= dindgen(nlevels)/(nlevels-1.)*253. +1.       
-  levelvals=dindgen(nlevels)/(nlevels-1.)*ma
-  contour,zplot,rrc,fidasim.coords.zzc $
-          ,c_colors=c_colors,levels=levelvals,/fill  $
-          ,xran=[100,250],yran=[-100,100],/isotropic $
-          ,xtit='R [cm]',ytit='Z [cm]'
-  ;; PLOT LEGEND
-  legpos=[!x.window[1],!y.window[0],!x.window[1]+0.04,!y.window[1]]
-  xleg = [0,1]
-  expo=double(fix(alog10(ma)))
-  yleg = (dindgen(255)/254.*ma)/(10.^expo)
-  dumarr = fltarr(2,255)
-  dumarr(0,*) = yleg
-  dumarr(1,*) = yleg
-  contour,dumarr,xleg,yleg,/noerase $
-          ,c_colors=c_colors,/fill $
-          ,levels=levelvals/10.^expo $
-          ,yran=[0.,ma]/10.^expo,/ysty $
-          ,pos=legpos,xticks=1,yticks=1 $
-          ,ytickname=(replicate(' ',2)),yticklen=-1.e-5,yminor=1 $
-          ,xtickname=(replicate(' ',2)),xticklen=-1.e-5,xminor=1
-  axis,/yaxis,yran=[0.,ma]/10.^expo,/ysty,yticks=5 $
-       ,chars=chars,ytickformat='(1f3.1)'
-  xyouts,legpos[2],legpos[3]+0.01,'deposited fast-ions [10!u' $
-         +strtrim(string(fix(expo)),2)+'!n/s/cm!u2!n]' $
-         ,chars=chars,/norm,/align
- 
-
-
-  ;; --------------------------------------------------------------
-  ;; ------------ Plot Birth density as a function of R  ----------
-  ;; --------------------------------------------------------------
-  if fidasim.inputs.ps eq 1 then device, filename='PLOTS/birth_dens_r_'    $
-                                         +string(fidasim.inputs.shot,f='(i5)') $
-                                         +'.eps' $
-  else window,2,xsize=600,ysize=500
-  zplot=total(zplot,2)*dz ;; integrate along z
-  ma=max(zplot)
-  expo=double(fix(alog10(ma)))
-  plot,[0.],/nodata,xran=[100,250],yran=[0,ma/10^expo] $
-       ,xtit='R [cm]',ytit='10!u'+strtrim(string(fix(expo)),2) $
-       +'!nfast-ions/(s cm)' 
-  oplot,rrc,zplot/10^expo
-
 
   ;; ----------------------------------------------------------
   ;; ------  CALCULATE RANDOM BIRTH POSITIONS of markers ------
@@ -138,6 +62,9 @@ pro plot_birth,ps=ps,path=path
   birth_p=fltarr(tb)
   birth_e=fltarr(tb)
   cc=0L
+  dx=abs(fidasim.grid.x_grid[1,0,0]-fidasim.grid.x_grid[0,0,0])
+  dy=abs(fidasim.grid.y_grid[0,1,0]-fidasim.grid.y_grid[0,0,0])
+  dz=abs(fidasim.grid.z_grid[0,0,1]-fidasim.grid.z_grid[0,0,0])
   for i=0,nx-1 do begin
      for j=0,ny-1 do begin   
         for k=0,nz-1 do begin
@@ -150,12 +77,10 @@ pro plot_birth,ps=ps,path=path
                  if ben gt randomu(seed) then nib=floor(nib)+1.
 
                  for ii=0L,nib-1 do begin
-                    birth_pos[*,cc]=[fidasim.coords.xx[i]   $
-                                     ,fidasim.coords.yy[j]  $
-                                     ,fidasim.coords.zz[k]] $
-                                    +[fidasim.coords.dx $
-                                      ,fidasim.coords.dy $
-                                      ,fidasim.coords.dz] $
+                    birth_pos[*,cc]=[fidasim.grid.x_grid[i,j,k]   $
+                                     ,fidasim.grid.y_grid[i,j,k]  $
+                                     ,fidasim.grid.z_grid[i,j,k]] $
+                                    +[dx,dy,dz]/2. $
                                     *randomu(seed,3)
                     if nib eq 1 then begin
                        dummy=max(zz,ipitch)
@@ -211,25 +136,27 @@ pro plot_birth,ps=ps,path=path
   if fidasim.inputs.ps eq 1 then device, filename='PLOTS/birth_profile_rz_'    $
                                         + string(fidasim.inputs.shot,f='(i5)') $
                                         + '.eps' $ 
-  else window,3,xsize=600,ysize=500
-  
-  plot,[0.],/nodata,xran=[100,250],yran=[-100,100],/isotropic $
-       ,xtit='R [cm]',ytit='Z [cm]'
+  else window,1,xsize=600,ysize=500
+  loadct,39,/silent
+  xran=[.8*min(birth_rzphi[0,*]),1.2*max(birth_rzphi[0,*])]
+  yran=[1.5*min(birth_rzphi[1,*]),1.2*max(birth_rzphi[1,*])]
+  plot,[0.],/nodata,/isotropic $
+       ,xrange=xran,yrange=yran,xtit='R [cm]',ytit='Z [cm]',color=0,background=255
   index=where(birth_p lt -.5,nind)
   if nind gt 0 then $
      oplot, [birth_rzphi[0,index]],[birth_rzphi[1,index]],psym=2 $
-            ,col=254,symsize=0.5
-  xyouts,0.25,0.3+0.05,'pitch < -0.5',color=254,/norm
+            ,col=150,symsize=0.5
+  xyouts,0.25,0.3+0.05,'pitch < -0.5',color=150,/norm
   index=where(birth_p lt -0.4 and birth_p gt -0.5,nind)
    if nind gt 0 then $
       oplot, [birth_rzphi[0,index]],[birth_rzphi[1,index]],psym=4 $
-             ,color=20,symsize=0.5
-   xyouts,0.25,0.3,'-0.5 < pitch < -0.4',color=20,/norm
+             ,color=200,symsize=0.5
+   xyouts,0.25,0.3,'-0.5 < pitch < -0.4',color=200,/norm
    index=where(birth_p gt -0.4,nind)
    if nind gt 0 then $
       oplot, [birth_rzphi[0,index]],[birth_rzphi[1,index]],psym=5 $
-             ,color=60,symsize=0.5
-   xyouts,0.25,0.3-0.05,'-0.4 < pitch',color=60,/norm
+             ,color=250,symsize=0.5
+   xyouts,0.25,0.3-0.05,'-0.4 < pitch',color=250,/norm
 
 
   ;; -------------------------------------------------------

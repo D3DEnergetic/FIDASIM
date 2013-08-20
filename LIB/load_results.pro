@@ -1,5 +1,9 @@
 PRO load_results,result_dir,output
 
+	;;CHECK FOR SLASH
+	slash=strmid(result_dir,0,1,/reverse_offset)
+	if slash ne '/' then result_dir+='/'
+
 	;;READ INPUTS
 	read_inputs,result_dir+'inputs.dat',inputs
 

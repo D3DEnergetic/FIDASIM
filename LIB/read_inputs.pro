@@ -105,7 +105,7 @@ PRO read_inputs,file,inputs
 		inputs={shot: shot, time: time,diag:diag,ps:ps $
 	          , transp_runid:transp_runid $
 	          , fidasim_runid:fidasim_runid $
-	          , calc_wght:calc_wght,nr_wght:nr_wght,ichan_wght:ichan_wght $         
+	          , calc_wght:calc_wght,nr_wght:nr_wght,ichan_wght:ichan_wght $
 	          , nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
 	          , calc_spec:calc_spec,npa:npa $
 	          , einj:einj $

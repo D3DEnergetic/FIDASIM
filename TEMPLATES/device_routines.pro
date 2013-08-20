@@ -1,7 +1,7 @@
 ;;RENAME TO "DEVICE"_ROUTINES I.E. D3D_ROUTINES AND RENAME FILE ACCORDINGLY
 PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT CHANGE
 					   nbi,$ 			;;OUTPUT: NEUTRAL BEAM INJECTION INFO STRUCTURE
-					   fida,$ 			;;OUTPUT: FIDA DIAGNOSTIC INFO STRUCTURE
+					   chords,$ 		;;OUTPUT: CHORDS INFO STRUCTURE
 					   profiles,$		;;OUTPUT: PROFILES STRUCTURE
 					   equil,$			;;OUTPUT: MAGNETIC GRID STRUCTURE
 					   err				;;OUTPUT: ERROR STATUS ERR=1 == SOMETHING WENT WRONG
@@ -11,7 +11,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;YOU WANT SO LONG AS YOU DEFINE THE OUTPUT STRUCTURES
 	;;CONTAIN AT LEAST THE FOLLOWING TAGS
 
-	;;	IDL> help,fida 
+	;;	IDL> help,chords 
 	;;	** Structure <1d447c48>, 11 tags, length=728, data length=724, refs=1:
 	;;	   NCHAN           LONG                11
 	;;	   DIAG            STRING    'OBLIQUE'
@@ -93,7 +93,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 		 divy:divy,$				   		;;HORIZONTAL BEAM DIVERGENCE [rad]
 		 divz:divz }				   		;;VERTICAL BEAM DIVERGENCE [rad]
 
-  	fida={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES
+  	chords={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES
 		 nchan:nchan,$				  		;;NUMBER OF CHANNELS
 		 xmid:xmid,$						;;X POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
 		 ymid:ymid,$						;;Y POS. OF WHERE CHORD CROSSES MIDPLANE [cm]

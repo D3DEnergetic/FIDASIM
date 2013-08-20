@@ -1,4 +1,4 @@
-PRO read_los,file,inputs,los
+PRO read_los,file,los
 
     idum=1L
     fdum=1.e0
@@ -6,7 +6,9 @@ PRO read_los,file,inputs,los
     sdum=''
 
 	if file_test(file) then begin
-
+        nx=0L
+		ny=0L
+		nz=0L
 		openr, 55, file
 		readu,55 , idum & nchan=idum
 		xyzlos= FLTARR(nchan,3)
@@ -25,7 +27,10 @@ PRO read_los,file,inputs,los
 			readu,55, ddum & opening_angle[i]=ddum
 			readu,55, ddum & sigma_pi[i]=ddum
 		endfor
-		weight=dblarr(inputs.nx,inputs.ny,inputs.nz,nchan)
+		readu,55,nx
+		readu,55,ny
+		readu,55,nz
+		weight=dblarr(nx,ny,nz,nchan)
 		readu,55,weight
 		close,55
 	

@@ -7,7 +7,7 @@ PRO load_results,result_dir,output
 	read_grid,result_dir+'grid.bin',grid
 
 	;;READ LOS
-	read_los,result_dir+'los.bin',inputs,los
+	read_los,result_dir+'los.bin',los
 
 	;;READ PLASMA 
 	read_plasma,result_dir+'plasma.bin',plasma

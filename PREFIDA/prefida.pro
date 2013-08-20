@@ -832,6 +832,9 @@ PRO prefida,input_pro,plot=plot
 			writeu,lun, double(chords.opening_angle[los[chan]])
 			writeu,lun, double(chords.sigma_pi_ratio[los[chan]])
 		endfor
+		writeu,lun , long(grid.nx)
+		writeu,lun , long(grid.ny)
+		writeu,lun , long(grid.nz)
   		writeu,lun , double(chords.weight[*,*,*,*])
 		close,lun
 		free_lun, lun

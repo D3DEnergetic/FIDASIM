@@ -369,7 +369,7 @@ contains
   !****************************************************************************
  subroutine read_los
     character(120)  :: filename
-    integer         :: i, j, k,ichan
+    integer(long)   :: Nx,Ny,Nz, i, j, k,ichan
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
     filename=trim(adjustl(result_dir))//"/los.bin"
     !! print*,'---- loading detector information ----'
@@ -392,6 +392,9 @@ contains
        read(66) spec%sigma_pi(ichan)
     enddo
     allocate(dummy_arr(grid%Nx,grid%Ny,grid%Nz,spec%nchan))
+	read(66)Nx
+	read(66)Ny
+	read(66)Nz
     read(66) dummy_arr
     do k = 1, grid%Nz   
        do j = 1, grid%Ny

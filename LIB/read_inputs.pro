@@ -8,7 +8,7 @@ PRO read_inputs,file,inputs,save=save
 	if file_test(file) then begin
 		openr,55,file
 		readf,55,sdum                 ;& print, sdum
-		readf,55,sdum                 ;& print, sdum
+		readf,55,sdum & install_dir=sdum
 		readf,55,idum & shot = long(idum) 
 		readf,55,fdum & time = float(fdum)
 		readf,55,sdum & fidasim_runid = sdum
@@ -102,7 +102,7 @@ PRO read_inputs,file,inputs,save=save
 	
 		close,55
 
-		inputs={shot: shot, time: time,diag:diag,ps:ps $
+		inputs={instal_dir:install_dir,shot: shot, time: time,diag:diag,ps:ps $
 	          , transp_runid:transp_runid $
 	          , fidasim_runid:fidasim_runid $
 	          , calc_wght:calc_wght,nr_wght:nr_wght,ichan_wght:ichan_wght $

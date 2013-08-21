@@ -1,4 +1,4 @@
-PRO read_npa,file,npa
+PRO read_npa,file,npa,save=save
 
 	if file_test(file) then begin
 
@@ -19,6 +19,7 @@ PRO read_npa,file,npa
 			readu,55,npawght 
 			close,55
 			npa={npaipos:npaipos,npafpos:npafpos,npav:npav, npawght:npawght,err:0}
+			if keyword_set(save) then save,npa,filename='npa.sav'
 		endif else begin
 			print, 'attention, no particle reached the detector!'
 			npa={err:1}

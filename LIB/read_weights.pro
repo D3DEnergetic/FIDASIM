@@ -1,4 +1,4 @@
-PRO read_weights,file,weights,pitch_sign_convention=pitch_sign_convention
+PRO read_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_convention
 	
 	if not keyword_set(pitch_sign_convention) then pitch_sign_convention=-1.0
 
@@ -54,7 +54,7 @@ PRO read_weights,file,weights,pitch_sign_convention=pitch_sign_convention
             ,central_wavel:central_wavel,energyarr:energyarr,pitcharr:pitcharr $
             ,weight_tot:weight_tot   $
             ,angle:angle,radius:radius,err:0}
-
+		if keyword_set(save) then save,weights,filename='weights.sav'
 	endif else begin
 		weights={err:1}
 	endelse

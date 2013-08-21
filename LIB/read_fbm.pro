@@ -1,4 +1,4 @@
-PRO read_fbm,file,FBM_struct,pitch_sign_convention=pitch_sign_convention
+PRO read_fbm,file,FBM_struct,save=save,pitch_sign_convention=pitch_sign_convention
   ;---------------------------------------------------
   ; LOAD TRANSP fast ion distribution function
   ;---------------------------------------------------
@@ -48,6 +48,10 @@ PRO read_fbm,file,FBM_struct,pitch_sign_convention=pitch_sign_convention
                     ,r2d:r2d,z2d:z2d,bmvol:bmvol $
                     ,time:time,cdf_file:cdf_file $
                     ,pitch_sign_convention:pitch_sign_convention,err:0}
+	if keyword_set(save) then begin
+		fbm=FBM_struct
+		save,fbm,filename='fbm.sav'
+	endif
   endif else begin
 	FBM_struct={err:1}
   endelse

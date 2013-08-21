@@ -1,4 +1,4 @@
-PRO read_fida,file,fida
+PRO read_fida,file,fida,save=save
 
 	idum=1L
 	fdum=1.e0
@@ -23,6 +23,8 @@ PRO read_fida,file,fida
 		close,55
 
 		fida={lambda:lambda,spectra:spectra,err:0}
+
+		if keyword_set(save) then save,fida,filename='fida.sav'
 	endif else begin
 		fida={err:1}
 	endelse

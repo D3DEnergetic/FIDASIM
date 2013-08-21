@@ -1,4 +1,4 @@
-PRO read_neutrals,file,neutrals
+PRO read_neutrals,file,neutrals,save=save
 
     idum=1L
     fdum=1.e0
@@ -29,7 +29,7 @@ PRO read_neutrals,file,neutrals
      	close,55
 
      	neutrals={fdens:fdens, hdens:hdens,tdens:tdens, halodens:halodens,err:0}
-
+		if keyword_set(save) then save,neutrals,filename='neutrals.sav'
 	endif else begin
 		neutrals={err:1}
   	endelse

@@ -763,8 +763,8 @@ contains
     write(66)real(lambda_arr(:),float)
     !-------- spectra:----------
     write(66)real(result%spectra(:,:,nbif_type),float)
-    write(66)real(result%spectra(:,:,nbit_type),float)
     write(66)real(result%spectra(:,:,nbih_type),float)
+    write(66)real(result%spectra(:,:,nbit_type),float)
     write(66)real(result%spectra(:,:,halo_type),float)
     write(66)real(result%spectra(:,:,brems_type),float)
     close (66)

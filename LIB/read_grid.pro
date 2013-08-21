@@ -1,4 +1,4 @@
-PRO read_grid,file,grid
+PRO read_grid,file,grid,save=save
 
 	if file_test(file) then begin
 		;;READ ARRAY SIZES
@@ -33,6 +33,7 @@ PRO read_grid,file,grid
 		grid={nx:nx,ny:ny,nz:nz,u_grid:u_grid,v_grid:v_grid,w_grid:w_grid,$
 			  r_grid:r_grid,phi_grid:phi_grid,$
 			  x_grid:x_grid,y_grid:y_grid,z_grid:z_grid,err:0}
+		if keyword_set(save) then save,grid,filename='grid.sav'
 	endif else begin
 		grid={err:1}
 	endelse

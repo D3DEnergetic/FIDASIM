@@ -1,4 +1,4 @@
-PRO read_nbi_halo,file,nbi_halo
+PRO read_nbi_halo,file,nbi_halo,save=save
 
     idum=1L
     fdum=1.e0
@@ -32,6 +32,7 @@ PRO read_nbi_halo,file,nbi_halo
 		
 		nbi_halo={lambda:lambda,full:fspectra,half:hspectra,third:tspectra,$
 				  halo:halospectra,brems:bremspectra,err:0}
+		if keyword_set(save) then save,nbi_halo,filename='nbi_halo.sav'
 	endif else begin
 		nbi_halo={err:1}
 	endelse

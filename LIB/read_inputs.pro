@@ -1,4 +1,4 @@
-PRO read_inputs,file,inputs
+PRO read_inputs,file,inputs,save=save
 
     idum=1L
     fdum=1.e0
@@ -114,6 +114,7 @@ PRO read_inputs,file,inputs
 	          , x0:xx[0],x1:xx[nx-1]+dx $
 	          , y0:yy[0],y1:yy[ny-1]+dy $
 	          , z0:zz[0],z1:zz[nz-1]+dz, isource:isource,origin:origin,alpha:alpha,beta:beta,err:0}
+		if keyword_set(save) then save,inputs,filename='inputs.sav'
 	endif else begin	
 		inputs={err:1}
 	endelse

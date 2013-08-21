@@ -1,4 +1,4 @@
-PRO read_plasma,plasma_file,plasma
+PRO read_plasma,plasma_file,plasma,save=save
 
 	if file_test(plasma_file) then begin
 		;;READ IN ARRAY SIZES
@@ -55,6 +55,7 @@ PRO read_plasma,plasma_file,plasma
 				dene:dene,deni:deni,denp:denp,denf:denf,zeff:zeff,$
 				vrotx:vrotx,vroty:vroty,vrotz:vrotz,bx:bx,by:by,bz:bz,$
 				ex:ex,ey:ey,ez:ez,err:0}
+		if keyword_set(save) then save,plasma,filename='plasma.sav'
 	endif else begin
 		plasma={err:1}
 	endelse

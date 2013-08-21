@@ -1,4 +1,4 @@
-PRO read_los,file,los
+PRO read_los,file,los,save=save
 
     idum=1L
     fdum=1.e0
@@ -38,6 +38,7 @@ PRO read_los,file,los
 		
 		los={nchan:nchan,rlos:rlos,xyzlens:xyzlens,xyzlos:xyzlos,$
 			 headsize:headsize,opening_angle:opening_angle,sigma_pi:sigma_pi,weight:weight,err:0}
+		if keyword_set(save) then save,los,filename='los.sav'
 	endif else begin
 		los={err:1}
 	endelse

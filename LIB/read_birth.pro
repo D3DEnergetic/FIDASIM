@@ -1,4 +1,4 @@
-PRO read_birth,file,birth
+PRO read_birth,file,birth,save=save
 
     idum=1L
     fdum=1.e0
@@ -23,6 +23,8 @@ PRO read_birth,file,birth
 		close,55
 	
 		birth={birth_dens:birth_dens,err:0}
+		
+		if keyword_set(save) then save,birth,filename='birth.sav'
 	endif else begin
 		birth={err:1}
 	endelse

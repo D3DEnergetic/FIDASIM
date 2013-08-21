@@ -53,18 +53,18 @@ PRO plot_spectra,path=path,fida=fida,nbi=nbi,halo=halo
 		if plt[0] ne 0 then begin
 			oplot,fida.lambda,fida.spectra[*,ichan]+brems ,color=254
 			if n_elements(wspec) ne 0 then begin
-				oplot,wlambda,wspec[*,ichan]+brems,color=50
+				oplot,wlambda,wspec[*,ichan]+brems,color=0,thick=2,linestyle=2
 			endif
 		endif
 
 		if plt[1] ne 0 then begin
-			oplot,nbi_halo.lambda,nbi_halo.full[*,ichan]+brems,color=80
-			oplot,nbi_halo.lambda,nbi_halo.half[*,ichan]+brems ,color=100
-			oplot,nbi_halo.lambda,nbi_halo.third[*,ichan]+brems ,color=120
+			oplot,nbi_halo.lambda,nbi_halo.full[*,ichan]+brems,color=100
+			oplot,nbi_halo.lambda,nbi_halo.half[*,ichan]+brems ,color=150
+			oplot,nbi_halo.lambda,nbi_halo.third[*,ichan]+brems ,color=200
 		endif
 
 		if plt[2] ne 0 then begin
-			oplot,nbi_halo.lambda,nbi_halo.halo[*,ichan]+brems,color=150
+			oplot,nbi_halo.lambda,nbi_halo.halo[*,ichan]+brems,color=70
 		endif
 		wait,2
 	endfor

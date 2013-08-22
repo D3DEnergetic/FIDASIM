@@ -40,5 +40,8 @@ PRO load_results,result_dir,results,save=save
 	results={inputs:inputs,grid:grid,los:los,plasma:plasma,$
 			fida:fida,nbi_halo:nbi_halo,neutrals:neutrals,$
 			npa:npa,fbm:fbm,weights:weights,birth:birth}
-	if keyword_set(save) then save,results,filename=inputs.fidasim_runid+'_results.sav'
+	if keyword_set(save) then begin
+		save,inputs,grid,los,plasma,fida,nbi_halo,neutrals,$
+		npa,fbm,weights,birth,filename=inputs.fidasim_runid+'_results.sav',/compress
+	endif
 END

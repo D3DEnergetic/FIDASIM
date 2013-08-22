@@ -102,7 +102,11 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 	
 			plt=plot(rlos,intensity,$
 			 	title='Intensity vs. Major Radius ',xtitle='R [cm]',ytitle='Intensity [Ph/(s $m^2$ nm sr)]')
-			if keyword_set(ps) then plt.Save,inputs.fidasim_runid+"_intensity.pdf",border=10
+			if keyword_set(ps) then begin
+				type=size(ps,/type)
+				if type eq 7 then dir=ps+inputs.fidasim_runid+"_intensity.pdf" else dir=inputs.fidasim_runid+"_intensity.pdf" 
+				plt.Save,dir,border=10
+			endif
 		endif else print,'MISSING FILES'
 	endelse
 	GET_OUT:

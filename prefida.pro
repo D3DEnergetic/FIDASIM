@@ -698,7 +698,7 @@ PRO prefida,input_pro,plot=plot
 	printf,55, inputs.calc_wght,f='(i2,"             # calculate wght function")'
 	printf,55,'# weight function settings:'
 	printf,55, inputs.nr_wght,f='(i9,"      # number velocities")'
-	printf,55, inputs.ichan_wght,f='(i3,"      # channel for weight function")'
+	printf,55, inputs.ichan_wght[0],f='(i3,"      # channel for weight function")'
 	printf,55, inputs.emax_wght,f='(1f12.2,"       # emax for weights")'
 	printf,55, inputs.dwav_wght,f='(1f12.5,"       # dwav")'
 	printf,55, inputs.wavel_start_wght,f='(1f12.5,"       # wavel_start")'

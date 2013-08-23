@@ -72,7 +72,7 @@ PRO calc_spectra,grid,fbm,weights,los,neutrals,lambda,radiance,mean_fbm
            prod=replicate(0.,weights.nen,weights.npitch)
            for ie=0,weights.nen-1 do begin
               for ip=0,weights.npitch-1 do begin
-                 prod[ie,ip]=mean_fbm2[ie,ip]*weights.weight_tot[ichan,ii,ie,ip]
+                 prod[ie,ip]=mean_fbm2[ie,ip]*weights.weight_tot[ii,ie,ip,ichan]
                  ;;--> [ph/(s cm^2 dP keV)]
               endfor
            endfor

@@ -1,32 +1,18 @@
 PRO read_fida,file,fida,save=save
 
-	idum=1L
-	fdum=1.e0
-	ddum=1.d0
-	sdum=''
-
 	if file_test(file) then begin
-		;;READ IN ARRAY SIZES
-		openr,55,file
-		readu,55,idum ;;SHOT
-		readu,55,fdum ;;TIME
-		readu,55,idum & nlos=idum
-		readu,55,idum & nlambda=idum
-		
-		;;DEFINE ARRAYS
-		lambda=fltarr(nlambda)
-		spectra=fltarr(nlambda,nlos)
 
-		;;READ IN ARRAYS
-		readu,55,lambda
-		readu,55,spectra
-		close,55
+       	ncid=ncdf_open(file,/nowrite)
+       	ncdf_varget,ncid,'shot',shot
+       	ncdf_varget,ncid,'time',time
+       	ncdf_varget,ncid,'lambda',lambda
+       	ncdf_varget,ncid,'spectra',spectra
+        ncdf_close,ncid
 
-		fida={lambda:lambda,spectra:spectra,err:0}
+		fida={shot:shot,time:time,lambda:lambda,spectra:spectra,err:0}
 
 		if keyword_set(save) then save,fida,filename='fida.sav'
 	endif else begin
 		fida={err:1}
 	endelse
-
 END

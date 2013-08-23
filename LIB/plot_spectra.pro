@@ -1,4 +1,4 @@
-PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,ps=ps
+PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,ps=ps,pretty=pretty
 
 	if keyword_set(fida) then fida_switch = [1,0,0] else fida_switch=[1,1,1] 
 	if keyword_set(nbi) then nbi_switch = [0,1,0] else nbi_switch=[1,1,1]
@@ -59,54 +59,83 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 		;;LOOP OVER CHANNELS
 		for ichan=startind,endind do begin
 			if nbi_halo.err eq 0 then brems=nbi_halo.brems[*,ichan] else brems=0
-		
-			plts=plot([0.],/nodata,xrange=xran,yrange=yran $
-				, ytitle='Intensity  [Ph/(s $m^2$ nm sr)]', xtitle='$\lambda$ [nm]' $
-				, /ylog)
-			txt=TEXT(100,435,'$R = $'+strtrim(string(rlos[ichan],format='(f10.2)'),1)+' cm',/device)
-			if plt[0] ne 0 then begin
-				if fida.err eq 0 then begin 
-					plt1=plot(fida.lambda,fida.spectra[*,ichan]+brems,'r',/overplot,name='Fida')
-					if n_elements(plt1) ne 0 then targets=[plt1]
+			if keyword_set(pretty) then begin
+				plts=plot([0.],/nodata,xrange=xran,yrange=yran $
+					, ytitle='Intensity  [Ph/(s $m^2$ nm sr)]', xtitle='$\lambda$ [nm]' $
+					, /ylog)
+				txt=TEXT(100,435,'$R = $'+strtrim(string(rlos[ichan],format='(f10.2)'),1)+' cm',/device)
+				if plt[0] ne 0 then begin
+					if fida.err eq 0 then begin 
+						plt1=plot(fida.lambda,fida.spectra[*,ichan]+brems,'r',/overplot,name='Fida')
+						if n_elements(plt1) ne 0 then targets=[plt1]
+					endif
+					if n_elements(wspec) ne 0 then begin
+						plt2=plot(wlambda,wspec[*,ichan]+brems,'k',thick=2,linestyle=2,/overplot,name='Weight')
+						if n_elements(plt2) ne 0 and n_elements(plt1) ne 0 then targets=[targets,plt2] else targets=[plt2] 
+					endif
 				endif
-				if n_elements(wspec) ne 0 then begin
-					plt2=plot(wlambda,wspec[*,ichan]+brems,'k',thick=2,linestyle=2,/overplot,name='Weight')
-					if n_elements(plt2) ne 0 and n_elements(plt1) ne 0 then targets=[targets,plt2] else targets=[plt2] 
+			
+				if plt[1] ne 0 and nbi_halo.err eq 0 then begin
+					plt3=plot(nbi_halo.lambda,nbi_halo.full[*,ichan]+brems,'c',/overplot,name='Full')
+					plt4=plot(nbi_halo.lambda,nbi_halo.half[*,ichan]+brems,'m',/overplot,name='Half')
+					plt5=plot(nbi_halo.lambda,nbi_halo.third[*,ichan]+brems,'g',/overplot,name='Third')
+					if n_elements(targets) eq 0 then targets=[plt3,plt4,plt5] else targets=[targets,plt3,plt4,plt5] 
 				endif
-			endif
-		
-			if plt[1] ne 0 and nbi_halo.err eq 0 then begin
-				plt3=plot(nbi_halo.lambda,nbi_halo.full[*,ichan]+brems,'c',/overplot,name='Full')
-				plt4=plot(nbi_halo.lambda,nbi_halo.half[*,ichan]+brems,'m',/overplot,name='Half')
-				plt5=plot(nbi_halo.lambda,nbi_halo.third[*,ichan]+brems,'g',/overplot,name='Third')
-				if n_elements(targets) eq 0 then targets=[plt3,plt4,plt5] else targets=[targets,plt3,plt4,plt5] 
-			endif
-		
-			if plt[2] ne 0 and nbi_halo.err eq 0 then begin
-				plt6=plot(nbi_halo.lambda,nbi_halo.halo[*,ichan]+brems,'b',/overplot,name='Halo')
-				if n_elements(targets) eq 0 then targets=[plt6] else targets=[targets,plt6] 				
-			endif
-			if n_elements(targets) ne 0 then leg=legend(target=targets,/device,position=[464,438])
+			
+				if plt[2] ne 0 and nbi_halo.err eq 0 then begin
+					plt6=plot(nbi_halo.lambda,nbi_halo.halo[*,ichan]+brems,'b',/overplot,name='Halo')
+					if n_elements(targets) eq 0 then targets=[plt6] else targets=[targets,plt6] 				
+				endif
+				if n_elements(targets) ne 0 then leg=legend(target=targets,/device,position=[464,438])
+			endif else begin
+				!p.multi=0
+				loadct,39,/silent
+				plot,[0.],/nodata,xrange=xran,yrange=yran $
+					, ytitle='Intensity  [Ph/(s m^2 nm sr)]', xtitle='lambda [nm]' $
+					, /ylog
+				xyouts,100,435,'R = '+strtrim(string(rlos[ichan],format='(f10.2)'),1)+' cm',/device
+				if plt[0] ne 0 then begin
+					if fida.err eq 0 then begin 
+						oplot,fida.lambda,fida.spectra[*,ichan]+brems,color=253
+					endif
+					if n_elements(wspec) ne 0 then begin
+						oplot,wlambda,wspec[*,ichan]+brems,thick=2,linestyle=2
+					endif
+				endif
+			
+				if plt[1] ne 0 and nbi_halo.err eq 0 then begin
+					oplot,nbi_halo.lambda,nbi_halo.full[*,ichan]+brems,color=100
+					oplot,nbi_halo.lambda,nbi_halo.half[*,ichan]+brems,color=150
+					oplot,nbi_halo.lambda,nbi_halo.third[*,ichan]+brems,color=200
+				endif
+			
+				if plt[2] ne 0 and nbi_halo.err eq 0 then begin
+					oplot,nbi_halo.lambda,nbi_halo.halo[*,ichan]+brems,color=70
+				endif
+			endelse
 			wait,2
 		endfor
-		if keyword_set(ps) then plts.Save,inputs.fidasim_runid+"_spectra.pdf",BORDER=10
+		if keyword_set(ps) and keyword_set(pretty) then plts.Save,inputs.fidasim_runid+"_spectra.pdf",BORDER=10
 	endif else begin
 		if inputs.err eq 0 and nbi_halo.err eq 0 and fida.err eq 0 then begin
-			!p.multi=0
-
 			intensity=dblarr(los.nchan)
 			for ichan=0,los.nchan-1 do begin
 				intensity[ichan]=total(plt[1]*(nbi_halo.full[*,ichan]+nbi_halo.half[*,ichan]+nbi_halo.third[*,ichan])+$
 						  	plt[2]*nbi_halo.halo[*,ichan]+plt[0]*fida.spectra[*,ichan]+nbi_halo.brems[*,ichan])
 			endfor
-	
-			plt=plot(rlos,intensity,$
-			 	title='Intensity vs. Major Radius ',xtitle='R [cm]',ytitle='Intensity [Ph/(s $m^2$ nm sr)]')
-			if keyword_set(ps) then begin
-				type=size(ps,/type)
-				if type eq 7 then dir=ps+inputs.fidasim_runid+"_intensity.pdf" else dir=inputs.fidasim_runid+"_intensity.pdf" 
-				plt.Save,dir,border=10
-			endif
+			if keyword_set(pretty) then begin
+				plt=plot(rlos,intensity,$
+				 	title='Intensity vs. Major Radius ',xtitle='R [cm]',ytitle='Intensity [Ph/(s $m^2$ nm sr)]')
+				if keyword_set(ps) then begin
+					type=size(ps,/type)
+					if type eq 7 then dir=ps+inputs.fidasim_runid+"_intensity.pdf" else dir=inputs.fidasim_runid+"_intensity.pdf" 
+					plt.Save,dir,border=10
+				endif
+			endif else begin
+				!p.multi=0
+				window,0 & wset,0
+				plot,rlos,intensity,title='Intensity vs. Major Radius',xtitle='R [cm]',ytitle='Intensity [Ph/(s m^2 nm sr)]',psym=2
+			endelse
 		endif else print,'MISSING FILES'
 	endelse
 	GET_OUT:

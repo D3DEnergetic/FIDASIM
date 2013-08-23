@@ -714,6 +714,10 @@ contains
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
     call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"birth_dens",NF90_DOUBLE,dimids,varid) )
+
+	!Add unit attributes
+	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+	call check( nf90_put_att(ncid,varid,"units","fast-ions/(s*dx*dy*dz*dE*dP)") )
     call check( nf90_enddef(ncid) )
 
     !Write data to file
@@ -753,6 +757,13 @@ contains
     call check( nf90_def_var(ncid,"hdens",NF90_DOUBLE,dimids,half_varid) )
     call check( nf90_def_var(ncid,"tdens",NF90_DOUBLE,dimids,third_varid) )
     call check( nf90_def_var(ncid,"halodens",NF90_DOUBLE,dimids,halo_varid) )
+
+	!Add unit attributes
+	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+	call check( nf90_put_att(ncid,full_varid,"units","neutrals/(dx*dy*dz)") )
+	call check( nf90_put_att(ncid,half_varid,"units","neutrals/(dx*dy*dz)") )
+	call check( nf90_put_att(ncid,third_varid,"units","neutrals/(dx*dy*dz)") )
+	call check( nf90_put_att(ncid,halo_varid,"units","neutrals/(dx*dy*dz)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -798,6 +809,13 @@ contains
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
     call check( nf90_def_var(ncid,"wght",NF90_FLOAT,c_dimid,wght_varid) )
+
+	!Add unit attributes
+	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+	call check( nf90_put_att(ncid,ipos_varid,"units","cm") )
+	call check( nf90_put_att(ncid,fpos_varid,"units","cm") )
+	call check( nf90_put_att(ncid,v_varid,"units","cm/s") )
+	call check( nf90_put_att(ncid,wght_varid,"units","particle # / marker") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -863,6 +881,16 @@ contains
     call check( nf90_def_var(ncid,"third",NF90_DOUBLE,dimids,third_varid) )
     call check( nf90_def_var(ncid,"halo",NF90_DOUBLE,dimids,halo_varid) )
     call check( nf90_def_var(ncid,"brems",NF90_DOUBLE,dimids,brems_varid) )
+
+	!Add unit attributes
+	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+	call check( nf90_put_att(ncid,lam_varid,"units","nm") )
+	call check( nf90_put_att(ncid,full_varid,"units","Ph/(s*nm*sr*m^2)") )
+	call check( nf90_put_att(ncid,half_varid,"units","Ph/(s*nm*sr*m^2)") )
+	call check( nf90_put_att(ncid,third_varid,"units","Ph/(s*nm*sr*m^2)") )
+	call check( nf90_put_att(ncid,halo_varid,"units","Ph/(s*nm*sr*m^2)") )
+	call check( nf90_put_att(ncid,brems_varid,"units","Ph/(s*nm*sr*m^2)") )
+
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -918,6 +946,11 @@ contains
     call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
     call check( nf90_def_var(ncid,"spectra",NF90_DOUBLE,dimids,fida_varid) )
+
+	!Add unit attributes
+	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+	call check( nf90_put_att(ncid,lam_varid,"units","nm") )
+	call check( nf90_put_att(ncid,fida_varid,"units","Ph/(s*nm*sr*m^2)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -2952,7 +2985,7 @@ contains
     real(double),dimension(  grid%ntrack) :: wght   !! radiation wght per cell 
     real(double),dimension(  grid%ntrack) :: los_wght !! los wght 
     real(double),dimension(grid%nx,grid%ny,grid%nz,spec%nchan) :: los_weight !! los wght
-    integer(long)                         :: ichan
+    integer(long)                         :: ichan,ind
     character(100)                        :: filename
     !! length through cloud of neutrals
     real(double), dimension(3,grid%ntrack):: pos_out
@@ -3201,11 +3234,16 @@ contains
                    wavelength_ranges: do ii=1,nwav
                       if (wavel(l).ge.wav_arr(ii).and. &
                            wavel(l).lt.wav_arr(ii+1)) then
+						   if(ichan.eq.inputs%ichan_wght) then 
+						      ind=1 
+						   else 
+							  ind=ichan
+						   endif
                            !calc weight functions w/o cross-sections:
-                           !wfunct(ii,i,j,ichan) = wfunct(ii,i,j,ichan) &
+                           !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
                            !    + intens(l)/real(inputs%nr_wght)
                            !normal calculation:
-                           wfunct(ii,i,j,ichan) = wfunct(ii,i,j,ichan) &
+                           wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
                                 + intens(l)*photons/real(inputs%nr_wght)
                       endif
                    enddo wavelength_ranges
@@ -3239,6 +3277,14 @@ contains
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
     call check( nf90_def_var(ncid,"theta",NF90_DOUBLE,nchan_dimid,theta_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
+
+	!Add unit attributes
+	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+	call check( nf90_put_att(ncid,wav_varid,"units","nm") )
+	call check( nf90_put_att(ncid,rad_varid,"units","cm") )
+	call check( nf90_put_att(ncid,theta_varid,"units","deg") )
+	call check( nf90_put_att(ncid,e_varid,"units","keV") )
+	call check( nf90_put_att(ncid,wfunct_varid,"units","(Ph*cm)/(s*dE*dP)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file

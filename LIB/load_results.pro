@@ -17,25 +17,25 @@ PRO load_results,result_dir,results,save=save
 	read_plasma,result_dir+'plasma.bin',plasma
 
 	;;READ FIDA SPECTRA
-	read_fida,result_dir+'fida_spectra.bin',fida
+	read_fida,result_dir+'fida_spectra.cdf',fida
 
 	;;READ HALO AND NBI SPECTRA
-	read_nbi_halo,result_dir+'nbi_halo_spectra.bin',nbi_halo
+	read_nbi_halo,result_dir+'nbi_halo_spectra.cdf',nbi_halo
 
 	;;READ NEUTRALS
-	read_neutrals,result_dir+'neutrals.bin',neutrals
+	read_neutrals,result_dir+'neutrals.cdf',neutrals
 
 	;;READ NPA
-	read_npa,result_dir+'npa.bin',npa
+	read_npa,result_dir+'npa.cdf',npa
 
 	;;READ FBM
 	read_fbm,result_dir+'transp_fbm.bin',fbm
 
 	;;READ WEIGHT FUNCTIONS
-	read_weights,result_dir+'weight_function.bin',weights
+	read_weights,result_dir+'weight_function.cdf',weights
 
 	;;READ BIRTH PROFILE
-	read_birth,result_dir+'birth.bin',birth
+	read_birth,result_dir+'birth.cdf',birth
 
 	results={inputs:inputs,grid:grid,los:los,plasma:plasma,$
 			fida:fida,nbi_halo:nbi_halo,neutrals:neutrals,$

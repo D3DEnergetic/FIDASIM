@@ -3,6 +3,7 @@
 !rewritten in F90 by Benedikt Geiger 2012 (IPP-Garching, ASDEX Upgrade)
 !The main routine (fidasim) is at the end of the file!
 module application
+  use netcdf
   implicit none
   !!                      Definition for the kind of the variables: 
   integer , parameter   :: long      = kind(int(1))
@@ -238,6 +239,7 @@ module application
   public :: inputs
   public :: npa
   !! routines to read inputs
+  public :: check
   public :: read_inputs
   public :: read_los
   public :: read_plasma
@@ -250,6 +252,16 @@ module application
   public :: write_nbi_halo_spectra
 contains
   !****************************************************************************
+  subroutine check(stat)
+    use netcdf
+    integer, intent ( in) :: stat
+    
+    if(stat /= nf90_noerr) then 
+      print *, trim(nf90_strerror(stat))
+      stop "Stopped: Failed to Write/Read netCDF file"
+    end if
+  end subroutine check 
+  !**************************************************************************** 
   subroutine read_inputs
     character(120)   :: filename
     integer :: i,j,k
@@ -680,124 +692,243 @@ contains
 
 
   subroutine write_birth_profile
-    integer         :: i,j,k,p 
-    character(100)  :: filename
-    filename=trim(adjustl(result_dir))//"/birth.bin"    
-    open (66, form='unformatted',file =filename,access='stream')
-    write(66)real(inputs%shot_number,float )
-    write(66)real(inputs%time)
-    write(66)real(grid%Nx,float)
-    write(66)real(grid%Ny,float)
-    write(66)real(grid%Nz,float) 
-    write(66)real(npitch_birth,float) 
-    write(66)real(result%birth_dens(:,:,:,:,:),float)
-    close (66)
+    use netcdf
+    integer           :: i,j,k,p,ncid,varid,dimids(5),shot_varid,time_varid
+    integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid
+    character(100)    :: filename
+    filename=trim(adjustl(result_dir))//"/birth.cdf"   
+
+    !Create netCDF file
+    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+
+    !Define Dimensions
+    call check( nf90_def_dim(ncid,"dim_001",1,dimid1) )
+    call check( nf90_def_dim(ncid,"x",grid%Nx,x_dimid) )
+    call check( nf90_def_dim(ncid,"y",grid%Ny,y_dimid) )
+    call check( nf90_def_dim(ncid,"z",grid%Nz,z_dimid) )
+    call check( nf90_def_dim(ncid,"energy",3,e_dimid) )
+    call check( nf90_def_dim(ncid,"pitch",npitch_birth,p_dimid) )
+    dimids = (/ x_dimid, y_dimid, z_dimid, e_dimid, p_dimid /)
+
+    !Define variable
+    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
+    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
+    call check( nf90_def_var(ncid,"birth_dens",NF90_DOUBLE,dimids,varid) )
+    call check( nf90_enddef(ncid) )
+
+    !Write data to file
+    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
+    call check( nf90_put_var(ncid, time_varid, inputs%time) )
+    call check( nf90_put_var(ncid, varid, result%birth_dens) )
+
+    !Close netCDF file
+    call check( nf90_close(ncid) )
+
     print*, 'birth profile written to:      ',filename
   end subroutine write_birth_profile
 
   subroutine write_neutrals
-    integer         :: i,j,k,n
+    use netcdf
+    integer         :: i,j,k,n,x_dimid,y_dimid,z_dimid,l_dimid,dimids(4)
+    integer 	    :: ncid,full_varid,half_varid,third_varid,halo_varid
+    integer         :: shot_varid,time_varid,dimid1
     character(120)  :: filename
-    filename=trim(adjustl(result_dir))//"/neutrals.bin"
-    open (66, form='unformatted',file =filename,access='stream')
-    write(66)real(inputs%shot_number,float )
-    write(66)real(inputs%time)
-    write(66)real(grid%Nx,float)
-    write(66)real(grid%Ny,float)
-    write(66)real(grid%Nz,float) 
-    write(66)real(nlevs  ,float) 
-    write(66)real(result%neut_dens(:,:,:,:,nbif_type),float)
-    write(66)real(result%neut_dens(:,:,:,:,nbih_type),float)
-    write(66)real(result%neut_dens(:,:,:,:,nbit_type),float)
-    write(66)real(result%neut_dens(:,:,:,:,halo_type),float)
-    close (66)
-    !!print*, 'neutral density written to:      ',filename
+    filename=trim(adjustl(result_dir))//"/neutrals.cdf"
+ 
+    !Create netCDF file
+    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+
+    !Define Dimensions
+    call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
+    call check( nf90_def_dim(ncid,"x",grid%Nx,x_dimid) )
+    call check( nf90_def_dim(ncid,"y",grid%Ny,y_dimid) )
+    call check( nf90_def_dim(ncid,"z",grid%Nz,z_dimid) )
+    call check( nf90_def_dim(ncid,"nlevs",nlevs,l_dimid) )
+    dimids = (/ x_dimid, y_dimid, z_dimid, l_dimid /)
+
+    !Define variables
+    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
+    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
+    call check( nf90_def_var(ncid,"fdens",NF90_DOUBLE,dimids,full_varid) )
+    call check( nf90_def_var(ncid,"hdens",NF90_DOUBLE,dimids,half_varid) )
+    call check( nf90_def_var(ncid,"tdens",NF90_DOUBLE,dimids,third_varid) )
+    call check( nf90_def_var(ncid,"halodens",NF90_DOUBLE,dimids,halo_varid) )
+    call check( nf90_enddef(ncid) )
+
+    !Write to file
+    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
+    call check( nf90_put_var(ncid, time_varid, inputs%time) )
+    call check( nf90_put_var(ncid, full_varid, result%neut_dens(:,:,:,:,nbif_type)) )
+    call check( nf90_put_var(ncid, half_varid, result%neut_dens(:,:,:,:,nbih_type)) )
+    call check( nf90_put_var(ncid, third_varid, result%neut_dens(:,:,:,:,nbit_type)) )
+    call check( nf90_put_var(ncid, halo_varid, result%neut_dens(:,:,:,:,halo_type)) )
+
+    !Close netCDF file
+    call check( nf90_close(ncid) )
+    
+    print*, 'neutral density written to:      ',filename
   end subroutine write_neutrals
 
   subroutine write_npa
-    integer         :: i
+    use netcdf
+    integer         :: i,e_dimid,c_dimid,ncid,dimids(2),dimid1
+    integer         :: ipos_varid,fpos_varid,v_varid,wght_varid,shot_varid,time_varid
     character(120)  :: filename
     real(float), dimension(:,:),allocatable :: output
+    real(float), dimension(:),allocatable :: output1
     allocate(output(npa%counter,3))
+    allocate(output1(npa%counter))
 
     npa%wght(:)=npa%wght(:)/(pi*npa%size(1)**2)
-    filename=trim(adjustl(result_dir))//"/npa.bin"      
-    open (66, form='unformatted',file =filename,access='stream')
-    write(66)inputs%shot_number
-    write(66)real(inputs%time,float)
-    write(66)inputs%nr_npa
-    write(66)npa%counter
+    filename=trim(adjustl(result_dir))//"/npa.cdf"
+
+    !Create netCDF file
+    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+
+    !Define Dimensions
+    call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
+    call check( nf90_def_dim(ncid,"counts",npa%counter,c_dimid) )
+    call check( nf90_def_dim(ncid,"energy",3,e_dimid) )
+    dimids = (/ c_dimid, e_dimid /)
+
+    !Define variables
+    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
+    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
+    call check( nf90_def_var(ncid,"ipos",NF90_FLOAT,dimids,ipos_varid) )
+    call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
+    call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
+    call check( nf90_def_var(ncid,"wght",NF90_FLOAT,c_dimid,wght_varid) )
+    call check( nf90_enddef(ncid) )
+
+    !Write to file
+    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
+    call check( nf90_put_var(ncid, time_varid, inputs%time) )
+
     output(:,:)=real(npa%ipos(:npa%counter,:),float)
-    write(66)output
+    call check( nf90_put_var(ncid, ipos_varid, output) )
+
     output(:,:)=real(npa%fpos(:npa%counter,:),float)
-    write(66)output
+    call check( nf90_put_var(ncid, fpos_varid, output) )
+
     output(:,:)=real(npa%v(:npa%counter,:)   ,float)
-    write(66)output
-    write(66)real(npa%wght(:npa%counter)  ,float)
-    close (66)
-    print*, 'NPA data written to: ',filename
+    call check( nf90_put_var(ncid, v_varid, output) )
+
+    output1(:)=real(npa%wght(:npa%counter) ,float)
+    call check( nf90_put_var(ncid, wght_varid, output1) )
+
+    !Close netCDF file
+    call check( nf90_close(ncid) )
     deallocate(output)
+    deallocate(output1)
+    print*, 'NPA data written to: ',filename
   end subroutine write_npa
   
   subroutine write_nbi_halo_spectra
+    use netcdf
     integer         :: i,j,k,ichan
+    integer         :: ncid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
+    integer         :: chan_dimid,lam_dimid,dimid1,dimids(2),shot_varid,time_varid
     character(120)  :: filename
     real(double), dimension(:)  , allocatable :: lambda_arr
+
     !! ------------------------ calculate wavelength array ------------------ !!
     allocate(lambda_arr(spec%nlambda))
     do i=1,spec%nlambda 
        lambda_arr(i)=(i-0.5)*spec%dlambda*0.1d0 &
             +spec%lambdamin*0.1d0
     enddo 
+
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
     result%spectra(:,:,:)=result%spectra(:,:,:)/(0.1d0*spec%dlambda) &
          /(4.d0*pi)*1.d4
+
     !! write to file
-    filename=trim(adjustl(result_dir))//"/nbi_halo_spectra.bin"
-    open (66, form='unformatted',file =filename,access='stream')
-    write(66)inputs%shot_number
-    write(66)real(inputs%time,float)
-    write(66)spec%nchan
-    write(66)spec%nlambda
-    !--- wavelength array: -----
-    write(66)real(lambda_arr(:),float)
-    !-------- spectra:----------
-    write(66)real(result%spectra(:,:,nbif_type),float)
-    write(66)real(result%spectra(:,:,nbih_type),float)
-    write(66)real(result%spectra(:,:,nbit_type),float)
-    write(66)real(result%spectra(:,:,halo_type),float)
-    write(66)real(result%spectra(:,:,brems_type),float)
-    close (66)
-    !! result arrays 
+    filename=trim(adjustl(result_dir))//"/nbi_halo_spectra.cdf"
+ 
+    !Create netCDF file
+    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+
+    !Define Dimensions
+    call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
+    call check( nf90_def_dim(ncid,"lambda",spec%nlambda,lam_dimid) )
+    call check( nf90_def_dim(ncid,"chan",spec%nchan,chan_dimid) )
+    dimids = (/ lam_dimid, chan_dimid /)
+
+    !Define variables
+    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
+    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
+    call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
+    call check( nf90_def_var(ncid,"full",NF90_DOUBLE,dimids,full_varid) )
+    call check( nf90_def_var(ncid,"half",NF90_DOUBLE,dimids,half_varid) )
+    call check( nf90_def_var(ncid,"third",NF90_DOUBLE,dimids,third_varid) )
+    call check( nf90_def_var(ncid,"halo",NF90_DOUBLE,dimids,halo_varid) )
+    call check( nf90_def_var(ncid,"brems",NF90_DOUBLE,dimids,brems_varid) )
+    call check( nf90_enddef(ncid) )
+
+    !Write to file
+    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
+    call check( nf90_put_var(ncid, time_varid, inputs%time) )
+    call check( nf90_put_var(ncid, lam_varid, lambda_arr) )
+    call check( nf90_put_var(ncid, full_varid, result%spectra(:,:,nbif_type)) )
+    call check( nf90_put_var(ncid, half_varid, result%spectra(:,:,nbih_type)) )
+    call check( nf90_put_var(ncid, third_varid, result%spectra(:,:,nbit_type)) )
+    call check( nf90_put_var(ncid, halo_varid, result%spectra(:,:,halo_type)) )
+    call check( nf90_put_var(ncid, brems_varid, result%spectra(:,:,brems_type)) )
+
+    !Close netCDF file
+    call check( nf90_close(ncid) )
+
     deallocate(lambda_arr)
     print*, 'NBI and HALO spectra written to: ', filename
   end subroutine write_nbi_halo_spectra
 
  subroutine write_fida_spectra
+    use netcdf
     integer         :: i,j,k,ichan
+    integer         :: ncid,fida_varid,lam_varid,shot_varid,time_varid
+    integer         :: chan_dimid,lam_dimid,dimid1,dimids(2)
     character(120)  :: filename
     real(double), dimension(:)  , allocatable :: lambda_arr
+
     !! ------------------------ calculate wavelength array ------------------ !!
     allocate(lambda_arr(spec%nlambda))
     do i=1,spec%nlambda 
        lambda_arr(i)=(i-0.5)*spec%dlambda*0.1d0 &
             +spec%lambdamin*0.1d0
     enddo 
+
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
     result%spectra(:,:,fida_type)=result%spectra(:,:,fida_type) &
          /(0.1d0*spec%dlambda)/(4.d0*pi)*1.d4
+
     !! write to file
-    filename=trim(adjustl(result_dir))//"/fida_spectra.bin"  
-    open (66, form='unformatted',file =filename,access='stream')
-    write(66)inputs%shot_number
-    write(66)real( inputs%time,float)
-    write(66)spec%nchan 
-    write(66)spec%nlambda
-    !--- wavelength array: -----
-    write(66)real(lambda_arr(:),float)
-    !-------- spectra:----------
-    write(66)real(result%spectra(:,:,fida_type),float)
-    close (66)
+    filename=trim(adjustl(result_dir))//"/fida_spectra.cdf"  
+
+    !Create netCDF file
+    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+
+    !Define Dimensions
+    call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
+    call check( nf90_def_dim(ncid,"lambda",spec%nlambda,lam_dimid) )
+    call check( nf90_def_dim(ncid,"chan",spec%nchan,chan_dimid) )
+    dimids = (/ lam_dimid, chan_dimid /)
+
+    !Define variables
+    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
+    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
+    call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
+    call check( nf90_def_var(ncid,"spectra",NF90_DOUBLE,dimids,fida_varid) )
+    call check( nf90_enddef(ncid) )
+
+    !Write to file
+    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
+    call check( nf90_put_var(ncid, time_varid, inputs%time) )
+    call check( nf90_put_var(ncid, lam_varid, lambda_arr) )
+    call check( nf90_put_var(ncid, fida_varid, result%spectra(:,:,fida_type)) )
+
+    !Close netCDF file
+    call check( nf90_close(ncid) )
+
     !! result arrays 
     deallocate(lambda_arr)
     !print*, 'FIDA spectra written to ',filename

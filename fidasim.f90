@@ -2916,6 +2916,7 @@ contains
   !----------- Calculation of weight functions----------------------------------
   !*****************************************************************************
   subroutine weight_function
+	use netcdf
     real(double)                   :: radius
     real(double)                   :: photons !! photon flux 
     real(double), dimension(nlevs) :: fdens,hdens,tdens,halodens
@@ -2924,14 +2925,14 @@ contains
     real(double)                   :: b_abs,theta
     real(double)                   :: ti,te,dene,denp,deni,length
     real(double)                   :: rad,max_wght
-    integer                        :: nwav
+    integer                        :: nwav,nchan
     real(double),dimension(:)    ,allocatable  :: wav_arr,central_wavel
     integer                        :: ii,i,j,k,l   !! indices wavel,vx,vy,vz
-    real(double),dimension(:,:,:),allocatable :: wfunct
-    real(double),dimension(:)    ,allocatable :: ebarr,ptcharr,phiarr
+    real(double),dimension(:,:,:,:),allocatable :: wfunct
+    real(double),dimension(:)    ,allocatable :: ebarr,ptcharr,phiarr,rad_arr,theta_arr
     real(double)                   :: sinus
     real(double),dimension(3)      :: vi,vi_norm
-    real(double)                   :: vabs
+    real(double)                   :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2
     real(double),dimension(3)      :: efield
     real(double),dimension(n_stark):: intens !!intensity vector
     real(double),dimension(n_stark):: wavel  !!wavelength vector [A)
@@ -2961,6 +2962,11 @@ contains
     real(double), dimension(  grid%ntrack):: tcell  !! time per cell
     integer,dimension(3,grid%ntrack)      :: icell  !! index of cells
     real(double)                          :: wght2
+	!!netCDF variables
+	integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,nr_dimid
+	integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
+	integer :: shot_varid,time_varid
+
     !! DEFINE wavelength array
     nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
     allocate(wav_arr(nwav+1))
@@ -2991,29 +2997,17 @@ contains
     do i=1,inputs%nr_wght
        phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nr_wght)
     enddo
-    !! define storage arrays
-    allocate(wfunct(nwav,inputs%nr_wght,inputs%nr_wght))
-  
-    !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/weight_function.bin" 
-    open (66,form='unformatted', file =filename,access='stream')
-    write(66)inputs%shot_number
-    write(66)real(inputs%time,float)
-    write(66)inputs%ichan_wght 
-    write(66)inputs%nr_wght  !!Nr of energies
-    write(66)real(ebarr(2)-ebarr(1),float)   
-    write(66)inputs%nr_wght  !!Nr. of pitches
-    write(66)real(abs(ptcharr(2)-ptcharr(1)),float)     
-    write(66)nwav
-    write(66)real(inputs%dwav_wght,float) 
-    write(66)real(inputs%wavel_start_wght,float) 
-    write(66)real(inputs%wavel_end_wght,float)
     if(inputs%ichan_wght.gt.0) then
-       write(66)int(1,long)
+       nchan=1
     else
-       write(66)spec%nchan
+       nchan=spec%nchan
     endif
-   
+
+    !! define storage arrays
+    allocate(wfunct(nwav,inputs%nr_wght,inputs%nr_wght,nchan))
+    allocate(rad_arr(nchan))
+	allocate(theta_arr(nchan))
+
     !!save the los-weights into an array
     !! because the structure is over-written
     do k=1,grid%nz
@@ -3028,10 +3022,18 @@ contains
        if(inputs%ichan_wght.gt.0) then
           if(ichan.ne.inputs%ichan_wght)cycle loop_over_channels
        endif
-       write(66)ichan
        print*,'channel:',ichan
-       radius=sqrt(spec%xyzlos(ichan,1)**2 &
-            +spec%xyzlos(ichan,2)**2)
+       xlos=spec%xyzlos(ichan,1)
+       ylos=spec%xyzlos(ichan,2)
+       zlos=spec%xyzlos(ichan,3)
+	   !!transform into machine coordinates
+	   xlos2 =  cos(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) &
+	  	      - sin(grid%alpha)*ylos + grid%origin(1)
+	   ylos2 =  sin(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) & 
+		      + cos(grid%alpha)*ylos + grid%origin(2)
+	   zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
+       
+       radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius:',radius
        !! Calcullate mean kinetic profiles...
        cc=0       ; max_wght=0.d0 ; los_wght=0.d0 ; wght=0.d0
@@ -3123,11 +3125,11 @@ contains
        theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
        print*,'Angle between B and LOS [deg]:', theta
        !! write angle and radius into the output file
-       write(66)real(theta,float)
-       write(66)real(radius,float)
+       rad_arr(ichan)=radius
+	   theta_arr(ichan)=theta
        !! START calculation of weight functions
        print*, 'nwav: ' ,nwav
-       wfunct       = 0.d0
+
        !! do the main simulation  !! 
        !$OMP PARALLEL DO private(i,j,k,vabs,sinus,vi,states,    &
        !$OMP& rates,in,vhalo,dt,photons,wavel,intens,l,ii, &
@@ -3200,10 +3202,10 @@ contains
                       if (wavel(l).ge.wav_arr(ii).and. &
                            wavel(l).lt.wav_arr(ii+1)) then
                            !calc weight functions w/o cross-sections:
-                           !wfunct(ii,i,j) = wfunct(ii,i,j) &
+                           !wfunct(ii,i,j,ichan) = wfunct(ii,i,j,ichan) &
                            !    + intens(l)/real(inputs%nr_wght)
                            !normal calculation:
-                           wfunct(ii,i,j) = wfunct(ii,i,j) &
+                           wfunct(ii,i,j,ichan) = wfunct(ii,i,j,ichan) &
                                 + intens(l)*photons/real(inputs%nr_wght)
                       endif
                    enddo wavelength_ranges
@@ -3213,18 +3215,59 @@ contains
        enddo
        !$OMP END PARALLEL DO
        !!wfunct:[Ph*cm/s] !!
-       write(66)real(wfunct(:,:,:),float)
     enddo loop_over_channels
-    close (66)
+
+    !! Open file for the outputs
+    filename=trim(adjustl(result_dir))//"/weight_function.cdf"
+
+    !Create netCDF file
+    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+
+    !Define Dimensions
+    call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
+    call check( nf90_def_dim(ncid,"nwav",nwav,nwav_dimid) )
+    call check( nf90_def_dim(ncid,"nchan",nchan,nchan_dimid) )
+    call check( nf90_def_dim(ncid,"nr_wght",inputs%nr_wght,nr_dimid) )
+    dimids = (/ nwav_dimid, nr_dimid, nr_dimid, nchan_dimid /)
+
+    !Define variables
+    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
+    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
+    call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,nwav_dimid,wav_varid) )
+    call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,nr_dimid,e_varid) )
+    call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,nr_dimid,ptch_varid) )
+    call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
+    call check( nf90_def_var(ncid,"theta",NF90_DOUBLE,nchan_dimid,theta_varid) )
+    call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
+    call check( nf90_enddef(ncid) )
+
+    !Write to file
+    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
+    call check( nf90_put_var(ncid, time_varid, inputs%time) )
+    call check( nf90_put_var(ncid, wav_varid, central_wavel(:nwav)) )
+    call check( nf90_put_var(ncid, e_varid, ebarr) )
+    call check( nf90_put_var(ncid, ptch_varid, ptcharr) )
+    call check( nf90_put_var(ncid, rad_varid, rad_arr) )
+    call check( nf90_put_var(ncid, theta_varid, theta_arr) )
+    call check( nf90_put_var(ncid, wfunct_varid, wfunct) )
+
+    !Close netCDF file
+    call check( nf90_close(ncid) )
+
     print*, 'weight function written to: ',filename
+
+	!!Deallocate arrays
     deallocate(ebarr)  
     deallocate(ptcharr)
     deallocate(phiarr)
     deallocate(wav_arr)
     deallocate(central_wavel)
     deallocate(wfunct)
+	deallocate(rad_arr)
+	deallocate(theta_arr)
   end subroutine weight_function
 end module application
+
 !*****************************************************************************
 !-----------Main proagramm ---------------------------------------------------
 !*****************************************************************************

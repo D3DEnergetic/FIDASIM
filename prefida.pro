@@ -301,7 +301,7 @@ PRO prepare_fida,inputs,grid,chords,fida
 			xlos:xlos,ylos:ylos,zlos:zlos,headsize:chords.headsize,opening_angle:chords.opening_angle,los:los,weight:weight,err:err}
 END
 
-PRO transp_fbeam,inputs,grid,denf,err
+PRO transp_fbeam,inputs,grid,denf,fbm_struct,err
 
 	!P.charsize=1.
 	!P.background=255 & !P.color=0
@@ -383,33 +383,10 @@ PRO transp_fbeam,inputs,grid,denf,err
 	pmax=(float(pitch[npitch-1])+ float(0.5*dP))<1
 	print, 'Pitch  min/max:', pmin,pmax
 	
-	;;-----------store distribution funciton in binary file
-	file =inputs.result_dir+inputs.runid+'/transp_fbm.bin'
-	openw, lun, file, /get_lun
-	writeu,lun , strmid(inputs.cdf_file,strlen(inputs.cdf_file)-17,17)
-	writeu,lun , double(cdf_time)
-	;; SPATIAL GRID
-	writeu,lun , long(ngrid)
-	writeu,lun , double(r2d[*])
-	writeu,lun , double(z2d[*])
-	writeu,lun , double(bmvol[*])
-	;; ENERGY GRID
-	writeu,lun , long(nenergy)
-	writeu,lun , double(emin)
-	writeu,lun , double(emax)
-	writeu,lun , double(energy[*])
-	;; PITCH GRID
-	writeu,lun , long(npitch)
-	writeu,lun , double(pmin)
-	writeu,lun , double(pmax)
-	writeu,lun , double(pitch[*])
-	writeu,lun , double(FBM[*,*,*]) 
-	close,lun
-	free_lun, lun 
-	print, 'TRANSP distribution in: '+file
+	fbm_struct={cdf_file:inputs.cdf_file,cdf_time:cdf_time,ngrid:ngrid,r2d:r2d,z2d:z2d,bmvol:bmvol,$
+				nenergy:nenergy,emin:emin,emax:emax,energy:energy,npitch:npitch,$
+				pmin:pmin,pmax:pmax,pitch:pitch,fbm:FBM}
 	
-	;help,fdens,r2d,z2d
-	;plot,r2d,fdens,color=0,background=255 
 	;; ------map fdens on FIDASIM grid and sort out
 	;; ------points outside the separatrix
 	fdens=total(reform(total(fbm,1)),1)*dE*dP
@@ -458,7 +435,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	
 	;;Fast-ion density
 	if inputs.sim_fida ne 0 and inputs.nr_fast gt 1 then begin
-     	transp_fbeam,inputs,grid,denf,terr
+     	transp_fbeam,inputs,grid,denf,fbm_struct,terr
 		if terr eq 1 then begin
 			print,'ERROR: FAILED TO MAP FAST ION DENSITY'
 			err=1
@@ -500,7 +477,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	index=where(finite([ti,te,dene,denp,zeff,denp,deni]) eq 0,nind)
 	if nind gt 0 then stop
 	;;-------SAVE-------
-	plasma={rho_grid:equil.rho_grid,$
+	plasma={fbm:fbm_struct,rho_grid:equil.rho_grid,$
 			bx:bx,by:by,bz:bz,ex:ex,ey:ey,ez:ez,$
 			bu:equil.bx,bv:equil.by,bw:equil.bz,eu:equil.ex,ev:equil.ey,ew:equil.ez,$
 			ab:inputs.ab,ai:inputs.ai,$
@@ -523,7 +500,7 @@ FUNCTION sinterpol,v,x,u,sortt=sortt,_extra=_extra
 	return,interpol(v[ind],x[ind],u,_extra=_extra)
 END
 
-PRO brems,inputs,det,profiles,equil
+PRO brems,inputs,det,profiles,equil,vbline
 	;; Calculates visible bremsstrahlung along FIDA sightlines
 	;; WWH 6/2013
 
@@ -582,16 +559,6 @@ PRO brems,inputs,det,profiles,equil
         if nwgtr1 ge 0 then vbepath[wgtr1]=0.0
 		vbline[i]=total(vbepath)*equil.rho_chords.ds*0.001*inputs.dlambda*(4*!DPI)*1.d-4   ; (ph/s-m2-bin)
 	endfor  ; channel loop
-
-	;--------------------------------
-	; Save results
-	;--------------------------------
-	file =inputs.result_dir+inputs.runid+'/bremsstrahlung.bin'
-	openw, lun, file, /get_lun
-	for i=0,nchan-1 do writeu,lun, double(vbline[i])
-	close,lun
-	free_lun,lun
-	print, 'Bremsstrahlung stored in BINARY: '+file
 END
 
 PRO prefida,input_pro,plot=plot
@@ -663,7 +630,7 @@ PRO prefida,input_pro,plot=plot
 
     ;; Calculate bremsstrahlung if desired
 	if inputs.f90brems eq 0 then $
-		brems,inputs,chords,profiles,equil
+		brems,inputs,chords,profiles,equil,brems
 
     ;; Plot grid, beam, sightlines, and equilibrium
 	if keyword_set(plot) then begin
@@ -770,76 +737,167 @@ PRO prefida,input_pro,plot=plot
 	close,55
 	print, 'Inputs stored in data file: '+file
 
-	;;WRITE GRID TO BINARY
-	file =inputs.result_dir+inputs.runid+'/grid.bin'
-	openw,lun,file,/get_lun
-	writeu,lun, long(inputs.nx)
-	writeu,lun, long(inputs.ny)
-	writeu,lun, long(inputs.nz)
-	writeu,lun, double(grid.u_grid)
-	writeu,lun, double(grid.v_grid)
-	writeu,lun, double(grid.w_grid)
-	writeu,lun, double(grid.r_grid)
-	writeu,lun, double(grid.phi_grid)
-	writeu,lun, double(grid.x_grid)
-	writeu,lun, double(grid.y_grid)
-	writeu,lun, double(grid.z_grid)
-	close,lun
-	free_lun,lun
-	print, 'Grid stored in BINARY: '+file
+	;;WRITE TO FILE
+	file =inputs.result_dir+inputs.runid+'/parameters.cdf'	
+	ncid = ncdf_create(file,/clobber)
+	;;DEFINE DIMENSIONS
+	ncdf_control,ncid
+	one_id = ncdf_dimdef(ncid,'dim001',1)
+	fbm_gdim= ncdf_dimdef(ncid,'fbm_grid',plasma.fbm.ngrid)
+    fbm_edim=ncdf_dimdef(ncid,'fbm_energy',plasma.fbm.nenergy)	
+    fbm_pdim=ncdf_dimdef(ncid,'fbm_pitch',plasma.fbm.npitch)	
+	xid = ncdf_dimdef(ncid,'x',grid.nx)
+	yid = ncdf_dimdef(ncid,'y',grid.ny)
+	zid = ncdf_dimdef(ncid,'z',grid.nz)
+	chan_id=ncdf_dimdef(ncid,'chan',n_elements(fida.los))
+	griddim=[xid,yid,zid]
+	
+	;;DEFINE VARIABLES
+	shot_varid=ncdf_vardef(ncid,'shot',one_id,/long)
+	time_varid=ncdf_vardef(ncid,'time',one_id,/float)
 
-	;;WRITE PLASMA PARAMETERS TO BINARY
-	file =inputs.result_dir+inputs.runid+'/plasma.bin'
-	openw, lun, file, /get_lun
-	writeu,lun, long(inputs.nx)
-	writeu,lun, long(inputs.ny)
-	writeu,lun, long(inputs.nz)
-	writeu,lun, double(plasma.te)
-	writeu,lun, double(plasma.ti)
-	writeu,lun, double(plasma.dene)
-	writeu,lun, double(plasma.denp)
-	writeu,lun, double(plasma.deni)
-	writeu,lun, double(plasma.denf)
-	writeu,lun, double(plasma.vrotx)
-	writeu,lun, double(plasma.vroty)
-	writeu,lun, double(plasma.vrotz)
-	writeu,lun, double(plasma.zeff)
-	writeu,lun, double(plasma.bx)
-	writeu,lun, double(plasma.by)
-	writeu,lun, double(plasma.bz)
-	writeu,lun, double(plasma.ex)
-	writeu,lun, double(plasma.ey)
-	writeu,lun, double(plasma.ez)
-	writeu,lun, double(plasma.rho_grid)
-	close,lun
-	free_lun, lun
-	print, 'Plasma parameters stored in BINARY: '+file
+	;;SIZE VARIABLES
+	nx_varid=ncdf_vardef(ncid,'Nx',one_id,/long)
+	ny_varid=ncdf_vardef(ncid,'Ny',one_id,/long)
+	nz_varid=ncdf_vardef(ncid,'Nz',one_id,/long)
+	nchan_varid=ncdf_vardef(ncid,'Nchan',one_id,/long)
+	gdim_varid=ncdf_vardef(ncid,'FBM_Ngrid',one_id,/long)
+	edim_varid=ncdf_vardef(ncid,'FBM_Nenergy',one_id,/long)
+	pdim_varid=ncdf_vardef(ncid,'FBM_Npitch',one_id,/long)
 
-	;;WRITE LINE OF SIGHT (LOS) INFORMATION TO BINARY
+	;;DEFINE GRID VARIABLES
+	ugrid_varid=ncdf_vardef(ncid,'u_grid',griddim,/double)
+	vgrid_varid=ncdf_vardef(ncid,'v_grid',griddim,/double)
+	wgrid_varid=ncdf_vardef(ncid,'w_grid',griddim,/double)
+	rgrid_varid=ncdf_vardef(ncid,'r_grid',griddim,/double)
+	phigrid_varid=ncdf_vardef(ncid,'phi_grid',griddim,/double)
+	xgrid_varid=ncdf_vardef(ncid,'x_grid',griddim,/double)
+	ygrid_varid=ncdf_vardef(ncid,'y_grid',griddim,/double)
+	zgrid_varid=ncdf_vardef(ncid,'z_grid',griddim,/double)
+
+	;;DEFINE FBM VARIABLES 
+	r2d_varid=ncdf_vardef(ncid,'FBM_r2d',fbm_gdim,/double)
+	z2d_varid=ncdf_vardef(ncid,'FBM_z2d',fbm_gdim,/double)
+	bmvol_varid=ncdf_vardef(ncid,'FBM_bmvol',fbm_gdim,/double)
+	energy_varid=ncdf_vardef(ncid,'FBM_energy',fbm_edim,/double)
+	pitch_varid=ncdf_vardef(ncid,'FBM_pitch',fbm_pdim,/double)
+	emin_varid=ncdf_vardef(ncid,'FBM_emin',one_id,/double)
+	emax_varid=ncdf_vardef(ncid,'FBM_emax',one_id,/double)
+	pmin_varid=ncdf_vardef(ncid,'FBM_pmin',one_id,/double)
+	pmax_varid=ncdf_vardef(ncid,'FBM_pmax',one_id,/double)
+	cdftime_varid=ncdf_vardef(ncid,'FBM_time',one_id,/double)	
+	fbm_varid=ncdf_vardef(ncid,'FBM',[fbm_edim,fbm_pdim,fbm_gdim],/double)
+
+	;;DEFINE PLASMA VARIABLES
+	te_varid=ncdf_vardef(ncid,'te',griddim,/double)
+	ti_varid=ncdf_vardef(ncid,'ti',griddim,/double)
+	dene_varid=ncdf_vardef(ncid,'dene',griddim,/double)
+	deni_varid=ncdf_vardef(ncid,'deni',griddim,/double)
+	denp_varid=ncdf_vardef(ncid,'denp',griddim,/double)
+	denf_varid=ncdf_vardef(ncid,'denf',griddim,/double)
+	vx_varid=ncdf_vardef(ncid,'vrotx',griddim,/double)
+	vy_varid=ncdf_vardef(ncid,'vroty',griddim,/double)
+	vz_varid=ncdf_vardef(ncid,'vrotz',griddim,/double)
+	zeff_varid=ncdf_vardef(ncid,'zeff',griddim,/double)
+	bx_varid=ncdf_vardef(ncid,'bx',griddim,/double)
+	by_varid=ncdf_vardef(ncid,'by',griddim,/double)
+	bz_varid=ncdf_vardef(ncid,'bz',griddim,/double)
+	ex_varid=ncdf_vardef(ncid,'ex',griddim,/double)
+	ey_varid=ncdf_vardef(ncid,'ey',griddim,/double)
+	ez_varid=ncdf_vardef(ncid,'ez',griddim,/double)
+	rho_varid=ncdf_vardef(ncid,'rho_grid',griddim,/double)
+
+	;;DEFINE BREMSTRUHLUNG VARIABLES
+	brems_varid=ncdf_vardef(ncid,'brems',chan_id,/double)
+
+	;;LOS VARIABLE DEFINITION
+	xlens_varid=ncdf_vardef(ncid,'xlens',chan_id,/double)
+	ylens_varid=ncdf_vardef(ncid,'ylens',chan_id,/double)
+	zlens_varid=ncdf_vardef(ncid,'zlens',chan_id,/double)
+	xlos_varid=ncdf_vardef(ncid,'xlos',chan_id,/double)
+	ylos_varid=ncdf_vardef(ncid,'ylos',chan_id,/double)
+	zlos_varid=ncdf_vardef(ncid,'zlos',chan_id,/double)
+	head_varid=ncdf_vardef(ncid,'headsize',chan_id,/double)
+	oa_varid=ncdf_vardef(ncid,'opening_angle',chan_id,/double)
+	sig_varid=ncdf_vardef(ncid,'sigma_pi',chan_id,/double)
+	wght_varid=ncdf_vardef(ncid,'los_wght',[xid,yid,zid,chan_id],/double)
+
+	;;END DEFINITION
+	ncdf_control,ncid,/ENDEF
+
+	;;WRITE VARIABLES TO FILE
+	;;WRITE ARRAY SIZES
+	ncdf_varput,ncid,shot_varid,long(inputs.shot)
+	ncdf_varput,ncid,time_varid,double(inputs.time)
+	ncdf_varput,ncid,nx_varid,long(inputs.nx)
+	ncdf_varput,ncid,ny_varid,long(inputs.ny)
+	ncdf_varput,ncid,nz_varid,long(inputs.nz)
+	ncdf_varput,ncid,nchan_varid,long(n_elements(fida.los))
+	ncdf_varput,ncid,gdim_varid,long(plasma.fbm.ngrid)
+	ncdf_varput,ncid,edim_varid,long(plasma.fbm.nenergy)
+	ncdf_varput,ncid,pdim_varid,long(plasma.fbm.npitch)
+
+	;;WRITE GRID VARIABLES
+	ncdf_varput,ncid,ugrid_varid,double(grid.u_grid)	
+	ncdf_varput,ncid,vgrid_varid,double(grid.v_grid)	
+	ncdf_varput,ncid,wgrid_varid,double(grid.w_grid)	
+	ncdf_varput,ncid,rgrid_varid,double(grid.r_grid)	
+	ncdf_varput,ncid,phigrid_varid,double(grid.phi_grid)	
+	ncdf_varput,ncid,xgrid_varid,double(grid.x_grid)	
+	ncdf_varput,ncid,ygrid_varid,double(grid.y_grid)	
+	ncdf_varput,ncid,zgrid_varid,double(grid.z_grid)	
+
+	;;WRITE FBM VARIABLES
+	ncdf_varput,ncid,r2d_varid,double(plasma.fbm.r2d)
+	ncdf_varput,ncid,z2d_varid,double(plasma.fbm.z2d)
+	ncdf_varput,ncid,bmvol_varid,double(plasma.fbm.bmvol)
+	ncdf_varput,ncid,energy_varid,double(plasma.fbm.energy)
+	ncdf_varput,ncid,pitch_varid,double(plasma.fbm.pitch)
+	ncdf_varput,ncid,emin_varid,double(plasma.fbm.emin)
+	ncdf_varput,ncid,emax_varid,double(plasma.fbm.emax)
+	ncdf_varput,ncid,pmin_varid,double(plasma.fbm.pmin)
+	ncdf_varput,ncid,pmax_varid,double(plasma.fbm.pmax)
+	ncdf_varput,ncid,cdftime_varid,double(plasma.fbm.cdf_time)
+	ncdf_varput,ncid,fbm_varid,double(plasma.fbm.fbm)
+
+	;;WRITE PLASMA VARIABLES
+	ncdf_varput,ncid,te_varid, double(plasma.te)
+	ncdf_varput,ncid,ti_varid, double(plasma.ti)
+	ncdf_varput,ncid,dene_varid, double(plasma.dene)
+	ncdf_varput,ncid,denp_varid, double(plasma.denp)
+	ncdf_varput,ncid,deni_varid, double(plasma.deni)
+	ncdf_varput,ncid,denf_varid, double(plasma.denf)
+	ncdf_varput,ncid,vx_varid, double(plasma.vrotx)
+	ncdf_varput,ncid,vy_varid, double(plasma.vroty)
+	ncdf_varput,ncid,vz_varid, double(plasma.vrotz)
+	ncdf_varput,ncid,zeff_varid, double(plasma.zeff)
+	ncdf_varput,ncid,bx_varid, double(plasma.bx)
+	ncdf_varput,ncid,by_varid, double(plasma.by)
+	ncdf_varput,ncid,bz_varid, double(plasma.bz)
+	ncdf_varput,ncid,ex_varid, double(plasma.ex)
+	ncdf_varput,ncid,ey_varid, double(plasma.ey)
+	ncdf_varput,ncid,ez_varid, double(plasma.ez)
+	ncdf_varput,ncid,rho_varid, double(plasma.rho_grid)
+
+	;;WRITE BREMS
+	if n_elements(brems) ne 0 then ncdf_varput,ncid,brems_varid,double(brems)
+	
+	;;WRITE LINE OF SIGHT (LOS)
+	los=fida.los
 	if inputs.calc_spec eq 1 or inputs.npa eq 1 then begin
-		file =inputs.result_dir+inputs.runid+'/los.bin'
-		los=fida.los
-		openw, lun, file, /get_lun
-		writeu,lun , long(n_elements(los))
-		for chan=0L,n_elements(los)-1 do begin
-			writeu,lun, double(fida.xlens[los[chan]])
-			writeu,lun, double(fida.ylens[los[chan]])
-			writeu,lun, double(fida.zlens[los[chan]])
-			writeu,lun, double(fida.xlos[los[chan]])
-			writeu,lun, double(fida.ylos[los[chan]])
-			writeu,lun, double(fida.zlos[los[chan]])
-			writeu,lun, double(fida.headsize[los[chan]]) ;; headsize is used for NPA
-			writeu,lun, double(fida.opening_angle[los[chan]])
-			writeu,lun, double(fida.sigma_pi_ratio[los[chan]])
-		endfor
-		writeu,lun , long(grid.nx)
-		writeu,lun , long(grid.ny)
-		writeu,lun , long(grid.nz)
-  		writeu,lun , double(fida.weight[*,*,*,*])
-		close,lun
-		free_lun, lun
-		print, 'LOS parameters stored in BINARY: '+file
+		ncdf_varput,ncid,xlens_varid,double(fida.xlens[los])
+		ncdf_varput,ncid,ylens_varid,double(fida.ylens[los])
+		ncdf_varput,ncid,zlens_varid,double(fida.zlens[los])
+		ncdf_varput,ncid,xlos_varid,double(fida.xlos[los])
+		ncdf_varput,ncid,ylos_varid,double(fida.ylos[los])
+		ncdf_varput,ncid,zlos_varid,double(fida.zlos[los])
+		ncdf_varput,ncid,head_varid,double(fida.headsize[los])
+		ncdf_varput,ncid,oa_varid,double(fida.opening_angle[los])
+		ncdf_varput,ncid,sig_varid,double(fida.sigma_pi_ratio[los])
+		ncdf_varput,ncid,wght_varid,double(fida.weight)
 	endif
+	ncdf_close,ncid
+	print,'Parameters stored in data file: '+file
 
 	print,''
 	print,''

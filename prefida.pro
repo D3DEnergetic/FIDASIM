@@ -561,7 +561,7 @@ PRO brems,inputs,det,profiles,equil,vbline
 	endfor  ; channel loop
 END
 
-PRO prefida,input_pro,plot=plot
+PRO prefida,input_pro,plot=plot,save=save
 
 	COMPILE_OPT DEFINT32
 
@@ -638,8 +638,10 @@ PRO prefida,input_pro,plot=plot
 	endif
 
 	;;SAVE STRUCTURES 
-	file = inputs.result_dir+inputs.runid+'/'+inputs.runid+'.sav'
-	save,inputs,grid,profiles,chords,nbi,equil,nbgeom,fida,plasma,filename=file,/compress
+	if keyword_set(save) then begin
+		file = inputs.result_dir+inputs.runid+'/'+inputs.runid+'.sav'
+		save,inputs,grid,profiles,chords,nbi,equil,nbgeom,fida,plasma,filename=file,/compress
+	endif
 
 	;;COPY INPUT PROCEDURE TO RESULT DIRECTORY
 	file_info=ROUTINE_INFO(input_pro,/source)

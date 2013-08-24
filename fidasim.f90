@@ -380,34 +380,59 @@ contains
   end subroutine read_inputs
   !****************************************************************************
  subroutine read_los
+	use netcdf
     character(120)  :: filename
-    integer(long)   :: Nx,Ny,Nz, i, j, k,ichan
+    integer(long)   :: i, j, k,ichan
+	integer			:: ncid,xlens_varid,ylens_varid,zlens_varid
+	integer 		:: xlos_varid,ylos_varid,zlos_varid,head_varid
+	integer         :: sig_varid,oa_varid,wght_varid,nchan_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
-    filename=trim(adjustl(result_dir))//"/los.bin"
-    !! print*,'---- loading detector information ----'
-    open(66,form='unformatted',file=filename,access='stream')
-    read(66)spec%nchan
+ 
+    filename=trim(adjustl(result_dir))//"/parameters.cdf"
+    print*,'---- loading detector information ----'
+	
+	!!OPEN netCDF file   
+	call check( nf90_open(filename, nf90_nowrite, ncid) )
+	
+	!!GET THE VARIDS
+	call check( nf90_inq_varid(ncid, "Nchan", nchan_varid) )
+	call check( nf90_inq_varid(ncid, "xlens", xlens_varid) )
+	call check( nf90_inq_varid(ncid, "ylens", ylens_varid) )
+	call check( nf90_inq_varid(ncid, "zlens", zlens_varid) )
+	call check( nf90_inq_varid(ncid, "xlos", xlos_varid) )
+	call check( nf90_inq_varid(ncid, "ylos", ylos_varid) )
+	call check( nf90_inq_varid(ncid, "zlos", zlos_varid) )
+	call check( nf90_inq_varid(ncid, "headsize", head_varid) )
+	call check( nf90_inq_varid(ncid, "sigma_pi", sig_varid) )
+	call check( nf90_inq_varid(ncid, "opening_angle", oa_varid) )
+	call check( nf90_inq_varid(ncid, "los_wght", wght_varid) )
+
+	!!READ IN THE NUMBER OF CHANNELS
+	call check( nf90_get_var(ncid, nchan_varid, spec%nchan) )
+
+	!!ALLOCATE SPACE
     allocate(spec%xyzhead(spec%nchan,3))
     allocate(spec%xyzlos(spec%nchan,3))
     allocate(spec%headsize(spec%nchan))
     allocate(spec%opening_angle(spec%nchan))
     allocate(spec%sigma_pi(spec%nchan))
-    do ichan = 1, spec%nchan
-       read(66) spec%xyzhead(ichan,1)
-       read(66) spec%xyzhead(ichan,2)
-       read(66) spec%xyzhead(ichan,3)
-       read(66) spec%xyzlos(ichan,1)
-       read(66) spec%xyzlos(ichan,2) 
-       read(66) spec%xyzlos(ichan,3)
-       read(66) spec%headsize(ichan)
-       read(66) spec%opening_angle(ichan)
-       read(66) spec%sigma_pi(ichan)
-    enddo
     allocate(dummy_arr(grid%Nx,grid%Ny,grid%Nz,spec%nchan))
-	read(66)Nx
-	read(66)Ny
-	read(66)Nz
-    read(66) dummy_arr
+
+	!!READ IN OTHER PARAMETERS
+	call check( nf90_get_var(ncid, xlens_varid, spec%xyzhead(:,1)) )
+	call check( nf90_get_var(ncid, ylens_varid, spec%xyzhead(:,2)) )
+	call check( nf90_get_var(ncid, zlens_varid, spec%xyzhead(:,3)) )
+	call check( nf90_get_var(ncid, xlos_varid, spec%xyzlos(:,1)) )
+	call check( nf90_get_var(ncid, ylos_varid, spec%xyzlos(:,2)) )
+	call check( nf90_get_var(ncid, zlos_varid, spec%xyzlos(:,3)) )
+	call check( nf90_get_var(ncid, head_varid, spec%headsize) )
+	call check( nf90_get_var(ncid, sig_varid, spec%opening_angle) )
+	call check( nf90_get_var(ncid, oa_varid, spec%sigma_pi) )
+	call check( nf90_get_var(ncid, wght_varid, dummy_arr(:,:,:,:)) )
+
+	!!CLOSE netCDF FILE
+	call check( nf90_close(ncid) )
+
     do k = 1, grid%Nz   
        do j = 1, grid%Ny
           do i = 1,grid%Nx      
@@ -417,12 +442,12 @@ contains
        enddo
     enddo
     deallocate(dummy_arr)
-    close(66)
+
     if (inputs%npa.eq.0) then 
        npa%npa_loop=1.
     else
        allocate(npa%size(spec%nchan))
-       npa%size=spec%headsize
+       npa%size=spec%headsize(1)
        npa%npa_loop=10000.
        npa%opening_angle=spec%opening_angle(1)
        npa%los=spec%xyzhead(1,:)-spec%xyzlos(1,:)
@@ -432,35 +457,62 @@ contains
 
   !***************************************************************************!
   subroutine read_plasma
+	use netcdf
     character(120):: filename
-    integer(long) :: Nx,Ny,Nz,i, j, k 
+    integer(long) :: i, j, k
+	integer		  :: te_var,ti_var,dene_var,deni_var,denp_var,denf_var
+	integer  	  :: vx_var,vy_var,vz_var,zeff_var,bx_var,by_var,bz_var
+	integer 	  :: ex_var,ey_var,ez_var,rho_var,ncid 
     real(double), dimension(grid%nx,grid%ny,grid%nz,3) :: bcell
     real(double)               :: b_abs     !! Magnetic field
     real(double), dimension(3) :: a,b,c    !! Magnetic field
-    filename=trim(adjustl(result_dir))//"/plasma.bin"
-    !!print*,'---- loading plasma data from ', filename
-    open(66,form='unformatted',file=filename,access='stream')
-    read(66)Nx
-    read(66)Ny
-    read(66)Nz
-    read(66) cell(:,:,:)%plasma%te
-    read(66) cell(:,:,:)%plasma%ti
-    read(66) cell(:,:,:)%plasma%dene
-    read(66) cell(:,:,:)%plasma%denp
-    read(66) cell(:,:,:)%plasma%deni
-    read(66) cell(:,:,:)%plasma%denf
-    read(66) cell(:,:,:)%plasma%vrot(1)
-    read(66) cell(:,:,:)%plasma%vrot(2)
-    read(66) cell(:,:,:)%plasma%vrot(3)
-    read(66) cell(:,:,:)%plasma%zeff
-    read(66) bcell(:,:,:,1)
-    read(66) bcell(:,:,:,2)
-    read(66) bcell(:,:,:,3)
-    read(66) cell(:,:,:)%plasma%e(1)
-    read(66) cell(:,:,:)%plasma%e(2)
-    read(66) cell(:,:,:)%plasma%e(3)
-    read(66) cell(:,:,:)%rho
-    close(66)
+
+    filename=trim(adjustl(result_dir))//"/parameters.cdf"
+
+	!!OPEN netCDF file   
+	call check( nf90_open(filename, nf90_nowrite, ncid) )
+	
+	!!GET THE VARIDS
+	call check( nf90_inq_varid(ncid, "te", te_var) )
+	call check( nf90_inq_varid(ncid, "ti", ti_var) )
+	call check( nf90_inq_varid(ncid, "dene", dene_var) )
+	call check( nf90_inq_varid(ncid, "deni", deni_var) )
+	call check( nf90_inq_varid(ncid, "denp", denp_var) )
+	call check( nf90_inq_varid(ncid, "denf", denf_var) )
+	call check( nf90_inq_varid(ncid, "vrotx", vx_var) )
+	call check( nf90_inq_varid(ncid, "vroty", vy_var) )
+	call check( nf90_inq_varid(ncid, "vrotz", vz_var) )
+	call check( nf90_inq_varid(ncid, "zeff", zeff_var) )
+	call check( nf90_inq_varid(ncid, "bx", bx_var) )
+	call check( nf90_inq_varid(ncid, "by", by_var) )
+	call check( nf90_inq_varid(ncid, "bz", bz_var) )
+	call check( nf90_inq_varid(ncid, "ex", ex_var) )
+	call check( nf90_inq_varid(ncid, "ey", ey_var) )
+	call check( nf90_inq_varid(ncid, "ez", ez_var) )
+	call check( nf90_inq_varid(ncid, "rho_grid", rho_var) )
+
+	!!READ IN OTHER PARAMETERS
+	call check( nf90_get_var(ncid, te_var,   cell(:,:,:)%plasma%te) )
+	call check( nf90_get_var(ncid, ti_var,   cell(:,:,:)%plasma%ti) )
+	call check( nf90_get_var(ncid, dene_var, cell(:,:,:)%plasma%dene) )
+	call check( nf90_get_var(ncid, deni_var, cell(:,:,:)%plasma%deni) )
+	call check( nf90_get_var(ncid, denp_var, cell(:,:,:)%plasma%denp) )
+	call check( nf90_get_var(ncid, denf_var, cell(:,:,:)%plasma%denf) )
+	call check( nf90_get_var(ncid, vx_var,   cell(:,:,:)%plasma%vrot(1)) )
+	call check( nf90_get_var(ncid, vy_var,   cell(:,:,:)%plasma%vrot(2)) )
+	call check( nf90_get_var(ncid, vz_var,   cell(:,:,:)%plasma%vrot(3)) )
+	call check( nf90_get_var(ncid, zeff_var, cell(:,:,:)%plasma%zeff) )
+	call check( nf90_get_var(ncid, bx_var,   bcell(:,:,:,1)) )
+	call check( nf90_get_var(ncid, by_var,   bcell(:,:,:,2)) )
+	call check( nf90_get_var(ncid, bz_var,   bcell(:,:,:,3)) )
+	call check( nf90_get_var(ncid, ex_var,   cell(:,:,:)%plasma%e(1)) )
+	call check( nf90_get_var(ncid, ey_var,   cell(:,:,:)%plasma%e(2)) )
+	call check( nf90_get_var(ncid, ez_var,   cell(:,:,:)%plasma%e(3)) )
+	call check( nf90_get_var(ncid, rho_var,  cell(:,:,:)%rho) )
+
+	!!CLOSE netCDF FILE
+	call check( nf90_close(ncid) )
+
     !! --- calculate vectors a,c that are perpendicular to b -- !!
     do k = 1, grid%Nz   
        do j = 1, grid%Ny
@@ -492,19 +544,30 @@ contains
   !****************************************************************************
   ! Read vb written by IDL routine  WWH 6/2013
   subroutine read_bremsstrahlung
+	use netcdf
     character(120)          :: filename
     integer(long) :: i
+	integer       :: ncid,brems_varid
     real(double) :: vb
     real(double), dimension(:)  , allocatable :: brems
-    filename=trim(adjustl(result_dir))//"/bremsstrahlung.bin"
+    filename=trim(adjustl(result_dir))//"/parameters.cdf"
     print*,'---- loading bremsstrahlung data from ', filename
-    open(66,form='unformatted',file=filename,access='stream')
-    allocate(brems(spec%nlambda))
+    allocate(brems(spec%nchan))
+
+	!!OPEN netCDF file   
+	call check( nf90_open(filename, nf90_nowrite, ncid) )
+
+	!!GET VARIABLE
+	call check( nf90_inq_varid(ncid, "brems", brems_varid) )
+	call check( nf90_get_var(ncid, brems_varid, brems) )
+
+	!!CLOSE netCDF FILE
+	call check( nf90_close(ncid) )
+
     do i = 1,spec%nchan
-      read(66) vb
-      result%spectra(:,i,brems_type)=vb
+      result%spectra(:,i,brems_type)=brems(i)
     enddo
-    close(66)
+
     deallocate(brems)
   end subroutine read_bremsstrahlung
   !****************************************************************************
@@ -597,10 +660,9 @@ contains
   !****************************************************************************
   !-------------------FASTION DISTRIBUTION FUNCTION ----------------------
   subroutine read_fbm
+	use netcdf
     character(120)  :: filename
     integer         :: i,j,k
-    character(17)  :: cdf_file
-    real(double)    :: cdf_time  
     !! sub_grid
     integer         :: l,m,n,nxsub,nysub,nzsub
     real(double)    :: dxsub,dysub,dzsub
@@ -608,30 +670,57 @@ contains
     !! for transp input grid
     integer(long)   :: nzones
     real(double), dimension(:), allocatable     :: transp_r,transp_z,transp_vol
-    real(double), dimension(:,:,:), allocatable :: transp_fbm   
-    filename=trim(adjustl(result_dir))//"/transp_fbm.bin"
+    real(double), dimension(:,:,:), allocatable :: transp_fbm
+	integer :: ncid,r2d_var,z2d_var,bmvol_var,emin_var,emax_var,pmin_var,pmax_var
+	integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
+   
+    filename=trim(adjustl(result_dir))//"/parameters.cdf"
     print*,'---- loading fast ion distribution function ----'
-    open(66,form='unformatted',file=filename,access='stream')
-    read(66) cdf_file
-    read(66) cdf_time
-    read(66) nzones
+
+	!!OPEN netCDF file   
+	call check( nf90_open(filename, nf90_nowrite, ncid) )
+
+	!!GET VARIABLES VARID
+	call check( nf90_inq_varid(ncid, "FBM_Ngrid"  , ng_var) )
+	call check( nf90_inq_varid(ncid, "FBM_Nenergy", ne_var) )
+	call check( nf90_inq_varid(ncid, "FBM_Npitch" , np_var) )
+	call check( nf90_inq_varid(ncid, "FBM_r2d"    , r2d_var) )
+	call check( nf90_inq_varid(ncid, "FBM_z2d"    , z2d_var) )
+	call check( nf90_inq_varid(ncid, "FBM_bmvol"  , bmvol_var) )
+	call check( nf90_inq_varid(ncid, "FBM_emin"   , emin_var) )
+	call check( nf90_inq_varid(ncid, "FBM_emax"   , emax_var) )
+	call check( nf90_inq_varid(ncid, "FBM_energy" , e_var) )
+	call check( nf90_inq_varid(ncid, "FBM_pmin"   , pmin_var) )
+	call check( nf90_inq_varid(ncid, "FBM_pmax"   , pmax_var) )
+	call check( nf90_inq_varid(ncid, "FBM_pitch"  , p_var) )
+	call check( nf90_inq_varid(ncid, "FBM"        , fbm_var) )
+
+	!!GET VARIABLES
+	call check( nf90_get_var(ncid, ng_var, nzones) )
+	call check( nf90_get_var(ncid, ne_var, distri%nenergy) )
+	call check( nf90_get_var(ncid, np_var, distri%npitch) )
+
+	!!ALLOCATE SPACE
     allocate(transp_r(nzones),transp_z(nzones),transp_vol(nzones))
-    read(66) transp_r(:)
-    read(66) transp_z(:)
-    read(66) transp_vol(:)
-    read(66) distri%nenergy
-    read(66) distri%emin
-    read(66) distri%emax
     allocate(distri%energy(distri%nenergy))
-    read(66)distri%energy(:)
-    read(66) distri%npitch
-    read(66) distri%pmin
-    read(66) distri%pmax
     allocate(distri%pitch(distri%npitch))
-    read(66) distri%pitch(:)
     allocate(transp_fbm(distri%nenergy,distri%npitch,nzones))
-    read(66) transp_fbm(:,:,:)
-    close(66)
+
+	!!GET REST OF VARIABLES	
+	call check( nf90_get_var(ncid, r2d_var,   transp_r(:)) )
+	call check( nf90_get_var(ncid, z2d_var,   transp_z(:)) )
+	call check( nf90_get_var(ncid, bmvol_var, transp_vol(:)) )
+	call check( nf90_get_var(ncid, emin_var,  distri%emin) )
+	call check( nf90_get_var(ncid, emax_var,  distri%emax) )
+	call check( nf90_get_var(ncid, e_var,     distri%energy(:)) )
+	call check( nf90_get_var(ncid, pmin_var,  distri%pmin) )
+	call check( nf90_get_var(ncid, pmax_var,  distri%pmax) )
+	call check( nf90_get_var(ncid, p_var,     distri%pitch(:)) )
+	call check( nf90_get_var(ncid, fbm_var,   transp_fbm(:,:,:)) )
+
+	!!CLOSE netCDF FILE
+	call check( nf90_close(ncid) )
+
     distri%eran   = distri%emax-distri%emin
     distri%pran   = distri%pmax-distri%pmin
     !! normalize the velocity space distribution
@@ -968,29 +1057,30 @@ contains
   end subroutine write_fida_spectra
 
   subroutine read_neutrals
+	use netcdf
     character(120)  :: filename
     real(float)     :: fdum
     real(float),dimension(:,:,:,:),allocatable   :: fdum_arr
-    allocate(fdum_arr(grid%nx,grid%ny,grid%nz,nlevs))
+	integer :: ncid,full_var,half_var,third_var,halo_var
+
     print*,'---- load neutrals RESULTS/neutrals.bin ----' 
-    filename=trim(adjustl(result_dir))//"/neutrals.bin" 
-    open (66, form='unformatted',file =filename,access='stream')
-    read(66)fdum
-    read(66)fdum
-    read(66)fdum
-    read(66)fdum
-    read(66)fdum
-    read(66)fdum
-    read(66)fdum_arr ;  result%neut_dens(:,:,:,:,nbif_type)=fdum_arr
-    read(66)fdum_arr ;  result%neut_dens(:,:,:,:,nbih_type)=fdum_arr
-    read(66)fdum_arr ;  result%neut_dens(:,:,:,:,nbit_type)=fdum_arr
-    read(66)fdum_arr ;  result%neut_dens(:,:,:,:,halo_type)=fdum_arr
-    deallocate(fdum_arr)
-    close (66)
+    filename=trim(adjustl(result_dir))//"/neutrals.cdf" 
+   	!!OPEN netCDF file   
+    call check( nf90_open(filename, nf90_nowrite, ncid) )
+
+    !!GET VARIABLE
+    call check( nf90_inq_varid(ncid, "fdens", full_var) )
+    call check( nf90_inq_varid(ncid, "hdens", half_var) )
+    call check( nf90_inq_varid(ncid, "tdens", third_var) )
+    call check( nf90_inq_varid(ncid, "halodens", halo_var) )
+    call check( nf90_get_var(ncid, full_var,result%neut_dens(:,:,:,:,nbif_type)) )
+    call check( nf90_get_var(ncid, half_var,result%neut_dens(:,:,:,:,nbih_type)) )
+    call check( nf90_get_var(ncid, third_var,result%neut_dens(:,:,:,:,nbit_type)) )
+    call check( nf90_get_var(ncid, halo_var,result%neut_dens(:,:,:,:,halo_type)) )
+
+    !!CLOSE netCDF FILE
+    call check( nf90_close(ncid) )
    end subroutine read_neutrals
-
-
-
   
   !*****************************************************************************
   !------------random number generator-----------------------------------------

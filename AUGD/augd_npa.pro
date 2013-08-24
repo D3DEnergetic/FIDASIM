@@ -1,5 +1,5 @@
 ;;This input file is a procedure so name this file accordingly
-PRO augd_input,inputs                                   ;; Name of this file without .pro
+PRO augd_npa,inputs                                   ;; Name of this file without .pro
 user=+GETENV('USER')
 ;;-----------------------------------------------------
 ;;				PREFIDA INPUT FILE
@@ -28,7 +28,7 @@ isource=2     											;; Beam source index (FIDASIM only simulates on NBI sou
 einj=0.                 								;; [keV] If 0, get data from MDS+
 pinj=0.                 								;; [MW] If 0, get data from MDS+
 
-diag='CFR'												;; Name of the FIDA diag
+diag='NPA'												;; Name of the FIDA diag
 equil='EQH'												;; Name of equilibrium. Ex. for D3D EFIT02
 
 ;;-----------------------------------------------------
@@ -86,12 +86,12 @@ wavel_end_wght=663.   									;; Maximum wavelength
 ;;-------------------------------------------------
 ;; Simulation switches
 ;;-------------------------------------------------
-npa=[0]   												;; (0 or 1) If 1 do a simulation for NPA
-calc_spec=[1]   										;; (0 or 1) If 1 then spectra is calculated
+npa=[1]   												;; (0 or 1) If 1 do a simulation for NPA
+calc_spec=[0]   										;; (0 or 1) If 1 then spectra is calculated
 sim_fida=[1]											;; (0 or 1) if 1 then the FIDA spectra is calculated
 calc_birth=[0]    										;; (0 or 1) If 1 then the birth profile is calculated
 f90brems=[1]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
-calc_wght=[1]  											;; (0 or 1) If 1 then weight functions are calculated
+calc_wght=[0]  											;; (0 or 1) If 1 then weight functions are calculated
 load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing 
 														;; neutrals.bin file located in runid directory
 ps=[0]													;; (0 or 1) If 1 then make hard copy of plots

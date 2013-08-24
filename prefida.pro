@@ -609,10 +609,10 @@ PRO prefida,input_pro,plot=plot
 	endif else err=0
 
 	;;FIDA PRE PROCESSING 
-	if inputs.calc_spec eq 1 then begin
+	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
 		prepare_fida,inputs,grid,chords,fida
 		if fida.err eq 1 then begin
-			print,'FIDA PREPROCESSING FAILED. EXITING...'
+			print,'CHORD PREPROCESSING FAILED. EXITING...'
 			goto, GET_OUT
 		endif
 	endif else begin
@@ -749,7 +749,8 @@ PRO prefida,input_pro,plot=plot
 	xid = ncdf_dimdef(ncid,'x',grid.nx)
 	yid = ncdf_dimdef(ncid,'y',grid.ny)
 	zid = ncdf_dimdef(ncid,'z',grid.nz)
-	chan_id=ncdf_dimdef(ncid,'chan',n_elements(fida.los))
+	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+		chan_id=ncdf_dimdef(ncid,'chan',n_elements(fida.los))
 	griddim=[xid,yid,zid]
 	
 	;;DEFINE VARIABLES
@@ -760,10 +761,11 @@ PRO prefida,input_pro,plot=plot
 	nx_varid=ncdf_vardef(ncid,'Nx',one_id,/long)
 	ny_varid=ncdf_vardef(ncid,'Ny',one_id,/long)
 	nz_varid=ncdf_vardef(ncid,'Nz',one_id,/long)
-	nchan_varid=ncdf_vardef(ncid,'Nchan',one_id,/long)
 	gdim_varid=ncdf_vardef(ncid,'FBM_Ngrid',one_id,/long)
 	edim_varid=ncdf_vardef(ncid,'FBM_Nenergy',one_id,/long)
 	pdim_varid=ncdf_vardef(ncid,'FBM_Npitch',one_id,/long)
+	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+		nchan_varid=ncdf_vardef(ncid,'Nchan',one_id,/long)
 
 	;;DEFINE GRID VARIABLES
 	ugrid_varid=ncdf_vardef(ncid,'u_grid',griddim,/double)
@@ -832,7 +834,8 @@ PRO prefida,input_pro,plot=plot
 	ncdf_varput,ncid,nx_varid,long(inputs.nx)
 	ncdf_varput,ncid,ny_varid,long(inputs.ny)
 	ncdf_varput,ncid,nz_varid,long(inputs.nz)
-	ncdf_varput,ncid,nchan_varid,long(n_elements(fida.los))
+	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+		ncdf_varput,ncid,nchan_varid,long(n_elements(fida.los))
 	ncdf_varput,ncid,gdim_varid,long(plasma.fbm.ngrid)
 	ncdf_varput,ncid,edim_varid,long(plasma.fbm.nenergy)
 	ncdf_varput,ncid,pdim_varid,long(plasma.fbm.npitch)
@@ -883,8 +886,8 @@ PRO prefida,input_pro,plot=plot
 	if n_elements(brems) ne 0 then ncdf_varput,ncid,brems_varid,double(brems)
 	
 	;;WRITE LINE OF SIGHT (LOS)
-	los=fida.los
-	if inputs.calc_spec eq 1 or inputs.npa eq 1 then begin
+	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
+		los=fida.los
 		ncdf_varput,ncid,xlens_varid,double(fida.xlens[los])
 		ncdf_varput,ncid,ylens_varid,double(fida.ylens[los])
 		ncdf_varput,ncid,zlens_varid,double(fida.zlens[los])

@@ -24,7 +24,7 @@ pro plot_npa,ps=ps,path=path
   load_results, path,fidasim
   shot=fidasim.inputs.shot
   time=fidasim.inputs.time
-
+  los=fidasim.los
   ;; density along NBI path
   dens=total(fidasim.neutrals.halodens[*,*,*,*],4) $
        +total(fidasim.neutrals.fdens[*,*,*,*],4)   $
@@ -54,8 +54,8 @@ pro plot_npa,ps=ps,path=path
           ,c_colors=(dindgen(20)+1.)*11,nlevels=20 $
           ,/isotropic,xtit='X [cm]',ytit='Y [cm]'
 
-  for ichan=0,los.nchan-1 do oplot,[los.xlens[ichan],los.xlos[ichan]] $
-                                   ,[los.ylens[ichan],los.ylos[ichan]]
+  for ichan=0,los.nchan-1 do oplot,[los.xyzlens[ichan,0],los.xyzlos[ichan,0]] $
+                                   ,[los.xyzlens[ichan,0],los.xyzlos[ichan,0]]
 
   for i=0,nnpa-1 do oplot,[npaipos[i,0]],[npaipos[i,1]],psym=3,color=254./nnpa*i
 

@@ -8,13 +8,13 @@ PRO load_results,result_dir,results,save=save
 	read_inputs,result_dir+'inputs.dat',inputs
 
 	;;READ GRID
-	read_grid,result_dir+'grid.bin',grid
+	read_grid,result_dir+'parameters.cdf',grid
 
 	;;READ LOS
-	read_los,result_dir+'los.bin',los
+	read_los,result_dir+'parameters.cdf',los
 
 	;;READ PLASMA 
-	read_plasma,result_dir+'plasma.bin',plasma
+	read_plasma,result_dir+'parameters.cdf',plasma
 
 	;;READ FIDA SPECTRA
 	read_fida,result_dir+'fida_spectra.cdf',fida
@@ -29,7 +29,7 @@ PRO load_results,result_dir,results,save=save
 	read_npa,result_dir+'npa.cdf',npa
 
 	;;READ FBM
-	read_fbm,result_dir+'transp_fbm.bin',fbm
+	read_fbm,result_dir+'parameters.cdf',fbm
 
 	;;READ WEIGHT FUNCTIONS
 	read_weights,result_dir+'weight_function.cdf',weights

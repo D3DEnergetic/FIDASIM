@@ -1,39 +1,22 @@
 PRO read_los,file,los,save=save
 
-    idum=1L
-    fdum=1.e0
-    ddum=1.d0
-    sdum=''
-
 	if file_test(file) then begin
-		nx=0L
-		ny=0L
-		nz=0L
-		openr, 55, file
-		readu,55 , idum & nchan=idum
-		xyzlos= FLTARR(nchan,3)
-		xyzlens  = FLTARR(nchan,3)
-		headsize = FLTARR(nchan) 
-		opening_angle = FLTARR(nchan) 
-		sigma_pi = FLTARR(nchan) 
-		for i=0,nchan-1 do begin
-			readu,55, ddum & xyzlens[i,0]=ddum
-			readu,55, ddum & xyzlens[i,1]=ddum
-			readu,55, ddum & xyzlens[i,2]=ddum
-			readu,55, ddum & xyzlos[i,0]=ddum
-			readu,55, ddum & xyzlos[i,1]=ddum
-			readu,55, ddum & xyzlos[i,2]=ddum
-			readu,55, ddum & headsize[i]=ddum
-			readu,55, ddum & opening_angle[i]=ddum
-			readu,55, ddum & sigma_pi[i]=ddum
-		endfor
-		readu,55,nx
-		readu,55,ny
-		readu,55,nz
-		weight=dblarr(nx,ny,nz,nchan)
-		readu,55,weight
-		close,55
-	
+       	ncid=ncdf_open(file,/nowrite)
+		ncdf_varget,ncid,'Nchan',nchan
+       	ncdf_varget,ncid,'xlens',xlens
+       	ncdf_varget,ncid,'ylens',ylens
+       	ncdf_varget,ncid,'zlens',zlens
+       	ncdf_varget,ncid,'xlos',xlos
+       	ncdf_varget,ncid,'ylos',ylos
+       	ncdf_varget,ncid,'zlos',zlos
+       	ncdf_varget,ncid,'headsize',headsize
+       	ncdf_varget,ncid,'sigma_pi',sigma_pi
+       	ncdf_varget,ncid,'opening_angle',opening_angle
+       	ncdf_varget,ncid,'los_wght',weight
+
+       	ncdf_close,ncid
+		xyzlens=[[xlens],[ylens],[zlens]]
+		xyzlos=[[xlos],[ylos],[zlos]]
 		rlos=sqrt(xyzlos[*,0]^2+xyzlos[*,1]^2)
 		
 		los={nchan:nchan,rlos:rlos,xyzlens:xyzlens,xyzlos:xyzlos,$

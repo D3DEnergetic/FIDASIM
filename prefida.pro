@@ -573,6 +573,12 @@ PRO prefida,input_pro,plot=plot,save=save
 	;;CALL INPUT PROCEDURE/FILE
 	CALL_PROCEDURE,input_pro,inputs
 
+    ;;CHECK FOR SLASH
+    slash=strmid(inputs.result_dir,0,1,/reverse_offset)
+    if slash ne '/' then inputs.result_dir+='/'
+    slash=strmid(inputs.install_dir,0,1,/reverse_offset)
+    if slash ne '/' then inputs.install_dir+='/'
+
 	;;MAKE DIRECTORIES IF THEY DONT EXIST
 	if file_test(inputs.result_dir,/directory) eq 0 then begin
 		spawn,'mkdir '+inputs.result_dir
@@ -632,8 +638,9 @@ PRO prefida,input_pro,plot=plot,save=save
 	if inputs.f90brems eq 0 then $
 		brems,inputs,chords,profiles,equil,brems
 
+	plot_file=inputs.install_dir+strupcase(inputs.device)+'/'+strlowcase(inputs.device)+'_plots.pro'
     ;; Plot grid, beam, sightlines, and equilibrium
-	if keyword_set(plot) then begin
+	if keyword_set(plot) and FILE_TEST(plot_file) then begin
 		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, chords, equil,nbgeom,plasma
 	endif
 

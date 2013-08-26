@@ -39,8 +39,8 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 
 	;;	IDL> help,equil.rho_chords
 	;;	** Structure <1d48bf08>, 2 tags, length=352008, data length=352004, refs=2:
-	;;	   RHOS            DOUBLE    Array[4000, 11]
-	;;	   DS              FLOAT          0.300000
+	;;	   RHOS            DOUBLE    Array[4000, 11] ;;Rho values along lines of sight
+	;;	   DS              FLOAT          0.300000   ;;step size along line of sight in [cm]
 	;;
 
 	;;	IDL> help,profiles

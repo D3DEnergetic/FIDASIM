@@ -404,35 +404,38 @@ PRO load_results,result_dir,results,save=save
 	;;READ INPUTS
 	read_inputs,result_dir+'inputs.dat',inputs
 
+	runid=inputs.fidasim_runid
+	input_file=inputs.fidasim_runid+'_inputs.cdf'
+
 	;;READ GRID
-	read_grid,result_dir+'parameters.cdf',grid
+	read_grid,result_dir+input_file,grid
 
 	;;READ LOS
-	read_los,result_dir+'parameters.cdf',los
+	read_los,result_dir+input_file,los
 
 	;;READ PLASMA 
-	read_plasma,result_dir+'parameters.cdf',plasma
+	read_plasma,result_dir+input_file,plasma
 
 	;;READ FIDA SPECTRA
-	read_fida,result_dir+'fida_spectra.cdf',fida
+	read_fida,result_dir+runid'_fida_spectra.cdf',fida
 
 	;;READ HALO AND NBI SPECTRA
-	read_nbi_halo,result_dir+'nbi_halo_spectra.cdf',nbi_halo
+	read_nbi_halo,result_dir+runid+'_nbi_halo_spectra.cdf',nbi_halo
 
 	;;READ NEUTRALS
-	read_neutrals,result_dir+'neutrals.cdf',neutrals
+	read_neutrals,result_dir+runid+'_neutrals.cdf',neutrals
 
 	;;READ NPA
-	read_npa,result_dir+'npa.cdf',npa
+	read_npa,result_dir+runid+'_npa.cdf',npa
 
 	;;READ FBM
-	read_fbm,result_dir+'parameters.cdf',fbm
+	read_fbm,result_dir+input_file,fbm
 
 	;;READ WEIGHT FUNCTIONS
-	read_weights,result_dir+'weight_function.cdf',weights
+	read_weights,result_dir+runid+'_weight_function.cdf',weights
 
 	;;READ BIRTH PROFILE
-	read_birth,result_dir+'birth.cdf',birth
+	read_birth,result_dir+runid+'_birth.cdf',birth
 
 	results={inputs:inputs,grid:grid,los:los,plasma:plasma,$
 			fida:fida,nbi_halo:nbi_halo,neutrals:neutrals,$

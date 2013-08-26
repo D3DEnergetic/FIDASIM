@@ -388,7 +388,7 @@ contains
 	integer         :: sig_varid,oa_varid,wght_varid,nchan_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
-    filename=trim(adjustl(result_dir))//"/parameters.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading detector information ----'
 	
 	!!OPEN netCDF file   
@@ -467,7 +467,7 @@ contains
     real(double)               :: b_abs     !! Magnetic field
     real(double), dimension(3) :: a,b,c    !! Magnetic field
 
-    filename=trim(adjustl(result_dir))//"/parameters.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
 
 	!!OPEN netCDF file   
 	call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -550,7 +550,8 @@ contains
 	integer       :: ncid,brems_varid
     real(double) :: vb
     real(double), dimension(:)  , allocatable :: brems
-    filename=trim(adjustl(result_dir))//"/parameters.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+
     print*,'---- loading bremsstrahlung data from ', filename
     allocate(brems(spec%nchan))
 
@@ -674,7 +675,7 @@ contains
 	integer :: ncid,r2d_var,z2d_var,bmvol_var,emin_var,emax_var,pmin_var,pmax_var
 	integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
    
-    filename=trim(adjustl(result_dir))//"/parameters.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading fast ion distribution function ----'
 
 	!!OPEN netCDF file   
@@ -785,7 +786,7 @@ contains
     integer           :: i,j,k,p,ncid,varid,dimids(5),shot_varid,time_varid
     integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid
     character(100)    :: filename
-    filename=trim(adjustl(result_dir))//"/birth.cdf"   
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -826,7 +827,7 @@ contains
     integer 	    :: ncid,full_varid,half_varid,third_varid,halo_varid
     integer         :: shot_varid,time_varid,dimid1
     character(120)  :: filename
-    filename=trim(adjustl(result_dir))//"/neutrals.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf"
  
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -880,7 +881,7 @@ contains
     allocate(output1(npa%counter))
 
     npa%wght(:)=npa%wght(:)/(pi*npa%size(1)**2)
-    filename=trim(adjustl(result_dir))//"/npa.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -950,7 +951,7 @@ contains
          /(4.d0*pi)*1.d4
 
     !! write to file
-    filename=trim(adjustl(result_dir))//"/nbi_halo_spectra.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_nbi_halo_spectra.cdf"
  
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -1019,7 +1020,7 @@ contains
          /(0.1d0*spec%dlambda)/(4.d0*pi)*1.d4
 
     !! write to file
-    filename=trim(adjustl(result_dir))//"/fida_spectra.cdf"  
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_spectra.cdf"  
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -1064,7 +1065,7 @@ contains
 	integer :: ncid,full_var,half_var,third_var,halo_var
 
     print*,'---- load neutrals RESULTS/neutrals.bin ----' 
-    filename=trim(adjustl(result_dir))//"/neutrals.cdf" 
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
    	!!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
 
@@ -3346,7 +3347,7 @@ contains
     enddo loop_over_channels
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/weight_function.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_weight_function.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )

@@ -740,7 +740,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	print, 'Inputs stored in data file: '+file
 
 	;;WRITE TO FILE
-	file =inputs.result_dir+inputs.runid+'/parameters.cdf'	
+	file =inputs.result_dir+inputs.runid+'/'+inputs.runid+'_inputs.cdf'	
 	ncid = ncdf_create(file,/clobber)
 	;;DEFINE DIMENSIONS
 	ncdf_control,ncid

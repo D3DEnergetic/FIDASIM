@@ -52,7 +52,8 @@ module load pathscale
 
 #How to run
 ## 1. Create an input file/procedure.
-Prefida, the FIDASIM preprocessing routine, calls an input procedure that returns a structure that contains the input parameters. An example is shown below.
+Prefida, the FIDASIM preprocessing routine, calls an input procedure that returns a structure that contains the input parameters. An example for DIII-D is shown below.
+Note: There may be some small differences depending on your device.
 
 ```
 ;;This input file is a procedure so name this file accordingly

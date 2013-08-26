@@ -9,11 +9,12 @@ pro rotate_uvw,uvw,Arot,Brot,Crot,updown,xyz
   xyz=MATRIX_MULTIPLY(C2rot,qrz)
 end
 
-PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
-                        ,rotated_coords=rotated_coords,src=src
+PRO nbi_geometry_transp,nbgeom, doplt=doplt,do_oplot_tor=do_oplot_tor $
+                        ,rotate=rotate,src=src,cm=cm
 ;===============================================
 ; Beam geometry settings from AUGD homepage
 ;===============================================
+  if not keyword_set(shot_in) then shot=27237 else shot=shot_in
 ;;R(P):: Distance horizontal beam crossing to - torus axis [cm]
   R0=[284.20d0,284.20d0,284.20d0,284.20d0,329.63d0,329.63d0,329.63d0,329.63d0]
 ;;PHI: angle between R and box [rad]
@@ -25,10 +26,10 @@ PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
   alpha=4.1357d0/!radeg
   ALPHA=alpha*[1.d0,-1.d0,-1.d0,1.d0,1.d0,-1.d0,-1.d0,1.d0]
 ;;BETA: vertical angle between box-axis and source [rad]
-  beta  = 4.8991d0/!radeg
-  beta6 = 6.65d0/!radeg 
-  beta7 = 6.65d0/!radeg 
-  BETA  = [-beta,-beta,beta,beta,-beta,-beta6,beta7,beta]
+ beta  = 4.8991d0/!radeg
+ beta6 = 6.65d0/!radeg 
+ beta7 = 6.65d0/!radeg 
+ BETA  = [-beta,-beta,beta,beta,-beta,-beta6,beta7,beta]
  
 ;;Ion source half width [cm]
   bmwidra=11.d0 
@@ -93,20 +94,36 @@ PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
   endfor
 
 
+  gamma=-!pi/8.*3.
+  Rrot=dblarr(3,3)
+  Rrot[0,0]= cos(GAMMA)  & Rrot[0,1]=-sin(GAMMA)  & Rrot[0,2]= 0.
+  Rrot[1,0]= sin(GAMMA)  & Rrot[1,1]= cos(GAMMA)  & Rrot[1,2]= 0.
+  Rrot[2,0]= 0.          & Rrot[2,1]= 0.          & Rrot[2,2]= 1. 
+  for ii=0,7 do begin
+     xyz_src[ii,*]=MATRIX_MULTIPLY(Rrot, reform(xyz_src[ii,*]))
+     xyz_pos[ii,*]=MATRIX_MULTIPLY(Rrot, reform(xyz_pos[ii,*]))
+     xyz_plasma[ii,*]=MATRIX_MULTIPLY(Rrot, reform(xyz_plasma[ii,*]))
+  endfor
+  phi_box=phi_box+replicate(gamma,8)
+  
+
   ;; If another coordinate system is used (e.g. by rmm)
-  if not(keyword_set(rotated_coords)) then begin
-     gamma=-!pi/8.*3.
+  if keyword_set(rotate) then begin
      Rrot=dblarr(3,3)
-     Rrot[0,0]= cos(GAMMA)  & Rrot[0,1]=-sin(GAMMA)  & Rrot[0,2]= 0.
-     Rrot[1,0]= sin(GAMMA)  & Rrot[1,1]= cos(GAMMA)  & Rrot[1,2]= 0.
+     Rrot[0,0]= cos(ROTATE)  & Rrot[0,1]=-sin(ROTATE)  & Rrot[0,2]= 0.
+     Rrot[1,0]= sin(ROTATE)  & Rrot[1,1]= cos(ROTATE)  & Rrot[1,2]= 0.
      Rrot[2,0]= 0.          & Rrot[2,1]= 0.          & Rrot[2,2]= 1. 
      for ii=0,7 do begin
         xyz_src[ii,*]=MATRIX_MULTIPLY(Rrot, reform(xyz_src[ii,*]))
         xyz_pos[ii,*]=MATRIX_MULTIPLY(Rrot, reform(xyz_pos[ii,*]))
         xyz_plasma[ii,*]=MATRIX_MULTIPLY(Rrot, reform(xyz_plasma[ii,*]))
      endfor
-     phi_box=phi_box+gamma
+     phi_box=phi_box+replicate(rotate,8)
   endif
+
+
+
+
   zero=replicate(0.d0,8)
   one=replicate(1.d0,8)
 ;;transformation matrix to rotate on NBI box axis by alpha
@@ -139,7 +156,7 @@ PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
              , focy: double(foclra)     , focz: double(foclza) $
              , divy: double(divra)      , divz: double(divza) $
              , bmwidra:double(bmwidra)  , bmwidza:double(bmwidza)  $
-             , xyz_src: xyz_src  }
+             , xyz_src: xyz_src, xyz_pos: xyz_pos  }
     
 
 ;==========
@@ -220,6 +237,10 @@ PRO nbi_geometry_transp,nbgeom,doplt=doplt,do_oplot_tor=do_oplot_tor $
          updown=1
          rotate_uvw,uvw_ray,Arot[ii,*,*],Brot[ii,*,*],Crot[ii,*,*],updown $
                     ,xyz_ray
+         if keyword_set(cm) then begin
+            xyz_ray=xyz_ray*100.
+            xyz_src=xyz_src*100.
+         endif
          oplot,[xyz_src[ii,0],xyz_src[ii,0]+xyz_ray[0]]/100. $
                ,[xyz_src[ii,1],xyz_src[ii,1]+xyz_ray[1]]/100.,thick=2,color=0
         

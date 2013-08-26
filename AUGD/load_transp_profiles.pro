@@ -1,9 +1,14 @@
-pro read_transp,shot,time_in,kind,diag,rho,output,rhostr,err
-  directory='/u/bgeiger/tr_client/AUGD/'+string(shot,f='(i5)')+'/'
-  file=directory+kind+string(shot,f='(i5)')+'.'+diag
-
+@~/FIDASIM/AUGD/rz2rho.pro
+@~/FIDASIM/LIB/nstring.pro
+pro read_transp,shot,time_in,file,rho,output,rhostr,err $
+                ,quantity=quantity, unit=unit, average=average, outtime=outtime
   openr, 55, file ,error = err  ; open ufile
-  IF (err ne 0) then return
+  IF (err ne 0) then begin
+     print, 'Warning: transp file not found: ', file
+     print, 'Trying other diagnostics...'
+     return
+     ;;stop
+  endif
   line    = ''
   READF, 55, line ;& print, line
   dummy=strsplit(line,' ',/extract)
@@ -15,6 +20,9 @@ pro read_transp,shot,time_in,kind,diag,rho,output,rhostr,err
   READF, 55, line ;& print, line
   rhostr=strmid(line,1,7)
   READF, 55, line ;& print, line
+  quantity_unit =line
+  quantity=strtrim(strmid(line,1,7),2)
+  unit=strtrim(strmid(line,21,10),2)
   if dims eq 2 then begin
      READF, 55, line ;& print, line 
   endif
@@ -35,45 +43,29 @@ pro read_transp,shot,time_in,kind,diag,rho,output,rhostr,err
   nmax=long(ntimes*nrho)
   data_raw=dblarr(nmax)
   cc=0L
+
+  ;new parse-code (hopefully strlen and stringstart are always the same)
+  strlen=13  ;length of one double string (including sign)
+  stringstart = indgen(6)*strlen+1 
+
   while cc lt nmax do begin
      READF, 55, line
-     dummy = strsplit(line,' ',/extract) 
-     ll++
-     cc1=cc
+     dummy = strmid(line, stringstart, strlen)  ;cut line string
+     dummy = dummy[where(dummy ne '')]   ;remove empty strings
+
      if n_elements(dummy) eq 6 then begin
         data_raw[indgen(6)+cc]=double(dummy)
         cc=cc+6
      endif else begin
         for i=0,n_elements(dummy)-1 do begin
-           if strlen(dummy[i]) lt 15 then begin
-              data_raw[cc]=dummy[i]
-              cc++
-           endif else begin
-              dummy2 = strsplit(dummy[i],'-',/extract) 
-              for ii=0,n_elements(dummy2)-1 do begin 
-                 factor=-1.
-                 if ii eq 0 then begin
-                    mpos=strpos(dummy[i],'-')
-                    if mpos ne 0 then factor=1.
-                 endif
-                 ;; there is a problem when the values become E-01!!
-                 if strlen(dummy2[ii]) lt 11 then begin
-                    dummy2[ii]=dummy2[ii]+'-'+dummy2[ii+1]
-                    ii=ii+1
-                 endif
-                 data_raw[cc]=factor*dummy2[0] 
-                 cc++
-              endfor
-           endelse
+           data_raw[cc]=dummy[i]
+           cc++
         endfor
      endelse
-     
-     cc2=cc
-     if cc2-cc1 gt 6 then stop
   endwhile
-  
+  close,55 
 
-  close,55   
+  
   data=fltarr(ntimes,nrho)
   cc=0L
   for i=0,nrho-1 do begin
@@ -82,9 +74,19 @@ pro read_transp,shot,time_in,kind,diag,rho,output,rhostr,err
         cc++
      endfor
   endfor
-  index=where(time_arr gt time_in-0.001 and time_arr lt time_in+0.001,nind)
+
+  
+  if n_elements(average) ne 0 then begin
+     delta_t = average/2.
+  endif else begin
+     delta_t=0.001
+  endelse
+
+
+  index=where(time_arr gt time_in-delta_t and time_arr lt time_in+delta_t,nind)
   if nind gt 1 then begin
      ;; take mean of the data
+     print, 'averaged over ' + nstring(nind) + ' time points.'
      output=total(data[index,*],1)/double(nind)
    ;  print, 'time file:', mean(time_arr[index])
   endif else begin
@@ -93,32 +95,134 @@ pro read_transp,shot,time_in,kind,diag,rho,output,rhostr,err
         output=reform(data[index,*])
     ;    print, 'time, time file:', time_in, mean(time_arr[index])
     ;    print, 'dt:', time_arr[index]-time_in
-  endelse
-
+     endelse
+  outtime= mean(time_arr[index])
+  if err eq 0 then begin
+     print, 'Ufile loaded: ',strmid(file,strlen(file)-21,21)
+  endif
 end
 
 
 
 
-pro load_transp_profiles,shot,time,profiles,rhostr_ne
-  doplot=1
 
 
- 
-  if !VERSION.MEMORY_BITS eq 32 then begin 
-     defsysv,'!libddww','/afs/ipp/aug/ads/lib/@sys/libddww.so' 
-     defsysv,'!libkk'  ,'/afs/ipp/aug/ads/lib/@sys/libkk.so'
+
+pro load_transp_profiles,shot,time,profiles,cdf_file
+  ;IN: shot, time, cdf_file
+  ;OUT: profiles
+
+
+  ti_diag='' & rot_diag='' & te_diag='' & dene_diag='' & zeff_diag=''
+  constant_zeff=0
+
+  ;;cdf_file can be the shot (as string with length=5), or the cdffile.
+  ;;->figure out u-file directory from that.
+  ;;if cdffile is from SSFPQL/TORIC, then find directory differently:
+
+  is_toric = stregex(cdf_file, 'toric', /fold) ne -1
+  if is_toric then begin
+     icut= (strsplit(cdf_file, '/'))[-1]
+     dir = strmid(cdf_file, 0, icut)
+     ;dir with leading /    
+     transp_runid=''
+     shot_str=string(shot,f='(i5)')
   endif else begin
-     defsysv,'!libddww','/afs/ipp/aug/ads/lib64/@sys/libddww.so' 
-     defsysv,'!libkk'  ,'/afs/ipp/aug/ads/lib64/@sys/libkk.so'
-  endelse   
+  ;;->figure out u-file directory
+
+  ;; ----------------------------------------------------------------
+  ;; - USE the cdf_file name to define where the u-files are stored -
+  ;; ----------------------------------------------------------------
+  if strlen(cdf_file) gt 5 then begin
+     dummy=strsplit(cdf_file,'tr_client',/regex,/extract)
+     home_dir=dummy[0]
+     dummy=strsplit(dummy[1],'/',/extract)
+     shot_str=dummy[1]
+     dir=home_dir+'tr_client/'+dummy[0]+'/'+shot_str+'/'
+     transp_runid=dummy[2]+'/'+dummy[3]
+     if long(shot_str) ne shot then begin
+        print, 'ATTENTION, THE KINETIC PROFILES WILL BE LOADED FOR #' +shot_str
+        print, 'AND NOT FOR THE SELECTED DISCHARGE (#'+string(shot,f='(i5)')+')'
+        print, 'CHANGE THE .CDF FILE IN start_fidasim.pro OR CONTINUE WITH .c!'
+        stop
+     endif
+     ;; ---------------------------------------------------------
+     ;; ------ CHECK TRANSP NAMELIST WHICH U-FILES ARE USED -----
+     ;; ---------------------------------------------------------
+     file= dir+strmid(transp_runid,0,strlen(transp_runid)-9)+'TR.DAT'
+     if file_test(file) then begin
+        openr, 55, file         ;open namelist
+        line=''
+        WHILE ~ EOF(55) DO BEGIN
+           READF, 55, line
+           if (strsplit(line, '!'))[0] eq 1 then continue   ;comment only line
+           commands = (strsplit(line, '!', /extra))[0]      ;comments removed
+           commands = strcompress(commands, /remove_all) ;remove blank spaces
+           ;; TI DIAG
+           if stregex(commands, 'extti2', /fold_case) ne -1 then begin
+              dum=strsplit(commands,"'",/extract)
+              ti_diag=dum[1]
+              continue
+           endif
+           ;; ROTATION DIAG
+           if stregex(commands, 'extvp2', /fold_case) ne -1 then begin
+              dum=strsplit(commands,"'",/extract)
+              rot_diag=dum[1]
+              continue
+           endif
+           ;; ELECTRON DENSITY DIAG
+           if stregex(commands, 'extner', /fold_case) ne -1 then begin
+              dum=strsplit(commands,"'",/extract)
+              dene_diag=dum[1]
+              continue
+           endif
+           ;; ELECTRON TEMPERATURE DIAG
+           if stregex(commands, 'extter', /fold_case) ne -1 then begin
+              dum=strsplit(commands,"'",/extract)
+              te_diag=dum[1]
+              continue
+           endif
+           ;; check namelist if Zeff is set manually
+           if stregex(commands, 'xzeffi', /fold_case) ne -1 then begin
+                                ;-> Zeile gefunden!
+              zeffi =strsplit(commands,'xzeffi',/extra,count=count $
+                              ,/reg,/fold_case)
+              zeffi =strsplit(zeffi, '=', /extra)
+              zeff_val = float(zeffi)
+              print, 'Zeff found in namelist! Set to: ' + string(zeff_val)
+              constant_zeff =1
+           endif
+           ;; 2D  ZEFF FILE
+           if constant_zeff eq 0 then begin
+              if stregex(commands, 'extzf2', /fold_case) ne -1 then begin
+                 dum=strsplit(commands,"'",/extract)
+                 zeff_diag=dum[1]
+                 continue
+              endif
+           endif
+        ENDWHILE
+        close, 55
+     endif
+  endif else begin
+     ;; ----------------------------------------------------------------
+     ;; -------- DEFINE THE POSITION OF THE U-FILES from the shot ------
+     ;; ----------------------------------------------------------------
+     dir='~/tr_client/AUGD/'+string(shot,f='(i5)')+'/'
+     transp_runid=''
+     shot_str=string(shot,f='(i5)')
+  endelse
+  endelse
+  
 
 
-  print, shot, time
+  ;; ----------------------------------------------------------------
+  ;; --------------- DEFINE THE OUTPUT STRUCTURE --------------------
+  ;; ----------------------------------------------------------------
   nr_rho=120
   rho=dindgen(nr_rho)/(nr_rho-1.)*1.2
   profiles=    { time:time              $
                  , rho:  rho      $
+                 , rho_str:  ''      $
                  , ti:  dblarr(nr_rho)    $  
                  , vtor: dblarr(nr_rho)   $
                  , te: dblarr(nr_rho)     $
@@ -127,73 +231,133 @@ pro load_transp_profiles,shot,time,profiles,rhostr_ne
   ;; add zero values to rho > 1.!!
   rho_sol=(dindgen(20)+0.5)/20.*0.2+1.
   val_sol=replicate(0.d0,20)
-  ;; NE
+
+
+  ;; --------------------------------------------------
+  ;; ------------- ELECTRON DENSITY -------------------
+  ;; --------------------------------------------------
   err=1
- ; if err ne 0 then read_transp,shot,time,'N','MOD',rho_dene,dene,rhostr_ne,err
-  if err ne 0 then read_transp,shot,time,'N','IDA',rho_dene,dene,rhostr_ne,err
-  if err ne 0 then read_transp,shot,time,'N','IDZ',rho_dene,dene,rhostr_ne,err
-  if err ne 0 then read_transp,shot,time,'N','VTA',rho_dene,dene,rhostr_ne,err
-  index=where(dene gt 0.0)   
+  file=dir+'N'+shot_str+'.'
+  if err ne 0 then read_transp,shot,time,file+dene_diag,rho_dene,dene,rhostr,err
+  if err ne 0 then read_transp,shot,time,file+'IDA',rho_dene,dene,rhostr,err
+  if err ne 0 then read_transp,shot,time,file+'IDZ',rho_dene,dene,rhostr,err
+  if err ne 0 then read_transp,shot,time,file+'VTA',rho_dene,dene,rhostr,err
+  if err ne 0 then read_transp,shot,time,file+'DPR',rho_dene,dene,rhostr,err
+  if err ne 0 then begin
+     print, 'Error: no transp Data for ne found'
+     stop
+  endif
+  index=where(dene gt 0.0)  
+  if index[0] eq -1 then stop
   rho_dene=[rho_dene[index],rho_sol]
   dene=[dene[index]*1.d6,val_sol]
+  profiles.rho_str=rhostr
   profiles.dene =  interpol(dene,rho_dene,profiles.rho)  
 
-  ;; TE
+  ;; --------------------------------------------------
+  ;; ----------- ELECTRON TEMPERATUERE ----------------
+  ;; --------------------------------------------------
   err=1
-  if err ne 0 then  read_transp,shot,time,'E','IDA',rho_te,te,rhostr_te,err
-  if err ne 0 then  read_transp,shot,time,'E','IDZ',rho_te,te,rhostr_te,err
-  if err ne 0 then  read_transp,shot,time,'E','CEC',rho_te,te,rhostr_te,err
-  if err ne 0 then  read_transp,shot,time,'E','VTA',rho_te,te,rhostr_te,err
+  file=dir+'E'+shot_str+'.'
+  if err ne 0 then  read_transp,shot,time,file+te_diag,rho_te,te,rhostr,err
+  if err ne 0 then  read_transp,shot,time,file+'IDA',rho_te,te,rhostr,err
+  if err ne 0 then  read_transp,shot,time,file+'IDZ',rho_te,te,rhostr,err
+  if err ne 0 then  read_transp,shot,time,file+'CEC',rho_te,te,rhostr,err
+  if err ne 0 then  read_transp,shot,time,file+'VTA',rho_te,te,rhostr,err
+  if err ne 0 then begin
+     print, 'Error: no transp Data for Te found'
+     stop
+  endif
   index=where(te gt 0.0)  
+  if index[0] eq -1 then stop
   rho_te=[rho_te[index],rho_sol]
   te=[te[index],val_sol]     
   profiles.te   =  interpol(te  ,rho_te,profiles.rho)   
- 
-  if rhostr_ne ne rhostr_te then stop
+  if rhostr ne profiles.rho_str then stop
 
-  ;; ZEFF
-  err=1
-  if err ne 0 then read_transp,shot,time,'Z','IDZ',rho_zeff,zeff,rhostr_zef,err
-  if err ne  0 then begin
-     ;; global estimate 
-     read_transp,shot,time,'Z','ZEF',rho_zeff,zeff,rhostr_zef,err
+
+  ;; --------------------------------------------------
+  ;; --------------- ZEFF -----------------------------
+  ;; --------------------------------------------------
+  if constant_zeff eq 1 then begin
+     ;; constang ZEFF value found in NAMELIST
      rho_zeff=rho_dene
-     if err ne 0 then begin
-        zeff=1.5d0
-        zeff=replicate(zeff,n_elements(rho_dene))
-        rhostr_zef='Zeff   '
+     zeff=replicate(zeff_val, n_elements(rho_zeff)) 
+  endif else begin
+     err=1
+     file=dir+'Z'+shot_str+'.'
+     if err ne 0 then read_transp,shot,time,file+zeff_diag,rho_zeff,zeff,rhostr,err
+     if err ne 0 then read_transp,shot,time,file+'IDZ',rho_zeff,zeff,rhostr,err
+     if err ne  0 then begin  ;; load the 1D ZEFF estimate
+       ; read_transp,shot,time,file+'ZEF',rho_zeff,zeff1d,rhostr,err
+        if err ne 0 then begin
+           print, 'No transp Data for Zeff found, set to 1.5!'
+           zeff1d=1.5d0
+        endif
+        rho_zeff=rho_dene
+        zeff=replicate(zeff1d, n_elements(rho_zeff)) 
      endif
-  endif
-  index=where(zeff ge 0.0)   
+  endelse
+  ;; now add some scrape-off layer data ponints that are set to zero
+  index=where(zeff ge 0.0,nzeff)   
+  if nzeff LE 0 then stop
   rho_zeff=[rho_zeff[index],rho_sol]
   zeff=[zeff[index],val_sol]
-  profiles.zeff =  interpol(zeff,rho_zeff,profiles.rho)
+  profiles.zeff =  interpol(zeff,rho_zeff,profiles.rho) 
+  if rhostr ne profiles.rho_str and rhostr ne 'Zeff   ' then stop
 
-  if rhostr_zef ne rhostr_te and rhostr_zef ne 'Zeff   ' then stop
-
-  ;; TI
-  err=1
-  if err ne 0 then read_transp,shot,time,'I','CEZ',rho_ti,ti,rhostr_ti,err
-  if err ne 0 then read_transp,shot,time,'I','CHZ',rho_ti,ti,rhostr_ti,err
-  index=where(ti gt 0.0)     
-  rho_ti=[rho_ti[index],rho_sol]
-  ti=[ti[index],val_sol]
+  ;; --------------------------------------------------
+  ;; --------- ION TEMPERATURE ------------------------
+  ;; --------------------------------------------------
+  err=1  
+  file=dir+'I'+shot_str+'.'
+  if err ne 0 then read_transp,shot,time,file+ti_diag,rho_ti,ti,rhostr,err
+  if err ne 0 then read_transp,shot,time,file+'CEZ',rho_ti,ti,rhostr,err
+  if err ne 0 then read_transp,shot,time,file+'CHZ',rho_ti,ti,rhostr,err
+  if err ne 0 then begin
+     rho_ti=rho_te
+     ti=te    
+     print,'NO TI FOUND! Using TI eq TE!'
+  endif else begin
+     index=where(ti gt 0.0)   
+     rho_ti=[rho_ti[index],rho_sol]
+     ti=[ti[index],val_sol]
+  endelse
   profiles.ti   =  interpol(ti  ,rho_ti,profiles.rho) 
- 
-  if rhostr_ti ne rhostr_te then stop
-  ;;VTOR
+  if rhostr ne profiles.rho_str then stop
+
+
+  ;; --------------------------------------------------
+  ;; --------- PLASMA ROTATION ------------------------
+  ;; --------------------------------------------------
   err=1
-  if err ne 0 then  read_transp,shot,time,'V','CEZ',rho_vtor,vtor,rhostr_vtor,err
-  if err ne 0 then  read_transp,shot,time,'V','CHZ',rho_vtor,vtor,rhostr_vtor,err
-  index=where(vtor gt 0.0)   
+  file=dir+'V'+shot_str+'.'
+  if err ne 0 then read_transp,shot,time,file+rot_diag,rho_vtor,vtor,rhostr,err, unit=unit
+  if err ne 0 then read_transp,shot,time,file+'CEZ',rho_vtor,vtor,rhostr,err, unit=unit
+ if err ne 0 then read_transp,shot,time,file+'CHZ',rho_vtor,vtor,rhostr,err, unit=unit
+  if err ne 0 then begin
+     print, 'Error: no transp Data for vtor found'
+     rho_vtor=rho_te
+     vtor=te*0.d0
+     print,'NO VTOR FOUND! Using VTOR=0!'
+  endif
+  if unit ne '(cm/s)' then begin
+     print, 'Error: vtor has unit: ' + unit
+     print, 'Expected: (cm/s) !'
+     stop
+  endif
+  index=where(vtor) ;; take all nonzero values (pos. and negative)
   rho_vtor=[rho_vtor[index],rho_sol]
   vtor=[vtor[index]*1.d-2,val_sol]
   profiles.vtor   =  interpol(vtor  ,rho_vtor,profiles.rho) 
+  if rhostr ne profiles.rho_str then stop
 
- if rhostr_vtor ne rhostr_te then stop
 
 
-  ;; correction if interpolation goes to infinity
+
+  ;; -----------------------------------------------------
+  ;; ---- correction if interpolation goes to infinity ---
+  ;; -----------------------------------------------------
   index=where(finite(profiles.vtor) eq 0,nind)
   if nind gt 0 then begin
       if mean(profiles.rho[index]) lt 0.1 then begin
@@ -204,8 +368,7 @@ pro load_transp_profiles,shot,time,profiles,rhostr_ne
         profiles.dene[index]=dindgen(nind)*0.d0+dene[0]
      endif else stop
   endif
-
-
+  save,filename='profiles_28061_1.6s.idl',profiles
 end
 
 

@@ -1,5 +1,5 @@
 function beam_therm_rate, temp,eb,am,ab,de,sig_name  $
-                          ,params=params,deexcit=deexcit
+                          ,params=params,deexcit=deexcit,mc=mc
 ;; Program to calculate beam-plasma reactivity numerically
 ;; INPUT
 ;;       temp    Plasma temperature (keV)
@@ -16,7 +16,46 @@ function beam_therm_rate, temp,eb,am,ab,de,sig_name  $
 ;;       <sigma*v>       cm^3/s
 
   if temp eq 0. and eb eq 0. then return,0.
-  
+  if keyword_set(mc) then begin
+     mass_u=1.6605e-27          ;[kg]   
+     ec= 1.602e-19              ;[C]
+     nv=5.e6
+     ;; define thermal velocity distribution of ions (monte carlo)
+     vti=sqrt(temp*1.e3*ec/(mass_u*am)) ;[m/s]
+     vi=fltarr(nv,3)
+     vi[*,0]=randomn(seed,nv)*vti
+     vi[*,1]=randomn(seed,nv)*vti
+     vi[*,2]=randomn(seed,nv)*vti
+     ;; define beam velocity vector
+     vb=sqrt(2.d0*eb*1.d3*ec/(mass_u*ab))       ;[m/s]
+     vrel=sqrt((vi[*,0]-vb)^2+vi[*,1]^2+vi[*,2]^2) ; [m/s]
+     ared = am*ab/(am+ab) 
+     e_coll = 0.5d0*mass_u*ared*vrel^2/ec*1.e-3 ; [kev/amu]  
+     factor = replicate(1.,nv)
+     if keyword_set(deexcit) then begin
+        factor = (e_coll + de)/e_coll*params[0]^2/params[1]^2
+        index=where(finite(factor) eq 0,nind)
+        if nind gt 0 then factor[index]=0.
+        e_coll = e_coll + de
+     endif
+     if ared ge 0.5 then begin
+        ;; ion-ion collision
+        e_for_sigma_call = e_coll/ared ;[keV/amu]
+     endif else begin
+        ;; electron ion collision
+        e_for_sigma_call = e_coll ;[keV]
+     endelse    
+     ;;get the cross sections [cm^2]
+     case n_elements(params) of
+        1: sigarr=call_function(sig_name,e_for_sigma_call,params[0])
+        2: sigarr=call_function(sig_name,e_for_sigma_call,params[0],params[1])
+        3: sigarr=call_function(sig_name,e_for_sigma_call,params[0],params[1],params[2])
+        else: stop
+     endcase 
+     return,mean(factor*vrel*100.*sigarr) ; [cm^3/s]
+  endif
+
+
   ;; Analytic solution
   temp_target_per_am = (temp > 1.d-6)/am
   e_beam_per_amu = eb/ab
@@ -77,10 +116,10 @@ function beam_therm_rate, temp,eb,am,ab,de,sig_name  $
   
      f = factor[*]*sigarr[*]*sqrt(u2[*])*exp(-(z[iz]^2+r[*]^2))*r[*]
      ;;Simpson's Rule
-     fz[iz] = (f[0]+f[nr-1]+4.d0*total(f[2*kr+1],/double)+2.*total(f[2*kr],/double))*dr/3.
+     fz[iz] = (-f[0]+f[nr-1]+4.d0*total(f[2*kr+1],/double)+2.*total(f[2*kr],/double))*dr/3.
   endfor
   ;;Simpson's Rule
-  sig_eff = (fz[0]+fz[nz-1]+4.d0*total(fz[2*kz+1],/double)+2.*total(fz[2*kz],/double))*dz/3.
+  sig_eff = (-fz[0]+fz[nz-1]+4.d0*total(fz[2*kz+1],/double)+2.*total(fz[2*kz],/double))*dz/3.
   sig_eff = sig_eff * 2./sqrt(!Dpi)
   rate = sig_eff*v_therm
   if keyword_set(deexcit) then  rate=rate*params[0]^2/params[1]^2

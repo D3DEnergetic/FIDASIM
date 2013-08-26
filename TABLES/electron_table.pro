@@ -1,23 +1,21 @@
 @all_tables.pro
-pro electron_table,low_res=low_res,plot=plot,ps=ps
-  nmax=12                       ; number of quantum states
-  maxeb=2010.d0                 ;[kev]
-  maxte=100.d0                  ;[kev]
+pro electron_table,plot=plot,ps=ps
+  nmax=12                      ;; number of quantum states
+  nmax_red=6                   ;; reduced number of quantum states whereby the 
+                               ;; states upto nmax are taken into account 
+                               ;; as loss mechanism!
 
-  neb=21
-  nte=10001 
-  if keyword_set(low_res) then begin
-     neb=21
-     nte=101
-  endif
-  
+  maxeb=400.d0  ;; maximum energy in table [kev]
+  maxte=20.d0   ;; maximum electron temperature in table [kev]         
+  neb=201       ;; table size
+  nte=201       ;; table size
 
   ;; arrays of eb and ti
   ebarr=maxeb*dindgen(neb)/(neb-1.)
   tearr=maxte*dindgen(nte)/(nte-1.)
   deb=ebarr[2]-ebarr[1]
   dte=tearr[2]-tearr[1]
-  print,'d-energy:', deb,'[kev]'
+  print,'d-energy:',deb,'[kev]'
   print,'d-te    :'    , dte,'[kev]' 
 
   if keyword_set(plot) then begin
@@ -106,26 +104,35 @@ pro electron_table,low_res=low_res,plot=plot,ps=ps
         for n=0,nmax-1 do begin 
            de = 13.6d-3/(n+1)^2
            qe[nmax,n,ie,ite]= $
-              beam_therm_rate(te,eb,ame,ab,de,'eiionization_janev2004',param=[n+1]) 
+           beam_therm_rate(te,eb,ame,ab,de,'eiionization_janev2004',param=[n+1])
         endfor
      endfor
   endfor
-  file='qetable.bin'
+
+  ;; ---------------------------------------
+  ;; ----- STORE DATE INTO BINARY FILES ----
+  ;; ---------------------------------------
+  file='qetable_full.bin'
   openw, lun, file, /get_lun
   writeu,lun, long(nte)
   writeu,lun, double(dte)
   writeu,lun, long(neb)
   writeu,lun, double(deb) 
   writeu,lun, long(nmax) 
-  for n=0,nmax-1 do begin
-     for m=0,nmax do begin
-        for ie=0,neb-1 do begin   
-           for ite=0,nte-1 do begin       
-              writeu, lun, float(qe[m,n,ie,ite])
-           endfor
-        endfor
-     endfor
-  endfor
+  writeu,lun, double(qe)
   close,lun
   free_lun, lun
+  ;; ------- STORE DATE WITH REDUCED N-LEVELS ----
+  reduce_table,qe,neb,nte,nmax_red,qe_red
+  file='qetable.bin'
+  openw, lun, file, /get_lun
+  writeu,lun, long(nte)
+  writeu,lun, double(dte)
+  writeu,lun, long(neb)
+  writeu,lun, double(deb) 
+  writeu,lun, long(nmax_red) 
+  writeu,lun, double(qe_red)
+  close,lun
+  free_lun, lun
+  print,'electron table written!'
 end

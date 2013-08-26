@@ -1,6 +1,6 @@
 PRO calc_spectra,grid,fbm,weights,los,neutrals,lambda,radiance,mean_fbm
 
-	nchan=weights.nchan
+	nchan=los.nchan
 	nwav=weights.nwav
 	lambda=weights.central_wavel
 

@@ -6,7 +6,7 @@ user=+GETENV('USER')
 ;;-----------------------------------------------------
 shot=28746L 											;; Shot Number
 time=4.421  											;; Time 
-runid='28746A01'	   									;; runid of FIDASIM
+runid='28746A02'	   									;; runid of FIDASIM
 device='AUGD'											;; D3D,NSTX,AUGD,MAST
 install_dir='/u/'+user+'/FIDASIM/'						;; Location of fidasim code and executable
 result_dir='/u/'+user+'/FIDASIM/RESULTS/AUGD/'  		;; Location where results will be stored /RESULTS/runid will be made

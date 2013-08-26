@@ -417,7 +417,7 @@ PRO load_results,result_dir,results,save=save
 	read_plasma,result_dir+input_file,plasma
 
 	;;READ FIDA SPECTRA
-	read_fida,result_dir+runid'_fida_spectra.cdf',fida
+	read_fida,result_dir+runid+'_fida_spectra.cdf',fida
 
 	;;READ HALO AND NBI SPECTRA
 	read_nbi_halo,result_dir+runid+'_nbi_halo_spectra.cdf',nbi_halo

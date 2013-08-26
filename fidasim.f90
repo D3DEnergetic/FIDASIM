@@ -426,8 +426,8 @@ contains
 	call check( nf90_get_var(ncid, ylos_varid, spec%xyzlos(:,2)) )
 	call check( nf90_get_var(ncid, zlos_varid, spec%xyzlos(:,3)) )
 	call check( nf90_get_var(ncid, head_varid, spec%headsize) )
-	call check( nf90_get_var(ncid, sig_varid, spec%opening_angle) )
-	call check( nf90_get_var(ncid, oa_varid, spec%sigma_pi) )
+	call check( nf90_get_var(ncid, oa_varid, spec%opening_angle) )
+	call check( nf90_get_var(ncid, sig_varid, spec%sigma_pi) )
 	call check( nf90_get_var(ncid, wght_varid, dummy_arr(:,:,:,:)) )
 
 	!!CLOSE netCDF FILE
@@ -964,7 +964,7 @@ contains
 
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
+    call check( nf90_def_var(ncid,"time",NF90_FLOAT,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
     call check( nf90_def_var(ncid,"full",NF90_DOUBLE,dimids,full_varid) )
     call check( nf90_def_var(ncid,"half",NF90_DOUBLE,dimids,half_varid) )
@@ -985,7 +985,7 @@ contains
 
     !Write to file
     call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, inputs%time) )
+    call check( nf90_put_var(ncid, time_varid, real(inputs%time)) )
     call check( nf90_put_var(ncid, lam_varid, lambda_arr) )
     call check( nf90_put_var(ncid, full_varid, result%spectra(:,:,nbif_type)) )
     call check( nf90_put_var(ncid, half_varid, result%spectra(:,:,nbih_type)) )

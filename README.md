@@ -47,6 +47,7 @@ module load pathscale
 
 ```
 * If you run FIDASIM on portal you will get an angry email. Make sure to schedule the job using the "use" command.
+* The netCDF directories lib and include, are located at /usr/pppl/intel/11-pkgs/netcdf-4.1.3/
 
 ***
 

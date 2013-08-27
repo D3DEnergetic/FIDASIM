@@ -3044,10 +3044,11 @@ contains
     real(double)                   :: radius
     real(double)                   :: photons !! photon flux 
     real(double), dimension(nlevs) :: fdens,hdens,tdens,halodens
-    real(double), dimension(3)     :: bvec,evec,vrot,los_vec
-    real(double), dimension(3)     :: a_norm,b_norm,c_norm
-    real(double)                   :: b_abs,theta
+    real(double), dimension(3)     :: bvec,evec,vrot,los_vec,evec_sav,vrot_sav
+    real(double), dimension(3)     :: a_norm,b_norm,c_norm,b_norm_sav
+    real(double)                   :: b_abs,theta,b_abs_sav
     real(double)                   :: ti,te,dene,denp,deni,length
+    real(double)                   :: ti_sav,te_sav,dene_sav,denp_sav,deni_sav
     real(double)                   :: rad,max_wght
     integer                        :: nwav,nchan
     real(double),dimension(:)    ,allocatable  :: wav_arr,central_wavel
@@ -3140,7 +3141,18 @@ contains
              los_weight(i,j,k,:)=cell(i,j,k)%los_wght(:)
           enddo
        enddo
-    enddo
+    enddo 
+    !! use only cell 111 for the calculation!
+    ac=(/1,1,1/)
+    denp_sav=cell(ac(1),ac(2),ac(3))%plasma%denp
+    dene_sav=cell(ac(1),ac(2),ac(3))%plasma%dene
+    deni_sav=cell(ac(1),ac(2),ac(3))%plasma%deni
+    ti_sav=cell(ac(1),ac(2),ac(3))%plasma%ti
+    te_sav=cell(ac(1),ac(2),ac(3))%plasma%te
+    vrot_sav=cell(ac(1),ac(2),ac(3))%plasma%vrot
+    b_abs_sav=cell(ac(1),ac(2),ac(3))%plasma%b_abs
+    b_norm_sav=cell(ac(1),ac(2),ac(3))%plasma%b_norm
+    evec_sav=cell(ac(1),ac(2),ac(3))%plasma%E
 
     loop_over_channels: do ichan=1,spec%nchan
        if(inputs%ichan_wght.gt.0) then
@@ -3212,8 +3224,6 @@ contains
        vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj
        vnbi_h=vnbi_f/sqrt(2.d0)
        vnbi_t=vnbi_f/sqrt(3.d0)     
-       !! use only cell 111 for the calculation!
-       ac=(/1,1,1/)
        !! normalize quantities
        denp=denp / rad
        cell(ac(1),ac(2),ac(3))%plasma%denp=denp
@@ -3345,6 +3355,25 @@ contains
        !$OMP END PARALLEL DO
        !!wfunct:[Ph*cm/s] !!
     enddo loop_over_channels
+	!! Put back plasma values so it doesn't possibly poison the rest of the code
+    do k=1,grid%nz
+       do j=1,grid%ny 
+          do i=1,grid%nx 
+             cell(i,j,k)%los_wght(:)=los_weight(i,j,k,:)
+          enddo
+       enddo
+    enddo
+    !! use only cell 111 for the calculation!
+    ac=(/1,1,1/)
+    cell(ac(1),ac(2),ac(3))%plasma%denp=denp_sav
+    cell(ac(1),ac(2),ac(3))%plasma%dene=dene_sav
+    cell(ac(1),ac(2),ac(3))%plasma%deni=deni_sav
+    cell(ac(1),ac(2),ac(3))%plasma%ti=ti_sav
+    cell(ac(1),ac(2),ac(3))%plasma%te=te_sav
+    cell(ac(1),ac(2),ac(3))%plasma%vrot=vrot_sav
+    cell(ac(1),ac(2),ac(3))%plasma%b_abs=b_abs_sav
+    cell(ac(1),ac(2),ac(3))%plasma%b_norm=b_norm_sav
+    cell(ac(1),ac(2),ac(3))%plasma%E=evec_sav
 
     !! Open file for the outputs
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_weight_function.cdf"

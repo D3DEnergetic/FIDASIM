@@ -3463,7 +3463,7 @@ contains
     real(double),dimension(3)      :: vnbi_f,vnbi_h,vnbi_t !! Velocity of NBI neutrals 
     real(double),dimension(3)      :: vhalo  !! v of halo neutral
     integer                        :: in      !! index of neut rates
-    real(double),dimension(nlevs)  :: rates   !! Rate coefficiants for CX
+    real(double),dimension(nlevs)  :: rates,pcx   !! Rate coefficiants for CX
     real(double),dimension(nlevs)  :: states  ! Density of n-states
     !! COLRAD
     real(double)                   :: dt  !!time interval in cell
@@ -3486,20 +3486,8 @@ contains
     real(double)                          :: wght2
 	!!netCDF variables
 	integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,nr_dimid
-	integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
+	integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid
 	integer :: shot_varid,time_varid
-
-    !! DEFINE wavelength array
-    nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
-    allocate(wav_arr(nwav+1))
-    allocate(central_wavel(nwav+1))
-    print*,nwav,' wavelengths to be simulated!'
-    do i=1,nwav+1
-       wav_arr(i)=real(i-1.)*inputs%dwav_wght+inputs%wavel_start_wght
-    enddo
-    central_wavel=wav_arr+0.5*inputs%dwav_wght
-    wav_arr=wav_arr*10. !![A]
-
 
     !! define pitch, energy and gyro angle arrays
     !! define energy - array
@@ -3583,10 +3571,12 @@ contains
                    cc=cc+1
                    los_wght(cc)=los_weight(i,j,k,ichan)
                    !! determine mean values like the halo density along LOS
-                   wght(cc)=(result%neut_dens(i,j,k,3,nbif_type)   &
-                        + result%neut_dens(i,j,k,3,nbih_type) &
-                        + result%neut_dens(i,j,k,3,nbit_type)  &
-                        + result%neut_dens(i,j,k,3,halo_type))*los_wght(cc)
+				   !! wght over every neutral not just those in the 3 energy
+				   !! state like for FIDA calc.
+                   wght(cc)=sum(result%neut_dens(i,j,k,:,nbif_type)   &
+                        + result%neut_dens(i,j,k,:,nbih_type) &
+                        + result%neut_dens(i,j,k,:,nbit_type)  &
+                        + result%neut_dens(i,j,k,:,halo_type))*los_wght(cc)
                    if (wght(cc).gt.max_wght)max_wght=wght(cc)
                    fdens=fdens &
                         +result%neut_dens(i,j,k,:,nbif_type)*los_wght(cc) 
@@ -3672,8 +3662,9 @@ contains
           sinus = sqrt(1.d0-ptcharr(j)**2)
           do k = 1, inputs%nr_wght !! gyro angle
              !! calculate velocity vector from energy,pitch, gyro angle
-             vi_norm(:)=sinus*cos(phiarr(k))*a_norm+ptcharr(j) &
-                  *b_norm+sinus*sin(phiarr(k))*c_norm
+             vi_norm(:)= sinus*cos(phiarr(k))*a_norm &
+					   +           ptcharr(j)*b_norm &
+                       + sinus*sin(phiarr(k))*c_norm
              !! calcualte possible trajectory of a fast-neutral that intersects 
              !! the measurment position with this velocity 
              !! The measurement postion is at maximum NBI density along LOS
@@ -3688,10 +3679,11 @@ contains
                 ic=icell(1,jj)
                 jc=icell(2,jj)
                 kc=icell(3,jj)
-                wght2=result%neut_dens(ic,jc,kc,3,nbif_type) &
-                     + result%neut_dens(ic,jc,kc,3,nbih_type) &
-                     + result%neut_dens(ic,jc,kc,3,nbit_type) &
-                     + result%neut_dens(ic,jc,kc,3,halo_type)
+				!!weight over all energy levels
+                wght2=sum(result%neut_dens(ic,jc,kc,:,nbif_type) &
+                     + result%neut_dens(ic,jc,kc,:,nbih_type) &
+                     + result%neut_dens(ic,jc,kc,:,nbit_type) &
+                     + result%neut_dens(ic,jc,kc,:,halo_type))
                 if (wght2.gt.0)then
                    cc=cc+1
                    los_wght(cc)=    tcell(jj)
@@ -3706,44 +3698,36 @@ contains
              dt=length/vabs
              !! -------------- calculate CX probability -------!!
              ! CX with full energetic NBI neutrals
-             states=0.d0
+             pcx=0.d0
              vi(:) = vi_norm(:)*vabs
              call neut_rates(fdens,vi,vnbi_f,rates)
-             states=states + rates
+             pcx=pcx + rates
              ! CX with half energetic NBI neutrals
              call neut_rates(hdens,vi,vnbi_h,rates)
-             states=states + rates
+             pcx=pcx + rates
              ! CX with third energetic NBI neutrals
              call neut_rates(tdens,vi,vnbi_t,rates)
-             states=states + rates
+             pcx=pcx + rates
              ! CX with HALO neutrals
              do in=1,int(nr_halo_neutrate)
                 call mc_halo( ac(:),vhalo(:))
                 call neut_rates(halodens,vi,vhalo,rates)
-                states=states + rates/nr_halo_neutrate
+                pcx=pcx + rates/nr_halo_neutrate
              enddo
+			 states=pcx
              call colrad(ac,vi,dt,states,photons,nbif_type,1.d0)
              !! photons: [Ph*cm/s/fast-ion]-!!
-             !! calcualte spectrum of this one fast-ion
-             call spectrum(vi,ac,pos,1.d0,nbif_type,wavel,intens)
-             stark_components: do l=1,n_stark 
-                wavelength_ranges: do ii=1,nwav
-                   if (wavel(l).ge.wav_arr(ii).and. &
-                       wavel(l).lt.wav_arr(ii+1)) then
-			 		 if(ichan.eq.inputs%ichan_wght) then 
-					    ind=1 
-					 else 
-						ind=ichan
-					 endif
-                       !calc weight functions w/o cross-sections:
-                       !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
-                       !    + intens(l)/real(inputs%nr_wght)
-                       !normal calculation:
-                     wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
-                          + intens(l)*photons/real(inputs%nr_wght)
-                   endif
-                enddo wavelength_ranges
-             enddo stark_components
+
+ 			 if(ichan.eq.inputs%ichan_wght) then 
+				ind=1 
+			 else 
+				ind=ichan
+			 endif
+              !calc weight functions w/o cross-sections:
+              !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
+              !    + intens(l)/real(inputs%nr_wght)
+              !normal calculation:
+              wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) + sum(pcx)*sum(states)
           enddo
        enddo
        !$OMP END PARALLEL DO
@@ -3777,7 +3761,6 @@ contains
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
-    call check( nf90_def_dim(ncid,"nwav",nwav,nwav_dimid) )
     call check( nf90_def_dim(ncid,"nchan",nchan,nchan_dimid) )
     call check( nf90_def_dim(ncid,"nr_wght",inputs%nr_wght,nr_dimid) )
     dimids = (/ nwav_dimid, nr_dimid, nr_dimid, nchan_dimid /)
@@ -3785,7 +3768,6 @@ contains
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
     call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
-    call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,nwav_dimid,wav_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,nr_dimid,e_varid) )
     call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,nr_dimid,ptch_varid) )
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
@@ -3794,7 +3776,6 @@ contains
 
 	!Add unit attributes
 	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
-	call check( nf90_put_att(ncid,wav_varid,"units","nm") )
 	call check( nf90_put_att(ncid,rad_varid,"units","cm") )
 	call check( nf90_put_att(ncid,theta_varid,"units","deg") )
 	call check( nf90_put_att(ncid,e_varid,"units","keV") )
@@ -3804,7 +3785,6 @@ contains
     !Write to file
     call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
     call check( nf90_put_var(ncid, time_varid, inputs%time) )
-    call check( nf90_put_var(ncid, wav_varid, central_wavel(:nwav)) )
     call check( nf90_put_var(ncid, e_varid, ebarr) )
     call check( nf90_put_var(ncid, ptch_varid, ptcharr) )
     call check( nf90_put_var(ncid, rad_varid, rad_arr) )

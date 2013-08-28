@@ -1198,7 +1198,7 @@ contains
     print*, 'rejection method found no solution!'
     print*, cell(ac(1),ac(2),ac(3))%fbm
   end subroutine mc_fastion
- 
+	 
   !****************************************************************************
   !----------------mc_halo------------------------------------------------
   !****************************************************************************
@@ -3265,7 +3265,7 @@ contains
        print*, 'nwav: ' ,nwav
 
        !! do the main simulation  !! 
-       !$OMP PARALLEL DO private(i,j,k,vabs,sinus,vi,states,    &
+       !$OMP PARALLEL DO private(i,j,k,ind,vabs,sinus,vi,states,    &
        !$OMP& rates,in,vhalo,dt,photons,wavel,intens,l,ii, &
        !$OMP& tcell,icell,pos_out,ncell,pos_edge,cc,max_wght,   &
        !$OMP& los_wght,wght,jj,ic,jc,kc,wght2,length,vi_norm)
@@ -3444,12 +3444,13 @@ contains
     real(double), dimension(3)     :: bvec,evec,vrot,los_vec,evec_sav,vrot_sav
     real(double), dimension(3)     :: a_norm,b_norm,c_norm,b_norm_sav
     real(double)                   :: b_abs,theta,b_abs_sav
-    real(double)                   :: ti,te,dene,denp,deni,length
-    real(double)                   :: ti_sav,te_sav,dene_sav,denp_sav,deni_sav
+    real(double)                   :: ti,te,dene,denp,deni,denf,length
+    real(double)                   :: ti_sav,te_sav,dene_sav,denp_sav,deni_sav,denf_sav
     real(double)                   :: rad,max_wght
     integer                        :: nwav,nchan
     real(double),dimension(:)    ,allocatable  :: wav_arr,central_wavel
     integer                        :: ii,i,j,k,l   !! indices wavel,vx,vy,vz
+	integer,dimension(1) 		   :: minpitch
     real(double),dimension(:,:,:,:),allocatable :: wfunct
     real(double),dimension(:)    ,allocatable :: ebarr,ptcharr,phiarr,rad_arr,theta_arr
     real(double)                   :: sinus
@@ -3502,11 +3503,6 @@ contains
     do i=1,inputs%nr_wght
        ptcharr(i)=real(i-0.5)*2./real(inputs%nr_wght)-1.
     enddo
-    !! define gyro - array
-    allocate(phiarr(inputs%nr_wght))
-    do i=1,inputs%nr_wght
-       phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nr_wght)
-    enddo
     if(inputs%ichan_wght.gt.0) then
        nchan=1
     else
@@ -3532,6 +3528,7 @@ contains
     denp_sav=cell(ac(1),ac(2),ac(3))%plasma%denp
     dene_sav=cell(ac(1),ac(2),ac(3))%plasma%dene
     deni_sav=cell(ac(1),ac(2),ac(3))%plasma%deni
+    denf_sav=cell(ac(1),ac(2),ac(3))%plasma%denf
     ti_sav=cell(ac(1),ac(2),ac(3))%plasma%ti
     te_sav=cell(ac(1),ac(2),ac(3))%plasma%te
     vrot_sav=cell(ac(1),ac(2),ac(3))%plasma%vrot
@@ -3556,13 +3553,14 @@ contains
        
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius:',radius
+       rad_arr(ichan)=radius
        !! Calcullate mean kinetic profiles...
        cc=0       ; max_wght=0.d0 ; los_wght=0.d0 ; wght=0.d0
        fdens=0.d0 ; hdens=0.d0    ; tdens=0.d0    ; halodens=0.d0
        b_abs=0.d0 ; evec=0.d0     
        a_norm=0.d0; b_norm=0.d0   ; c_norm=0.d0
        ti=0.d0    ; te=0.d0
-       dene=0.d0  ; denp=0.d0     ; deni=0.d0
+       dene=0.d0  ; denp=0.d0     ; deni=0.d0     ; denf=0.d0
        vrot=0.d0  ; pos=0.d0 
        do k=1,grid%nz
           do j=1,grid%ny 
@@ -3596,6 +3594,7 @@ contains
                    dene   =dene   +cell(i,j,k)%plasma%dene  * wght(cc)
                    denp   =denp   +cell(i,j,k)%plasma%denp  * wght(cc)
                    deni   =deni   +cell(i,j,k)%plasma%deni  * wght(cc)
+                   denf   =denf   +cell(i,j,k)%plasma%denf  * wght(cc)
                    vrot(:)=vrot(:)+cell(i,j,k)%plasma%vrot(:)*wght(cc)
                    pos(:)=pos(:)+(/grid%xxc(i),grid%yyc(j),grid%zzc(k)/) &
                         *wght(cc)
@@ -3618,6 +3617,8 @@ contains
        cell(ac(1),ac(2),ac(3))%plasma%dene=dene
        deni=deni / rad  
        cell(ac(1),ac(2),ac(3))%plasma%deni=deni
+       denf=denf / rad  
+       cell(ac(1),ac(2),ac(3))%plasma%denf=denf
        ti=ti     / rad
        cell(ac(1),ac(2),ac(3))%plasma%ti=ti
        te=te     / rad
@@ -3642,93 +3643,89 @@ contains
        los_vec(2)=pos(2)-spec%xyzhead(ichan,2) 
        los_vec(3)=pos(3)-spec%xyzhead(ichan,3) 
        !! normalize los_vec and bvec and determine angle between B and LOS
-       los_vec=los_vec/sqrt(dot_product(los_vec,los_vec)) 
-       theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
+	   radius=sqrt(dot_product(los_vec,los_vec))
+       los_vec=los_vec/radius 
+       theta=acos(dot_product(b_norm,los_vec))*180./pi
        print*,'Angle between B and LOS [deg]:', theta
        !! write angle and radius into the output file
-       rad_arr(ichan)=radius
 	   theta_arr(ichan)=theta
 
        !! do the main simulation  !! 
-       !$OMP PARALLEL DO private(i,j,k,vabs,sinus,vi,states,    &
-       !$OMP& rates,in,vhalo,dt,photons,wavel,intens,l,ii, &
+       !$OMP PARALLEL DO private(i,j,k,minpitch,vabs,sinus,vi,states,    &
+       !$OMP& rates,in,vhalo,dt,photons,ind,l,ii, &
        !$OMP& tcell,icell,pos_out,ncell,pos_edge,cc,max_wght,   &
        !$OMP& los_wght,wght,jj,ic,jc,kc,wght2,length,vi_norm)
        !! LOOP over the three velocity vector components 
-       !! (energy,pitch,gyro angle)
+       !! (energy)
        do i = 1, inputs%nr_wght !! energy loop
           vabs = sqrt(ebarr(i)/(v_to_E*inputs%ab))
-		  j=minloc(abs(pitcharr-cos(theta_arr(ichan)*pi/180.)))
-          sinus = sqrt(1.d0-ptcharr(j)**2)
-          do k = 1, inputs%nr_wght !! gyro angle
-             !! calculate velocity vector from energy,pitch, gyro angle
-             vi_norm(:)= sinus*cos(phiarr(k))*a_norm &
-					   +           ptcharr(j)*b_norm &
-                       + sinus*sin(phiarr(k))*c_norm
-             !! calcualte possible trajectory of a fast-neutral that intersects 
-             !! the measurment position with this velocity 
-             !! The measurement postion is at maximum NBI density along LOS
-             call track(-vi_norm,pos,tcell,icell,pos_out,ncell)
-             pos_edge=pos_out(:,ncell-2)
-             !! now determine the track length throught the grid!
-             call track(vi_norm,pos_edge,tcell,icell,pos_out,ncell)
+		  minpitch=minloc(abs(ptcharr-cos(theta_arr(ichan)*pi/180.)))
+          !! Velocity vector points in same direction of line of sight vector
+          vi_norm(:)= los_vec(:)
+          !! calcualte possible trajectory of a fast-neutral that intersects 
+          !! the measurment position with this velocity 
+          !! The measurement postion is at maximum NBI density along LOS
+          call track(-vi_norm,pos,tcell,icell,pos_out,ncell)
+          pos_edge=pos_out(:,ncell-2)
+          !! now determine the track length throught the grid!
+          call track(vi_norm,pos_edge,tcell,icell,pos_out,ncell)
 
-             !! Calculate averge beam density seen by the fast-ion
-             cc=0 ; max_wght=0.d0 ; los_wght=0.d0 ;wght=0.d0
-             loop_along_track: do jj=1,ncell
-                ic=icell(1,jj)
-                jc=icell(2,jj)
-                kc=icell(3,jj)
-				!!weight over all energy levels
-                wght2=sum(result%neut_dens(ic,jc,kc,:,nbif_type) &
-                     + result%neut_dens(ic,jc,kc,:,nbih_type) &
-                     + result%neut_dens(ic,jc,kc,:,nbit_type) &
-                     + result%neut_dens(ic,jc,kc,:,halo_type))
-                if (wght2.gt.0)then
-                   cc=cc+1
-                   los_wght(cc)=    tcell(jj)
-                   wght(cc)=wght2 * tcell(jj)
-                   if (wght(cc).gt.max_wght)max_wght=wght(cc)
-                endif
-             enddo loop_along_track
-             length=sum(los_wght(:)*wght(:))/max_wght ! (FWHM)
-             !! determine time by length and velocity 
-             !! calculate the average time until a fast-neutral is 
-             !! detected after its neutralization
-             dt=length/vabs
-             !! -------------- calculate CX probability -------!!
-             ! CX with full energetic NBI neutrals
-             pcx=0.d0
-             vi(:) = vi_norm(:)*vabs
-             call neut_rates(fdens,vi,vnbi_f,rates)
-             pcx=pcx + rates
-             ! CX with half energetic NBI neutrals
-             call neut_rates(hdens,vi,vnbi_h,rates)
-             pcx=pcx + rates
-             ! CX with third energetic NBI neutrals
-             call neut_rates(tdens,vi,vnbi_t,rates)
-             pcx=pcx + rates
-             ! CX with HALO neutrals
-             do in=1,int(nr_halo_neutrate)
-                call mc_halo( ac(:),vhalo(:))
-                call neut_rates(halodens,vi,vhalo,rates)
-                pcx=pcx + rates/nr_halo_neutrate
-             enddo
-			 states=pcx
-             call colrad(ac,vi,dt,states,photons,nbif_type,1.d0)
-             !! photons: [Ph*cm/s/fast-ion]-!!
-
- 			 if(ichan.eq.inputs%ichan_wght) then 
-				ind=1 
-			 else 
-				ind=ichan
-			 endif
-              !calc weight functions w/o cross-sections:
-              !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
-              !    + intens(l)/real(inputs%nr_wght)
-              !normal calculation:
-              wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) + sum(pcx)*sum(states)
+          !! Calculate averge beam density seen by the fast-ion
+          cc=0 ; max_wght=0.d0 ; los_wght=0.d0 ;wght=0.d0
+          loop_along_track: do jj=1,ncell
+             ic=icell(1,jj)
+             jc=icell(2,jj)
+             kc=icell(3,jj)
+			 !!weight over all energy levels
+             wght2=sum(result%neut_dens(ic,jc,kc,:,nbif_type) &
+                  + result%neut_dens(ic,jc,kc,:,nbih_type) &
+                  + result%neut_dens(ic,jc,kc,:,nbit_type) &
+                  + result%neut_dens(ic,jc,kc,:,halo_type))
+             if (wght2.gt.0)then
+                cc=cc+1
+                los_wght(cc)=    tcell(jj)
+                wght(cc)=wght2 * tcell(jj)
+                if (wght(cc).gt.max_wght)max_wght=wght(cc)
+             endif
+          enddo loop_along_track
+          length=sum(los_wght(:)*wght(:))/max_wght ! (FWHM)
+          !! determine time by length and velocity 
+          !! calculate the average time until a fast-neutral is 
+          !! detected after its neutralization
+          dt=length/vabs
+          !! -------------- calculate CX probability -------!!
+          ! CX with full energetic NBI neutrals
+          pcx=0.d0
+          vi(:) = vi_norm(:)*vabs
+          call neut_rates(fdens,vi,vnbi_f,rates)
+          pcx=pcx + rates
+          ! CX with half energetic NBI neutrals
+          call neut_rates(hdens,vi,vnbi_h,rates)
+          pcx=pcx + rates
+          ! CX with third energetic NBI neutrals
+          call neut_rates(tdens,vi,vnbi_t,rates)
+          pcx=pcx + rates
+          ! CX with HALO neutrals
+          do in=1,int(nr_halo_neutrate)
+             call mc_halo( ac(:),vhalo(:))
+             call neut_rates(halodens,vi,vhalo,rates)
+             pcx=pcx + rates/nr_halo_neutrate
           enddo
+		  states=pcx*cell(ac(1),ac(2),ac(3))%plasma%denf
+          call colrad(ac,vi,dt,states,photons,nbif_type,1.d0)
+          !! photons: [Ph*cm/s/fast-ion]-!!
+
+ 		  if(ichan.eq.inputs%ichan_wght) then 
+			 ind=1 
+		  else 
+			 ind=ichan
+		  endif
+          !calc weight functions w/o cross-sections:
+          !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
+          !    + intens(l)/real(inputs%nr_wght)
+          !normal calculation:
+          wfunct(ii,i,minpitch(1),ind) = wfunct(ii,i,minpitch(1),ind) + &
+				(spec%opening_angle(ind)*spec%headsize(ind)/(4.*pi*radius*radius))*sum(pcx*states/(pcx*denf))
        enddo
        !$OMP END PARALLEL DO
        !!wfunct:[Ph*cm/s] !!
@@ -3741,11 +3738,11 @@ contains
           enddo
        enddo
     enddo
-    !! use only cell 111 for the calculation!
     ac=(/1,1,1/)
     cell(ac(1),ac(2),ac(3))%plasma%denp=denp_sav
     cell(ac(1),ac(2),ac(3))%plasma%dene=dene_sav
     cell(ac(1),ac(2),ac(3))%plasma%deni=deni_sav
+    cell(ac(1),ac(2),ac(3))%plasma%denf=denf_sav
     cell(ac(1),ac(2),ac(3))%plasma%ti=ti_sav
     cell(ac(1),ac(2),ac(3))%plasma%te=te_sav
     cell(ac(1),ac(2),ac(3))%plasma%vrot=vrot_sav
@@ -3779,7 +3776,7 @@ contains
 	call check( nf90_put_att(ncid,rad_varid,"units","cm") )
 	call check( nf90_put_att(ncid,theta_varid,"units","deg") )
 	call check( nf90_put_att(ncid,e_varid,"units","keV") )
-	call check( nf90_put_att(ncid,wfunct_varid,"units","(Ph*cm)/(s*dE*dP)") )
+	call check( nf90_put_att(ncid,wfunct_varid,"units","(Neutrals*cm)/(s*dE*dP)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -3800,8 +3797,6 @@ contains
     deallocate(ebarr)  
     deallocate(ptcharr)
     deallocate(phiarr)
-    deallocate(wav_arr)
-    deallocate(central_wavel)
     deallocate(wfunct)
 	deallocate(rad_arr)
 	deallocate(theta_arr)
@@ -3932,6 +3927,11 @@ program fidasim
      call fida_weight_function()
   endif
 
+  if(inputs%calc_wght.eq.1) then
+	 if(inputs%npa.eq.1) then
+	    call npa_weight_function()
+	 endif
+  endif
 
   call date_and_time (values=time_arr)
   write(*,"(A,I2,A,I2.2,A,I2.2)") 'END: hour, minute, second: '  &

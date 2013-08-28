@@ -5,8 +5,11 @@ FIDASIM is a code that models the signal that is produced by charge-exchange rea
 
 # How to Install 
 ## 1. Install dependencies
-FIDASIM reads and writes netCDF files. In order to use this code you must download the required fortran libraries. You can download the library from [here](https://github.com/Unidata/netcdf-fortran/releases)
+FIDASIM reads and writes netCDF files. This requires netCDF-4.1.3. You can download the library from [here](http://www.unidata.ucar.edu/downloads/netcdf/netcdf-4_1_3/index.jsp)
 
+Note: By default netCDF will build using the GNU fortran compiler, gfortran. If you plan to use the Intel Fortran Compiler you must also build the 
+netCDF library using it. Instructions on how to do this can be found [here](http://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-netcdf-with-the-intel-compilers)
+ 
 ## 2. Retrieve FIDASIM source code from GitHub
 Clone the git repository from GitHub and change to the source directory: 
 

@@ -408,7 +408,6 @@ PRO read_npa_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_con
 		ncdf_varget,ncid,'energy',energyarr
 		ncdf_varget,ncid,'pitch',pitcharr
 		ncdf_varget,ncid,'radius',radarr
-		ncdf_varget,ncid,'theta',theta_arr
 		ncdf_varget,ncid,'wfunct',weight_tot
 		ncdf_close,ncid
 		
@@ -425,7 +424,7 @@ PRO read_npa_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_con
             ,dE:dE,emax:emax,emin:0.,npitch:npitch,dpitch:dpitch   $
             ,energyarr:energyarr,pitcharr:pitcharr $
             ,weight_tot:weight_tot   $
-            ,angle:theta_arr,radius:radarr,err:0}
+            ,radius:radarr,err:0}
 		if keyword_set(save) then save,weights,filename='npa_weights.sav'
 	endif else begin
 		weights={err:1}

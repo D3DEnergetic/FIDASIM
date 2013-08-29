@@ -3638,7 +3638,7 @@ contains
 
 				         wfunct(i,j,k,ii,minpitch(1)) = wfunct(i,j,k,ii,minpitch(1)) + &
 				             (spec%opening_angle(ind)*spec%headsize(ind)/(4.*pi*radius*radius)) & 
-				             * sum(pcx*states/states_i) * los_weight(i,j,k,ind)
+				             * sum(pcx)*sum(states)/sum(states_i) * los_weight(i,j,k,ind)
                enddo
              endif
            enddo loop_over_x

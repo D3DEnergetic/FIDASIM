@@ -3447,18 +3447,17 @@ contains
     real(double)                   :: ti,te,dene,denp,deni,denf,length
     real(double)                   :: ti_sav,te_sav,dene_sav,denp_sav,deni_sav,denf_sav
     real(double)                   :: rad,max_wght
-    integer                        :: nwav,nchan
+    integer                        :: nchan
     real(double),dimension(:)    ,allocatable  :: wav_arr,central_wavel
     integer                        :: ii,i,j,k,l   !! indices wavel,vx,vy,vz
 	integer,dimension(1) 		   :: minpitch
-    real(double),dimension(:,:,:,:),allocatable :: wfunct
+    real(double),dimension(:,:,:),allocatable :: wfunct
     real(double),dimension(:)    ,allocatable :: ebarr,ptcharr,phiarr,rad_arr,theta_arr
     real(double)                   :: sinus
     real(double),dimension(3)      :: vi,vi_norm
     real(double)                   :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2
     real(double),dimension(3)      :: efield
     real(double),dimension(n_stark):: intens !!intensity vector
-    real(double),dimension(n_stark):: wavel  !!wavelength vector [A)
     real(double),dimension(3)      :: vn  ! vi in m/s
    !! Determination of the CX probability
     real(double),dimension(3)      :: vnbi_f,vnbi_h,vnbi_t !! Velocity of NBI neutrals 
@@ -3486,11 +3485,11 @@ contains
     integer,dimension(3,grid%ntrack)      :: icell  !! index of cells
     real(double)                          :: wght2
 	!!netCDF variables
-	integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,nr_dimid
+	integer :: ncid,dimid1,dimids(3),nchan_dimid,nr_dimid
 	integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid
 	integer :: shot_varid,time_varid
 
-    !! define pitch, energy and gyro angle arrays
+    !! define pitch, energy arrays
     !! define energy - array
     print*, 'nr of energies, pitches and gyro angles', inputs%nr_wght
     print*, 'maximal energy: ', inputs%emax_wght
@@ -3510,7 +3509,7 @@ contains
     endif
 
     !! define storage arrays
-    allocate(wfunct(nwav,inputs%nr_wght,inputs%nr_wght,nchan))
+    allocate(wfunct(inputs%nr_wght,inputs%nr_wght,nchan))
     allocate(rad_arr(nchan))
 	allocate(theta_arr(nchan))
 
@@ -3651,11 +3650,11 @@ contains
 	   theta_arr(ichan)=theta
 
        !! do the main simulation  !! 
+       !! LOOP over the three velocity vector components 
        !$OMP PARALLEL DO private(i,j,k,minpitch,vabs,sinus,vi,states,    &
        !$OMP& rates,in,vhalo,dt,photons,ind,l,ii, &
        !$OMP& tcell,icell,pos_out,ncell,pos_edge,cc,max_wght,   &
        !$OMP& los_wght,wght,jj,ic,jc,kc,wght2,length,vi_norm)
-       !! LOOP over the three velocity vector components 
        !! (energy)
        do i = 1, inputs%nr_wght !! energy loop
           vabs = sqrt(ebarr(i)/(v_to_E*inputs%ab))
@@ -3724,13 +3723,15 @@ contains
           !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
           !    + intens(l)/real(inputs%nr_wght)
           !normal calculation:
-          wfunct(ii,i,minpitch(1),ind) = wfunct(ii,i,minpitch(1),ind) + &
+
+          wfunct(i,minpitch(1),ind) = wfunct(i,minpitch(1),ind) + &
 				(spec%opening_angle(ind)*spec%headsize(ind)/(4.*pi*radius*radius))*sum(pcx*states/(pcx*denf))
        enddo
        !$OMP END PARALLEL DO
        !!wfunct:[Ph*cm/s] !!
     enddo loop_over_channels
 	!! Put back plasma values so it doesn't possibly poison the rest of the code
+
     do k=1,grid%nz
        do j=1,grid%ny 
           do i=1,grid%nx 
@@ -3760,7 +3761,7 @@ contains
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
     call check( nf90_def_dim(ncid,"nchan",nchan,nchan_dimid) )
     call check( nf90_def_dim(ncid,"nr_wght",inputs%nr_wght,nr_dimid) )
-    dimids = (/ nwav_dimid, nr_dimid, nr_dimid, nchan_dimid /)
+    dimids = (/ nr_dimid, nr_dimid, nchan_dimid /)
 
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
@@ -3796,7 +3797,6 @@ contains
 	!!Deallocate arrays
     deallocate(ebarr)  
     deallocate(ptcharr)
-    deallocate(phiarr)
     deallocate(wfunct)
 	deallocate(rad_arr)
 	deallocate(theta_arr)

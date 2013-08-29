@@ -69,15 +69,15 @@ alpha=0.0		    ;; Rotation angle in radians from +x about z axis that transforms
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
-nr_fast=500000   										;; FIDA
+nr_fast=5000     										;; FIDA
 nr_ndmc=5000 											;; Beam emission
-nr_halo=50000   										;; Halo contribution
+nr_halo=5000    										;; Halo contribution
 
 ;;--------------------------------------------------
 ;; Calculation of the weight function
 ;;--------------------------------------------------
-nr_wght=50   											;; Number of Pitches, energyies and gyro angles 
-emax_wght=125.  										;; Maximum energy (keV)
+nr_wght=100   											;; Number of Pitches, energyies and gyro angles 
+emax_wght=100.  										;; Maximum energy (keV)
 ichan_wght=-1  											;; -1 for all channels, otherwise a given channel index
 dwav_wght=.2   											;; Wavelength interval
 wavel_start_wght=651.  									;; Minimum wavelength
@@ -91,7 +91,7 @@ calc_spec=[0]   										;; (0 or 1) If 1 then spectra is calculated
 sim_fida=[1]											;; (0 or 1) if 1 then the FIDA spectra is calculated
 calc_birth=[0]    										;; (0 or 1) If 1 then the birth profile is calculated
 f90brems=[1]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
-calc_wght=[0]  											;; (0 or 1) If 1 then weight functions are calculated
+calc_wght=[1]  											;; (0 or 1) If 1 then weight functions are calculated
 load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing 
 														;; neutrals.bin file located in runid directory
 ps=[0]													;; (0 or 1) If 1 then make hard copy of plots

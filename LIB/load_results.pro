@@ -356,7 +356,8 @@ PRO read_plasma,plasma_file,plasma,save=save
 	endelse
 
 END
-PRO read_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_convention
+
+PRO read_fida_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_convention
 	
 	if not keyword_set(pitch_sign_convention) then pitch_sign_convention=-1.0
 
@@ -389,12 +390,49 @@ PRO read_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_convent
             ,central_wavel:central_wavel,energyarr:energyarr,pitcharr:pitcharr $
             ,weight_tot:weight_tot   $
             ,angle:theta_arr,radius:radarr,err:0}
-		if keyword_set(save) then save,weights,filename='weights.sav'
+		if keyword_set(save) then save,weights,filename='fida_weights.sav'
 	endif else begin
 		weights={err:1}
 	endelse
 
 END
+
+PRO read_npa_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_convention
+	
+	if not keyword_set(pitch_sign_convention) then pitch_sign_convention=-1.0
+
+	if file_test(file) then begin
+		ncid=ncdf_open(file,/nowrite)
+		ncdf_varget,ncid,'shot',shot
+		ncdf_varget,ncid,'time',time
+		ncdf_varget,ncid,'energy',energyarr
+		ncdf_varget,ncid,'pitch',pitcharr
+		ncdf_varget,ncid,'radius',radarr
+		ncdf_varget,ncid,'theta',theta_arr
+		ncdf_varget,ncid,'wfunct',weight_tot
+		ncdf_close,ncid
+		
+		dE=abs(energyarr[1]-energyarr[0])
+		dpitch=abs(pitcharr[1]-pitcharr[0])
+
+	    nen=n_elements(energyarr)
+		npitch=n_elements(pitcharr)
+
+	    pitcharr*=pitch_sign_convention
+    	emax=max(energyarr)+0.5*dE
+
+    	weights={shot:shot,time:time,nchan:n_elements(radarr),nen:nen $
+            ,dE:dE,emax:emax,emin:0.,npitch:npitch,dpitch:dpitch   $
+            ,energyarr:energyarr,pitcharr:pitcharr $
+            ,weight_tot:weight_tot   $
+            ,angle:theta_arr,radius:radarr,err:0}
+		if keyword_set(save) then save,weights,filename='npa_weights.sav'
+	endif else begin
+		weights={err:1}
+	endelse
+
+END
+
 PRO load_results,result_dir,results,save=save
 
 	;;CHECK FOR SLASH
@@ -431,15 +469,18 @@ PRO load_results,result_dir,results,save=save
 	;;READ FBM
 	read_fbm,result_dir+input_file,fbm
 
-	;;READ WEIGHT FUNCTIONS
-	read_weights,result_dir+runid+'_weight_function.cdf',weights
+	;;READ FIDA WEIGHT FUNCTIONS
+	read_fida_weights,result_dir+runid+'_fida_weight_function.cdf',fida_weights
+
+	;;READ NPA WEIGHT FUNCTIONS
+	read_npa_weights,result_dir+runid+'_npa_weight_function.cdf',npa_weights
 
 	;;READ BIRTH PROFILE
 	read_birth,result_dir+runid+'_birth.cdf',birth
 
 	results={inputs:inputs,grid:grid,los:los,plasma:plasma,$
 			fida:fida,nbi_halo:nbi_halo,neutrals:neutrals,$
-			npa:npa,fbm:fbm,weights:weights,birth:birth}
+			npa:npa,fbm:fbm,fida_weights:fida_weights,npa_weights:npa_weights,birth:birth}
 	if keyword_set(save) then begin
 		save,inputs,grid,los,plasma,fida,nbi_halo,neutrals,$
 		npa,fbm,weights,birth,filename=inputs.fidasim_runid+'_results.sav',/compress

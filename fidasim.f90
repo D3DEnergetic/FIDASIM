@@ -3448,7 +3448,7 @@ contains
   !*****************************************************************************
   subroutine npa_weight_function
 	use netcdf
-    real(double)                    :: radius,theta
+    real(double)                    :: radius,theta,alpha,area
     real(double)                    :: photons !! photon flux 
     real(double), dimension(nlevs)  :: fdens,hdens,tdens,halodens
     real(double), dimension(3)      :: los_vec
@@ -3543,7 +3543,8 @@ contains
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius: ',radius
        rad_arr(ichan)=radius
-
+       alpha=spec%opening_angle(ichan)
+       area= pi*spec%headsize(ichan)**2.
        pos(:)=spec%xyzexit(:,ichan)
        los_vec(1) = spec%xyzhead(ichan,1) - pos(1)
        los_vec(2) = spec%xyzhead(ichan,2) - pos(2)
@@ -3581,7 +3582,6 @@ contains
          !! normalize los_vec and bvec and determine angle between B and LOS
          radius=sqrt(dot_product(los_vec,los_vec))
          los_vec=los_vec/radius
-	
          !! Determine the angle between the B-field and the Line of Sight 
 		 b_norm(:) = cell(ic,jc,kc)%plasma%b_norm(:)
          theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
@@ -3633,7 +3633,7 @@ contains
              ind=ichan
            endif
            wfunct(ii,minpitch(1),jj) = wfunct(ii,minpitch(1),jj) + &
-                  sum(pcx)*sum(states)/sum(states_i) * tcell(jj)
+                  (grid%dv*alpha*area/(4*pi))*sum(pcx*states/states_i) * tcell(jj)
          enddo loop_over_energy
        enddo loop_along_los
        !$OMP END PARALLEL DO

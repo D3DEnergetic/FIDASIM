@@ -2360,6 +2360,7 @@ contains
           ray=ri(:)+vn(:)/sqrt(dot_product(vn,vn))*dray
           !$OMP CRITICAL(col_rad_npa)
           npa%counter=npa%counter+1
+          if(0.eq.mod(npa%counter,10)) print*,'Neutrals Detected:',npa%counter
           if(npa%counter.gt.inputs%nr_npa)stop'too many neutrals'
           npa%v(npa%counter,:)=vn(:)
           npa%wght(npa%counter)=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]

@@ -115,6 +115,31 @@ FUNCTION d3d_chords,shot,fida_diag
         zlens6=replicate(100.0,nchan5)
 	endelse
 
+	;;NPA CHORDS
+    detxyz=fltarr(3,3)
+    detxyz[0,*]=[2.52,.08,.81]
+    detxyz[1,*]=[2.5,.05,.86]
+    detxyz[2,*]=[2.49,.09,.89]
+	npap=detxyz*0.
+    for i=0,2 do begin
+        npap[i,0]=-(detxyz[i,0] + detxyz[i,1])/sqrt(2.)
+        npap[i,1]=(detxyz[i,1] - detxyz[i,0])/sqrt(2.)
+        npap[i,2]=-detxyz[i,2]
+    endfor
+    npap*=100   ; convert from meters to centimeters
+    
+    iwall=fltarr(3,3)
+    iwall[0,*]=[0.95,1.15,32.4]
+    iwall[1,*]=[0.95,0.70,4.19]
+    iwall[2,*]=[0.95,0.49,-10.96]
+	npa_mid=iwall*0.
+    for i=0,2 do begin
+        npa_mid[i,0]=iwall[i,0]*cos(!pi*(225+iwall[i,2])/180)
+        npa_mid[i,1]=iwall[i,0]*sin(!pi*(225+iwall[i,2])/180)
+        npa_mid[i,2]=iwall[i,1]
+    endfor
+    npa_mid*=100    ; cm
+
  ;; SELECT THE VIEWS
     CASE (fida_diag) OF
       'VERTICAL': begin
@@ -125,6 +150,9 @@ FUNCTION d3d_chords,shot,fida_diag
         yhead=ylens5
         zhead=zlens5
         nchan=n_elements(xlos)
+        sigma_pi=replicate(1.d0,nchan)
+        headsize=replicate(0.d0,nchan)
+        opening_angle=replicate(0.d0,nchan)
        end
       'OBLIQUE': begin
         xlos=xmid3
@@ -134,6 +162,9 @@ FUNCTION d3d_chords,shot,fida_diag
         yhead=ylens3
         zhead=zlens3
         nchan=n_elements(xlos)
+        sigma_pi=replicate(1.d0,nchan)
+        headsize=replicate(0.d0,nchan)
+        opening_angle=replicate(0.d0,nchan)
        end
       'TANGENTIAL': begin
         xlos=xmid4
@@ -143,6 +174,9 @@ FUNCTION d3d_chords,shot,fida_diag
         yhead=ylens4
         zhead=zlens4
         nchan=n_elements(xlos)
+        sigma_pi=replicate(1.d0,nchan)
+        headsize=replicate(0.d0,nchan)
+        opening_angle=replicate(0.d0,nchan)
        end
       'ALL': begin
 		xlos=[xmid1,xmid2,xmid3,xmid4,xmid5,xmid6]
@@ -152,17 +186,31 @@ FUNCTION d3d_chords,shot,fida_diag
 		yhead=[ylens1,ylens2,ylens3,ylens4,ylens5,ylens6]
 		zhead=[zlens1,zlens2,zlens3,zlens4,zlens5,zlens6]
 		nchan=n_elements(xlos)
+        sigma_pi=replicate(1.d0,nchan)
+        headsize=replicate(0.d0,nchan)
+        opening_angle=replicate(0.d0,nchan)
 	   end
-;      'NPA': npa_setup,det,fida_diag ;
-       ELSE: BEGIN
+      'NPA': begin
+        xlos=npa_mid[*,0]
+        ylos=npa_mid[*,1]
+        zlos=npa_mid[*,2]
+        xhead=npap[*,0]
+        yhead=npap[*,1]
+        zhead=npap[*,2]
+        nchan=n_elements(xlos)        
+        sigma_pi=replicate(1.d0,nchan)
+        headsize=replicate(1.5d0,nchan)
+        opening_angle=replicate(0.0261799388d0,nchan)
+       end
+       ELSE: begin
          PRINT, '% Diagnostic unknown'
          STOP
        END
-       ENDCASE
+    ENDCASE
 
 	;;SAVE IN FIDA STRUCTURE
 	fida={nchan:nchan,diag:fida_diag,xlos:double(xlos),ylos:double(ylos),zlos:double(zlos),$
 		  xlens:double(xhead),ylens:double(yhead),zlens:double(zhead),$
-		  sigma_pi_ratio:replicate(1.d0,nchan),headsize:replicate(0.0,nchan),opening_angle:replicate(0.0,nchan)}
+		  sigma_pi_ratio:sigma_pi,headsize:headsize,opening_angle:opening_angle}
 	return,fida
 END

@@ -1,5 +1,11 @@
 # FIDASIM
 FIDASIM is a code that models the signal that is produced by charge-exchange reactions between fast-ions and injected neutral beams in tokamak plasmas. 
+It was originally developed in IDL at UC Irvine [1] and converted to Fortran 90 by Benedikt Geiger (AUGD) [2]. The model is described in Comm. Comp. Phys. 10 (2011) 716. The halo algorithm was improved by Geiger; a weight function calculation was also added.
+
+[1] Heidbrink, W. W., et al. "A code that simulates fast-ion D-alpha and neutral particle measurements." Comm. Comp. Phys. 10 (2011) 716.
+
+[2] Geiger, Benedikt. "Fast-ion transport studies using FIDA spectroscopy at the ASDEX Upgrade tokamak." Diss. lmu, 2013. APA	
+
 
 ***
 
@@ -34,7 +40,8 @@ The last step is the run make in the source directory
 
     make
 
-## 4. Device Specific Notes
+## 4. Device Specific Installation Instructions
+These installation instructions are unique to each machine. For instructions on how to get FIDASIM to work with a particular machine see the section titled "How do make FIDASIM work for your device"
 ### DIII-D
 FIDASIM currently does not run on the venus cluster since it does not have the required libraries.
 
@@ -192,27 +199,11 @@ Note: prefida can take two keywords: plot and save.
     /path/to/fidasim/executable/fidasim /path/to/input/directory/<RUNID>
 
 ***
-# Frequently Asked Questions
-### I get a segmentation fault when I run the code with multiple cores, but not when I only use one core. 
-A segmentation fault happens when a code tries to access memory that it wasn't allocated. When a code runs in parallel each thread is allocated a certain amount of memory. Under certain conditions, i.e. a large grid, a thread runs out of room and tries to access more. This throws a seg fault. To increase this limit run the following:
 
-For tsch shell:
-
-    limit stacksize unlimited
-For bash shell:
-
-    ulimit -s unlimited
-    
-### I have fixed your code. How do I submit a patch?
-FIDASIM is open source code. In order to contribute to the project please fork us on GitHub and open a pull request. We will then review your changes and incorporate them into code base.
-
-### Can you please add "enter device name here" support?
-See above
-
-### How do add I support for my device
+# How do make FIDASIM work for your device
 FIDASIM is device agnostic. This means that it doesn't care what your machine is so long as it can read in the needed information.
-Prefida, the FIDASIM preprocessing routine, is also device agnostic. It can accomplish this by delegating device specific routines to other programs. 
-In other words, prefida is modular. This allows users to use whatever routines they want so long as it delivers it to prefida in a certain way.
+Prefida, the FIDASIM preprocessing routine, is also device agnostic. It can accomplish this by delegating device-specific routines to other programs. 
+In other words, prefida is modular. This allows users to use device-specific routines to prepare the data as long as it delivers the results to prefida in the specified format.
 This can best be described with an example. 
 
 Say I have a device called ABCD, which stands for "A Beautiful Cylindrical Device". I want FIDASIM to work with it, so in the source directory I make an ABCD directory.
@@ -298,7 +289,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;	   FOCY            DOUBLE           999999.90
 	;;	   FOCZ            DOUBLE           1000.0000
 
-	;;FOR CONVINIENCE HERE ARE THE MINIMUM STRUCTURE DEFINITIONS
+	;;FOR CONVENIENCE HERE ARE THE MINIMUM STRUCTURE DEFINITIONS
 	equil={rho_grid:rho_grid,$	   			;;FIDA GRID IN MAGNETIC FLUX COORDINATES (RHO)
 		   rho_chords:rho_chords,$			;;STRUCTURE CONTAINING AN ARRAY OF RHO VALUES AND STEP SIZE IN [cm]
 		   bx:bx,$					   		;;X MAGNETIC FIELD COMPONENT AT GRID POINTS
@@ -346,16 +337,22 @@ As you can see it is all rather self explaintory. All I need to do now to get AB
 I can use whatever routines I want so long as the output of abcd_routines is defined as above. I could also include other things in the
 structures so long as I have the above. 
 
-Note: All positions in the device routines are in machine coordinates.
+Note: All positions in the device routines are in machine coordinates
+
+# Frequently Asked Questions
+### I get a segmentation fault when I run the code with multiple cores, but not when I only use one core. 
+A segmentation fault happens when a code tries to access memory that it wasn't allocated. When a code runs in parallel each thread is allocated a certain amount of memory. Under certain conditions, i.e. a large grid, a thread runs out of room and tries to access more. This throws a seg fault. To increase this limit run the following:
+
+For tsch shell:
+
+    limit stacksize unlimited
+For bash shell:
+
+    ulimit -s unlimited
+    
+### I have fixed your code. How do I submit a patch?
+FIDASIM is open source code. In order to contribute to the project please fork us on GitHub and open a pull request. We will then review your changes and incorporate them into code base.
 
 ### The plot keyword doesn't do anything. 
-Plotting, like the device routines, are often very specific to the device. As such plotting is treated the same way as the device routines. 
+Plotting, like the device routines, are often very specific to the device. Accordingly, plotting is treated the same way as the device routines. 
 Prefida will look for a routine called, using the nomenclature from above, abcd_plots.pro. A basic plot routine can be found in the TEMPLATES/ directory.
-
-***
-# References
-
-Heidbrink, W. W., et al. "A code that simulates fast-ion D-alpha and neutral particle measurements." Comm. Comp. Phys. 10 (2011) 716.
-
-Geiger, Benedikt. "Fast-ion transport studies using FIDA spectroscopy at the ASDEX Upgrade tokamak." Diss. lmu, 2013. APA	
-

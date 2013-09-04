@@ -29,10 +29,15 @@ For tsch shell:
 
     setenv NETCDF_INCLUDE /path/to/netcdf/install/include
     setenv NETCDF_LIB /path/to/netcdf/install/lib
+    setenv LD_LIBRARY_PATH "/path/to/netcdf/install/lib":{$LD_LIBRARY_PATH}
+    setenv LD_LIBRARY_PATH "/path/to/netcdf/install/include":{$LD_LIBRARY_PATH}
+
 For bash shell:
 
     export NETCDF_INCLUDE=/path/to/netcdf/install/include
     export NETCDF_LIB=/path/to/netcdf/install/lib
+    export LD_LIBRARY_PATH = /path/to/netcdf/install/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH = /path/to/netcdf/install/include:$LD_LIBRARY_PATH
 
 The Intel Fortran compiler is recommended. You can download the non-commercial version from [here](http://software.intel.com/en-us/non-commercial-software-development)
 
@@ -50,13 +55,14 @@ FIDASIM currently does not run on the venus cluster since it does not have the r
 
 ```
 
-module load git
+module load git/1.8.0.2
 module load intel
 #GIT AND INTEL MODULES MUST BE LOADED BEFORE PATHSCALE MODULE
 module load pathscale
 
 ```
 * If you run FIDASIM on portal you will get an angry email. Make sure to schedule the job using the "use" command.
+* Use the following link to clone the repository http://github.com/D3DEnergetic/FIDASIM.git
 * The netCDF directories lib and include, are located at /usr/pppl/intel/11-pkgs/netcdf-4.1.3/
 
 ***

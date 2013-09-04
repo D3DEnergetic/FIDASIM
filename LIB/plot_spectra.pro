@@ -16,7 +16,7 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 	grid=results.grid
 	fida=results.fida
 	nbi_halo=results.nbi_halo
-	weights=results.weights
+	weights=results.fida_weights
 	los=results.los
 	fbm=results.fbm
 	neutrals=results.neutrals

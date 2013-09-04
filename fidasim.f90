@@ -3630,13 +3630,8 @@ contains
              ac=icell(:,kk)
              call colrad(ac(:),vi(:),tcell(kk)/vabs,states,photons,0,1.d0)
            enddo
-           if(ichan.eq.inputs%ichan_wght) then 
-             ind=1 
-           else 
-             ind=ichan
-           endif
            wfunct(ii,minpitch(1),jj) = wfunct(ii,minpitch(1),jj) + &
-                  (grid%dv*alpha*area/(4*pi))*sum(pcx*states/states_i) * tcell(jj)
+                  (alpha*area/(4*pi))*sum(pcx*states/states_i) * tcell(jj)
          enddo loop_over_energy
        enddo loop_along_los
        !$OMP END PARALLEL DO
@@ -3644,7 +3639,7 @@ contains
        do jj=1,ncell
          do ii=1,inputs%nr_wght
 		   do kk=1,inputs%nr_wght
-             wfunct_tot(ii,kk,ichan)=wfunct_tot(ii,kk,ichan)+wfunct(ii,kk,jj)
+             wfunct_tot(ii,kk,ichan)=wfunct_tot(ii,kk,ichan)+wfunct(ii,kk,jj)*grid%dv
            enddo
          enddo
        enddo   

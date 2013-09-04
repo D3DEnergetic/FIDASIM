@@ -164,7 +164,7 @@ PRO prepare_beam,inputs,nbi,nbgeom
 	GET_OUT:
 END
 
-PRO los_track,coords,xyz_los_vec,xyspt,tcell,cell,ncell
+PRO los_track,coords,xyz_los_vec,xyspt,ri,tcell,cell,ncell
 	ri=xyspt
 	vn=xyz_los_vec
 	;; zeros are not good!
@@ -228,6 +228,8 @@ PRO prepare_fida,inputs,grid,chords,fida
     ;;CALCULATE WEIGHTS
 	err_arr=dblarr(chords.nchan)
 	weight  = replicate(0.d0,nx,ny,nz,chords.nchan)
+	r_enter = replicate(0.d0,3,chords.nchan)
+	r_exit = replicate(0.d0,3,chords.nchan)
 ;	print, 'nchan:', fida.nchan
 
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
@@ -237,7 +239,7 @@ PRO prepare_fida,inputs,grid,chords,fida
 
 	rotate_points,ulens,vlens,wlens,Arot,Brot,Crot,xlens,ylens,zlens
 	rotate_points,ulos,vlos,wlos,Arot,Brot,Crot,xlos,ylos,zlos
-
+	
 	for chan=0L, chords.nchan-1 do  begin
 		xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
         xyzlos  = [xlos[chan], ylos[chan], zlos[chan]]
@@ -264,10 +266,12 @@ PRO prepare_fida,inputs,grid,chords,fida
            	endif  
         endfor
         out:
+		r_enter[*,chan]=xyz_pos
       ; determine cells along the LOS
         if i lt nstep then begin
-        	los_track,grid,vi,xyz_pos,tcell,cell,ncell
-           	if ncell gt 1 then begin
+        	los_track,grid,vi,xyz_pos,rout,tcell,cell,ncell
+			r_exit[*,chan]=rout
+          	if ncell gt 1 then begin
             	for jj=0L,ncell-1 do begin
                 	if finite(tcell[jj]) eq 0 then stop
                 	;;  tcell is the length of the track (cm) as v is 1cm/s
@@ -298,7 +302,8 @@ PRO prepare_fida,inputs,grid,chords,fida
 		err=0
 	endelse
 	fida={nchan:chords.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:chords.sigma_pi_ratio,$
-			xlos:xlos,ylos:ylos,zlos:zlos,headsize:chords.headsize,opening_angle:chords.opening_angle,los:los,weight:weight,err:err}
+			xlos:xlos,ylos:ylos,zlos:zlos,xyz_enter:r_enter,xyz_exit:r_exit,$
+			headsize:chords.headsize,opening_angle:chords.opening_angle,los:los,weight:weight,err:err}
 END
 
 PRO transp_fbeam,inputs,grid,denf,fbm_struct,err
@@ -434,7 +439,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	print,total(deni)/total(denp)*100. ,' percent of impurities'
 	
 	;;Fast-ion density
-	if inputs.sim_fida ne 0 and inputs.nr_fast gt 1 then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
      	transp_fbeam,inputs,grid,denf,fbm_struct,terr
 		if terr eq 1 then begin
 			print,'ERROR: FAILED TO MAP FAST ION DENSITY'
@@ -615,7 +620,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	endif else err=0
 
 	;;FIDA PRE PROCESSING 
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		prepare_fida,inputs,grid,chords,fida
 		if fida.err eq 1 then begin
 			print,'CHORD PREPROCESSING FAILED. EXITING...'
@@ -668,10 +673,11 @@ PRO prefida,input_pro,plot=plot,save=save
 	printf,55, inputs.calc_birth,f='(i2,"             # calculate birth profile")'
 	printf,55, inputs.calc_spec,f='(i2,"             # calculate spectra")'
 	printf,55, inputs.ps,f='(i2,"             # plot ps output")'
-	printf,55, inputs.npa          ,f='(i2,"             # NPA simulation")'
+	printf,55, inputs.calc_npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
     printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
-	printf,55, inputs.calc_wght,f='(i2,"             # calculate wght function")'
+	printf,55, inputs.calc_fida_wght,f='(i2,"             # calculate fida wght function")'
+	printf,55, inputs.calc_npa_wght,f='(i2,"             # calculate npa wght function")'
 	printf,55,'# weight function settings:'
 	printf,55, inputs.nr_wght,f='(i9,"      # number velocities")'
 	printf,55, inputs.ichan_wght[0],f='(i3,"      # channel for weight function")'
@@ -752,16 +758,19 @@ PRO prefida,input_pro,plot=plot,save=save
 	;;DEFINE DIMENSIONS
 	ncdf_control,ncid
 	one_id = ncdf_dimdef(ncid,'dim001',1)
+	three_id = ncdf_dimdef(ncid,'dim003',3)
 	fbm_gdim= ncdf_dimdef(ncid,'fbm_grid',plasma.fbm.ngrid)
     fbm_edim=ncdf_dimdef(ncid,'fbm_energy',plasma.fbm.nenergy)	
     fbm_pdim=ncdf_dimdef(ncid,'fbm_pitch',plasma.fbm.npitch)	
 	xid = ncdf_dimdef(ncid,'x',grid.nx)
 	yid = ncdf_dimdef(ncid,'y',grid.ny)
 	zid = ncdf_dimdef(ncid,'z',grid.nz)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		chan_id=ncdf_dimdef(ncid,'chan',n_elements(fida.los))
+		xyz_dim=[three_id,chan_id]
+	endif
+
 	griddim=[xid,yid,zid]
-	
 	;;DEFINE VARIABLES
 	shot_varid=ncdf_vardef(ncid,'shot',one_id,/long)
 	time_varid=ncdf_vardef(ncid,'time',one_id,/float)
@@ -773,7 +782,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	gdim_varid=ncdf_vardef(ncid,'FBM_Ngrid',one_id,/long)
 	edim_varid=ncdf_vardef(ncid,'FBM_Nenergy',one_id,/long)
 	pdim_varid=ncdf_vardef(ncid,'FBM_Npitch',one_id,/long)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then $
 		nchan_varid=ncdf_vardef(ncid,'Nchan',one_id,/long)
 
 	;;DEFINE GRID VARIABLES
@@ -822,17 +831,20 @@ PRO prefida,input_pro,plot=plot,save=save
 	brems_varid=ncdf_vardef(ncid,'brems',chan_id,/double)
 
 	;;LOS VARIABLE DEFINITION
-	xlens_varid=ncdf_vardef(ncid,'xlens',chan_id,/double)
-	ylens_varid=ncdf_vardef(ncid,'ylens',chan_id,/double)
-	zlens_varid=ncdf_vardef(ncid,'zlens',chan_id,/double)
-	xlos_varid=ncdf_vardef(ncid,'xlos',chan_id,/double)
-	ylos_varid=ncdf_vardef(ncid,'ylos',chan_id,/double)
-	zlos_varid=ncdf_vardef(ncid,'zlos',chan_id,/double)
-	head_varid=ncdf_vardef(ncid,'headsize',chan_id,/double)
-	oa_varid=ncdf_vardef(ncid,'opening_angle',chan_id,/double)
-	sig_varid=ncdf_vardef(ncid,'sigma_pi',chan_id,/double)
-	wght_varid=ncdf_vardef(ncid,'los_wght',[xid,yid,zid,chan_id],/double)
-
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
+		xlens_varid=ncdf_vardef(ncid,'xlens',chan_id,/double)
+		ylens_varid=ncdf_vardef(ncid,'ylens',chan_id,/double)
+		zlens_varid=ncdf_vardef(ncid,'zlens',chan_id,/double)
+		xlos_varid=ncdf_vardef(ncid,'xlos',chan_id,/double)
+		ylos_varid=ncdf_vardef(ncid,'ylos',chan_id,/double)
+		zlos_varid=ncdf_vardef(ncid,'zlos',chan_id,/double)
+		head_varid=ncdf_vardef(ncid,'headsize',chan_id,/double)
+		oa_varid=ncdf_vardef(ncid,'opening_angle',chan_id,/double)
+		sig_varid=ncdf_vardef(ncid,'sigma_pi',chan_id,/double)
+		wght_varid=ncdf_vardef(ncid,'los_wght',[xid,yid,zid,chan_id],/double)
+		xyz_enter_varid=ncdf_vardef(ncid,'xyz_enter',xyz_dim,/double)
+		xyz_exit_varid=ncdf_vardef(ncid,'xyz_exit',xyz_dim,/double)
+	endif
 	;;END DEFINITION
 	ncdf_control,ncid,/ENDEF
 
@@ -843,7 +855,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	ncdf_varput,ncid,nx_varid,long(inputs.nx)
 	ncdf_varput,ncid,ny_varid,long(inputs.ny)
 	ncdf_varput,ncid,nz_varid,long(inputs.nz)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then $
 		ncdf_varput,ncid,nchan_varid,long(n_elements(fida.los))
 	ncdf_varput,ncid,gdim_varid,long(plasma.fbm.ngrid)
 	ncdf_varput,ncid,edim_varid,long(plasma.fbm.nenergy)
@@ -895,7 +907,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	if n_elements(brems) ne 0 then ncdf_varput,ncid,brems_varid,double(brems)
 	
 	;;WRITE LINE OF SIGHT (LOS)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		los=fida.los
 		ncdf_varput,ncid,xlens_varid,double(fida.xlens[los])
 		ncdf_varput,ncid,ylens_varid,double(fida.ylens[los])
@@ -907,6 +919,8 @@ PRO prefida,input_pro,plot=plot,save=save
 		ncdf_varput,ncid,oa_varid,double(fida.opening_angle[los])
 		ncdf_varput,ncid,sig_varid,double(fida.sigma_pi_ratio[los])
 		ncdf_varput,ncid,wght_varid,double(fida.weight)
+		ncdf_varput,ncid,xyz_enter_varid,double(fida.xyz_enter[*,los])
+		ncdf_varput,ncid,xyz_exit_varid,double(fida.xyz_exit[*,los])		
 	endif
 	ncdf_close,ncid
 	print,'Parameters stored in data file: '+file

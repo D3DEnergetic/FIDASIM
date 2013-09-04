@@ -439,7 +439,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	print,total(deni)/total(denp)*100. ,' percent of impurities'
 	
 	;;Fast-ion density
-	if inputs.sim_fida ne 0 and inputs.nr_fast gt 1 then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
      	transp_fbeam,inputs,grid,denf,fbm_struct,terr
 		if terr eq 1 then begin
 			print,'ERROR: FAILED TO MAP FAST ION DENSITY'
@@ -620,7 +620,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	endif else err=0
 
 	;;FIDA PRE PROCESSING 
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		prepare_fida,inputs,grid,chords,fida
 		if fida.err eq 1 then begin
 			print,'CHORD PREPROCESSING FAILED. EXITING...'
@@ -673,10 +673,11 @@ PRO prefida,input_pro,plot=plot,save=save
 	printf,55, inputs.calc_birth,f='(i2,"             # calculate birth profile")'
 	printf,55, inputs.calc_spec,f='(i2,"             # calculate spectra")'
 	printf,55, inputs.ps,f='(i2,"             # plot ps output")'
-	printf,55, inputs.npa          ,f='(i2,"             # NPA simulation")'
+	printf,55, inputs.calc_npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
     printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
-	printf,55, inputs.calc_wght,f='(i2,"             # calculate wght function")'
+	printf,55, inputs.calc_fida_wght,f='(i2,"             # calculate fida wght function")'
+	printf,55, inputs.calc_npa_wght,f='(i2,"             # calculate npa wght function")'
 	printf,55,'# weight function settings:'
 	printf,55, inputs.nr_wght,f='(i9,"      # number velocities")'
 	printf,55, inputs.ichan_wght[0],f='(i3,"      # channel for weight function")'
@@ -764,7 +765,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	xid = ncdf_dimdef(ncid,'x',grid.nx)
 	yid = ncdf_dimdef(ncid,'y',grid.ny)
 	zid = ncdf_dimdef(ncid,'z',grid.nz)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		chan_id=ncdf_dimdef(ncid,'chan',n_elements(fida.los))
 		xyz_dim=[three_id,chan_id]
 	endif
@@ -781,7 +782,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	gdim_varid=ncdf_vardef(ncid,'FBM_Ngrid',one_id,/long)
 	edim_varid=ncdf_vardef(ncid,'FBM_Nenergy',one_id,/long)
 	pdim_varid=ncdf_vardef(ncid,'FBM_Npitch',one_id,/long)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then $
 		nchan_varid=ncdf_vardef(ncid,'Nchan',one_id,/long)
 
 	;;DEFINE GRID VARIABLES
@@ -830,7 +831,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	brems_varid=ncdf_vardef(ncid,'brems',chan_id,/double)
 
 	;;LOS VARIABLE DEFINITION
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		xlens_varid=ncdf_vardef(ncid,'xlens',chan_id,/double)
 		ylens_varid=ncdf_vardef(ncid,'ylens',chan_id,/double)
 		zlens_varid=ncdf_vardef(ncid,'zlens',chan_id,/double)
@@ -854,7 +855,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	ncdf_varput,ncid,nx_varid,long(inputs.nx)
 	ncdf_varput,ncid,ny_varid,long(inputs.ny)
 	ncdf_varput,ncid,nz_varid,long(inputs.nz)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then $
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then $
 		ncdf_varput,ncid,nchan_varid,long(n_elements(fida.los))
 	ncdf_varput,ncid,gdim_varid,long(plasma.fbm.ngrid)
 	ncdf_varput,ncid,edim_varid,long(plasma.fbm.nenergy)
@@ -906,7 +907,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	if n_elements(brems) ne 0 then ncdf_varput,ncid,brems_varid,double(brems)
 	
 	;;WRITE LINE OF SIGHT (LOS)
-	if inputs.calc_spec or inputs.npa or inputs.calc_wght then begin
+	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		los=fida.los
 		ncdf_varput,ncid,xlens_varid,double(fida.xlens[los])
 		ncdf_varput,ncid,ylens_varid,double(fida.ylens[los])

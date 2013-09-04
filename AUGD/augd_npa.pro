@@ -6,7 +6,7 @@ user=+GETENV('USER')
 ;;-----------------------------------------------------
 shot=28746L 											;; Shot Number
 time=4.421  											;; Time 
-runid='28746A02'	   									;; runid of FIDASIM
+runid='28746A03'	   									;; runid of FIDASIM
 device='AUGD'											;; D3D,NSTX,AUGD,MAST
 install_dir='/u/'+user+'/FIDASIM/'						;; Location of fidasim code and executable
 result_dir='/u/'+user+'/FIDASIM/RESULTS/AUGD/'  		;; Location where results will be stored /RESULTS/runid will be made
@@ -65,7 +65,7 @@ origin=[0.,0.,0.]	;; If using different a coordinate system, this is the origin
 
 alpha=0.0		    ;; Rotation angle in radians from +x about z axis that transforms machine
 					;; coordinates to the new system. Rotations about x or y not supported
-
+beta=0.0
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
@@ -76,7 +76,7 @@ nr_halo=5000    										;; Halo contribution
 ;;--------------------------------------------------
 ;; Calculation of the weight function
 ;;--------------------------------------------------
-nr_wght=100   											;; Number of Pitches, energyies and gyro angles 
+nr_wght=50   											;; Number of Pitches, energyies and gyro angles 
 emax_wght=100.  										;; Maximum energy (keV)
 ichan_wght=-1  											;; -1 for all channels, otherwise a given channel index
 dwav_wght=.2   											;; Wavelength interval
@@ -86,12 +86,12 @@ wavel_end_wght=663.   									;; Maximum wavelength
 ;;-------------------------------------------------
 ;; Simulation switches
 ;;-------------------------------------------------
-npa=[1]   												;; (0 or 1) If 1 do a simulation for NPA
+calc_npa=[1]   											;; (0 or 1) If 1 do a simulation for NPA
 calc_spec=[0]   										;; (0 or 1) If 1 then spectra is calculated
-sim_fida=[1]											;; (0 or 1) if 1 then the FIDA spectra is calculated
 calc_birth=[0]    										;; (0 or 1) If 1 then the birth profile is calculated
 f90brems=[1]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
-calc_wght=[1]  											;; (0 or 1) If 1 then weight functions are calculated
+calc_fida_wght=[0]  								    ;; (0 or 1) If 1 then weight functions are calculated
+calc_npa_wght=[1]  										;; (0 or 1) If 1 then weight functions are calculated
 load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing 
 														;; neutrals.bin file located in runid directory
 ps=[0]													;; (0 or 1) If 1 then make hard copy of plots
@@ -104,9 +104,9 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
 	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
 	    lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
 	    nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-		origin:origin,alpha:alpha,beta:0.0,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+		origin:origin,alpha:alpha,beta:beta,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
-		wavel_end_wght:wavel_end_wght,npa:npa,calc_spec:calc_spec,sim_fida:sim_fida,calc_birth:calc_birth,calc_wght:calc_wght,$
-		f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
+		wavel_end_wght:wavel_end_wght,calc_npa:calc_npa,calc_spec:calc_spec,calc_birth:calc_birth,calc_fida_wght:calc_fida_wght,$
+		calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
 
 END

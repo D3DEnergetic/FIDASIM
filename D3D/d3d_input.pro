@@ -52,7 +52,7 @@ dlambda= (lambdamax-lambdamin)/double(nlambda)	;; Wavelength seperation
 ;;---------------------------------------------------
 origin=[-180.16373,600.82700,0.0]
 alpha=-4.6020171774D 	;; rotation about z axis
-
+beta=0.0
 nx=40				;; Number of cells in x direction
 ny=60				;; Number of cells in y direction
 nz=50				;; Number of cells in z direction
@@ -87,10 +87,9 @@ npa=[0]   					;; (0 or 1) If 1 do a simulation for NPA
 no_spectra=[0]   			;; (0 or 1) If 1 then no spectra are calculated
 nofida=[0]    				;; (0 or 1) If 1 then no fast-ions are simulated
 f90brems=[0]                ;; (0 or 1) If 0 use the IDL bremstrahlung calculation
-guidingcenter=[1]           ;; (0 or 1) Use 1 for guiding center distribution functs.
-calc_wght=[0]  				;; (0 or 1) If 1 then weight functions are calculated
+calc_fida_wght=[0]  		;; (0 or 1) If 1 then weight functions are calculated
+calc_npa_wght=[0]  			;; (0 or 1) If 1 then weight functions are calculated
 load_neutrals=[0]   		;; (0 or 1) If 1 then the neutral density is loaded from an existing 
-							;; neutrals.bin file located in runid directory
 
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
@@ -100,11 +99,11 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
        cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax, $
        isource:isource,einj:einj,pinj:pinj,fida_diag:fida_diag,gfile:gfile,equil:equil,$
        btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
-       lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,origin:origin,alpha:alpha,beta:0.0,$
+       lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,origin:origin,alpha:alpha,beta:beta,$
        nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
        nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
 	   wavel_end_wght:wavel_end_wght,npa:npa,no_spectra:no_spectra,nofida:nofida, $
-       f90brems:f90brems,guidingcenter:guidingcenter,calc_wght:calc_wght,load_neutrals:load_neutrals}
+       f90brems:f90brems,calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,load_neutrals:load_neutrals}
 
 END

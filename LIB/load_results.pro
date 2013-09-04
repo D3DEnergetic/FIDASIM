@@ -37,7 +37,8 @@ PRO read_inputs,file,inputs,save=save
 		readf,55,idum & npa          = idum      ;& print, 'npa: ', npa
 		readf,55,idum & load_neutrals= idum
 		readf,55,idum & f90brems=idum
-		readf,55,idum & calc_wght    = idum
+		readf,55,idum & calc_fida_wght    = idum
+		readf,55,idum & calc_npa_wght    = idum
 		readf,55,sdum;'# weight function settings:'
 		readf,55,idum & nr_wght      = idum
 		readf,55,idum & ichan_wght   = idum
@@ -123,7 +124,7 @@ PRO read_inputs,file,inputs,save=save
 		inputs={instal_dir:install_dir,shot: shot, time: time,diag:diag,ps:ps $
 	          , transp_runid:transp_runid $
 	          , fidasim_runid:fidasim_runid $
-	          , calc_wght:calc_wght,nr_wght:nr_wght,ichan_wght:ichan_wght $
+	          , calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,nr_wght:nr_wght,ichan_wght:ichan_wght $
 	          , nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
 	          , calc_spec:calc_spec,npa:npa $
 	          , einj:einj $

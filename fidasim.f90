@@ -204,7 +204,8 @@ module application
      integer(long) :: load_neutrals
      integer(long) :: f90brems       !! 0 to use IDL v.b.
      integer(long) :: npa 
-     integer(long) :: calc_wght
+     integer(long) :: calc_fida_wght
+     integer(long) :: calc_npa_wght
      integer(long) :: calc_birth
      !! Plasma parameters
      integer(long) :: impurity_charge
@@ -282,7 +283,8 @@ contains
     read(66,*) inputs%npa
     read(66,*) inputs%load_neutrals
     read(66,*) inputs%f90brems
-    read(66,*) inputs%calc_wght
+    read(66,*) inputs%calc_fida_wght
+    read(66,*) inputs%calc_npa_wght
     read(66,*) !# weight function settings
     read(66,*) inputs%nr_wght
     read(66,*) inputs%ichan_wght
@@ -3409,7 +3411,7 @@ contains
     call check( nf90_def_var(ncid,"theta",NF90_DOUBLE,nchan_dimid,theta_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
 
-	  !Add unit attributes
+	!Add unit attributes
     call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,wav_varid,"units","nm") )
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
@@ -3433,7 +3435,7 @@ contains
 
     print*, 'fida weight function written to: ',filename
 
-	  !!Deallocate arrays
+	!!Deallocate arrays
     deallocate(ebarr)  
     deallocate(ptcharr)
     deallocate(phiarr)
@@ -3807,7 +3809,7 @@ program fidasim
   !! -----------------------------------------------------------------------
   !! --------------- CALCULATE the FIDA RADIATION/ NPA FLUX ----------------
   !! -----------------------------------------------------------------------
-  if(inputs%nr_fida.gt.10)then    
+  if(inputs%npa.eq.1 .or. inputs%calc_spec.eq.1 .and. inputs.nr_fida.gt.10)then    
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
@@ -3815,7 +3817,7 @@ program fidasim
      print*,'start fida'
      call fida
      !! ------- Store Spectra and neutral densities in binary files ------ !!
-     call write_fida_spectra()
+     if(inputs%calc_spec.eq.1) call write_fida_spectra()
      !! ---------------- Store NPA simulation ------------ !!
      if(inputs%npa.eq.1) call write_npa()
   endif
@@ -3823,7 +3825,7 @@ program fidasim
   !! -------------------------------------------------------------------
   !! ----------- Calculation of weight functions -----------------------
   !! -------------------------------------------------------------------
-  if(inputs%calc_wght.eq.1) then 
+  if(inputs%calc_fida_wght.eq.1) then 
      colrad_threshold=0. !! to speed up simulation!
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'fida weight function:    '  &
@@ -3831,13 +3833,11 @@ program fidasim
      call fida_weight_function()
   endif
 
-  if(inputs%calc_wght.eq.1) then
-	 if(inputs%npa.eq.1) then
-        call date_and_time (values=time_arr)
-        write(*,"(A,I2,A,I2.2,A,I2.2)") 'npa weight function:    '  &
+  if(inputs%calc_npa_wght.eq.1) then
+     call date_and_time (values=time_arr)
+     write(*,"(A,I2,A,I2.2,A,I2.2)") 'npa weight function:    '  &
           ,time_arr(5), ':', time_arr(6), ':',time_arr(7)
-	    call npa_weight_function()
-	 endif
+	 call npa_weight_function()
   endif
 
   call date_and_time (values=time_arr)

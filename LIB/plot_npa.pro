@@ -1,4 +1,4 @@
-pro plot_npa,ps=ps,path=path
+pro plot_npa,histo,ps=ps,path=path
   ;; ROUTINE OF FIDASIM to plot resulting NPA fluxes
   ;; written by Philipp Scheider and Benedikt Geiger 2013
   ;; plot settings
@@ -67,14 +67,14 @@ pro plot_npa,ps=ps,path=path
 
   ;; Define arrays for histograms
   ;; energy array:
-  nen  = 51.
+  nen  = 50.
   emax = 100.
   emin = 0.
   energy_arr = emin+dindgen(nen)/(nen-1.)*(emax-emin)
   dE   = energy_arr[1]-energy_arr[0]
 
   ;;pitch array:
-  npitch = 101
+  npitch = 50
   pmin   = -1.
   pmax   = 1.
   pitch_arr = pmin+dindgen(npitch)/(npitch-1.)*(pmax-pmin)
@@ -133,7 +133,7 @@ pro plot_npa,ps=ps,path=path
      contour,distri[idet,*,*],energy_arr,pitch_arr $
              ,c_colors=indgen(20)*12,nlevels=20,/fill,yran=[-1,1] $
              ,ytit='Pitch',xtit='Energy [keV]'
-     plot, energy_arr, histo,ytit='neutrals/s',xtit='Energy [keV]'
+     plot, energy_arr, histo,ytit='neutrals/s',xtit='Energy [keV]',psym=10
   endfor
   if keyword_set(ps) then device, /close
 end 

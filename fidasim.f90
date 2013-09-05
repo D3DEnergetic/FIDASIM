@@ -3546,8 +3546,9 @@ contains
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius: ',radius
        rad_arr(ichan)=radius
-       alpha=spec%opening_angle(ichan)
-       area= pi*spec%headsize(ichan)**2.
+       alpha=2*pi*(1.0 - cos(3.*spec%opening_angle(ichan))) !factor of 3 same fudge factor used in mc npa
+       area= pi*(spec%headsize(ichan)*spec%headsize(ichan))
+
        pos(:)=spec%xyzexit(:,ichan)
        los_vec(1) = spec%xyzhead(ichan,1) - pos(1)
        los_vec(2) = spec%xyzhead(ichan,2) - pos(2)
@@ -3564,7 +3565,6 @@ contains
        !! do the main simulation  !! 
        !! LOOP over the three velocity vector components 
        wfunct=wfunct*0.
-
        !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,in,ind,ac, &
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,   &
@@ -3631,11 +3631,10 @@ contains
              call colrad(ac(:),vi(:),tcell(kk)/vabs,states,photons,0,1.d0)
            enddo
            wfunct(ii,minpitch(1),jj) = wfunct(ii,minpitch(1),jj) + &
-                  (alpha*area/(4*pi))*sum(pcx*states/states_i) * tcell(jj)
+                  (alpha*area/(4*pi))*sum(pcx*states/states_i)
          enddo loop_over_energy
        enddo loop_along_los
        !$OMP END PARALLEL DO
-       wfunct=wfunct/sum(tcell)
        do jj=1,ncell
          do ii=1,inputs%nr_wght
 		   do kk=1,inputs%nr_wght

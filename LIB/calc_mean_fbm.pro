@@ -1,7 +1,8 @@
-PRO calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm2
+PRO calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm2,elevel=elevel
+
+	if not keyword_set(elevel) then elevel=indgen(n_elements(neutrals.fdens[0,0,0,*]))
 
 	nchan=los.nchan
-
     nen_transp=n_elements(fbm.energy)
     npitch_transp=n_elements(fbm.pitch) 
     dE_transp=fbm.energy[1]-fbm.energy[0]
@@ -21,10 +22,10 @@ PRO calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm2
                  los_wght=los.weight[i,j,k,ichan]
                  if los_wght gt 0. then begin
                     ;; determine mean values like the halo density along LOS
-                    wght=(  neutrals.fdens[i,j,k,2] + $
-                            neutrals.hdens[i,j,k,2] + $
-                            neutrals.tdens[i,j,k,2] + $
-                            neutrals.halodens[i,j,k,2]) * los_wght
+                    wght=(  total(neutrals.fdens[i,j,k,elevel] + $
+                            neutrals.hdens[i,j,k,elevel] + $
+                            neutrals.tdens[i,j,k,elevel] + $
+                            neutrals.halodens[i,j,k,elevel])) * los_wght
                     rad=rad+wght
 					rrc=grid.r_grid[i,j,k]
 					zzc=grid.w_grid[i,j,k]

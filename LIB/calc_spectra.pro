@@ -12,7 +12,7 @@ PRO calc_spectra,grid,fbm,weights,los,neutrals,lambda,radiance,mean_fbm
 
     radiance= fltarr(nchan,nwav)
 
-	calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm
+	calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm,elevel=2
         ;;------------------------------------------------------------
         ;; ------ CALCULATE SYNTHETIC SPECTRA AND PROFIELES ----------
         ;;------------------------------------------------------------

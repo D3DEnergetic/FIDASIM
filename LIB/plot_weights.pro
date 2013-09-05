@@ -13,11 +13,16 @@ PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
 	fbm=results.fbm
 	neutrals=results.neutrals
 
-
-	if keyword_set(fida) then weights=fida_wght
-	if keyword_set(npa) then weights=npa_wght
-
- 	calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm
+    if not keyword_set(fida) and not keyword_set(npa) then fida=1
+	if keyword_set(fida) then begin
+		weights=fida_wght
+		e_level=2
+	endif
+	if keyword_set(npa) then begin
+		weights=npa_wght
+		e_level=indgen(n_elements(neutrals.fdens[0,0,0,*]))
+	endif
+ 	calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm,elevel=e_level
 
 	if keyword_set(chan) then begin
 		start=chan
@@ -35,8 +40,7 @@ PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
 				if keyword_set(prod) then begin
 					wght=mean_fbm[*,*,ichan]*weights.weight_tot[ii,*,*,ichan]
 				endif else wght=weights.weight_tot[ii,*,*,ichan]
-                contour,mean_fbm[*,*,ichan],weights.energyarr,weights.pitcharr,nlevels=10
-				contour,wght,weights.energyarr,weights.pitcharr,nlevels=30,/fill,/overplot
+				contour,wght,weights.energyarr,weights.pitcharr,nlevels=30,/fill
 				wait,1
 			endfor
 		endif
@@ -44,8 +48,7 @@ PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
 			if keyword_set(prod) then begin
 				wght=mean_fbm[*,*,ichan]*weights.weight_tot[*,*,ichan]
 			endif else wght=weights.weight_tot[*,*,ichan]
-            contour,mean_fbm[*,*,ichan],weights.energyarr,weights.pitcharr,nlevels=10
-			contour,wght,weights.energyarr,weights.pitcharr,nlevels=30,/fill,/overplot
+			contour,wght,weights.energyarr,weights.pitcharr,nlevels=30,/fill
 			wait,1
 		endif
 	endfor		

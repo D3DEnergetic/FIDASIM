@@ -23,10 +23,10 @@ PRO calc_npa,grid,fbm,weights,los,neutrals,flux,prod,mean_fbm2
                  los_wght=los.weight[i,j,k,ichan]
                  if los_wght gt 0. then begin
                     ;; determine mean values like the halo density along LOS
-                    wght=(  neutrals.fdens[i,j,k,2] + $
-                            neutrals.hdens[i,j,k,2] + $
-                            neutrals.tdens[i,j,k,2] + $
-                            neutrals.halodens[i,j,k,2]) * los_wght
+                    wght=(  total(neutrals.fdens[i,j,k,*] + $
+                            neutrals.hdens[i,j,k,*] + $
+                            neutrals.tdens[i,j,k,*] + $
+                            neutrals.halodens[i,j,k,*])) * los_wght
                     rad=rad+wght
 					rrc=grid.r_grid[i,j,k]
 					zzc=grid.w_grid[i,j,k]

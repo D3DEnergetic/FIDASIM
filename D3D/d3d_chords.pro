@@ -50,13 +50,13 @@ FUNCTION d3d_chords,shot,fida_diag
 	ylens3=replicate(-198.5,n_elements(xmid3))
 	zlens3=replicate(122.0,n_elements(xmid3))
 
-	;;from fida_grierson_co
-	xlens4=[-163.0]
-	ylens4=[163.0]
-	zlens4=[0.0]
-	xmid4=[32.9832]
-	ymid4=[169.684]
-	zmid4=[0.0]
+    ;;from fida_grierson_MU1_MU2 (30LT/RT from 315T0)
+    xlens4=replicate(-182.609,8)
+    ylens4=replicate(203.626,8)
+    zlens4=replicate(3.4302,8)
+    xmid4=[34.803, 42.116, 48.071, 54.495, 67.172, 68.501, 75.616, 82.214] ;; cm
+    ymid4=[167.035, 172.633, 177.193, 182.110, 187.223, 192.833, 198.280, 203.331] ;; cm
+    zmid4=[-3.510, -3.710, -3.870, -4.270, -4.700, -4.830, -4.940,-5.310] ;; cm
 
 	;;fida_yadong
 	if shot le 143721 then begin
@@ -115,6 +115,14 @@ FUNCTION d3d_chords,shot,fida_diag
         zlens6=replicate(100.0,nchan5)
 	endelse
 
+    ;; from fida_grierson_MU3_MU4 210LT/RT from 165R0
+    xlens7=replicate(83.51,8)
+    ylens7=replicate(-239.2,8)
+    zlens7=replicate(0.,8)
+    xmid7=[-126.145, -128.594, -129.522, -130.514, -131.476, -132.440, -133.568, -134.655]
+    ymid7=[-99.732,  -121.144, -129.260, -137.932, -146.338, -154.773, -164.629, -174.137]
+    zmid7=[-4.950,   -4.620,   -4.450,   -4.450,   -4.320,   -3.94 , -4.010  , -4.270]
+
 	;;NPA CHORDS
     detxyz=fltarr(3,3)
     detxyz[0,*]=[2.52,.08,.81]
@@ -166,7 +174,7 @@ FUNCTION d3d_chords,shot,fida_diag
         headsize=replicate(0.d0,nchan)
         opening_angle=replicate(0.d0,nchan)
        end
-      'TANGENTIAL': begin
+      'TANGENTIAL30': begin
         xlos=xmid4
         ylos=ymid4
         zlos=zmid4
@@ -177,14 +185,26 @@ FUNCTION d3d_chords,shot,fida_diag
         sigma_pi=replicate(1.d0,nchan)
         headsize=replicate(0.d0,nchan)
         opening_angle=replicate(0.d0,nchan)
-       end
+      end
+      'TANGENTIAL210': begin
+        xlos=xmid7
+        ylos=ymid7
+        zlos=zmid7
+        xhead=xlens7
+        yhead=ylens7
+        zhead=zlens7
+        nchan=n_elements(xlos)
+        sigma_pi=replicate(1.d0,nchan)
+        headsize=replicate(0.d0,nchan)
+        opening_angle=replicate(0.d0,nchan)
+      end
       'ALL': begin
-		xlos=[xmid1,xmid2,xmid3,xmid4,xmid5,xmid6]
-		ylos=[ymid1,ymid2,ymid3,ymid4,ymid5,ymid6]
-		zlos=[zmid1,zmid2,zmid3,zmid4,zmid5,zmid6]
-		xhead=[xlens1,xlens2,xlens3,xlens4,xlens5,xlens6]
-		yhead=[ylens1,ylens2,ylens3,ylens4,ylens5,ylens6]
-		zhead=[zlens1,zlens2,zlens3,zlens4,zlens5,zlens6]
+		xlos=[xmid1,xmid2,xmid3,xmid4,xmid5,xmid6,xmid7]
+		ylos=[ymid1,ymid2,ymid3,ymid4,ymid5,ymid6,ymid7]
+		zlos=[zmid1,zmid2,zmid3,zmid4,zmid5,zmid6,zmid7]
+		xhead=[xlens1,xlens2,xlens3,xlens4,xlens5,xlens6,xlens7]
+		yhead=[ylens1,ylens2,ylens3,ylens4,ylens5,ylens6,ylens7]
+		zhead=[zlens1,zlens2,zlens3,zlens4,zlens5,zlens6,zlens7]
 		nchan=n_elements(xlos)
         sigma_pi=replicate(1.d0,nchan)
         headsize=replicate(0.d0,nchan)

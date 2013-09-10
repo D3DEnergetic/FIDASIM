@@ -87,7 +87,7 @@ wavel_end_wght=663.   									;; Maximum wavelength
 ;;-------------------------------------------------
 calc_npa=[0]   											;; (0 or 1) If 1 do a simulation for NPA
 calc_spec=[1]   										;; (0 or 1) If 1 then spectra is calculated
-calc_birth=[1]    										;; (0 or 1) If 1 then the birth profile is calculated
+calc_birth=[0]    										;; (0 or 1) If 1 then the birth profile is calculated
 f90brems=[1]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
 calc_fida_wght=[1]  									;; (0 or 1) If 1 then weight functions are calculated
 calc_npa_wght=[0]  										;; (0 or 1) If 1 then weight functions are calculated

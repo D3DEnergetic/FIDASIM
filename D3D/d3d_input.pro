@@ -82,9 +82,9 @@ wavel_end_wght=663.   		;; Maximum wavelength
 ;;-------------------------------------------------
 ;; Simulation switches
 ;;-------------------------------------------------
-npa=[0]   					;; (0 or 1) If 1 do a simulation for NPA
-no_spectra=[0]   			;; (0 or 1) If 1 then no spectra are calculated
-nofida=[0]    				;; (0 or 1) If 1 then no fast-ions are simulated
+calc_npa=[0]   				;; (0 or 1) If 1 do a simulation for NPA
+calc_spec=[0]    		    ;; (0 or 1) If 1 then spectra is calculated
+calc_birth=[0]              ;; (0 or 1) If then the birth profile is calculated
 f90brems=[0]                ;; (0 or 1) If 0 use the IDL bremstrahlung calculation
 calc_fida_wght=[0]  		;; (0 or 1) If 1 then weight functions are calculated
 calc_npa_wght=[0]  			;; (0 or 1) If 1 then weight functions are calculated
@@ -102,7 +102,7 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
        nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
        nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
-	   wavel_end_wght:wavel_end_wght,npa:npa,no_spectra:no_spectra,nofida:nofida, $
+	   wavel_end_wght:wavel_end_wght,calc_npa:calc_npa,calc_spec:calc_spec,calc_birth:calc_birth, $
        f90brems:f90brems,calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,load_neutrals:load_neutrals}
 
 END

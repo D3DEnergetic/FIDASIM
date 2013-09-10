@@ -6,7 +6,6 @@ PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
 	
 	inputs=results.inputs
 	grid=results.grid
-	nbi_halo=results.nbi_halo
 	fida_wght=results.fida_weights
 	npa_wght=results.npa_weights
 	los=results.los

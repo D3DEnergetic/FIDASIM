@@ -1,21 +1,3 @@
-PRO read_fida,file,fida,save=save
-
-	if file_test(file) then begin
-
-       	ncid=ncdf_open(file,/nowrite)
-       	ncdf_varget,ncid,'shot',shot
-       	ncdf_varget,ncid,'time',time
-       	ncdf_varget,ncid,'lambda',lambda
-       	ncdf_varget,ncid,'spectra',spectra
-        ncdf_close,ncid
-
-		fida={shot:shot,time:time,lambda:lambda,spectra:spectra,err:0}
-
-		if keyword_set(save) then save,fida,filename='fida.sav'
-	endif else begin
-		fida={err:1}
-	endelse
-END
 PRO read_inputs,file,inputs,save=save
 
     idum=1L
@@ -26,7 +8,6 @@ PRO read_inputs,file,inputs,save=save
 	if file_test(file) then begin
 		openr,55,file
 		readf,55,sdum                 ;& print, sdum
-		readf,55,sdum & install_dir=sdum
 		readf,55,idum & shot = long(idum) 
 		readf,55,fdum & time = float(fdum)
 		readf,55,sdum & fidasim_runid = sdum
@@ -51,8 +32,6 @@ PRO read_inputs,file,inputs,save=save
 		readf,55,fdum & nr_ndmc = long(fdum)
 		readf,55,fdum & nr_halo = long(fdum)
 		readf,55,sdum;impurity_charge,f='(i2,"             # Impurity charge")'
-		readf,55,sdum;'# Location of transp cdf file:'
-		readf,55,sdum & transp_runid=sdum
 		readf,55,sdum                 ;& print, sdum
 		readf,55,sdum                 ;& print, sdum
 		readf,55,fdum & ai=fdum       ;& print, 'ai: ', ai
@@ -120,9 +99,8 @@ PRO read_inputs,file,inputs,save=save
 		endfor
 	
 		close,55
-
+        install_dir=+getenv('FIDASIM_DIR')
 		inputs={instal_dir:install_dir,shot: shot, time: time,diag:diag,ps:ps $
-	          , transp_runid:transp_runid $
 	          , fidasim_runid:fidasim_runid $
 	          , calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,nr_wght:nr_wght,ichan_wght:ichan_wght $
 	          , nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
@@ -257,28 +235,40 @@ PRO read_grid,file,grid,save=save
 	endelse
 
 END
-PRO read_nbi_halo,file,nbi_halo,save=save
+PRO read_spectra,nbi_halo_file,fida_file,spectra,save=save
 
-	if file_test(file) then begin
-		ncid=ncdf_open(file,/nowrite)
-		ncdf_varget,ncid,'shot',shot
-		ncdf_varget,ncid,'time',time
-		ncdf_varget,ncid,'lambda',lambda
-		ncdf_varget,ncid,'full',full
-		ncdf_varget,ncid,'half',half
-		ncdf_varget,ncid,'third',third
-		ncdf_varget,ncid,'halo',halo
-		ncdf_varget,ncid,'brems',brems
-		ncdf_close,ncid
+    if file_test(nbi_halo_file) or file_test(fida_file) then begin
+        nbi_halo_err=0
+        fida_err=0
+	    if file_test(nbi_halo_file) then begin
+		    ncid=ncdf_open(nbi_halo_file,/nowrite)
+		    ncdf_varget,ncid,'shot',shot
+		    ncdf_varget,ncid,'time',time
+		    ncdf_varget,ncid,'lambda',lambda
+		    ncdf_varget,ncid,'full',full
+		    ncdf_varget,ncid,'half',half
+		    ncdf_varget,ncid,'third',third
+		    ncdf_varget,ncid,'halo',halo
+		    ncdf_varget,ncid,'brems',brems
+		    ncdf_close,ncid
+	    endif else begin
+            full=0 & half=0 & third=0 & halo=0 & brems=0
+	    endelse
 
-		nbi_halo={shot:shot,time:time,lambda:lambda,full:full,half:half,third:third,$
-				  halo:halo,brems:brems,err:0}
-		if keyword_set(save) then save,nbi_halo,filename='nbi_halo.sav'
-	endif else begin
-		nbi_halo={err:1}
-	endelse
-
+	    if file_test(fida_file) then begin
+       	    ncid=ncdf_open(fida_file,/nowrite)
+       	    ncdf_varget,ncid,'shot',shot
+       	    ncdf_varget,ncid,'time',time
+       	    ncdf_varget,ncid,'lambda',lambda
+       	    ncdf_varget,ncid,'spectra',fida
+            ncdf_close,ncid
+	    endif else begin
+            fida=0
+    	endelse
+	    spectra={shot:shot,time:time,lambda:lambda,full:full,half:half,third:third,halo:halo,fida:fida,brems:brems,err:0}
+    endif else spectra={err:1}
 END
+
 PRO read_neutrals,file,neutrals,save=save
 
 	if file_test(file) then begin
@@ -454,11 +444,8 @@ PRO load_results,result_dir,results,save=save
 	;;READ PLASMA 
 	read_plasma,result_dir+input_file,plasma
 
-	;;READ FIDA SPECTRA
-	read_fida,result_dir+runid+'_fida_spectra.cdf',fida
-
-	;;READ HALO AND NBI SPECTRA
-	read_nbi_halo,result_dir+runid+'_nbi_halo_spectra.cdf',nbi_halo
+	;;READ SPECTRA
+	read_spectra,result_dir+runid+'_nbi_halo_spectra.cdf', result_dir+runid+'_fida_spectra.cdf',spectra
 
 	;;READ NEUTRALS
 	read_neutrals,result_dir+runid+'_neutrals.cdf',neutrals
@@ -479,7 +466,7 @@ PRO load_results,result_dir,results,save=save
 	read_birth,result_dir+runid+'_birth.cdf',birth
 
 	results={inputs:inputs,grid:grid,los:los,plasma:plasma,$
-			fida:fida,nbi_halo:nbi_halo,neutrals:neutrals,$
+			spectra:spectra,neutrals:neutrals,$
 			npa:npa,fbm:fbm,fida_weights:fida_weights,npa_weights:npa_weights,birth:birth}
 	if keyword_set(save) then begin
 		save,inputs,grid,los,plasma,fida,nbi_halo,neutrals,$

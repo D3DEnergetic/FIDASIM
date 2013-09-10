@@ -14,8 +14,9 @@ It was originally developed in IDL at UC Irvine [1] and converted to Fortran 90 
 FIDASIM reads and writes netCDF files. This requires netCDF-4.1.3. You can download the library from [here](http://www.unidata.ucar.edu/downloads/netcdf/netcdf-4_1_3/index.jsp)
 
 Note: By default netCDF will build using the GNU fortran compiler, gfortran. If you plan to use the Intel Fortran Compiler you must also build the 
-netCDF library using it. Instructions on how to do this can be found [here](http://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-netcdf-with-the-intel-compilers)
- 
+netCDF library using it. Instructions on how to do this can be found [here](http://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-netcdf-with-the-intel-compilers).
+Also, netCDF has the option of using HDF5 data format. This, naturally, requires the HDF5 libraries. If you do not have access to the HDF5 libraries netCDF can be built without it.
+
 ## 2. Retrieve FIDASIM source code from GitHub
 Clone the git repository from GitHub and change to the source directory: 
 

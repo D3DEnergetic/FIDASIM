@@ -268,11 +268,11 @@ contains
   subroutine read_inputs
     character(120)   :: filename
     integer :: i,j,k
+    call getenv("FIDASIM_DIR",root_dir)
     print*,'---- loading inputs -----' 
     filename=trim(adjustl(result_dir))//"/inputs.dat"
     open(66,form='formatted',file=filename)
     read(66,*) !# FIDASIM input file created...
-    read(66,"(A120)") root_dir
     read(66,*) inputs%shot_number
     read(66,*) inputs%time
     read(66,*) inputs%runid
@@ -298,8 +298,6 @@ contains
     read(66,*) inputs%nr_halo   
     inputs%nr_dcx = inputs%nr_halo
     read(66,*) inputs%impurity_charge 
-    read(66,*) !# Location of transp cdf file:   
-    read(66,*) !cdf-file    
     read(66,*) !# discharge parameters:         
     read(66,*) inputs%btipsign
     read(66,*) inputs%ab       

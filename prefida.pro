@@ -665,7 +665,6 @@ PRO prefida,input_pro,plot=plot,save=save
 	file = inputs.result_dir+inputs.runid+'/inputs.dat'
 	openw, 55, file
 	printf,55,'# FIDASIM input file created: ', systime(),' Version 2.1'
-	printf,55, inputs.install_dir
 	printf,55, inputs.shot         ,f='(i6,"         # shotnumber")'  
 	printf,55, inputs.time,f='(1f8.5,"       # time")'
 	printf,55, inputs.runid
@@ -690,8 +689,6 @@ PRO prefida,input_pro,plot=plot,save=save
 	printf,55, inputs.nr_ndmc,f='(i9,"      # number of NBI mc particles")' 
 	printf,55, inputs.nr_halo,f='(i9,"      # number of HALO mc particles")'
 	printf,55, inputs.impurity_charge,f='(i2,"             # Impurity charge")'
-	printf,55,'# Location of transp cdf file:'
-	printf,55, inputs.cdf_file
 	printf,55,'# discharge parameters:'
 	printf,55, inputs.btipsign,f='(i3,"            # B*Ip sign")'
 	printf,55, inputs.ai,f='(1f7.4,"        # plasma mass")'

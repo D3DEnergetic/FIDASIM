@@ -8,7 +8,6 @@ shot=146088L											;; Shot Number
 time=1.385  											;; Time 
 runid='146088H05'   									;; runid of FIDASIM
 device='D3D'											;; D3D,NSTX,AUGD,MAST
-install_dir='/u/stagnerl/FIDASIM/'						;; Location of fidasim code and executable
 result_dir='/u/stagnerl/FIDASIM/RESULTS/D3D/'  			;; Location where results will be stored /RESULTS/runid will be made
 profile_dir='/u/heidbrin/OANB/AUG/'						;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
 
@@ -98,7 +97,7 @@ ps=[0]													;; (0 or 1) If 1 then make hard copy of plots
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
-
+install_dir=+GETENV('FIDASIM_DIR')
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
 	    cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
 	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$

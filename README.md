@@ -23,17 +23,19 @@ Clone the git repository from GitHub and change to the source directory:
     cd FIDASIM 
 
 ## 3. Compile 
-FIDASIM will not compile out of the box. You will first need to set the following environmental variables to point to the netCDF lib and include directories. I recommend having this automatically be done at startup.
+FIDASIM will not compile out of the box. You will first need to set the following environmental variables to point to the netCDF and install directories. I recommend having this automatically be done at startup.
 
 For tsch shell:
 
+    setenv FIDASIM_DIR /path/to/fidasim/install/    #don't forget the last slash
     setenv NETCDF_INCLUDE /path/to/netcdf/install/include
     setenv NETCDF_LIB /path/to/netcdf/install/lib
     setenv LD_LIBRARY_PATH "/path/to/netcdf/install/lib":{$LD_LIBRARY_PATH}
     setenv LD_LIBRARY_PATH "/path/to/netcdf/install/include":{$LD_LIBRARY_PATH}
-
+    
 For bash shell:
 
+    export FIDASIM_DIR=/path/to/fidasim/install/    #don't forget the last slash
     export NETCDF_INCLUDE=/path/to/netcdf/install/include
     export NETCDF_LIB=/path/to/netcdf/install/lib
     export LD_LIBRARY_PATH = /path/to/netcdf/install/lib:$LD_LIBRARY_PATH
@@ -45,7 +47,16 @@ The last step is the run make in the source directory
 
     make
 
-## 4. Device Specific Installation Instructions
+## 4. Run a test case
+From the install directory run 
+
+    fidasim TEST/D3D
+
+or 
+
+    fidasim TEST/AUGD
+
+## 5. Device Specific Installation Instructions
 These installation instructions are unique to each machine. For instructions on how to get FIDASIM to work with a particular machine see the section titled "How do make FIDASIM work for your device"
 ### DIII-D
 FIDASIM currently does not run on the venus cluster since it does not have the required libraries.
@@ -83,7 +94,6 @@ shot=146088L                               ;; Shot Number
 time=1.385                                 ;; Time 
 runid='146088H05'                          ;; runid of FIDASIM
 device='D3D'                               ;; D3D,NSTX,AUGD,MAST
-install_dir='/path/to/install/FIDASIM/'	   ;; Location of fidasim code and executable
 result_dir='/path/to/result/directory/'    ;; Location where results will be stored /RESULTS/runid will be made
 profile_dir='/path/to/profile/directory/'  ;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
 
@@ -174,7 +184,7 @@ ps=[0]                ;; (0 or 1) If 1 then make hard copy of plots
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
-
+install_dir=+getenv('FIDASIM_DIR')
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
 	    cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
 	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$

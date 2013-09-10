@@ -8,14 +8,13 @@ shot=28746L 											;; Shot Number
 time=4.421  											;; Time 
 runid='28746A01'	   									;; runid of FIDASIM
 device='AUGD'											;; D3D,NSTX,AUGD,MAST
-install_dir='/u/'+user+'/FIDASIM/'						;; Location of fidasim code and executable
 result_dir='/u/'+user+'/FIDASIM/RESULTS/AUGD/'  		;; Location where results will be stored /RESULTS/runid will be made
 profile_dir='/u/'+user+'/GAPROFILES/'					;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
 
 ;;----------------------------------------------------
 ;; Fast-ion distribution function from transp
 ;;----------------------------------------------------
-cdf_file='/u/'+user+'/FIDASIM/TEST/28746A01_fi_1.cdf'        ;; CDF file from transp with the distribution funciton
+cdf_file='/u/'+user+'/FIDASIM/TEST/AUGD/28746A01_fi_1.cdf'        ;; CDF file from transp with the distribution funciton
 emin=0.    													 ;; Minimum energy used from the distribution function
 emax=100.  													 ;; Maximum energy used from the distribution function
 pmin=-1.													 ;; Minimum pitch used from the distribution function
@@ -98,7 +97,7 @@ ps=[0]													;; (0 or 1) If 1 then make hard copy of plots
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
-
+install_dir=+GETENV('FIDASIM_DIR')
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
 	    cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
 	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$

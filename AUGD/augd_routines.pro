@@ -3,14 +3,14 @@ PRO augd_routines,inputs,grid,nbi,chords,profiles,equil,err
 
   ;;GET PROFILES
 ;  load_transp_profiles,inputs.shot,inputs.time,profiles,inputs.cdf_file
-  restore,'/u/'+user+'/FIDASIM/TEST/load_transp_profiles.idl'
+  restore,'/u/'+user+'/FIDASIM/TEST/AUGD/load_transp_profiles.idl'
   profiles=iprof
 
   ;;GET B FIELD
 ;  load_bfield,inputs,grid,bx,by,bz,rhopf,rhotf
 ;  if profiles.rho_str eq 'rho_tor' then rho_grid=rhotf 
 ;  if profiles.rho_str eq 'rho_pol' then rho_grid=rhopf  
-  restore,'/u/'+user+'/FIDASIM/TEST/load_bfield.idl'
+  restore,'/u/'+user+'/FIDASIM/TEST/AUGD/load_bfield.idl'
 
   equil={rho_grid:rho_grid,rho_chords:{rhos:0,ds:0},bx:bx,by:by,bz:bz,ex:bx*0,ey:by*0,ez:bz*0}
 
@@ -18,7 +18,7 @@ PRO augd_routines,inputs,grid,nbi,chords,profiles,equil,err
   ;nbi_data,inputs,einj,pinj $ ;power,energy,particle mix
   ;              ,ffull,fhalf,fthird,doplot=0 $
   ;              ,ps=inputs.ps  
-  restore,'/u/'+user+'/FIDASIM/TEST/nbi_data.idl'
+  restore,'/u/'+user+'/FIDASIM/TEST/AUGD/nbi_data.idl'
   nbi_geometry_transp,nbgeom
   help,nbgeom
   nbi={einj:double(einj[inputs.isource]),pinj:pinj[inputs.isource],full:double(ffull[inputs.isource]),$
@@ -32,7 +32,7 @@ PRO augd_routines,inputs,grid,nbi,chords,profiles,equil,err
       npa_setup,det
   endif else begin
 ;	cfr_setup,inputs.shot,det
-	restore,'/u/'+user+'/FIDASIM/TEST/cfr_setup.idl'
+	restore,'/u/'+user+'/FIDASIM/TEST/AUGD/cfr_setup.idl'
   endelse
 
   chords={sigma_pi_ratio:det.sigma_pi,nchan:det.nchan,xlos:det.xlos,ylos:det.ylos,$

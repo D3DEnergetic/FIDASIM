@@ -7,7 +7,6 @@ shot=142114											;; Shot Number
 time=1.090 		        							;; Time (s) 
 runid='142114B08'   								;; runid of FIDASIM
 device='D3D'										;; D3D,NSTX,AUGD,MAST
-install_dir='/u/'+user+'/FIDASIM/'		   			;; Location of fidasim code and executable
 result_dir='/u/'+user+'/FIDASIM/RESULTS/D3D/'  	;; Location where results will be stored result_dir/runid directory will be created
 profile_dir='/u/'+user+'/GAPROFILES/'              	;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
 
@@ -94,7 +93,7 @@ load_neutrals=[0]   		;; (0 or 1) If 1 then the neutral density is loaded from a
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
-
+install_dir=+GETENV('FIDASIM_DIR')
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
        cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax, $
        isource:isource,einj:einj,pinj:pinj,fida_diag:fida_diag,gfile:gfile,equil:equil,$

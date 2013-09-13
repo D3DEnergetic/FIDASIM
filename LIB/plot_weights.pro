@@ -23,7 +23,8 @@ PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
 	endif
  	calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm,elevel=e_level
 
-	if keyword_set(chan) then begin
+    if inputs.ichan_wght gt 0 then chan=inputs.ichan_wght-1
+	if n_elements(chan) ne 0 then begin
 		start=chan
 		fin=chan
 	endif else begin

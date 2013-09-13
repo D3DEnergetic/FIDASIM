@@ -3098,10 +3098,10 @@ contains
     real(double), dimension(  grid%ntrack):: tcell  !! time per cell
     integer,dimension(3,grid%ntrack)      :: icell  !! index of cells
     real(double)                          :: wght2
-	  !!netCDF variables
-	  integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,nr_dimid
-	  integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
-	  integer :: shot_varid,time_varid
+    !!netCDF variables
+    integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,nr_dimid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
+    integer :: shot_varid,time_varid
 
     !! DEFINE wavelength array
     nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
@@ -3133,16 +3133,13 @@ contains
     do i=1,inputs%nr_wght
        phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nr_wght)
     enddo
-    if(inputs%ichan_wght.gt.0) then
-       nchan=1
-    else
-       nchan=spec%nchan
-    endif
+
+    nchan=spec%nchan
 
     !! define storage arrays
     allocate(wfunct(nwav,inputs%nr_wght,inputs%nr_wght,nchan))
     allocate(rad_arr(nchan))
-	  allocate(theta_arr(nchan))
+    allocate(theta_arr(nchan))
 
     !!save the los-weights into an array
     !! because the structure is over-written
@@ -3271,7 +3268,7 @@ contains
        print*,'Angle between B and LOS [deg]:', theta
        !! write angle and radius into the output file
        rad_arr(ichan)=radius
-	     theta_arr(ichan)=theta
+       theta_arr(ichan)=theta
        !! START calculation of weight functions
        print*, 'nwav: ' ,nwav
        print*,''
@@ -3346,16 +3343,11 @@ contains
                    wavelength_ranges: do ii=1,nwav
                       if (wavel(l).ge.wav_arr(ii).and. &
                            wavel(l).lt.wav_arr(ii+1)) then
-						   if(ichan.eq.inputs%ichan_wght) then 
-						      ind=1 
-						   else 
-							  ind=ichan
-						   endif
                            !calc weight functions w/o cross-sections:
                            !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
                            !    + intens(l)/real(inputs%nr_wght)
                            !normal calculation:
-                           wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
+                           wfunct(ii,i,j,ichan) = wfunct(ii,i,j,ichan) &
                                 + intens(l)*photons/real(inputs%nr_wght)
                       endif
                    enddo wavelength_ranges
@@ -3504,11 +3496,7 @@ contains
        ptcharr(i)=real(i-0.5)*2./real(inputs%nr_wght)-1.
     enddo
     
-    if(inputs%ichan_wght.gt.0) then
-       nchan=1
-    else
-       nchan=spec%nchan
-    endif
+    nchan=spec%nchan
 
     !! define storage arrays   
     allocate(wfunct_tot(inputs%nr_wght,inputs%nr_wght,nchan))

@@ -6,7 +6,7 @@ user=+GETENV('USER')
 ;;-----------------------------------------------------
 shot=28746L 											;; Shot Number
 time=4.421  											;; Time 
-runid='28746A01'	   									;; runid of FIDASIM
+runid='28746A04'	   									;; runid of FIDASIM
 device='AUGD'											;; D3D,NSTX,AUGD,MAST
 result_dir='/u/'+user+'/FIDASIM/RESULTS/AUGD/'  		;; Location where results will be stored /RESULTS/runid will be made
 profile_dir='/u/'+user+'/GAPROFILES/'					;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
@@ -77,7 +77,7 @@ nr_halo=50000   										;; Halo contribution
 ;;--------------------------------------------------
 nr_wght=50   											;; Number of Pitches, energyies and gyro angles 
 emax_wght=100.  										;; Maximum energy (keV)
-ichan_wght=-1  											;; -1 for all channels, otherwise a given channel index
+ichan_wght=1  											;; -1 for all channels, otherwise a given channel index
 dwav_wght=.2   											;; Wavelength interval
 wavel_start_wght=651.  									;; Minimum wavelength
 wavel_end_wght=663.   									;; Maximum wavelength

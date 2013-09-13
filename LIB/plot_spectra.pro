@@ -48,8 +48,8 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 		xran=[647,665]
 		minbrems=min(spec.brems)
 		yran=[minbrems,1.e19]
-
-		if keyword_set(chan) then begin
+        if inputs.ichan_wght gt 0 then chan=inputs.ichan_wght-1
+		if n_elements(chan) ne 0 then begin
 			startind=chan & endind=chan 
 		endif else begin
 			startind=0L & endind=los.nchan-1

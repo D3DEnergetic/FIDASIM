@@ -427,7 +427,8 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	dene[ww]=0.001*1d13
 
 	;;Zeff
-	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 1.0
+	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 1.0 
+    zeff = zeff < inputs.impurity_charge
 ;	zeff[ww]=profiles.zeff[-1]
 	zeff[ww]=1.0
 
@@ -668,7 +669,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	printf,55, inputs.shot         ,f='(i6,"         # shotnumber")'  
 	printf,55, inputs.time,f='(1f8.5,"       # time")'
 	printf,55, inputs.runid
-	printf,55,' ',inputs.diag, '           # diagnostic'
+	printf,55,' ',inputs.diag[0], '           # diagnostic'
 	printf,55, inputs.calc_birth,f='(i2,"             # calculate birth profile")'
 	printf,55, inputs.calc_spec,f='(i2,"             # calculate spectra")'
 	printf,55, inputs.ps,f='(i2,"             # plot ps output")'

@@ -271,14 +271,14 @@ PRO prepare_fida,inputs,grid,chords,fida
         if i lt nstep then begin
         	los_track,grid,vi,xyz_pos,rout,tcell,cell,ncell
 			r_exit[*,chan]=rout
-          	if ncell gt 1 then begin
+          	if ncell gt 5 then begin
             	for jj=0L,ncell-1 do begin
                 	if finite(tcell[jj]) eq 0 then stop
                 	;;  tcell is the length of the track (cm) as v is 1cm/s
                  	weight[cell[0,jj],cell[1,jj],cell[2,jj],chan]=tcell[jj]
               	endfor
            	endif else begin
-             	print, 'WARNING: CHANNEL #'+strtrim(string(chan),1)+' ONLY CROSSES ONE CELL!'
+             	print, 'WARNING: CHANNEL #'+strtrim(string(chan),1)+' ONLY CROSSES <= 5 CELLS!'
 				err_arr[chan]=1
            	endelse
         endif else begin
@@ -301,9 +301,9 @@ PRO prepare_fida,inputs,grid,chords,fida
 		weight=weight[*,*,*,los]
 		err=0
 	endelse
-	fida={nchan:chords.nchan,xlens:xlens,ylens:ylens,zlens:zlens,sigma_pi_ratio:chords.sigma_pi_ratio,$
-			xlos:xlos,ylos:ylos,zlos:zlos,xyz_enter:r_enter,xyz_exit:r_exit,$
-			headsize:chords.headsize,opening_angle:chords.opening_angle,los:los,weight:weight,err:err}
+	fida={nchan:n_elements(los),xlens:xlens[los],ylens:ylens[los],zlens:zlens[los],sigma_pi_ratio:chords.sigma_pi_ratio[los],$
+			xlos:xlos[los],ylos:ylos[los],zlos:zlos[los],xyz_enter:r_enter[*,los],xyz_exit:r_exit[*,los],$
+			headsize:chords.headsize[los],opening_angle:chords.opening_angle[los],los:los,weight:weight,err:err}
 END
 
 PRO transp_fbeam,inputs,grid,denf,fbm_struct,err
@@ -554,10 +554,11 @@ PRO brems,inputs,det,profiles,equil,vbline
 	;NOW do line integration to get surface radiance
 	;***********************************************
 	nchan=det.nchan
+    los=det.los
 	vbline=replicate(0.,nchan)
 
 	for i=0,nchan-1 do begin
-		rhospath=equil.rho_chords.rhos[*,i]
+		rhospath=equil.rho_chords.rhos[*,los[i]]
 		rhospath=rhospath[where(finite(rhospath))]
         vbepath=sinterpol(emisrho,rho,rhospath,/sort)
         wgtr1=where(rhospath ge rhomax,nwgtr1)
@@ -642,12 +643,12 @@ PRO prefida,input_pro,plot=plot,save=save
 
     ;; Calculate bremsstrahlung if desired
 	if inputs.f90brems eq 0 then $
-		brems,inputs,chords,profiles,equil,brems
+		brems,inputs,fida,profiles,equil,brems
 
 	plot_file=inputs.install_dir+strupcase(inputs.device)+'/'+strlowcase(inputs.device)+'_plots.pro'
     ;; Plot grid, beam, sightlines, and equilibrium
 	if keyword_set(plot) and FILE_TEST(plot_file) then begin
-		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid, nbi, chords, equil,nbgeom,plasma
+		CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid,nbi,chords,fida,equil,nbgeom,plasma
 	endif
 
 	;;SAVE STRUCTURES 

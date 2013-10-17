@@ -1,4 +1,4 @@
-PRO device_plots,inputs,grid,nbi,chords,equil,nbgeom,plasma
+PRO device_plots,inputs,grid,nbi,chords,fida,equil,nbgeom,plasma
 
 	ind=long(grid.nz/2.0)
 	!p.multi=0
@@ -22,10 +22,10 @@ PRO device_plots,inputs,grid,nbi,chords,equil,nbgeom,plasma
 		,xrange=x_range,yrange=y_range,title='PLANE VIEW',xtitle='U [cm]',ytitle='V [cm]',color=0
 	oplot,grid.u_grid,grid.v_grid,psym=3,color=0
 
-
-	for i=0,chords.nchan-1 do $
-		oplot,chords.xlens[i]+[0,2*(chords.xlos[i]-chords.xlens[i])],$
-        chords.ylens[i]+[0,2*(chords.ylos[i]-chords.ylens[i])],$
+    los=fida.los
+	for i=0,fida.nchan-1 do $
+		oplot,chords.xlens[los[i]]+[0,2*(chords.xlos[los[i]]-chords.xlens[los[i]])],$
+        chords.ylens[los[i]]+[0,2*(chords.ylos[los[i]]-chords.ylens[los[i]])],$
         color=50
 
 	src=nbi.xyz_src
@@ -42,19 +42,19 @@ PRO device_plots,inputs,grid,nbi,chords,equil,nbgeom,plasma
 	oplot,grid.r_grid,grid.w_grid,psym=3,color=0  
 
 	; Lines of sight
-	for i=0,chords.nchan-1 do begin
-		if chords.zlos[i] ne chords.zlens[i] then begin
-			z=(chords.zlos[i]-chords.zlens[i])*findgen(201)/100.+chords.zlens[i]
-			x=(chords.xlos[i]-chords.xlens[i])*(z-chords.zlens[i])/ $
-			  (chords.zlos[i]-chords.zlens[i]) + chords.xlens[i]
-			y=(chords.ylos[i]-chords.ylens[i])*(z-chords.zlens[i])/ $
-			  (chords.zlos[i]-chords.zlens[i]) + chords.ylens[i]
+	for i=0,fida.nchan-1 do begin
+		if chords.zlos[los[i]] ne chords.zlens[los[i]] then begin
+			z=(chords.zlos[los[i]]-chords.zlens[los[i]])*findgen(201)/100.+chords.zlens[los[i]]
+			x=(chords.xlos[los[i]]-chords.xlens[los[i]])*(z-chords.zlens[los[i]])/ $
+			  (chords.zlos[los[i]]-chords.zlens[los[i]]) + chords.xlens[los[i]]
+			y=(chords.ylos[los[i]]-chords.ylens[los[i]])*(z-chords.zlens[los[i]])/ $
+			  (chords.zlos[los[i]]-chords.zlens[los[i]]) + chords.ylens[los[i]]
 			oplot,sqrt(x^2+y^2),z,color=50
 		endif else begin 
-    		y=(chords.ylos[i]-chords.ylens[i])*findgen(201)/100.+chords.ylens[i]
-    		x=(chords.xlos[i]-chords.xlens[i])*(y-chords.ylens[i])/ $
-      		  (chords.ylos[i]-chords.ylens[i]) + chords.ylens[i]
-		    oplot,sqrt(x^2+y^2),replicate(chords.zlens[i],201),color=50
+    		y=(chords.ylos[los[i]]-chords.ylens[los[i]])*findgen(201)/100.+chords.ylens[los[i]]
+    		x=(chords.xlos[los[i]]-chords.xlens[los[i]])*(y-chords.ylens[los[i]])/ $
+      		  (chords.ylos[los[i]]-chords.ylens[los[i]]) + chords.ylens[los[i]]
+		    oplot,sqrt(x^2+y^2),replicate(chords.zlens[los[i]],201),color=50
 		endelse
 	endfor
 

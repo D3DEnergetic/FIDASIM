@@ -265,7 +265,8 @@ PRO read_spectra,nbi_halo_file,fida_file,spectra,save=save
 	    endif else begin
             fida=0
     	endelse
-	    spectra={shot:shot,time:time,lambda:lambda,full:full,half:half,third:third,halo:halo,fida:fida,brems:brems,err:0}
+        spec=full+half+third+halo+fida+brems
+	    spectra={shot:shot,time:time,lambda:lambda,spectra:spec,full:full,half:half,third:third,halo:halo,fida:fida,brems:brems,err:0}
     endif else spectra={err:1}
 END
 

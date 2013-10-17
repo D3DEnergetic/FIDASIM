@@ -175,7 +175,7 @@ FUNCTION d3d_chords,shot,fida_diag
         	 headsize=replicate(0.d0,nchan)
          	 opening_angle=replicate(0.d0,nchan)
        		end
-       		'TANGENTIAL30': begin
+       		'MAIN_ION30': begin
         	 xlos=xmid4
         	 ylos=ymid4
         	 zlos=zmid4
@@ -187,7 +187,7 @@ FUNCTION d3d_chords,shot,fida_diag
         	 headsize=replicate(0.d0,nchan)
         	 opening_angle=replicate(0.d0,nchan)
       		end
-      		'TANGENTIAL210': begin
+      		'MAIN_ION210': begin
         	 xlos=xmid7
         	 ylos=ymid7
         	 zlos=zmid7

@@ -271,14 +271,14 @@ PRO prepare_fida,inputs,grid,chords,fida
         if i lt nstep then begin
         	los_track,grid,vi,xyz_pos,rout,tcell,cell,ncell
 			r_exit[*,chan]=rout
-          	if ncell gt 5 then begin
+          	if ncell gt 1 then begin
             	for jj=0L,ncell-1 do begin
                 	if finite(tcell[jj]) eq 0 then stop
                 	;;  tcell is the length of the track (cm) as v is 1cm/s
                  	weight[cell[0,jj],cell[1,jj],cell[2,jj],chan]=tcell[jj]
               	endfor
            	endif else begin
-             	print, 'WARNING: CHANNEL #'+strtrim(string(chan),1)+' ONLY CROSSES <= 5 CELLS!'
+             	print, 'WARNING: CHANNEL #'+strtrim(string(chan),1)+' ONLY CROSSES <= 1 CELLS!'
 				err_arr[chan]=1
            	endelse
         endif else begin
@@ -292,12 +292,13 @@ PRO prepare_fida,inputs,grid,chords,fida
     	print,'weight set to 0. as it was NAN or Infinite!'
         weight[index]=0.
     endif	
-	los=where(err_arr eq 0,nw)
+	los=where(err_arr eq 0,nw,complement=miss_los)
 	if nw eq 0 then begin
 		print,'NO LINES OF SIGHT CROSSED THE SIMULATION GRID'
 		err=1
 	endif else begin
 		print,strtrim(string(nw),1)+' OUT OF '+strtrim(string(chords.nchan),1)+' CHORDS CROSSED THE SIMULATION GRID'
+		if n_elements(miss_los) ne 0 then print, 'MISSED INDEXES:',miss_los
 		weight=weight[*,*,*,los]
 		err=0
 	endelse

@@ -1,5 +1,38 @@
-FUNCTION d3d_chords,shot,fida_diag
+FUNCTION get_cer_geom,shot,isource
 
+	a=GET_CERGEOM(shot)
+	b=GET_CER_BEAM_ORDER(shot)
+	beams=['30LT','30RT','150LT','150RT','210LT','210RT','330LT','330RT']
+	nchan=n_elements(a.labels)
+	xlens=dblarr(nchan) & xlos=xlens
+	ylens=dblarr(nchan)	& ylos=ylens
+	zlens=dblarr(nchan)	& zlos=zlens
+	err_arr=intarr(nchan)
+
+	whb=where(b eq beams[isource])
+	for i=0,nchan-1 do begin
+      	rl=a.rcers[i]*100.
+      	phil=a.phicers[i]
+      	rb=a.rcere[i,whb]*100.
+      	phib=a.phicere[i,whb]
+
+		if phib le 360.0 then begin
+      		zlens[i]=a.zcers[i]*100.
+    	  	xlens[i]=a.rcers[i]*COS((90. - a.phicers[i])*!DTOR)*100.
+	      	ylens[i]=a.rcers[i]*SIN((90. - a.phicers[i])*!DTOR)*100.
+      		zlos[i]=a.zcere[i,whb]*100.
+      		xlos[i]=a.rcere[i,whb]*COS((90 - a.phicere[i,whb])*!DTOR)*100.
+      		ylos[i]=a.rcere[i,whb]*SIN((90 - a.phicere[i,whb])*!DTOR)*100.
+		endif else err_arr[i]=1
+  	endfor
+	w=where(err_arr eq 0)
+	output={chords:a.labels[w],xlens:xlens[w],ylens:ylens[w],zlens:zlens[w],xlos:xlos[w],ylos:ylos[w],zlos:zlos[w]}
+	return,output
+END
+
+FUNCTION d3d_chords,shot,fida_diag,isource=isource
+
+	if n_elements(isource) eq 0 then isource=6
 	fida_diag=strupcase(fida_diag)
     ;; fida structure (15 == number of chords/channels)
     ;;** Structure <88d87f8>, 9 tags, length=800, data length=792, refs=1:
@@ -58,62 +91,19 @@ FUNCTION d3d_chords,shot,fida_diag
     ymid4=[167.035, 172.633, 177.193, 182.110, 187.223, 192.833, 198.280, 203.331] ;; cm
     zmid4=[-3.510, -3.710, -3.870, -4.270, -4.700, -4.830, -4.940,-5.310] ;; cm
 
-	;;fida_yadong
-	if shot le 143721 then begin
-		xmid5=[-128.4,-129.3,-130.0,-130.8,-131.3,-131.9,-132.7,-128.9,-131.0,-133.2]
-		ymid5=[120.9,129.1,135.1,142.2,147.2,152.4,160.2,125.1,144.9,165.2]
-		nchan5=n_elements(xmid5)
-		zmid5=replicate(0.,nchan5)
-		xlens5=replicate(-142.55,nchan5)
-		ylens5=replicate( 142.55,nchan5)
-		zlens5=replicate(-152.00,nchan5)
-
-		xmid6=replicate(0.0,nchan5) & ymid6=xmid5
-		zmid6=replicate(0.0,nchan5)
-		xmid6[0]=-128.9
-		ymid6[0]=125.1
-		xlens6=replicate(-163.0,nchan5)
-		ylens6=replicate(163.0,nchan5)
-		zlens6=replicate(0.0,nchan5)
+    cer_chords=get_cer_geom(shot,isource)
+	w=where(strmid(cer_chords.chords,0,1) eq 'V',nw)
+	if nw ne 0 then begin
+		xmid5=cer_chords.xlos[w]
+		ymid5=cer_chords.ylos[w]
+		zmid5=cer_chords.zlos[w]
+		xlens5=cer_chords.xlens[w]
+		ylens5=cer_chords.ylens[w]
+		zlens5=cer_chords.zlens[w]
 	endif else begin
-		name_cv1=['v17','v18','v19','v20']
-		radii_cv1=[176.3,182.48,187.75,192.77]
-		phi_cv1=[313.18,314.93,316.05,317.27]
-		umid_cv1=radii_cv1*sin(!pi*phi_cv1/180.)
-		vmid_cv1=radii_cv1*abs(cos(!pi*phi_cv1/180.))
-
-		; Note that v08 and v24 are on u3 but they are collected by 330 R+1 lens
-		name_u3=['v01','v02','v06','v21','v22','v23']
-		radii_u3=[185.3,190.03,216.42,196.49,201.09,207.63]
-		phi_u3=[315.5,316.64,321.77,318.16,319.06,320.33]
-		umid_u3=radii_u3*sin(!pi*phi_u3/180.)
-		vmid_u3=radii_u3*abs(cos(!pi*phi_u3/180.))
-
-		; Using old values for yadong's system
-		name_1G=['v1','v2','v3']
-		umid_1G=[-128.9,-131.0,-133.2]
-		vmid_1G=[125.1,144.9,165.2]
-		radii_1G=[179.625,195.338,212.210]
-
-		xmid5=[umid_cv1,umid_u3,umid_1G]
-		ymid5=[vmid_cv1,vmid_u3,vmid_1G]
-		nchan5=n_elements(xmid5)
-		zmid5=replicate(0.0,nchan5)
-		xlens5=replicate(-142.55,nchan5)
-        ylens5=replicate( 142.55,nchan5)
-        zlens5=replicate(-152.00,nchan5)
-
-        xmid6=replicate(0.0,nchan5) & ymid6=xmid5
-        zmid6=replicate(0.0,nchan5)
-		radii=[224.67,223.]
-		phi=[325.62,325.5]
-		xmid6[0:1]=radii*sin(!pi*phi/180.)
-		ymid6[0:1]=radii*abs(cos(!pi*phi/180.))
-
-        xlens6=replicate(235*sin(!pi*330./180.),nchan5)
-        ylens6=replicate(235*abs(cos(!pi*330./180.)),nchan5)
-        zlens6=replicate(100.0,nchan5)
-	endelse
+        xmid5=0. & ymid5=0. & zmid5=100.
+        xlens5=0. & ylens5=0. & zlens5=0.
+    endelse
 
     ;; from fida_grierson_MU3_MU4 210LT/RT from 165R0
     xlens7=replicate(83.51,8)
@@ -122,6 +112,20 @@ FUNCTION d3d_chords,shot,fida_diag
     xmid7=[-126.145, -128.594, -129.522, -130.514, -131.476, -132.440, -133.568, -134.655]
     ymid7=[-99.732,  -121.144, -129.260, -137.932, -146.338, -154.773, -164.629, -174.137]
     zmid7=[-4.950,   -4.620,   -4.450,   -4.450,   -4.320,   -3.94 , -4.010  , -4.270]
+
+	;;CER TANGENTIAL CHORDS
+	w=where(strmid(cer_chords.chords,0,1) ne 'V',nw)
+	if nw ne 0 then begin
+		xmid8=cer_chords.xlos[w]
+		ymid8=cer_chords.ylos[w]
+		zmid8=cer_chords.zlos[w]
+		xlens8=cer_chords.xlens[w]
+		ylens8=cer_chords.ylens[w]
+		zlens8=cer_chords.zlens[w]
+	endif else begin
+		xmid8=0. & ymid8=0. & zmid8=100.
+		xlens8=0. & ylens8=0. & zlens8=0.
+	endelse
 
 	;;NPA CHORDS
     detxyz=fltarr(3,3)
@@ -175,6 +179,18 @@ FUNCTION d3d_chords,shot,fida_diag
         	 headsize=replicate(0.d0,nchan)
          	 opening_angle=replicate(0.d0,nchan)
        		end
+            'TANGENTIAL': begin
+             xlos=xmid8
+             ylos=ymid8
+             zlos=zmid8
+             xhead=xlens8
+             yhead=ylens8
+             zhead=zlens8
+             nchan=n_elements(xlos)
+             sigma_pi=replicate(1.d0,nchan)
+             headsize=replicate(0.d0,nchan)
+             opening_angle=replicate(0.d0,nchan)
+            end
        		'MAIN_ION30': begin
         	 xlos=xmid4
         	 ylos=ymid4
@@ -200,12 +216,12 @@ FUNCTION d3d_chords,shot,fida_diag
         	 opening_angle=replicate(0.d0,nchan)
       		end
       	 	'ALL': begin
-			 xlos=[xmid1,xmid2,xmid3,xmid4,xmid5,xmid6,xmid7]
-			 ylos=[ymid1,ymid2,ymid3,ymid4,ymid5,ymid6,ymid7]
-			 zlos=[zmid1,zmid2,zmid3,zmid4,zmid5,zmid6,zmid7]
-			 xhead=[xlens1,xlens2,xlens3,xlens4,xlens5,xlens6,xlens7]
-			 yhead=[ylens1,ylens2,ylens3,ylens4,ylens5,ylens6,ylens7]
-			 zhead=[zlens1,zlens2,zlens3,zlens4,zlens5,zlens6,zlens7]
+			 xlos=[xmid1,xmid2,xmid3,xmid4,xmid5,xmid7,xmid8]
+			 ylos=[ymid1,ymid2,ymid3,ymid4,ymid5,ymid7,ymid8]
+			 zlos=[zmid1,zmid2,zmid3,zmid4,zmid5,zmid7,zmid8]
+			 xhead=[xlens1,xlens2,xlens3,xlens4,xlens5,xlens7,xlens8]
+			 yhead=[ylens1,ylens2,ylens3,ylens4,ylens5,ylens7,ylens8]
+			 zhead=[zlens1,zlens2,zlens3,zlens4,zlens5,zlens7,zlens8]
 			 nchan=n_elements(xlos)
         	 sigma_pi=replicate(1.d0,nchan)
         	 headsize=replicate(0.d0,nchan)

@@ -3224,6 +3224,10 @@ contains
              enddo
           enddo
        enddo
+       if(max_wght.eq.0.) then
+          print*,'Skipping Channel: Neutral Density is Zero'
+          cycle loop_over_channels
+       endif
        length=sum(los_wght(:)*wght(:))/max_wght ! (FWHM)
        print*,'intersection length of NBI and LOS: ', length
        rad=sum(wght)

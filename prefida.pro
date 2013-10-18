@@ -565,7 +565,7 @@ PRO brems,inputs,det,profiles,equil,vbline
         wgtr1=where(rhospath ge rhomax,nwgtr1)
         ;set emission at radii outside of max rho to zero
         if nwgtr1 ge 0 then vbepath[wgtr1]=0.0
-		vbline[i]=total(vbepath)*equil.rho_chords.ds*0.001*inputs.dlambda*(4*!DPI)*1.d-4   ; (ph/s-m2-bin)
+		vbline[i]=total(vbepath)*equil.rho_chords.ds*0.001*inputs.dlambda*(4*!DPI)*1.d-4 > 0.001  ; (ph/s-m2-bin)
 	endfor  ; channel loop
 END
 

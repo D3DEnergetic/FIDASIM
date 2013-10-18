@@ -47,6 +47,7 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 
 		xran=[647,665]
 		minbrems=min(spec.brems)
+		print,minbrems
 		yran=[minbrems,1.e19]
         if inputs.ichan_wght gt 0 then chan=inputs.ichan_wght-1
 		if n_elements(chan) ne 0 then begin
@@ -61,28 +62,28 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 			if keyword_set(pretty) then begin
 				plts=plot([0.],/nodata,xrange=xran,yrange=yran $
 					, ytitle='Intensity  [Ph/(s $m^2$ nm sr)]', xtitle='$\lambda$ [nm]' $
-					, /ylog)
+					, /ylog,min_value=0.1)
 				txt=TEXT(100,435,'$R = $'+strtrim(string(rlos[ichan],format='(f10.2)'),1)+' cm',/device)
 				if plt[0] ne 0 then begin
 					if spec.err eq 0 then begin 
-						plt1=plot(spec.lambda,spec.fida[*,ichan]+brems,'r',/overplot,name='Fida')
+						plt1=plot(spec.lambda,spec.fida[*,ichan]+brems,'r',/overplot,name='Fida',min_value=0.1)
 						if n_elements(plt1) ne 0 then targets=[plt1]
 					endif
 					if n_elements(wspec) ne 0 then begin
-						plt2=plot(wlambda,wspec[*,ichan]+brems,'k',thick=2,linestyle=2,/overplot,name='Weight')
+						plt2=plot(wlambda,wspec[*,ichan]+brems,'k',thick=2,linestyle=2,/overplot,name='Weight',min_value=0.1)
 						if n_elements(plt2) ne 0 and n_elements(plt1) ne 0 then targets=[targets,plt2] else targets=[plt2] 
 					endif
 				endif
 			
 				if plt[1] ne 0 and spec.err eq 0 then begin
-					plt3=plot(spec.lambda,spec.full[*,ichan]+brems,'c',/overplot,name='Full')
-					plt4=plot(spec.lambda,spec.half[*,ichan]+brems,'m',/overplot,name='Half')
-					plt5=plot(spec.lambda,spec.third[*,ichan]+brems,'g',/overplot,name='Third')
+					plt3=plot(spec.lambda,spec.full[*,ichan]+brems,'c',/overplot,name='Full',min_value=0.1)
+					plt4=plot(spec.lambda,spec.half[*,ichan]+brems,'m',/overplot,name='Half',min_value=0.1)
+					plt5=plot(spec.lambda,spec.third[*,ichan]+brems,'g',/overplot,name='Third',min_value=0.1)
 					if n_elements(targets) eq 0 then targets=[plt3,plt4,plt5] else targets=[targets,plt3,plt4,plt5] 
 				endif
 			
 				if plt[2] ne 0 and spec.err eq 0 then begin
-					plt6=plot(spec.lambda,spec.halo[*,ichan]+brems,'b',/overplot,name='Halo')
+					plt6=plot(spec.lambda,spec.halo[*,ichan]+brems,'b',/overplot,name='Halo',min_value=0.1)
 					if n_elements(targets) eq 0 then targets=[plt6] else targets=[targets,plt6] 				
 				endif
 				if n_elements(targets) ne 0 then leg=legend(target=targets,/device,position=[464,438])
@@ -91,25 +92,25 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 				loadct,39,/silent
 				plot,[0.],/nodata,xrange=xran,yrange=yran $
 					, ytitle='Intensity  [Ph/(s m^2 nm sr)]', xtitle='lambda [nm]' $
-					, /ylog
+					, /ylog,min_value=0.1
 				xyouts,100,435,'R = '+strtrim(string(rlos[ichan],format='(f10.2)'),1)+' cm',/device
 				if plt[0] ne 0 then begin
 					if spec.err eq 0 then begin 
-						oplot,spec.lambda,spec.fida[*,ichan]+brems,color=253
+						oplot,spec.lambda,spec.fida[*,ichan]+brems,color=253,min_value=0.1
 					endif
 					if n_elements(wspec) ne 0 then begin
-						oplot,wlambda,wspec[*,ichan]+brems,thick=2,linestyle=2
+						oplot,wlambda,wspec[*,ichan]+brems,thick=2,linestyle=2,min_value=0.1
 					endif
 				endif
 			
 				if plt[1] ne 0 and spec.err eq 0 then begin
-					oplot,spec.lambda,spec.full[*,ichan]+brems,color=100
-					oplot,spec.lambda,spec.half[*,ichan]+brems,color=150
-					oplot,spec.lambda,spec.third[*,ichan]+brems,color=200
+					oplot,spec.lambda,spec.full[*,ichan]+brems,color=100,min_value=0.1
+					oplot,spec.lambda,spec.half[*,ichan]+brems,color=150,min_value=0.1
+					oplot,spec.lambda,spec.third[*,ichan]+brems,color=200,min_value=0.1
 				endif
 			
 				if plt[2] ne 0 and spec.err eq 0 then begin
-					oplot,spec.lambda,spec.halo[*,ichan]+brems,color=70
+					oplot,spec.lambda,spec.halo[*,ichan]+brems,color=70,min_value=0.1
 				endif
 			endelse
 			wait,2

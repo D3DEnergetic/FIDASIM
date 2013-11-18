@@ -83,13 +83,33 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
 	ylens3=replicate(-198.5,n_elements(xmid3))
 	zlens3=replicate(122.0,n_elements(xmid3))
 
+	common bst_chord_param,chord_param
+	mchords=['m01','m02','m03','m04','m05','m06','m07','m08']
+	for i=0,7 do begin
+		bst_chord_param,shot,mchords[i],'30lt'
+		if i eq 0 then begin
+			xlens4=chord_param.geometry.lens[0]
+			ylens4=chord_param.geometry.lens[1]
+			zlens4=chord_param.geometry.lens[2]
+			xmid4=chord_param.geometry.location[0]
+			ymid4=chord_param.geometry.location[1]
+			zmid4=chord_param.geometry.location[2]
+		endif else begin
+            xlens4=[xlens4,chord_param.geometry.lens[0]]
+            ylens4=[ylens4,chord_param.geometry.lens[1]]
+            zlens4=[zlens4,chord_param.geometry.lens[2]]
+            xmid4=[xmid4,chord_param.geometry.location[0]]
+            ymid4=[ymid4,chord_param.geometry.location[1]]
+            zmid4=[zmid4,chord_param.geometry.location[2]]
+		endelse
+	endfor
     ;;from fida_grierson_MU1_MU2 (30LT/RT from 315T0)
-    xlens4=replicate(-182.609,8)
-    ylens4=replicate(203.626,8)
-    zlens4=replicate(3.4302,8)
-    xmid4=[34.803, 42.116, 48.071, 54.495, 67.172, 68.501, 75.616, 82.214] ;; cm
-    ymid4=[167.035, 172.633, 177.193, 182.110, 187.223, 192.833, 198.280, 203.331] ;; cm
-    zmid4=[-3.510, -3.710, -3.870, -4.270, -4.700, -4.830, -4.940,-5.310] ;; cm
+;    xlens4=replicate(-182.609,8)
+;    ylens4=replicate(203.626,8)
+;    zlens4=replicate(3.4302,8)
+;    xmid4=[34.803, 42.116, 48.071, 54.495, 67.172, 68.501, 75.616, 82.214] ;; cm
+;    ymid4=[167.035, 172.633, 177.193, 182.110, 187.223, 192.833, 198.280, 203.331] ;; cm
+;    zmid4=[-3.510, -3.710, -3.870, -4.270, -4.700, -4.830, -4.940,-5.310] ;; cm
 
     cer_chords=get_cer_geom(shot,isource)
 	w=where(strmid(cer_chords.chords,0,1) eq 'V',nw)
@@ -106,12 +126,32 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
     endelse
 
     ;; from fida_grierson_MU3_MU4 210LT/RT from 165R0
-    xlens7=replicate(83.51,8)
-    ylens7=replicate(-239.2,8)
-    zlens7=replicate(0.,8)
-    xmid7=[-126.145, -128.594, -129.522, -130.514, -131.476, -132.440, -133.568, -134.655]
-    ymid7=[-99.732,  -121.144, -129.260, -137.932, -146.338, -154.773, -164.629, -174.137]
-    zmid7=[-4.950,   -4.620,   -4.450,   -4.450,   -4.320,   -3.94 , -4.010  , -4.270]
+    mchords=['m09','m10','m11','m12','m13','m14','m15','m16']
+    for i=0,7 do begin
+        bst_chord_param,shot,mchords[i],'210rt'
+        if i eq 0 then begin
+            xlens7=chord_param.geometry.lens[0]
+            ylens7=chord_param.geometry.lens[1]
+            zlens7=chord_param.geometry.lens[2]
+            xmid7=chord_param.geometry.location[0]
+            ymid7=chord_param.geometry.location[1]
+            zmid7=chord_param.geometry.location[2]
+        endif else begin
+            xlens7=[xlens7,chord_param.geometry.lens[0]]
+            ylens7=[ylens7,chord_param.geometry.lens[1]]
+            zlens7=[zlens7,chord_param.geometry.lens[2]]
+            xmid7=[xmid7,chord_param.geometry.location[0]]
+            ymid7=[ymid7,chord_param.geometry.location[1]]
+            zmid7=[zmid7,chord_param.geometry.location[2]]
+        endelse
+    endfor
+
+;    xlens7=replicate(83.51,8)
+;    ylens7=replicate(-239.2,8)
+;    zlens7=replicate(0.,8)
+;    xmid7=[-126.145, -128.594, -129.522, -130.514, -131.476, -132.440, -133.568, -134.655]
+;    ymid7=[-99.732,  -121.144, -129.260, -137.932, -146.338, -154.773, -164.629, -174.137]
+;    zmid7=[-4.950,   -4.620,   -4.450,   -4.450,   -4.320,   -3.94 , -4.010  , -4.270]
 
 	;;CER TANGENTIAL CHORDS
 	w=where(strmid(cer_chords.chords,0,1) ne 'V',nw)

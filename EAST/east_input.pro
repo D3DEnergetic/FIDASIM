@@ -28,8 +28,6 @@ pinj=4.0                 ;; [MW] If 0, retrieves archived data
 
 diag='VERTICAL-B'	          ;; Name of the FIDA or NPA diagnostic
 
-gfile='/home/FIDA/FIDASIM/EAST/data/g034616.03200'   ;; EFIT g eqdsk
-
 ;;-----------------------------------------------------
 ;; Discharge Parameters
 ;;-----------------------------------------------------
@@ -75,7 +73,9 @@ nr_halo=10000	   		;; Halo contribution
 ;;--------------------------------------------------
 ;; Calculation of the weight function
 ;;--------------------------------------------------
-nr_wght=30   				;; Number of Pitches, energyies and gyro angles 
+ne_wght=30   				;; Number of Energies 
+np_wght=30   				;; Number of Pitches 
+nphi_wght=30   				;; Number of Gyro-angles 
 emax_wght=90  				;; Maximum energy (keV)
 ichan_wght=-1.  				;; -1 for all channels, otherwise a given channel index
 dwav_wght=1.   				;; Wavelength interval
@@ -87,7 +87,6 @@ wavel_end_wght=661.1   		;; Maximum wavelength
 ;;-------------------------------------------------
 calc_npa=[0]   				;; (0 or 1) If 1 do a simulation for NPA
 calc_spec=[0]   			;; (0 or 1) If 1 then spectra are calculated
-sim_fida=[0]    			;; (0 or 1) If 1 then the FIDA spectra are simulated
 calc_birth=[0]                          ;; (0 or 1) If 1 then the birth profile is calculated
 f90brems=[0]                ;; (0 or 1) If 0 use the IDL bremsstrahlung calculation
 calc_fida_wght=[1]  		;; (0 or 1) If 1 then weight functions are calculated
@@ -102,11 +101,12 @@ ps=[0]                  ;; (0 or 1) If 1 then make hard copy of plots
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir, $
         result_dir:result_dir,transpid:transpid,profile_dir:profile_dir, $
        cdf_file:cdf_file,emin:emin,emax:emax,pmin:pmin,pmax:pmax, $
-       isource:isource,einj:einj,pinj:pinj,diag:diag,gfile:gfile,$
+       isource:isource,einj:einj,pinj:pinj,diag:diag,$
        btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
        lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,origin:origin,alpha:alpha,beta:beta,$
        nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-       nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+       nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,$
+       ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
 	   wavel_end_wght:wavel_end_wght,calc_npa:calc_npa,calc_spec:calc_spec, $
        sim_fida:sim_fida, calc_birth:calc_birth, $

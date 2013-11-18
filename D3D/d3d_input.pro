@@ -16,7 +16,8 @@ profile_dir='/u/'+user+'/GAPROFILES/'              	;; Location of profile save 
 cdf_file='/u/'+user+'/GAPROFILES/142114/142114B08_fi_1.cdf'  ;; CDF file from transp with the distribution funciton
 emin=0.                                                      ;; minimum energy used from the distribution function
 emax=100.        										     ;; maximum energy used from the distribution function
-
+pmin=-1.
+pmax=1.
 
 ;;-----------------------------------------------------
 ;; Beam/diagnostic/equilibrium Selection
@@ -25,9 +26,8 @@ isource=6     		    ;; Beam source index (FIDASIM only simulates one NBI source)
 einj=0.                 ;; [keV] If 0, get data from MDS+
 pinj=0.                 ;; [MW] If 0, get data from MDS+
 
-fida_diag='VERTICAL'	;; Name of the FIDA diag
+diag='VERTICAL'	;; Name of the diagnostic
 
-gfile=''                ;; If empty, use MDS+; otherwise, filename
 equil='EFIT01'			;; MDS+ equilibrium runid
 
 ;;-----------------------------------------------------
@@ -72,7 +72,9 @@ nr_halo=5000	   		;; Halo contribution
 ;;--------------------------------------------------
 ;; Calculation of the weight function
 ;;--------------------------------------------------
-nr_wght=40   				;; Number of Pitches, energyies and gyro angles 
+ne_wght=50                  ;; Number of Energies
+np_wght=50                  ;; Number of Pitches
+nphi_wght=50   				;; Number of Gyro-angles 
 emax_wght=100  				;; Maximum energy (keV)
 ichan_wght=-1  				;; -1 for all channels, otherwise a given channel index
 dwav_wght=1.   				;; Wavelength interval
@@ -95,12 +97,12 @@ load_neutrals=[0]   		;; (0 or 1) If 1 then the neutral density is loaded from a
 ;;------------------------------------------------
 install_dir=+GETENV('FIDASIM_DIR')
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
-       cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax, $
-       isource:isource,einj:einj,pinj:pinj,fida_diag:fida_diag,gfile:gfile,equil:equil,$
+       cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax, $
+       isource:isource,einj:einj,pinj:pinj,diag:diag,equil:equil,$
        btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
        lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,origin:origin,alpha:alpha,beta:beta,$
        nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-       nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+       nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
 	   wavel_end_wght:wavel_end_wght,calc_npa:calc_npa,calc_spec:calc_spec,calc_birth:calc_birth, $
        f90brems:f90brems,calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,load_neutrals:load_neutrals}

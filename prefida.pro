@@ -369,14 +369,16 @@ PRO transp_fbeam,inputs,grid,denf,fbm_struct,err
 	;; TRANSP defines the pitch along the current direction. In
 	;; contrast, FIDASIM uses pitch along the B-field! Therefore,
 	;; reverse the pitch coordinate in fbm!
-	npitch=n_elements(pitch)
-	index=npitch-(indgen(npitch)+1)
-	fbm[*,*,*]=fbm[*,index,*]
+    if inputs.btipsign lt 0 then begin
+	    npitch=n_elements(pitch)
+	    index=npitch-(indgen(npitch)+1)
+	    fbm[*,*,*]=fbm[*,index,*]
+    endif
 	;;----------- select energy range -------
 	index=where(energy ge inputs.emin and energy le inputs.emax,nenergy)
 	energy=energy[index]     
 	fbm=fbm[index,*,*]
-	dE      = energy[2] - energy[1]
+	dE      = energy[1] - energy[0]
 	emin=(float(energy[0])         - float(0.5*dE))>0.
 	emax=float(energy[nenergy-1]) + float(0.5*dE)
 	print, 'Energy min/max:', emin,emax
@@ -384,7 +386,7 @@ PRO transp_fbeam,inputs,grid,denf,fbm_struct,err
 	index=where(pitch ge inputs.pmin and pitch le inputs.pmax,npitch)
 	pitch=pitch[index] 
 	fbm=fbm[*,index,*]   
-	dP  = abs(pitch[2]  - pitch[1])
+	dP  = abs(pitch[1]  - pitch[0])
 	pmin=(float(pitch[0])       - float(0.5*dP))>(-1)
 	pmax=(float(pitch[npitch-1])+ float(0.5*dP))<1
 	print, 'Pitch  min/max:', pmin,pmax
@@ -425,13 +427,12 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	ww=where(equil.rho_grid gt rhomax,nww)
 	;;Electron density
 	dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid) > 0. ;[1/cm^3]
-	dene[ww]=0.001*1d13
+	if nww ne 0 then dene[ww]=0.001*1d13
 
 	;;Zeff
 	zeff = interpol(profiles.zeff,profiles.rho,equil.rho_grid) > 1.0 
     zeff = zeff < inputs.impurity_charge
-;	zeff[ww]=profiles.zeff[-1]
-	zeff[ww]=1.0
+	if nww ne 0 then zeff[ww]=1.0
 
 	;;Impurity density
 	deni = (zeff-1.)/(inputs.impurity_charge*(inputs.impurity_charge-1))*dene
@@ -454,7 +455,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 
 	;;Electron temperature
 	te = 1.d-3 * interpol(profiles.te,profiles.rho,equil.rho_grid) > 0.001 ;keV
-	te[ww]=0.001
+	if nww ne 0 then te[ww]=0.001
 	
 	;;Ion temperature   
 	ti = 1.d-3 * interpol(profiles.ti,profiles.rho,equil.rho_grid) > 0.001 ;keV
@@ -464,11 +465,11 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 		print, 'Look at the tables, they might only consider'
 		print, 'temperatures less than 10keV!'
 	endif
-	ti[ww]=0.001
+	if nww ne 0 then ti[ww]=0.001
 
 	;;Plasma rotation	
 	vtor      =   interpol(profiles.vtor,profiles.rho,equil.rho_grid)*grid.r_grid ; [cm/s]  
-	vtor[ww]  =   replicate(0.0,nww)*grid.r_grid[ww]
+	if nww ne 0 then vtor[ww]  =   replicate(0.0,nww)*grid.r_grid[ww]
 
 	vrotu = - sin(grid.phi_grid)*vtor 
 	vrotv =   cos(grid.phi_grid)*vtor

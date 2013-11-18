@@ -21,7 +21,9 @@ PRO read_inputs,file,inputs,save=save
 		readf,55,idum & calc_fida_wght    = idum
 		readf,55,idum & calc_npa_wght    = idum
 		readf,55,sdum;'# weight function settings:'
-		readf,55,idum & nr_wght      = idum
+		readf,55,idum & ne_wght      = idum
+		readf,55,idum & np_wght      = idum
+		readf,55,idum & nphi_wght      = idum
 		readf,55,idum & ichan_wght   = idum
 		readf,55,sdum;inputs.emax_wght
 		readf,55,sdum;inputs.dwav_wght
@@ -102,7 +104,8 @@ PRO read_inputs,file,inputs,save=save
         install_dir=+getenv('FIDASIM_DIR')
 		inputs={instal_dir:install_dir,shot: shot, time: time,diag:diag,ps:ps $
 	          , fidasim_runid:fidasim_runid $
-	          , calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,nr_wght:nr_wght,ichan_wght:ichan_wght $
+	          , calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght$
+              , ichan_wght:ichan_wght $
 	          , nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
 	          , calc_spec:calc_spec,npa:npa $
 	          , einj:einj $

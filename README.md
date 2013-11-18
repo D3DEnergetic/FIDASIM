@@ -164,7 +164,9 @@ nr_halo=500000        ;; Halo contribution
 ;;--------------------------------------------------
 ;; Calculation of the weight function
 ;;--------------------------------------------------
-nr_wght=50            ;; Number of Pitches, energyies and gyro angles 
+ne_wght=50            ;; Number of Energies
+np_wght=50            ;; Number of Pitches 
+nphi_wght=50          ;; Number of Gyro-angles 
 emax_wght=125.        ;; Maximum energy (keV)
 ichan_wght=-1         ;; -1 for all channels, otherwise a given channel index
 dwav_wght=.2          ;; Wavelength interval
@@ -187,14 +189,15 @@ ps=[0]                ;; (0 or 1) If 1 then make hard copy of plots
 ;;------------------------------------------------
 install_dir=+getenv('FIDASIM_DIR')
 inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
-	    cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
-	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
-	    lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
-	    nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-		origin:origin,alpha:alpha,beta:beta,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
+        cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
+        einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
+        lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
+        nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
+        origin:origin,alpha:alpha,beta:beta,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,$
+        ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
-		wavel_end_wght:wavel_end_wght,calc_npa:calc)npa,calc_spec:calc_spec,calc_birth:calc_birth,calc_fida_wght:calc_fida_wght,$
-		calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
+        wavel_end_wght:wavel_end_wght,calc_npa:calc)npa,calc_spec:calc_spec,calc_birth:calc_birth,calc_fida_wght:calc_fida_wght,$
+        calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
 
 END
 ```

@@ -213,7 +213,9 @@ module application
      real(double)  :: ai   !! atomic mass of plasma ions
      real(double)  :: ab   !! atomic mass of beam neutrals
      !! Settings for weight function calculation
-     integer(long) :: nr_wght
+     integer(long) :: ne_wght
+     integer(long) :: np_wght
+     integer(long) :: nphi_wght
      integer(long) :: ichan_wght
      real(double)  :: emax_wght
      real(double)  :: dwav_wght
@@ -286,7 +288,9 @@ contains
     read(66,*) inputs%calc_fida_wght
     read(66,*) inputs%calc_npa_wght
     read(66,*) !# weight function settings
-    read(66,*) inputs%nr_wght
+    read(66,*) inputs%ne_wght
+    read(66,*) inputs%np_wght
+    read(66,*) inputs%nphi_wght
     read(66,*) inputs%ichan_wght
     read(66,*) inputs%emax_wght
     read(66,*) inputs%dwav_wght
@@ -3099,7 +3103,7 @@ contains
     integer,dimension(3,grid%ntrack)      :: icell  !! index of cells
     real(double)                          :: wght2
     !!netCDF variables
-    integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,nr_dimid
+    integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
     integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
     integer :: shot_varid,time_varid
 
@@ -3117,27 +3121,27 @@ contains
 
     !! define pitch, energy and gyro angle arrays
     !! define energy - array
-    print*, 'nr of energies, pitches and gyro angles', inputs%nr_wght
+    print*, 'nr of energies, pitches and gyro angles', inputs%ne_wght,inputs%np_wght,inputs%nphi_wght
     print*, 'maximal energy: ', inputs%emax_wght
-    allocate(ebarr(inputs%nr_wght))  
-    do i=1,inputs%nr_wght
-       ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%nr_wght)
+    allocate(ebarr(inputs%ne_wght))  
+    do i=1,inputs%ne_wght
+       ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
     !! define pitch - array
-    allocate(ptcharr(inputs%nr_wght))
-    do i=1,inputs%nr_wght
-       ptcharr(i)=real(i-0.5)*2./real(inputs%nr_wght)-1.
+    allocate(ptcharr(inputs%np_wght))
+    do i=1,inputs%np_wght
+       ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
     enddo
     !! define gyro - array
-    allocate(phiarr(inputs%nr_wght))
-    do i=1,inputs%nr_wght
-       phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nr_wght)
+    allocate(phiarr(inputs%nphi_wght))
+    do i=1,inputs%nphi_wght
+       phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nphi_wght)
     enddo
 
     nchan=spec%nchan
 
     !! define storage arrays
-    allocate(wfunct(nwav,inputs%nr_wght,inputs%nr_wght,nchan))
+    allocate(wfunct(nwav,inputs%ne_wght,inputs%np_wght,nchan))
     allocate(rad_arr(nchan))
     allocate(theta_arr(nchan))
 
@@ -3283,11 +3287,11 @@ contains
        !$OMP& los_wght,wght,jj,ic,jc,kc,wght2,length,vi_norm)
        !! LOOP over the three velocity vector components 
        !! (energy,pitch,gyro angle)
-       do i = 1, inputs%nr_wght !! energy loop
+       do i = 1, inputs%ne_wght !! energy loop
           vabs = sqrt(ebarr(i)/(v_to_E*inputs%ab))
-          do j = 1, inputs%nr_wght !! pitch loop
+          do j = 1, inputs%np_wght !! pitch loop
              sinus = sqrt(1.d0-ptcharr(j)**2)
-             do k = 1, inputs%nr_wght !! gyro angle
+             do k = 1, inputs%nphi_wght !! gyro angle
                 !! cacluate velocity vector from energy,pitch, gyro angle
                 vi_norm(:)=sinus*cos(phiarr(k))*a_norm+ptcharr(j) &
                      *b_norm+sinus*sin(phiarr(k))*c_norm
@@ -3349,10 +3353,10 @@ contains
                            wavel(l).lt.wav_arr(ii+1)) then
                            !calc weight functions w/o cross-sections:
                            !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
-                           !    + intens(l)/real(inputs%nr_wght)
+                           !    + intens(l)/real(inputs%ne_wght)
                            !normal calculation:
                            wfunct(ii,i,j,ichan) = wfunct(ii,i,j,ichan) &
-                                + intens(l)*photons/real(inputs%nr_wght)
+                                + intens(l)*photons/real(inputs%ne_wght)
                       endif
                    enddo wavelength_ranges
                 enddo stark_components
@@ -3392,15 +3396,17 @@ contains
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
     call check( nf90_def_dim(ncid,"nwav",nwav,nwav_dimid) )
     call check( nf90_def_dim(ncid,"nchan",nchan,nchan_dimid) )
-    call check( nf90_def_dim(ncid,"nr_wght",inputs%nr_wght,nr_dimid) )
-    dimids = (/ nwav_dimid, nr_dimid, nr_dimid, nchan_dimid /)
+    call check( nf90_def_dim(ncid,"ne_wght",inputs%ne_wght,ne_dimid) )
+    call check( nf90_def_dim(ncid,"np_wght",inputs%np_wght,np_dimid) )
+    call check( nf90_def_dim(ncid,"nphi_wght",inputs%nphi_wght,nphi_dimid) )
+    dimids = (/ nwav_dimid, ne_dimid, np_dimid, nchan_dimid /)
 
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
     call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,nwav_dimid,wav_varid) )
-    call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,nr_dimid,e_varid) )
-    call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,nr_dimid,ptch_varid) )
+    call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
+    call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
     call check( nf90_def_var(ncid,"theta",NF90_DOUBLE,nchan_dimid,theta_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
@@ -3480,30 +3486,30 @@ contains
     integer,dimension(3,grid%ntrack)      :: icell  !! index of cells
 
     !!netCDF variables
-    integer :: ncid,dimid1,dimids(3),nchan_dimid,nr_dimid
+    integer :: ncid,dimid1,dimids(3),nchan_dimid,ne_dimid,np_dimid
     integer :: wfunct_varid,e_varid,ptch_varid,rad_varid
     integer :: shot_varid,time_varid
 
     !! define pitch, energy arrays
     !! define energy - array
-    print*, 'nr of energies, pitches and gyro angles', inputs%nr_wght
+    print*, 'nr of energies and pitches', inputs%ne_wght,inputs%np_wght
     print*, 'maximal energy: ', inputs%emax_wght
     
-    allocate(ebarr(inputs%nr_wght))  
-    do i=1,inputs%nr_wght
-       ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%nr_wght)
+    allocate(ebarr(inputs%ne_wght))  
+    do i=1,inputs%ne_wght
+       ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
     
     !! define pitch - array
-    allocate(ptcharr(inputs%nr_wght))
-    do i=1,inputs%nr_wght
-       ptcharr(i)=real(i-0.5)*2./real(inputs%nr_wght)-1.
+    allocate(ptcharr(inputs%np_wght))
+    do i=1,inputs%np_wght
+       ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
     enddo
     
     nchan=spec%nchan
 
     !! define storage arrays   
-    allocate(wfunct_tot(inputs%nr_wght,inputs%nr_wght,nchan))
+    allocate(wfunct_tot(inputs%ne_wght,inputs%np_wght,nchan))
     allocate(rad_arr(nchan))
 
     !!save the los-weights into an array
@@ -3548,7 +3554,7 @@ contains
        vi_norm(:) = los_vec
 
        call track(vi_norm,pos,tcell,icell,pos_out,ncell)
-       allocate(wfunct(inputs%nr_wght,inputs%nr_wght,ncell))
+       allocate(wfunct(inputs%ne_wght,inputs%ne_wght,ncell))
        print*,'Ncells: ',ncell
        print*,''
 
@@ -3588,7 +3594,7 @@ contains
          halodens=result%neut_dens(ic,jc,kc,:,halo_type)
 		 denf=cell(ic,jc,kc)%plasma%denf
 
-         loop_over_energy: do ii = 1, inputs%nr_wght !! energy loop
+         loop_over_energy: do ii = 1, inputs%ne_wght !! energy loop
            vabs = sqrt(ebarr(ii)/(v_to_E*inputs%ab))
            !! -------------- calculate CX probability -------!!
 
@@ -3626,8 +3632,8 @@ contains
        enddo loop_along_los
        !$OMP END PARALLEL DO
        do jj=1,ncell
-         do ii=1,inputs%nr_wght
-		   do kk=1,inputs%nr_wght
+         do ii=1,inputs%ne_wght
+		   do kk=1,inputs%np_wght
              wfunct_tot(ii,kk,ichan)=wfunct_tot(ii,kk,ichan)+wfunct(ii,kk,jj)*grid%dv
            enddo
          enddo
@@ -3654,14 +3660,15 @@ contains
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
     call check( nf90_def_dim(ncid,"nchan",nchan,nchan_dimid) )
-    call check( nf90_def_dim(ncid,"nr_wght",inputs%nr_wght,nr_dimid) )
-    dimids = (/ nr_dimid, nr_dimid, nchan_dimid /)
+    call check( nf90_def_dim(ncid,"ne_wght",inputs%ne_wght,ne_dimid) )
+    call check( nf90_def_dim(ncid,"np_wght",inputs%np_wght,np_dimid) )
+    dimids = (/ ne_dimid, np_dimid, nchan_dimid /)
 
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
     call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
-    call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,nr_dimid,e_varid) )
-    call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,nr_dimid,ptch_varid) )
+    call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
+    call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
 
@@ -3685,7 +3692,7 @@ contains
 
     print*, 'npa weight function written to: ',filename
 
-	  !!Deallocate arrays
+    !!Deallocate arrays
     deallocate(ebarr)  
     deallocate(ptcharr)
     deallocate(wfunct_tot)

@@ -3356,7 +3356,7 @@ contains
                            !    + intens(l)/real(inputs%ne_wght)
                            !normal calculation:
                            wfunct(ii,i,j,ichan) = wfunct(ii,i,j,ichan) &
-                                + intens(l)*photons/real(inputs%ne_wght)
+                                + intens(l)*photons/real(inputs%nphi_wght)
                       endif
                    enddo wavelength_ranges
                 enddo stark_components

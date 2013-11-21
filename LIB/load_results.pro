@@ -104,7 +104,7 @@ PRO read_inputs,file,inputs,save=save
         install_dir=+getenv('FIDASIM_DIR')
 		inputs={instal_dir:install_dir,shot: shot, time: time,diag:diag,ps:ps $
 	          , fidasim_runid:fidasim_runid $
-	          , calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght$
+	          , calc_fida_wght:calc_fida_wght,calc_npa_wght:calc_npa_wght,ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght $
               , ichan_wght:ichan_wght $
 	          , nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
 	          , calc_spec:calc_spec,npa:npa $

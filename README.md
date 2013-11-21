@@ -353,7 +353,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 			  zeff:zeff}					;;ZEFF
 END 
 ```
-As you can see it is all rather self explaintory. All I need to do now to get ABCD to work with prefida is supply the above information.
+As you can see it is all rather self-explanatory. All I need to do now to get ABCD to work with prefida is supply the above information.
 I can use whatever routines I want so long as the output of abcd_routines is defined as above. I could also include other things in the
 structures so long as I have the above. 
 

@@ -160,8 +160,10 @@ module application
      real(double),dimension(:,:),  allocatable :: xyzhead
      real(double),dimension(:,:),  allocatable :: xyzenter
      real(double),dimension(:,:),  allocatable :: xyzexit
-     real(double),dimension(:),    allocatable :: headsize
-     real(double),dimension(:),    allocatable :: opening_angle
+     real(double),dimension(:),    allocatable :: ra
+     real(double),dimension(:),    allocatable :: rd
+     real(double),dimension(:),    allocatable :: h
+     real(double),dimension(:),    allocatable :: chan_id
      real(double),dimension(:),    allocatable :: sigma_pi
      integer(long) :: nchan
      integer(long) :: nlambda
@@ -390,8 +392,8 @@ contains
     character(120)  :: filename
     integer(long)   :: i, j, k,ichan
 	integer			:: ncid,xlens_varid,ylens_varid,zlens_varid,enter_varid
-	integer 		:: xlos_varid,ylos_varid,zlos_varid,head_varid,exit_varid
-	integer         :: sig_varid,oa_varid,wght_varid,nchan_varid
+	integer 		:: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid,exit_varid
+	integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
@@ -408,9 +410,11 @@ contains
 	call check( nf90_inq_varid(ncid, "xlos", xlos_varid) )
 	call check( nf90_inq_varid(ncid, "ylos", ylos_varid) )
 	call check( nf90_inq_varid(ncid, "zlos", zlos_varid) )
-	call check( nf90_inq_varid(ncid, "headsize", head_varid) )
+	call check( nf90_inq_varid(ncid, "ra", ra_varid) )
+	call check( nf90_inq_varid(ncid, "rd", rd_varid) )
 	call check( nf90_inq_varid(ncid, "sigma_pi", sig_varid) )
-	call check( nf90_inq_varid(ncid, "opening_angle", oa_varid) )
+	call check( nf90_inq_varid(ncid, "h", h_varid) )
+	call check( nf90_inq_varid(ncid, "chan_id", chan_id_varid) )
 	call check( nf90_inq_varid(ncid, "los_wght", wght_varid) )
 	call check( nf90_inq_varid(ncid, "xyz_enter", enter_varid) )
 	call check( nf90_inq_varid(ncid, "xyz_exit", exit_varid) )
@@ -423,8 +427,10 @@ contains
     allocate(spec%xyzlos(spec%nchan,3))
     allocate(spec%xyzenter(3,spec%nchan))
     allocate(spec%xyzexit(3,spec%nchan))
-    allocate(spec%headsize(spec%nchan))
-    allocate(spec%opening_angle(spec%nchan))
+    allocate(spec%ra(spec%nchan))
+    allocate(spec%rd(spec%nchan))
+    allocate(spec%h(spec%nchan))
+    allocate(spec%chan_id(spec%nchan))
     allocate(spec%sigma_pi(spec%nchan))
     allocate(dummy_arr(grid%Nx,grid%Ny,grid%Nz,spec%nchan))
 
@@ -435,8 +441,10 @@ contains
 	call check( nf90_get_var(ncid, xlos_varid, spec%xyzlos(:,1)) )
 	call check( nf90_get_var(ncid, ylos_varid, spec%xyzlos(:,2)) )
 	call check( nf90_get_var(ncid, zlos_varid, spec%xyzlos(:,3)) )
-	call check( nf90_get_var(ncid, head_varid, spec%headsize) )
-	call check( nf90_get_var(ncid, oa_varid, spec%opening_angle) )
+	call check( nf90_get_var(ncid, ra_varid, spec%ra) )
+	call check( nf90_get_var(ncid, rd_varid, spec%rd) )
+	call check( nf90_get_var(ncid, h_varid, spec%h) )
+	call check( nf90_get_var(ncid, chan_id_varid, spec%chan_id) )
 	call check( nf90_get_var(ncid, sig_varid, spec%sigma_pi) )
 	call check( nf90_get_var(ncid, wght_varid, dummy_arr(:,:,:,:)) )
 	call check( nf90_get_var(ncid, enter_varid, spec%xyzenter(:,:)) )
@@ -459,9 +467,9 @@ contains
        npa%npa_loop=1.
     else
        allocate(npa%size(spec%nchan))
-       npa%size=spec%headsize(1)
+       npa%size=spec%ra(1)
        npa%npa_loop=10000.
-       npa%opening_angle=spec%opening_angle(1)
+       npa%opening_angle=atan(spec%ra(1)/spec%h(1))
        npa%los=spec%xyzhead(1,:)-spec%xyzlos(1,:)
        npa%dlos=sqrt(dot_product(npa%los,npa%los))
     endif
@@ -3542,8 +3550,8 @@ contains
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius: ',radius
        rad_arr(ichan)=radius
-       alpha=2*pi*(1.0 - cos(3.*spec%opening_angle(ichan))) !factor of 3 same fudge factor used in mc npa
-       area= pi*(spec%headsize(ichan)*spec%headsize(ichan))
+       alpha=2*pi*(1.0 - cos(3.*atan(spec%ra(ichan)/spec%h(ichan)))) !factor of 3 same fudge factor used in mc npa
+       area= pi*(spec%ra(ichan)*spec%ra(ichan))
 
        pos(:)=spec%xyzexit(:,ichan)
        los_vec(1) = spec%xyzhead(ichan,1) - pos(1)

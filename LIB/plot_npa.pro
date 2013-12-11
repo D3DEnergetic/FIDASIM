@@ -53,9 +53,9 @@ pro plot_npa,histo,ps=ps,path=path
   contour,total(dens,3),fidasim.grid.x_grid[*,*,0],fidasim.grid.y_grid[*,*,0] $
           ,c_colors=(dindgen(20)+1.)*11,nlevels=20 $
           ,/isotropic,xtit='X [cm]',ytit='Y [cm]'
-
+  oplot,fidasim.grid.x_grid[*,*,0],fidasim.grid.y_grid[*,*,0],psym=3
   for ichan=0,los.nchan-1 do oplot,[los.xyzlens[ichan,0],los.xyzlos[ichan,0]] $
-                                   ,[los.xyzlens[ichan,0],los.xyzlos[ichan,0]]
+                                   ,[los.xyzlens[ichan,1],los.xyzlos[ichan,1]]
 
   for i=0,nnpa-1 do oplot,[npaipos[i,0]],[npaipos[i,1]],psym=3,color=254./nnpa*i
 
@@ -67,14 +67,14 @@ pro plot_npa,histo,ps=ps,path=path
 
   ;; Define arrays for histograms
   ;; energy array:
-  nen  = 50.
+  nen  = 40.
   emax = 100.
-  emin = 0.
+  emin = 0
   energy_arr = emin+dindgen(nen)/(nen-1.)*(emax-emin)
   dE   = energy_arr[1]-energy_arr[0]
-
+  print,energy_arr
   ;;pitch array:
-  npitch = 50
+  npitch = 40
   pmin   = -1.
   pmax   = 1.
   pitch_arr = pmin+dindgen(npitch)/(npitch-1.)*(pmax-pmin)

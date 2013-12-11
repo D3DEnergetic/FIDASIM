@@ -415,7 +415,6 @@ PRO npa_los_wght,chords,grid,xlens,ylens,zlens,xlos,ylos,zlos,weight,r_enter,r_e
 				w=where(rrs ge rs[xi,yi,zi] or rrd ge rd[chan],nw)
 				if nw ne 0 then p[w]=0
 				weight[xi,yi,zi,chan]=total(p*dx*dy)	
-				wait,1
 			endfor
 		endif
 	endfor
@@ -446,21 +445,21 @@ PRO prepare_chords,inputs,grid,chords,fida
 	w=where(chords.chan_id eq 0,nw)
 	if nw ne 0 then begin
 		fida_los_wght,grid,xlens[w],ylens[w],zlens[w],xlos[w],ylos[w],zlos[w],fida_wght,fida_enter,fida_exit,fida_err
+		weight[*,*,*,w]=fida_wght
+		r_enter[*,w]=fida_enter
+		r_exit[*,w]=fida_exit
+		err_arr[w]=fida_err
 	endif
-	weight[*,*,*,w]=fida_wght
-	r_enter[*,w]=fida_enter
-	r_exit[*,w]=fida_exit
-	err_arr[w]=fida_err
 
 	;;CALCULATE NPA LOS WEIGHTS
 	w=where(chords.chan_id eq 1,nw)
 	if nw ne 0 then begin
 		npa_los_wght,chords,grid,xlens[w],ylens[w],zlens[w],xlos[w],ylos[w],zlos[w],npa_wght,npa_enter,npa_exit,npa_err
+		weight[*,*,*,w]=npa_wght
+		r_enter[*,w]=npa_enter
+		r_exit[*,w]=npa_exit
+		err_arr[w]=npa_err
 	endif
-	weight[*,*,*,w]=npa_wght
-	r_enter[*,w]=npa_enter
-	r_exit[*,w]=npa_exit
-	err_arr[w]=npa_err
 
 	;;GET RID OF LOS THAT DONT CROSS THE GRID
 	los=where(err_arr eq 0,nw,complement=miss_los)

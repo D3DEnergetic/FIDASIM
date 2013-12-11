@@ -3178,6 +3178,8 @@ contains
        if(inputs%ichan_wght.gt.0) then
           if(ichan.ne.inputs%ichan_wght)cycle loop_over_channels
        endif
+       if(spec%chan_id(ichan).gt.0)cycle loop_over_channels
+
        print*,'channel:',ichan
        xlos=spec%xyzlos(ichan,1)
        ylos=spec%xyzlos(ichan,2)
@@ -3535,6 +3537,8 @@ contains
        if(inputs%ichan_wght.gt.0) then
           if(ichan.ne.inputs%ichan_wght)cycle loop_over_channels
        endif
+       if(spec%chan_id(ichan).ne.1)cycle loop_over_channels
+
        print*,'channel:',ichan
        xlos=spec%xyzlos(ichan,1)
        ylos=spec%xyzlos(ichan,2)

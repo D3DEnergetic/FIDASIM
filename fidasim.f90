@@ -82,6 +82,7 @@ module application
      real(double)                            :: rho     !! Normalized flux coord
      real(double),dimension(:)  ,allocatable :: los_wght!! Weights of LOS
      real(double),dimension(:,:),allocatable :: fbm     !! fast-ion distribution
+     real(double),dimension(:),allocatable   :: fbm_norm!! fast-ion distribution norm
   end type cell_type
   type nbi_type 
      integer(long)  :: number            !! number of the NBI
@@ -744,18 +745,11 @@ contains
 
     distri%eran   = distri%emax-distri%emin
     distri%pran   = distri%pmax-distri%pmin
-    !! normalize the velocity space distribution
-    !! (the fast-ion density is stored in cell%plasma%fdens!)
-    do k=1,nzones
-       if(sum(transp_fbm(:,:,k)).gt.0)then
-          transp_fbm(:,:,k) = transp_fbm(:,:,k) / maxval(transp_fbm(:,:,k))
-       else
-          transp_fbm(:,:,k)=0.d0
-       endif
-    enddo
+
     !! define gridsize of energy and pitch
     distri%deb=distri%energy(2)-distri%energy(1)
     distri%dpitch=abs(distri%pitch(2)-distri%pitch(1))
+
     !! map TRANSP velocity space on grid
     !! Use spatial resolution of sub grids with ~1cm
     nxsub=anint(grid%dr(1)/1.d0)
@@ -770,6 +764,7 @@ contains
              if (cell(i,j,k)%plasma%denf.gt.0. .and. &
                   sum(result%neut_dens(i,j,k,:,:)).gt.0.)then
                 allocate(cell(i,j,k)%fbm(distri%nenergy,distri%npitch))
+                allocate(cell(i,j,k)%fbm_norm(1))
                 cell(i,j,k)%fbm(:,:)=0.d0
                 do l=1,nxsub
                    do m=1,nysub
@@ -790,7 +785,8 @@ contains
                       enddo
                    enddo
                 enddo
-                cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/(nxsub*nysub*nzsub)
+                cell(i,j,k)%fbm_norm(1)=maxval(cell(i,j,k)%fbm(:,:))
+                cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/cell(i,j,k)%fbm_norm(1)
              endif
           enddo
        enddo
@@ -1084,7 +1080,7 @@ contains
     real(float),dimension(:,:,:,:),allocatable   :: fdum_arr
 	integer :: ncid,full_var,half_var,third_var,halo_var
 
-    print*,'---- load neutrals RESULTS/neutrals.bin ----' 
+    print*,'---- loading neutrals ----' 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
    	!!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -3461,7 +3457,7 @@ contains
   !*****************************************************************************
   subroutine npa_weight_function
 	use netcdf
-    real(double)                    :: radius,theta,alpha,area
+    real(double)                    :: radius,theta
     real(double)                    :: photons !! photon flux 
     real(double), dimension(nlevs)  :: fdens,hdens,tdens,halodens
     real(double), dimension(3)      :: los_vec
@@ -3469,12 +3465,13 @@ contains
     real(double)                    :: rad,max_wght
     integer                         :: nchan
     integer                         :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
-    integer,dimension(1) 		    :: minpitch
+    integer,dimension(1) 		    :: minpitch,ipitch,ienergy
     real(double), dimension(:,:,:),     allocatable :: wfunct
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
+    real(double), dimension(:,:),     allocatable :: flux
     real(double), dimension(:)    ,     allocatable :: ebarr,ptcharr,rad_arr
     real(double), dimension(3)      :: vi,vi_norm,b_norm
-    real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf
+    real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf,fbm_denf,los_tot
     real(double),dimension(3)       :: vn  ! vi in m/s
 
     !! Determination of the CX probability
@@ -3497,7 +3494,7 @@ contains
 
     !!netCDF variables
     integer :: ncid,dimid1,dimids(3),nchan_dimid,ne_dimid,np_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid
     integer :: shot_varid,time_varid
 
     !! define pitch, energy arrays
@@ -3520,6 +3517,7 @@ contains
 
     !! define storage arrays   
     allocate(wfunct_tot(inputs%ne_wght,inputs%np_wght,nchan))
+    allocate(flux(inputs%ne_wght,nchan))  
     allocate(rad_arr(nchan))
 
     !!save the los-weights into an array
@@ -3533,6 +3531,7 @@ contains
     enddo 
     
     wfunct_tot=wfunct_tot*0.
+    flux=flux*0.
     loop_over_channels: do ichan=1,spec%nchan
        if(inputs%ichan_wght.gt.0) then
           if(ichan.ne.inputs%ichan_wght)cycle loop_over_channels
@@ -3554,8 +3553,6 @@ contains
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius: ',radius
        rad_arr(ichan)=radius
-       alpha=2*pi*(1.0 - cos(3.*atan(spec%ra(ichan)/spec%h(ichan)))) !factor of 3 same fudge factor used in mc npa
-       area= pi*(spec%ra(ichan)*spec%ra(ichan))
 
        pos(:)=spec%xyzexit(:,ichan)
        los_vec(1) = spec%xyzhead(ichan,1) - pos(1)
@@ -3573,10 +3570,18 @@ contains
        !! do the main simulation  !! 
        !! LOOP over the three velocity vector components 
        wfunct=wfunct*0.
+       los_tot=0
+       do jj=1,ncell
+         ic=icell(1,jj)
+         jc=icell(2,jj)
+         kc=icell(3,jj)
+         los_tot=los_tot+los_weight(ic,jc,kc,ichan)
+       enddo
+
        !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,in,ind,ac, &
-       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch, &
+       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,   &
-       !$OMP& states,states_i,los_vec,vi_norm,photons,denf)
+       !$OMP& states,states_i,los_vec,vi_norm,photons,denf,fbm_denf)
        loop_along_los: do jj=1,ncell
          ic=icell(1,jj)
          jc=icell(2,jj)
@@ -3597,7 +3602,7 @@ contains
 		 b_norm(:) = cell(ic,jc,kc)%plasma%b_norm(:)
          theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
          minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
-
+         ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
          vi_norm(:)=los_vec(:)
 
          fdens=result%neut_dens(ic,jc,kc,:,nbif_type) 
@@ -3607,6 +3612,11 @@ contains
 		 denf=cell(ic,jc,kc)%plasma%denf
 
          loop_over_energy: do ii = 1, inputs%ne_wght !! energy loop
+           ienergy=minloc(abs(distri%energy-ebarr(ii)))
+           fbm_denf=0
+           if (allocated(cell(ic,jc,kc)%fbm)) then 
+             fbm_denf=cell(ic,jc,kc)%fbm(ienergy(1),ipitch(1))*cell(ic,jc,kc)%fbm_norm(1)*distri%deb*distri%dpitch
+           endif
            vabs = sqrt(ebarr(ii)/(v_to_E*inputs%ab))
            !! -------------- calculate CX probability -------!!
 
@@ -3638,15 +3648,19 @@ contains
              ac=icell(:,kk)
              call colrad(ac(:),vi(:),tcell(kk)/vabs,states,photons,0,1.d0)
            enddo
-           wfunct(ii,minpitch(1),jj) = wfunct(ii,minpitch(1),jj) + &
-                  (alpha*area/(4*pi))*sum(pcx*states/states_i)
+           wfunct(ii,minpitch(1),jj) = wfunct(ii,minpitch(1),jj) + sum(pcx*states/states_i)
+           flux(ii,ichan)=flux(ii,ichan)+ &
+               grid%dv*distri%dpitch*fbm_denf*sum(pcx*states/states_i)*los_weight(ic,jc,kc,ichan)/los_tot
          enddo loop_over_energy
        enddo loop_along_los
        !$OMP END PARALLEL DO
        do jj=1,ncell
+         ic=icell(1,jj)
+         jc=icell(2,jj)
+         kc=icell(3,jj)
          do ii=1,inputs%ne_wght
 		   do kk=1,inputs%np_wght
-             wfunct_tot(ii,kk,ichan)=wfunct_tot(ii,kk,ichan)+wfunct(ii,kk,jj)*grid%dv
+             wfunct_tot(ii,kk,ichan)=wfunct_tot(ii,kk,ichan)+wfunct(ii,kk,jj)*grid%dv*los_weight(ic,jc,kc,ichan)/los_tot
            enddo
          enddo
        enddo   
@@ -3683,6 +3697,7 @@ contains
     call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
+    call check( nf90_def_var(ncid,"flux",NF90_DOUBLE,(/ ne_dimid,nchan_dimid /),flux_varid) )
 
     !Add unit attributes
     call check( nf90_put_att(ncid,time_varid,"units","seconds") )
@@ -3698,6 +3713,7 @@ contains
     call check( nf90_put_var(ncid, ptch_varid, ptcharr) )
     call check( nf90_put_var(ncid, rad_varid, rad_arr) )
     call check( nf90_put_var(ncid, wfunct_varid, wfunct_tot) )
+    call check( nf90_put_var(ncid, flux_varid, flux) )
 
     !Close netCDF file
     call check( nf90_close(ncid) )
@@ -3706,6 +3722,7 @@ contains
 
     !!Deallocate arrays
     deallocate(ebarr)  
+    deallocate(flux)  
     deallocate(ptcharr)
     deallocate(wfunct_tot)
     deallocate(rad_arr)
@@ -3837,6 +3854,7 @@ program fidasim
   endif
 
   if(inputs%calc_npa_wght.eq.1) then
+     call read_fbm
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'npa weight function:    '  &
           ,time_arr(5), ':', time_arr(6), ':',time_arr(7)

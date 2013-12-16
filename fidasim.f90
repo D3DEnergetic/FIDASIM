@@ -159,8 +159,6 @@ module application
   type spec_type
      real(double),dimension(:,:),  allocatable :: xyzlos
      real(double),dimension(:,:),  allocatable :: xyzhead
-     real(double),dimension(:,:),  allocatable :: xyzenter
-     real(double),dimension(:,:),  allocatable :: xyzexit
      real(double),dimension(:),    allocatable :: ra
      real(double),dimension(:),    allocatable :: rd
      real(double),dimension(:),    allocatable :: h
@@ -392,8 +390,8 @@ contains
 	use netcdf
     character(120)  :: filename
     integer(long)   :: i, j, k,ichan
-	integer			:: ncid,xlens_varid,ylens_varid,zlens_varid,enter_varid
-	integer 		:: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid,exit_varid
+	integer			:: ncid,xlens_varid,ylens_varid,zlens_varid
+	integer 		:: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid
 	integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
@@ -417,8 +415,6 @@ contains
 	call check( nf90_inq_varid(ncid, "h", h_varid) )
 	call check( nf90_inq_varid(ncid, "chan_id", chan_id_varid) )
 	call check( nf90_inq_varid(ncid, "los_wght", wght_varid) )
-	call check( nf90_inq_varid(ncid, "xyz_enter", enter_varid) )
-	call check( nf90_inq_varid(ncid, "xyz_exit", exit_varid) )
 
 	!!READ IN THE NUMBER OF CHANNELS
 	call check( nf90_get_var(ncid, nchan_varid, spec%nchan) )
@@ -426,8 +422,6 @@ contains
 	!!ALLOCATE SPACE
     allocate(spec%xyzhead(spec%nchan,3))
     allocate(spec%xyzlos(spec%nchan,3))
-    allocate(spec%xyzenter(3,spec%nchan))
-    allocate(spec%xyzexit(3,spec%nchan))
     allocate(spec%ra(spec%nchan))
     allocate(spec%rd(spec%nchan))
     allocate(spec%h(spec%nchan))
@@ -448,8 +442,6 @@ contains
 	call check( nf90_get_var(ncid, chan_id_varid, spec%chan_id) )
 	call check( nf90_get_var(ncid, sig_varid, spec%sigma_pi) )
 	call check( nf90_get_var(ncid, wght_varid, dummy_arr(:,:,:,:)) )
-	call check( nf90_get_var(ncid, enter_varid, spec%xyzenter(:,:)) )
-	call check( nf90_get_var(ncid, exit_varid, spec%xyzexit(:,:)) )
 
 	!!CLOSE netCDF FILE
 	call check( nf90_close(ncid) )

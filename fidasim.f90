@@ -777,6 +777,7 @@ contains
                       enddo
                    enddo
                 enddo
+                cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/sum(cell(i,j,k)%fbm(:,:)*distri%dpitch*distri%deb)
                 cell(i,j,k)%fbm_norm(1)=maxval(cell(i,j,k)%fbm(:,:))
                 cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/cell(i,j,k)%fbm_norm(1)
              endif
@@ -3461,7 +3462,7 @@ contains
     real(double)                    :: photons !! photon flux 
     real(double), dimension(nlevs)  :: fdens,hdens,tdens,halodens
     real(double), dimension(3)      :: los_vec
-    real(double)                    :: length
+    real(double)                    :: length,pcxa
     real(double)                    :: rad,max_wght
     integer(long)                   :: nchan,cnt
     integer(long)                   :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
@@ -3602,7 +3603,7 @@ contains
                ienergy=minloc(abs(distri%energy-ebarr(ic)))
                fbm_denf=0
                if (allocated(cell(ii,jj,kk)%fbm)) then 
-                 fbm_denf=cell(ii,jj,kk)%fbm(ienergy(1),ipitch(1))*cell(ii,jj,kk)%fbm_norm(1)*distri%deb*distri%dpitch
+                 fbm_denf=cell(ii,jj,kk)%fbm(ienergy(1),ipitch(1))*cell(ii,jj,kk)%fbm_norm(1)
                endif
                vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))
                !! -------------- calculate CX probability -------!!
@@ -3635,9 +3636,11 @@ contains
                do kc=1,ncell 
                  ac=icell(:,kc)
                  call colrad(ac(:),vi(:),tcell(kc)/vabs,states,photons,0,1.d0)
+                 if (photons.le.0) exit
                enddo
-               wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx*states/states_i)
-               flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*fbm_denf*sum(pcx*states/states_i)*los_weight(ii,jj,kk,ichan)
+               pcxa=sum(states)/sum(states_i)
+               wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx)*pcxa
+               flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
              enddo loop_over_energy
             endif
            enddo loop_along_z

@@ -220,7 +220,7 @@ PRO los_track,coords,xyz_los_vec,xyspt,ri,tcell,cell,ncell
 	ncell=m-1
 END
 
-PRO fida_los_wght,grid,xlens,ylens,zlens,xlos,ylos,zlos,weight,r_enter,r_exit,err_arr
+PRO fida_los_wght,grid,xlens,ylens,zlens,xlos,ylos,zlos,weight,err_arr
 
 	nx=grid.nx
 	ny=grid.ny
@@ -228,8 +228,6 @@ PRO fida_los_wght,grid,xlens,ylens,zlens,xlos,ylos,zlos,weight,r_enter,r_exit,er
     nchan=n_elements(xlens)
     err_arr=dblarr(nchan)
     weight  = replicate(0.d0,nx,ny,nz,nchan)
-    r_enter = replicate(0.d0,3,nchan)
-    r_exit = replicate(0.d0,3,nchan)
 
 	for chan=0L, n_elements(xlens)-1 do  begin
 		xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
@@ -252,12 +250,10 @@ PRO fida_los_wght,grid,xlens,ylens,zlens,xlos,ylos,zlos,weight,r_enter,r_exit,er
            	endif  
         endfor
         out:
-		r_enter[*,chan]=xyz_pos
 
       ; determine cells along the LOS
         if i lt nstep then begin
         	los_track,grid,vi,xyz_pos,rout,tcell,cell,ncell
-			r_exit[*,chan]=rout
           	if ncell gt 1 then begin
             	for jj=0L,ncell-1 do begin
                 	if finite(tcell[jj]) eq 0 then stop
@@ -279,7 +275,11 @@ PRO fida_los_wght,grid,xlens,ylens,zlens,xlos,ylos,zlos,weight,r_enter,r_exit,er
     endif
 END
 
-PRO chord_coor,x0,y0,z0,xf,yf,zf,u,v,z,xp,yp,zp
+PRO chord_coor,pi,pf,u,v,z,xp,yp,zp
+
+    x0=pi[0] & xf=pf[0]
+    y0=pi[1] & yf=pf[1]
+    z0=pi[2] & zf=pf[2]
 
     ;;1st Quadrant
     if (yf-y0) gt 0 and (xf-x0) gt 0 then begin
@@ -331,92 +331,69 @@ FUNCTION npa_prob,x,y,xp,yp,zp,tol=tol,dx=dx,dy=dy
 	return, p
 END
 
-PRO npa_los_wght,chords,grid,xlens,ylens,zlens,xlos,ylos,zlos,weight,r_enter,r_exit,err_arr
+PRO npa_los_wght,los,grid,weight,err_arr
 
-	nchan=n_elements(xlens)
-	err_arr=dblarr(nchan)
+	w=where(los.chan_id eq 1,nchan)
+    rd=los.rd[w]
+    ra=los.ra[w]
+    h=los.h[w]
+    xlens=los.xlens[w] & xlos=los.xlos[w]
+    ylens=los.ylens[w] & ylos=los.ylos[w]
+    zlens=los.zlens[w] & zlos=los.zlos[w]
+
 	weight  = replicate(0.d0,grid.nx,grid.ny,grid.nz,nchan)
-	r_enter = replicate(0.d0,3,nchan)
-	r_exit = replicate(0.d0,3,nchan)
-	rd=chords.rd[where(chords.chan_id eq 1)]
-	ra=chords.ra[where(chords.chan_id eq 1)]
-	h=chords.h[where(chords.chan_id eq 1)]
-	;;DEFINE DETECTOR GRID
+    err_arr=replicate(0.0,nchan)
 	ny=200L
 	nx=200L
 
-	for chan=0,n_elements(xlens)-1 do begin
-		;;CHECK WHETHER LOS INTERSECTS GRID
-		xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
+	for chan=0,nchan-1 do begin
+        xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
         xyzlos  = [xlos[chan], ylos[chan], zlos[chan]]
-        vi    = xyzlos-xyzlens
-        dummy = max(abs(vi),ic)
-        nstep = fix(700./grid.dr[ic])
-        vi    = vi/sqrt(vi[0]^2+vi[1]^2+vi[2]^2) ;; unit vector
-        xyz_pos = xyzlens
 
-      ; find first grid cell
-        for i=0L,nstep do begin
-            xyz_pos[0] = xyz_pos[0] + grid.dr[ic] * vi[0]/abs(vi[ic])
-            xyz_pos[1] = xyz_pos[1] + grid.dr[ic] * vi[1]/abs(vi[ic])
-            xyz_pos[2] = xyz_pos[2] + grid.dr[ic] * vi[2]/abs(vi[ic])
-            if xyz_pos[0] gt grid.xx[0] and xyz_pos[0] lt grid.xx[grid.nx-1]+grid.dx and $
-                xyz_pos[1] gt grid.yy[0] and xyz_pos[1] lt grid.yy[grid.ny-1]+grid.dy and $
-                xyz_pos[2] gt grid.zz[0] and xyz_pos[2] lt grid.zz[grid.nz-1]+grid.dz then begin
-                goto, out
-            endif
-        endfor
-		out:
-		r_enter[*,chan]=xyz_pos
+		ymin=-1.1d0*rd[chan]
+		xmin=-1.1d0*rd[chan]
+		ymax= 1.1d0*rd[chan]
+		xmax= 1.1d0*rd[chan]
+		x = xmin + dindgen(nx)*(xmax-xmin)/nx
+		y = ymin + dindgen(ny)*(ymax-ymin)/ny
+		dx=abs(x[1]-x[0])
+		dy=abs(y[1]-y[0])
+		xd = reform(rebin(x,nx,ny,/sample),nx*ny)
+		yd = reform(transpose(rebin(y,ny,nx,/sample)),nx*ny)	
+		rrd = sqrt(xd^2 + yd^2)
 
-      ; determine cells along the LOS
-        if i lt nstep then begin
-            los_track,grid,vi,xyz_pos,rout,tcell,cell,ncell
-            r_exit[*,chan]=rout
-			if ncell le 1 then err_arr[chan]=1
-		endif else err_arr[chan]=1
-		
-		;;IF LOS INTERSECTS GRID CALC. WEIGHTS
-		if err_arr[chan] eq 0 then begin
-			ymin=-1.1d0*rd[chan]
-			xmin=-1.1d0*rd[chan]
-			ymax= 1.1d0*rd[chan]
-			xmax= 1.1d0*rd[chan]
-		    x = xmin + dindgen(nx)*(xmax-xmin)/nx
-		    y = ymin + dindgen(ny)*(ymax-ymin)/ny
-			dx=abs(x[1]-x[0])
-			dy=abs(y[1]-y[0])
-			xd = reform(rebin(x,nx,ny,/sample),nx*ny)
-		    yd = reform(transpose(rebin(y,ny,nx,/sample)),nx*ny)	
-			rrd = sqrt(xd^2 + yd^2)
-
-			chord_coor,xlens[chan],ylens[chan],zlens[chan],xlos[chan],ylos[chan],zlos[chan],grid.x_grid,grid.y_grid,grid.z_grid,xp,yp,zp
-			zp=zp+h[chan]
-			w=where(zp gt h[chan],nw)
-			alpha=zp*0
-			xcen=zp*0
-			ycen=xcen
-			rs=xcen+rd[chan]
-			if nw ne 0 then begin
-				alpha[w]=zp[w]/(h[chan]-zp[w])
-				rs[w]=abs(ra[chan]*alpha[w])
-				xcen[w]=-xp[w]-xp[w]*alpha[w]
-				ycen[w]=-yp[w]-yp[w]*alpha[w]
-			endif
-	
-			for i=0, ncell-1 do begin
-				xi=cell[0,i]
-				yi=cell[1,i]
-				zi=cell[2,i]
-				xs=xd+xcen[xi,yi,zi]
-				ys=yd+ycen[xi,yi,zi]
-				rrs=sqrt(xs^2.0 + ys^2.0)
-				p=npa_prob(xd,yd,xp[xi,yi,zi],yp[xi,yi,zi],zp[xi,yi,zi],dx=dx,dy=dy,tol=0.0001)
-				w=where(rrs ge rs[xi,yi,zi] or rrd ge rd[chan],nw)
-				if nw ne 0 then p[w]=0
-				weight[xi,yi,zi,chan]=total(p*dx*dy)	
-			endfor
+		chord_coor,xyzlens,xyzlos,grid.u_grid,grid.v_grid,grid.w_grid,xp,yp,zp
+		zp=zp+h[chan]
+		ww=where(zp gt h[chan],nw)
+		alpha=zp*0
+		xcen=zp*0
+		ycen=xcen
+		rs=xcen+rd[chan]
+		if nw ne 0 then begin
+			alpha[ww]=zp[ww]/(h[chan]-zp[ww])
+			rs[ww]=abs(ra[chan]*alpha[ww])
+			xcen[ww]=-xp[ww]-xp[ww]*alpha[ww]
+			ycen[ww]=-yp[ww]-yp[ww]*alpha[ww]
 		endif
+	
+		for xi=0, grid.nx-1 do begin
+            for yi=0, grid.ny-1 do begin
+		 		for zi=0, grid.nz-1 do begin
+    	            if sqrt(xcen[xi,yi,zi]^2 + ycen[xi,yi,zi]^2) gt rd[chan]+rs[xi,yi,zi] then continue
+					xs=xd+xcen[xi,yi,zi]
+					ys=yd+ycen[xi,yi,zi]
+					rrs=sqrt(xs^2.0 + ys^2.0)
+					p=npa_prob(xd,yd,xp[xi,yi,zi],yp[xi,yi,zi],zp[xi,yi,zi],dx=dx,dy=dy,tol=0.0001)
+					www=where(rrs ge rs[xi,yi,zi] or rrd ge rd[chan],nw)
+					if nw ne 0 then p[www]=0
+					weight[xi,yi,zi,chan]=total(p*dx*dy)	
+				endfor
+			endfor
+		endfor
+        
+        if total(weight[*,*,*,chan]) gt 0 then begin
+			 weight[*,*,*,chan]=weight[*,*,*,chan]/total(weight[*,*,*,chan])
+        endif else err_arr[chan]=1
 	endfor
 			
 END
@@ -430,8 +407,6 @@ PRO prepare_chords,inputs,grid,chords,fida
     ;;DECLARE ARRAYS
 	err_arr=dblarr(chords.nchan)
 	weight  = replicate(0.d0,nx,ny,nz,chords.nchan)
-	r_enter = replicate(0.d0,3,chords.nchan)
-	r_exit = replicate(0.d0,3,chords.nchan)
 
 	;;ROTATE CHORDS INTO BEAM COORDINATES
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
@@ -444,20 +419,16 @@ PRO prepare_chords,inputs,grid,chords,fida
 	;;CALCULATE FIDA LOS WEIGHTS
 	w=where(chords.chan_id eq 0,nw)
 	if nw ne 0 then begin
-		fida_los_wght,grid,xlens[w],ylens[w],zlens[w],xlos[w],ylos[w],zlos[w],fida_wght,fida_enter,fida_exit,fida_err
+		fida_los_wght,grid,xlens[w],ylens[w],zlens[w],xlos[w],ylos[w],zlos[w],fida_wght,fida_err
 		weight[*,*,*,w]=fida_wght
-		r_enter[*,w]=fida_enter
-		r_exit[*,w]=fida_exit
 		err_arr[w]=fida_err
 	endif
 
 	;;CALCULATE NPA LOS WEIGHTS
 	w=where(chords.chan_id eq 1,nw)
 	if nw ne 0 then begin
-		npa_los_wght,chords,grid,xlens[w],ylens[w],zlens[w],xlos[w],ylos[w],zlos[w],npa_wght,npa_enter,npa_exit,npa_err
+		npa_los_wght,chords,grid,npa_wght,npa_err
 		weight[*,*,*,w]=npa_wght
-		r_enter[*,w]=npa_enter
-		r_exit[*,w]=npa_exit
 		err_arr[w]=npa_err
 	endif
 
@@ -474,7 +445,7 @@ PRO prepare_chords,inputs,grid,chords,fida
 	endelse
 
 	fida={nchan:n_elements(los),xlens:xlens[los],ylens:ylens[los],zlens:zlens[los],sigma_pi_ratio:chords.sigma_pi_ratio[los],$
-			xlos:xlos[los],ylos:ylos[los],zlos:zlos[los],xyz_enter:r_enter[*,los],xyz_exit:r_exit[*,los],chan_id:chords.chan_id[los],$
+			xlos:xlos[los],ylos:ylos[los],zlos:zlos[los],chan_id:chords.chan_id[los],$
 			ra:chords.ra[los],rd:chords.rd[los],h:chords.h[los],los:los,weight:weight,err:err}
 END
 
@@ -1018,8 +989,6 @@ PRO prefida,input_pro,plot=plot,save=save
 		chan_id_varid=ncdf_vardef(ncid,'chan_id',chan_id,/double)
 		sig_varid=ncdf_vardef(ncid,'sigma_pi',chan_id,/double)
 		wght_varid=ncdf_vardef(ncid,'los_wght',[xid,yid,zid,chan_id],/double)
-		xyz_enter_varid=ncdf_vardef(ncid,'xyz_enter',xyz_dim,/double)
-		xyz_exit_varid=ncdf_vardef(ncid,'xyz_exit',xyz_dim,/double)
 	endif
 	;;END DEFINITION
 	ncdf_control,ncid,/ENDEF
@@ -1097,8 +1066,6 @@ PRO prefida,input_pro,plot=plot,save=save
 		ncdf_varput,ncid,chan_id_varid,double(fida.chan_id)
 		ncdf_varput,ncid,sig_varid,double(fida.sigma_pi_ratio)
 		ncdf_varput,ncid,wght_varid,double(fida.weight)
-		ncdf_varput,ncid,xyz_enter_varid,double(fida.xyz_enter)
-		ncdf_varput,ncid,xyz_exit_varid,double(fida.xyz_exit)		
 	endif
 	ncdf_close,ncid
 	print,'Parameters stored in data file: '+file

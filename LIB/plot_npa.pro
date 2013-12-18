@@ -44,7 +44,7 @@ pro plot_npa,histo,ps=ps,path=path
   npawght=fidasim.npa.npawght
 
   ;; npa weight: Particles/s/cm^2
-  headsize=mean(los.headsize)
+  headsize=mean(los.ra)
   npawght=npawght*(!pi*headsize^2)
   nnpa=n_elements(npawght)
 

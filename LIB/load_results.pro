@@ -406,6 +406,7 @@ PRO read_npa_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_con
 		ncdf_varget,ncid,'pitch',pitcharr
 		ncdf_varget,ncid,'radius',radarr
 		ncdf_varget,ncid,'wfunct',weight_tot
+        ncdf_varget,ncid,'flux',flux
 		ncdf_close,ncid
 		
 		dE=abs(energyarr[1]-energyarr[0])
@@ -420,7 +421,7 @@ PRO read_npa_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_con
     	weights={shot:shot,time:time,nchan:n_elements(radarr),nen:nen $
             ,dE:dE,emax:emax,emin:0.,npitch:npitch,dpitch:dpitch   $
             ,energyarr:energyarr,pitcharr:pitcharr $
-            ,weight_tot:weight_tot   $
+            ,weight_tot:weight_tot,flux:flux   $
             ,radius:radarr,err:0}
 		if keyword_set(save) then save,weights,filename='npa_weights.sav'
 	endif else begin

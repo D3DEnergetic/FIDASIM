@@ -281,33 +281,8 @@ PRO chord_coor,pi,pf,u,v,z,xp,yp,zp
     y0=pi[1] & yf=pf[1]
     z0=pi[2] & zf=pf[2]
 
-    ;;1st Quadrant
-    if (yf-y0) gt 0 and (xf-x0) gt 0 then begin
-        phi=atan(abs(yf-y0)/abs(xf-x0))
-    endif
-
-    ;;2nd Quadrant
-    if (yf-y0) gt 0 and (xf-x0) lt 0 then begin
-        phi = !DPI - atan(abs(yf-y0)/abs(xf-x0))
-    endif
-
-    ;;3rd Quadrant
-    if (yf-y0) lt 0 and (xf-x0) lt 0 then begin
-        phi = atan(abs(yf-y0)/abs(xf-x0)) + !DPI
-    endif
-
-    ;;4th Quadrant
-    if (yf-y0) lt 0 and (xf-x0) gt 0 then begin
-        phi = 2*!DPI - atan(abs(yf-y0)/abs(xf-x0))
-    endif
-
-    if (xf-x0) eq 0 and (yf-y0) gt 0 then phi=!DPI/2.0d
-    if (xf-x0) eq 0 and (yf-y0) lt 0 then phi=3*!DPI/2.0d
-    if (yf-y0) eq 0 and (xf-x0) gt 0 then phi=0
-    if (yf-y0) eq 0 and (xf-x0) lt 0 then phi=!DPI
-    if (yf-y0) eq 0 and (xf-x0) eq 0 then phi=0
-
-    if (yf-y0) eq 0 and (xf-x0) eq 0 then theta=0 else theta = -atan(SQRT((xf-x0)^2.0d + (yf-y0)^2.0d)/(zf-z0))
+    phi=atan((yf-y0),(xf-x0))
+    theta=-atan(SQRT((xf-x0)^2.0d + (yf-y0)^2.0d),(zf-z0))
 
     ;;Change coordinance system to chord view (where z in entering the plasma)
     xp=(u-x0)*cos(phi)+(v-y0)*sin(phi)

@@ -172,17 +172,13 @@ module application
   end type spec_type
 
   type npa_type
-     real(double), dimension(:,:) ,allocatable  :: v    !! velocity array
-     real(double), dimension(:,:) ,allocatable  :: ipos !! initial position arra
-     real(double), dimension(:,:) ,allocatable  :: fpos !! final position array
-     real(double), dimension(:)   ,allocatable  :: wght !! weight
-     real(double), dimension(:)   ,allocatable  :: size !! active area of detect
-     integer(long)               :: counter
-     real(double)                :: npa_loop
-     real(double)                :: opening_angle
-     real(double), dimension(3)  :: los
-     real(double)                :: dlos
-
+     real(double), dimension(:,:,:) ,allocatable  :: v    !! velocity array
+     real(double), dimension(:,:,:) ,allocatable  :: ipos !! initial position arra
+     real(double), dimension(:,:,:) ,allocatable  :: fpos !! final position array
+     real(double), dimension(:,:)   ,allocatable  :: wght !! weight
+     integer(long),dimension(:)     ,allocatable  :: counter
+     real(double)                                 :: npa_loop
+     integer(long),                               :: nchan
   end type npa_type
   type result_type
      real(double),dimension(:,:,:,:,:),allocatable:: neut_dens! Density 
@@ -459,12 +455,11 @@ contains
     if (inputs%npa.eq.0) then 
        npa%npa_loop=1.
     else
-       allocate(npa%size(spec%nchan))
-       npa%size=spec%ra(1)
        npa%npa_loop=10000.
-       npa%opening_angle=atan(spec%ra(1)/spec%h(1))
-       npa%los=spec%xyzhead(1,:)-spec%xyzlos(1,:)
-       npa%dlos=sqrt(dot_product(npa%los,npa%los))
+       npa%nchan=0
+       do i=1,spec%nchan
+         if(spec%chan_id(i).eq.1) npa%nchan=npa%nchan+1
+       enddo 
     endif
   end subroutine read_los
 
@@ -881,15 +876,17 @@ contains
 
   subroutine write_npa
     use netcdf
-    integer         :: i,e_dimid,c_dimid,ncid,dimids(2),dimid1
-    integer         :: ipos_varid,fpos_varid,v_varid,wght_varid,shot_varid,time_varid
+    integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(2),dimid1,maxcnt
+    integer         :: ipos_varid,fpos_varid,v_varid,wght_varid,shot_varid,time_varid,cnt_varid
     character(120)  :: filename
-    real(float), dimension(:,:),allocatable :: output
-    real(float), dimension(:),allocatable :: output1
-    allocate(output(npa%counter,3))
-    allocate(output1(npa%counter))
+    real(float), dimension(:,:,:),allocatable :: output
+    real(float), dimension(:,:),allocatable :: output1
+    real(float), dimension(:),allocatable :: output2
+    maxcnt=max(npa%counter(:))
+    allocate(output(npa%nchan,maxcnt,3))
+    allocate(output1(npa%nchan,maxcnt))
+    allocate(output2(npa%nchan))
 
-    npa%wght(:)=npa%wght(:)/(pi*npa%size(1)**2)
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
 
     !Create netCDF file
@@ -897,9 +894,10 @@ contains
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
-    call check( nf90_def_dim(ncid,"counts",npa%counter,c_dimid) )
+    call check( nf90_def_dim(ncid,"nchan",npa%nchan,nchan_dimid) )
+    call check( nf90_def_dim(ncid,"max_counts",maxcnt,c_dimid) )
     call check( nf90_def_dim(ncid,"energy",3,e_dimid) )
-    dimids = (/ c_dimid, e_dimid /)
+    dimids = (/ nchan_dimid, c_dimid, e_dimid /)
 
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
@@ -908,6 +906,7 @@ contains
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
     call check( nf90_def_var(ncid,"wght",NF90_FLOAT,c_dimid,wght_varid) )
+    call check( nf90_def_var(ncid,"counts",NF90_FLOAT,nchan_dimid,cnt_varid) )
 
 	!Add unit attributes
 	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
@@ -921,22 +920,26 @@ contains
     call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
     call check( nf90_put_var(ncid, time_varid, inputs%time) )
 
-    output(:,:)=real(npa%ipos(:npa%counter,:),float)
+    output(:,:,:)=real(npa%ipos(:,:maxcnt,:),float)
     call check( nf90_put_var(ncid, ipos_varid, output) )
 
-    output(:,:)=real(npa%fpos(:npa%counter,:),float)
+    output(:,:,:)=real(npa%fpos(:,:maxcnt,:),float)
     call check( nf90_put_var(ncid, fpos_varid, output) )
 
-    output(:,:)=real(npa%v(:npa%counter,:)   ,float)
+    output(:,:,:)=real(npa%v(:,:maxcnt,:)   ,float)
     call check( nf90_put_var(ncid, v_varid, output) )
 
-    output1(:)=real(npa%wght(:npa%counter) ,float)
+    output1(:,:)=real(npa%wght(:,:maxcnt) ,float)
     call check( nf90_put_var(ncid, wght_varid, output1) )
+
+    output2(:)=real(npa%counter(:),float)
+    call check( nf90_put_var(ncid, cnt_varid,output2)
 
     !Close netCDF file
     call check( nf90_close(ncid) )
     deallocate(output)
     deallocate(output1)
+    deallocate(output2)
     print*, 'NPA data written to: ',filename
   end subroutine write_npa
   
@@ -2298,7 +2301,7 @@ contains
   end subroutine table_interp
   
 
-  subroutine colrad(ac,vn,dt,states,photons,neut_type,nlaunch,ri)
+  subroutine colrad(ac,vn,dt,states,photons,neut_type,nlaunch,ri,det)
     !colrad solves the collisional-radiative balance equations
     real(double) , dimension(:),  intent(in)    :: vn  !!velocitiy (cm/s)
     real(double)               ,  intent(in)    :: dt  !!time interval in cell
@@ -2308,6 +2311,7 @@ contains
     real(double), dimension(:) ,  intent(inout) :: states  !!density of states
     real(double),                 intent(out)   :: photons !!emitted photons 
     real(double) , dimension(:),  intent(in), optional  :: ri  !! start position
+    integer,                      intent(in), optional  :: det  !! npa detector index
     !! ---- to determine rate coefficients ---- !   
     real(double), dimension(nlevs+1,nlevs)     :: qp !! Proton rate coefficants
     real(double), dimension(nlevs+1,nlevs)     :: qi !! Impurity rate coefficant
@@ -2360,13 +2364,13 @@ contains
                ,ri-spec%xyzhead(1,:)))
           ray=ri(:)+vn(:)/sqrt(dot_product(vn,vn))*dray
           !$OMP CRITICAL(col_rad_npa)
-          npa%counter=npa%counter+1
-          if(0.eq.mod(npa%counter,10)) print*,'Neutrals Detected:',npa%counter
-          if(npa%counter.gt.inputs%nr_npa)stop'too many neutrals'
-          npa%v(npa%counter,:)=vn(:)
-          npa%wght(npa%counter)=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
-          npa%ipos(npa%counter,:)=ri(:)
-          npa%fpos(npa%counter,:)=ray(:)
+          npa%counter(det)=npa%counter(det)+1
+          if(0.eq.mod(npa%counter(det),10)) print*,'Neutrals Detected:',det,npa%counter(det)
+          if(npa%counter(det).gt.inputs%nr_npa)stop'too many neutrals'
+          npa%v(det,npa%counter(det),:)=vn(:)
+          npa%wght(det.npa%counter(det))=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
+          npa%ipos(det,npa%counter(det),:)=ri(:)
+          npa%fpos(det.npa%counter(det),:)=ray(:)
           !$OMP END CRITICAL(col_rad_npa)
        endif
        return
@@ -2583,7 +2587,62 @@ contains
     enddo tracking
     ncell=cc-1
   end subroutine track
-  
+
+ !*****************************************************************************
+ !------------hit_npa_detector-------------------------------------------------
+ !*****************************************************************************
+  subroutine hit_npa_detector(pos,vel,det)
+    integer                       ,               :: i,det
+	real(double), dimension(3)    ,               :: pos,vel,xyz_i,xyz_f
+    real(double), dimension(3)    ,               :: rpos,rvel
+    real(double)                  ,               :: phi,theta,xp,yp,zp
+    real(double)                  ,               :: ra,rd,xa,ya,xd,yd
+
+    det=0
+    loop_over_chan: do i=1,spec%nchan
+      !!only do npa channels
+      if(spec%chan_id(i).ne.1) cycle loop_over_chan
+      !!transform to chord coordinates 
+      xyz_i(1)=spec%xyzhead(i,1)
+      xyz_i(2)=spec%xyzhead(i,2)
+      xyz_i(3)=spec%xyzhead(i,3)
+      xyz_f(1)=spec%xyzlos(i,1)
+      xyz_f(2)=spec%xyzlos(i,2)
+      xyz_f(3)=spec%xyzlos(i,3)
+
+      phi=atan((xyz_f(2)-xyz_i(2)),(xyz_f(1)-xyz_i(1)))
+      theta= -1*atan(sqrt((xyz_f(1)-xyz_i(1))**2.0 + (xyz_f(2)-xyz_i(2))**2.0),(xyz_f(3)-xyz_i(3)))
+      
+      xp=(pos(1)-xyz_i(1))*cos(phi)+(pos(2)-xyz_i(2))*sin(phi)
+      yp=-(pos(1)-xyz_i(1))*sin(phi)+(pos(2)-xyz_i(2))*cos(phi)
+      zp=pos(3)-xyz_i(3)
+      rpos(1)=xp*cos(theta)+zp*sin(theta)
+      rpos(2)=yp
+      rpos(3)=-xp*sin(theta)+zp*cos(theta)
+      
+      xp=(vel(1))*cos(phi)+(pos(2))*sin(phi)
+      yp=-(vel(1))*sin(phi)+(pos(2))*cos(phi)
+      zp=vel(3)
+      rvel(1)=xp*cos(theta)+zp*sin(theta)
+      rvel(2)=yp
+      rvel(3)=-xp*sin(theta)+zp*cos(theta)
+      !!if a neutral particle is moving in the opposite direction it will not hit detector
+      if(rvel(3).ge.0) cycle loop_over_chan
+      xa=rpos(1)+rvel(1)*(-rpos(3)/rvel(3))
+      ya=rpos(2)+rvel(2)*(-rpos(3)/rvel(3))
+      ra=sqrt(xa**2.0 + ya**2.0)
+      xd=rpos(1)+rvel(1)*((-spec%h(i)-rpos(3))/rvel(3))
+      yd=rpos(2)+rvel(2)*((-spec%h(i)-rpos(3))/rvel(3))
+      rd=sqrt(xd**2.0 + yd**2.0)
+      !!if a neutral particle pass through both the aperture and detector then it count it
+      if((rd.le.spec%rd(i)).and.(ra.le.spec%ra(i)))
+        det=i
+        exit loop_over_chan
+	  endif
+    enddo loop_over_chan
+
+  end subroutine hit_npa_detector
+
  !*****************************************************************************
  !----------- get_nlauch ------------------------------------------------------
  !*****************************************************************************
@@ -2920,12 +2979,13 @@ contains
     result%neut_dens(:,:,:,:,s1type) = 0.d0
     result%neut_dens(:,:,:,:,s2type) = 0.d0
   end subroutine halo
+
   !*****************************************************************************
   !-----------FIDA simulation---------------------------------------------------
   !*****************************************************************************
   subroutine fida      
     integer                               :: i,j,k   !! indices  x,y,z  of cells
-    integer                               :: iion
+    integer                               :: iion,det
     real(double), dimension(3)            :: ri      !! start position
     real(double), dimension(3)            :: vi      !! velocity of fast ions
     integer,dimension(3)                  :: ac      !! new actual cell 
@@ -2957,10 +3017,7 @@ contains
        do j=1,grid%Ny 
           do i=1,grid%Nx 
              if (inputs%npa.eq.1) then
-                ri(:)=(/grid%xxc(i),grid%yyc(j),grid%zzc(k)/)
-                ray=spec%xyzhead(1,:)-ri
-                alpha=acos(dot_product(npa%los,ray)/(npa%dlos*sqrt(dot_product(ray,ray))))
-                if (alpha.gt.npa%opening_angle*3.) cycle
+                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle
              endif
              papprox(i,j,k)=(sum(result%neut_dens(i,j,k,:,nbif_type))  &
                   +          sum(result%neut_dens(i,j,k,:,nbih_type))  &
@@ -2978,29 +3035,22 @@ contains
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
           loop_along_x: do i = 1, grid%Nx
+             !!if there is no chance of the particle hitting any detector skip cell
+             if (inputs%npa.eq.1) then
+                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle
+             endif
              !! ------------- loop over the markers ---------------------- !!
              npa_loop: do inpa=1,int(npa%npa_loop)
                 loop_over_fast_ions: do iion=1,int(nlaunch(i,j,k))
-
                    ac=(/i,j,k/)
                    !! ---------------- calculate vi, ri and track --------- !!
                    call mc_fastion(ac, vi(:)) 
                    if(sum(vi).eq.0)cycle loop_over_fast_ions
                    !! -------- check if particle flies into NPA detector ---- !!
-                   if(inputs%npa.eq.1)then  
-                      vi_abs=sqrt(dot_product(vi,vi))
-                      alpha=acos(dot_product(npa%los,vi(:))/(vi_abs*npa%dlos))
-                      if (alpha.gt.npa%opening_angle) cycle loop_over_fast_ions
-                   endif
                    call mc_start  (ac, vi(:),  ri(:))
-                   !! -------- check if track ends at the NPA detector ---- !!
-                   if(inputs%npa.eq.1)then 
-                      !! check if track ends at the NPA detector
-                      ray=ri-spec%xyzhead(1,:)
-                      hit_pos(:)=ri(:)+vi(:)/vi_abs*sqrt(dot_product(ray,ray)) 
-                      ddet=hit_pos-spec%xyzhead(1,:)
-                      if(sqrt(dot_product(ddet,ddet))&
-                           .gt.npa%size(1)) cycle loop_over_fast_ions
+                   if(inputs%npa.eq.1)then  
+                     call hit_npa_detector(ri(:),vi(:),det)
+                     if(det.eq.0) cycle loop_over_fast_ions 
                    endif
                    call track(vi(:), ri(:), tcell, icell,pos, ncell)
                    if(ncell.eq.0)cycle loop_over_fast_ions
@@ -3035,7 +3085,7 @@ contains
                    loop_along_track: do jj=1,ncell        
                       ac=icell(:,jj)
                       call colrad(ac(:),vi(:),tcell(jj) &
-                           ,states,photons,fida_type,nlaunch(i,j,k),ri(:))
+                           ,states,photons,fida_type,nlaunch(i,j,k),ri(:),det)
                       if(photons.le.0.d0)cycle loop_over_fast_ions
                       if(inputs%calc_spec.eq.1) call spectrum(vi(:),ac(:),pos(:,jj),photons,fida_type)
                    enddo loop_along_track
@@ -3776,11 +3826,16 @@ program fidasim
   if(inputs%npa.eq.1)then
      print*, 'this is a NPA simultation!'
      inputs%nr_npa=1000000
-     allocate(npa%v(inputs%nr_npa,3)) 
-     allocate(npa%ipos(inputs%nr_npa,3)) 
-     allocate(npa%fpos(inputs%nr_npa,3)) 
-     allocate(npa%wght(inputs%nr_npa))
-     npa%counter=0    
+     allocate(npa%v(npa%nchan,inputs%nr_npa,3)) 
+     allocate(npa%ipos(npa%nchan,inputs%nr_npa,3)) 
+     allocate(npa%fpos(npa%nchan,inputs%nr_npa,3)) 
+     allocate(npa%wght(npa%nchan,inputs%nr_npa))
+     allocate(npa%counter(npa%nchan))
+     npa%counter(:)=0
+     npa%v(:,:,:)=0   
+     npa%ipos(:,:,:)=0   
+     npa%fpos(:,:,:)=0   
+     npa%wght(:,:)=0   
   endif
   
 
@@ -3920,6 +3975,7 @@ program fidasim
      deallocate(npa%ipos) 
      deallocate(npa%fpos) 
      deallocate(npa%wght)
+     deallocate(npa%counter)
   endif
 end program fidasim
  

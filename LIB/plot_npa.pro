@@ -1,4 +1,4 @@
-pro plot_npa,histo,ps=ps,path=path
+pro plot_npa,histo,energy_arr,ps=ps,path=path
   ;; ROUTINE OF FIDASIM to plot resulting NPA fluxes
   ;; written by Philipp Scheider and Benedikt Geiger 2013
   ;; plot settings
@@ -45,7 +45,6 @@ pro plot_npa,histo,ps=ps,path=path
 
   ;; npa weight: Particles/s/cm^2
   headsize=mean(los.ra)
-  npawght=npawght*(!pi*headsize^2)
   nnpa=n_elements(npawght)
 
   ;; plot initial and end position of fast-ion trajectories on

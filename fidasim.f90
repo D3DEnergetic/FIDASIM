@@ -178,7 +178,7 @@ module application
      real(double), dimension(:,:)   ,allocatable  :: wght !! weight
      integer(long),dimension(:)     ,allocatable  :: counter
      real(double)                                 :: npa_loop
-     integer(long),                               :: nchan
+     integer(long)                                :: nchan
   end type npa_type
   type result_type
      real(double),dimension(:,:,:,:,:),allocatable:: neut_dens! Density 
@@ -876,13 +876,13 @@ contains
 
   subroutine write_npa
     use netcdf
-    integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(2),dimid1,maxcnt
+    integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,maxcnt
     integer         :: ipos_varid,fpos_varid,v_varid,wght_varid,shot_varid,time_varid,cnt_varid
     character(120)  :: filename
     real(float), dimension(:,:,:),allocatable :: output
     real(float), dimension(:,:),allocatable :: output1
     real(float), dimension(:),allocatable :: output2
-    maxcnt=max(npa%counter(:))
+    maxcnt=maxval(npa%counter(:))
     allocate(output(npa%nchan,maxcnt,3))
     allocate(output1(npa%nchan,maxcnt))
     allocate(output2(npa%nchan))
@@ -933,7 +933,7 @@ contains
     call check( nf90_put_var(ncid, wght_varid, output1) )
 
     output2(:)=real(npa%counter(:),float)
-    call check( nf90_put_var(ncid, cnt_varid,output2)
+    call check( nf90_put_var(ncid, cnt_varid,output2) )
 
     !Close netCDF file
     call check( nf90_close(ncid) )
@@ -2368,9 +2368,9 @@ contains
           if(0.eq.mod(npa%counter(det),10)) print*,'Neutrals Detected:',det,npa%counter(det)
           if(npa%counter(det).gt.inputs%nr_npa)stop'too many neutrals'
           npa%v(det,npa%counter(det),:)=vn(:)
-          npa%wght(det.npa%counter(det))=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
+          npa%wght(det,npa%counter(det))=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
           npa%ipos(det,npa%counter(det),:)=ri(:)
-          npa%fpos(det.npa%counter(det),:)=ray(:)
+          npa%fpos(det,npa%counter(det),:)=ray(:)
           !$OMP END CRITICAL(col_rad_npa)
        endif
        return
@@ -2592,11 +2592,11 @@ contains
  !------------hit_npa_detector-------------------------------------------------
  !*****************************************************************************
   subroutine hit_npa_detector(pos,vel,det)
-    integer                       ,               :: i,det
-	real(double), dimension(3)    ,               :: pos,vel,xyz_i,xyz_f
-    real(double), dimension(3)    ,               :: rpos,rvel
-    real(double)                  ,               :: phi,theta,xp,yp,zp
-    real(double)                  ,               :: ra,rd,xa,ya,xd,yd
+    integer                                       :: i,det
+	real(double), dimension(3)                    :: pos,vel,xyz_i,xyz_f
+    real(double), dimension(3)                    :: rpos,rvel
+    real(double)                                  :: phi,theta,xp,yp,zp
+    real(double)                                  :: ra,rd,xa,ya,xd,yd
 
     det=0
     loop_over_chan: do i=1,spec%nchan
@@ -2610,8 +2610,8 @@ contains
       xyz_f(2)=spec%xyzlos(i,2)
       xyz_f(3)=spec%xyzlos(i,3)
 
-      phi=atan((xyz_f(2)-xyz_i(2)),(xyz_f(1)-xyz_i(1)))
-      theta= -1*atan(sqrt((xyz_f(1)-xyz_i(1))**2.0 + (xyz_f(2)-xyz_i(2))**2.0),(xyz_f(3)-xyz_i(3)))
+      phi=atan2((xyz_f(2)-xyz_i(2)),(xyz_f(1)-xyz_i(1)))
+      theta= -1*atan2(sqrt((xyz_f(1)-xyz_i(1))**2.0 + (xyz_f(2)-xyz_i(2))**2.0),(xyz_f(3)-xyz_i(3)))
       
       xp=(pos(1)-xyz_i(1))*cos(phi)+(pos(2)-xyz_i(2))*sin(phi)
       yp=-(pos(1)-xyz_i(1))*sin(phi)+(pos(2)-xyz_i(2))*cos(phi)
@@ -2635,7 +2635,7 @@ contains
       yd=rpos(2)+rvel(2)*((-spec%h(i)-rpos(3))/rvel(3))
       rd=sqrt(xd**2.0 + yd**2.0)
       !!if a neutral particle pass through both the aperture and detector then it count it
-      if((rd.le.spec%rd(i)).and.(ra.le.spec%ra(i)))
+      if( rd.le.spec%rd(i).and.ra.le.spec%ra(i) ) then
         det=i
         exit loop_over_chan
 	  endif

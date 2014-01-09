@@ -102,9 +102,9 @@ module application
      real(double), dimension(3,3) :: Crot 
   end type nbi_type
   type grid_type
-	 real(double), dimension(3) :: origin !! origin
-	 real(double)               :: alpha  !! rotation about z
-	 real(double)				:: beta   !! rotation about y/tilt
+     real(double), dimension(3) :: origin !! origin
+     real(double)               :: alpha  !! rotation about z
+     real(double)                :: beta   !! rotation about y/tilt
      real(double), dimension(3) :: dr     !! dx, dy, dz
      real(double)               :: drmin  !! min(dx,dy,dz)
      real(double)               :: dv     !! volume of cells
@@ -383,39 +383,39 @@ contains
   end subroutine read_inputs
   !****************************************************************************
  subroutine read_los
-	use netcdf
+    use netcdf
     character(120)  :: filename
     integer(long)   :: i, j, k,ichan
-	integer			:: ncid,xlens_varid,ylens_varid,zlens_varid
-	integer 		:: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid
-	integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
+    integer            :: ncid,xlens_varid,ylens_varid,zlens_varid
+    integer         :: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid
+    integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading detector information ----'
-	
-	!!OPEN netCDF file   
-	call check( nf90_open(filename, nf90_nowrite, ncid) )
-	
-	!!GET THE VARIDS
-	call check( nf90_inq_varid(ncid, "Nchan", nchan_varid) )
-	call check( nf90_inq_varid(ncid, "xlens", xlens_varid) )
-	call check( nf90_inq_varid(ncid, "ylens", ylens_varid) )
-	call check( nf90_inq_varid(ncid, "zlens", zlens_varid) )
-	call check( nf90_inq_varid(ncid, "xlos", xlos_varid) )
-	call check( nf90_inq_varid(ncid, "ylos", ylos_varid) )
-	call check( nf90_inq_varid(ncid, "zlos", zlos_varid) )
-	call check( nf90_inq_varid(ncid, "ra", ra_varid) )
-	call check( nf90_inq_varid(ncid, "rd", rd_varid) )
-	call check( nf90_inq_varid(ncid, "sigma_pi", sig_varid) )
-	call check( nf90_inq_varid(ncid, "h", h_varid) )
-	call check( nf90_inq_varid(ncid, "chan_id", chan_id_varid) )
-	call check( nf90_inq_varid(ncid, "los_wght", wght_varid) )
+    
+    !!OPEN netCDF file   
+    call check( nf90_open(filename, nf90_nowrite, ncid) )
+    
+    !!GET THE VARIDS
+    call check( nf90_inq_varid(ncid, "Nchan", nchan_varid) )
+    call check( nf90_inq_varid(ncid, "xlens", xlens_varid) )
+    call check( nf90_inq_varid(ncid, "ylens", ylens_varid) )
+    call check( nf90_inq_varid(ncid, "zlens", zlens_varid) )
+    call check( nf90_inq_varid(ncid, "xlos", xlos_varid) )
+    call check( nf90_inq_varid(ncid, "ylos", ylos_varid) )
+    call check( nf90_inq_varid(ncid, "zlos", zlos_varid) )
+    call check( nf90_inq_varid(ncid, "ra", ra_varid) )
+    call check( nf90_inq_varid(ncid, "rd", rd_varid) )
+    call check( nf90_inq_varid(ncid, "sigma_pi", sig_varid) )
+    call check( nf90_inq_varid(ncid, "h", h_varid) )
+    call check( nf90_inq_varid(ncid, "chan_id", chan_id_varid) )
+    call check( nf90_inq_varid(ncid, "los_wght", wght_varid) )
 
-	!!READ IN THE NUMBER OF CHANNELS
-	call check( nf90_get_var(ncid, nchan_varid, spec%nchan) )
+    !!READ IN THE NUMBER OF CHANNELS
+    call check( nf90_get_var(ncid, nchan_varid, spec%nchan) )
 
-	!!ALLOCATE SPACE
+    !!ALLOCATE SPACE
     allocate(spec%xyzhead(spec%nchan,3))
     allocate(spec%xyzlos(spec%nchan,3))
     allocate(spec%ra(spec%nchan))
@@ -425,22 +425,22 @@ contains
     allocate(spec%sigma_pi(spec%nchan))
     allocate(dummy_arr(grid%Nx,grid%Ny,grid%Nz,spec%nchan))
 
-	!!READ IN OTHER PARAMETERS
-	call check( nf90_get_var(ncid, xlens_varid, spec%xyzhead(:,1)) )
-	call check( nf90_get_var(ncid, ylens_varid, spec%xyzhead(:,2)) )
-	call check( nf90_get_var(ncid, zlens_varid, spec%xyzhead(:,3)) )
-	call check( nf90_get_var(ncid, xlos_varid, spec%xyzlos(:,1)) )
-	call check( nf90_get_var(ncid, ylos_varid, spec%xyzlos(:,2)) )
-	call check( nf90_get_var(ncid, zlos_varid, spec%xyzlos(:,3)) )
-	call check( nf90_get_var(ncid, ra_varid, spec%ra) )
-	call check( nf90_get_var(ncid, rd_varid, spec%rd) )
-	call check( nf90_get_var(ncid, h_varid, spec%h) )
-	call check( nf90_get_var(ncid, chan_id_varid, spec%chan_id) )
-	call check( nf90_get_var(ncid, sig_varid, spec%sigma_pi) )
-	call check( nf90_get_var(ncid, wght_varid, dummy_arr(:,:,:,:)) )
+    !!READ IN OTHER PARAMETERS
+    call check( nf90_get_var(ncid, xlens_varid, spec%xyzhead(:,1)) )
+    call check( nf90_get_var(ncid, ylens_varid, spec%xyzhead(:,2)) )
+    call check( nf90_get_var(ncid, zlens_varid, spec%xyzhead(:,3)) )
+    call check( nf90_get_var(ncid, xlos_varid, spec%xyzlos(:,1)) )
+    call check( nf90_get_var(ncid, ylos_varid, spec%xyzlos(:,2)) )
+    call check( nf90_get_var(ncid, zlos_varid, spec%xyzlos(:,3)) )
+    call check( nf90_get_var(ncid, ra_varid, spec%ra) )
+    call check( nf90_get_var(ncid, rd_varid, spec%rd) )
+    call check( nf90_get_var(ncid, h_varid, spec%h) )
+    call check( nf90_get_var(ncid, chan_id_varid, spec%chan_id) )
+    call check( nf90_get_var(ncid, sig_varid, spec%sigma_pi) )
+    call check( nf90_get_var(ncid, wght_varid, dummy_arr(:,:,:,:)) )
 
-	!!CLOSE netCDF FILE
-	call check( nf90_close(ncid) )
+    !!CLOSE netCDF FILE
+    call check( nf90_close(ncid) )
 
     do k = 1, grid%Nz   
        do j = 1, grid%Ny
@@ -465,61 +465,61 @@ contains
 
   !***************************************************************************!
   subroutine read_plasma
-	use netcdf
+    use netcdf
     character(120):: filename
     integer(long) :: i, j, k
-	integer		  :: te_var,ti_var,dene_var,deni_var,denp_var,denf_var
-	integer  	  :: vx_var,vy_var,vz_var,zeff_var,bx_var,by_var,bz_var
-	integer 	  :: ex_var,ey_var,ez_var,rho_var,ncid 
+    integer          :: te_var,ti_var,dene_var,deni_var,denp_var,denf_var
+    integer        :: vx_var,vy_var,vz_var,zeff_var,bx_var,by_var,bz_var
+    integer       :: ex_var,ey_var,ez_var,rho_var,ncid 
     real(double), dimension(grid%nx,grid%ny,grid%nz,3) :: bcell
     real(double)               :: b_abs     !! Magnetic field
     real(double), dimension(3) :: a,b,c    !! Magnetic field
 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
 
-	!!OPEN netCDF file   
-	call check( nf90_open(filename, nf90_nowrite, ncid) )
-	
-	!!GET THE VARIDS
-	call check( nf90_inq_varid(ncid, "te", te_var) )
-	call check( nf90_inq_varid(ncid, "ti", ti_var) )
-	call check( nf90_inq_varid(ncid, "dene", dene_var) )
-	call check( nf90_inq_varid(ncid, "deni", deni_var) )
-	call check( nf90_inq_varid(ncid, "denp", denp_var) )
-	call check( nf90_inq_varid(ncid, "denf", denf_var) )
-	call check( nf90_inq_varid(ncid, "vrotx", vx_var) )
-	call check( nf90_inq_varid(ncid, "vroty", vy_var) )
-	call check( nf90_inq_varid(ncid, "vrotz", vz_var) )
-	call check( nf90_inq_varid(ncid, "zeff", zeff_var) )
-	call check( nf90_inq_varid(ncid, "bx", bx_var) )
-	call check( nf90_inq_varid(ncid, "by", by_var) )
-	call check( nf90_inq_varid(ncid, "bz", bz_var) )
-	call check( nf90_inq_varid(ncid, "ex", ex_var) )
-	call check( nf90_inq_varid(ncid, "ey", ey_var) )
-	call check( nf90_inq_varid(ncid, "ez", ez_var) )
-	call check( nf90_inq_varid(ncid, "rho_grid", rho_var) )
+    !!OPEN netCDF file   
+    call check( nf90_open(filename, nf90_nowrite, ncid) )
+    
+    !!GET THE VARIDS
+    call check( nf90_inq_varid(ncid, "te", te_var) )
+    call check( nf90_inq_varid(ncid, "ti", ti_var) )
+    call check( nf90_inq_varid(ncid, "dene", dene_var) )
+    call check( nf90_inq_varid(ncid, "deni", deni_var) )
+    call check( nf90_inq_varid(ncid, "denp", denp_var) )
+    call check( nf90_inq_varid(ncid, "denf", denf_var) )
+    call check( nf90_inq_varid(ncid, "vrotx", vx_var) )
+    call check( nf90_inq_varid(ncid, "vroty", vy_var) )
+    call check( nf90_inq_varid(ncid, "vrotz", vz_var) )
+    call check( nf90_inq_varid(ncid, "zeff", zeff_var) )
+    call check( nf90_inq_varid(ncid, "bx", bx_var) )
+    call check( nf90_inq_varid(ncid, "by", by_var) )
+    call check( nf90_inq_varid(ncid, "bz", bz_var) )
+    call check( nf90_inq_varid(ncid, "ex", ex_var) )
+    call check( nf90_inq_varid(ncid, "ey", ey_var) )
+    call check( nf90_inq_varid(ncid, "ez", ez_var) )
+    call check( nf90_inq_varid(ncid, "rho_grid", rho_var) )
 
-	!!READ IN OTHER PARAMETERS
-	call check( nf90_get_var(ncid, te_var,   cell(:,:,:)%plasma%te) )
-	call check( nf90_get_var(ncid, ti_var,   cell(:,:,:)%plasma%ti) )
-	call check( nf90_get_var(ncid, dene_var, cell(:,:,:)%plasma%dene) )
-	call check( nf90_get_var(ncid, deni_var, cell(:,:,:)%plasma%deni) )
-	call check( nf90_get_var(ncid, denp_var, cell(:,:,:)%plasma%denp) )
-	call check( nf90_get_var(ncid, denf_var, cell(:,:,:)%plasma%denf) )
-	call check( nf90_get_var(ncid, vx_var,   cell(:,:,:)%plasma%vrot(1)) )
-	call check( nf90_get_var(ncid, vy_var,   cell(:,:,:)%plasma%vrot(2)) )
-	call check( nf90_get_var(ncid, vz_var,   cell(:,:,:)%plasma%vrot(3)) )
-	call check( nf90_get_var(ncid, zeff_var, cell(:,:,:)%plasma%zeff) )
-	call check( nf90_get_var(ncid, bx_var,   bcell(:,:,:,1)) )
-	call check( nf90_get_var(ncid, by_var,   bcell(:,:,:,2)) )
-	call check( nf90_get_var(ncid, bz_var,   bcell(:,:,:,3)) )
-	call check( nf90_get_var(ncid, ex_var,   cell(:,:,:)%plasma%e(1)) )
-	call check( nf90_get_var(ncid, ey_var,   cell(:,:,:)%plasma%e(2)) )
-	call check( nf90_get_var(ncid, ez_var,   cell(:,:,:)%plasma%e(3)) )
-	call check( nf90_get_var(ncid, rho_var,  cell(:,:,:)%rho) )
+    !!READ IN OTHER PARAMETERS
+    call check( nf90_get_var(ncid, te_var,   cell(:,:,:)%plasma%te) )
+    call check( nf90_get_var(ncid, ti_var,   cell(:,:,:)%plasma%ti) )
+    call check( nf90_get_var(ncid, dene_var, cell(:,:,:)%plasma%dene) )
+    call check( nf90_get_var(ncid, deni_var, cell(:,:,:)%plasma%deni) )
+    call check( nf90_get_var(ncid, denp_var, cell(:,:,:)%plasma%denp) )
+    call check( nf90_get_var(ncid, denf_var, cell(:,:,:)%plasma%denf) )
+    call check( nf90_get_var(ncid, vx_var,   cell(:,:,:)%plasma%vrot(1)) )
+    call check( nf90_get_var(ncid, vy_var,   cell(:,:,:)%plasma%vrot(2)) )
+    call check( nf90_get_var(ncid, vz_var,   cell(:,:,:)%plasma%vrot(3)) )
+    call check( nf90_get_var(ncid, zeff_var, cell(:,:,:)%plasma%zeff) )
+    call check( nf90_get_var(ncid, bx_var,   bcell(:,:,:,1)) )
+    call check( nf90_get_var(ncid, by_var,   bcell(:,:,:,2)) )
+    call check( nf90_get_var(ncid, bz_var,   bcell(:,:,:,3)) )
+    call check( nf90_get_var(ncid, ex_var,   cell(:,:,:)%plasma%e(1)) )
+    call check( nf90_get_var(ncid, ey_var,   cell(:,:,:)%plasma%e(2)) )
+    call check( nf90_get_var(ncid, ez_var,   cell(:,:,:)%plasma%e(3)) )
+    call check( nf90_get_var(ncid, rho_var,  cell(:,:,:)%rho) )
 
-	!!CLOSE netCDF FILE
-	call check( nf90_close(ncid) )
+    !!CLOSE netCDF FILE
+    call check( nf90_close(ncid) )
 
     !! --- calculate vectors a,c that are perpendicular to b -- !!
     do k = 1, grid%Nz   
@@ -552,10 +552,10 @@ contains
   !****************************************************************************
   ! Read vb written by IDL routine  WWH 6/2013
   subroutine read_bremsstrahlung
-	use netcdf
+    use netcdf
     character(120)          :: filename
     integer(long) :: i
-	integer       :: ncid,brems_varid
+    integer       :: ncid,brems_varid
     real(double) :: vb
     real(double), dimension(:)  , allocatable :: brems
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
@@ -563,15 +563,15 @@ contains
     print*,'---- loading bremsstrahlung data from ', filename
     allocate(brems(spec%nchan))
 
-	!!OPEN netCDF file   
-	call check( nf90_open(filename, nf90_nowrite, ncid) )
+    !!OPEN netCDF file   
+    call check( nf90_open(filename, nf90_nowrite, ncid) )
 
-	!!GET VARIABLE
-	call check( nf90_inq_varid(ncid, "brems", brems_varid) )
-	call check( nf90_get_var(ncid, brems_varid, brems) )
+    !!GET VARIABLE
+    call check( nf90_inq_varid(ncid, "brems", brems_varid) )
+    call check( nf90_get_var(ncid, brems_varid, brems) )
 
-	!!CLOSE netCDF FILE
-	call check( nf90_close(ncid) )
+    !!CLOSE netCDF FILE
+    call check( nf90_close(ncid) )
 
     do i = 1,spec%nchan
       result%spectra(:,i,brems_type)=brems(i)
@@ -669,7 +669,7 @@ contains
   !****************************************************************************
   !-------------------FASTION DISTRIBUTION FUNCTION ----------------------
   subroutine read_fbm
-	use netcdf
+    use netcdf
     character(120)  :: filename
     integer         :: i,j,k
     !! sub_grid
@@ -680,55 +680,55 @@ contains
     integer(long)   :: nzones
     real(double), dimension(:), allocatable     :: transp_r,transp_z,transp_vol
     real(double), dimension(:,:,:), allocatable :: transp_fbm
-	integer :: ncid,r2d_var,z2d_var,bmvol_var,emin_var,emax_var,pmin_var,pmax_var
-	integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
+    integer :: ncid,r2d_var,z2d_var,bmvol_var,emin_var,emax_var,pmin_var,pmax_var
+    integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
    
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading fast ion distribution function ----'
 
-	!!OPEN netCDF file   
-	call check( nf90_open(filename, nf90_nowrite, ncid) )
+    !!OPEN netCDF file   
+    call check( nf90_open(filename, nf90_nowrite, ncid) )
 
-	!!GET VARIABLES VARID
-	call check( nf90_inq_varid(ncid, "FBM_Ngrid"  , ng_var) )
-	call check( nf90_inq_varid(ncid, "FBM_Nenergy", ne_var) )
-	call check( nf90_inq_varid(ncid, "FBM_Npitch" , np_var) )
-	call check( nf90_inq_varid(ncid, "FBM_r2d"    , r2d_var) )
-	call check( nf90_inq_varid(ncid, "FBM_z2d"    , z2d_var) )
-	call check( nf90_inq_varid(ncid, "FBM_bmvol"  , bmvol_var) )
-	call check( nf90_inq_varid(ncid, "FBM_emin"   , emin_var) )
-	call check( nf90_inq_varid(ncid, "FBM_emax"   , emax_var) )
-	call check( nf90_inq_varid(ncid, "FBM_energy" , e_var) )
-	call check( nf90_inq_varid(ncid, "FBM_pmin"   , pmin_var) )
-	call check( nf90_inq_varid(ncid, "FBM_pmax"   , pmax_var) )
-	call check( nf90_inq_varid(ncid, "FBM_pitch"  , p_var) )
-	call check( nf90_inq_varid(ncid, "FBM"        , fbm_var) )
+    !!GET VARIABLES VARID
+    call check( nf90_inq_varid(ncid, "FBM_Ngrid"  , ng_var) )
+    call check( nf90_inq_varid(ncid, "FBM_Nenergy", ne_var) )
+    call check( nf90_inq_varid(ncid, "FBM_Npitch" , np_var) )
+    call check( nf90_inq_varid(ncid, "FBM_r2d"    , r2d_var) )
+    call check( nf90_inq_varid(ncid, "FBM_z2d"    , z2d_var) )
+    call check( nf90_inq_varid(ncid, "FBM_bmvol"  , bmvol_var) )
+    call check( nf90_inq_varid(ncid, "FBM_emin"   , emin_var) )
+    call check( nf90_inq_varid(ncid, "FBM_emax"   , emax_var) )
+    call check( nf90_inq_varid(ncid, "FBM_energy" , e_var) )
+    call check( nf90_inq_varid(ncid, "FBM_pmin"   , pmin_var) )
+    call check( nf90_inq_varid(ncid, "FBM_pmax"   , pmax_var) )
+    call check( nf90_inq_varid(ncid, "FBM_pitch"  , p_var) )
+    call check( nf90_inq_varid(ncid, "FBM"        , fbm_var) )
 
-	!!GET VARIABLES
-	call check( nf90_get_var(ncid, ng_var, nzones) )
-	call check( nf90_get_var(ncid, ne_var, distri%nenergy) )
-	call check( nf90_get_var(ncid, np_var, distri%npitch) )
+    !!GET VARIABLES
+    call check( nf90_get_var(ncid, ng_var, nzones) )
+    call check( nf90_get_var(ncid, ne_var, distri%nenergy) )
+    call check( nf90_get_var(ncid, np_var, distri%npitch) )
 
-	!!ALLOCATE SPACE
+    !!ALLOCATE SPACE
     allocate(transp_r(nzones),transp_z(nzones),transp_vol(nzones))
     allocate(distri%energy(distri%nenergy))
     allocate(distri%pitch(distri%npitch))
     allocate(transp_fbm(distri%nenergy,distri%npitch,nzones))
 
-	!!GET REST OF VARIABLES	
-	call check( nf90_get_var(ncid, r2d_var,   transp_r(:)) )
-	call check( nf90_get_var(ncid, z2d_var,   transp_z(:)) )
-	call check( nf90_get_var(ncid, bmvol_var, transp_vol(:)) )
-	call check( nf90_get_var(ncid, emin_var,  distri%emin) )
-	call check( nf90_get_var(ncid, emax_var,  distri%emax) )
-	call check( nf90_get_var(ncid, e_var,     distri%energy(:)) )
-	call check( nf90_get_var(ncid, pmin_var,  distri%pmin) )
-	call check( nf90_get_var(ncid, pmax_var,  distri%pmax) )
-	call check( nf90_get_var(ncid, p_var,     distri%pitch(:)) )
-	call check( nf90_get_var(ncid, fbm_var,   transp_fbm(:,:,:)) )
+    !!GET REST OF VARIABLES    
+    call check( nf90_get_var(ncid, r2d_var,   transp_r(:)) )
+    call check( nf90_get_var(ncid, z2d_var,   transp_z(:)) )
+    call check( nf90_get_var(ncid, bmvol_var, transp_vol(:)) )
+    call check( nf90_get_var(ncid, emin_var,  distri%emin) )
+    call check( nf90_get_var(ncid, emax_var,  distri%emax) )
+    call check( nf90_get_var(ncid, e_var,     distri%energy(:)) )
+    call check( nf90_get_var(ncid, pmin_var,  distri%pmin) )
+    call check( nf90_get_var(ncid, pmax_var,  distri%pmax) )
+    call check( nf90_get_var(ncid, p_var,     distri%pitch(:)) )
+    call check( nf90_get_var(ncid, fbm_var,   transp_fbm(:,:,:)) )
 
-	!!CLOSE netCDF FILE
-	call check( nf90_close(ncid) )
+    !!CLOSE netCDF FILE
+    call check( nf90_close(ncid) )
 
     distri%eran   = distri%emax-distri%emin
     distri%pran   = distri%pmax-distri%pmin
@@ -759,13 +759,13 @@ contains
                          xsub=grid%xx(i)+(l-0.5d0)*dxsub
                          ysub=grid%yy(j)+(m-0.5d0)*dysub
                          zsub=grid%zz(k)+(n-0.5d0)*dzsub
-						 !!transform into machine coordinates
-						 xsub2 =  cos(grid%alpha)*(cos(grid%beta)*xsub + sin(grid%beta)*zsub) &
-							  - sin(grid%alpha)*ysub + grid%origin(1)
-						 ysub2 =  sin(grid%alpha)*(cos(grid%beta)*xsub + sin(grid%beta)*zsub) & 
-							  + cos(grid%alpha)*ysub + grid%origin(2)
-						 zsub2 = -sin(grid%beta)*xsub + cos(grid%beta)*zsub + grid%origin(3)
-                    	 rsub=sqrt(xsub2**2+ysub2**2)
+                         !!transform into machine coordinates
+                         xsub2 =  cos(grid%alpha)*(cos(grid%beta)*xsub + sin(grid%beta)*zsub) &
+                              - sin(grid%alpha)*ysub + grid%origin(1)
+                         ysub2 =  sin(grid%alpha)*(cos(grid%beta)*xsub + sin(grid%beta)*zsub) & 
+                              + cos(grid%alpha)*ysub + grid%origin(2)
+                         zsub2 = -sin(grid%beta)*xsub + cos(grid%beta)*zsub + grid%origin(3)
+                         rsub=sqrt(xsub2**2+ysub2**2)
                          minpos=minloc((transp_r-rsub)**2+(transp_z-zsub2)**2)
                          cell(i,j,k)%fbm(:,:)= cell(i,j,k)%fbm(:,:) &
                               + transp_fbm(:,:,minpos(1))
@@ -809,9 +809,9 @@ contains
     call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"birth_dens",NF90_DOUBLE,dimids,varid) )
 
-	!Add unit attributes
-	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
-	call check( nf90_put_att(ncid,varid,"units","fast-ions/(s*dx*dy*dz*dE*dP)") )
+    !Add unit attributes
+    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+    call check( nf90_put_att(ncid,varid,"units","fast-ions/(s*dx*dy*dz*dE*dP)") )
     call check( nf90_enddef(ncid) )
 
     !Write data to file
@@ -828,7 +828,7 @@ contains
   subroutine write_neutrals
     use netcdf
     integer         :: i,j,k,n,x_dimid,y_dimid,z_dimid,l_dimid,dimids(4)
-    integer 	    :: ncid,full_varid,half_varid,third_varid,halo_varid
+    integer         :: ncid,full_varid,half_varid,third_varid,halo_varid
     integer         :: shot_varid,time_varid,dimid1
     character(120)  :: filename
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf"
@@ -852,12 +852,12 @@ contains
     call check( nf90_def_var(ncid,"tdens",NF90_DOUBLE,dimids,third_varid) )
     call check( nf90_def_var(ncid,"halodens",NF90_DOUBLE,dimids,halo_varid) )
 
-	!Add unit attributes
-	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
-	call check( nf90_put_att(ncid,full_varid,"units","neutrals/(dx*dy*dz)") )
-	call check( nf90_put_att(ncid,half_varid,"units","neutrals/(dx*dy*dz)") )
-	call check( nf90_put_att(ncid,third_varid,"units","neutrals/(dx*dy*dz)") )
-	call check( nf90_put_att(ncid,halo_varid,"units","neutrals/(dx*dy*dz)") )
+    !Add unit attributes
+    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+    call check( nf90_put_att(ncid,full_varid,"units","neutrals/(dx*dy*dz)") )
+    call check( nf90_put_att(ncid,half_varid,"units","neutrals/(dx*dy*dz)") )
+    call check( nf90_put_att(ncid,third_varid,"units","neutrals/(dx*dy*dz)") )
+    call check( nf90_put_att(ncid,halo_varid,"units","neutrals/(dx*dy*dz)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -908,12 +908,12 @@ contains
     call check( nf90_def_var(ncid,"wght",NF90_FLOAT,(/ c_dimid,nchan_dimid /),wght_varid) )
     call check( nf90_def_var(ncid,"counts",NF90_FLOAT,nchan_dimid,cnt_varid) )
 
-	!Add unit attributes
-	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
-	call check( nf90_put_att(ncid,ipos_varid,"units","cm") )
-	call check( nf90_put_att(ncid,fpos_varid,"units","cm") )
-	call check( nf90_put_att(ncid,v_varid,"units","cm/s") )
-	call check( nf90_put_att(ncid,wght_varid,"units","particle # / marker") )
+    !Add unit attributes
+    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+    call check( nf90_put_att(ncid,ipos_varid,"units","cm") )
+    call check( nf90_put_att(ncid,fpos_varid,"units","cm") )
+    call check( nf90_put_att(ncid,v_varid,"units","cm/s") )
+    call check( nf90_put_att(ncid,wght_varid,"units","particle # / marker") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -984,14 +984,14 @@ contains
     call check( nf90_def_var(ncid,"halo",NF90_DOUBLE,dimids,halo_varid) )
     call check( nf90_def_var(ncid,"brems",NF90_DOUBLE,dimids,brems_varid) )
 
-	!Add unit attributes
-	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
-	call check( nf90_put_att(ncid,lam_varid,"units","nm") )
-	call check( nf90_put_att(ncid,full_varid,"units","Ph/(s*nm*sr*m^2)") )
-	call check( nf90_put_att(ncid,half_varid,"units","Ph/(s*nm*sr*m^2)") )
-	call check( nf90_put_att(ncid,third_varid,"units","Ph/(s*nm*sr*m^2)") )
-	call check( nf90_put_att(ncid,halo_varid,"units","Ph/(s*nm*sr*m^2)") )
-	call check( nf90_put_att(ncid,brems_varid,"units","Ph/(s*nm*sr*m^2)") )
+    !Add unit attributes
+    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+    call check( nf90_put_att(ncid,lam_varid,"units","nm") )
+    call check( nf90_put_att(ncid,full_varid,"units","Ph/(s*nm*sr*m^2)") )
+    call check( nf90_put_att(ncid,half_varid,"units","Ph/(s*nm*sr*m^2)") )
+    call check( nf90_put_att(ncid,third_varid,"units","Ph/(s*nm*sr*m^2)") )
+    call check( nf90_put_att(ncid,halo_varid,"units","Ph/(s*nm*sr*m^2)") )
+    call check( nf90_put_att(ncid,brems_varid,"units","Ph/(s*nm*sr*m^2)") )
 
     call check( nf90_enddef(ncid) )
 
@@ -1049,10 +1049,10 @@ contains
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
     call check( nf90_def_var(ncid,"spectra",NF90_DOUBLE,dimids,fida_varid) )
 
-	!Add unit attributes
-	call check( nf90_put_att(ncid,time_varid,"units","seconds") )
-	call check( nf90_put_att(ncid,lam_varid,"units","nm") )
-	call check( nf90_put_att(ncid,fida_varid,"units","Ph/(s*nm*sr*m^2)") )
+    !Add unit attributes
+    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
+    call check( nf90_put_att(ncid,lam_varid,"units","nm") )
+    call check( nf90_put_att(ncid,fida_varid,"units","Ph/(s*nm*sr*m^2)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -1070,15 +1070,15 @@ contains
   end subroutine write_fida_spectra
 
   subroutine read_neutrals
-	use netcdf
+    use netcdf
     character(120)  :: filename
     real(float)     :: fdum
     real(float),dimension(:,:,:,:),allocatable   :: fdum_arr
-	integer :: ncid,full_var,half_var,third_var,halo_var
+    integer :: ncid,full_var,half_var,third_var,halo_var
 
     print*,'---- loading neutrals ----' 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
-   	!!OPEN netCDF file   
+       !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
 
     !!GET VARIABLE
@@ -1210,7 +1210,7 @@ contains
     print*, 'rejection method found no solution!'
     print*, cell(ac(1),ac(2),ac(3))%fbm
   end subroutine mc_fastion
-	 
+     
   !****************************************************************************
   !----------------mc_halo------------------------------------------------
   !****************************************************************************
@@ -1321,7 +1321,7 @@ contains
     ri(2)=grid%yy(ac(2))+ grid%dr(2)*randomu(2) 
     ri(3)=grid%zz(ac(3))+ grid%dr(3)*randomu(3)  
 
-	!! this parts corrects for the fact that we are using gyro-center dist.
+    !! this parts corrects for the fact that we are using gyro-center dist.
     b_abs=cell(ac(1),ac(2),ac(3))%plasma%b_abs
     b_norm=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:) 
     one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2    
@@ -1497,7 +1497,7 @@ contains
     do i = low, high
        s = scal(i)
        do j = 0, n-1  
-	  eivec(i,j) = eivec(i,j) * s
+      eivec(i,j) = eivec(i,j) * s
        enddo
     enddo
     do i = low-1, 0, -1
@@ -1607,14 +1607,14 @@ contains
     !*====================================================================*
     do i = 0, n-1
        do k = 0, n-1 
-	  h(i,k) = ZERO
+      h(i,k) = ZERO
        enddo
        h(i,i) = ONE
     enddo
     do i = high - 1, low+1, -1
        j = perm(i)
        do k = i + 1, high 
-	  h(k,i) = mat(k,i-1)
+      h(k,i) = mat(k,i-1)
        enddo
        if (i.ne.j) then
           do k = i, high
@@ -1838,7 +1838,7 @@ contains
     j = n-1
     do while (j>=low)
        if(j<=high)then
-	  m =j 
+      m =j 
        else 
           j = high
        endif
@@ -1946,7 +1946,7 @@ contains
           enddo
 10        if(ll.ne.999)then 
              l=ll 
-	  else 
+      else 
              l=0          !restore l
           endif
           x = h(en,en)
@@ -2592,7 +2592,7 @@ contains
  !*****************************************************************************
   subroutine hit_npa_detector(pos,vel,det)
     integer                                       :: i,det
-	real(double), dimension(3)                    :: pos,vel,xyz_i,xyz_f
+    real(double), dimension(3)                    :: pos,vel,xyz_i,xyz_f
     real(double), dimension(3)                    :: rpos,rvel
     real(double)                                  :: phi,theta,xp,yp,zp
     real(double)                                  :: ra,rd,xa,ya,xd,yd
@@ -2637,7 +2637,7 @@ contains
       if( rd.le.spec%rd(i).and.ra.le.spec%ra(i) ) then
         det=i
         exit loop_over_chan
-	  endif
+      endif
     enddo loop_over_chan
 
   end subroutine hit_npa_detector
@@ -3102,7 +3102,7 @@ contains
   !----------- Calculation of FIDA weight functions-----------------------------
   !*****************************************************************************
   subroutine fida_weight_function
-	use netcdf
+    use netcdf
     real(double)                   :: radius
     real(double)                   :: photons !! photon flux 
     real(double), dimension(nlevs) :: fdens,hdens,tdens,halodens
@@ -3151,7 +3151,8 @@ contains
     real(double)                          :: wght2
     !!netCDF variables
     integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_
+varid,wav_varid
     integer :: shot_varid,time_varid
 
     !! DEFINE wavelength array
@@ -3228,12 +3229,12 @@ contains
        xlos=spec%xyzlos(ichan,1)
        ylos=spec%xyzlos(ichan,2)
        zlos=spec%xyzlos(ichan,3)
-	     !!transform into machine coordinates
-	     xlos2 =  cos(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) &
-	  	        - sin(grid%alpha)*ylos + grid%origin(1)
-	     ylos2 =  sin(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) & 
-		          + cos(grid%alpha)*ylos + grid%origin(2)
-	     zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
+         !!transform into machine coordinates
+         xlos2 =  cos(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) &
+                  - sin(grid%alpha)*ylos + grid%origin(1)
+         ylos2 =  sin(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) & 
+                  + cos(grid%alpha)*ylos + grid%origin(2)
+         zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
        
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius:',radius
@@ -3422,7 +3423,7 @@ contains
        !!wfunct:[Ph*cm/s] !!
        cnt=cnt+1
     enddo loop_over_channels
-	!! Put back plasma values so it doesn't possibly poison the rest of the code
+    !! Put back plasma values so it doesn't possibly poison the rest of the code
     do k=1,grid%nz
        do j=1,grid%ny 
           do i=1,grid%nx 
@@ -3468,7 +3469,7 @@ contains
     call check( nf90_def_var(ncid,"theta",NF90_DOUBLE,nchan_dimid,theta_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
 
-	!Add unit attributes
+    !Add unit attributes
     call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,wav_varid,"units","nm") )
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
@@ -3492,7 +3493,7 @@ contains
 
     print*, 'fida weight function written to: ',filename
 
-	!!Deallocate arrays
+    !!Deallocate arrays
     deallocate(ebarr)  
     deallocate(ptcharr)
     deallocate(phiarr)
@@ -3507,7 +3508,7 @@ contains
   !----------- Calculation of NPA weight functions------------------------------
   !*****************************************************************************
   subroutine npa_weight_function
-	use netcdf
+    use netcdf
     real(double)                    :: radius,theta
     real(double)                    :: photons !! photon flux 
     real(double), dimension(nlevs)  :: fdens,hdens,tdens,halodens
@@ -3516,7 +3517,7 @@ contains
     real(double)                    :: rad,max_wght
     integer(long)                   :: nchan,cnt
     integer(long)                   :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
-    integer,dimension(1) 		    :: minpitch,ipitch,ienergy
+    integer,dimension(1)             :: minpitch,ipitch,ienergy
     real(double), dimension(:,:,:,:,:),     allocatable :: wfunct
     real(double), dimension(:,:,:,:),     allocatable :: flux
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
@@ -3615,7 +3616,8 @@ contains
        allocate(flux(inputs%ne_wght,grid%nx,grid%ny,grid%nz))
        flux(:,:,:,:)=0.
        !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,in,ind,ac,pos, &
-       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy, &
+       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,
+ipitch,ienergy, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,fbm_denf)
        loop_along_x: do ii=1,grid%nx
@@ -3625,7 +3627,7 @@ contains
             hdens=result%neut_dens(ii,jj,kk,:,nbih_type) 
             tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
             halodens=result%neut_dens(ii,jj,kk,:,halo_type)
-		    denf=cell(ii,jj,kk)%plasma%denf
+            denf=cell(ii,jj,kk)%plasma%denf
              
             if((los_weight(ii,jj,kk,ichan).gt.0).and.(denf.gt.0)) then
              pos(:) = (/grid%xxc(ii), grid%yyc(jj), grid%zzc(kk)/)
@@ -3644,7 +3646,7 @@ contains
 
              !! Determine the angle between the B-field and the Line of Sight 
              los_vec(:)= -1*los_vec(:)
-		     b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
+             b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
              theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
              minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
              ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
@@ -3681,7 +3683,7 @@ contains
                endif
                !!Calculate attenuation
                !!by looping along rest of track
-	           states = pcx*denf
+               states = pcx*denf
                states_i=states
                do kc=1,ncell 
                  ac=icell(:,kc)
@@ -3703,7 +3705,7 @@ contains
              if (los_weight(ii,jj,kk,ichan).le.0)cycle loop_over_x
              do ic=1,inputs%ne_wght
                flux_tot(ic,cnt)=flux_tot(ic,cnt)+flux(ic,ii,jj,kk)
-		       do jc=1,inputs%np_wght
+               do jc=1,inputs%np_wght
                  wfunct_tot(ic,jc,cnt)=wfunct_tot(ic,jc,cnt)+wfunct(ic,jc,ii,jj,kk)*grid%dv*los_weight(ii,jj,kk,ichan)
                enddo
              enddo
@@ -3911,7 +3913,7 @@ program fidasim
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'npa weight function:    '  &
           ,time_arr(5), ':', time_arr(6), ':',time_arr(7)
-	 call npa_weight_function()
+     call npa_weight_function()
   endif
 
   call date_and_time (values=time_arr)

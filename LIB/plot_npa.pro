@@ -1,4 +1,4 @@
-pro plot_npa,histo,energy_arr,ps=ps,path=path
+pro plot_npa,histo,energy_arr,ps=ps,path=path,chan=chan
   ;; ROUTINE OF FIDASIM to plot resulting NPA fluxes
   ;; written by Philipp Scheider and Benedikt Geiger 2013
   ;; plot settings
@@ -20,7 +20,7 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path
      runid=strsplit(path,'/',/extract,count=nid)
      runid=runid[nid-1]
   endif
-
+  if not keyword_set(chan) then chan=0
   load_results, path,fidasim
   shot=fidasim.inputs.shot
   time=fidasim.inputs.time
@@ -32,20 +32,24 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path
        +total(fidasim.neutrals.tdens[*,*,*,*],4)   
 
   ;; initial position where fast-neutral is born (ion is neutraliszed)
-  npaipos=fidasim.npa.npaipos
+  npaipos=fidasim.npa.npaipos[*,*,chan]
 
   ;; position where neutral is detected!
-  npafpos=fidasim.npa.npafpos
+  npafpos=fidasim.npa.npafpos[*,*,chan]
 
   ;; velocity vector of fast-neutral
-  npav=fidasim.npa.npav
+  npav=fidasim.npa.npav[*,*,chan]
 
   ;; weight (particle number per marker)
-  npawght=fidasim.npa.npawght
+  npawght=fidasim.npa.npawght[*,chan]
 
   ;; npa weight: Particles/s/cm^2
-  headsize=mean(los.ra)
-  nnpa=n_elements(npawght)
+  ww=where(npawght ne 0,nnpa)
+
+  npawght=npawght[ww]
+  npav=npav[ww,*]
+  npaipos=npaipos[ww,*]
+  npafpos=npafpos[ww,*]
 
   ;; plot initial and end position of fast-ion trajectories on
   ;; top-down view
@@ -71,7 +75,7 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path
   emin = 0
   energy_arr = emin+dindgen(nen)/(nen-1.)*(emax-emin)
   dE   = energy_arr[1]-energy_arr[0]
-  print,energy_arr
+
   ;;pitch array:
   npitch = 40
   pmin   = -1.
@@ -135,5 +139,6 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path
      plot, energy_arr, histo,ytit='neutrals/s',xtit='Energy [keV]',psym=10
   endfor
   if keyword_set(ps) then device, /close
+  !p.multi=0
 end 
 

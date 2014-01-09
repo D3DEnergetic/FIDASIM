@@ -883,8 +883,8 @@ contains
     real(float), dimension(:,:),allocatable :: output1
     real(float), dimension(:),allocatable :: output2
     maxcnt=maxval(npa%counter(:))
-    allocate(output(npa%nchan,maxcnt,3))
-    allocate(output1(npa%nchan,maxcnt))
+    allocate(output(maxcnt,3,npa%nchan))
+    allocate(output1(maxcnt,npa%nchan))
     allocate(output2(npa%nchan))
 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
@@ -897,7 +897,7 @@ contains
     call check( nf90_def_dim(ncid,"nchan",npa%nchan,nchan_dimid) )
     call check( nf90_def_dim(ncid,"max_counts",maxcnt,c_dimid) )
     call check( nf90_def_dim(ncid,"energy",3,e_dimid) )
-    dimids = (/ nchan_dimid, c_dimid, e_dimid /)
+    dimids = (/ c_dimid, e_dimid, nchan_dimid /)
 
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
@@ -905,7 +905,7 @@ contains
     call check( nf90_def_var(ncid,"ipos",NF90_FLOAT,dimids,ipos_varid) )
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
-    call check( nf90_def_var(ncid,"wght",NF90_FLOAT,c_dimid,wght_varid) )
+    call check( nf90_def_var(ncid,"wght",NF90_FLOAT,(/ c_dimid,nchan_dimid /),wght_varid) )
     call check( nf90_def_var(ncid,"counts",NF90_FLOAT,nchan_dimid,cnt_varid) )
 
 	!Add unit attributes
@@ -920,16 +920,16 @@ contains
     call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
     call check( nf90_put_var(ncid, time_varid, inputs%time) )
 
-    output(:,:,:)=real(npa%ipos(:,:maxcnt,:),float)
+    output(:,:,:)=real(npa%ipos(:maxcnt,:,:),float)
     call check( nf90_put_var(ncid, ipos_varid, output) )
 
-    output(:,:,:)=real(npa%fpos(:,:maxcnt,:),float)
+    output(:,:,:)=real(npa%fpos(:maxcnt,:,:),float)
     call check( nf90_put_var(ncid, fpos_varid, output) )
 
-    output(:,:,:)=real(npa%v(:,:maxcnt,:)   ,float)
+    output(:,:,:)=real(npa%v(:maxcnt,:,:)   ,float)
     call check( nf90_put_var(ncid, v_varid, output) )
 
-    output1(:,:)=real(npa%wght(:,:maxcnt) ,float)
+    output1(:,:)=real(npa%wght(:maxcnt,:) ,float)
     call check( nf90_put_var(ncid, wght_varid, output1) )
 
     output2(:)=real(npa%counter(:),float)
@@ -2365,12 +2365,11 @@ contains
           ray=ri(:)+vn(:)/sqrt(dot_product(vn,vn))*dray
           !$OMP CRITICAL(col_rad_npa)
           npa%counter(det)=npa%counter(det)+1
-          if(0.eq.mod(npa%counter(det),10)) print*,'Neutrals Detected:',det,npa%counter(det)
           if(npa%counter(det).gt.inputs%nr_npa)stop'too many neutrals'
-          npa%v(det,npa%counter(det),:)=vn(:)
-          npa%wght(det,npa%counter(det))=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
-          npa%ipos(det,npa%counter(det),:)=ri(:)
-          npa%fpos(det,npa%counter(det),:)=ray(:)
+          npa%v(npa%counter(det),:,det)=vn(:)
+          npa%wght(npa%counter(det),det)=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
+          npa%ipos(npa%counter(det),:,det)=ri(:)
+          npa%fpos(npa%counter(det),:,det)=ray(:)
           !$OMP END CRITICAL(col_rad_npa)
        endif
        return
@@ -2620,8 +2619,8 @@ contains
       rpos(2)=yp
       rpos(3)=-xp*sin(theta)+zp*cos(theta)
       
-      xp=(vel(1))*cos(phi)+(pos(2))*sin(phi)
-      yp=-(vel(1))*sin(phi)+(pos(2))*cos(phi)
+      xp=(vel(1))*cos(phi)+(vel(2))*sin(phi)
+      yp=-(vel(1))*sin(phi)+(vel(2))*cos(phi)
       zp=vel(3)
       rvel(1)=xp*cos(theta)+zp*sin(theta)
       rvel(2)=yp
@@ -3030,14 +3029,15 @@ contains
     enddo
     call get_nlaunch(inputs%nr_fida,papprox,papprox_tot,nlaunch)
     print*,'    # of markers: ',int(sum(nlaunch))
-    !$OMP PARALLEL DO private(i,j,k,iion,ac,vi,ri,ray,inpa,hit_pos,ddet,vi_abs, &
+
+    !$OMP PARALLEL DO private(i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,vi_abs, &
     !$OMP& tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi,in,vnhalo,states,photons)
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
           loop_along_x: do i = 1, grid%Nx
              !!if there is no chance of the particle hitting any detector skip cell
              if (inputs%npa.eq.1) then
-                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle
+                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle loop_along_x
              endif
              !! ------------- loop over the markers ---------------------- !!
              npa_loop: do inpa=1,int(npa%npa_loop)
@@ -3050,7 +3050,7 @@ contains
                    call mc_start  (ac, vi(:),  ri(:))
                    if(inputs%npa.eq.1)then  
                      call hit_npa_detector(ri(:),vi(:),det)
-                     if(det.eq.0) cycle loop_over_fast_ions 
+                     if(det.eq.0) cycle loop_over_fast_ions
                    endif
                    call track(vi(:), ri(:), tcell, icell,pos, ncell)
                    if(ncell.eq.0)cycle loop_over_fast_ions
@@ -3826,10 +3826,10 @@ program fidasim
   if(inputs%npa.eq.1)then
      print*, 'this is a NPA simultation!'
      inputs%nr_npa=1000000
-     allocate(npa%v(npa%nchan,inputs%nr_npa,3)) 
-     allocate(npa%ipos(npa%nchan,inputs%nr_npa,3)) 
-     allocate(npa%fpos(npa%nchan,inputs%nr_npa,3)) 
-     allocate(npa%wght(npa%nchan,inputs%nr_npa))
+     allocate(npa%v(inputs%nr_npa,3,npa%nchan)) 
+     allocate(npa%ipos(inputs%nr_npa,3,npa%nchan)) 
+     allocate(npa%fpos(inputs%nr_npa,3,npa%nchan)) 
+     allocate(npa%wght(inputs%nr_npa,npa%nchan))
      allocate(npa%counter(npa%nchan))
      npa%counter(:)=0
      npa%v(:,:,:)=0   
@@ -3907,7 +3907,7 @@ program fidasim
   endif
 
   if(inputs%calc_npa_wght.eq.1) then
-     call read_fbm
+     if(inputs%npa.ne.1 .and. inputs%calc_spec.ne.1) call read_fbm
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'npa weight function:    '  &
           ,time_arr(5), ':', time_arr(6), ':',time_arr(7)

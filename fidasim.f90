@@ -3151,8 +3151,7 @@ contains
     real(double)                          :: wght2
     !!netCDF variables
     integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_
-varid,wav_varid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
     integer :: shot_varid,time_varid
 
     !! DEFINE wavelength array
@@ -3616,8 +3615,7 @@ varid,wav_varid
        allocate(flux(inputs%ne_wght,grid%nx,grid%ny,grid%nz))
        flux(:,:,:,:)=0.
        !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,in,ind,ac,pos, &
-       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,
-ipitch,ienergy, &
+       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,fbm_denf)
        loop_along_x: do ii=1,grid%nx

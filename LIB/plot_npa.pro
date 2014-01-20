@@ -1,4 +1,4 @@
-pro plot_npa,histo,energy_arr,ps=ps,path=path,chan=chan
+pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,currentmode=currentmode
   ;; ROUTINE OF FIDASIM to plot resulting NPA fluxes
   ;; written by Philipp Scheider and Benedikt Geiger 2013
   ;; plot settings
@@ -50,6 +50,12 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path,chan=chan
   npav=npav[ww,*]
   npaipos=npaipos[ww,*]
   npafpos=npafpos[ww,*]
+
+  if keyword_set(currentmode) then begin
+    ; Use simple model based on Fig. 2 of Shinohara et al., RSI 75 (2004) 3640
+    eintercept=25.        ; keV--value depends on foil & detector
+    cmode=0.
+  end
 
   ;; plot initial and end position of fast-ion trajectories on
   ;; top-down view
@@ -111,6 +117,9 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path,chan=chan
         ;; calculate energy of neutral
         energy=0.5*mass*vabs^2/(ec*1.e3)*1.e-4 ; [keV]
 
+        if keyword_set(currentmode) then begin
+          if energy gt eintercept then cmode+=(energy-eintercept)*npawght[i]
+        endif
         ;; get magnetic field where neutral was born
         dummy=min(abs(fidasim.grid.x_grid[*,0,0]-npaipos[i,0]),xind)
         dummy=min(abs(fidasim.grid.y_grid[0,*,0]-npaipos[i,1]),yind)
@@ -129,7 +138,13 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path,chan=chan
         dummy=min(abs(energy_arr-energy),eindex)
         dummy=min(abs(pitch_arr-pitch),pindex)    
         histo[idet,eindex]=histo[idet,eindex]+npawght[i]
-        distri[idet,eindex,pindex]=distri[idet,eindex,pindex]+npawght[i]
+        if keyword_set(currentmode) then begin
+            cm=0
+            if energy gt eintercept then cm=(energy-eintercept)
+	        distri[idet,eindex,pindex]=distri[idet,eindex,pindex] + cm
+		endif else begin    
+    		distri[idet,eindex,pindex]=distri[idet,eindex,pindex]+npawght[i]
+        endelse
         pEnergy[i] = eindex
      endfor
 
@@ -139,6 +154,9 @@ pro plot_npa,histo,energy_arr,ps=ps,path=path,chan=chan
      plot, energy_arr, histo,ytit='neutrals/s',xtit='Energy [keV]',psym=10
   endfor
   if keyword_set(ps) then device, /close
+
+  if keyword_set(currentmode) then print,'Current mode:',cmode
+
   !p.multi=0
 end 
 

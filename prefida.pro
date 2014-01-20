@@ -367,7 +367,7 @@ PRO npa_los_wght,los,grid,weight,err_arr
 		endfor
         
         if total(weight[*,*,*,chan]) gt 0 then begin
-			 weight[*,*,*,chan]=weight[*,*,*,chan]/total(weight[*,*,*,chan])
+			 weight[*,*,*,chan]=weight[*,*,*,chan];/total(weight[*,*,*,chan])
         endif else err_arr[chan]=1
 	endfor
 			

@@ -1066,7 +1066,7 @@ contains
 
     !! result arrays 
     deallocate(lambda_arr)
-    !print*, 'FIDA spectra written to ',filename
+    print*, 'FIDA spectra written to ',filename
   end subroutine write_fida_spectra
 
   subroutine read_neutrals
@@ -2588,13 +2588,47 @@ contains
   end subroutine track
 
  !*****************************************************************************
+ !------------chord_coor-------------------------------------------------------
+ !*****************************************************************************
+  subroutine chord_coor(xyz_i,xyz_f,origin,pos_in,pos_out)
+    real(double), dimension(3)                    :: pos_in,pos_out
+    real(double), dimension(3)                    :: xyz_i,xyz_f,origin
+    real(double)                                  :: phi,theta,xp,yp,zp
+
+    phi=atan2((xyz_f(2)-xyz_i(2)),(xyz_f(1)-xyz_i(1)))
+    theta= -1*atan2(sqrt((xyz_f(1)-xyz_i(1))**2.0 + (xyz_f(2)-xyz_i(2))**2.0),(xyz_f(3)-xyz_i(3)))
+      
+    xp=(pos_in(1)-origin(1))*cos(phi)+(pos_in(2)-origin(2))*sin(phi)
+    yp=-(pos_in(1)-origin(1))*sin(phi)+(pos_in(2)-origin(2))*cos(phi)
+    zp=pos_in(3)-origin(3)
+    pos_out(1)=xp*cos(theta)+zp*sin(theta)
+    pos_out(2)=yp
+    pos_out(3)=-xp*sin(theta)+zp*cos(theta)
+  end subroutine chord_coor
+
+ !*****************************************************************************
+ !------------inv_chord_coor-------------------------------------------------------
+ !*****************************************************************************
+  subroutine inv_chord_coor(xyz_i,xyz_f,origin,pos_in,pos_out)
+    real(double), dimension(3)                    :: pos_in,pos_out
+    real(double), dimension(3)                    :: xyz_i,xyz_f,origin
+    real(double)                                  :: phi,theta
+
+    phi=atan2((xyz_f(2)-xyz_i(2)),(xyz_f(1)-xyz_i(1)))
+    theta= -1*atan2(sqrt((xyz_f(1)-xyz_i(1))**2.0 + (xyz_f(2)-xyz_i(2))**2.0),(xyz_f(3)-xyz_i(3)))
+    pos_out(1)=origin(1)+pos_in(1)*cos(phi)*cos(theta) - pos_in(3)*cos(phi)*sin(theta) - pos_in(2)*sin(phi)
+    pos_out(2)=origin(2)+pos_in(2)*cos(phi) + pos_in(1)*cos(theta)*sin(phi) - pos_in(3)*sin(phi)*sin(theta)
+    pos_out(3)=origin(3)+pos_in(3)*cos(theta) + pos_in(1)*sin(theta)
+
+  end subroutine inv_chord_coor
+
+ !*****************************************************************************
  !------------hit_npa_detector-------------------------------------------------
  !*****************************************************************************
   subroutine hit_npa_detector(pos,vel,det)
     integer                                       :: i,det
     real(double), dimension(3)                    :: pos,vel,xyz_i,xyz_f
     real(double), dimension(3)                    :: rpos,rvel
-    real(double)                                  :: phi,theta,xp,yp,zp
     real(double)                                  :: ra,rd,xa,ya,xd,yd
 
     det=0
@@ -2609,22 +2643,9 @@ contains
       xyz_f(2)=spec%xyzlos(i,2)
       xyz_f(3)=spec%xyzlos(i,3)
 
-      phi=atan2((xyz_f(2)-xyz_i(2)),(xyz_f(1)-xyz_i(1)))
-      theta= -1*atan2(sqrt((xyz_f(1)-xyz_i(1))**2.0 + (xyz_f(2)-xyz_i(2))**2.0),(xyz_f(3)-xyz_i(3)))
-      
-      xp=(pos(1)-xyz_i(1))*cos(phi)+(pos(2)-xyz_i(2))*sin(phi)
-      yp=-(pos(1)-xyz_i(1))*sin(phi)+(pos(2)-xyz_i(2))*cos(phi)
-      zp=pos(3)-xyz_i(3)
-      rpos(1)=xp*cos(theta)+zp*sin(theta)
-      rpos(2)=yp
-      rpos(3)=-xp*sin(theta)+zp*cos(theta)
-      
-      xp=(vel(1))*cos(phi)+(vel(2))*sin(phi)
-      yp=-(vel(1))*sin(phi)+(vel(2))*cos(phi)
-      zp=vel(3)
-      rvel(1)=xp*cos(theta)+zp*sin(theta)
-      rvel(2)=yp
-      rvel(3)=-xp*sin(theta)+zp*cos(theta)
+      call chord_coor(xyz_i,xyz_f,xyz_i,pos,rpos)
+      call chord_coor(xyz_i,xyz_f,xyz_i*0.0,vel,rvel)
+
       !!if a neutral particle is moving in the opposite direction it will not hit detector
       if(rvel(3).ge.0) cycle loop_over_chan
       xa=rpos(1)+rvel(1)*(-rpos(3)/rvel(3))
@@ -2633,6 +2654,7 @@ contains
       xd=rpos(1)+rvel(1)*((-spec%h(i)-rpos(3))/rvel(3))
       yd=rpos(2)+rvel(2)*((-spec%h(i)-rpos(3))/rvel(3))
       rd=sqrt(xd**2.0 + yd**2.0)
+
       !!if a neutral particle pass through both the aperture and detector then it count it
       if( rd.le.spec%rd(i).and.ra.le.spec%ra(i) ) then
         det=i
@@ -2675,8 +2697,6 @@ contains
     nlaunch=floor(nlaunch)
     deallocate(randomu)
   end subroutine get_nlaunch
-
-
 
   !*****************************************************************************
   !-----------ndmc (NBI)--------------------------------------------------------
@@ -3514,7 +3534,7 @@ contains
     real(double), dimension(3)      :: los_vec
     real(double)                    :: length,pcxa
     real(double)                    :: rad,max_wght
-    integer(long)                   :: nchan,cnt
+    integer(long)                   :: nchan,cnt,det
     integer(long)                   :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
     integer,dimension(1)             :: minpitch,ipitch,ienergy
     real(double), dimension(:,:,:,:,:),     allocatable :: wfunct
@@ -3522,8 +3542,9 @@ contains
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),     allocatable :: flux_tot
     real(double), dimension(:)    ,     allocatable :: ebarr,ptcharr,rad_arr
+    real(double), dimension(5)     :: xd_arr,yd_arr !!npa detector array
     real(double), dimension(3)      :: vi,vi_norm,b_norm
-    real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf,fbm_denf
+    real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf,fbm_denf,wght
     real(double),dimension(3)       :: vn  ! vi in m/s
 
     !! Determination of the CX probability
@@ -3535,7 +3556,7 @@ contains
 
     !! ---- Solution of differential equation  ---- ! 
     integer,dimension(3)                  :: ac  !!actual cell
-    real(double), dimension(3)            :: pos !! position of mean cell
+    real(double), dimension(3)            :: pos,rpos,dpos,rdpos !! position of mean cell
     real(double),dimension(grid%nx,grid%ny,grid%nz,spec%nchan) :: los_weight !! los wght
     integer(long)                         :: ichan,ind
     character(100)                        :: filename
@@ -3578,13 +3599,13 @@ contains
     !!save the los-weights into an array
     !! because the structure is over-written
     do k=1,grid%nz
-       do j=1,grid%ny 
-          do i=1,grid%nx 
-             los_weight(i,j,k,:)=cell(i,j,k)%los_wght(:)
-          enddo
-       enddo
+      do j=1,grid%ny 
+        do i=1,grid%nx 
+          los_weight(i,j,k,:)=cell(i,j,k)%los_wght(:)
+        enddo
+      enddo
     enddo 
-    
+   
     wfunct_tot(:,:,:)=0.
     flux_tot(:,:)=0.
     cnt=1
@@ -3609,12 +3630,17 @@ contains
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius: ',radius
        rad_arr(cnt)=radius
-   
+       
+       do i=1,5
+         xd_arr(i)=-1.05*spec%rd(ichan)+i*(2.1*spec%rd(ichan)/20.)
+         yd_arr(i)=-1.05*spec%rd(ichan)+i*(2.1*spec%rd(ichan)/20.)
+       enddo
+
        allocate(wfunct(inputs%ne_wght,inputs%np_wght,grid%nx,grid%ny,grid%nz))
        wfunct(:,:,:,:,:)=0.
        allocate(flux(inputs%ne_wght,grid%nx,grid%ny,grid%nz))
        flux(:,:,:,:)=0.
-       !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,in,ind,ac,pos, &
+       !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,in,det,ind,ac,pos, wght,&
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,fbm_denf)
@@ -3626,72 +3652,91 @@ contains
             tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
             halodens=result%neut_dens(ii,jj,kk,:,halo_type)
             denf=cell(ii,jj,kk)%plasma%denf
-             
+                         
             if((los_weight(ii,jj,kk,ichan).gt.0).and.(denf.gt.0)) then
              pos(:) = (/grid%xxc(ii), grid%yyc(jj), grid%zzc(kk)/)
-             los_vec(1) = spec%xyzhead(ichan,1) - pos(1)
-             los_vec(2) = spec%xyzhead(ichan,2) - pos(2)
-             los_vec(3) = spec%xyzhead(ichan,3) - pos(3)
-             radius=sqrt(dot_product(los_vec,los_vec))
-             los_vec=los_vec/radius 
-             vi_norm(:) = los_vec
-             call track(vi_norm,pos,tcell,icell,pos_out,ncell)
+             call chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),pos,rpos)
+             print*,ii,jj,kk
+             loop_along_xd: do i=1,5
+               loop_along_yd: do j=1,5
+                 rdpos(1)=xd_arr(i)
+                 rdpos(2)=yd_arr(j)
+                 rdpos(3)=-spec%h(ichan)
+                 radius=sqrt((rdpos(1)-rpos(1))**2. + (rdpos(2)-rpos(2))**2.)
+                 wght=((rpos(3)+spec%h(ichan))/(radius**2. + (rpos(3)+spec%h(ichan))**2.))*(radius**(-1.0))*(pi**(-2.0))
+                 wght=wght*abs(xd_arr(2)-xd_arr(1))*abs(yd_arr(2)-yd_arr(1))
+                 call inv_chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),rdpos,dpos)
+                 
+                 los_vec(1) = dpos(1) - pos(1)
+                 los_vec(2) = dpos(2) - pos(2)
+                 los_vec(3) = dpos(3) - pos(3)
+                 radius=sqrt(dot_product(los_vec,los_vec))
+                 los_vec=los_vec/radius 
+               
+                 det=0
+                 call hit_npa_detector(pos,los_vec,det)
+                 if (det.eq.0) cycle loop_along_yd 
+                 print*,'hit',i,j
+                 vi_norm(:) = los_vec
+                 call track(vi_norm,pos,tcell,icell,pos_out,ncell)
 
-             vnbi_f(:)=pos(:) - nbi%xyz_pos(:)
-             vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj
-             vnbi_h=vnbi_f/sqrt(2.d0)
-             vnbi_t=vnbi_f/sqrt(3.d0) 
+                 vnbi_f(:)=pos(:) - nbi%xyz_pos(:)
+                 vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj
+                 vnbi_h=vnbi_f/sqrt(2.d0)
+                 vnbi_t=vnbi_f/sqrt(3.d0) 
 
-             !! Determine the angle between the B-field and the Line of Sight 
-             los_vec(:)= -1*los_vec(:)
-             b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
-             theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
-             minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
-             ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
-             vi_norm(:)=los_vec(:)
-             loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
-               ienergy=minloc(abs(distri%energy-ebarr(ic)))
-               fbm_denf=0
-               if (allocated(cell(ii,jj,kk)%fbm)) then 
-                 fbm_denf=cell(ii,jj,kk)%fbm(ienergy(1),ipitch(1))*cell(ii,jj,kk)%fbm_norm(1)
-               endif
-               vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))
-               !! -------------- calculate CX probability -------!!
-               ! CX with full energetic NBI neutrals
-               pcx=0.d0
-               vi(:) = vi_norm(:)*vabs
-               call neut_rates(fdens,vi,vnbi_f,rates)
-               pcx=pcx + rates
-               ! CX with half energetic NBI neutrals
-               call neut_rates(hdens,vi,vnbi_h,rates)
-               pcx=pcx + rates
-               ! CX with third energetic NBI neutrals
-               call neut_rates(tdens,vi,vnbi_t,rates)
-               pcx=pcx + rates
+                 !! Determine the angle between the B-field and the Line of Sight 
+                 los_vec(:)= -1*los_vec(:)
+                 b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
+                 theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
+                 minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
+                 ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
+                 vi_norm(:)=los_vec(:)
+                 loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
+                   ienergy=minloc(abs(distri%energy-ebarr(ic)))
+                   fbm_denf=0
+                   if (allocated(cell(ii,jj,kk)%fbm)) then 
+                     fbm_denf=cell(ii,jj,kk)%fbm(ienergy(1),ipitch(1))*cell(ii,jj,kk)%fbm_norm(1)
+                   endif
+                   vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))
+                   !! -------------- calculate CX probability -------!!
+                   ! CX with full energetic NBI neutrals
+                   pcx=0.d0
+                   vi(:) = vi_norm(:)*vabs
+                   call neut_rates(fdens,vi,vnbi_f,rates)
+                   pcx=pcx + rates
+                   ! CX with half energetic NBI neutrals
+                   call neut_rates(hdens,vi,vnbi_h,rates)
+                   pcx=pcx + rates
+                   ! CX with third energetic NBI neutrals
+                   call neut_rates(tdens,vi,vnbi_t,rates)
+                   pcx=pcx + rates
 
-               ! CX with HALO neutrals
-               do in=1,int(nr_halo_neutrate)
-                 call mc_halo((/ii, jj, kk/),vhalo(:))
-                 call neut_rates(halodens,vi,vhalo,rates)
-                 pcx=pcx + rates/nr_halo_neutrate
-               enddo
+                   ! CX with HALO neutrals
+                   do in=1,int(nr_halo_neutrate)
+                     call mc_halo((/ii, jj, kk/),vhalo(:))
+                     call neut_rates(halodens,vi,vhalo,rates)
+                     pcx=pcx + rates/nr_halo_neutrate
+                   enddo
 
-               if(sum(pcx).le.0) then
-                 cycle loop_over_energy
-               endif
-               !!Calculate attenuation
-               !!by looping along rest of track
-               states = pcx*denf
-               states_i=states
-               do kc=1,ncell 
-                 ac=icell(:,kc)
-                 call colrad(ac(:),vi(:),tcell(kc)/vabs,states,photons,0,1.d0)
-                 if (photons.le.0) exit
-               enddo
-               pcxa=sum(states)/sum(states_i)
-               wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx)*pcxa
-               flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
-             enddo loop_over_energy
+                   if(sum(pcx).le.0) then
+                     cycle loop_over_energy
+                   endif
+                   !!Calculate attenuation
+                   !!by looping along rest of track
+                   states = pcx*denf
+                   states_i=states
+                   do kc=1,ncell 
+                     ac=icell(:,kc)
+                     call colrad(ac(:),vi(:),tcell(kc)/vabs,states,photons,0,1.d0)
+                     if (photons.le.0) exit
+                   enddo
+                   pcxa=sum(states)/sum(states_i)
+                   wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx)*pcxa*wght
+                   flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*wght
+                 enddo loop_over_energy
+                enddo loop_along_yd
+              enddo loop_along_xd
             endif
            enddo loop_along_z
          enddo loop_along_y
@@ -3704,7 +3749,7 @@ contains
              do ic=1,inputs%ne_wght
                flux_tot(ic,cnt)=flux_tot(ic,cnt)+flux(ic,ii,jj,kk)
                do jc=1,inputs%np_wght
-                 wfunct_tot(ic,jc,cnt)=wfunct_tot(ic,jc,cnt)+wfunct(ic,jc,ii,jj,kk)*grid%dv*los_weight(ii,jj,kk,ichan)
+                 wfunct_tot(ic,jc,cnt)=wfunct_tot(ic,jc,cnt)+wfunct(ic,jc,ii,jj,kk)*grid%dv
                enddo
              enddo
            enddo loop_over_x

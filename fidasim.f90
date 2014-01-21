@@ -3542,7 +3542,7 @@ contains
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),     allocatable :: flux_tot
     real(double), dimension(:)    ,     allocatable :: ebarr,ptcharr,rad_arr
-    real(double), dimension(5)     :: xd_arr,yd_arr !!npa detector array
+    real(double), dimension(10)     :: xd_arr,yd_arr !!npa detector array
     real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
     real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf,fbm_denf,wght,b_abs
     real(double),dimension(3)       :: vn  ! vi in m/s
@@ -3631,9 +3631,9 @@ contains
        print*,'Radius: ',radius
        rad_arr(cnt)=radius
        
-       do i=1,5
-         xd_arr(i)=-1.05*spec%rd(ichan)+i*(2.1*spec%rd(ichan)/20.)
-         yd_arr(i)=-1.05*spec%rd(ichan)+i*(2.1*spec%rd(ichan)/20.)
+       do i=1,10
+         yd_arr(i)=(i-.5)*spec%rd(ichan)/10.
+         xd_arr(i)=i*2*pi/10.
        enddo
 
        allocate(wfunct(inputs%ne_wght,inputs%np_wght,grid%nx,grid%ny,grid%nz))
@@ -3660,14 +3660,14 @@ contains
              call chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),pos,rpos)
              print*,ii,jj,kk
              !!Loop over detector area
-             loop_along_xd: do i=1,5
-               loop_along_yd: do j=1,5
-                 rdpos(1)=xd_arr(i)
-                 rdpos(2)=yd_arr(j)
+             loop_along_xd: do i=1,10
+               loop_along_yd: do j=1,10
+                 rdpos(1)=yd_arr(j)*cos(xd_arr(i))
+                 rdpos(2)=yd_arr(j)*sin(xd_arr(i))
                  rdpos(3)=-spec%h(ichan)
                  radius=sqrt((rdpos(1)-rpos(1))**2. + (rdpos(2)-rpos(2))**2.)
                  wght=((rpos(3)+spec%h(ichan))/(radius**2. + (rpos(3)+spec%h(ichan))**2.))*(radius**(-1.0))*(pi**(-2.0))
-                 wght=wght*abs(xd_arr(2)-xd_arr(1))*abs(yd_arr(2)-yd_arr(1))
+                 wght=wght*abs(xd_arr(2)-xd_arr(1))*abs(yd_arr(2)-yd_arr(1))*yd_arr(j)
                  call inv_chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),rdpos,dpos)
                  
                  los_vec(1) = dpos(1) - pos(1)
@@ -3679,7 +3679,7 @@ contains
                  det=0
                  call hit_npa_detector(pos,los_vec,det)
                  if (det.eq.0) cycle loop_along_yd 
-                 print*,'hit',i,j
+
                  vi_norm(:) = los_vec
                  call track(vi_norm,pos,tcell,icell,pos_out,ncell)
 
@@ -3704,9 +3704,9 @@ contains
                    vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
                    vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
                    r_gyro(:)=pos(:)+vxB(:)*one_over_omega
-                   ix=minloc(abs(r_gyro(1)-grid%xx))
-                   iy=minloc(abs(r_gyro(2)-grid%yy))
-                   iz=minloc(abs(r_gyro(3)-grid%zz))
+                   ix=minloc(abs(r_gyro(1)-grid%xxc))
+                   iy=minloc(abs(r_gyro(2)-grid%yyc))
+                   iz=minloc(abs(r_gyro(3)-grid%zzc))
                    fbm_denf=0
                    denf=0.
                    if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
@@ -3733,7 +3733,7 @@ contains
                      pcx=pcx + rates/nr_halo_neutrate
                    enddo
 
-                   if(sum(pcx).le.0) then
+                   if(sum(pcx).le.0.or.denf.le.0) then
                      cycle loop_over_energy
                    endif
                    !!Calculate attenuation

@@ -3532,19 +3532,19 @@ contains
     real(double)                    :: photons !! photon flux 
     real(double), dimension(nlevs)  :: fdens,hdens,tdens,halodens
     real(double), dimension(3)      :: los_vec
-    real(double)                    :: length,pcxa
+    real(double)                    :: length,pcxa,one_over_omega
     real(double)                    :: rad,max_wght
     integer(long)                   :: nchan,cnt,det
     integer(long)                   :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
-    integer,dimension(1)             :: minpitch,ipitch,ienergy
+    integer,dimension(1)             :: minpitch,ipitch,ienergy,ix,iy,iz
     real(double), dimension(:,:,:,:,:),     allocatable :: wfunct
     real(double), dimension(:,:,:,:),     allocatable :: flux
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),     allocatable :: flux_tot
     real(double), dimension(:)    ,     allocatable :: ebarr,ptcharr,rad_arr
     real(double), dimension(5)     :: xd_arr,yd_arr !!npa detector array
-    real(double), dimension(3)      :: vi,vi_norm,b_norm
-    real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf,fbm_denf,wght
+    real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
+    real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf,fbm_denf,wght,b_abs
     real(double),dimension(3)       :: vn  ! vi in m/s
 
     !! Determination of the CX probability
@@ -3556,7 +3556,7 @@ contains
 
     !! ---- Solution of differential equation  ---- ! 
     integer,dimension(3)                  :: ac  !!actual cell
-    real(double), dimension(3)            :: pos,rpos,dpos,rdpos !! position of mean cell
+    real(double), dimension(3)            :: pos,rpos,dpos,rdpos,r_gyro !! position of mean cell
     real(double),dimension(grid%nx,grid%ny,grid%nz,spec%nchan) :: los_weight !! los wght
     integer(long)                         :: ichan,ind
     character(100)                        :: filename
@@ -3640,23 +3640,26 @@ contains
        wfunct(:,:,:,:,:)=0.
        allocate(flux(inputs%ne_wght,grid%nx,grid%ny,grid%nz))
        flux(:,:,:,:)=0.
-       !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,in,det,ind,ac,pos, wght,&
+       !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
-       !$OMP& states,states_i,los_vec,vi_norm,photons,denf,fbm_denf)
+       !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf)
        loop_along_x: do ii=1,grid%nx
          loop_along_y: do jj=1,grid%ny
            loop_along_z: do kk=1,grid%nz
             fdens=result%neut_dens(ii,jj,kk,:,nbif_type) 
             hdens=result%neut_dens(ii,jj,kk,:,nbih_type) 
             tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
-            halodens=result%neut_dens(ii,jj,kk,:,halo_type)
-            denf=cell(ii,jj,kk)%plasma%denf
-                         
-            if((los_weight(ii,jj,kk,ichan).gt.0).and.(denf.gt.0)) then
+            halodens=result%neut_dens(ii,jj,kk,:,halo_type)             
+            b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
+            b_abs=cell(ii,jj,kk)%plasma%b_abs
+            one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
+
+            if(los_weight(ii,jj,kk,ichan).gt.0) then
              pos(:) = (/grid%xxc(ii), grid%yyc(jj), grid%zzc(kk)/)
              call chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),pos,rpos)
              print*,ii,jj,kk
+             !!Loop over detector area
              loop_along_xd: do i=1,5
                loop_along_yd: do j=1,5
                  rdpos(1)=xd_arr(i)
@@ -3687,22 +3690,33 @@ contains
 
                  !! Determine the angle between the B-field and the Line of Sight 
                  los_vec(:)= -1*los_vec(:)
-                 b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
                  theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
                  minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
                  ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
                  vi_norm(:)=los_vec(:)
                  loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
                    ienergy=minloc(abs(distri%energy-ebarr(ic)))
-                   fbm_denf=0
-                   if (allocated(cell(ii,jj,kk)%fbm)) then 
-                     fbm_denf=cell(ii,jj,kk)%fbm(ienergy(1),ipitch(1))*cell(ii,jj,kk)%fbm_norm(1)
-                   endif
                    vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))
+                   vi(:) = vi_norm(:)*vabs
+
+                   !!Correct for gyro orbit
+                   vxB(1)= (vi(2) * b_norm(3) - vi(3) * b_norm(2))
+                   vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
+                   vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
+                   r_gyro(:)=pos(:)+vxB(:)*one_over_omega
+                   ix=minloc(abs(r_gyro(1)-grid%xx))
+                   iy=minloc(abs(r_gyro(2)-grid%yy))
+                   iz=minloc(abs(r_gyro(3)-grid%zz))
+                   fbm_denf=0
+                   denf=0.
+                   if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
+                     fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
+                     denf=cell(ix(1),iy(1),iz(1))%plasma%denf
+                   endif
+
                    !! -------------- calculate CX probability -------!!
                    ! CX with full energetic NBI neutrals
                    pcx=0.d0
-                   vi(:) = vi_norm(:)*vabs
                    call neut_rates(fdens,vi,vnbi_f,rates)
                    pcx=pcx + rates
                    ! CX with half energetic NBI neutrals

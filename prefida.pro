@@ -293,17 +293,12 @@ PRO chord_coor,pi,pf,u,v,z,xp,yp,zp
     xp=xpp
     zp=zpp
 END
+FUNCTION shadow_function,x,r,xcen
+   return, (x-xcen)*sqrt((r+x-xcen)*(r-x+xcen))-(r^2.0)*atan((xcen-x)/sqrt((r+x-xcen)*(r-x+xcen))) 
+END
 
-FUNCTION npa_prob,x,y,xp,yp,zp,tol=tol,dx=dx,dy=dy
-	if not keyword_set(tol) then tol=0.001
-	if not keyword_set(dx) then dx=abs(x[1]-x[0])
-	if not keyword_set(dy) then dy=abs(y[1]-y[0])
-
-	r=sqrt((x-xp)^2.0 + (y-yp)^2.0)
-	p=(zp/(r^2.0 + zp^2.0))*(r^(-1.0))*(!DPI^(-2.0))
-	w=where(r lt tol*zp,nw)
-	if nw ne 0 then p[w]=(2*atan(tol)/(!DPI*nw))/(dx*dy)
-	return, p
+FUNCTION shadow_area,rs,rcen,up,low
+   return, shadow_function(up,rs,rcen)-shadow_function(low,rs,rcen)
 END
 
 PRO npa_los_wght,los,grid,weight,err_arr
@@ -318,56 +313,30 @@ PRO npa_los_wght,los,grid,weight,err_arr
 
 	weight  = replicate(0.d0,grid.nx,grid.ny,grid.nz,nchan)
     err_arr=replicate(0.0,nchan)
-	ny=200L
-	nx=200L
 
 	for chan=0,nchan-1 do begin
         xyzlens = [xlens[chan],ylens[chan],zlens[chan]]
         xyzlos  = [xlos[chan], ylos[chan], zlos[chan]]
 
-		ymin=-1.1d0*rd[chan]
-		xmin=-1.1d0*rd[chan]
-		ymax= 1.1d0*rd[chan]
-		xmax= 1.1d0*rd[chan]
-		x = xmin + dindgen(nx)*(xmax-xmin)/nx
-		y = ymin + dindgen(ny)*(ymax-ymin)/ny
-		dx=abs(x[1]-x[0])
-		dy=abs(y[1]-y[0])
-		xd = reform(rebin(x,nx,ny,/sample),nx*ny)
-		yd = reform(transpose(rebin(y,ny,nx,/sample)),nx*ny)	
-		rrd = sqrt(xd^2 + yd^2)
-
 		chord_coor,xyzlens,xyzlos,grid.u_grid,grid.v_grid,grid.w_grid,xp,yp,zp
 		zp=zp+h[chan]
-		ww=where(zp gt h[chan],nw)
-		alpha=zp*0
-		xcen=zp*0
-		ycen=xcen
-		rs=xcen+rd[chan]
-		if nw ne 0 then begin
-			alpha[ww]=zp[ww]/(h[chan]-zp[ww])
-			rs[ww]=abs(ra[chan]*alpha[ww])
-			xcen[ww]=-xp[ww]-xp[ww]*alpha[ww]
-			ycen[ww]=-yp[ww]-yp[ww]*alpha[ww]
-		endif
-	
-		for xi=0, grid.nx-1 do begin
-            for yi=0, grid.ny-1 do begin
-		 		for zi=0, grid.nz-1 do begin
-    	            if sqrt(xcen[xi,yi,zi]^2 + ycen[xi,yi,zi]^2) gt rd[chan]+rs[xi,yi,zi] then continue
-					xs=xd+xcen[xi,yi,zi]
-					ys=yd+ycen[xi,yi,zi]
-					rrs=sqrt(xs^2.0 + ys^2.0)
-					p=npa_prob(xd,yd,xp[xi,yi,zi],yp[xi,yi,zi],zp[xi,yi,zi],dx=dx,dy=dy,tol=0.0001)
-					www=where(rrs ge rs[xi,yi,zi] or rrd ge rd[chan],nw)
-					if nw ne 0 then p[www]=0
-					weight[xi,yi,zi,chan]=total(p*dx*dy)	
-				endfor
-			endfor
-		endfor
+        rp=sqrt(xp^2.0 + yp^2.0) 
+		alpha=zp/(h[chan]-zp)
+		rcen=rp+rp*alpha        
+		rs=abs(ra[chan]*alpha)
+        rint=(rd[chan]^2.0 - rs^2.0 + rcen^2.0)/(2*rcen)
+        zline=(h[chan]/(2*rd[chan]))*(rp+rd[chan])
+        S=xp*0+!DPI*rd[chan]^2.0
+
+        wline=where(zp le zline and zp gt h[chan],nwline)
+        w=where(rp gt rd[chan] and zp gt h[chan],nw)
         
+        if nw ne 0 then S[w]=shadow_area(rs[w],rcen[w],rcen[w]+rs[w],rint[w])+shadow_area(rd[chan],0,rint[w],-ra[chan])
+        if nwline ne 0 then s[wline]=0
+        weight[*,*,*,chan]=S
+       
         if total(weight[*,*,*,chan]) gt 0 then begin
-			 weight[*,*,*,chan]=weight[*,*,*,chan];/total(weight[*,*,*,chan])
+			 weight[*,*,*,chan]=weight[*,*,*,chan]/total(weight[*,*,*,chan])
         endif else err_arr[chan]=1
 	endfor
 			

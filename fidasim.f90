@@ -3676,7 +3676,6 @@ contains
                  radius=sqrt(dot_product(los_vec,los_vec))
                  los_vec=los_vec/radius 
                
-                 det=0
                  call hit_npa_detector(pos,los_vec,det)
                  if (det.eq.0) cycle loop_along_yd 
 
@@ -3693,7 +3692,7 @@ contains
                  theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
                  minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
                  ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
-                 vi_norm(:)=los_vec(:)
+
                  loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
                    ienergy=minloc(abs(distri%energy-ebarr(ic)))
                    vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))

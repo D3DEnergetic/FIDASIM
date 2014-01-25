@@ -170,7 +170,6 @@ module application
      real(double)  :: lambdamin
      real(double)  :: lambdamax
   end type spec_type
-
   type npa_type
      real(double), dimension(:,:,:) ,allocatable  :: v    !! velocity array
      real(double), dimension(:,:,:) ,allocatable  :: ipos !! initial position arra
@@ -3702,10 +3701,8 @@ contains
              !! Determine the angle between the B-field and the Line of Sight 
              theta=180.-acos(dot_product(b_norm,-los_vec))*180./pi
              minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
-             ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
 
              loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
-               ienergy=minloc(abs(distri%energy-ebarr(ic)))
                vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))
                vi(:) = vi_norm(:)*vabs
 
@@ -3720,6 +3717,8 @@ contains
                fbm_denf=0
                denf=0.
                if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
+                 ienergy=minloc(abs(distri%energy-ebarr(ic)))
+                 ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
                  fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
                  denf=cell(ix(1),iy(1),iz(1))%plasma%denf
                endif
@@ -3756,7 +3755,9 @@ contains
                enddo
                pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma
                wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
-               flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
+               if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
+                 flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
+               endif
              enddo loop_over_energy
             endif
            enddo loop_along_z
@@ -3973,7 +3974,6 @@ program fidasim
   endif
 
   if(inputs%calc_npa_wght.eq.1) then
-     if(inputs%npa.ne.1 .and. inputs%calc_spec.ne.1) call read_fbm
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'npa weight function:    '  &
           ,time_arr(5), ':', time_arr(6), ':',time_arr(7)

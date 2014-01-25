@@ -557,7 +557,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 	print,total(deni)/total(denp)*100. ,' percent of impurities'
 	
 	;;Fast-ion density
-	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
+	if inputs.load_fbm then begin
      	transp_fbeam,inputs,grid,denf,fbm_struct,terr
 		if terr eq 1 then begin
 			print,'ERROR: FAILED TO MAP FAST ION DENSITY'
@@ -566,6 +566,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 		endif
   	endif else begin
 		denf=dene*0.d0
+        fbm_struct={err:1}
   	endelse
 
 	;;Electron temperature
@@ -879,9 +880,11 @@ PRO prefida,input_pro,plot=plot,save=save
 	ncdf_control,ncid
 	one_id = ncdf_dimdef(ncid,'dim001',1)
 	three_id = ncdf_dimdef(ncid,'dim003',3)
-	fbm_gdim= ncdf_dimdef(ncid,'fbm_grid',plasma.fbm.ngrid)
-    fbm_edim=ncdf_dimdef(ncid,'fbm_energy',plasma.fbm.nenergy)	
-    fbm_pdim=ncdf_dimdef(ncid,'fbm_pitch',plasma.fbm.npitch)	
+    if inputs.load_fbm then begin
+	    fbm_gdim= ncdf_dimdef(ncid,'fbm_grid',plasma.fbm.ngrid)
+        fbm_edim=ncdf_dimdef(ncid,'fbm_energy',plasma.fbm.nenergy)	
+        fbm_pdim=ncdf_dimdef(ncid,'fbm_pitch',plasma.fbm.npitch)	
+    endif
 	xid = ncdf_dimdef(ncid,'x',grid.nx)
 	yid = ncdf_dimdef(ncid,'y',grid.ny)
 	zid = ncdf_dimdef(ncid,'z',grid.nz)
@@ -899,9 +902,11 @@ PRO prefida,input_pro,plot=plot,save=save
 	nx_varid=ncdf_vardef(ncid,'Nx',one_id,/long)
 	ny_varid=ncdf_vardef(ncid,'Ny',one_id,/long)
 	nz_varid=ncdf_vardef(ncid,'Nz',one_id,/long)
-	gdim_varid=ncdf_vardef(ncid,'FBM_Ngrid',one_id,/long)
-	edim_varid=ncdf_vardef(ncid,'FBM_Nenergy',one_id,/long)
-	pdim_varid=ncdf_vardef(ncid,'FBM_Npitch',one_id,/long)
+    if inputs.load_fbm then begin
+	    gdim_varid=ncdf_vardef(ncid,'FBM_Ngrid',one_id,/long)
+	    edim_varid=ncdf_vardef(ncid,'FBM_Nenergy',one_id,/long)
+	    pdim_varid=ncdf_vardef(ncid,'FBM_Npitch',one_id,/long)
+    endif
 	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then $
 		nchan_varid=ncdf_vardef(ncid,'Nchan',one_id,/long)
 
@@ -915,18 +920,20 @@ PRO prefida,input_pro,plot=plot,save=save
 	ygrid_varid=ncdf_vardef(ncid,'y_grid',griddim,/double)
 	zgrid_varid=ncdf_vardef(ncid,'z_grid',griddim,/double)
 
-	;;DEFINE FBM VARIABLES 
-	r2d_varid=ncdf_vardef(ncid,'FBM_r2d',fbm_gdim,/double)
-	z2d_varid=ncdf_vardef(ncid,'FBM_z2d',fbm_gdim,/double)
-	bmvol_varid=ncdf_vardef(ncid,'FBM_bmvol',fbm_gdim,/double)
-	energy_varid=ncdf_vardef(ncid,'FBM_energy',fbm_edim,/double)
-	pitch_varid=ncdf_vardef(ncid,'FBM_pitch',fbm_pdim,/double)
-	emin_varid=ncdf_vardef(ncid,'FBM_emin',one_id,/double)
-	emax_varid=ncdf_vardef(ncid,'FBM_emax',one_id,/double)
-	pmin_varid=ncdf_vardef(ncid,'FBM_pmin',one_id,/double)
-	pmax_varid=ncdf_vardef(ncid,'FBM_pmax',one_id,/double)
-	cdftime_varid=ncdf_vardef(ncid,'FBM_time',one_id,/double)	
-	fbm_varid=ncdf_vardef(ncid,'FBM',[fbm_edim,fbm_pdim,fbm_gdim],/double)
+	;;DEFINE FBM VARIABLES
+    if inputs.load_fbm then begin
+	    r2d_varid=ncdf_vardef(ncid,'FBM_r2d',fbm_gdim,/double)
+	    z2d_varid=ncdf_vardef(ncid,'FBM_z2d',fbm_gdim,/double)
+	    bmvol_varid=ncdf_vardef(ncid,'FBM_bmvol',fbm_gdim,/double)
+	    energy_varid=ncdf_vardef(ncid,'FBM_energy',fbm_edim,/double)
+	    pitch_varid=ncdf_vardef(ncid,'FBM_pitch',fbm_pdim,/double)
+	    emin_varid=ncdf_vardef(ncid,'FBM_emin',one_id,/double)
+	    emax_varid=ncdf_vardef(ncid,'FBM_emax',one_id,/double)
+	    pmin_varid=ncdf_vardef(ncid,'FBM_pmin',one_id,/double)
+	    pmax_varid=ncdf_vardef(ncid,'FBM_pmax',one_id,/double)
+	    cdftime_varid=ncdf_vardef(ncid,'FBM_time',one_id,/double)	
+	    fbm_varid=ncdf_vardef(ncid,'FBM',[fbm_edim,fbm_pdim,fbm_gdim],/double)
+    endif
 
 	;;DEFINE PLASMA VARIABLES
 	te_varid=ncdf_vardef(ncid,'te',griddim,/double)
@@ -977,9 +984,11 @@ PRO prefida,input_pro,plot=plot,save=save
 	ncdf_varput,ncid,nz_varid,long(inputs.nz)
 	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then $
 		ncdf_varput,ncid,nchan_varid,long(n_elements(fida.los))
-	ncdf_varput,ncid,gdim_varid,long(plasma.fbm.ngrid)
-	ncdf_varput,ncid,edim_varid,long(plasma.fbm.nenergy)
-	ncdf_varput,ncid,pdim_varid,long(plasma.fbm.npitch)
+    if inputs.load_fbm then begin
+	    ncdf_varput,ncid,gdim_varid,long(plasma.fbm.ngrid)
+	    ncdf_varput,ncid,edim_varid,long(plasma.fbm.nenergy)
+	    ncdf_varput,ncid,pdim_varid,long(plasma.fbm.npitch)
+    endif
 
 	;;WRITE GRID VARIABLES
 	ncdf_varput,ncid,ugrid_varid,double(grid.u_grid)	
@@ -992,17 +1001,19 @@ PRO prefida,input_pro,plot=plot,save=save
 	ncdf_varput,ncid,zgrid_varid,double(grid.z_grid)	
 
 	;;WRITE FBM VARIABLES
-	ncdf_varput,ncid,r2d_varid,double(plasma.fbm.r2d)
-	ncdf_varput,ncid,z2d_varid,double(plasma.fbm.z2d)
-	ncdf_varput,ncid,bmvol_varid,double(plasma.fbm.bmvol)
-	ncdf_varput,ncid,energy_varid,double(plasma.fbm.energy)
-	ncdf_varput,ncid,pitch_varid,double(plasma.fbm.pitch)
-	ncdf_varput,ncid,emin_varid,double(plasma.fbm.emin)
-	ncdf_varput,ncid,emax_varid,double(plasma.fbm.emax)
-	ncdf_varput,ncid,pmin_varid,double(plasma.fbm.pmin)
-	ncdf_varput,ncid,pmax_varid,double(plasma.fbm.pmax)
-	ncdf_varput,ncid,cdftime_varid,double(plasma.fbm.cdf_time)
-	ncdf_varput,ncid,fbm_varid,double(plasma.fbm.fbm)
+    if inputs.load_fbm then begin
+	    ncdf_varput,ncid,r2d_varid,double(plasma.fbm.r2d)
+	    ncdf_varput,ncid,z2d_varid,double(plasma.fbm.z2d)
+	    ncdf_varput,ncid,bmvol_varid,double(plasma.fbm.bmvol)
+	    ncdf_varput,ncid,energy_varid,double(plasma.fbm.energy)
+	    ncdf_varput,ncid,pitch_varid,double(plasma.fbm.pitch)
+	    ncdf_varput,ncid,emin_varid,double(plasma.fbm.emin)
+	    ncdf_varput,ncid,emax_varid,double(plasma.fbm.emax)
+	    ncdf_varput,ncid,pmin_varid,double(plasma.fbm.pmin)
+	    ncdf_varput,ncid,pmax_varid,double(plasma.fbm.pmax)
+	    ncdf_varput,ncid,cdftime_varid,double(plasma.fbm.cdf_time)
+	    ncdf_varput,ncid,fbm_varid,double(plasma.fbm.fbm)
+    endif
 
 	;;WRITE PLASMA VARIABLES
 	ncdf_varput,ncid,te_varid, double(plasma.te)

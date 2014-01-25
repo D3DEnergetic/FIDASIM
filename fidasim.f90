@@ -3248,12 +3248,12 @@ contains
        xlos=spec%xyzlos(ichan,1)
        ylos=spec%xyzlos(ichan,2)
        zlos=spec%xyzlos(ichan,3)
-         !!transform into machine coordinates
-         xlos2 =  cos(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) &
+       !!transform into machine coordinates
+       xlos2 =  cos(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) &
                   - sin(grid%alpha)*ylos + grid%origin(1)
-         ylos2 =  sin(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) & 
+       ylos2 =  sin(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) & 
                   + cos(grid%alpha)*ylos + grid%origin(2)
-         zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
+       zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
        
        radius=sqrt(xlos2**2 + ylos2**2)
        print*,'Radius:',radius
@@ -3533,18 +3533,19 @@ contains
     real(double), dimension(nlevs)  :: fdens,hdens,tdens,halodens
     real(double), dimension(3)      :: los_vec
     real(double)                    :: length,pcxa,one_over_omega
-    real(double)                    :: rad,max_wght
+    real(double)                    :: rad
     integer(long)                   :: nchan,cnt,det
     integer(long)                   :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
-    integer,dimension(1)             :: minpitch,ipitch,ienergy,ix,iy,iz
-    real(double), dimension(:,:,:,:,:),     allocatable :: wfunct
-    real(double), dimension(:,:,:,:),     allocatable :: flux
+    integer,dimension(1)            :: minpitch,ipitch,ienergy,ix,iy,iz
+    real(double), dimension(:,:,:,:,:), allocatable :: wfunct
+    real(double), dimension(:,:,:,:),   allocatable :: flux
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
-    real(double), dimension(:,:),     allocatable :: flux_tot
-    real(double), dimension(:)    ,     allocatable :: ebarr,ptcharr,rad_arr
-    real(double), dimension(10)     :: xd_arr,yd_arr !!npa detector array
+    real(double), dimension(:,:),       allocatable :: flux_tot
+    real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr
+    real(double), dimension(100)    :: xd_arr,yd_arr !!npa detector array
     real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
-    real(double)                    :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2,denf,fbm_denf,wght,b_abs
+    real(double)                    :: xlos,ylos,zlos,xlos2,ylos2,zlos2,xcen,ycen,rshad,rs
+    real(double)                    :: vabs,denf,fbm_denf,wght,b_abs
     real(double),dimension(3)       :: vn  ! vi in m/s
 
     !! Determination of the CX probability
@@ -3556,7 +3557,7 @@ contains
 
     !! ---- Solution of differential equation  ---- ! 
     integer,dimension(3)                  :: ac  !!actual cell
-    real(double), dimension(3)            :: pos,rpos,dpos,rdpos,r_gyro !! position of mean cell
+    real(double), dimension(3)            :: pos,rpos,dpos,rdpos,r_gyro,mrdpos !! position of mean cell
     real(double),dimension(grid%nx,grid%ny,grid%nz,spec%nchan) :: los_weight !! los wght
     integer(long)                         :: ichan,ind
     character(100)                        :: filename
@@ -3631,9 +3632,9 @@ contains
        print*,'Radius: ',radius
        rad_arr(cnt)=radius
        
-       do i=1,10
-         yd_arr(i)=(i-.5)*spec%rd(ichan)/10.
-         xd_arr(i)=i*2*pi/10.
+       do i=1,100
+         yd_arr(i)=(i-.5)*spec%rd(ichan)/100.
+         xd_arr(i)=i*2*pi/100.
        enddo
 
        allocate(wfunct(inputs%ne_wght,inputs%np_wght,grid%nx,grid%ny,grid%nz))
@@ -3641,7 +3642,7 @@ contains
        allocate(flux(inputs%ne_wght,grid%nx,grid%ny,grid%nz))
        flux(:,:,:,:)=0.
        !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
-       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy, &
+       !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy,mrdpos,rshad,rs,xcen,ycen, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf)
        loop_along_x: do ii=1,grid%nx
@@ -3658,98 +3659,105 @@ contains
             if(los_weight(ii,jj,kk,ichan).gt.0) then
              pos(:) = (/grid%xxc(ii), grid%yyc(jj), grid%zzc(kk)/)
              call chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),pos,rpos)
-             print*,ii,jj,kk
-             !!Loop over detector area
-             loop_along_xd: do i=1,10
-               loop_along_yd: do j=1,10
+             xcen = -rpos(1)-rpos(1)*(rpos(3)+spec%h(ichan))/(-rpos(3))
+             ycen = -rpos(2)-rpos(2)*(rpos(3)+spec%h(ichan))/(-rpos(3))
+             rshad=abs(spec%ra(ichan)*(rpos(3)+spec%h(ichan))/(-rpos(3)))
+
+             !!Loop over detector area to find mean detectorposition 
+             wght=0
+             loop_along_xd: do i=1,100
+               loop_along_yd: do j=1,100
                  rdpos(1)=yd_arr(j)*cos(xd_arr(i))
                  rdpos(2)=yd_arr(j)*sin(xd_arr(i))
                  rdpos(3)=-spec%h(ichan)
-                 radius=sqrt((rdpos(1)-rpos(1))**2. + (rdpos(2)-rpos(2))**2.)
-                 wght=((rpos(3)+spec%h(ichan))/(radius**2. + (rpos(3)+spec%h(ichan))**2.))*(radius**(-1.0))*(pi**(-2.0))
-                 wght=wght*abs(xd_arr(2)-xd_arr(1))*abs(yd_arr(2)-yd_arr(1))*yd_arr(j)
-                 call inv_chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),rdpos,dpos)
+                 rs=sqrt((rdpos(1)+xcen)**2 + (rdpos(2)+ycen)**2)
+                 if(rs.gt.rshad) cycle loop_along_yd
+                 mrdpos(:)=mrdpos(:)+rdpos(:)
+                 wght=wght+1
+               enddo loop_along_yd
+             enddo loop_along_xd
+             if(wght.le.0) cycle loop_along_z
+             mrdpos(:)=mrdpos(:)/wght
+             call inv_chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),mrdpos,dpos)
                  
-                 los_vec(1) = dpos(1) - pos(1)
-                 los_vec(2) = dpos(2) - pos(2)
-                 los_vec(3) = dpos(3) - pos(3)
-                 radius=sqrt(dot_product(los_vec,los_vec))
-                 los_vec=los_vec/radius 
+             !!Determine velocity vector 
+             los_vec(:) = dpos(:) - pos(:)
+             radius=sqrt(dot_product(los_vec,los_vec))
+             los_vec=los_vec/radius 
+             vi_norm(:) = los_vec
                
-                 call hit_npa_detector(pos,los_vec,det)
-                 if (det.eq.0) cycle loop_along_yd 
+             !!Check if it hits a detector just to make sure
+             call hit_npa_detector(pos,vi_norm,det)
+             if (det.eq.0) cycle loop_along_z 
+          
+             !!Determine path particle takes throught the grid
+             call track(vi_norm,pos,tcell,icell,pos_out,ncell)
 
-                 vi_norm(:) = los_vec
-                 call track(vi_norm,pos,tcell,icell,pos_out,ncell)
+             !!Set velocity vectors of neutral beam species
+             vnbi_f(:)=pos(:) - nbi%xyz_pos(:)
+             vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj
+             vnbi_h=vnbi_f/sqrt(2.d0)
+             vnbi_t=vnbi_f/sqrt(3.d0) 
 
-                 vnbi_f(:)=pos(:) - nbi%xyz_pos(:)
-                 vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj
-                 vnbi_h=vnbi_f/sqrt(2.d0)
-                 vnbi_t=vnbi_f/sqrt(3.d0) 
+             !! Determine the angle between the B-field and the Line of Sight 
+             theta=180.-acos(dot_product(b_norm,-los_vec))*180./pi
+             minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
+             ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
 
-                 !! Determine the angle between the B-field and the Line of Sight 
-                 los_vec(:)= -1*los_vec(:)
-                 theta=180.-acos(dot_product(b_norm,los_vec))*180./pi
-                 minpitch=minloc(abs(ptcharr-cos(theta*pi/180.)))
-                 ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
+             loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
+               ienergy=minloc(abs(distri%energy-ebarr(ic)))
+               vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))
+               vi(:) = vi_norm(:)*vabs
 
-                 loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
-                   ienergy=minloc(abs(distri%energy-ebarr(ic)))
-                   vabs = sqrt(ebarr(ic)/(v_to_E*inputs%ab))
-                   vi(:) = vi_norm(:)*vabs
+               !!Correct for gyro orbit
+               vxB(1)= (vi(2) * b_norm(3) - vi(3) * b_norm(2))
+               vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
+               vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
+               r_gyro(:)=pos(:)+vxB(:)*one_over_omega
+               ix=minloc(abs(r_gyro(1)-grid%xxc))
+               iy=minloc(abs(r_gyro(2)-grid%yyc))
+               iz=minloc(abs(r_gyro(3)-grid%zzc))
+               fbm_denf=0
+               denf=0.
+               if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
+                 fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
+                 denf=cell(ix(1),iy(1),iz(1))%plasma%denf
+               endif
 
-                   !!Correct for gyro orbit
-                   vxB(1)= (vi(2) * b_norm(3) - vi(3) * b_norm(2))
-                   vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
-                   vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
-                   r_gyro(:)=pos(:)+vxB(:)*one_over_omega
-                   ix=minloc(abs(r_gyro(1)-grid%xxc))
-                   iy=minloc(abs(r_gyro(2)-grid%yyc))
-                   iz=minloc(abs(r_gyro(3)-grid%zzc))
-                   fbm_denf=0
-                   denf=0.
-                   if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
-                     fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
-                     denf=cell(ix(1),iy(1),iz(1))%plasma%denf
-                   endif
+               !! -------------- calculate CX probability -------!!
+               ! CX with full energetic NBI neutrals
+               pcx=0.d0
+               call neut_rates(fdens,vi,vnbi_f,rates)
+               pcx=pcx + rates
+               ! CX with half energetic NBI neutrals
+               call neut_rates(hdens,vi,vnbi_h,rates)
+               pcx=pcx + rates
+               ! CX with third energetic NBI neutrals
+               call neut_rates(tdens,vi,vnbi_t,rates)
+               pcx=pcx + rates
 
-                   !! -------------- calculate CX probability -------!!
-                   ! CX with full energetic NBI neutrals
-                   pcx=0.d0
-                   call neut_rates(fdens,vi,vnbi_f,rates)
-                   pcx=pcx + rates
-                   ! CX with half energetic NBI neutrals
-                   call neut_rates(hdens,vi,vnbi_h,rates)
-                   pcx=pcx + rates
-                   ! CX with third energetic NBI neutrals
-                   call neut_rates(tdens,vi,vnbi_t,rates)
-                   pcx=pcx + rates
+               ! CX with HALO neutrals
+               do in=1,int(nr_halo_neutrate)
+                 call mc_halo((/ii, jj, kk/),vhalo(:))
+                 call neut_rates(halodens,vi,vhalo,rates)
+                 pcx=pcx + rates/nr_halo_neutrate
+               enddo
 
-                   ! CX with HALO neutrals
-                   do in=1,int(nr_halo_neutrate)
-                     call mc_halo((/ii, jj, kk/),vhalo(:))
-                     call neut_rates(halodens,vi,vhalo,rates)
-                     pcx=pcx + rates/nr_halo_neutrate
-                   enddo
+               if(sum(pcx).le.0) cycle loop_over_energy
 
-                   if(sum(pcx).le.0.or.denf.le.0) then
-                     cycle loop_over_energy
-                   endif
-                   !!Calculate attenuation
-                   !!by looping along rest of track
-                   states = pcx*denf
-                   states_i=states
-                   do kc=1,ncell 
-                     ac=icell(:,kc)
-                     call colrad(ac(:),vi(:),tcell(kc)/vabs,states,photons,0,1.d0)
-                     if (photons.le.0) exit
-                   enddo
-                   pcxa=sum(states)/sum(states_i)
-                   wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx)*pcxa*wght
-                   flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*wght
-                 enddo loop_over_energy
-                enddo loop_along_yd
-              enddo loop_along_xd
+               !!Calculate attenuation
+               !!by looping along rest of track
+               states = pcx*10000000000000. !!needs to be large aribitrary number so colrad works 
+               states_i=states
+               do kc=1,ncell 
+                 ac=icell(:,kc)
+                 call colrad(ac(:),vi(:),tcell(kc)/vabs,states,photons,0,1.d0)
+                 if (photons.le.0) exit
+               enddo
+               pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma
+               wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
+               flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
+             enddo loop_over_energy
             endif
            enddo loop_along_z
          enddo loop_along_y

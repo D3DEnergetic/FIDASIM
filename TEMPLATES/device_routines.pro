@@ -15,6 +15,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;	** Structure <1d447c48>, 11 tags, length=728, data length=724, refs=1:
 	;;	   NCHAN           LONG                11
 	;;	   DIAG            STRING    'OBLIQUE'
+    ;;     CHAN_ID         LONG      Array[11]
 	;;	   XLOS            DOUBLE    Array[11]
 	;;	   YLOS            DOUBLE    Array[11]
 	;;	   ZLOS            DOUBLE    Array[11]
@@ -22,8 +23,9 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;	   YLENS           DOUBLE    Array[11]
 	;;	   ZLENS           DOUBLE    Array[11]
 	;;	   SIGMA_PI_RATIO  DOUBLE    Array[11]
-	;;	   HEADSIZE        FLOAT     Array[11]
-	;;	   OPENING_ANGLE   FLOAT     Array[11]
+	;;	   RA              FLOAT     Array[11]
+	;;	   RD              FLOAT     Array[11]
+	;;	   H               FLOAT     Array[11]
 
 	;;	IDL> help,equil
 	;;	** Structure <1d474638>, 10 tags, length=6636160, data length=6636138, refs=1:
@@ -93,16 +95,18 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 		 divy:divy,$				   		;;HORIZONTAL BEAM DIVERGENCE [rad]
 		 divz:divz }				   		;;VERTICAL BEAM DIVERGENCE [rad]
 
-  	chords={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES
+  	chords={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES  (0 IF NPA)
 		 nchan:nchan,$				  		;;NUMBER OF CHANNELS
+         chan_id:chan_id,$                  ;;CHANNEL ID (0 FOR FIDA,1 FOR NPA)
 		 xmid:xmid,$						;;X POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
 		 ymid:ymid,$						;;Y POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
          zmid:zmid,$						;;Z POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
-		 xlens:xlens,$						;;X POS. OF LENS [cm]
-		 ylens:ylens,$						;;Y POS. OF LENS [cm]
- 		 zlens:zlens,$						;;Z POS. OF LENS [cm]
-  		 headsize:headsize,$				;;SIZE OF HEAD
-		 opening_angle:opening_angle}		;;OPENING ANGLE
+		 xlens:xlens,$						;;X POS. OF LENS/APERTURE [cm]
+		 ylens:ylens,$						;;Y POS. OF LENS/APERTURE [cm]
+ 		 zlens:zlens,$						;;Z POS. OF LENS/APERTURE [cm]
+  		 ra:ra,$				            ;;RADIUS OF APERTURE [cm] (0 IF FIDA)
+  		 rd:rd,$				            ;;RADIUS OF DETECTOR [cm] (0 IF FIDA)
+		 h:h}		                        ;;SEPERATION BETWEEN DETECTOR AND APERTURE [cm] (0 IF FIDA)
 
 	profiles={time:time,$					;;SHOT TIME
 			  rho:rho,$						;;RHO VALUES

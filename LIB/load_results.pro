@@ -17,6 +17,7 @@ PRO read_inputs,file,inputs,save=save
 		readf,55,idum & ps           = idum
 		readf,55,idum & npa          = idum      ;& print, 'npa: ', npa
 		readf,55,idum & load_neutrals= idum
+		readf,55,idum & load_fbm     = idum
 		readf,55,idum & f90brems=idum
 		readf,55,idum & calc_fida_wght    = idum
 		readf,55,idum & calc_npa_wght    = idum
@@ -109,7 +110,7 @@ PRO read_inputs,file,inputs,save=save
 	          , nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
 	          , calc_spec:calc_spec,npa:npa $
 	          , einj:einj $
-	          , load_neutrals:load_neutrals  $
+	          , load_neutrals:load_neutrals,load_fbm:load_fbm  $
 	          , nx:nx, ny:ny, nz:nz $
 	          , x0:xx[0],x1:xx[nx-1]+dx $
 	          , y0:yy[0],y1:yy[ny-1]+dy $

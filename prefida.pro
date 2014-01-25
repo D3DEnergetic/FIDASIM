@@ -696,7 +696,8 @@ PRO prefida,input_pro,plot=plot,save=save
 
 	;;CALL INPUT PROCEDURE/FILE
 	CALL_PROCEDURE,input_pro,inputs
-
+    
+    if inputs.calc_spec or inputs.calc_npa then inputs.load_fbm=1
     ;;CHECK FOR SLASH
     slash=strmid(inputs.result_dir,0,1,/reverse_offset)
     if slash ne '/' then inputs.result_dir+='/'
@@ -793,6 +794,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	printf,55, inputs.ps,f='(i2,"             # plot ps output")'
 	printf,55, inputs.calc_npa          ,f='(i2,"             # NPA simulation")'
 	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
+	printf,55, inputs.load_fbm,f='(i2,"             # load FBM ")'
     printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
 	printf,55, inputs.calc_fida_wght,f='(i2,"             # calculate fida wght function")'
 	printf,55, inputs.calc_npa_wght,f='(i2,"             # calculate npa wght function")'

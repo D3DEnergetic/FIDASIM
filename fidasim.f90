@@ -198,6 +198,7 @@ module application
      !! general settings
      integer(long) :: calc_spec
      integer(long) :: load_neutrals
+     integer(long) :: load_fbm
      integer(long) :: f90brems       !! 0 to use IDL v.b.
      integer(long) :: npa 
      integer(long) :: calc_fida_wght
@@ -280,6 +281,7 @@ contains
     read(66,*) !# this was nofida...is now ps
     read(66,*) inputs%npa
     read(66,*) inputs%load_neutrals
+    read(66,*) inputs%load_fbm
     read(66,*) inputs%f90brems
     read(66,*) inputs%calc_fida_wght
     read(66,*) inputs%calc_npa_wght
@@ -782,7 +784,6 @@ contains
     deallocate(transp_z)
     deallocate(transp_fbm)
   end subroutine read_fbm
-
 
   subroutine write_birth_profile
     use netcdf
@@ -3868,12 +3869,13 @@ program fidasim
   random_init=ran()
 
   !! ----------------------------------------------------------
-  !! ------- READ INPUTS, PROFILES, LOS AND TABLES  -----------
+  !! ------- READ INPUTS, PROFILES, LOS, TABLES, & FBM --------
   !! ----------------------------------------------------------
   call read_inputs
   call read_tables
   call read_los
   call read_plasma
+
   !! ----------------------------------------------------------
   !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
   !! ----------------------------------------------------------
@@ -3946,6 +3948,12 @@ program fidasim
      call write_neutrals()
       if(inputs%calc_spec.eq.1) call write_nbi_halo_spectra()
   endif
+
+  !! -----------------------------------------------------------------------
+  !!-----------------------LOAD FAST ION DISTRIBUTION-----------------------
+  !! -----------------------------------------------------------------------
+  if(inputs%load_fbm.eq.1) call read_fbm
+
   !! -----------------------------------------------------------------------
   !! --------------- CALCULATE the FIDA RADIATION/ NPA FLUX ----------------
   !! -----------------------------------------------------------------------
@@ -3953,7 +3961,6 @@ program fidasim
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
-     call read_fbm
      print*,'start fida'
      call fida
      !! ------- Store Spectra and neutral densities in binary files ------ !!

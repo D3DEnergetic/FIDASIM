@@ -306,10 +306,12 @@ PRO read_npa,file,npa,save=save
 		ncdf_varget,ncid,'fpos',npafpos
 		ncdf_varget,ncid,'v',npav
 		ncdf_varget,ncid,'wght',npawght
+		ncdf_varget,ncid,'flux',flux
+		ncdf_varget,ncid,'energy',energy
 		ncdf_close,ncid
 
 		if n_elements(npawght) gt 0 then begin
-			npa={npaipos:npaipos,npafpos:npafpos,npav:npav, npawght:npawght,err:0}
+			npa={npaipos:npaipos,npafpos:npafpos,npav:npav,npawght:npawght,energy:energy,flux:flux,err:0}
 			if keyword_set(save) then save,npa,filename='npa.sav'
 		endif else begin
 			print, 'attention, no particle reached the detector!'

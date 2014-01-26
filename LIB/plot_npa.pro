@@ -43,6 +43,9 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
   ;; weight (particle number per marker)
   npawght=fidasim.npa.npawght[*,chan]
 
+  flux=fidasim.npa.flux[*,chan]
+  ener=fidasim.npa.energy
+
   ;; npa weight: Particles/s/cm^2
   ww=where(npawght ne 0,nnpa)
 
@@ -97,7 +100,6 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
 
   ;; detector heads (here only 1)
   ndet=1
-  histo =fltarr(ndet,nen)
   distri=fltarr(ndet,nen,npitch)
 
 ; loop over all particles which reach the detector
@@ -137,7 +139,7 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
               *fidasim.fbm.pitch_sign_convention
         dummy=min(abs(energy_arr-energy),eindex)
         dummy=min(abs(pitch_arr-pitch),pindex)    
-        histo[idet,eindex]=histo[idet,eindex]+npawght[i]
+
         if keyword_set(currentmode) then begin
             cm=0
             if energy gt eintercept then cm=(energy-eintercept)
@@ -151,7 +153,8 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
      contour,distri[idet,*,*],energy_arr,pitch_arr $
              ,c_colors=indgen(20)*12,nlevels=20,/fill,yran=[-1,1] $
              ,ytit='Pitch',xtit='Energy [keV]'
-     plot, energy_arr, histo,ytit='neutrals/s',xtit='Energy [keV]',psym=10
+     plot, ener, flux,ytit='neutrals/s',xtit='Energy [keV]',psym=10
+
   endfor
   if keyword_set(ps) then device, /close
 

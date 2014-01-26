@@ -175,6 +175,8 @@ module application
      real(double), dimension(:,:,:) ,allocatable  :: ipos !! initial position arra
      real(double), dimension(:,:,:) ,allocatable  :: fpos !! final position array
      real(double), dimension(:,:)   ,allocatable  :: wght !! weight
+     real(double), dimension(:,:)   ,allocatable  :: flux !! flux
+     real(double), dimension(:)     ,allocatable  :: energy !! energy
      integer(long),dimension(:)     ,allocatable  :: counter
      real(double)                                 :: npa_loop
      integer(long)                                :: nchan
@@ -876,8 +878,8 @@ contains
 
   subroutine write_npa
     use netcdf
-    integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,maxcnt
-    integer         :: ipos_varid,fpos_varid,v_varid,wght_varid,shot_varid,time_varid,cnt_varid
+    integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,dimid3,maxcnt
+    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,shot_varid,time_varid,cnt_varid
     character(120)  :: filename
     real(float), dimension(:,:,:),allocatable :: output
     real(float), dimension(:,:),allocatable :: output1
@@ -894,10 +896,11 @@ contains
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
+    call check( nf90_def_dim(ncid,"dim003",3,dimid3) )
+    call check( nf90_def_dim(ncid,"energies",distri%nenergy,e_dimid) )
     call check( nf90_def_dim(ncid,"nchan",npa%nchan,nchan_dimid) )
     call check( nf90_def_dim(ncid,"max_counts",maxcnt,c_dimid) )
-    call check( nf90_def_dim(ncid,"energy",3,e_dimid) )
-    dimids = (/ c_dimid, e_dimid, nchan_dimid /)
+    dimids = (/ c_dimid, dimid3, nchan_dimid /)
 
     !Define variables
     call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
@@ -906,6 +909,8 @@ contains
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
     call check( nf90_def_var(ncid,"wght",NF90_FLOAT,(/ c_dimid,nchan_dimid /),wght_varid) )
+    call check( nf90_def_var(ncid,"flux",NF90_FLOAT,(/ e_dimid,nchan_dimid /),f_varid) )
+    call check( nf90_def_var(ncid,"energy",NF90_FLOAT,e_dimid,e_varid) )
     call check( nf90_def_var(ncid,"counts",NF90_FLOAT,nchan_dimid,cnt_varid) )
 
     !Add unit attributes
@@ -931,6 +936,10 @@ contains
 
     output1(:,:)=real(npa%wght(:maxcnt,:) ,float)
     call check( nf90_put_var(ncid, wght_varid, output1) )
+
+    call check( nf90_put_var(ncid,f_varid,real(npa%flux(:,:),float)) )
+
+    call check( nf90_put_var(ncid,e_varid,real(npa%energy(:),float)) )
 
     output2(:)=real(npa%counter(:),float)
     call check( nf90_put_var(ncid, cnt_varid,output2) )
@@ -2336,6 +2345,7 @@ contains
     integer                                 :: ipitch !! index of pitch
     real(double)                            :: dray !! (for NPA)
     real(double), dimension(3)              :: ray     !! ray towards NPA
+    real(double), dimension(1)              :: ienergy !! (for NPA)
     photons=0.d0
     iflux=sum(states)
     !! --------------- Check if inputs are valid for colrad -------------- !!
@@ -2370,6 +2380,8 @@ contains
           npa%wght(npa%counter(det),det)=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
           npa%ipos(npa%counter(det),:,det)=ri(:)
           npa%fpos(npa%counter(det),:,det)=ray(:)
+          ienergy=minloc(abs(npa%energy-(inputs%ab*v_to_E*dot_product(vn,vn))))
+          npa%flux(ienergy(1),det)=npa%flux(ienergy(1),det)+ npa%wght(npa%counter(det),det)/distri%deb
           !$OMP END CRITICAL(col_rad_npa)
        endif
        return
@@ -3541,11 +3553,11 @@ contains
     real(double), dimension(:,:,:,:),   allocatable :: flux
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),       allocatable :: flux_tot
-    real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr
-    real(double), dimension(100)    :: xd_arr,yd_arr !!npa detector array
+    real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr,los_tot
+    real(double), dimension(100)    :: rd_arr,phid_arr !!npa detector array
     real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
     real(double)                    :: xlos,ylos,zlos,xlos2,ylos2,zlos2,xcen,ycen,rshad,rs
-    real(double)                    :: vabs,denf,fbm_denf,wght,b_abs
+    real(double)                    :: vabs,denf,fbm_denf,wght,b_abs,dE,dP
     real(double),dimension(3)       :: vn  ! vi in m/s
 
     !! Determination of the CX probability
@@ -3580,13 +3592,15 @@ contains
     do i=1,inputs%ne_wght
        ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
-    
+    dE=abs(ebarr(2)-ebarr(1))
+
     !! define pitch - array
     allocate(ptcharr(inputs%np_wght))
     do i=1,inputs%np_wght
        ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
     enddo
-    
+    dP=abs(ptcharr(2)-ptcharr(1))
+
     nchan=0
     do i=1,spec%nchan
       if(spec%chan_id(i).eq.1) nchan=nchan+1
@@ -3596,13 +3610,16 @@ contains
     allocate(wfunct_tot(inputs%ne_wght,inputs%np_wght,nchan))
     allocate(flux_tot(inputs%ne_wght,nchan))  
     allocate(rad_arr(nchan))
+    allocate(los_tot(spec%nchan))
 
     !!save the los-weights into an array
     !! because the structure is over-written
+    los_tot(:)=0.
     do k=1,grid%nz
       do j=1,grid%ny 
         do i=1,grid%nx 
           los_weight(i,j,k,:)=cell(i,j,k)%los_wght(:)
+          los_tot=los_tot+los_weight(i,j,k,:)
         enddo
       enddo
     enddo 
@@ -3633,8 +3650,8 @@ contains
        rad_arr(cnt)=radius
        
        do i=1,100
-         yd_arr(i)=(i-.5)*spec%rd(ichan)/100.
-         xd_arr(i)=i*2*pi/100.
+         rd_arr(i)=(i-.5)*spec%rd(ichan)/100.
+         phid_arr(i)=i*2*pi/100.
        enddo
 
        allocate(wfunct(inputs%ne_wght,inputs%np_wght,grid%nx,grid%ny,grid%nz))
@@ -3667,8 +3684,8 @@ contains
              wght=0
              loop_along_xd: do i=1,100
                loop_along_yd: do j=1,100
-                 rdpos(1)=yd_arr(j)*cos(xd_arr(i))
-                 rdpos(2)=yd_arr(j)*sin(xd_arr(i))
+                 rdpos(1)=rd_arr(j)*cos(phid_arr(i))
+                 rdpos(2)=rd_arr(j)*sin(phid_arr(i))
                  rdpos(3)=-spec%h(ichan)
                  rs=sqrt((rdpos(1)+xcen)**2 + (rdpos(2)+ycen)**2)
                  if(rs.gt.rshad) cycle loop_along_yd
@@ -3755,9 +3772,13 @@ contains
                  if (photons.le.0) exit
                enddo
                pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma
-               wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
+
+               wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + &
+                 sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)*grid%dv
+
                if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
-                 flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)
+                 flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + &
+                   grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)/distri%deb
                endif
              enddo loop_over_energy
             endif
@@ -3772,7 +3793,7 @@ contains
              do ic=1,inputs%ne_wght
                flux_tot(ic,cnt)=flux_tot(ic,cnt)+flux(ic,ii,jj,kk)
                do jc=1,inputs%np_wght
-                 wfunct_tot(ic,jc,cnt)=wfunct_tot(ic,jc,cnt)+wfunct(ic,jc,ii,jj,kk)*grid%dv
+                 wfunct_tot(ic,jc,cnt)=wfunct_tot(ic,jc,cnt)+wfunct(ic,jc,ii,jj,kk)
                enddo
              enddo
            enddo loop_over_x
@@ -3842,6 +3863,7 @@ contains
     deallocate(wfunct_tot)
     deallocate(flux_tot)  
     deallocate(rad_arr)
+    deallocate(los_tot)
   end subroutine npa_weight_function
 end module application
 
@@ -3962,6 +3984,11 @@ program fidasim
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
      print*,'start fida'
+     if(inputs%npa.eq.1) then
+       allocate(npa%energy(distri%nenergy))
+       allocate(npa%flux(distri%nenergy,npa%nchan))
+       npa%energy(:)=distri%energy
+     endif
      call fida
      !! ------- Store Spectra and neutral densities in binary files ------ !!
      if(inputs%calc_spec.eq.1) call write_fida_spectra()
@@ -4048,7 +4075,8 @@ program fidasim
      deallocate(npa%ipos) 
      deallocate(npa%fpos) 
      deallocate(npa%wght)
+     deallocate(npa%energy)
+     deallocate(npa%flux)
      deallocate(npa%counter)
   endif
 end program fidasim
- 

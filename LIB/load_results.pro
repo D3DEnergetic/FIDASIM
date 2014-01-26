@@ -17,6 +17,7 @@ PRO read_inputs,file,inputs,save=save
 		readf,55,idum & ps           = idum
 		readf,55,idum & npa          = idum      ;& print, 'npa: ', npa
 		readf,55,idum & load_neutrals= idum
+		readf,55,idum & load_fbm     = idum
 		readf,55,idum & f90brems=idum
 		readf,55,idum & calc_fida_wght    = idum
 		readf,55,idum & calc_npa_wght    = idum
@@ -109,7 +110,7 @@ PRO read_inputs,file,inputs,save=save
 	          , nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo $
 	          , calc_spec:calc_spec,npa:npa $
 	          , einj:einj $
-	          , load_neutrals:load_neutrals  $
+	          , load_neutrals:load_neutrals,load_fbm:load_fbm  $
 	          , nx:nx, ny:ny, nz:nz $
 	          , x0:xx[0],x1:xx[nx-1]+dx $
 	          , y0:yy[0],y1:yy[ny-1]+dy $
@@ -131,10 +132,12 @@ PRO read_los,file,los,save=save
        	ncdf_varget,ncid,'xlos',xlos
        	ncdf_varget,ncid,'ylos',ylos
        	ncdf_varget,ncid,'zlos',zlos
-       	ncdf_varget,ncid,'headsize',headsize
+       	ncdf_varget,ncid,'ra',ra
+       	ncdf_varget,ncid,'rd',rd
        	ncdf_varget,ncid,'sigma_pi',sigma_pi
-       	ncdf_varget,ncid,'opening_angle',opening_angle
+       	ncdf_varget,ncid,'h',h
        	ncdf_varget,ncid,'los_wght',weight
+       	ncdf_varget,ncid,'chan_id',chan_id
 
        	ncdf_close,ncid
 		xyzlens=[[xlens],[ylens],[zlens]]
@@ -142,7 +145,7 @@ PRO read_los,file,los,save=save
 		rlos=sqrt(xyzlos[*,0]^2+xyzlos[*,1]^2)
 		
 		los={nchan:nchan,rlos:rlos,xyzlens:xyzlens,xyzlos:xyzlos,$
-			 headsize:headsize,opening_angle:opening_angle,sigma_pi:sigma_pi,weight:weight,err:0}
+			 ra:ra,rd:rd,h:h,chan_id:chan_id,sigma_pi:sigma_pi,weight:weight,err:0}
 		if keyword_set(save) then save,los,filename='los.sav'
 	endif else begin
 		los={err:1}
@@ -303,10 +306,12 @@ PRO read_npa,file,npa,save=save
 		ncdf_varget,ncid,'fpos',npafpos
 		ncdf_varget,ncid,'v',npav
 		ncdf_varget,ncid,'wght',npawght
+		ncdf_varget,ncid,'flux',flux
+		ncdf_varget,ncid,'energy',energy
 		ncdf_close,ncid
 
 		if n_elements(npawght) gt 0 then begin
-			npa={npaipos:npaipos,npafpos:npafpos,npav:npav, npawght:npawght,err:0}
+			npa={npaipos:npaipos,npafpos:npafpos,npav:npav,npawght:npawght,energy:energy,flux:flux,err:0}
 			if keyword_set(save) then save,npa,filename='npa.sav'
 		endif else begin
 			print, 'attention, no particle reached the detector!'
@@ -404,6 +409,7 @@ PRO read_npa_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_con
 		ncdf_varget,ncid,'pitch',pitcharr
 		ncdf_varget,ncid,'radius',radarr
 		ncdf_varget,ncid,'wfunct',weight_tot
+        ncdf_varget,ncid,'flux',flux
 		ncdf_close,ncid
 		
 		dE=abs(energyarr[1]-energyarr[0])
@@ -418,7 +424,7 @@ PRO read_npa_weights,file,weights,save=save,pitch_sign_convention=pitch_sign_con
     	weights={shot:shot,time:time,nchan:n_elements(radarr),nen:nen $
             ,dE:dE,emax:emax,emin:0.,npitch:npitch,dpitch:dpitch   $
             ,energyarr:energyarr,pitcharr:pitcharr $
-            ,weight_tot:weight_tot   $
+            ,weight_tot:weight_tot,flux:flux   $
             ,radius:radarr,err:0}
 		if keyword_set(save) then save,weights,filename='npa_weights.sav'
 	endif else begin

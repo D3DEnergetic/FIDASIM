@@ -53,10 +53,6 @@ From the install directory run
 
     fidasim TEST/D3D
 
-or 
-
-    fidasim TEST/AUGD
-
 ## 5. Device Specific Installation Instructions
 These installation instructions are unique to each machine. For instructions on how to get FIDASIM to work with a particular machine see the section titled "How do make FIDASIM work for your device"
 ### DIII-D
@@ -183,6 +179,7 @@ f90brems=[0]          ;; (0 or 1) If 0 use the IDL bremstrahlung calculation
 calc_fida_wght=[1]    ;; (0 or 1) If 1 then weight functions are calculated
 calc_npa_wght=[0]     ;; (0 or 1) If 1 then weight functions are calculated
 load_neutrals=[0]     ;; (0 or 1) If 1 then the neutral density is loaded from an existing 
+load_fbm=[1]          ;; (0 or 1) If 1 then the FBM is loaded (calc_spec/npa overwrites) 
 ps=[0]                ;; (0 or 1) If 1 then make hard copy of plots
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
@@ -197,7 +194,7 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
         ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
         wavel_end_wght:wavel_end_wght,calc_npa:calc)npa,calc_spec:calc_spec,calc_birth:calc_birth,calc_fida_wght:calc_fida_wght,$
-        calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
+        calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,load_fbm:load_fbm,ps:ps}
 
 END
 ```
@@ -255,6 +252,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;	** Structure <1d447c48>, 11 tags, length=728, data length=724, refs=1:
 	;;	   NCHAN           LONG                11
 	;;	   DIAG            STRING    'OBLIQUE'
+	;;	   CHAN_ID         LONG      Array[11]
 	;;	   XLOS            DOUBLE    Array[11]
 	;;	   YLOS            DOUBLE    Array[11]
 	;;	   ZLOS            DOUBLE    Array[11]
@@ -262,8 +260,9 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;	   YLENS           DOUBLE    Array[11]
 	;;	   ZLENS           DOUBLE    Array[11]
 	;;	   SIGMA_PI_RATIO  DOUBLE    Array[11]
-	;;	   HEADSIZE        FLOAT     Array[11]
-	;;	   OPENING_ANGLE   FLOAT     Array[11]
+	;;	   RD              FLOAT     Array[11]
+	;;	   RA              FLOAT     Array[11]
+	;;	   H               FLOAT     Array[11]
 
 	;;	IDL> help,equil
 	;;	** Structure <1d474638>, 10 tags, length=6636160, data length=6636138, refs=1:
@@ -333,16 +332,18 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 		 divy:divy,$				   		;;HORIZONTAL BEAM DIVERGENCE [rad]
 		 divz:divz }				   		;;VERTICAL BEAM DIVERGENCE [rad]
 
-  	chords={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES
+  	chords={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES  (0 IF NPA)
 		 nchan:nchan,$				  		;;NUMBER OF CHANNELS
+         chan_id:chan_id,$                  ;;CHANNEL ID (0 FOR FIDA, 1 FOR NPA)
 		 xmid:xmid,$						;;X POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
 		 ymid:ymid,$						;;Y POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
          zmid:zmid,$						;;Z POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
-		 xlens:xlens,$						;;X POS. OF LENS [cm]
-		 ylens:ylens,$						;;Y POS. OF LENS [cm]
- 		 zlens:zlens,$						;;Z POS. OF LENS [cm]
-  		 headsize:headsize,$				;;SIZE OF HEAD
-		 opening_angle:opening_angle}		;;OPENING ANGLE
+		 xlens:xlens,$						;;X POS. OF LENS/APERTURE [cm]
+		 ylens:ylens,$						;;Y POS. OF LENS/APERTURE [cm]
+ 		 zlens:zlens,$						;;Z POS. OF LENS/APERTURE [cm]
+  		 ra:ra,$      				        ;;RADIUS OF NPA APERTURE [cm] (0 IF FIDA)
+  		 rd:rd,$      				        ;;RADIUS OF NPA DETECTOR [cm] (0 IF FIDA)
+		 h:h}     		                    ;;SEPERATION BETWEEN APERTURE AND DETECTOR [cm] (0 IF FIDA)
 
 	profiles={time:time,$					;;SHOT TIME
 			  rho:rho,$						;;RHO VALUES

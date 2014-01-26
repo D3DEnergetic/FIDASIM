@@ -93,8 +93,8 @@ calc_birth=[1]    										;; (0 or 1) If 1 then the birth profile is calculate
 f90brems=[0]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
 calc_fida_wght=[1]  									;; (0 or 1) If 1 then fida weight functions are calculated
 calc_npa_wght=[0]  										;; (0 or 1) If 1 then npa weight functions are calculated
-load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing 
-														;; neutrals.bin file located in runid directory
+load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing run 
+load_fbm=[1]   									        ;; (0 or 1) If 1 then the fbm is loaded (calc_spec/npa overwrites)
 ps=[0]													;; (0 or 1) If 1 then make hard copy of plots
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
@@ -109,6 +109,6 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
         nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
 		wavel_end_wght:wavel_end_wght,calc_npa:calc_npa,calc_spec:calc_spec,calc_birth:calc_birth,calc_fida_wght:calc_fida_wght,$
-		calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
+		calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,load_fbm:load_fbm,ps:ps}
 
 END

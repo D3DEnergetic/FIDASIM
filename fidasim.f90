@@ -252,8 +252,7 @@ module application
   public :: read_neutrals
   public :: write_neutrals 
   public :: write_birth_profile
-  public :: write_fida_spectra
-  public :: write_nbi_halo_spectra
+  public :: write_spectra
 contains
   !****************************************************************************
   subroutine check(stat)
@@ -577,6 +576,7 @@ contains
     call check( nf90_close(ncid) )
 
     do i = 1,spec%nchan
+      if(spec%chan_id(i).ne.0)cycle
       result%spectra(:,i,brems_type)=brems(i)
     enddo
 
@@ -952,10 +952,10 @@ contains
     print*, 'NPA data written to: ',filename
   end subroutine write_npa
   
-  subroutine write_nbi_halo_spectra
+  subroutine write_spectra
     use netcdf
-    integer         :: i,j,k,ichan
-    integer         :: ncid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
+    integer         :: i,j,k,ichan,nchan
+    integer         :: ncid,fida_varid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
     integer         :: chan_dimid,lam_dimid,dimid1,dimids(2),shot_varid,time_varid
     character(120)  :: filename
     real(double), dimension(:)  , allocatable :: lambda_arr
@@ -967,12 +967,17 @@ contains
             +spec%lambdamin*0.1d0
     enddo 
 
+    nchan=0
+    do i=1,spec%nchan
+       if(spec%chan_id(i).eq.0) nchan=nchan+1
+    enddo
+
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
     result%spectra(:,:,:)=result%spectra(:,:,:)/(0.1d0*spec%dlambda) &
          /(4.d0*pi)*1.d4
 
     !! write to file
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_nbi_halo_spectra.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.cdf"
  
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -980,7 +985,7 @@ contains
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
     call check( nf90_def_dim(ncid,"lambda",spec%nlambda,lam_dimid) )
-    call check( nf90_def_dim(ncid,"chan",spec%nchan,chan_dimid) )
+    call check( nf90_def_dim(ncid,"chan",nchan,chan_dimid) )
     dimids = (/ lam_dimid, chan_dimid /)
 
     !Define variables
@@ -992,6 +997,7 @@ contains
     call check( nf90_def_var(ncid,"third",NF90_DOUBLE,dimids,third_varid) )
     call check( nf90_def_var(ncid,"halo",NF90_DOUBLE,dimids,halo_varid) )
     call check( nf90_def_var(ncid,"brems",NF90_DOUBLE,dimids,brems_varid) )
+    call check( nf90_def_var(ncid,"fida",NF90_DOUBLE,dimids,fida_varid) )
 
     !Add unit attributes
     call check( nf90_put_att(ncid,time_varid,"units","seconds") )
@@ -1001,6 +1007,7 @@ contains
     call check( nf90_put_att(ncid,third_varid,"units","Ph/(s*nm*sr*m^2)") )
     call check( nf90_put_att(ncid,halo_varid,"units","Ph/(s*nm*sr*m^2)") )
     call check( nf90_put_att(ncid,brems_varid,"units","Ph/(s*nm*sr*m^2)") )
+    call check( nf90_put_att(ncid,fida_varid,"units","Ph/(s*nm*sr*m^2)") )
 
     call check( nf90_enddef(ncid) )
 
@@ -1013,70 +1020,14 @@ contains
     call check( nf90_put_var(ncid, third_varid, result%spectra(:,:,nbit_type)) )
     call check( nf90_put_var(ncid, halo_varid, result%spectra(:,:,halo_type)) )
     call check( nf90_put_var(ncid, brems_varid, result%spectra(:,:,brems_type)) )
-
-    !Close netCDF file
-    call check( nf90_close(ncid) )
-
-    deallocate(lambda_arr)
-    print*, 'NBI and HALO spectra written to: ', filename
-  end subroutine write_nbi_halo_spectra
-
- subroutine write_fida_spectra
-    use netcdf
-    integer         :: i,j,k,ichan
-    integer         :: ncid,fida_varid,lam_varid,shot_varid,time_varid
-    integer         :: chan_dimid,lam_dimid,dimid1,dimids(2)
-    character(120)  :: filename
-    real(double), dimension(:)  , allocatable :: lambda_arr
-
-    !! ------------------------ calculate wavelength array ------------------ !!
-    allocate(lambda_arr(spec%nlambda))
-    do i=1,spec%nlambda 
-       lambda_arr(i)=(i-0.5)*spec%dlambda*0.1d0 &
-            +spec%lambdamin*0.1d0
-    enddo 
-
-    !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
-    result%spectra(:,:,fida_type)=result%spectra(:,:,fida_type) &
-         /(0.1d0*spec%dlambda)/(4.d0*pi)*1.d4
-
-    !! write to file
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_spectra.cdf"  
-
-    !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
-
-    !Define Dimensions
-    call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
-    call check( nf90_def_dim(ncid,"lambda",spec%nlambda,lam_dimid) )
-    call check( nf90_def_dim(ncid,"chan",spec%nchan,chan_dimid) )
-    dimids = (/ lam_dimid, chan_dimid /)
-
-    !Define variables
-    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
-    call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
-    call check( nf90_def_var(ncid,"spectra",NF90_DOUBLE,dimids,fida_varid) )
-
-    !Add unit attributes
-    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
-    call check( nf90_put_att(ncid,lam_varid,"units","nm") )
-    call check( nf90_put_att(ncid,fida_varid,"units","Ph/(s*nm*sr*m^2)") )
-    call check( nf90_enddef(ncid) )
-
-    !Write to file
-    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, inputs%time) )
-    call check( nf90_put_var(ncid, lam_varid, lambda_arr) )
     call check( nf90_put_var(ncid, fida_varid, result%spectra(:,:,fida_type)) )
 
     !Close netCDF file
     call check( nf90_close(ncid) )
 
-    !! result arrays 
     deallocate(lambda_arr)
-    print*, 'FIDA spectra written to ',filename
-  end subroutine write_fida_spectra
+    print*, 'Spectra written to: ', filename
+  end subroutine write_spectra
 
   subroutine read_neutrals
     use netcdf
@@ -2481,11 +2432,14 @@ contains
     real(double), dimension(3) :: vn  ! vi in m/s
     real(double), dimension(3) :: efield  !E-field (static + vxB)
     real(double), dimension(3) :: bfield  !B-field
-    integer                    :: i, ichan, bin  !counter, wavelengths bins
+    integer                    :: i, ichan, bin,cnt  !counter, wavelengths bins
     integer,parameter,dimension(n_stark)::stark_sign= +1*stark_sigma -1*stark_pi
                !sign in stark intensity formula:
                !- for Pi (linear), + for Sigma (circular)
+    cnt=0
     loop_over_channels: do ichan=1,spec%nchan
+       if(spec%chan_id(ichan).ne.0)cycle loop_over_channels
+       cnt=cnt+1
        if(cell(ac(1),ac(2),ac(3))%los_wght(ichan).le.0.)cycle loop_over_channels
        !! vector directing towards the optical head
        vp(1)=pos(1)-spec%xyzhead(ichan,1) 
@@ -2531,9 +2485,9 @@ contains
           if (bin.lt.1)            bin = 1
           if (bin.gt.spec%nlambda) bin = spec%nlambda  
           !$OMP CRITICAL(spec_trum)
-          result%spectra(bin,ichan,neut_type)= &
-               result%spectra(bin,ichan,neut_type) &
-               +intens(i)*cell(ac(1),ac(2),ac(3))%los_wght(ichan)
+          result%spectra(bin,cnt,neut_type)= &
+               result%spectra(bin,cnt,neut_type) &
+               +intens(i)*cell(ac(1),ac(2),ac(3))%los_wght(cnt)
           !$OMP END CRITICAL(spec_trum)
        enddo
     enddo loop_over_channels
@@ -3911,7 +3865,11 @@ program fidasim
   endif
   !! allocate the spectra array
   if(inputs%calc_spec.eq.1)then
-     allocate(result%spectra(spec%nlambda,spec%nchan,ntypes))
+     j=0
+     do i=1,spec%nchan
+       if(spec%chan_id(i).eq.0) j=j+1
+     enddo
+     allocate(result%spectra(spec%nlambda,j,ntypes))
      result%spectra(:,:,:)=0.d0
   endif
   if(inputs%npa.eq.1)then
@@ -3968,7 +3926,6 @@ program fidasim
      endif
      !! ---------- write output        ----------------------------------- !!   
      call write_neutrals()
-      if(inputs%calc_spec.eq.1) call write_nbi_halo_spectra()
   endif
 
   !! -----------------------------------------------------------------------
@@ -3979,7 +3936,7 @@ program fidasim
   !! -----------------------------------------------------------------------
   !! --------------- CALCULATE the FIDA RADIATION/ NPA FLUX ----------------
   !! -----------------------------------------------------------------------
-  if(inputs%npa.eq.1 .or. inputs%calc_spec.eq.1 .and. inputs.nr_fida.gt.10)then    
+  if(inputs%npa.eq.1 .or. inputs%calc_spec.eq.1 .and. inputs%nr_fida.gt.10)then    
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
@@ -3990,11 +3947,15 @@ program fidasim
        npa%energy(:)=distri%energy
      endif
      call fida
-     !! ------- Store Spectra and neutral densities in binary files ------ !!
-     if(inputs%calc_spec.eq.1) call write_fida_spectra()
-     !! ---------------- Store NPA simulation ------------ !!
-     if(inputs%npa.eq.1) call write_npa()
+
   endif
+  
+  !! -------------------------------------------------------------------
+  !! ------------------- Write Spectrum/NPA to file -------------------- 
+  !! -------------------------------------------------------------------
+  if(inputs%npa.eq.1.and.inputs%nr_fida.gt.10) call write_npa()
+  if(inputs%calc_spec.eq.1.and.inputs%nr_fida.gt.10) call write_spectra()
+  if(inputs%calc_spec.eq.1)deallocate(result%spectra)
 
   !! -------------------------------------------------------------------
   !! ----------- Calculation of weight functions -----------------------
@@ -4061,7 +4022,6 @@ program fidasim
   deallocate(spec%xyzhead)
   !! result arrays
   deallocate(result%neut_dens)
-  if(inputs%calc_spec.eq.1)deallocate(result%spectra)
   if(inputs%calc_birth.eq.1)deallocate(result%birth_dens) 
 
 

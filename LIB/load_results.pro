@@ -241,36 +241,21 @@ PRO read_grid,file,grid,save=save
 	endelse
 
 END
-PRO read_spectra,nbi_halo_file,fida_file,spectra,save=save
+PRO read_spectra,file,spectra,save=save
 
-    if file_test(nbi_halo_file) or file_test(fida_file) then begin
-        nbi_halo_err=0
-        fida_err=0
-	    if file_test(nbi_halo_file) then begin
-		    ncid=ncdf_open(nbi_halo_file,/nowrite)
-		    ncdf_varget,ncid,'shot',shot
-		    ncdf_varget,ncid,'time',time
-		    ncdf_varget,ncid,'lambda',lambda
-		    ncdf_varget,ncid,'full',full
-		    ncdf_varget,ncid,'half',half
-		    ncdf_varget,ncid,'third',third
-		    ncdf_varget,ncid,'halo',halo
-		    ncdf_varget,ncid,'brems',brems
-		    ncdf_close,ncid
-	    endif else begin
-            full=0 & half=0 & third=0 & halo=0 & brems=0
-	    endelse
+    if file_test(file) then begin
+	    ncid=ncdf_open(file,/nowrite)
+	    ncdf_varget,ncid,'shot',shot
+	    ncdf_varget,ncid,'time',time
+	    ncdf_varget,ncid,'lambda',lambda
+	    ncdf_varget,ncid,'full',full
+	    ncdf_varget,ncid,'half',half
+	    ncdf_varget,ncid,'third',third
+	    ncdf_varget,ncid,'halo',halo
+	    ncdf_varget,ncid,'brems',brems
+	    ncdf_varget,ncid,'fida',fida
+	    ncdf_close,ncid
 
-	    if file_test(fida_file) then begin
-       	    ncid=ncdf_open(fida_file,/nowrite)
-       	    ncdf_varget,ncid,'shot',shot
-       	    ncdf_varget,ncid,'time',time
-       	    ncdf_varget,ncid,'lambda',lambda
-       	    ncdf_varget,ncid,'spectra',fida
-            ncdf_close,ncid
-	    endif else begin
-            fida=0
-    	endelse
         spec=full+half+third+halo+fida+brems
 	    spectra={shot:shot,time:time,lambda:lambda,spectra:spec,full:full,half:half,third:third,halo:halo,fida:fida,brems:brems,err:0}
     endif else spectra={err:1}
@@ -455,7 +440,7 @@ PRO load_results,result_dir,results,save=save
 	read_plasma,result_dir+input_file,plasma
 
 	;;READ SPECTRA
-	read_spectra,result_dir+runid+'_nbi_halo_spectra.cdf', result_dir+runid+'_fida_spectra.cdf',spectra
+	read_spectra,result_dir+runid+'_spectra.cdf',spectra
 
 	;;READ NEUTRALS
 	read_neutrals,result_dir+runid+'_neutrals.cdf',neutrals

@@ -424,11 +424,8 @@ PRO load_results,result_dir,results,save=save
 	slash=strmid(result_dir,0,1,/reverse_offset)
 	if slash ne '/' then result_dir+='/'
 
-	;;READ INPUTS
-	read_inputs,result_dir+'inputs.dat',inputs
-
-	runid=inputs.fidasim_runid
-	input_file=inputs.fidasim_runid+'_inputs.cdf'
+	runid=file_basename(result_dir)
+	input_file=runid+'_inputs.cdf'
 
 	;;READ GRID
 	read_grid,result_dir+input_file,grid
@@ -460,7 +457,7 @@ PRO load_results,result_dir,results,save=save
 	;;READ BIRTH PROFILE
 	read_birth,result_dir+runid+'_birth.cdf',birth
 
-	results={inputs:inputs,grid:grid,los:los,plasma:plasma,$
+	results={grid:grid,los:los,plasma:plasma,$
 			spectra:spectra,neutrals:neutrals,$
 			npa:npa,fbm:fbm,fida_weights:fida_weights,npa_weights:npa_weights,birth:birth}
 	if keyword_set(save) then begin

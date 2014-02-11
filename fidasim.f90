@@ -3021,10 +3021,6 @@ contains
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
           loop_along_x: do i = 1, grid%Nx
-             !!if there is no chance of the particle hitting any detector skip cell
-             if (inputs%npa.eq.1) then
-                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle loop_along_x
-             endif
              !! ------------- loop over the markers ---------------------- !!
              npa_loop: do inpa=1,int(npa%npa_loop)
                 loop_over_fast_ions: do iion=1,int(nlaunch(i,j,k))

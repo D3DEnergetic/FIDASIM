@@ -452,10 +452,10 @@ PRO load_results,result_dir,results,save=save
 	read_fbm,result_dir+input_file,fbm
 
 	;;READ FIDA WEIGHT FUNCTIONS
-	read_fida_weights,result_dir+runid+'_fida_weight_function.cdf',fida_weights
+	read_fida_weights,result_dir+runid+'_fida_weights.cdf',fida_weights
 
 	;;READ NPA WEIGHT FUNCTIONS
-	read_npa_weights,result_dir+runid+'_npa_weight_function.cdf',npa_weights
+	read_npa_weights,result_dir+runid+'_npa_weights.cdf',npa_weights
 
 	;;READ BIRTH PROFILE
 	read_birth,result_dir+runid+'_birth.cdf',birth

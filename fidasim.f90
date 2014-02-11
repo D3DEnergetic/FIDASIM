@@ -3426,7 +3426,7 @@ contains
     cell(ac(1),ac(2),ac(3))%plasma%E=evec_sav
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weight_function.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -3765,7 +3765,7 @@ contains
     !$OMP END PARALLEL DO
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weight_function.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )

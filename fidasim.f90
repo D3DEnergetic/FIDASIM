@@ -2592,15 +2592,17 @@ contains
  !------------hit_npa_detector-------------------------------------------------
  !*****************************************************************************
   subroutine hit_npa_detector(pos,vel,det)
-    integer                                       :: i,det
+    integer                                       :: i,det,cnt
     real(double), dimension(3)                    :: pos,vel,xyz_i,xyz_f
     real(double), dimension(3)                    :: rpos,rvel
     real(double)                                  :: ra,rd,xa,ya,xd,yd
 
     det=0
+    cnt=0
     loop_over_chan: do i=1,spec%nchan
       !!only do npa channels
       if(spec%chan_id(i).ne.1) cycle loop_over_chan
+      cnt=cnt+1
       !!transform to chord coordinates 
       xyz_i(1)=spec%xyzhead(i,1)
       xyz_i(2)=spec%xyzhead(i,2)
@@ -2623,7 +2625,7 @@ contains
 
       !!if a neutral particle pass through both the aperture and detector then it count it
       if( rd.le.spec%rd(i).and.ra.le.spec%ra(i) ) then
-        det=i
+        det=cnt
         exit loop_over_chan
       endif
     enddo loop_over_chan
@@ -3873,7 +3875,6 @@ program fidasim
      result%spectra(:,:,:)=0.d0
   endif
   if(inputs%npa.eq.1)then
-     print*, 'this is a NPA simultation!'
      inputs%nr_npa=1000000
      allocate(npa%v(inputs%nr_npa,3,npa%nchan)) 
      allocate(npa%ipos(inputs%nr_npa,3,npa%nchan)) 
@@ -3940,7 +3941,12 @@ program fidasim
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
-     print*,'start fida'
+     if(inputs%npa.eq.1) then
+       print*,'Starting NPA Simulation'
+     else 
+       print*,'Starting FIDA Simulation'
+     endif 
+
      if(inputs%npa.eq.1) then
        allocate(npa%energy(distri%nenergy))
        allocate(npa%flux(distri%nenergy,npa%nchan))

@@ -189,7 +189,7 @@ module application
   type inputs_type
      integer(long) :: shot_number
      real(double)  :: time
-     character(15) :: runid
+     character(25) :: runid
      character(4)  :: diag 
      !! Monte Carlo Settings
      integer(long) :: nr_fida
@@ -394,7 +394,7 @@ contains
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
-    print*,'---- loading detector information ----'
+    print*,'---- loading detector information ----',filename
     
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -478,6 +478,7 @@ contains
     real(double), dimension(3) :: a,b,c    !! Magnetic field
 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    print*,'---- loading plasma parameters ----',filename
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -687,7 +688,7 @@ contains
     integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
    
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
-    print*,'---- loading fast ion distribution function ----'
+    print*,'---- loading fast ion distribution function ----',filename
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -1036,8 +1037,9 @@ contains
     real(float),dimension(:,:,:,:),allocatable   :: fdum_arr
     integer :: ncid,full_var,half_var,third_var,halo_var
 
-    print*,'---- loading neutrals ----' 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
+    print*,'---- loading neutrals ----',filename
+
        !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
 

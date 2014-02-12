@@ -3023,10 +3023,6 @@ contains
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
           loop_along_x: do i = 1, grid%Nx
-             !!if there is no chance of the particle hitting any detector skip cell
-             if (inputs%npa.eq.1) then
-                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle loop_along_x
-             endif
              !! ------------- loop over the markers ---------------------- !!
              npa_loop: do inpa=1,int(npa%npa_loop)
                 loop_over_fast_ions: do iion=1,int(nlaunch(i,j,k))
@@ -3432,7 +3428,7 @@ contains
     cell(ac(1),ac(2),ac(3))%plasma%E=evec_sav
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weight_function.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -3771,7 +3767,7 @@ contains
     !$OMP END PARALLEL DO
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weight_function.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )

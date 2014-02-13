@@ -12,8 +12,8 @@ PRO read_inputs,file,inputs,save=save
 		readf,55,fdum & time = float(fdum)
 		readf,55,sdum & fidasim_runid = sdum
 		readf,55,sdum
-        pos=STREGEX(sdum, '^[^#]*', length=len)
-        diag=strcompress(strmid(sdum,pos,len),/remove_all)
+        pos=STREGEX(sdum, '^[^#]*[^\ #]', length=len)
+        diag=strmid(sdum,pos,len)
 		readf,55,sdum
 		readf,55,idum & calc_spec    = idum
 		readf,55,idum & ps           = idum

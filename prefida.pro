@@ -48,7 +48,7 @@ PRO make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
     Crot[2,0]= zero 	  & Crot[2,1]= zero	      & Crot[2,2]= one
 END
 
-PRO make_fida_grid,inputs,grid,err
+PRO make_grid,inputs,grid,err
 
 	err=1
 
@@ -686,6 +686,65 @@ PRO brems,inputs,det,profiles,equil,vbline
 	endfor  ; channel loop
 END
 
+PRO write_namelist,inputs
+
+    spawn,'which git',git_command
+    git_hash = ''
+    if git_command ne '' then begin 
+        spawn,git_command+' --git-dir='+inputs.install_dir+'.git rev-parse HEAD',git_hash
+    endif
+    filename = inputs.result_dir+inputs.runid+'/inputs.nml'
+    openw,55,filename
+    printf,55,'!! Created: ', systime()
+    if git_hash ne '' then begin
+        printf,55,'!! FIDASIM git commit: ',git_hash
+    endif else begin
+        printf,55,'!! FIDASIM version: '
+    endelse
+
+    printf,55,'&fidasim_inputs'
+    printf,55,''
+    printf,55,'!! Shot Info'
+    printf,55,'!! Diagnostic: ',inputs.diag
+    printf,55,f='("shot = ", i6 ,"    !! Shot Number")',inputs.shot    
+    printf,55,f='("time = ", 1f8.5 ,"    !! Time")',inputs.time    
+    printf,55,"runid = '" + inputs.runid + "'    !! runID"
+    printf,55,''
+    printf,55,'!! Simulation Switches'
+    printf,55,f='("calc_spec = ",i2 , "    !! Calculate Spectra")',inputs.calc_spec
+    printf,55,f='("calc_npa = ",i2 , "   !! Calculate NPA")',inputs.calc_npa
+    printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
+    printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
+    printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght
+    printf,55,f='("calc_brems = ",i2,"    !! Calculate Bremsstrahlung else load from inputs")',inputs.calc_brems
+    printf,55,f='("load_neutrals = ",i2,"    !! Load Neutrals")',inputs.load_neutrals
+    printf,55,f='("load_fbm = ",i2,"    !! Load FBM")',inputs.load_fbm
+    printf,55,''
+    printf,55,'!! Wavelength Grid Settings'
+    printf,55,f='("nlambda = ",1i5,"    !! Number of Wavelengths")',inputs.nlambda
+    printf,55,f='("lambdamin = ",1f9.3,"    !! Minimum Wavelength")',inputs.lambdamin
+    printf,55,f='("lambdamax = ",1f9.3,"    !! Maximum Wavelength")',inputs.lambdamax
+    printf,55,''
+    printf,55,'!! Monte Carlo Settings'
+    printf,55,f='("nr_fast = ",i9,"    !! Number of FAST mc particles")',inputs.nr_fast
+    printf,55,f='("nr_nbi = ",i9,"    !! Number of NBI mc particles")',inputs.nr_nbi
+    printf,55,f='("nr_halo = ",i9,"    !! Number of HALO mc particles")',inputs.nr_halo
+    printf,55,''
+    printf,55,'!! Weight Function Settings'
+    printf,55,f='("ne_wght = ",i9,"    !! Number of Energies")',inputs.ne_wght
+    printf,55,f='("np_wght = ",i9,"    !! Number of Pitches")',inputs.np_wght
+    printf,55,f='("nphi_wght = ",i9,"    !! Number of Gyro-angles")',inputs.nphi_wght
+    printf,55,f='("ichan_wght = ",i3,"    !! Channel for weight function")',inputs.ichan_wght
+    printf,55,f='("emax_wght = ",1f12.2,"    !! Maximum Energy for Weights")',inputs.emax_wght
+    printf,55,f='("dwav_wght = ",1f12.5,"    !! Wavelength Seperation for Weights ")',inputs.dwav_wght
+    printf,55,f='("wavel_start_wght = ",1f12.5,"    !! Wavelength Start for Weights ")',inputs.wavel_start_wght
+    printf,55,f='("wavel_end_wght = ",1f12.5,"    !! Wavelength End for Weights ")',inputs.wavel_end_wght
+    printf,55,''
+    printf,55,'/'
+    close,55
+    print, 'Created Namelist file: '+filename
+END
+
 PRO prefida,input_pro,plot=plot,save=save
 
 	COMPILE_OPT DEFINT32
@@ -719,8 +778,8 @@ PRO prefida,input_pro,plot=plot,save=save
 	;;ADD INSTALL DIRECTORY TO PATH
 	!path = !path + ":" + expand_path(inputs.install_dir)
 
-	;;MAKE FIDA GRID
-	make_fida_grid,inputs,grid,err
+	;;MAKE GRID
+	make_grid,inputs,grid,err
 	if err eq 1 then begin
 		print,'GRID CREATION FAILED. EXITING...'
 		goto,GET_OUT
@@ -761,7 +820,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	endif else err=0
 
     ;; Calculate bremsstrahlung if desired
-	if inputs.f90brems eq 0 then $
+	if inputs.calc_brems eq 0 then $
 		brems,inputs,fida,profiles,equil,brems
 
 	plot_file=inputs.install_dir+strupcase(inputs.device)+'/'+strlowcase(inputs.device)+'_plots.pro'
@@ -783,95 +842,7 @@ PRO prefida,input_pro,plot=plot,save=save
 			  /overwrite,/allow_same
 
 	;;WRITE FIDASIM INPUT FILES
-	file = inputs.result_dir+inputs.runid+'/inputs.dat'
-	openw, 55, file
-	printf,55,'# FIDASIM input file created: ', systime(),' Version 2.1'
-	printf,55, inputs.shot         ,f='(i6,"         # shotnumber")'  
-	printf,55, inputs.time,f='(1f8.5,"       # time")'
-	printf,55, inputs.runid
-	printf,55,' ',inputs.diag[0], '           # diagnostic'
-	printf,55, inputs.calc_birth,f='(i2,"             # calculate birth profile")'
-	printf,55, inputs.calc_spec,f='(i2,"             # calculate spectra")'
-	printf,55, inputs.ps,f='(i2,"             # plot ps output")'
-	printf,55, inputs.calc_npa          ,f='(i2,"             # NPA simulation")'
-	printf,55, inputs.load_neutrals,f='(i2,"             # load NBI+HALO density")'
-	printf,55, inputs.load_fbm,f='(i2,"             # load FBM ")'
-    printf,55, inputs.f90brems,f='(i2,"             # 0 reads IDL v.b.")'
-	printf,55, inputs.calc_fida_wght,f='(i2,"             # calculate fida wght function")'
-	printf,55, inputs.calc_npa_wght,f='(i2,"             # calculate npa wght function")'
-	printf,55,'# weight function settings:'
-	printf,55, inputs.ne_wght,f='(i9,"      # number energies")'
-	printf,55, inputs.np_wght,f='(i9,"      # number pitch angles")'
-	printf,55, inputs.nphi_wght,f='(i9,"      # number gyro angles")'
-	printf,55, inputs.ichan_wght[0],f='(i3,"      # channel for weight function")'
-	printf,55, inputs.emax_wght,f='(1f12.2,"       # emax for weights")'
-	printf,55, inputs.dwav_wght,f='(1f12.5,"       # dwav")'
-	printf,55, inputs.wavel_start_wght,f='(1f12.5,"       # wavel_start")'
-	printf,55, inputs.wavel_end_wght,f='(1f12.5,"       # wavel_end")'
-	printf,55,'# Monte Carlo settings:'
-	printf,55, inputs.nr_fast,f='(i9,"      # number of FIDA mc particles")'  
-	printf,55, inputs.nr_ndmc,f='(i9,"      # number of NBI mc particles")' 
-	printf,55, inputs.nr_halo,f='(i9,"      # number of HALO mc particles")'
-	printf,55, inputs.impurity_charge,f='(i2,"             # Impurity charge")'
-	printf,55,'# discharge parameters:'
-	printf,55, inputs.btipsign,f='(i3,"            # B*Ip sign")'
-	printf,55, inputs.ai,f='(1f7.4,"        # plasma mass")'
-	printf,55, inputs.ab,f='(1f7.4,"        # NBI mass")'
-	printf,55,'# wavelength grid:'
-	printf,55, inputs.nlambda,f='(1i5,"          # nlambda")'
-	printf,55, inputs.lambdamin,f='(1f9.3,"      # lambda min")'
-	printf,55, inputs.lambdamax,f='(1f9.3,"      # lambda max")'
-	printf,55,'# simulation grid: '
-	printf,55, inputs.origin[0],f='(1D,"      # x position of origin [cm]")' 
-	printf,55, inputs.origin[1],f='(1D,"      # y position of origin [cm]")' 
-	printf,55, inputs.origin[2],f='(1D,"      # z position of origin [cm]")' 
-	printf,55, inputs.alpha,f='(1D,"            # alpha")'
-	printf,55, inputs.beta,f='(1D,"            # beta")'
-	printf,55, inputs.nx,f='(1i3,"            # nx")'
-	printf,55, inputs.ny,f='(1i3,"            # ny")'
-	printf,55, inputs.nz,f='(1i3,"            # nz")'  
-	for i=0L,inputs.nx-1 do begin   ;; cell borders          
-		printf,55,grid.xx[i],f='(1f9.4,"      # xx[i]")'
-	endfor
-	for i=0L,inputs.ny-1 do begin
-		printf,55,grid.yy[i],f='(1f9.4,"      # yy[i]")'
-	endfor
-	for i=0L,inputs.nz-1 do begin
-		printf,55,grid.zz[i],f='(1f9.4,"      # zz[i]")'
-	endfor
-	printf,55,'# Neutral beam injection:'
-	printf,55, nbi.BMWIDRA,f='(1f9.4,"      # NBI half width horizontal")'
-	printf,55, nbi.BMWIDZA,f='(1f9.4,"      # NBI half width vertical")'
-	ii=inputs.isource[0]
-	printf,55, ii,f='(1i2,"             # Nr of NBI")'
-	printf,55, nbi.divy[0],f='(1f10.7,"     #divergence y of full comp")'
-	printf,55, nbi.divy[1],f='(1f10.7,"     #divergence y of half comp")'
-	printf,55, nbi.divy[2],f='(1f10.7,"     #divergence y of third comp")'
-	printf,55, nbi.divz[0],f='(1f10.7,"     #divergence z of full comp")'
-	printf,55, nbi.divz[1],f='(1f10.7,"     #divergence z of half comp")'
-	printf,55, nbi.divz[2],f='(1f10.7,"     #divergence z of third comp")'
-	printf,55, nbi.focy,f='(1f10.2,"      # focal length in y")' 
-	printf,55, nbi.focz,f='(1f10.2,"      # focal length in z")' 
-	printf,55, nbi.einj,f='(1f9.4,"      # injected energy [keV]")' 
-	printf,55, nbi.pinj,f='(1f9.4,"      # injected power [MW]")'  
-	printf,55,'# Species-mix (Particles):'
-	printf,55, nbi.full,f='(1f9.6,"      # full energy")' 
-	printf,55, nbi.half,f='(1f9.6,"      # half energy")'  
-	printf,55, nbi.third,f='(1f9.6,"      # third energy")' 
-	printf,55,'#position of NBI source in xyz coords:'
-	printf,55, nbgeom.xyz_src[0],f='(1f9.4,"      # x [cm]")' 
-	printf,55, nbgeom.xyz_src[1],f='(1f9.4,"      # y [cm]")' 
-	printf,55, nbgeom.xyz_src[2],f='(1f9.4,"      # z [cm]")' 
-	printf,55,'# 3 rotation matrizes 3x3'
-	for j=0,2 do begin
-		for k=0,2 do begin
-			printf,55, nbgeom.Arot[j,k] ;; rotation in the top-down view plane
-			printf,55, nbgeom.Brot[j,k] ;; vertical rotation
-			printf,55, nbgeom.Crot[j,k] ;; vertical rotation
-		endfor 
-	endfor
-	close,55
-	print, 'Inputs stored in data file: '+file
+    write_namelist,inputs
 
 	;;WRITE TO FILE
 	file =inputs.result_dir+inputs.runid+'/'+inputs.runid+'_inputs.cdf'	

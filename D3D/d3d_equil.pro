@@ -61,7 +61,7 @@ FUNCTION d3d_equil,inputs,grid,det
 		ey[i,j,k]=sph*ecylr
 	endfor
 	
-	if inputs.f90brems eq 0 then begin
+	if inputs.calc_brems eq 0 then begin
 		;;GET RHO VALUES ALONG LINE OF SIGHT
 		ds=.3    ; step size (cm)
 	    ns=4000  ; maximum number of steps

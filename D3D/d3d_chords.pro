@@ -44,7 +44,9 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
     ;;   XHEAD           DOUBLE    Array[15]
     ;;   YHEAD           DOUBLE    Array[15]
     ;;   ZHEAD           DOUBLE    Array[15]
-    ;;   ra        FLOAT     Array[15]
+    ;;   ra              FLOAT     Array[15]
+    ;;   rd              FLOAT     Array[15]
+    ;;   h               FLOAT     Array[15]
 
 	;;FROM fida_vanzeeland DIII-D 2-D camera at 90 degrees
 	xlens1=[276.326]
@@ -248,9 +250,10 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
         	 zhead=npap[*,2]
         	 nchan=n_elements(xlos)        
         	 sigma_pi=replicate(1.d0,nchan)
-        	 ra=replicate(1.5d0,nchan)
-        	 rd=replicate(1.5d0,nchan)
-        	 h=replicate(57.25d0,nchan)
+        	 ra=replicate(0.5d0,nchan)
+        	 rd=replicate(0.5d0,nchan)
+        	 h=replicate(25.4d0,nchan)
+             ;;Rev. Sci. Instrum. 83, 10D304 (2012) <-NPA Geometry
         	 chan_id=replicate(1.d0,nchan)
        		end
         	ELSE: begin

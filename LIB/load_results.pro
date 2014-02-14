@@ -11,7 +11,9 @@ PRO read_inputs,file,inputs,save=save
 		readf,55,idum & shot = long(idum) 
 		readf,55,fdum & time = float(fdum)
 		readf,55,sdum & fidasim_runid = sdum
-		readf,55,sdum & diag          = strmid(sdum,1,3) 
+		readf,55,sdum
+        pos=STREGEX(sdum, '^[^#]*[^\ #]', length=len)
+        diag=strmid(sdum,pos,len)
 		readf,55,sdum
 		readf,55,idum & calc_spec    = idum
 		readf,55,idum & ps           = idum
@@ -449,10 +451,10 @@ PRO load_results,result_dir,results,save=save
 	read_fbm,result_dir+input_file,fbm
 
 	;;READ FIDA WEIGHT FUNCTIONS
-	read_fida_weights,result_dir+runid+'_fida_weight_function.cdf',fida_weights
+	read_fida_weights,result_dir+runid+'_fida_weights.cdf',fida_weights
 
 	;;READ NPA WEIGHT FUNCTIONS
-	read_npa_weights,result_dir+runid+'_npa_weight_function.cdf',npa_weights
+	read_npa_weights,result_dir+runid+'_npa_weights.cdf',npa_weights
 
 	;;READ BIRTH PROFILE
 	read_birth,result_dir+runid+'_birth.cdf',birth

@@ -189,7 +189,7 @@ module application
   type inputs_type
      integer(long) :: shot_number
      real(double)  :: time
-     character(15) :: runid
+     character(25) :: runid
      character(4)  :: diag 
      !! Monte Carlo Settings
      integer(long) :: nr_fast
@@ -465,7 +465,7 @@ contains
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
-    print*,'---- loading detector information ----'
+    print*,'---- loading detector information ----',filename
     
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -554,6 +554,7 @@ contains
     real(double), dimension(3) :: a,b,c    !! Magnetic field
 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    print*,'---- loading plasma parameters ----',filename
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -769,7 +770,7 @@ contains
     integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
    
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
-    print*,'---- loading fast ion distribution function ----'
+    print*,'---- loading fast ion distribution function ----',filename
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -1118,8 +1119,9 @@ contains
     real(float),dimension(:,:,:,:),allocatable   :: fdum_arr
     integer :: ncid,full_var,half_var,third_var,halo_var
 
-    print*,'---- loading neutrals ----' 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
+    print*,'---- loading neutrals ----',filename
+
        !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
 
@@ -2674,15 +2676,17 @@ contains
  !------------hit_npa_detector-------------------------------------------------
  !*****************************************************************************
   subroutine hit_npa_detector(pos,vel,det)
-    integer                                       :: i,det
+    integer                                       :: i,det,cnt
     real(double), dimension(3)                    :: pos,vel,xyz_i,xyz_f
     real(double), dimension(3)                    :: rpos,rvel
     real(double)                                  :: ra,rd,xa,ya,xd,yd
 
     det=0
+    cnt=0
     loop_over_chan: do i=1,spec%nchan
       !!only do npa channels
       if(spec%chan_id(i).ne.1) cycle loop_over_chan
+      cnt=cnt+1
       !!transform to chord coordinates 
       xyz_i(1)=spec%xyzhead(i,1)
       xyz_i(2)=spec%xyzhead(i,2)
@@ -2705,7 +2709,7 @@ contains
 
       !!if a neutral particle pass through both the aperture and detector then it count it
       if( rd.le.spec%rd(i).and.ra.le.spec%ra(i) ) then
-        det=i
+        det=cnt
         exit loop_over_chan
       endif
     enddo loop_over_chan
@@ -3103,10 +3107,6 @@ contains
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
           loop_along_x: do i = 1, grid%Nx
-             !!if there is no chance of the particle hitting any detector skip cell
-             if (inputs%calc_npa.eq.1) then
-                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle loop_along_x
-             endif
              !! ------------- loop over the markers ---------------------- !!
              npa_loop: do inpa=1,int(npa%npa_loop)
                 loop_over_fast_ions: do iion=1,int(nlaunch(i,j,k))
@@ -3512,7 +3512,7 @@ contains
     cell(ac(1),ac(2),ac(3))%plasma%E=evec_sav
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weight_function.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -3851,7 +3851,7 @@ contains
     !$OMP END PARALLEL DO
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weight_function.cdf"
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -3956,8 +3956,7 @@ program fidasim
      allocate(result%spectra(spec%nlambda,j,ntypes))
      result%spectra(:,:,:)=0.d0
   endif
-  if(inputs%calc_npa.eq.1)then
-     print*, 'this is a NPA simultation!'
+  if(inputs%npa.eq.1)then
      inputs%nr_npa=1000000
      allocate(npa%v(inputs%nr_npa,3,npa%nchan)) 
      allocate(npa%ipos(inputs%nr_npa,3,npa%nchan)) 
@@ -4024,8 +4023,13 @@ program fidasim
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
-     print*,'start fida'
-     if(inputs%calc_npa.eq.1) then
+     if(inputs%npa.eq.1) then
+       print*,'Starting NPA Simulation'
+     else 
+       print*,'Starting FIDA Simulation'
+     endif 
+
+     if(inputs%npa.eq.1) then
        allocate(npa%energy(distri%nenergy))
        allocate(npa%flux(distri%nenergy,npa%nchan))
        npa%energy(:)=distri%energy

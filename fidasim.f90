@@ -872,7 +872,7 @@ contains
 
   subroutine write_birth_profile
     use netcdf
-    integer           :: i,j,k,p,ncid,varid,dimids(5),shot_varid,time_varid
+    integer           :: i,j,k,p,ncid,varid,dimids(5)
     integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid
     character(100)    :: filename
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
@@ -890,18 +890,13 @@ contains
     dimids = (/ x_dimid, y_dimid, z_dimid, e_dimid, p_dimid /)
 
     !Define variable
-    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"birth_dens",NF90_DOUBLE,dimids,varid) )
 
     !Add unit attributes
-    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,varid,"units","fast-ions/(s*dx*dy*dz*dE*dP)") )
     call check( nf90_enddef(ncid) )
 
     !Write data to file
-    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, inputs%time) )
     call check( nf90_put_var(ncid, varid, result%birth_dens) )
 
     !Close netCDF file
@@ -914,7 +909,7 @@ contains
     use netcdf
     integer         :: i,j,k,n,x_dimid,y_dimid,z_dimid,l_dimid,dimids(4)
     integer         :: ncid,full_varid,half_varid,third_varid,halo_varid
-    integer         :: shot_varid,time_varid,dimid1
+    integer         :: dimid1
     character(120)  :: filename
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf"
  
@@ -930,15 +925,12 @@ contains
     dimids = (/ x_dimid, y_dimid, z_dimid, l_dimid /)
 
     !Define variables
-    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"fdens",NF90_DOUBLE,dimids,full_varid) )
     call check( nf90_def_var(ncid,"hdens",NF90_DOUBLE,dimids,half_varid) )
     call check( nf90_def_var(ncid,"tdens",NF90_DOUBLE,dimids,third_varid) )
     call check( nf90_def_var(ncid,"halodens",NF90_DOUBLE,dimids,halo_varid) )
 
     !Add unit attributes
-    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,full_varid,"units","neutrals/(dx*dy*dz)") )
     call check( nf90_put_att(ncid,half_varid,"units","neutrals/(dx*dy*dz)") )
     call check( nf90_put_att(ncid,third_varid,"units","neutrals/(dx*dy*dz)") )
@@ -946,8 +938,6 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
-    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, inputs%time) )
     call check( nf90_put_var(ncid, full_varid, result%neut_dens(:,:,:,:,nbif_type)) )
     call check( nf90_put_var(ncid, half_varid, result%neut_dens(:,:,:,:,nbih_type)) )
     call check( nf90_put_var(ncid, third_varid, result%neut_dens(:,:,:,:,nbit_type)) )
@@ -962,7 +952,7 @@ contains
   subroutine write_npa
     use netcdf
     integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,dimid3,maxcnt
-    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,shot_varid,time_varid,cnt_varid
+    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,cnt_varid
     character(120)  :: filename
     real(float), dimension(:,:,:),allocatable :: output
     real(float), dimension(:,:),allocatable :: output1
@@ -986,8 +976,6 @@ contains
     dimids = (/ c_dimid, dimid3, nchan_dimid /)
 
     !Define variables
-    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"ipos",NF90_FLOAT,dimids,ipos_varid) )
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
@@ -997,7 +985,6 @@ contains
     call check( nf90_def_var(ncid,"counts",NF90_FLOAT,nchan_dimid,cnt_varid) )
 
     !Add unit attributes
-    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,ipos_varid,"units","cm") )
     call check( nf90_put_att(ncid,fpos_varid,"units","cm") )
     call check( nf90_put_att(ncid,v_varid,"units","cm/s") )
@@ -1005,9 +992,6 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
-    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, inputs%time) )
-
     output(:,:,:)=real(npa%ipos(:maxcnt,:,:),float)
     call check( nf90_put_var(ncid, ipos_varid, output) )
 
@@ -1039,7 +1023,7 @@ contains
     use netcdf
     integer         :: i,j,k,ichan,nchan
     integer         :: ncid,fida_varid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
-    integer         :: chan_dimid,lam_dimid,dimid1,dimids(2),shot_varid,time_varid
+    integer         :: chan_dimid,lam_dimid,dimid1,dimids(2)
     character(120)  :: filename
     real(double), dimension(:)  , allocatable :: lambda_arr
 
@@ -1072,8 +1056,6 @@ contains
     dimids = (/ lam_dimid, chan_dimid /)
 
     !Define variables
-    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_FLOAT,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
     call check( nf90_def_var(ncid,"full",NF90_DOUBLE,dimids,full_varid) )
     call check( nf90_def_var(ncid,"half",NF90_DOUBLE,dimids,half_varid) )
@@ -1083,7 +1065,6 @@ contains
     call check( nf90_def_var(ncid,"fida",NF90_DOUBLE,dimids,fida_varid) )
 
     !Add unit attributes
-    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,lam_varid,"units","nm") )
     call check( nf90_put_att(ncid,full_varid,"units","Ph/(s*nm*sr*m^2)") )
     call check( nf90_put_att(ncid,half_varid,"units","Ph/(s*nm*sr*m^2)") )
@@ -1095,8 +1076,6 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
-    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, real(inputs%time)) )
     call check( nf90_put_var(ncid, lam_varid, lambda_arr) )
     call check( nf90_put_var(ncid, full_varid, result%spectra(:,:,nbif_type)) )
     call check( nf90_put_var(ncid, half_varid, result%spectra(:,:,nbih_type)) )
@@ -3220,7 +3199,6 @@ contains
     !!netCDF variables
     integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
     integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
-    integer :: shot_varid,time_varid
 
     !! DEFINE wavelength array
     nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
@@ -3527,8 +3505,6 @@ contains
     dimids = (/ nwav_dimid, ne_dimid, np_dimid, nchan_dimid /)
 
     !Define variables
-    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,nwav_dimid,wav_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
     call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
@@ -3537,7 +3513,6 @@ contains
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
 
     !Add unit attributes
-    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,wav_varid,"units","nm") )
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
     call check( nf90_put_att(ncid,theta_varid,"units","deg") )
@@ -3546,8 +3521,6 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
-    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, inputs%time) )
     call check( nf90_put_var(ncid, wav_varid, central_wavel(:nwav)) )
     call check( nf90_put_var(ncid, e_varid, ebarr) )
     call check( nf90_put_var(ncid, ptch_varid, ptcharr) )
@@ -3617,7 +3590,6 @@ contains
     !!netCDF variables
     integer :: ncid,dimid1,dimids(3),nchan_dimid,ne_dimid,np_dimid
     integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid
-    integer :: shot_varid,time_varid
 
     !! define pitch, energy arrays
     !! define energy - array
@@ -3864,8 +3836,6 @@ contains
     dimids = (/ ne_dimid, np_dimid, nchan_dimid /)
 
     !Define variables
-    call check( nf90_def_var(ncid,"shot",NF90_INT,dimid1,shot_varid) )
-    call check( nf90_def_var(ncid,"time",NF90_DOUBLE,dimid1,time_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
     call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
@@ -3873,15 +3843,12 @@ contains
     call check( nf90_def_var(ncid,"flux",NF90_DOUBLE,(/ ne_dimid,nchan_dimid /),flux_varid) )
 
     !Add unit attributes
-    call check( nf90_put_att(ncid,time_varid,"units","seconds") )
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
     call check( nf90_put_att(ncid,e_varid,"units","keV") )
     call check( nf90_put_att(ncid,wfunct_varid,"units","(Neutrals*cm)/(s*dE*dP)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
-    call check( nf90_put_var(ncid, shot_varid, inputs%shot_number) )
-    call check( nf90_put_var(ncid, time_varid, inputs%time) )
     call check( nf90_put_var(ncid, e_varid, ebarr) )
     call check( nf90_put_var(ncid, ptch_varid, ptcharr) )
     call check( nf90_put_var(ncid, rad_varid, rad_arr) )

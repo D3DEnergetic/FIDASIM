@@ -281,7 +281,7 @@ contains
 
     call getenv("FIDASIM_DIR",root_dir)
     filename=trim(adjustl(result_dir))//"/inputs.nml"
-    print*,'---- loading inputs -----' 
+    print*,'---- loading inputs ----' 
 
     open(13,file=filename)
     read(13,NML=fidasim_inputs)
@@ -465,7 +465,7 @@ contains
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
-    print*,'---- loading detector information ----',filename
+    print*,'---- loading detector information ----'
     
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -554,7 +554,7 @@ contains
     real(double), dimension(3) :: a,b,c    !! Magnetic field
 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
-    print*,'---- loading plasma parameters ----',filename
+    print*,'---- loading plasma parameters ----'
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -645,7 +645,7 @@ contains
     real(double), dimension(:)  , allocatable :: brems
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
 
-    print*,'---- loading bremsstrahlung data from ', filename
+    print*,'---- loading bremsstrahlung ----'
     allocate(brems(spec%nchan))
 
     !!OPEN netCDF file   
@@ -770,7 +770,7 @@ contains
     integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
    
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
-    print*,'---- loading fast ion distribution function ----',filename
+    print*,'---- loading fast ion distribution function ----'
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -3956,7 +3956,7 @@ program fidasim
      allocate(result%spectra(spec%nlambda,j,ntypes))
      result%spectra(:,:,:)=0.d0
   endif
-  if(inputs%npa.eq.1)then
+  if(inputs%calc_npa.eq.1)then
      inputs%nr_npa=1000000
      allocate(npa%v(inputs%nr_npa,3,npa%nchan)) 
      allocate(npa%ipos(inputs%nr_npa,3,npa%nchan)) 
@@ -4023,13 +4023,13 @@ program fidasim
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
-     if(inputs%npa.eq.1) then
+     if(inputs%calc_npa.eq.1) then
        print*,'Starting NPA Simulation'
      else 
        print*,'Starting FIDA Simulation'
      endif 
 
-     if(inputs%npa.eq.1) then
+     if(inputs%calc_npa.eq.1) then
        allocate(npa%energy(distri%nenergy))
        allocate(npa%flux(distri%nenergy,npa%nchan))
        npa%energy(:)=distri%energy

@@ -865,6 +865,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	endif
 
 	griddim=[xid,yid,zid]
+    dim3d=[three_id,three_id]
 	;;DEFINE VARIABLES
 	shot_varid=ncdf_vardef(ncid,'shot',one_id,/long)
 	time_varid=ncdf_vardef(ncid,'time',one_id,/float)
@@ -890,6 +891,29 @@ PRO prefida,input_pro,plot=plot,save=save
 	xgrid_varid=ncdf_vardef(ncid,'x_grid',griddim,/double)
 	ygrid_varid=ncdf_vardef(ncid,'y_grid',griddim,/double)
 	zgrid_varid=ncdf_vardef(ncid,'z_grid',griddim,/double)
+    alpha_varid=ncdf_vardef(ncid,'alpha',one_id,/double)
+    beta_varid=ncdf_vardef(ncid,'beta',one_id,/double)
+    origin_varid=ncdf_vardef(ncid,'origin',three_id,/double)
+    xx_varid=ncdf_vardef(ncid,'xx',xid,/double)
+    yy_varid=ncdf_vardef(ncid,'yy',yid,/double)
+    zz_varid=ncdf_vardef(ncid,'zz',zid,/double)
+
+    ;;DEFINE BEAM VARIABLES
+    bn_varid=ncdf_vardef(ncid,'beam',one_id,/long)
+    ab_varid=ncdf_vardef(ncid,'ab',one_id,/double)
+    divy_varid=ncdf_vardef(ncid,'divy',three_id,/double)    
+    divz_varid=ncdf_vardef(ncid,'divz',three_id,/double)
+    focy_varid=ncdf_vardef(ncid,'focy',one_id,/double)    
+    focz_varid=ncdf_vardef(ncid,'focz',one_id,/double)
+    bmwidra_varid=ncdf_vardef(ncid,'bmwidra',one_id,/double)
+    bmwidza_varid=ncdf_vardef(ncid,'bmwidza',one_id,/double)
+    einj_varid=ncdf_vardef(ncid,'einj',one_id,/double)
+    pinj_varid=ncdf_vardef(ncid,'pinj',one_id,/double)
+    sm_varid=ncdf_vardef(ncid,'species_mix',three_id,/double)
+    xyzsrc_varid=ncdf_vardef(ncid,'xyz_src',three_id,/double)
+    arot_varid=ncdf_vardef(ncid,'Arot',dim3d,/double)
+    brot_varid=ncdf_vardef(ncid,'Brot',dim3d,/double)
+    crot_varid=ncdf_vardef(ncid,'Crot',dim3d,/double)
 
 	;;DEFINE FBM VARIABLES
     if inputs.load_fbm then begin
@@ -907,6 +931,9 @@ PRO prefida,input_pro,plot=plot,save=save
     endif
 
 	;;DEFINE PLASMA VARIABLES
+    ai_varid=ncdf_vardef(ncid,'ai',one_id,/double)
+    impc_varid=ncdf_vardef(ncid,'impurity_charge',one_id,/float)
+    btip_varid=ncdf_vardef(ncid,'btipsign',one_id,/float)
 	te_varid=ncdf_vardef(ncid,'te',griddim,/double)
 	ti_varid=ncdf_vardef(ncid,'ti',griddim,/double)
 	dene_varid=ncdf_vardef(ncid,'dene',griddim,/double)
@@ -970,6 +997,29 @@ PRO prefida,input_pro,plot=plot,save=save
 	ncdf_varput,ncid,xgrid_varid,double(grid.x_grid)	
 	ncdf_varput,ncid,ygrid_varid,double(grid.y_grid)	
 	ncdf_varput,ncid,zgrid_varid,double(grid.z_grid)	
+    ncdf_varput,ncid,alpha_varid,double(inputs.alpha)
+    ncdf_varput,ncid,beta_varid,double(inputs.beta)
+    ncdf_varput,ncid,origin_varid,double(inputs.origin)
+    ncdf_varput,ncid,xx_varid,double(grid.xx)
+    ncdf_varput,ncid,yy_varid,double(grid.yy)
+    ncdf_varput,ncid,zz_varid,double(grid.zz)
+
+    ;;WRITE BEAM VARIABLES
+    ncdf_varput,ncid,bn_varid,long(inputs.isource[0])
+    ncdf_varput,ncid,ab_varid,double(inputs.ab)
+    ncdf_varput,ncid,divy_varid,double(nbi.divy)
+    ncdf_varput,ncid,divz_varid,double(nbi.divz)
+    ncdf_varput,ncid,focy_varid,double(nbi.focy)
+    ncdf_varput,ncid,focz_varid,double(nbi.focz)
+    ncdf_varput,ncid,bmwidra_varid,double(nbi.BMWIDRA)
+    ncdf_varput,ncid,bmwidza_varid,double(nbi.BMWIDZA)
+    ncdf_varput,ncid,einj_varid,double(nbi.einj)
+    ncdf_varput,ncid,pinj_varid,double(nbi.pinj)
+    ncdf_varput,ncid,sm_varid,double([nbi.full,nbi.half,nbi.third])
+    ncdf_varput,ncid,xyzsrc_varid,double(nbgeom.xyz_src)
+    ncdf_varput,ncid,arot_varid,double(nbgeom.Arot)
+    ncdf_varput,ncid,brot_varid,double(nbgeom.Brot)
+    ncdf_varput,ncid,crot_varid,double(nbgeom.Crot)
 
 	;;WRITE FBM VARIABLES
     if inputs.load_fbm then begin
@@ -987,6 +1037,9 @@ PRO prefida,input_pro,plot=plot,save=save
     endif
 
 	;;WRITE PLASMA VARIABLES
+    ncdf_varput,ncid,ai_varid, double(inputs.ai)
+    ncdf_varput,ncid,btip_varid,float(inputs.btipsign)
+    ncdf_varput,ncid,impc_varid,float(inputs.impurity_charge)
 	ncdf_varput,ncid,te_varid, double(plasma.te)
 	ncdf_varput,ncid,ti_varid, double(plasma.ti)
 	ncdf_varput,ncid,dene_varid, double(plasma.dene)

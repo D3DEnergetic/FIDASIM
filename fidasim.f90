@@ -192,8 +192,8 @@ module application
      character(15) :: runid
      character(4)  :: diag 
      !! Monte Carlo Settings
-     integer(long) :: nr_fida
-     integer(long) :: nr_ndmc
+     integer(long) :: nr_fast
+     integer(long) :: nr_nbi
      integer(long) :: nr_dcx
      integer(long) :: nr_halo 
      integer(long) :: nr_npa
@@ -201,8 +201,8 @@ module application
      integer(long) :: calc_spec
      integer(long) :: load_neutrals
      integer(long) :: load_fbm
-     integer(long) :: f90brems       !! 0 to use IDL v.b.
-     integer(long) :: npa 
+     integer(long) :: calc_brems       !! 0 to use IDL v.b.
+     integer(long) :: calc_npa 
      integer(long) :: calc_fida_wght
      integer(long) :: calc_npa_wght
      integer(long) :: calc_birth
@@ -245,8 +245,10 @@ module application
   !! routines to read inputs
   public :: check
   public :: read_inputs
+  public :: read_grid
   public :: read_los
   public :: read_plasma
+  public :: read_beam
   public :: read_tables
   public :: read_fbm
   public :: read_neutrals
@@ -267,107 +269,115 @@ contains
   !**************************************************************************** 
   subroutine read_inputs
     character(120)   :: filename
-    integer :: i,j,k
+
+    character(25) :: runid
+    integer       :: calc_spec,calc_npa,calc_birth,calc_fida_wght,calc_npa_wght,calc_brems,load_neutrals,load_fbm
+    integer(long) :: shot,nr_fast,nr_nbi,nr_halo,nlambda,ne_wght,np_wght,nphi_wght,ichan_wght
+    real(double)  :: time,lambdamin,lambdamax,emax_wght,dwav_wght,wavel_start_wght,wavel_end_wght
+
+    NAMELIST /fidasim_inputs/ runid ,calc_spec,calc_npa,calc_birth,calc_fida_wght,calc_npa_wght,calc_brems, &
+              load_neutrals,load_fbm,shot,nr_fast,nr_nbi,nr_halo,nlambda,ne_wght,np_wght,nphi_wght,ichan_wght, &
+              time,lambdamin,lambdamax,emax_wght,dwav_wght,wavel_start_wght,wavel_end_wght
+
     call getenv("FIDASIM_DIR",root_dir)
+    filename=trim(adjustl(result_dir))//"/inputs.nml"
     print*,'---- loading inputs -----' 
-    filename=trim(adjustl(result_dir))//"/inputs.dat"
-    open(66,form='formatted',file=filename)
-    read(66,*) !# FIDASIM input file created...
-    read(66,*) inputs%shot_number
-    read(66,*) inputs%time
-    read(66,*) inputs%runid
-    read(66,*) inputs%diag
-    read(66,*) inputs%calc_birth
-    read(66,*) inputs%calc_spec
-    read(66,*) !# this was nofida...is now ps
-    read(66,*) inputs%npa
-    read(66,*) inputs%load_neutrals
-    read(66,*) inputs%load_fbm
-    read(66,*) inputs%f90brems
-    read(66,*) inputs%calc_fida_wght
-    read(66,*) inputs%calc_npa_wght
-    read(66,*) !# weight function settings
-    read(66,*) inputs%ne_wght
-    read(66,*) inputs%np_wght
-    read(66,*) inputs%nphi_wght
-    read(66,*) inputs%ichan_wght
-    read(66,*) inputs%emax_wght
-    read(66,*) inputs%dwav_wght
-    read(66,*) inputs%wavel_start_wght
-    read(66,*) inputs%wavel_end_wght
-    read(66,*) !# Monte Carlo settings:
-    read(66,*) inputs%nr_fida
-    read(66,*) inputs%nr_ndmc   
-    read(66,*) inputs%nr_halo   
-    inputs%nr_dcx = inputs%nr_halo
-    read(66,*) inputs%impurity_charge 
-    read(66,*) !# discharge parameters:         
-    read(66,*) inputs%btipsign
-    read(66,*) inputs%ab       
-    read(66,*) inputs%ai    
-    read(66,*) !# wavelength grid:    
-    read(66,*) spec%nlambda 
-    read(66,*) spec%lambdamin
-    read(66,*) spec%lambdamax
+
+    open(13,file=filename)
+    read(13,NML=fidasim_inputs)
+    close(13)
+
+    !!General Information
+    inputs%shot_number=shot
+    inputs%time=time
+    inputs%runid=runid
+
+    !!Simulation Switches
+    inputs%calc_spec=calc_spec
+    inputs%calc_npa=calc_npa
+    inputs%calc_brems=calc_brems        
+    inputs%calc_birth=calc_birth
+    inputs%calc_fida_wght=calc_fida_wght
+    inputs%calc_npa_wght=calc_npa_wght
+    inputs%load_neutrals=load_neutrals
+    inputs%load_fbm=load_fbm
+
+    !!Monte Carlo Settings
+    inputs%nr_fast=nr_fast
+    inputs%nr_nbi=nr_nbi
+    inputs%nr_halo=nr_halo
+    inputs%nr_dcx=nr_halo
+
+    !!Weight Function Settings
+    inputs%ne_wght=ne_wght
+    inputs%np_wght=np_wght
+    inputs%nphi_wght=nphi_wght
+    inputs%ichan_wght=ichan_wght
+    inputs%emax_wght=emax_wght
+    inputs%dwav_wght=dwav_wght
+    inputs%wavel_start_wght=wavel_start_wght
+    inputs%wavel_end_wght=wavel_end_wght
+
+    !!Wavelength Grid Settings
+    spec%nlambda=nlambda
+    spec%lambdamin=lambdamin*10. !convert to angstroms
+    spec%lambdamax=lambdamax*10. !convert to angstroms
     spec%dlambda=(spec%lambdamax-spec%lambdamin)/spec%nlambda
-    read(66,*) !# simulation grid:
-    read(66,*) grid%origin(1)
-    read(66,*) grid%origin(2)
-    read(66,*) grid%origin(3)
-    read(66,*) grid%alpha 
-    read(66,*) grid%beta 
-    read(66,*) grid%Nx 
-    read(66,*) grid%Ny      
-    read(66,*) grid%Nz
+
+    print*,'Shot:   ',inputs%shot_number
+    print*,'Time: ',int(inputs%time*1.d3),'ms'
+    print*,'Runid:        ',inputs%runid
+
+  end subroutine read_inputs
+
+  !****************************************************************************
+  subroutine read_grid
+    use netcdf
+    character(120)  :: filename
+    integer         :: nx_varid,ny_varid,nz_varid
+    integer         :: ncid,alpha_varid,beta_varid,o_varid,xx_varid,yy_varid,zz_varid
+
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    print*,'---- loading grid ----'
+
+    !!OPEN netCDF file   
+    call check( nf90_open(filename, nf90_nowrite, ncid) )
+
+    !!GET THE VARIDS
+    call check( nf90_inq_varid(ncid, "Nx", nx_varid) )
+    call check( nf90_inq_varid(ncid, "Ny", ny_varid) )
+    call check( nf90_inq_varid(ncid, "Nz", nz_varid) )
+    call check( nf90_inq_varid(ncid, "xx", xx_varid) )
+    call check( nf90_inq_varid(ncid, "yy", yy_varid) )
+    call check( nf90_inq_varid(ncid, "zz", zz_varid) )
+    call check( nf90_inq_varid(ncid, "alpha", alpha_varid) )
+    call check( nf90_inq_varid(ncid, "beta", beta_varid) )
+    call check( nf90_inq_varid(ncid, "origin", o_varid) )
+
+    !!Read in Variables
+    call check( nf90_get_var(ncid, nx_varid, grid%Nx) )
+    call check( nf90_get_var(ncid, ny_varid, grid%Ny) )
+    call check( nf90_get_var(ncid, nz_varid, grid%Nz) )
+    call check( nf90_get_var(ncid, alpha_varid, grid%alpha) )
+    call check( nf90_get_var(ncid, beta_varid, grid%beta) )
+    call check( nf90_get_var(ncid, o_varid, grid%origin(:)) )
+
     allocate(grid%xx(grid%Nx)  &
          ,   grid%yy(grid%Ny)  &
          ,   grid%zz(grid%Nz))
-    do i=1,grid%Nx 
-       read(66,*) grid%xx(i)
-    enddo
-    do i=1,grid%Ny 
-       read(66,*) grid%yy(i)
-    enddo
-    do i=1,grid%Nz 
-       read(66,*) grid%zz(i)
-    enddo
-    read(66,*) !# Neutral beam injection
-    read(66,*) nbi%dv
-    read(66,*) nbi%dw  
-    read(66,*) nbi%number
-    read(66,*) nbi%divay(1) 
-    read(66,*) nbi%divay(2) 
-    read(66,*) nbi%divay(3) 
-    read(66,*) nbi%divaz(1)  
-    read(66,*) nbi%divaz(2)  
-    read(66,*) nbi%divaz(3)  
-    read(66,*) nbi%focy  
-    read(66,*) nbi%focz   
-    read(66,*) nbi%einj 
-    read(66,*) nbi%pinj 
-    read(66,*) !# Species-mix (Particles):
-    read(66,*) nbi%species_mix(1)
-    read(66,*) nbi%species_mix(2)
-    read(66,*) nbi%species_mix(3)
-    read(66,*) !#position of NBI source in xyz coords:
-    read(66,*) nbi%xyz_pos(1)
-    read(66,*) nbi%xyz_pos(2)
-    read(66,*) nbi%xyz_pos(3)
-    read(66,*) !# 3 rotation matrizes 3x3
-    do j=1,3 
-       do k=1,3
-          read(66,*) nbi%Arot(j,k)
-          read(66,*) nbi%Brot(j,k)
-          read(66,*) nbi%Crot(j,k)
-       enddo
-    enddo
-    close(66) 
-    nbi%vinj=sqrt(2.d0*nbi%einj*1.d3 &
-            *e0/(inputs%ab*mass_u))*1.d2 !! [cm/s]
+
+    call check( nf90_get_var(ncid, xx_varid, grid%xx(:)) )    
+    call check( nf90_get_var(ncid, yy_varid, grid%yy(:)) )    
+    call check( nf90_get_var(ncid, zz_varid, grid%zz(:)) )    
+
+    !!CLOSE netCDF FILE
+    call check( nf90_close(ncid) )
+
     allocate(cell(grid%Nx,grid%Ny,grid%Nz)) 
     allocate(grid%xxc(grid%Nx) &
          ,   grid%yyc(grid%Ny) &
          ,   grid%zzc(grid%Nz))
+
     grid%dr(1)=grid%xx(2)-grid%xx(1)
     grid%dr(2)=grid%yy(2)-grid%yy(1) 
     grid%dr(3)=grid%zz(2)-grid%zz(1)
@@ -377,18 +387,79 @@ contains
     grid%drmin=minval(grid%dr)
     grid%dv=grid%dr(1)*grid%dr(2)*grid%dr(3)
     grid%ntrack=grid%Nx+grid%Ny+grid%Nz 
-    print*,                         'Shot  :',inputs%shot_number
-    print*,                         'Time:',int(inputs%time*1.d3),'ms'
-    print*, 'NBI #',nbi%number+1
+
+    print*,'Nx: ',grid%Nx
+    print*,'Ny: ',grid%Ny
+    print*,'Nz: ',grid%Nz
+    print*,'dV: ',real(grid%dv,float),'[cm^-3]'
+  end subroutine read_grid
+
+  !****************************************************************************
+  subroutine read_beam
+    use netcdf
+    character(120)  :: filename
+    integer         :: ncid,ab_varid,divy_varid,divz_varid,focy_varid,focz_varid,bn_varid
+    integer         :: einj_varid,pinj_varid,sm_varid,xyzsrc_varid,bwra_varid,bwza_varid
+    integer         :: arot_varid,brot_varid,crot_varid
+
+    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    print*,'---- loading beam ----'
+
+    !!OPEN netCDF file   
+    call check( nf90_open(filename, nf90_nowrite, ncid) )
+
+    !!Get the varids
+    call check( nf90_inq_varid(ncid, "beam", bn_varid) )    
+    call check( nf90_inq_varid(ncid, "ab", ab_varid) )
+    call check( nf90_inq_varid(ncid, "divy", divy_varid) )
+    call check( nf90_inq_varid(ncid, "divz", divz_varid) )
+    call check( nf90_inq_varid(ncid, "focy", focy_varid) )
+    call check( nf90_inq_varid(ncid, "focz", focz_varid) )
+    call check( nf90_inq_varid(ncid, "bmwidra", bwra_varid) )
+    call check( nf90_inq_varid(ncid, "bmwidza", bwza_varid) )
+    call check( nf90_inq_varid(ncid, "einj", einj_varid) )
+    call check( nf90_inq_varid(ncid, "pinj", pinj_varid) )
+    call check( nf90_inq_varid(ncid, "species_mix", sm_varid) )
+    call check( nf90_inq_varid(ncid, "xyz_src", xyzsrc_varid) )
+    call check( nf90_inq_varid(ncid, "Arot", arot_varid) )
+    call check( nf90_inq_varid(ncid, "Brot", brot_varid) )
+    call check( nf90_inq_varid(ncid, "Crot", crot_varid) )
+
+    !!Read the variables
+    call check( nf90_get_var(ncid, bn_varid, nbi%number) )    
+    call check( nf90_get_var(ncid, ab_varid, inputs%ab) )    
+    call check( nf90_get_var(ncid, bwra_varid, nbi%dv) )    
+    call check( nf90_get_var(ncid, bwza_varid, nbi%dw) )
+    call check( nf90_get_var(ncid, divy_varid, nbi%divay(:)) )
+    call check( nf90_get_var(ncid, divz_varid, nbi%divaz(:)) )
+    call check( nf90_get_var(ncid, focy_varid, nbi%focy) )
+    call check( nf90_get_var(ncid, focz_varid, nbi%focz) )
+    call check( nf90_get_var(ncid, einj_varid, nbi%einj) )
+    call check( nf90_get_var(ncid, pinj_varid, nbi%pinj) )
+    call check( nf90_get_var(ncid, sm_varid, nbi%species_mix(:)) )
+    call check( nf90_get_var(ncid, xyzsrc_varid, nbi%xyz_pos(:)) )
+    call check( nf90_get_var(ncid, arot_varid, nbi%Arot(:,:)) )
+    call check( nf90_get_var(ncid, brot_varid, nbi%Brot(:,:)) )
+    call check( nf90_get_var(ncid, crot_varid, nbi%Crot(:,:)) )
+
+    !!CLOSE netCDF FILE
+    call check( nf90_close(ncid) )
+
+    nbi%vinj=sqrt(2.d0*nbi%einj*1.d3 &
+            *e0/(inputs%ab*mass_u))*1.d2 !! [cm/s]
+
+    print*,'NBI #',nbi%number+1
     print*,'NBI power   :', real(nbi%pinj,float)
     print*,'NBI voltage :', real(nbi%einj,float)
-  end subroutine read_inputs
+
+  end subroutine read_beam
+
   !****************************************************************************
- subroutine read_los
+  subroutine read_los
     use netcdf
     character(120)  :: filename
     integer(long)   :: i, j, k,ichan
-    integer            :: ncid,xlens_varid,ylens_varid,zlens_varid
+    integer         :: ncid,xlens_varid,ylens_varid,zlens_varid
     integer         :: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid
     integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
@@ -454,15 +525,20 @@ contains
     enddo
     deallocate(dummy_arr)
 
-    if (inputs%npa.eq.0) then 
+    npa%nchan=0 
+    if (inputs%calc_npa.eq.0) then 
        npa%npa_loop=1.
     else
        npa%npa_loop=10000.
-       npa%nchan=0
-       do i=1,spec%nchan
-         if(spec%chan_id(i).eq.1) npa%nchan=npa%nchan+1
-       enddo 
     endif
+
+    do i=1,spec%nchan
+       if(spec%chan_id(i).eq.1) npa%nchan=npa%nchan+1
+    enddo
+
+    print*,'FIDA Channels: ',spec%nchan-npa%nchan
+    print*,'NPA Channels:  ',npa%nchan
+
   end subroutine read_los
 
   !***************************************************************************!
@@ -472,7 +548,7 @@ contains
     integer(long) :: i, j, k
     integer          :: te_var,ti_var,dene_var,deni_var,denp_var,denf_var
     integer        :: vx_var,vy_var,vz_var,zeff_var,bx_var,by_var,bz_var
-    integer       :: ex_var,ey_var,ez_var,rho_var,ncid 
+    integer       :: ex_var,ey_var,ez_var,rho_var,ncid,ai_var,btip_var,impc_var 
     real(double), dimension(grid%nx,grid%ny,grid%nz,3) :: bcell
     real(double)               :: b_abs     !! Magnetic field
     real(double), dimension(3) :: a,b,c    !! Magnetic field
@@ -482,7 +558,10 @@ contains
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
     
-    !!GET THE VARIDS
+    !!GET THE VARIDS   
+    call check( nf90_inq_varid(ncid, "ai", ai_var) )
+    call check( nf90_inq_varid(ncid, "btipsign", btip_var) )
+    call check( nf90_inq_varid(ncid, "impurity_charge", impc_var) )
     call check( nf90_inq_varid(ncid, "te", te_var) )
     call check( nf90_inq_varid(ncid, "ti", ti_var) )
     call check( nf90_inq_varid(ncid, "dene", dene_var) )
@@ -502,6 +581,9 @@ contains
     call check( nf90_inq_varid(ncid, "rho_grid", rho_var) )
 
     !!READ IN OTHER PARAMETERS
+    call check( nf90_get_var(ncid, ai_var, inputs%ai) )
+    call check( nf90_get_var(ncid, btip_var, inputs%btipsign) )
+    call check( nf90_get_var(ncid, impc_var, inputs%impurity_charge) )
     call check( nf90_get_var(ncid, te_var,   cell(:,:,:)%plasma%te) )
     call check( nf90_get_var(ncid, ti_var,   cell(:,:,:)%plasma%ti) )
     call check( nf90_get_var(ncid, dene_var, cell(:,:,:)%plasma%dene) )
@@ -2300,7 +2382,7 @@ contains
     photons=0.d0
     iflux=sum(states)
     !! --------------- Check if inputs are valid for colrad -------------- !!
-    if(iflux.lt.colrad_threshold .and. inputs%npa.eq.0)then
+    if(iflux.lt.colrad_threshold .and. inputs%calc_npa.eq.0)then
       ! print*, 'threshold!',ac
        return
     endif
@@ -2320,7 +2402,7 @@ contains
           result%neut_dens(ac(1),ac(2),ac(3),:,neut_type)= & 
               result%neut_dens(ac(1),ac(2),ac(3),:,neut_type)+dens(:)
        endif
-       if(inputs%npa.eq.1.and.neut_type.eq.fida_type)then !! NPA simulation !!
+       if(inputs%calc_npa.eq.1.and.neut_type.eq.fida_type)then !! NPA simulation !!
           dray=sqrt(dot_product(ri-spec%xyzhead(1,:) &
                ,ri-spec%xyzhead(1,:)))
           ray=ri(:)+vn(:)/sqrt(dot_product(vn,vn))*dray
@@ -2684,7 +2766,7 @@ contains
     !!collisional radiative model and spectrum calculation
     real(double), dimension(nlevs)         :: states
     real(double)                           :: photons
-    print*,'    # of markers: ',inputs%nr_ndmc
+    print*,'    # of markers: ',inputs%nr_nbi
     !! ------------- calculate nr. of injected neutrals ---------------- !!
     !! # of injected neutrals = NBI power/energy_per_particle
     nneutrals=1.d6*nbi%pinj/ (1.d3*nbi%einj*e0 &
@@ -2692,11 +2774,11 @@ contains
          +  nbi%species_mix(2)/2.d0 &
             +  nbi%species_mix(3)/3.d0 ) )
     !! ------------------ loop over the markers ------------------------ !!
-    nlaunch=real(inputs%nr_ndmc)
+    nlaunch=real(inputs%nr_nbi)
     !$OMP PARALLEL DO private(indmc,vnbi,rnbi,tcell,icell,pos,ncell,states,ac,photons,type,jj)
     energy_fractions: do type=1,3
        !! (type = 1: full energy, =2: half energy, =3: third energy
-       loop_over_markers: do indmc=1,inputs%nr_ndmc
+       loop_over_markers: do indmc=1,inputs%nr_nbi
           call mc_nbi(vnbi(:),type,rnbi(:))
           if(rnbi(1).eq.-1)cycle loop_over_markers
           call track(vnbi,rnbi,tcell,icell,pos,ncell)
@@ -2717,7 +2799,7 @@ contains
     !$OMP END PARALLEL DO
     if(nbi_outside.gt.0)then
        print*, 'Percent of markers outside the grid: ' &
-            ,100.*nbi_outside/(3.*inputs%nr_ndmc)
+            ,100.*nbi_outside/(3.*inputs%nr_nbi)
        if(sum(result%neut_dens).eq.0)stop 'Beam does not intersect the grid!'
     endif
   end subroutine ndmc
@@ -3001,7 +3083,7 @@ contains
     do k=1,grid%Nz 
        do j=1,grid%Ny 
           do i=1,grid%Nx 
-             if (inputs%npa.eq.1) then
+             if (inputs%calc_npa.eq.1) then
                 if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle
              endif
              papprox(i,j,k)=(sum(result%neut_dens(i,j,k,:,nbif_type))  &
@@ -3013,7 +3095,7 @@ contains
           enddo
        enddo
     enddo
-    call get_nlaunch(inputs%nr_fida,papprox,papprox_tot,nlaunch)
+    call get_nlaunch(inputs%nr_fast,papprox,papprox_tot,nlaunch)
     print*,'    # of markers: ',int(sum(nlaunch))
 
     !$OMP PARALLEL DO private(i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,vi_abs, &
@@ -3022,7 +3104,7 @@ contains
        loop_along_y: do j = 1, grid%Ny
           loop_along_x: do i = 1, grid%Nx
              !!if there is no chance of the particle hitting any detector skip cell
-             if (inputs%npa.eq.1) then
+             if (inputs%calc_npa.eq.1) then
                 if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle loop_along_x
              endif
              !! ------------- loop over the markers ---------------------- !!
@@ -3034,7 +3116,7 @@ contains
                    if(sum(vi).eq.0)cycle loop_over_fast_ions
                    !! -------- check if particle flies into NPA detector ---- !!
                    call mc_start  (ac, vi(:),  ri(:))
-                   if(inputs%npa.eq.1)then  
+                   if(inputs%calc_npa.eq.1)then  
                      call hit_npa_detector(ri(:),vi(:),det)
                      if(det.eq.0) cycle loop_over_fast_ions
                    endif
@@ -3848,9 +3930,11 @@ program fidasim
   !! ------- READ INPUTS, PROFILES, LOS, TABLES, & FBM --------
   !! ----------------------------------------------------------
   call read_inputs
-  call read_tables
+  call read_grid
+  call read_beam
   call read_los
   call read_plasma
+  call read_tables
 
   !! ----------------------------------------------------------
   !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
@@ -3872,7 +3956,7 @@ program fidasim
      allocate(result%spectra(spec%nlambda,j,ntypes))
      result%spectra(:,:,:)=0.d0
   endif
-  if(inputs%npa.eq.1)then
+  if(inputs%calc_npa.eq.1)then
      print*, 'this is a NPA simultation!'
      inputs%nr_npa=1000000
      allocate(npa%v(inputs%nr_npa,3,npa%nchan)) 
@@ -3905,7 +3989,7 @@ program fidasim
      endif
      !! calculate level of bremsstrahlung
      if(inputs%calc_spec.eq.1) then
-        if(inputs%f90brems.eq.1) then
+        if(inputs%calc_brems.eq.1) then
            call bremsstrahlung
         else
            call read_bremsstrahlung
@@ -3936,12 +4020,12 @@ program fidasim
   !! -----------------------------------------------------------------------
   !! --------------- CALCULATE the FIDA RADIATION/ NPA FLUX ----------------
   !! -----------------------------------------------------------------------
-  if(inputs%npa.eq.1 .or. inputs%calc_spec.eq.1 .and. inputs%nr_fida.gt.10)then    
+  if(inputs%calc_npa.eq.1 .or. inputs%calc_spec.eq.1 .and. inputs%nr_fast.gt.10)then    
      call date_and_time (values=time_arr)
      write(*,"(A,I2,A,I2.2,A,I2.2)") 'D-alpha main: ' ,time_arr(5), ':' &
           , time_arr(6), ':',time_arr(7)
      print*,'start fida'
-     if(inputs%npa.eq.1) then
+     if(inputs%calc_npa.eq.1) then
        allocate(npa%energy(distri%nenergy))
        allocate(npa%flux(distri%nenergy,npa%nchan))
        npa%energy(:)=distri%energy
@@ -3953,8 +4037,8 @@ program fidasim
   !! -------------------------------------------------------------------
   !! ------------------- Write Spectrum/NPA to file -------------------- 
   !! -------------------------------------------------------------------
-  if(inputs%npa.eq.1.and.inputs%nr_fida.gt.10) call write_npa()
-  if(inputs%calc_spec.eq.1.and.inputs%nr_fida.gt.10) call write_spectra()
+  if(inputs%calc_npa.eq.1.and.inputs%nr_fast.gt.10) call write_npa()
+  if(inputs%calc_spec.eq.1.and.inputs%nr_fast.gt.10) call write_spectra()
   if(inputs%calc_spec.eq.1)deallocate(result%spectra)
 
   !! -------------------------------------------------------------------
@@ -4030,7 +4114,7 @@ program fidasim
   deallocate(grid%yy)
   deallocate(grid%zz)
   !!deallocate npa arrays
-  if(inputs%npa .eq. 1)then
+  if(inputs%calc_npa .eq. 1)then
      deallocate(npa%v) 
      deallocate(npa%ipos) 
      deallocate(npa%fpos) 

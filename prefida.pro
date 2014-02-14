@@ -847,18 +847,25 @@ PRO prefida,input_pro,plot=plot,save=save
 	;;WRITE TO FILE
 	file =inputs.result_dir+inputs.runid+'/'+inputs.runid+'_inputs.cdf'	
 	ncid = ncdf_create(file,/clobber)
+
 	;;DEFINE DIMENSIONS
 	ncdf_control,ncid
 	one_id = ncdf_dimdef(ncid,'dim001',1)
 	three_id = ncdf_dimdef(ncid,'dim003',3)
+
+    ndiag_id=ncdf_dimdef(ncid,'ndiag',n_elements(inputs.diag))
+    strmax_id=ncdf_dimdef(ncid,'maxstr',max(strlen(inputs.diag)))
+
     if inputs.load_fbm then begin
 	    fbm_gdim= ncdf_dimdef(ncid,'fbm_grid',plasma.fbm.ngrid)
         fbm_edim=ncdf_dimdef(ncid,'fbm_energy',plasma.fbm.nenergy)	
         fbm_pdim=ncdf_dimdef(ncid,'fbm_pitch',plasma.fbm.npitch)	
     endif
+
 	xid = ncdf_dimdef(ncid,'x',grid.nx)
 	yid = ncdf_dimdef(ncid,'y',grid.ny)
 	zid = ncdf_dimdef(ncid,'z',grid.nz)
+
 	if inputs.calc_spec or inputs.calc_npa or inputs.calc_fida_wght or inputs.calc_npa_wght then begin
 		chan_id=ncdf_dimdef(ncid,'chan',n_elements(fida.los))
 		xyz_dim=[three_id,chan_id]
@@ -866,9 +873,11 @@ PRO prefida,input_pro,plot=plot,save=save
 
 	griddim=[xid,yid,zid]
     dim3d=[three_id,three_id]
+    diagstr_dim=[strmax_id,ndiag_id]
 	;;DEFINE VARIABLES
 	shot_varid=ncdf_vardef(ncid,'shot',one_id,/long)
 	time_varid=ncdf_vardef(ncid,'time',one_id,/float)
+    diag_varid=ncdf_vardef(ncid,'diagnostic',diagstr_dim,/char)
 
 	;;SIZE VARIABLES
 	nx_varid=ncdf_vardef(ncid,'Nx',one_id,/long)
@@ -977,6 +986,7 @@ PRO prefida,input_pro,plot=plot,save=save
 	;;WRITE ARRAY SIZES
 	ncdf_varput,ncid,shot_varid,long(inputs.shot)
 	ncdf_varput,ncid,time_varid,double(inputs.time)
+    ncdf_varput,ncid,diag_varid,inputs.diag
 	ncdf_varput,ncid,nx_varid,long(inputs.nx)
 	ncdf_varput,ncid,ny_varid,long(inputs.ny)
 	ncdf_varput,ncid,nz_varid,long(inputs.nz)

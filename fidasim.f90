@@ -954,7 +954,7 @@ contains
   subroutine write_npa
     use netcdf
     integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,dimid3,maxcnt
-    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,cnt_varid
+    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,cnt_varid,nchan_varid
     character(120)  :: filename
     real(float), dimension(:,:,:),allocatable :: output
     real(float), dimension(:,:),allocatable :: output1
@@ -977,7 +977,8 @@ contains
     call check( nf90_def_dim(ncid,"max_counts",maxcnt,c_dimid) )
     dimids = (/ c_dimid, dimid3, nchan_dimid /)
 
-    !Define variables
+    !Define variables    
+    call check( nf90_def_var(ncid,"nchan",NF90_INT,dimid1,nchan_varid) )
     call check( nf90_def_var(ncid,"ipos",NF90_FLOAT,dimids,ipos_varid) )
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
@@ -994,6 +995,8 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
+    call check( nf90_put_var(ncid, nchan_varid, npa%nchan) )
+
     output(:,:,:)=real(npa%ipos(:maxcnt,:,:),float)
     call check( nf90_put_var(ncid, ipos_varid, output) )
 
@@ -1024,7 +1027,7 @@ contains
   subroutine write_spectra
     use netcdf
     integer         :: i,j,k,ichan,nchan
-    integer         :: ncid,fida_varid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
+    integer         :: ncid,nchan_varid,fida_varid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
     integer         :: chan_dimid,lam_dimid,dimid1,dimids(2)
     character(120)  :: filename
     real(double), dimension(:)  , allocatable :: lambda_arr
@@ -1058,6 +1061,7 @@ contains
     dimids = (/ lam_dimid, chan_dimid /)
 
     !Define variables
+    call check( nf90_def_var(ncid,"nchan",NF90_INT,dimid1,nchan_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,lam_dimid,lam_varid) )
     call check( nf90_def_var(ncid,"full",NF90_DOUBLE,dimids,full_varid) )
     call check( nf90_def_var(ncid,"half",NF90_DOUBLE,dimids,half_varid) )
@@ -1078,6 +1082,7 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
+    call check( nf90_put_var(ncid, nchan_varid, nchan) )
     call check( nf90_put_var(ncid, lam_varid, lambda_arr) )
     call check( nf90_put_var(ncid, full_varid, result%spectra(:,:,nbif_type)) )
     call check( nf90_put_var(ncid, half_varid, result%spectra(:,:,nbih_type)) )
@@ -3200,7 +3205,7 @@ contains
     real(double)                          :: wght2
     !!netCDF variables
     integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid,ichan_varid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid,ichan_varid,nchan_varid
 
     !! DEFINE wavelength array
     nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
@@ -3507,6 +3512,7 @@ contains
     dimids = (/ nwav_dimid, ne_dimid, np_dimid, nchan_dimid /)
 
     !Define variables
+    call check( nf90_def_var(ncid,"nchan",NF90_INT,dimid1,nchan_varid) )
     call check( nf90_def_var(ncid,"ichan",NF90_INT,dimid1,ichan_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,nwav_dimid,wav_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
@@ -3524,6 +3530,7 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
+    call check( nf90_put_var(ncid, nchan_varid, nchan) )
     call check( nf90_put_var(ncid, ichan_varid, inputs%ichan_wght) )
     call check( nf90_put_var(ncid, wav_varid, central_wavel(:nwav)) )
     call check( nf90_put_var(ncid, e_varid, ebarr) )
@@ -3593,7 +3600,7 @@ contains
 
     !!netCDF variables
     integer :: ncid,dimid1,dimids(3),nchan_dimid,ne_dimid,np_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid,nchan_varid
 
     !! define pitch, energy arrays
     !! define energy - array
@@ -3640,9 +3647,6 @@ contains
     flux_tot(:,:)=0.
     cnt=1
     loop_over_channels: do ichan=1,spec%nchan
-       if(inputs%ichan_wght.gt.0) then
-          if(ichan.ne.inputs%ichan_wght)cycle loop_over_channels
-       endif
        if(spec%chan_id(ichan).ne.1)cycle loop_over_channels
 
        print*,'channel:',ichan
@@ -3677,15 +3681,15 @@ contains
        loop_along_x: do ii=1,grid%nx
          loop_along_y: do jj=1,grid%ny
            loop_along_z: do kk=1,grid%nz
-            fdens=result%neut_dens(ii,jj,kk,:,nbif_type) 
-            hdens=result%neut_dens(ii,jj,kk,:,nbih_type) 
-            tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
-            halodens=result%neut_dens(ii,jj,kk,:,halo_type)             
-            b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
-            b_abs=cell(ii,jj,kk)%plasma%b_abs
-            one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
-
             if(los_weight(ii,jj,kk,ichan).gt.0) then
+             fdens=result%neut_dens(ii,jj,kk,:,nbif_type) 
+             hdens=result%neut_dens(ii,jj,kk,:,nbih_type) 
+             tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
+             halodens=result%neut_dens(ii,jj,kk,:,halo_type)             
+             b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
+             b_abs=cell(ii,jj,kk)%plasma%b_abs
+             one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
+
              pos(:) = (/grid%xxc(ii), grid%yyc(jj), grid%zzc(kk)/)
              call chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),pos,rpos)
              xcen = -rpos(1)-rpos(1)*(rpos(3)+spec%h(ichan))/(-rpos(3))
@@ -3840,6 +3844,7 @@ contains
     dimids = (/ ne_dimid, np_dimid, nchan_dimid /)
 
     !Define variables
+    call check( nf90_def_var(ncid,"nchan",NF90_INT,dimid1,nchan_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
     call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
@@ -3853,6 +3858,7 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
+    call check( nf90_put_var(ncid, nchan_varid, nchan) )
     call check( nf90_put_var(ncid, e_varid, ebarr) )
     call check( nf90_put_var(ncid, ptch_varid, ptcharr) )
     call check( nf90_put_var(ncid, rad_varid, rad_arr) )

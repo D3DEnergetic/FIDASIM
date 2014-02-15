@@ -18,7 +18,7 @@ PRO load_results,result_dir,results,save=save
     grid=read_ncdf(result_dir+input_file,vars=gridvars)
 
 	;;READ LOS
-    losvars=['diagnostic','chan_id','Nchan','xlos','ylos','zlos',$
+    losvars=['diagnostic','chan_id','Nchan','xlos','ylos','zlos','rlos',$
              'xlens','ylens','zlens','sigma_pi','h','rd','ra','los_wght']
 	los=read_ncdf(result_dir+input_file,vars=losvars)
 
@@ -60,8 +60,9 @@ PRO load_results,result_dir,results,save=save
 	birth=read_ncdf(result_dir+runid+'_birth.cdf')
 
 	results={inputs:inputs,grid:grid,los:los,plasma:plasma,$
-			spectra:spectra,neutrals:neutrals,$
+			spectra:spectra,neutrals:neutrals,beam:beam,$
 			npa:npa,fbm:fbm,fida_weights:fida_weights,npa_weights:npa_weights,birth:birth}
+
 	if keyword_set(save) then begin
 		save,inputs,grid,los,plasma,spectra,neutrals,$
 		npa,fbm,fida_weights,npa_weights,birth,filename=inputs.fidasim_runid+'_results.sav',/compress

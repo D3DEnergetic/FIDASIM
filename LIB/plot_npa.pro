@@ -32,19 +32,19 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
        +total(fidasim.neutrals.tdens[*,*,*,*],4)   
 
   ;; initial position where fast-neutral is born (ion is neutraliszed)
-  npaipos=fidasim.npa.npaipos[*,*,chan]
+  npaipos=fidasim.npa.ipos[*,*,chan]
 
   ;; position where neutral is detected!
-  npafpos=fidasim.npa.npafpos[*,*,chan]
+  npafpos=fidasim.npa.fpos[*,*,chan]
 
   ;; velocity vector of fast-neutral
-  npav=fidasim.npa.npav[*,*,chan]
+  npav=fidasim.npa.v[*,*,chan]
 
   ;; weight (particle number per marker)
-  npawght=fidasim.npa.npawght[*,chan]
+  npawght=fidasim.npa.wght[*,chan]
 
   flux=fidasim.npa.flux[*,chan]
-  ener=fidasim.npa.energy
+  energy_arr=fidasim.npa.energy
 
   ;; npa weight: Particles/s/cm^2
   ww=where(npawght ne 0,nnpa)
@@ -66,12 +66,12 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
           ,c_colors=(dindgen(20)+1.)*11,nlevels=20 $
           ,/isotropic,xtit='X [cm]',ytit='Y [cm]'
   oplot,fidasim.grid.x_grid[*,*,0],fidasim.grid.y_grid[*,*,0],psym=3
-  for ichan=0,los.nchan-1 do oplot,[los.xyzlens[ichan,0],los.xyzlos[ichan,0]] $
-                                   ,[los.xyzlens[ichan,1],los.xyzlos[ichan,1]]
-
+  for ichan=0,los.nchan-1 do begin
+      if fidasim.los.chan_id[ichan] ne 1 then continue
+      oplot,[los.xlens[ichan],los.xlos[ichan]] $
+          ,[los.ylens[ichan],los.ylos[ichan]]
+  endfor
   for i=0,nnpa-1 do oplot,[npaipos[i,0]],[npaipos[i,1]],psym=3,color=254./nnpa*i
-
-  oplot, npafpos[*,0],npafpos[*,1],psym=3,thick=2
 
   ;; PLOT Histogram
   if keyword_set(ps) then device, filename='PLOTS/npa_histogram.eps' $
@@ -79,10 +79,7 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
 
   ;; Define arrays for histograms
   ;; energy array:
-  nen  = 40.
-  emax = 100.
-  emin = 0
-  energy_arr = emin+dindgen(nen)/(nen-1.)*(emax-emin)
+  nen  = n_elements(energy_arr)
   dE   = energy_arr[1]-energy_arr[0]
 
   ;;pitch array:
@@ -136,7 +133,7 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
 
         ;; calculate pitch of neutral
         pitch=(vec[0]*bvec[0]+vec[1]*bvec[1]+vec[2]*bvec[2]) $
-              *fidasim.fbm.pitch_sign_convention
+              *fidasim.plasma.btipsign
         dummy=min(abs(energy_arr-energy),eindex)
         dummy=min(abs(pitch_arr-pitch),pindex)    
 
@@ -153,7 +150,7 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
      contour,distri[idet,*,*],energy_arr,pitch_arr $
              ,c_colors=indgen(20)*12,nlevels=20,/fill,yran=[-1,1] $
              ,ytit='Pitch',xtit='Energy [keV]'
-     plot, ener, flux,ytit='neutrals/s',xtit='Energy [keV]',psym=10
+     plot, energy_arr, flux,ytit='neutrals/s',xtit='Energy [keV]',psym=10
 
   endfor
   if keyword_set(ps) then device, /close

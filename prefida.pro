@@ -381,6 +381,9 @@ PRO prepare_chords,inputs,grid,chords,fida
 	err_arr=dblarr(chords.nchan)
 	weight  = replicate(0.d0,nx,ny,nz,chords.nchan)
 
+    ;;CALCULATE RADIUS IN MACHINE COORDINATES
+    rlos=sqrt(chords.xlos^2.0 + chords.ylos^2.0)
+
 	;;ROTATE CHORDS INTO BEAM COORDINATES
 	make_rot_mat,-inputs.alpha,inputs.beta,Arot,Brot,Crot
 	ulens=chords.xlens-inputs.origin[0] & ulos=chords.xlos-inputs.origin[0]
@@ -418,7 +421,7 @@ PRO prepare_chords,inputs,grid,chords,fida
 	endelse
 
 	fida={nchan:n_elements(los),xlens:xlens[los],ylens:ylens[los],zlens:zlens[los],sigma_pi_ratio:chords.sigma_pi_ratio[los],$
-			xlos:xlos[los],ylos:ylos[los],zlos:zlos[los],chan_id:chords.chan_id[los],$
+			xlos:xlos[los],ylos:ylos[los],zlos:zlos[los],rlos:rlos[los],chan_id:chords.chan_id[los],$
 			ra:chords.ra[los],rd:chords.rd[los],h:chords.h[los],los:los,weight:weight,err:err}
 END
 
@@ -972,6 +975,7 @@ PRO prefida,input_pro,plot=plot,save=save
 		xlos_varid=ncdf_vardef(ncid,'xlos',chan_id,/double)
 		ylos_varid=ncdf_vardef(ncid,'ylos',chan_id,/double)
 		zlos_varid=ncdf_vardef(ncid,'zlos',chan_id,/double)
+        rlos_varid=ncdf_vardef(ncid,'rlos',chan_id,/double)
 		ra_varid=ncdf_vardef(ncid,'ra',chan_id,/double)
 		rd_varid=ncdf_vardef(ncid,'rd',chan_id,/double)
 		h_varid=ncdf_vardef(ncid,'h',chan_id,/double)
@@ -1080,6 +1084,7 @@ PRO prefida,input_pro,plot=plot,save=save
 		ncdf_varput,ncid,xlos_varid,double(fida.xlos)
 		ncdf_varput,ncid,ylos_varid,double(fida.ylos)
 		ncdf_varput,ncid,zlos_varid,double(fida.zlos)
+		ncdf_varput,ncid,rlos_varid,double(fida.rlos)
 		ncdf_varput,ncid,ra_varid,double(fida.ra)
 		ncdf_varput,ncid,rd_varid,double(fida.rd)
 		ncdf_varput,ncid,h_varid,double(fida.h)

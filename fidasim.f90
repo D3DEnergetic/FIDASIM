@@ -266,6 +266,31 @@ contains
       stop "Stopped: Failed to Write/Read netCDF file"
     end if
   end subroutine check 
+
+  !**************************************************************************** 
+  subroutine calc_perp_vectors(b,a,c)
+    !!Returns normalized vectors that are perpendicular to b
+    real(double), dimension(3),intent(in)  :: b  
+    real(double), dimension(3),intent(out) :: a,c
+    real(double), dimension(3)             :: bnorm
+  
+    bnorm=b/sqrt(dot_product(b,b))
+
+    if (abs(bnorm(3)).eq.1) then
+      a=(/1.d0,0.d0,0.d0/)
+      c=(/0.d0,1.d0,0.d0/)
+    else 
+      if (bnorm(3).eq.0.) then
+        a=(/0.d0,0.d0,1.d0/)
+        c=(/bnorm(2),-bnorm(1), 0.d0/)/sqrt(bnorm(1)**2+bnorm(2)**2)
+      else
+        a=(/bnorm(2),-bnorm(1),0.d0/)/sqrt(bnorm(1)**2+bnorm(2)**2)
+        c=(/ a(2) , -a(1) , (a(1)*bnorm(2)-a(2)*bnorm(1))/bnorm(3) /)
+        c=c/sqrt(dot_product(c,c))
+      endif
+    endif
+  end subroutine calc_perp_vectors
+
   !**************************************************************************** 
   subroutine read_inputs
     character(120)   :: filename
@@ -613,19 +638,7 @@ contains
              b_abs=sqrt(dot_product(bcell(i,j,k,:) &
                   ,bcell(i,j,k,:)))
              b= bcell(i,j,k,:)/b_abs
-             if (abs(b(3)).eq.1) then
-                a=(/1.d0,0.d0,0.d0/)
-                c=(/0.d0,1.d0,0.d0/)
-             else 
-                if (b(3).eq.0.) then
-                   a=(/0.d0,0.d0,1.d0/)
-                   c=(/b(2),-b(1), 0.d0/)/sqrt(b(1)**2+b(2)**2)
-                else
-                   a=(/b(2),-b(1),0.d0/)/sqrt(b(1)**2+b(2)**2)
-                   c=(/ a(2) , -a(1) , (a(1)*b(2)-a(2)*b(1))/b(3) /)
-                   c=c/sqrt(dot_product(c,c))
-                endif
-             endif
+             call calc_perp_vectors(b,a,c)
              cell(i,j,k)%plasma%b_abs=b_abs
              cell(i,j,k)%plasma%b_norm=b
              cell(i,j,k)%plasma%a_norm=a
@@ -3294,7 +3307,7 @@ contains
        cc=0       ; max_wght=0.d0 ; los_wght=0.d0 ; wght=0.d0
        fdens=0.d0 ; hdens=0.d0    ; tdens=0.d0    ; halodens=0.d0
        b_abs=0.d0 ; evec=0.d0     
-       a_norm=0.d0; b_norm=0.d0   ; c_norm=0.d0
+       b_norm=0.d0
        ti=0.d0    ; te=0.d0
        dene=0.d0  ; denp=0.d0     ; deni=0.d0
        vrot=0.d0  ; pos=0.d0 
@@ -3319,9 +3332,7 @@ contains
                    halodens=halodens &
                         +result%neut_dens(i,j,k,:,halo_type)*los_wght(cc)
                    b_abs    =b_abs+cell(i,j,k)%plasma%b_abs  * wght(cc)
-                   a_norm(:)=a_norm(:)+cell(i,j,k)%plasma%a_norm(:) * wght(cc)
                    b_norm(:)=b_norm(:)+cell(i,j,k)%plasma%b_norm(:) * wght(cc)
-                   c_norm(:)=c_norm(:)+cell(i,j,k)%plasma%c_norm(:) * wght(cc)
                    evec(:)=evec(:)+cell(i,j,k)%plasma%E(:)  * wght(cc)
                    ti     =ti     +cell(i,j,k)%plasma%ti    * wght(cc)
                    te     =te     +cell(i,j,k)%plasma%te    * wght(cc)
@@ -3365,10 +3376,10 @@ contains
        print*, '|B|: ',real(b_abs,float), ' T'
        cell(ac(1),ac(2),ac(3))%plasma%b_abs=b_abs
    
-       a_norm=a_norm/ rad
        b_norm=b_norm/ rad
        cell(ac(1),ac(2),ac(3))%plasma%b_norm=b_norm
-       c_norm=c_norm/ rad
+       call calc_perp_vectors(b_norm,a_norm,c_norm)
+
        evec=evec    / rad
        cell(ac(1),ac(2),ac(3))%plasma%E=evec 
        !! set los_wght to 1 only for one channel (needed for spectrum routine)

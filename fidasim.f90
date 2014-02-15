@@ -873,7 +873,7 @@ contains
   subroutine write_birth_profile
     use netcdf
     integer           :: i,j,k,p,ncid,varid,dimids(5)
-    integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid
+    integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid,nr_varid
     character(100)    :: filename
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
 
@@ -890,6 +890,7 @@ contains
     dimids = (/ x_dimid, y_dimid, z_dimid, e_dimid, p_dimid /)
 
     !Define variable
+    call check( nf90_def_var(ncid,"nr_nbi",NF90_INT,dimid1,nr_varid) )
     call check( nf90_def_var(ncid,"birth_dens",NF90_DOUBLE,dimids,varid) )
 
     !Add unit attributes
@@ -897,6 +898,7 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write data to file
+    call check( nf90_put_var(ncid, nr_varid,inputs%nr_nbi) )
     call check( nf90_put_var(ncid, varid, result%birth_dens) )
 
     !Close netCDF file
@@ -3198,7 +3200,7 @@ contains
     real(double)                          :: wght2
     !!netCDF variables
     integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid,ichan_varid
 
     !! DEFINE wavelength array
     nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
@@ -3505,6 +3507,7 @@ contains
     dimids = (/ nwav_dimid, ne_dimid, np_dimid, nchan_dimid /)
 
     !Define variables
+    call check( nf90_def_var(ncid,"ichan",NF90_INT,dimid1,ichan_varid) )
     call check( nf90_def_var(ncid,"lambda",NF90_DOUBLE,nwav_dimid,wav_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
     call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
@@ -3521,6 +3524,7 @@ contains
     call check( nf90_enddef(ncid) )
 
     !Write to file
+    call check( nf90_put_var(ncid, ichan_varid, inputs%ichan_wght) )
     call check( nf90_put_var(ncid, wav_varid, central_wavel(:nwav)) )
     call check( nf90_put_var(ncid, e_varid, ebarr) )
     call check( nf90_put_var(ncid, ptch_varid, ptcharr) )

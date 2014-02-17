@@ -3054,7 +3054,7 @@ contains
   !-----------FIDA simulation---------------------------------------------------
   !*****************************************************************************
   subroutine fida      
-    integer                               :: i,j,k   !! indices  x,y,z  of cells
+    integer                               :: i,j,k  !! indices  x,y,z  of cells
     integer                               :: iion,det
     real(double), dimension(3)            :: ri      !! start position
     real(double), dimension(3)            :: vi      !! velocity of fast ions
@@ -3077,12 +3077,14 @@ contains
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox,nlaunch !! approx. density
     real(double)                          :: vi_abs             !! (for NPA)
     real(double), dimension(3)            :: ray,ddet,hit_pos   !! ray towards NPA
-    real(double)                          :: papprox_tot 
+    real(double)                          :: papprox_tot,maxcnt,cnt
     integer                               :: inpa    
     real(double)                          :: alpha !! angle relative to detector LOS
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
     papprox=0.d0
     papprox_tot=0.d0
+    maxcnt=real(grid%Nx)*real(grid%Ny)*real(grid%Nz)
+
     do k=1,grid%Nz 
        do j=1,grid%Ny 
           do i=1,grid%Nx 
@@ -3100,7 +3102,7 @@ contains
     enddo
     call get_nlaunch(inputs%nr_fast,papprox,papprox_tot,nlaunch)
     print*,'    # of markers: ',int(sum(nlaunch))
-
+    cnt=0
     !$OMP PARALLEL DO private(i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,vi_abs, &
     !$OMP& tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi,in,vnhalo,states,photons)
     loop_along_z: do k = 1, grid%Nz
@@ -3108,7 +3110,7 @@ contains
           loop_along_x: do i = 1, grid%Nx
              !! ------------- loop over the markers ---------------------- !!
              npa_loop: do inpa=1,int(npa%npa_loop)
-                loop_over_fast_ions: do iion=1,int(nlaunch(i,j,k))
+               loop_over_fast_ions: do iion=1,int(nlaunch(i,j,k))
                    ac=(/i,j,k/)
                    !! ---------------- calculate vi, ri and track --------- !!
                    call mc_fastion(ac, vi(:)) 
@@ -3156,8 +3158,10 @@ contains
                       if(photons.le.0.d0)cycle loop_over_fast_ions
                       if(inputs%calc_spec.eq.1) call spectrum(vi(:),ac(:),pos(:,jj),photons,fida_type)
                    enddo loop_along_track
-                enddo loop_over_fast_ions
+               enddo loop_over_fast_ions
              enddo npa_loop
+             cnt=cnt+1.0
+             WRITE(*,'(f7.2,"%",a,$)') cnt/maxcnt*100,char(13)
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z

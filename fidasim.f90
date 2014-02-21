@@ -112,6 +112,7 @@ module application
      integer(long)              :: Ny     !! Nr. of cells in y direction
      integer(long)              :: Nz     !! Nr. of cells in z direction
      integer(long)              :: ntrack !! Maximum Nr. of cells for tracking
+     integer(long)              :: ngrid  !! Nr. of cells
      real(double), dimension(:), allocatable        :: xx,xxc
      real(double), dimension(:), allocatable        :: yy,yyc 
      real(double), dimension(:), allocatable        :: zz,zzc
@@ -412,6 +413,7 @@ contains
     grid%drmin=minval(grid%dr)
     grid%dv=grid%dr(1)*grid%dr(2)*grid%dr(3)
     grid%ntrack=grid%Nx+grid%Ny+grid%Nz 
+    grid%ngrid=grid%Nx*grid%Ny*grid%Nz
 
     print*,'Nx: ',grid%Nx
     print*,'Ny: ',grid%Ny
@@ -846,7 +848,7 @@ contains
     dzsub=grid%dr(3)/nzsub
     do k=1,grid%nz
        do j=1,grid%ny
-          do i=1, grid%nx
+          loop_over_x: do i=1, grid%nx
              if (cell(i,j,k)%plasma%denf.gt.0. .and. &
                   sum(result%neut_dens(i,j,k,:,:)).gt.0.)then
                 allocate(cell(i,j,k)%fbm(distri%nenergy,distri%npitch))
@@ -875,7 +877,7 @@ contains
                 cell(i,j,k)%fbm_norm(1)=maxval(cell(i,j,k)%fbm(:,:))
                 cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/cell(i,j,k)%fbm_norm(1)
              endif
-          enddo
+          enddo loop_over_x
        enddo
     enddo
     deallocate(transp_r)
@@ -2813,7 +2815,7 @@ contains
   !*****************************************************************************
   subroutine bremsstrahlung
     integer        :: i,j,k,ichan,ilam   !! indices of cells
-    real(double)   :: ne,zeff,te,lam,gaunt
+    real(double)   :: ne,zeff,te,lam,gaunt,ccnt
     real(double), dimension(:)  , allocatable :: lambda_arr,brems
     !! ------------------------ calculate wavelength array ------------------ !!
     print*,'calculate the bremsstrahung!'
@@ -2821,6 +2823,7 @@ contains
     do i=1,spec%nlambda 
        lambda_arr(i)=(i-0.5)*spec%dlambda+spec%lambdamin ! [A]
     enddo 
+    ccnt=0.0
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1,grid%Ny
           loop_along_x: do i = 1, grid%Nx
@@ -2838,6 +2841,8 @@ contains
                      +brems(:)*cell(i,j,k)%los_wght(ichan)*1.d-2 & !!integration
                      *spec%dlambda*(4.d0*pi)*1.d-4 !! [ph/m^2/s/bin]
              enddo loop_over_channels
+             ccnt=ccnt+1
+             WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z
@@ -2870,7 +2875,7 @@ contains
     integer                                :: jj      !! counter along track
     real(double)                           :: photons !! photon flux
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox !!approx.density
-    real(double)                           :: papprox_tot
+    real(double)                           :: papprox_tot,ccnt
     real(double), dimension(grid%nx,grid%ny,grid%nz)::nlaunch
     papprox=0.d0
     papprox_tot=0.d0
@@ -2890,7 +2895,8 @@ contains
 
     ! Loop through all of the cells
     print*,'    # of markers: ',int(sum(nlaunch))
-    !$OMP PARALLEL DO private(i,j,k,idcx,randomu,ac,vhalo,ri,photons,rates, &
+    ccnt=0.0
+    !$OMP PARALLEL DO collapse(3) private(i,j,k,idcx,randomu,ac,vhalo,ri,photons,rates, &
     !$OMP& prob,jj,states,vnbi,tcell,icell,pos,ncell,denn)
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
@@ -2935,6 +2941,8 @@ contains
                         ,pos(:,jj),photons,halo_type)
                 enddo loop_along_track
              enddo loop_over_dcx
+          ccnt=ccnt+1
+          WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z
@@ -2966,7 +2974,7 @@ contains
     integer                                :: jj       !! counter along track
     real(double)                           :: photons  !! photon flux
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox,nlaunch !! approx. density
-    real(double)                           :: papprox_tot 
+    real(double)                           :: papprox_tot ,ccnt
     !! Halo iteration
     integer                                :: hh !! counters
     real(double)                           :: dcx_dens, halo_iteration_dens
@@ -2995,7 +3003,8 @@ contains
        enddo
        call get_nlaunch(inputs%nr_halo,papprox,papprox_tot,nlaunch)
        print*, '    # of markers: ' ,int(sum(nlaunch))
-       !$OMP PARALLEL DO private(i,j,k,ihalo,ac,vihalo,randomu,ri,tcell,icell, &
+       ccnt=0.0
+       !$OMP PARALLEL DO collapse(3) private(i,j,k,ihalo,ac,vihalo,randomu,ri,tcell,icell, &
        !$OMP& pos,ncell,prob,denn,in,vnhalo,rates,states,jj,photons)
        loop_along_z: do k = 1, grid%Nz
           loop_along_y: do j = 1, grid%Ny
@@ -3032,6 +3041,8 @@ contains
                       if(inputs%calc_spec.eq.1) call spectrum(vihalo(:),ac(:),pos(:,jj),photons,halo_type)
                    enddo loop_along_track
                 enddo loop_over_halos
+                ccnt=ccnt+1
+                WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
              enddo loop_along_x
           enddo loop_along_y
        enddo loop_along_z
@@ -3055,10 +3066,11 @@ contains
   !*****************************************************************************
   subroutine fida      
     integer                               :: i,j,k  !! indices  x,y,z  of cells
-    integer                               :: iion,det
+    integer                               :: iion,det,ip
     real(double), dimension(3)            :: ri      !! start position
     real(double), dimension(3)            :: vi      !! velocity of fast ions
     integer,dimension(3)                  :: ac      !! new actual cell 
+    integer,dimension(3,grid%ngrid)       :: pcell
     !! Determination of the CX probability
     real(double), dimension(nlevs)        :: denn    !!  neutral dens (n=1-4)
     real(double), dimension(nlevs)        :: prob    !! Prob. for CX 
@@ -3078,94 +3090,95 @@ contains
     real(double)                          :: vi_abs             !! (for NPA)
     real(double), dimension(3)            :: ray,ddet,hit_pos   !! ray towards NPA
     real(double)                          :: papprox_tot,maxcnt,cnt
-    integer                               :: inpa    
+    integer                               :: inpa,pcnt
     real(double)                          :: alpha !! angle relative to detector LOS
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
     papprox=0.d0
     papprox_tot=0.d0
     maxcnt=real(grid%Nx)*real(grid%Ny)*real(grid%Nz)
-
+    pcnt=1
     do k=1,grid%Nz 
        do j=1,grid%Ny 
-          do i=1,grid%Nx 
-             if (inputs%calc_npa.eq.1) then
-                if (sum(cell(i,j,k)%los_wght(:)).le.0) cycle
-             endif
+          loop_over_x: do i=1,grid%Nx 
              papprox(i,j,k)=(sum(result%neut_dens(i,j,k,:,nbif_type))  &
                   +          sum(result%neut_dens(i,j,k,:,nbih_type))  &
                   +          sum(result%neut_dens(i,j,k,:,nbit_type))  &
                   +          sum(result%neut_dens(i,j,k,:,halo_type))) &
                   *          cell(i,j,k)%plasma%denf
+             if(papprox(i,j,k).gt.0) then 
+               pcell(:,pcnt)=(/i,j,k/)
+               pcnt=pcnt+1
+             endif 
              if(cell(i,j,k)%rho.lt.1.1)papprox_tot=papprox_tot+papprox(i,j,k)
-          enddo
+          enddo loop_over_x
        enddo
     enddo
+    pcnt=pcnt-1
+    maxcnt=real(pcnt)
     call get_nlaunch(inputs%nr_fast,papprox,papprox_tot,nlaunch)
     print*,'    # of markers: ',int(sum(nlaunch))
-    cnt=0
-    !$OMP PARALLEL DO private(i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,vi_abs, &
-    !$OMP& tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi,in,vnhalo,states,photons)
-    loop_along_z: do k = 1, grid%Nz
-       loop_along_y: do j = 1, grid%Ny
-          loop_along_x: do i = 1, grid%Nx
-             !! ------------- loop over the markers ---------------------- !!
-             npa_loop: do inpa=1,int(npa%npa_loop)
-               loop_over_fast_ions: do iion=1,int(nlaunch(i,j,k))
-                   ac=(/i,j,k/)
-                   !! ---------------- calculate vi, ri and track --------- !!
-                   call mc_fastion(ac, vi(:)) 
-                   if(sum(vi).eq.0)cycle loop_over_fast_ions
-                   !! -------- check if particle flies into NPA detector ---- !!
-                   call mc_start  (ac, vi(:),  ri(:))
-                   if(inputs%calc_npa.eq.1)then  
-                     call hit_npa_detector(ri(:),vi(:),det)
-                     if(det.eq.0) cycle loop_over_fast_ions
-                   endif
-                   call track(vi(:), ri(:), tcell, icell,pos, ncell)
-                   if(ncell.eq.0)cycle loop_over_fast_ions
-                   !! ---------------- calculate CX probability --------------!!
-                   ac=icell(:,1) !! new actual cell maybe due to gyro orbit!
-                   prob=0.d0
-                   vnbi=ri(:)-nbi%xyz_pos(:)
-                   vnbi=vnbi/sqrt(dot_product(vnbi,vnbi))*nbi%vinj
-                   ! CX with full energetic NBI neutrals
-                   denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbif_type)
-                   call neut_rates(denn,vi,vnbi,rates)
-                   prob=prob + rates
-                   ! CX with half energetic NBI neutrals
-                   denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbih_type)
-                   call neut_rates(denn,vi,vnbi/sqrt(2.d0),rates)
-                   prob=prob + rates
-                   ! CX with third energetic NBI neutrals
-                   denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbit_type)
-                   call neut_rates(denn,vi,vnbi/sqrt(3.d0),rates)
-                   prob=prob + rates
-                   ! CX with HALO neutrals
-                   denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,halo_type)
-                   do in=1,int(nr_halo_neutrate)
-                      call mc_halo( ac(:), vnhalo(:))
-                      call neut_rates(denn,vi,vnhalo,rates)
-                      prob=prob + rates/nr_halo_neutrate
-                   enddo
+    cnt=0.0
+    !$OMP PARALLEL DO schedule(static) private(ip,i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,&
+    !$OMP vi_abs,tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi,in,vnhalo,states,photons)
+    loop_over_cells: do ip = 1, int(pcnt)
+      npa_loop: do inpa=1,int(npa%npa_loop)
+        loop_over_fast_ions: do iion=1,int(nlaunch(pcell(1,ip),pcell(2,ip),pcell(3,ip)))
+          i=pcell(1,ip) 
+          j=pcell(2,ip)
+          k=pcell(3,ip)
+          ac=(/i,j,k/)
+          !! ---------------- calculate vi, ri and track --------- !!
+          call mc_fastion(ac, vi(:)) 
+          if(sum(vi).eq.0)cycle loop_over_fast_ions
+          !! -------- check if particle flies into NPA detector ---- !!
+          call mc_start  (ac, vi(:),  ri(:))
+          if(inputs%calc_npa.eq.1)then  
+            call hit_npa_detector(ri(:),vi(:),det)
+            if(det.eq.0) cycle loop_over_fast_ions
+          endif
+          call track(vi(:), ri(:), tcell, icell,pos, ncell)
+          if(ncell.eq.0)cycle loop_over_fast_ions
+          !! ---------------- calculate CX probability --------------!!
+          ac=icell(:,1) !! new actual cell maybe due to gyro orbit!
+          prob=0.d0
+          vnbi=ri(:)-nbi%xyz_pos(:)
+          vnbi=vnbi/sqrt(dot_product(vnbi,vnbi))*nbi%vinj
+          ! CX with full energetic NBI neutrals
+          denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbif_type)
+          call neut_rates(denn,vi,vnbi,rates)
+          prob=prob + rates
+          ! CX with half energetic NBI neutrals
+          denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbih_type)
+          call neut_rates(denn,vi,vnbi/sqrt(2.d0),rates)
+          prob=prob + rates
+          ! CX with third energetic NBI neutrals
+          denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbit_type)
+          call neut_rates(denn,vi,vnbi/sqrt(3.d0),rates)
+          prob=prob + rates
+          ! CX with HALO neutrals
+          denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,halo_type)
+          do in=1,int(nr_halo_neutrate)
+            call mc_halo( ac(:), vnhalo(:))
+            call neut_rates(denn,vi,vnhalo,rates)
+            prob=prob + rates/nr_halo_neutrate
+          enddo
 
-                   if(sum(prob).le.0.)cycle loop_over_fast_ions
-                   !! --------- solve collisional radiative model along track-!!
-                   states=prob*cell(i,j,k)%plasma%denf
-                   loop_along_track: do jj=1,ncell        
-                      ac=icell(:,jj)
-                      call colrad(ac(:),vi(:),tcell(jj) &
-                           ,states,photons,fida_type,nlaunch(i,j,k),ri(:),det)
-                      if(photons.le.0.d0)cycle loop_over_fast_ions
-                      if(inputs%calc_spec.eq.1) call spectrum(vi(:),ac(:),pos(:,jj),photons,fida_type)
-                   enddo loop_along_track
-               enddo loop_over_fast_ions
-             enddo npa_loop
-             cnt=cnt+1.0
-             WRITE(*,'(f7.2,"%",a,$)') cnt/maxcnt*100,char(13)
-          enddo loop_along_x
-       enddo loop_along_y
-    enddo loop_along_z
-    !$OMP END PARALLEL DO 
+          if(sum(prob).le.0.)cycle loop_over_fast_ions
+          !! --------- solve collisional radiative model along track-!!
+          states=prob*cell(i,j,k)%plasma%denf
+          loop_along_track: do jj=1,ncell        
+            ac=icell(:,jj)
+            call colrad(ac(:),vi(:),tcell(jj) &
+                ,states,photons,fida_type,nlaunch(i,j,k),ri(:),det)
+            if(photons.le.0.d0)cycle loop_over_fast_ions
+            if(inputs%calc_spec.eq.1) call spectrum(vi(:),ac(:),pos(:,jj),photons,fida_type)
+          enddo loop_along_track
+        enddo loop_over_fast_ions
+      enddo npa_loop
+      cnt=cnt+1
+      WRITE(*,'(f7.2,"%",a,$)') cnt/maxcnt*100,char(13)
+    enddo loop_over_cells
+    !$OMP END PARALLEL DO
   end subroutine fida
 
  
@@ -3584,15 +3597,13 @@ contains
     integer(long)                   :: nchan,cnt,det
     integer(long)                   :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
     integer,dimension(1)            :: minpitch,ipitch,ienergy,ix,iy,iz
-    real(double), dimension(:,:,:,:,:), allocatable :: wfunct
-    real(double), dimension(:,:,:,:),   allocatable :: flux
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),       allocatable :: flux_tot
-    real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr,los_tot
+    real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr
     real(double), dimension(100)    :: rd_arr,phid_arr !!npa detector array
     real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
     real(double)                    :: xlos,ylos,zlos,xlos2,ylos2,zlos2,xcen,ycen,rshad,rs
-    real(double)                    :: vabs,denf,fbm_denf,wght,b_abs,dE,dP
+    real(double)                    :: vabs,denf,fbm_denf,wght,b_abs,dE,dP,ccnt
     real(double),dimension(3)       :: vn  ! vi in m/s
 
     !! Determination of the CX probability
@@ -3605,7 +3616,6 @@ contains
     !! ---- Solution of differential equation  ---- ! 
     integer,dimension(3)                  :: ac  !!actual cell
     real(double), dimension(3)            :: pos,rpos,dpos,rdpos,r_gyro,mrdpos !! position of mean cell
-    real(double),dimension(grid%nx,grid%ny,grid%nz,spec%nchan) :: los_weight !! los wght
     integer(long)                         :: ichan,ind
     character(100)                        :: filename
     real(double), dimension(3,grid%ntrack):: pos_out
@@ -3644,19 +3654,6 @@ contains
     allocate(wfunct_tot(inputs%ne_wght,inputs%np_wght,nchan))
     allocate(flux_tot(inputs%ne_wght,nchan))  
     allocate(rad_arr(nchan))
-    allocate(los_tot(spec%nchan))
-
-    !!save the los-weights into an array
-    !! because the structure is over-written
-    los_tot(:)=0.
-    do k=1,grid%nz
-      do j=1,grid%ny 
-        do i=1,grid%nx 
-          los_weight(i,j,k,:)=cell(i,j,k)%los_wght(:)
-          los_tot=los_tot+los_weight(i,j,k,:)
-        enddo
-      enddo
-    enddo 
    
     wfunct_tot(:,:,:)=0.
     flux_tot(:,:)=0.
@@ -3685,18 +3682,15 @@ contains
          phid_arr(i)=i*2*pi/100.
        enddo
 
-       allocate(wfunct(inputs%ne_wght,inputs%np_wght,grid%nx,grid%ny,grid%nz))
-       wfunct(:,:,:,:,:)=0.
-       allocate(flux(inputs%ne_wght,grid%nx,grid%ny,grid%nz))
-       flux(:,:,:,:)=0.
-       !$OMP PARALLEL DO private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
+       ccnt=0.0
+       !$OMP PARALLEL DO collapse(3) private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy,mrdpos,rshad,rs,xcen,ycen, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf)
-       loop_along_x: do ii=1,grid%nx
+       loop_along_z: do kk=1,grid%nz
          loop_along_y: do jj=1,grid%ny
-           loop_along_z: do kk=1,grid%nz
-            if(los_weight(ii,jj,kk,ichan).gt.0) then
+           loop_along_x: do ii=1,grid%nx
+            if(cell(ii,jj,kk)%los_wght(ichan).gt.0) then
              fdens=result%neut_dens(ii,jj,kk,:,nbif_type) 
              hdens=result%neut_dens(ii,jj,kk,:,nbih_type) 
              tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
@@ -3724,7 +3718,7 @@ contains
                  wght=wght+1
                enddo loop_along_yd
              enddo loop_along_xd
-             if(wght.le.0) cycle loop_along_z
+             if(wght.le.0) cycle loop_along_x
              mrdpos(:)=mrdpos(:)/wght
              call inv_chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),mrdpos,dpos)
                  
@@ -3736,7 +3730,7 @@ contains
                
              !!Check if it hits a detector just to make sure
              call hit_npa_detector(pos,vi_norm,det)
-             if (det.eq.0) cycle loop_along_z 
+             if (det.eq.0) cycle loop_along_x 
           
              !!Determine path particle takes throught the grid
              call track(vi_norm,pos,tcell,icell,pos_out,ncell)
@@ -3803,47 +3797,26 @@ contains
                  if (photons.le.0) exit
                enddo
                pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma
-
-               wfunct(ic,minpitch(1),ii,jj,kk) = wfunct(ic,minpitch(1),ii,jj,kk) + &
-                 sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)*grid%dv
+               !$OMP CRITICAL(npa_wght)
+               wfunct_tot(ic,minpitch(1),cnt) = wfunct_tot(ic,minpitch(1),cnt) + &
+                 sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)*grid%dv
 
                if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
-                 flux(ic,ii,jj,kk) = flux(ic,ii,jj,kk) + &
-                   grid%dv*distri%dpitch*denf*fbm_denf*sum(pcx)*pcxa*los_weight(ii,jj,kk,ichan)/distri%deb
+                 flux_tot(ic,cnt) = flux_tot(ic,cnt) + &
+                   2*grid%dv*denf*fbm_denf*sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)
+                   !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
                endif
+               !$OMP END CRITICAL(npa_wght)
              enddo loop_over_energy
             endif
-           enddo loop_along_z
+            ccnt=ccnt+1
+            WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+           enddo loop_along_x
          enddo loop_along_y
-       enddo loop_along_x
+       enddo loop_along_z
        !$OMP END PARALLEL DO
-       do kk=1,grid%nz
-         do jj=1,grid%ny
-           loop_over_x: do ii=1,grid%nx
-             if (los_weight(ii,jj,kk,ichan).le.0)cycle loop_over_x
-             do ic=1,inputs%ne_wght
-               flux_tot(ic,cnt)=flux_tot(ic,cnt)+flux(ic,ii,jj,kk)
-               do jc=1,inputs%np_wght
-                 wfunct_tot(ic,jc,cnt)=wfunct_tot(ic,jc,cnt)+wfunct(ic,jc,ii,jj,kk)
-               enddo
-             enddo
-           enddo loop_over_x
-         enddo
-       enddo   
-      deallocate(wfunct) 
-      deallocate(flux) 
       cnt=cnt+1
     enddo loop_over_channels
-
-    !$OMP PARALLEL DO private(i,j,k)
-    do k=1,grid%nz
-       do j=1,grid%ny 
-         do i=1,grid%nx 
-           cell(i,j,k)%los_wght(:)=los_weight(i,j,k,:)
-         enddo
-       enddo
-    enddo
-    !$OMP END PARALLEL DO
 
     !! Open file for the outputs
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
@@ -3891,7 +3864,6 @@ contains
     deallocate(wfunct_tot)
     deallocate(flux_tot)  
     deallocate(rad_arr)
-    deallocate(los_tot)
   end subroutine npa_weight_function
 end module application
 

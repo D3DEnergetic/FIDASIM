@@ -294,15 +294,12 @@ PRO chord_coor,pi,pf,u,v,z,xp,yp,zp
     zp=zpp
 END
 
-FUNCTION npa_prob,x,y,xp,yp,zp,tol=tol,dx=dx,dy=dy
-	if not keyword_set(tol) then tol=0.001
+FUNCTION npa_prob,x,y,xp,yp,zp,dx=dx,dy=dy
 	if not keyword_set(dx) then dx=abs(x[1]-x[0])
 	if not keyword_set(dy) then dy=abs(y[1]-y[0])
 
-	r=sqrt((x-xp)^2.0 + (y-yp)^2.0)
-	p=(zp/(r^2.0 + zp^2.0))*(r^(-1.0))*(!DPI^(-2.0))
-	w=where(r lt tol*zp,nw)
-	if nw ne 0 then p[w]=(2*atan(tol)/(!DPI*nw))/(dx*dy)
+	r=(x-xp)^2.0 + (y-yp)^2.0+zp^2.0
+	p=((4*!DPI)^(-1.0))*zp*r^(-1.5)
 	return, p
 END
 
@@ -358,7 +355,7 @@ PRO npa_los_wght,los,grid,weight,err_arr
 					xs=xd+xcen[xi,yi,zi]
 					ys=yd+ycen[xi,yi,zi]
 					rrs=sqrt(xs^2.0 + ys^2.0)
-					p=npa_prob(xd,yd,xp[xi,yi,zi],yp[xi,yi,zi],zp[xi,yi,zi],dx=dx,dy=dy,tol=0.0001)
+					p=npa_prob(xd,yd,xp[xi,yi,zi],yp[xi,yi,zi],zp[xi,yi,zi],dx=dx,dy=dy)
 					www=where(rrs ge rs[xi,yi,zi] or rrd ge rd[chan],nw)
 					if nw ne 0 then p[www]=0
 					weight[xi,yi,zi,chan]=total(p*dx*dy)	

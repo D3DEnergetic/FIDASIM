@@ -3629,8 +3629,8 @@ contains
 
     !! define pitch, energy arrays
     !! define energy - array
-    print*, 'nr of energies and pitches', inputs%ne_wght,inputs%np_wght
-    print*, 'maximal energy: ', inputs%emax_wght
+    print*, 'Nr of energies and pitches: ', inputs%ne_wght,inputs%np_wght
+    write(*, '(A,f14.3)') ' Maximum energy: ', inputs%emax_wght
     
     allocate(ebarr(inputs%ne_wght))  
     do i=1,inputs%ne_wght
@@ -3650,6 +3650,7 @@ contains
       if(spec%chan_id(i).eq.1) nchan=nchan+1
     enddo
     print*,'Number of Channels: ',nchan
+    print*,'----'
     !! define storage arrays   
     allocate(wfunct_tot(inputs%ne_wght,inputs%np_wght,nchan))
     allocate(flux_tot(inputs%ne_wght,nchan))  
@@ -3661,7 +3662,7 @@ contains
     loop_over_channels: do ichan=1,spec%nchan
        if(spec%chan_id(ichan).ne.1)cycle loop_over_channels
 
-       print*,'channel:',ichan
+       print*,'Channel:',ichan
        xlos=spec%xyzlos(ichan,1)
        ylos=spec%xyzlos(ichan,2)
        zlos=spec%xyzlos(ichan,3)
@@ -3674,7 +3675,7 @@ contains
        zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
        
        radius=sqrt(xlos2**2 + ylos2**2)
-       print*,'Radius: ',radius
+       write(*,'(A,f10.3)') ' Radius: ',radius
        rad_arr(cnt)=radius
        
        do i=1,100
@@ -3686,19 +3687,19 @@ contains
        !$OMP PARALLEL DO collapse(3) private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy,mrdpos,rshad,rs,xcen,ycen, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
-       !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf)
+       !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf,b_abs)
        loop_along_z: do kk=1,grid%nz
          loop_along_y: do jj=1,grid%ny
            loop_along_x: do ii=1,grid%nx
-            if(cell(ii,jj,kk)%los_wght(ichan).gt.0) then
-             fdens=result%neut_dens(ii,jj,kk,:,nbif_type) 
-             hdens=result%neut_dens(ii,jj,kk,:,nbih_type) 
-             tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
-             halodens=result%neut_dens(ii,jj,kk,:,halo_type)             
-             b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
-             b_abs=cell(ii,jj,kk)%plasma%b_abs
-             one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
+            fdens=result%neut_dens(ii,jj,kk,:,nbif_type) 
+            hdens=result%neut_dens(ii,jj,kk,:,nbih_type) 
+            tdens=result%neut_dens(ii,jj,kk,:,nbit_type)
+            halodens=result%neut_dens(ii,jj,kk,:,halo_type)             
+            b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
+            b_abs=cell(ii,jj,kk)%plasma%b_abs
+            one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
 
+            if(cell(ii,jj,kk)%los_wght(ichan).gt.0) then
              pos(:) = (/grid%xxc(ii), grid%yyc(jj), grid%zzc(kk)/)
              call chord_coor(spec%xyzhead(ichan,:),spec%xyzlos(ichan,:),spec%xyzhead(ichan,:),pos,rpos)
              xcen = -rpos(1)-rpos(1)*(rpos(3)+spec%h(ichan))/(-rpos(3))
@@ -3815,6 +3816,8 @@ contains
          enddo loop_along_y
        enddo loop_along_z
        !$OMP END PARALLEL DO
+      write(*,'(A,ES14.5)'),' Flux: ',sum(flux_tot(:,cnt))*dE
+      write(*,*) ''
       cnt=cnt+1
     enddo loop_over_channels
 

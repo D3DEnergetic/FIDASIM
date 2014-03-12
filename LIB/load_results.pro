@@ -46,15 +46,15 @@ PRO load_results,result_dir,results,save=save
              'FBM_r2d','FBM_z2d','FBM_bmvol','FBM','FBM_emin',$
              'FBM_emax','FBM_energy','FBM_pmin','FBM_pmax','FBM_pitch']
 	fbm=read_ncdf(result_dir+input_file,vars=fbmvars)
-    fbm.FBM_pitch=fbm.FBM_pitch*plasma.btipsign
+    if not fbm.err then fbm.FBM_pitch=fbm.FBM_pitch*plasma.btipsign
 
 	;;READ FIDA WEIGHT FUNCTIONS
 	fida_weights=read_ncdf(result_dir+runid+'_fida_weights.cdf')
-    fida_weights.pitch=fida_weights.pitch*plasma.btipsign
+    if not fida_weights.err then fida_weights.pitch=fida_weights.pitch*plasma.btipsign
 
 	;;READ NPA WEIGHT FUNCTIONS
 	npa_weights=read_ncdf(result_dir+runid+'_npa_weights.cdf')
-    npa_weights.pitch=npa_weights.pitch*plasma.btipsign
+    if not npa_weights.err then npa_weights.pitch=npa_weights.pitch*plasma.btipsign
 
 	;;READ BIRTH PROFILE
 	birth=read_ncdf(result_dir+runid+'_birth.cdf')

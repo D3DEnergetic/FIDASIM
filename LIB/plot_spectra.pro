@@ -129,7 +129,7 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 				 	title='Intensity vs. Major Radius ',xtitle='R [cm]',ytitle='Intensity [Ph/(s $m^2$ nm sr)]')
 				if keyword_set(ps) then begin
 					type=size(ps,/type)
-					if type eq 7 then dir=ps+inputs.fidasim_runid+"_intensity.pdf" else dir=inputs.fidasim_runid+"_intensity.pdf" 
+					if type eq 7 then dir=inputs.fidasim_runid+"_intensity.pdf" else dir=inputs.fidasim_runid+"_intensity.pdf" 
 					plt.Save,dir,border=10
 				endif
 			endif else begin

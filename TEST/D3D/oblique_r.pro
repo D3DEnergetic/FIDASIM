@@ -27,7 +27,7 @@ isource=5     											;; Beam source index (FIDASIM only simulates on NBI sou
 einj=0.                 								;; [keV] If 0, get data from MDS+
 pinj=0.                 								;; [MW] If 0, get data from MDS+
 
-diag='OBLIQUE'											;; Name of the FIDA diag
+diag=['OBLIQUE','NPA']									;; Name of the FIDA diag
 equil='EFIT01'											;; Name of equilibrium. Ex. for D3D EFIT02
 
 ;;-----------------------------------------------------
@@ -67,7 +67,7 @@ zdim2=70.           ;; Maximum z value
 ;; Define number of Monte Carlo particles
 ;;--------------------------------------------------
 nr_fast=500000    										;; FIDA
-nr_ndmc=5000 											;; Beam emission
+nr_nbi=5000 											;; Beam emission
 nr_halo=50000    										;; Halo contribution
 
 ;;--------------------------------------------------
@@ -88,12 +88,12 @@ wavel_end_wght=663.   									;; Maximum wavelength
 calc_npa=[0]   												;; (0 or 1) If 1 do a simulation for NPA
 calc_spec=[1]   										;; (0 or 1) If 1 then spectra is calculated
 calc_birth=[0]    										;; (0 or 1) If 1 then the birth profile is calculated
-f90brems=[0]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
+calc_brems=[0]                							;; (0 or 1) If 0 use the IDL bremstrahlung calculation
 calc_fida_wght=[1]  											;; (0 or 1) If 1 then weight functions are calculated
-calc_npa_wght=[0]  											;; (0 or 1) If 1 then weight functions are calculated
+calc_npa_wght=[1]  											;; (0 or 1) If 1 then weight functions are calculated
 load_neutrals=[0]   									;; (0 or 1) If 1 then the neutral density is loaded from an existing 
 load_fbm=[1]   									        ;; (0 or 1) If 1 then the fbm is loaded (calc_spec/npa overwrites) 
-ps=[0]													;; (0 or 1) If 1 then make hard copy of plots
+
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
@@ -103,10 +103,10 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
         einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
         lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
         nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-        origin:origin,alpha:alpha,beta:beta,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,$
+        origin:origin,alpha:alpha,beta:beta,nr_fast:nr_fast,nr_nbi:nr_nbi,nr_halo:nr_halo,$
         ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
-        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
+       emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
         wavel_end_wght:wavel_end_wght,calc_npa:calc_npa,calc_spec:calc_spec,calc_birth:calc_birth,calc_fida_wght:calc_fida_wght,$
-        calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,load_fbm:load_fbm,ps:ps}
+        calc_npa_wght:calc_npa_wght,calc_brems:calc_brems,load_neutrals:load_neutrals,load_fbm:load_fbm}
 
 END

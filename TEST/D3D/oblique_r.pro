@@ -41,8 +41,8 @@ impurity_charge=6           							;; 5: BORON, 6: carbon, 7: Nitrogen
 ;;-----------------------------------------------------
 ;; Wavelength Grid
 ;;-----------------------------------------------------
-lambdamin=6470.d0           							;; Minimum wavelength of wavelength grid[A] 
-lambdamax=6670.d0           							;; Maximum wavelength of wavelength grid[A] 
+lambdamin=647.d0           							    ;; Minimum wavelength of wavelength grid[nm]
+lambdamax=667.d0           							    ;; Maximum wavelength of wavelength grid[nm]
 nlambda=2000L               							;; Number of wavelengths
 dlambda= (lambdamax-lambdamin)/double(nlambda)			;; Wavelength seperation
 

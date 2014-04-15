@@ -5,11 +5,11 @@ COMPILER=ifort
 
 ifeq ($(COMPILER),gfortran)
 	LFLAGS = -lnetcdff -lnetcdf -lm
-	CFLAGS = -g -O2 -fopenmp -Wall -fbacktrace
+	CFLAGS = -g -O2 -fopenmp -Wall
 endif
 
 ifeq ($(COMPILER),ifort)
-	LFLAGS = -lnetcdf -lnetcdf -limf -lm
+	LFLAGS = -lnetcdff -lnetcdf -limf -lm
 	CFLAGS = -O2 -openmp -openmp-report -parallel
 endif
 

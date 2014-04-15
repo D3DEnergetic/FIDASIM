@@ -51,7 +51,6 @@ module application
        (/1,0,0,1,1,1,0,0,0,1,1,1,0,0,1/)
   integer,parameter,dimension(n_stark)::     stark_sigma=1 - stark_pi
 
-  integer, dimension(1) :: minpos  !! dummy array to determine minloc
   !!Numerical Settings
   integer,parameter:: nlevs=6             !!nr of quantum states  
   integer,parameter:: npitch_birth=100    !!nr pitches in birth profile
@@ -783,7 +782,8 @@ contains
     real(double), dimension(:,:,:), allocatable :: transp_fbm
     integer :: ncid,r2d_var,z2d_var,bmvol_var,emin_var,emax_var,pmin_var,pmax_var
     integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
-   
+    integer, dimension(1) :: minpos  !! dummy array to determine minloc
+
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading fast ion distribution function ----'
 
@@ -1224,6 +1224,8 @@ contains
     real(double)                           :: vabs, phi, sinus
     real(double), dimension(3)             :: randomu3
     real(double), dimension(1)             :: randomu1
+    integer, dimension(1) :: minpos  !! dummy array to determine minloc
+
     a=cell(ac(1),ac(2),ac(3))%plasma%a_norm(:)
     b=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:)
     c=cell(ac(1),ac(2),ac(3))%plasma%c_norm(:)
@@ -2596,6 +2598,8 @@ contains
     real(double)               :: dt     !!min time to cell boundary
     real(double), dimension(3) :: vn !!velocitiy that can be changed
     real(double), dimension(3) :: ri !!position of ray  
+    integer, dimension(1) :: minpos  !! dummy array to determine minloc
+
     tcell=0.d0 ; icell=0 ;  ; pos=0.d0 ; ncell=0
     vn(:)=vin(:) ;  ri(:)=rin(:)
     !! define actual cell

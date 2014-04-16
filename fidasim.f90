@@ -3824,7 +3824,8 @@ contains
          enddo loop_along_y
        enddo loop_along_z
        !$OMP END PARALLEL DO
-      write(*,'(A,ES14.5)'),' Flux: ',sum(flux_tot(:,cnt))*dE
+      write(*,'(A,ES14.5)'),' Flux:   ',sum(flux_tot(:,cnt))*dE
+      write(*,'(A,ES14.5)'),' Weight: ',sum(wfunct_tot(:,:,cnt))*dE*dP
       write(*,*) ''
       cnt=cnt+1
     enddo loop_over_channels

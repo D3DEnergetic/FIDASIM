@@ -36,11 +36,11 @@ For tsch shell:
     
 For bash shell:
 
-    export FIDASIM_DIR = /path/to/fidasim/install/    #don't forget the last slash
-    export NETCDF_INCLUDE = /path/to/netcdf/install/include
-    export NETCDF_LIB = /path/to/netcdf/install/lib
-    export LD_LIBRARY_PATH = /path/to/netcdf/install/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH = /path/to/netcdf/install/include:$LD_LIBRARY_PATH
+    export FIDASIM_DIR=/path/to/fidasim/install/    #don't forget the last slash
+    export NETCDF_INCLUDE=/path/to/netcdf/install/include
+    export NETCDF_LIB=/path/to/netcdf/install/lib
+    export LD_LIBRARY_PATH=/path/to/netcdf/install/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/path/to/netcdf/install/include:$LD_LIBRARY_PATH
 
 The Intel Fortran compiler (version >= 11.0) is recommended. You can download the non-commercial version from [here](http://software.intel.com/en-us/non-commercial-software-development)
 

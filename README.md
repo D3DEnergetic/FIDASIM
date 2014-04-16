@@ -13,7 +13,7 @@ It was originally developed in IDL at UC Irvine [1] and converted to Fortran 90 
 ## 1. Install dependencies
 FIDASIM reads and writes netCDF files. This requires netCDF-4.1.3 or earlier. You can download the library from [here](http://www.unidata.ucar.edu/downloads/netcdf/netcdf-4_1_3/index.jsp)
 
-Note: By default netCDF will build using the GNU fortran compiler, gfortran. If you plan to use the Intel Fortran Compiler you must also build the 
+Note: By default netCDF will build using the GNU Fortran compiler, gfortran. If you plan to use the Intel Fortran compiler you must also build the 
 netCDF library using it. Instructions on how to do this can be found [here](http://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-netcdf-with-the-intel-compilers).
 Also, netCDF has the option of using HDF5 data format. This, naturally, requires the HDF5 libraries. If you do not have access to the HDF5 libraries netCDF can be built without it.
 
@@ -29,6 +29,7 @@ FIDASIM will not compile out of the box. You will first need to set the followin
 For tsch shell:
 
     setenv FIDASIM_DIR /path/to/fidasim/install/    #don't forget the last slash
+    setenv FIDASIM_COMPILER gfortran #use 'ifort' for Intel compiler
     setenv NETCDF_INCLUDE /path/to/netcdf/install/include
     setenv NETCDF_LIB /path/to/netcdf/install/lib
     setenv LD_LIBRARY_PATH "/path/to/netcdf/install/lib":{$LD_LIBRARY_PATH}
@@ -37,12 +38,13 @@ For tsch shell:
 For bash shell:
 
     export FIDASIM_DIR=/path/to/fidasim/install/    #don't forget the last slash
+    export FIDASIM_COMPILER=gfortran #use 'ifort' for Intel compiler
     export NETCDF_INCLUDE=/path/to/netcdf/install/include
     export NETCDF_LIB=/path/to/netcdf/install/lib
     export LD_LIBRARY_PATH=/path/to/netcdf/install/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/path/to/netcdf/install/include:$LD_LIBRARY_PATH
 
-The Intel Fortran compiler (version >= 11.0) is recommended. You can download the non-commercial version from [here](http://software.intel.com/en-us/non-commercial-software-development)
+The GNU Fortran compiler, gfortran (version >= 4.7.3), is recommended. You can also use Intel Fortran compiler (version >= 11.0). The non-commercial version of the Intel compiler is available [here](http://software.intel.com/en-us/non-commercial-software-development)
 
 The last step is the run make in the source directory
 

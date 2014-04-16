@@ -2867,7 +2867,7 @@ contains
     !! Determination of the CX probability
     real(double), dimension(nlevs)         :: denn    !!  neutral dens (n=1-4)
     real(double), dimension(nlevs)         :: prob    !!  Prob. for CX 
-    real(double), dimension(3)             :: vnbi    !! Velocity of NBIneutrals
+    real(double), dimension(3)             :: vnbi_f,vnbi_h,vnbi_t !! Velocity of NBIneutrals
     integer                                :: in      !! index neut rates
     real(double), dimension(nlevs)         :: rates   !! Rate coefficiants forCX
     !! Collisiional radiative model along track
@@ -2900,8 +2900,8 @@ contains
     ! Loop through all of the cells
     print*,'    # of markers: ',int(sum(nlaunch))
     ccnt=0.0
-    !$OMP PARALLEL DO collapse(3) private(i,j,k,idcx,randomu,ac,vhalo,ri,photons,rates, &
-    !$OMP& prob,jj,states,vnbi,tcell,icell,pos,ncell,denn)
+    !$OMP PARALLEL DO private(i,j,k,idcx,randomu,ac,vhalo,ri,photons,rates, &
+    !$OMP& prob,jj,states,vnbi_f,vnbi_h,vnbi_t,tcell,icell,pos,ncell,denn)
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
           loop_along_x: do i = 1, grid%Nx
@@ -2919,19 +2919,21 @@ contains
                 !! ---------------- calculate CX probability ------------- !!
                 ac=icell(:,1) 
                 prob=0.d0
-                vnbi=ri(:)-nbi%xyz_pos(:)
-                vnbi=vnbi/sqrt(dot_product(vnbi,vnbi))*nbi%vinj
+                vnbi_f=ri(:)-nbi%xyz_pos(:)
+                vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj
+                vnbi_h=vnbi_f/sqrt(2.d0)
+                vnbi_t=vnbi_f/sqrt(3.d0)
                 ! CX with full energetic NBI neutrals ------ !!
                 denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbif_type)
-                call neut_rates(denn,vhalo,vnbi,rates)
+                call neut_rates(denn,vhalo,vnbi_f,rates)
                 prob=prob + rates
                 ! CX with half energetic NBI neutrals ------ !!
                 denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbih_type)
-                call neut_rates(denn,vhalo,vnbi/sqrt(2.d0),rates)
+                call neut_rates(denn,vhalo,vnbi_h,rates)
                 prob=prob + rates
                 ! CX with third energetic NBI neutrals ------ !!
                 denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbit_type)
-                call neut_rates(denn,vhalo,vnbi/sqrt(3.d0),rates)
+                call neut_rates(denn,vhalo,vnbi_t,rates)
                 prob=prob + rates
                 if(sum(prob).le.0.)cycle loop_over_dcx
                 !! --------- solve collisional radiative model along track-!!
@@ -2946,7 +2948,7 @@ contains
                 enddo loop_along_track
              enddo loop_over_dcx
           ccnt=ccnt+1
-          WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+          WRITE(6,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z
@@ -3078,7 +3080,7 @@ contains
     !! Determination of the CX probability
     real(double), dimension(nlevs)        :: denn    !!  neutral dens (n=1-4)
     real(double), dimension(nlevs)        :: prob    !! Prob. for CX 
-    real(double), dimension(3)            :: vnbi    !! Velocity of NBI neutrals
+    real(double), dimension(3)            :: vnbi_f,vnbi_h,vnbi_t    !! Velocity of NBI neutrals
     real(double), dimension(3)            :: vnhalo  !! v of halo neutral
     integer                               :: in      !! index of neut rates
     real(double), dimension(nlevs)        :: rates   !! Rate coefficiants for CX
@@ -3123,7 +3125,7 @@ contains
     print*,'    # of markers: ',int(sum(nlaunch))
     cnt=0.0
     !$OMP PARALLEL DO schedule(static) private(ip,i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,&
-    !$OMP vi_abs,tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi,in,vnhalo,states,photons)
+    !$OMP vi_abs,tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi_f,vnbi_h,vnbi_t,in,vnhalo,states,photons)
     loop_over_cells: do ip = 1, int(pcnt)
       npa_loop: do inpa=1,int(npa%npa_loop)
         loop_over_fast_ions: do iion=1,int(nlaunch(pcell(1,ip),pcell(2,ip),pcell(3,ip)))
@@ -3145,19 +3147,21 @@ contains
           !! ---------------- calculate CX probability --------------!!
           ac=icell(:,1) !! new actual cell maybe due to gyro orbit!
           prob=0.d0
-          vnbi=ri(:)-nbi%xyz_pos(:)
-          vnbi=vnbi/sqrt(dot_product(vnbi,vnbi))*nbi%vinj
+          vnbi_f=ri(:)-nbi%xyz_pos(:)
+          vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj
+          vnbi_h=vnbi_f/sqrt(2.d0)
+          vnbi_t=vnbi_f/sqrt(3.d0)
           ! CX with full energetic NBI neutrals
           denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbif_type)
-          call neut_rates(denn,vi,vnbi,rates)
+          call neut_rates(denn,vi,vnbi_f,rates)
           prob=prob + rates
           ! CX with half energetic NBI neutrals
           denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbih_type)
-          call neut_rates(denn,vi,vnbi/sqrt(2.d0),rates)
+          call neut_rates(denn,vi,vnbi_h,rates)
           prob=prob + rates
           ! CX with third energetic NBI neutrals
           denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,nbit_type)
-          call neut_rates(denn,vi,vnbi/sqrt(3.d0),rates)
+          call neut_rates(denn,vi,vnbi_t,rates)
           prob=prob + rates
           ! CX with HALO neutrals
           denn(:)=result%neut_dens(ac(1),ac(2),ac(3),:,halo_type)

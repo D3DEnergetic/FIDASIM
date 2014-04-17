@@ -484,7 +484,7 @@ contains
   subroutine read_los
     use netcdf
     character(120)  :: filename
-    integer(long)   :: i, j, k,ichan
+    integer(long)   :: i, j, k
     integer         :: ncid,xlens_varid,ylens_varid,zlens_varid
     integer         :: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid
     integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
@@ -655,7 +655,6 @@ contains
     character(120)          :: filename
     integer(long) :: i
     integer       :: ncid,brems_varid
-    real(double) :: vb
     real(double), dimension(:)  , allocatable :: brems
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
 
@@ -683,7 +682,6 @@ contains
   subroutine read_tables
     character(120)  :: filename
     integer         :: n,m !! initial/final state
-    integer         :: ie,iti !! energy/ti index
     integer(long)   :: nlev
 
    !-------------------ELECTRON EXCITATION/IONIZATION TABLE--------
@@ -887,7 +885,7 @@ contains
 
   subroutine write_birth_profile
     use netcdf
-    integer           :: i,j,k,p,ncid,varid,dimids(5)
+    integer           :: ncid,varid,dimids(5)
     integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid,nr_varid
     character(100)    :: filename
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
@@ -924,7 +922,7 @@ contains
 
   subroutine write_neutrals
     use netcdf
-    integer         :: i,j,k,n,x_dimid,y_dimid,z_dimid,l_dimid,dimids(4)
+    integer         :: x_dimid,y_dimid,z_dimid,l_dimid,dimids(4)
     integer         :: ncid,full_varid,half_varid,third_varid,halo_varid
     integer         :: dimid1
     character(120)  :: filename
@@ -968,7 +966,7 @@ contains
 
   subroutine write_npa
     use netcdf
-    integer         :: i,nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,dimid3,maxcnt
+    integer         :: nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,dimid3,maxcnt
     integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,cnt_varid,nchan_varid
     character(120)  :: filename
     real(float), dimension(:,:,:),allocatable :: output
@@ -1041,7 +1039,7 @@ contains
   
   subroutine write_spectra
     use netcdf
-    integer         :: i,j,k,ichan,nchan
+    integer         :: i,nchan
     integer         :: ncid,nchan_varid,fida_varid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
     integer         :: chan_dimid,lam_dimid,dimid1,dimids(2)
     character(120)  :: filename
@@ -1116,8 +1114,6 @@ contains
   subroutine read_neutrals
     use netcdf
     character(120)  :: filename
-    real(float)     :: fdum
-    real(float),dimension(:,:,:,:),allocatable   :: fdum_arr
     integer :: ncid,full_var,half_var,third_var,halo_var
 
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
@@ -1293,7 +1289,6 @@ contains
     real(double), dimension(3), intent(out)   :: vnbi  !! velocity [cm/s]
     real(double), dimension(3), intent(out), optional :: rnbi  !! postition
     integer                      :: jj, updown
-    real(double)                 :: a_dx, a_dy, a_dz
     real(double), dimension(3)   :: uvw_pos    !! Start position on ion source
     real(double), dimension(3)   :: xyz_pos    !! Start position on ion source
     real(double), dimension(3)   :: uvw_ray    !! NBI veloicity in uvw coords
@@ -2176,8 +2171,6 @@ contains
     integer          :: high, low
     real(double)     :: d(0:nlevs), scale(0:nlevs)
     integer          :: perm(0:nlevs)
-    integer          :: i,j,k ! counter
-    real(double)     :: w,v,norm
     integer          :: n ! nlevels
     n=nlevs
     !**********************************************************************
@@ -2818,8 +2811,8 @@ contains
   !-----------Bremsstrahlung ---------------------------------------------------
   !*****************************************************************************
   subroutine bremsstrahlung
-    integer        :: i,j,k,ichan,ilam   !! indices of cells
-    real(double)   :: ne,zeff,te,lam,gaunt,ccnt
+    integer        :: i,j,k,ichan   !! indices of cells
+    real(double)   :: ne,zeff,te,gaunt,ccnt
     real(double), dimension(:)  , allocatable :: lambda_arr,brems
     !! ------------------------ calculate wavelength array ------------------ !!
     print*,'calculate the bremsstrahung!'
@@ -2846,7 +2839,9 @@ contains
                      *spec%dlambda*(4.d0*pi)*1.d-4 !! [ph/m^2/s/bin]
              enddo loop_over_channels
              ccnt=ccnt+1
+             !$OMP CRITICAL
              WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+             !$OMP END CRITICAL
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z
@@ -2868,7 +2863,6 @@ contains
     real(double), dimension(nlevs)         :: denn    !!  neutral dens (n=1-4)
     real(double), dimension(nlevs)         :: prob    !!  Prob. for CX 
     real(double), dimension(3)             :: vnbi_f,vnbi_h,vnbi_t !! Velocity of NBIneutrals
-    integer                                :: in      !! index neut rates
     real(double), dimension(nlevs)         :: rates   !! Rate coefficiants forCX
     !! Collisiional radiative model along track
     real(double), dimension(nlevs)         :: states  !! Density of n-states
@@ -3048,7 +3042,9 @@ contains
                    enddo loop_along_track
                 enddo loop_over_halos
                 ccnt=ccnt+1
+                !$OMP CRITICAL
                 WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+                !$OMP END CRITICAL
              enddo loop_along_x
           enddo loop_along_y
        enddo loop_along_z
@@ -3090,14 +3086,14 @@ contains
     real(double), dimension(  grid%ntrack):: tcell   !! time per cell
     integer,dimension(3,grid%ntrack)      :: icell   !! index of cells
     real(double), dimension(3,grid%ntrack):: pos     !! mean position in cell
-    integer                               :: jj,kk      !! counter along track
+    integer                               :: jj      !! counter along track
     real(double)                          :: photons !! photon flux 
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox,nlaunch !! approx. density
     real(double)                          :: vi_abs             !! (for NPA)
     real(double), dimension(3)            :: ray,ddet,hit_pos   !! ray towards NPA
     real(double)                          :: papprox_tot,maxcnt,cnt
     integer                               :: inpa,pcnt
-    real(double)                          :: alpha !! angle relative to detector LOS
+
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
     papprox=0.d0
     papprox_tot=0.d0
@@ -3184,7 +3180,9 @@ contains
         enddo loop_over_fast_ions
       enddo npa_loop
       cnt=cnt+1
+      !$OMP CRITICAL
       WRITE(*,'(f7.2,"%",a,$)') cnt/maxcnt*100,char(13)
+      !$OMP END CRITICAL
     enddo loop_over_cells
     !$OMP END PARALLEL DO
   end subroutine fida
@@ -3198,7 +3196,7 @@ contains
     real(double)                   :: radius
     real(double)                   :: photons !! photon flux 
     real(double), dimension(nlevs) :: fdens,hdens,tdens,halodens
-    real(double), dimension(3)     :: bvec,evec,vrot,los_vec,evec_sav,vrot_sav
+    real(double), dimension(3)     :: evec,vrot,los_vec,evec_sav,vrot_sav
     real(double), dimension(3)     :: a_norm,b_norm,c_norm,b_norm_sav
     real(double)                   :: b_abs,theta,b_abs_sav
     real(double)                   :: ti,te,dene,denp,deni,length
@@ -3212,10 +3210,8 @@ contains
     real(double)                   :: sinus
     real(double),dimension(3)      :: vi,vi_norm
     real(double)                   :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2
-    real(double),dimension(3)      :: efield
     real(double),dimension(n_stark):: intens !!intensity vector
     real(double),dimension(n_stark):: wavel  !!wavelength vector [A)
-    real(double),dimension(3)      :: vn  ! vi in m/s
    !! Determination of the CX probability
     real(double),dimension(3)      :: vnbi_f,vnbi_h,vnbi_t !! Velocity of NBI neutrals 
     real(double),dimension(3)      :: vhalo  !! v of halo neutral
@@ -3600,10 +3596,9 @@ contains
     real(double)                    :: photons !! photon flux 
     real(double), dimension(nlevs)  :: fdens,hdens,tdens,halodens
     real(double), dimension(3)      :: los_vec
-    real(double)                    :: length,pcxa,one_over_omega
-    real(double)                    :: rad
+    real(double)                    :: pcxa,one_over_omega
     integer(long)                   :: nchan,cnt,det
-    integer(long)                   :: ii,jj,kk,i,j,k,ic,jc,kc   !!indices
+    integer(long)                   :: ii,jj,kk,i,j,ic,jc,kc   !!indices
     integer,dimension(1)            :: minpitch,ipitch,ienergy,ix,iy,iz
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),       allocatable :: flux_tot
@@ -3612,7 +3607,6 @@ contains
     real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
     real(double)                    :: xlos,ylos,zlos,xlos2,ylos2,zlos2,xcen,ycen,rshad,rs
     real(double)                    :: vabs,denf,fbm_denf,wght,b_abs,dE,dP,ccnt
-    real(double),dimension(3)       :: vn  ! vi in m/s
 
     !! Determination of the CX probability
     real(double),dimension(3)       :: vnbi_f,vnbi_h,vnbi_t !! Velocity of NBI neutrals 
@@ -3819,7 +3813,9 @@ contains
              enddo loop_over_energy
             endif
             ccnt=ccnt+1
+            !$OMP CRITICAL
             WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+            !$OMP END CRITICAL
            enddo loop_along_x
          enddo loop_along_y
        enddo loop_along_z
@@ -3886,7 +3882,7 @@ program fidasim
   use application
   implicit none 
   integer, dimension(8)              :: time_arr,time_start,time_end !Time array
-  integer                            :: i,j,k,n,los,seed
+  integer                            :: i,j,k,seed
   integer                            :: hour,minu,sec
   real(double)                       :: random_init
   !! measure time

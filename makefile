@@ -3,12 +3,12 @@
 
 ifeq ($(FIDASIM_COMPILER),gfortran)
 	LFLAGS = -lnetcdff -lnetcdf -lm
-	CFLAGS = -g -O2 -fopenmp -Wall
+	CFLAGS = -O2 -fopenmp -Wall
 endif
 
 ifeq ($(FIDASIM_COMPILER),ifort)
 	LFLAGS = -lnetcdff -lnetcdf -limf -lm
-	CFLAGS = -O2 -openmp -openmp-report -parallel
+	CFLAGS = -O2 -openmp -parallel -warn
 endif
 
 fidasim: fidasim.o

@@ -2942,7 +2942,9 @@ contains
                 enddo loop_along_track
              enddo loop_over_dcx
           ccnt=ccnt+1
+          !$OMP CRITICAL
           WRITE(6,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+          !$OMP END CRITICAL
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z

@@ -189,7 +189,7 @@ module application
   type inputs_type
      integer(long) :: shot_number
      real(double)  :: time
-     character(25) :: runid
+     character(120) :: runid
      character(4)  :: diag 
      !! Monte Carlo Settings
      integer(long) :: nr_fast
@@ -295,7 +295,7 @@ contains
   subroutine read_inputs
     character(120)   :: filename
 
-    character(25) :: runid
+    character(120) :: runid
     integer       :: calc_spec,calc_npa,calc_birth,calc_fida_wght,calc_npa_wght,calc_brems,load_neutrals,load_fbm
     integer(long) :: shot,nr_fast,nr_nbi,nr_halo,nlambda,ne_wght,np_wght,nphi_wght,ichan_wght
     real(double)  :: time,lambdamin,lambdamax,emax_wght,dwav_wght,wavel_start_wght,wavel_end_wght
@@ -887,7 +887,7 @@ contains
     use netcdf
     integer           :: ncid,varid,dimids(5)
     integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid,nr_varid
-    character(100)    :: filename
+    character(120)    :: filename
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
 
     !Create netCDF file
@@ -1317,7 +1317,7 @@ contains
     xyz_pos(:)=xyz_pos(:)+nbi%xyz_pos(:)
     !! ----------- Determine start postition on FIDASIM grid --------- !!
     if(present(rnbi)) then
-       nstep=anint(2000./grid%dr(1))
+       nstep=anint(4000./grid%dr(1))
        nbi_track: do jj=1,nstep
           xyz_pos(1) = xyz_pos(1) + grid%dr(1) * vnbi(1)
           xyz_pos(2) = xyz_pos(2) + grid%dr(1) * vnbi(2)
@@ -3230,7 +3230,7 @@ contains
     real(double),dimension(  grid%ntrack) :: los_wght !! los wght 
     real(double),dimension(grid%nx,grid%ny,grid%nz,spec%nchan) :: los_weight !! los wght
     integer(long)                         :: ichan,ind
-    character(100)                        :: filename
+    character(120)                        :: filename
     !! length through cloud of neutrals
     real(double), dimension(3,grid%ntrack):: pos_out
     real(double), dimension(3)            :: pos_edge
@@ -3621,7 +3621,7 @@ contains
     integer,dimension(3)                  :: ac  !!actual cell
     real(double), dimension(3)            :: pos,rpos,dpos,rdpos,r_gyro,mrdpos !! position of mean cell
     integer(long)                         :: ichan,ind
-    character(100)                        :: filename
+    character(120)                        :: filename
     real(double), dimension(3,grid%ntrack):: pos_out
     integer                               :: ncell  !! number of cells
     real(double), dimension(  grid%ntrack):: tcell  !! time per cell

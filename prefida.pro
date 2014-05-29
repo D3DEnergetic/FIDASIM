@@ -138,10 +138,12 @@ PRO prepare_beam,inputs,nbi,nbgeom
 	endif
 	uvw_src=nbi.xyz_src-inputs.origin
 	uvw_pos=nbi.xyz_pos-inputs.origin
-
+	uvw_origin=[0,0,0]-inputs.origin
+	
 	make_rot_mat,-inputs.alpha,inputs.beta,Drot,Erot,Frot
-    rotate_uvw,uvw_src,Drot,Erot,Frot,1,xyz_src ;;rotate from machine to beam coordinates
-    rotate_uvw,uvw_pos,Drot,Erot,Frot,1,xyz_pos
+        rotate_uvw,uvw_src,Drot,Erot,Frot,1,xyz_src ;;rotate from machine to beam coordinates
+        rotate_uvw,uvw_pos,Drot,Erot,Frot,1,xyz_pos
+	rotate_uvw,uvw_origin,Drot,Erot,Frot,1,xyz_origin
 	
 	xs=xyz_src[0] & ys=xyz_src[1] & zs=xyz_src[2]
 	xp=xyz_pos[0] & yp=xyz_pos[1] & zp=xyz_pos[2]
@@ -149,14 +151,17 @@ PRO prepare_beam,inputs,nbi,nbgeom
 	dis=sqrt( (xs-xp)^2.0d +(ys-yp)^2.0d + (zs-zp)^2.0d)
 	BETA=double(asin((zp-zs)/dis))
 	ALPHA=double(atan((yp-ys),(xp-xs))-!DPI)
-	print,'BEAM CROSSOVER POINT:'
-	print,xyz_pos
+	print,'MACHINE CENTER IN BEAM COORDINATES:'
+	print, xyz_origin
+	print,'BEAM INJECTION START POINT IN BEAM COORDINATES:'
+	print, xyz_src
+	print,'BEAM INJECTION END POINT IN BEAM COORDINATES:
+	print, xyz_pos
 	print,'BEAM ROTATION ANGLES AS DEFINED BY fidasim.f90'
 	print,'ALPHA: '
-	print,ALPHA,FORMAT='(F20.10)'
+	print,ALPHA/!pi*180,FORMAT='(F20.10)'
 	print,'BETA:'
 	print,BETA,FORMAT='(F20.10)'
-
 	;;MAKE ROTATION MATRICES 
 	make_rot_mat,ALPHA,BETA,Arot,Brot,Crot
 
@@ -763,7 +768,9 @@ PRO prefida,input_pro,plot=plot,save=save
     if slash ne '/' then inputs.result_dir+='/'
     slash=strmid(inputs.install_dir,0,1,/reverse_offset)
     if slash ne '/' then inputs.install_dir+='/'
-
+    slash=strmid(inputs.profile_dir,0,1,/reverse_offset)
+    if slash ne '/' then inputs.profile_dir+='/'
+    
 	;;MAKE DIRECTORIES IF THEY DONT EXIST
 	if file_test(inputs.result_dir,/directory) eq 0 then begin
 		spawn,'mkdir '+inputs.result_dir

@@ -32,7 +32,12 @@ end
 cdf_file = STRSPLIT(inputs.cdf_file,'/',/EXTRACT)
 cdf_file = STRSPLIT(cdf_file[-1],'_',/EXTRACT)
 cdf_file = strupcase(cdf_file[0]) + '.CDF'
-cdfname  = inputs.profile_dir + '/' + cdf_file
+slash=strmid(inputs.profile_dir,0,1,/reverse_offset)
+if slash ne '/' then begin
+   cdfname  = inputs.profile_dir + '/' + cdf_file
+endif else begin
+   cdfname  = inputs.profile_dir + cdf_file
+endelse
 test=findfile(cdfname)
 if test[0] eq '' then begin
   print," * FATAL ERROR:  Can't find TRANSP file: " + cdfname

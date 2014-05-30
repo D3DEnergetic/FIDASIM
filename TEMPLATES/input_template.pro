@@ -52,12 +52,12 @@ dlambda= (lambdamax-lambdamin)/double(nlambda)			;; Wavelength seperation
 nx=40               ;; Number of cells in x direction
 ny=60               ;; Number of cells in y direction
 nz=50               ;; Number of cells in z direction
-xdim1=-170.         ;; Minimum x value
-xdim2=-70.          ;; Maximum x value
-ydim1=-195.         ;; Minimum y value
-ydim2=-80.          ;; Maximum y value
-zdim1=-70.          ;; Minimum z value
-zdim2=70.           ;; Maximum z value
+xmin=-170.         ;; Minimum x value
+xmax=-70.          ;; Maximum x value
+ymin=-195.         ;; Minimum y value
+ymax=-80.          ;; Maximum y value
+zmin=-70.          ;; Minimum z value
+zmax=70.           ;; Maximum z value
 
 origin=[0.,0.,0.]	;; If using different a coordinate system, this is the origin 
 					;; in machine coordinates of the new system
@@ -104,7 +104,7 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
 	    cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
 	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
 	    lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
-	    nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
+	    nx:nx,ny:ny,nz:nz,xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax,zmin:zmin,zmax:zmax,$
 		origin:origin,alpha:alpha,beta:beta,$
         nr_fast:nr_fast,nr_nbi:nr_nbi,nr_halo:nr_halo,ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$

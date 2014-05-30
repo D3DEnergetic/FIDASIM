@@ -653,7 +653,7 @@ contains
   subroutine read_bremsstrahlung
     use netcdf
     character(120)          :: filename
-    integer(long) :: i
+    integer(long) :: i,cnt
     integer       :: ncid,brems_varid
     real(double), dimension(:)  , allocatable :: brems
     filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
@@ -671,9 +671,11 @@ contains
     !!CLOSE netCDF FILE
     call check( nf90_close(ncid) )
 
+    cnt=0
     do i = 1,spec%nchan
       if(spec%chan_id(i).ne.0)cycle
-      result%spectra(:,i,brems_type)=brems(i)
+      cnt=cnt+1
+      result%spectra(:,cnt,brems_type)=brems(i)
     enddo
 
     deallocate(brems)
@@ -1317,7 +1319,7 @@ contains
     xyz_pos(:)=xyz_pos(:)+nbi%xyz_pos(:)
     !! ----------- Determine start postition on FIDASIM grid --------- !!
     if(present(rnbi)) then
-       nstep=anint(4000./grid%dr(1))
+       nstep=anint(2000./grid%dr(1))
        nbi_track: do jj=1,nstep
           xyz_pos(1) = xyz_pos(1) + grid%dr(1) * vnbi(1)
           xyz_pos(2) = xyz_pos(2) + grid%dr(1) * vnbi(2)
@@ -2811,7 +2813,7 @@ contains
   !-----------Bremsstrahlung ---------------------------------------------------
   !*****************************************************************************
   subroutine bremsstrahlung
-    integer        :: i,j,k,ichan   !! indices of cells
+    integer        :: i,j,k,ichan,cnt   !! indices of cells
     real(double)   :: ne,zeff,te,gaunt,ccnt
     real(double), dimension(:)  , allocatable :: lambda_arr,brems
     !! ------------------------ calculate wavelength array ------------------ !!
@@ -2824,8 +2826,11 @@ contains
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1,grid%Ny
           loop_along_x: do i = 1, grid%Nx
+             cnt=0
              loop_over_channels: do ichan=1,spec%nchan
+                if(spec%chan_id(ichan).ne.0) cycle loop_over_channels
                 if(cell(i,j,k)%los_wght(ichan).le.0.)cycle loop_over_channels
+                cnt=cnt+1
                 ne=cell(i,j,k)%plasma%dene     ![cm^3]
                 zeff=cell(i,j,k)%plasma%zeff   !       
                 te=cell(i,j,k)%plasma%te*1000. ! [eV]
@@ -2833,8 +2838,8 @@ contains
                 gaunt=5.542-(3.108-log(te/1000.))*(0.6905-0.1323/zeff)
                 brems(:)=7.57d-9*gaunt*ne**2*zeff/(lambda_arr(:)*sqrt(te)) &
                      *exp(-h_planck*c0/(lambda_arr(:)*te))
-                result%spectra(:,ichan,brems_type) =  &
-                     result%spectra(:,ichan,brems_type)  &
+                result%spectra(:,cnt,brems_type) =  &
+                     result%spectra(:,cnt,brems_type)  &
                      +brems(:)*cell(i,j,k)%los_wght(ichan)*1.d-2 & !!integration
                      *spec%dlambda*(4.d0*pi)*1.d-4 !! [ph/m^2/s/bin]
              enddo loop_over_channels

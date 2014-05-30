@@ -59,7 +59,7 @@ FUNCTION nstx_beams,inputs,doplot=doplot
     focz=replicate(988.0,nsources)
     
     transp_geometry,RTCENA[isource],XLBAPA[isource],XLBTNA[isource],XBZETA[isource],$
-                    XYBAPA[isource],XYBSCA[isource],NLCO[isource],xyz_src,xyz_pos,angle=145
+                    XYBAPA[isource],XYBSCA[isource],NLCO[isource],xyz_src,xyz_pos,angle=145.2
 
     einj=double(inputs.einj) & pinj=double(inputs.pinj)
     

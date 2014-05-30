@@ -14,10 +14,10 @@ FUNCTION nstx_equil,inputs,grid,det
     endelse    
     gfiletest=findfile(gfile)
     if gfiletest ne '' then begin
-        print,'RESTORING EQUILIBRIUM FROM GFILE'
+        print,'Restoring equilibrium from gfile'
         restore,gfile
     endif else begin
-        print,'GFILE DOES NOT EXIST'
+        print,'gfile does not exist'
         goto, GET_OUT
     endelse
 

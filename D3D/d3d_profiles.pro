@@ -17,7 +17,12 @@ FUNCTION d3d_profiles,inputs,save=save
 	shot_str=strtrim(string(inputs.shot),1)
 	profile_str=shot_str+'.'+time_str
 
-	dir=inputs.profile_dir+shot_str+'/'
+	dir = inputs.profiles_dir
+    ;; Look for electron density in this directory
+    test = FILE_SEARCH(STRJOIN([dir,'dne*']))
+    ;; if we don't find it, then look in the shot sub-directory
+    if not test THEN dir = STRJOIN([dir,shot_str])+'/'
+
 	ne_string=dir+'dne'+profile_str
 	te_string=dir+'dte'+profile_str
 	ti_string=dir+'dti'+profile_str

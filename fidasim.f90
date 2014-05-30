@@ -1319,7 +1319,7 @@ contains
     xyz_pos(:)=xyz_pos(:)+nbi%xyz_pos(:)
     !! ----------- Determine start postition on FIDASIM grid --------- !!
     if(present(rnbi)) then
-       nstep=anint(2000./grid%dr(1))
+       nstep=anint(4000./grid%dr(1))
        nbi_track: do jj=1,nstep
           xyz_pos(1) = xyz_pos(1) + grid%dr(1) * vnbi(1)
           xyz_pos(2) = xyz_pos(2) + grid%dr(1) * vnbi(2)

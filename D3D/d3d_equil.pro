@@ -9,13 +9,13 @@ FUNCTION d3d_equil,inputs,grid,det
     gfile=inputs.profile_dir+shot_str+'/g'+profile_str
 	gfiletest=findfile(gfile)
 	if gfiletest ne '' then begin
-		print,'RESTORING EQUILIBRIUM FROM GFILE'
+		print,'Restoring equilbrium from gfile'
 		g=readg(gfile) 
 	endif else begin
-		print,'FETCHING EQUILIBRIUM FROM MDS+'
+		print,'Fetching equilbrium from MDS+'
 		g=readg(inputs.shot,inputs.time*1000,RUNID=inputs.equil,status=gerr)
 		if gerr ne 1 then begin
-			print,'READG FAILED'
+			print,'readg failed'
 			equil={err:1}
 			goto,GET_OUT
 		endif

@@ -1,3 +1,10 @@
+;;These are instructions to run the input procedure for people who cannot use the JSON input template.
+
+;;-----------------------------------------------------
+;;IDL> .compile /path/to/procedure/input_template.pro
+;;IDL> prefida,'input_template'  ;; <- input_template is the name of the procedure
+;;-----------------------------------------------------
+
 ;;This input file is a procedure so name this file accordingly
 PRO input_template,inputs                                   ;; Name of this file without .pro
 

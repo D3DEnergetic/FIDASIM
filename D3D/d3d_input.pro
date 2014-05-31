@@ -55,12 +55,12 @@ beta=0.0
 nx=40				;; Number of cells in x direction
 ny=60				;; Number of cells in y direction
 nz=50				;; Number of cells in z direction
-xdim1=-520.			;; Minimum x value
-xdim2=-420.			;; Maximum x value
-ydim1=-40.			;; Minimum y value
-ydim2=40.			;; Maximum y value
-zdim1=-40.			;; Minimum z value
-zdim2=40.			;; Maximum z value
+xmin=-520.			;; Minimum x value
+xmax=-420.			;; Maximum x value
+ymin=-40.			;; Minimum y value
+ymax=40.			;; Maximum y value
+zmin=-40.			;; Minimum z value
+zmax=40.			;; Maximum z value
 
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
@@ -101,7 +101,7 @@ inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:ins
        isource:isource,einj:einj,pinj:pinj,diag:diag,equil:equil,$
        btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
        lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,origin:origin,alpha:alpha,beta:beta,$
-       nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
+       nx:nx,ny:ny,nz:nz,xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax,zmin:zmin,zmax:zmax,$
        nr_fida:nr_fida,nr_ndmc:nr_ndmc,nr_halo:nr_halo,ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
 	   wavel_end_wght:wavel_end_wght,calc_npa:calc_npa,calc_spec:calc_spec,calc_birth:calc_birth, $

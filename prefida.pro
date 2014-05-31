@@ -594,17 +594,14 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 
     rhomax=max(profiles.rho)
     ww=where(equil.rho_grid gt rhomax,nww)
-    if nww ne 0 then begin
-        printc,'ATTENTION: ',f='y'
-        printc,'    dene[rho > '+string(rhomax,f='(1f8.3)')+'] = 1e10 [cm^-3]',f='y'
-        printc,'    te[  rho > '+string(rhomax,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
-        printc,'    ti[  rho > '+string(rhomax,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
-        printc,'    vtor[rho > '+string(rhomax,f='(1f8.3)')+'] = 0 [cm/s]',f='y'
-        printc,'    zeff[rho > '+string(rhomax,f='(1f8.3)')+'] = 1 ',f='y'
-    endif 
+    
 
     ;;Electron density
     dene = 1.d-6 * interpol(profiles.dene,profiles.rho,equil.rho_grid) > 0. ;[1/cm^3]
+    w=where(dene le 1.0d12,nw)
+    if nw ne 0 then begin
+        printc,'WARNING: dene < 0.1e13 cm^-3 for '+string((100.0*nw)/grid.ng,f='(1f8.3)')+'% of grid elements',f='y'
+    endif
     if nww ne 0 then dene[ww]=0.001*1d13
 
     ;;Zeff
@@ -617,7 +614,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
     
     ;;Proton density
     denp = dene-inputs.impurity_charge*deni
-    print,'Percent impurity: '+string(total(deni)/total(denp)*100.,f='(1f8.3)')+' %'
+    print,'Percent impurity: '+string(total(deni)/total(denp)*100.,f='(1f8.3)')+'%'
     
     ;;Fast-ion density
     if inputs.load_fbm then begin
@@ -634,6 +631,10 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 
     ;;Electron temperature
     te = 1.d-3 * interpol(profiles.te,profiles.rho,equil.rho_grid) > 0.001 ;keV
+    w=where(te le .05,nw)
+    if nw ne 0 then begin
+        printc,'WARNING: te < 50 eV for '+string((100.0*nw)/grid.ng,f='(1f8.3)')+'% of grid elements',f='y'
+    endif
     if nww ne 0 then te[ww]=0.001
     
     ;;Ion temperature   
@@ -653,6 +654,15 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
     vrotu = - sin(grid.phi_grid)*vtor 
     vrotv =   cos(grid.phi_grid)*vtor
     vrotw =   0.d0*vrotu 
+
+    if nww ne 0 then begin
+        printc,'ATTENTION: Setting...',f='y'
+        printc,'    dene[rho > '+string(rhomax,f='(1f8.3)')+'] = 1e10 [cm^-3]',f='y'
+        printc,'    te[  rho > '+string(rhomax,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
+        printc,'    ti[  rho > '+string(rhomax,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
+        printc,'    vtor[rho > '+string(rhomax,f='(1f8.3)')+'] = 0 [cm/s]',f='y'
+        printc,'    zeff[rho > '+string(rhomax,f='(1f8.3)')+'] = 1 ',f='y'
+    endif 
 
     ;;Rotate vector quantities to beam coordinates 
     make_rot_mat,-inputs.alpha,-inputs.beta,Arot,Brot,Crot

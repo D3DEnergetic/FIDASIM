@@ -53,8 +53,8 @@ FUNCTION nstx_beams,inputs,doplot=doplot
 
     bmwidra=replicate(6.0,nsources)
     bmwidza=replicate(21.5,nsources)   ;array of ion source half height in cm
-    divy=replicate(4.94d-3,nsources)
-    divz=replicate(1.36d-2,nsources)
+    divy=replicate(4.94d-3,3,nsources)
+    divz=replicate(1.36d-2,3,nsources)
     focy=replicate(988.0,nsources)
     focz=replicate(988.0,nsources)
     
@@ -91,7 +91,7 @@ FUNCTION nstx_beams,inputs,doplot=doplot
     nbi={einj:einj,pinj:pinj,full:ffracs,half:hfracs,third:tfracs,$
          xyz_src:xyz_src,xyz_pos:xyz_pos,$
          bmwidra:bmwidra[isource],bmwidza:bmwidza[isource],$
-         divy:divy[isource],divz:divz[isource],$
+         divy:divy[*,isource],divz:divz[*,isource],$
          focy:focy[isource],focz:focz[isource] }
 
     return,nbi

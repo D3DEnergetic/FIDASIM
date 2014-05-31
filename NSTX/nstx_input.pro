@@ -70,12 +70,12 @@ beta=0.0                      ;; Rotation about z axis
 nx=71                         ;; Number of cells in x direction
 ny=41                         ;; Number of cells in y direction
 nz=71                         ;; Number of cells in z direction
-xdim1=-20.                    ;; Minimum x value
-xdim2=120.                    ;; Maximum x value
-ydim1=-40.                    ;; Minimum y value
-ydim2=45.                     ;; Maximum y value
-zdim1=-70.                    ;; Minimum z value
-zdim2=70.                     ;; Maximum z value
+xmin=-20.                    ;; Minimum x value
+xmax=120.                    ;; Maximum x value
+ymin=-40.                    ;; Minimum y value
+ymax=45.                     ;; Maximum y value
+zmin=-70.                    ;; Minimum z value
+zmax=70.                     ;; Maximum z value
 
 ;;--------------------------------------------------
 ;; Define number of Monte Carlo particles
@@ -124,7 +124,7 @@ inputs={shot:shot,time:time,runid:runid,device:device,install_dir:install_dir,$
         ab:ab,ai:ai,impurity_charge:impurity_charge,$
         lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
         origin:origin,alpha:alpha,beta:beta,nx:nx,ny:ny,nz:nz,$
-        xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
+        xmin:xmin,xmax:xmax,ymin:ymin,ymax:ymax,zmin:zmin,zmax:zmax,$
         nr_fast:nr_fast,nr_nbi:nr_nbi,nr_halo:nr_halo,$
         ne_wght:ne_wght,np_wght:np_wght,nphi_wght:nphi_wght,$
         emax_wght:emax_wght,ichan_wght:ichan_wght,$

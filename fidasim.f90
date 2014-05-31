@@ -351,7 +351,7 @@ contains
 
     print*,'Shot:   ',inputs%shot_number
     print*,'Time: ',int(inputs%time*1.d3),'ms'
-    print*,'Runid:        ',inputs%runid
+    print*,'Runid:        ',trim(adjustl(inputs%runid))
 
   end subroutine read_inputs
 

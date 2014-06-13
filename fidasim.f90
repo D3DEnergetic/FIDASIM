@@ -1211,47 +1211,75 @@ contains
   !****************************************************************************
   !----------------mc_fastion------------------------------------------------
   !****************************************************************************
-  subroutine mc_fastion(ac,vi)
-    !!IN: ac,   OUT: vi
+  subroutine mc_fastion(ac,ri,vi)
+    !!IN: ac,   OUT: ri,vi
     !!mcbeam computes monte carlo velocity of fast ions from cell%fbm
     integer,      dimension(3), intent(in) :: ac !ind of actual cell
     real(double), dimension(3), intent(out):: vi !velocity [cm/s]
+    real(double), dimension(3), intent(out):: ri !starting position
     real(double), dimension(3)             :: a,b,c ! vectors relative to b
+    real(double), dimension(3)             :: b_norm,vxB,r_gyro,rp,pc
     real(double)                           :: eb ,ptch
     integer                                :: ienergy, ipitch ,ii
     real(double)                           :: vabs, phi, sinus
+    real(double)                           :: one_over_omega,b_abs
     real(double), dimension(3)             :: randomu3
     real(double), dimension(1)             :: randomu1
     integer, dimension(1) :: minpos  !! dummy array to determine minloc
 
+    call randu(randomu3)  
+    ri(1)=grid%xx(ac(1))+ grid%dr(1)*randomu3(1)
+    ri(2)=grid%yy(ac(2))+ grid%dr(2)*randomu3(2) 
+    ri(3)=grid%zz(ac(3))+ grid%dr(3)*randomu3(3)  
+
+    !! Assumes that magnetic field does not change appreciably over gyroradius
     a=cell(ac(1),ac(2),ac(3))%plasma%a_norm(:)
     b=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:)
     c=cell(ac(1),ac(2),ac(3))%plasma%c_norm(:)
-    !! -- use a rejection method to determine vi from distrbution function --!!
+    b_abs=cell(ac(1),ac(2),ac(3))%plasma%b_abs
+    b_norm=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:) 
+    one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
+
+    !! Use rejection method to determine velocity vector
     vi=0.d0
     rejection_loop: do ii=1,10000
        call randu(randomu3)
+       !! Pick a random energy, pitch, and gyro angle
        eb   = distri%emin + distri%eran * randomu3(1)
        ptch = distri%pmin + distri%pran * randomu3(2)
+       phi  = 2.d0*pi*randomu3(3)
+
+       !! Calculate gyroradius
+       vabs  = sqrt(eb/(v_to_E*inputs%ab))
+       sinus = sqrt(1.d0-ptch**2)
+       vi(:) = vabs * (sinus*cos(phi)*a + ptch*b + sinus*sin(phi)*c)
+       vxB(1)= (vi(2) * b_norm(3) - vi(3) * b_norm(2))
+       vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
+       vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
+       r_gyro(:)=vxB(:)*one_over_omega
+      
+       !! Move a gyrorbit away and sample distribution there
+       rp(:)=ri(:)+r_gyro(:)
+       !! find new cell
+       minpos=minloc(abs(rp(1)-grid%xxc))
+       pc(1)=minpos(1)
+       minpos=minloc(abs(rp(2)-grid%yyc))
+       pc(2)=minpos(1)  
+       minpos=minloc(abs(rp(3)-grid%zzc))
+       pc(3)=minpos(1) 
+
        !! take point in FBM distribution closest to eb, ptch.
-       !! maybe interpolation would be better (todo?!?)
        minpos=minloc(abs(eb   - distri%energy))
        ienergy= minpos(1)
        minpos=minloc(abs(ptch - distri%pitch ))
        ipitch = minpos(1)
-       !the following might be slightly faster than the above method,
-       !but: not working for TORIC runs with non-uniform energy grid.
-!       ienergy=int((eb-distri%emin)  /distri%deb)   +1
-!       ipitch =int((ptch-distri%pmin)/distri%dpitch)+1
-       if((cell(ac(1),ac(2),ac(3))%fbm(ienergy,ipitch)).gt.randomu3(3))then
-          call randu(randomu1)
-          vabs          = sqrt(eb/(v_to_E*inputs%ab))
-          phi           = 2.d0*pi*randomu1(1)
-          sinus         = sqrt(1.d0-ptch**2)
-          vi(:) = vabs * (sinus*cos(phi)*a + ptch*b + sinus*sin(phi)*c)
+       call randu(randomu1)
+       if((cell(pc(1),pc(2),pc(3))%fbm(ienergy,ipitch)).gt.randomu1(1))then
           return
        endif
+       vi=0.d0
     enddo rejection_loop
+
     print*, 'rejection method found no solution!'
     print*, cell(ac(1),ac(2),ac(3))%fbm
   end subroutine mc_fastion
@@ -1344,37 +1372,6 @@ contains
     !! ---- Determine velocity of neutrals corrected by efrac ---- !!
     vnbi(:) = vnbi(:)*nbi%vinj/sqrt(real(efrac))
   end subroutine mc_nbi 
-
-
-  !****************************************************************************
-  !----------------mc_start-------------------------------------------------
-  !****************************************************************************
-  subroutine mc_start(ac,vi,ri)
-    !! determine random start position within a cell and correct for gyro
-    !! orbit
-    integer  , dimension(3)  , intent(in)          :: ac !ind of actual cell
-    real(double)   , dimension(3)  , intent(in)    :: vi !velocity [cm/s]
-    real(double)   , dimension(3)  , intent(out)   :: ri !starting position
-    real(double)   , dimension(3)    :: b_norm   ! Magnetic field vector
-    real(double)   , dimension(3)    :: vxB      ! crossproduct
-    real(double)   , dimension(3)    :: r_gyro! gyro-radius
-    real(double)                     :: one_over_omega,b_abs! For gyro-radius
-    real(double)   , dimension(3)    :: randomu    
-    call randu(randomu)  
-    ri(1)=grid%xx(ac(1))+ grid%dr(1)*randomu(1)
-    ri(2)=grid%yy(ac(2))+ grid%dr(2)*randomu(2) 
-    ri(3)=grid%zz(ac(3))+ grid%dr(3)*randomu(3)  
-
-    !! this parts corrects for the fact that we are using gyro-center dist.
-    b_abs=cell(ac(1),ac(2),ac(3))%plasma%b_abs
-    b_norm=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:) 
-    one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2    
-    vxB(1)= (vi(2) * b_norm(3) - vi(3) * b_norm(2))
-    vxB(2)= (vi(3) * b_norm(1) - vi(1) * b_norm(3))
-    vxB(3)= (vi(1) * b_norm(2) - vi(2) * b_norm(1))
-    r_gyro(:)=vxB(:)*one_over_omega
-    ri(:)=ri(:)-r_gyro(:) !! '-'because v x B is towards the gyrocenter    
-  end subroutine mc_start
 
 
   !****************************************************************************
@@ -3114,7 +3111,7 @@ contains
                   +          sum(result%neut_dens(i,j,k,:,nbit_type))  &
                   +          sum(result%neut_dens(i,j,k,:,halo_type))) &
                   *          cell(i,j,k)%plasma%denf
-             if(papprox(i,j,k).gt.0) then 
+             if(papprox(i,j,k).gt.0.and.(sum(cell(i,j,k)%los_wght(:)).gt.0)) then 
                pcell(:,pcnt)=(/i,j,k/)
                pcnt=pcnt+1
              endif 
@@ -3137,10 +3134,9 @@ contains
           k=pcell(3,ip)
           ac=(/i,j,k/)
           !! ---------------- calculate vi, ri and track --------- !!
-          call mc_fastion(ac, vi(:)) 
+          call mc_fastion(ac,ri(:), vi(:)) 
           if(sum(vi).eq.0)cycle loop_over_fast_ions
           !! -------- check if particle flies into NPA detector ---- !!
-          call mc_start  (ac, vi(:),  ri(:))
           if(inputs%calc_npa.eq.1)then  
             call hit_npa_detector(ri(:),vi(:),det)
             if(det.eq.0) cycle loop_over_fast_ions
@@ -3148,7 +3144,6 @@ contains
           call track(vi(:), ri(:), tcell, icell,pos, ncell)
           if(ncell.eq.0)cycle loop_over_fast_ions
           !! ---------------- calculate CX probability --------------!!
-          ac=icell(:,1) !! new actual cell maybe due to gyro orbit!
           prob=0.d0
           vnbi_f=ri(:)-nbi%xyz_pos(:)
           vnbi_f=vnbi_f/sqrt(dot_product(vnbi_f,vnbi_f))*nbi%vinj

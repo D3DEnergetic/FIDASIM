@@ -3096,10 +3096,8 @@ contains
     real(double)                          :: vi_abs             !! (for NPA)
     real(double), dimension(3)            :: ray,ddet,hit_pos   !! ray towards NPA
     real(double)                          :: papprox_tot,maxcnt,cnt,los_tot
-    integer                               :: inpa,pcnt,chan_id
+    integer                               :: inpa,pcnt
 
-    chan_id=0
-    if (inputs%calc_npa.eq.1) chan_id=1
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
     papprox=0.d0
     papprox_tot=0.d0
@@ -3114,10 +3112,16 @@ contains
                   +          sum(result%neut_dens(i,j,k,:,nbit_type))  &
                   +          sum(result%neut_dens(i,j,k,:,halo_type))) &
                   *          cell(i,j,k)%plasma%denf
-             do ip = 1,spec%nchan 
-                  if(spec%chan_id(ip).eq.chan_id) los_tot=los_tot+cell(i,j,k)%los_wght(ip)
-             enddo
-  
+
+             !!This saves time for mc NPA calculation 
+             if(inputs%calc_npa.eq.1) then
+               do ip = 1,spec%nchan 
+                 if(spec%chan_id(ip).eq.1) los_tot=los_tot+cell(i,j,k)%los_wght(ip)
+               enddo
+             else 
+               los_tot=1
+             endif
+
              if(papprox(i,j,k).gt.0.and.(los_tot.gt.0)) then 
                pcell(:,pcnt)=(/i,j,k/)
                pcnt=pcnt+1
@@ -3132,7 +3136,7 @@ contains
     call get_nlaunch(inputs%nr_fast,papprox,papprox_tot,nlaunch)
     print*,'    # of markers: ',int(sum(nlaunch))
     cnt=0.0
-    !$OMP PARALLEL DO schedule(static) private(ip,i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,&
+    !$OMP PARALLEL DO schedule(guided) private(ip,i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,&
     !$OMP vi_abs,tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi_f,vnbi_h,vnbi_t,in,vnhalo,states,photons)
     loop_over_cells: do ip = 1, int(pcnt)
       npa_loop: do inpa=1,int(npa%npa_loop)

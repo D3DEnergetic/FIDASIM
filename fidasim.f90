@@ -1224,7 +1224,7 @@ contains
     real(double)                           :: vabs, phi, sinus
     real(double)                           :: one_over_omega,b_abs
     real(double), dimension(3)             :: randomu3
-    real(double), dimension(1)             :: randomu1
+    real(double), dimension(4)             :: randomu4
     integer, dimension(1) :: minpos  !! dummy array to determine minloc
 
     call randu(randomu3)  
@@ -1243,11 +1243,11 @@ contains
     !! Use rejection method to determine velocity vector
     vi=0.d0
     rejection_loop: do ii=1,10000
-       call randu(randomu3)
+       call randu(randomu4)
        !! Pick a random energy, pitch, and gyro angle
-       eb   = distri%emin + distri%eran * randomu3(1)
-       ptch = distri%pmin + distri%pran * randomu3(2)
-       phi  = 2.d0*pi*randomu3(3)
+       eb   = distri%emin + distri%eran * randomu4(1)
+       ptch = distri%pmin + distri%pran * randomu4(2)
+       phi  = 2.d0*pi*randomu4(3)
 
        !! Calculate gyroradius
        vabs  = sqrt(eb/(v_to_E*inputs%ab))
@@ -1273,8 +1273,7 @@ contains
        ienergy= minpos(1)
        minpos=minloc(abs(ptch - distri%pitch ))
        ipitch = minpos(1)
-       call randu(randomu1)
-       if((cell(pc(1),pc(2),pc(3))%fbm(ienergy,ipitch)).gt.randomu1(1))then
+       if((cell(pc(1),pc(2),pc(3))%fbm(ienergy,ipitch)).gt.randomu4(4))then
           return
        endif
        vi=0.d0
@@ -3095,14 +3094,17 @@ contains
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox,nlaunch !! approx. density
     real(double)                          :: vi_abs             !! (for NPA)
     real(double), dimension(3)            :: ray,ddet,hit_pos   !! ray towards NPA
-    real(double)                          :: papprox_tot,maxcnt,cnt
-    integer                               :: inpa,pcnt
+    real(double)                          :: papprox_tot,maxcnt,cnt,los_tot
+    integer                               :: inpa,pcnt,chan_id
 
+    chan_id=0
+    if (inputs%calc_npa.eq.1) chan_id=1
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
     papprox=0.d0
     papprox_tot=0.d0
     maxcnt=real(grid%Nx)*real(grid%Ny)*real(grid%Nz)
     pcnt=1
+    los_tot=0.0
     do k=1,grid%Nz 
        do j=1,grid%Ny 
           loop_over_x: do i=1,grid%Nx 
@@ -3111,11 +3113,16 @@ contains
                   +          sum(result%neut_dens(i,j,k,:,nbit_type))  &
                   +          sum(result%neut_dens(i,j,k,:,halo_type))) &
                   *          cell(i,j,k)%plasma%denf
-             if(papprox(i,j,k).gt.0.and.(sum(cell(i,j,k)%los_wght(:)).gt.0)) then 
+             do ip = 1,spec%nchan 
+                  if(spec%chan_id(ip).eq.chan_id) los_tot=los_tot+cell(i,j,k)%los_wght(ip)
+             enddo
+  
+             if(papprox(i,j,k).gt.0.and.(los_tot.gt.0)) then 
                pcell(:,pcnt)=(/i,j,k/)
                pcnt=pcnt+1
              endif 
              if(cell(i,j,k)%rho.lt.1.1)papprox_tot=papprox_tot+papprox(i,j,k)
+             los_tot=0
           enddo loop_over_x
        enddo
     enddo

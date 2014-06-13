@@ -1267,14 +1267,15 @@ contains
        pc(2)=minpos(1)  
        minpos=minloc(abs(rp(3)-grid%zzc))
        pc(3)=minpos(1) 
-
-       !! take point in FBM distribution closest to eb, ptch.
-       minpos=minloc(abs(eb   - distri%energy))
-       ienergy= minpos(1)
-       minpos=minloc(abs(ptch - distri%pitch ))
-       ipitch = minpos(1)
-       if((cell(pc(1),pc(2),pc(3))%fbm(ienergy,ipitch)).gt.randomu4(4))then
-          return
+       if(allocated(cell(pc(1),pc(2),pc(3))%fbm)) then
+         !! take point in FBM distribution closest to eb, ptch.
+         minpos=minloc(abs(eb   - distri%energy))
+         ienergy= minpos(1)
+         minpos=minloc(abs(ptch - distri%pitch ))
+         ipitch = minpos(1)
+         if((cell(pc(1),pc(2),pc(3))%fbm(ienergy,ipitch)).gt.randomu4(4))then
+            return
+         endif
        endif
        vi=0.d0
     enddo rejection_loop

@@ -3700,7 +3700,8 @@ contains
        enddo
 
        ccnt=0.0
-       !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
+       !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk, &
+       !$OMP& ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro,wght, &
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy,mrdpos,rshad,rs,xcen,ycen, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf,b_abs)

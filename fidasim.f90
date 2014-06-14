@@ -2776,7 +2776,7 @@ contains
             +  nbi%species_mix(3)/3.d0 ) )
     !! ------------------ loop over the markers ------------------------ !!
     nlaunch=real(inputs%nr_nbi)
-    !$OMP PARALLEL DO private(indmc,vnbi,rnbi,tcell,icell,pos,ncell,states,ac,photons,type,jj)
+    !$OMP PARALLEL DO schedule(guided) private(indmc,vnbi,rnbi,tcell,icell,pos,ncell,states,ac,photons,type,jj)
     energy_fractions: do type=1,3
        !! (type = 1: full energy, =2: half energy, =3: third energy
        loop_over_markers: do indmc=1,inputs%nr_nbi
@@ -2896,7 +2896,7 @@ contains
     ! Loop through all of the cells
     print*,'    # of markers: ',int(sum(nlaunch))
     ccnt=0.0
-    !$OMP PARALLEL DO private(i,j,k,idcx,randomu,ac,vhalo,ri,photons,rates, &
+    !$OMP PARALLEL DO schedule(guided) private(i,j,k,idcx,randomu,ac,vhalo,ri,photons,rates, &
     !$OMP& prob,jj,states,vnbi_f,vnbi_h,vnbi_t,tcell,icell,pos,ncell,denn)
     loop_along_z: do k = 1, grid%Nz
        loop_along_y: do j = 1, grid%Ny
@@ -3008,7 +3008,7 @@ contains
        call get_nlaunch(inputs%nr_halo,papprox,papprox_tot,nlaunch)
        print*, '    # of markers: ' ,int(sum(nlaunch))
        ccnt=0.0
-       !$OMP PARALLEL DO collapse(3) private(i,j,k,ihalo,ac,vihalo,randomu,ri,tcell,icell, &
+       !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ac,vihalo,randomu,ri,tcell,icell, &
        !$OMP& pos,ncell,prob,denn,in,vnhalo,rates,states,jj,photons)
        loop_along_z: do k = 1, grid%Nz
           loop_along_y: do j = 1, grid%Ny
@@ -3435,7 +3435,7 @@ contains
        print*, 'nwav: ' ,nwav
        print*,''
        !! do the main simulation  !! 
-       !$OMP PARALLEL DO private(i,j,k,ind,vabs,sinus,vi,states,    &
+       !$OMP PARALLEL DO schedule(guided) private(i,j,k,ind,vabs,sinus,vi,states,    &
        !$OMP& rates,in,vhalo,dt,photons,wavel,intens,l,ii, &
        !$OMP& tcell,icell,pos_out,ncell,pos_edge,cc,max_wght,   &
        !$OMP& los_wght,wght,jj,ic,jc,kc,wght2,length,vi_norm)
@@ -3700,7 +3700,7 @@ contains
        enddo
 
        ccnt=0.0
-       !$OMP PARALLEL DO collapse(3) private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
+       !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro, wght,&
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy,mrdpos,rshad,rs,xcen,ycen, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf,b_abs)

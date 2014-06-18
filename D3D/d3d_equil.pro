@@ -10,7 +10,9 @@ FUNCTION d3d_equil,inputs,grid,det
 	gfiletest=findfile(gfile)
 	if gfiletest ne '' then begin
 		print,'Restoring equilbrium from gfile'
-		g=readg(gfile) 
+        if file_test(gfile,/EXECUTABLE)	then begin 
+       	    restore,gfile
+       	endif else g=readg(gfile)
 	endif else begin
 		print,'Fetching equilbrium from MDS+'
 		g=readg(inputs.shot,inputs.time*1000,RUNID=inputs.equil,status=gerr)

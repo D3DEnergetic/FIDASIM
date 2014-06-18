@@ -15,7 +15,9 @@ FUNCTION nstx_equil,inputs,grid,det
     gfiletest=findfile(gfile)
     if gfiletest ne '' then begin
         print,'Restoring equilibrium from gfile'
-        restore,gfile
+        if file_test(gfile,/EXECUTABLE) then begin
+            restore,gfile
+        endif else g=readg(gfile)
     endif else begin
         print,'gfile does not exist'
         goto, GET_OUT

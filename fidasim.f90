@@ -875,7 +875,9 @@ contains
                 enddo
                 cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/sum(cell(i,j,k)%fbm(:,:)*distri%dpitch*distri%deb)
                 cell(i,j,k)%fbm_norm(1)=maxval(cell(i,j,k)%fbm(:,:))
-                cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/cell(i,j,k)%fbm_norm(1)
+                if (cell(i,j,k)%fbm_norm(1).gt.0) then
+                    cell(i,j,k)%fbm(:,:)=cell(i,j,k)%fbm(:,:)/cell(i,j,k)%fbm_norm(1)
+                endif
              endif
           enddo loop_over_x
        enddo
@@ -3783,7 +3785,7 @@ contains
                  fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
                  denf=cell(ix(1),iy(1),iz(1))%plasma%denf
                endif
-
+               if (isnan(fbm_denf)) cycle loop_over_energy
                !! -------------- calculate CX probability -------!!
                ! CX with full energetic NBI neutrals
                pcx=0.d0

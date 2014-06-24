@@ -3616,6 +3616,7 @@ contains
     integer(long)                   :: nchan,cnt,det
     integer(long)                   :: ii,jj,kk,i,j,ic,jc,kc   !!indices
     integer,dimension(1)            :: minpitch,ipitch,ienergy,ix,iy,iz
+    real(float),  dimension(:,:,:,:,:), allocatable :: emissivity
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),       allocatable :: flux_tot
     real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr
@@ -3642,8 +3643,8 @@ contains
     integer,dimension(3,grid%ntrack)      :: icell  !! index of cells
 
     !!netCDF variables
-    integer :: ncid,dimid1,dimids(3),nchan_dimid,ne_dimid,np_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid,nchan_varid
+    integer :: ncid,dimid1,dimid3(3),dimid5(5),nchan_dimid,ne_dimid,np_dimid,nx_dimid,ny_dimid,nz_dimid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid,emiss_varid,nchan_varid
 
     !! define pitch, energy arrays
     !! define energy - array
@@ -3670,10 +3671,12 @@ contains
     print*,'Number of Channels: ',nchan
     print*,'----'
     !! define storage arrays   
+    allocate(emissivity(grid%Nx,grid%Ny,grid%Nz,inputs%ne_wght,nchan))
     allocate(wfunct_tot(inputs%ne_wght,inputs%np_wght,nchan))
     allocate(flux_tot(inputs%ne_wght,nchan))  
     allocate(rad_arr(nchan))
    
+    emissivity(:,:,:,:,:)=0.
     wfunct_tot(:,:,:)=0.
     flux_tot(:,:)=0.
     cnt=1
@@ -3824,6 +3827,8 @@ contains
                if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
                  flux_tot(ic,cnt) = flux_tot(ic,cnt) + &
                    2*grid%dv*denf*fbm_denf*sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)
+                 emissivity(ii,jj,kk,ic,cnt)=emissivity(ii,jj,kk,ic,cnt)+ &
+                   2*grid%dv*denf*fbm_denf*sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)
                    !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
                endif
                !$OMP END CRITICAL(npa_wght)
@@ -3854,20 +3859,25 @@ contains
     call check( nf90_def_dim(ncid,"nchan",nchan,nchan_dimid) )
     call check( nf90_def_dim(ncid,"ne_wght",inputs%ne_wght,ne_dimid) )
     call check( nf90_def_dim(ncid,"np_wght",inputs%np_wght,np_dimid) )
-    dimids = (/ ne_dimid, np_dimid, nchan_dimid /)
+    call check( nf90_def_dim(ncid,"Nx",grid%Nx,nx_dimid) )
+    call check( nf90_def_dim(ncid,"Ny",grid%Ny,ny_dimid) )
+    call check( nf90_def_dim(ncid,"Nz",grid%Nz,nz_dimid) )
+    dimid3 = (/ ne_dimid, np_dimid, nchan_dimid /)
+    dimid5 = (/ nx_dimid, ny_dimid, nz_dimid, ne_dimid, nchan_dimid /)
 
     !Define variables
     call check( nf90_def_var(ncid,"nchan",NF90_INT,dimid1,nchan_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_DOUBLE,ne_dimid,e_varid) )
     call check( nf90_def_var(ncid,"pitch",NF90_DOUBLE,np_dimid,ptch_varid) )
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
-    call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
+    call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimid3,wfunct_varid) )
     call check( nf90_def_var(ncid,"flux",NF90_DOUBLE,(/ ne_dimid,nchan_dimid /),flux_varid) )
+    call check( nf90_def_var(ncid,"emissivity",NF90_FLOAT,dimid5,emiss_varid) )
 
     !Add unit attributes
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
     call check( nf90_put_att(ncid,e_varid,"units","keV") )
-    call check( nf90_put_att(ncid,wfunct_varid,"units","(Neutrals*cm)/(s*dE*dP)") )
+    call check( nf90_put_att(ncid,flux_varid,"units","Neutrals/(s*dE)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file
@@ -3877,6 +3887,7 @@ contains
     call check( nf90_put_var(ncid, rad_varid, rad_arr) )
     call check( nf90_put_var(ncid, wfunct_varid, wfunct_tot) )
     call check( nf90_put_var(ncid, flux_varid, flux_tot) )
+    call check( nf90_put_var(ncid, emiss_varid, emissivity) )
 
     !Close netCDF file
     call check( nf90_close(ncid) )
@@ -3887,6 +3898,7 @@ contains
     deallocate(ebarr)  
     deallocate(ptcharr)
     deallocate(wfunct_tot)
+    deallocate(emissivity)
     deallocate(flux_tot)  
     deallocate(rad_arr)
   end subroutine npa_weight_function

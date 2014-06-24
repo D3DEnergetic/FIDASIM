@@ -3828,7 +3828,7 @@ contains
                  flux_tot(ic,cnt) = flux_tot(ic,cnt) + &
                    2*grid%dv*denf*fbm_denf*sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)
                  emissivity(ii,jj,kk,ic,cnt)=emissivity(ii,jj,kk,ic,cnt)+ &
-                   2*grid%dv*denf*fbm_denf*sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)
+                   2*denf*fbm_denf*sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)
                    !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
                endif
                !$OMP END CRITICAL(npa_wght)
@@ -3878,6 +3878,7 @@ contains
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
     call check( nf90_put_att(ncid,e_varid,"units","keV") )
     call check( nf90_put_att(ncid,flux_varid,"units","Neutrals/(s*dE)") )
+    call check( nf90_put_att(ncid,emiss_varid,"units","Neutrals/(s*dE*dV)") )
     call check( nf90_enddef(ncid) )
 
     !Write to file

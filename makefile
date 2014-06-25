@@ -8,7 +8,7 @@ endif
 
 ifeq ($(FIDASIM_COMPILER),ifort)
 	LFLAGS = -lnetcdff -lnetcdf -limf -lm
-	CFLAGS = -O2 -openmp -parallel -warn
+	CFLAGS = -O2 -openmp -warn
 endif
 
 fidasim: fidasim.o

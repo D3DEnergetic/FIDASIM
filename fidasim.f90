@@ -3676,9 +3676,9 @@ contains
     allocate(flux_tot(inputs%ne_wght,nchan))  
     allocate(rad_arr(nchan))
    
-    emissivity(:,:,:,:,:)=0.
-    wfunct_tot(:,:,:)=0.
-    flux_tot(:,:)=0.
+    emissivity(:,:,:,:,:)=emissivity(:,:,:,:,:)*0.
+    wfunct_tot(:,:,:)=wfunct_tot(:,:,:)*0.
+    flux_tot(:,:)=flux_tot(:,:)*0.
     cnt=1
     loop_over_channels: do ichan=1,spec%nchan
        if(spec%chan_id(ichan).ne.1)cycle loop_over_channels
@@ -3708,7 +3708,7 @@ contains
        !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk, &
        !$OMP& ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro,wght, &
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy,mrdpos,rshad,rs,xcen,ycen, &
-       !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,rates,vhalo,icell,tcell,ncell,pos_out,   &
+       !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,pcxa,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf,b_abs)
        loop_along_z: do kk=1,grid%nz
          loop_along_y: do jj=1,grid%ny
@@ -3807,7 +3807,6 @@ contains
                  call neut_rates(halodens,vi,vhalo,rates)
                  pcx=pcx + rates/nr_halo_neutrate
                enddo
-
                if(sum(pcx).le.0) cycle loop_over_energy
 
                !!Calculate attenuation
@@ -3819,8 +3818,8 @@ contains
                  call colrad(ac(:),vi(:),tcell(kc)/vabs,states,photons,0,1.d0)
                  if (photons.le.0) exit
                enddo
-               pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma
                !$OMP CRITICAL(npa_wght)
+               pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma
                wfunct_tot(ic,minpitch(1),cnt) = wfunct_tot(ic,minpitch(1),cnt) + &
                  sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)*grid%dv
 

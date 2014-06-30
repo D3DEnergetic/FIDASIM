@@ -861,27 +861,41 @@ PRO check_inputs,inputs,err
 
 END
 
-PRO prefida,input_file,plot=plot,save=save
+PRO prefida,input_file,input_str=input_str,plot=plot,save=save
 
     COMPILE_OPT DEFINT32
 
-    if n_elements(input_file) eq 0 then begin
-        printc,'ERROR: Input file not specified',f='r'
-        goto,GET_OUT
-    endif
+    ;;READ IN INPUTS 
+	;;THREE TYPES OF INPUTS...
+	;;   'FILE': JSON INPUT FILE
+	;;   'PROCEDURE': INPUT PROCEDURE
+	;;   'STRUCTURE': KEYWORD STRUCTURE
+    if not keyword_set(input_str) then begin
+        if n_elements(input_file) eq 0 then begin
+            printc,'ERROR: Input file not specified',f='r'
+            goto,GET_OUT
+        endif
 
-    if FILE_TEST(input_file) then begin
-        ;;READ JSON INPUT FILE
-        input_proc=0
-        inputs=read_json(input_file)
-        inputs=create_struct('install_dir',GETENV('FIDASIM_DIR'),inputs)
+        if FILE_TEST(input_file) then begin
+            ;;READ JSON INPUT FILE
+            input_type='FILE'
+            printc,'Reading input from input file...',f='c'
+            inputs=read_json(input_file)
+            inputs=create_struct('install_dir',GETENV('FIDASIM_DIR'),inputs)
+        endif else begin
+            ;;CALL INPUT PROCEDURE/FILE
+            input_type='PROCEDURE'
+            printc,'Reading input from input procedure...',f='c'
+            printc,'WARNING: Input procedure is depreciated. Use JSON input file if possible',f='y'
+            CALL_PROCEDURE,input_file,inputs
+        endelse
     endif else begin
-        ;;CALL INPUT PROCEDURE/FILE
-        input_proc=1
-        printc,'WARNING: Input procedure is depreciated. Use JSON input file if possible',f='y'
-        CALL_PROCEDURE,input_file,inputs
-    endelse
-    
+        ;;READ INPUTS FROM KEYWORD STRUCTURE
+        input_type='STRUCTURE'
+        printc,'Reading input from structure...',f='c'
+		inputs=input_str
+	endelse
+
     ;;CHECK INPUTS
     check_inputs,inputs,err
     if err ne 0 then goto,GET_OUT
@@ -987,19 +1001,28 @@ PRO prefida,input_file,plot=plot,save=save
         save,inputs,grid,profiles,chords,nbi,equil,nbgeom,fida,plasma,filename=file,/compress
     endif
 
-    ;;COPY INPUT PROCEDURE/FILE TO RESULT DIRECTORY
-    if input_proc then begin
-        file_info=ROUTINE_INFO(input_file,/source)
-        file_path=file_info.path
-        file_name=input_file+'.pro'
-    endif else begin
-        file_path=input_file
-        file_name=FILE_BASENAME(input_file)
-    endelse
-
-    FILE_COPY,file_path,$
+    ;;COPY INPUT PROCEDURE/FILE/STRUCT TO RESULT DIRECTORY
+    CASE input_type OF
+        'FILE':begin
+            file_path=input_file
+            file_name=FILE_BASENAME(input_file)
+            FILE_COPY,file_path,$
               inputs.result_dir+inputs.runid+'/'+file_name,$
               /overwrite,/allow_same
+	        end
+        'PROCEDURE':begin
+            file_info=ROUTINE_INFO(input_file,/source)
+            file_path=file_info.path
+            file_name=input_file+'.pro'
+            FILE_COPY,file_path,$
+              inputs.result_dir+inputs.runid+'/'+file_name,$
+              /overwrite,/allow_same
+            end
+        'STRUCTURE':begin
+            file_name=inputs.result_dir+inputs.runid+'/inputs_str.sav'
+            save,inputs,filename=file_name
+            end
+    ENDCASE
 
     ;;WRITE FIDASIM INPUT FILES
     write_namelist,inputs

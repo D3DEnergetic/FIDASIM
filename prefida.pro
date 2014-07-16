@@ -396,20 +396,16 @@ PRO npa_los_wght,los,grid,weight,err_arr
             xcen[ww]=-xp[ww]-xp[ww]*alpha[ww]
             ycen[ww]=-yp[ww]-yp[ww]*alpha[ww]
         endif
-    
-        for xi=0, grid.nx-1 do begin
-            for yi=0, grid.ny-1 do begin
-                for zi=0, grid.nz-1 do begin
-                    if sqrt(xcen[xi,yi,zi]^2 + ycen[xi,yi,zi]^2) gt rd[chan]+rs[xi,yi,zi] then continue
-                    xs=xd+xcen[xi,yi,zi]
-                    ys=yd+ycen[xi,yi,zi]
-                    rrs=sqrt(xs^2.0 + ys^2.0)
-                    p=npa_prob(xd,yd,xp[xi,yi,zi],yp[xi,yi,zi],zp[xi,yi,zi],dx=dx,dy=dy)
-                    www=where(rrs ge rs[xi,yi,zi] or rrd ge rd[chan],nw)
-                    if nw ne 0 then p[www]=0
-                    weight[xi,yi,zi,chan]=total(p*dx*dy)    
-                endfor
-            endfor
+
+        for i=0,grid.ng-1 do begin
+            ind=array_indices([grid.nx,grid.ny,grid.nz],i,/DIM)
+            xi=ind[0] & yi=ind[1] & zi=ind[2]
+            if sqrt(xcen[xi,yi,zi]^2 + ycen[xi,yi,zi]^2) gt rd[chan]+rs[xi,yi,zi] then continue
+            rrs=sqrt((xd+xcen[xi,yi,zi])^2.0 + (yd+ycen[xi,yi,zi])^2.0)
+            p=npa_prob(xd,yd,xp[xi,yi,zi],yp[xi,yi,zi],zp[xi,yi,zi],dx=dx,dy=dy)
+            www=where(rrs ge rs[xi,yi,zi] or rrd ge rd[chan],nw)
+            if nw ne 0 then p[www]=0
+            weight[xi,yi,zi,chan]=total(p)*dx*dy    
         endfor
         
         if total(weight[*,*,*,chan]) le 0 then err_arr[chan]=1
@@ -1104,6 +1100,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     pinj_varid=ncdf_vardef(ncid,'pinj',one_id,/double)
     sm_varid=ncdf_vardef(ncid,'species_mix',three_id,/double)
     xyzsrc_varid=ncdf_vardef(ncid,'xyz_src',three_id,/double)
+    xyzpos_varid=ncdf_vardef(ncid,'xyz_pos',three_id,/double)
     arot_varid=ncdf_vardef(ncid,'Arot',dim3d,/double)
     brot_varid=ncdf_vardef(ncid,'Brot',dim3d,/double)
     crot_varid=ncdf_vardef(ncid,'Crot',dim3d,/double)
@@ -1212,6 +1209,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     ncdf_varput,ncid,pinj_varid,double(nbi.pinj)
     ncdf_varput,ncid,sm_varid,double([nbi.full,nbi.half,nbi.third])
     ncdf_varput,ncid,xyzsrc_varid,double(nbgeom.xyz_src)
+    ncdf_varput,ncid,xyzpos_varid,double(nbgeom.xyz_pos)
     ncdf_varput,ncid,arot_varid,double(nbgeom.Arot)
     ncdf_varput,ncid,brot_varid,double(nbgeom.Brot)
     ncdf_varput,ncid,crot_varid,double(nbgeom.Crot)

@@ -21,7 +21,7 @@ FUNCTION d3d_profiles,inputs,save=save
     ;; Look for electron density in this directory
     test = FILE_SEARCH(STRJOIN([dir,'dne*']))
     ;; if we don't find it, then look in the shot sub-directory
-    if test eq '' THEN dir = STRJOIN([dir,shot_str])+'/'
+    if test[0] eq '' THEN dir = STRJOIN([dir,shot_str])+'/'
 
 	ne_string=dir+'dne'+profile_str
 	te_string=dir+'dte'+profile_str

@@ -9,7 +9,7 @@
 ;;  XYBSCA: Elevation above/below vacuum vessel midplane of center of beam source grid [cm]
 ;;  NLCO:   1 for Co-beam, -1 for Counter-beam
 ;;KEYWORDS:
-;;  angle: Angle to add to XBZETA to rotate the beams into correct coordinates Ex. 90 for D3D,145 for NSTX
+;;  angle: Angle to add to XBZETA to rotate the beams into correct coordinates Ex. 90 for D3D,142.243 for NSTX
 ;;  plot: Plot the beam
 ;;OUTPUTS:
 ;;  xyz_src: Beam source position in machine coordinates [cm]

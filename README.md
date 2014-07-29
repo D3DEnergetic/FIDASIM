@@ -205,6 +205,17 @@ Note: prefida can take two keywords: plot and save.
 
     /path/to/fidasim/executable/fidasim /path/to/input/directory/<RUNID>
 
+## Read the output files
+FIDASIM can create the following output netCDF files depending on the simulation switches
+```
+<RUNID>_neutrals.cdf: This file contains the neutral beam and halo density.
+<RUNID>_birth.cdf: This file contains the birth positions of the fast ions.
+<RUNID>_spectra.cdf: This file contains the simulated spectra.
+<RUNID>_npa.cdf: This file contains the simulated NPA spectrum.
+<RUNID>_fida_weights.cdf: This file contains the calculated FIDA weight functions.
+<RUNID>_npa_weights.cdf: This file contains the calculated NPA flux and weight functions.
+```
+The netCDF files can be read by using the IDL routine ```read_ncdf.pro``` or ```load_results.pro``` located in the ```LIB``` directory
 ***
 
 # How do make FIDASIM work for your device

@@ -763,7 +763,7 @@ PRO write_namelist,inputs
     if git_command ne '' then begin 
         spawn,git_command+' --git-dir='+inputs.install_dir+'.git rev-parse HEAD',git_hash
     endif
-    filename = inputs.result_dir+inputs.runid+'/inputs.nml'
+    filename = inputs.result_dir+'/inputs.nml'
     openw,55,filename
     printf,55,'!! Created: ', systime()
     if git_hash ne '' then begin
@@ -908,9 +908,6 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     if file_test(inputs.result_dir,/directory) eq 0 then begin
         spawn,'mkdir '+inputs.result_dir
     endif
-    if file_test(inputs.result_dir+inputs.runid,/directory) eq 0 then begin
-        spawn,'mkdir '+inputs.result_dir+inputs.runid
-    endif
 
     ;;ADD DEVICE DIRECTORY TO PATH
     !path = !path + ":" + expand_path("+"+inputs.install_dir+inputs.device)
@@ -993,7 +990,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
 
     ;;SAVE STRUCTURES 
     if keyword_set(save) then begin
-        file = inputs.result_dir+inputs.runid+'/'+inputs.runid+'.sav'
+        file = inputs.result_dir+'/'+inputs.runid+'.sav'
         save,inputs,grid,profiles,chords,nbi,equil,nbgeom,fida,plasma,filename=file,/compress
     endif
 
@@ -1003,7 +1000,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
             file_path=input_file
             file_name=FILE_BASENAME(input_file)
             FILE_COPY,file_path,$
-              inputs.result_dir+inputs.runid+'/'+file_name,$
+              inputs.result_dir+'/'+file_name,$
               /overwrite,/allow_same
 	        end
         'PROCEDURE':begin
@@ -1011,11 +1008,11 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
             file_path=file_info.path
             file_name=input_file+'.pro'
             FILE_COPY,file_path,$
-              inputs.result_dir+inputs.runid+'/'+file_name,$
+              inputs.result_dir+'/'+file_name,$
               /overwrite,/allow_same
             end
         'STRUCTURE':begin
-            file_name=inputs.result_dir+inputs.runid+'/inputs_str.sav'
+            file_name=inputs.result_dir+'/inputs_str.sav'
             save,inputs,filename=file_name
             end
     ENDCASE
@@ -1025,7 +1022,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
 
     printc,'Writing input data file...',f='c'
     ;;WRITE TO FILE
-    file =inputs.result_dir+inputs.runid+'/'+inputs.runid+'_inputs.cdf' 
+    file =inputs.result_dir+'/'+inputs.runid+'_inputs.cdf' 
     ncid = ncdf_create(file,/clobber)
 
     ;;DEFINE DIMENSIONS
@@ -1278,7 +1275,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     print,''
     printc, 'SUCCESS: FIDASIM pre-processing completed',f='g'
     print, 'To run FIDASIM use the following command'
-    print, inputs.install_dir+'fidasim '+inputs.result_dir+inputs.runid
+    print, inputs.install_dir+'fidasim '+inputs.result_dir
     print,''
     print,''
     GET_OUT:

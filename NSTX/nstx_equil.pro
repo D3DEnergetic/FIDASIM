@@ -19,9 +19,11 @@ FUNCTION nstx_equil,inputs,grid,det
             restore,gfile
         endif else g=readg(gfile)
     endif else begin
-        print,'gfile does not exist'
-        goto, GET_OUT
-    endelse
+        print,'Getting equilibrium from MDS+'
+        g=readg(inputs.shot,inputs.time*1000)
+        if g.error eq 1 then goto, GET_OUT
+        print,g.source
+	endelse
 
     rhogrid=rho_rz(g,grid.r_grid/100.,grid.w_grid/100.,/do_linear)
 

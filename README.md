@@ -53,7 +53,7 @@ The last step is the run make in the source directory
 ## 4. Run a test case
 From the install directory run 
 
-    fidasim TEST/D3D
+    fidasim TEST/D3D/146088H06_inputs.dat
 
 ## 5. Device Specific Installation Instructions
 These installation instructions are unique to each machine. For instructions on how to get FIDASIM to work with a particular machine see the section titled "How do make FIDASIM work for your device"
@@ -197,13 +197,13 @@ Prefida pulls in the required profiles and geometry and puts them into netCDF fi
 
     IDL> prefida,'input_template.json'
 
-This will make an FORTRAN namelist file and a netCDF inputs file in a RUNID directory in the result directory. It will also copy the input file into the same directory.
+This will make an FORTRAN namelist file and a netCDF inputs file in the result directory. It will also copy the input file into the same directory.
 
 Note: prefida can take two keywords: plot and save. 
 
 ## Run FIDASIM
 
-    /path/to/fidasim/executable/fidasim /path/to/input/directory/<RUNID>
+    /path/to/fidasim/executable/fidasim /path/to/input/directory/<RUNID>_inputs.dat
 
 ## Read the output files
 FIDASIM can create the following output netCDF files depending on the simulation switches
@@ -224,7 +224,7 @@ Prefida, the FIDASIM preprocessing routine, is also device agnostic. It can acco
 In other words, prefida is modular. This allows users to use device-specific routines to prepare the data as long as it delivers the results to prefida in the specified format.
 This can best be described with an example. 
 
-Say I have a device called ABCD, which stands for "A Beautiful Cylindrical Device". I want FIDASIM to work with it, so in the source directory I make an ABCD directory.
+Say I have a device called ABCD, which stands for "A Big Cylindrical Device". I want FIDASIM to work with it, so in the source directory I make an ABCD directory.
 
     mkdir ABCD
     

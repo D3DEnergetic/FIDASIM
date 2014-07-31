@@ -10,7 +10,7 @@ module application
   integer , parameter   :: float     = kind(1.e0)
   integer , parameter   :: double    = kind(1.d0)
   !!                      Indizes of the different components:
-  character(120)        :: result_dir
+  character(120)        :: namelist_file
   character(120)        :: root_dir
   integer , parameter   :: nbif_type = 1 ! full energy NBI spectra/density
   integer , parameter   :: nbih_type = 2 ! half energy NBI spectra/density
@@ -189,8 +189,9 @@ module application
   type inputs_type
      integer(long) :: shot_number
      real(double)  :: time
-     character(120) :: runid
+     character(120):: runid
      character(4)  :: diag 
+     character(120):: result_dir
      !! Monte Carlo Settings
      integer(long) :: nr_fast
      integer(long) :: nr_nbi
@@ -206,6 +207,7 @@ module application
      integer(long) :: calc_fida_wght
      integer(long) :: calc_npa_wght
      integer(long) :: calc_birth
+     integer(long) :: interactive
      !! Plasma parameters
      integer(long) :: impurity_charge
      real(double)  :: btipsign 
@@ -293,22 +295,19 @@ contains
 
   !**************************************************************************** 
   subroutine read_inputs
-    character(120)   :: filename
-
-    character(120) :: runid
-    integer       :: calc_spec,calc_npa,calc_birth,calc_fida_wght,calc_npa_wght,calc_brems,load_neutrals,load_fbm
+    character(120) :: runid,result_dir
+    integer       :: calc_spec,calc_npa,calc_birth,calc_fida_wght,calc_npa_wght,calc_brems,load_neutrals,load_fbm,interactive
     integer(long) :: shot,nr_fast,nr_nbi,nr_halo,nlambda,ne_wght,np_wght,nphi_wght,ichan_wght
     real(double)  :: time,lambdamin,lambdamax,emax_wght,dwav_wght,wavel_start_wght,wavel_end_wght
 
-    NAMELIST /fidasim_inputs/ runid ,calc_spec,calc_npa,calc_birth,calc_fida_wght,calc_npa_wght,calc_brems, &
+    NAMELIST /fidasim_inputs/ runid,result_dir,calc_spec,calc_npa,calc_birth,calc_fida_wght,calc_npa_wght,calc_brems, &
               load_neutrals,load_fbm,shot,nr_fast,nr_nbi,nr_halo,nlambda,ne_wght,np_wght,nphi_wght,ichan_wght, &
-              time,lambdamin,lambdamax,emax_wght,dwav_wght,wavel_start_wght,wavel_end_wght
+              time,lambdamin,lambdamax,emax_wght,dwav_wght,wavel_start_wght,wavel_end_wght,interactive
 
     call getenv("FIDASIM_DIR",root_dir)
-    filename=trim(adjustl(result_dir))//"/inputs.nml"
     print*,'---- loading inputs ----' 
 
-    open(13,file=filename)
+    open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)
 
@@ -316,6 +315,7 @@ contains
     inputs%shot_number=shot
     inputs%time=time
     inputs%runid=runid
+    inputs%result_dir=result_dir
 
     !!Simulation Switches
     inputs%calc_spec=calc_spec
@@ -326,6 +326,7 @@ contains
     inputs%calc_npa_wght=calc_npa_wght
     inputs%load_neutrals=load_neutrals
     inputs%load_fbm=load_fbm
+    inputs%interactive=interactive
 
     !!Monte Carlo Settings
     inputs%nr_fast=nr_fast
@@ -362,7 +363,7 @@ contains
     integer         :: nx_varid,ny_varid,nz_varid
     integer         :: ncid,alpha_varid,beta_varid,o_varid,xx_varid,yy_varid,zz_varid
 
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading grid ----'
 
     !!OPEN netCDF file   
@@ -428,7 +429,7 @@ contains
     integer         :: einj_varid,pinj_varid,sm_varid,xyzsrc_varid,bwra_varid,bwza_varid
     integer         :: arot_varid,brot_varid,crot_varid
 
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading beam ----'
 
     !!OPEN netCDF file   
@@ -490,7 +491,7 @@ contains
     integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
  
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading detector information ----'
     
     !!OPEN netCDF file   
@@ -579,7 +580,7 @@ contains
     real(double)               :: b_abs     !! Magnetic field
     real(double), dimension(3) :: a,b,c    !! Magnetic field
 
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading plasma parameters ----'
 
     !!OPEN netCDF file   
@@ -656,7 +657,7 @@ contains
     integer(long) :: i,cnt
     integer       :: ncid,brems_varid
     real(double), dimension(:)  , allocatable :: brems
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
 
     print*,'---- loading bremsstrahlung ----'
     allocate(brems(spec%nchan))
@@ -784,7 +785,7 @@ contains
     integer :: np_var, ne_var, ng_var,fbm_var,e_var,p_var
     integer, dimension(1) :: minpos  !! dummy array to determine minloc
 
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading fast ion distribution function ----'
 
     !!OPEN netCDF file   
@@ -892,7 +893,7 @@ contains
     integer           :: ncid,varid,dimids(5)
     integer           :: dimid1,x_dimid,y_dimid,z_dimid,e_dimid,p_dimid,nr_varid
     character(120)    :: filename
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -930,7 +931,7 @@ contains
     integer         :: ncid,full_varid,half_varid,third_varid,halo_varid
     integer         :: dimid1
     character(120)  :: filename
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf"
  
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -981,7 +982,7 @@ contains
     allocate(output1(maxcnt,npa%nchan))
     allocate(output2(npa%nchan))
 
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -1066,7 +1067,7 @@ contains
          /(4.d0*pi)*1.d4
 
     !! write to file
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.cdf"
  
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -1120,7 +1121,7 @@ contains
     character(120)  :: filename
     integer :: ncid,full_var,half_var,third_var,halo_var
 
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf" 
     print*,'---- loading neutrals ----',filename
 
        !!OPEN netCDF file   
@@ -2843,9 +2844,11 @@ contains
                      *spec%dlambda*(4.d0*pi)*1.d-4 !! [ph/m^2/s/bin]
              enddo loop_over_channels
              ccnt=ccnt+1
-             !$OMP CRITICAL
-             WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
-             !$OMP END CRITICAL
+             if (inputs%interactive)then 
+             	!$OMP CRITICAL
+             	WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+             	!$OMP END CRITICAL
+             endif
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z
@@ -2945,10 +2948,12 @@ contains
                         ,pos(:,jj),photons,halo_type)
                 enddo loop_along_track
              enddo loop_over_dcx
-          ccnt=ccnt+1
-          !$OMP CRITICAL
-          WRITE(6,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
-          !$OMP END CRITICAL
+             ccnt=ccnt+1
+             if (inputs%interactive)then
+                !$OMP CRITICAL
+                WRITE(6,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+                !$OMP END CRITICAL
+             endif
           enddo loop_along_x
        enddo loop_along_y
     enddo loop_along_z
@@ -3048,9 +3053,11 @@ contains
                    enddo loop_along_track
                 enddo loop_over_halos
                 ccnt=ccnt+1
-                !$OMP CRITICAL
-                WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
-                !$OMP END CRITICAL
+                if (inputs%interactive)then
+                    !$OMP CRITICAL
+                    WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+                    !$OMP END CRITICAL
+                endif
              enddo loop_along_x
           enddo loop_along_y
        enddo loop_along_z
@@ -3196,9 +3203,11 @@ contains
         enddo loop_over_fast_ions
       enddo npa_loop
       cnt=cnt+1
-      !$OMP CRITICAL
-      WRITE(*,'(f7.2,"%",a,$)') cnt/maxcnt*100,char(13)
-      !$OMP END CRITICAL
+      if (inputs%interactive)then
+          !$OMP CRITICAL
+          WRITE(*,'(f7.2,"%",a,$)') cnt/maxcnt*100,char(13)
+          !$OMP END CRITICAL
+      endif
     enddo loop_over_cells
     !$OMP END PARALLEL DO
   end subroutine fida
@@ -3545,7 +3554,7 @@ contains
     cell(ac(1),ac(2),ac(3))%plasma%E=evec_sav
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -3834,9 +3843,11 @@ contains
              enddo loop_over_energy
             endif
             ccnt=ccnt+1
-            !$OMP CRITICAL
-            WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
-            !$OMP END CRITICAL
+            if (inputs%interactive)then
+                !$OMP CRITICAL
+                WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
+                !$OMP END CRITICAL
+            endif
            enddo loop_along_x
          enddo loop_along_y
        enddo loop_along_z
@@ -3848,7 +3859,7 @@ contains
     enddo loop_over_channels
 
     !! Open file for the outputs
-    filename=trim(adjustl(result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
 
     !Create netCDF file
     call check( nf90_create(filename, NF90_CLOBBER, ncid) )
@@ -3917,7 +3928,7 @@ program fidasim
   !! measure time
   call date_and_time (values=time_start)
   !! get filename of input
-  call getarg(1,result_dir)
+  call getarg(1,namelist_file)
   !! ----------------------------------------------------------
   !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
   !! ----------------------------------------------------------

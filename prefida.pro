@@ -763,13 +763,13 @@ PRO write_namelist,inputs
     if git_command ne '' then begin 
         spawn,git_command+' --git-dir='+inputs.install_dir+'.git rev-parse HEAD',git_hash
     endif
-    filename = inputs.result_dir+'/inputs.nml'
+    filename = inputs.result_dir+'/'+inputs.runid+'_inputs.dat'
     openw,55,filename
     printf,55,'!! Created: ', systime()
     if git_hash ne '' then begin
         printf,55,'!! FIDASIM git commit: ',git_hash
     endif else begin
-        printf,55,'!! FIDASIM version: '
+        printf,55,'!! FIDASIM version: 0.3 '
     endelse
 
     printf,55,'&fidasim_inputs'
@@ -779,6 +779,7 @@ PRO write_namelist,inputs
     printf,55,f='("shot = ", i6 ,"    !! Shot Number")',inputs.shot    
     printf,55,f='("time = ", 1f8.5 ,"    !! Time")',inputs.time    
     printf,55,"runid = '" + inputs.runid + "'    !! runID"
+	printf,55,"result_dir = '" + inputs.result_dir+"'    !! Result Dir"
     printf,55,''
     printf,55,'!! Simulation Switches'
     printf,55,f='("calc_spec = ",i2 , "    !! Calculate Spectra")',inputs.calc_spec
@@ -789,6 +790,7 @@ PRO write_namelist,inputs
     printf,55,f='("calc_brems = ",i2,"    !! Calculate Bremsstrahlung else load from inputs")',inputs.calc_brems
     printf,55,f='("load_neutrals = ",i2,"    !! Load Neutrals")',inputs.load_neutrals
     printf,55,f='("load_fbm = ",i2,"    !! Load FBM")',inputs.load_fbm
+    printf,55,f='("interactive = ",i2,"    !! Show Progress")',inputs.interactive
     printf,55,''
     printf,55,'!! Wavelength Grid Settings'
     printf,55,f='("nlambda = ",1i5,"    !! Number of Wavelengths")',inputs.nlambda
@@ -824,7 +826,7 @@ PRO check_inputs,inputs,err
           "xmin","xmax","ymin","ymax","zmin","zmax","origin","alpha","beta","nr_fast","nr_nbi",$
           "nr_halo","ne_wght","np_wght","nphi_wght","emax_wght","ichan_wght","dwav_wght",$
           "wavel_start_wght","wavel_end_wght","calc_npa","calc_spec","calc_birth","calc_fida_wght",$
-          "calc_npa_wght","calc_brems","load_neutrals","load_fbm"]
+          "calc_npa_wght","calc_brems","load_neutrals","load_fbm","interactive"]
 
     inVars=strlowcase(TAG_NAMES(inputs))
 
@@ -1275,7 +1277,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     print,''
     printc, 'SUCCESS: FIDASIM pre-processing completed',f='g'
     print, 'To run FIDASIM use the following command'
-    print, inputs.install_dir+'fidasim '+inputs.result_dir
+    print, inputs.install_dir+'fidasim '+inputs.result_dir+'/'+inputs.runid+'_inputs.dat'
     print,''
     print,''
     GET_OUT:

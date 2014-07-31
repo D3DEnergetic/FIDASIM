@@ -110,7 +110,7 @@ load_neutrals=[0]       ;; (0 or 1) If 1 then the neutral density is loaded
                         ;;                    from an existing FIDAsim run  
 load_fbm=[1]            ;; (0 or 1) If 1 then the fbm is loaded 
                         ;; (calc_spec/npa overwrites)
-
+interactive=[1]         ;; (0 or 1) If 1 then percent complete is shown
 ;;------------------------------------------------
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
@@ -133,6 +133,6 @@ inputs={shot:shot,time:time,runid:runid,device:device,install_dir:install_dir,$
         calc_npa:calc_npa,calc_spec:calc_spec,$
         calc_birth:calc_birth,calc_brems:calc_brems,calc_fida_wght:calc_fida_wght,$
         calc_npa_wght:calc_npa_wght,$
-        load_neutrals:load_neutrals,load_fbm:load_fbm }
+        load_neutrals:load_neutrals,load_fbm:load_fbm,interactive:interactive }
 
 END

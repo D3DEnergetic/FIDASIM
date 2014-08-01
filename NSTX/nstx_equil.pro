@@ -20,7 +20,7 @@ FUNCTION nstx_equil,inputs,grid,det
         endif else g=readg(gfile)
     endif else begin
         print,'Getting equilibrium from MDS+'
-        g=readg(inputs.shot,inputs.time*1000)
+        g=readg(inputs.shot,inputs.time)
         if g.error eq 1 then goto, GET_OUT
         print,g.source
 	endelse

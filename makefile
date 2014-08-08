@@ -1,14 +1,21 @@
-#System:   amd64_sles11
-#Compiler: ifort  ('ifort -help > man.dat' to store help into file)
-COMPILER=ifort -O2 -openmp -openmp-report -parallel
-#COMPILER=gfortran44 -fopenmp -Wall 
-#COMPILER=pgf90 -O2 -Mconcur -Minform=inform 
+#System:   64 bit
+#Compiler: gfortran or ifort
+
+ifeq ($(FIDASIM_COMPILER),gfortran)
+	LFLAGS = -lnetcdff -lnetcdf -lm
+	CFLAGS = -O2 -fopenmp -Wall
+endif
+
+ifeq ($(FIDASIM_COMPILER),ifort)
+	LFLAGS = -lnetcdff -lnetcdf -limf -lm
+	CFLAGS = -O2 -openmp -warn
+endif
 
 fidasim: fidasim.o
-	$(COMPILER) fidasim.o -o fidasim -L$(NETCDF_LIB) -lnetcdff -lnetcdf -limf -lm
+	$(FIDASIM_COMPILER) $(CFLAGS) fidasim.o -o fidasim -L$(NETCDF_LIB) $(LFLAGS)
 
 fidasim.o: fidasim.f90
-	$(COMPILER) -c -I$(NETCDF_INCLUDE) fidasim.f90
+	$(FIDASIM_COMPILER) $(CFLAGS) -c -I$(NETCDF_INCLUDE) fidasim.f90
 
 clean:
 	-rm application.mod fidasim.o fidasim

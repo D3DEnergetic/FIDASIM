@@ -7,7 +7,7 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 	plt=fida_switch+nbi_switch+halo_switch 
 	plt-=min(plt)
 	if min(plt) eq max(plt) then plt=[1,1,1]
- 
+
 	if not keyword_set(path) then path=dialog_pickfile(path='~/FIDASIM/RESULTS/',/directory)
 	print,path
 	load_results,path,results
@@ -16,16 +16,17 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 	grid=results.grid
 	spec=results.spectra
 	weights=results.fida_weights
+    ichan_wght=weights.ichan
 	los=results.los
 	fbm=results.fbm
 	neutrals=results.neutrals
 
 			
 	;; LOS IS IN BEAM COORDINATES WE NEED TO CONVERT THEM TO MACHINE COORS.
-	alpha=inputs.alpha & beta=inputs.beta & origin=inputs.origin
-	xlos=los.xyzlos[*,0]
-	ylos=los.xyzlos[*,1]
-	zlos=los.xyzlos[*,2]
+	alpha=grid.alpha & beta=grid.beta & origin=grid.origin
+	xlos=los.xlos
+	ylos=los.ylos
+	zlos=los.zlos
 	
 	x =  cos(alpha)*(cos(beta)*xlos + sin(beta)*zlos) $
     - sin(alpha)*ylos + origin[0]
@@ -49,11 +50,11 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 		minbrems=min(spec.brems)
 		print,minbrems
 		yran=[minbrems,1.e19]
-        if inputs.ichan_wght gt 0 then chan=inputs.ichan_wght-1
+        if ichan_wght gt 0 then chan=ichan_wght-1
 		if n_elements(chan) ne 0 then begin
 			startind=chan & endind=chan 
 		endif else begin
-			startind=0L & endind=los.nchan-1
+			startind=0L & endind=spec.nchan-1
 		endelse
 
 		;;LOOP OVER CHANNELS
@@ -128,7 +129,7 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 				 	title='Intensity vs. Major Radius ',xtitle='R [cm]',ytitle='Intensity [Ph/(s $m^2$ nm sr)]')
 				if keyword_set(ps) then begin
 					type=size(ps,/type)
-					if type eq 7 then dir=ps+inputs.fidasim_runid+"_intensity.pdf" else dir=inputs.fidasim_runid+"_intensity.pdf" 
+					if type eq 7 then dir=inputs.fidasim_runid+"_intensity.pdf" else dir=inputs.fidasim_runid+"_intensity.pdf" 
 					plt.Save,dir,border=10
 				endif
 			endif else begin

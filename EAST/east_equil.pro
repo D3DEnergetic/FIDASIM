@@ -11,7 +11,9 @@ if gfiletest eq '' then begin
   return,equil
 endif else begin
   print,'RESTORING EQUILIBRIUM FROM GFILE'
-  g=readg(gfile) 
+  if file_test(gfile,/EXECUTABLE) then begin 
+    restore,gfile
+  endif else g=readg(gfile)
 endelse
 
 ;---------------------------------------

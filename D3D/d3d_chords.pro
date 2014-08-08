@@ -44,7 +44,9 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
     ;;   XHEAD           DOUBLE    Array[15]
     ;;   YHEAD           DOUBLE    Array[15]
     ;;   ZHEAD           DOUBLE    Array[15]
-    ;;   HEADSIZE        FLOAT     Array[15]
+    ;;   ra              FLOAT     Array[15]
+    ;;   rd              FLOAT     Array[15]
+    ;;   h               FLOAT     Array[15]
 
 	;;FROM fida_vanzeeland DIII-D 2-D camera at 90 degrees
 	xlens1=[276.326]
@@ -204,8 +206,10 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
         	 zhead=zlens5
         	 nchan=n_elements(xlos)
         	 sigma_pi=replicate(1.d0,nchan)
-        	 headsize=replicate(0.d0,nchan)
-        	 opening_angle=replicate(0.d0,nchan)
+        	 ra=replicate(0.d0,nchan)
+        	 rd=replicate(0.d0,nchan)
+        	 h=replicate(0.d0,nchan)
+        	 chan_id=replicate(0.d0,nchan)
        		end
       		'OBLIQUE': begin
         	 xlos=xmid3
@@ -216,8 +220,10 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
         	 zhead=zlens3
         	 nchan=n_elements(xlos)
         	 sigma_pi=replicate(1.d0,nchan)
-        	 headsize=replicate(0.d0,nchan)
-         	 opening_angle=replicate(0.d0,nchan)
+        	 ra=replicate(0.d0,nchan)
+           	 rd=replicate(0.d0,nchan)
+		  	 h=replicate(0.d0,nchan)
+        	 chan_id=replicate(0.d0,nchan)
        		end
             'TANGENTIAL': begin
              xlos=xmid8
@@ -228,8 +234,10 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
              zhead=zlens8
              nchan=n_elements(xlos)
              sigma_pi=replicate(1.d0,nchan)
-             headsize=replicate(0.d0,nchan)
-             opening_angle=replicate(0.d0,nchan)
+             ra=replicate(0.d0,nchan)
+        	 rd=replicate(0.d0,nchan)
+             h=replicate(0.d0,nchan)
+        	 chan_id=replicate(0.d0,nchan)
             end
        		'MAIN_ION30': begin
         	 xlos=xmid4
@@ -240,8 +248,10 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
         	 zhead=zlens4
         	 nchan=n_elements(xlos)
         	 sigma_pi=replicate(1.d0,nchan)
-        	 headsize=replicate(0.d0,nchan)
-        	 opening_angle=replicate(0.d0,nchan)
+        	 ra=replicate(0.d0,nchan)
+        	 rd=replicate(0.d0,nchan)
+        	 h=replicate(0.d0,nchan)
+        	 chan_id=replicate(0.d0,nchan)
       		end
       		'MAIN_ION210': begin
         	 xlos=xmid7
@@ -252,8 +262,10 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
         	 zhead=zlens7
         	 nchan=n_elements(xlos)
         	 sigma_pi=replicate(1.d0,nchan)
-        	 headsize=replicate(0.d0,nchan)
-        	 opening_angle=replicate(0.d0,nchan)
+        	 ra=replicate(0.d0,nchan)
+        	 rd=replicate(0.d0,nchan)
+        	 h=replicate(0.d0,nchan)
+        	 chan_id=replicate(0.d0,nchan)
       		end
       	 	'ALL': begin
 			 xlos=[xmid1,xmid2,xmid3,xmid4,xmid5,xmid7,xmid8]
@@ -264,8 +276,10 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
 			 zhead=[zlens1,zlens2,zlens3,zlens4,zlens5,zlens7,zlens8]
 			 nchan=n_elements(xlos)
         	 sigma_pi=replicate(1.d0,nchan)
-        	 headsize=replicate(0.d0,nchan)
-        	 opening_angle=replicate(0.d0,nchan)
+        	 ra=replicate(0.d0,nchan)
+        	 rd=replicate(0.d0,nchan)
+        	 chan_id=replicate(0.d0,nchan)
+        	 h=replicate(0.d0,nchan)
 	   	 	end
       		'NPA': begin
         	 xlos=npa_mid[*,0]
@@ -276,8 +290,11 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
         	 zhead=npap[*,2]
         	 nchan=n_elements(xlos)        
         	 sigma_pi=replicate(1.d0,nchan)
-        	 headsize=replicate(1.5d0,nchan)
-        	 opening_angle=replicate(0.0261799388d0,nchan)
+        	 ra=replicate(0.5d0,nchan)
+        	 rd=replicate(0.5d0,nchan)
+        	 h=replicate(25.4d0,nchan)
+             ;;Rev. Sci. Instrum. 83, 10D304 (2012) <-NPA Geometry
+        	 chan_id=replicate(1.d0,nchan)
        		end
         	ELSE: begin
          	 PRINT, '% Diagnostic unknown'
@@ -288,19 +305,19 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
 		if i eq 0 then begin
 			xloss=xlos & yloss=ylos & zloss=zlos
 			xheads=xhead & yheads=yhead & zheads=zhead
-			nchans=nchan & sigma_pis=sigma_pi & headsizes=headsize 
-			opening_angles=opening_angle
+			nchans=nchan & sigma_pis=sigma_pi & ras=ra & rds=rd
+			hs=h & chan_ids=chan_id
 		endif else begin
             xloss=[xloss,xlos] & yloss=[yloss,ylos] & zloss=[zloss,zlos]
             xheads=[xheads,xhead] & yheads=[yheads,yhead] & zheads=[zheads,zhead]
-            nchans+=nchan & sigma_pis=[sigma_pis,sigma_pi] & headsizes=[headsizes,headsize] 
-    	    opening_angles=[opening_angles,opening_angle]
+            nchans+=nchan & sigma_pis=[sigma_pis,sigma_pi] & ras=[ras,ra] & rds=[rds,rd] 
+    	    hs=[hs,h] & chan_ids=[chan_ids,chan_id]
 		endelse
 	endfor
 	
 	;;SAVE IN FIDA STRUCTURE
 	fida={nchan:nchans,diag:fida_diag,xlos:double(xloss),ylos:double(yloss),zlos:double(zloss),$
 		  xlens:double(xheads),ylens:double(yheads),zlens:double(zheads),$
-		  sigma_pi_ratio:sigma_pis,headsize:headsizes,opening_angle:opening_angles}
+		  sigma_pi_ratio:sigma_pis,ra:ras,rd:rds,h:hs,chan_id:chan_ids}
 	return,fida
 END

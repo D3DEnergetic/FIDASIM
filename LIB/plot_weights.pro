@@ -1,4 +1,4 @@
-PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
+PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa,currentmode=currentmode
 
 	if not keyword_set(path) then path=dialog_pickfile(path='~/FIDASIM/RESULTS/',/directory)
 	print,path
@@ -23,7 +23,7 @@ PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
 	endif
  	calc_mean_fbm,grid,fbm,weights,los,neutrals,mean_fbm,elevel=e_level
 
-    if inputs.ichan_wght gt 0 then chan=inputs.ichan_wght-1
+    if fida_wght.ichan gt 0 and not keyword_set(npa) then chan=fida_wght.ichan-1
 	if n_elements(chan) ne 0 then begin
 		start=chan
 		fin=chan
@@ -32,23 +32,28 @@ PRO plot_weights,path=path,chan=chan,prod=prod,fida=fida,npa=npa
 		fin=los.nchan-1
 	endelse
 
-	wght=fltarr(weights.nen,weights.npitch)
+	wght=fltarr(n_elements(weights.energy),n_elements(weights.pitch))
 	loadct,39,/silent
 	for ichan=start,fin do begin
 		if keyword_set(fida) then begin
-			for ii=0,weights.nwav-1 do begin
+			for ii=0,n_elements(weights.lambda)-1 do begin
 				if keyword_set(prod) then begin
-					wght=mean_fbm[*,*,ichan]*weights.weight_tot[ii,*,*,ichan]
-				endif else wght=weights.weight_tot[ii,*,*,ichan]
-				contour,wght,weights.energyarr,weights.pitcharr,nlevels=30,/fill
+					wght=mean_fbm[*,*,ichan]*weights.wfunct[ii,*,*,ichan]
+				endif else wght=weights.wfunct[ii,*,*,ichan]
+				contour,wght,weights.energy,weights.pitch,nlevels=30,/fill
 				wait,1
 			endfor
 		endif
 		if keyword_set(npa)then begin
 			if keyword_set(prod) then begin
-				wght=mean_fbm[*,*,ichan]*weights.weight_tot[*,*,ichan]
-			endif else wght=weights.weight_tot[*,*,ichan]
-			contour,wght,weights.energyarr,weights.pitcharr,nlevels=30,/fill
+				wght=mean_fbm[*,*,ichan]*weights.wfunct[*,*,ichan]
+			endif else wght=weights.wfunct[*,*,ichan]
+            if keyword_set(currentmode) then begin
+                for i=0,n_elements(weights.energy)-1 do begin
+                    if weights.energy[i] gt 25 then wght[i,*]=wght[i,*]*(weights.energy[i]-25.) else wght[i,*]=0.0
+                endfor
+            endif
+			contour,wght,weights.energy,weights.pitch,nlevels=30,/fill
 			wait,1
 		endif
 	endfor		

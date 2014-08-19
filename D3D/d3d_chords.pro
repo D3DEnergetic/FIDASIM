@@ -1,3 +1,26 @@
+FUNCTION get_oblique_geom
+
+	chrds = oblique_spatial()
+	str_names=tag_names(chrds)
+    xmid=[]
+    ymid=[]
+	chords=[]
+	for i=0,n_tags(chrds)-1 do begin	
+        if str_names[i] eq 'CALDATE' then continue
+        xmid=[xmid,chrds.(i).fibers.x]
+        ymid=[ymid,chrds.(i).fibers.y]
+        chords=[chords,replicate(str_names[i],3)]
+	endfor
+	zmid=xmid*0
+
+    xlens=replicate(-46.02,n_elements(xmid))
+    ylens=replicate(-198.5,n_elements(xmid))
+    zlens=replicate(122.0,n_elements(xmid))
+	return, {chords:chords,xlens:xlens,ylens:ylens,$ 
+             zlens:zlens,xlos:xmid,ylos:ymid,zlos:zmid}
+
+END
+
 FUNCTION get_cer_geom,shot,isource
 
 	a=GET_CERGEOM(shot)
@@ -77,13 +100,14 @@ FUNCTION d3d_chords,shot,fida_diag,isource=isource
 	ylens2=replicate(-70.1,32)
 	zlens2=replicate(15.0 ,32)
 	
-	;;from fida_chris for tangential viewing FIDA system
-	xmid3=[-135.21,-134.667,-133.97,-133.239,-132.486,-131.677,-130.913,-130.249,-129.474,-128.621,-127.879]
-	ymid3=[-177.627,-172.757,-166.495,-159.936,-153.178,-145.923,-139.065,-133.102,-126.145,-118.493,-111.834]
-	zmid3=replicate(0.0,n_elements(xmid3))
-	xlens3=replicate(-46.02,n_elements(xmid3))
-	ylens3=replicate(-198.5,n_elements(xmid3))
-	zlens3=replicate(122.0,n_elements(xmid3))
+	;;Get oblique chords
+	oblique_chords=get_oblique_geom()
+	xmid3 = oblique_chords.xlos	
+	ymid3 = oblique_chords.ylos	
+	zmid3 = oblique_chords.zlos	
+	xlens3 = oblique_chords.xlens
+	ylens3 = oblique_chords.ylens
+	zlens3 = oblique_chords.zlens
 
 	common bst_chord_param,chord_param
 	mchords=['m01','m02','m03','m04','m05','m06','m07','m08']

@@ -164,6 +164,7 @@ module application
      real(double),dimension(:),    allocatable :: h
      real(double),dimension(:),    allocatable :: chan_id
      real(double),dimension(:),    allocatable :: sigma_pi
+     real(double),dimension(:),    allocatable :: radius
      integer(long) :: nchan
      integer(long) :: nlambda
      real(double)  :: dlambda
@@ -486,7 +487,7 @@ contains
     use netcdf
     character(120)  :: filename
     integer(long)   :: i, j, k
-    integer         :: ncid,xlens_varid,ylens_varid,zlens_varid
+    integer         :: ncid,xlens_varid,ylens_varid,zlens_varid,rad_varid
     integer         :: xlos_varid,ylos_varid,zlos_varid,ra_varid,rd_varid
     integer         :: sig_varid,h_varid,wght_varid,nchan_varid,chan_id_varid
     real(double), dimension(:,:,:,:),allocatable :: dummy_arr
@@ -508,6 +509,7 @@ contains
     call check( nf90_inq_varid(ncid, "ra", ra_varid) )
     call check( nf90_inq_varid(ncid, "rd", rd_varid) )
     call check( nf90_inq_varid(ncid, "sigma_pi", sig_varid) )
+    call check( nf90_inq_varid(ncid, "rlos", rad_varid) )
     call check( nf90_inq_varid(ncid, "h", h_varid) )
     call check( nf90_inq_varid(ncid, "chan_id", chan_id_varid) )
     call check( nf90_inq_varid(ncid, "los_wght", wght_varid) )
@@ -523,6 +525,7 @@ contains
     allocate(spec%h(spec%nchan))
     allocate(spec%chan_id(spec%nchan))
     allocate(spec%sigma_pi(spec%nchan))
+    allocate(spec%radius(spec%nchan))
     allocate(dummy_arr(grid%Nx,grid%Ny,grid%Nz,spec%nchan))
 
     !!READ IN OTHER PARAMETERS
@@ -537,6 +540,7 @@ contains
     call check( nf90_get_var(ncid, h_varid, spec%h) )
     call check( nf90_get_var(ncid, chan_id_varid, spec%chan_id) )
     call check( nf90_get_var(ncid, sig_varid, spec%sigma_pi) )
+    call check( nf90_get_var(ncid, rad_varid, spec%radius) )
     call check( nf90_get_var(ncid, wght_varid, dummy_arr(:,:,:,:)) )
 
     !!CLOSE netCDF FILE
@@ -1045,10 +1049,11 @@ contains
   subroutine write_spectra
     use netcdf
     integer         :: i,nchan
-    integer         :: ncid,nchan_varid,fida_varid,brems_varid,halo_varid,full_varid,half_varid,third_varid,lam_varid
+    integer         :: ncid,nchan_varid,fida_varid,brems_varid,halo_varid
+    integer         :: full_varid,half_varid,third_varid,lam_varid,rad_varid
     integer         :: chan_dimid,lam_dimid,dimid1,dimids(2)
     character(120)  :: filename
-    real(double), dimension(:)  , allocatable :: lambda_arr
+    real(double), dimension(:)  , allocatable :: lambda_arr,radius
 
     !! ------------------------ calculate wavelength array ------------------ !!
     allocate(lambda_arr(spec%nlambda))
@@ -1062,6 +1067,12 @@ contains
        if(spec%chan_id(i).eq.0) nchan=nchan+1
     enddo
 
+    allocate(radius(nchan))
+    do i=1,spec%nchan
+       if(spec%chan_id(i).eq.0) then
+           radius(i) = spec%radius(i)
+       endif
+    enddo
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
     result%spectra(:,:,:)=result%spectra(:,:,:)/(0.1d0*spec%dlambda) &
          /(4.d0*pi)*1.d4
@@ -1087,6 +1098,7 @@ contains
     call check( nf90_def_var(ncid,"halo",NF90_DOUBLE,dimids,halo_varid) )
     call check( nf90_def_var(ncid,"brems",NF90_DOUBLE,dimids,brems_varid) )
     call check( nf90_def_var(ncid,"fida",NF90_DOUBLE,dimids,fida_varid) )
+    call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,chan_dimid,rad_varid) )
 
     !Add unit attributes
     call check( nf90_put_att(ncid,lam_varid,"units","nm") )
@@ -1096,12 +1108,14 @@ contains
     call check( nf90_put_att(ncid,halo_varid,"units","Ph/(s*nm*sr*m^2)") )
     call check( nf90_put_att(ncid,brems_varid,"units","Ph/(s*nm*sr*m^2)") )
     call check( nf90_put_att(ncid,fida_varid,"units","Ph/(s*nm*sr*m^2)") )
+    call check( nf90_put_att(ncid,rad_varid,"units","cm") )
 
     call check( nf90_enddef(ncid) )
 
     !Write to file
     call check( nf90_put_var(ncid, nchan_varid, nchan) )
     call check( nf90_put_var(ncid, lam_varid, lambda_arr) )
+    call check( nf90_put_var(ncid, rad_varid, radius) )
     call check( nf90_put_var(ncid, full_varid, result%spectra(:,:,nbif_type)) )
     call check( nf90_put_var(ncid, half_varid, result%spectra(:,:,nbih_type)) )
     call check( nf90_put_var(ncid, third_varid, result%spectra(:,:,nbit_type)) )
@@ -1113,6 +1127,7 @@ contains
     call check( nf90_close(ncid) )
 
     deallocate(lambda_arr)
+    deallocate(radius)
     print*, 'Spectra written to: ', filename
   end subroutine write_spectra
 
@@ -2717,7 +2732,7 @@ contains
   end subroutine hit_npa_detector
 
  !*****************************************************************************
- !----------- get_nlauch ------------------------------------------------------
+ !----------- get_nlaunch -----------------------------------------------------
  !*****************************************************************************
   subroutine get_nlaunch(nr_markers,papprox,papprox_tot,nlaunch)
     !! routine to define the number of MC particles started in one cell
@@ -3234,7 +3249,7 @@ contains
     real(double),dimension(:)    ,allocatable :: ebarr,ptcharr,phiarr,rad_arr,theta_arr
     real(double)                   :: sinus
     real(double),dimension(3)      :: vi,vi_norm
-    real(double)                   :: vabs,xlos,ylos,zlos,xlos2,ylos2,zlos2
+    real(double)                   :: vabs
     real(double),dimension(n_stark):: intens !!intensity vector
     real(double),dimension(n_stark):: wavel  !!wavelength vector [A)
    !! Determination of the CX probability
@@ -3337,18 +3352,10 @@ contains
        if(spec%chan_id(ichan).gt.0)cycle loop_over_channels
 
        print*,'channel:',ichan
-       xlos=spec%xyzlos(ichan,1)
-       ylos=spec%xyzlos(ichan,2)
-       zlos=spec%xyzlos(ichan,3)
-       !!transform into machine coordinates
-       xlos2 =  cos(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) &
-                  - sin(grid%alpha)*ylos + grid%origin(1)
-       ylos2 =  sin(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) & 
-                  + cos(grid%alpha)*ylos + grid%origin(2)
-       zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
-       
-       radius=sqrt(xlos2**2 + ylos2**2)
+
+       radius=spec%radius(ichan)
        print*,'Radius:',radius
+
        !! Calcullate mean kinetic profiles...
        cc=0       ; max_wght=0.d0 ; los_wght=0.d0 ; wght=0.d0
        fdens=0.d0 ; hdens=0.d0    ; tdens=0.d0    ; halodens=0.d0
@@ -3631,7 +3638,7 @@ contains
     real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr
     real(double), dimension(100)    :: rd_arr,phid_arr !!npa detector array
     real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
-    real(double)                    :: xlos,ylos,zlos,xlos2,ylos2,zlos2,xcen,ycen,rshad,rs
+    real(double)                    :: xcen,ycen,rshad,rs
     real(double)                    :: vabs,denf,fbm_denf,wght,b_abs,dE,dP,ccnt
 
     !! Determination of the CX probability
@@ -3693,18 +3700,8 @@ contains
        if(spec%chan_id(ichan).ne.1)cycle loop_over_channels
 
        print*,'Channel:',ichan
-       xlos=spec%xyzlos(ichan,1)
-       ylos=spec%xyzlos(ichan,2)
-       zlos=spec%xyzlos(ichan,3)
 
-       !!transform into machine coordinates
-       xlos2 =  cos(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) &
-              - sin(grid%alpha)*ylos + grid%origin(1)
-       ylos2 =  sin(grid%alpha)*(cos(grid%beta)*xlos + sin(grid%beta)*zlos) & 
-              + cos(grid%alpha)*ylos + grid%origin(2)
-       zlos2 = -sin(grid%beta)*xlos + cos(grid%beta)*zlos + grid%origin(3)
-       
-       radius=sqrt(xlos2**2 + ylos2**2)
+       radius=spec%radius(ichan)
        write(*,'(A,f10.3)') ' Radius: ',radius
        rad_arr(cnt)=radius
        

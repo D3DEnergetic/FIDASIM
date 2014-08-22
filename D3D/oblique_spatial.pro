@@ -7,7 +7,7 @@ return, [(xy[1]-y210co)^2-d^2+(xy[0]-x210co)^2,$
  
 END 
 
-FUNCTION spatial,whichcal,plot=plot
+FUNCTION oblique_spatial,shot,whichcal=whichcal,plot=plot
 
 ;INPUT
 ;whichcal (optional)
@@ -30,7 +30,7 @@ FUNCTION spatial,whichcal,plot=plot
 
 common share, d,x210co,y210co,a210R,b210R
 
-IF N_ELEMENTS(whichcal) EQ 0 THEN BEGIN
+IF not keyword_set(whichcal) THEN BEGIN
 whichcal='forward2012'
 print,'Using spatial calibration data from 4/10/2012'
 ENDIF

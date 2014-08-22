@@ -34,6 +34,7 @@ For tsch shell:
     setenv NETCDF_LIB /path/to/netcdf/install/lib
     setenv LD_LIBRARY_PATH "/path/to/netcdf/install/lib":{$LD_LIBRARY_PATH}
     setenv LD_LIBRARY_PATH "/path/to/netcdf/install/include":{$LD_LIBRARY_PATH}
+    setenv PATH {$FIDASIM_DIR}LIB:{$PATH}
     
 For bash shell:
 
@@ -43,6 +44,7 @@ For bash shell:
     export NETCDF_LIB=/path/to/netcdf/install/lib
     export LD_LIBRARY_PATH=/path/to/netcdf/install/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/path/to/netcdf/install/include:$LD_LIBRARY_PATH
+    export PATH=$FIDASIM_DIR/LIB:$PATH
 
 The GNU Fortran compiler, gfortran (version >= 4.7.3), is recommended. You can also use Intel Fortran compiler (version >= 11.0). The non-commercial version of the Intel compiler is available [here](http://software.intel.com/en-us/non-commercial-software-development)
 
@@ -58,6 +60,11 @@ From the install directory run
 ## 5. Device Specific Installation Instructions
 These installation instructions are unique to each machine. For instructions on how to get FIDASIM to work with a particular machine see the section titled "How do make FIDASIM work for your device"
 ### DIII-D
+Cerview routines are needed to run prefida. Add the commands located in ```D3D/d3d_startup.pro``` to your IDL startup file or start IDL as follows
+'''bash
+venus ~ $ idl D3D/d3d_startup.pro
+```
+ 
 FIDASIM currently does not run on the venus cluster since it does not have the required libraries.
 
 ### NSTX-U

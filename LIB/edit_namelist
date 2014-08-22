@@ -13,7 +13,7 @@ def main():
                         help = 'Namelist file or result directory')
     parser.add_argument('-var',
                        	help = 'Variable to edit')
-    parser.add_argument('-valo',
+    parser.add_argument('-val',
                         help = 'Value to set')					
     parser.add_argument('-v','--verbose',
                         action = 'store_true',
@@ -43,7 +43,7 @@ def main():
                 if args.verbose: print("")
                 continue
             if words[0] == args.var and words[1] == "=":
-                words[2] = args.value
+                words[2] = args.val
             newlines.append(' '.join(words))
             if args.verbose:
                 print(' '.join(words))

@@ -61,7 +61,7 @@ From the install directory run
 These installation instructions are unique to each machine. For instructions on how to get FIDASIM to work with a particular machine see the section titled "How do make FIDASIM work for your device"
 ### DIII-D
 Cerview routines are needed to run prefida. Add the commands located in ```D3D/d3d_startup.pro``` to your IDL startup file or start IDL as follows
-'''bash
+```bash
 venus ~ $ idl D3D/d3d_startup.pro
 ```
  

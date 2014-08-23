@@ -188,7 +188,8 @@ Note: JSON input file only runs on IDL v8.2 and above. If you don't have a compa
 "calc_fida_wght":1,     // (0 or 1) If 1 then fida weight functions are calculated
 "calc_npa_wght":0,      // (0 or 1) If 1 then npa weight functions are calculated
 "load_neutrals":0,      // (0 or 1) If 1 then the neutral density is loaded from an existing run 
-"load_fbm":1            // (0 or 1) If 1 then the fbm is loaded (calc_spec/npa overwrites)
+"load_fbm":1,            // (0 or 1) If 1 then the fbm is loaded (calc_spec/npa overwrites)
+"interactive":0         // (0 or 1) If 1 then percent complete is shown
 
 //------------------------------------------------
 // Extra Variables

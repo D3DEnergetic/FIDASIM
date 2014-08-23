@@ -76,7 +76,8 @@ module load git/1.8.0.2
 module load intel
 #GIT AND INTEL MODULES MUST BE LOADED BEFORE PATHSCALE MODULE
 module load pathscale
-
+module load nstx/python-2.7
+module load python/scipy
 ```
 * If you run FIDASIM on portal you will get an angry email. Make sure to schedule the job using the "use" command.
 * Use the following link to clone the repository http://github.com/D3DEnergetic/FIDASIM.git

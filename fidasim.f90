@@ -2859,7 +2859,7 @@ contains
                      *spec%dlambda*(4.d0*pi)*1.d-4 !! [ph/m^2/s/bin]
              enddo loop_over_channels
              ccnt=ccnt+1
-             if (inputs%interactive)then 
+             if (inputs%interactive.eq.1)then 
              	!$OMP CRITICAL
              	WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
              	!$OMP END CRITICAL
@@ -2964,7 +2964,7 @@ contains
                 enddo loop_along_track
              enddo loop_over_dcx
              ccnt=ccnt+1
-             if (inputs%interactive)then
+             if (inputs%interactive.eq.1)then
                 !$OMP CRITICAL
                 WRITE(6,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
                 !$OMP END CRITICAL
@@ -3068,7 +3068,7 @@ contains
                    enddo loop_along_track
                 enddo loop_over_halos
                 ccnt=ccnt+1
-                if (inputs%interactive)then
+                if (inputs%interactive.eq.1)then
                     !$OMP CRITICAL
                     WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
                     !$OMP END CRITICAL
@@ -3218,7 +3218,7 @@ contains
         enddo loop_over_fast_ions
       enddo npa_loop
       cnt=cnt+1
-      if (inputs%interactive)then
+      if (inputs%interactive.eq.1)then
           !$OMP CRITICAL
           WRITE(*,'(f7.2,"%",a,$)') cnt/maxcnt*100,char(13)
           !$OMP END CRITICAL
@@ -3840,7 +3840,7 @@ contains
              enddo loop_over_energy
             endif
             ccnt=ccnt+1
-            if (inputs%interactive)then
+            if (inputs%interactive.eq.1)then
                 !$OMP CRITICAL
                 WRITE(*,'(f7.2,"%",a,$)') ccnt/real(grid%ngrid)*100,char(13)
                 !$OMP END CRITICAL

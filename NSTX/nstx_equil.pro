@@ -15,9 +15,12 @@ FUNCTION nstx_equil,inputs,grid,det
     gfiletest=findfile(gfile)
     if gfiletest ne '' then begin
         print,'Restoring equilibrium from gfile'
-        if file_test(gfile,/EXECUTABLE) then begin
+        CATCH, Error_status
+        if Error_status ne 0 then begin
             restore,gfile
-        endif else g=readg(gfile)
+            CATCH,/cancel         
+        endif
+        g = readg(gfile)
     endif else begin
         print,'Getting equilibrium from MDS+'
         g=readg(inputs.shot,inputs.time)

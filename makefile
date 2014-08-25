@@ -3,7 +3,7 @@
 
 ifeq ($(FIDASIM_COMPILER),gfortran)
 	LFLAGS = -lnetcdff -lnetcdf -lm
-	CFLAGS = -O2 -fopenmp -Wall
+	CFLAGS = -Ofast -fopenmp -Wall
 endif
 
 ifeq ($(FIDASIM_COMPILER),ifort)

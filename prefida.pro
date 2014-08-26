@@ -588,8 +588,8 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
     ;; MAP kinetic profiles on FIDASIM grid
     ;;------------------------------------------------- 
 
-    rhomax=max(profiles.rho)
-    ww=where(equil.rho_grid gt rhomax,nww)
+    rho_max=max(profiles.rho)
+    ww=where(equil.rho_grid gt rho_max,nww)
     
 
     ;;Electron density
@@ -653,11 +653,11 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
 
     if nww ne 0 then begin
         printc,'ATTENTION: Setting...',f='y'
-        printc,'    dene[rho > '+string(rhomax,f='(1f8.3)')+'] = 1e10 [cm^-3]',f='y'
-        printc,'    te[  rho > '+string(rhomax,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
-        printc,'    ti[  rho > '+string(rhomax,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
-        printc,'    vtor[rho > '+string(rhomax,f='(1f8.3)')+'] = 0 [cm/s]',f='y'
-        printc,'    zeff[rho > '+string(rhomax,f='(1f8.3)')+'] = 1 ',f='y'
+        printc,'    dene[rho > '+string(rho_max,f='(1f8.3)')+'] = 1e10 [cm^-3]',f='y'
+        printc,'    te[  rho > '+string(rho_max,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
+        printc,'    ti[  rho > '+string(rho_max,f='(1f8.3)')+'] = 1e-3 [keV]',f='y'
+        printc,'    vtor[rho > '+string(rho_max,f='(1f8.3)')+'] = 0 [cm/s]',f='y'
+        printc,'    zeff[rho > '+string(rho_max,f='(1f8.3)')+'] = 1 ',f='y'
     endif 
 
     ;;Rotate vector quantities to beam coordinates 
@@ -670,7 +670,7 @@ PRO map_profiles,inputs,grid,equil,profiles,plasma,err
     index=where(finite([ti,te,dene,denp,zeff,denp,deni]) eq 0,nind)
     if nind gt 0 then stop
     ;;-------SAVE-------
-    plasma={fbm:fbm_struct,rho_grid:equil.rho_grid,$
+    plasma={fbm:fbm_struct,rho_grid:equil.rho_grid,rho_max:rho_max,$
             bx:bx,by:by,bz:bz,ex:ex,ey:ey,ez:ez,$
             bu:equil.bx,bv:equil.by,bw:equil.bz,eu:equil.ex,ev:equil.ey,ew:equil.ez,$
             ab:inputs.ab,ai:inputs.ai,$
@@ -1141,6 +1141,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     ey_varid=ncdf_vardef(ncid,'ey',griddim,/double)
     ez_varid=ncdf_vardef(ncid,'ez',griddim,/double)
     rho_varid=ncdf_vardef(ncid,'rho_grid',griddim,/double)
+    rhomax_varid=ncdf_vardef(ncid,'rho_max',one_id,/double)
 
     ;;DEFINE BREMSTRUHLUNG VARIABLES
     brems_varid=ncdf_vardef(ncid,'brems',chan_id,/double)
@@ -1250,6 +1251,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     ncdf_varput,ncid,ey_varid, double(plasma.ey)
     ncdf_varput,ncid,ez_varid, double(plasma.ez)
     ncdf_varput,ncid,rho_varid, double(plasma.rho_grid)
+    ncdf_varput,ncid,rhomax_varid, double(plasma.rho_max)
 
     ;;WRITE BREMS
     if n_elements(brems) ne 0 then ncdf_varput,ncid,brems_varid,double(brems)

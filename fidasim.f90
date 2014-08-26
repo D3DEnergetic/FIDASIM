@@ -103,7 +103,7 @@ module application
   type grid_type
      real(double), dimension(3) :: origin !! origin
      real(double)               :: alpha  !! rotation about z
-     real(double)                :: beta   !! rotation about y/tilt
+     real(double)               :: beta   !! rotation about y/tilt
      real(double), dimension(3) :: dr     !! dx, dy, dz
      real(double)               :: drmin  !! min(dx,dy,dz)
      real(double)               :: dv     !! volume of cells
@@ -214,6 +214,7 @@ module application
      real(double)  :: btipsign 
      real(double)  :: ai   !! atomic mass of plasma ions
      real(double)  :: ab   !! atomic mass of beam neutrals
+     real(double)  :: rho_max   !! Maximum normalized flux coord
      !! Settings for weight function calculation
      integer(long) :: ne_wght
      integer(long) :: np_wght
@@ -577,7 +578,7 @@ contains
     use netcdf
     character(120):: filename
     integer(long) :: i, j, k
-    integer          :: te_var,ti_var,dene_var,deni_var,denp_var,denf_var
+    integer          :: rhomax_var,te_var,ti_var,dene_var,deni_var,denp_var,denf_var
     integer        :: vx_var,vy_var,vz_var,zeff_var,bx_var,by_var,bz_var
     integer       :: ex_var,ey_var,ez_var,rho_var,ncid,ai_var,btip_var,impc_var 
     real(double), dimension(grid%nx,grid%ny,grid%nz,3) :: bcell
@@ -611,11 +612,13 @@ contains
     call check( nf90_inq_varid(ncid, "ey", ey_var) )
     call check( nf90_inq_varid(ncid, "ez", ez_var) )
     call check( nf90_inq_varid(ncid, "rho_grid", rho_var) )
+    call check( nf90_inq_varid(ncid, "rho_max", rhomax_var) )
 
     !!READ IN OTHER PARAMETERS
     call check( nf90_get_var(ncid, ai_var, inputs%ai) )
     call check( nf90_get_var(ncid, btip_var, inputs%btipsign) )
     call check( nf90_get_var(ncid, impc_var, inputs%impurity_charge) )
+    call check( nf90_get_var(ncid, rhomax_var, inputs%rho_max) )
     call check( nf90_get_var(ncid, te_var,   cell(:,:,:)%plasma%te) )
     call check( nf90_get_var(ncid, ti_var,   cell(:,:,:)%plasma%ti) )
     call check( nf90_get_var(ncid, dene_var, cell(:,:,:)%plasma%dene) )
@@ -2379,6 +2382,7 @@ contains
     real(double)                :: ti,te          !! Ion/electron temperature
     real(double)                :: denp,dene,deni !! P/impurity/electron density
     real(double)                :: eb             !! Energy of the fast neutral
+    real(double)                :: rho            !! Normalized flux coord of cell
     integer                     :: ebi, tii,tei   !! bin postions in arrays
     !! ---- Solution of differential equation  ---- ! 
     real(double),   dimension(nlevs,nlevs)  :: eigvec, eigvec_inv
@@ -2407,11 +2411,10 @@ contains
     ti=cell(ac(1),ac(2),ac(3))%plasma%ti
     te=cell(ac(1),ac(2),ac(3))%plasma%te
     vrot=cell(ac(1),ac(2),ac(3))%plasma%vrot
+    rho=cell(ac(1),ac(2),ac(3))%rho
 
-    !! IF the temperature or density is too low, stop simulation
-    !! => particles in the SOL
-    !! (stopped by return of photons=0.!)
-    if(ti.le.0.05.or.te.le.0.05.or.denp.lt.1.d12)then
+    !! If cells rho is greater than rho_max then stop simulation
+    if(rho.gt.inputs%rho_max) then
        if(neut_type.le.3.and.neut_type.ne.0)then  !! Store density for NBI simulation!
           dens(:)=states*dt/nlaunch!![neutrals/(cm^3)]!!
           result%neut_dens(ac(1),ac(2),ac(3),:,neut_type)= & 

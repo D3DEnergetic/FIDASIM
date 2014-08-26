@@ -813,6 +813,7 @@ PRO write_namelist,inputs
     printf,55,f='("wavel_end_wght = ",1f12.5,"    !! Wavelength End for Weights ")',inputs.wavel_end_wght
     printf,55,''
     printf,55,'/'
+    printf,55,''
     close,55
     printc, 'SUCCESS: Namelist file created: '+filename,f='g'
 END

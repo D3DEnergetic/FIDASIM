@@ -47,8 +47,10 @@ def main():
             newlines.append(' '.join(words))
             if args.verbose:
                 print(' '.join(words))
-        text = '\n'.join(newlines)
 
+        newlines.append('\n')
+        text = '\n'.join(newlines)
+        
         f = open(file,'wb')
         f.write(text)
         f.close()        

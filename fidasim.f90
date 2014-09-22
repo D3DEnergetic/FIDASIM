@@ -2491,6 +2491,15 @@ contains
     exp_eigval_dt = exp(eigval*dt)   ! to improve speed (used twice)
     states(:) = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
     dens(:)   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)/nlaunch
+
+    !! - Protect against negative values
+    if ((minval(states).lt.0).or.(minval(dens).lt.0)) then
+        do n=1,nlevs
+            if(states(n).lt.0) states(n)=0.0
+            if(dens(n).lt.0) dens(n)=0.0
+        enddo
+    endif
+
     if(neut_type.ne.0) then
       !$OMP CRITICAL(col_rad)
       result%neut_dens(ac(1),ac(2),ac(3),:,neut_type)= & 
@@ -3636,6 +3645,7 @@ contains
     integer(long)                   :: ii,jj,kk,i,j,ic,jc,kc   !!indices
     integer,dimension(1)            :: minpitch,ipitch,ienergy,ix,iy,iz
     real(float),  dimension(:,:,:,:,:), allocatable :: emissivity
+    real(float),  dimension(:,:,:,:,:), allocatable :: attenuation
     real(double), dimension(:,:,:),     allocatable :: wfunct_tot
     real(double), dimension(:,:),       allocatable :: flux_tot
     real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr
@@ -3663,7 +3673,7 @@ contains
 
     !!netCDF variables
     integer :: ncid,dimid1,dimid3(3),dimid5(5),nchan_dimid,ne_dimid,np_dimid,nx_dimid,ny_dimid,nz_dimid
-    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid,emiss_varid,nchan_varid
+    integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,flux_varid,emiss_varid,nchan_varid,atten_varid
 
     !! define pitch, energy arrays
     !! define energy - array
@@ -3691,11 +3701,13 @@ contains
     print*,'----'
     !! define storage arrays   
     allocate(emissivity(grid%Nx,grid%Ny,grid%Nz,inputs%ne_wght,nchan))
+    allocate(attenuation(grid%Nx,grid%Ny,grid%Nz,inputs%ne_wght,nchan))
     allocate(wfunct_tot(inputs%ne_wght,inputs%np_wght,nchan))
     allocate(flux_tot(inputs%ne_wght,nchan))  
     allocate(rad_arr(nchan))
    
     emissivity(:,:,:,:,:)=emissivity(:,:,:,:,:)*0.
+    attenuation(:,:,:,:,:)=attenuation(:,:,:,:,:)*0.
     wfunct_tot(:,:,:)=wfunct_tot(:,:,:)*0.
     flux_tot(:,:)=flux_tot(:,:)*0.
     cnt=1
@@ -3829,6 +3841,8 @@ contains
                enddo
                !$OMP CRITICAL(npa_wght)
                pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma
+               attenuation(ii,jj,kk,ic,cnt) = pcxa
+
                wfunct_tot(ic,minpitch(1),cnt) = wfunct_tot(ic,minpitch(1),cnt) + &
                  sum(pcx)*pcxa*cell(ii,jj,kk)%los_wght(ichan)*grid%dv
 
@@ -3883,6 +3897,7 @@ contains
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimid3,wfunct_varid) )
     call check( nf90_def_var(ncid,"flux",NF90_DOUBLE,(/ ne_dimid,nchan_dimid /),flux_varid) )
     call check( nf90_def_var(ncid,"emissivity",NF90_FLOAT,dimid5,emiss_varid) )
+    call check( nf90_def_var(ncid,"attenuation",NF90_FLOAT,dimid5,atten_varid) )
 
     !Add unit attributes
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
@@ -3899,6 +3914,7 @@ contains
     call check( nf90_put_var(ncid, wfunct_varid, wfunct_tot) )
     call check( nf90_put_var(ncid, flux_varid, flux_tot) )
     call check( nf90_put_var(ncid, emiss_varid, emissivity) )
+    call check( nf90_put_var(ncid, atten_varid, attenuation) )
 
     !Close netCDF file
     call check( nf90_close(ncid) )
@@ -3910,6 +3926,7 @@ contains
     deallocate(ptcharr)
     deallocate(wfunct_tot)
     deallocate(emissivity)
+    deallocate(attenuation)
     deallocate(flux_tot)  
     deallocate(rad_arr)
   end subroutine npa_weight_function

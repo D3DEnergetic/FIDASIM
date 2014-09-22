@@ -772,6 +772,7 @@ PRO write_namelist,inputs
         printf,55,'!! FIDASIM version: 0.3 '
     endelse
 
+    printf,55,'!! Comment: '+inputs.comment
     printf,55,'&fidasim_inputs'
     printf,55,''
     printf,55,'!! Shot Info'
@@ -830,6 +831,10 @@ PRO check_inputs,inputs,err
           "calc_npa_wght","calc_brems","load_neutrals","load_fbm","interactive"]
 
     inVars=strlowcase(TAG_NAMES(inputs))
+
+    if where('comment' eq inVars) eq -1 then begin
+        inputs = create_struct(inputs,'comment','Default comment')
+    endif
 
     err=0
     for i=0,n_elements(vars)-1 do begin

@@ -95,6 +95,7 @@ Note: JSON input file only runs on IDL v8.2 and above. If you don't have a compa
 //                PREFIDA INPUT FILE
 //-----------------------------------------------------
 {
+"comment":"This is a comment"
 "shot":146088,          // Shot Number
 "time":1.385,           // Time 
 "runid":"146088H05",    // runid of FIDASIM

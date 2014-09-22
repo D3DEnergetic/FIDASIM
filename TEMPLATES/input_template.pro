@@ -11,6 +11,7 @@ PRO input_template,inputs                                   ;; Name of this file
 ;;-----------------------------------------------------
 ;;              PREFIDA INPUT FILE
 ;;-----------------------------------------------------
+comment='This is a comment'
 shot=146088L                                            ;; Shot Number
 time=1.385                                              ;; Time 
 runid='146088H05'                                       ;; runid of FIDASIM
@@ -108,7 +109,7 @@ interactive=[1]                                         ;; (0 or 1) If 1 then pe
 ;; DO NOT MODIFY THIS PART
 ;;------------------------------------------------
 install_dir=+GETENV('FIDASIM_DIR')
-inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
+inputs={comment:comment,shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
         cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
         einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
         lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$

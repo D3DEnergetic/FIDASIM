@@ -2,6 +2,7 @@ PRO nstx_input,inputs
 ;;=============================================================================
 ;;PREFIDA INPUT FILE FOR NSTX or NSTX-U
 ;;=============================================================================
+comment='This is a template for NSTX runs'
 shot=122631L                           ;; Shot Number
 time=0.1                               ;; Time in second
 runid='122631L21_fi1_tssnpa'  ;; runid of FIDASIM
@@ -117,7 +118,7 @@ interactive=[1]         ;; (0 or 1) If 1 then percent complete is shown
 install_dir=+GETENV('FIDASIM_DIR')
 ;;device=strupcase(device)
 
-inputs={shot:shot,time:time,runid:runid,device:device,install_dir:install_dir,$
+inputs={comment:comment,shot:shot,time:time,runid:runid,device:device,install_dir:install_dir,$
         result_dir:result_dir,cdf_file:cdf_file,profile_dir:profile_dir,$   
         emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
         einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,$

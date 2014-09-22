@@ -3224,7 +3224,11 @@ contains
             ac=icell(:,jj)
             call colrad(ac(:),vi(:),tcell(jj) &
                 ,states,photons,fida_type,nlaunch(i,j,k),ri(:),det)
-            if(photons.le.0.d0)cycle loop_over_fast_ions
+            if(inputs%calc_npa.eq.1) then
+               if(cell(ac(1),ac(2),ac(3))%rho.gt.inputs%rho_max)cycle loop_over_fast_ions
+            else
+               if(photons.le.0.d0)cycle loop_over_fast_ions
+            endif
             if(inputs%calc_spec.eq.1) call spectrum(vi(:),ac(:),pos(:,jj),photons,fida_type)
           enddo loop_along_track
         enddo loop_over_fast_ions
@@ -3837,7 +3841,9 @@ contains
                do kc=1,ncell 
                  ac=icell(:,kc)
                  call colrad(ac(:),vi(:),tcell(kc)/vabs,states,photons,0,1.d0)
-                 if (photons.le.0) exit
+                 if (cell(ac(1),ac(2),ac(3))%rho.gt.inputs%rho_max) then
+                     exit
+                 endif
                enddo
                !$OMP CRITICAL(npa_wght)
                pcxa=sum(states)/sum(states_i) !!This is probability of a particle not attenuating into plasma

@@ -3255,7 +3255,7 @@ contains
     real(double), dimension(3)     :: evec,vrot,los_vec,evec_sav,vrot_sav
     real(double), dimension(3)     :: a_norm,b_norm,c_norm,b_norm_sav
     real(double)                   :: b_abs,theta,b_abs_sav
-    real(double)                   :: ti,te,dene,denp,deni,length
+    real(double)                   :: ti,te,dene,denp,deni,length,rho,rho_sav
     real(double)                   :: ti_sav,te_sav,dene_sav,denp_sav,deni_sav
     real(double)                   :: rad,max_wght
     integer                        :: nwav,nchan
@@ -3359,6 +3359,7 @@ contains
     b_abs_sav=cell(ac(1),ac(2),ac(3))%plasma%b_abs
     b_norm_sav=cell(ac(1),ac(2),ac(3))%plasma%b_norm
     evec_sav=cell(ac(1),ac(2),ac(3))%plasma%E
+    rho_sav=cell(ac(1),ac(2),ac(3))%rho
 
     cnt=1
     loop_over_channels: do ichan=1,spec%nchan
@@ -3379,7 +3380,7 @@ contains
        b_norm=0.d0
        ti=0.d0    ; te=0.d0
        dene=0.d0  ; denp=0.d0     ; deni=0.d0
-       vrot=0.d0  ; pos=0.d0 
+       vrot=0.d0  ; pos=0.d0      ; rho=0.d0
        do k=1,grid%nz
           do j=1,grid%ny 
              do i=1,grid%nx 
@@ -3408,6 +3409,7 @@ contains
                    dene   =dene   +cell(i,j,k)%plasma%dene  * wght(cc)
                    denp   =denp   +cell(i,j,k)%plasma%denp  * wght(cc)
                    deni   =deni   +cell(i,j,k)%plasma%deni  * wght(cc)
+                   rho    =rho    +cell(i,j,k)%rho          * wght(cc)
                    vrot(:)=vrot(:)+cell(i,j,k)%plasma%vrot(:)*wght(cc)
                    pos(:)=pos(:)+(/grid%xxc(i),grid%yyc(j),grid%zzc(k)/) &
                         *wght(cc)
@@ -3429,6 +3431,8 @@ contains
        vnbi_h=vnbi_f/sqrt(2.d0)
        vnbi_t=vnbi_f/sqrt(3.d0)     
        !! normalize quantities
+       rho=rho / rad
+       cell(ac(1),ac(2),ac(3))%rho=rho
        denp=denp / rad
        cell(ac(1),ac(2),ac(3))%plasma%denp=denp
        dene=dene / rad
@@ -3532,6 +3536,7 @@ contains
                    states=states + rates/nr_halo_neutrate
                 enddo
                 call colrad(ac,vi,dt,states,photons,0,1.d0)
+                if(isnan(photons))photons=0
                 !! photons: [Ph*cm/s/fast-ion]-!!
                 !! calcualte spectrum of this one fast-ion
                 call spectrum(vi,ac,pos,1.d0,nbif_type,wavel,intens)
@@ -3566,6 +3571,7 @@ contains
 
     !! use only cell 111 for the calculation!
     ac=(/1,1,1/)
+    cell(ac(1),ac(2),ac(3))%rho=rho_sav
     cell(ac(1),ac(2),ac(3))%plasma%denp=denp_sav
     cell(ac(1),ac(2),ac(3))%plasma%dene=dene_sav
     cell(ac(1),ac(2),ac(3))%plasma%deni=deni_sav

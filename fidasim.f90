@@ -1259,7 +1259,7 @@ contains
     c=cell(ac(1),ac(2),ac(3))%plasma%c_norm(:)
     b_abs=cell(ac(1),ac(2),ac(3))%plasma%b_abs
     b_norm=cell(ac(1),ac(2),ac(3))%plasma%b_norm(:) 
-    one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
+    one_over_omega=inputs%ab*mass_u/(b_abs*e0)
 
     !! Use rejection method to determine velocity vector
     vi=0.d0
@@ -3750,7 +3750,7 @@ contains
             halodens=result%neut_dens(ii,jj,kk,:,halo_type)             
             b_norm(:) = cell(ii,jj,kk)%plasma%b_norm(:)
             b_abs=cell(ii,jj,kk)%plasma%b_abs
-            one_over_omega=inputs%ab*mass_u/(b_abs*e0)*1.d-2
+            one_over_omega=inputs%ab*mass_u/(b_abs*e0)
 
             if(cell(ii,jj,kk)%los_wght(ichan).gt.0) then
              pos(:) = (/grid%xxc(ii), grid%yyc(jj), grid%zzc(kk)/)

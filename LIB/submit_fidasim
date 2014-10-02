@@ -41,6 +41,10 @@ def main():
                         action = 'append',
                         default = [],
                         help = 'Command to run after code execution')
+    parser.add_argument('-rids','--runids',
+                        default = '',
+                        nargs='+',
+                        help = 'List of run ids')
     parser.add_argument('-v','--verbose',
                         action = 'store_true',
                         help = 'Verbose')
@@ -61,7 +65,10 @@ def main():
     if os.path.isfile(fileordir):
         files=[fileordir]
     elif os.path.isdir(fileordir):
-        files=glob.glob(fileordir+'/*.dat')
+        if args.runids:
+             files=[fileordir + '/' + rid + '_inputs.dat' for rid in args.runids]
+        else:
+             files=glob.glob(fileordir+'/*_inputs.dat')
     else:
         raise IOError('Not a file or directory')
 

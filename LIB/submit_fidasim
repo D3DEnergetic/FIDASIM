@@ -2,7 +2,7 @@
 
 import argparse
 import os
-import glob
+import re
 import tempfile
 from subprocess import call
 
@@ -65,10 +65,11 @@ def main():
     if os.path.isfile(fileordir):
         files=[fileordir]
     elif os.path.isdir(fileordir):
+        allfiles = os.listdir(fileordir)
         if args.runids:
-             files=[fileordir + '/' + rid + '_inputs.dat' for rid in args.runids]
+             files=[fileordir + '/' + f for f in allfiles for r in args.runids if re.search(r+'_inputs\.dat',f)]
         else:
-             files=glob.glob(fileordir+'/*_inputs.dat')
+             files=[fileordir+'/'+ f for f in allfiles if re.search('.*_inputs\.dat',f)]
     else:
         raise IOError('Not a file or directory')
 

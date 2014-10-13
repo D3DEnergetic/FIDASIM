@@ -82,6 +82,8 @@ def main():
         output_file = '_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".out"
         error_file = '_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".err"
 
+        print('Input File: '+file)
+
         args_dict =  {'file':file,'nodes':args.nodes,
                       'ppn':args.ppn,'mem':args.memory,
                       'ex':args.executable,'walltime':args.walltime,

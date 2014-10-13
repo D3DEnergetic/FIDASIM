@@ -7,6 +7,12 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 					   err				;;OUTPUT: ERROR STATUS ERR=1 == SOMETHING WENT WRONG
 
 	err=0
+ 
+    ;; CHECK FOR D3D SPECIFIC INPUTS
+    inVars=strlowcase(TAG_NAMES(inputs))
+    if where('use_transp' eq inVars) eq -1 then begin
+        inputs = create_struct(inputs,'use_transp',0) ;;DEFAULT TO GAPROFILES
+    endif
 
 	;;GET BEAM GEOMETRY
 	nbi=d3d_beams(inputs)
@@ -15,7 +21,12 @@ PRO d3d_routines,inputs,grid,$ 			;;INPUT: INPUTS AND GRID
 	chords=d3d_chords(inputs.shot,inputs.diag,isource=inputs.isource)
 
 	;;GET PROFILES
-	profiles=d3d_profiles(inputs)
+    if inputs.use_transp eq 1 then begin
+        profiles=create_transp_profiles(inputs)
+    endif else begin
+	    profiles=d3d_profiles(inputs)
+    endelse
+
 	if profiles.err eq 1 then begin
 		print,'FAILED TO GET PROFILES'
 		err=1

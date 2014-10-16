@@ -57,7 +57,7 @@ FUNCTION get_mainion_geom,shot,beam
 	ylos = []
 	zlos = []
     for i=0,n_elements(mchords)-1 do begin
-        bst_chord_param,shot,mchords[i],'210rt'
+        bst_chord_param,shot,mchords[i],beam
         xlens = [xlens,chord_param.geometry.lens[0]]
         ylens = [ylens,chord_param.geometry.lens[1]]
         zlens = [zlens,chord_param.geometry.lens[2]]

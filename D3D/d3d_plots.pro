@@ -63,7 +63,7 @@ PRO d3d_plots,inputs,grid,nbi,chords,fida,equil,nbgeom,plasma
 		endif else begin 
     		y=(chords.ylos[los[i]]-chords.ylens[los[i]])*findgen(201)/100.+chords.ylens[los[i]]
     		x=(chords.xlos[los[i]]-chords.xlens[los[i]])*(y-chords.ylens[los[i]])/ $
-      		  (chords.ylos[los[i]]-chords.ylens[los[i]]) + chords.ylens[los[i]]
+      		  (chords.ylos[los[i]]-chords.ylens[los[i]]) + chords.xlens[los[i]]
 		    oplot,sqrt(x^2+y^2),replicate(chords.zlens[los[i]],201),color=50
 		endelse
 	endfor

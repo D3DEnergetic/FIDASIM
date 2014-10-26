@@ -1,4 +1,4 @@
-pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,currentmode=currentmode
+pro plot_npa,runid,histo,energy_arr,pitch_arr,distri,ps=ps,dir=dir,chan=chan,currentmode=currentmode
   ;; ROUTINE OF FIDASIM to plot resulting NPA fluxes
   ;; written by Philipp Scheider and Benedikt Geiger 2013
   ;; plot settings
@@ -15,17 +15,15 @@ pro plot_npa,histo,energy_arr,pitch_arr,distri,ps=ps,path=path,chan=chan,current
   endif
 
   ;; load fidasim results
-  if not KEYWORD_SET(path) then begin
-     path=DIALOG_PICKFILE(path='RESULTS/',/directory)
-     runid=strsplit(path,'/',/extract,count=nid)
-     runid=runid[nid-1]
+  if not KEYWORD_SET(dir) then begin
+     dir=DIALOG_PICKFILE(dir='RESULTS/',/directory)
   endif
   if not keyword_set(chan) then chan=0
-  load_results, path,fidasim
+  load_results,runid,fidasim,dir=dir
   shot=fidasim.inputs.shot
   time=fidasim.inputs.time
   los=fidasim.los
-  ;; density along NBI path
+  ;; density along NBI dir
   dens=total(fidasim.neutrals.halodens[*,*,*,*],4) $
        +total(fidasim.neutrals.fdens[*,*,*,*],4)   $
        +total(fidasim.neutrals.hdens[*,*,*,*],4)   $

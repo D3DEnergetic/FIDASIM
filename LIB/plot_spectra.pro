@@ -1,4 +1,4 @@
-PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,ps=ps,pretty=pretty
+PRO plot_spectra,runid,dir=dir,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,ps=ps,pretty=pretty
 
 	if keyword_set(fida) then fida_switch = [1,0,0] else fida_switch=[1,1,1] 
 	if keyword_set(nbi) then nbi_switch = [0,1,0] else nbi_switch=[1,1,1]
@@ -8,9 +8,9 @@ PRO plot_spectra,path=path,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=intens,p
 	plt-=min(plt)
 	if min(plt) eq max(plt) then plt=[1,1,1]
 
-	if not keyword_set(path) then path=dialog_pickfile(path='~/FIDASIM/RESULTS/',/directory)
-	print,path
-	load_results,path,results
+	if not keyword_set(dir) then dir=dialog_pickfile(dir='~/FIDASIM/RESULTS/',/directory)
+	print,dir
+	load_results,runid,results,dir=dir
 	
 	inputs=results.inputs
 	grid=results.grid

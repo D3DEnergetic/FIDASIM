@@ -1,14 +1,11 @@
-pro plot_birth,ps=ps,path=path
+pro plot_birth,runid,ps=ps,dir=dir
   ;; PLOT ROUTINE of FIDASIM to illustrate the FAST-ION BIRTH profile of a
   ;; given NBI source
   ;; wirtten by Benedikt Geiger 2013
-  if not keyword_set(path) then $
-     path=dialog_pickfile(path='RESULTS/',/directory)
+  if not keyword_set(dir) then $
+     dir=dialog_pickfile(dir='RESULTS/',/directory)
 
-  runid=strsplit(path,'/',/extract,count=nid)
-  runid=runid[nid-1]
-
-  load_results,path,fidasim
+  load_results,runid,fidasim,dir=dir
   birth_dens=fidasim.birth.birth_dens
 
   ;;[fast-ions/s/grid_cell/energy_bin/pitch_bin]
@@ -164,7 +161,7 @@ pro plot_birth,ps=ps,path=path
   ;; -------------------------------------------------------
   ;; --------- WRITE THE BIRTH PROFILE to a file !! --------
   ;; -------------------------------------------------------
-  file = path+'/birth_profile.dat'
+  file = dir+'/birth_profile.dat'
   openw, 55, file
   printf,55,'# FIDASIM birth profile created: ', systime(),' Version 1.0'
   printf,55, fidasim.inputs.shot         ,f='(i6,"         # shotnumber")'  

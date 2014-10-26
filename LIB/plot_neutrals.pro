@@ -1,6 +1,6 @@
 PRO plot_neutrals,runid,dir=dir,halo=halo,beam=beam
 
-    if not keyword_set(dir) then dir=dialog_pickfile(dir='~/FIDASIM/RESULTS/',/directory)
+    if not keyword_set(dir) then dir=dialog_pickfile(dir='~/',/directory)
     print,dir
 
 	load_results,runid,results,dir=dir

@@ -16,7 +16,7 @@ pro plot_npa,runid,histo,energy_arr,pitch_arr,distri,ps=ps,dir=dir,chan=chan,cur
 
   ;; load fidasim results
   if not KEYWORD_SET(dir) then begin
-     dir=DIALOG_PICKFILE(dir='RESULTS/',/directory)
+     dir=DIALOG_PICKFILE(dir='~/',/directory)
   endif
   if not keyword_set(chan) then chan=0
   load_results,runid,fidasim,dir=dir

@@ -1,6 +1,6 @@
 PRO plot_weights,runid,dir=dir,chan=chan,prod=prod,fida=fida,npa=npa,currentmode=currentmode
 
-	if not keyword_set(dir) then dir=dialog_pickfile(dir='~/FIDASIM/RESULTS/',/directory)
+	if not keyword_set(dir) then dir=dialog_pickfile(dir='~/',/directory)
 	print,dir
 	load_results,runid,results,dir=dir
 	

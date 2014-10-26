@@ -8,7 +8,7 @@ PRO plot_spectra,runid,dir=dir,chan=chan,fida=fida,nbi=nbi,halo=halo,intens=inte
 	plt-=min(plt)
 	if min(plt) eq max(plt) then plt=[1,1,1]
 
-	if not keyword_set(dir) then dir=dialog_pickfile(dir='~/FIDASIM/RESULTS/',/directory)
+	if not keyword_set(dir) then dir=dialog_pickfile(dir='~/',/directory)
 	print,dir
 	load_results,runid,results,dir=dir
 	

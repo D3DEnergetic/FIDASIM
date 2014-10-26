@@ -3,7 +3,7 @@ pro plot_birth,runid,ps=ps,dir=dir
   ;; given NBI source
   ;; wirtten by Benedikt Geiger 2013
   if not keyword_set(dir) then $
-     dir=dialog_pickfile(dir='RESULTS/',/directory)
+     dir=dialog_pickfile(dir='~/',/directory)
 
   load_results,runid,fidasim,dir=dir
   birth_dens=fidasim.birth.birth_dens

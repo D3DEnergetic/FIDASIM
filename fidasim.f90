@@ -1,6 +1,5 @@
-!!FIDASIM2.0 
-!Original version from W. W. Heidbrink 2007
-!rewritten in F90 by Benedikt Geiger 2012 (IPP-Garching, ASDEX Upgrade)
+!!FIDASIM Version 0.3 
+
 !The main routine (fidasim) is at the end of the file!
 module application
   use netcdf

@@ -1,4 +1,4 @@
-pro plot_npa,histo,ps=ps,path=path
+pro plot_npa,runid,histo,energy_arr,pitch_arr,distri,ps=ps,dir=dir,chan=chan,currentmode=currentmode
   ;; ROUTINE OF FIDASIM to plot resulting NPA fluxes
   ;; written by Philipp Scheider and Benedikt Geiger 2013
   ;; plot settings
@@ -15,51 +15,61 @@ pro plot_npa,histo,ps=ps,path=path
   endif
 
   ;; load fidasim results
-  if not KEYWORD_SET(path) then begin
-     path=DIALOG_PICKFILE(path='RESULTS/',/directory)
-     runid=strsplit(path,'/',/extract,count=nid)
-     runid=runid[nid-1]
+  if not KEYWORD_SET(dir) then begin
+     dir=DIALOG_PICKFILE(dir='~/',/directory)
   endif
-
-  load_results, path,fidasim
+  if not keyword_set(chan) then chan=0
+  load_results,runid,fidasim,dir=dir
   shot=fidasim.inputs.shot
   time=fidasim.inputs.time
   los=fidasim.los
-  ;; density along NBI path
+  ;; density along NBI dir
   dens=total(fidasim.neutrals.halodens[*,*,*,*],4) $
        +total(fidasim.neutrals.fdens[*,*,*,*],4)   $
        +total(fidasim.neutrals.hdens[*,*,*,*],4)   $
        +total(fidasim.neutrals.tdens[*,*,*,*],4)   
 
   ;; initial position where fast-neutral is born (ion is neutraliszed)
-  npaipos=fidasim.npa.npaipos
+  npaipos=fidasim.npa.ipos[*,*,chan]
 
   ;; position where neutral is detected!
-  npafpos=fidasim.npa.npafpos
+  npafpos=fidasim.npa.fpos[*,*,chan]
 
   ;; velocity vector of fast-neutral
-  npav=fidasim.npa.npav
+  npav=fidasim.npa.v[*,*,chan]
 
   ;; weight (particle number per marker)
-  npawght=fidasim.npa.npawght
+  npawght=fidasim.npa.wght[*,chan]
+
+  flux=fidasim.npa.flux[*,chan]
+  energy_arr=fidasim.npa.energy
 
   ;; npa weight: Particles/s/cm^2
-  headsize=mean(los.headsize)
-  npawght=npawght*(!pi*headsize^2)
-  nnpa=n_elements(npawght)
+  ww=where(npawght ne 0,nnpa)
+
+  npawght=npawght[ww]
+  npav=npav[ww,*]
+  npaipos=npaipos[ww,*]
+  npafpos=npafpos[ww,*]
+
+  if keyword_set(currentmode) then begin
+    ; Use simple model based on Fig. 2 of Shinohara et al., RSI 75 (2004) 3640
+    eintercept=25.        ; keV--value depends on foil & detector
+    cmode=0.
+  end
 
   ;; plot initial and end position of fast-ion trajectories on
   ;; top-down view
   contour,total(dens,3),fidasim.grid.x_grid[*,*,0],fidasim.grid.y_grid[*,*,0] $
           ,c_colors=(dindgen(20)+1.)*11,nlevels=20 $
           ,/isotropic,xtit='X [cm]',ytit='Y [cm]'
-
-  for ichan=0,los.nchan-1 do oplot,[los.xyzlens[ichan,0],los.xyzlos[ichan,0]] $
-                                   ,[los.xyzlens[ichan,0],los.xyzlos[ichan,0]]
-
+  oplot,fidasim.grid.x_grid[*,*,0],fidasim.grid.y_grid[*,*,0],psym=3
+  for ichan=0,los.nchan-1 do begin
+      if fidasim.los.chan_id[ichan] ne 1 then continue
+      oplot,[los.xlens[ichan],los.xlos[ichan]] $
+          ,[los.ylens[ichan],los.ylos[ichan]]
+  endfor
   for i=0,nnpa-1 do oplot,[npaipos[i,0]],[npaipos[i,1]],psym=3,color=254./nnpa*i
-
-  oplot, npafpos[*,0],npafpos[*,1],psym=3,thick=2
 
   ;; PLOT Histogram
   if keyword_set(ps) then device, filename='PLOTS/npa_histogram.eps' $
@@ -67,14 +77,11 @@ pro plot_npa,histo,ps=ps,path=path
 
   ;; Define arrays for histograms
   ;; energy array:
-  nen  = 50.
-  emax = 100.
-  emin = 0.
-  energy_arr = emin+dindgen(nen)/(nen-1.)*(emax-emin)
+  nen  = n_elements(energy_arr)
   dE   = energy_arr[1]-energy_arr[0]
 
   ;;pitch array:
-  npitch = 50
+  npitch = 40
   pmin   = -1.
   pmax   = 1.
   pitch_arr = pmin+dindgen(npitch)/(npitch-1.)*(pmax-pmin)
@@ -88,7 +95,6 @@ pro plot_npa,histo,ps=ps,path=path
 
   ;; detector heads (here only 1)
   ndet=1
-  histo =fltarr(ndet,nen)
   distri=fltarr(ndet,nen,npitch)
 
 ; loop over all particles which reach the detector
@@ -108,6 +114,9 @@ pro plot_npa,histo,ps=ps,path=path
         ;; calculate energy of neutral
         energy=0.5*mass*vabs^2/(ec*1.e3)*1.e-4 ; [keV]
 
+        if keyword_set(currentmode) then begin
+          if energy gt eintercept then cmode+=(energy-eintercept)*npawght[i]
+        endif
         ;; get magnetic field where neutral was born
         dummy=min(abs(fidasim.grid.x_grid[*,0,0]-npaipos[i,0]),xind)
         dummy=min(abs(fidasim.grid.y_grid[0,*,0]-npaipos[i,1]),yind)
@@ -122,19 +131,30 @@ pro plot_npa,histo,ps=ps,path=path
 
         ;; calculate pitch of neutral
         pitch=(vec[0]*bvec[0]+vec[1]*bvec[1]+vec[2]*bvec[2]) $
-              *fidasim.fbm.pitch_sign_convention
+              *fidasim.plasma.btipsign
         dummy=min(abs(energy_arr-energy),eindex)
         dummy=min(abs(pitch_arr-pitch),pindex)    
-        histo[idet,eindex]=histo[idet,eindex]+npawght[i]
-        distri[idet,eindex,pindex]=distri[idet,eindex,pindex]+npawght[i]
+
+        if keyword_set(currentmode) then begin
+            cm=0
+            if energy gt eintercept then cm=(energy-eintercept)
+	        distri[idet,eindex,pindex]=distri[idet,eindex,pindex] + cm
+		endif else begin    
+    		distri[idet,eindex,pindex]=distri[idet,eindex,pindex]+npawght[i]
+        endelse
         pEnergy[i] = eindex
      endfor
 
      contour,distri[idet,*,*],energy_arr,pitch_arr $
              ,c_colors=indgen(20)*12,nlevels=20,/fill,yran=[-1,1] $
              ,ytit='Pitch',xtit='Energy [keV]'
-     plot, energy_arr, histo,ytit='neutrals/s',xtit='Energy [keV]',psym=10
+     plot, energy_arr, flux,ytit='neutrals/s',xtit='Energy [keV]',psym=10
+
   endfor
   if keyword_set(ps) then device, /close
+
+  if keyword_set(currentmode) then print,'Current mode:',cmode
+
+  !p.multi=0
 end 
 

@@ -1,0 +1,106 @@
+//-----------------------------------------------------
+//                PREFIDA INPUT FILE
+//-----------------------------------------------------
+{
+"comment":"This is a template for D3D runs",
+"shot":146088,          // Shot Number
+"time":1.385,           // Time 
+"runid":"146088H05",    // runid of FIDASIM
+"device":"D3D",         // D3D,NSTX,AUGD,MAST
+"result_dir":"/u/stagnerl/FIDASIM/RESULTS/D3D/",           
+                        // Location where results will be stored
+"profile_dir":"/u/heidbrin/OANB/AUG/",                     
+                        // Location of profile files
+
+//-----------------------------------------------------
+// Fast-ion distribution function from transp
+//-----------------------------------------------------
+"cdf_file":"/e/alfven/FIDAsim/D3D/146088/146088H02_fi_9.cdf",    
+                        // CDF file from transp with the distribution funciton
+"emin":0.0,             // Minimum energy used from the distribution function
+"emax":100.0,           // Maximum energy used from the distribution function
+"pmin":-1.0,            // Minimum pitch used from the distribution function
+"pmax":1.0,             // Maximum pitch used from the distribution function
+
+//-----------------------------------------------------
+// Beam/FIDA/EQUILIBRIUM Selection
+//-----------------------------------------------------
+"isource":5,            // Beam source index (FIDASIM only simulates one NBI source)
+"einj":0.,              // [keV] If 0, get data from MDS+
+"pinj":0.,              // [MW] If 0, get data from MDS+
+"diag":"OBLIQUE",       // Name of the diagnostics 
+"equil":"EFIT01",       // Name of equilibrium. Ex. for D3D EFIT02
+
+//-----------------------------------------------------
+// Discharge Parameters
+//-----------------------------------------------------
+"btipsign":-1.0,        // Bt and Ip are in the opposite direction   
+"ab":2.01410178,        // Atomic mass of beam [u]
+"ai":2.01410178,        // Atomic mass of hydrogenic plasma ions [u]
+"impurity_charge":6,    // 5: BORON, 6: carbon, 7: Nitrogen
+
+//-----------------------------------------------------
+// Wavelength Grid
+//-----------------------------------------------------
+"lambdamin":647.0,      // Minimum wavelength of wavelength grid [nm] 
+"lambdamax":667.0,      // Maximum wavelength of wavelength grid [nm] 
+"nlambda":2000,         // Number of wavelengths
+"dlambda":0.01,         // Wavelength seperation
+
+//---------------------------------------------------
+// Define FIDASIM grid in machine coordinates(x,y,z)
+//---------------------------------------------------
+"nx":40,                // Number of cells in x direction
+"ny":60,                // Number of cells in y direction
+"nz":50,                // Number of cells in z direction
+"xmin":-170.0,          // Minimum x value
+"xmax":-70.0,           // Maximum x value
+"ymin":-195.0,          // Minimum y value
+"ymax":-80.0,           // Maximum y value
+"zmin":-70.0,           // Minimum z value
+"zmax":70.0,            // Maximum z value
+
+"origin":[0,0,0],       // If using different a coordinate system, this is the origin 
+                        // in machine coordinates of the new system
+
+"alpha":0.0,            // Rotation angle in radians from +x about z axis that transforms machine
+                        // coordinates to the new system. 
+"beta":0.0,             // Rotation about +y axis
+
+//--------------------------------------------------
+// Define number of Monte Carlo particles
+//--------------------------------------------------
+"nr_fast":5000000,      // FIDA
+"nr_nbi":50000,         // Beam emission
+"nr_halo":500000,       // Halo contribution
+
+//--------------------------------------------------
+// Calculation of the weight function
+//--------------------------------------------------
+"ne_wght":50,               // Number of Energies 
+"np_wght":50,               // Number of Pitches 
+"nphi_wght":50,             // Number of Gyro-angles 
+"emax_wght":125.0,          // Maximum energy (keV)
+"ichan_wght":-1,            // -1 for all channels, otherwise a given channel index
+"dwav_wght":0.2,            // Wavelength interval
+"wavel_start_wght":651.0,   // Minimum wavelength
+"wavel_end_wght":663.0,     // Maximum wavelength
+
+//-------------------------------------------------
+// Simulation switches
+//-------------------------------------------------
+"calc_npa":0,           // (0 or 1) If 1 do a simulation for NPA
+"calc_spec":1,          // (0 or 1) If 1 then spectra is calculated
+"calc_birth":1,         // (0 or 1) If 1 then the birth profile is calculated
+"calc_brems":0,         // (0 or 1) If 0 use the IDL bremstrahlung calculation
+"calc_fida_wght":1,     // (0 or 1) If 1 then fida weight functions are calculated
+"calc_npa_wght":0,      // (0 or 1) If 1 then npa weight functions are calculated
+"load_neutrals":0,      // (0 or 1) If 1 then the neutral density is loaded from an existing run 
+"load_fbm":1,           // (0 or 1) If 1 then the fbm is loaded (calc_spec/npa overwrites)
+"interactive":1         // (0 or 1) If 1 then percent complete is shown
+
+//------------------------------------------------
+// Extra Variables
+//------------------------------------------------
+
+}

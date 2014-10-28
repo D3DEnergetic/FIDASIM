@@ -13,7 +13,7 @@ It was originally developed in IDL at UC Irvine [1] and converted to Fortran 90 
 ## 1. Install dependencies
 FIDASIM reads and writes netCDF files. This requires netCDF-4.1.3 or earlier. You can download the library from [here](http://www.unidata.ucar.edu/downloads/netcdf/netcdf-4_1_3/index.jsp)
 
-Note: By default netCDF will build using the GNU fortran compiler, gfortran. If you plan to use the Intel Fortran Compiler you must also build the 
+Note: By default netCDF will build using the GNU Fortran compiler, gfortran. If you plan to use the Intel Fortran compiler you must also build the 
 netCDF library using it. Instructions on how to do this can be found [here](http://software.intel.com/en-us/articles/performance-tools-for-software-developers-building-netcdf-with-the-intel-compilers).
 Also, netCDF has the option of using HDF5 data format. This, naturally, requires the HDF5 libraries. If you do not have access to the HDF5 libraries netCDF can be built without it.
 
@@ -29,20 +29,24 @@ FIDASIM will not compile out of the box. You will first need to set the followin
 For tsch shell:
 
     setenv FIDASIM_DIR /path/to/fidasim/install/    #don't forget the last slash
+    setenv FIDASIM_COMPILER gfortran #use 'ifort' for Intel compiler
     setenv NETCDF_INCLUDE /path/to/netcdf/install/include
     setenv NETCDF_LIB /path/to/netcdf/install/lib
     setenv LD_LIBRARY_PATH "/path/to/netcdf/install/lib":{$LD_LIBRARY_PATH}
     setenv LD_LIBRARY_PATH "/path/to/netcdf/install/include":{$LD_LIBRARY_PATH}
+    setenv PATH {$FIDASIM_DIR}LIB:{$PATH}
     
 For bash shell:
 
-    export FIDASIM_DIR = /path/to/fidasim/install/    #don't forget the last slash
-    export NETCDF_INCLUDE = /path/to/netcdf/install/include
-    export NETCDF_LIB = /path/to/netcdf/install/lib
-    export LD_LIBRARY_PATH = /path/to/netcdf/install/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH = /path/to/netcdf/install/include:$LD_LIBRARY_PATH
+    export FIDASIM_DIR=/path/to/fidasim/install/    #don't forget the last slash
+    export FIDASIM_COMPILER=gfortran #use 'ifort' for Intel compiler
+    export NETCDF_INCLUDE=/path/to/netcdf/install/include
+    export NETCDF_LIB=/path/to/netcdf/install/lib
+    export LD_LIBRARY_PATH=/path/to/netcdf/install/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/path/to/netcdf/install/include:$LD_LIBRARY_PATH
+    export PATH=$FIDASIM_DIR/LIB:$PATH
 
-The Intel Fortran compiler (version >= 11.0) is recommended. You can download the non-commercial version from [here](http://software.intel.com/en-us/non-commercial-software-development)
+The GNU Fortran compiler, gfortran (version >= 4.7.3), is recommended. You can also use Intel Fortran compiler (version >= 11.0). The non-commercial version of the Intel compiler is available [here](http://software.intel.com/en-us/non-commercial-software-development)
 
 The last step is the run make in the source directory
 
@@ -51,15 +55,16 @@ The last step is the run make in the source directory
 ## 4. Run a test case
 From the install directory run 
 
-    fidasim TEST/D3D
-
-or 
-
-    fidasim TEST/AUGD
+    fidasim TEST/D3D/146088H06_inputs.dat
 
 ## 5. Device Specific Installation Instructions
 These installation instructions are unique to each machine. For instructions on how to get FIDASIM to work with a particular machine see the section titled "How do make FIDASIM work for your device"
 ### DIII-D
+Cerview routines are needed to run prefida. Add the commands located in ```D3D/d3d_startup.pro``` to your IDL startup file or start IDL as follows
+```bash
+venus ~ $ idl D3D/d3d_startup.pro
+```
+ 
 FIDASIM currently does not run on the venus cluster since it does not have the required libraries.
 
 ### NSTX-U
@@ -71,7 +76,8 @@ module load git/1.8.0.2
 module load intel
 #GIT AND INTEL MODULES MUST BE LOADED BEFORE PATHSCALE MODULE
 module load pathscale
-
+module load nstx/python-2.7
+module load python/scipy
 ```
 * If you run FIDASIM on portal you will get an angry email. Make sure to schedule the job using the "use" command.
 * Use the following link to clone the repository http://github.com/D3DEnergetic/FIDASIM.git
@@ -80,141 +86,146 @@ module load pathscale
 ***
 
 #How to run
-## 1. Create an input file/procedure.
-Prefida, the FIDASIM preprocessing routine, calls an input procedure that returns a structure that contains the input parameters. An example for DIII-D is shown below.
+## 1. Create an input file
+Prefida, the FIDASIM preprocessing routine, reads in a JSON file that contains the input parameters. An example for DIII-D is shown below.
 Note: There may be some small differences depending on your device.
+Note: JSON input file only runs on IDL v8.2 and above. If you don't have a compatible version see `TEMPLATES/input_template.pro` 
+```C
+//-----------------------------------------------------
+//                PREFIDA INPUT FILE
+//-----------------------------------------------------
+{
+"comment":"This is a comment"
+"shot":146088,          // Shot Number
+"time":1.385,           // Time 
+"runid":"146088H05",    // runid of FIDASIM
+"device":"D3D",         // D3D",NSTX",AUGD",MAST
+"result_dir":"/u/stagnerl/FIDASIM/RESULTS/D3D/",           
+                        // Location where results will be stored
+"profile_dir":"/u/heidbrin/OANB/AUG/",                     
+                        // Location of profile files
 
-```
-;;This input file is a procedure so name this file accordingly
-PRO input_template,inputs                  ;; Name of this file without .pro
+//-----------------------------------------------------
+// Fast-ion distribution function from transp
+//-----------------------------------------------------
+"cdf_file":"/e/alfven/FIDAsim/D3D/146088/146088H02_fi_9.cdf",    
+                        // CDF file from transp with the distribution funciton
+"emin":0.0,             // Minimum energy used from the distribution function
+"emax":100.0,           // Maximum energy used from the distribution function
+"pmin":-1.0,            // Minimum pitch used from the distribution function
+"pmax":1.0,             // Maximum pitch used from the distribution function
 
-;;-----------------------------------------------------
-;;				PREFIDA INPUT FILE
-;;-----------------------------------------------------
-shot=146088L                               ;; Shot Number
-time=1.385                                 ;; Time 
-runid='146088H05'                          ;; runid of FIDASIM
-device='D3D'                               ;; D3D,NSTX,AUGD,MAST
-result_dir='/path/to/result/directory/'    ;; Location where results will be stored /RESULTS/runid will be made
-profile_dir='/path/to/profile/directory/'  ;; Location of profile save files. EX: profile_dir+'shot/'+'dne142353.00505'
+//-----------------------------------------------------
+// Beam/FIDA/EQUILIBRIUM Selection
+//-----------------------------------------------------
+"isource":5,            // Beam source index (FIDASIM only simulates one NBI source)
+"einj":0.,              // [keV] If 0, get data from MDS+
+"pinj":0.,              // [MW] If 0, get data from MDS+
+"diag":"OBLIQUE",       // Name of the FIDA diag
+"equil":"EFIT01",       // Name of equilibrium. Ex. for D3D EFIT02
 
-;;----------------------------------------------------
-;; Fast-ion distribution function from transp
-;;----------------------------------------------------
-cdf_file='/path/to/the/transp/fast/ion/distribution.cdf'  
-                      ;; CDF file from transp with the distribution funciton
-emin=0.               ;; Minimum energy used from the distribution function
-emax=100.             ;; Maximum energy used from the distribution function
-pmin=-1.              ;; Minimum pitch used from the distribution function
-pmax=1.	              ;; Maximum pitch used from the distribution function
+//-----------------------------------------------------
+// Discharge Parameters
+//-----------------------------------------------------
+"btipsign":-1.0,        // Bt and Ip are in the opposite direction   
+"ab":2.01410178,        // Atomic mass of beam [u]
+"ai":2.01410178,        // Atomic mass of hydrogenic plasma ions [u]
+"impurity_charge":6,    // 5: BORON, 6: carbon, 7: Nitrogen
 
-;;-----------------------------------------------------
-;; Beam/FIDA/EQUILIBRIUM Selection
-;;-----------------------------------------------------
-isource=5             ;; Beam source index (FIDASIM only simulates on NBI source)
-einj=0.               ;; [keV] If 0, get data from MDS+
-pinj=0.               ;; [MW] If 0, get data from MDS+
+//-----------------------------------------------------
+// Wavelength Grid
+//-----------------------------------------------------
+"lambdamin":647.0,      // Minimum wavelength of wavelength grid [nm] 
+"lambdamax":667.0,      // Maximum wavelength of wavelength grid [nm] 
+"nlambda":2000,         // Number of wavelengths
+"dlambda":0.01,         // Wavelength seperation
 
-diag='OBLIQUE'	      ;; Name of the FIDA diag
-equil='EFIT01'        ;; Name of equilibrium. Ex. for D3D EFIT02
+//---------------------------------------------------
+// Define FIDASIM grid in machine coordinates(x,y,z)
+//---------------------------------------------------
+"nx":40,                // Number of cells in x direction
+"ny":60,                // Number of cells in y direction
+"nz":50,                // Number of cells in z direction
+"xmin":-170.0,         // Minimum x value
+"xmax":-70.0,          // Maximum x value
+"ymin":-195.0,         // Minimum y value
+"ymax":-80.0,          // Maximum y value
+"zmin":-70.0,          // Minimum z value
+"zmax":70.0,           // Maximum z value
 
-;;-----------------------------------------------------
-;; Discharge Parameters
-;;-----------------------------------------------------
-btipsign=-1.d0	      ;; Bt and Ip are in the opposite direction   
-ab=2.01410178d0       ;; Atomic mass of beam [u]
-ai=2.01410178d0       ;; Atomic mass of hydrogenic plasma ions [u]
-impurity_charge=6     ;; 5: BORON, 6: carbon, 7: Nitrogen
+"origin":[0,0,0],       // If using different a coordinate system, this is the origin 
+                        // in machine coordinates of the new system
 
-;;-----------------------------------------------------
-;; Wavelength Grid
-;;-----------------------------------------------------
-lambdamin=6470.d0                               ;; Minimum wavelength of wavelength grid[A] 
-lambdamax=6670.d0                               ;; Maximum wavelength of wavelength grid[A] 
-nlambda=2000L                                   ;; Number of wavelengths
-dlambda= (lambdamax-lambdamin)/double(nlambda)	;; Wavelength seperation
+"alpha":0.0,            // Rotation angle in radians from +x about z axis that transforms machine
+                        // coordinates to the new system. 
+"beta":0.0,             // Rotation about +y axis
 
-;;---------------------------------------------------
-;; Define FIDASIM grid in machine coordinates(x,y,z)
-;;---------------------------------------------------
-nx=40                 ;; Number of cells in x direction
-ny=60                 ;; Number of cells in y direction
-nz=50                 ;; Number of cells in z direction
-xdim1=-170.           ;; Minimum x value
-xdim2=-70.            ;; Maximum x value
-ydim1=-195.           ;; Minimum y value
-ydim2=-80.            ;; Maximum y value
-zdim1=-70.            ;; Minimum z value
-zdim2=70.             ;; Maximum z value
+//--------------------------------------------------
+// Define number of Monte Carlo particles
+//--------------------------------------------------
+"nr_fast":5000000,      // FIDA
+"nr_nbi":50000,         // Beam emission
+"nr_halo":500000,       // Halo contribution
 
-origin=[0.,0.,0.]     ;; If using different a coordinate system, this is the origin 
-                      ;; in machine coordinates of the new system
+//--------------------------------------------------
+// Calculation of the weight function
+//--------------------------------------------------
+"ne_wght":50,               // Number of Energies 
+"np_wght":50,               // Number of Pitches 
+"nphi_wght":50,             // Number of Gyro-angles 
+"emax_wght":125.0,          // Maximum energy (keV)
+"ichan_wght":-1,            // -1 for all channels", otherwise a given channel index
+"dwav_wght":0.2,            // Wavelength interval
+"wavel_start_wght":651.0,   // Minimum wavelength
+"wavel_end_wght":663.0,     // Maximum wavelength
 
-alpha=0.0             ;; Rotation angle in radians from +x about z axis that transforms machine
-                      ;; coordinates to the new system. 
-beta=0.0              ;; Rotation about +y axis
+//-------------------------------------------------
+// Simulation switches
+//-------------------------------------------------
+"calc_npa":0,           // (0 or 1) If 1 do a simulation for NPA
+"calc_spec":1,          // (0 or 1) If 1 then spectra is calculated
+"calc_birth":1,         // (0 or 1) If 1 then the birth profile is calculated
+"calc_brems":0,         // (0 or 1) If 0 use the IDL bremstrahlung calculation
+"calc_fida_wght":1,     // (0 or 1) If 1 then fida weight functions are calculated
+"calc_npa_wght":0,      // (0 or 1) If 1 then npa weight functions are calculated
+"load_neutrals":0,      // (0 or 1) If 1 then the neutral density is loaded from an existing run 
+"load_fbm":1,            // (0 or 1) If 1 then the fbm is loaded (calc_spec/npa overwrites)
+"interactive":0         // (0 or 1) If 1 then percent complete is shown
 
-;;--------------------------------------------------
-;; Define number of Monte Carlo particles
-;;--------------------------------------------------
-nr_fast=5000000       ;; FIDA
-nr_ndmc=50000 	      ;; Beam emission
-nr_halo=500000        ;; Halo contribution
+//------------------------------------------------
+// Extra Variables
+//------------------------------------------------
 
-;;--------------------------------------------------
-;; Calculation of the weight function
-;;--------------------------------------------------
-nr_wght=50            ;; Number of Pitches, energyies and gyro angles 
-emax_wght=125.        ;; Maximum energy (keV)
-ichan_wght=-1         ;; -1 for all channels, otherwise a given channel index
-dwav_wght=.2          ;; Wavelength interval
-wavel_start_wght=651. ;; Minimum wavelength
-wavel_end_wght=663.   ;; Maximum wavelength
-
-;;-------------------------------------------------
-;; Simulation switches
-;;-------------------------------------------------
-calc_npa=[0]          ;; (0 or 1) If 1 do a simulation for NPA
-calc_spec=[1]         ;; (0 or 1) If 1 then spectra is calculated
-calc_birth=[1]        ;; (0 or 1) If 1 then the birth profile is calculated
-f90brems=[0]          ;; (0 or 1) If 0 use the IDL bremstrahlung calculation
-calc_fida_wght=[1]    ;; (0 or 1) If 1 then weight functions are calculated
-calc_npa_wght=[0]     ;; (0 or 1) If 1 then weight functions are calculated
-load_neutrals=[0]     ;; (0 or 1) If 1 then the neutral density is loaded from an existing 
-ps=[0]                ;; (0 or 1) If 1 then make hard copy of plots
-;;------------------------------------------------
-;; DO NOT MODIFY THIS PART
-;;------------------------------------------------
-install_dir=+getenv('FIDASIM_DIR')
-inputs={shot:shot,time:time,runid:runid,device:strupcase(device),install_dir:install_dir,result_dir:result_dir,$
-	    cdf_file:cdf_file,profile_dir:profile_dir,emin:emin,emax:emax,pmin:pmin,pmax:pmax,isource:isource,diag:diag,$
-	    einj:einj,pinj:pinj,equil:equil,btipsign:btipsign,ab:ab,ai:ai,impurity_charge:impurity_charge,$
-	    lambdamin:lambdamin,lambdamax:lambdamax,nlambda:nlambda,dlambda:dlambda,$
-	    nx:nx,ny:ny,nz:nz,xdim1:xdim1,xdim2:xdim2,ydim1:ydim1,ydim2:ydim2,zdim1:zdim1,zdim2:zdim2,$
-		origin:origin,alpha:alpha,beta:beta,nr_fast:nr_fast,nr_ndmc:nr_ndmc,nr_halo:nr_halo,nr_wght:nr_wght,$
-        emax_wght:emax_wght,ichan_wght:ichan_wght,dwav_wght:dwav_wght,wavel_start_wght:wavel_start_wght,$
-		wavel_end_wght:wavel_end_wght,calc_npa:calc)npa,calc_spec:calc_spec,calc_birth:calc_birth,calc_fida_wght:calc_fida_wght,$
-		calc_npa_wght:calc_npa_wght,f90brems:f90brems,load_neutrals:load_neutrals,ps:ps}
-
-END
+}
 ```
 This template can be found in the TEMPLATES/ directory.
 
-Note: This is an IDL procedure so make sure the procedure name matches the name of the file or else it will not load. 
+Note: The input file is not proper JSON since it has C style comments. The comments are stripped out of the file before being parsed.
 
 ## Run the pre-processing routine
-Prefida pulls in the required profiles and geometry and puts them into netCDF file that FIDASIM can read. Using the above input procedure run the following.
+Prefida pulls in the required profiles and geometry and puts them into netCDF file that FIDASIM can read. Using the above input file run the following.
 
-    IDL> prefida,'input_template'
+    IDL> prefida,'input_template.json'
 
-This will make an ASCII input.dat file and and RUNID_inputs.cdf file in a RUNID directory in the result directory. It will also copy the input procedure into the same directory.
+This will make an FORTRAN namelist file and a netCDF inputs file in the result directory. It will also copy the input file into the same directory.
 
 Note: prefida can take two keywords: plot and save. 
 
 ## Run FIDASIM
 
-    /path/to/fidasim/executable/fidasim /path/to/input/directory/<RUNID>
+    /path/to/fidasim/executable/fidasim /path/to/input/directory/<RUNID>_inputs.dat
 
+## Read the output files
+FIDASIM can create the following output netCDF files depending on the simulation switches
+```
+<RUNID>_neutrals.cdf: This file contains the neutral beam and halo density.
+<RUNID>_birth.cdf: This file contains the birth positions of the fast ions.
+<RUNID>_spectra.cdf: This file contains the simulated spectra.
+<RUNID>_npa.cdf: This file contains the simulated NPA spectrum.
+<RUNID>_fida_weights.cdf: This file contains the calculated FIDA weight functions.
+<RUNID>_npa_weights.cdf: This file contains the calculated NPA flux and weight functions.
+```
+The netCDF files can be read by using the IDL routine ```read_ncdf.pro``` or ```load_results.pro``` located in the ```LIB``` directory
 ***
 
 # How do make FIDASIM work for your device
@@ -223,7 +234,7 @@ Prefida, the FIDASIM preprocessing routine, is also device agnostic. It can acco
 In other words, prefida is modular. This allows users to use device-specific routines to prepare the data as long as it delivers the results to prefida in the specified format.
 This can best be described with an example. 
 
-Say I have a device called ABCD, which stands for "A Beautiful Cylindrical Device". I want FIDASIM to work with it, so in the source directory I make an ABCD directory.
+Say I have a device called ABCD, which stands for "A Big Cylindrical Device". I want FIDASIM to work with it, so in the source directory I make an ABCD directory.
 
     mkdir ABCD
     
@@ -252,6 +263,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;	** Structure <1d447c48>, 11 tags, length=728, data length=724, refs=1:
 	;;	   NCHAN           LONG                11
 	;;	   DIAG            STRING    'OBLIQUE'
+	;;	   CHAN_ID         LONG      Array[11]
 	;;	   XLOS            DOUBLE    Array[11]
 	;;	   YLOS            DOUBLE    Array[11]
 	;;	   ZLOS            DOUBLE    Array[11]
@@ -259,8 +271,9 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 	;;	   YLENS           DOUBLE    Array[11]
 	;;	   ZLENS           DOUBLE    Array[11]
 	;;	   SIGMA_PI_RATIO  DOUBLE    Array[11]
-	;;	   HEADSIZE        FLOAT     Array[11]
-	;;	   OPENING_ANGLE   FLOAT     Array[11]
+	;;	   RD              FLOAT     Array[11]
+	;;	   RA              FLOAT     Array[11]
+	;;	   H               FLOAT     Array[11]
 
 	;;	IDL> help,equil
 	;;	** Structure <1d474638>, 10 tags, length=6636160, data length=6636138, refs=1:
@@ -330,16 +343,18 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 		 divy:divy,$				   		;;HORIZONTAL BEAM DIVERGENCE [rad]
 		 divz:divz }				   		;;VERTICAL BEAM DIVERGENCE [rad]
 
-  	chords={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES
+  	chords={sigma_pi_ratio:sigma_pi_ratio,$	;;RATIO OF SIGMA LINES TO PI LINES  (0 IF NPA)
 		 nchan:nchan,$				  		;;NUMBER OF CHANNELS
+         chan_id:chan_id,$                  ;;CHANNEL ID (0 FOR FIDA, 1 FOR NPA)
 		 xmid:xmid,$						;;X POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
 		 ymid:ymid,$						;;Y POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
          zmid:zmid,$						;;Z POS. OF WHERE CHORD CROSSES MIDPLANE [cm]
-		 xlens:xlens,$						;;X POS. OF LENS [cm]
-		 ylens:ylens,$						;;Y POS. OF LENS [cm]
- 		 zlens:zlens,$						;;Z POS. OF LENS [cm]
-  		 headsize:headsize,$				;;SIZE OF HEAD
-		 opening_angle:opening_angle}		;;OPENING ANGLE
+		 xlens:xlens,$						;;X POS. OF LENS/APERTURE [cm]
+		 ylens:ylens,$						;;Y POS. OF LENS/APERTURE [cm]
+ 		 zlens:zlens,$						;;Z POS. OF LENS/APERTURE [cm]
+  		 ra:ra,$      				        ;;RADIUS OF NPA APERTURE [cm] (0 IF FIDA)
+  		 rd:rd,$      				        ;;RADIUS OF NPA DETECTOR [cm] (0 IF FIDA)
+		 h:h}     		                    ;;SEPERATION BETWEEN APERTURE AND DETECTOR [cm] (0 IF FIDA)
 
 	profiles={time:time,$					;;SHOT TIME
 			  rho:rho,$						;;RHO VALUES
@@ -350,7 +365,7 @@ PRO templete_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT C
 			  zeff:zeff}					;;ZEFF
 END 
 ```
-As you can see it is all rather self explaintory. All I need to do now to get ABCD to work with prefida is supply the above information.
+As you can see it is all rather self-explanatory. All I need to do now to get ABCD to work with prefida is supply the above information.
 I can use whatever routines I want so long as the output of abcd_routines is defined as above. I could also include other things in the
 structures so long as I have the above. 
 

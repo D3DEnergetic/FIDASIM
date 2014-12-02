@@ -53,7 +53,7 @@ The last step is the run make in the source directory
     make
 
 ## 4. Run a test case
-From the install directory run 
+Edit the variable ```result_dir``` in the file ```TEST/D3D/149088H06_inputs.dat``` to the correct file path. Then from the install directory run 
 
     fidasim TEST/D3D/146088H06_inputs.dat
 

@@ -31,6 +31,8 @@ end
 ; Find and open netcdf file with transp profile data
 cdf_file = STRSPLIT(inputs.cdf_file,'/',/EXTRACT)
 cdf_file = STRSPLIT(cdf_file[-1],'_',/EXTRACT)
+inputs = create_struct(inputs,"transpid",cdf_file[0])
+
 cdf_file = strupcase(cdf_file[0]) + '.CDF'
 slash=strmid(inputs.profile_dir,0,1,/reverse_offset)
 if slash ne '/' then begin

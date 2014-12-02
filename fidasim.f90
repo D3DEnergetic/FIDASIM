@@ -307,7 +307,7 @@ contains
 
     call getenv("FIDASIM_DIR",root_dir)
     print*,'---- loading inputs ----' 
-
+    print*,namelist_file
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)
@@ -366,6 +366,7 @@ contains
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading grid ----'
+    print*,filename
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -3262,6 +3263,7 @@ contains
     integer                        :: ii,i,j,k,l   !! indices wavel,vx,vy,vz
     real(double),dimension(:,:,:,:),allocatable :: wfunct
     real(double),dimension(:)    ,allocatable :: ebarr,ptcharr,phiarr,rad_arr,theta_arr
+    real(double),dimension(:,:), allocatable :: jacobian,e_grid,p_grid,vpa_grid,vpe_grid
     real(double)                   :: sinus
     real(double),dimension(3)      :: vi,vi_norm
     real(double)                   :: vabs
@@ -3295,6 +3297,7 @@ contains
     !!netCDF variables
     integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
     integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid,ichan_varid,nchan_varid
+    integer :: vpe_varid,vpa_varid,j_varid
 
     !! DEFINE wavelength array
     nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
@@ -3326,6 +3329,28 @@ contains
     do i=1,inputs%nphi_wght
        phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nphi_wght)
     enddo
+
+    !! define energy grid
+    allocate(e_grid(inputs%ne_wght,inputs%np_wght))
+    do i=1,inputs%ne_wght
+        e_grid(i,:) = ebarr(i)
+    enddo
+
+    !! define pitch grid
+    allocate(p_grid(inputs%ne_wght,inputs%np_wght))
+    do i=1,inputs%np_wght
+        p_grid(:,i) = ptcharr(i)
+    enddo
+
+    !! define velocity space grid
+    allocate(vpe_grid(inputs%ne_wght,inputs%np_wght)) !! V perpendicular
+    allocate(vpa_grid(inputs%ne_wght,inputs%np_wght)) !! V parallel
+    vpa_grid(:,:) = sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid(:,:))*p_grid(:,:)
+    vpe_grid(:,:) = sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid(:,:)*(1.0-p_grid(:,:)**2.0))
+
+    !! define jacobian to convert between E-p to velocity
+    allocate(jacobian(inputs%ne_wght,inputs%np_wght))
+    jacobian(:,:) = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid(:,:)/sqrt(vpa_grid(:,:)**2.0 + vpe_grid(:,:)**2.0)
 
     nchan=0
     do i=1,spec%nchan
@@ -3605,7 +3630,10 @@ contains
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
     call check( nf90_def_var(ncid,"theta",NF90_DOUBLE,nchan_dimid,theta_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
-
+    call check( nf90_def_var(ncid,"vpa",NF90_DOUBLE,(/ne_dimid,np_dimid/),vpa_varid) )
+    call check( nf90_def_var(ncid,"vpe",NF90_DOUBLE,(/ne_dimid,np_dimid/),vpe_varid) )
+    call check( nf90_def_var(ncid,"jacobian",NF90_DOUBLE,(/ne_dimid,np_dimid/),j_varid) )
+   
     !Add unit attributes
     call check( nf90_put_att(ncid,wav_varid,"units","nm") )
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
@@ -3623,6 +3651,9 @@ contains
     call check( nf90_put_var(ncid, rad_varid, rad_arr) )
     call check( nf90_put_var(ncid, theta_varid, theta_arr) )
     call check( nf90_put_var(ncid, wfunct_varid, wfunct) )
+    call check( nf90_put_var(ncid, vpe_varid, vpe_grid) )
+    call check( nf90_put_var(ncid, vpa_varid, vpa_grid) )
+    call check( nf90_put_var(ncid, j_varid, jacobian) )
 
     !Close netCDF file
     call check( nf90_close(ncid) )
@@ -3638,6 +3669,11 @@ contains
     deallocate(wfunct)
     deallocate(rad_arr)
     deallocate(theta_arr)
+    deallocate(jacobian)
+    deallocate(e_grid)
+    deallocate(p_grid)
+    deallocate(vpe_grid)
+    deallocate(vpa_grid)
   end subroutine fida_weight_function
 
   !*****************************************************************************

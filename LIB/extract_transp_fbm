@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import re
+import glob
+import subprocess
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('path',
+                        help='Result directory')
+    parser.add_argument('runid',
+                        help='TRANSP run ID')
+    parser.add_argument('-fid','--file_id',
+                        nargs='+',
+                        help='File ID list e.g. 1 2 3 ...')
+    parser.add_argument('-d','--device',
+                        default='D3D',
+                        help='Set device')
+    parser.add_argument('-t','--type',
+                        default = 'c',
+                        help = 'Type of distribution: c: Guiding Center (default) or p: Particle Location')
+    parser.add_argument('-v','--verbose',
+                        action = 'store_true',
+                        help = 'Verbose')
+    parser.add_argument('-db','--debug',
+                        action = 'store_true',
+                        help = 'Debug mode')
+
+    args = parser.parse_args()
+
+    fileid_list = args.file_id
+
+    if not fileid_list:
+       file_list = glob.glob(args.path+'/'+args.runid+'.DATA*')
+       fileid_list=[re.match('.*?([0-9]+)$',s).group(1) for s in file_list]
+
+    for id in fileid_list:
+       args_dict = {'rid':args.runid,'path':args.path,
+                    'fileid':id,'device':args.device,
+                    'type':args.type}
+    
+       fbm_script = """
+                    %(rid)s
+                    %(path)s
+                    q
+                    %(fileid)s
+                    t
+                    %(device)s
+                    w
+                    %(type)s
+                    q
+                    q
+                    q
+
+                    """%args_dict
+
+       fbm_script = "\n".join([line.lstrip() for line in fbm_script.splitlines()])
+
+       if args.verbose:
+           print(args.path+'/'+args.runid+'.DATA'+id)
+
+       if not args.debug:
+           proc = subprocess.Popen('get_fbm',stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+           out, err = proc.communicate(input=fbm_script)
+       else:
+           print(fbm_script)
+         
+if __name__=='__main__':
+    main()

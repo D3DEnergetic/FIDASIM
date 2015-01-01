@@ -903,7 +903,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim_001",1,dimid1) )
@@ -941,7 +941,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf"
  
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -992,7 +992,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -1084,7 +1084,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.cdf"
  
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -3610,7 +3610,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.cdf"
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -3923,7 +3923,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )

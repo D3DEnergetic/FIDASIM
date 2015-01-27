@@ -3572,8 +3572,10 @@ contains
                            !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
                            !    + intens(l)/real(inputs%ne_wght)
                            !normal calculation:
-                           wfunct(ii,i,j,cnt) = wfunct(ii,i,j,cnt) &
-                                + intens(l)*photons/real(inputs%nphi_wght)
+                           wght2 = intens(l)*photons/real(inputs%nphi_wght)
+                           if (wght2.gt.XMACH_EPS) then
+                               wfunct(ii,i,j,cnt) = wfunct(ii,i,j,cnt) + wght2
+                           endif
                       endif
                    enddo wavelength_ranges
                 enddo stark_components

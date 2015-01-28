@@ -383,7 +383,7 @@ For bash shell:
     ulimit -s unlimited
     
 ### I have fixed your code. How do I submit a patch?
-FIDASIM is open source code. In order to contribute to the project please fork us on GitHub and open a pull request. We will then review your changes and incorporate them into code base.
+FIDASIM is open source code. In order to contribute to the project please fork us on GitHub, create a new branch, and open a pull request. We will then review your changes and incorporate them into code base.
 
 ### The plot keyword doesn't do anything. 
 Plotting, like the device routines, are often very specific to the device. Accordingly, plotting is treated the same way as the device routines. 

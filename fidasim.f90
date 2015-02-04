@@ -172,11 +172,12 @@ module application
   end type spec_type
   type npa_type
      real(double), dimension(:,:,:) ,allocatable  :: v    !! velocity array
-     real(double), dimension(:,:,:) ,allocatable  :: ipos !! initial position arra
+     real(double), dimension(:,:,:) ,allocatable  :: ipos !! initial position array
      real(double), dimension(:,:,:) ,allocatable  :: fpos !! final position array
-     real(double), dimension(:,:)   ,allocatable  :: wght !! weight
+     real(double), dimension(:,:)   ,allocatable  :: wght !! weight of ith mc particle
+     real(double), dimension(:,:)   ,allocatable  :: E    !! Energy of ith mc particle
      real(double), dimension(:,:)   ,allocatable  :: flux !! flux
-     real(double), dimension(:)     ,allocatable  :: energy !! energy
+     real(double), dimension(:)     ,allocatable  :: energy !! energy array
      integer(long),dimension(:)     ,allocatable  :: counter
      real(double)                                 :: npa_loop
      integer(long)                                :: nchan
@@ -979,7 +980,7 @@ contains
   subroutine write_npa
     use netcdf
     integer         :: nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,dimid3,maxcnt
-    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,cnt_varid,nchan_varid
+    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,ei_varid,cnt_varid,nchan_varid
     character(120)  :: filename
     real(float), dimension(:,:,:),allocatable :: output
     real(float), dimension(:,:),allocatable :: output1
@@ -1008,6 +1009,7 @@ contains
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
     call check( nf90_def_var(ncid,"wght",NF90_FLOAT,(/ c_dimid,nchan_dimid /),wght_varid) )
+    call check( nf90_def_var(ncid,"E",NF90_FLOAT,(/ c_dimid,nchan_dimid /),ei_varid) )
     call check( nf90_def_var(ncid,"flux",NF90_FLOAT,(/ e_dimid,nchan_dimid /),f_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_FLOAT,e_dimid,e_varid) )
     call check( nf90_def_var(ncid,"counts",NF90_FLOAT,nchan_dimid,cnt_varid) )
@@ -1033,6 +1035,9 @@ contains
 
     output1(:,:)=real(npa%wght(:maxcnt,:) ,float)
     call check( nf90_put_var(ncid, wght_varid, output1) )
+
+    output1(:,:)=real(npa%E(:maxcnt,:) ,float)
+    call check( nf90_put_var(ncid, ei_varid, output1) )
 
     call check( nf90_put_var(ncid,f_varid,real(npa%flux(:,:),float)) )
 
@@ -2429,9 +2434,10 @@ contains
           if(npa%counter(det).gt.inputs%nr_npa)stop'too many neutrals'
           npa%v(npa%counter(det),:,det)=vn(:)
           npa%wght(npa%counter(det),det)=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
+          npa%E(npa%counter(det),det) = inputs%ab*v_to_E*dot_product(vn,vn)
           npa%ipos(npa%counter(det),:,det)=ri(:)
           npa%fpos(npa%counter(det),:,det)=ray(:)
-          ienergy=minloc(abs(npa%energy-(inputs%ab*v_to_E*dot_product(vn,vn))))
+          ienergy=minloc(abs(npa%energy - npa%E(npa%counter(det),det)))
           npa%flux(ienergy(1),det)=npa%flux(ienergy(1),det)+ npa%wght(npa%counter(det),det)/distri%deb
           !$OMP END CRITICAL(col_rad_npa)
        endif
@@ -4040,12 +4046,14 @@ program fidasim
      allocate(npa%ipos(inputs%nr_npa,3,npa%nchan)) 
      allocate(npa%fpos(inputs%nr_npa,3,npa%nchan)) 
      allocate(npa%wght(inputs%nr_npa,npa%nchan))
+     allocate(npa%E(inputs%nr_npa,npa%nchan))
      allocate(npa%counter(npa%nchan))
      npa%counter(:)=0
      npa%v(:,:,:)=0   
      npa%ipos(:,:,:)=0   
      npa%fpos(:,:,:)=0   
      npa%wght(:,:)=0   
+     npa%E(:,:)=0   
   endif
   
 
@@ -4201,6 +4209,7 @@ program fidasim
      deallocate(npa%ipos) 
      deallocate(npa%fpos) 
      deallocate(npa%wght)
+     deallocate(npa%E)
      deallocate(npa%energy)
      deallocate(npa%flux)
      deallocate(npa%counter)

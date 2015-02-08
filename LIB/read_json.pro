@@ -25,7 +25,7 @@ END
 FUNCTION json_minify,str
     ;;; Strips out C like comments out of JSON string ;;;
     ;;; Based of JSON.minify https://github.com/getify/JSON.minify ;;;
-    regex='"|(/\*)|(\*/)|(//)|'+string(10b)+'|'+string(13b)
+    regex='"|(#=)|(=#)|(#)|'+string(10b)+'|'+string(13b)
     slashes='(\\)*$'
 
     in_string = 0
@@ -35,7 +35,8 @@ FUNCTION json_minify,str
     index=0
     tokenizer=tokenize(str,regex)
  
-    for i=0,n_elements(tokenizer.group)-1 do begin        
+    for i=0,n_elements(tokenizer.group)-1 do begin
+        
         if not (in_multi or in_single) then begin
              tmp=strmid(str,index,tokenizer.start[i]-index)
              if not in_string then begin
@@ -55,9 +56,9 @@ FUNCTION json_minify,str
             index-=1
 
         endif else if not (in_string or in_multi or in_single) then begin
-            if val eq '/*' then in_multi = 1 else if val eq '//' then in_single=1
+            if val eq '#=' then in_multi = 1 else if val eq '#' then in_single=1
 
-        endif else if val eq '*/' and in_multi and not (in_string or in_single) then begin
+        endif else if val eq '=#' and in_multi and not (in_string or in_single) then begin
             in_multi=0
         endif else if (stregex(val,string(10b),/boolean) or stregex(val,string(13b),/boolean)) $
                       and not (in_multi or in_string) and in_single then begin
@@ -89,5 +90,6 @@ FUNCTION read_json, file
     endwhile
     free_lun,lun
     stripped_json=json_minify(json)
+
     return,json_parse(stripped_json,/toarray,/tostruct)
 END

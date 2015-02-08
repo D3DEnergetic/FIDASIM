@@ -1,0 +1,134 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import re
+import glob
+import time as tm
+import subprocess
+
+def main():
+    parser = argparse.ArgumentParser(description="Extracts GEQDSK file from a TRANSP run using trxpl program")
+
+    parser.add_argument('directory',
+                        help='Directory that contains TRANSP output files')
+    parser.add_argument('runid',
+                        help='TRANSP run ID')
+    parser.add_argument('-out','--output_dir',
+                        default = '.',
+                        help='Output directory. Default = cwd')
+    parser.add_argument('-d','--device',
+                        default = 'D3D',
+                        help = 'Device Default = D3D')
+    parser.add_argument('-y','--year',
+                        default = str(tm.localtime().tm_year)[2::],
+                        help = 'Run year Default = Current Year')
+    parser.add_argument('-fid','--file_id',
+                        nargs='+',
+                        help='File ID list e.g. 1 2 3 ...')
+    parser.add_argument('-t','--time',
+                        nargs = '+', type=float,
+                        help = 'Time of interest in seconds')
+    parser.add_argument('-dt','--delta_time',
+                        default = 0.005, type=float,
+                        help = 'Averaging time window in seconds. Default = 0.005 s')
+    parser.add_argument('-bt','--bt_dir',
+                        default = -1,
+                        help = 'Btorodial direction (1=ccw, -1=cw). Default = -1')
+    parser.add_argument('-ip','--ip_dir',
+                        default = 1,
+                        help = 'Plasma current direction (1=ccw, -1=cw). Default = 1')
+    parser.add_argument('-nr','--num_r',
+                        default = 101,
+                        help = 'Number of R points for cartesian overlay grid. Default = 101')
+    parser.add_argument('-nz','--num_z',
+                        default = 101,
+                        help = 'Number of Z points for cartesian overlay grid. Default = 101')
+    parser.add_argument('-nt','--num_theta',
+                        default = 151,
+                        help = 'Number of theta points for 2d splines. Default = 151')
+    parser.add_argument('-nv','--num_vertical',
+                        default = 101,
+                        help = 'Number of vertical points for GEQDSK file. Default = 101')
+    parser.add_argument('-nh','--num_horizontal',
+                        default = 101,
+                        help = 'Number of horizontal points for GEQDSK file. Default = 101')
+    parser.add_argument('-nc','--num_contours',
+                        default = 201,
+                        help = 'Number of bdy contours for GEQDSK file. Default = 201')
+    parser.add_argument('-g','--gfile',
+                        default = None,
+                        help = 'GEQDSK file name. Default = "g[shot].[time]"')
+    parser.add_argument('-v','--verbose',
+                        action = 'store_true',
+                        help = 'Verbose')
+    parser.add_argument('-db','--debug',
+                        action = 'store_true',
+                        help = 'Debug mode')
+
+    args = parser.parse_args()
+
+    if not args.time:
+       fileid_list = args.file_id
+       times = []
+       if not fileid_list:
+           file_list = glob.glob(args.directory+'/'+args.runid+'.DATA*')
+           fileid_list=[re.match('.*?([0-9]+)$',s).group(1) for s in file_list]
+
+       for id in fileid_list:
+           f = open(args.directory+'/'+args.runid+'.DATA'+id,'r')
+           times.append(float(f.readline().split()[2]))
+           f.close()
+    else: times=args.time
+
+    for time in times:
+        if not args.gfile:
+            gfile = 'g'+re.match('^\d+',args.runid).group(0)+'.00'+str(long(round(time*1000.)))
+        gfile = args.output_dir+'/'+gfile
+
+        args_dict = {'runid':args.runid,'time':time, 'dt':args.delta_time,
+                     'ntheta':args.num_theta,'nr':args.num_r,'nz':args.num_r,
+                     'bt_sign':args.bt_dir,'ip_sign':args.ip_dir,
+                     'nh':args.num_horizontal,'nv':args.num_vertical,'nc':args.num_contours,
+                     'gfile':gfile,'dir':args.directory,'year':args.year,'device':args.device}
+
+        trxpl_script = """
+                         y
+                         %(device)s/%(year)s
+                         d
+                         %(runid)s
+                         a
+                         %(time)s
+                         %(dt)s
+                         %(ntheta)s
+                         %(nr)s
+                         %(nz)s
+                         %(bt_sign)s
+                         %(ip_sign)s
+                         y
+                         g
+                         %(nh)s
+                         %(nv)s
+                         %(nc)s
+                         %(gfile)s
+                         q
+                         q
+                       """%args_dict
+
+        trxpl_script = "\n".join([line.lstrip() for line in trxpl_script.splitlines()])
+
+        if args.verbose: 
+            print('Device: '+args.device)
+            print('Year: '+args.year)
+            print('Runid: '+args.runid)
+            print('Time: '+str(time)+' +/- '+str(args.delta_time)+' [s]')
+            print('GEQDSK file: '+gfile+'\n')
+
+        if not args.debug:
+            proc = subprocess.Popen('trxpl',stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+            out, err = proc.communicate(input=trxpl_script)
+        else:
+            print(trxpl_script)
+
+if __name__=='__main__':
+    main()

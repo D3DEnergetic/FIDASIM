@@ -7,7 +7,7 @@ import tempfile
 from subprocess import call
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Creates a FIDASIM PBS job script and submits it using qsub")
 
     parser.add_argument('path',
                         help='Namelist file or result directory')
@@ -44,13 +44,13 @@ def main():
     parser.add_argument('-rids','--runids',
                         default = '',
                         nargs='+',
-                        help = 'List of run ids')
+                        help = 'List of run ids, accepts regex')
     parser.add_argument('-v','--verbose',
                         action = 'store_true',
                         help = 'Verbose')
-    parser.add_argument('--no-submit',dest='no_submit',
-                        action = 'store_false',
-                        help = 'Do not submit job. For debugging purposes')
+    parser.add_argument('-db','--debug',
+                        action = 'store_true',
+                        help = 'Debug mode. Does not submit job')
 
     args = parser.parse_args()
 
@@ -82,7 +82,7 @@ def main():
         output_file = '_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".out"
         error_file = '_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".err"
 
-        print('Input File: '+file)
+        if args.verbose: print('Input File: '+file)
 
         args_dict =  {'file':file,'nodes':args.nodes,
                       'ppn':args.ppn,'mem':args.memory,
@@ -139,15 +139,15 @@ def main():
 
 
         if args.verbose:
-            if args.no_submit: print('Submitting: '+file)
-            print("\n".join([item.lstrip() for item in pbs_script.splitlines()]))
+            print('Submitting: '+file)
 
-        if args.no_submit:
-            tfile = tempfile.NamedTemporaryFile(mode='w+t')
+        if not args.debug:
+            tfile = tempfile.NamedTemporaryFile(mode='w+t',dir=os.path.expanduser("~"))
             tfile.file.write("\n".join([line.lstrip() for line in pbs_script.splitlines()]))
             tfile.file.close()
             call(['qsub',tfile.name])
             tfile.close()
+        else: print("\n".join([item.lstrip() for item in pbs_script.splitlines()]))
          
 if __name__=='__main__':
     main()

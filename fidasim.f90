@@ -1,4 +1,4 @@
-!!FIDASIM Version 0.3 
+!!FIDASIM Version 0.3.1
 
 !The main routine (fidasim) is at the end of the file!
 module application
@@ -172,11 +172,12 @@ module application
   end type spec_type
   type npa_type
      real(double), dimension(:,:,:) ,allocatable  :: v    !! velocity array
-     real(double), dimension(:,:,:) ,allocatable  :: ipos !! initial position arra
+     real(double), dimension(:,:,:) ,allocatable  :: ipos !! initial position array
      real(double), dimension(:,:,:) ,allocatable  :: fpos !! final position array
-     real(double), dimension(:,:)   ,allocatable  :: wght !! weight
+     real(double), dimension(:,:)   ,allocatable  :: wght !! weight of ith mc particle
+     real(double), dimension(:,:)   ,allocatable  :: E    !! Energy of ith mc particle
      real(double), dimension(:,:)   ,allocatable  :: flux !! flux
-     real(double), dimension(:)     ,allocatable  :: energy !! energy
+     real(double), dimension(:)     ,allocatable  :: energy !! energy array
      integer(long),dimension(:)     ,allocatable  :: counter
      real(double)                                 :: npa_loop
      integer(long)                                :: nchan
@@ -307,7 +308,7 @@ contains
 
     call getenv("FIDASIM_DIR",root_dir)
     print*,'---- loading inputs ----' 
-
+    print*,namelist_file
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)
@@ -366,6 +367,7 @@ contains
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_inputs.cdf"
     print*,'---- loading grid ----'
+    print*,filename
 
     !!OPEN netCDF file   
     call check( nf90_open(filename, nf90_nowrite, ncid) )
@@ -902,7 +904,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.cdf"   
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim_001",1,dimid1) )
@@ -940,7 +942,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.cdf"
  
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -978,7 +980,7 @@ contains
   subroutine write_npa
     use netcdf
     integer         :: nchan_dimid,e_dimid,c_dimid,ncid,dimids(3),dimid1,dimid3,maxcnt
-    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,cnt_varid,nchan_varid
+    integer         :: ipos_varid,fpos_varid,v_varid,e_varid,f_varid,wght_varid,ei_varid,cnt_varid,nchan_varid
     character(120)  :: filename
     real(float), dimension(:,:,:),allocatable :: output
     real(float), dimension(:,:),allocatable :: output1
@@ -991,7 +993,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -1007,6 +1009,7 @@ contains
     call check( nf90_def_var(ncid,"fpos",NF90_FLOAT,dimids,fpos_varid) )
     call check( nf90_def_var(ncid,"v",NF90_FLOAT,dimids,v_varid) )
     call check( nf90_def_var(ncid,"wght",NF90_FLOAT,(/ c_dimid,nchan_dimid /),wght_varid) )
+    call check( nf90_def_var(ncid,"E",NF90_FLOAT,(/ c_dimid,nchan_dimid /),ei_varid) )
     call check( nf90_def_var(ncid,"flux",NF90_FLOAT,(/ e_dimid,nchan_dimid /),f_varid) )
     call check( nf90_def_var(ncid,"energy",NF90_FLOAT,e_dimid,e_varid) )
     call check( nf90_def_var(ncid,"counts",NF90_FLOAT,nchan_dimid,cnt_varid) )
@@ -1032,6 +1035,9 @@ contains
 
     output1(:,:)=real(npa%wght(:maxcnt,:) ,float)
     call check( nf90_put_var(ncid, wght_varid, output1) )
+
+    output1(:,:)=real(npa%E(:maxcnt,:) ,float)
+    call check( nf90_put_var(ncid, ei_varid, output1) )
 
     call check( nf90_put_var(ncid,f_varid,real(npa%flux(:,:),float)) )
 
@@ -1083,7 +1089,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.cdf"
  
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -2428,9 +2434,10 @@ contains
           if(npa%counter(det).gt.inputs%nr_npa)stop'too many neutrals'
           npa%v(npa%counter(det),:,det)=vn(:)
           npa%wght(npa%counter(det),det)=sum(states)/nlaunch*grid%dv/npa%npa_loop !![neutrals/s]
+          npa%E(npa%counter(det),det) = inputs%ab*v_to_E*dot_product(vn,vn)
           npa%ipos(npa%counter(det),:,det)=ri(:)
           npa%fpos(npa%counter(det),:,det)=ray(:)
-          ienergy=minloc(abs(npa%energy-(inputs%ab*v_to_E*dot_product(vn,vn))))
+          ienergy=minloc(abs(npa%energy - npa%E(npa%counter(det),det)))
           npa%flux(ienergy(1),det)=npa%flux(ienergy(1),det)+ npa%wght(npa%counter(det),det)/distri%deb
           !$OMP END CRITICAL(col_rad_npa)
        endif
@@ -3262,6 +3269,7 @@ contains
     integer                        :: ii,i,j,k,l   !! indices wavel,vx,vy,vz
     real(double),dimension(:,:,:,:),allocatable :: wfunct
     real(double),dimension(:)    ,allocatable :: ebarr,ptcharr,phiarr,rad_arr,theta_arr
+    real(double),dimension(:,:), allocatable :: jacobian,e_grid,p_grid,vpa_grid,vpe_grid
     real(double)                   :: sinus
     real(double),dimension(3)      :: vi,vi_norm
     real(double)                   :: vabs
@@ -3295,6 +3303,7 @@ contains
     !!netCDF variables
     integer :: ncid,dimid1,dimids(4),nwav_dimid,nchan_dimid,ne_dimid,np_dimid,nphi_dimid
     integer :: wfunct_varid,e_varid,ptch_varid,rad_varid,theta_varid,wav_varid,ichan_varid,nchan_varid
+    integer :: vpe_varid,vpa_varid,j_varid
 
     !! DEFINE wavelength array
     nwav=(inputs%wavel_end_wght-inputs%wavel_start_wght)/inputs%dwav_wght
@@ -3326,6 +3335,28 @@ contains
     do i=1,inputs%nphi_wght
        phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nphi_wght)
     enddo
+
+    !! define energy grid
+    allocate(e_grid(inputs%ne_wght,inputs%np_wght))
+    do i=1,inputs%ne_wght
+        e_grid(i,:) = ebarr(i)
+    enddo
+
+    !! define pitch grid
+    allocate(p_grid(inputs%ne_wght,inputs%np_wght))
+    do i=1,inputs%np_wght
+        p_grid(:,i) = ptcharr(i)
+    enddo
+
+    !! define velocity space grid
+    allocate(vpe_grid(inputs%ne_wght,inputs%np_wght)) !! V perpendicular
+    allocate(vpa_grid(inputs%ne_wght,inputs%np_wght)) !! V parallel
+    vpa_grid(:,:) = sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid(:,:))*p_grid(:,:)
+    vpe_grid(:,:) = sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid(:,:)*(1.0-p_grid(:,:)**2.0))
+
+    !! define jacobian to convert between E-p to velocity
+    allocate(jacobian(inputs%ne_wght,inputs%np_wght))
+    jacobian(:,:) = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid(:,:)/sqrt(vpa_grid(:,:)**2.0 + vpe_grid(:,:)**2.0)
 
     nchan=0
     do i=1,spec%nchan
@@ -3547,8 +3578,10 @@ contains
                            !wfunct(ii,i,j,ind) = wfunct(ii,i,j,ind) &
                            !    + intens(l)/real(inputs%ne_wght)
                            !normal calculation:
-                           wfunct(ii,i,j,cnt) = wfunct(ii,i,j,cnt) &
-                                + intens(l)*photons/real(inputs%nphi_wght)
+                           wght2 = intens(l)*photons/real(inputs%nphi_wght)
+                           if (wght2.gt.XMACH_EPS) then
+                               wfunct(ii,i,j,cnt) = wfunct(ii,i,j,cnt) + wght2
+                           endif
                       endif
                    enddo wavelength_ranges
                 enddo stark_components
@@ -3585,7 +3618,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.cdf"
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -3605,7 +3638,10 @@ contains
     call check( nf90_def_var(ncid,"radius",NF90_DOUBLE,nchan_dimid,rad_varid) )
     call check( nf90_def_var(ncid,"theta",NF90_DOUBLE,nchan_dimid,theta_varid) )
     call check( nf90_def_var(ncid,"wfunct",NF90_DOUBLE,dimids,wfunct_varid) )
-
+    call check( nf90_def_var(ncid,"vpa",NF90_DOUBLE,(/ne_dimid,np_dimid/),vpa_varid) )
+    call check( nf90_def_var(ncid,"vpe",NF90_DOUBLE,(/ne_dimid,np_dimid/),vpe_varid) )
+    call check( nf90_def_var(ncid,"jacobian",NF90_DOUBLE,(/ne_dimid,np_dimid/),j_varid) )
+   
     !Add unit attributes
     call check( nf90_put_att(ncid,wav_varid,"units","nm") )
     call check( nf90_put_att(ncid,rad_varid,"units","cm") )
@@ -3623,6 +3659,9 @@ contains
     call check( nf90_put_var(ncid, rad_varid, rad_arr) )
     call check( nf90_put_var(ncid, theta_varid, theta_arr) )
     call check( nf90_put_var(ncid, wfunct_varid, wfunct) )
+    call check( nf90_put_var(ncid, vpe_varid, vpe_grid) )
+    call check( nf90_put_var(ncid, vpa_varid, vpa_grid) )
+    call check( nf90_put_var(ncid, j_varid, jacobian) )
 
     !Close netCDF file
     call check( nf90_close(ncid) )
@@ -3638,6 +3677,11 @@ contains
     deallocate(wfunct)
     deallocate(rad_arr)
     deallocate(theta_arr)
+    deallocate(jacobian)
+    deallocate(e_grid)
+    deallocate(p_grid)
+    deallocate(vpe_grid)
+    deallocate(vpa_grid)
   end subroutine fida_weight_function
 
   !*****************************************************************************
@@ -3887,7 +3931,7 @@ contains
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.cdf"
 
     !Create netCDF file
-    call check( nf90_create(filename, NF90_CLOBBER, ncid) )
+    call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
     !Define Dimensions
     call check( nf90_def_dim(ncid,"dim001",1,dimid1) )
@@ -4002,12 +4046,14 @@ program fidasim
      allocate(npa%ipos(inputs%nr_npa,3,npa%nchan)) 
      allocate(npa%fpos(inputs%nr_npa,3,npa%nchan)) 
      allocate(npa%wght(inputs%nr_npa,npa%nchan))
+     allocate(npa%E(inputs%nr_npa,npa%nchan))
      allocate(npa%counter(npa%nchan))
      npa%counter(:)=0
      npa%v(:,:,:)=0   
      npa%ipos(:,:,:)=0   
      npa%fpos(:,:,:)=0   
      npa%wght(:,:)=0   
+     npa%E(:,:)=0   
   endif
   
 
@@ -4163,6 +4209,7 @@ program fidasim
      deallocate(npa%ipos) 
      deallocate(npa%fpos) 
      deallocate(npa%wght)
+     deallocate(npa%E)
      deallocate(npa%energy)
      deallocate(npa%flux)
      deallocate(npa%counter)

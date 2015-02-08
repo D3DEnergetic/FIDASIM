@@ -769,7 +769,7 @@ PRO write_namelist,inputs
     if git_hash ne '' then begin
         printf,55,'!! FIDASIM git commit: ',git_hash
     endif else begin
-        printf,55,'!! FIDASIM version: 0.3 '
+        printf,55,'!! FIDASIM version: 0.3.1 '
     endelse
 
     printf,55,'!! Comment: '+inputs.comment

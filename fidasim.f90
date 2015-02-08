@@ -1,4 +1,4 @@
-!!FIDASIM Version 0.3 
+!!FIDASIM Version 0.3.1
 
 !The main routine (fidasim) is at the end of the file!
 module application

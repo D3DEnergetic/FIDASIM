@@ -1006,7 +1006,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     CASE input_type OF
         'FILE':begin
             file_path=input_file
-            file_name=FILE_BASENAME(input_file)
+            file_name=inputs.runid+'_inputs.json'
             FILE_COPY,file_path,$
               inputs.result_dir+'/'+file_name,$
               /overwrite,/allow_same
@@ -1014,13 +1014,13 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
         'PROCEDURE':begin
             file_info=ROUTINE_INFO(input_file,/source)
             file_path=file_info.path
-            file_name=input_file+'.pro'
+            file_name=inputs.runid+'_inputs.pro'
             FILE_COPY,file_path,$
               inputs.result_dir+'/'+file_name,$
               /overwrite,/allow_same
             end
         'STRUCTURE':begin
-            file_name=inputs.result_dir+'/inputs_str.sav'
+            file_name=inputs.result_dir+'/'+inputs.runid+'_inputs.sav'
             save,inputs,filename=file_name
             end
     ENDCASE

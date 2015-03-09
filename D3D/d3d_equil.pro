@@ -1,22 +1,17 @@
 FUNCTION d3d_equil,inputs,grid,det
 
-	equil={err:1}
-	;; Get eqdsk
-    time_str='00000'+strtrim(string(long(round(inputs.time*1000))),1)
+  equil={err:1}
+  ;; Get eqdsk
+    time_str='00000'+strtrim(string(long(inputs.time*1000)),1)
     time_str=strmid(time_str,4,/reverse_offset)
     shot_str=strtrim(string(inputs.shot),1)
     profile_str=shot_str+'.'+time_str
-
-    gfile=inputs.profile_dir+'/g'+profile_str
+    ;; BAG 20141119
+    ;; This next line was wrong.
+    gfile=inputs.profile_dir+'/'+'g'+profile_str
 	gfiletest=findfile(gfile)
-    ;; if equilbrium not in profile directory then look in a shot dir
-    if gfiletest eq '' then begin
-        gfile=inputs.profile_dir+shot_str+'/g'+profile_str
-        gfiletest=findfile(gfile)
-    endif
-
 	if gfiletest ne '' then begin
-		print,'Restoring equilbrium from gfile: ',gfile
+		print,'Restoring equilbrium from gfile'
         if file_test(gfile,/EXECUTABLE)	then begin 
        	    restore,gfile
        	endif else g=readg(gfile)

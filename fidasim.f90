@@ -2596,7 +2596,7 @@ contains
        endif
        !! ---------------------- Store spectra ---------------------- !!
        do i=1,n_stark           
-          bin=int(((wavel(i)-spec%lambdamin)/spec%dlambda)+.5)
+          bin=floor((wavel(i)-spec%lambdamin)/spec%dlambda)+1
           if (bin.lt.1)            bin = 1
           if (bin.gt.spec%nlambda) bin = spec%nlambda  
           !$OMP CRITICAL(spec_trum)

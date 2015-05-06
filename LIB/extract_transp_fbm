@@ -35,7 +35,7 @@ def main():
 
     if not fileid_list:
        file_list = glob.glob(args.path+'/'+args.runid+'.DATA*')
-       fileid_list=[re.match('.*?([0-9]+)$',s).group(1) for s in file_list]
+       fileid_list=list(set([re.match('.*?([0-9]+)~?$',s).group(1) for s in file_list]))
 
     for id in fileid_list:
        args_dict = {'rid':args.runid,'path':args.path,

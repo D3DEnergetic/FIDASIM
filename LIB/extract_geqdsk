@@ -83,7 +83,8 @@ def main():
 
     for time in times:
         if not args.gfile:
-            gfile = 'g'+re.match('^\d+',args.runid).group(0)+'.00'+str(long(round(time*1000.)))
+			time_str = str(long(round(time*1000.)))
+            gfile = 'g'+re.match('^\d+',args.runid).group(0)+'.'+'0'*(5-len(time_str))+time_str
         gfile = args.output_dir+'/'+gfile
 
         args_dict = {'runid':args.runid,'time':time, 'dt':args.delta_time,

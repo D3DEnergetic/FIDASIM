@@ -1056,7 +1056,7 @@ contains
   
   subroutine write_spectra
     use netcdf
-    integer         :: i,nchan
+    integer         :: i,nchan,cnt
     integer         :: ncid,nchan_varid,fida_varid,brems_varid,halo_varid
     integer         :: full_varid,half_varid,third_varid,lam_varid,rad_varid
     integer         :: chan_dimid,lam_dimid,dimid1,dimids(2)
@@ -1076,9 +1076,11 @@ contains
     enddo
 
     allocate(radius(nchan))
+	cnt=0
     do i=1,spec%nchan
        if(spec%chan_id(i).eq.0) then
-           radius(i) = spec%radius(i)
+		   cnt=cnt+1
+           radius(cnt) = spec%radius(i)
        endif
     enddo
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
@@ -2595,16 +2597,16 @@ contains
           return
        endif
        !! ---------------------- Store spectra ---------------------- !!
-       do i=1,n_stark           
+       loop_over_stark: do i=1,n_stark           
           bin=floor((wavel(i)-spec%lambdamin)/spec%dlambda)+1
-          if (bin.lt.1)            bin = 1
-          if (bin.gt.spec%nlambda) bin = spec%nlambda  
+          if (bin.lt.1)            cycle loop_over_stark
+          if (bin.gt.spec%nlambda) cycle loop_over_stark
           !$OMP CRITICAL(spec_trum)
           result%spectra(bin,cnt,neut_type)= &
                result%spectra(bin,cnt,neut_type) &
                +intens(i)*cell(ac(1),ac(2),ac(3))%los_wght(cnt)
           !$OMP END CRITICAL(spec_trum)
-       enddo
+       enddo loop_over_stark
     enddo loop_over_channels
   end subroutine spectrum
   

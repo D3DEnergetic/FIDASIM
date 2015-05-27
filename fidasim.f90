@@ -2497,6 +2497,9 @@ contains
     call matinv(eigvec, eigvec_inv)
     coef = matmul(eigvec_inv, states)!coeffs determined from states at t=0
     exp_eigval_dt = exp(eigval*dt)   ! to improve speed (used twice)
+    do n=1,nlevs
+       if(eigval(n).eq.0.0) eigval(n)=eigval(n)+1 !protect against dividing by zero
+    enddo
     states(:) = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
     dens(:)   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)/nlaunch
 

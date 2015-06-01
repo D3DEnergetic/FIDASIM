@@ -64,8 +64,17 @@ Cerview routines are needed to run prefida. Add the commands located in ```D3D/d
 ```bash
 venus ~ $ idl D3D/d3d_startup.pro
 ```
- 
-FIDASIM currently does not run on the venus cluster since it does not have the required libraries.
+
+To compile FIDASIM on the venus cluster you can use pgf90 (because this is what was used to compile netCDF on the cluster). Set the following environment variables before running make:
+```
+setenv FIDASIM_DIR /u/haskeysr/FIDASIM/
+setenv FIDASIM_COMPILER pgf90
+setenv LD_LIBRARY_PATH /task/imd/local64/lib:$LD_LIBRARY_PATH
+setenv LD_LIBRARY_PATH /task/imd/local64/include:$LD_LIBRARY_PATH
+setenv NETCDF_INCLUDE /task/imd/local64/include
+setenv NETCDF_LIB /task/imd/local64/lib
+``` 
+Note: this does not currently include multi-processing.
 
 ### NSTX-U
 * To access the git repository and to use the Intel compiler add the following lines to your .login file before the pathscale module is loaded. 

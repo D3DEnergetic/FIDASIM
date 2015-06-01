@@ -11,6 +11,11 @@ ifeq ($(FIDASIM_COMPILER),ifort)
 	CFLAGS = -O2 -openmp -warn
 endif
 
+ifeq ($(FIDASIM_COMPILER),pgf90)
+	LFLAGS = -lnetcdff -lnetcdf  -lm
+	CFLAGS = -O2
+endif
+
 fidasim: fidasim.o
 	$(FIDASIM_COMPILER) $(CFLAGS) fidasim.o -o fidasim -L$(NETCDF_LIB) $(LFLAGS)
 

@@ -3,6 +3,7 @@
 !The main routine (fidasim) is at the end of the file!
 module application
   use netcdf
+  use ieee_arithmetic
   implicit none
   !!                      Definition for the kind of the variables: 
   integer , parameter   :: long      = kind(int(1))
@@ -3566,7 +3567,7 @@ contains
                    states=states + rates/nr_halo_neutrate
                 enddo
                 call colrad(ac,vi,dt,states,photons,0,1.d0)
-                if(isnan(photons))photons=0
+                if(ieee_is_nan(photons))photons=0
                 !! photons: [Ph*cm/s/fast-ion]-!!
                 !! calcualte spectrum of this one fast-ion
                 call spectrum(vi,ac,pos,1.d0,nbif_type,wavel,intens)
@@ -3862,7 +3863,7 @@ contains
                  fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
                  denf=cell(ix(1),iy(1),iz(1))%plasma%denf
                endif
-               if (isnan(fbm_denf)) cycle loop_over_energy
+               if (ieee_is_nan(fbm_denf)) cycle loop_over_energy
                !! -------------- calculate CX probability -------!!
                ! CX with full energetic NBI neutrals
                pcx=0.d0

@@ -60,7 +60,7 @@ def main():
         print('PPN:      '+str(args.ppn))
         print('Memory:   '+args.memory)
 
-    fileordir = args.path
+    fileordir = os.path.abspath(args.path)
 	
     if os.path.isfile(fileordir):
         files=[fileordir]

@@ -12,7 +12,7 @@ FUNCTION d3d_profiles,inputs,save=save
 
 
 	;;CREATE FILENAMES 
-	time_str='00000'+strtrim(string(long(inputs.time*1000)),1)
+	time_str='00000'+strtrim(string(long(round(inputs.time*1000))),1)
 	time_str=strmid(time_str,4,/reverse_offset)
 	shot_str=strtrim(string(inputs.shot),1)
 	profile_str=shot_str+'.'+time_str

@@ -19,6 +19,9 @@ def main():
     parser.add_argument('-d','--device',
                         default='D3D',
                         help='Set device')
+    parser.add_argument('-o','--output_dir',
+                        default='.',
+                        help = 'Output directory. Default = cwd')
     parser.add_argument('-t','--type',
                         default = 'c',
                         help = 'Type of distribution: c: Guiding Center (default) or p: Particle Location')
@@ -40,6 +43,7 @@ def main():
     for id in fileid_list:
        args_dict = {'rid':args.runid,'path':args.path,
                     'fileid':id,'device':args.device,
+                    'outdir':os.path.abspath(args.output_dir),
                     'type':args.type}
     
        fbm_script = """
@@ -49,6 +53,9 @@ def main():
                     %(fileid)s
                     t
                     %(device)s
+                    x
+                    %(outdir)s
+                    q
                     w
                     %(type)s
                     q

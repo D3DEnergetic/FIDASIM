@@ -3997,11 +3997,16 @@ end module application
 !*****************************************************************************
 program fidasim
   use application
+  use omp_lib
   implicit none 
   integer, dimension(8)              :: time_arr,time_start,time_end !Time array
   integer                            :: i,j,k,seed
-  integer                            :: hour,minu,sec
+  integer                            :: hour,minu,sec,max_threads
   real(double)                       :: random_init
+
+  max_threads = min(8,OMP_get_num_procs())
+  call OMP_set_num_threads(max_threads)
+
   !! measure time
   call date_and_time (values=time_start)
   !! get filename of input

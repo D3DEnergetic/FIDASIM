@@ -11,7 +11,7 @@ FUNCTION d3d_equil,inputs,grid,det
 	gfiletest=findfile(gfile)
     ;; if equilbrium not in profile directory then look in a shot dir
     if gfiletest eq '' then begin
-        gfile=inputs.profile_dir+shot_str+'/g'+profile_str
+        gfile=inputs.profile_dir+'/'+shot_str+'/g'+profile_str
         gfiletest=findfile(gfile)
     endif
 

@@ -4,9 +4,10 @@ PRO test_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT CHANG
 					   profiles,$		;;OUTPUT: PROFILES STRUCTURE
 					   equil,$			;;OUTPUT: MAGNETIC GRID STRUCTURE
 					   err				;;OUTPUT: ERROR STATUS ERR=1 == SOMETHING WENT WRONG
-           
+
+    ;; Profiles           
     profiles = read_ncdf(inputs.profile_dir)
-    equil = test_equil(inputs,grid)
+    profiles = create_struct("vtor",profiles.omega,profiles)
 
     ;; Chords
     ulens = dblarr(3)
@@ -34,6 +35,10 @@ PRO test_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT CHANG
               ulens:ulens,vlens:vlens,wlens:wlens,xlens:ulens,ylens:vlens,zlens:wlens,$
               sigma_pi_ratio:sigma_pi,ra:ra,rd:rd,h:h,chan_id:chan_id,err:0}
 
+    ;; Magnetic Equilibrium
+    equil = test_equil(inputs,grid,chords)
+
+    ;; Neutral Beam Injection
     uvw_src = [0.0,-230.0 - 2.0*cos(inputs.beta),2.0*sin(inputs.beta)]
     uvw_pos = [0.0,-230.0,0.0]
     einj = inputs.einj
@@ -53,7 +58,7 @@ PRO test_routines,inputs,grid,$     ;;INPUT: INPUTS AND GRID POINTS DO NOT CHANG
     tfracs=1.0-ffracs-hfracs
 
     nbi={einj:einj,pinj:pinj,full:ffracs,half:hfracs,third:tfracs,$
-         uvw_src:uvw_src,uvw_pos:uvw_pos,bmwidra:bmwidra,bmwidza:bmwidza,$
+         xyz_src:uvw_src,xyz_pos:uvw_pos,bmwidra:bmwidra,bmwidza:bmwidza,$
          divy:divy,divz:divz,focy:focy,focz:focz,err:0}
 
     ;err=0

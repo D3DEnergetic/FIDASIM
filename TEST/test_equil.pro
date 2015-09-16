@@ -1,45 +1,79 @@
-FUNCTION test_equil,inputs,grid
+FUNCTION test_equil,inputs,grid,det
 
-    equil={err:1}
-	;; Get eqdsk
+	equil={err:1}
     g=readg(inputs.install_dir+'/TEST/'+inputs.equil)
-    rhogrid=rho_rz(g,grid.r2d/100.,grid.w2d/100.,/do_linear)
+    rhogrid=rho_rz(g,grid.r_grid/100.,grid.w_grid/100.,/do_linear)
 
-  	calculate_bfield,bp,br,bphi,bz1,g
+	calculate_bfield,bp,br,bphi,bz1,g
 
-  	;; Get radial electric field on efit's grid from potential
-  	;; epoten is on a grid of equally spaced points in psi from g.ssimag to g.ssibry
-  	dpsi=(g.ssibry-g.ssimag)/(n_elements(g.epoten)-1)
-  	psi=g.ssimag + dpsi*findgen(n_elements(g.epoten))
-  	npot=n_elements(g.epoten)
-  	epot=replicate(g.epoten[npot-1],n_elements(g.r),n_elements(g.z))
-  	for i=0l,n_elements(g.r)-1 do begin
-  	    for j=0l,n_elements(g.z)-1 do begin
-  	        psi1=g.psirz[i,j]
-  			    dum=min(abs(psi1-psi),kpsi)
-  			    if kpsi ne npot-1 then epot[i,j]=spline(psi,g.epoten,[psi1])
-  		  endfor
-  	endfor
+	;; Get radial electric field on efit's grid from potential
+	;; epoten is on a grid of equally spaced points in psi from g.ssimag to g.ssibry
+	dpsi=(g.ssibry-g.ssimag)/(n_elements(g.epoten)-1)
+	psi=g.ssimag + dpsi*findgen(n_elements(g.epoten))
+	npot=n_elements(g.epoten)
+	epot=replicate(g.epoten[npot-1],n_elements(g.r),n_elements(g.z))
+	for i=0l,n_elements(g.r)-1 do begin 
+		for j=0l,n_elements(g.z)-1 do begin
+			psi1=g.psirz[i,j]
+			dum=min(abs(psi1-psi),kpsi)
+			if kpsi ne npot-1 then epot[i,j]=spline(psi,g.epoten,[psi1])
+		endfor
+	endfor
+	; E = - grad(Phi)    EFIT units should be V/m
+	er=-(shift(epot,-1,0) - shift(epot,1,0))/(g.r[2]-g.r[0])
+	ez1=-(shift(epot,0,-1) - shift(epot,0,1))/(g.z[2]-g.z[0])
+	
+	;; Interpolate cylindrical fields onto (x,y,z) mesh then rotate vectors
+	bx=dblarr(grid.nx,grid.ny,grid.nz) & by=bx & bz=bx
+	ex=dblarr(grid.nx,grid.ny,grid.nz) & ey=ex & ez=ex	
+	
+	for i=0L,grid.nx-1 do for j=0L,grid.ny-1 do for k=0L,grid.nz-1 do begin
+		rgrid=(.01*grid.r_grid[i,j,k] - g.r[0])/(g.r[1]-g.r[0]) ; in grid units
+		zgrid=(.01*grid.w_grid[i,j,k] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
+		bcylr=interpolate(br,[rgrid],[zgrid])
+		ecylr=interpolate(er,[rgrid],[zgrid])
+		bcylphi=interpolate(bphi,[rgrid],[zgrid])
+		ez[i,j,k]=interpolate(ez1,[rgrid],[zgrid])
+		bz[i,j,k]=interpolate(bz1,[rgrid],[zgrid])
+		cph=cos(grid.phi_grid[i,j,k]) & sph=sin(grid.phi_grid[i,j,k])
+		bx[i,j,k]=(cph*bcylr - sph*bcylphi)
+		by[i,j,k]=(sph*bcylr + cph*bcylphi)
+		ex[i,j,k]=cph*ecylr
+		ey[i,j,k]=sph*ecylr
+	endfor
+	
+	if inputs.calc_brems eq 0 then begin
+		;;GET RHO VALUES ALONG LINE OF SIGHT
+		ds=.3    ; step size (cm)
+	    ns=4000  ; maximum number of steps
 
-  	; E = - grad(Phi)    EFIT units should be V/m
-  	er=-(shift(epot,-1,0) - shift(epot,1,0))/(g.r[2]-g.r[0])
-  	ez1=-(shift(epot,0,-1) - shift(epot,0,1))/(g.z[2]-g.z[0])
-  
-  	;; Interpolate cylindrical fields onto (r,w) mesh
-  	b_r=dblarr(grid.nr,grid.nw) & b_t=b_r & b_w=b_r
-  	e_r=dblarr(grid.nr,grid.nw) & e_t=e_r & e_w=e_r
+	    ;; Sightlines
+	    nchan=det.nchan
+	    x0=det.xlens   ; cm
+	    y0=det.ylens
+	    z0=det.zlens
+	    v=fltarr(3,nchan)
+	    for i=0,nchan-1 do begin
+	        v[0,i]=det.xlos[i]-x0[i]
+	        v[1,i]=det.ylos[i]-y0[i]
+	        v[2,i]=det.zlos[i]-z0[i]
+	        v[*,i]=v[*,i]/sqrt(v[0,i]^2+v[1,i]^2+v[2,i]^2)
+	    endfor
+		rhospath=dblarr(ns,nchan)
+	    for i=0,nchan-1 do begin
+	        ;equations for lines in x,y,z are
+	        x=x0[i] + v[0,i]*ds*findgen(ns)  ; cm
+	        y=y0[i] + v[1,i]*ds*findgen(ns)
+	        z=z0[i] + v[2,i]*ds*findgen(ns)
+	
+	        rmajvals=(x^2.+y^2.)^.5  ; major radii of all points along ray
+			rhospath[*,i]=rho_rz(g,rmajvals/100.,z/100.,/do_linear)
+	    endfor  ; channel loop
 
-  	for i=0L,grid.nr-1 do for j=0L,grid.nw-1 do begin
-    		rgrid=(.01*grid.r2d[i,j] - g.r[0])/(g.r[1]-g.r[0]) ; in grid units
-    		zgrid=(.01*grid.w2d[i,j] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
-    		b_r[i,j]  =interpolate(br,[rgrid],[zgrid])
-    		e_r[i,j]  =interpolate(er,[rgrid],[zgrid])
-    		b_t[i,j]  =interpolate(bphi,[rgrid],[zgrid])
-    		e_w[i,j]  =interpolate(ez1,[rgrid],[zgrid])
-    		b_w[i,j]  =interpolate(bz1,[rgrid],[zgrid])
-  	endfor
-  
-  	equil={g:g,rho2d:rhogrid,br:b_r,bt:b_t,bw:b_w,er:e_r,et:e_t,ew:e_w,err:0}
-  	GET_OUT:
-  	return,equil
+		rho_chords={rhos:rhospath,ds:ds}
+	endif else rho_chords={rhos:0,ds:0}
+
+	equil={g:g,rho_grid:rhogrid,rho_chords:rho_chords,bx:bx,by:by,bz:bz,ex:ex,ey:ey,ez:ez,err:0}
+	GET_OUT:
+	return,equil
 END

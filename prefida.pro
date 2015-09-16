@@ -904,21 +904,13 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     check_inputs,inputs,err
     if err ne 0 then goto,GET_OUT
 
-    ;;CHECK FOR SLASH
-    slash=strmid(inputs.result_dir,0,1,/reverse_offset)
-    if slash ne '/' then inputs.result_dir+='/'
-    slash=strmid(inputs.install_dir,0,1,/reverse_offset)
-    if slash ne '/' then inputs.install_dir+='/'
-    slash=strmid(inputs.profile_dir,0,1,/reverse_offset)
-    if slash ne '/' then inputs.profile_dir+='/'
-    
     ;;MAKE DIRECTORIES IF THEY DONT EXIST
     if file_test(inputs.result_dir,/directory) eq 0 then begin
         spawn,'mkdir '+inputs.result_dir
     endif
 
     ;;ADD DEVICE DIRECTORY TO PATH
-    !path = !path + ":" + expand_path("+"+inputs.install_dir+inputs.device)
+    !path = !path + ":" + expand_path("+"+inputs.install_dir+'/'+inputs.device)
     
     ;;ADD INSTALL DIRECTORY TO PATH
     !path = !path + ":" + expand_path(inputs.install_dir)
@@ -990,7 +982,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
         printc,'SUCCESS: Bremsstrahlung calculation completed',f='g'
     endif
 
-    plot_file=inputs.install_dir+strupcase(inputs.device)+'/'+strlowcase(inputs.device)+'_plots.pro'
+    plot_file=inputs.install_dir+'/'+strupcase(inputs.device)+'/'+strlowcase(inputs.device)+'_plots.pro'
     ;; Plot grid, beam, sightlines, and equilibrium
     if keyword_set(plot) and FILE_TEST(plot_file) then begin
         CALL_PROCEDURE, strlowcase(inputs.device)+'_plots',inputs,grid,nbi,chords,fida,equil,nbgeom,plasma
@@ -1285,7 +1277,7 @@ PRO prefida,input_file,input_str=input_str,plot=plot,save=save
     print,''
     printc, 'SUCCESS: FIDASIM pre-processing completed',f='g'
     print, 'To run FIDASIM use the following command'
-    print, inputs.install_dir+'fidasim '+inputs.result_dir+'/'+inputs.runid+'_inputs.dat'
+    print, inputs.install_dir+'/fidasim '+inputs.result_dir+'/'+inputs.runid+'_inputs.dat'
     print,''
     print,''
     GET_OUT:

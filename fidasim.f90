@@ -3809,6 +3809,7 @@ contains
 
              !!Loop over detector area to find mean detectorposition 
              wght=0
+             mrdpos = mrdpos*0.0
              loop_along_xd: do i=1,100
                loop_along_yd: do j=1,100
                  rdpos(1)=rd_arr(j)*cos(phid_arr(i))
@@ -3832,8 +3833,11 @@ contains
                
              !!Check if it hits a detector just to make sure
              call hit_npa_detector(pos,vi_norm,det)
-             if (det.eq.0) cycle loop_along_x 
-          
+             if (det.eq.0) then 
+               print*,'Missed detector ',det
+               cycle loop_along_x 
+             endif
+
              !!Determine path particle takes throught the grid
              call track(vi_norm,pos,tcell,icell,pos_out,ncell)
 

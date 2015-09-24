@@ -16,7 +16,7 @@ PRO run_tests,result_dir,test_case=test_case
              nr_fast:5000000,nr_nbi:50000,nr_halo:500000,$
              ne_wght:50,np_wght:50,nphi_wght:100,emax_wght:100,ichan_wght:-1,$
              dwav_wght:0.02,wavel_start_wght:647.0,wavel_end_wght:667.0,$
-             calc_npa:0,calc_spec:1,calc_birth:1,calc_brems:1,calc_fida_wght:1,$
+             calc_npa:0,calc_spec:1,calc_birth:1,calc_brems:0,calc_fida_wght:1,$
              calc_npa_wght:1,load_neutrals:0,load_fbm:1,interactive:0,$
              install_dir:fida_dir,diag:["ALL"],isource:0,$
              result_dir:result_dir,cdf_file:fida_dir+'TEST/test_fi_1.cdf'}

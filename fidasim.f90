@@ -2867,8 +2867,8 @@ contains
              cnt=0
              loop_over_channels: do ichan=1,spec%nchan
                 if(spec%chan_id(ichan).ne.0) cycle loop_over_channels
-                if(cell(i,j,k)%los_wght(ichan).le.0.)cycle loop_over_channels
                 cnt=cnt+1
+                if(cell(i,j,k)%los_wght(ichan).le.0.)cycle loop_over_channels
                 ne=cell(i,j,k)%plasma%dene     ![cm^3]
                 zeff=cell(i,j,k)%plasma%zeff   !       
                 te=cell(i,j,k)%plasma%te*1000. ! [eV]
@@ -4134,7 +4134,7 @@ program fidasim
        allocate(npa%flux(distri%nenergy,npa%nchan))
        npa%energy(:)=distri%energy
      endif
-     call fida
+     if(inputs%load_fbm.eq.1) call fida
 
   endif
   

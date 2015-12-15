@@ -497,20 +497,8 @@ PRO transp_fbeam,inputs,grid,denf,fbm_struct,err
     ncdf_varget, cdfid,'A_D_NBI', pitch  ; central values
     ncdf_varget, cdfid,'F_D_NBI', FBM    ; fast-ion distribution function
     ncdf_varget, cdfid,'NTOT_D_NBI',ntot ; total number of fast ions
-    ncdf_varget, cdfid,'RSURF', rsurf    ; flux surface
-    ncdf_varget, cdfid,'ZSURF', zsurf    ; flux surface
     NCDF_Close,cdfid
     ngrid=n_elements(r2d)
-    ;;================================
-    ;; get tranpped -passing boundary
-    ;;================================
-    rmin=fltarr(ngrid)
-    for i=0,ngrid -1 do begin
-        dummy=min((rsurf-r2d[i])^2+(zsurf-z2d[i])^2,index)
-        index = array_indices(rsurf, index)
-        rmin[i]=min(rsurf[*,index[1]])
-    endfor
-    pitch_boundary=sqrt(1.-rmin[*]/r2d[*])
     
     ;; ----------- Check the time
     if abs(inputs.time-cdf_time) gt 0.02 then begin

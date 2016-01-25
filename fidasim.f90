@@ -985,13 +985,19 @@ contains
     real(float), dimension(:,:,:),allocatable :: output
     real(float), dimension(:,:),allocatable :: output1
     real(float), dimension(:),allocatable :: output2
+
     maxcnt=maxval(npa%counter(:))
+    if(maxcnt.eq.0) then
+        print*,'No NPA particles hit a detector'
+        return
+    endif
+
     allocate(output(maxcnt,3,npa%nchan))
     allocate(output1(maxcnt,npa%nchan))
     allocate(output2(npa%nchan))
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.cdf"
-
+    
     !Create netCDF file
     call check( nf90_create(filename, cmode=or(NF90_CLOBBER,NF90_64BIT_OFFSET), ncid=ncid) )
 
@@ -2403,7 +2409,7 @@ contains
     real(double)                            :: ptch  !! pitch of particle
     integer                                 :: ipitch !! index of pitch
     real(double)                            :: dray !! (for NPA)
-    real(double), dimension(3)              :: ray     !! ray towards NPA
+    real(double), dimension(3)              :: ray  !! ray towards NPA
     real(double), dimension(1)              :: ienergy !! (for NPA)
     photons=0.d0
     iflux=sum(states)
@@ -3142,8 +3148,9 @@ contains
     real(double), dimension(grid%nx,grid%ny,grid%nz)::papprox,nlaunch !! approx. density
     real(double)                          :: vi_abs             !! (for NPA)
     real(double), dimension(3)            :: ray,ddet,hit_pos   !! ray towards NPA
-    real(double)                          :: papprox_tot,maxcnt,cnt,los_tot
+    real(double)                          :: papprox_tot,maxcnt,cnt,los_tot,dray
     integer                               :: inpa,pcnt
+    integer, dimension(1)                 :: ienergy
 
     !! ------------- calculate papprox needed for guess of nlaunch --------!!
     papprox=0.d0
@@ -3183,7 +3190,7 @@ contains
     call get_nlaunch(inputs%nr_fast,papprox,papprox_tot,nlaunch)
     print*,'    # of markers: ',int(sum(nlaunch))
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(ip,i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,&
+    !$OMP PARALLEL DO schedule(guided) private(ienergy,ip,i,j,k,iion,ac,vi,ri,det,ray,inpa,hit_pos,ddet,dray,&
     !$OMP vi_abs,tcell,icell,pos,ncell,jj,prob,denn,rates,vnbi_f,vnbi_h,vnbi_t,in,vnhalo,states,photons)
     loop_over_cells: do ip = 1, int(pcnt)
       npa_loop: do inpa=1,int(npa%npa_loop)
@@ -3196,6 +3203,7 @@ contains
           call mc_fastion(ac,ri(:), vi(:)) 
           if(sum(vi).eq.0)cycle loop_over_fast_ions
           !! -------- check if particle flies into NPA detector ---- !!
+          det = 0
           if(inputs%calc_npa.eq.1)then  
             call hit_npa_detector(ri(:),vi(:),det)
             if(det.eq.0) cycle loop_over_fast_ions
@@ -3242,6 +3250,22 @@ contains
             endif
             if(inputs%calc_spec.eq.1) call spectrum(vi(:),ac(:),pos(:,jj),photons,fida_type)
           enddo loop_along_track
+          if(inputs%calc_npa.eq.1)then
+              dray=sqrt(dot_product(ri-spec%xyzhead(det,:) &
+                   ,ri-spec%xyzhead(1,:)))
+              ray=ri(:)+vi(:)/sqrt(dot_product(vi,vi))*dray
+              !$OMP CRITICAL(col_rad_npa)
+              npa%counter(det)=npa%counter(det)+1
+              if(npa%counter(det).gt.inputs%nr_npa)stop'too many neutrals'
+              npa%v(npa%counter(det),:,det)=vi(:)
+              npa%wght(npa%counter(det),det)=sum(states)/nlaunch(i,j,k)*grid%dv/npa%npa_loop !![neutrals/s]
+              npa%E(npa%counter(det),det) = inputs%ab*v_to_E*dot_product(vi,vi)
+              npa%ipos(npa%counter(det),:,det)=ri(:)
+              npa%fpos(npa%counter(det),:,det)=ray(:)
+              ienergy=minloc(abs(npa%energy - npa%E(npa%counter(det),det)))
+              npa%flux(ienergy(1),det)=npa%flux(ienergy(1),det)+ npa%wght(npa%counter(det),det)/distri%deb
+              !$OMP END CRITICAL(col_rad_npa)
+           endif
         enddo loop_over_fast_ions
       enddo npa_loop
       cnt=cnt+1
@@ -3709,7 +3733,7 @@ contains
     real(double), dimension(:),         allocatable :: ebarr,ptcharr,rad_arr
     real(double), dimension(100)    :: rd_arr,phid_arr !!npa detector array
     real(double), dimension(3)      :: vi,vi_norm,b_norm,vxB
-    real(double)                    :: xcen,ycen,rshad,rs
+    real(double)                    :: xcen,ycen,rshad,rs,delE,delp
     real(double)                    :: vabs,denf,fbm_denf,wght,b_abs,dE,dP,ccnt
 
     !! Determination of the CX probability
@@ -3785,7 +3809,7 @@ contains
 
        ccnt=0.0
        !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk, &
-       !$OMP& ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro,wght, &
+       !$OMP& ic,jc,kc,ix,iy,iz,in,det,ind,ac,pos,rpos,rdpos,dpos,r_gyro,wght,delE,delp, &
        !$OMP& vnbi_f,vnbi_h,vnbi_t,b_norm,theta,radius,minpitch,ipitch,ienergy,mrdpos,rshad,rs,xcen,ycen, &
        !$OMP& vabs,fdens,hdens,tdens,halodens,vi,pcx,pcxa,rates,vhalo,icell,tcell,ncell,pos_out,   &
        !$OMP& states,states_i,los_vec,vi_norm,photons,denf,one_over_omega,vxB,fbm_denf,b_abs)
@@ -3868,8 +3892,12 @@ contains
                if (allocated(cell(ix(1),iy(1),iz(1))%fbm)) then 
                  ienergy=minloc(abs(distri%energy-ebarr(ic)))
                  ipitch=minloc(abs(distri%pitch-cos(theta*pi/180.)))
-                 fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
-                 denf=cell(ix(1),iy(1),iz(1))%plasma%denf
+                 delE = 2*abs(distri%energy(ienergy(1)) - ebarr(ic))
+                 delp = 2*abs(distri%pitch(ipitch(1)) - cos(theta*pi/180.))
+                 if((delE.le.distri%deb).and.(delp.le.distri%dpitch)) then
+                   fbm_denf=cell(ix(1),iy(1),iz(1))%fbm(ienergy(1),ipitch(1))*cell(ix(1),iy(1),iz(1))%fbm_norm(1)
+                   denf=cell(ix(1),iy(1),iz(1))%plasma%denf
+                 endif
                endif
                if (isnan(fbm_denf)) cycle loop_over_energy
                !! -------------- calculate CX probability -------!!

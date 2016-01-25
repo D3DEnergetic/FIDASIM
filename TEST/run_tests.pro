@@ -9,7 +9,7 @@ PRO run_tests,result_dir,test_case=test_case
 
    fida_dir = GETENV('FIDASIM_DIR')
    inputs = {device:"TEST",shot:1,time:1.0,$
-             emin:0.0,emax:100.0,pmin:-1.0,pmax:1.0,$
+             emin:67.0,emax:77.0,pmin:-0.1,pmax:0.1,$
              einj:72.5,pinj:1.7,equil:'g000001.01000',btipsign:-1.0,$
              ab:2.01410178,ai:2.0141078,impurity_charge:6,$
              lambdamin:647.0,lambdamax:667.0,nlambda:2000,dlambda:0.01,$

@@ -5,6 +5,10 @@ import os
 import re
 import tempfile
 from subprocess import call
+import string
+
+def chunk(lst,n):
+    return [ lst[i::n] for i in range(n) if lst[i::n] ]
 
 def main():
     parser = argparse.ArgumentParser(description="Creates a FIDASIM PBS job script and submits it using qsub")
@@ -15,13 +19,13 @@ def main():
                         default = '5:00:00',
                         help = 'Set walltime. Defaults to 5:00:00')
     parser.add_argument('-n','--nodes',
-                        default = 1,
+                        type=int,default = 1,
                         help = 'Set number of nodes. Defaults to 1')
     parser.add_argument('-ppn',
-                        default = 4,dest='ppn',
-                        help = 'Set processors per node. Defaults to 4')
+                        type=int,default = 8,dest='ppn',
+                        help = 'Set processors per node. Defaults to 8')
     parser.add_argument('-mem','--memory',
-                        default = '2048mb',
+                        default = '2gb',
                         help = 'Set required memory. Defaults to 2048mb')
     parser.add_argument('-ex','--executable',
                         default = os.path.normpath(os.environ['FIDASIM_DIR']+'/fidasim'),
@@ -45,6 +49,12 @@ def main():
                         default = '',
                         nargs='+',
                         help = 'List of run ids, accepts regex')
+    parser.add_argument('-j','--jobs',
+                        type=int,default = 0,
+                        help = 'Split runs into N jobs. Defaults to 1 job per namelist')
+    parser.add_argument('-c','--clobber',
+                        action = 'store_true',
+                        help = 'Overwrite existing runs')
     parser.add_argument('-v','--verbose',
                         action = 'store_true',
                         help = 'Verbose')
@@ -61,7 +71,15 @@ def main():
         print('Memory:   '+args.memory)
 
     fileordir = os.path.abspath(args.path)
-	
+
+    if not os.access(fileordir, os.W_OK):
+        print('\033[91m'+'ERROR: You do not have write permissions in this directory. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'+'\033[0m') 
+        quit()
+        
+    if not os.access(fileordir, os.R_OK):
+        print('\033[91m'+'ERROR: You do not have read permissions in this directory. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'+'\033[0m') 
+        quit()
+        
     if os.path.isfile(fileordir):
         files=[fileordir]
     elif os.path.isdir(fileordir):
@@ -70,39 +88,47 @@ def main():
              files=[fileordir + '/' + f for f in allfiles for r in args.runids if re.search(r+'_inputs\.dat',f)]
         else:
              files=[fileordir+'/'+ f for f in allfiles if re.search('.*_inputs\.dat',f)]
+
+        if not args.clobber:
+            sfiles=[fileordir+'/'+ f for f in allfiles if re.search('.*_spectra\.(cdf|h5)',f)]
+            frids = ['_'.join(os.path.basename(f).split(".")[0].split("_")[0:-1]) for f in files]
+            srids = ['_'.join(os.path.basename(f).split(".")[0].split("_")[0:-1]) for f in sfiles]
+            files = [fileordir+'/'+f+'_inputs.dat' for f in set(frids).difference(srids)]
     else:
         raise IOError('Not a file or directory')
 
-    for file in files:
+    if not args.jobs:
+        jobs = chunk(files,len(files))
+    else:
+        jobs = chunk(files,args.jobs)
+
+    for job in jobs:
         if not args.log:
-            log_dir = os.path.dirname(file)
+            log_dir = os.path.dirname(job[0])
         else:
             log_dir = args.log
 
-        output_file = '_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".out"
-        error_file = '_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".err"
+        output_files = ['_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".out" for file in job]
 
-        if args.verbose: print('Input File: '+file)
-
-        args_dict =  {'file':file,'nodes':args.nodes,
-                      'ppn':args.ppn,'mem':args.memory,
-                      'ex':args.executable,'walltime':args.walltime,
-                      'output':os.path.normpath(log_dir+"/"+output_file),
-                      'errfile':os.path.normpath(log_dir+"/"+error_file),
+        args_dict =  {'commands':"\n".join([args.executable+" "+z[0]+" >& "+log_dir+"/"+z[1] for z in zip(job,output_files)]),
+                      'nodes':str(args.nodes),
+                      'ppn':str(args.ppn),'mem':args.memory,
+                      'walltime':args.walltime,
                       'pbs':"\n".join(item for item in args.pbs),
                       'precall':"\n".join(item for item in args.precall),
-                      'postcall':"\n".join(item for item in args.postcall)}    
+                      'postcall':"\n".join(item for item in args.postcall),
+                      'job_name':'fidasim'}
 
         pbs_script = """
                      #!/bin/tcsh
-                     #PBS -N fidasim
+                     #PBS -N %(job_name)s
                      #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
                      #PBS -l mem=%(mem)s
                      #PBS -l walltime=%(walltime)s
                      #PBS -r n
                      #PBS -V
-                     #PBS -o %(output)s
-                     #PBS -e %(errfile)s
+                     #PBS -o /dev/null
+                     #PBS -e /dev/null
                      %(pbs)s
 
                      echo " "
@@ -126,7 +152,7 @@ def main():
 
                      %(precall)s
 
-                     %(ex)s %(file)s
+                     %(commands)s
 
                      %(postcall)s
 
@@ -136,10 +162,8 @@ def main():
                      exit
                      """%args_dict
 
-
-
         if args.verbose:
-            print('Submitting: '+file)
+            print('Submitting: \n\t'+'\n\t'.join(file for file in job))
 
         if not args.debug:
             tfile = tempfile.NamedTemporaryFile(mode='w+t',dir=os.path.expanduser("~"))
@@ -148,6 +172,6 @@ def main():
             call(['qsub',tfile.name])
             tfile.close()
         else: print("\n".join([item.lstrip() for item in pbs_script.splitlines()]))
-         
+
 if __name__=='__main__':
     main()

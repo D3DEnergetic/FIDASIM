@@ -1,22 +1,63 @@
-#System:   64 bit
-#Compiler: gfortran or ifort
+SHELL = /bin/sh
 
-ifeq ($(FIDASIM_COMPILER),gfortran)
-	LFLAGS = -lnetcdff -lnetcdf -lm
-	CFLAGS = -Ofast -fopenmp -Wall
-endif
+# directories
+SRC_DIR = $(FIDASIM_DIR)/src
+DEPS_DIR = $(FIDASIM_DIR)/deps
+TABLES_DIR = $(FIDASIM_DIR)/tables
+DOCS_DIR = $(FIDASIM_DIR)/docs
 
-ifeq ($(FIDASIM_COMPILER),ifort)
-	LFLAGS = -lnetcdff -lnetcdf -limf -lm
-	CFLAGS = -O2 -openmp -warn
-endif
+# atomic table variables
+OUTPUT_DIR = $(TABLES_DIR)
+NTHREADS = 1000 
 
-fidasim: fidasim.o
-	$(FIDASIM_COMPILER) $(CFLAGS) fidasim.o -o fidasim -L$(NETCDF_LIB) $(LFLAGS)
+# FORD documentation variables
+FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
 
-fidasim.o: fidasim.f90
-	$(FIDASIM_COMPILER) $(CFLAGS) -c -I$(NETCDF_INCLUDE) fidasim.f90
+export SRC_DIR
+export DEPS_DIR
+export TABLES_DIR
+export OUTPUT_DIR
+export NTHREADS
 
-clean:
-	-rm application.mod fidasim.o fidasim
+fidasim: deps src tables
 
+debug: clean
+debug: fidasim_debug
+
+fidasim_debug: deps
+	cd $(SRC_DIR); make DEBUG=y
+
+.PHONY: deps
+deps:
+	cd $(DEPS_DIR); make
+
+.PHONY: src
+src:
+	cd $(SRC_DIR); make
+
+.PHONY: tables
+tables: src
+	cd $(TABLES_DIR); make
+
+.PHONY: atomic_tables
+atomic_tables:
+	cd $(TABLES_DIR); make atomic_tables
+
+.PHONY: docs
+docs:
+	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
+
+clean: clean_src clean_tables
+	-rm -f *.mod *.o fidasim fidasim_debug
+
+clean_src:
+	cd $(SRC_DIR); make clean
+
+clean_deps:
+	cd $(DEPS_DIR); make clean
+
+clean_tables:
+	cd $(TABLES_DIR); make clean
+
+clean_docs:
+	-rm -f $(DOCS_DIR)/html

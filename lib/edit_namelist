@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import glob
+
+def main():
+    parser = argparse.ArgumentParser(description="Edits Fortran namelist files")
+
+    parser.add_argument('path',
+                        help = 'Namelist file or result directory')
+    parser.add_argument('-var',
+                       	help = 'Variable to edit')
+    parser.add_argument('-val',
+                        help = 'Value to set')					
+    parser.add_argument('-v','--verbose',
+                        action = 'store_true',
+                        help = 'Verbose')
+
+    args = parser.parse_args()
+
+    fileordir = args.path
+	
+    if os.path.isfile(fileordir):
+        files=[fileordir]
+    elif os.path.isdir(fileordir):
+        files=glob.glob(fileordir+'/*.dat')
+    else:
+        raise IOError('Not a file or directory')
+
+    for file in files:
+        f = open(file,'rb')
+        lines = f.read().splitlines()
+        f.close()
+
+        newlines = []       
+        for line in lines:
+            words=line.split()
+            if not words:
+                newlines.append("") 
+                if args.verbose: print("")
+                continue
+            if words[0] == args.var and words[1] == "=":
+                words[2] = args.val
+            newlines.append(' '.join(words))
+            if args.verbose:
+                print(' '.join(words))
+
+        newlines.append('\n')
+        text = '\n'.join(newlines)
+        
+        f = open(file,'wb')
+        f.write(text)
+        f.close()        
+         
+if __name__=='__main__':
+    main()

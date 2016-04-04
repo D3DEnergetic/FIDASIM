@@ -1,6 +1,6 @@
 project: FIDASIM
 version: {!../VERSION!}
-project_github: httpss://github.com/D3DEnergetic/FIDASIM
+project_github: https://github.com/D3DEnergetic/FIDASIM
 project_website: https://d3denergetic.github.io/FIDASIM
 summary: FIDASIM - A Neutral Beam and Fast-ion Diagnostic Modeling Suite
 author: Luke Stagner

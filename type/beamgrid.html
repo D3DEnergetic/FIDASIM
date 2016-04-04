@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="FIDASIM - A Neutral Beam and Fast-ion Diagnostic Modeling Suite">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>BeamGrid &ndash; FIDASIM </title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../page/index.html'>User Guide</a></li>
+				
+                
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+				
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>BeamGrid
+    <small>Derived Type</small>
+    
+    </h1>
+	 
+<div class="row">
+<div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+  
+     <li><a href='../module/libfida.html'>libfida</a></li>
+  
+     <li class="active">BeamGrid</li>
+  </ol>
+</div>
+</div>
+</div>
+    
+  </div>
+  
+  <div class="row">
+    <div class="col-lg-3">
+    
+<div id="sidebar">
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars">Variables</a></h3></div>
+    <div id="vars" class="panel-collapse collapse">
+      <div class="list-group">
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-nx">nx</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-ny">ny</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-nz">nz</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-xmin">xmin</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-xmax">xmax</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-ymin">ymin</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-ymax">ymax</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-zmin">zmin</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-zmax">zmax</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-alpha">alpha</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-beta">beta</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-gamma">gamma</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-drmin">drmin</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-dv">dv</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-volume">volume</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-ntrack">ntrack</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-ngrid">ngrid</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-origin">origin</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-center">center</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-dr">dr</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-lwh">lwh</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-basis">basis</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-inv_basis">inv_basis</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-xc">xc</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-yc">yc</a>
+        
+        <a class="list-group-item" href="../type/beamgrid.html#variable-zc">zc</a>
+        
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+    <div class="list-group">
+      <a class="list-group-item" href="../type/beamgrid.html#src">BeamGrid</a>
+    </div>
+  </div>
+  
+  <hr>
+  
+  <div class="panel panel-default">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#alltypes">All Derived Types</a></h3></div>
+    <div id="alltypes" class="panel-collapse collapse">
+        <div class="list-group">
+          
+          <a class="list-group-item" href="../type/atomiccrosssection.html">AtomicCrossSection</a>
+          
+          <a class="list-group-item" href="../type/atomicrates.html">AtomicRates</a>
+          
+          <a class="list-group-item" href="../type/atomictables.html">AtomicTables</a>
+          
+          <a class="list-group-item" href="../type/beamgrid.html">BeamGrid</a>
+          
+          <a class="list-group-item" href="../type/birthprofile.html">BirthProfile</a>
+          
+          <a class="list-group-item" href="../type/boundedplane.html">BoundedPlane</a>
+          
+          <a class="list-group-item" href="../type/emfields.html">EMFields</a>
+          
+          <a class="list-group-item" href="../type/equilibrium.html">Equilibrium</a>
+          
+          <a class="list-group-item" href="../type/fastion.html">FastIon</a>
+          
+          <a class="list-group-item" href="../type/fastiondistribution.html">FastIonDistribution</a>
+          
+          <a class="list-group-item" href="../type/fastionparticles.html">FastIonParticles</a>
+          
+          <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
+          
+          <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
+          
+          <a class="list-group-item" href="../type/lineofsight.html">LineOfSight</a>
+          
+          <a class="list-group-item" href="../type/localemfields.html">LocalEMFields</a>
+          
+          <a class="list-group-item" href="../type/localprofiles.html">LocalProfiles</a>
+          
+          <a class="list-group-item" href="../type/neutralbeam.html">NeutralBeam</a>
+          
+          <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
+          
+          <a class="list-group-item" href="../type/npachords.html">NPAChords</a>
+          
+          <a class="list-group-item" href="../type/npadetector.html">NPADetector</a>
+          
+          <a class="list-group-item" href="../type/npaparticle.html">NPAParticle</a>
+          
+          <a class="list-group-item" href="../type/npaprobability.html">NPAProbability</a>
+          
+          <a class="list-group-item" href="../type/nparesults.html">NPAResults</a>
+          
+          <a class="list-group-item" href="../type/npaweights.html">NPAWeights</a>
+          
+          <a class="list-group-item" href="../type/particletrack.html">ParticleTrack</a>
+          
+          <a class="list-group-item" href="../type/profiles.html">Profiles</a>
+          
+          <a class="list-group-item" href="../type/rng_type.html">rng_type</a>
+          
+          <a class="list-group-item" href="../type/simulationinputs.html">SimulationInputs</a>
+          
+          <a class="list-group-item" href="../type/spectra.html">Spectra</a>
+          
+          <a class="list-group-item" href="../type/spectralchords.html">SpectralChords</a>
+          
+        </div>
+    </div>
+  </div>
+  
+</div>
+
+    </div>
+    
+    <div class="col-lg-9" id='text'>
+    <h2>type, public :: BeamGrid</h2>
+    
+    <p>Defines a 3D grid for neutral beam calculations</p>
+    <br>
+    
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nx"></span>integer(kind=Float32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nx</strong></td><td></td><td></td><td><p>Number of cells in the x direction</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ny"></span>integer(kind=Float32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ny</strong></td><td></td><td></td><td><p>Number of cells in the y direction</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nz"></span>integer(kind=Float32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nz</strong></td><td></td><td></td><td><p>Number of cells in the z direction</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-xmin"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>xmin</strong></td><td></td><td></td><td><p>Minimum x value</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-xmax"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>xmax</strong></td><td></td><td></td><td><p>Maximum x value</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ymin"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ymin</strong></td><td></td><td></td><td><p>Minimum y value</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ymax"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ymax</strong></td><td></td><td></td><td><p>Maximum y value</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zmin"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>zmin</strong></td><td></td><td></td><td><p>Minimum z value</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zmax"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>zmax</strong></td><td></td><td></td><td><p>Maximum z value</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-alpha"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>alpha</strong></td><td></td><td></td><td><p>Tait-Bryan angle for a rotation about z [radians]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-beta"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>beta</strong></td><td></td><td></td><td><p>Tait-Bryan angle for a rotation about y' [radians]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-gamma"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>gamma</strong></td><td></td><td></td><td><p>Tait-Bryan angle for a rotation about x" [radians]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-drmin"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>drmin</strong></td><td></td><td></td><td><p>Minimum cell spacing: <code>min(dx,dy,dz)</code></p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dv"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dv</strong></td><td></td><td></td><td><p>Cell volume [\(cm^3\)]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-volume"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>volume</strong></td><td></td><td></td><td><p>Grid volume [\(cm^3\)]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ntrack"></span>integer(kind=Float32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ntrack</strong></td><td></td><td></td><td><p>Maximum number of cell for particle tracking</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ngrid"></span>integer(kind=Float32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ngrid</strong></td><td></td><td></td><td><p>Number of cells</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-origin"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>origin</strong></td><td></td><td></td><td><p>Origin of beam grid in machine coordinates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-center"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>center</strong></td><td></td><td></td><td><p>Center of beam grid in beam coordinates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dr"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>dr</strong></td><td></td><td></td><td><p>Cell spacings [dx, dy, dz]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lwh"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>lwh</strong></td><td></td><td></td><td><p>Grid [length(x), width(y), height(z)]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-basis"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3,3)</td><td>::</td>
+  <td><strong>basis</strong></td><td></td><td></td><td><p>Beam grid basis for converting from beam coordinates(xyz) 
+to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inv_basis"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3,3)</td><td>::</td>
+  <td><strong>inv_basis</strong></td><td></td><td></td><td><p>Inverse basis for reverse transformation: (\xyz = B^{-1}*(uvw - origin))</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-xc"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>xc</strong></td><td></td><td></td><td><p>x positions of cell centers</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-yc"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>yc</strong></td><td></td><td></td><td><p>y positions of cell centers</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zc"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>zc</strong></td><td></td><td></td><td><p>z positions of cell centers</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span class="k">type </span><span class="n">BeamGrid</span>
+    <span class="c">!+ Defines a 3D grid for neutral beam calculations</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nx</span>
+        <span class="c">!+ Number of cells in the x direction</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ny</span>
+        <span class="c">!+ Number of cells in the y direction</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nz</span>
+        <span class="c">!+ Number of cells in the z direction</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">xmin</span>
+        <span class="c">!+ Minimum x value</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">xmax</span>
+        <span class="c">!+ Maximum x value</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">ymin</span>
+        <span class="c">!+ Minimum y value</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">ymax</span>
+        <span class="c">!+ Maximum y value</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">zmin</span>
+        <span class="c">!+ Minimum z value</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">zmax</span>
+        <span class="c">!+ Maximum z value</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">alpha</span>
+        <span class="c">!+ Tait-Bryan angle for a rotation about z [radians]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">beta</span>
+        <span class="c">!+ Tait-Bryan angle for a rotation about y&#39; [radians]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="nb">gamma</span>
+        <span class="c">!+ Tait-Bryan angle for a rotation about x&quot; [radians]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">drmin</span>
+        <span class="c">!+ Minimum cell spacing: `min(dx,dy,dz)`</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">dv</span>
+        <span class="c">!+ Cell volume [\(cm^3\)]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">volume</span>
+        <span class="c">!+ Grid volume [\(cm^3\)]</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ntrack</span>
+        <span class="c">!+ Maximum number of cell for particle tracking</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ngrid</span>
+        <span class="c">!+ Number of cells</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">origin</span>
+        <span class="c">!+ Origin of beam grid in machine coordinates</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">center</span>
+        <span class="c">!+ Center of beam grid in beam coordinates</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">dr</span>
+        <span class="c">!+ Cell spacings [dx, dy, dz]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">lwh</span>
+        <span class="c">!+ Grid [length(x), width(y), height(z)]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">basis</span>
+        <span class="c">!+Beam grid basis for converting from beam coordinates(xyz) </span>
+        <span class="c">!+to machine coordinates(uvw): (\uvw = B*xyz + origin\)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">inv_basis</span>
+        <span class="c">!+Inverse basis for reverse transformation: (\xyz = B^{-1}*(uvw - origin)\)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">xc</span>
+        <span class="c">!+ x positions of cell centers</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">yc</span>
+        <span class="c">!+ y positions of cell centers</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">zc</span>
+        <span class="c">!+ z positions of cell centers</span>
+<span class="k">end type </span><span class="n">BeamGrid</span>
+</pre></div>
+
+    </section>
+    
+    
+    </div>
+  </div>
+
+    <hr>
+    <footer>
+        <div class="row">
+        <div class="col-md-4">&copy; 2016 </div>
+	<div class="col-md-4"><span class="text-center"> FIDASIM was developed by Luke Stagner</span></div>
+        <div class="col-md-4"><span class="pull-right">Documentation generated by <a href="https://github.com/cmacmackin/ford">FORD</a></span></div>
+        </div>
+        <br>
+    </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="FIDASIM - A Neutral Beam and Fast-ion Diagnostic Modeling Suite">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>dcx &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../page/index.html'>User Guide</a></li>
+				
+                
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+				
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>dcx
+    <small>Subroutine</small>
+    
+    </h1>
+	 
+<div class="row">
+<div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+  
+     <li><a href='../module/libfida.html'>libfida</a></li>
+  
+     <li class="active">dcx</li>
+  </ol>
+</div>
+</div>
+</div>
+    
+  </div>
+  
+  <div class="row">
+    <div class="col-lg-3">
+    
+<div id="sidebar">
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars">Variables</a></h3></div>
+    <div id="vars" class="panel-collapse collapse">
+      <div class="list-group">
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-i%7E41">i</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-j%7E20">j</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-k%7E9">k</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-idcx">idcx</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-ri%7E9">ri</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-vihalo">vihalo</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-ind%7E21">ind</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-neut_types">neut_types</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-plasma%7E9">plasma</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-denn%7E3">denn</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-prob%7E2">prob</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-states%7E4">states</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-ncell%7E4">ncell</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-tracks%7E4">tracks</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-jj%7E2">jj</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-tot_denn">tot_denn</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-photons%7E9">photons</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-papprox%7E2">papprox</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-nlaunch%7E3">nlaunch</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-papprox_tot%7E2">papprox_tot</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-ccnt">ccnt</a>
+        
+        <a class="list-group-item" href="../proc/dcx.html#variable-inv_ng">inv_ng</a>
+        
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+    <div class="list-group">
+      <a class="list-group-item" href="../proc/dcx.html#src">dcx</a>
+    </div>
+  </div>
+  
+  <hr>
+  
+  <div class="panel panel-default">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs">All Procedures</a></h3></div>
+    <div id="allprocs" class="panel-collapse collapse">
+        <div class="list-group">
+          
+          <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
+          
+          <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
+          
+          <a class="list-group-item" href="../proc/aq_cx_n_adas.html">Aq_cx_n_adas</a>
+          
+          <a class="list-group-item" href="../proc/aq_cx_n_janev.html">Aq_cx_n_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit.html">Aq_excit</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_2_janev.html">Aq_excit_1_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_3_janev.html">Aq_excit_1_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_4_janev.html">Aq_excit_1_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_5_janev.html">Aq_excit_1_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_janev.html">Aq_excit_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_10_janev.html">Aq_excit_2_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_3_janev.html">Aq_excit_2_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_4_janev.html">Aq_excit_2_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_5_janev.html">Aq_excit_2_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_6_janev.html">Aq_excit_2_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_7_janev.html">Aq_excit_2_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_8_janev.html">Aq_excit_2_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_9_janev.html">Aq_excit_2_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_janev.html">Aq_excit_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_10_janev.html">Aq_excit_3_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_4_janev.html">Aq_excit_3_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_5_janev.html">Aq_excit_3_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_6_janev.html">Aq_excit_3_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_7_janev.html">Aq_excit_3_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_8_janev.html">Aq_excit_3_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_9_janev.html">Aq_excit_3_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_janev.html">Aq_excit_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_n.html">Aq_excit_n</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_n_janev.html">Aq_excit_n_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_n_m.html">Aq_excit_n_m</a>
+          
+          <a class="list-group-item" href="../proc/aq_ioniz.html">Aq_ioniz</a>
+          
+          <a class="list-group-item" href="../proc/aq_ioniz_n.html">Aq_ioniz_n</a>
+          
+          <a class="list-group-item" href="../proc/aq_ioniz_n_janev.html">Aq_ioniz_n_janev</a>
+          
+          <a class="list-group-item" href="../interface/assignment%28%3D%29.html">assignment(=)</a>
+          
+          <a class="list-group-item" href="../proc/attenuate.html">attenuate</a>
+          
+          <a class="list-group-item" href="../proc/b5_cx_1_adas.html">B5_cx_1_adas</a>
+          
+          <a class="list-group-item" href="../proc/b5_cx_1_janev.html">B5_cx_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/b5_cx_2_adas.html">B5_cx_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/b5_ioniz_1_janev.html">B5_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/balance.html">balance</a>
+          
+          <a class="list-group-item" href="../proc/balback.html">balback</a>
+          
+          <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+          
+          <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_q_n.html">bt_maxwellian_q_n</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_q_n_m.html">bt_maxwellian_q_n_m</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_1_adas.html">C6_cx_1_adas</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_1_janev.html">C6_cx_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_2_adas.html">C6_cx_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_3_adas.html">C6_cx_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/c6_ioniz_1_janev.html">C6_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/calc_perp_vectors.html">calc_perp_vectors</a>
+          
+          <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
+          
+          <a class="list-group-item" href="../proc/colrad.html">colrad</a>
+          
+          <a class="list-group-item" href="../proc/comabs.html">comabs</a>
+          
+          <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
+          
+          <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+          
+          <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+          
+          <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_2_janev.html">e_excit_1_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_3_janev.html">e_excit_1_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_4_janev.html">e_excit_1_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_5_janev.html">e_excit_1_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_janev.html">e_excit_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_2_3_janev.html">e_excit_2_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_f.html">e_excit_f</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_n.html">e_excit_n</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_n_m.html">e_excit_n_m</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz.html">e_ioniz</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_1_janev.html">e_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_2_janev.html">e_ioniz_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_3_janev.html">e_ioniz_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_n.html">e_ioniz_n</a>
+          
+          <a class="list-group-item" href="../proc/eigen.html">eigen</a>
+          
+          <a class="list-group-item" href="../proc/elmhes.html">elmhes</a>
+          
+          <a class="list-group-item" href="../proc/elmtrans.html">elmtrans</a>
+          
+          <a class="list-group-item" href="../proc/fast_ion_assign.html">fast_ion_assign</a>
+          
+          <a class="list-group-item" href="../proc/ff_add.html">ff_add</a>
+          
+          <a class="list-group-item" href="../proc/ff_assign.html">ff_assign</a>
+          
+          <a class="list-group-item" href="../proc/ff_subtract.html">ff_subtract</a>
+          
+          <a class="list-group-item" href="../proc/fida_f.html">fida_f</a>
+          
+          <a class="list-group-item" href="../proc/fida_mc.html">fida_mc</a>
+          
+          <a class="list-group-item" href="../proc/fida_weights_los.html">fida_weights_los</a>
+          
+          <a class="list-group-item" href="../proc/fida_weights_mc.html">fida_weights_mc</a>
+          
+          <a class="list-group-item" href="../proc/flf_assign.html">flf_assign</a>
+          
+          <a class="list-group-item" href="../proc/fs_divide.html">fs_divide</a>
+          
+          <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
+          
+          <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+          
+          <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
+          
+          <a class="list-group-item" href="../proc/get_ep_denf.html">get_ep_denf</a>
+          
+          <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
+          
+          <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+          
+          <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
+          
+          <a class="list-group-item" href="../proc/get_plasma.html">get_plasma</a>
+          
+          <a class="list-group-item" href="../proc/get_position.html">get_position</a>
+          
+          <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+          
+          <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
+          
+          <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
+          
+          <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_2.html">h5ltmake_compressed_dataset_double_f_2</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_3.html">h5ltmake_compressed_dataset_double_f_3</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_4.html">h5ltmake_compressed_dataset_double_f_4</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_5.html">h5ltmake_compressed_dataset_double_f_5</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_6.html">h5ltmake_compressed_dataset_double_f_6</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_7.html">h5ltmake_compressed_dataset_double_f_7</a>
+          
+          <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_int_f.html">h5ltmake_compressed_dataset_int_f</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_1.html">h5ltmake_compressed_dataset_int_f_1</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_2.html">h5ltmake_compressed_dataset_int_f_2</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_3.html">h5ltmake_compressed_dataset_int_f_3</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_4.html">h5ltmake_compressed_dataset_int_f_4</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_5.html">h5ltmake_compressed_dataset_int_f_5</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_6.html">h5ltmake_compressed_dataset_int_f_6</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_7.html">h5ltmake_compressed_dataset_int_f_7</a>
+          
+          <a class="list-group-item" href="../proc/h5ltread_dataset_double_scalar_f.html">h5ltread_dataset_double_scalar_f</a>
+          
+          <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
+          
+          <a class="list-group-item" href="../proc/halo.html">halo</a>
+          
+          <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
+          
+          <a class="list-group-item" href="../proc/hqr2.html">hqr2</a>
+          
+          <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
+          
+          <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+          
+          <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
+          
+          <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
+          
+          <a class="list-group-item" href="../interface/interpol.html">interpol</a>
+          
+          <a class="list-group-item" href="../proc/interpol1d_arr.html">interpol1D_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol1d_coeff.html">interpol1D_coeff</a>
+          
+          <a class="list-group-item" href="../proc/interpol1d_coeff_arr.html">interpol1D_coeff_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_2d_arr.html">interpol2D_2D_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_arr.html">interpol2D_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_coeff.html">interpol2D_coeff</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_coeff_arr.html">interpol2D_coeff_arr</a>
+          
+          <a class="list-group-item" href="../interface/interpol_coeff.html">interpol_coeff</a>
+          
+          <a class="list-group-item" href="../proc/lff_assign.html">lff_assign</a>
+          
+          <a class="list-group-item" href="../proc/lflf_add.html">lflf_add</a>
+          
+          <a class="list-group-item" href="../proc/lflf_assign.html">lflf_assign</a>
+          
+          <a class="list-group-item" href="../proc/lflf_subtract.html">lflf_subtract</a>
+          
+          <a class="list-group-item" href="../proc/lfs_divide.html">lfs_divide</a>
+          
+          <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
+          
+          <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+          
+          <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
+          
+          <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
+          
+          <a class="list-group-item" href="../proc/lplp_subtract.html">lplp_subtract</a>
+          
+          <a class="list-group-item" href="../proc/lpp_assign.html">lpp_assign</a>
+          
+          <a class="list-group-item" href="../proc/lps_divide.html">lps_divide</a>
+          
+          <a class="list-group-item" href="../proc/lps_multiply.html">lps_multiply</a>
+          
+          <a class="list-group-item" href="../proc/lubksb.html">lubksb</a>
+          
+          <a class="list-group-item" href="../proc/ludcmp.html">ludcmp</a>
+          
+          <a class="list-group-item" href="../proc/m_spread.html">m_spread</a>
+          
+          <a class="list-group-item" href="../proc/make_beam_grid.html">make_beam_grid</a>
+          
+          <a class="list-group-item" href="../proc/matinv.html">matinv</a>
+          
+          <a class="list-group-item" href="../proc/mc_fastion.html">mc_fastion</a>
+          
+          <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
+          
+          <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+          
+          <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
+          
+          <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+          
+          <a class="list-group-item" href="../proc/normp.html">normp</a>
+          
+          <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+          
+          <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
+          
+          <a class="list-group-item" href="../proc/npa_part_assign.html">npa_part_assign</a>
+          
+          <a class="list-group-item" href="../proc/npa_weights.html">npa_weights</a>
+          
+          <a class="list-group-item" href="../interface/operator%28%2A%29.html">operator(*)</a>
+          
+          <a class="list-group-item" href="../interface/operator%28%2B%29.html">operator(+)</a>
+          
+          <a class="list-group-item" href="../interface/operator%28-%29.html">operator(-)</a>
+          
+          <a class="list-group-item" href="../interface/operator%28SLASH%29.html">operator(/)</a>
+          
+          <a class="list-group-item" href="../proc/outerprod.html">outerprod</a>
+          
+          <a class="list-group-item" href="../proc/p_cx.html">p_cx</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1.html">p_cx_1</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_1_adas.html">p_cx_1_1_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_2_adas.html">p_cx_1_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_3_adas.html">p_cx_1_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_4_adas.html">p_cx_1_4_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_janev.html">p_cx_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2.html">p_cx_2</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2_2_adas.html">p_cx_2_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2_3_adas.html">p_cx_2_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2_janev.html">p_cx_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3.html">p_cx_3</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_2_adas.html">p_cx_3_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_3_adas.html">p_cx_3_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_4_adas.html">p_cx_3_4_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_5_adas.html">p_cx_3_5_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_6inf_adas.html">p_cx_3_6inf_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_janev.html">p_cx_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_janev.html">p_cx_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_n.html">p_cx_n</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_n_janev.html">p_cx_n_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_n_m.html">p_cx_n_m</a>
+          
+          <a class="list-group-item" href="../proc/p_excit.html">p_excit</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_2_janev.html">p_excit_1_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_3_janev.html">p_excit_1_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_4_janev.html">p_excit_1_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_5_janev.html">p_excit_1_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_6_janev.html">p_excit_1_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_janev.html">p_excit_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_10_janev.html">p_excit_2_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_3_janev.html">p_excit_2_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_4_janev.html">p_excit_2_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_5_janev.html">p_excit_2_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_6_janev.html">p_excit_2_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_7_janev.html">p_excit_2_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_8_janev.html">p_excit_2_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_9_janev.html">p_excit_2_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_janev.html">p_excit_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_10_janev.html">p_excit_3_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_4_janev.html">p_excit_3_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_5_janev.html">p_excit_3_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_6_janev.html">p_excit_3_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_7_janev.html">p_excit_3_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_8_janev.html">p_excit_3_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_9_janev.html">p_excit_3_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_janev.html">p_excit_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_n.html">p_excit_n</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_n_m.html">p_excit_n_m</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz.html">p_ioniz</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_1_janev.html">p_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_2_omullane.html">p_ioniz_2_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_3_omullane.html">p_ioniz_3_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_4_omullane.html">p_ioniz_4_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_5_omullane.html">p_ioniz_5_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
+          
+          <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
+          
+          <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
+          
+          <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
+          
+          <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+          
+          <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
+          
+          <a class="list-group-item" href="../proc/pp_assign.html">pp_assign</a>
+          
+          <a class="list-group-item" href="../proc/pp_subtract.html">pp_subtract</a>
+          
+          <a class="list-group-item" href="../proc/print_banner.html">print_banner</a>
+          
+          <a class="list-group-item" href="../proc/ps_divide.html">ps_divide</a>
+          
+          <a class="list-group-item" href="../proc/ps_multiply.html">ps_multiply</a>
+          
+          <a class="list-group-item" href="../interface/randind.html">randind</a>
+          
+          <a class="list-group-item" href="../proc/randn.html">randn</a>
+          
+          <a class="list-group-item" href="../proc/randu.html">randu</a>
+          
+          <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
+          
+          <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
+          
+          <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
+          
+          <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
+          
+          <a class="list-group-item" href="../proc/read_equilibrium.html">read_equilibrium</a>
+          
+          <a class="list-group-item" href="../proc/read_f.html">read_f</a>
+          
+          <a class="list-group-item" href="../proc/read_inputs.html">read_inputs</a>
+          
+          <a class="list-group-item" href="../proc/read_mc.html">read_mc</a>
+          
+          <a class="list-group-item" href="../proc/read_neutrals.html">read_neutrals</a>
+          
+          <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
+          
+          <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+          
+          <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
+          
+          <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
+          
+          <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+          
+          <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
+          
+          <a class="list-group-item" href="../proc/rswap.html">RSWAP</a>
+          
+          <a class="list-group-item" href="../proc/sf_multiply.html">sf_multiply</a>
+          
+          <a class="list-group-item" href="../proc/simpsons_rule.html">simpsons_rule</a>
+          
+          <a class="list-group-item" href="../proc/slf_multiply.html">slf_multiply</a>
+          
+          <a class="list-group-item" href="../proc/slp_multiply.html">slp_multiply</a>
+          
+          <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
+          
+          <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
+          
+          <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
+          
+          <a class="list-group-item" href="../proc/store_births.html">store_births</a>
+          
+          <a class="list-group-item" href="../proc/store_fida_photons.html">store_fida_photons</a>
+          
+          <a class="list-group-item" href="../proc/store_fw_photons.html">store_fw_photons</a>
+          
+          <a class="list-group-item" href="../proc/store_fw_photons_at_chan.html">store_fw_photons_at_chan</a>
+          
+          <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
+          
+          <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+          
+          <a class="list-group-item" href="../proc/swap.html">swap</a>
+          
+          <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+          
+          <a class="list-group-item" href="../proc/track.html">track</a>
+          
+          <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
+          
+          <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
+          
+          <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
+          
+          <a class="list-group-item" href="../proc/write_bb_h_h.html">write_bb_H_H</a>
+          
+          <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
+          
+          <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+          
+          <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
+          
+          <a class="list-group-item" href="../proc/write_bt_h_e.html">write_bt_H_e</a>
+          
+          <a class="list-group-item" href="../proc/write_bt_h_h.html">write_bt_H_H</a>
+          
+          <a class="list-group-item" href="../proc/write_dcx.html">write_dcx</a>
+          
+          <a class="list-group-item" href="../proc/write_einstein.html">write_einstein</a>
+          
+          <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
+          
+          <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+          
+          <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
+          
+          <a class="list-group-item" href="../proc/write_npa_weights.html">write_npa_weights</a>
+          
+          <a class="list-group-item" href="../proc/write_spectra.html">write_spectra</a>
+          
+          <a class="list-group-item" href="../proc/xyz_to_uvw.html">xyz_to_uvw</a>
+          
+        </div>
+    </div>
+  </div>
+  
+</div>
+
+    </div>
+    
+    <div class="col-lg-9" id='text'>
+    <h2>
+public subroutine dcx()
+    
+    
+    
+</h2>
+    
+  
+
+
+
+    <h3>Arguments</h3>
+    
+      <em>None</em>
+    
+    
+    
+    <h3>Description</h3>
+    <p>Calculates Direct Charge Exchange (DCX) neutral density and spectra</p>
+    
+    
+     <h3>Calls</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: proc~~dcx~~CallsGraph Pages: 1 -->
+<svg id="procdcxCallsGraph" width="641pt" height="471pt"
+ viewBox="0.00 0.00 641.00 470.97" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~dcx~~CallsGraph" class="graph" transform="scale(0.521562 0.521562) rotate(0) translate(4 899)">
+<title>proc~~dcx~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-899 1225,-899 1225,4 -4,4"/>
+<!-- proc~dcx -->
+<g id="proc~~dcx~~CallsGraph_node1" class="node"><title>proc~dcx</title>
+<polygon fill="none" stroke="black" points="54,-515 0,-515 0,-491 54,-491 54,-515"/>
+<text text-anchor="middle" x="27" y="-500.6" font-family="Helvetica,sans-Serif" font-size="10.50">dcx</text>
+</g>
+<!-- proc~store_bes_photons -->
+<g id="proc~~dcx~~CallsGraph_node2" class="node"><title>proc~store_bes_photons</title>
+<g id="a_proc~~dcx~~CallsGraph_node2"><a xlink:href="../proc/store_bes_photons.html" xlink:title="store_bes_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="335,-646 231,-646 231,-622 335,-622 335,-646"/>
+<text text-anchor="middle" x="283" y="-631.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_bes_photons</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~store_bes_photons -->
+<g id="proc~~dcx~~CallsGraph_edge64" class="edge"><title>proc~dcx&#45;&gt;proc~store_bes_photons</title>
+<path fill="none" stroke="black" d="M38.3201,-515.131C49.8136,-528.002 69.4899,-548.207 90,-561 132.538,-587.533 186.259,-606.94 226.052,-619.045"/>
+<polygon fill="black" stroke="black" points="225.27,-622.464 235.853,-621.965 227.269,-615.756 225.27,-622.464"/>
+</g>
+<!-- proc~mc_halo -->
+<g id="proc~~dcx~~CallsGraph_node3" class="node"><title>proc~mc_halo</title>
+<g id="a_proc~~dcx~~CallsGraph_node3"><a xlink:href="../proc/mc_halo.html" xlink:title="mc_halo">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-495 256,-495 256,-471 310,-471 310,-495"/>
+<text text-anchor="middle" x="283" y="-480.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_halo</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~mc_halo -->
+<g id="proc~~dcx~~CallsGraph_edge65" class="edge"><title>proc~dcx&#45;&gt;proc~mc_halo</title>
+<path fill="none" stroke="black" d="M54.2258,-500.935C99.8797,-497.34 194.024,-489.927 245.84,-485.847"/>
+<polygon fill="black" stroke="black" points="246.223,-489.328 255.917,-485.054 245.673,-482.35 246.223,-489.328"/>
+</g>
+<!-- proc~colrad -->
+<g id="proc~~dcx~~CallsGraph_node4" class="node"><title>proc~colrad</title>
+<g id="a_proc~~dcx~~CallsGraph_node4"><a xlink:href="../proc/colrad.html" xlink:title="colrad">
+<polygon fill="#d9534f" stroke="#d9534f" points="169.5,-337 115.5,-337 115.5,-313 169.5,-313 169.5,-337"/>
+<text text-anchor="middle" x="142.5" y="-322.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">colrad</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~colrad -->
+<g id="proc~~dcx~~CallsGraph_edge66" class="edge"><title>proc~dcx&#45;&gt;proc~colrad</title>
+<path fill="none" stroke="black" d="M35.3339,-490.924C46.8264,-472.057 69.8505,-434.486 90,-403 102.576,-383.348 117.271,-361.166 127.738,-345.495"/>
+<polygon fill="black" stroke="black" points="130.71,-347.347 133.364,-337.089 124.893,-343.453 130.71,-347.347"/>
+</g>
+<!-- proc~track -->
+<g id="proc~~dcx~~CallsGraph_node5" class="node"><title>proc~track</title>
+<g id="a_proc~~dcx~~CallsGraph_node5"><a xlink:href="../proc/track.html" xlink:title="track">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-575 256,-575 256,-551 310,-551 310,-575"/>
+<text text-anchor="middle" x="283" y="-560.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~track -->
+<g id="proc~~dcx~~CallsGraph_edge67" class="edge"><title>proc~dcx&#45;&gt;proc~track</title>
+<path fill="none" stroke="black" d="M45.9095,-515.133C57.8778,-522.645 74.2586,-531.817 90,-537 142.387,-554.25 206.432,-560.069 245.71,-562.024"/>
+<polygon fill="black" stroke="black" points="245.717,-565.527 255.861,-562.47 246.024,-558.534 245.717,-565.527"/>
+</g>
+<!-- proc~store_neutrals -->
+<g id="proc~~dcx~~CallsGraph_node6" class="node"><title>proc~store_neutrals</title>
+<g id="a_proc~~dcx~~CallsGraph_node6"><a xlink:href="../proc/store_neutrals.html" xlink:title="store_neutrals">
+<polygon fill="#d9534f" stroke="#d9534f" points="183,-295 102,-295 102,-271 183,-271 183,-295"/>
+<text text-anchor="middle" x="142.5" y="-280.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_neutrals</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~store_neutrals -->
+<g id="proc~~dcx~~CallsGraph_edge68" class="edge"><title>proc~dcx&#45;&gt;proc~store_neutrals</title>
+<path fill="none" stroke="black" d="M28.3294,-490.973C29.8928,-457.092 38.8464,-359.706 90,-304 91.1674,-302.729 92.4228,-301.533 93.7483,-300.407"/>
+<polygon fill="black" stroke="black" points="95.7516,-303.277 101.981,-294.707 91.7669,-297.522 95.7516,-303.277"/>
+</g>
+<!-- proc~get_nlaunch -->
+<g id="proc~~dcx~~CallsGraph_node7" class="node"><title>proc~get_nlaunch</title>
+<g id="a_proc~~dcx~~CallsGraph_node7"><a xlink:href="../proc/get_nlaunch.html" xlink:title="get_nlaunch">
+<polygon fill="#d9534f" stroke="#d9534f" points="178,-436 107,-436 107,-412 178,-412 178,-436"/>
+<text text-anchor="middle" x="142.5" y="-421.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_nlaunch</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~get_nlaunch -->
+<g id="proc~~dcx~~CallsGraph_edge69" class="edge"><title>proc~dcx&#45;&gt;proc~get_nlaunch</title>
+<path fill="none" stroke="black" d="M45.7344,-490.656C64.4751,-477.612 94.2182,-456.91 115.586,-442.037"/>
+<polygon fill="black" stroke="black" points="117.682,-444.843 123.89,-436.257 113.683,-439.097 117.682,-444.843"/>
+</g>
+<!-- proc~get_beam_cx_prob -->
+<g id="proc~~dcx~~CallsGraph_node8" class="node"><title>proc~get_beam_cx_prob</title>
+<g id="a_proc~~dcx~~CallsGraph_node8"><a xlink:href="../proc/get_beam_cx_prob.html" xlink:title="get_beam_cx_prob">
+<polygon fill="#d9534f" stroke="#d9534f" points="195,-764 90,-764 90,-740 195,-740 195,-764"/>
+<text text-anchor="middle" x="142.5" y="-749.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_beam_cx_prob</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~get_beam_cx_prob -->
+<g id="proc~~dcx~~CallsGraph_edge70" class="edge"><title>proc~dcx&#45;&gt;proc~get_beam_cx_prob</title>
+<path fill="none" stroke="black" d="M33.4743,-515.01C51.4124,-554.363 108.588,-679.797 131.684,-730.464"/>
+<polygon fill="black" stroke="black" points="128.615,-732.171 135.948,-739.819 134.985,-729.268 128.615,-732.171"/>
+</g>
+<!-- proc~get_plasma -->
+<g id="proc~~dcx~~CallsGraph_node9" class="node"><title>proc~get_plasma</title>
+<g id="a_proc~~dcx~~CallsGraph_node9"><a xlink:href="../proc/get_plasma.html" xlink:title="get_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="439,-535 371,-535 371,-511 439,-511 439,-535"/>
+<text text-anchor="middle" x="405" y="-520.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~dcx&#45;&gt;proc~get_plasma -->
+<g id="proc~~dcx~~CallsGraph_edge71" class="edge"><title>proc~dcx&#45;&gt;proc~get_plasma</title>
+<path fill="none" stroke="black" d="M54.2322,-505.307C65.2699,-506.228 78.2534,-507.246 90,-508 186.593,-514.2 300.053,-519.009 360.65,-521.378"/>
+<polygon fill="black" stroke="black" points="360.851,-524.889 370.979,-521.778 361.122,-517.894 360.851,-524.889"/>
+</g>
+<!-- proc~spectrum -->
+<g id="proc~~dcx~~CallsGraph_node10" class="node"><title>proc~spectrum</title>
+<g id="a_proc~~dcx~~CallsGraph_node10"><a xlink:href="../proc/spectrum.html" xlink:title="spectrum">
+<polygon fill="#d9534f" stroke="#d9534f" points="562.5,-815 505.5,-815 505.5,-791 562.5,-791 562.5,-815"/>
+<text text-anchor="middle" x="534" y="-800.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spectrum</text>
+</a>
+</g>
+</g>
+<!-- proc~store_bes_photons&#45;&gt;proc~spectrum -->
+<g id="proc~~dcx~~CallsGraph_edge23" class="edge"><title>proc~store_bes_photons&#45;&gt;proc~spectrum</title>
+<path fill="none" stroke="black" d="M298.148,-646.114C328.898,-672.075 404.723,-734.113 475,-776 481.559,-779.91 488.779,-783.667 495.83,-787.071"/>
+<polygon fill="black" stroke="black" points="494.723,-790.417 505.265,-791.476 497.685,-784.074 494.723,-790.417"/>
+</g>
+<!-- proc~get_fields -->
+<g id="proc~~dcx~~CallsGraph_node11" class="node"><title>proc~get_fields</title>
+<g id="a_proc~~dcx~~CallsGraph_node11"><a xlink:href="../proc/get_fields.html" xlink:title="get_fields">
+<polygon fill="#d9534f" stroke="#d9534f" points="434,-657 376,-657 376,-633 434,-633 434,-657"/>
+<text text-anchor="middle" x="405" y="-642.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+</a>
+</g>
+</g>
+<!-- proc~store_bes_photons&#45;&gt;proc~get_fields -->
+<g id="proc~~dcx~~CallsGraph_edge24" class="edge"><title>proc~store_bes_photons&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="black" d="M335.239,-638.697C345.437,-639.632 355.981,-640.598 365.656,-641.485"/>
+<polygon fill="black" stroke="black" points="365.48,-644.984 375.758,-642.411 366.119,-638.013 365.48,-644.984"/>
+</g>
+<!-- proc~get_indices -->
+<g id="proc~~dcx~~CallsGraph_node12" class="node"><title>proc~get_indices</title>
+<g id="a_proc~~dcx~~CallsGraph_node12"><a xlink:href="../proc/get_indices.html" xlink:title="get_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="438.5,-615 371.5,-615 371.5,-591 438.5,-591 438.5,-615"/>
+<text text-anchor="middle" x="405" y="-600.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~store_bes_photons&#45;&gt;proc~get_indices -->
+<g id="proc~~dcx~~CallsGraph_edge25" class="edge"><title>proc~store_bes_photons&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="black" d="M330.739,-621.926C340.906,-619.299 351.608,-616.534 361.597,-613.954"/>
+<polygon fill="black" stroke="black" points="362.494,-617.337 371.301,-611.447 360.744,-610.56 362.494,-617.337"/>
+</g>
+<!-- proc~mc_halo&#45;&gt;proc~get_plasma -->
+<g id="proc~~dcx~~CallsGraph_edge33" class="edge"><title>proc~mc_halo&#45;&gt;proc~get_plasma</title>
+<path fill="none" stroke="black" d="M310.038,-491.679C324.905,-496.635 343.919,-502.973 360.949,-508.65"/>
+<polygon fill="black" stroke="black" points="360.107,-512.058 370.7,-511.9 362.32,-505.417 360.107,-512.058"/>
+</g>
+<!-- proc~randn -->
+<g id="proc~~dcx~~CallsGraph_node27" class="node"><title>proc~randn</title>
+<g id="a_proc~~dcx~~CallsGraph_node27"><a xlink:href="../proc/randn.html" xlink:title="randn">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-457 378,-457 378,-433 432,-433 432,-457"/>
+<text text-anchor="middle" x="405" y="-442.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randn</text>
+</a>
+</g>
+</g>
+<!-- proc~mc_halo&#45;&gt;proc~randn -->
+<g id="proc~~dcx~~CallsGraph_edge31" class="edge"><title>proc~mc_halo&#45;&gt;proc~randn</title>
+<path fill="none" stroke="black" d="M310.038,-474.755C326.983,-469.389 349.316,-462.317 367.958,-456.413"/>
+<polygon fill="black" stroke="black" points="369.121,-459.716 377.598,-453.361 367.008,-453.043 369.121,-459.716"/>
+</g>
+<!-- proc~randu -->
+<g id="proc~~dcx~~CallsGraph_node28" class="node"><title>proc~randu</title>
+<g id="a_proc~~dcx~~CallsGraph_node28"><a xlink:href="../proc/randu.html" xlink:title="randu">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-415 378,-415 378,-391 432,-391 432,-415"/>
+<text text-anchor="middle" x="405" y="-400.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+</a>
+</g>
+</g>
+<!-- proc~mc_halo&#45;&gt;proc~randu -->
+<g id="proc~~dcx~~CallsGraph_edge32" class="edge"><title>proc~mc_halo&#45;&gt;proc~randu</title>
+<path fill="none" stroke="black" d="M301.561,-470.87C319.062,-458.835 346.749,-439.934 371,-424 372.66,-422.909 374.372,-421.794 376.101,-420.673"/>
+<polygon fill="black" stroke="black" points="378.222,-423.47 384.744,-415.121 374.439,-417.581 378.222,-423.47"/>
+</g>
+<!-- proc~eigen -->
+<g id="proc~~dcx~~CallsGraph_node32" class="node"><title>proc~eigen</title>
+<g id="a_proc~~dcx~~CallsGraph_node32"><a xlink:href="../proc/eigen.html" xlink:title="eigen">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-234 256,-234 256,-210 310,-210 310,-234"/>
+<text text-anchor="middle" x="283" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigen</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~eigen -->
+<g id="proc~~dcx~~CallsGraph_edge49" class="edge"><title>proc~colrad&#45;&gt;proc~eigen</title>
+<path fill="none" stroke="black" d="M169.569,-316.52C178.012,-313.22 187.204,-309.014 195,-304 222.25,-286.476 248.614,-259.836 265.042,-241.712"/>
+<polygon fill="black" stroke="black" points="267.828,-243.845 271.858,-234.047 262.597,-239.194 267.828,-243.845"/>
+</g>
+<!-- proc~get_rate_matrix -->
+<g id="proc~~dcx~~CallsGraph_node33" class="node"><title>proc~get_rate_matrix</title>
+<g id="a_proc~~dcx~~CallsGraph_node33"><a xlink:href="../proc/get_rate_matrix.html" xlink:title="get_rate_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="829,-397 741,-397 741,-373 829,-373 829,-397"/>
+<text text-anchor="middle" x="785" y="-382.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_rate_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~get_rate_matrix -->
+<g id="proc~~dcx~~CallsGraph_edge50" class="edge"><title>proc~colrad&#45;&gt;proc~get_rate_matrix</title>
+<path fill="none" stroke="black" d="M169.753,-325C216.735,-325 318.297,-325 404,-325 404,-325 404,-325 535,-325 610.713,-325 695.862,-351.543 744.402,-369.32"/>
+<polygon fill="black" stroke="black" points="743.305,-372.646 753.898,-372.858 745.749,-366.087 743.305,-372.646"/>
+</g>
+<!-- proc~matinv -->
+<g id="proc~~dcx~~CallsGraph_node34" class="node"><title>proc~matinv</title>
+<g id="a_proc~~dcx~~CallsGraph_node34"><a xlink:href="../proc/matinv.html" xlink:title="matinv">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-87 256,-87 256,-63 310,-63 310,-87"/>
+<text text-anchor="middle" x="283" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matinv</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~matinv -->
+<g id="proc~~dcx~~CallsGraph_edge51" class="edge"><title>proc~colrad&#45;&gt;proc~matinv</title>
+<path fill="none" stroke="black" d="M169.622,-319.095C178.662,-315.923 188.215,-311.139 195,-304 228.406,-268.848 213.898,-246.378 231,-201 244.971,-163.93 262.55,-121.296 272.997,-96.3362"/>
+<polygon fill="black" stroke="black" points="276.236,-97.6619 276.88,-87.0866 269.782,-94.9518 276.236,-97.6619"/>
+</g>
+<!-- proc~track&#45;&gt;proc~get_indices -->
+<g id="proc~~dcx~~CallsGraph_edge53" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="black" d="M310.038,-571.679C325.02,-576.673 344.214,-583.071 361.345,-588.782"/>
+<polygon fill="black" stroke="black" points="360.551,-592.206 371.145,-592.048 362.765,-585.566 360.551,-592.206"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="proc~~dcx~~CallsGraph_node16" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~dcx~~CallsGraph_node16"><a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="564.5,-575 503.5,-575 503.5,-551 564.5,-551 564.5,-575"/>
+<text text-anchor="middle" x="534" y="-560.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~track&#45;&gt;proc~in_plasma -->
+<g id="proc~~dcx~~CallsGraph_edge52" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="black" d="M310.177,-563C353.866,-563 441.904,-563 493.273,-563"/>
+<polygon fill="black" stroke="black" points="493.341,-566.5 503.341,-563 493.341,-559.5 493.341,-566.5"/>
+</g>
+<!-- proc~get_nlaunch&#45;&gt;proc~randu -->
+<g id="proc~~dcx~~CallsGraph_edge54" class="edge"><title>proc~get_nlaunch&#45;&gt;proc~randu</title>
+<path fill="none" stroke="black" d="M178.092,-421.211C227.451,-417.232 317.654,-409.961 367.853,-405.914"/>
+<polygon fill="black" stroke="black" points="368.243,-409.394 377.929,-405.102 367.68,-402.417 368.243,-409.394"/>
+</g>
+<!-- proc~get_beam_cx_prob&#45;&gt;proc~mc_halo -->
+<g id="proc~~dcx~~CallsGraph_edge57" class="edge"><title>proc~get_beam_cx_prob&#45;&gt;proc~mc_halo</title>
+<path fill="none" stroke="black" d="M147.018,-739.99C157.034,-706.835 187.794,-611.874 231,-542 239.824,-527.729 252.056,-513.45 262.328,-502.514"/>
+<polygon fill="black" stroke="black" points="264.967,-504.819 269.385,-495.189 259.926,-499.962 264.967,-504.819"/>
+</g>
+<!-- proc~normp -->
+<g id="proc~~dcx~~CallsGraph_node13" class="node"><title>proc~normp</title>
+<g id="a_proc~~dcx~~CallsGraph_node13"><a xlink:href="../proc/normp.html" xlink:title="normp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="691,-815 637,-815 637,-791 691,-791 691,-815"/>
+<text text-anchor="middle" x="664" y="-800.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">normp</text>
+</a>
+</g>
+</g>
+<!-- proc~get_beam_cx_prob&#45;&gt;proc~normp -->
+<g id="proc~~dcx~~CallsGraph_edge59" class="edge"><title>proc~get_beam_cx_prob&#45;&gt;proc~normp</title>
+<path fill="none" stroke="black" d="M185.154,-764.061C247.519,-781.428 369.157,-812.638 475,-824 527.145,-829.598 541.111,-831.616 593,-824 604.341,-822.335 616.396,-819.23 627.247,-815.909"/>
+<polygon fill="black" stroke="black" points="628.37,-819.224 636.82,-812.833 626.229,-812.56 628.37,-819.224"/>
+</g>
+<!-- proc~neut_rates -->
+<g id="proc~~dcx~~CallsGraph_node47" class="node"><title>proc~neut_rates</title>
+<g id="a_proc~~dcx~~CallsGraph_node47"><a xlink:href="../proc/neut_rates.html" xlink:title="neut_rates">
+<polygon fill="#d9534f" stroke="#d9534f" points="566,-895 502,-895 502,-871 566,-871 566,-895"/>
+<text text-anchor="middle" x="534" y="-880.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neut_rates</text>
+</a>
+</g>
+</g>
+<!-- proc~get_beam_cx_prob&#45;&gt;proc~neut_rates -->
+<g id="proc~~dcx~~CallsGraph_edge58" class="edge"><title>proc~get_beam_cx_prob&#45;&gt;proc~neut_rates</title>
+<path fill="none" stroke="black" d="M149.413,-764.098C161.284,-786.892 190.399,-835.812 231,-857 315.236,-900.958 430.876,-895.843 491.72,-889.01"/>
+<polygon fill="black" stroke="black" points="492.199,-892.478 501.713,-887.816 491.368,-885.527 492.199,-892.478"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_node15" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~dcx~~CallsGraph_node15"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="948,-596 871,-596 871,-572 948,-572 948,-596"/>
+<text text-anchor="middle" x="909.5" y="-581.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+</a>
+</g>
+</g>
+<!-- proc~get_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge63" class="edge"><title>proc~get_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="black" d="M439.101,-515.217C512.953,-499.459 695.642,-469.448 835,-521 858.141,-529.561 878.913,-549.022 892.423,-564.066"/>
+<polygon fill="black" stroke="black" points="889.97,-566.582 899.15,-571.872 895.273,-562.012 889.97,-566.582"/>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~in_plasma -->
+<g id="proc~~dcx~~CallsGraph_edge61" class="edge"><title>proc~get_plasma&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="black" d="M439.036,-533.405C455.624,-538.63 475.847,-544.999 493.277,-550.489"/>
+<polygon fill="black" stroke="black" points="492.578,-553.938 503.168,-553.604 494.681,-547.261 492.578,-553.938"/>
+</g>
+<!-- proc~get_position -->
+<g id="proc~~dcx~~CallsGraph_node17" class="node"><title>proc~get_position</title>
+<g id="a_proc~~dcx~~CallsGraph_node17"><a xlink:href="../proc/get_position.html" xlink:title="get_position">
+<polygon fill="#d9534f" stroke="#d9534f" points="569,-617 499,-617 499,-593 569,-593 569,-617"/>
+<text text-anchor="middle" x="534" y="-602.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+</a>
+</g>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~get_position -->
+<g id="proc~~dcx~~CallsGraph_edge60" class="edge"><title>proc~get_plasma&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="black" d="M417.125,-535.294C429.939,-548.826 452.176,-570.453 475,-584 479.489,-586.665 484.372,-589.076 489.336,-591.234"/>
+<polygon fill="black" stroke="black" points="488.315,-594.595 498.899,-595.071 490.921,-588.099 488.315,-594.595"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~dcx~~CallsGraph_node18" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~dcx~~CallsGraph_node18"><a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-554 630,-554 630,-530 698,-530 698,-554"/>
+<text text-anchor="middle" x="664" y="-539.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~dcx~~CallsGraph_edge62" class="edge"><title>proc~get_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="black" d="M439.072,-525.445C485.112,-528.849 568.594,-535.021 619.593,-538.791"/>
+<polygon fill="black" stroke="black" points="619.417,-542.287 629.648,-539.534 619.933,-535.306 619.417,-542.287"/>
+</g>
+<!-- proc~spectrum&#45;&gt;proc~normp -->
+<g id="proc~~dcx~~CallsGraph_edge1" class="edge"><title>proc~spectrum&#45;&gt;proc~normp</title>
+<path fill="none" stroke="black" d="M562.774,-803C581.433,-803 606.217,-803 626.47,-803"/>
+<polygon fill="black" stroke="black" points="626.592,-806.5 636.592,-803 626.592,-799.5 626.592,-806.5"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~normp -->
+<g id="proc~~dcx~~CallsGraph_edge22" class="edge"><title>proc~get_fields&#45;&gt;proc~normp</title>
+<path fill="none" stroke="black" d="M411.298,-657.312C420.919,-678.229 443.247,-720.697 475,-744 478.158,-746.317 573.067,-775.531 626.797,-791.96"/>
+<polygon fill="black" stroke="black" points="626.05,-795.392 636.637,-794.967 628.096,-788.697 626.05,-795.392"/>
+</g>
+<!-- proc~calc_perp_vectors -->
+<g id="proc~~dcx~~CallsGraph_node14" class="node"><title>proc~calc_perp_vectors</title>
+<g id="a_proc~~dcx~~CallsGraph_node14"><a xlink:href="../proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-735 484,-735 484,-711 584,-711 584,-735"/>
+<text text-anchor="middle" x="534" y="-720.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
+<g id="proc~~dcx~~CallsGraph_edge17" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
+<path fill="none" stroke="black" d="M420.138,-657.156C433.638,-668.392 454.853,-685.098 475,-697 480.809,-700.432 487.151,-703.707 493.441,-706.706"/>
+<polygon fill="black" stroke="black" points="492.002,-709.896 502.551,-710.886 494.922,-703.534 492.002,-709.896"/>
+</g>
+<!-- proc~get_fields&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge18" class="edge"><title>proc~get_fields&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="black" d="M434.095,-651.899C504.498,-667.779 692.989,-701.544 835,-647 858.033,-638.153 878.821,-618.734 892.364,-603.778"/>
+<polygon fill="black" stroke="black" points="895.187,-605.865 899.11,-596.023 889.906,-601.27 895.187,-605.865"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
+<g id="proc~~dcx~~CallsGraph_edge19" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="black" d="M426.853,-632.944C431.025,-630.202 435.268,-627.159 439,-624 457.257,-608.549 455.162,-597.36 475,-584 480.729,-580.142 487.253,-576.894 493.808,-574.195"/>
+<polygon fill="black" stroke="black" points="495.206,-577.409 503.345,-570.626 492.752,-570.853 495.206,-577.409"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~get_position -->
+<g id="proc~~dcx~~CallsGraph_edge20" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="black" d="M434.185,-636.123C450.217,-631.074 470.651,-624.638 488.772,-618.93"/>
+<polygon fill="black" stroke="black" points="490.072,-622.19 498.559,-615.848 487.969,-615.514 490.072,-622.19"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~dcx~~CallsGraph_edge21" class="edge"><title>proc~get_fields&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="black" d="M434.268,-649.642C473.318,-654.496 544.438,-657.571 593,-626 620.038,-608.423 606.589,-586.19 629,-563 629.895,-562.074 630.839,-561.172 631.82,-560.295"/>
+<polygon fill="black" stroke="black" points="634.087,-562.967 639.873,-554.091 629.815,-557.421 634.087,-562.967"/>
+</g>
+<!-- proc~calc_perp_vectors&#45;&gt;proc~normp -->
+<g id="proc~~dcx~~CallsGraph_edge2" class="edge"><title>proc~calc_perp_vectors&#45;&gt;proc~normp</title>
+<path fill="none" stroke="black" d="M565.485,-735.054C574.564,-739.068 584.383,-743.844 593,-749 610.233,-759.312 628.136,-773.19 641.523,-784.294"/>
+<polygon fill="black" stroke="black" points="639.327,-787.021 649.228,-790.793 643.841,-781.67 639.327,-787.021"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~dcx~~CallsGraph_node19" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~dcx~~CallsGraph_node19"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="1094,-616 984,-616 984,-592 1094,-592 1094,-616"/>
+<text text-anchor="middle" x="1039" y="-601.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~dcx~~CallsGraph_edge5" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M948.065,-589.892C956.177,-591.165 964.974,-592.545 973.783,-593.927"/>
+<polygon fill="black" stroke="black" points="973.276,-597.39 983.697,-595.482 974.361,-590.474 973.276,-597.39"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~dcx~~CallsGraph_node20" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~dcx~~CallsGraph_node20"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="1221,-565 1130,-565 1130,-541 1221,-541 1221,-565"/>
+<text text-anchor="middle" x="1175.5" y="-550.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M948.044,-579.591C992.886,-574.326 1068.27,-565.474 1119.64,-559.442"/>
+<polygon fill="black" stroke="black" points="1120.05,-562.918 1129.58,-558.275 1119.24,-555.965 1120.05,-562.918"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~dcx~~CallsGraph_node21" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~dcx~~CallsGraph_node21"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="1221,-626 1130,-626 1130,-602 1221,-602 1221,-626"/>
+<text text-anchor="middle" x="1175.5" y="-611.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge7" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M926.393,-596.034C940.624,-606.004 962.505,-619.41 984,-625 1028.74,-636.634 1081.3,-632.318 1119.87,-625.983"/>
+<polygon fill="black" stroke="black" points="1120.6,-629.407 1129.85,-624.246 1119.4,-622.511 1120.6,-629.407"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~dcx~~CallsGraph_node22" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~dcx~~CallsGraph_node22"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="1094,-536 984,-536 984,-512 1094,-512 1094,-536"/>
+<text text-anchor="middle" x="1039" y="-521.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~dcx~~CallsGraph_edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M936.302,-571.858C955.484,-562.831 981.875,-550.412 1002.96,-540.487"/>
+<polygon fill="black" stroke="black" points="1004.68,-543.549 1012.24,-536.124 1001.7,-537.215 1004.68,-543.549"/>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~dcx~~CallsGraph_edge16" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="black" d="M564.688,-558.129C581.062,-555.443 601.691,-552.059 619.819,-549.084"/>
+<polygon fill="black" stroke="black" points="620.569,-552.508 629.87,-547.435 619.436,-545.601 620.569,-552.508"/>
+</g>
+<!-- interface~interpol -->
+<g id="proc~~dcx~~CallsGraph_node23" class="node"><title>interface~interpol</title>
+<g id="a_proc~~dcx~~CallsGraph_node23"><a xlink:href="../interface/interpol.html" xlink:title="interpol">
+<polygon fill="#a7506f" stroke="#a7506f" points="691,-596 637,-596 637,-572 691,-572 691,-596"/>
+<text text-anchor="middle" x="664" y="-581.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;interface~interpol -->
+<g id="proc~~dcx~~CallsGraph_edge15" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol</title>
+<path fill="none" stroke="black" d="M564.688,-567.871C583.218,-570.911 607.196,-574.845 626.833,-578.066"/>
+<polygon fill="black" stroke="black" points="626.508,-581.56 636.943,-579.725 627.642,-574.652 626.508,-581.56"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge3" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="black" d="M1094.32,-608.039C1102.72,-608.663 1111.39,-609.308 1119.8,-609.933"/>
+<polygon fill="black" stroke="black" points="1119.65,-613.431 1129.88,-610.682 1120.17,-606.451 1119.65,-613.431"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge4" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="black" d="M1094.32,-535.712C1102.81,-537.542 1111.58,-539.434 1120.07,-541.265"/>
+<polygon fill="black" stroke="black" points="1119.37,-544.693 1129.88,-543.379 1120.84,-537.85 1119.37,-544.693"/>
+</g>
+<!-- proc~interpol2d_arr -->
+<g id="proc~~dcx~~CallsGraph_node24" class="node"><title>proc~interpol2d_arr</title>
+<g id="a_proc~~dcx~~CallsGraph_node24"><a xlink:href="../proc/interpol2d_arr.html" xlink:title="interpol2D_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="825.5,-554 744.5,-554 744.5,-530 825.5,-530 825.5,-554"/>
+<text text-anchor="middle" x="785" y="-539.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol&#45;&gt;proc~interpol2d_arr -->
+<g id="proc~~dcx~~CallsGraph_edge12" class="edge"><title>interface~interpol&#45;&gt;proc~interpol2d_arr</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M691.115,-574.783C705.528,-569.696 723.804,-563.246 740.325,-557.415"/>
+<polygon fill="black" stroke="black" points="741.542,-560.697 749.807,-554.068 739.212,-554.096 741.542,-560.697"/>
+</g>
+<!-- proc~interpol2d_2d_arr -->
+<g id="proc~~dcx~~CallsGraph_node25" class="node"><title>proc~interpol2d_2d_arr</title>
+<g id="a_proc~~dcx~~CallsGraph_node25"><a xlink:href="../proc/interpol2d_2d_arr.html" xlink:title="interpol2D_2D_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="835,-638 735,-638 735,-614 835,-614 835,-638"/>
+<text text-anchor="middle" x="785" y="-623.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_2D_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol&#45;&gt;proc~interpol2d_2d_arr -->
+<g id="proc~~dcx~~CallsGraph_edge13" class="edge"><title>interface~interpol&#45;&gt;proc~interpol2d_2d_arr</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M691.115,-593.217C705.528,-598.304 723.804,-604.754 740.325,-610.585"/>
+<polygon fill="black" stroke="black" points="739.212,-613.904 749.807,-613.932 741.542,-607.303 739.212,-613.904"/>
+</g>
+<!-- proc~interpol1d_arr -->
+<g id="proc~~dcx~~CallsGraph_node26" class="node"><title>proc~interpol1d_arr</title>
+<g id="a_proc~~dcx~~CallsGraph_node26"><a xlink:href="../proc/interpol1d_arr.html" xlink:title="interpol1D_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="825.5,-596 744.5,-596 744.5,-572 825.5,-572 825.5,-596"/>
+<text text-anchor="middle" x="785" y="-581.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol&#45;&gt;proc~interpol1d_arr -->
+<g id="proc~~dcx~~CallsGraph_edge14" class="edge"><title>interface~interpol&#45;&gt;proc~interpol1d_arr</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M691.115,-584C703.789,-584 719.452,-584 734.281,-584"/>
+<polygon fill="black" stroke="black" points="734.367,-587.5 744.367,-584 734.367,-580.5 734.367,-587.5"/>
+</g>
+<!-- proc~interpol2d_arr&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge9" class="edge"><title>proc~interpol2d_arr&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="black" d="M821.104,-554.036C834.431,-558.605 849.791,-563.871 863.88,-568.702"/>
+<polygon fill="black" stroke="black" points="862.797,-572.03 873.391,-571.963 865.067,-565.409 862.797,-572.03"/>
+</g>
+<!-- proc~interpol2d_2d_arr&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge10" class="edge"><title>proc~interpol2d_2d_arr&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="black" d="M821.104,-613.964C834.431,-609.395 849.791,-604.129 863.88,-599.298"/>
+<polygon fill="black" stroke="black" points="865.067,-602.591 873.391,-596.037 862.797,-595.97 865.067,-602.591"/>
+</g>
+<!-- proc~interpol1d_arr&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge11" class="edge"><title>proc~interpol1d_arr&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="black" d="M825.772,-584C836.791,-584 848.871,-584 860.313,-584"/>
+<polygon fill="black" stroke="black" points="860.594,-587.5 870.594,-584 860.594,-580.5 860.594,-587.5"/>
+</g>
+<!-- proc~rng_normal -->
+<g id="proc~~dcx~~CallsGraph_node29" class="node"><title>proc~rng_normal</title>
+<g id="a_proc~~dcx~~CallsGraph_node29"><a xlink:href="../proc/rng_normal.html" xlink:title="rng_normal">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="567.5,-457 500.5,-457 500.5,-433 567.5,-433 567.5,-457"/>
+<text text-anchor="middle" x="534" y="-442.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_normal</text>
+</a>
+</g>
+</g>
+<!-- proc~randn&#45;&gt;proc~rng_normal -->
+<g id="proc~~dcx~~CallsGraph_edge27" class="edge"><title>proc~randn&#45;&gt;proc~rng_normal</title>
+<path fill="none" stroke="black" d="M432.007,-445C448.739,-445 470.881,-445 490.168,-445"/>
+<polygon fill="black" stroke="black" points="490.243,-448.5 500.243,-445 490.243,-441.5 490.243,-448.5"/>
+</g>
+<!-- omp_get_thread_num -->
+<g id="proc~~dcx~~CallsGraph_node30" class="node"><title>omp_get_thread_num</title>
+<polygon fill="#777777" stroke="#777777" points="593,-415 475,-415 475,-391 593,-391 593,-415"/>
+<text text-anchor="middle" x="534" y="-400.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
+</g>
+<!-- proc~randn&#45;&gt;omp_get_thread_num -->
+<g id="proc~~dcx~~CallsGraph_edge28" class="edge"><title>proc~randn&#45;&gt;omp_get_thread_num</title>
+<path fill="none" stroke="black" d="M432.007,-436.399C447.754,-431.191 468.295,-424.399 486.737,-418.3"/>
+<polygon fill="black" stroke="black" points="488.041,-421.555 496.437,-415.092 485.843,-414.909 488.041,-421.555"/>
+</g>
+<!-- proc~randu&#45;&gt;omp_get_thread_num -->
+<g id="proc~~dcx~~CallsGraph_edge30" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
+<path fill="none" stroke="black" d="M432.007,-403C441.605,-403 452.983,-403 464.581,-403"/>
+<polygon fill="black" stroke="black" points="464.791,-406.5 474.791,-403 464.791,-399.5 464.791,-406.5"/>
+</g>
+<!-- proc~rng_uniform -->
+<g id="proc~~dcx~~CallsGraph_node31" class="node"><title>proc~rng_uniform</title>
+<g id="a_proc~~dcx~~CallsGraph_node31"><a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="699,-417 629,-417 629,-393 699,-393 699,-417"/>
+<text text-anchor="middle" x="664" y="-402.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
+</a>
+</g>
+</g>
+<!-- proc~randu&#45;&gt;proc~rng_uniform -->
+<g id="proc~~dcx~~CallsGraph_edge29" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
+<path fill="none" stroke="black" d="M432.12,-393.057C444.851,-388.728 460.509,-384.156 475,-382 526.873,-374.281 541.215,-373.71 593,-382 603.137,-383.623 613.797,-386.488 623.656,-389.658"/>
+<polygon fill="black" stroke="black" points="622.605,-392.997 633.199,-392.894 624.853,-386.368 622.605,-392.997"/>
+</g>
+<!-- proc~rng_normal&#45;&gt;proc~rng_uniform -->
+<g id="proc~~dcx~~CallsGraph_edge26" class="edge"><title>proc~rng_normal&#45;&gt;proc~rng_uniform</title>
+<path fill="none" stroke="black" d="M567.631,-434.803C583.234,-429.927 602.142,-424.018 618.994,-418.752"/>
+<polygon fill="black" stroke="black" points="620.137,-422.062 628.638,-415.738 618.049,-415.38 620.137,-422.062"/>
+</g>
+<!-- proc~elmtrans -->
+<g id="proc~~dcx~~CallsGraph_node35" class="node"><title>proc~elmtrans</title>
+<g id="a_proc~~dcx~~CallsGraph_node35"><a xlink:href="../proc/elmtrans.html" xlink:title="elmtrans">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-255 378,-255 378,-231 432,-231 432,-255"/>
+<text text-anchor="middle" x="405" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmtrans</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmtrans -->
+<g id="proc~~dcx~~CallsGraph_edge39" class="edge"><title>proc~eigen&#45;&gt;proc~elmtrans</title>
+<path fill="none" stroke="black" d="M310.038,-226.557C326.905,-229.508 349.11,-233.394 367.7,-236.647"/>
+<polygon fill="black" stroke="black" points="367.145,-240.103 377.598,-238.38 368.351,-233.208 367.145,-240.103"/>
+</g>
+<!-- proc~balback -->
+<g id="proc~~dcx~~CallsGraph_node36" class="node"><title>proc~balback</title>
+<g id="a_proc~~dcx~~CallsGraph_node36"><a xlink:href="../proc/balback.html" xlink:title="balback">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-213 378,-213 378,-189 432,-189 432,-213"/>
+<text text-anchor="middle" x="405" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balback</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balback -->
+<g id="proc~~dcx~~CallsGraph_edge40" class="edge"><title>proc~eigen&#45;&gt;proc~balback</title>
+<path fill="none" stroke="black" d="M310.038,-217.443C326.905,-214.492 349.11,-210.606 367.7,-207.353"/>
+<polygon fill="black" stroke="black" points="368.351,-210.792 377.598,-205.62 367.145,-203.897 368.351,-210.792"/>
+</g>
+<!-- proc~hqr2 -->
+<g id="proc~~dcx~~CallsGraph_node37" class="node"><title>proc~hqr2</title>
+<g id="a_proc~~dcx~~CallsGraph_node37"><a xlink:href="../proc/hqr2.html" xlink:title="hqr2">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-297 378,-297 378,-273 432,-273 432,-297"/>
+<text text-anchor="middle" x="405" y="-282.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqr2</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~hqr2 -->
+<g id="proc~~dcx~~CallsGraph_edge41" class="edge"><title>proc~eigen&#45;&gt;proc~hqr2</title>
+<path fill="none" stroke="black" d="M307.137,-234.147C325.564,-243.821 351.565,-257.472 371.989,-268.194"/>
+<polygon fill="black" stroke="black" points="370.453,-271.341 380.934,-272.89 373.707,-265.143 370.453,-271.341"/>
+</g>
+<!-- proc~elmhes -->
+<g id="proc~~dcx~~CallsGraph_node38" class="node"><title>proc~elmhes</title>
+<g id="a_proc~~dcx~~CallsGraph_node38"><a xlink:href="../proc/elmhes.html" xlink:title="elmhes">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-129 378,-129 378,-105 432,-105 432,-129"/>
+<text text-anchor="middle" x="405" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmhes</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmhes -->
+<g id="proc~~dcx~~CallsGraph_edge42" class="edge"><title>proc~eigen&#45;&gt;proc~elmhes</title>
+<path fill="none" stroke="black" d="M295.132,-209.799C311.05,-192.704 341.644,-161.128 371,-138 372.357,-136.931 373.77,-135.867 375.215,-134.818"/>
+<polygon fill="black" stroke="black" points="377.388,-137.571 383.663,-129.035 373.434,-131.795 377.388,-137.571"/>
+</g>
+<!-- proc~balance -->
+<g id="proc~~dcx~~CallsGraph_node39" class="node"><title>proc~balance</title>
+<g id="a_proc~~dcx~~CallsGraph_node39"><a xlink:href="../proc/balance.html" xlink:title="balance">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-171 378,-171 378,-147 432,-147 432,-171"/>
+<text text-anchor="middle" x="405" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balance</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balance -->
+<g id="proc~~dcx~~CallsGraph_edge43" class="edge"><title>proc~eigen&#45;&gt;proc~balance</title>
+<path fill="none" stroke="black" d="M307.137,-209.853C325.564,-200.179 351.565,-186.528 371.989,-175.806"/>
+<polygon fill="black" stroke="black" points="373.707,-178.857 380.934,-171.11 370.453,-172.659 373.707,-178.857"/>
+</g>
+<!-- proc~get_rate_matrix&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge44" class="edge"><title>proc~get_rate_matrix&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="black" d="M793.479,-397.149C813.768,-430.108 870.036,-521.516 895.584,-563.019"/>
+<polygon fill="black" stroke="black" points="892.741,-565.076 900.964,-571.757 898.702,-561.407 892.741,-565.076"/>
+</g>
+<!-- proc~lubksb -->
+<g id="proc~~dcx~~CallsGraph_node43" class="node"><title>proc~lubksb</title>
+<g id="a_proc~~dcx~~CallsGraph_node43"><a xlink:href="../proc/lubksb.html" xlink:title="lubksb">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-87 378,-87 378,-63 432,-63 432,-87"/>
+<text text-anchor="middle" x="405" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">lubksb</text>
+</a>
+</g>
+</g>
+<!-- proc~matinv&#45;&gt;proc~lubksb -->
+<g id="proc~~dcx~~CallsGraph_edge47" class="edge"><title>proc~matinv&#45;&gt;proc~lubksb</title>
+<path fill="none" stroke="black" d="M310.038,-75C326.827,-75 348.905,-75 367.441,-75"/>
+<polygon fill="black" stroke="black" points="367.598,-78.5001 377.598,-75 367.598,-71.5001 367.598,-78.5001"/>
+</g>
+<!-- proc~ludcmp -->
+<g id="proc~~dcx~~CallsGraph_node44" class="node"><title>proc~ludcmp</title>
+<g id="a_proc~~dcx~~CallsGraph_node44"><a xlink:href="../proc/ludcmp.html" xlink:title="ludcmp">
+<polygon fill="#d9534f" stroke="#d9534f" points="432,-45 378,-45 378,-21 432,-21 432,-45"/>
+<text text-anchor="middle" x="405" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ludcmp</text>
+</a>
+</g>
+</g>
+<!-- proc~matinv&#45;&gt;proc~ludcmp -->
+<g id="proc~~dcx~~CallsGraph_edge48" class="edge"><title>proc~matinv&#45;&gt;proc~ludcmp</title>
+<path fill="none" stroke="black" d="M310.038,-65.8866C326.983,-59.956 349.316,-52.1393 367.958,-45.6148"/>
+<polygon fill="black" stroke="black" points="369.316,-48.8477 377.598,-42.2406 367.003,-42.2407 369.316,-48.8477"/>
+</g>
+<!-- proc~rswap -->
+<g id="proc~~dcx~~CallsGraph_node40" class="node"><title>proc~rswap</title>
+<g id="a_proc~~dcx~~CallsGraph_node40"><a xlink:href="../proc/rswap.html" xlink:title="RSWAP">
+<polygon fill="#d9534f" stroke="#d9534f" points="561,-171 507,-171 507,-147 561,-147 561,-171"/>
+<text text-anchor="middle" x="534" y="-156.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RSWAP</text>
+</a>
+</g>
+</g>
+<!-- proc~balback&#45;&gt;proc~rswap -->
+<g id="proc~~dcx~~CallsGraph_edge34" class="edge"><title>proc~balback&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="black" d="M432.007,-192.399C450.716,-186.212 476.191,-177.787 496.874,-170.947"/>
+<polygon fill="black" stroke="black" points="498.196,-174.196 506.592,-167.734 495.998,-167.55 498.196,-174.196"/>
+</g>
+<!-- proc~hqrvec -->
+<g id="proc~~dcx~~CallsGraph_node41" class="node"><title>proc~hqrvec</title>
+<g id="a_proc~~dcx~~CallsGraph_node41"><a xlink:href="../proc/hqrvec.html" xlink:title="hqrvec">
+<polygon fill="#d9534f" stroke="#d9534f" points="561,-297 507,-297 507,-273 561,-273 561,-297"/>
+<text text-anchor="middle" x="534" y="-282.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqrvec</text>
+</a>
+</g>
+</g>
+<!-- proc~hqr2&#45;&gt;proc~hqrvec -->
+<g id="proc~~dcx~~CallsGraph_edge36" class="edge"><title>proc~hqr2&#45;&gt;proc~hqrvec</title>
+<path fill="none" stroke="black" d="M432.007,-285C450.631,-285 475.959,-285 496.591,-285"/>
+<polygon fill="black" stroke="black" points="496.592,-288.5 506.592,-285 496.591,-281.5 496.592,-288.5"/>
+</g>
+<!-- proc~elmhes&#45;&gt;proc~rswap -->
+<g id="proc~~dcx~~CallsGraph_edge37" class="edge"><title>proc~elmhes&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="black" d="M432.007,-125.601C450.716,-131.788 476.191,-140.213 496.874,-147.053"/>
+<polygon fill="black" stroke="black" points="495.998,-150.45 506.592,-150.266 498.196,-143.804 495.998,-150.45"/>
+</g>
+<!-- proc~balance&#45;&gt;proc~rswap -->
+<g id="proc~~dcx~~CallsGraph_edge38" class="edge"><title>proc~balance&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="black" d="M432.007,-159C450.631,-159 475.959,-159 496.591,-159"/>
+<polygon fill="black" stroke="black" points="496.592,-162.5 506.592,-159 496.591,-155.5 496.592,-162.5"/>
+</g>
+<!-- proc~comdiv -->
+<g id="proc~~dcx~~CallsGraph_node42" class="node"><title>proc~comdiv</title>
+<g id="a_proc~~dcx~~CallsGraph_node42"><a xlink:href="../proc/comdiv.html" xlink:title="Comdiv">
+<polygon fill="#d9534f" stroke="#d9534f" points="691,-297 637,-297 637,-273 691,-273 691,-297"/>
+<text text-anchor="middle" x="664" y="-282.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Comdiv</text>
+</a>
+</g>
+</g>
+<!-- proc~hqrvec&#45;&gt;proc~comdiv -->
+<g id="proc~~dcx~~CallsGraph_edge35" class="edge"><title>proc~hqrvec&#45;&gt;proc~comdiv</title>
+<path fill="none" stroke="black" d="M561.212,-285C580.108,-285 605.851,-285 626.72,-285"/>
+<polygon fill="black" stroke="black" points="626.824,-288.5 636.823,-285 626.823,-281.5 626.824,-288.5"/>
+</g>
+<!-- proc~outerprod -->
+<g id="proc~~dcx~~CallsGraph_node45" class="node"><title>proc~outerprod</title>
+<g id="a_proc~~dcx~~CallsGraph_node45"><a xlink:href="../proc/outerprod.html" xlink:title="outerprod">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="563.5,-66 504.5,-66 504.5,-42 563.5,-42 563.5,-66"/>
+<text text-anchor="middle" x="534" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">outerprod</text>
+</a>
+</g>
+</g>
+<!-- proc~ludcmp&#45;&gt;proc~outerprod -->
+<g id="proc~~dcx~~CallsGraph_edge45" class="edge"><title>proc~ludcmp&#45;&gt;proc~outerprod</title>
+<path fill="none" stroke="black" d="M432.007,-37.3003C449.928,-40.2637 474.057,-44.2535 494.235,-47.5901"/>
+<polygon fill="black" stroke="black" points="493.937,-51.0882 504.374,-49.2665 495.079,-44.1819 493.937,-51.0882"/>
+</g>
+<!-- proc~swap -->
+<g id="proc~~dcx~~CallsGraph_node46" class="node"><title>proc~swap</title>
+<g id="a_proc~~dcx~~CallsGraph_node46"><a xlink:href="../proc/swap.html" xlink:title="swap">
+<polygon fill="#d9534f" stroke="#d9534f" points="561,-24 507,-24 507,-0 561,-0 561,-24"/>
+<text text-anchor="middle" x="534" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">swap</text>
+</a>
+</g>
+</g>
+<!-- proc~ludcmp&#45;&gt;proc~swap -->
+<g id="proc~~dcx~~CallsGraph_edge46" class="edge"><title>proc~ludcmp&#45;&gt;proc~swap</title>
+<path fill="none" stroke="black" d="M432.007,-28.6997C450.631,-25.6201 475.959,-21.4319 496.591,-18.0203"/>
+<polygon fill="black" stroke="black" points="497.297,-21.4513 506.592,-16.3668 496.154,-14.5451 497.297,-21.4513"/>
+</g>
+<!-- proc~neut_rates&#45;&gt;proc~normp -->
+<g id="proc~~dcx~~CallsGraph_edge55" class="edge"><title>proc~neut_rates&#45;&gt;proc~normp</title>
+<path fill="none" stroke="black" d="M565.485,-870.946C574.564,-866.932 584.383,-862.156 593,-857 610.233,-846.688 628.136,-832.81 641.523,-821.706"/>
+<polygon fill="black" stroke="black" points="643.841,-824.33 649.228,-815.207 639.327,-818.979 643.841,-824.33"/>
+</g>
+<!-- proc~neut_rates&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~dcx~~CallsGraph_edge56" class="edge"><title>proc~neut_rates&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="black" d="M566.284,-875.799C600.579,-867.01 656.391,-850.022 699,-824 769.58,-780.895 781.84,-760.352 835,-697 859.989,-667.22 883.495,-628.509 896.921,-604.996"/>
+<polygon fill="black" stroke="black" points="900.014,-606.637 901.874,-596.206 893.916,-603.2 900.014,-606.637"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var panprocdcxCallsGraph = svgPanZoom('#procdcxCallsGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+Nodes of different colours represent the following:
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="26pt"
+ viewBox="0.00 0.00 641.00 25.98" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.811906 0.811906) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 785.5,-28 785.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.5,-24 72.5,-24 72.5,-0 139.5,-0 139.5,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Type -->
+<g id="node3" class="node"><title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="212,-24 158,-24 158,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="185" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- Subroutine -->
+<g id="node4" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="294,-24 230,-24 230,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="262" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node5" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node6" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="439.5,-24 384.5,-24 384.5,-0 439.5,-0 439.5,-24"/>
+<text text-anchor="middle" x="412" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node7" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="594,-24 458,-24 458,-0 594,-0 594,-24"/>
+<text text-anchor="middle" x="526" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node8" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="666,-24 612,-24 612,-0 666,-0 666,-24"/>
+<text text-anchor="middle" x="639" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node9" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="781.5,-24 684.5,-24 684.5,-0 781.5,-0 781.5,-24"/>
+<text text-anchor="middle" x="733" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<h5>Module Graph</h5>
+<p>Solid arrows point from a parent (sub)module to the submodule which is
+descended from it. Dashed arrows point from a module being used to the
+module using it.</p>
+<h5>Type Graph</h5>
+<p>Solid arrows point from one derived type to another which extends
+(inherits from) it. Dashed arrows point from a derived type to another
+type containing it as a components, with a label listing the name(s) of
+said component(s).</p>
+<h5>Call Graph</h5>
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.</p>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
+     
+     <h3>Called By</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: proc~~dcx~~CalledByGraph Pages: 1 -->
+<svg id="procdcxCalledByGraph" width="152pt" height="32pt"
+ viewBox="0.00 0.00 152.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~dcx~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~dcx~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 148,-28 148,4 -4,4"/>
+<!-- proc~dcx -->
+<g id="proc~~dcx~~CalledByGraph_node1" class="node"><title>proc~dcx</title>
+<polygon fill="none" stroke="black" points="144,-24 90,-24 90,-0 144,-0 144,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">dcx</text>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~dcx~~CalledByGraph_node2" class="node"><title>program~fidasim</title>
+<g id="a_proc~~dcx~~CalledByGraph_node2"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~dcx -->
+<g id="proc~~dcx~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<path fill="none" stroke="black" d="M54.4029,-12C62.3932,-12 71.3106,-12 79.8241,-12"/>
+<polygon fill="black" stroke="black" points="79.919,-15.5001 89.919,-12 79.919,-8.5001 79.919,-15.5001"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+Nodes of different colours represent the following:
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="26pt"
+ viewBox="0.00 0.00 641.00 25.98" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.811906 0.811906) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 785.5,-28 785.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.5,-24 72.5,-24 72.5,-0 139.5,-0 139.5,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Type -->
+<g id="node3" class="node"><title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="212,-24 158,-24 158,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="185" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- Subroutine -->
+<g id="node4" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="294,-24 230,-24 230,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="262" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node5" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node6" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="439.5,-24 384.5,-24 384.5,-0 439.5,-0 439.5,-24"/>
+<text text-anchor="middle" x="412" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node7" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="594,-24 458,-24 458,-0 594,-0 594,-24"/>
+<text text-anchor="middle" x="526" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node8" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="666,-24 612,-24 612,-0 666,-0 666,-24"/>
+<text text-anchor="middle" x="639" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node9" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="781.5,-24 684.5,-24 684.5,-0 781.5,-0 781.5,-24"/>
+<text text-anchor="middle" x="733" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<h5>Module Graph</h5>
+<p>Solid arrows point from a parent (sub)module to the submodule which is
+descended from it. Dashed arrows point from a module being used to the
+module using it.</p>
+<h5>Type Graph</h5>
+<p>Solid arrows point from one derived type to another which extends
+(inherits from) it. Dashed arrows point from a derived type to another
+type containing it as a components, with a label listing the name(s) of
+said component(s).</p>
+<h5>Call Graph</h5>
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.</p>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
+    <br>
+    
+    <section>
+    <h2>Variables</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-i%7E41"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>i</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-j%7E20"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>j</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-k%7E9"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>k</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-idcx"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>idcx</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ri%7E9"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ri</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-vihalo"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vihalo</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ind%7E21"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ind</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-neut_types"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>neut_types</strong></td><td> =</td><td>[1, 2, 3]</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-plasma%7E9"></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>plasma</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-denn%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(nlevs)</td><td>::</td>
+  <td><strong>denn</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-prob%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(nlevs)</td><td>::</td>
+  <td><strong>prob</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-states%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(nlevs)</td><td>::</td>
+  <td><strong>states</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ncell%7E4"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ncell</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tracks%7E4"></span>type(<a href='../type/particletrack.html'>ParticleTrack</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(beam_grid%ntrack)</td><td>::</td>
+  <td><strong>tracks</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-jj%7E2"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>jj</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tot_denn"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>tot_denn</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-photons%7E9"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>photons</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-papprox%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz)</td><td>::</td>
+  <td><strong>papprox</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nlaunch%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz)</td><td>::</td>
+  <td><strong>nlaunch</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-papprox_tot%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>papprox_tot</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ccnt"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ccnt</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inv_ng"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>inv_ng</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span class="k">subroutine </span><span class="n">dcx</span>
+    <span class="c">!+ Calculates Direct Charge Exchange (DCX) neutral density and spectra</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span> <span class="c">!indices of cells</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">idcx</span> <span class="c">!! counter</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ri</span>    <span class="c">!! start position</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vihalo</span>
+    <span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>    <span class="c">!! actual cell</span>
+    <span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">neut_types</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+    <span class="c">!! Determination of the CX probability</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LocalProfiles</span><span class="p">)</span> <span class="kd">::</span> <span class="n">plasma</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denn</span>    <span class="c">!!  neutral dens (n=1-4)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">prob</span>    <span class="c">!!  Prob. for CX</span>
+    <span class="c">!! Collisiional radiative model along track</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">states</span>  <span class="c">! Density of n-states</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ncell</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">ParticleTrack</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ntrack</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tracks</span>  <span class="c">!! Particle tracks</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">jj</span>       <span class="c">!! counter along track</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span><span class="kd">::</span> <span class="n">tot_denn</span><span class="p">,</span> <span class="n">photons</span>  <span class="c">!! photon flux</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span> <span class="kd">::</span> <span class="n">papprox</span><span class="p">,</span> <span class="n">nlaunch</span> <span class="c">!! approx. density</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">papprox_tot</span><span class="p">,</span> <span class="n">ccnt</span><span class="p">,</span> <span class="n">inv_ng</span>
+  
+    <span class="n">halo_iter_dens</span><span class="p">(</span><span class="n">halo_type</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">papprox</span><span class="o">=</span><span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">papprox_tot</span><span class="o">=</span><span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">tot_denn</span><span class="o">=</span><span class="mf">0.</span><span class="n">d0</span>
+    <span class="k">do </span><span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
+        <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span>
+            <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">ind</span><span class="o">=</span><span class="n">ind</span><span class="p">)</span>
+                <span class="n">tot_denn</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">nbif_type</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">))</span> <span class="o">+</span> <span class="p">&amp;</span>
+                           <span class="nb">sum</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">nbih_type</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">))</span> <span class="o">+</span> <span class="p">&amp;</span>
+                           <span class="nb">sum</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">nbit_type</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
+                <span class="n">papprox</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span><span class="o">=</span> <span class="n">tot_denn</span><span class="o">*</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">denp</span><span class="o">-</span><span class="n">plasma</span><span class="p">%</span><span class="n">denf</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">in_plasma</span><span class="p">)</span> <span class="n">papprox_tot</span><span class="o">=</span><span class="n">papprox_tot</span><span class="o">+</span><span class="n">papprox</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">enddo</span>
+        <span class="n">enddo</span>
+    <span class="n">enddo</span>
+  
+    <span class="k">call </span><span class="n">get_nlaunch</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">n_dcx</span><span class="p">,</span><span class="n">papprox</span><span class="p">,</span><span class="n">papprox_tot</span><span class="p">,</span><span class="n">nlaunch</span><span class="p">)</span>
+  
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">       write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i9)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">nlaunch</span><span class="p">))</span>
+    <span class="n">endif</span>
+  
+    <span class="n">ccnt</span><span class="o">=</span><span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">inv_ng</span> <span class="o">=</span> <span class="mi">10</span><span class="mf">0.0</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">)</span>
+    <span class="c">!$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,idcx,ind,vihalo, &amp;</span>
+    <span class="c">!$OMP&amp; ri,tracks,ncell,prob,denn,states,jj,photons,plasma)</span>
+    <span class="n">loop_along_z</span><span class="p">:</span> <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
+        <span class="n">loop_along_y</span><span class="p">:</span> <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span>
+            <span class="n">loop_along_x</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span>
+                <span class="c">!! Loop over the markers</span>
+                <span class="n">loop_over_dcx</span><span class="p">:</span> <span class="k">do </span><span class="n">idcx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">))</span>
+                    <span class="c">!! Calculate ri,vhalo and track</span>
+                    <span class="n">ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                    <span class="k">call </span><span class="n">mc_halo</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">ri</span><span class="p">)</span>
+                    <span class="k">call </span><span class="n">track</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">tracks</span><span class="p">,</span><span class="n">ncell</span><span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">ncell</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_dcx</span>
+  
+                    <span class="c">!! Calculate CX probability</span>
+                    <span class="k">call </span><span class="n">get_beam_cx_prob</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="mi">1</span><span class="p">)%</span><span class="n">ind</span><span class="p">,</span><span class="n">ri</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">neut_types</span><span class="p">,</span><span class="n">prob</span><span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">prob</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_dcx</span>
+  
+                    <span class="c">!! Solve collisional radiative model along track</span>
+                    <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">tracks</span><span class="p">(</span><span class="mi">1</span><span class="p">)%</span><span class="n">pos</span><span class="p">)</span>
+  
+                    <span class="n">states</span> <span class="o">=</span> <span class="n">prob</span><span class="o">*</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">denp</span> <span class="o">-</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denf</span><span class="p">)</span>
+  
+                    <span class="n">loop_along_track</span><span class="p">:</span> <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ncell</span>
+                        <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">)</span>
+    
+                        <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">thermal_ion</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="nb">time</span><span class="p">,</span><span class="n">states</span><span class="p">,</span><span class="n">denn</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span>
+                        <span class="k">call </span><span class="n">store_neutrals</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">ind</span><span class="p">,</span><span class="n">halo_type</span><span class="p">,</span><span class="n">denn</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">),</span><span class="n">plasma</span><span class="p">%</span><span class="n">in_plasma</span><span class="p">)</span>
+    
+                        <span class="k">if</span><span class="p">((</span><span class="n">photons</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.</span><span class="n">d0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                          call </span><span class="n">store_bes_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">photons</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">),</span><span class="n">halo_type</span><span class="p">)</span>
+                        <span class="n">endif</span>
+    
+                    <span class="n">enddo</span> <span class="n">loop_along_track</span>
+                <span class="n">enddo</span> <span class="n">loop_over_dcx</span>
+                <span class="n">ccnt</span><span class="o">=</span><span class="n">ccnt</span><span class="o">+</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span><span class="k">then</span>
+<span class="k">                    WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(f7.2,&quot;% completed&quot;,a,$)&#39;</span><span class="p">)</span> <span class="n">ccnt</span><span class="o">*</span><span class="n">inv_ng</span><span class="p">,</span><span class="nb">char</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+                <span class="n">endif</span>
+            <span class="n">enddo</span> <span class="n">loop_along_x</span>
+        <span class="n">enddo</span> <span class="n">loop_along_y</span>
+    <span class="n">enddo</span> <span class="n">loop_along_z</span>
+    <span class="c">!$OMP END PARALLEL DO</span>
+
+<span class="k">end subroutine </span><span class="n">dcx</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+    <hr>
+    <footer>
+        <div class="row">
+        <div class="col-md-4">&copy; 2016 </div>
+	<div class="col-md-4"><span class="text-center"> FIDASIM was developed by Luke Stagner</span></div>
+        <div class="col-md-4"><span class="pull-right">Documentation generated by <a href="https://github.com/cmacmackin/ford">FORD</a></span></div>
+        </div>
+        <br>
+    </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

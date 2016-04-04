@@ -1,0 +1,2662 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="FIDASIM - A Neutral Beam and Fast-ion Diagnostic Modeling Suite">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>write_bt_H_Aq &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../page/index.html'>User Guide</a></li>
+				
+                
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+				
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>write_bt_H_Aq
+    <small>Subroutine</small>
+    
+    </h1>
+	 
+<div class="row">
+<div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+    <li><i class="fa fa-code"></i><a href="../src/atomic_tables.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/atomic_tables.f90.html'>atomic_tables.f90</a></li>
+  
+     <li><a href='../module/atomic_tables.html'>atomic_tables</a></li>
+  
+     <li class="active">write_bt_H_Aq</li>
+  </ol>
+</div>
+</div>
+</div>
+    
+  </div>
+  
+  <div class="row">
+    <div class="col-lg-3">
+    
+<div id="sidebar">
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars">Variables</a></h3></div>
+    <div id="vars" class="panel-collapse collapse">
+      <div class="list-group">
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-q%7E40">q</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-mass">mass</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-emin%7E9">emin</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-emax%7E9">emax</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-nenergy%7E9">nenergy</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-tmin%7E4">tmin</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-tmax%7E4">tmax</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-ntemp%7E4">ntemp</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-eb%7E105">eb</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-dloge%7E10">dlogE</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-ebarr%7E11">ebarr</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-ti%7E4">ti</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-dlogt%7E5">dlogT</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-tarr%7E3">tarr</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-ioniz%7E6">ioniz</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-cx%7E5">cx</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-excit%7E6">excit</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-gid%7E14">gid</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-dim1%7E8">dim1</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-dim2%7E13">dim2</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-dim3%7E8">dim3</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-dim4%7E6">dim4</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-dim5%7E5">dim5</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-ie%7E4">ie</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-it%7E3">it</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-ia%7E3">ia</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-n%7E62">n</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-m%7E28">m</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-error%7E44">error</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-cnt%7E15">cnt</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-rate%7E7">rate</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-n_bt_amu%7E4">n_bt_amu</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-a%7E27">a</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-aname%7E2">aname</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-asym%7E2">asym</a>
+        
+        <a class="list-group-item" href="../proc/write_bt_h_aq.html#variable-exis%7E8">exis</a>
+        
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <div class="panel panel-primary">
+    <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+    <div class="list-group">
+      <a class="list-group-item" href="../proc/write_bt_h_aq.html#src">write_bt_H_Aq</a>
+    </div>
+  </div>
+  
+  <hr>
+  
+  <div class="panel panel-default">
+    <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs">All Procedures</a></h3></div>
+    <div id="allprocs" class="panel-collapse collapse">
+        <div class="list-group">
+          
+          <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
+          
+          <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
+          
+          <a class="list-group-item" href="../proc/aq_cx_n_adas.html">Aq_cx_n_adas</a>
+          
+          <a class="list-group-item" href="../proc/aq_cx_n_janev.html">Aq_cx_n_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit.html">Aq_excit</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_2_janev.html">Aq_excit_1_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_3_janev.html">Aq_excit_1_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_4_janev.html">Aq_excit_1_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_5_janev.html">Aq_excit_1_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_1_janev.html">Aq_excit_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_10_janev.html">Aq_excit_2_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_3_janev.html">Aq_excit_2_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_4_janev.html">Aq_excit_2_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_5_janev.html">Aq_excit_2_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_6_janev.html">Aq_excit_2_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_7_janev.html">Aq_excit_2_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_8_janev.html">Aq_excit_2_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_9_janev.html">Aq_excit_2_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_2_janev.html">Aq_excit_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_10_janev.html">Aq_excit_3_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_4_janev.html">Aq_excit_3_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_5_janev.html">Aq_excit_3_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_6_janev.html">Aq_excit_3_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_7_janev.html">Aq_excit_3_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_8_janev.html">Aq_excit_3_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_9_janev.html">Aq_excit_3_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_3_janev.html">Aq_excit_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_n.html">Aq_excit_n</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_n_janev.html">Aq_excit_n_janev</a>
+          
+          <a class="list-group-item" href="../proc/aq_excit_n_m.html">Aq_excit_n_m</a>
+          
+          <a class="list-group-item" href="../proc/aq_ioniz.html">Aq_ioniz</a>
+          
+          <a class="list-group-item" href="../proc/aq_ioniz_n.html">Aq_ioniz_n</a>
+          
+          <a class="list-group-item" href="../proc/aq_ioniz_n_janev.html">Aq_ioniz_n_janev</a>
+          
+          <a class="list-group-item" href="../interface/assignment%28%3D%29.html">assignment(=)</a>
+          
+          <a class="list-group-item" href="../proc/attenuate.html">attenuate</a>
+          
+          <a class="list-group-item" href="../proc/b5_cx_1_adas.html">B5_cx_1_adas</a>
+          
+          <a class="list-group-item" href="../proc/b5_cx_1_janev.html">B5_cx_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/b5_cx_2_adas.html">B5_cx_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/b5_ioniz_1_janev.html">B5_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/balance.html">balance</a>
+          
+          <a class="list-group-item" href="../proc/balback.html">balback</a>
+          
+          <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+          
+          <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_q_n.html">bt_maxwellian_q_n</a>
+          
+          <a class="list-group-item" href="../proc/bt_maxwellian_q_n_m.html">bt_maxwellian_q_n_m</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_1_adas.html">C6_cx_1_adas</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_1_janev.html">C6_cx_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_2_adas.html">C6_cx_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/c6_cx_3_adas.html">C6_cx_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/c6_ioniz_1_janev.html">C6_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/calc_perp_vectors.html">calc_perp_vectors</a>
+          
+          <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
+          
+          <a class="list-group-item" href="../proc/colrad.html">colrad</a>
+          
+          <a class="list-group-item" href="../proc/comabs.html">comabs</a>
+          
+          <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
+          
+          <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+          
+          <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+          
+          <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_2_janev.html">e_excit_1_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_3_janev.html">e_excit_1_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_4_janev.html">e_excit_1_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_5_janev.html">e_excit_1_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_1_janev.html">e_excit_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_2_3_janev.html">e_excit_2_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_f.html">e_excit_f</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_n.html">e_excit_n</a>
+          
+          <a class="list-group-item" href="../proc/e_excit_n_m.html">e_excit_n_m</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz.html">e_ioniz</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_1_janev.html">e_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_2_janev.html">e_ioniz_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_3_janev.html">e_ioniz_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/e_ioniz_n.html">e_ioniz_n</a>
+          
+          <a class="list-group-item" href="../proc/eigen.html">eigen</a>
+          
+          <a class="list-group-item" href="../proc/elmhes.html">elmhes</a>
+          
+          <a class="list-group-item" href="../proc/elmtrans.html">elmtrans</a>
+          
+          <a class="list-group-item" href="../proc/fast_ion_assign.html">fast_ion_assign</a>
+          
+          <a class="list-group-item" href="../proc/ff_add.html">ff_add</a>
+          
+          <a class="list-group-item" href="../proc/ff_assign.html">ff_assign</a>
+          
+          <a class="list-group-item" href="../proc/ff_subtract.html">ff_subtract</a>
+          
+          <a class="list-group-item" href="../proc/fida_f.html">fida_f</a>
+          
+          <a class="list-group-item" href="../proc/fida_mc.html">fida_mc</a>
+          
+          <a class="list-group-item" href="../proc/fida_weights_los.html">fida_weights_los</a>
+          
+          <a class="list-group-item" href="../proc/fida_weights_mc.html">fida_weights_mc</a>
+          
+          <a class="list-group-item" href="../proc/flf_assign.html">flf_assign</a>
+          
+          <a class="list-group-item" href="../proc/fs_divide.html">fs_divide</a>
+          
+          <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
+          
+          <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+          
+          <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
+          
+          <a class="list-group-item" href="../proc/get_ep_denf.html">get_ep_denf</a>
+          
+          <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
+          
+          <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+          
+          <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
+          
+          <a class="list-group-item" href="../proc/get_plasma.html">get_plasma</a>
+          
+          <a class="list-group-item" href="../proc/get_position.html">get_position</a>
+          
+          <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+          
+          <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
+          
+          <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
+          
+          <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_2.html">h5ltmake_compressed_dataset_double_f_2</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_3.html">h5ltmake_compressed_dataset_double_f_3</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_4.html">h5ltmake_compressed_dataset_double_f_4</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_5.html">h5ltmake_compressed_dataset_double_f_5</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_6.html">h5ltmake_compressed_dataset_double_f_6</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_7.html">h5ltmake_compressed_dataset_double_f_7</a>
+          
+          <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_int_f.html">h5ltmake_compressed_dataset_int_f</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_1.html">h5ltmake_compressed_dataset_int_f_1</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_2.html">h5ltmake_compressed_dataset_int_f_2</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_3.html">h5ltmake_compressed_dataset_int_f_3</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_4.html">h5ltmake_compressed_dataset_int_f_4</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_5.html">h5ltmake_compressed_dataset_int_f_5</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_6.html">h5ltmake_compressed_dataset_int_f_6</a>
+          
+          <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_7.html">h5ltmake_compressed_dataset_int_f_7</a>
+          
+          <a class="list-group-item" href="../proc/h5ltread_dataset_double_scalar_f.html">h5ltread_dataset_double_scalar_f</a>
+          
+          <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
+          
+          <a class="list-group-item" href="../proc/halo.html">halo</a>
+          
+          <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
+          
+          <a class="list-group-item" href="../proc/hqr2.html">hqr2</a>
+          
+          <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
+          
+          <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+          
+          <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
+          
+          <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
+          
+          <a class="list-group-item" href="../interface/interpol.html">interpol</a>
+          
+          <a class="list-group-item" href="../proc/interpol1d_arr.html">interpol1D_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol1d_coeff.html">interpol1D_coeff</a>
+          
+          <a class="list-group-item" href="../proc/interpol1d_coeff_arr.html">interpol1D_coeff_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_2d_arr.html">interpol2D_2D_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_arr.html">interpol2D_arr</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_coeff.html">interpol2D_coeff</a>
+          
+          <a class="list-group-item" href="../proc/interpol2d_coeff_arr.html">interpol2D_coeff_arr</a>
+          
+          <a class="list-group-item" href="../interface/interpol_coeff.html">interpol_coeff</a>
+          
+          <a class="list-group-item" href="../proc/lff_assign.html">lff_assign</a>
+          
+          <a class="list-group-item" href="../proc/lflf_add.html">lflf_add</a>
+          
+          <a class="list-group-item" href="../proc/lflf_assign.html">lflf_assign</a>
+          
+          <a class="list-group-item" href="../proc/lflf_subtract.html">lflf_subtract</a>
+          
+          <a class="list-group-item" href="../proc/lfs_divide.html">lfs_divide</a>
+          
+          <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
+          
+          <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+          
+          <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
+          
+          <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
+          
+          <a class="list-group-item" href="../proc/lplp_subtract.html">lplp_subtract</a>
+          
+          <a class="list-group-item" href="../proc/lpp_assign.html">lpp_assign</a>
+          
+          <a class="list-group-item" href="../proc/lps_divide.html">lps_divide</a>
+          
+          <a class="list-group-item" href="../proc/lps_multiply.html">lps_multiply</a>
+          
+          <a class="list-group-item" href="../proc/lubksb.html">lubksb</a>
+          
+          <a class="list-group-item" href="../proc/ludcmp.html">ludcmp</a>
+          
+          <a class="list-group-item" href="../proc/m_spread.html">m_spread</a>
+          
+          <a class="list-group-item" href="../proc/make_beam_grid.html">make_beam_grid</a>
+          
+          <a class="list-group-item" href="../proc/matinv.html">matinv</a>
+          
+          <a class="list-group-item" href="../proc/mc_fastion.html">mc_fastion</a>
+          
+          <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
+          
+          <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+          
+          <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
+          
+          <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+          
+          <a class="list-group-item" href="../proc/normp.html">normp</a>
+          
+          <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+          
+          <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
+          
+          <a class="list-group-item" href="../proc/npa_part_assign.html">npa_part_assign</a>
+          
+          <a class="list-group-item" href="../proc/npa_weights.html">npa_weights</a>
+          
+          <a class="list-group-item" href="../interface/operator%28%2A%29.html">operator(*)</a>
+          
+          <a class="list-group-item" href="../interface/operator%28%2B%29.html">operator(+)</a>
+          
+          <a class="list-group-item" href="../interface/operator%28-%29.html">operator(-)</a>
+          
+          <a class="list-group-item" href="../interface/operator%28SLASH%29.html">operator(/)</a>
+          
+          <a class="list-group-item" href="../proc/outerprod.html">outerprod</a>
+          
+          <a class="list-group-item" href="../proc/p_cx.html">p_cx</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1.html">p_cx_1</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_1_adas.html">p_cx_1_1_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_2_adas.html">p_cx_1_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_3_adas.html">p_cx_1_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_4_adas.html">p_cx_1_4_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_1_janev.html">p_cx_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2.html">p_cx_2</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2_2_adas.html">p_cx_2_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2_3_adas.html">p_cx_2_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_2_janev.html">p_cx_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3.html">p_cx_3</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_2_adas.html">p_cx_3_2_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_3_adas.html">p_cx_3_3_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_4_adas.html">p_cx_3_4_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_5_adas.html">p_cx_3_5_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_6inf_adas.html">p_cx_3_6inf_adas</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_3_janev.html">p_cx_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_janev.html">p_cx_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_n.html">p_cx_n</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_n_janev.html">p_cx_n_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_cx_n_m.html">p_cx_n_m</a>
+          
+          <a class="list-group-item" href="../proc/p_excit.html">p_excit</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_2_janev.html">p_excit_1_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_3_janev.html">p_excit_1_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_4_janev.html">p_excit_1_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_5_janev.html">p_excit_1_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_6_janev.html">p_excit_1_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_1_janev.html">p_excit_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_10_janev.html">p_excit_2_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_3_janev.html">p_excit_2_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_4_janev.html">p_excit_2_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_5_janev.html">p_excit_2_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_6_janev.html">p_excit_2_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_7_janev.html">p_excit_2_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_8_janev.html">p_excit_2_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_9_janev.html">p_excit_2_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_2_janev.html">p_excit_2_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_10_janev.html">p_excit_3_10_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_4_janev.html">p_excit_3_4_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_5_janev.html">p_excit_3_5_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_6_janev.html">p_excit_3_6_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_7_janev.html">p_excit_3_7_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_8_janev.html">p_excit_3_8_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_9_janev.html">p_excit_3_9_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_3_janev.html">p_excit_3_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_n.html">p_excit_n</a>
+          
+          <a class="list-group-item" href="../proc/p_excit_n_m.html">p_excit_n_m</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz.html">p_ioniz</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_1_janev.html">p_ioniz_1_janev</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_2_omullane.html">p_ioniz_2_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_3_omullane.html">p_ioniz_3_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_4_omullane.html">p_ioniz_4_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_5_omullane.html">p_ioniz_5_omullane</a>
+          
+          <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
+          
+          <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
+          
+          <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
+          
+          <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
+          
+          <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+          
+          <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
+          
+          <a class="list-group-item" href="../proc/pp_assign.html">pp_assign</a>
+          
+          <a class="list-group-item" href="../proc/pp_subtract.html">pp_subtract</a>
+          
+          <a class="list-group-item" href="../proc/print_banner.html">print_banner</a>
+          
+          <a class="list-group-item" href="../proc/ps_divide.html">ps_divide</a>
+          
+          <a class="list-group-item" href="../proc/ps_multiply.html">ps_multiply</a>
+          
+          <a class="list-group-item" href="../interface/randind.html">randind</a>
+          
+          <a class="list-group-item" href="../proc/randn.html">randn</a>
+          
+          <a class="list-group-item" href="../proc/randu.html">randu</a>
+          
+          <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
+          
+          <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
+          
+          <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
+          
+          <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
+          
+          <a class="list-group-item" href="../proc/read_equilibrium.html">read_equilibrium</a>
+          
+          <a class="list-group-item" href="../proc/read_f.html">read_f</a>
+          
+          <a class="list-group-item" href="../proc/read_inputs.html">read_inputs</a>
+          
+          <a class="list-group-item" href="../proc/read_mc.html">read_mc</a>
+          
+          <a class="list-group-item" href="../proc/read_neutrals.html">read_neutrals</a>
+          
+          <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
+          
+          <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+          
+          <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
+          
+          <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
+          
+          <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+          
+          <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
+          
+          <a class="list-group-item" href="../proc/rswap.html">RSWAP</a>
+          
+          <a class="list-group-item" href="../proc/sf_multiply.html">sf_multiply</a>
+          
+          <a class="list-group-item" href="../proc/simpsons_rule.html">simpsons_rule</a>
+          
+          <a class="list-group-item" href="../proc/slf_multiply.html">slf_multiply</a>
+          
+          <a class="list-group-item" href="../proc/slp_multiply.html">slp_multiply</a>
+          
+          <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
+          
+          <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
+          
+          <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
+          
+          <a class="list-group-item" href="../proc/store_births.html">store_births</a>
+          
+          <a class="list-group-item" href="../proc/store_fida_photons.html">store_fida_photons</a>
+          
+          <a class="list-group-item" href="../proc/store_fw_photons.html">store_fw_photons</a>
+          
+          <a class="list-group-item" href="../proc/store_fw_photons_at_chan.html">store_fw_photons_at_chan</a>
+          
+          <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
+          
+          <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+          
+          <a class="list-group-item" href="../proc/swap.html">swap</a>
+          
+          <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+          
+          <a class="list-group-item" href="../proc/track.html">track</a>
+          
+          <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
+          
+          <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
+          
+          <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
+          
+          <a class="list-group-item" href="../proc/write_bb_h_h.html">write_bb_H_H</a>
+          
+          <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
+          
+          <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+          
+          <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
+          
+          <a class="list-group-item" href="../proc/write_bt_h_e.html">write_bt_H_e</a>
+          
+          <a class="list-group-item" href="../proc/write_bt_h_h.html">write_bt_H_H</a>
+          
+          <a class="list-group-item" href="../proc/write_dcx.html">write_dcx</a>
+          
+          <a class="list-group-item" href="../proc/write_einstein.html">write_einstein</a>
+          
+          <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
+          
+          <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+          
+          <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
+          
+          <a class="list-group-item" href="../proc/write_npa_weights.html">write_npa_weights</a>
+          
+          <a class="list-group-item" href="../proc/write_spectra.html">write_spectra</a>
+          
+          <a class="list-group-item" href="../proc/xyz_to_uvw.html">xyz_to_uvw</a>
+          
+        </div>
+    </div>
+  </div>
+  
+</div>
+
+    </div>
+    
+    <div class="col-lg-9" id='text'>
+    <h2>
+public subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
+    
+    
+    
+</h2>
+    
+  
+
+
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-id%7E8"></span>integer(kind=HID_T),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>id</strong></td><td><p>HDF5 file or group object id</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-namelist_file%7E6"></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>namelist_file</strong></td><td><p>Namelist file that contains settings</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-n_max%7E20"></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>n_max</strong></td><td><p>Number of initial atomic energy states to calculate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-m_max%7E33"></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>m_max</strong></td><td><p>Number of final atomic energy states to calculate</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+    <h3>Description</h3>
+    <p>Write Hydrogen-Impurity reaction rates to a HDF5 file</p>
+    
+    
+     <h3>Calls</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: proc~~write_bt_h_aq~~CallsGraph Pages: 1 -->
+<svg id="procwrite_bt_h_aqCallsGraph" width="641pt" height="444pt"
+ viewBox="0.00 0.00 641.00 444.47" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~write_bt_h_aq~~CallsGraph" class="graph" transform="scale(0.829237 0.829237) rotate(0) translate(4 532)">
+<title>proc~~write_bt_h_aq~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-532 769,-532 769,4 -4,4"/>
+<!-- proc~write_bt_h_aq -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node1" class="node"><title>proc~write_bt_h_aq</title>
+<polygon fill="none" stroke="black" points="82,-297 0,-297 0,-273 82,-273 82,-297"/>
+<text text-anchor="middle" x="41" y="-282.6" font-family="Helvetica,sans-Serif" font-size="10.50">write_bt_H_Aq</text>
+</g>
+<!-- h5ltset_attribute_string_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node2" class="node"><title>h5ltset_attribute_string_f</title>
+<polygon fill="#777777" stroke="#777777" points="287.5,-524 157.5,-524 157.5,-500 287.5,-500 287.5,-524"/>
+<text text-anchor="middle" x="222.5" y="-509.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltset_attribute_string_f</text>
+</g>
+<!-- proc~write_bt_h_aq&#45;&gt;h5ltset_attribute_string_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge93" class="edge"><title>proc~write_bt_h_aq&#45;&gt;h5ltset_attribute_string_f</title>
+<path fill="none" stroke="black" d="M42.8132,-297.089C45.8352,-332.017 59.5,-433.888 118,-486 126.506,-493.577 136.897,-499.015 147.777,-502.903"/>
+<polygon fill="black" stroke="black" points="146.839,-506.277 157.429,-505.936 148.938,-499.599 146.839,-506.277"/>
+</g>
+<!-- h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node3" class="node"><title>h5ltmake_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="765,-528 620,-528 620,-504 765,-504 765,-528"/>
+<text text-anchor="middle" x="692.5" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_dataset_double_f</text>
+</g>
+<!-- proc~write_bt_h_aq&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge94" class="edge"><title>proc~write_bt_h_aq&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M54.3149,-297.138C68.6769,-310.814 93.5777,-333.076 118,-348 219.088,-409.772 249.726,-418.309 363,-453 445.39,-478.232 542.633,-495.38 609.831,-505.338"/>
+<polygon fill="black" stroke="black" points="609.535,-508.831 619.936,-506.814 610.547,-501.905 609.535,-508.831"/>
+</g>
+<!-- h5gcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node4" class="node"><title>h5gcreate_f</title>
+<polygon fill="#777777" stroke="#777777" points="257.5,-297 187.5,-297 187.5,-273 257.5,-273 257.5,-297"/>
+<text text-anchor="middle" x="222.5" y="-282.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gcreate_f</text>
+</g>
+<!-- proc~write_bt_h_aq&#45;&gt;h5gcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge95" class="edge"><title>proc~write_bt_h_aq&#45;&gt;h5gcreate_f</title>
+<path fill="none" stroke="black" d="M82.2833,-285C110.453,-285 148.079,-285 177.112,-285"/>
+<polygon fill="black" stroke="black" points="177.386,-288.5 187.386,-285 177.386,-281.5 177.386,-288.5"/>
+</g>
+<!-- h5gclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node5" class="node"><title>h5gclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="254.5,-255 190.5,-255 190.5,-231 254.5,-231 254.5,-255"/>
+<text text-anchor="middle" x="222.5" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
+</g>
+<!-- proc~write_bt_h_aq&#45;&gt;h5gclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge96" class="edge"><title>proc~write_bt_h_aq&#45;&gt;h5gclose_f</title>
+<path fill="none" stroke="black" d="M82.0964,-273.36C93.643,-270.161 106.285,-266.804 118,-264 138.405,-259.117 161.249,-254.403 180.273,-250.683"/>
+<polygon fill="black" stroke="black" points="180.971,-254.113 190.125,-248.779 179.642,-247.241 180.971,-254.113"/>
+</g>
+<!-- h5ltmake_dataset_int_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node6" class="node"><title>h5ltmake_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="284.5,-213 160.5,-213 160.5,-189 284.5,-189 284.5,-213"/>
+<text text-anchor="middle" x="222.5" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_dataset_int_f</text>
+</g>
+<!-- proc~write_bt_h_aq&#45;&gt;h5ltmake_dataset_int_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge97" class="edge"><title>proc~write_bt_h_aq&#45;&gt;h5ltmake_dataset_int_f</title>
+<path fill="none" stroke="black" d="M52.828,-272.958C66.5339,-258.507 91.5623,-234.646 118,-222 128.17,-217.135 139.426,-213.396 150.659,-210.522"/>
+<polygon fill="black" stroke="black" points="151.561,-213.906 160.496,-208.213 149.961,-207.091 151.561,-213.906"/>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node7" class="node"><title>interface~h5ltmake_compressed_dataset_double_f</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node7"><a xlink:href="../interface/h5ltmake_compressed_dataset_double_f.html" xlink:title="h5ltmake_compressed_dataset_double_f">
+<polygon fill="#a7506f" stroke="#a7506f" points="327,-339 118,-339 118,-315 327,-315 327,-339"/>
+<text text-anchor="middle" x="222.5" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f</text>
+</a>
+</g>
+</g>
+<!-- proc~write_bt_h_aq&#45;&gt;interface~h5ltmake_compressed_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge98" class="edge"><title>proc~write_bt_h_aq&#45;&gt;interface~h5ltmake_compressed_dataset_double_f</title>
+<path fill="none" stroke="black" d="M82.0964,-296.64C93.643,-299.839 106.285,-303.196 118,-306 127.932,-308.377 138.442,-310.713 148.807,-312.915"/>
+<polygon fill="black" stroke="black" points="148.173,-316.358 158.678,-314.981 149.607,-309.506 148.173,-316.358"/>
+</g>
+<!-- interface~bt_maxwellian -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node8" class="node"><title>interface~bt_maxwellian</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node8"><a xlink:href="../interface/bt_maxwellian.html" xlink:title="bt_maxwellian">
+<polygon fill="#a7506f" stroke="#a7506f" points="262.5,-108 182.5,-108 182.5,-84 262.5,-84 262.5,-108"/>
+<text text-anchor="middle" x="222.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_maxwellian</text>
+</a>
+</g>
+</g>
+<!-- proc~write_bt_h_aq&#45;&gt;interface~bt_maxwellian -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge99" class="edge"><title>proc~write_bt_h_aq&#45;&gt;interface~bt_maxwellian</title>
+<path fill="none" stroke="black" d="M49.2838,-272.89C61.8565,-252.504 89.0773,-210.566 118,-180 142.011,-154.624 173.695,-129.966 195.652,-114.004"/>
+<polygon fill="black" stroke="black" points="197.759,-116.8 203.842,-108.125 193.677,-111.113 197.759,-116.8"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node9" class="node"><title>proc~h5ltmake_compressed_dataset_double_f_1</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node9"><a xlink:href="../proc/h5ltmake_compressed_dataset_double_f_1.html" xlink:title="h5ltmake_compressed_dataset_double_f_1">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-402 363,-402 363,-378 584,-378 584,-402"/>
+<text text-anchor="middle" x="473.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f_1</text>
+</a>
+</g>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_1 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge78" class="edge"><title>interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_1</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M259.93,-339.092C287.913,-348.106 327.631,-360.309 363,-369 372.972,-371.45 383.512,-373.787 393.958,-375.952"/>
+<polygon fill="black" stroke="black" points="393.426,-379.415 403.923,-377.973 394.818,-372.555 393.426,-379.415"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node10" class="node"><title>proc~h5ltmake_compressed_dataset_double_f_2</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node10"><a xlink:href="../proc/h5ltmake_compressed_dataset_double_f_2.html" xlink:title="h5ltmake_compressed_dataset_double_f_2">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-360 363,-360 363,-336 584,-336 584,-360"/>
+<text text-anchor="middle" x="473.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f_2</text>
+</a>
+</g>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_2 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge79" class="edge"><title>interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_2</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M327.295,-335.754C335.736,-336.466 344.307,-337.189 352.847,-337.909"/>
+<polygon fill="black" stroke="black" points="352.59,-341.399 362.849,-338.752 353.179,-334.424 352.59,-341.399"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node11" class="node"><title>proc~h5ltmake_compressed_dataset_double_f_3</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node11"><a xlink:href="../proc/h5ltmake_compressed_dataset_double_f_3.html" xlink:title="h5ltmake_compressed_dataset_double_f_3">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-318 363,-318 363,-294 584,-294 584,-318"/>
+<text text-anchor="middle" x="473.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f_3</text>
+</a>
+</g>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_3 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge80" class="edge"><title>interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_3</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M327.295,-318.246C335.736,-317.534 344.307,-316.811 352.847,-316.091"/>
+<polygon fill="black" stroke="black" points="353.179,-319.576 362.849,-315.248 352.59,-312.601 353.179,-319.576"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node12" class="node"><title>proc~h5ltmake_compressed_dataset_double_f_4</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node12"><a xlink:href="../proc/h5ltmake_compressed_dataset_double_f_4.html" xlink:title="h5ltmake_compressed_dataset_double_f_4">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-276 363,-276 363,-252 584,-252 584,-276"/>
+<text text-anchor="middle" x="473.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f_4</text>
+</a>
+</g>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_4 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge81" class="edge"><title>interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_4</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M297.846,-314.995C307.794,-312.499 317.748,-309.526 327,-306 344.309,-299.403 345.656,-291.504 363,-285 369.332,-282.625 375.975,-280.508 382.727,-278.621"/>
+<polygon fill="black" stroke="black" points="383.884,-281.936 392.673,-276.02 382.112,-275.164 383.884,-281.936"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node13" class="node"><title>proc~h5ltmake_compressed_dataset_double_f_5</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node13"><a xlink:href="../proc/h5ltmake_compressed_dataset_double_f_5.html" xlink:title="h5ltmake_compressed_dataset_double_f_5">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-234 363,-234 363,-210 584,-210 584,-234"/>
+<text text-anchor="middle" x="473.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f_5</text>
+</a>
+</g>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_5 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge82" class="edge"><title>interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_5</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M311.377,-314.912C316.9,-312.434 322.171,-309.491 327,-306 353.135,-287.107 336.764,-261.753 363,-243 365.136,-241.473 367.353,-240.05 369.636,-238.722"/>
+<polygon fill="black" stroke="black" points="371.432,-241.735 378.741,-234.064 368.245,-235.502 371.432,-241.735"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node14" class="node"><title>proc~h5ltmake_compressed_dataset_double_f_6</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node14"><a xlink:href="../proc/h5ltmake_compressed_dataset_double_f_6.html" xlink:title="h5ltmake_compressed_dataset_double_f_6">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-192 363,-192 363,-168 584,-168 584,-192"/>
+<text text-anchor="middle" x="473.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f_6</text>
+</a>
+</g>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_6 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge83" class="edge"><title>interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_6</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M314.375,-314.757C318.889,-312.283 323.142,-309.386 327,-306 364.078,-273.458 325.748,-233.343 363,-201 364.357,-199.822 365.759,-198.702 367.201,-197.637"/>
+<polygon fill="black" stroke="black" points="369.311,-200.443 375.871,-192.123 365.555,-194.537 369.311,-200.443"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node15" class="node"><title>proc~h5ltmake_compressed_dataset_double_f_7</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node15"><a xlink:href="../proc/h5ltmake_compressed_dataset_double_f_7.html" xlink:title="h5ltmake_compressed_dataset_double_f_7">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-444 363,-444 363,-420 584,-420 584,-444"/>
+<text text-anchor="middle" x="473.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltmake_compressed_dataset_double_f_7</text>
+</a>
+</g>
+</g>
+<!-- interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_7 -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge84" class="edge"><title>interface~h5ltmake_compressed_dataset_double_f&#45;&gt;proc~h5ltmake_compressed_dataset_double_f_7</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M239.275,-339.082C264.162,-357.524 314.687,-392.497 363,-411 369.194,-413.372 375.692,-415.485 382.301,-417.367"/>
+<polygon fill="black" stroke="black" points="381.477,-420.769 392.041,-419.96 383.278,-414.005 381.477,-420.769"/>
+</g>
+<!-- proc~bt_maxwellian_n_m -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node26" class="node"><title>proc~bt_maxwellian_n_m</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node26"><a xlink:href="../proc/bt_maxwellian_n_m.html" xlink:title="bt_maxwellian_n_m">
+<polygon fill="#d9534f" stroke="#d9534f" points="527,-150 420,-150 420,-126 527,-126 527,-150"/>
+<text text-anchor="middle" x="473.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_maxwellian_n_m</text>
+</a>
+</g>
+</g>
+<!-- interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_n_m -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge89" class="edge"><title>interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_n_m</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M262.68,-102.609C302.107,-109.259 363.529,-119.619 409.748,-127.415"/>
+<polygon fill="black" stroke="black" points="409.219,-130.875 419.662,-129.088 410.383,-123.973 409.219,-130.875"/>
+</g>
+<!-- proc~bt_maxwellian_n -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node27" class="node"><title>proc~bt_maxwellian_n</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node27"><a xlink:href="../proc/bt_maxwellian_n.html" xlink:title="bt_maxwellian_n">
+<polygon fill="#d9534f" stroke="#d9534f" points="519.5,-108 427.5,-108 427.5,-84 519.5,-84 519.5,-108"/>
+<text text-anchor="middle" x="473.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_maxwellian_n</text>
+</a>
+</g>
+</g>
+<!-- interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_n -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge90" class="edge"><title>interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_n</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M262.68,-96C304.189,-96 370.077,-96 416.937,-96"/>
+<polygon fill="black" stroke="black" points="417.224,-99.5001 427.224,-96 417.224,-92.5001 417.224,-99.5001"/>
+</g>
+<!-- proc~bt_maxwellian_q_n_m -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node28" class="node"><title>proc~bt_maxwellian_q_n_m</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node28"><a xlink:href="../proc/bt_maxwellian_q_n_m.html" xlink:title="bt_maxwellian_q_n_m">
+<polygon fill="#d9534f" stroke="#d9534f" points="533,-66 414,-66 414,-42 533,-42 533,-66"/>
+<text text-anchor="middle" x="473.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_maxwellian_q_n_m</text>
+</a>
+</g>
+</g>
+<!-- interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_q_n_m -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge91" class="edge"><title>interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_q_n_m</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M262.68,-89.3913C300.369,-83.0342 358.157,-73.2868 403.551,-65.63"/>
+<polygon fill="black" stroke="black" points="404.345,-69.0455 413.624,-63.931 403.181,-62.1431 404.345,-69.0455"/>
+</g>
+<!-- proc~bt_maxwellian_q_n -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node29" class="node"><title>proc~bt_maxwellian_q_n</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node29"><a xlink:href="../proc/bt_maxwellian_q_n.html" xlink:title="bt_maxwellian_q_n">
+<polygon fill="#d9534f" stroke="#d9534f" points="525.5,-24 421.5,-24 421.5,-0 525.5,-0 525.5,-24"/>
+<text text-anchor="middle" x="473.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_maxwellian_q_n</text>
+</a>
+</g>
+</g>
+<!-- interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_q_n -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge92" class="edge"><title>interface~bt_maxwellian&#45;&gt;proc~bt_maxwellian_q_n</title>
+<path fill="none" stroke="black" stroke-dasharray="5,2" d="M246.05,-83.8171C273.106,-69.6757 320.188,-46.5649 363,-33 378.364,-28.132 395.317,-24.2091 411.201,-21.1315"/>
+<polygon fill="black" stroke="black" points="412.262,-24.4944 421.456,-19.2297 410.986,-17.6118 412.262,-24.4944"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge3" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M570.049,-402.082C575.004,-404.592 579.702,-407.541 584,-411 615.642,-436.467 589.619,-468.041 620,-495 621.488,-496.32 623.055,-497.558 624.686,-498.717"/>
+<polygon fill="black" stroke="black" points="622.934,-501.748 633.31,-503.893 626.537,-495.746 622.934,-501.748"/>
+</g>
+<!-- h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node16" class="node"><title>h5dwrite_f</title>
+<polygon fill="#777777" stroke="#777777" points="723.5,-402 661.5,-402 661.5,-378 723.5,-378 723.5,-402"/>
+<text text-anchor="middle" x="692.5" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5dwrite_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge1" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5dwrite_f</title>
+<path fill="none" stroke="black" d="M584.271,-390C608.22,-390 632.085,-390 651.201,-390"/>
+<polygon fill="black" stroke="black" points="651.302,-393.5 661.302,-390 651.302,-386.5 651.302,-393.5"/>
+</g>
+<!-- h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node17" class="node"><title>h5sclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="724.5,-360 660.5,-360 660.5,-336 724.5,-336 724.5,-360"/>
+<text text-anchor="middle" x="692.5" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5sclose_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge2" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5sclose_f</title>
+<path fill="none" stroke="black" d="M537.334,-377.988C552.607,-375.058 568.892,-371.924 584,-369 605.94,-364.753 630.389,-359.98 650.421,-356.059"/>
+<polygon fill="black" stroke="black" points="651.317,-359.45 660.458,-354.093 649.971,-352.581 651.317,-359.45"/>
+</g>
+<!-- h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node18" class="node"><title>h5pclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="724.5,-318 660.5,-318 660.5,-294 724.5,-294 724.5,-318"/>
+<text text-anchor="middle" x="692.5" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5pclose_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge4" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pclose_f</title>
+<path fill="none" stroke="black" d="M564.479,-377.98C571.295,-375.508 577.889,-372.546 584,-369 605.264,-356.66 599.354,-340.348 620,-327 629.139,-321.091 639.992,-316.799 650.445,-313.697"/>
+<polygon fill="black" stroke="black" points="651.516,-317.034 660.277,-311.075 649.712,-310.271 651.516,-317.034"/>
+</g>
+<!-- h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node19" class="node"><title>h5dclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="724.5,-276 660.5,-276 660.5,-252 724.5,-252 724.5,-276"/>
+<text text-anchor="middle" x="692.5" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5dclose_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge5" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5dclose_f</title>
+<path fill="none" stroke="black" d="M570.049,-377.918C575.004,-375.408 579.702,-372.459 584,-369 615.642,-343.533 589.619,-311.959 620,-285 628.52,-277.439 639.637,-272.595 650.557,-269.494"/>
+<polygon fill="black" stroke="black" points="651.55,-272.855 660.45,-267.107 649.908,-266.05 651.55,-272.855"/>
+</g>
+<!-- h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node20" class="node"><title>h5screate_simple_f</title>
+<polygon fill="#777777" stroke="#777777" points="745.5,-234 639.5,-234 639.5,-210 745.5,-210 745.5,-234"/>
+<text text-anchor="middle" x="692.5" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5screate_simple_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge6" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5screate_simple_f</title>
+<path fill="none" stroke="black" d="M571.598,-377.977C576.041,-375.433 580.215,-372.463 584,-369 626.97,-329.686 578.97,-284.334 620,-243 623.025,-239.953 626.467,-237.343 630.168,-235.108"/>
+<polygon fill="black" stroke="black" points="631.85,-238.179 639.196,-230.544 628.693,-231.932 631.85,-238.179"/>
+</g>
+<!-- h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node21" class="node"><title>h5pcreate_f</title>
+<polygon fill="#777777" stroke="#777777" points="727.5,-192 657.5,-192 657.5,-168 727.5,-168 727.5,-192"/>
+<text text-anchor="middle" x="692.5" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5pcreate_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge7" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pcreate_f</title>
+<path fill="none" stroke="black" d="M572.623,-377.829C576.714,-375.309 580.541,-372.385 584,-369 638.576,-315.591 568.055,-256.971 620,-201 627.27,-193.167 637.292,-188.202 647.534,-185.071"/>
+<polygon fill="black" stroke="black" points="648.498,-188.437 657.338,-182.596 646.785,-181.65 648.498,-188.437"/>
+</g>
+<!-- h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node22" class="node"><title>h5pset_shuffle_f</title>
+<polygon fill="#777777" stroke="#777777" points="738,-150 647,-150 647,-126 738,-126 738,-150"/>
+<text text-anchor="middle" x="692.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5pset_shuffle_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge8" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pset_shuffle_f</title>
+<path fill="none" stroke="black" d="M573.28,-377.692C577.143,-375.197 580.748,-372.317 584,-369 650.297,-301.384 557.031,-229.725 620,-159 624.682,-153.741 630.605,-149.77 637.029,-146.775"/>
+<polygon fill="black" stroke="black" points="638.636,-149.907 646.714,-143.051 636.124,-143.373 638.636,-149.907"/>
+</g>
+<!-- h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node23" class="node"><title>h5pset_deflate_f</title>
+<polygon fill="#777777" stroke="#777777" points="738.5,-108 646.5,-108 646.5,-84 738.5,-84 738.5,-108"/>
+<text text-anchor="middle" x="692.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5pset_deflate_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge9" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pset_deflate_f</title>
+<path fill="none" stroke="black" d="M573.394,-377.803C577.227,-375.279 580.794,-372.362 584,-369 662.074,-287.119 545.953,-202.539 620,-117 624.551,-111.742 630.343,-107.767 636.655,-104.767"/>
+<polygon fill="black" stroke="black" points="638.153,-107.939 646.189,-101.033 635.601,-101.421 638.153,-107.939"/>
+</g>
+<!-- h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node24" class="node"><title>h5pset_chunk_f</title>
+<polygon fill="#777777" stroke="#777777" points="736.5,-486 648.5,-486 648.5,-462 736.5,-462 736.5,-486"/>
+<text text-anchor="middle" x="692.5" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5pset_chunk_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge10" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5pset_chunk_f</title>
+<path fill="none" stroke="black" d="M564.479,-402.02C571.295,-404.492 577.889,-407.454 584,-411 605.264,-423.34 599.354,-439.652 620,-453 625.694,-456.681 632.053,-459.735 638.566,-462.265"/>
+<polygon fill="black" stroke="black" points="637.564,-465.622 648.159,-465.607 639.868,-459.012 637.564,-465.622"/>
+</g>
+<!-- h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node25" class="node"><title>h5dcreate_f</title>
+<polygon fill="#777777" stroke="#777777" points="727.5,-444 657.5,-444 657.5,-420 727.5,-420 727.5,-444"/>
+<text text-anchor="middle" x="692.5" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5dcreate_f</text>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge11" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_1&#45;&gt;h5dcreate_f</title>
+<path fill="none" stroke="black" d="M537.334,-402.012C552.607,-404.942 568.892,-408.076 584,-411 604.731,-415.013 627.704,-419.496 647.072,-423.286"/>
+<polygon fill="black" stroke="black" points="646.646,-426.768 657.132,-425.255 647.991,-419.899 646.646,-426.768"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge14" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M571.598,-360.023C576.041,-362.567 580.215,-365.537 584,-369 626.97,-408.314 578.97,-453.666 620,-495 621.082,-496.09 622.218,-497.125 623.4,-498.106"/>
+<polygon fill="black" stroke="black" points="621.562,-501.089 631.793,-503.841 625.511,-495.31 621.562,-501.089"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge12" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5dwrite_f</title>
+<path fill="none" stroke="black" d="M537.334,-360.012C552.607,-362.942 568.892,-366.076 584,-369 606.36,-373.328 631.326,-378.203 651.567,-382.165"/>
+<polygon fill="black" stroke="black" points="650.9,-385.601 661.386,-384.089 652.245,-378.732 650.9,-385.601"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge13" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5sclose_f</title>
+<path fill="none" stroke="black" d="M584.271,-348C607.865,-348 631.378,-348 650.348,-348"/>
+<polygon fill="black" stroke="black" points="650.391,-351.5 660.391,-348 650.391,-344.5 650.391,-351.5"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge15" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pclose_f</title>
+<path fill="none" stroke="black" d="M537.334,-335.988C552.607,-333.058 568.892,-329.924 584,-327 605.94,-322.753 630.389,-317.98 650.421,-314.059"/>
+<polygon fill="black" stroke="black" points="651.317,-317.45 660.458,-312.093 649.971,-310.581 651.317,-317.45"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge16" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5dclose_f</title>
+<path fill="none" stroke="black" d="M564.479,-335.98C571.295,-333.508 577.889,-330.546 584,-327 605.264,-314.66 599.354,-298.348 620,-285 629.139,-279.091 639.992,-274.799 650.445,-271.697"/>
+<polygon fill="black" stroke="black" points="651.516,-275.034 660.277,-269.075 649.712,-268.271 651.516,-275.034"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge17" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5screate_simple_f</title>
+<path fill="none" stroke="black" d="M570.049,-335.918C575.004,-333.408 579.702,-330.459 584,-327 615.642,-301.533 589.619,-269.959 620,-243 623.157,-240.199 626.671,-237.77 630.399,-235.665"/>
+<polygon fill="black" stroke="black" points="631.931,-238.812 639.42,-231.317 628.892,-232.506 631.931,-238.812"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge18" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pcreate_f</title>
+<path fill="none" stroke="black" d="M571.598,-335.977C576.041,-333.433 580.215,-330.463 584,-327 626.97,-287.686 578.97,-242.334 620,-201 627.46,-193.485 637.457,-188.629 647.608,-185.5"/>
+<polygon fill="black" stroke="black" points="648.5,-188.884 657.309,-182.998 646.752,-182.106 648.5,-188.884"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge19" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pset_shuffle_f</title>
+<path fill="none" stroke="black" d="M572.623,-335.829C576.714,-333.309 580.541,-330.385 584,-327 638.576,-273.591 568.055,-214.971 620,-159 624.79,-153.839 630.774,-149.924 637.229,-146.957"/>
+<polygon fill="black" stroke="black" points="638.841,-150.088 646.938,-143.255 636.347,-143.547 638.841,-150.088"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge20" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pset_deflate_f</title>
+<path fill="none" stroke="black" d="M573.28,-335.692C577.143,-333.197 580.748,-330.317 584,-327 650.297,-259.384 557.031,-187.725 620,-117 624.624,-111.806 630.458,-107.868 636.791,-104.886"/>
+<polygon fill="black" stroke="black" points="638.293,-108.058 646.342,-101.168 635.754,-101.534 638.293,-108.058"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge21" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5pset_chunk_f</title>
+<path fill="none" stroke="black" d="M570.049,-360.082C575.004,-362.592 579.702,-365.541 584,-369 615.642,-394.467 589.619,-426.041 620,-453 625.455,-457.841 631.975,-461.568 638.827,-464.437"/>
+<polygon fill="black" stroke="black" points="637.711,-467.756 648.306,-467.842 640.078,-461.168 637.711,-467.756"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge22" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_2&#45;&gt;h5dcreate_f</title>
+<path fill="none" stroke="black" d="M564.479,-360.02C571.295,-362.492 577.889,-365.454 584,-369 605.264,-381.34 599.354,-397.652 620,-411 628.306,-416.37 638.026,-420.405 647.577,-423.424"/>
+<polygon fill="black" stroke="black" points="646.825,-426.849 657.401,-426.216 648.739,-420.116 646.825,-426.849"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge25" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M572.623,-318.171C576.714,-320.691 580.541,-323.615 584,-327 638.576,-380.409 568.055,-439.029 620,-495 620.916,-495.987 621.875,-496.928 622.873,-497.826"/>
+<polygon fill="black" stroke="black" points="621.055,-500.832 631.198,-503.892 625.178,-495.174 621.055,-500.832"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge23" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5dwrite_f</title>
+<path fill="none" stroke="black" d="M564.479,-318.02C571.295,-320.492 577.889,-323.454 584,-327 605.264,-339.34 599.354,-355.652 620,-369 629.483,-375.131 640.811,-379.522 651.623,-382.648"/>
+<polygon fill="black" stroke="black" points="650.781,-386.045 661.341,-385.175 652.544,-379.27 650.781,-386.045"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge24" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5sclose_f</title>
+<path fill="none" stroke="black" d="M537.334,-318.012C552.607,-320.942 568.892,-324.076 584,-327 605.94,-331.247 630.389,-336.02 650.421,-339.941"/>
+<polygon fill="black" stroke="black" points="649.971,-343.419 660.458,-341.907 651.317,-336.55 649.971,-343.419"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge26" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pclose_f</title>
+<path fill="none" stroke="black" d="M584.271,-306C607.865,-306 631.378,-306 650.348,-306"/>
+<polygon fill="black" stroke="black" points="650.391,-309.5 660.391,-306 650.391,-302.5 650.391,-309.5"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge27" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5dclose_f</title>
+<path fill="none" stroke="black" d="M537.334,-293.988C552.607,-291.058 568.892,-287.924 584,-285 605.94,-280.753 630.389,-275.98 650.421,-272.059"/>
+<polygon fill="black" stroke="black" points="651.317,-275.45 660.458,-270.093 649.971,-268.581 651.317,-275.45"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge28" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5screate_simple_f</title>
+<path fill="none" stroke="black" d="M564.479,-293.98C571.295,-291.508 577.889,-288.546 584,-285 605.264,-272.66 599.354,-256.348 620,-243 623.117,-240.985 626.433,-239.158 629.865,-237.502"/>
+<polygon fill="black" stroke="black" points="631.355,-240.671 639.161,-233.506 628.591,-234.24 631.355,-240.671"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge29" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pcreate_f</title>
+<path fill="none" stroke="black" d="M570.049,-293.918C575.004,-291.408 579.702,-288.459 584,-285 615.642,-259.533 589.619,-227.959 620,-201 627.693,-194.173 637.504,-189.561 647.374,-186.447"/>
+<polygon fill="black" stroke="black" points="648.442,-189.784 657.189,-183.805 646.623,-183.025 648.442,-189.784"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge30" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pset_shuffle_f</title>
+<path fill="none" stroke="black" d="M571.598,-293.977C576.041,-291.433 580.215,-288.463 584,-285 626.97,-245.686 578.97,-200.334 620,-159 624.899,-154.065 630.893,-150.276 637.306,-147.37"/>
+<polygon fill="black" stroke="black" points="638.819,-150.539 646.922,-143.714 636.331,-143.996 638.819,-150.539"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge31" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pset_deflate_f</title>
+<path fill="none" stroke="black" d="M572.623,-293.829C576.714,-291.309 580.541,-288.385 584,-285 638.576,-231.591 568.055,-172.971 620,-117 624.671,-111.967 630.479,-108.118 636.752,-105.178"/>
+<polygon fill="black" stroke="black" points="638.153,-108.389 646.195,-101.491 635.607,-101.868 638.153,-108.389"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge32" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5pset_chunk_f</title>
+<path fill="none" stroke="black" d="M571.598,-318.023C576.041,-320.567 580.215,-323.537 584,-327 626.97,-366.314 578.97,-411.666 620,-453 625.264,-458.303 631.791,-462.281 638.744,-465.264"/>
+<polygon fill="black" stroke="black" points="637.816,-468.65 648.411,-468.744 640.188,-462.064 637.816,-468.65"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge33" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_3&#45;&gt;h5dcreate_f</title>
+<path fill="none" stroke="black" d="M570.049,-318.082C575.004,-320.592 579.702,-323.541 584,-327 615.642,-352.467 589.619,-384.041 620,-411 627.693,-417.827 637.504,-422.439 647.374,-425.553"/>
+<polygon fill="black" stroke="black" points="646.623,-428.975 657.189,-428.195 648.442,-422.216 646.623,-428.975"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge36" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M573.28,-276.308C577.143,-278.803 580.748,-281.683 584,-285 650.297,-352.616 557.031,-424.275 620,-495 620.774,-495.87 621.582,-496.704 622.421,-497.505"/>
+<polygon fill="black" stroke="black" points="620.635,-500.545 630.706,-503.836 624.886,-494.983 620.635,-500.545"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge34" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5dwrite_f</title>
+<path fill="none" stroke="black" d="M570.049,-276.082C575.004,-278.592 579.702,-281.541 584,-285 615.642,-310.467 589.619,-342.041 620,-369 628.668,-376.692 640.025,-381.572 651.127,-384.667"/>
+<polygon fill="black" stroke="black" points="650.63,-388.145 661.167,-387.036 652.238,-381.332 650.63,-388.145"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge35" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5sclose_f</title>
+<path fill="none" stroke="black" d="M564.479,-276.02C571.295,-278.492 577.889,-281.454 584,-285 605.264,-297.34 599.354,-313.652 620,-327 629.139,-332.909 639.992,-337.201 650.445,-340.303"/>
+<polygon fill="black" stroke="black" points="649.712,-343.729 660.277,-342.925 651.516,-336.966 649.712,-343.729"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge37" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pclose_f</title>
+<path fill="none" stroke="black" d="M537.334,-276.012C552.607,-278.942 568.892,-282.076 584,-285 605.94,-289.247 630.389,-294.02 650.421,-297.941"/>
+<polygon fill="black" stroke="black" points="649.971,-301.419 660.458,-299.907 651.317,-294.55 649.971,-301.419"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge38" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5dclose_f</title>
+<path fill="none" stroke="black" d="M584.271,-264C607.865,-264 631.378,-264 650.348,-264"/>
+<polygon fill="black" stroke="black" points="650.391,-267.5 660.391,-264 650.391,-260.5 650.391,-267.5"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge39" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5screate_simple_f</title>
+<path fill="none" stroke="black" d="M537.334,-251.988C552.607,-249.058 568.892,-245.924 584,-243 598.638,-240.167 614.393,-237.099 629.209,-234.206"/>
+<polygon fill="black" stroke="black" points="630.147,-237.589 639.29,-232.237 628.804,-230.719 630.147,-237.589"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge40" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pcreate_f</title>
+<path fill="none" stroke="black" d="M564.479,-251.98C571.295,-249.508 577.889,-246.546 584,-243 605.264,-230.66 599.354,-214.348 620,-201 628.306,-195.63 638.026,-191.595 647.577,-188.576"/>
+<polygon fill="black" stroke="black" points="648.739,-191.884 657.401,-185.784 646.825,-185.151 648.739,-191.884"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge41" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pset_shuffle_f</title>
+<path fill="none" stroke="black" d="M570.049,-251.918C575.004,-249.408 579.702,-246.459 584,-243 615.642,-217.533 589.619,-185.959 620,-159 625.071,-154.5 631.063,-150.962 637.385,-148.181"/>
+<polygon fill="black" stroke="black" points="638.694,-151.428 646.816,-144.625 636.224,-144.879 638.694,-151.428"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge42" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pset_deflate_f</title>
+<path fill="none" stroke="black" d="M571.598,-251.977C576.041,-249.433 580.215,-246.463 584,-243 626.97,-203.686 578.97,-158.334 620,-117 624.777,-112.188 630.594,-108.466 636.825,-105.59"/>
+<polygon fill="black" stroke="black" points="638.128,-108.839 646.179,-101.952 635.591,-102.315 638.128,-108.839"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge43" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5pset_chunk_f</title>
+<path fill="none" stroke="black" d="M572.623,-276.171C576.714,-278.691 580.541,-281.615 584,-285 638.576,-338.409 568.055,-397.029 620,-453 625.143,-458.542 631.664,-462.647 638.665,-465.684"/>
+<polygon fill="black" stroke="black" points="637.832,-469.104 648.426,-469.197 640.202,-462.518 637.832,-469.104"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge44" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_4&#45;&gt;h5dcreate_f</title>
+<path fill="none" stroke="black" d="M571.598,-276.023C576.041,-278.567 580.215,-281.537 584,-285 626.97,-324.314 578.97,-369.666 620,-411 627.46,-418.515 637.457,-423.371 647.608,-426.5"/>
+<polygon fill="black" stroke="black" points="646.752,-429.894 657.309,-429.002 648.5,-423.116 646.752,-429.894"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge47" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M573.394,-234.197C577.227,-236.721 580.794,-239.638 584,-243 662.074,-324.881 545.953,-409.461 620,-495 620.762,-495.88 621.559,-496.725 622.387,-497.535"/>
+<polygon fill="black" stroke="black" points="620.558,-500.546 630.598,-503.931 624.86,-495.024 620.558,-500.546"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge45" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5dwrite_f</title>
+<path fill="none" stroke="black" d="M571.598,-234.023C576.041,-236.567 580.215,-239.537 584,-243 626.97,-282.314 578.97,-327.666 620,-369 628.389,-377.451 639.988,-382.54 651.404,-385.591"/>
+<polygon fill="black" stroke="black" points="650.784,-389.039 661.304,-387.782 652.297,-382.204 650.784,-389.039"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge46" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5sclose_f</title>
+<path fill="none" stroke="black" d="M570.049,-234.082C575.004,-236.592 579.702,-239.541 584,-243 615.642,-268.467 589.619,-300.041 620,-327 628.52,-334.561 639.637,-339.405 650.557,-342.506"/>
+<polygon fill="black" stroke="black" points="649.908,-345.95 660.45,-344.893 651.55,-339.145 649.908,-345.95"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge48" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pclose_f</title>
+<path fill="none" stroke="black" d="M564.479,-234.02C571.295,-236.492 577.889,-239.454 584,-243 605.264,-255.34 599.354,-271.652 620,-285 629.139,-290.909 639.992,-295.201 650.445,-298.303"/>
+<polygon fill="black" stroke="black" points="649.712,-301.729 660.277,-300.925 651.516,-294.966 649.712,-301.729"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge49" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5dclose_f</title>
+<path fill="none" stroke="black" d="M537.334,-234.012C552.607,-236.942 568.892,-240.076 584,-243 605.94,-247.247 630.389,-252.02 650.421,-255.941"/>
+<polygon fill="black" stroke="black" points="649.971,-259.419 660.458,-257.907 651.317,-252.55 649.971,-259.419"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge50" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5screate_simple_f</title>
+<path fill="none" stroke="black" d="M584.271,-222C599.752,-222 615.197,-222 629.348,-222"/>
+<polygon fill="black" stroke="black" points="629.405,-225.5 639.404,-222 629.404,-218.5 629.405,-225.5"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge51" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pcreate_f</title>
+<path fill="none" stroke="black" d="M537.334,-209.988C552.607,-207.058 568.892,-203.924 584,-201 604.731,-196.987 627.704,-192.504 647.072,-188.714"/>
+<polygon fill="black" stroke="black" points="647.991,-192.101 657.132,-186.745 646.646,-185.232 647.991,-192.101"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge52" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pset_shuffle_f</title>
+<path fill="none" stroke="black" d="M564.479,-209.98C571.295,-207.508 577.889,-204.546 584,-201 605.264,-188.66 599.354,-172.348 620,-159 625.276,-155.589 631.123,-152.716 637.135,-150.301"/>
+<polygon fill="black" stroke="black" points="638.438,-153.551 646.66,-146.869 636.065,-146.966 638.438,-153.551"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge53" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pset_deflate_f</title>
+<path fill="none" stroke="black" d="M570.049,-209.918C575.004,-207.408 579.702,-204.459 584,-201 615.642,-175.533 589.619,-143.959 620,-117 624.89,-112.661 630.635,-109.217 636.708,-106.483"/>
+<polygon fill="black" stroke="black" points="638.362,-109.597 646.443,-102.745 635.853,-103.062 638.362,-109.597"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge54" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5pset_chunk_f</title>
+<path fill="none" stroke="black" d="M573.28,-234.308C577.143,-236.803 580.748,-239.683 584,-243 650.297,-310.616 557.031,-382.275 620,-453 625.027,-458.647 631.485,-462.81 638.459,-465.872"/>
+<polygon fill="black" stroke="black" points="637.607,-469.286 648.201,-469.402 639.992,-462.705 637.607,-469.286"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge55" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_5&#45;&gt;h5dcreate_f</title>
+<path fill="none" stroke="black" d="M572.623,-234.171C576.714,-236.691 580.541,-239.615 584,-243 638.576,-296.409 568.055,-355.029 620,-411 627.27,-418.833 637.292,-423.798 647.534,-426.929"/>
+<polygon fill="black" stroke="black" points="646.785,-430.35 657.338,-429.404 648.498,-423.563 646.785,-430.35"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge58" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M573.478,-192.118C577.288,-194.664 580.828,-197.606 584,-201 673.885,-297.18 534.843,-394.61 620,-495 620.753,-495.888 621.542,-496.739 622.362,-497.556"/>
+<polygon fill="black" stroke="black" points="620.502,-500.547 630.519,-503.998 624.841,-495.054 620.502,-500.547"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge56" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5dwrite_f</title>
+<path fill="none" stroke="black" d="M572.623,-192.171C576.714,-194.691 580.541,-197.615 584,-201 638.576,-254.409 568.055,-313.029 620,-369 628.168,-377.801 639.812,-382.981 651.337,-386.008"/>
+<polygon fill="black" stroke="black" points="650.833,-389.48 661.345,-388.152 652.299,-382.635 650.833,-389.48"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge57" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5sclose_f</title>
+<path fill="none" stroke="black" d="M571.598,-192.023C576.041,-194.567 580.215,-197.537 584,-201 626.97,-240.314 578.97,-285.666 620,-327 628.095,-335.155 639.178,-340.179 650.203,-343.263"/>
+<polygon fill="black" stroke="black" points="649.692,-346.737 660.223,-345.584 651.271,-339.918 649.692,-346.737"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge59" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pclose_f</title>
+<path fill="none" stroke="black" d="M570.049,-192.082C575.004,-194.592 579.702,-197.541 584,-201 615.642,-226.467 589.619,-258.041 620,-285 628.52,-292.561 639.637,-297.405 650.557,-300.506"/>
+<polygon fill="black" stroke="black" points="649.908,-303.95 660.45,-302.893 651.55,-297.145 649.908,-303.95"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge60" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5dclose_f</title>
+<path fill="none" stroke="black" d="M564.479,-192.02C571.295,-194.492 577.889,-197.454 584,-201 605.264,-213.34 599.354,-229.652 620,-243 629.139,-248.909 639.992,-253.201 650.445,-256.303"/>
+<polygon fill="black" stroke="black" points="649.712,-259.729 660.277,-258.925 651.516,-252.966 649.712,-259.729"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge61" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5screate_simple_f</title>
+<path fill="none" stroke="black" d="M537.334,-192.012C552.607,-194.942 568.892,-198.076 584,-201 598.638,-203.833 614.393,-206.901 629.209,-209.794"/>
+<polygon fill="black" stroke="black" points="628.804,-213.281 639.29,-211.763 630.147,-206.411 628.804,-213.281"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge62" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pcreate_f</title>
+<path fill="none" stroke="black" d="M584.271,-180C606.52,-180 628.697,-180 647.06,-180"/>
+<polygon fill="black" stroke="black" points="647.123,-183.5 657.123,-180 647.123,-176.5 647.123,-183.5"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge63" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pset_shuffle_f</title>
+<path fill="none" stroke="black" d="M537.334,-167.988C552.607,-165.058 568.892,-161.924 584,-159 601.084,-155.693 619.69,-152.067 636.547,-148.773"/>
+<polygon fill="black" stroke="black" points="637.646,-152.124 646.788,-146.77 636.302,-145.254 637.646,-152.124"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge64" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pset_deflate_f</title>
+<path fill="none" stroke="black" d="M564.479,-167.98C571.295,-165.508 577.889,-162.546 584,-159 605.264,-146.66 599.354,-130.348 620,-117 625.081,-113.715 630.692,-110.93 636.469,-108.571"/>
+<polygon fill="black" stroke="black" points="638.089,-111.705 646.285,-104.99 635.691,-105.129 638.089,-111.705"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge65" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5pset_chunk_f</title>
+<path fill="none" stroke="black" d="M573.394,-192.197C577.227,-194.721 580.794,-197.638 584,-201 662.074,-282.881 545.953,-367.461 620,-453 625.006,-458.783 631.514,-463.016 638.563,-466.104"/>
+<polygon fill="black" stroke="black" points="637.825,-469.558 648.419,-469.646 640.192,-462.971 637.825,-469.558"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge66" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_6&#45;&gt;h5dcreate_f</title>
+<path fill="none" stroke="black" d="M573.28,-192.308C577.143,-194.803 580.748,-197.683 584,-201 650.297,-268.616 557.031,-340.275 620,-411 627.171,-419.055 637.254,-424.091 647.591,-427.219"/>
+<polygon fill="black" stroke="black" points="646.945,-430.665 657.493,-429.671 648.627,-423.87 646.945,-430.665"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5ltmake_dataset_double_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge69" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5ltmake_dataset_double_f</title>
+<path fill="none" stroke="black" d="M550.267,-444.036C561.99,-447.563 573.634,-452.118 584,-458 603.955,-469.323 600.349,-483.157 620,-495 622.971,-496.791 626.104,-498.436 629.332,-499.948"/>
+<polygon fill="black" stroke="black" points="628.054,-503.207 638.628,-503.863 630.771,-496.756 628.054,-503.207"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5dwrite_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge67" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5dwrite_f</title>
+<path fill="none" stroke="black" d="M537.334,-419.988C552.607,-417.058 568.892,-413.924 584,-411 606.36,-406.672 631.326,-401.797 651.567,-397.835"/>
+<polygon fill="black" stroke="black" points="652.245,-401.268 661.386,-395.911 650.9,-394.399 652.245,-401.268"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5sclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge68" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5sclose_f</title>
+<path fill="none" stroke="black" d="M564.479,-419.98C571.295,-417.508 577.889,-414.546 584,-411 605.264,-398.66 599.354,-382.348 620,-369 629.139,-363.091 639.992,-358.799 650.445,-355.697"/>
+<polygon fill="black" stroke="black" points="651.516,-359.034 660.277,-353.075 649.712,-352.271 651.516,-359.034"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge70" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pclose_f</title>
+<path fill="none" stroke="black" d="M570.049,-419.918C575.004,-417.408 579.702,-414.459 584,-411 615.642,-385.533 589.619,-353.959 620,-327 628.52,-319.439 639.637,-314.595 650.557,-311.494"/>
+<polygon fill="black" stroke="black" points="651.55,-314.855 660.45,-309.107 649.908,-308.05 651.55,-314.855"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5dclose_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge71" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5dclose_f</title>
+<path fill="none" stroke="black" d="M571.598,-419.977C576.041,-417.433 580.215,-414.463 584,-411 626.97,-371.686 578.97,-326.334 620,-285 628.095,-276.845 639.178,-271.821 650.203,-268.737"/>
+<polygon fill="black" stroke="black" points="651.271,-272.082 660.223,-266.416 649.692,-265.263 651.271,-272.082"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5screate_simple_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge72" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5screate_simple_f</title>
+<path fill="none" stroke="black" d="M572.623,-419.829C576.714,-417.309 580.541,-414.385 584,-411 638.576,-357.591 568.055,-298.971 620,-243 622.97,-239.8 626.4,-237.078 630.117,-234.765"/>
+<polygon fill="black" stroke="black" points="631.939,-237.763 639.228,-230.074 628.735,-231.539 631.939,-237.763"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge73" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pcreate_f</title>
+<path fill="none" stroke="black" d="M573.28,-419.692C577.143,-417.197 580.748,-414.317 584,-411 650.297,-343.384 557.031,-271.725 620,-201 627.171,-192.945 637.254,-187.909 647.591,-184.781"/>
+<polygon fill="black" stroke="black" points="648.627,-188.13 657.493,-182.329 646.945,-181.335 648.627,-188.13"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pset_shuffle_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge74" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pset_shuffle_f</title>
+<path fill="none" stroke="black" d="M573.394,-419.803C577.227,-417.279 580.794,-414.362 584,-411 662.074,-329.119 545.953,-244.539 620,-159 624.665,-153.611 630.634,-149.569 637.129,-146.543"/>
+<polygon fill="black" stroke="black" points="638.838,-149.637 646.931,-142.8 636.34,-143.098 638.838,-149.637"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pset_deflate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge75" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pset_deflate_f</title>
+<path fill="none" stroke="black" d="M573.478,-419.882C577.288,-417.336 580.828,-414.394 584,-411 673.885,-314.82 534.843,-217.39 620,-117 624.555,-111.631 630.404,-107.595 636.792,-104.569"/>
+<polygon fill="black" stroke="black" points="638.393,-107.702 646.448,-100.82 635.859,-101.177 638.393,-107.702"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pset_chunk_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge76" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5pset_chunk_f</title>
+<path fill="none" stroke="black" d="M536.683,-444.036C568.752,-450.242 607.466,-457.735 638.158,-463.676"/>
+<polygon fill="black" stroke="black" points="637.754,-467.163 648.237,-465.627 639.085,-460.29 637.754,-467.163"/>
+</g>
+<!-- proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5dcreate_f -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge77" class="edge"><title>proc~h5ltmake_compressed_dataset_double_f_7&#45;&gt;h5dcreate_f</title>
+<path fill="none" stroke="black" d="M584.271,-432C606.52,-432 628.697,-432 647.06,-432"/>
+<polygon fill="black" stroke="black" points="647.123,-435.5 657.123,-432 647.123,-428.5 647.123,-435.5"/>
+</g>
+<!-- proc~simpsons_rule -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_node30" class="node"><title>proc~simpsons_rule</title>
+<g id="a_proc~~write_bt_h_aq~~CallsGraph_node30"><a xlink:href="../proc/simpsons_rule.html" xlink:title="simpsons_rule">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="733.5,-66 651.5,-66 651.5,-42 733.5,-42 733.5,-66"/>
+<text text-anchor="middle" x="692.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">simpsons_rule</text>
+</a>
+</g>
+</g>
+<!-- proc~bt_maxwellian_n_m&#45;&gt;proc~simpsons_rule -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge85" class="edge"><title>proc~bt_maxwellian_n_m&#45;&gt;proc~simpsons_rule</title>
+<path fill="none" stroke="black" d="M527.163,-135.103C546.071,-132.257 566.923,-126.91 584,-117 605.264,-104.66 599.354,-88.3482 620,-75 626.57,-70.7526 634.025,-67.34 641.581,-64.6049"/>
+<polygon fill="black" stroke="black" points="642.721,-67.9146 651.147,-61.4909 640.554,-61.2584 642.721,-67.9146"/>
+</g>
+<!-- proc~bt_maxwellian_n&#45;&gt;proc~simpsons_rule -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge86" class="edge"><title>proc~bt_maxwellian_n&#45;&gt;proc~simpsons_rule</title>
+<path fill="none" stroke="black" d="M519.524,-87.4013C539.307,-83.614 562.81,-79.1015 584,-75 602.737,-71.3732 623.305,-67.3625 641.388,-63.8264"/>
+<polygon fill="black" stroke="black" points="642.291,-67.2162 651.432,-61.8611 640.946,-60.3465 642.291,-67.2162"/>
+</g>
+<!-- proc~bt_maxwellian_q_n_m&#45;&gt;proc~simpsons_rule -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge87" class="edge"><title>proc~bt_maxwellian_q_n_m&#45;&gt;proc~simpsons_rule</title>
+<path fill="none" stroke="black" d="M533.223,-54C566.975,-54 608.931,-54 641.165,-54"/>
+<polygon fill="black" stroke="black" points="641.266,-57.5001 651.266,-54 641.266,-50.5001 641.266,-57.5001"/>
+</g>
+<!-- proc~bt_maxwellian_q_n&#45;&gt;proc~simpsons_rule -->
+<g id="proc~~write_bt_h_aq~~CallsGraph_edge88" class="edge"><title>proc~bt_maxwellian_q_n&#45;&gt;proc~simpsons_rule</title>
+<path fill="none" stroke="black" d="M525.757,-21.7924C544.13,-25.3125 564.996,-29.3215 584,-33 602.737,-36.6268 623.305,-40.6375 641.388,-44.1736"/>
+<polygon fill="black" stroke="black" points="640.946,-47.6535 651.432,-46.1389 642.291,-40.7838 640.946,-47.6535"/>
+</g>
+</g>
+</svg>
+</div>
+                <script>var panprocwrite_bt_h_aqCallsGraph = svgPanZoom('#procwrite_bt_h_aqCallsGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+Nodes of different colours represent the following:
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="26pt"
+ viewBox="0.00 0.00 641.00 25.98" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.811906 0.811906) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 785.5,-28 785.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.5,-24 72.5,-24 72.5,-0 139.5,-0 139.5,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Type -->
+<g id="node3" class="node"><title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="212,-24 158,-24 158,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="185" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- Subroutine -->
+<g id="node4" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="294,-24 230,-24 230,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="262" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node5" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node6" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="439.5,-24 384.5,-24 384.5,-0 439.5,-0 439.5,-24"/>
+<text text-anchor="middle" x="412" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node7" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="594,-24 458,-24 458,-0 594,-0 594,-24"/>
+<text text-anchor="middle" x="526" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node8" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="666,-24 612,-24 612,-0 666,-0 666,-24"/>
+<text text-anchor="middle" x="639" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node9" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="781.5,-24 684.5,-24 684.5,-0 781.5,-0 781.5,-24"/>
+<text text-anchor="middle" x="733" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<h5>Module Graph</h5>
+<p>Solid arrows point from a parent (sub)module to the submodule which is
+descended from it. Dashed arrows point from a module being used to the
+module using it.</p>
+<h5>Type Graph</h5>
+<p>Solid arrows point from one derived type to another which extends
+(inherits from) it. Dashed arrows point from a derived type to another
+type containing it as a components, with a label listing the name(s) of
+said component(s).</p>
+<h5>Call Graph</h5>
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.</p>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
+     
+     <h3>Called By</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: proc~~write_bt_h_aq~~CalledByGraph Pages: 1 -->
+<svg id="procwrite_bt_h_aqCalledByGraph" width="216pt" height="32pt"
+ viewBox="0.00 0.00 216.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~write_bt_h_aq~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~write_bt_h_aq~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 212,-28 212,4 -4,4"/>
+<!-- proc~write_bt_h_aq -->
+<g id="proc~~write_bt_h_aq~~CalledByGraph_node1" class="node"><title>proc~write_bt_h_aq</title>
+<polygon fill="none" stroke="black" points="208,-24 126,-24 126,-0 208,-0 208,-24"/>
+<text text-anchor="middle" x="167" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">write_bt_H_Aq</text>
+</g>
+<!-- program~generate_tables -->
+<g id="proc~~write_bt_h_aq~~CalledByGraph_node2" class="node"><title>program~generate_tables</title>
+<g id="a_proc~~write_bt_h_aq~~CalledByGraph_node2"><a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-24 0,-24 0,-0 90,-0 90,-24"/>
+<text text-anchor="middle" x="45" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+</a>
+</g>
+</g>
+<!-- program~generate_tables&#45;&gt;proc~write_bt_h_aq -->
+<g id="proc~~write_bt_h_aq~~CalledByGraph_edge1" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bt_h_aq</title>
+<path fill="none" stroke="black" d="M90.0022,-12C98.3719,-12 107.19,-12 115.736,-12"/>
+<polygon fill="black" stroke="black" points="115.979,-15.5001 125.979,-12 115.979,-8.5001 115.979,-15.5001"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+Nodes of different colours represent the following:
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.38.0 (20140413.2041)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="641pt" height="26pt"
+ viewBox="0.00 0.00 641.00 25.98" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(0.811906 0.811906) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 785.5,-28 785.5,4 -4,4"/>
+<!-- Module -->
+<g id="node1" class="node"><title>Module</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+</g>
+<!-- Submodule -->
+<g id="node2" class="node"><title>Submodule</title>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.5,-24 72.5,-24 72.5,-0 139.5,-0 139.5,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+</g>
+<!-- Type -->
+<g id="node3" class="node"><title>Type</title>
+<polygon fill="#5cb85c" stroke="#5cb85c" points="212,-24 158,-24 158,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="185" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Type</text>
+</g>
+<!-- Subroutine -->
+<g id="node4" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="294,-24 230,-24 230,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="262" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node5" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node6" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="439.5,-24 384.5,-24 384.5,-0 439.5,-0 439.5,-24"/>
+<text text-anchor="middle" x="412" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node7" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="594,-24 458,-24 458,-0 594,-0 594,-24"/>
+<text text-anchor="middle" x="526" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node8" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="666,-24 612,-24 612,-0 666,-0 666,-24"/>
+<text text-anchor="middle" x="639" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node9" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="781.5,-24 684.5,-24 684.5,-0 781.5,-0 781.5,-24"/>
+<text text-anchor="middle" x="733" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+<h5>Module Graph</h5>
+<p>Solid arrows point from a parent (sub)module to the submodule which is
+descended from it. Dashed arrows point from a module being used to the
+module using it.</p>
+<h5>Type Graph</h5>
+<p>Solid arrows point from one derived type to another which extends
+(inherits from) it. Dashed arrows point from a derived type to another
+type containing it as a components, with a label listing the name(s) of
+said component(s).</p>
+<h5>Call Graph</h5>
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.</p>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
+    <br>
+    
+    <section>
+    <h2>Variables</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-q%7E40"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>q</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-mass"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>mass</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-emin%7E9"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>emin</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-emax%7E9"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>emax</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nenergy%7E9"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nenergy</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tmin%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>tmin</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tmax%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>tmax</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ntemp%7E4"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ntemp</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-eb%7E105"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>eb</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dloge%7E10"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dlogE</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ebarr%7E11"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>ebarr</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ti%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ti</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dlogt%7E5"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dlogT</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tarr%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>tarr</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioniz%7E6"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>ioniz</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-cx%7E5"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>cx</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-excit%7E6"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>excit</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-gid%7E14"></span>integer(kind=HID_T),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>gid</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dim1%7E8"></span>integer(kind=HSIZE_T),</td>
+  
+  <td>public,</td>
+  <td>dimension(1)</td><td>::</td>
+  <td><strong>dim1</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dim2%7E13"></span>integer(kind=HSIZE_T),</td>
+  
+  <td>public,</td>
+  <td>dimension(2)</td><td>::</td>
+  <td><strong>dim2</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dim3%7E8"></span>integer(kind=HSIZE_T),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>dim3</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dim4%7E6"></span>integer(kind=HSIZE_T),</td>
+  
+  <td>public,</td>
+  <td>dimension(4)</td><td>::</td>
+  <td><strong>dim4</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dim5%7E5"></span>integer(kind=HSIZE_T),</td>
+  
+  <td>public,</td>
+  <td>dimension(5)</td><td>::</td>
+  <td><strong>dim5</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ie%7E4"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ie</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-it%7E3"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>it</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ia%7E3"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ia</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-n%7E62"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>n</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-m%7E28"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>m</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-error%7E44"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>error</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-cnt%7E15"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>cnt</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rate%7E7"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rate</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-n_bt_amu%7E4"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>n_bt_amu</strong></td><td> =</td><td>2</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-a%7E27"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(2,n_bt_amu)</td><td>::</td>
+  <td><strong>a</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-aname%7E2"></span>character(len=10),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>aname</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-asym%7E2"></span>character(len=5),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>asym</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-exis%7E8"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>exis</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span class="k">subroutine </span><span class="n">write_bt_H_Aq</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+    <span class="c">!+ Write Hydrogen-Impurity reaction rates to a HDF5 file</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">id</span>
+        <span class="c">!+ HDF5 file or group object id</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">namelist_file</span>
+        <span class="c">!+ Namelist file that contains settings</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">n_max</span>
+        <span class="c">!+ Number of initial atomic energy states to calculate</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">m_max</span>
+        <span class="c">!+ Number of final atomic energy states to calculate</span>
+
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">q</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">mass</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emax</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nenergy</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tmin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tmax</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ntemp</span>
+  
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlogE</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">ebarr</span>
+  
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ti</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlogT</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">tarr</span>
+  
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">ioniz</span><span class="p">,</span> <span class="n">cx</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">excit</span>
+  
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gid</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim1</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim2</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim3</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim4</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim5</span>
+  
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ie</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">ia</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">cnt</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rate</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n_bt_amu</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
+  
+    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="kd">::</span> <span class="n">aname</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="kd">::</span> <span class="n">asym</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">exis</span>
+
+    <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">H_Aq_rates</span><span class="o">/</span> <span class="n">q</span><span class="p">,</span> <span class="n">mass</span><span class="p">,</span> <span class="n">nenergy</span><span class="p">,</span> <span class="n">emin</span><span class="p">,</span> <span class="n">emax</span><span class="p">,</span> <span class="n">ntemp</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span>
+
+    <span class="n">q</span> <span class="o">=</span> <span class="mi">6</span> <span class="p">;</span> <span class="n">mass</span> <span class="o">=</span> <span class="n">C_amu</span>
+    <span class="n">nenergy</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">emin</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">3</span> <span class="p">;</span> <span class="n">emax</span> <span class="o">=</span> <span class="mf">4.</span><span class="n">d2</span>
+    <span class="n">ntemp</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">tmin</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">3</span> <span class="p">;</span> <span class="n">tmax</span> <span class="o">=</span> <span class="mf">2.</span><span class="n">d1</span>
+    <span class="k">inquire</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">,</span><span class="n">exist</span><span class="o">=</span><span class="n">exis</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">exis</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;WRITE_BT_H_Aq: Input file does not exist: &#39;</span><span class="p">,</span><span class="nb">trim</span><span class="p">(</span><span class="n">namelist_file</span><span class="p">)</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;Continuing with default settings...&#39;</span>
+    <span class="k">else</span>
+<span class="k">        open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">)</span>
+        <span class="k">read</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="n">NML</span><span class="o">=</span><span class="n">H_Aq_rates</span><span class="p">)</span>
+        <span class="k">close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="k">allocate</span><span class="p">(</span><span class="n">ebarr</span><span class="p">(</span><span class="n">nenergy</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">tarr</span><span class="p">(</span><span class="n">ntemp</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">ioniz</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="n">nenergy</span><span class="p">,</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">cx</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="n">nenergy</span><span class="p">,</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">excit</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="n">m_max</span><span class="p">,</span><span class="n">nenergy</span><span class="p">,</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">))</span>
+  
+  
+    <span class="k">select case</span> <span class="p">(</span><span class="n">q</span><span class="p">)</span>
+      <span class="k">case</span> <span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+          <span class="n">aname</span> <span class="o">=</span> <span class="s2">&quot;Boron&quot;</span>
+          <span class="n">asym</span> <span class="o">=</span> <span class="s2">&quot;H_B5&quot;</span>
+      <span class="k">case</span> <span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+          <span class="n">aname</span> <span class="o">=</span> <span class="s2">&quot;Carbon&quot;</span>
+          <span class="n">asym</span> <span class="o">=</span> <span class="s2">&quot;H_C6&quot;</span>
+      <span class="k">case </span><span class="n">DEFAULT</span>
+          <span class="n">aname</span> <span class="o">=</span> <span class="s2">&quot;Impurity&quot;</span>
+          <span class="n">asym</span> <span class="o">=</span> <span class="s2">&quot;H_Aq&quot;</span>
+    <span class="k">end select</span>
+<span class="k">  </span>
+<span class="k">    </span><span class="n">ebarr</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">ioniz</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">cx</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">excit</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">a</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">H1_amu</span><span class="p">,</span> <span class="n">mass</span><span class="p">]</span>
+    <span class="n">a</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">H2_amu</span><span class="p">,</span> <span class="n">mass</span><span class="p">]</span>
+     
+    <span class="n">dlogE</span> <span class="o">=</span> <span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">emax</span><span class="p">)</span> <span class="o">-</span> <span class="n">log10</span><span class="p">(</span><span class="n">emin</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">nenergy</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">do </span><span class="n">ie</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nenergy</span>
+        <span class="n">ebarr</span><span class="p">(</span><span class="n">ie</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span><span class="o">**</span><span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">emin</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">ie</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dlogE</span><span class="p">)</span>
+    <span class="n">enddo</span>
+  
+    <span class="n">dlogT</span> <span class="o">=</span> <span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">tmax</span><span class="p">)</span> <span class="o">-</span> <span class="n">log10</span><span class="p">(</span><span class="n">tmin</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">ntemp</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">do </span><span class="n">it</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntemp</span>
+        <span class="n">tarr</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span><span class="o">**</span><span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">tmin</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">it</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dlogT</span><span class="p">)</span>
+    <span class="n">enddo</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- H-&quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">aname</span><span class="p">))</span><span class="o">//</span><span class="s2">&quot; reaction rates settings ----&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;q = &quot;, i2)&#39;</span><span class="p">),</span> <span class="n">q</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;mass = &quot;,f7.2, &quot; amu&quot;)&#39;</span><span class="p">)</span> <span class="n">mass</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Emin = &quot;,e9.2, &quot; keV&quot;)&#39;</span><span class="p">)</span> <span class="n">emin</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Emax = &quot;,e9.2, &quot; keV&quot;)&#39;</span><span class="p">)</span> <span class="n">emax</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Nenergy = &quot;, i4)&#39;</span><span class="p">)</span> <span class="n">nenergy</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Tmin = &quot;,e9.2, &quot; keV&quot;)&#39;</span><span class="p">)</span> <span class="n">tmin</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Tmax = &quot;,e9.2, &quot; keV&quot;)&#39;</span><span class="p">)</span> <span class="n">tmax</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Ntemp = &quot;, i4)&#39;</span><span class="p">)</span> <span class="n">ntemp</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+  
+    <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c">!$OMP PARALLEL DO private(ie, it, ia, n, m, eb, ti, rate)</span>
+    <span class="k">do </span><span class="n">ie</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nenergy</span>
+        <span class="n">eb</span> <span class="o">=</span> <span class="n">ebarr</span><span class="p">(</span><span class="n">ie</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">it</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntemp</span>
+            <span class="n">ti</span> <span class="o">=</span> <span class="n">tarr</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+            <span class="k">do </span><span class="n">ia</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_bt_amu</span>
+                <span class="k">do </span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_max</span>
+                    <span class="k">do </span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">m_max</span>
+                        <span class="k">if</span><span class="p">(</span><span class="n">m</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">n</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                            call </span><span class="n">bt_maxwellian</span><span class="p">(</span><span class="n">Aq_excit_n_m</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="p">&amp;</span>
+                                               <span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">a</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
+                            <span class="n">excit</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">ie</span><span class="p">,</span><span class="n">it</span><span class="p">,</span><span class="n">ia</span><span class="p">)</span> <span class="o">=</span> <span class="n">rate</span>
+
+                            <span class="k">call </span><span class="n">bt_maxwellian</span><span class="p">(</span><span class="n">Aq_excit_n_m</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="p">&amp;</span>
+                                               <span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">a</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="p">&amp;</span>
+                                               <span class="n">rate</span><span class="p">,</span> <span class="n">deexcit</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
+                            <span class="n">excit</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">ie</span><span class="p">,</span><span class="n">it</span><span class="p">,</span><span class="n">ia</span><span class="p">)</span> <span class="o">=</span> <span class="n">rate</span>
+                        <span class="n">endif</span>
+                    <span class="n">enddo</span>
+                    <span class="k">call </span><span class="n">bt_maxwellian</span><span class="p">(</span><span class="n">Aq_cx_n</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="p">&amp;</span>
+                                       <span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">a</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
+                    <span class="n">cx</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">ie</span><span class="p">,</span><span class="n">it</span><span class="p">,</span><span class="n">ia</span><span class="p">)</span> <span class="o">=</span> <span class="n">rate</span>
+
+                    <span class="k">call </span><span class="n">bt_maxwellian</span><span class="p">(</span><span class="n">Aq_ioniz_n</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">eb</span><span class="p">,</span> <span class="p">&amp;</span>
+                                       <span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">a</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ia</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
+                    <span class="n">ioniz</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">ie</span><span class="p">,</span><span class="n">it</span><span class="p">,</span><span class="n">ia</span><span class="p">)</span> <span class="o">=</span> <span class="n">rate</span>
+                <span class="n">enddo</span>
+            <span class="n">enddo</span>
+            <span class="n">cnt</span> <span class="o">=</span> <span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(f7.2,&quot;%&quot;,a,$)&#39;</span><span class="p">)</span> <span class="mi">100</span><span class="o">*</span><span class="n">cnt</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">nenergy</span><span class="o">*</span><span class="n">ntemp</span><span class="p">),</span><span class="nb">char</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+        <span class="n">enddo</span>
+    <span class="n">enddo</span>
+    <span class="c">!$OMP END PARALLEL DO</span>
+  
+    <span class="k">call </span><span class="n">h5gcreate_f</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">asym</span><span class="p">)),</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="n">dim1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">dim4</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">nenergy</span><span class="p">,</span> <span class="n">ntemp</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">]</span>
+    <span class="n">dim5</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">nenergy</span><span class="p">,</span> <span class="n">ntemp</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">]</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;nenergy&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">nenergy</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;ntemp&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">ntemp</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;n_bt_amu&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">n_bt_amu</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;n_max&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">n_max</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;m_max&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">m_max</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;dlogE&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">dlogE</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;emin&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">emin</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;emax&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">emax</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;dlogT&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">dlogT</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;tmin&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">tmin</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;tmax&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="p">[</span><span class="n">tmax</span><span class="p">],</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="n">dim2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">]</span>
+    <span class="k">call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;bt_amu&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dim2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> 
+    <span class="n">dim1</span> <span class="o">=</span> <span class="p">[</span><span class="n">nenergy</span><span class="p">]</span>
+    <span class="k">call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="n">ebarr</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="n">dim1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ntemp</span><span class="p">]</span>
+    <span class="k">call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dim1</span><span class="p">,</span> <span class="n">tarr</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;cx&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dim4</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;ionization&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dim4</span><span class="p">,</span> <span class="n">ioniz</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;excitation&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">dim5</span><span class="p">,</span> <span class="n">excit</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">asym</span><span class="p">)),</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Reaction rates for Hydrogen(beam)-&quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">aname</span><span class="p">))</span><span class="o">//</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;(target) interactions&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;nenergy&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Number of energy values&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;ntemp&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Number of target temperature values&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;n_bt_amu&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Number of beam-target amu combinations&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;n_max&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Number of initial energy levels&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;m_max&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Number of final energy levels&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;bt_amu&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Combinations of beam-target amu&#39;s e.g. b_amu, t_amu = bt_amu[:,i]&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Energy values&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;dlogE&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Energy spacing in log-10&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;dlogE&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;log10(keV)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;emin&quot;</span><span class="p">,</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Minimum energy&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;emin&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;emax&quot;</span><span class="p">,</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Maximum energy&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;emax&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>  
+  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Target temperature values&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;dlogT&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Temperature spacing in log-10&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;dlogT&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;log10(keV)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;tmin&quot;</span><span class="p">,</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Minimum temperature&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;tmin&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;tmax&quot;</span><span class="p">,</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;Maximum temperature&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;tmax&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;keV&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>  
+  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;cx&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;n-resolved charge exchange reaction rates: cx(n,energy,temp,bt_amu)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;cx&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;cm^3/s&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;cx&quot;</span><span class="p">,</span> <span class="s2">&quot;reaction&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;A(q+) + H(n) -&gt; A((q-1)+) + H(+)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;excitation&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;n/m resolved (de-)excitation reaction rates: excitation(n,m,energy,temp,bt_amu)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;excitation&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;cm^3/s&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;excitation&quot;</span><span class="p">,</span> <span class="s2">&quot;reaction&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;A(q+) + H(n) -&gt; A(q+) + H(m); m &gt; n excitation, m &lt; n de-excitation&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;ionization&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;n resolved ionization reaction rates: ionization(n,energy,temp,bt_amu)&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;ionization&quot;</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">,</span> <span class="s2">&quot;cm^3/s&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;ionization&quot;</span><span class="p">,</span> <span class="s2">&quot;reaction&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+         <span class="s2">&quot;A(q+) + H(n) -&gt; A(q+) + H(+) + e-&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  
+    <span class="k">deallocate</span><span class="p">(</span><span class="n">ebarr</span><span class="p">,</span> <span class="n">tarr</span><span class="p">,</span> <span class="n">excit</span><span class="p">,</span> <span class="n">ioniz</span><span class="p">)</span>
+
+<span class="k">end subroutine </span><span class="n">write_bt_H_Aq</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+    <hr>
+    <footer>
+        <div class="row">
+        <div class="col-md-4">&copy; 2016 </div>
+	<div class="col-md-4"><span class="text-center"> FIDASIM was developed by Luke Stagner</span></div>
+        <div class="col-md-4"><span class="pull-right">Documentation generated by <a href="https://github.com/cmacmackin/ford">FORD</a></span></div>
+        </div>
+        <br>
+    </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

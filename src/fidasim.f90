@@ -101,39 +101,39 @@ integer :: nbi_outside = 0
 
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
-    integer(Float32) :: nx
+    integer(Int32) :: nx
         !+ Number of cells in the x direction
-    integer(Float32) :: ny
+    integer(Int32) :: ny
         !+ Number of cells in the y direction
-    integer(Float32) :: nz
+    integer(Int32) :: nz
         !+ Number of cells in the z direction
-    real(Float64)    :: xmin
+    real(Float64)  :: xmin
         !+ Minimum x value
-    real(Float64)    :: xmax
+    real(Float64)  :: xmax
         !+ Maximum x value
-    real(Float64)    :: ymin
+    real(Float64)  :: ymin
         !+ Minimum y value
-    real(Float64)    :: ymax
+    real(Float64)  :: ymax
         !+ Maximum y value
-    real(Float64)    :: zmin
+    real(Float64)  :: zmin
         !+ Minimum z value
-    real(Float64)    :: zmax
+    real(Float64)  :: zmax
         !+ Maximum z value
-    real(Float64)    :: alpha
+    real(Float64)  :: alpha
         !+ Tait-Bryan angle for a rotation about z [radians]
-    real(Float64)    :: beta
+    real(Float64)  :: beta
         !+ Tait-Bryan angle for a rotation about y' [radians]
-    real(Float64)    :: gamma
+    real(Float64)  :: gamma
         !+ Tait-Bryan angle for a rotation about x" [radians]
-    real(Float64)    :: drmin
+    real(Float64)  :: drmin
         !+ Minimum cell spacing: `min(dx,dy,dz)`
-    real(Float64)    :: dv
+    real(Float64)  :: dv
         !+ Cell volume [\(cm^3\)]
-    real(Float64)    :: volume
+    real(Float64)  :: volume
         !+ Grid volume [\(cm^3\)]
-    integer(Float32) :: ntrack
+    integer(Int32) :: ntrack
         !+ Maximum number of cell for particle tracking
-    integer(Float32) :: ngrid
+    integer(Int32) :: ngrid
         !+ Number of cells
     real(Float64), dimension(3)   :: origin
         !+ Origin of beam grid in machine coordinates
@@ -158,15 +158,15 @@ end type BeamGrid
 
 type InterpolationGrid
     !+ Defines a 2D R-Z grid for interpolating plasma parameters and fields
-    integer(Float32) :: nr
+    integer(Int32) :: nr
         !+ Number of Radii
-    integer(Float32) :: nz
+    integer(Int32) :: nz
         !+ Number of Z values
-    real(Float64)    :: dr
+    real(Float64)  :: dr
         !+ Radial spacing [cm]
-    real(Float64)    :: dz
+    real(Float64)  :: dz
         !+ Vertical spacing [cm]
-    real(Float64)    :: da
+    real(Float64)  :: da
         !+ Grid element area [\(cm^2\)]
     real(Float64), dimension(:),   allocatable :: r
         !+ Radii values [cm]
@@ -260,25 +260,25 @@ end type Equilibrium
 
 type FastIonDistribution
     !+ Defines a fast-ion distribution function: F(E,p,R,Z)
-    integer(Float32) :: nenergy
+    integer(Int32) :: nenergy
         !+ Number of energies
-    integer(Float32) :: npitch
+    integer(Int32) :: npitch
         !+ Number of pitches
-    real(Float64)    :: dE
+    real(Float64)  :: dE
         !+ Energy spacing [keV]
-    real(Float64)    :: dp
+    real(Float64)  :: dp
         !+ Pitch spacing
-    real(Float64)    :: emin
+    real(Float64)  :: emin
         !+ Minimum energy [keV]
-    real(Float64)    :: emax
+    real(Float64)  :: emax
         !+ Maximum energy [keV]
-    real(Float64)    :: e_range
+    real(Float64)  :: e_range
         !+ Energy interval length [keV]
-    real(Float64)    :: pmin
+    real(Float64)  :: pmin
         !+ Minimum pitch
-    real(Float64)    :: pmax
+    real(Float64)  :: pmax
         !+ Maximum pitch
-    real(Float64)    :: p_range
+    real(Float64)  :: p_range
         !+ Pitch interval length
     real(Float64), dimension(:), allocatable       :: energy
         !+ Energy values [keV]
@@ -290,41 +290,41 @@ end type FastIonDistribution
 
 type FastIon
     !+ Defines a fast-ion
-    logical          :: cross_grid = .False.
+    logical        :: cross_grid = .False.
         !+ Indicates whether the fast-ion crosses the [[libfida:beam_grid]]
-    real(Float64)    :: r = 0.d0
+    real(Float64)  :: r = 0.d0
         !+ Radial position of fast-ion [cm]
-    real(Float64)    :: z = 0.d0
+    real(Float64)  :: z = 0.d0
         !+ Vertical position of fast-ion [cm]
-    real(Float64)    :: phi_enter = 0.d0
+    real(Float64)  :: phi_enter = 0.d0
         !+ Torodial/phi position where fast-ion enters the [[libfida:beam_grid]] [radians]
-    real(Float64)    :: delta_phi = 0.d0
+    real(Float64)  :: delta_phi = 0.d0
         !+ Angle subtended by the [[libfida:beam_grid]] at (r,z)
-    real(Float64)    :: energy = 0.d0
+    real(Float64)  :: energy = 0.d0
         !+ Energy [keV]
-    real(Float64)    :: pitch = 0.d0
+    real(Float64)  :: pitch = 0.d0
         !+ Pitch w.r.t. the magnetic field
-    real(Float64)    :: vabs = 0.d0
+    real(Float64)  :: vabs = 0.d0
         !+ Speed [cm/s]
-    real(Float64)    :: vr = 0.d0
+    real(Float64)  :: vr = 0.d0
         !+ Radial velocity [cm/s]
-    real(Float64)    :: vt = 0.d0 
+    real(Float64)  :: vt = 0.d0 
         !+ Torodial velocity [cm/s]
-    real(Float64)    :: vz = 0.d0 
+    real(Float64)  :: vz = 0.d0 
         !+ Z velocity [cm/s]
-    real(Float64)    :: weight = 0.d0
+    real(Float64)  :: weight = 0.d0
         !+ Particle weight: How many fast-ions does particle represent.
-    integer(Float32) :: class = 0
+    integer(Int32) :: class = 0
         !+ Orbit class id
 end type FastIon
 
 type FastIonParticles
     !+ Collection of fast-ion particles
-    logical          :: guiding_center = .True.
+    logical        :: guiding_center = .True.
         !+ Indicates whether fast-ions are at guiding center
-    integer(Float32) :: nparticle = 0
+    integer(Int32) :: nparticle = 0
         !+ Number of particles
-    integer(Float32) :: nclass = 1
+    integer(Int32) :: nclass = 1
         !+ Number of orbit classes
     type(FastIon), dimension(:), allocatable :: fast_ion
         !+ Fast-ion particles
@@ -536,13 +536,13 @@ end type NPAParticle
 
 type NPAResults
     !+ MC NPA result structure
-    integer(Float32) :: nchan = 0
+    integer(Int32) :: nchan = 0
         !+ Number of NPA channels
-    integer(Float32) :: npart = 0
+    integer(Int32) :: npart = 0
         !+ Number of particles that hit a detector
-    integer(Float32) :: nmax = 1000000
+    integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
-    integer(Float32) :: nloop = 1000
+    integer(Int32) :: nloop = 1000
         !+ Increases number of MC markers by factor of `nloop` 
     type(NPAParticle), dimension(:), allocatable  :: part
         !+ Array of NPA particles
@@ -554,12 +554,14 @@ end type NPAResults
 
 type BirthProfile
     !+ Birth profile structure
-    integer :: ind = 1
+    integer :: cnt = 1
         !+ Particle counter
     real(Float64), dimension(:,:), allocatable     :: ri
         !+ Particle birth position [cm]
     real(Float64), dimension(:,:), allocatable     :: vi
         !+ Particle birth velocity [cm/s]
+    integer, dimension(:,:), allocatable           :: ind
+        !+ Particle [[libfida:beam_grid]] indices
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
@@ -606,62 +608,62 @@ end type NPAWeights
 
 type SimulationInputs
     !+ Simulation settings structure
-    integer(Float32) :: shot_number
+    integer(Int32) :: shot_number
         !+ Shot Number
-    real(Float64)    :: time
+    real(Float64)  :: time
         !+ Shot time [s]
-    character(120)   :: runid = ''
+    character(120) :: runid = ''
         !+ FIDASIM run ID
-    character(120)   :: result_dir = ''
+    character(120) :: result_dir = ''
         !+ Result directory
-    character(120)   :: tables_file = ''
+    character(120) :: tables_file = ''
         !+ Atomic tables file
-    character(120)   :: geometry_file = ''
+    character(120) :: geometry_file = ''
         !+ FIDASIM input file containing geometric quantities
-    character(120)   :: equilibrium_file = ''
+    character(120) :: equilibrium_file = ''
         !+ FIDASIM input file containing the plasma parameters and fields
-    character(120)   :: distribution_file = ''
+    character(120) :: distribution_file = ''
         !+ FIDASIM input file containing the fast-ion distribution
-    character(120)   :: neutrals_file = ''
+    character(120) :: neutrals_file = ''
         !+ FIDASIM output/input file containing beam neutral density.
         !+ Used when [[SimulationInputs:load_neutrals]] is set.
 
     !! Monte Carlo settings
-    integer(Float32) :: n_fida
+    integer(Int32) :: n_fida
         !+ Number of FIDA mc markers
-    integer(Float32) :: n_npa
+    integer(Int32) :: n_npa
         !+ Number of NPA mc markers
-    integer(Float32) :: n_nbi
+    integer(Int32) :: n_nbi
         !+ Number of neutral beam mc markers
-    integer(Float32) :: n_dcx
+    integer(Int32) :: n_dcx
         !+ Number of direct charge exchange (DCX) mc markers
-    integer(Float32) :: n_halo
+    integer(Int32) :: n_halo
         !+ Number of halo mc markers
-    integer(Float32) :: n_birth
+    integer(Int32) :: n_birth
         !+ Number of birth particles per [[SimulationInputs:n_nbi]]
 
     !! Simulation switches
-    integer(Float32) :: calc_spec
+    integer(Int32) :: calc_spec
         !+ Calculate spectra: 0 = off, 1=on
-    integer(Float32) :: calc_brems
+    integer(Int32) :: calc_brems
         !+ Calculate bremmstruhlung: 0 = off, 1=on
-    integer(Float32) :: calc_bes
+    integer(Int32) :: calc_bes
         !+ Calculate BES: 0 = off, 1=on
-    integer(Float32) :: calc_fida
+    integer(Int32) :: calc_fida
         !+ Calculate FIDA: 0 = off, 1=on
-    integer(Float32) :: load_neutrals
+    integer(Int32) :: load_neutrals
         !+ Load neutrals from file: 0 = off, 1=on
-    integer(Float32) :: calc_npa
+    integer(Int32) :: calc_npa
         !+ Calculate NPA: 0 = off, 1=on, 2=on++
-    integer(Float32) :: calc_fida_wght
+    integer(Int32) :: calc_fida_wght
         !+ Calculate FIDA weight: 0 = off, 1=on, 2=on++
-    integer(Float32) :: calc_npa_wght
+    integer(Int32) :: calc_npa_wght
         !+ Calculate NPA weights: 0 = off, 1=on, 2=on++
-    integer(Float32) :: calc_birth
+    integer(Int32) :: calc_birth
         !+ Calculate birth profile: 0 = off, 1=on
-    integer(Float32) :: dump_dcx
+    integer(Int32) :: dump_dcx
         !+ Output DCX density and spectra: 0 = off, 1=on
-    integer(Float32) :: verbose
+    integer(Int32) :: verbose
         !+ Verbosity: 0 = off, 1=on, 2=on++
 
     !! Neutral Beam Settings
@@ -669,39 +671,39 @@ type SimulationInputs
         !+ Atomic mass of beam neutrals
 
     !! Plasma parameters
-    integer(Float32) :: impurity_charge
+    integer(Int32) :: impurity_charge
         !+ Impurity proton number
-    real(Float64)    :: ai   
+    real(Float64)  :: ai   
         !+ Atomic mass of thermal ions
 
     !! Distribution settings
-    integer(Float32) :: dist_type
+    integer(Int32) :: dist_type
         !+ Type of fast-ion distribution
 
     !! Spectrum parameters
-    integer(Float32) :: nlambda
+    integer(Int32) :: nlambda
         !+ Number of wavelength to calculate
-    real(Float64)    :: dlambda
+    real(Float64)  :: dlambda
         !+ Wavelength spacing [nm]
-    real(Float64)    :: lambdamin
+    real(Float64)  :: lambdamin
         !+ Minimum wavelength [nm]
-    real(Float64)    :: lambdamax
+    real(Float64)  :: lambdamax
         !+ Maximum wavelength [nm]
 
     !! Weight function settings
-    integer(Float32) :: ne_wght
+    integer(Int32) :: ne_wght
         !+ Number of energies in weight functions
-    integer(Float32) :: np_wght
+    integer(Int32) :: np_wght
         !+ Number of pitches in weight functions
-    integer(Float32) :: nphi_wght
+    integer(Int32) :: nphi_wght
         !+ Number of gyro-angles to average over in weight functions
-    integer(Float32) :: nlambda_wght
+    integer(Int32) :: nlambda_wght
         !+ Number of wavelength to calculate in weight functions
-    real(Float64)    :: emax_wght
+    real(Float64)  :: emax_wght
         !+ Maximum energy in weight functions [keV]
-    real(Float64)    :: lambdamin_wght
+    real(Float64)  :: lambdamin_wght
         !+ Minimum wavelength in weight functions [nm]
-    real(Float64)    :: lambdamax_wght
+    real(Float64)  :: lambdamax_wght
         !+ Maximum wavelength in weight functions [nm]
 end type SimulationInputs
 
@@ -711,9 +713,9 @@ type ParticleTrack
         !+ Time/distance/... in cell
     real(Float64) :: flux = 0.d0
         !+ Flux/density/... in cell
-    integer(Float32), dimension(3) :: ind = 0
+    integer(Int32), dimension(3) :: ind = 0
         !+ Indices of cell
-    real(Float64), dimension(3)    :: pos = 0.d0
+    real(Float64), dimension(3)  :: pos = 0.d0
         !+ Midpoint of track in cell [cm]
 end type ParticleTrack
 
@@ -1302,22 +1304,22 @@ end function lfs_divide
 subroutine read_inputs
     !+ Reads input namelist file and stores the results into [[libfida:inputs]],
     !+ [[libfida:nbi]], and [[libfida:beam_grid]]
-    character(120)   :: runid,result_dir, tables_file
-    character(120)   :: distribution_file, equilibrium_file
-    character(120)   :: geometry_file, neutrals_file
-    integer          :: calc_brems,calc_bes,calc_fida,calc_npa
-    integer          :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer          :: load_neutrals,verbose,dump_dcx
-    integer(Float32) :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
-    integer(Float32) :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    real(Float64)    :: time,lambdamin,lambdamax,emax_wght
-    real(Float64)    :: lambdamin_wght,lambdamax_wght
-    real(Float64)    :: ai,ab,pinj,einj,species_mix(3)
-    integer(Float32) :: impurity_charge
-    integer(Float32) :: nx,ny,nz
-    real(Float64)    :: xmin,xmax,ymin,ymax,zmin,zmax
-    real(Float64)    :: alpha,beta,gamma,origin(3)
-    logical          :: exis, error
+    character(120) :: runid,result_dir, tables_file
+    character(120) :: distribution_file, equilibrium_file
+    character(120) :: geometry_file, neutrals_file
+    integer        :: calc_brems,calc_bes,calc_fida,calc_npa
+    integer        :: calc_birth,calc_fida_wght,calc_npa_wght
+    integer        :: load_neutrals,verbose,dump_dcx
+    integer(Int32) :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
+    integer(Int32) :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
+    real(Float64)  :: time,lambdamin,lambdamax,emax_wght
+    real(Float64)  :: lambdamin_wght,lambdamax_wght
+    real(Float64)  :: ai,ab,pinj,einj,species_mix(3)
+    integer(Int32) :: impurity_charge
+    integer(Int32) :: nx,ny,nz
+    real(Float64)  :: xmin,xmax,ymin,ymax,zmin,zmax
+    real(Float64)  :: alpha,beta,gamma,origin(3)
+    logical        :: exis, error
   
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -1485,7 +1487,7 @@ end subroutine read_inputs
 
 subroutine make_beam_grid
     !+ Makes [[libfida:beam_grid] from user defined inputs
-    integer(Float32) :: i
+    integer(Int32) :: i
     real(Float64) :: dx, dy, dz
   
     allocate(beam_grid%xc(beam_grid%nx),  &
@@ -2112,16 +2114,16 @@ subroutine read_mc(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(1) :: dims
-    integer(Float32) :: i,ii,ir,iz,nphi
+    integer(Int32) :: i,ii,ir,iz,nphi
     real(Float64) :: phi,xmin,xmax,ymin,ymax,zmin,zmax
     real(Float64) :: phi_enter,delta_phi
     real(Float64), dimension(3) :: uvw,xyz
-    integer(Float32), dimension(1) :: minpos
+    integer(Int32), dimension(1) :: minpos
     logical :: in_grid
     real(Float64), dimension(:), allocatable :: weight
     real(Float64), dimension(:), allocatable :: r, z, vr, vt, vz
     real(Float64), dimension(:), allocatable :: energy, pitch
-    integer(Float32), dimension(:), allocatable :: orbit_class
+    integer(Int32), dimension(:), allocatable :: orbit_class
     integer :: cnt,num
     character(len=32) :: dist_type_name = ''
   
@@ -2662,11 +2664,11 @@ subroutine write_birth_profile
     integer(HSIZE_T), dimension(1) :: d
     integer :: error, i
   
-    character(120)    :: filename
+    character(120) :: filename
     real(Float64), dimension(:,:), allocatable :: ri
     real(Float64), dimension(:,:), allocatable :: vi
     real(Float64), dimension(3) :: xyz,uvw,v_uvw
-  
+
     allocate(ri(3,size(birth%ri,2)))
     allocate(vi(3,size(birth%vi,2)))
   
@@ -2702,7 +2704,8 @@ subroutine write_birth_profile
     dim2 = shape(birth%ri)
     call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
-  
+    call h5ltmake_compressed_dataset_int_f(fid,"/ind",2,dim2, birth%ind, error) 
+
     !Add attributes
     call h5ltset_attribute_string_f(fid, "/n_nbi", "description", &
          "Number of beam mc particles", error)
@@ -2718,9 +2721,11 @@ subroutine write_birth_profile
     call h5ltset_attribute_string_f(fid, "/vi", "description", &
          "Fast-ion birth velocity in R-Z-Phi: vi([r,z,phi],particle)", error)
     call h5ltset_attribute_string_f(fid, "/vi", "units", "cm/s", error)
+    call h5ltset_attribute_string_f(fid, "/ind", "description", &
+         "Fast-ion birth beam grid indices: ind([i,j,k],particle)", error)
+
     call h5ltset_attribute_string_f(fid, "/", "coordinate_system", &
          "Cylindrical (R,Z,Phi)",error)
-
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid, "/", "description", &
          "Birth density and particles calculated by FIDASIM", error)
@@ -3822,13 +3827,13 @@ end subroutine grid_intersect
 
 subroutine get_indices(pos, ind)
     !+ Find closests [[libfida:beam_grid]] indices `ind` to position `pos`
-    real(Float64),  dimension(3), intent(in)    :: pos
+    real(Float64),  dimension(3), intent(in)  :: pos
         !+ Position [cm]
-    integer(Float32), dimension(3), intent(out) :: ind
+    integer(Int32), dimension(3), intent(out) :: ind
         !+ Closest indices to position
 
     real(Float64),  dimension(3) :: mini
-    integer(Float32), dimension(3) :: maxind
+    integer(Int32), dimension(3) :: maxind
     integer :: i
   
     maxind(1) = beam_grid%nx
@@ -3849,9 +3854,9 @@ end subroutine get_indices
 
 subroutine get_position(ind, pos)
     !+ Get position `pos` given [[libfida:beam_grid]] indices `ind`
-    integer(Float32), dimension(3), intent(in)  :: ind
+    integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
-    real(Float64), dimension(3), intent(out)    :: pos
+    real(Float64), dimension(3), intent(out) :: pos
         !+ Position [cm]
   
     pos(1) = beam_grid%xc(ind(1))
@@ -3862,15 +3867,15 @@ end subroutine get_position
 
 subroutine track(rin, vin, tracks, ncell, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:beam_grid]]
-    real(Float64), dimension(3), intent(in)           :: rin  
+    real(Float64), dimension(3), intent(in)          :: rin  
         !+ Initial position of particle
-    real(Float64), dimension(3), intent(in)           :: vin
+    real(Float64), dimension(3), intent(in)          :: vin
         !+ Initial velocity of particle
-    type(ParticleTrack), dimension(:), intent(inout)  :: tracks
+    type(ParticleTrack), dimension(:), intent(inout) :: tracks
         !+ Array of [[ParticleTrack]] type
-    integer(Float32), intent(out)                     :: ncell
+    integer(Int32), intent(out)                      :: ncell
         !+ Number of cells that a particle crosses
-    logical, intent(out), optional                    :: los_intersect
+    logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]] 
 
     integer :: cc, i, ii, mind
@@ -4276,11 +4281,11 @@ end subroutine in_plasma
 
 subroutine get_plasma(plasma, pos, ind)
     !+ Gets plasma parameters at position `pos` or [[libfida:beam_grid]] indices `ind`
-    type(LocalProfiles), intent(out)                     :: plasma
+    type(LocalProfiles), intent(out)                   :: plasma
         !+ Plasma parameters at `pos`/`ind`
-    real(Float64), dimension(3), intent(in), optional    :: pos
+    real(Float64), dimension(3), intent(in), optional  :: pos
         !+ Position in beam grid coordinates
-    integer(Float32), dimension(3), intent(in), optional :: ind
+    integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
 
     logical :: inp
@@ -4351,11 +4356,11 @@ end subroutine calc_perp_vectors
 
 subroutine get_fields(fields,pos,ind)
     !+ Gets electro-magnetic fields at position `pos` or [[libfida:beam_grid]] indices `ind`
-    type(LocalEMFields),intent(out)                      :: fields
+    type(LocalEMFields),intent(out)                    :: fields
         !+ Electro-magnetic fields at `pos`/`ind`
-    real(Float64), dimension(3), intent(in), optional    :: pos
+    real(Float64), dimension(3), intent(in), optional  :: pos
         !+ Position in beam grid coordinates
-    integer(Float32), dimension(3), intent(in), optional :: ind
+    integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
 
     logical :: inp
@@ -4414,11 +4419,11 @@ end subroutine get_fields
 
 subroutine get_distribution(fbeam, pos, ind)
     !+ Gets electro-magnetic fields at position `pos` or [[libfida:beam_grid]] indices `ind`
-    real(Float64), dimension(:,:), intent(out)           :: fbeam
+    real(Float64), dimension(:,:), intent(out)         :: fbeam
         !+ Fast-ion distribution at `pos`/`ind`: F(E,p)
-    real(Float64), dimension(3), intent(in), optional    :: pos
+    real(Float64), dimension(3), intent(in), optional  :: pos
         !+ Position in beam grid coordinates
-    integer(Float32), dimension(3), intent(in), optional :: ind
+    integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
 
     real(Float64), dimension(3) :: xyz, uvw
@@ -4447,21 +4452,21 @@ end subroutine get_distribution
 subroutine get_ep_denf(energy, pitch, denf, pos,ind)
     !+ Get fast-ion density at given energy and pitch 
     !+ at position `pos` or [[libfida:beam_grid]] indices `ind`
-    real(Float64), intent(in)                            :: energy
+    real(Float64), intent(in)                          :: energy
         !+ Energy [keV]
-    real(Float64), intent(in)                            :: pitch
+    real(Float64), intent(in)                          :: pitch
         !+ Pitch
-    real(Float64), intent(out)                           :: denf
+    real(Float64), intent(out)                         :: denf
         !+ Fast-ion density [fast-ions/(cm^3*dE*dp)]
-    real(Float64), dimension(3), intent(in), optional    :: pos
+    real(Float64), dimension(3), intent(in), optional  :: pos
         !+ Position in beam grid coordinates
-    integer(Float32), dimension(3), intent(in), optional :: ind
+    integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
   
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam 
-    integer(Float32), dimension(2) :: epi
-    integer(Float32), dimension(1) :: dummy
+    integer(Int32), dimension(2) :: epi
+    integer(Int32), dimension(1) :: dummy
     real(Float64) :: R, Z
     real(Float64) :: dE, dp
     logical :: in_plasma1
@@ -4497,13 +4502,13 @@ end subroutine get_ep_denf
 !=============================================================================
 subroutine store_neutrals(ind, neut_type, dens, store_iter)
     !Store neutrals in [[libfida:neut]] at indices `ind`
-    integer(Float32), dimension(3), intent(in) :: ind
+    integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
-    integer, intent(in)                        :: neut_type
+    integer, intent(in)                      :: neut_type
         !+ Neutral type
-    real(Float64), dimension(:), intent(in)    :: dens
+    real(Float64), dimension(:), intent(in)  :: dens
         !+ Neutral density [neutrals/cm^3]
-    logical, intent(in), optional              :: store_iter
+    logical, intent(in), optional            :: store_iter
         !+ Store DCX/Halo iteration density in [[libfida:halo_iter_dens]]
     logical :: iter
   
@@ -4523,11 +4528,11 @@ end subroutine store_neutrals
 
 subroutine store_births(ind, neut_type, dflux)
     !+ Store birth particles/density in [[libfida:birth]]
-    integer(Float32), dimension(3), intent(in) :: ind
+    integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
-    integer(Float32), intent(in)               :: neut_type
+    integer(Int32), intent(in)               :: neut_type
         !+ Neutral type
-    real(Float64), intent(in)                  :: dflux
+    real(Float64), intent(in)                :: dflux
         !+ Deposited flux
   
     !$OMP CRITICAL(store_births_1)
@@ -4552,7 +4557,7 @@ subroutine store_npa(det, ri, rf, vn, flux)
     type(LocalEMFields) :: fields
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
     real(Float64) :: energy, pitch
-    integer(Float32), dimension(1) :: ienergy
+    integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
   
     ! Convert to machine coordinates
@@ -4646,13 +4651,13 @@ end subroutine neut_rates
 
 subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     !+ Get probability of a thermal ion charge exchanging with `types` neutrals
-    integer(Float32), dimension(3), intent(in)   :: ind
+    integer(Int32), dimension(3), intent(in)     :: ind
         !+ [[libfida:beam_grid]] indices 
     real(Float64), dimension(3), intent(in)      :: pos
         !+ Interaction position in beam grid coordinates
     real(Float64), dimension(3), intent(in)      :: v_ion
         !+ Ion velocity [cm/s]
-    integer(Float32), dimension(:),intent(in)    :: types
+    integer(Int32), dimension(:), intent(in)     :: types
         !+ Neutral types
     real(Float64), dimension(nlevs), intent(out) :: prob
         !+ Charge exchange rate/probability [1/s] 
@@ -5027,7 +5032,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     real(Float64), dimension(n_stark) :: lambda, intensity
     real(Float64) :: dlength, sigma_pi
     type(LocalEMFields) :: fields
-    integer(Float32), dimension(3) :: ind
+    integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
     integer :: ichan,i,bin
   
@@ -5069,7 +5074,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     real(Float64), dimension(n_stark) :: lambda, intensity
     real(Float64) :: dlength, sigma_pi
     type(LocalEMFields) :: fields
-    integer(Float32), dimension(3) :: ind
+    integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
     integer :: ichan, i, bin, iclass
   
@@ -5171,7 +5176,7 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
   
     real(Float64) :: dlength, sigma_pi
     type(LocalEMFields) :: fields
-    integer(Float32), dimension(3):: ind
+    integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
     integer :: ichan
   
@@ -5194,7 +5199,7 @@ end subroutine store_fw_photons
 !=============================================================================
 subroutine get_nlaunch(nr_markers,papprox,papprox_tot,nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell
-    integer(Float32), intent(in)                 :: nr_markers
+    integer(Int32), intent(in)                   :: nr_markers
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), intent(in)  :: papprox
         !+ [[libfida:beam_grid]] cell weights
@@ -5481,7 +5486,7 @@ subroutine ndmc
     type(LocalProfiles) :: plasma
     real(Float64), dimension(nlevs) :: states, dens
     real(Float64) :: photons, iflux
-    integer(Float32), dimension(3) :: ind
+    integer(Int32), dimension(3) :: ind
     real(Float64), dimension(1) :: randomu
     integer, dimension(1) :: randi
   
@@ -5542,10 +5547,11 @@ subroutine ndmc
                 do kk=1,nl_birth(neut_type)
                     call randind(tracks(1:ncell)%flux,randi)
                     call randu(randomu)
-                    birth%vi(:,birth%ind) = vnbi
-                    birth%ri(:,birth%ind) = tracks(randi(1))%pos + &
+                    birth%ind(:,birth%cnt) = tracks(randi(1))%ind
+                    birth%vi(:,birth%cnt) = vnbi
+                    birth%ri(:,birth%cnt) = tracks(randi(1))%pos + &
                                             vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
-                    birth%ind = birth%ind+1
+                    birth%cnt = birth%cnt+1
                 enddo
             endif
         enddo energy_fractions
@@ -5980,7 +5986,7 @@ subroutine fida_mc
     real(Float64)  :: s, c
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(2) :: randomu
-    integer(Float32) :: nlaunch
+    integer(Int32) :: nlaunch
   
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
@@ -6172,7 +6178,7 @@ subroutine npa_mc
     real(Float64) :: s,c
     real(Float64) :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(2) :: randomu
-    integer(Float32) :: nlaunch
+    integer(Int32) :: nlaunch
   
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
@@ -6431,8 +6437,8 @@ subroutine fida_weights_los
     real(Float64) :: length
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer :: nwav
-    integer(Float32) :: i, j, k, ienergy
-    integer(Float32) :: ipitch, igyro, icell, ichan
+    integer(Int32) :: i, j, k, ienergy
+    integer(Int32) :: ipitch, igyro, icell, ichan
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr,phiarr
     real(Float64), dimension(:,:), allocatable :: mean_f
     real(Float64), dimension(3) :: vi, vi_norm, vp
@@ -6450,7 +6456,7 @@ subroutine fida_weights_los
     !! Solution of differential equation
     integer, dimension(3) :: ind  !!actual cell
     real(Float64), dimension(3) :: ri
-    integer(Float32) :: ncell
+    integer(Int32) :: ncell
     
     real(Float64):: etov2, dEdP
   
@@ -6627,8 +6633,8 @@ subroutine npa_weights
     type(LocalEMFields) :: fields
     real(Float64) :: pitch
     real(Float64) :: pcxa
-    integer(Float32) :: det
-    integer(Float32) :: ii, jj, kk, i, ic   !!indices
+    integer(Int32) :: det
+    integer(Int32) :: ii, jj, kk, i, ic   !!indices
     integer,dimension(1) :: ipitch
     real(Float64), dimension(3) :: vi,vi_norm
     real(Float64) :: vabs, fbm_denf, dE, dP, ccnt
@@ -6636,7 +6642,7 @@ subroutine npa_weights
     real(Float64), dimension(nlevs) :: states, states_i  ! Density of n-states
     integer, dimension(4) :: neut_types=[1,2,3,4]
     real(Float64), dimension(3) :: pos,dpos,r_gyro
-    integer(Float32) :: ichan
+    integer(Int32) :: ichan
     real(Float64), dimension(:), allocatable :: ebarr, ptcharr
    
     !! define energy - array
@@ -6875,9 +6881,11 @@ program fidasim
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
+        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
         allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
         allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
         birth%dens = 0.d0
+        birth%ind = 0
         birth%ri = 0.d0
         birth%vi = 0.d0
     endif

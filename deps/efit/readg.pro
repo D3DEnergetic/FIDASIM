@@ -166,16 +166,13 @@
 ;
 ; EXTERNAL CALLS:  MDSplus
 ;
-; RESPONSIBLE PERSON: Jeff Schachter
-;
 ; CODE TYPE: modeling, analysis, control  
 ;
 ; CODE SUBJECT:  handling, equilibrium
 ;
-; DATE OF LAST MODIFICATION: 06/04/01
-;
 ; MODIFICATION HISTORY:
 ;
+;	15-Jan-2015 BD use \ZLIM if \YLIM not defined (needed for efitrt_test)
 ;	Version 1.0: Released by Jeff Schachter 98.03.19
 ;	   98.03.26: bunch of bug fixes
 ;	Version 2.0: Standardized behavior in finding nearest time, and added keyword
@@ -247,10 +244,6 @@
 ;               separately, incorporated by QP
 ;       2006.12.19 Q.P.- for machines other than D3D,CMOD,NSTX, add r,z,lim
 ;                  tags assuming the tree structure is similar to that of D3D.
-;       2007.06.14 Q.P - handle ONETWO EQDSK header separately per Prater's request.
-;                      - in readg_mdssub, when there is only one time slice
-;                        convert size-1 arrays to scalars to avoid side-effects.
-
 ;-	
 
 
@@ -258,17 +251,22 @@
 ; FILE SPECIFIC CODE
 ;-------------------------------------------------------------------------------------
 
-function readg_file,info,verbose=verbose,debug=debug,status=status
+function readg_file, info, verbose=verbose, debug=debug, status=status
 
-compile_opt defint32,strictarr,strictarrsubs
-
+COMPILE_OPT IDL2
   forward_function efit_read_error, efit_read_filesearch
+
+;;;debug = 1
+if n_elements( debug ) eq 0 then begin
+  if getenv('DEBUG') ne '' then debug=1 else debug=0
+end
 
   ;====== ONE ERROR HANDLER FOR ALL I/O ERRORS
   if (not(keyword_set(debug))) then catch,err else err=0
   if (err ne 0) then begin
     catch,/cancel
     efit_read_message,1,'READG_FILE: Error reading gfile '+info.file+': '+!ERR_STRING
+    if keyword_set(debug) then stop
     if (keyword_set(lun)) then free_lun,lun
     status = 0
     return,efit_read_error()
@@ -306,10 +304,10 @@ compile_opt defint32,strictarr,strictarrsubs
   idum  = long(0)
   mw    = long(0)
   mh    = long(0)
-  notes = ''    ; remaing of the 1st line, useful in EQDSK by codes like ONETWO
 
   ;====== Open the file for formatted reads.  
     
+  print, '  >>> in READG_FILE, reading info.file ' + info.file
   openr,lun,info.file,/get_lun
 
     
@@ -321,8 +319,8 @@ compile_opt defint32,strictarr,strictarrsubs
 		    ; this will be switched to 1 - formatted
 
   on_ioerror,READG_UNFORMATTED
-
-  readf, lun, ecase, idum, mw, mh, notes, format='(6a8,3i4,a)'
+    
+  readf, lun, ecase, idum, mw, mh, format='(6a8,3i4)'
 
   ;==== if formatted read attempt successful, will reach here
 
@@ -382,10 +380,7 @@ READG_UNFORMATTED:
 ;         feqdsk in ecase).
 ; g     - ONETWO wrteqdsk routine
 ; TEQ   - TEQ code from LLNL
-; TRXPL - TRANSP equilibrium
-; ONETWO- ONETWO EQDSK (header is different)
 ;
-  IF strpos(notes,'ONETWO') GE 0 THEN author_program = 'ONETWO' ELSE $
   author_program = StrCompress(ecase[0],/Remove_All)
 
   ;==== proceed with read
@@ -463,7 +458,7 @@ READG_UNFORMATTED:
   
   ;nvernum = long(strmid(ecase(3-1),2-1,2)+strmid(ecase(2-1),4-1,2)+$
   ;	strmid(ecase(2-1),7-1,2))
-  if author_program eq 'ONETWO' then nvernum = 0 else $
+
   nvernum = long(strcompress(strmid(ecase[3-1],2-1,4),/Remove)+$
 	strmid(ecase[2-1],4-1,2)+strmid(ecase[2-1],7-1,2))
     
@@ -624,12 +619,9 @@ on_ioerror,null
   ;
   ; Get the actual shot number and time from the G file data.
   ;
-  if author_program eq 'ONETWO' then begin
-   ; ONETWO equilibrium
-     shotuse = long(ecase[0]);
-     nntime = ecase[1];
-     if info.time eq 0 then info.time = float(nntime)
-  endif else if strpos(author_program,'TRXPL') lt 0 then begin
+  
+  timeInMsec = 0
+  if strpos(author_program,'TRXPL') lt 0 then begin
    ; regular EFIT equilibrium
      nine = strmid(ecase[4-1],3-1,1)
      if(nine ne ' ') then begin
@@ -646,13 +638,14 @@ on_ioerror,null
 ;    nntime = strmid(ecase(5-1),3-1,4)
      nntime = str_sep(ecase[4],',')	; remove preceding ","
      nntime = nntime[N_Elements(nntime)-1]
+     if strpos( strlowcase(nntime), 'ms' ) gt -1 then timeInMsec = 1
      nntime = (str_sep(nntime,'ms'))[0]	; remove following "ms"
   endif else begin
    ; process TRANSP(TRXPL) equilibrium separately
      alla = ecase[0] & for ipl=1,5 do alla = alla+ecase[ipl]
      alla = str_sep(alla," ")
      transpid = alla[2]
-     transptime=float(alla[6])
+     transptime=float(alla(6))
      transptime = long(transptime*1000)
      alphabet = ['a','b','c','d','e','f',$
                  'g','h','i','j','k','l','m','n','o','p',$
@@ -664,7 +657,7 @@ on_ioerror,null
      l2 = strarr(l1)
      for i = 0,l1-1 do l2[i] = strmid(transpid,i,1)
      l3 = intarr(l1)
-     for i = 0,l1-1 do l3[i] = where (l2[i] eq alphabet)
+     for i = 0,l1-1 do l3[i] = where (l2(i) eq alphabet)
      l4 = where(l3 ne -1)
      nshot6 = strmid(transpid,0,l4)
      shotuse = long(nshot6)
@@ -678,6 +671,9 @@ on_ioerror,null
 ;;; DETERMINE TIME EITHER FROM G FILE OR FROM FILENAME
 ;;; G FILE DOES *NOT* STORE SUB-MILLISECOND TIME
 ;;; - revised by Jeff Schachter 1999.10.27
+if debug then print, '  >>> about to figure time in readg_file'
+;;;if debug then stop
+
   gtimeFile = 0.
   gtime = info.time 			; use time from info - overwrite next.
   on_ioerror,bad_time			; catch convertion error for time
@@ -685,7 +681,8 @@ on_ioerror,null
 bad_time:				; error - usually '****'
   on_ioerror,null			; turn off the special handling.
   if (gtime ne gtimeFile and (long(gtime) eq gtime)) then begin
-    message,/info,'Trouble determining exact time.  Filename gives: '+strtrim(gtime,2)+'  but file contains: '+strtrim(gtimeFile,2)
+    message,/info,'Trouble determining exact time.  Filename gives: '+strtrim(gtime,2)+ $
+                  '  but file contains: '+strtrim(gtimeFile,2)
   endif
 
   ;;; G structure returned will use gtime, so it will be using the
@@ -718,7 +715,10 @@ bad_time:				; error - usually '****'
               nbdry:nbdry, limitr:limitr, bdry:bdrypad, $
               lim:lim, r:rgrid1+findgen(mw)*dR, z:zmid-0.5*zdim+findgen(mh)*dz, $
               rhovn:rhovn, epoten:epoten}
-   
+;;;  print, ' >>> in readg.pro, g.bdry[*,0:4]='
+;;;  print, g.bdry[0,0:4]
+;;;  print, g.bdry[1,0:4]
+;;;  beep
 
   free_lun,lun
   status = 1
@@ -736,26 +736,13 @@ end
 
 function readg_mdssub,shot,itime,runid,status=status
 
+COMPILE_OPT IDL2
   common efit_readg_cache,info_cache,data_cache
 
+if n_elements( itime ) eq 0 then itime = 0
 
   source = 'MDSplus, shot = '+strtrim(shot,2)+', run = '+runid+', time = '+strtrim(data_cache.time[itime[0]],2)
-
-  ;;; 2007JUN15 QP
-  ;;; Instead of returning the whole structure when there is only one time slice
-  ;;; create a new struct and convert arrays of size 1 to scalars since
-  ;;; size-1-array in place of scalar causes side-effect in postprocessing.
-  if (n_elements(data_cache.time) eq 1) then begin
-    data = create_struct('tree',runid,'source',source)
-    tags=tag_names(data_cache)
-    for i=0,n_tags(data_cache)-1 do begin
-	if (size(data_cache.(i),/n_dim) eq 1) and $     ; test for size-1-array
-	   (size(data_cache.(i),/n_ele) eq 1) then $
-	data = create_struct(temporary(data),tags[i],(data_cache.(i))[0]) else $
-	data = create_struct(temporary(data),tags[i],data_cache.(i))
-    end
-    return,data
-  endif
+  if (n_elements(data_cache.time) eq 1) then return,create_struct(data_cache,'tree',runid,'source',source)
 
   data={shot:shot, time:data_cache.time[itime], tree:runid, error:0, source:source}
 
@@ -776,39 +763,54 @@ function readg_mdssub,shot,itime,runid,status=status
     data = create_struct(data,'lim',data_cache.lim,'r',data_cache.r,'z',data_cache.z)
    end
    'CMOD': begin
-    ;;; CMOD
-    s = size(data_cache.rbbbs)
-    bdry = fltarr(2,s[1],s[2])
-    bdry[0,*,*] = data_cache.rbbbs
-    bdry[1,*,*] = data_cache.zbbbs
-    data = create_struct(data,'lim',transpose([[data_cache.xlim], [data_cache.ylim]]), $
+       s = size(data_cache.rbbbs)
+       bdry = fltarr(2,s[1],s[2])
+       bdry[0,*,*] = data_cache.rbbbs
+       bdry[1,*,*] = data_cache.zbbbs
+       data = create_struct(data,'lim',transpose([[data_cache.xlim], [data_cache.ylim]]), $
                               'r',data_cache.rgrid, $
                               'z',data_cache.zgrid);, $
                               ;'bdry',temporary(bdry), $
                               ;'rgrid1',data_cache.rgrid[0])
-   end
+           end
    'NSTX': begin
-    s = size(data_cache.rbdry)
-    bdry = fltarr(2,s[1])
-    bdry[0,*] = (data_cache.rbdry)[*,itime]
-    bdry[1,*] = (data_cache.zbdry)[*,itime]
-    data = create_struct(data,$
-	'lim',transpose([[data_cache.xlim[*,0]],[data_cache.ylim[*,0]]]),$
-	'r',(data_cache.r)[*,itime],$
-	'z',(data_cache.z)[*,itime],$
-	'bdry',temporary(bdry))
-   end
+       s = size(data_cache.rbdry)
+       bdry = fltarr(2,s[1])
+          ; EFIT03 returns 1-D array here
+       if s[0] eq 1 then begin
+          bdry[0,*] = (data_cache.rbdry)[itime]
+          bdry[1,*] = (data_cache.zbdry)[itime]
+       endif else begin
+          bdry[0,*] = (data_cache.rbdry)[*,itime]
+          bdry[1,*] = (data_cache.zbdry)[*,itime]
+       end
+          ; see if YLIM defined OK [BD add]
+       tags = tag_names( data_cache )
+       if where( tags EQ 'YLIM' ) EQ -1 then begin
+          data = create_struct( data, $
+		   'lim',  transpose([[data_cache.xlim[*,0]],[data_cache.zlim[*,0]]]),$
+		   'r',    (data_cache.r)[*,itime],$
+		   'z',    (data_cache.z)[*,itime],$
+		   'bdry', temporary(bdry)  )
+       endif else begin
+          data = create_struct( data, $
+		   'lim',  transpose([[data_cache.xlim[*,0]],[data_cache.ylim[*,0]]]),$
+		   'r',    (data_cache.r)[*,itime],$
+		   'z',    (data_cache.z)[*,itime],$
+		   'bdry', temporary(bdry)  )
+       end    
+	   end
    else: begin
-    ; other machine, assume same structure as D3D
-    dummy = where(tags eq 'R' or tags eq 'Z',n)
-    if (n ne 2) then begin
-      message,machine+' - no R, Z in MDSplus',/info
-      data.error = 1
-      status = 0
-      return,data
-    endif
-    data = create_struct(data,'lim',data_cache.lim,'r',data_cache.r,'z',data_cache.z)
-   end
+       ; other machine, assume same structure as D3D
+       dummy = where(tags eq 'R' or tags eq 'Z',n)
+       if (n ne 2) then begin
+	  message,machine+' - no R, Z in MDSplus',/info
+	  data.error = 1
+	  status = 0
+	  return,data
+       endif
+       data = create_struct(data,'lim',data_cache.lim,'r',data_cache.r,'z',data_cache.z)
+          end
    endcase
 
 
@@ -848,9 +850,19 @@ skip_tag:
     data.error = 1
   endelse
 
+;;;  help,data
+;;; print, ' >>> in '+proname()+', data.bdry[*,0:4]='
+;;; print, data.bdry[0,0:4]
+;;; print, ' '
+;;; print, data.bdry[1,0:4]  
+
+;;;  stop
+
   return,data
+
 end
 
+;--------------------------------------------------------------------------
 function readg_mdsread,info,itime,verbose=verbose,debug=debug,status=status
 
   common efit_readg_cache,info_cache,data_cache
@@ -909,6 +921,8 @@ function readg, arg1, arg2, mode=mode, runid=runid, info=info, source=source, $
 
   forward_function efit_read, efitde_read
 
+;;;stop
+
   if n_elements(runid) gt 0 then begin
     if strupcase(strtrim(strjoin(runid),2)) eq 'EFITDE' then begin
       g = efitde_read(arg1,type='g',debug=debug,status=status,server=server)
@@ -921,7 +935,28 @@ function readg, arg1, arg2, mode=mode, runid=runid, info=info, source=source, $
                 exact_time=exact_time, time_range=time_range, $
                 server=server, $
                 verbose=verbose, debug=debug, status=status)
-  
+
+;;;  if keyword_set(debug) then begin
+;;;     print, ''
+;;;     print, ' oooooooooo  for g.psirz:'
+;;;     minmax, g.psirz
+;;;     print, ''
+;;;  endif
+
+; 20-Oct-2009 Change at the request of Steve Sabbagh (his files don't need this)
+
+;;;  if n_elements( source ) gt 0 then begin
+;;;    if source eq 'FILE' then begin
+;;;       minp = MIN( g.psirz, MAX=maxp )
+;;;       if minp lt -.1 and maxP lt .08 then begin
+;;;	  g.psirz = -1.0*g.psirz
+;;;	  print, ' '
+;;;	  print, ' >>> Inverting g.psirz for file input!!!" 
+;;;	  print, ' '
+;;;       endif
+;;;    endif
+;;;  endif
+
   return,g
 
 end

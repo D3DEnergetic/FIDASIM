@@ -1761,6 +1761,7 @@ subroutine read_npa
     integer, dimension(:), allocatable :: a_shape, d_shape
     character(len=20) :: system = ''
     
+    real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1.d0)
     real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
     real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
     real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0, r0_d, v0
@@ -1918,7 +1919,7 @@ subroutine read_npa
                             call hit_npa_detector(r0,v0,d_index)
                             if(d_index.ne.0) then
                                 r = normp(rd_d - r0_d)**2.0
-                                dprob = (dx*dy) * ((4*pi)**(-1.0)) * r0_d(3) * (r**(-1.5))
+                                dprob = (dx*dy) * inv_4pi * r0_d(3) * (r**(-1.5))
                                 eff_rd = eff_rd + dprob*rd
                                 total_prob = total_prob + dprob
                             endif
@@ -6970,6 +6971,7 @@ program fidasim
     endif
   
     if(inputs%calc_spec.ge.1) call write_spectra()
+    write(*,'(30X,a)') ''
   
     !! -----------------------------------------------------------------------
     !! ----------------------- CALCULATE the NPA FLUX ------------------------
@@ -6989,6 +6991,7 @@ program fidasim
     endif
   
     if(inputs%calc_npa.ge.1) call write_npa()
+    write(*,'(30X,a)') ''
   
     !! -------------------------------------------------------------------
     !! ----------- Calculation of weight functions -----------------------

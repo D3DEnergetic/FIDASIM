@@ -1,5 +1,24 @@
 SHELL = /bin/sh
 
+SUPPORTED_FC = gfortran ifort
+SUPPORTED_CC = gcc icc
+SUPPORTED_CXX = g++ icpc
+
+HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
+ifeq ($(HAS_FC),)
+    $(error Fortran compiler $(FC) is not supported. Set FC to gfortran or ifort)
+endif
+
+HAS_CC := $(strip $(foreach SC, $(SUPPORTED_CC), $(findstring $(SC), $(CC))))
+ifeq ($(HAS_CC),)
+    $(error C compiler $(CC) is not supported. Set CC to gcc or icc)
+endif
+
+HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
+ifeq ($(HAS_CXX),)
+    $(error C++ compiler $(CXX) is not supported. Set CXX to g++ or icpc)
+endif
+
 # directories
 SRC_DIR = $(FIDASIM_DIR)/src
 DEPS_DIR = $(FIDASIM_DIR)/deps

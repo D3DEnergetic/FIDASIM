@@ -763,37 +763,37 @@ interface interpol
 end interface
 
 !! definition of the structures:
-type(BeamGrid)            :: beam_grid
+type(BeamGrid), save            :: beam_grid
     !+ Variable containing beam grid definition
-type(InterpolationGrid)   :: inter_grid
+type(InterpolationGrid), save   :: inter_grid
     !+ Variable containing interpolation grid definition
-type(FastIonDistribution) :: fbm
+type(FastIonDistribution), save :: fbm
     !+ Variable containing the fast-ion distribution function
-type(FastIonParticles)    :: particles
+type(FastIonParticles), save    :: particles
     !+ Variable containing a MC fast-ion distribution
-type(Equilibrium)         :: equil
+type(Equilibrium), save         :: equil
     !+ Variable containing the plasma parameters and fields
-type(NeutralBeam)         :: nbi
+type(NeutralBeam), save         :: nbi
     !+ Variable containing the neutral beam geometry and settings
-type(AtomicTables)        :: tables
+type(AtomicTables), save        :: tables
     !+ Variable containing the atomic tables
-type(NPAResults)          :: npa
+type(NPAResults), save          :: npa
     !+ Variable for storing the calculated NPA results
-type(SpectralChords)      :: spec_chords
+type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
-type(NPAChords)           :: npa_chords
+type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
-type(SimulationInputs)    :: inputs
+type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
-type(BirthProfile)        :: birth
+type(BirthProfile), save        :: birth
     !+ Variable for storing the calculated birth profile
-type(NeutralDensity)      :: neut
+type(NeutralDensity), save      :: neut
     !+ Variable for storing the calculated beam density
-type(Spectra)             :: spec
+type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
-type(FIDAWeights)         :: fweight
+type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
-type(NPAWeights)          :: nweight
+type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
 
 contains
@@ -1428,6 +1428,8 @@ subroutine read_inputs
         write(*,'(a)') "---- Input files ----"
     endif
   
+    error = .False.
+
     inquire(file=inputs%tables_file,exist=exis)
     if(exis) then
         if(inputs%verbose.ge.1) then
@@ -1458,7 +1460,7 @@ subroutine read_inputs
     else
         write(*,'(a,a)') 'READ_INPUTS: Equilibrium file does not exist: ', &
                          trim(inputs%equilibrium_file)
-      error = .True.
+        error = .True.
     endif
   
     inquire(file=inputs%distribution_file,exist=exis)

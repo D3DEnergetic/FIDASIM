@@ -582,7 +582,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-class"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-class"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -608,31 +608,31 @@ implementation in a submodule of an interface in a parent module.</p>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">type </span><span class="n">FastIon</span>
     <span class="c">!+ Defines a fast-ion</span>
-    <span class="kt">logical</span>          <span class="kd">::</span> <span class="n">cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+    <span class="kt">logical</span>        <span class="kd">::</span> <span class="n">cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
         <span class="c">!+ Indicates whether the fast-ion crosses the [[libfida:beam_grid]]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">r</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">r</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Radial position of fast-ion [cm]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">z</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">z</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Vertical position of fast-ion [cm]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Torodial/phi position where fast-ion enters the [[libfida:beam_grid]] [radians]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">delta_phi</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">delta_phi</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Angle subtended by the [[libfida:beam_grid]] at (r,z)</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">energy</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">energy</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Energy [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">pitch</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">pitch</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Pitch w.r.t. the magnetic field</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">vabs</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vabs</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Speed [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">vr</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vr</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Radial velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">vt</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span> 
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vt</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span> 
         <span class="c">!+ Torodial velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">vz</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span> 
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vz</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span> 
         <span class="c">!+ Z velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">weight</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">weight</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Particle weight: How many fast-ions does particle represent.</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="k">class</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="k">class</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Orbit class id</span>
 <span class="k">end type </span><span class="n">FastIon</span>
 </pre></div>

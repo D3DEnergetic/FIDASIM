@@ -189,7 +189,7 @@
         
         <a class="list-group-item" href="../proc/read_mc.html#variable-orbit_class">orbit_class</a>
         
-        <a class="list-group-item" href="../proc/read_mc.html#variable-cnt%7E4">cnt</a>
+        <a class="list-group-item" href="../proc/read_mc.html#variable-cnt%7E5">cnt</a>
         
         <a class="list-group-item" href="../proc/read_mc.html#variable-num">num</a>
         
@@ -688,6 +688,8 @@
           <a class="list-group-item" href="../proc/pp_subtract.html">pp_subtract</a>
           
           <a class="list-group-item" href="../proc/print_banner.html">print_banner</a>
+          
+          <a class="list-group-item" href="../proc/print_default_namelist.html">print_default_namelist</a>
           
           <a class="list-group-item" href="../proc/ps_divide.html">ps_divide</a>
           
@@ -1205,7 +1207,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-i%7E12"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-i%7E12"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1219,7 +1221,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-ii%7E2"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-ii%7E2"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1233,7 +1235,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-ir"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-ir"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1247,7 +1249,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-iz"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-iz"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1261,7 +1263,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-nphi"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nphi"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1429,7 +1431,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-minpos"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-minpos"></span>integer(kind=Int32),</td>
   
   <td>public,</td>
   <td>dimension(1)</td><td>::</td>
@@ -1569,7 +1571,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-orbit_class"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-orbit_class"></span>integer(kind=Int32),</td>
   
   <td>public,</td>
   <td>dimension(:), allocatable</td><td>::</td>
@@ -1583,7 +1585,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-cnt%7E4"></span>integer,</td>
+  <td><span class="anchor" id="variable-cnt%7E5"></span>integer,</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1650,16 +1652,16 @@ implementation in a submodule of an interface in a parent module.</p>
         <span class="c">!+ Error code</span>
 
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">ii</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">,</span><span class="n">nphi</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">ii</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">,</span><span class="n">nphi</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi</span><span class="p">,</span><span class="n">xmin</span><span class="p">,</span><span class="n">xmax</span><span class="p">,</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">,</span><span class="n">zmin</span><span class="p">,</span><span class="n">zmax</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi_enter</span><span class="p">,</span><span class="n">delta_phi</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">uvw</span><span class="p">,</span><span class="n">xyz</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">minpos</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">minpos</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">in_grid</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">weight</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">r</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="n">vt</span><span class="p">,</span> <span class="n">vz</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">orbit_class</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">orbit_class</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">cnt</span><span class="p">,</span><span class="n">num</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dist_type_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
   

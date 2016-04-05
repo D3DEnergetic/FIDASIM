@@ -133,11 +133,13 @@
     <div id="vars" class="panel-collapse collapse">
       <div class="list-group">
         
-        <a class="list-group-item" href="../type/birthprofile.html#variable-ind">ind</a>
+        <a class="list-group-item" href="../type/birthprofile.html#variable-cnt">cnt</a>
         
         <a class="list-group-item" href="../type/birthprofile.html#variable-ri">ri</a>
         
         <a class="list-group-item" href="../type/birthprofile.html#variable-vi">vi</a>
+        
+        <a class="list-group-item" href="../type/birthprofile.html#variable-ind">ind</a>
         
         <a class="list-group-item" href="../type/birthprofile.html#variable-dens">dens</a>
         
@@ -270,11 +272,11 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-ind"></span>integer,</td>
+  <td><span class="anchor" id="variable-cnt"></span>integer,</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>ind</strong></td><td> =</td><td>1</td><td><p>Particle counter</p></td>
+  <td><strong>cnt</strong></td><td> =</td><td>1</td><td><p>Particle counter</p></td>
   
 </tr>
 
@@ -312,6 +314,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-ind"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>ind</strong></td><td></td><td></td><td><p>Particle <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dens"></span>real(kind=Float64),</td>
   
   <td>public,</td>
@@ -338,12 +354,14 @@
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">type </span><span class="n">BirthProfile</span>
     <span class="c">!+ Birth profile structure</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ind</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">cnt</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="c">!+ Particle counter</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">ri</span>
         <span class="c">!+ Particle birth position [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">vi</span>
         <span class="c">!+ Particle birth velocity [cm/s]</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>           <span class="kd">::</span> <span class="n">ind</span>
+        <span class="c">!+ Particle [[libfida:beam_grid]] indices</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dens</span>
         <span class="c">!+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]</span>
 <span class="k">end type </span><span class="n">BirthProfile</span>

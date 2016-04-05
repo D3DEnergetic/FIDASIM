@@ -81,12 +81,12 @@ function rng_normal(self) result(n)
     real(Float64)                 :: n
         !+ Normal random deviate
 
-    real(Float64) :: s = 0.449871d0
-    real(Float64) :: t = 0.386595d0
-    real(Float64) :: a = 0.196000d0
-    real(Float64) :: b = 0.254720d0
-    real(Float64) :: r1 = 0.27597d0
-    real(Float64) :: r2 = 0.27846d0
+    real(Float64), parameter :: s = 0.449871d0
+    real(Float64), parameter :: t = 0.386595d0
+    real(Float64), parameter :: a = 0.196000d0
+    real(Float64), parameter :: b = 0.254720d0
+    real(Float64), parameter :: r1 = 0.27597d0
+    real(Float64), parameter :: r2 = 0.27846d0
     real(Float64) :: u, v, x, y, q
   
     do

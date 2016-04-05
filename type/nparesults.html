@@ -402,7 +402,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-nchan%7E3"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nchan%7E3"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -416,7 +416,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-npart"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-npart"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -430,7 +430,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-nmax"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nmax"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -444,7 +444,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-nloop"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nloop"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -512,13 +512,13 @@ implementation in a submodule of an interface in a parent module.</p>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">type </span><span class="n">NPAResults</span>
     <span class="c">!+ MC NPA result structure</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nchan</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nchan</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Number of NPA channels</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">npart</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">npart</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Number of particles that hit a detector</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nmax</span> <span class="o">=</span> <span class="mi">1000000</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nmax</span> <span class="o">=</span> <span class="mi">1000000</span>
         <span class="c">!+ Maximum allowed number of particles grows if necessary</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nloop</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nloop</span> <span class="o">=</span> <span class="mi">1000</span>
         <span class="c">!+ Increases number of MC markers by factor of `nloop` </span>
     <span class="k">type</span><span class="p">(</span><span class="n">NPAParticle</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">part</span>
         <span class="c">!+ Array of NPA particles</span>

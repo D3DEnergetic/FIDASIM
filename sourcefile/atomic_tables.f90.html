@@ -5707,144 +5707,209 @@
 <a name="ln-5503"></a>
 <a name="ln-5504"></a><span class="k">end subroutine </span><span class="n">write_bt_H_Aq</span>
 <a name="ln-5505"></a>
-<a name="ln-5506"></a><span class="k">end module </span><span class="n">atomic_tables</span>
-<a name="ln-5507"></a>
-<a name="ln-5508"></a><span class="k">program </span><span class="n">generate_tables</span>
-<a name="ln-5509"></a>    <span class="c">!+ Tabulates cross sections and reaction rates and writes them to a HDF5 file</span>
-<a name="ln-5510"></a>    <span class="k">use </span><span class="n">atomic_tables</span>
-<a name="ln-5511"></a>    <span class="k">use </span><span class="n">H5LT</span>
-<a name="ln-5512"></a>    <span class="k">use </span><span class="n">HDF5</span>
-<a name="ln-5513"></a>    <span class="k">use </span><span class="n">hdf5_extra</span>
-<a name="ln-5514"></a>
-<a name="ln-5515"></a><span class="cp">#ifdef _OMP</span>
-<a name="ln-5516"></a>  <span class="k">use </span><span class="n">omp_lib</span>
-<a name="ln-5517"></a><span class="cp">#endif</span>
-<a name="ln-5518"></a>
-<a name="ln-5519"></a>    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span> <span class="kd">::</span> <span class="n">namelist_file</span>
-<a name="ln-5520"></a>    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">arg</span>
-<a name="ln-5521"></a>
-<a name="ln-5522"></a>    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tables_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-5523"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span>
-<a name="ln-5524"></a>
-<a name="ln-5525"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="kd">::</span> <span class="n">time_arr</span><span class="p">,</span> <span class="n">time_start</span><span class="p">,</span> <span class="n">time_end</span>
-<a name="ln-5526"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minu</span><span class="p">,</span> <span class="n">sec</span>
-<a name="ln-5527"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">argc</span><span class="p">,</span> <span class="n">max_threads</span><span class="p">,</span> <span class="n">nthreads</span>
-<a name="ln-5528"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fid</span><span class="p">,</span> <span class="n">gid</span>
-<a name="ln-5529"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">error</span>
-<a name="ln-5530"></a>    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">exis</span>
-<a name="ln-5531"></a>
-<a name="ln-5532"></a>    <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">general_settings</span><span class="o">/</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">tables_file</span>
-<a name="ln-5533"></a>
-<a name="ln-5534"></a>    <span class="n">argc</span> <span class="o">=</span> <span class="nb">command_argument_count</span><span class="p">()</span>
-<a name="ln-5535"></a>    <span class="k">if</span><span class="p">(</span><span class="n">argc</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-5536"></a><span class="k">        call </span><span class="nb">get_command_argument</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">)</span>
-<a name="ln-5537"></a>    <span class="n">endif</span>
-<a name="ln-5538"></a>
-<a name="ln-5539"></a>    <span class="k">inquire</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">,</span><span class="n">exist</span><span class="o">=</span><span class="n">exis</span><span class="p">)</span>
-<a name="ln-5540"></a>    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">exis</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-5541"></a><span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;Input file does not exist: &#39;</span><span class="p">,</span><span class="nb">trim</span><span class="p">(</span><span class="n">namelist_file</span><span class="p">)</span>
-<a name="ln-5542"></a>        <span class="k">stop</span>
-<a name="ln-5543"></a><span class="k">    else</span>
-<a name="ln-5544"></a><span class="k">        open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">)</span>
-<a name="ln-5545"></a>        <span class="k">read</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="n">NML</span><span class="o">=</span><span class="n">general_settings</span><span class="p">)</span>
-<a name="ln-5546"></a>        <span class="k">close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
-<a name="ln-5547"></a>        <span class="n">n_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
-<a name="ln-5548"></a>        <span class="n">m_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m_max</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
-<a name="ln-5549"></a>    <span class="n">endif</span>
-<a name="ln-5550"></a>
-<a name="ln-5551"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- General settings ----&quot;</span>
-<a name="ln-5552"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;n_max = &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">n_max</span>
-<a name="ln-5553"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;m_max = &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">m_max</span>
-<a name="ln-5554"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Tables File: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="n">tables_file</span><span class="p">)</span>
-<a name="ln-5555"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-5556"></a>
-<a name="ln-5557"></a><span class="cp">#ifdef _OMP</span>
-<a name="ln-5558"></a>    <span class="n">max_threads</span> <span class="o">=</span> <span class="n">OMP_get_num_procs</span><span class="p">()</span>
-<a name="ln-5559"></a>    <span class="k">if</span><span class="p">(</span><span class="n">argc</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-5560"></a><span class="k">        call </span><span class="nb">get_command_argument</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">arg</span><span class="p">)</span>
-<a name="ln-5561"></a>        <span class="k">read</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span><span class="s1">&#39;(i3)&#39;</span><span class="p">)</span> <span class="n">nthreads</span>
-<a name="ln-5562"></a>    <span class="k">else</span>
-<a name="ln-5563"></a><span class="k">        </span><span class="n">nthreads</span> <span class="o">=</span> <span class="n">max_threads</span>
-<a name="ln-5564"></a>    <span class="n">endif</span>
-<a name="ln-5565"></a>    <span class="n">max_threads</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nthreads</span><span class="p">,</span><span class="n">max_threads</span><span class="p">)</span>
-<a name="ln-5566"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- OpenMP settings ----&quot;</span>
-<a name="ln-5567"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Number of threads: &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">max_threads</span>
-<a name="ln-5568"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-5569"></a>    <span class="k">call </span><span class="n">OMP_set_num_threads</span><span class="p">(</span><span class="n">max_threads</span><span class="p">)</span>
-<a name="ln-5570"></a><span class="cp">#endif</span>
-<a name="ln-5571"></a>
-<a name="ln-5572"></a>    <span class="c">!! Check if compression is possible</span>
-<a name="ln-5573"></a>    <span class="k">call </span><span class="n">check_compression_availability</span><span class="p">()</span>
+<a name="ln-5506"></a><span class="k">subroutine </span><span class="n">print_default_namelist</span>
+<a name="ln-5507"></a>    <span class="c">!+ Prints out the default settings as a namelist</span>
+<a name="ln-5508"></a>
+<a name="ln-5509"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;!Default Atomic Table Settings&quot;</span>
+<a name="ln-5510"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&amp;general_settings&quot;</span>
+<a name="ln-5511"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;n_max = 12,    !Number of initial atomic energy levels&quot;</span>
+<a name="ln-5512"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;m_max = 12,    !Number of final atomic energy levels&quot;</span>
+<a name="ln-5513"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;tables_file = &#39;./atomic_tables.h5&#39;&quot;</span>
+<a name="ln-5514"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;/&quot;</span>
+<a name="ln-5515"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;!Hydrogen-Hydrogen Cross Sections&quot;</span>
+<a name="ln-5516"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&amp;H_H_cross&quot;</span>
+<a name="ln-5517"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;nenergy = 200, !Number of energy values&quot;</span>
+<a name="ln-5518"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emin = 1.0E-3, !Minimum energy [keV]&quot;</span>
+<a name="ln-5519"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emax = 8.0E2   !Maximum energy [keV]&quot;</span>
+<a name="ln-5520"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;/&quot;</span>
+<a name="ln-5521"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;!Hydrogen-Electron Cross Sections&quot;</span>
+<a name="ln-5522"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&amp;H_e_cross&quot;</span>
+<a name="ln-5523"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;nenergy = 200, !Number of energy values&quot;</span>
+<a name="ln-5524"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emin = 1.0E-3, !Minimum energy [keV]&quot;</span>
+<a name="ln-5525"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emax = 8.0E2   !Maximum energy [keV]&quot;</span>
+<a name="ln-5526"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;/&quot;</span>
+<a name="ln-5527"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;!Hydrogen-Impurity Cross Sections&quot;</span>
+<a name="ln-5528"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&amp;H_Aq_cross&quot;</span>
+<a name="ln-5529"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;q = 6,         !Impurity charge: Boron: 5, Carbon: 6, ...&quot;</span>
+<a name="ln-5530"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;nenergy = 200, !Number of energy values&quot;</span>
+<a name="ln-5531"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emin = 1.0E-3, !Minimum energy [keV]&quot;</span>
+<a name="ln-5532"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emax = 8.0E2   !Maximum energy [keV]&quot;</span>
+<a name="ln-5533"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;/&quot;</span>
+<a name="ln-5534"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;!Hydrogen-Hydrogen Reaction Rates&quot;</span>
+<a name="ln-5535"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&amp;H_H_rates&quot;</span>
+<a name="ln-5536"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;nenergy = 100, !Number of energy values&quot;</span>
+<a name="ln-5537"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emin = 1.0E-3, !Minimum energy [keV]&quot;</span>
+<a name="ln-5538"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emax = 4.0E2,  !Maximum energy [keV]&quot;</span>
+<a name="ln-5539"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;ntemp = 100,   !Number of temperature values&quot;</span>
+<a name="ln-5540"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;tmin = 1.0E-3, !Minimum ion temperature [keV]&quot;</span>
+<a name="ln-5541"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;tmax = 2.0E1   !Maximum ion temperature [keV]&quot;</span>
+<a name="ln-5542"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;/&quot;</span>
+<a name="ln-5543"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;!Hydrogen-Electron Reaction Rates&quot;</span>
+<a name="ln-5544"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&amp;H_e_rates&quot;</span>
+<a name="ln-5545"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;nenergy = 100, !Number of energy values&quot;</span>
+<a name="ln-5546"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emin = 1.0E-3, !Minimum energy [keV]&quot;</span>
+<a name="ln-5547"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emax = 4.0E2,  !Maximum energy [keV]&quot;</span>
+<a name="ln-5548"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;ntemp = 100,   !Number of temperature values&quot;</span>
+<a name="ln-5549"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;tmin = 1.0E-3, !Minimum electron temperature [keV]&quot;</span>
+<a name="ln-5550"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;tmax = 2.0E1   !Maximum electron temperature [keV]&quot;</span>
+<a name="ln-5551"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;/&quot;</span>
+<a name="ln-5552"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;!Hydrogen-Impurity Reaction Rates&quot;</span>
+<a name="ln-5553"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&amp;H_Aq_rates&quot;</span>
+<a name="ln-5554"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;q = 6,         !Impurity charge: Boron: 5, Carbon: 6, ...&quot;</span>
+<a name="ln-5555"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;mass = 12.011, !Impurity mass [amu]&quot;</span>
+<a name="ln-5556"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;nenergy = 100, !Number of energy values&quot;</span>
+<a name="ln-5557"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emin = 1.0E-3, !Minimum energy [keV]&quot;</span>
+<a name="ln-5558"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;emax = 4.0E2,  !Maximum energy [keV]&quot;</span>
+<a name="ln-5559"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;ntemp = 100,   !Number of temperature values&quot;</span>
+<a name="ln-5560"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;tmin = 1.0E-3, !Minimum ion temperature [keV]&quot;</span>
+<a name="ln-5561"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;tmax = 2.0E1   !Maximum ion temperature [keV]&quot;</span>
+<a name="ln-5562"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;/&quot;</span>
+<a name="ln-5563"></a>
+<a name="ln-5564"></a><span class="k">end subroutine </span><span class="n">print_default_namelist</span>
+<a name="ln-5565"></a>
+<a name="ln-5566"></a><span class="k">end module </span><span class="n">atomic_tables</span>
+<a name="ln-5567"></a>
+<a name="ln-5568"></a><span class="k">program </span><span class="n">generate_tables</span>
+<a name="ln-5569"></a>    <span class="c">!+ Tabulates cross sections and reaction rates and writes them to a HDF5 file</span>
+<a name="ln-5570"></a>    <span class="k">use </span><span class="n">atomic_tables</span>
+<a name="ln-5571"></a>    <span class="k">use </span><span class="n">H5LT</span>
+<a name="ln-5572"></a>    <span class="k">use </span><span class="n">HDF5</span>
+<a name="ln-5573"></a>    <span class="k">use </span><span class="n">hdf5_extra</span>
 <a name="ln-5574"></a>
-<a name="ln-5575"></a>    <span class="k">call </span><span class="nb">date_and_time</span> <span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-5576"></a> 
-<a name="ln-5577"></a>    <span class="c">!! Open HDF5 Interface</span>
-<a name="ln-5578"></a>    <span class="k">call </span><span class="n">h5open_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-<a name="ln-5579"></a>  
-<a name="ln-5580"></a>    <span class="c">!! Create tables file. Overwrites if already exists</span>
-<a name="ln-5581"></a>    <span class="k">call </span><span class="n">h5fcreate_f</span><span class="p">(</span><span class="n">tables_file</span><span class="p">,</span> <span class="n">H5F_ACC_TRUNC_F</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5582"></a>  
-<a name="ln-5583"></a>    <span class="c">!! Create group for cross sections</span>
-<a name="ln-5584"></a>    <span class="k">call </span><span class="n">h5gcreate_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;cross&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5585"></a>  
-<a name="ln-5586"></a>    <span class="c">!! Calculate cross sections</span>
-<a name="ln-5587"></a>    <span class="k">call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_arr</span><span class="p">)</span>
-<a name="ln-5588"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s2">&quot;(A,I2,A,I2.2,A,I2.2)&quot;</span><span class="p">)</span> <span class="s1">&#39;Cross Sections:   &#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-<a name="ln-5589"></a>    <span class="k">call </span><span class="n">write_bb_H_H</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
-<a name="ln-5590"></a>    <span class="k">call </span><span class="n">write_bb_H_e</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
-<a name="ln-5591"></a>    <span class="k">call </span><span class="n">write_bb_H_Aq</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
-<a name="ln-5592"></a>  
-<a name="ln-5593"></a>    <span class="c">!! Close cross section group</span>
-<a name="ln-5594"></a>    <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5595"></a>  
-<a name="ln-5596"></a>    <span class="c">!! Create group for reaction rates</span>
-<a name="ln-5597"></a>    <span class="k">call </span><span class="n">h5gcreate_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;rates&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5598"></a>    
-<a name="ln-5599"></a>    <span class="c">!! Calculate reaction rates</span>
-<a name="ln-5600"></a>    <span class="k">call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_arr</span><span class="p">)</span>
-<a name="ln-5601"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s2">&quot;(A,I2,A,I2.2,A,I2.2)&quot;</span><span class="p">)</span> <span class="s1">&#39;Reaction Rates:   &#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-<a name="ln-5602"></a>    <span class="k">call </span><span class="n">write_bt_H_H</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
-<a name="ln-5603"></a>    <span class="k">call </span><span class="n">write_bt_H_e</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
-<a name="ln-5604"></a>    <span class="k">call </span><span class="n">write_bt_H_Aq</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
-<a name="ln-5605"></a>    <span class="k">call </span><span class="n">write_einstein</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
-<a name="ln-5606"></a>  
-<a name="ln-5607"></a>    <span class="c">!! Close reaction rates group</span>
-<a name="ln-5608"></a>    <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5609"></a>  
-<a name="ln-5610"></a>    <span class="c">!! Add group attributes</span>
-<a name="ln-5611"></a>    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
-<a name="ln-5612"></a>         <span class="s2">&quot;Atomic Cross Sections and Rates&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5613"></a>    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;cross&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
-<a name="ln-5614"></a>         <span class="s2">&quot;Atomic Cross Sections&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5615"></a>    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;rates&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
-<a name="ln-5616"></a>         <span class="s2">&quot;Atomic Reaction Rates&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5617"></a>  
-<a name="ln-5618"></a>    <span class="c">!! Close file and HDF5 interface</span>
-<a name="ln-5619"></a>    <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-<a name="ln-5620"></a>    <span class="k">call </span><span class="n">h5close_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-<a name="ln-5621"></a>  
-<a name="ln-5622"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Atomic tables written to &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">tables_file</span><span class="p">)</span>
-<a name="ln-5623"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-5624"></a>
-<a name="ln-5625"></a>    <span class="k">call </span><span class="nb">date_and_time</span> <span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_arr</span><span class="p">)</span>
-<a name="ln-5626"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(A,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="s1">&#39;END: hour, minute, second: &#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">time_arr</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-<a name="ln-5627"></a>
-<a name="ln-5628"></a>    <span class="k">call </span><span class="nb">date_and_time</span> <span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_end</span><span class="p">)</span>
-<a name="ln-5629"></a>    <span class="n">hour</span> <span class="o">=</span> <span class="n">time_end</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-<a name="ln-5630"></a>    <span class="n">minu</span> <span class="o">=</span> <span class="n">time_end</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
-<a name="ln-5631"></a>    <span class="n">sec</span>  <span class="o">=</span> <span class="n">time_end</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-<a name="ln-5632"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">minu</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-5633"></a><span class="k">        </span><span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">+</span><span class="mi">60</span>
-<a name="ln-5634"></a>        <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span> <span class="o">-</span><span class="mi">1</span>
-<a name="ln-5635"></a>    <span class="n">endif</span>
-<a name="ln-5636"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">sec</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-5637"></a><span class="k">        </span><span class="n">sec</span>  <span class="o">=</span> <span class="n">sec</span> <span class="o">+</span><span class="mi">60</span>
-<a name="ln-5638"></a>        <span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">-</span><span class="mi">1</span>
-<a name="ln-5639"></a>    <span class="n">endif</span>
-<a name="ln-5640"></a>
-<a name="ln-5641"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(A,18X,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="s1">&#39;duration:&#39;</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minu</span><span class="p">,</span><span class="n">sec</span>
-<a name="ln-5642"></a>
-<a name="ln-5643"></a><span class="k">end program</span>
+<a name="ln-5575"></a><span class="cp">#ifdef _OMP</span>
+<a name="ln-5576"></a>  <span class="k">use </span><span class="n">omp_lib</span>
+<a name="ln-5577"></a><span class="cp">#endif</span>
+<a name="ln-5578"></a>
+<a name="ln-5579"></a>    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span> <span class="kd">::</span> <span class="n">namelist_file</span>
+<a name="ln-5580"></a>    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">arg</span>
+<a name="ln-5581"></a>
+<a name="ln-5582"></a>    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tables_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-5583"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span>
+<a name="ln-5584"></a>
+<a name="ln-5585"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="kd">::</span> <span class="n">time_arr</span><span class="p">,</span> <span class="n">time_start</span><span class="p">,</span> <span class="n">time_end</span>
+<a name="ln-5586"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minu</span><span class="p">,</span> <span class="n">sec</span>
+<a name="ln-5587"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">argc</span><span class="p">,</span> <span class="n">max_threads</span><span class="p">,</span> <span class="n">nthreads</span>
+<a name="ln-5588"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fid</span><span class="p">,</span> <span class="n">gid</span>
+<a name="ln-5589"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">error</span>
+<a name="ln-5590"></a>    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">exis</span>
+<a name="ln-5591"></a>
+<a name="ln-5592"></a>    <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">general_settings</span><span class="o">/</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">tables_file</span>
+<a name="ln-5593"></a>
+<a name="ln-5594"></a>    <span class="n">argc</span> <span class="o">=</span> <span class="nb">command_argument_count</span><span class="p">()</span>
+<a name="ln-5595"></a>    <span class="k">if</span><span class="p">(</span><span class="n">argc</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-5596"></a><span class="k">        call </span><span class="n">print_default_namelist</span><span class="p">()</span>
+<a name="ln-5597"></a>        <span class="k">stop</span>
+<a name="ln-5598"></a><span class="k">    </span><span class="n">endif</span>
+<a name="ln-5599"></a>
+<a name="ln-5600"></a>    <span class="k">if</span><span class="p">(</span><span class="n">argc</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-5601"></a><span class="k">        call </span><span class="nb">get_command_argument</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">)</span>
+<a name="ln-5602"></a>    <span class="n">endif</span>
+<a name="ln-5603"></a>
+<a name="ln-5604"></a>    <span class="k">inquire</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">,</span><span class="n">exist</span><span class="o">=</span><span class="n">exis</span><span class="p">)</span>
+<a name="ln-5605"></a>    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">exis</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-5606"></a><span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;Input file does not exist: &#39;</span><span class="p">,</span><span class="nb">trim</span><span class="p">(</span><span class="n">namelist_file</span><span class="p">)</span>
+<a name="ln-5607"></a>        <span class="k">stop</span>
+<a name="ln-5608"></a><span class="k">    else</span>
+<a name="ln-5609"></a><span class="k">        open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">)</span>
+<a name="ln-5610"></a>        <span class="k">read</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="n">NML</span><span class="o">=</span><span class="n">general_settings</span><span class="p">)</span>
+<a name="ln-5611"></a>        <span class="k">close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+<a name="ln-5612"></a>        <span class="n">n_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+<a name="ln-5613"></a>        <span class="n">m_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m_max</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+<a name="ln-5614"></a>    <span class="n">endif</span>
+<a name="ln-5615"></a>
+<a name="ln-5616"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- General settings ----&quot;</span>
+<a name="ln-5617"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;n_max = &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">n_max</span>
+<a name="ln-5618"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;m_max = &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">m_max</span>
+<a name="ln-5619"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Tables File: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="n">tables_file</span><span class="p">)</span>
+<a name="ln-5620"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-5621"></a>
+<a name="ln-5622"></a><span class="cp">#ifdef _OMP</span>
+<a name="ln-5623"></a>    <span class="n">max_threads</span> <span class="o">=</span> <span class="n">OMP_get_num_procs</span><span class="p">()</span>
+<a name="ln-5624"></a>    <span class="k">if</span><span class="p">(</span><span class="n">argc</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-5625"></a><span class="k">        call </span><span class="nb">get_command_argument</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">arg</span><span class="p">)</span>
+<a name="ln-5626"></a>        <span class="k">read</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span><span class="s1">&#39;(i3)&#39;</span><span class="p">)</span> <span class="n">nthreads</span>
+<a name="ln-5627"></a>    <span class="k">else</span>
+<a name="ln-5628"></a><span class="k">        </span><span class="n">nthreads</span> <span class="o">=</span> <span class="n">max_threads</span>
+<a name="ln-5629"></a>    <span class="n">endif</span>
+<a name="ln-5630"></a>    <span class="n">max_threads</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nthreads</span><span class="p">,</span><span class="n">max_threads</span><span class="p">)</span>
+<a name="ln-5631"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- OpenMP settings ----&quot;</span>
+<a name="ln-5632"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Number of threads: &quot;,i2)&#39;</span><span class="p">)</span> <span class="n">max_threads</span>
+<a name="ln-5633"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-5634"></a>    <span class="k">call </span><span class="n">OMP_set_num_threads</span><span class="p">(</span><span class="n">max_threads</span><span class="p">)</span>
+<a name="ln-5635"></a><span class="cp">#endif</span>
+<a name="ln-5636"></a>
+<a name="ln-5637"></a>    <span class="c">!! Check if compression is possible</span>
+<a name="ln-5638"></a>    <span class="k">call </span><span class="n">check_compression_availability</span><span class="p">()</span>
+<a name="ln-5639"></a>
+<a name="ln-5640"></a>    <span class="k">call </span><span class="nb">date_and_time</span> <span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-5641"></a> 
+<a name="ln-5642"></a>    <span class="c">!! Open HDF5 Interface</span>
+<a name="ln-5643"></a>    <span class="k">call </span><span class="n">h5open_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<a name="ln-5644"></a>  
+<a name="ln-5645"></a>    <span class="c">!! Create tables file. Overwrites if already exists</span>
+<a name="ln-5646"></a>    <span class="k">call </span><span class="n">h5fcreate_f</span><span class="p">(</span><span class="n">tables_file</span><span class="p">,</span> <span class="n">H5F_ACC_TRUNC_F</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5647"></a>  
+<a name="ln-5648"></a>    <span class="c">!! Create group for cross sections</span>
+<a name="ln-5649"></a>    <span class="k">call </span><span class="n">h5gcreate_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;cross&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5650"></a>  
+<a name="ln-5651"></a>    <span class="c">!! Calculate cross sections</span>
+<a name="ln-5652"></a>    <span class="k">call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_arr</span><span class="p">)</span>
+<a name="ln-5653"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s2">&quot;(A,I2,A,I2.2,A,I2.2)&quot;</span><span class="p">)</span> <span class="s1">&#39;Cross Sections:   &#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<a name="ln-5654"></a>    <span class="k">call </span><span class="n">write_bb_H_H</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+<a name="ln-5655"></a>    <span class="k">call </span><span class="n">write_bb_H_e</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+<a name="ln-5656"></a>    <span class="k">call </span><span class="n">write_bb_H_Aq</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+<a name="ln-5657"></a>  
+<a name="ln-5658"></a>    <span class="c">!! Close cross section group</span>
+<a name="ln-5659"></a>    <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5660"></a>  
+<a name="ln-5661"></a>    <span class="c">!! Create group for reaction rates</span>
+<a name="ln-5662"></a>    <span class="k">call </span><span class="n">h5gcreate_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;rates&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5663"></a>    
+<a name="ln-5664"></a>    <span class="c">!! Calculate reaction rates</span>
+<a name="ln-5665"></a>    <span class="k">call </span><span class="nb">date_and_time</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_arr</span><span class="p">)</span>
+<a name="ln-5666"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s2">&quot;(A,I2,A,I2.2,A,I2.2)&quot;</span><span class="p">)</span> <span class="s1">&#39;Reaction Rates:   &#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="s1">&#39;:&#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<a name="ln-5667"></a>    <span class="k">call </span><span class="n">write_bt_H_H</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+<a name="ln-5668"></a>    <span class="k">call </span><span class="n">write_bt_H_e</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+<a name="ln-5669"></a>    <span class="k">call </span><span class="n">write_bt_H_Aq</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">namelist_file</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+<a name="ln-5670"></a>    <span class="k">call </span><span class="n">write_einstein</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">)</span>
+<a name="ln-5671"></a>  
+<a name="ln-5672"></a>    <span class="c">!! Close reaction rates group</span>
+<a name="ln-5673"></a>    <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5674"></a>  
+<a name="ln-5675"></a>    <span class="c">!! Add group attributes</span>
+<a name="ln-5676"></a>    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-5677"></a>         <span class="s2">&quot;Atomic Cross Sections and Rates&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5678"></a>    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;cross&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-5679"></a>         <span class="s2">&quot;Atomic Cross Sections&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5680"></a>    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;rates&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-5681"></a>         <span class="s2">&quot;Atomic Reaction Rates&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5682"></a>  
+<a name="ln-5683"></a>    <span class="c">!! Close file and HDF5 interface</span>
+<a name="ln-5684"></a>    <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+<a name="ln-5685"></a>    <span class="k">call </span><span class="n">h5close_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+<a name="ln-5686"></a>  
+<a name="ln-5687"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Atomic tables written to &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">tables_file</span><span class="p">)</span>
+<a name="ln-5688"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-5689"></a>
+<a name="ln-5690"></a>    <span class="k">call </span><span class="nb">date_and_time</span> <span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_arr</span><span class="p">)</span>
+<a name="ln-5691"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(A,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="s1">&#39;END: hour, minute, second: &#39;</span><span class="p">,</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="n">time_arr</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span><span class="n">time_arr</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<a name="ln-5692"></a>
+<a name="ln-5693"></a>    <span class="k">call </span><span class="nb">date_and_time</span> <span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_end</span><span class="p">)</span>
+<a name="ln-5694"></a>    <span class="n">hour</span> <span class="o">=</span> <span class="n">time_end</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<a name="ln-5695"></a>    <span class="n">minu</span> <span class="o">=</span> <span class="n">time_end</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<a name="ln-5696"></a>    <span class="n">sec</span>  <span class="o">=</span> <span class="n">time_end</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <span class="o">-</span> <span class="n">time_start</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<a name="ln-5697"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">minu</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-5698"></a><span class="k">        </span><span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">+</span><span class="mi">60</span>
+<a name="ln-5699"></a>        <span class="n">hour</span> <span class="o">=</span> <span class="n">hour</span> <span class="o">-</span><span class="mi">1</span>
+<a name="ln-5700"></a>    <span class="n">endif</span>
+<a name="ln-5701"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">sec</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-5702"></a><span class="k">        </span><span class="n">sec</span>  <span class="o">=</span> <span class="n">sec</span> <span class="o">+</span><span class="mi">60</span>
+<a name="ln-5703"></a>        <span class="n">minu</span> <span class="o">=</span> <span class="n">minu</span> <span class="o">-</span><span class="mi">1</span>
+<a name="ln-5704"></a>    <span class="n">endif</span>
+<a name="ln-5705"></a>
+<a name="ln-5706"></a>    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(A,18X,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="s1">&#39;duration:&#39;</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minu</span><span class="p">,</span><span class="n">sec</span>
+<a name="ln-5707"></a>
+<a name="ln-5708"></a><span class="k">end program</span>
 </pre></div>
 
     </section>

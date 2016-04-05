@@ -99,9 +99,9 @@
         
         <li><i class="fa fa-sitemap"></i> Subsections:</li>
         
-        <li><a href='../page/input_files/index.html'>Input Files</a></li>
+        <li><a href='../page/./01_getting_started.html'>Getting Started</a></li>
         
-        <li><a href='../page/./getting_started.html'>Getting Started</a></li>
+        <li><a href='../page/02_input_files/index.html'>Input Files</a></li>
         
         
 -->
@@ -126,41 +126,41 @@
           <ul class="nav nav-stacked nav-pills">
             
             <li role="presentation">
-            <a href='../page/input_files/index.html'>Input Files</a>
+            <a href='../page/./01_getting_started.html'>Getting Started</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../page/02_input_files/index.html'>Input Files</a>
             
             <ul class="nav nav-stacked nav-pills">
               
             <li role="presentation">
-            <a href='../page/input_files/prefida.html'>Making Input Files</a>
+            <a href='../page/02_input_files/01_namelist_file.html'>Namelist File</a>
             
             </li>
             
             <li role="presentation">
-            <a href='../page/input_files/namelist_file.html'>Namelist File</a>
+            <a href='../page/02_input_files/02_geometry_file.html'>Geometry File</a>
             
             </li>
             
             <li role="presentation">
-            <a href='../page/input_files/equilibrium_file.html'>Equilibrium File</a>
+            <a href='../page/02_input_files/03_equilibrium_file.html'>Equilibrium File</a>
             
             </li>
             
             <li role="presentation">
-            <a href='../page/input_files/distribution_file.html'>Distribution File</a>
+            <a href='../page/02_input_files/04_distribution_file.html'>Distribution File</a>
             
             </li>
             
             <li role="presentation">
-            <a href='../page/input_files/geometry_file.html'>Geometry File</a>
+            <a href='../page/02_input_files/05_prefida.html'>Making Input Files</a>
             
             </li>
             
             </ul>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../page/./getting_started.html'>Getting Started</a>
             
             </li>
             
@@ -173,7 +173,7 @@
 <p>In fusion plasmas fast-ions can undergo the following process with injected neutral Hydrogen:
 $$ H^+ + H(n) \rightarrow H^\ast(m) + H^+ $$
 where \(H^\ast(m)\) is an excited state of Hydrogen.
-The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excited to a lower state, emitting a doppler shifted photon illustrated below.</p>
+The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excited to a lower state, emitting a doppler shifted photon as illustrated below.</p>
 <p style="text-align: center"><img alt="Charge Exchange Process" src="../media/fast_ion_process.svg" title="Charge Exchange Process" width="500"></p>
 <p>Both the fast-neutral and the photon contain information about the velocity of fast-ion before it was neutralized.
 There are two types diagnostics that take advantage of this fact: Fast-ion D-α (FIDA) diagnostics and Neutral Partile Analyzers (NPA).
@@ -185,8 +185,8 @@ The code would be later be improved upon by <a href="http://www.physics.uci.edu/
 <p>Originally, FIDASIM was written in the IDL programming language and was prohibitively slow.
 As a part of his <a href="http://www.iaea.org/inis/collection/NCLCollectionStore/_Public/46/051/46051941.pdf">thesis</a> Ben Geiger wrote a version of FIDASIM written in Fortran 90.
 This prototype version was parallelized using OpenMP and was orders of magnitude faster but was not as easy to use as the IDL version and was difficult to port to different devices. </p>
-<p>Most recently, <a href="http://github.com/lstagner">Luke Stagner</a> as a part of his thesis has rewritten Ben Geigers Fortran 90 version to work on any axisymmetric fusion devices as well as additional functionality.
-Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful for. </p>
+<p>Most recently, <a href="http://github.com/lstagner">Luke Stagner</a> as a part of his thesis has rewritten Ben Geigers Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
+Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful. </p>
 <h2 id="capabilities">Capabilities</h2>
 <p>Currently, FIDASIM has routines for calculating:</p>
 <ul>

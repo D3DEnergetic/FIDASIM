@@ -635,6 +635,8 @@
           
           <a class="list-group-item" href="../proc/print_banner.html">print_banner</a>
           
+          <a class="list-group-item" href="../proc/print_default_namelist.html">print_default_namelist</a>
+          
           <a class="list-group-item" href="../proc/ps_divide.html">ps_divide</a>
           
           <a class="list-group-item" href="../proc/ps_multiply.html">ps_multiply</a>
@@ -1044,7 +1046,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-i%7E9"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-i%7E9"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1119,7 +1121,7 @@ implementation in a submodule of an interface in a parent module.</p>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">subroutine </span><span class="n">make_beam_grid</span>
     <span class="c">!+ Makes [[libfida:beam_grid] from user defined inputs</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span>
   
     <span class="k">allocate</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">),</span>  <span class="p">&amp;</span>

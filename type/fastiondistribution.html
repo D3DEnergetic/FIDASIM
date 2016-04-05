@@ -288,7 +288,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-nenergy"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nenergy"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -302,7 +302,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-npitch"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-npitch"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -482,25 +482,25 @@
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">type </span><span class="n">FastIonDistribution</span>
     <span class="c">!+ Defines a fast-ion distribution function: F(E,p,R,Z)</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nenergy</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nenergy</span>
         <span class="c">!+ Number of energies</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">npitch</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">npitch</span>
         <span class="c">!+ Number of pitches</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">dE</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dE</span>
         <span class="c">!+ Energy spacing [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">dp</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dp</span>
         <span class="c">!+ Pitch spacing</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">emin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">emin</span>
         <span class="c">!+ Minimum energy [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">emax</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">emax</span>
         <span class="c">!+ Maximum energy [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">e_range</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">e_range</span>
         <span class="c">!+ Energy interval length [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">pmin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">pmin</span>
         <span class="c">!+ Minimum pitch</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">pmax</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">pmax</span>
         <span class="c">!+ Maximum pitch</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">p_range</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">p_range</span>
         <span class="c">!+ Pitch interval length</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">energy</span>
         <span class="c">!+ Energy values [keV]</span>

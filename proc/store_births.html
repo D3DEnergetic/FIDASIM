@@ -617,6 +617,8 @@
           
           <a class="list-group-item" href="../proc/print_banner.html">print_banner</a>
           
+          <a class="list-group-item" href="../proc/print_default_namelist.html">print_default_namelist</a>
+          
           <a class="list-group-item" href="../proc/ps_divide.html">ps_divide</a>
           
           <a class="list-group-item" href="../proc/ps_multiply.html">ps_multiply</a>
@@ -763,7 +765,7 @@ public subroutine store_births(ind, neut_type, dflux)
   
 <tr>
   
-  <td><span class="anchor" id="variable-ind%7E13"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-ind%7E13"></span>integer(kind=Int32),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -778,7 +780,7 @@ public subroutine store_births(ind, neut_type, dflux)
   
 <tr>
   
-  <td><span class="anchor" id="variable-neut_type%7E2"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-neut_type%7E2"></span>integer(kind=Int32),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -972,11 +974,11 @@ implementation in a submodule of an interface in a parent module.</p>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">subroutine </span><span class="n">store_births</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">neut_type</span><span class="p">,</span> <span class="n">dflux</span><span class="p">)</span>
     <span class="c">!+ Store birth particles/density in [[libfida:birth]]</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
         <span class="c">!+ [[libfida:beam_grid]] indices</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">neut_type</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">neut_type</span>
         <span class="c">!+ Neutral type</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                  <span class="kd">::</span> <span class="n">dflux</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">dflux</span>
         <span class="c">!+ Deposited flux</span>
   
     <span class="c">!$OMP CRITICAL(store_births_1)</span>

@@ -5503,6 +5503,66 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
 
 end subroutine write_bt_H_Aq
 
+subroutine print_default_namelist
+    !+ Prints out the default settings as a namelist
+
+    write(*,'(a)') "!Default Atomic Table Settings"
+    write(*,'(a)') "&general_settings"
+    write(*,'(a)') "n_max = 12,    !Number of initial atomic energy levels"
+    write(*,'(a)') "m_max = 12,    !Number of final atomic energy levels"
+    write(*,'(a)') "tables_file = './atomic_tables.h5'"
+    write(*,'(a)') "/"
+    write(*,'(a)') "!Hydrogen-Hydrogen Cross Sections"
+    write(*,'(a)') "&H_H_cross"
+    write(*,'(a)') "nenergy = 200, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
+    write(*,'(a)') "/"
+    write(*,'(a)') "!Hydrogen-Electron Cross Sections"
+    write(*,'(a)') "&H_e_cross"
+    write(*,'(a)') "nenergy = 200, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
+    write(*,'(a)') "/"
+    write(*,'(a)') "!Hydrogen-Impurity Cross Sections"
+    write(*,'(a)') "&H_Aq_cross"
+    write(*,'(a)') "q = 6,         !Impurity charge: Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "nenergy = 200, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
+    write(*,'(a)') "/"
+    write(*,'(a)') "!Hydrogen-Hydrogen Reaction Rates"
+    write(*,'(a)') "&H_H_rates"
+    write(*,'(a)') "nenergy = 100, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
+    write(*,'(a)') "ntemp = 100,   !Number of temperature values"
+    write(*,'(a)') "tmin = 1.0E-3, !Minimum ion temperature [keV]"
+    write(*,'(a)') "tmax = 2.0E1   !Maximum ion temperature [keV]"
+    write(*,'(a)') "/"
+    write(*,'(a)') "!Hydrogen-Electron Reaction Rates"
+    write(*,'(a)') "&H_e_rates"
+    write(*,'(a)') "nenergy = 100, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
+    write(*,'(a)') "ntemp = 100,   !Number of temperature values"
+    write(*,'(a)') "tmin = 1.0E-3, !Minimum electron temperature [keV]"
+    write(*,'(a)') "tmax = 2.0E1   !Maximum electron temperature [keV]"
+    write(*,'(a)') "/"
+    write(*,'(a)') "!Hydrogen-Impurity Reaction Rates"
+    write(*,'(a)') "&H_Aq_rates"
+    write(*,'(a)') "q = 6,         !Impurity charge: Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "mass = 12.011, !Impurity mass [amu]"
+    write(*,'(a)') "nenergy = 100, !Number of energy values"
+    write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
+    write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
+    write(*,'(a)') "ntemp = 100,   !Number of temperature values"
+    write(*,'(a)') "tmin = 1.0E-3, !Minimum ion temperature [keV]"
+    write(*,'(a)') "tmax = 2.0E1   !Maximum ion temperature [keV]"
+    write(*,'(a)') "/"
+
+end subroutine print_default_namelist
+
 end module atomic_tables
 
 program generate_tables
@@ -5532,6 +5592,11 @@ program generate_tables
     NAMELIST /general_settings/ n_max, m_max, tables_file
 
     argc = command_argument_count()
+    if(argc.eq.0) then
+        call print_default_namelist()
+        stop
+    endif
+
     if(argc.ge.1) then
         call get_command_argument(1, namelist_file)
     endif

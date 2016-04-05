@@ -410,7 +410,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-nparticle"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nparticle"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -424,7 +424,7 @@ implementation in a submodule of an interface in a parent module.</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-nclass"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nclass"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -464,11 +464,11 @@ implementation in a submodule of an interface in a parent module.</p>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">type </span><span class="n">FastIonParticles</span>
     <span class="c">!+ Collection of fast-ion particles</span>
-    <span class="kt">logical</span>          <span class="kd">::</span> <span class="n">guiding_center</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
+    <span class="kt">logical</span>        <span class="kd">::</span> <span class="n">guiding_center</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
         <span class="c">!+ Indicates whether fast-ions are at guiding center</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nparticle</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nparticle</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Number of particles</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nclass</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nclass</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="c">!+ Number of orbit classes</span>
     <span class="k">type</span><span class="p">(</span><span class="n">FastIon</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fast_ion</span>
         <span class="c">!+ Fast-ion particles</span>

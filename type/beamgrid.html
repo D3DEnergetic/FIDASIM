@@ -314,7 +314,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-nx"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nx"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -328,7 +328,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-ny"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-ny"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -342,7 +342,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-nz"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-nz"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -524,7 +524,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-ntrack"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-ntrack"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -538,7 +538,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-ngrid"></span>integer(kind=Float32),</td>
+  <td><span class="anchor" id="variable-ngrid"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -691,39 +691,39 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span class="k">type </span><span class="n">BeamGrid</span>
     <span class="c">!+ Defines a 3D grid for neutral beam calculations</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nx</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nx</span>
         <span class="c">!+ Number of cells in the x direction</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ny</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ny</span>
         <span class="c">!+ Number of cells in the y direction</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nz</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nz</span>
         <span class="c">!+ Number of cells in the z direction</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">xmin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">xmin</span>
         <span class="c">!+ Minimum x value</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">xmax</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">xmax</span>
         <span class="c">!+ Maximum x value</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">ymin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">ymin</span>
         <span class="c">!+ Minimum y value</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">ymax</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">ymax</span>
         <span class="c">!+ Maximum y value</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">zmin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">zmin</span>
         <span class="c">!+ Minimum z value</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">zmax</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">zmax</span>
         <span class="c">!+ Maximum z value</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">alpha</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">alpha</span>
         <span class="c">!+ Tait-Bryan angle for a rotation about z [radians]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">beta</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">beta</span>
         <span class="c">!+ Tait-Bryan angle for a rotation about y&#39; [radians]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="nb">gamma</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="nb">gamma</span>
         <span class="c">!+ Tait-Bryan angle for a rotation about x&quot; [radians]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">drmin</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">drmin</span>
         <span class="c">!+ Minimum cell spacing: `min(dx,dy,dz)`</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">dv</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dv</span>
         <span class="c">!+ Cell volume [\(cm^3\)]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">volume</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">volume</span>
         <span class="c">!+ Grid volume [\(cm^3\)]</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ntrack</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ntrack</span>
         <span class="c">!+ Maximum number of cell for particle tracking</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Float32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ngrid</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ngrid</span>
         <span class="c">!+ Number of cells</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">origin</span>
         <span class="c">!+ Origin of beam grid in machine coordinates</span>

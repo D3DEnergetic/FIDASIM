@@ -57,7 +57,9 @@ git checkout v{!../VERSION!}
 FIDASIM needs to know where somethings are so you have to set the following environmental variables in your `.bashrc`
 ```bash
 export FIDASIM_DIR=/path/to/fidasim/install
-export FIDASIM_COMPILER=gfortran #use 'ifort' for Intel compiler
+export FC=gfortran #use 'ifort' for Intel Fortran compiler
+export CC=gcc      #use 'icc' for Intel C compiler
+export CXX=g++     #use 'icpc' for Intel C++ compiler
 
 #For HDF5 dependency
 export HDF5_INCLUDE=$FIDASIM_DIR/deps/hdf5/include
@@ -95,7 +97,7 @@ user@computer:~/FIDASIM-{!../VERSION!}$ ./fidasim
 Version: 1.0.0
 
 FIDASIM is released as open source code under the MIT Licence.
-For more information visit https://D3DEnergetic.github.io/FIDASIM
+For more information visit http://d3denergetic.github.io/FIDASIM/
 
 usage: ./fidasim namelist_file [num_threads]
 ```
@@ -103,25 +105,28 @@ Congrats you installed FIDASIM! But wait there's more.
 
 ##Generating Atomic Tables
 Calculating reaction rates on the fly is time consuming so FIDASIM pre-computes them to save time.
-To generate the tables run
+The following code snippit will generate the atomic tables using the default settings.
+If you want to change the settings you can edit the `table_settings.dat` namelist file located in the `tables` directory.
+
 ```bash
 make atomic_tables
 ```
+
 @warning 
 This is computationally expensive so make sure you run this on a computer 
 where you won't get angry emails for using up all the CPU's.
 Optionally you can add `NTHREADS=#` to the command to set the number of threads.
 
-Now would be a good time to get more coffee.
+Now would be a good time to get more coffee... or maybe a nap. 
 
 ##Run a test case
 From within IDL
 ```idl
-IDL> run_tests, "/place/where/you/the/output"
+IDL> run_tests, "/place/where/you/want/the/output"
 ```
 
 Some stuff that will make sense later will flash by and when its done you should see something like
-```
+```text
 SUCCESS: FIDASIM pre-processing completed
 To run FIDASIM use the following command
 /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
@@ -132,7 +137,7 @@ Now do what the computer says.
 Think of as good practice for when the [robots take over](https://www.youtube.com/watch?v=7Pq-S557XQU).
 
 It should print out the following. 
-```
+```text
 [lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
@@ -142,7 +147,7 @@ It should print out the following.
 Version: v0.3.2-64-g16005c5
 
 FIDASIM is released as open source code under the MIT Licence.
-For more information visit ENTER WEBSITE HERE
+For more information visit http://d3denergetic.github.io/FIDASIM/
 
 ---- Shot settings ----
  Shot:        1
@@ -283,4 +288,5 @@ duration:                   0:15:53
 
 ##Now what
 Most likely you won't be satisfied by just running a test case.
+
 To figure out what kind of input files are needed to run FIDASIM click [this](./input_files/index.html)

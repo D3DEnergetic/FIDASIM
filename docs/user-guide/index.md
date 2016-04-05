@@ -4,7 +4,7 @@ title: User Guide
 In fusion plasmas fast-ions can undergo the following process with injected neutral Hydrogen:
 $$ H^+ + H(n) \rightarrow H^\ast(m) + H^+ $$
 where \(H^\ast(m)\) is an excited state of Hydrogen.
-The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excited to a lower state, emitting a doppler shifted photon illustrated below.
+The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excited to a lower state, emitting a doppler shifted photon as illustrated below.
 
 ![Charge Exchange Process](|media|/fast_ion_process.svg Charge Exchange Process){: width="500" }
 {: style="text-align: center" }
@@ -23,8 +23,8 @@ Originally, FIDASIM was written in the IDL programming language and was prohibit
 As a part of his [thesis](http://www.iaea.org/inis/collection/NCLCollectionStore/_Public/46/051/46051941.pdf) Ben Geiger wrote a version of FIDASIM written in Fortran 90.
 This prototype version was parallelized using OpenMP and was orders of magnitude faster but was not as easy to use as the IDL version and was difficult to port to different devices. 
 
-Most recently, [Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geigers Fortran 90 version to work on any axisymmetric fusion devices as well as additional functionality.
-Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful for. 
+Most recently, [Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geigers Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
+Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful. 
 
 ##Capabilities
 Currently, FIDASIM has routines for calculating:

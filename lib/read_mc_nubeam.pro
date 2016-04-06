@@ -102,7 +102,7 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
     print,'Number of markers in energy range: ',nw
 
     fbm_struct = {type:2,time:time,data_source:infile, $
-                  nparticle:long(nw),nclass:1,r:r[ww],w:w[ww],$
+                  nparticle:long(nw),nclass:1,r:r[ww],z:w[ww],$
                   energy:energy[ww],pitch:pitch[ww],class:orbit_class[ww],$
                   weight:weight[ww]}
 

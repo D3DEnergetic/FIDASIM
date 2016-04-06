@@ -1,22 +1,82 @@
-#System:   64 bit
-#Compiler: gfortran or ifort
+SHELL = /bin/sh
 
-ifeq ($(FIDASIM_COMPILER),gfortran)
-	LFLAGS = -lnetcdff -lnetcdf -lm
-	CFLAGS = -Ofast -fopenmp -Wall
+SUPPORTED_FC = gfortran ifort
+SUPPORTED_CC = gcc icc
+SUPPORTED_CXX = g++ icpc
+
+HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
+ifeq ($(HAS_FC),)
+    $(error Fortran compiler $(FC) is not supported. Set FC to gfortran or ifort)
 endif
 
-ifeq ($(FIDASIM_COMPILER),ifort)
-	LFLAGS = -lnetcdff -lnetcdf -limf -lm
-	CFLAGS = -O2 -openmp -warn
+HAS_CC := $(strip $(foreach SC, $(SUPPORTED_CC), $(findstring $(SC), $(CC))))
+ifeq ($(HAS_CC),)
+    $(error C compiler $(CC) is not supported. Set CC to gcc or icc)
 endif
 
-fidasim: fidasim.o
-	$(FIDASIM_COMPILER) $(CFLAGS) fidasim.o -o fidasim -L$(NETCDF_LIB) $(LFLAGS)
+HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
+ifeq ($(HAS_CXX),)
+    $(error C++ compiler $(CXX) is not supported. Set CXX to g++ or icpc)
+endif
 
-fidasim.o: fidasim.f90
-	$(FIDASIM_COMPILER) $(CFLAGS) -c -I$(NETCDF_INCLUDE) fidasim.f90
+# directories
+SRC_DIR = $(FIDASIM_DIR)/src
+DEPS_DIR = $(FIDASIM_DIR)/deps
+TABLES_DIR = $(FIDASIM_DIR)/tables
+DOCS_DIR = $(FIDASIM_DIR)/docs
 
-clean:
-	-rm application.mod fidasim.o fidasim
+# atomic table variables
+OUTPUT_DIR = $(TABLES_DIR)
+NTHREADS = 1000 
 
+# FORD documentation variables
+FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
+
+export SRC_DIR
+export DEPS_DIR
+export TABLES_DIR
+export OUTPUT_DIR
+export NTHREADS
+
+fidasim: deps src tables
+
+debug: clean
+debug: fidasim_debug
+
+fidasim_debug: deps
+	cd $(SRC_DIR); make DEBUG=y
+
+.PHONY: deps
+deps:
+	cd $(DEPS_DIR); make
+
+.PHONY: src
+src:
+	cd $(SRC_DIR); make
+
+.PHONY: tables
+tables: src
+	cd $(TABLES_DIR); make
+
+.PHONY: atomic_tables
+atomic_tables:
+	cd $(TABLES_DIR); make atomic_tables
+
+.PHONY: docs
+docs:
+	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
+
+clean: clean_src clean_tables
+	-rm -f *.mod *.o fidasim fidasim_debug
+
+clean_src:
+	cd $(SRC_DIR); make clean
+
+clean_deps:
+	cd $(DEPS_DIR); make clean
+
+clean_tables:
+	cd $(TABLES_DIR); make clean
+
+clean_docs:
+	-rm -f $(DOCS_DIR)/html

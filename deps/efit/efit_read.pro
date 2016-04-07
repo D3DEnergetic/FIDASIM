@@ -1,4 +1,4 @@
- ;+ 
+;+ 
 ; NAME: 
 ;	EFIT_READ
 ;
@@ -187,7 +187,7 @@
 ; DATE OF LAST MODIFICATION:  6/04/01
 ;
 ; MODIFICATION HISTORY:
-;
+;	13-Jul-2006 add option to read other types of fits, like LRDFIT [Bill Davis, PPPL]
 ;	Version 1.0: Released by Jeff Schachter 98.03.19
 ;	   98.03.25: EFIT_READ_FILESEARCH: only do searchpath for file if file
 ;                    does not already contain directory
@@ -226,11 +226,6 @@
 ;                    This forced a transpose. 
 ;                    Now only look at sz[0:nsz-3], where sz = size(data). 
 ;                    Change in efit_read_mdsreadall.
-;	2003.12.09   Q.Peng, make sure efit_read_timematch returns a scalar
-;		     rather than an array of size 1 (fix for IDL 6)
-;	2007.06.27   Q.P. Use nodes themselves instead of their children's
-;                    parents to determine NODE_NAME, FULLPATH for M trees
-;                    as not all nodes under M have child "label".
 ;-
 
 pro efit_read_message,verbose,msg
@@ -242,7 +237,6 @@ function efit_read_error
 end
 
 function efit_read_timerange,time,time_range
-compile_opt defint32,strictarr,strictarrsubs
   t0 = time - time_range[0]	
   if (n_elements(time_range) eq 2) then begin
     t1 = time + time_range[1]
@@ -251,7 +245,6 @@ compile_opt defint32,strictarr,strictarrsubs
 end
 
 function efit_read_timematch,timereq,time_range,times
-compile_opt defint32,strictarr,strictarrsubs
   tr = efit_read_timerange(timereq,time_range)
   itemp = where(times ge tr.t0 and times le tr.t1, ntemp)
   if (ntemp gt 0) then begin
@@ -265,7 +258,6 @@ end
 ;-------------------------------------------------------------------------------------
 
 function efit_read_filenearest,path,type,shot,time,time_range,count=count,debug=debug
-  compile_opt defint32,strictarr,strictarrsubs
   forward_function efit_shotfiles
   info = efit_shotfiles('.',subdir=path,shot=shot,types=type)
   if (keyword_set(debug)) then help,path,shot,type,info,/str
@@ -283,7 +275,7 @@ function efit_read_filenearest,path,type,shot,time,time_range,count=count,debug=
     endelse
 
     if (itime ge 0) then begin
-      fileFound = FILE_SEARCH((*info.ptrs[0]).dep.files[itime],count=count)
+      fileFound = findfile((*info.ptrs[0]).dep.files[itime],count=count)
     endif else begin
       count = 0
       fileFound = ''
@@ -301,7 +293,7 @@ end
   
 function efit_read_filesearch,info,exact_time=exact_time,time_range=time_range,$
 				time_indep=time_indep,debug=debug,status=status
-compile_opt defint32,strictarr,strictarrsubs
+
   ;====== find file in search path
 
   shot6str = 'shot'+string(info.shot,format='(i6.6)')
@@ -335,7 +327,7 @@ compile_opt defint32,strictarr,strictarrsubs
   i = 0
 
   while (count eq 0 and i lt n_elements(searchpath)) do begin
-    fileFound = (FILE_SEARCH(searchpath[i]+info.file, count=count))[0]
+    fileFound = (findfile(searchpath[i]+info.file, count=count))[0]
     if (keyword_set(debug)) then print,"Searched for: "+searchpath[i]+info.file+ $
         "   Found: "+fileFound
     i = i + 1
@@ -348,7 +340,7 @@ compile_opt defint32,strictarr,strictarrsubs
     filetmp = 'm'+string(info.shot,format='(i6.6)')+'.nc'
     i = 0
     while (count eq 0 and i lt n_elements(searchpath)) do begin
-      fileFound = (FILE_SEARCH(searchpath[i]+filetmp, count=count))[0]
+      fileFound = (findfile(searchpath[i]+filetmp, count=count))[0]
       if (keyword_set(debug)) then print,"Searched for: "+searchpath[i]+filetmp+ $
           "   Found: "+fileFound
       i = i + 1
@@ -378,8 +370,8 @@ end
 ;-------------------------------------------------------------------------------------
 
 function efit_read_setinfo, arg1, arg2, type=type, mode=mode, runid=runid, exact_time=exact_time, $
-				verbose=verbose, debug=debug, status=status
-  compile_opt defint32,strictarr,strictarrsubs	
+					verbose=verbose, debug=debug, status=status
+
   forward_function efit_filename_parse
 
   ;--- Initialize INFO structure
@@ -395,13 +387,13 @@ function efit_read_setinfo, arg1, arg2, type=type, mode=mode, runid=runid, exact
 
   ;--- Set SHOT, TIME, FILE 
 
-  if (size1[n_elements(size1)-2] eq 7) then begin      ; arg1 is a string
+  if (size1(n_elements(size1)-2) eq 7) then begin      ; arg1 is a string
 
     info.file = arg1
     ; parse filename to get shot and time if can
     fileparse=efit_filename_parse(info.file) 
-    info.shot=fileparse.shots[0]  ; will be -1 if can't parse the shot number from the filename
-    info.time=fileparse.times[0]  ; will be -1 if can't parse the time from the filename
+    info.shot=fileparse.shots(0)  ; will be -1 if can't parse the shot number from the filename
+    info.time=fileparse.times(0)  ; will be -1 if can't parse the time from the filename
     if (info.time eq -1.) then if (keyword_set(arg2)) then info.time = double(arg2)
   
     exact_time = 1  ; force finding exact time!
@@ -458,15 +450,22 @@ end
 
 ;-------------------------------------------------------------------------------------
 
-function efit_read_mds_time,efittime,timereq,exact_time=exact_time,time_range=time_range,verbose=verbose,debug=debug,status=status
-  compile_opt defint32,strictarr,strictarrsubs
+function efit_read_mds_time, efittime, timereq, exact_time=exact_time, $
+                             time_range=time_range, $
+			     verbose=verbose, debug=debug, status=status
+
+print, '  >>> in efit_read_mds_time: minmax of efittime'
+minmax, efittime
+help, efittime, timereq, debug
   ;==== FIND NEAREST TIME, or EXACT TIME IF REQUESTED
 
   ;== first look for exact match
 
-  itime = where(efittime eq timereq,nmatch)
-  status = (nmatch eq 1)
-
+   ; doesn't work for real decimal comparing to double-precision decimal
+;;;;  itime = where(efittime eq timereq,nmatch)
+;;;;  status = (nmatch eq 1)
+  itime = nearesti( efittime, timereq )   &  nmatch = 1
+;;;stop
   ;== if no exact match, what to do depends on keywords
 
   if (nmatch eq 0) then begin
@@ -477,7 +476,7 @@ function efit_read_mds_time,efittime,timereq,exact_time=exact_time,time_range=ti
 
       ;= look for nearest only within specified range
       keyword_set(time_range) : begin	
-	itime = efit_read_timematch(timereq,time_range,efittime)
+	itime = efit_read_timematch( timereq, time_range, efittime)
 	if (keyword_set(debug)) then print,'Found time: ',itime
 	status = (itime ge 0)
       end
@@ -490,25 +489,30 @@ function efit_read_mds_time,efittime,timereq,exact_time=exact_time,time_range=ti
 
     endcase
   endif
-  return,itime[0]
+  return,itime
 
 end
 
 function efit_read_mdsreadall,info,verbose=verbose,debug=debug,status=status
-compile_opt defint32,strictarr,strictarrsubs
+
+;;;print, 'Entered efit_read_mdsreadall'
+verbose = 1
   forward_function efit_read_error, efit_read_mds_tags, mdsvalue, efit_read_getmdstime
   quiet = 1 - (keyword_set(debug))
 
-  time = efit_read_getmdstime(info.type,debug=debug,status=status)
+  time = efit_read_getmdstime(info.type,debug=debug,status=status, runid=info.runid)
   if (status) then begin
-    s={shot:info.shot, time:time, error:0}
+    strc = { shot:info.shot, time:time, error:0 }
     if (status) then begin
       siginfo = efit_read_mds_tags(info.type,debug=debug)
       status = siginfo.status
       if (status) then begin
         for i=0,n_elements(siginfo.parents)-1 do begin
           if (keyword_set(verbose)) then print,siginfo.parents[i],' --- ',siginfo.tags[i]
+;;;if siginfo.tags[i] eq 'PSIRZ' then stop
           data=mdsvalue('_s = '+siginfo.parents[i],quiet=quiet,status=statread)
+;;;print, 'For '+siginfo.parents[i]+', statread=', statread
+;;;help,data
           if (statread) then begin
             ndims = size(data,/n_dimensions) 
             if (ndims gt 1) then begin
@@ -534,32 +538,45 @@ compile_opt defint32,strictarr,strictarrsubs
                 0 : 
                 1 : if (itimedim[0] ne sz[0]) then data=temporary(transpose(data))
                 else : begin
+		  ;;;print, '  >>> from efit_read_mdsreadall, about to get units'
                   unitslast = mdsvalue('UNITS(DIM_OF(_s,$))',ndims-1,quiet=quiet,status=statunits)
                   if (statunits) then begin
                     if (unitslast ne 's' and unitslast ne 'ms') then data = temporary(transpose(data)) 
                   endif
                 end
               endcase
-            endif
-            s=create_struct(temporary(s),siginfo.tags[i],data)
+            endif else if n_elements( data ) eq 1 then data = data[0]	; prevent array arith later
+	    
+	    data = reform( data )	; to remove trivial dimensions like [1, 33, 189]
+	    
+	    if siginfo.tags[i] EQ 'CASE' then siginfo.tags[i] = 'CASERUN'	; case tag not allowed
+;;;            s=create_struct(temporary(s),siginfo.tags[i],data)
+            strc=create_struct( strc, siginfo.tags[i], data )
           endif
         endfor
-      endif else s.error=1
-    endif else s.error=1
-  endif else s.error=1
-  return,s
+      endif else strc.error=1
+    endif else strc.error=1
+  endif else strc.error=1
+
+;;;stop  
+  return, strc
 
 end
-function efit_read_mds_tags,type,debug=debug
-compile_opt defint32,strictarr,strictarrsubs
+
+;------------------------------------------------------------------------------
+function efit_read_mds_tags, type, debug=debug, runid=runid
+
   quiet = (1-keyword_set(debug))
 
+  if n_elements( runid ) eq 0 then fit = '\EFIT_'  $
+  else fit = '\'+strmid( runid, 0, strlen(runid)-2 ) + '_'
+
   if (strupcase(type) eq 'M') then begin
-    checkHeader = '\EFIT_MEASUREMENTS'
+    checkHeader = fit+'MEASUREMENTS'
     fallbackHeader = '\TOP.MEASUREMENTS'
     child = 'LABEL'
   endif else begin
-    checkHeader = '\EFIT_'+type+'EQDSK'
+    checkHeader = fit+type+'EQDSK'
     fallbackHeader = '\TOP.RESULTS.'+type+'EQDSK'
     child = 'READA_NAME'
   endelse
@@ -568,18 +585,11 @@ compile_opt defint32,strictarr,strictarrsubs
   if (not(statheader)) then headerPath = fallbackHeader
 
   expression = headerPath + ":*"
-  if (strupcase(type) eq 'M') then $  ; not all nodes in M have "child"
-  nids = mdsvalue('GETNCI($,"NID_NUMBER")',expression,quiet=quiet,status=status) else $
   nids = mdsvalue('GETNCI($,"NID_NUMBER")',expression+":"+child,quiet=quiet,status=status)
 
   if (status) then begin
-    if (strupcase(type) eq 'M') then begin
-      parents = strtrim(mdsvalue('GETNCI($,"FULLPATH")',nids,quiet=quiet,status=status),2)
-      nodes = strtrim(mdsvalue('GETNCI($,"NODE_NAME")',nids,quiet=quiet,status=status),2)
-    endif else begin
-      parents = strtrim(mdsvalue('GETNCI(GETNCI($,"PARENT"),"FULLPATH")',nids,quiet=quiet,status=status),2)
-      nodes = strtrim(mdsvalue('GETNCI(GETNCI($,"PARENT"),"NODE_NAME")',nids,quiet=quiet,status=status),2)
-    end
+    parents = strtrim(mdsvalue('GETNCI(GETNCI($,"PARENT"),"FULLPATH")',nids,quiet=quiet,status=status),2)
+    nodes = strtrim(mdsvalue('GETNCI(GETNCI($,"PARENT"),"NODE_NAME")',nids,quiet=quiet,status=status),2)
     if (status) then begin
 
       ;=== MEASUREMENTS signals do not have "READA_NAME" nodes underneath
@@ -603,17 +613,30 @@ compile_opt defint32,strictarr,strictarrsubs
 
   endif else begin ; Do not look for children (C-Mod)
 
+;;;print, 'check both efit and lrdfit here'
+;;;help, fit
     nids = mdsvalue('GETNCI($,"NID_NUMBER")',expression,quiet=quiet,status=status)
     if (status) then begin
-      parents = strtrim(mdsvalue('GETNCI($,"FULLPATH")',nids,quiet=quiet,status=status1),2)
-      nodes = strtrim(mdsvalue('GETNCI($,"NODE_NAME")',nids,quiet=quiet,status=status2),2)
-      status = status1 and status2
-      if (status) then begin
-        ind=where(nodes NE 'CASE') ; illegal tag name from CMOD
-        d = {nodes:nodes[ind], parents:parents[ind], tags:nodes[ind], status:status}
-      endif else d = {status:status}
-    endif else d={status:status}
+       parents = strtrim(mdsvalue('GETNCI($,"FULLPATH")',nids,quiet=quiet,status=status1),2)
+       nodes = strtrim(mdsvalue('GETNCI($,"NODE_NAME")',nids,quiet=quiet,status=status2),2)
+       status = status1 and status2
+       if (status) then begin
+          d = {nodes:nodes, parents:parents, tags:nodes, status:status}
+       endif else d = {status:status}
+    endif else begin
+       rest = '.*.'+type+'EQDSK'+':*'
+       nids = mdsvalue('GETNCI($,"NID_NUMBER")',rest, quiet=quiet,status=status)
+       if (status) then begin
+	   parents = strtrim(mdsvalue('GETNCI($,"FULLPATH")',nids,quiet=quiet,status=status1),2)
+	   nodes = strtrim(mdsvalue('GETNCI($,"NODE_NAME")',nids,quiet=quiet,status=status2),2)
+	   status = status1 and status2
+	   if (status) then begin
+              d = {nodes:nodes, parents:parents, tags:nodes, status:status}
+	   endif else d = {status:status}
+	endif else d = {status:status}
+     endelse
   endelse
+;;;help,/str,d
 
   return,d
 
@@ -623,7 +646,7 @@ end
 ;-------------------------------------------------------------------------------------
 function efit_read_file,info,exact_time=exact_time,time_range=time_range, $
 			     verbose=verbose, debug=debug, status=status
-  compile_opt defint32,strictarr,strictarrsubs
+
   forward_function reada_file, readg_file, readm_file
  
   file = efit_read_filesearch(info, exact_time=exact_time, time_range=time_range, $
@@ -657,22 +680,25 @@ end
 
 ;-------------------------------------------------------------------------------------
 
-function efit_read_getmdstime,type,debug=debug,status=status
-  compile_opt defint32,strictarr,strictarrsubs
+function efit_read_getmdstime,type,debug=debug,status=status, runid=runid
+
+  if n_elements( runid ) eq 0 then fit = '\EFIT_'  $
+  else fit = '\'+strmid( runid, 0, strlen(runid)-2 ) + '_'
+
   quiet = (1-keyword_set(debug))
   expression = '\'+type+'TIME'
-  time = mdsvalue(expression,quiet=quiet,status=status)
+  time = mdsvalue( expression, quiet=quiet, status=status )
   if (not(status)) then begin
-    time = mdsvalue('\EFIT_AEQDSK:TIME',quiet=quiet,status=status) ; C-Mod trees
+    time = mdsvalue(fit+'AEQDSK:TIME',quiet=quiet,status=status) ; C-Mod trees
   endif
   return,time
 end
 
 ;-------------------------------------------------------------------------------------
 
-function efit_read_mds,info,exact_time=exact_time,time_range=time_range, $
+function efit_read_mds, info, exact_time=exact_time, time_range=time_range, $
 			     verbose=verbose, debug=debug, status=status
-  compile_opt defint32,strictarr,strictarrsubs
+
   forward_function reada_mdsread, readg_mdsread, readm_mdsread
  
   quiet = (1-keyword_set(debug))
@@ -684,11 +710,14 @@ function efit_read_mds,info,exact_time=exact_time,time_range=time_range, $
     efit_read_message,verbose,'EFIT_READ_SETINFO: Using EFIT runid: --->'+info.runid+'<---'
   endif
 
+;;;print, '  >>> Calling mdsopen with ',info.runid, info.shot
   mdsopen,info.runid,info.shot,quiet=quiet,status=status
-
+;;;stop
   if (status) then begin
-    efittime = efit_read_getmdstime(info.type,debug=debug,status=status)
+;;;print, '  >>> In efit_read_mds, about to call efit_read_getmdstime of type '+info.type
+    efittime = efit_read_getmdstime(info.type,debug=debug,status=status, runid=info.runid)
     if (status) then begin
+;;;print, '  >>> In efit_read_mds, about to call efit_read_mds_time of type '+info.type
       itime = efit_read_mds_time(efittime,info.time,exact_time=exact_time,time_range=time_range,$
                                                   verbose=verbose,debug=debug,status=status)
 
@@ -696,7 +725,8 @@ function efit_read_mds,info,exact_time=exact_time,time_range=time_range, $
 	
 
 	;readX_mdsread functions in file readX.pro
-
+;;;print, '  >>> about to call read?_mdsread of type '+info.type
+;;;stop
 	case (strupcase(info.type)) of
 	  'A' : data = reada_mdsread(info, itime, verbose=verbose,debug=debug,status=status)
 	  'G' : data = readg_mdsread(info, itime, verbose=verbose,debug=debug,status=status)  
@@ -733,11 +763,11 @@ function efit_read, arg1, arg2, type=type, mode=mode, runid=runid, info=info, so
 		  		exact_time=exact_time, time_range=time_range, $
                                 server=server, $
 				verbose=verbose, debug=debug, status=status 
-compile_opt defint32,strictarr,strictarrsubs
+
 forward_function mdsplus_setup
 
   ;====== initialize keywords
-
+;;;stop
   if (not(keyword_set(type))) then type='a' ; default to reading A file if no type specified
   if (not(keyword_set(verbose))) then verbose = 0
   if (keyword_set(debug)) then verbose = 1   ; if called in debug mode, then will always print messages
@@ -747,7 +777,6 @@ forward_function mdsplus_setup
   ;====== Will contain shot, time, file, and EFIT run.
 
   calltype='READ'+strupcase(type)  ; used in efit_read_message messages
-
   if (not(keyword_set(info))) then begin
     if (not(keyword_set(arg1))) then begin
       status = 0
@@ -756,10 +785,11 @@ forward_function mdsplus_setup
     endif else begin
       info=efit_read_setinfo(arg1,arg2,type=type,mode=mode,runid=runid,exact_time=exact_time, $
 				       verbose=verbose,debug=debug,status=status)
+;;;print, ' >>> in efit_read, returned from efit_read_setinfo'
+;;;print, '     status=', status
       ;EXACT_TIME will be set to 1 if efit_read_setinfo discovers that ARG1 is a string (ie. specifies a file)
     endelse
   endif else status=1  ; no error checking on info if passed in!
-
 
   ;====== if able to assemble INFO structure, attempt to read from file, then MDSplus
 
@@ -773,11 +803,11 @@ forward_function mdsplus_setup
     endif else begin
 
       status = 0  ; pretend that FILE read attempt was unsuccessful
-      efit_read_message,verbose,"EFIT_READ: MDSplus mode selected"
-      
+      efit_read_message,verbose,"EFIT_READ: MDSplus mode selected
+
     endelse
-    
-    
+
+
     ;====== If found file, then done.  Otherwise, try MDSplus if allowed.
 
     if (status) then begin
@@ -788,19 +818,22 @@ forward_function mdsplus_setup
     endif else begin
 
       if (info.mode ne 'FILE') then begin
-        
+
         status = mdsplus_setup(server=server)
-        if (not(status)) then message,'Could not initialize MDSplus'
-        
-        data = efit_read_mds(info,exact_time=exact_time,time_range=time_range, $
-                             verbose=verbose, debug=debug, status=status)
-        
-        if (status) then begin
-          source = 'MDSPLUS'
-        endif else begin
-          efit_read_message,verbose,'EFIT_READ: MDSplus read unsuccessful'
+;;;print, ' >>> in efit_read, returned from mdsplus_setup'
+
+        if (not(status)) then message,'Could not initialize MDSplus', /info
+
+	data = efit_read_mds( info, exact_time=exact_time, time_range=time_range, $
+			      verbose=verbose, debug=debug, status=status )
+;;;print, ' >>> in efit_read, returned from efit_read_mds'
+
+	if (status) then begin
+	  source = 'MDSPLUS'
+	endif else begin
+	  efit_read_message,verbose,'EFIT_READ: MDSplus read unsuccessful'
         endelse
-        
+
       endif else begin
 
         efit_read_message,verbose,'EFIT_READ: Error reading data from file '+info.file
@@ -818,9 +851,8 @@ forward_function mdsplus_setup
 
   endelse
 
- 
   if (status) then begin
-    if (data.time ne info.time) then begin
+    if ( dt_nicenumber(data.time) ne dt_nicenumber(info.time) ) then begin
       msg = 'WARNING: time requested = '+strtrim(info.time,2)+' does not match time returned = '+strtrim(data.time,2)
       efit_read_message,verbose,msg
     endif
@@ -829,6 +861,3 @@ forward_function mdsplus_setup
   return,data
 
 end
-
-
-

@@ -433,7 +433,7 @@ PRO check_inputs, inputs, err_status
     zero_double = {dims:0,type:'DOUBLE'}
     three_double = {dims:[3],type:'DOUBLE'}
     schema = {comment:zero_string, $
-              shot:zero_int, time:zero_double, $
+              shot:zero_long, time:zero_double, $
               runid:zero_string, device:zero_string, $ 
               install_dir:zero_string, tables_file:zero_string, result_dir:zero_string, $
               nlambda:zero_int, lambdamin:zero_double, lambdamax:zero_double, $

@@ -19,7 +19,7 @@ PRO run_tests,result_dir,test_case=test_case
    tfracs=1.0-ffracs-hfracs
    species_mix = double([ffracs,hfracs,tfracs])
 
-   basic_inputs = {max_threads:16,device:"TEST",shot:1,time:1.d0,$
+   basic_inputs = {max_threads:16,device:"TEST",shot:1L,time:1.d0,$
                    einj:einj,pinj:pinj,species_mix:species_mix,$
                    ab:2.01410178d0,ai:2.0141078d0,impurity_charge:6,$
                    lambdamin:647.0d0,lambdamax:667.0d0,nlambda:2000,$
@@ -124,7 +124,7 @@ PRO run_tests,result_dir,test_case=test_case
        PRINT, 'Preparing test case '+test_cases[i]
        PRINT, input_str[i].comment
        grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100) 
-       
+
        fbm = read_nubeam(test_dir+'test_fi_1.cdf',grid,$
                          btipsign=-1.0,$
                          e_range=[67.0,77.0], $

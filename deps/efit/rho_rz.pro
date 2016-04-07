@@ -62,8 +62,6 @@ function rho_rz, g,r_pts, z_pts, psi_pts, index, $
                  do_linear=do_linear,            $
 		 norm = norm, rhobnd = rhobnd
 
-compile_opt defint32,strictarr,strictarrsubs
-
 if n_elements(norm) le 0 then norm = 1
 
 ;Print, ' '
@@ -81,15 +79,15 @@ y_pts = z_pts
 ; -- setup psi on the cartesian grid given by GEQDSK --
 x = linspace(g.rgrid1,g.rgrid1 + g.xdim,g.mw)
 y = linspace(g.zmid - g.zdim/2.,g.zmid + g.zdim/2.,g.mh)
-psixy = g.psirz[0:g.mw-1,0:g.mh-1]
+psixy = g.psirz(0:g.mw-1,0:g.mh-1)
 
 if keyword_set(do_linear) then begin 
   ;
   ; -- use bi-linear interpolation to get psi at (x,y) --
   ;
-  dx = x[1] - x[0]
-  dy = y[1] - y[0]
-  psi_pts = interpolate(psixy,(x_pts-x[0])/dx,(y_pts-y[0])/dy)
+  dx = x(1) - x(0)
+  dy = y(1) - y(0)
+  psi_pts = interpolate(psixy,(x_pts-x(0))/dx,(y_pts-y(0))/dy)
 endif else begin
   ;
   ; -- use bi-cubic spline interpolation to get psi at (x,y) --
@@ -115,8 +113,8 @@ rho_pts   = nr_splint(psi,rho,nr_spline(psi,rho),psi_pts)
 ; -- obtain boundary points from GEQDSK --
 ;
 
-x_bdry = g.bdry[0,0:(g.nbdry-1)]
-y_bdry = g.bdry[1,0:(g.nbdry-1)]
+x_bdry = g.bdry(0,0:(g.nbdry-1))
+y_bdry = g.bdry(1,0:(g.nbdry-1))
 
 ;
 ; -- express boundary points in (r,theta) coordinates --
@@ -137,7 +135,7 @@ r      = sqrt(x_bdry^2 + y_bdry^2)
  i = where(r Ne 0.0, inum)
 
 ; Print, 'Rho_rz: i for where (r.Ne. 0.0) = ', inum
- If (inum Ne 0) Then theta[i] = acos(x_bdry[i]/r[i])
+ If (inum Ne 0) Then theta(i) = acos(x_bdry(i)/r(i))
 
 ;theta = acos(x_bdry/r)
 
@@ -149,7 +147,7 @@ i = where(y_bdry lt 0., in_y_bdry)
 ;Print, 'rho_rz: i for where y_bdry .lt. 0 = ', in_y_bdry
 ;;theta(i) = 2.*!pi - theta(i)  20020402 tbt - new
 
-If (in_y_bdry Gt 0) Then theta[i] = 2.*!pi - theta[i]
+If (in_y_bdry Gt 0) Then theta(i) = 2.*!pi - theta(i)
 
 ;
 ; -- sort and make ends periodic --
@@ -159,17 +157,17 @@ i               = uniq(theta,sort(theta))
 
 ;Print, 'Rho_rz: N_elements(uniq(i)) = ', N_elements(i)
 
-theta           = theta[i]
-r               = r[i]
+theta           = theta(i)
+r               = r(i)
 n               = n_elements(r)
 r_bdry          = fltarr(n+2)
 theta_bdry      = fltarr(n+2)
-theta_bdry[1:n] = theta
-r_bdry[1:n]     = r
-r_bdry[0]       = r[n-1]
-theta_bdry[0]   = theta[n-1] - 2.*!pi
-r_bdry[n+1]     = r[0]
-theta_bdry[n+1] = theta[0] + 2.*!pi
+theta_bdry(1:n) = theta
+r_bdry(1:n)     = r
+r_bdry(0)       = r(n-1)
+theta_bdry(0)   = theta(n-1) - 2.*!pi
+r_bdry(n+1)     = r(0)
+theta_bdry(n+1) = theta(0) + 2.*!pi
 
 ;
 ; -- express (x_pts,y_pts) in (r,theta) coordinates --
@@ -188,7 +186,7 @@ i = where(r Ne 0.0, inum)
 
 ;Print, 'Rho_rz: inum for where r Ne 0.0 = ', inum
 
-If (inum Ne 0) Then theta_pts[i] = acos(x_pts[i]/r[i])
+If (inum Ne 0) Then theta_pts(i) = acos(x_pts(i)/r(i))
 
 ;theta_pts = acos(x_pts/r)
 
@@ -199,7 +197,7 @@ i = where(y_pts lt 0., inum)
 
 ;Print, 'Rho_rz: inum for where y_pts Lt 0. = ', inum
 
-if (inum Ne 0) then theta_pts[i] = 2.*!pi - theta_pts[i]
+if (inum Ne 0) then theta_pts(i) = 2.*!pi - theta_pts(i)
 
 ;
 ; -- interpolate to get the radial position of the boundary 
@@ -220,12 +218,12 @@ index = where(r gt r_boundary, inum)
 
 rhobnd = max(rho)
 
-if (inum Ne 0) then rho_pts[index] = rhobnd
+if (inum Ne 0) then rho_pts(index) = rhobnd
 
 if norm ge 1 then begin
 	rho_pts = temporary(rho_pts) / rhobnd
-	if (inum Ne 0) then	rho_pts[index] = $
-	   ((-psi_pts[index]+g.ssimag)/(g.ssimag-g.ssibry))^0.5
+	if (inum Ne 0) then	rho_pts(index) = $
+	   ((-psi_pts(index)+g.ssimag)/(g.ssimag-g.ssibry))^0.5
 endif
 
 ;

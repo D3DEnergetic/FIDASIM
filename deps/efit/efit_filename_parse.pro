@@ -3,16 +3,15 @@
 ;             - Jeff Schachter
 
 function efit_filename_parse_pad,array
-  compile_opt defint32,strictarr,strictarrsubs
   i = where(array eq 0,n)
   if (n gt 0) then array[i]=32b
   return,array
 end
 
 function efit_filename_parse,files
-  compile_opt defint32,strictarr,strictarrsubs
+
   ; purpose:  to get shot numbers and times from list of EFIT files.
-  ; acceptable filenames are of form x012345.01234 or y987654.3210_123
+  ; acceptable filenames are of form x012345.01234 or y987654.32100_123
  
   ; rather than looping over the list of files and using strmid etc, 
   ; I convert the string to a byte array and take advantage of the fact
@@ -25,6 +24,8 @@ function efit_filename_parse,files
   ; byte(files) is a 17 x 2 array, where 17 is the length of the longest
   ; element in files.  Shorter elements are padded with 32b (space), which
   ; can be removed later (globally - no loop needed) with strtrim(x,2) 
+
+  if getenv('DEBUG') ne '' then debug=1 else debug=0
 
   br=efit_filename_parse_pad(temporary(reverse(byte(files))))
 
@@ -121,11 +122,23 @@ function efit_filename_parse,files
 
   test = byte(strmid(filenames,1,1))	; first look for files whose 2nd char isn't a number
   i = where(test lt 47 or test gt 57,n)
-  if (n gt 0) then filenames[i] = "x-00001.-0001" ; so shot and time are returned as -1
-  return,{shots:long(strmid(filenames,1,6)), $ 
-;@@@ change for any file extension @@@;  times:double(strmid(filenames,8,max(strlen(filenames)))), $
-	  times:strmid(filenames,8,max(strlen(filenames))), $
-	  types:strmid(filenames,0,1), $
-	  shottimes:strtrim(strmid(filenames,1,max(strlen(filenames))),2)}
+  if (n gt 0) then filenames(i) = "x-00001.-0001" ; so shot and time are returned as -1
+  times = strmid(filenames,8,max(strlen(filenames)))
+  shottimes = strtrim(strmid(filenames,1,max(strlen(filenames))),2)
+  if getenv( 'MACHINE' ) eq 'nstx' then begin
+        ; NSTX times assumed to be in seconds
+     if isnumber(times) then times = times/1000.
+     if isnumber(shottimes) then shottimes = times/1000.
+     print, '  *** dividing time from file by 1000 ***'
+
+  endif 
+  if debug then begin
+     print, '  >>> times in files:', times
+     print, '  >>> shottimes in files:', shottimes
+  end
+  return,{ shots:long(strmid(filenames,1,6)), $ 
+	   times:times, $
+	   types:strmid(filenames,0,1), $
+	   shottimes:shottimes }
 
 end

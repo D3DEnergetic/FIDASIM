@@ -68,16 +68,9 @@ export LD_LIBRARY_PATH=$HDF5_LIB:$HDF5_INCLUDE:$LD_LIBRARY_PATH
 
 #For using helper routines
 export PATH=$FIDASIM_DIR/lib:$PATH
+export IDL_PATH=+$FIDASIM_DIR:IDL_PATH
 ```
-replacing `/path/to/fidasim/install` with the real directory
-
-While we are at it lets set up your IDL environment as well.
-Add the following to your `.idl_startup` file.
-```idl
-!path = !path + ":" + expand_path("+" + getenv("FIDASIM_DIR") + "/")
-.compile /path/to/fidasim/install/src/prefida.pro
-```
-replacing `/path/to/fidasim/install` with the real directory
+replacing `/path/to/fidasim/install` with the real directory.
 
 ##Building FIDASIM
 Once you are in the source directory run the following
@@ -289,4 +282,4 @@ duration:                   0:15:53
 ##Now what
 Most likely you won't be satisfied by just running a test case.
 
-To figure out what kind of input files are needed to run FIDASIM click [this](./input_files/index.html)
+The next thing to do is figure out what kind of [input files](./02_input_files/index.html) you need to run your own simulation.

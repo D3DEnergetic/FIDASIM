@@ -66,6 +66,8 @@ atomic_tables:
 .PHONY: docs
 docs:
 	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
+	@echo "Checking for broken links..."
+	linkchecker $(DOCS_DIR)/html/index.html
 
 clean: clean_src clean_tables
 	-rm -f *.mod *.o fidasim fidasim_debug

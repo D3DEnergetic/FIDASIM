@@ -9,8 +9,8 @@ The inputs for FIDASIM are split into four categories/files
 [The Geometry File](./02_geometry_file.html)
 :    This file contains the geometric quanties used by FIDASIM. This includes the neutral beam, spectral, and NPA geometries.
 
-[The Equilibrium File](./02_equilibrium_file.html)
+[The Equilibrium File](./03_equilibrium_file.html)
 :    This file contains the plasma parameters and electromagnetic fields mapped onto a 2D R-Z grid.
 
-[The Distribution File](./03_distribution_file.html)
+[The Distribution File](./04_distribution_file.html)
 :    This file contains the fast-ion distribution. 

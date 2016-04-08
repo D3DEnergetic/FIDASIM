@@ -15,11 +15,15 @@ To figure out what shell you currently have run `echo $SHELL` to find out.
 FIDASIM has the following dependencies:
 
 * Linux because all other operating systems are inferior
-* [IDL](http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx) for pre-processing. Sorry.
+* [Make](https://www.gnu.org/software/make/) for building FIDASIM. 
+* Fortran, C, and C++ compilers.
+  [GNU](https://gcc.gnu.org/) and [Intel](https://software.intel.com/en-us/intel-compilers) compilers are supported.
+* [IDL](http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx) for pre-processing.
 * [HDF5](https://www.hdfgroup.org/HDF5/) for reading and writing compressed data files
+* [Anaconda Python](https://www.continuum.io/why-anaconda) For python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
+* [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
 
-Fortunately for you (the user) FIDASIM bundles and builds HDF5 for you and only FIDASIM developers should need Ford.
 
 ##Getting FIDASIM source
 It is a fact of nature that you cannot run code you haven't installed. There are two ways correcting this.

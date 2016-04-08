@@ -556,6 +556,8 @@ type BirthProfile
     !+ Birth profile structure
     integer :: cnt = 1
         !+ Particle counter
+    integer, dimension(:), allocatable             :: neut_type
+        !+ Particle birth type (1=Full, 2=Half, 3=Third)
     real(Float64), dimension(:,:), allocatable     :: ri
         !+ Particle birth position [cm]
     real(Float64), dimension(:,:), allocatable     :: vi
@@ -2704,7 +2706,8 @@ subroutine write_birth_profile
     dim2 = shape(birth%ri)
     call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
-    call h5ltmake_compressed_dataset_int_f(fid,"/ind",2,dim2, birth%ind, error) 
+    call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, birth%ind, error) 
+    call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), birth%neut_type, error)
 
     !Add attributes
     call h5ltset_attribute_string_f(fid, "/n_nbi", "description", &
@@ -2723,6 +2726,8 @@ subroutine write_birth_profile
     call h5ltset_attribute_string_f(fid, "/vi", "units", "cm/s", error)
     call h5ltset_attribute_string_f(fid, "/ind", "description", &
          "Fast-ion birth beam grid indices: ind([i,j,k],particle)", error)
+    call h5ltset_attribute_string_f(fid, "/type", "description", &
+         "Fast-ion birth type (1=Full, 2=Half, 3=Third)", error)
 
     call h5ltset_attribute_string_f(fid, "/", "coordinate_system", &
          "Cylindrical (R,Z,Phi)",error)
@@ -5547,6 +5552,7 @@ subroutine ndmc
                 do kk=1,nl_birth(neut_type)
                     call randind(tracks(1:ncell)%flux,randi)
                     call randu(randomu)
+                    birth%neut_type(birth%cnt) = neut_type
                     birth%ind(:,birth%cnt) = tracks(randi(1))%ind
                     birth%vi(:,birth%cnt) = vnbi
                     birth%ri(:,birth%cnt) = tracks(randi(1))%pos + &
@@ -6881,9 +6887,11 @@ program fidasim
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
+        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi)))
         allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
         allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
         allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
+        birth%neut_type = 0
         birth%dens = 0.d0
         birth%ind = 0
         birth%ri = 0.d0

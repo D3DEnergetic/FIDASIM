@@ -123,22 +123,12 @@
           <ul class="nav nav-stacked nav-pills">
             
             <li role="presentation">
-            <a href='../../page/./01_getting_started.html'>Getting Started</a>
-            
-            </li>
-            
-            <li role="presentation">
             <a href='../../page/02_input_files/index.html'>Input Files</a>
             
             <ul class="nav nav-stacked nav-pills">
               
-            <li role="presentation" class="disabled">
-            <a href='../../page/02_input_files/01_namelist_file.html'>Namelist File</a>
-            
-            </li>
-            
             <li role="presentation">
-            <a href='../../page/02_input_files/02_geometry_file.html'>Geometry File</a>
+            <a href='../../page/02_input_files/04_distribution_file.html'>Distribution File</a>
             
             </li>
             
@@ -148,16 +138,41 @@
             </li>
             
             <li role="presentation">
-            <a href='../../page/02_input_files/04_distribution_file.html'>Distribution File</a>
-            
-            </li>
-            
-            <li role="presentation">
             <a href='../../page/02_input_files/05_prefida.html'>Making Input Files</a>
             
             </li>
             
+            <li role="presentation">
+            <a href='../../page/02_input_files/02_geometry_file.html'>Geometry File</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/02_input_files/01_namelist_file.html'>Namelist File</a>
+            
+            </li>
+            
             </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/./01_getting_started.html'>Getting Started</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/04_physics/index.html'>Physics</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_output_files/index.html'>Output Files</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/05_technical/index.html'>Technical Details</a>
             
             </li>
             
@@ -167,6 +182,212 @@
     
     <div class="col-lg-9" id='text'>
         <h1 id="namelist-file">Namelist File</h1>
+<p>The namelist file contains all the basic settings. 
+This file can be edited without having to re-create the other input files.</p>
+<h2 id="header">Header</h2>
+<p>The header has some basic information about the simulation run. </p>
+<div class="codehilite"><pre><span class="c">!! Created: Thu Mar 24 04:59:13 2016</span>
+<span class="c">!! Comment: This is a comment</span>
+</pre></div>
+
+
+<p>Generally, "This is a comment" is not good comment.
+A good comment should be descriptive.</p>
+<h2 id="shot-information">Shot Information</h2>
+<div class="codehilite"><pre><span class="p">&amp;</span><span class="n">fidasim_inputs</span>
+<span class="n">shot</span> <span class="o">=</span>      <span class="mi">1</span>    <span class="c">!! Shot Number</span>
+<span class="nb">time</span> <span class="o">=</span>  <span class="mf">0.00051</span>    <span class="c">!! Time [s]</span>
+<span class="n">runid</span> <span class="o">=</span> <span class="s1">&#39;051&#39;</span>    <span class="c">!! runID</span>
+<span class="n">result_dir</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/&#39;</span>    <span class="c">!! Result Directory</span>
+</pre></div>
+
+
+<p>These are pretty self-explainatory. I would note that the <code>runid</code> could be anything so .
+In this particular example the <code>runid</code> was set to be <code>051</code> which is the time in ms.
+This run was a part of a time series so choosing <code>051</code> made sorting the runs by time very easy.</p>
+<h2 id="input-files">Input Files</h2>
+<div class="codehilite"><pre><span class="c">!! Input Files</span>
+<span class="n">tables_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/FIDASIM/tables/atomic_tables.h5&#39;</span> <span class="c">!! Atomic Tables File</span>
+<span class="n">equilibrium_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_equilibrium.h5&#39;</span>         <span class="c">!! File containing plasma parameters and fields</span>
+<span class="n">geometry_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_geometry.h5&#39;</span>               <span class="c">!! File containing NBI and diagnostic geometry</span>
+<span class="n">distribution_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_distribution.h5&#39;</span>       <span class="c">!! File containing fast-ion distribution</span>
+<span class="n">neutrals_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/51_neutrals.h5&#39;</span>                <span class="c">!! File containing the neutral density</span>
+</pre></div>
+
+
+<p></p><div class="alert alert-info" role="alert"><h4>Note</h4>The neutrals file is actually an <a href="../03_output_files/index.html">output file</a>.
+It is listed here since there is an option to load the neutral density from a file instead of calculating it.</div>
+<h2 id="simulation-switches">Simulation Switches</h2>
+<div class="codehilite"><pre><span class="c">!! Simulation Switches</span>
+<span class="n">calc_bes</span> <span class="o">=</span>  <span class="mi">1</span>        <span class="c">!! Calculate Beam Emission and Halo Spectra</span>
+<span class="n">calc_brems</span> <span class="o">=</span>  <span class="mi">1</span>      <span class="c">!! Calculate Bremsstrahlung</span>
+<span class="n">calc_fida</span> <span class="o">=</span>  <span class="mi">1</span>       <span class="c">!! Calculate FIDA Spectra</span>
+<span class="n">calc_npa</span> <span class="o">=</span>  <span class="mi">0</span>        <span class="c">!! Calculate NPA</span>
+<span class="n">calc_birth</span> <span class="o">=</span>  <span class="mi">1</span>      <span class="c">!! Calculate Birth Profile</span>
+<span class="n">calc_fida_wght</span> <span class="o">=</span>  <span class="mi">0</span>  <span class="c">!! Calculate FIDA weights</span>
+<span class="n">calc_npa_wght</span> <span class="o">=</span>  <span class="mi">0</span>   <span class="c">!! Calculate NPA weights</span>
+<span class="n">load_neutrals</span> <span class="o">=</span>  <span class="mi">0</span>   <span class="c">!! Load neutrals from neutrals file</span>
+<span class="n">dump_dcx</span> <span class="o">=</span>  <span class="mi">1</span>        <span class="c">!! Dump DCX neutrals and spectra</span>
+<span class="n">verbose</span> <span class="o">=</span>  <span class="mi">1</span>         <span class="c">!! Verbose</span>
+</pre></div>
+
+
+<h2 id="monte-carlo-settings">Monte Carlo Settings</h2>
+<div class="codehilite"><pre><span class="c">!! Monte Carlo Settings</span>
+<span class="n">n_fida</span> <span class="o">=</span>  <span class="mi">25000000</span>    <span class="c">!! Number of FIDA mc particles</span>
+<span class="n">n_npa</span> <span class="o">=</span>   <span class="mi">2500000</span>    <span class="c">!! Number of NPA mc particles</span>
+<span class="n">n_nbi</span> <span class="o">=</span>     <span class="mi">50000</span>    <span class="c">!! Number of NBI mc particles</span>
+<span class="n">n_halo</span> <span class="o">=</span>    <span class="mi">500000</span>    <span class="c">!! Number of HALO mc particles</span>
+<span class="n">n_dcx</span> <span class="o">=</span>    <span class="mi">500000</span>     <span class="c">!! Number of DCX mc particles</span>
+<span class="n">n_birth</span> <span class="o">=</span>     <span class="mi">10000</span>    <span class="c">!! Number of BIRTH mc particles</span>
+</pre></div>
+
+
+<h2 id="neutral-beam-settings">Neutral Beam Settings</h2>
+<div class="codehilite"><pre><span class="c">!! Neutral Beam Settings</span>
+<span class="n">ab</span> <span class="o">=</span>   <span class="mf">1.00728</span>                 <span class="c">!! Beam Species mass [amu]</span>
+<span class="n">pinj</span> <span class="o">=</span>     <span class="mf">1.326</span>               <span class="c">!! Beam Power [MW]</span>
+<span class="n">einj</span> <span class="o">=</span>    <span class="mi">1</span><span class="mf">5.000</span>               <span class="c">!! Beam Energy [keV]</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.85000</span>     <span class="c">!! Beam Species Mix (Full component)</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.10000</span>     <span class="c">!! Beam Species Mix (Half component)</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.05000</span>     <span class="c">!! Beam Species Mix (Third component)</span>
+</pre></div>
+
+
+<h2 id="plasma-settings">Plasma Settings</h2>
+<div class="codehilite"><pre><span class="c">!! Plasma Settings</span>
+<span class="n">ai</span> <span class="o">=</span>   <span class="mf">2.01411</span>     <span class="c">!! Ion Species mass [amu]</span>
+<span class="n">impurity_charge</span> <span class="o">=</span>   <span class="mi">6</span>     <span class="c">!! Impurity Charge</span>
+</pre></div>
+
+
+<h2 id="beam-grid-settings">Beam Grid Settings</h2>
+<div class="codehilite"><pre><span class="c">!! Beam Grid Settings</span>
+<span class="n">nx</span> <span class="o">=</span>   <span class="mi">80</span>                 <span class="c">!! Number of cells in X direction (Into Plasma)</span>
+<span class="n">ny</span> <span class="o">=</span>   <span class="mi">80</span>                 <span class="c">!! Number of cells in Y direction</span>
+<span class="n">nz</span> <span class="o">=</span>  <span class="mi">120</span>                 <span class="c">!! Number of cells in Z direction</span>
+<span class="n">xmin</span> <span class="o">=</span>   <span class="o">-</span><span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Minimum X value [cm]</span>
+<span class="n">xmax</span> <span class="o">=</span>    <span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Maximum X value [cm]</span>
+<span class="n">ymin</span> <span class="o">=</span>   <span class="o">-</span><span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Minimum Y value [cm]</span>
+<span class="n">ymax</span> <span class="o">=</span>    <span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Maximum Y value [cm]</span>
+<span class="n">zmin</span> <span class="o">=</span>  <span class="o">-</span><span class="mi">12</span><span class="mf">0.000</span>          <span class="c">!! Minimum Z value [cm]</span>
+<span class="n">zmax</span> <span class="o">=</span>   <span class="mi">12</span><span class="mf">0.000</span>          <span class="c">!! Maximum Z value [cm]</span>
+<span class="c">!! Tait-Bryan Angles for z-y`-x`` rotation</span>
+<span class="n">alpha</span> <span class="o">=</span>   <span class="mf">0.00000</span>         <span class="c">!! Rotation about z-axis [rad]</span>
+<span class="n">beta</span>  <span class="o">=</span>   <span class="mf">0.00000</span>         <span class="c">!! Rotation about y`-axis [rad]</span>
+<span class="nb">gamma</span> <span class="o">=</span>   <span class="mf">0.00000</span>         <span class="c">!! Rotation about x&quot;-axis [rad]</span>
+<span class="c">!! Beam Grid origin in machine coordinates (cartesian)</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span>     <span class="mf">0.000</span>     <span class="c">!! X value [cm]</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span>     <span class="mf">0.000</span>     <span class="c">!! Y value [cm]</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span>     <span class="mf">0.000</span>     <span class="c">!! Z value [cm]</span>
+</pre></div>
+
+
+<h2 id="wavelength-grid-settings">Wavelength Grid Settings</h2>
+<div class="codehilite"><pre><span class="c">!! Wavelength Grid Settings</span>
+<span class="n">nlambda</span> <span class="o">=</span>  <span class="mi">2000</span>    <span class="c">!! Number of Wavelengths</span>
+<span class="n">lambdamin</span> <span class="o">=</span>   <span class="mi">64</span><span class="mf">7.000</span>    <span class="c">!! Minimum Wavelength [nm]</span>
+<span class="n">lambdamax</span> <span class="o">=</span>   <span class="mi">66</span><span class="mf">7.000</span>    <span class="c">!! Maximum Wavelength [nm]</span>
+</pre></div>
+
+
+<h2 id="weight-function-settings">Weight Function Settings</h2>
+<div class="codehilite"><pre><span class="c">!! Weight Function Settings</span>
+<span class="n">ne_wght</span> <span class="o">=</span>        <span class="mi">50</span>    <span class="c">!! Number of Energies for Weights</span>
+<span class="n">np_wght</span> <span class="o">=</span>        <span class="mi">50</span>    <span class="c">!! Number of Pitches for Weights</span>
+<span class="n">nphi_wght</span> <span class="o">=</span>       <span class="mi">100</span>    <span class="c">!! Number of Gyro-angles for Weights</span>
+<span class="n">emax_wght</span> <span class="o">=</span>    <span class="mi">10</span><span class="mf">0.00</span>    <span class="c">!! Maximum Energy for Weights [keV]</span>
+<span class="n">nlambda_wght</span> <span class="o">=</span>  <span class="mi">1000</span>    <span class="c">!! Number of Wavelengths for Weights </span>
+<span class="n">lambdamin_wght</span> <span class="o">=</span>   <span class="mi">64</span><span class="mf">7.000</span>    <span class="c">!! Minimum Wavelength for Weights [nm]</span>
+<span class="n">lambdamax_wght</span> <span class="o">=</span>   <span class="mi">66</span><span class="mf">7.000</span>    <span class="c">!! Maximum Wavelength for Weights [nm]</span>
+
+<span class="o">/</span>
+</pre></div>
+
+
+<h1 id="example-namelist-file">Example Namelist File</h1>
+<div class="codehilite"><pre><span class="c">!! Created: Thu Mar 24 04:59:13 2016</span>
+<span class="c">!! Comment: This is a comment</span>
+<span class="p">&amp;</span><span class="n">fidasim_inputs</span>
+<span class="n">shot</span> <span class="o">=</span>      <span class="mi">1</span>    <span class="c">!! Shot Number</span>
+<span class="nb">time</span> <span class="o">=</span>  <span class="mf">0.00051</span>    <span class="c">!! Time [s]</span>
+<span class="n">runid</span> <span class="o">=</span> <span class="s1">&#39;051&#39;</span>    <span class="c">!! runID</span>
+<span class="n">result_dir</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/&#39;</span>    <span class="c">!! Result Directory</span>
+
+<span class="c">!! Input Files</span>
+<span class="n">tables_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/FIDASIM/tables/atomic_tables.h5&#39;</span> <span class="c">!! Atomic Tables File</span>
+<span class="n">equilibrium_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_equilibrium.h5&#39;</span>         <span class="c">!! File containing plasma parameters and fields</span>
+<span class="n">geometry_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_geometry.h5&#39;</span>               <span class="c">!! File containing NBI and diagnostic geometry</span>
+<span class="n">distribution_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_distribution.h5&#39;</span>       <span class="c">!! File containing fast-ion distribution</span>
+<span class="n">neutrals_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/51_neutrals.h5&#39;</span>                <span class="c">!! File containing the neutral density</span>
+
+<span class="c">!! Simulation Switches</span>
+<span class="n">calc_bes</span> <span class="o">=</span>  <span class="mi">1</span>        <span class="c">!! Calculate Beam Emission and Halo Spectra</span>
+<span class="n">calc_brems</span> <span class="o">=</span>  <span class="mi">1</span>      <span class="c">!! Calculate Bremsstrahlung</span>
+<span class="n">calc_fida</span> <span class="o">=</span>  <span class="mi">1</span>       <span class="c">!! Calculate FIDA Spectra</span>
+<span class="n">calc_npa</span> <span class="o">=</span>  <span class="mi">0</span>        <span class="c">!! Calculate NPA</span>
+<span class="n">calc_birth</span> <span class="o">=</span>  <span class="mi">1</span>      <span class="c">!! Calculate Birth Profile</span>
+<span class="n">calc_fida_wght</span> <span class="o">=</span>  <span class="mi">0</span>  <span class="c">!! Calculate FIDA weights</span>
+<span class="n">calc_npa_wght</span> <span class="o">=</span>  <span class="mi">0</span>   <span class="c">!! Calculate NPA weights</span>
+<span class="n">load_neutrals</span> <span class="o">=</span>  <span class="mi">0</span>   <span class="c">!! Load neutrals from neutrals file</span>
+<span class="n">dump_dcx</span> <span class="o">=</span>  <span class="mi">1</span>        <span class="c">!! Dump DCX neutrals and spectra</span>
+<span class="n">verbose</span> <span class="o">=</span>  <span class="mi">1</span>         <span class="c">!! Verbose</span>
+
+<span class="c">!! Monte Carlo Settings</span>
+<span class="n">n_fida</span> <span class="o">=</span>  <span class="mi">25000000</span>   <span class="c">!! Number of FIDA mc particles</span>
+<span class="n">n_npa</span> <span class="o">=</span>   <span class="mi">2500000</span>    <span class="c">!! Number of NPA mc particles</span>
+<span class="n">n_nbi</span> <span class="o">=</span>     <span class="mi">50000</span>    <span class="c">!! Number of NBI mc particles</span>
+<span class="n">n_halo</span> <span class="o">=</span>    <span class="mi">500000</span>   <span class="c">!! Number of HALO mc particles</span>
+<span class="n">n_dcx</span> <span class="o">=</span>    <span class="mi">500000</span>    <span class="c">!! Number of DCX mc particles</span>
+<span class="n">n_birth</span> <span class="o">=</span>     <span class="mi">10000</span>  <span class="c">!! Number of BIRTH mc particles</span>
+
+<span class="c">!! Neutral Beam Settings</span>
+<span class="n">ab</span> <span class="o">=</span>   <span class="mf">1.00728</span>                 <span class="c">!! Beam Species mass [amu]</span>
+<span class="n">pinj</span> <span class="o">=</span>     <span class="mf">1.326</span>               <span class="c">!! Beam Power [MW]</span>
+<span class="n">einj</span> <span class="o">=</span>    <span class="mi">1</span><span class="mf">5.000</span>               <span class="c">!! Beam Energy [keV]</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.85000</span>     <span class="c">!! Beam Species Mix (Full component)</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.10000</span>     <span class="c">!! Beam Species Mix (Half component)</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.05000</span>     <span class="c">!! Beam Species Mix (Third component)</span>
+
+<span class="c">!! Plasma Settings</span>
+<span class="n">ai</span> <span class="o">=</span>   <span class="mf">2.01411</span>            <span class="c">!! Ion Species mass [amu]</span>
+<span class="n">impurity_charge</span> <span class="o">=</span>   <span class="mi">6</span>     <span class="c">!! Impurity Charge</span>
+
+<span class="c">!! Beam Grid Settings</span>
+<span class="n">nx</span> <span class="o">=</span>   <span class="mi">80</span>                 <span class="c">!! Number of cells in X direction (Into Plasma)</span>
+<span class="n">ny</span> <span class="o">=</span>   <span class="mi">80</span>                 <span class="c">!! Number of cells in Y direction</span>
+<span class="n">nz</span> <span class="o">=</span>  <span class="mi">120</span>                 <span class="c">!! Number of cells in Z direction</span>
+<span class="n">xmin</span> <span class="o">=</span>   <span class="o">-</span><span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Minimum X value [cm]</span>
+<span class="n">xmax</span> <span class="o">=</span>    <span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Maximum X value [cm]</span>
+<span class="n">ymin</span> <span class="o">=</span>   <span class="o">-</span><span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Minimum Y value [cm]</span>
+<span class="n">ymax</span> <span class="o">=</span>    <span class="mi">8</span><span class="mf">0.000</span>          <span class="c">!! Maximum Y value [cm]</span>
+<span class="n">zmin</span> <span class="o">=</span>  <span class="o">-</span><span class="mi">12</span><span class="mf">0.000</span>          <span class="c">!! Minimum Z value [cm]</span>
+<span class="n">zmax</span> <span class="o">=</span>   <span class="mi">12</span><span class="mf">0.000</span>          <span class="c">!! Maximum Z value [cm]</span>
+<span class="c">!! Tait-Bryan Angles for z-y`-x`` rotation</span>
+<span class="n">alpha</span> <span class="o">=</span>   <span class="mf">0.00000</span>         <span class="c">!! Rotation about z-axis [rad]</span>
+<span class="n">beta</span>  <span class="o">=</span>   <span class="mf">0.00000</span>         <span class="c">!! Rotation about y`-axis [rad]</span>
+<span class="nb">gamma</span> <span class="o">=</span>   <span class="mf">0.00000</span>         <span class="c">!! Rotation about x&quot;-axis [rad]</span>
+<span class="c">!! Beam Grid origin in machine coordinates (cartesian)</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span>     <span class="mf">0.000</span>     <span class="c">!! X value [cm]</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span>     <span class="mf">0.000</span>     <span class="c">!! Y value [cm]</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span>     <span class="mf">0.000</span>     <span class="c">!! Z value [cm]</span>
+
+<span class="c">!! Wavelength Grid Settings</span>
+<span class="n">nlambda</span> <span class="o">=</span>  <span class="mi">2000</span>    <span class="c">!! Number of Wavelengths</span>
+<span class="n">lambdamin</span> <span class="o">=</span>   <span class="mi">64</span><span class="mf">7.000</span>    <span class="c">!! Minimum Wavelength [nm]</span>
+<span class="n">lambdamax</span> <span class="o">=</span>   <span class="mi">66</span><span class="mf">7.000</span>    <span class="c">!! Maximum Wavelength [nm]</span>
+
+<span class="c">!! Weight Function Settings</span>
+<span class="n">ne_wght</span> <span class="o">=</span>        <span class="mi">50</span>    <span class="c">!! Number of Energies for Weights</span>
+<span class="n">np_wght</span> <span class="o">=</span>        <span class="mi">50</span>    <span class="c">!! Number of Pitches for Weights</span>
+<span class="n">nphi_wght</span> <span class="o">=</span>       <span class="mi">100</span>    <span class="c">!! Number of Gyro-angles for Weights</span>
+<span class="n">emax_wght</span> <span class="o">=</span>    <span class="mi">10</span><span class="mf">0.00</span>    <span class="c">!! Maximum Energy for Weights [keV]</span>
+<span class="n">nlambda_wght</span> <span class="o">=</span>  <span class="mi">1000</span>    <span class="c">!! Number of Wavelengths for Weights </span>
+<span class="n">lambdamin_wght</span> <span class="o">=</span>   <span class="mi">64</span><span class="mf">7.000</span>    <span class="c">!! Minimum Wavelength for Weights [nm]</span>
+<span class="n">lambdamax_wght</span> <span class="o">=</span>   <span class="mi">66</span><span class="mf">7.000</span>    <span class="c">!! Maximum Wavelength for Weights [nm]</span>
+
+<span class="o">/</span>
+</pre></div>
     </div>
   </div>
 

@@ -135,6 +135,8 @@
         
         <a class="list-group-item" href="../type/birthprofile.html#variable-cnt">cnt</a>
         
+        <a class="list-group-item" href="../type/birthprofile.html#variable-neut_type">neut_type</a>
+        
         <a class="list-group-item" href="../type/birthprofile.html#variable-ri">ri</a>
         
         <a class="list-group-item" href="../type/birthprofile.html#variable-vi">vi</a>
@@ -286,6 +288,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-neut_type"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>neut_type</strong></td><td></td><td></td><td><p>Particle birth type (1=Full, 2=Half, 3=Third)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-ri"></span>real(kind=Float64),</td>
   
   <td>public,</td>
@@ -356,6 +372,8 @@
     <span class="c">!+ Birth profile structure</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">cnt</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="c">!+ Particle counter</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>             <span class="kd">::</span> <span class="n">neut_type</span>
+        <span class="c">!+ Particle birth type (1=Full, 2=Half, 3=Third)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">ri</span>
         <span class="c">!+ Particle birth position [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">vi</span>

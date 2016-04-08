@@ -120,23 +120,13 @@
           <hr>
           <ul class="nav nav-stacked nav-pills">
             
-            <li role="presentation" class="disabled">
-            <a href='../page/./01_getting_started.html'>Getting Started</a>
-            
-            </li>
-            
             <li role="presentation">
             <a href='../page/02_input_files/index.html'>Input Files</a>
             
             <ul class="nav nav-stacked nav-pills">
               
             <li role="presentation">
-            <a href='../page/02_input_files/01_namelist_file.html'>Namelist File</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../page/02_input_files/02_geometry_file.html'>Geometry File</a>
+            <a href='../page/02_input_files/04_distribution_file.html'>Distribution File</a>
             
             </li>
             
@@ -146,16 +136,41 @@
             </li>
             
             <li role="presentation">
-            <a href='../page/02_input_files/04_distribution_file.html'>Distribution File</a>
-            
-            </li>
-            
-            <li role="presentation">
             <a href='../page/02_input_files/05_prefida.html'>Making Input Files</a>
             
             </li>
             
+            <li role="presentation">
+            <a href='../page/02_input_files/02_geometry_file.html'>Geometry File</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../page/02_input_files/01_namelist_file.html'>Namelist File</a>
+            
+            </li>
+            
             </ul>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../page/./01_getting_started.html'>Getting Started</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../page/04_physics/index.html'>Physics</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../page/03_output_files/index.html'>Output Files</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../page/05_technical/index.html'>Technical Details</a>
             
             </li>
             
@@ -174,11 +189,15 @@ To figure out what shell you currently have run <code>echo $SHELL</code> to find
 <p>FIDASIM has the following dependencies:</p>
 <ul>
 <li>Linux because all other operating systems are inferior</li>
-<li><a href="http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx">IDL</a> for pre-processing. Sorry.</li>
+<li><a href="https://www.gnu.org/software/make/">Make</a> for building FIDASIM. </li>
+<li>Fortran, C, and C++ compilers.
+  <a href="https://gcc.gnu.org/">GNU</a> and <a href="https://software.intel.com/en-us/intel-compilers">Intel</a> compilers are supported.</li>
+<li><a href="http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx">IDL</a> for pre-processing.</li>
 <li><a href="https://www.hdfgroup.org/HDF5/">HDF5</a> for reading and writing compressed data files</li>
+<li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> For python scripts (Optional)</li>
 <li><a href="https://github.com/cmacmackin/ford">Ford</a> for creating HTML documentation (Optional)</li>
+<li><a href="http://wummel.github.io/linkchecker/">LinkChecker</a> for validating HTML documentation (Optional)</li>
 </ul>
-<p>Fortunately for you (the user) FIDASIM bundles and builds HDF5 for you and only FIDASIM developers should need Ford.</p>
 <h2 id="getting-fidasim-source">Getting FIDASIM source</h2>
 <p>It is a fact of nature that you cannot run code you haven't installed. There are two ways correcting this.</p>
 <h3 id="downloading-source-directly">Downloading source directly</h3>
@@ -225,18 +244,11 @@ To use the release version run the command</p>
 
 <span class="c1">#For using helper routines</span>
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$F</span>IDASIM_DIR/lib:$PATH
+<span class="nb">export</span> <span class="nv">IDL_PATH</span><span class="o">=</span>+<span class="nv">$F</span>IDASIM_DIR:IDL_PATH
 </pre></div>
 
 
-<p>replacing <code>/path/to/fidasim/install</code> with the real directory</p>
-<p>While we are at it lets set up your IDL environment as well.
-Add the following to your <code>.idl_startup</code> file.</p>
-<div class="codehilite"><pre>!path <span class="o">=</span> !path <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="nb">expand_path</span>(<span class="s2">&quot;+&quot;</span> <span class="o">+</span> <span class="nb">getenv</span>(<span class="s2">&quot;FIDASIM_DIR&quot;</span>) <span class="o">+</span> <span class="s2">&quot;/&quot;</span>)
-.compile <span class="o">/</span>path<span class="o">/</span>to<span class="o">/</span>fidasim<span class="o">/</span>install<span class="o">/</span>src<span class="o">/</span>prefida.<span class="k">pro</span>
-</pre></div>
-
-
-<p>replacing <code>/path/to/fidasim/install</code> with the real directory</p>
+<p>replacing <code>/path/to/fidasim/install</code> with the real directory.</p>
 <h2 id="building-fidasim">Building FIDASIM</h2>
 <p>Once you are in the source directory run the following</p>
 <div class="codehilite"><pre>make
@@ -440,7 +452,7 @@ duration:                   0:15:53
 
 <h2 id="now-what">Now what</h2>
 <p>Most likely you won't be satisfied by just running a test case.</p>
-<p>To figure out what kind of input files are needed to run FIDASIM click <a href="./input_files/index.html">this</a></p>
+<p>The next thing to do is figure out what kind of <a href="./02_input_files/index.html">input files</a> you need to run your own simulation.</p>
     </div>
   </div>
 

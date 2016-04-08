@@ -159,6 +159,26 @@ PRO hdf5_write_attributes,id,atts
 END
 
 PRO write_hdf5,vars,atts=atts,filename=filename,clobber=clobber
+    ;+#write_hdf5
+    ;+Writes HDF5 files from variables in the local scope or a structure
+    ;+***
+    ;+##Arguments
+    ;+    **vars**: List of variables or a structure
+    ;+
+    ;+##Keyword Arguments
+    ;+    **atts**: Attributes to write
+    ;+
+    ;+    **filename**: Filename of output HDF5 file
+    ;+
+    ;+    **clobber**: Overwrite exisiting HDF5 file
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> a = [1,2,3]
+    ;+IDL> write_hdf5,"a",atts={attribute,obj:"/a",name:"description",data:"example variable"}
+    ;+IDL> s = {a:1,b:{a:2}}
+    ;+IDL> write_hdf5,s,/clobber
+    ;+```
 
     if not keyword_set(filename) then filename = 'idlsave.h5'
 

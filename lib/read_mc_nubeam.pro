@@ -1,5 +1,26 @@
 FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = particle_weight,btipsign=btipsign
-
+    ;+#read_mc_nubeam
+    ;+Reads guiding center Monte Carlo NUBEAM fast-ion distribution file
+    ;+***
+    ;+##Arguments
+    ;+    **infile**: NUBEAM Monte Carlo distribution file
+    ;+
+    ;+##Keyword Arguments
+    ;+    **ntotal**: Total number of fast-ions
+    ;+
+    ;+    **e_range**: Energy range of particles to consider
+    ;+
+    ;+    **particle_weight**: Set particle/marker weight such that sum(particle_weights) = ntotal: Defaults to `ntotal`/nparticles
+    ;+
+    ;+    **btipsign**: Sign of the dot product between the current and magnetic field (Required)
+    ;+
+    ;+##Return Value
+    ;+Distribution structure
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> dist = read_spiral("./spiral_file.TXT",time=1.0, ntotal=1e19)
+    ;+```
     if not keyword_set(btipsign) then begin
         print,'ERROR: btipsign is not set.'
         goto, GET_OUT

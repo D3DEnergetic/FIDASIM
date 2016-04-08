@@ -48,8 +48,6 @@
 
 function fluxmap, g
 
-compile_opt defint32,strictarr,strictarrsubs
-
 numpts = g.mw
 
 If (numpts Le 1) Then Begin
@@ -59,7 +57,7 @@ EndIf
 
 dpsi = g.ssibry - g.ssimag
 psi_eqdsk = findgen(numpts-1)/float(numpts-1)
-q_eqdsk = g.qpsi[0:(numpts-2)]  
+q_eqdsk = g.qpsi(0:(numpts-2))   
 
 ;
 ; -- q_eqdsk = q(psi) evaluated at the points psi = psi_eqdsk,
@@ -75,7 +73,7 @@ q_eqdsk = g.qpsi[0:(numpts-2)]
 ;
 
 nint = 100 ; number of points on fine psi grid.
-psi = psi_eqdsk[numpts-2]*findgen(nint)/float(nint-1)
+psi = psi_eqdsk(numpts-2)*findgen(nint)/float(nint-1)
 q = spline(psi_eqdsk,q_eqdsk,psi) 
 
 ;
@@ -89,7 +87,7 @@ flux = 2.*qsimpv(psi,q)*abs(dpsi)
 ; NOTE flux = (Toroidal Flux)/pi.
 ; Also, the toroidal flux is not evaluated at the boundary
 ; surface, but only to some nearby interior surface, 
-; where psi = psi_eqdsk[numpts-2].
+; where psi = psi_eqdsk(numpts-2).
 ;
 ; -- calculate the toroidal flux for boundary surface --
 ; This is done in 4 STEPS, as given below.
@@ -97,7 +95,7 @@ flux = 2.*qsimpv(psi,q)*abs(dpsi)
 ; STEP 1 -- calculate the contour of an interior surface --
 ;
 
-psi_c = psi_eqdsk[numpts-2] 	; interior surface
+psi_c = psi_eqdsk(numpts-2) 	; interior surface
 pts = 101  			; number of theta points (** an odd number **)
 
 contour_psi, g,pts,psi_c,psi_c,g.mw,g.mh,psi_c,thetag,r_c,/do_one
@@ -105,9 +103,9 @@ contour_psi, g,pts,psi_c,psi_c,g.mw,g.mh,psi_c,thetag,r_c,/do_one
 ;
 ; STEP 2 -- define boundary surface from GEQDSK --
 ;
-
-x_bdry = g.bdry[0,0:(g.nbdry-1)] - g.rmaxis
-y_bdry = g.bdry[1,0:(g.nbdry-1)] - g.zmaxis
+if g.nbdry eq 0.0 then g.nbdry = n_elements( g.bdry(0,*) )
+x_bdry = g.bdry(0,0:(g.nbdry-1)) - g.rmaxis
+y_bdry = g.bdry(1,0:(g.nbdry-1)) - g.zmaxis
 
 ;
 ; STEP 3 -- interpolate boundary into (r,theta) coordinates --
@@ -119,20 +117,20 @@ theta = acos(x_bdry/r)
 ; Check put in for ni - 20020402 tbt
 i = where(y_bdry lt 0., ni)
 
-If (ni Gt 0) Then theta[i] = 2.*!pi - temporary(theta[i])
+If (ni Gt 0) Then theta(i) = 2.*!pi - temporary(theta(i))
 
 i = uniq(theta,sort(theta))
-theta = temporary(theta[i])
-r = temporary(r[i])
+theta = temporary(theta(i))
+r = temporary(r(i))
 n = n_elements(r)
 r_s = fltarr(n+2)
 theta_s = fltarr(n+2)
-theta_s[1:n] = theta
-r_s[1:n] = r
-r_s[0] = r[n-1]
-theta_s[0] = theta[n-1] - 2.*!pi
-r_s[n+1] = r[0]
-theta_s[n+1] = theta[0] + 2.*!pi
+theta_s(1:n) = theta
+r_s(1:n) = r
+r_s(0) = r(n-1)
+theta_s(0) = theta(n-1) - 2.*!pi
+r_s(n+1) = r(0)
+theta_s(n+1) = theta(0) + 2.*!pi
 r_bdry = spline(theta_s,r_s,thetag)
 
 ;
@@ -152,10 +150,10 @@ eps = r_c/g.rmaxis
 y1 = (eps - alog(1.+eps*cos(thetag))/cos(thetag))/cos(thetag)
 eps = r_bdry/g.rmaxis
 y2 = (eps - alog(1.+eps*cos(thetag))/cos(thetag))/cos(thetag)
-fpsi = 0.5*(g.fpol[numpts-2] + g.fpol[numpts-1])
+fpsi = 0.5*(g.fpol(numpts-2) + g.fpol(numpts-1))
 r_integral = abs(fpsi)*g.rmaxis*(y2 - y1)
 dflux = 2.*total(r_integral)/float(pts)
-flux_bdry = flux[nint-1] + dflux
+flux_bdry = flux(nint-1) + dflux
 
 ;
 ; NOTE flux_bdry = (Toroidal Flux inside boundary)/pi.

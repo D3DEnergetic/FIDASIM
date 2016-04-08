@@ -1,4 +1,21 @@
 FUNCTION read_ncdf,file,vars=vars
+    ;+#read_ncdf
+    ;+Reads a flat NetCDF file
+    ;+***
+    ;+##Arguments
+    ;+    **file**: NetCDF file
+    ;+
+    ;+##Keyword Arguments
+    ;+    **vars**: List of variables to read
+    ;+
+    ;+##Return Value
+    ;+Structure containing NetCDF variables
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> a = read_ncdf("./123324H01_fi_1.cdf")
+    ;+```
+
     ;;List of reserved names
     reserved=['AND','BEGIN','BREAK','CASE','COMMON','COMPILE_OPT',$
               'CONTINUE','DO','ELSE','END','ENDCASE','ENDELSE',$

@@ -458,7 +458,6 @@ READG_UNFORMATTED:
   
   ;nvernum = long(strmid(ecase(3-1),2-1,2)+strmid(ecase(2-1),4-1,2)+$
   ;	strmid(ecase(2-1),7-1,2))
-
   nvernum = long(strcompress(strmid(ecase[3-1],2-1,4),/Remove)+$
 	strmid(ecase[2-1],4-1,2)+strmid(ecase[2-1],7-1,2))
     

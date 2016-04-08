@@ -1,15 +1,29 @@
-FUNCTION extract_transp_plasma,filename, intime, grid, equil, $
+FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
             no_omega=no_omega,doplot=doplot, sne=sne, ste=ste, sti=sti, simp=simp, srot=srot
+    ;+#extract_transp_plasma
+    ;+Extracts `plasma` structure from a TRANSP run
+    ;+***
+    ;+##Arguments
+    ;+    **filename**: TRANSP output file e.g. [TRANSP_RUNID].CDF
+    ;+
+    ;+    **intime**: Time of interest [s]
+    ;+
+    ;+    **grid**: Interpolation grid
+    ;+
+    ;+    **flux**: Torodial Flux mapped onto the interpolation grid 
+    ;+
+    ;+##Keyword Arguments
+    ;+    **no_omega**: Do not try to load omega from TRANSP file
+    ;+
+    ;+    **doplot**: Plot profiles
+    ;+
+    ;+    **s(ne|te|ti|imp|rot)**: Smooth profiles
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, flux)
+    ;+```
 
-    ;; Plot Settings    
-    !p.charsize=2   &  	!x.minor=-1   & !y.minor=-1
-    if keyword_set(sne) OR keyword_set(ste)  OR keyword_set(sti) $
-                        OR keyword_set(simp) OR keyword_set(srot) then begin
-       	loadct, 13  & !p.color=100  & !p.multi=[0,2,3]  &  !p.psym=1  & !p.thick=1
-    	device, decompose=0
-    	window, 0, retain=2, xs=600, ys=800
-    end
-    
     var_list = ["X","TIME","NE","TE","TI","ZEFFI"]
     if not keyword_set(no_omega) then begin
         var_list = [var_list, "OMEGA"]
@@ -35,48 +49,51 @@ FUNCTION extract_transp_plasma,filename, intime, grid, equil, $
     dummy=min( abs(t-intime), idx)
     time = t[idx]
     print, ' * Selecting profiles at :', t[idx], ' s' ;pick the closest timeslice to TOI
-    print
     
-    if keyword_set(sne) then begin
-       z = smooth(transp_ne, [1, sne])
-       plot,  x, transp_ne[*,idx], title='Ne' + inputs.transpid
-       oplot, x, z[*,idx], psym=0, color=100
-       transp_ne = z
-    end
-
-    if keyword_set(simp) then begin
-       z = smooth(transp_zeff, [1, simp])
-       plot,  x, transp_zeff[*,idx], title='Zeff' + inputs.transpid
-       oplot, x, z[*,idx], psym=0, color=100
-       transp_zeff = z
-    end
-
-    if keyword_set(ste) then begin
-       z = smooth(transp_te, [1, ste])
-       plot,  x, transp_te[*,idx], title='Te' + inputs.transpid
-       oplot, x, z[*,idx], psym=0, color=100
-       transp_te = z
-    end
-
-    if keyword_set(sti) then begin
-       z = smooth(transp_ti, [1, sti])
-       plot,  x, transp_ti[*,idx], title='Ti' + inputs.transpid
-       oplot, x, z[*,idx], psym=0, color=100
-       transp_ti = z
-    end
-
-    if keyword_set(srot) then begin
-       z = smooth(transp_omega, [1, srot])
-       plot,  x, transp_omega[*,idx], title='Omega' + inputs.transpid
-       oplot, x, z[*,idx], psym=0, color=100
-       transp_omega = z
-    end
     
     if keyword_set(doplot) then begin
+        !p.charsize=2 & !x.minor=-1 & !y.minor=-1
+       	loadct, 13  & !p.color=100  & !p.multi=[0,2,3]  &  !p.psym=1  & !p.thick=1
+    	device, decompose=0
+    	window, 0, retain=2, xs=600, ys=800
+        if keyword_set(sne) then begin
+           z = smooth(transp_ne, [1, sne])
+           plot,  x, transp_ne[*,idx], title='Ne' 
+           oplot, x, z[*,idx], psym=0, color=100
+           transp_ne = z
+        end
+
+        if keyword_set(simp) then begin
+           z = smooth(transp_zeff, [1, simp])
+           plot,  x, transp_zeff[*,idx], title='Zeff'
+           oplot, x, z[*,idx], psym=0, color=100
+           transp_zeff = z
+        end
+
+        if keyword_set(ste) then begin
+           z = smooth(transp_te, [1, ste])
+           plot,  x, transp_te[*,idx], title='Te'
+           oplot, x, z[*,idx], psym=0, color=100
+           transp_te = z
+        end
+
+        if keyword_set(sti) then begin
+           z = smooth(transp_ti, [1, sti])
+           plot,  x, transp_ti[*,idx], title='Ti'
+           oplot, x, z[*,idx], psym=0, color=100
+           transp_ti = z
+        end
+
+        if keyword_set(srot) then begin
+           z = smooth(transp_omega, [1, srot])
+           plot,  x, transp_omega[*,idx], title='Omega'
+           oplot, x, z[*,idx], psym=0, color=100
+           transp_omega = z
+        end
     	!p.color=220  & !p.multi=[0,2,3]  &  !p.psym=0  & !p.thick=2
     	window, 1, retain=2, xs=600, ys=800
     
-    	plot, x, transp_ne[*,idx],                  ytitle=' x E13 cm-3', title='Ne  '+inputs.transpid
+    	plot, x, transp_ne[*,idx],                  ytitle=' x E13 cm-3', title='Ne  '
     	plot, x, transp_zeff[*,idx],                ytitle= 'x E13 cm-3', title='Zeff'
     	plot, x, transp_te[*,idx],                  ytitle=' keV',        title='Te'
     	plot, x, transp_ti[*,idx],    xtitle='rho', ytitle=' keV',        title='Ti'
@@ -84,14 +101,14 @@ FUNCTION extract_transp_plasma,filename, intime, grid, equil, $
     endif
 
     ;; Interpolate onto r-z grid
-    dene=interpol(transp_ne[*,idx],x,equil.flux) > 0.0
-    te=interpol(transp_te[*,idx],x,equil.flux) > 0.0
-    ti=interpol(transp_ti[*,idx],x,equil.flux) > 0.0
-    zeff=interpol(transp_zeff[*,idx],x,equil.flux) > 1.0
-    vt = grid.r2d*interpol(trans_omega[*,idx],x,equil.flux)
+    dene=interpol(transp_ne[*,idx],x,flux) > 0.0
+    te=interpol(transp_te[*,idx],x,flux) > 0.0
+    ti=interpol(transp_ti[*,idx],x,flux) > 0.0
+    zeff=interpol(transp_zeff[*,idx],x,flux) > 1.0
+    vt = grid.r2d*interpol(trans_omega[*,idx],x,flux)
     vr = replicate(0.0,grid.nr,grid.nz)
-    vw = replicate(0.0,grid.nr,grid.nz)
-    max_flux = max(abs(rho))
+    vz = replicate(0.0,grid.nr,grid.nz)
+    max_flux = max(abs(x))
 
     s = size(flux,/dim)
     mask = intarr(s[0],s[1])
@@ -100,7 +117,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, equil, $
 
 
     ;;SAVE IN PROFILES STRUCTURE
-    profiles={data_source:filename,time:time,max_abs_flux:max(abs(x)),dene:dene,te:te,ti:ti,vr:vr,vt:vt,vw:vw,zeff:zeff} 
+    profiles={data_source:filename,time:time,mask:mask,dene:dene,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff} 
 
     return,profiles
 

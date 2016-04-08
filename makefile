@@ -23,6 +23,7 @@ endif
 SRC_DIR = $(FIDASIM_DIR)/src
 DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
+LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
 
 # atomic table variables
@@ -30,7 +31,7 @@ OUTPUT_DIR = $(TABLES_DIR)
 NTHREADS = 1000 
 
 # FORD documentation variables
-FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
+FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -d $(LIB_DIR) -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
 
 export SRC_DIR
 export DEPS_DIR

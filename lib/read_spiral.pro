@@ -9,7 +9,30 @@ END
 ;+ This file contains the procedure to read SPIRAL fast-ion distribution file
 FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, $
                            particle_weight=particle_weight, btipsign=btipsign
-    ;+ Reads SPIRAL fast-ion distribution file
+    ;+#read_spiral
+    ;+Reads SPIRAL guiding center fast-ion distribution file
+    ;+***
+    ;+##Arguments
+    ;+    **file**: SPIRAL output file
+    ;+
+    ;+##Keyword Arguments
+    ;+    **time**: Time [s]
+    ;+
+    ;+    **ntotal**: Total number of fast-ions
+    ;+
+    ;+    **e_range**: Energy range of particles to consider
+    ;+
+    ;+    **particle_weight**: Set particle/marker weight such that sum(particle_weights) = ntotal: Defaults to `ntotal`/nparticles
+    ;+
+    ;+    **btipsign**: Sign of the dot product between the current and magnetic field (Required)
+    ;+
+    ;+##Return Value
+    ;+Distribution structure
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> dist = read_mc_nubeam("./mc_159243H06_9",ntotal=1e19)
+    ;+```
 
     dist_struct = {err:1}
 

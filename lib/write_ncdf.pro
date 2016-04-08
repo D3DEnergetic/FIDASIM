@@ -1,4 +1,22 @@
 PRO write_ncdf,vars,filename=filename,merge_struct=merge_struct,clobber = clobber
+    ;+#write_ncdf
+    ;+Writes variables in the local scope to a NetCDF file
+    ;+***
+    ;+##Arguments
+    ;+    **vars**: Variables to write to file
+    ;+
+    ;+##Keyword Arguments
+    ;+    **filename**: Filename of NetCDF file
+    ;+
+    ;+    **merge_struct**: Merge structures before writing
+    ;+
+    ;+    **clobber**: Overwrite existing NetCDF file
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> a = 2
+    ;+IDL> write_ncdf,"a"
+    ;+```
 
     if not keyword_set(filename) then filename = 'idlsave.cdf'
 

@@ -77,9 +77,20 @@ FUNCTION json_minify,str
 END
 
 FUNCTION read_json, file
-    ;;; Reads a JSON file into a string ;;;
-    ;;; Strips out C like comments ;;;
-    ;;; Returns structure containing JSON variables ;;;
+    ;+#read_json
+    ;+ Reads a JSON file that can have YAML like comments
+    ;+***
+    ;+##Arguments
+    ;+    **file**: JSON file
+    ;+
+    ;+##Return Value 
+    ;+Structure containg JSON values
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> json_struct = read_json("./file.json")
+    ;+```
+
     openr,lun,file,/GET_LUN
     json=''
     tmp=''

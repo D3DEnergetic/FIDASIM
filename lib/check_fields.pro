@@ -1,18 +1,18 @@
 PRO check_fields, inp, grid, fields, err_status
-    ;+##`check_fields, inputs, grid, fields, err`
-    ;+Check if electromagnetic fields structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+#check_fields
+    ;+Checks if electromagnetic fields structure is valid
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: Input structure
     ;+ 
     ;+     **grid**: Interpolation grid structure
     ;+ 
     ;+     **fields**: Electromagnetic fields structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_fields, inputs, grid, fields, err
     ;+```

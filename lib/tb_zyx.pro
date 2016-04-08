@@ -1,17 +1,17 @@
 FUNCTION tb_zyx, a, b, g
-    ;+##`tb_zyx(alpha, beta, gamma)`
+    ;+#tb_zyx
     ;+Calculates Tait-Bryan z-y'-x" active rotation matrix given rotation angles `alpha`,`beta`,`gamma` in radians
-    ;+###Arguments
+    ;+##Arguments
     ;+     **alpha**: rotation angle about z [radians]
     ;+
     ;+     **beta**: rotation angle about y' [radians]
     ;+
     ;+     **gamma**: rotation angle about x" [radians]
     ;+
-    ;+###Return value
-    ;+     Rotation Matrix
+    ;+##Return Value
+    ;+     Rotation Matrix [prefida](|url|/sourcefile/prefida.pro.html)
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+ IDL> rot_mat = tb_zyx(!DPI/2, 0.0, !DPI/3)
     ;+```

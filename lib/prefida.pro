@@ -1,8 +1,8 @@
 PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa
-    ;+##`prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa`
+    ;+#prefida
     ;+Checks FIDASIM inputs and writes FIDASIM input files
-    ;+
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: Inputs structure
     ;+
     ;+     **grid**: Interpolation grid structure
@@ -15,12 +15,12 @@ PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa
     ;+
     ;+     **dist**: Fast-ion distribution structure
     ;+
-    ;+###Keyword Arguments
+    ;+##Keyword Arguments
     ;+     **spec**: Optional, Spectral geometry structure
     ;+
     ;+     **npa**: Optional, NPA geometry structure
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
     ;+```

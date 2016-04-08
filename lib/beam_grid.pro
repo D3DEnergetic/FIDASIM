@@ -1,14 +1,15 @@
 FUNCTION beam_grid, nbi, rstart, $
     nx = nx, ny = ny, nz = nz, dv=dv, $
     length=length, width=width, height=height
-    ;+##`beam_grid(nbi, rstart)`
-    ;+ Calculates beam grid settings that aligns with the neutral beam.
-    ;+###Arguments
+    ;+#beam_grid
+    ;+ Calculates settings for a grid that aligns with the neutral beam.
+    ;+***
+    ;+##Arguments
     ;+    **nbi**: Neutral beam geometry structure
     ;+
     ;+    **rstart**: Radial start position of beam grid [cm]
     ;+
-    ;+###Keyword Arguments
+    ;+##Keyword Arguments
     ;+    **dV**: Cell volume [\(cm^3\)]: Defaults to 8.0
     ;+
     ;+    **nx**: Number of cells in length: Default determined by `dV`
@@ -23,10 +24,10 @@ FUNCTION beam_grid, nbi, rstart, $
     ;+
     ;+    **height**: Height of grid [cm]: Defaults to 50 cm
     ;+
-    ;+###Return Value
-    ;+    Structure containing beam grid settings suitable for FIDASIM
+    ;+##Return Value
+    ;+    Structure containing beam grid settings suitable for the [Namelist File](|url|/page/02_input_files/01_namelist_file.html)
     ;+   
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> grid = beam_grid(nbi,200.0,nx=100,ny=50,ny=50,length=100,width=50,height=50)
     ;+```

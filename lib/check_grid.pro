@@ -1,14 +1,14 @@
 PRO check_grid, grid, err_status
-    ;+##`check_grid, grid, err`
+    ;+#check_grid
     ;+Checks if interpolation grid structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **grid**: Interpolation grid structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_grid, grid, err
     ;+```

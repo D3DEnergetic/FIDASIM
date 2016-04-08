@@ -1,14 +1,14 @@
 PRO check_inputs, inputs, err_status
-    ;+##`check_inputs, inputs, err`
+    ;+#check_inputs
     ;+Checks if input structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: input structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_inputs, inputs, err
     ;+```

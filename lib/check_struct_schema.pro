@@ -1,18 +1,19 @@
 PRO check_struct_schema, schema, s, err_status, desc=desc
-    ;+##`check_struct_schema, schema, s, err, desc="structure"`
+    ;+#check_struct_schema
     ;+ Check structure `s` is formatted according to `schema`
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **schema**: structure schema
     ;+
     ;+     **s**: structure to check
     ;+
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Keyword Arguments
+    ;+##Keyword Arguments
     ;+     **desc**: description of structure `s`
     ;+
-    ;+ Example usage:
+    ;+##Example usage
     ;+```idl
     ;+IDL> s = {a:0, b:[1.d0,2.d0], c:"example"}
     ;+IDL> schema = {a:{dims:0,type:"INT"}, b:{dims:[2],type:"DOUBLE"}, c:{dims:0,type:"STRING"}  }

@@ -1,14 +1,14 @@
 FUNCTION get_version, fidasim_dir
-    ;+##`get_version(fidasim_dir)`
+    ;+#get_version
     ;+ Gets FIDASIM version number from git. 
     ;+ Falls back to reading VERSION file when git is not available
-    ;+
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+    **fidasim_dir**: FIDASIM install directory
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
-    ;+IDL> version = get_version("~/FIDASIM")
+    ;+IDL> version = get_version(getenv("FIDASIM_DIR"))
     ;+```
 
     version = ''

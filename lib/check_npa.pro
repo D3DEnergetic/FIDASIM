@@ -1,16 +1,16 @@
 PRO check_npa, inp, npa, err_status
-    ;+##`check_npa, inputs, npa, err`
-    ;+Check if NPA geometry structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+#check_npa
+    ;+Checks if NPA geometry structure is valid
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: input structure
     ;+
     ;+     **npa**: NPA geometry structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_npa, inputs, npa, err
     ;+```

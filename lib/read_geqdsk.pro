@@ -127,6 +127,24 @@ PRO calculate_bfield,bp,br,bt,bz,g
 end
 
 FUNCTION read_geqdsk,filename,grid,flux=flux
+    ;+#read_geqdsk
+    ;+Reads an EFIT GEQDSK file
+    ;+***
+    ;+##Arguments
+    ;+    **filename**: GEQDSK file
+    ;+
+    ;+    **grid**: Interpolation grid
+    ;+
+    ;+##Keyword Arguments
+    ;+    **flux**: Set this keyword to a named variable to recieve the torodial flux mapped onto the interpolation grid
+    ;+
+    ;+##Return Value
+    ;+Electronmagnetic fields structure
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> fields = read_geqdsk("./g133223.00200",flux=flux)
+    ;+```
 
     equil={err:1}
     ;; Get eqdsk

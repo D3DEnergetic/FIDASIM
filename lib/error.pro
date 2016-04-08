@@ -1,10 +1,11 @@
 PRO error, str
-    ;+##`error, str`
+    ;+#error
     ;+Print a error message
-    ;+###Arguments
+    ;+***
+    ;+##Arguments
     ;+     **str**: message
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> error, "=("
     ;+```

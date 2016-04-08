@@ -1,18 +1,18 @@
 PRO check_distribution, inp, grid, dist, err_status
-    ;+##`check_distribution, inputs, grid, dist, err`
-    ;+Check if distribution structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+#check_distribution
+    ;+Checks if distribution structure is valid
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: Input structure
     ;+ 
     ;+     **grid**: Interpolation grid structure
     ;+ 
     ;+     **dist**: Fast-ion distribution structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_distribution, inputs, grid, dist, err
     ;+```

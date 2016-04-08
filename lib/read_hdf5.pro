@@ -198,7 +198,25 @@ FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten
 END
 
 FUNCTION read_hdf5,filename,paths=paths,flatten=flatten
-    
+    ;+#read_hdf5
+    ;+Reads HDF5 file variables and attributes
+    ;+***
+    ;+##Arguments
+    ;+    **filename**: HDF5 file
+    ;+
+    ;+##Keyword Arguments
+    ;+    **paths**: Paths to variables to be read
+    ;+
+    ;+    **flatten**: Flatten tree structure
+    ;+
+    ;+##Return Value
+    ;+Structure containing variables and attributes
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> a = read_hdf5("./test_1a_geometry.h5")
+    ;+IDL> b = read_hdf5("./test_1a_geometry.h5",paths="/spec/lens",/flatten)
+    ;+```
     if file_test(filename) then begin
         ;; Open file
         fid = h5f_open(filename)

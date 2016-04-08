@@ -1,16 +1,16 @@
 PRO check_spec, inp, chords, err_status
-    ;+##`check_spec, inputs, chords, err`
+    ;+#check_spec
     ;+Check if spectral geometry structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: input structure
     ;+
     ;+     **chords**: spectral geometry structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_spec, inputs, chords, err
     ;+```

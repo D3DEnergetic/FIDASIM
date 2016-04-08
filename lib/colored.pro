@@ -1,15 +1,16 @@
 FUNCTION colored, str, c=c, s=s
-    ;+##`colored(str, c="w", s="n")`
+    ;+#colored
     ;+Creates colored string
-    ;+###Arguments
+    ;+***
+    ;+##Arguments
     ;+     **str**: String to be colored
     ;+
-    ;+###Keyword Arguments
+    ;+##Keyword Arguments
     ;+     **c**: Foreground color code
     ;+
     ;+     **s**: Style code
     ;+
-    ;+####Foreground Color Codes
+    ;+###Foreground Color Codes
     ;+     **k**: Black,
     ;+     **r**: Red,
     ;+     **g**: Green,
@@ -18,7 +19,7 @@ FUNCTION colored, str, c=c, s=s
     ;+     **m**: Magenta,
     ;+     **c**: Cyan,
     ;+     **w**: White
-    ;+####Style Format Codes
+    ;+###Style Format Codes
     ;+     **n**: Normal, 
     ;+     **b**: Bright, 
     ;+     **d**: Dim, 
@@ -27,10 +28,10 @@ FUNCTION colored, str, c=c, s=s
     ;+     **r**: Reverse, 
     ;+     **h**: Hidden, 
     ;+     **s**: Strikethrough 
-    ;+###Return Value
+    ;+##Return Value
     ;+     Colored string
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> blue_bright_hello = colored("Hello",c="b",s="b")
     ;+```

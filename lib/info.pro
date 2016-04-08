@@ -1,10 +1,11 @@
 PRO info, str
-    ;+##`info, str`
+    ;+#info
     ;+Print a informational message
-    ;+###Arguments
+    ;+***
+    ;+##Arguments
     ;+     **str**: message
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> info, "This is an informative message"
     ;+```

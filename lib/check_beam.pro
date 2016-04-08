@@ -1,16 +1,16 @@
 PRO check_beam, inp, nbi, err_status
-    ;+##`check_beam, inputs, nbi, err`
-    ;+Check if neutral beam geometry structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+#check_beam
+    ;+Checks if neutral beam geometry structure is valid
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: input structure
     ;+
     ;+     **nbi**: neutral beam geometry structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_beam, inputs, nbi, err
     ;+```

@@ -1,7 +1,8 @@
 PRO aabb_intersect, rc, dr, r0, d0, intersect, r_enter, r_exit
-    ;+##`aabb_intersect, rc, dr, r0, d0, length, ri, rf`
+    ;+#aabb_intersect
     ;+Calculates intersection length of a ray and an axis aligned bounding box (AABB)
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **rc**: Center of AABB
     ;+
     ;+     **dr**: [length, width, height] of AABB
@@ -10,14 +11,14 @@ PRO aabb_intersect, rc, dr, r0, d0, intersect, r_enter, r_exit
     ;+
     ;+     **d0**: direction of ray
     ;+
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **intersect**: Intersection length of ray and AABB
     ;+
     ;+     **ri**: Optional, ray enterence point
     ;+
     ;+     **rf**: Optional, ray exit point
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> aabb_intersect, [0,0,0], [1,1,1], [-1,0,0], [1,0,0], intersect, ri, rf
     ;+IDL> print, intersect

@@ -1,18 +1,18 @@
 PRO check_plasma, inp, grid, plasma, err_status
-    ;+##`check_plasma, inputs, grid, plasma, err`
+    ;+#check_plasma
     ;+Checks if plasma paramters structure is valid
-    ;+
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **inputs**: Input structure
     ;+
     ;+     **grid**: Interpolation grid structure
     ;+
     ;+     **plasma**: Plasma parameters structure
     ;+ 
-    ;+###Output Arguments
+    ;+##Output Arguments
     ;+     **err**: error code
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> check_plasma, inputs, grid, plasma, err
     ;+```

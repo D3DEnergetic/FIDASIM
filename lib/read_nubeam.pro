@@ -1,4 +1,26 @@
 FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_range
+    ;+#read_nubeam
+    ;+Reads NUBEAM fast-ion distribution function
+    ;+***
+    ;+##Arguments
+    ;+    **filename**: NUBEAM guiding center fast-ion distribution function file e.g. 159245H01_fi_1.cdf
+    ;+
+    ;+    **grid**: Interpolation grid
+    ;+
+    ;+##Keyword Arguments
+    ;+    **btipsign**: Sign of the dot product of the magnetic field and plasma current
+    ;+
+    ;+    **e_range**: Energy range to consider
+    ;+
+    ;+    **p_range**: Pitch range to consider
+    ;+
+    ;+##Return Value
+    ;+Distribution structure
+    ;+
+    ;+##Example Usage
+    ;+```idl
+    ;+IDL> dist = read_nubeam("./159245H02_fi_1.cdf")
+    ;+```
 
     if not keyword_set(btipsign) then btipsign = -1
 

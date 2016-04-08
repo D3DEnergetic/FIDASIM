@@ -1,14 +1,54 @@
 FUNCTION beam_grid, nbi, rstart, $
     nx = nx, ny = ny, nz = nz, dv=dv, $
     length=length, width=width, height=height
+    ;+##`beam_grid(nbi, rstart)`
+    ;+ Calculates beam grid settings that aligns with the neutral beam.
+    ;+###Arguments
+    ;+    **nbi**: Neutral beam geometry structure
+    ;+
+    ;+    **rstart**: Radial start position of beam grid [cm]
+    ;+
+    ;+###Keyword Arguments
+    ;+    **dV**: Cell volume [\(cm^3\)]: Defaults to 8.0
+    ;+
+    ;+    **nx**: Number of cells in length: Default determined by `dV`
+    ;+
+    ;+    **ny**: Number of cells in width: Default determined by `dV`
+    ;+
+    ;+    **nz**: Number of cells in height: Default determined by `dV`
+    ;+
+    ;+    **length**: Length of grid along beam sightline. [cm]: Defaults to 100 cm
+    ;+
+    ;+    **width**: Width of grid [cm]: Defaults to 50 cm
+    ;+
+    ;+    **height**: Height of grid [cm]: Defaults to 50 cm
+    ;+
+    ;+###Return Value
+    ;+    Structure containing beam grid settings suitable for FIDASIM
+    ;+   
+    ;+###Example Usage
+    ;+```idl
+    ;+IDL> grid = beam_grid(nbi,200.0,nx=100,ny=50,ny=50,length=100,width=50,height=50)
+    ;+```
+
 
     beam_grid = {err:1}
 
     if not keyword_set(length) then length = 100.0 ;cm
+
     if not keyword_set(width) then width = 80.0 ;cm
-    width = max(width,2*nbi.widy)
+    if width lt nbi.widy then  begin
+        warning, "Grid width is smaller then the source width"
+        print, "width: ", width
+        print, "source width: ",nbi.widy
+    endif
+ 
     if not keyword_set(height) then height = 80.0 ;cm
-    width = max(height,2*nbi.widz)
+    if height lt nbi.widz then begin
+        warning, "Grid height is smaller then the source height" 
+        print, "height: ", height
+        print, "source height: ",nbi.widz
+    endif
 
     if not keyword_set(dv) then dv = 8.0 ;cm^3
 

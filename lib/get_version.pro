@@ -15,7 +15,7 @@ FUNCTION get_version, fidasim_dir
     git_dir = fidasim_dir+'/.git'
     spawn,'command -v git ',git_command,/sh
     if file_test(git_command) and file_test(git_dir,/dir) then begin
-        spawn,git_command+' --git-dir='+git_dir+' describe --tags --always',version,err_status
+        spawn,git_command+' --git-dir='+git_dir+' describe --tags --always --dirty',version,err_status
     endif else begin
         version_file = fidasim_dir+'/VERSION'
         version = ''

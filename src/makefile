@@ -16,7 +16,7 @@ endif
 
 BUILD := $(shell command -v git >/dev/null 2>&1 && \
 	[ -d $(FIDASIM_DIR)/.git ] && \
-	git --git-dir=$(FIDASIM_DIR)/.git describe --tags --always)
+	git --git-dir=$(FIDASIM_DIR)/.git describe --tags --always --dirty)
 
 ifneq ($(BUILD),)
 	UFLAGS = -D_VERSION=\"$(BUILD)\"

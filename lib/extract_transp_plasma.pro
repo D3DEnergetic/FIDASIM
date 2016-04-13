@@ -30,7 +30,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     endif
 
     zz = read_ncdf(filename,vars = var_list)
-    if vars.err eq 1 then begin
+    if zz.err eq 1 then begin
         return, 1
     END
     
@@ -40,14 +40,15 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     transp_zeff = zz.zeffi
     x = zz.x
     t = zz.time
+   
+    dummy=min( abs(t-intime), idx)
+    time = double(t[idx])
+    x = double(x[*,idx])
     if keyword_set(no_omega) then begin
       transp_omega=replicate(0.,n_elements(x),n_elements(t))
     endif else begin
       transp_omega = zz.omega  ; rad/s
     endelse
-    
-    dummy=min( abs(t-intime), idx)
-    time = t[idx]
     print, ' * Selecting profiles at :', t[idx], ' s' ;pick the closest timeslice to TOI
     
     
@@ -105,9 +106,9 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     te=interpol(transp_te[*,idx],x,flux) > 0.0
     ti=interpol(transp_ti[*,idx],x,flux) > 0.0
     zeff=interpol(transp_zeff[*,idx],x,flux) > 1.0
-    vt = grid.r2d*interpol(trans_omega[*,idx],x,flux)
-    vr = replicate(0.0,grid.nr,grid.nz)
-    vz = replicate(0.0,grid.nr,grid.nz)
+    vt = double(grid.r2d*interpol(transp_omega[*,idx],x,flux))
+    vr = double(replicate(0.0,grid.nr,grid.nz))
+    vz = double(replicate(0.0,grid.nr,grid.nz))
     max_flux = max(abs(x))
 
     s = size(flux,/dim)

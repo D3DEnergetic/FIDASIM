@@ -69,6 +69,8 @@ docs:
 	@echo "Checking for broken links..."
 	linkchecker $(DOCS_DIR)/html/index.html
 
+clean_all: clean clean_deps
+
 clean: clean_src clean_tables
 	-rm -f *.mod *.o fidasim fidasim_debug
 

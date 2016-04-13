@@ -84,7 +84,7 @@ FUNCTION beam_grid, nbi, rstart, $
     t = (-b - sqrt(b^2 - 4*a*c))/(2*a)
     origin = src + t*axis
 
-    beam_grid = {nx:nx, ny:ny, nz:nz, $
+    beam_grid = {nx:fix(nx), ny:fix(ny), nz:fix(nz), $
                  xmin:xmin, xmax:xmax, $
                  ymin:ymin, ymax:ymax, $
                  zmin:zmin, zmax:zmax, $

@@ -67,6 +67,8 @@ atomic_tables:
 docs:
 	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
 
+clean_all: clean clean_deps
+
 clean: clean_src clean_tables
 	-rm -f *.mod *.o fidasim fidasim_debug
 

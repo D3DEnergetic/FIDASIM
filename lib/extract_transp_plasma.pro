@@ -1,5 +1,6 @@
 FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
-            no_omega=no_omega,doplot=doplot, sne=sne, ste=ste, sti=sti, simp=simp, srot=srot
+            no_omega=no_omega, doplot=doplot, profiles=profiles, $
+            sne=sne, ste=ste, sti=sti, simp=simp, srot=srot
     ;+#extract_transp_plasma
     ;+Extracts `plasma` structure from a TRANSP run
     ;+***
@@ -16,6 +17,8 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+    **no_omega**: Do not try to load omega from TRANSP file
     ;+
     ;+    **doplot**: Plot profiles
+    ;+
+    ;+    **profiles**: Set this keyword to a named variable to recieve the plasma profiles as a function of rho
     ;+
     ;+    **s(ne|te|ti|imp|rot)**: Smooth profiles
     ;+
@@ -101,6 +104,13 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     	plot, x, transp_omega[*,idx], xtitle='rho', ytitle='rad/s',       title='Omega'
     endif
 
+    profiles = {rho:x, $
+                dene:transp_ne[*,idx] > 0.0, $
+                te:transp_te[*,idx] > 0.0, $
+                ti:transp_ti[*,idx] > 0.0, $
+                zeff:transp_zeff[*,idx] > 1.0, $
+                omega:transp_omega[*,idx]}
+
     ;; Interpolate onto r-z grid
     dene=interpol(transp_ne[*,idx],x,flux) > 0.0
     te=interpol(transp_te[*,idx],x,flux) > 0.0
@@ -118,8 +128,9 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
 
 
     ;;SAVE IN PROFILES STRUCTURE
-    profiles={data_source:filename,time:time,mask:mask,dene:dene,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff} 
+    plasma={data_source:filename,time:time,mask:mask, $
+            dene:dene,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff} 
 
-    return,profiles
+    return,plasma
 
 END

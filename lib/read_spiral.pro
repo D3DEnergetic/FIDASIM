@@ -7,9 +7,11 @@ FUNCTION read_spiral_header, file
     err = 0
     nheader = 0
     line = ''
+    header = ''
     readf, lun, line
     while strmid(line,0,1) eq ';' do begin
         nheader = nheader + 1
+        header = header + line + string(10B)
         if stregex(line,"number",/fold_case) ne -1 then begin
             npart = long(stregex(line,"[0-9]+",/extract))
         endif
@@ -35,7 +37,7 @@ FUNCTION read_spiral_header, file
         print,'ERROR: Number of particles le 0'
     endif
 
-    return, {err:err, nheader:nheader, npart:npart}
+    return, {err:err, nheader:nheader, npart:npart, header:header}
 
 END
 

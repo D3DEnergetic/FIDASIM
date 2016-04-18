@@ -29,7 +29,7 @@ FUNCTION beam_grid, nbi, rstart, $
     ;+   
     ;+##Example Usage
     ;+```idl
-    ;+IDL> grid = beam_grid(nbi,200.0,nx=100,ny=50,ny=50,length=100,width=50,height=50)
+    ;+IDL> grid = beam_grid(nbi,200.0,nx=100,ny=50,nz=50,length=100,width=50,height=50)
     ;+```
 
 

@@ -2017,9 +2017,29 @@ subroutine read_equilibrium
     call h5ltread_dataset_int_f(gid, "/plasma/mask", p_mask, dims,error)
   
     impc = inputs%impurity_charge
+    where(equil%plasma%zeff.lt.1.0)
+        equil%plasma%zeff = 1
+    endwhere
+
+    where(equil%plasma%zeff.gt.impc)
+        equil%plasma%zeff = impc
+    endwhere
+
+    where(equil%plasma%dene.lt.0.0)
+        equil%plasma%dene = 0.0
+    endwhere
+
+    where(equil%plasma%te.lt.0.0)
+        equil%plasma%te = 0.0
+    endwhere
+
+    where(equil%plasma%ti.lt.0.0)
+        equil%plasma%ti = 0.0
+    endwhere
+
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
-  
+
     !!Close PLASMA group
     call h5gclose_f(gid, error)
   

@@ -19,7 +19,7 @@ PRO run_tests,result_dir,test_case=test_case
    tfracs=1.0-ffracs-hfracs
    species_mix = double([ffracs,hfracs,tfracs])
 
-   basic_inputs = {max_threads:16,device:"TEST",shot:1L,time:1.d0,$
+   basic_inputs = {device:"TEST",shot:1L,time:1.d0,$
                    einj:einj,pinj:pinj,species_mix:species_mix,$
                    ab:2.01410178d0,ai:2.0141078d0,impurity_charge:6,$
                    lambdamin:647.0d0,lambdamax:667.0d0,nlambda:2000,$

@@ -27,7 +27,7 @@ END
 FUNCTION test_npa
     
     ;; Chords
-    nchan = 3
+    nchan = 3L
     ulens = dblarr(nchan)
     vlens = [-170.d0,-170.d0,-170.d0]
     wlens = replicate(100.d0,nchan)
@@ -66,7 +66,7 @@ FUNCTION test_npa
         d_tedge[*,i] = transpose(R##transpose(dt)) + r0
     endfor
 
-    npa_chords = {nchan:3,system:"NPA",data_source:"test_npa.pro", $
+    npa_chords = {nchan:3L,system:"NPA",data_source:"test_npa.pro", $
                   a_shape:replicate(2,nchan),d_shape:replicate(2,nchan), $
                   a_cent:a_cent,a_redge:a_redge,a_tedge:a_tedge, $
                   d_cent:d_cent,d_redge:d_redge,d_tedge:d_tedge, radius:radius}

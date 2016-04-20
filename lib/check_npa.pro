@@ -35,9 +35,9 @@ PRO check_npa, inp, npa, err_status
     nsys = size(npa.system,/dim)
     nchan = npa.nchan
     zero_string = {dims:0, type:'STRING'}
-    zero_int = {dims:0, type:'INT'}
+    zero_long = {dims:0, type:'LONG'}
     schema = {data_source:zero_string, $
-              nchan:zero_int, $
+              nchan:zero_long, $
               system:{dims:nsys, type:'STRING'}, $
               a_shape:{dims:[nchan], type:'INT'},$
               d_shape:{dims:[nchan], type:'INT'}, $

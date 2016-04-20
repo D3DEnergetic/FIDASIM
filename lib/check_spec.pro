@@ -34,10 +34,10 @@ PRO check_spec, inp, chords, err_status
     nchan = chords.nchan
     nsys = size(chords.system,/dim)
     zero_string = {dims:0, type:'STRING'}
-    zero_int = {dims:0, type:'INT'}
+    zero_long = {dims:0, type:'LONG'}
     nchan_double = {dims:[nchan], type:'DOUBLE'}
     schema = {data_source:zero_string, $
-              nchan:zero_int, $
+              nchan:zero_long, $
               system:{dims:nsys,type:'STRING'}, $
               lens:{dims:[3,nchan], type:'DOUBLE'}, $
               axis:{dims:[3,nchan], type:'DOUBLE'}, $

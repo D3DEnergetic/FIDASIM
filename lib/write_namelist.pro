@@ -35,14 +35,14 @@ PRO write_namelist, filename, inputs
     printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"
     printf,55,''
     printf,55,'!! Simulation Switches'
-    printf,55,f='("calc_bes = ",i2 , "    !! Calculate Beam Emission Spectra")',inputs.calc_bes
+    printf,55,f='("calc_bes = ",i2 , "    !! Calculate Beam Emission and Halo Spectra")',inputs.calc_bes
     printf,55,f='("calc_brems = ",i2 , "    !! Calculate Bremsstrahlung")',inputs.calc_brems
     printf,55,f='("calc_fida = ",i2 , "    !! Calculate FIDA Spectra")',inputs.calc_fida
     printf,55,f='("calc_npa = ",i2 , "   !! Calculate NPA")',inputs.calc_npa
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
     printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght
-    printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from neutrals file")',inputs.load_neutrals
+    printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from a preexisting neutrals file")',inputs.load_neutrals
     printf,55,f='("dump_dcx = ",i2,"    !! Dump DCX neutrals and spectra")',inputs.dump_dcx
     printf,55,f='("verbose = ",i2,"    !! Verbose")',inputs.verbose
     printf,55,''

@@ -16,14 +16,14 @@ The interpretation of the diagnostic signals requires modeling of the above proc
 Towards this end, FIDASIM was created.  
 
 ##History
-The very first implementation of FIDASIM was written by Yadong Luo as a part in his [thesis](http://www.physics.uci.edu/~wwheidbr/papers/thesis_luo.pdf).
-The code would be later be improved upon by [Bill Heidbrink and Deyong Lui](http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf) for public use.
+The very first implementation of FIDASIM was written by Yadong Luo and Bill Heidbrink while Yadong was working on his [thesis](http://www.physics.uci.edu/~wwheidbr/papers/thesis_luo.pdf).
+Subsequently, Deyong Liu added features to simulate NPA signals. The IDL version of the code was distributed for public use and documented in a journal publication (http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf).
 
 Originally, FIDASIM was written in the IDL programming language and was prohibitively slow.
 As a part of his [thesis](http://www.iaea.org/inis/collection/NCLCollectionStore/_Public/46/051/46051941.pdf) Ben Geiger wrote a version of FIDASIM written in Fortran 90.
 This prototype version was parallelized using OpenMP and was orders of magnitude faster but was not as easy to use as the IDL version and was difficult to port to different devices. 
 
-Most recently, [Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geigers Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
+Most recently, [Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geiger's Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
 Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful. 
 
 ##Capabilities

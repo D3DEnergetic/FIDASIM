@@ -10,7 +10,7 @@ The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excite
 {: style="text-align: center" }
 
 Both the fast-neutral and the photon contain information about the velocity of fast-ion before it was neutralized.
-There are two types diagnostics that take advantage of this fact: Fast-ion D-α (FIDA) diagnostics and Neutral Partile Analyzers (NPA).
+There are two types diagnostics that take advantage of this fact: Fast-ion D-α (FIDA) diagnostics and Neutral Particle Analyzers (NPA).
 The interpretation of the diagnostic signals requires modeling of the above process which has a complicated dependence on the plasma parameters, electromagnetic fields, and neutral beam and diagnostic geometry.
 
 Towards this end, FIDASIM was created.  

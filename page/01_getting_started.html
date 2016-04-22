@@ -154,6 +154,11 @@
             
             </li>
             
+            <li role="presentation">
+            <a href='../page/./06_dependencies.html'>Namelist File</a>
+            
+            </li>
+            
             <li role="presentation" class="disabled">
             <a href='../page/./01_getting_started.html'>Getting Started</a>
             
@@ -193,46 +198,48 @@ To figure out what shell you currently have run <code>echo $SHELL</code> to find
 <li>Fortran, C, and C++ compilers.
   <a href="https://gcc.gnu.org/">GNU</a> and <a href="https://software.intel.com/en-us/intel-compilers">Intel</a> compilers are supported.</li>
 <li><a href="http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx">IDL</a> for pre-processing.</li>
-<li><a href="https://www.hdfgroup.org/HDF5/">HDF5</a> for reading and writing compressed data files</li>
+<li><a href="http://zlib.net/">zlib</a> for file compression.</li>
+<li><a href="https://www.hdfgroup.org/HDF5/">HDF5 1.8.16</a> for reading and writing data files</li>
 <li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> For python scripts (Optional)</li>
 <li><a href="https://github.com/cmacmackin/ford">Ford</a> for creating HTML documentation (Optional)</li>
 <li><a href="http://wummel.github.io/linkchecker/">LinkChecker</a> for validating HTML documentation (Optional)</li>
 </ul>
+<p>Click <a href="./06_dependencies.html">here</a> or more specific information about the dependencies.</p>
 <h2 id="getting-fidasim-source">Getting FIDASIM source</h2>
 <p>It is a fact of nature that you cannot run code you haven't installed. There are two ways correcting this.</p>
 <h3 id="downloading-source-directly">Downloading source directly</h3>
 <p>The most recent version of FIDASIM (1.0.0) can be downloaded from <a href="https://github.com/D3DEnergetic/FIDASIM/releases">here</a>
 Once you have downloaded the <code>.tar.gz</code> or <code>.zip</code> file unpack it using the following commands.</p>
-<div class="codehilite"><pre>tar -zxf FIDASIM-1.0.0.tar.gz
+<div class="codehilite"><pre><span></span>tar -zxf FIDASIM-1.0.0.tar.gz
 </pre></div>
 
 
 <p>or if you downloaded the <code>.zip</code> file</p>
-<div class="codehilite"><pre>unzip FIDASIM-1.0.0.zip
+<div class="codehilite"><pre><span></span>unzip FIDASIM-1.0.0.zip
 </pre></div>
 
 
 <p>There should now be a directory named <code>FIDASIM-1.0.0</code> in your current directory. Enter the directory using</p>
-<div class="codehilite"><pre><span class="nb">cd</span> FIDASIM-1.0.0
+<div class="codehilite"><pre><span></span><span class="nb">cd</span> FIDASIM-1.0.0
 </pre></div>
 
 
 <h3 id="cloning-the-git-repository">Cloning the git repository</h3>
 <p>If you are planning to develop FIDASIM it is best to use git.</p>
-<div class="codehilite"><pre>git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
+<div class="codehilite"><pre><span></span>git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
 <span class="nb">cd</span> FIDASIM
 </pre></div>
 
 
 <p>By default you will be on the master branch which may or may not be in a usable state.
 To use the release version run the command</p>
-<div class="codehilite"><pre>git checkout v1.0.0
+<div class="codehilite"><pre><span></span>git checkout v1.0.0
 </pre></div>
 
 
 <h2 id="setting-up-environmental-variables">Setting up environmental variables</h2>
 <p>FIDASIM needs to know where somethings are so you have to set the following environmental variables in your <code>.bashrc</code></p>
-<div class="codehilite"><pre><span class="nb">export</span> <span class="nv">FIDASIM_DIR</span><span class="o">=</span>/path/to/fidasim/install
+<div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">FIDASIM_DIR</span><span class="o">=</span>/path/to/fidasim/install
 <span class="nb">export</span> <span class="nv">FC</span><span class="o">=</span>gfortran <span class="c1">#use &#39;ifort&#39; for Intel Fortran compiler</span>
 <span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span>gcc      <span class="c1">#use &#39;icc&#39; for Intel C compiler</span>
 <span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>g++     <span class="c1">#use &#39;icpc&#39; for Intel C++ compiler</span>
@@ -244,20 +251,22 @@ To use the release version run the command</p>
 
 <span class="c1">#For using helper routines</span>
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$F</span>IDASIM_DIR/lib:$PATH
-<span class="nb">export</span> <span class="nv">IDL_PATH</span><span class="o">=</span>+<span class="nv">$F</span>IDASIM_DIR:IDL_PATH
+<span class="nb">export</span> <span class="nv">IDL_PATH</span><span class="o">=</span><span class="s2">&quot;+</span><span class="nv">$F</span><span class="s2">IDASIM_DIR:</span>$<span class="s2">IDL_PATH:&lt;IDL_DEFAULT&gt;&quot;</span>
+
+<span class="nb">ulimit</span> -s unlimited <span class="c1">#Omit this if you like segfaults</span>
 </pre></div>
 
 
 <p>replacing <code>/path/to/fidasim/install</code> with the real directory.</p>
 <h2 id="building-fidasim">Building FIDASIM</h2>
-<p>Once you are in the source directory run the following</p>
-<div class="codehilite"><pre>make
+<p>Once you are in the source directory (and have all the dependencies installed) run the following</p>
+<div class="codehilite"><pre><span></span>make
 </pre></div>
 
 
 <p>Once running, go get a coffee since it will take a while because HDF5 is being built as well.</p>
 <p>Once make has completed check if FIDASIM compiled correctly.</p>
-<div class="codehilite"><pre>user@computer:~/FIDASIM-1.0.0$ ./fidasim
+<div class="codehilite"><pre><span></span>user@computer:~/FIDASIM-1.0.0$ ./fidasim
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ <span class="se">\ </span>/ _ <span class="p">|</span>  / __//  _//  <span class="p">|</span>/  /
  / _/ _/ / / // // __ <span class="p">|</span> _<span class="se">\ \ </span>_/ / / /<span class="p">|</span>_/ / 
@@ -272,12 +281,12 @@ usage: ./fidasim namelist_file <span class="o">[</span>num_threads<span class="o
 </pre></div>
 
 
-<p>Congrats you installed FIDASIM! But wait there's more.</p>
+<p>Good job! You installed FIDASIM! But wait there's more.</p>
 <h2 id="generating-atomic-tables">Generating Atomic Tables</h2>
 <p>Calculating reaction rates on the fly is time consuming so FIDASIM pre-computes them to save time.
 The following code snippit will generate the atomic tables using the default settings.
 If you want to change the settings you can edit the <code>table_settings.dat</code> namelist file located in the <code>tables</code> directory.</p>
-<div class="codehilite"><pre>make atomic_tables
+<div class="codehilite"><pre><span></span>make atomic_tables
 </pre></div>
 
 
@@ -287,12 +296,12 @@ Optionally you can add <code>NTHREADS=#</code> to the command to set the number 
 <p>Now would be a good time to get more coffee... or maybe a nap. </p>
 <h2 id="run-a-test-case">Run a test case</h2>
 <p>From within IDL</p>
-<div class="codehilite"><pre>IDL<span class="o">&gt;</span> run_tests, <span class="s2">&quot;/place/where/you/want/the/output&quot;</span>
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> run_tests, <span class="s2">&quot;/place/where/you/want/the/output&quot;</span>
 </pre></div>
 
 
 <p>Some stuff that will make sense later will flash by and when its done you should see something like</p>
-<div class="codehilite"><pre>SUCCESS: FIDASIM pre-processing completed
+<div class="codehilite"><pre><span></span>SUCCESS: FIDASIM pre-processing completed
 To run FIDASIM use the following command
 /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
 </pre></div>
@@ -301,7 +310,7 @@ To run FIDASIM use the following command
 <p>Now do what the computer says.
 Think of as good practice for when the <a href="https://www.youtube.com/watch?v=7Pq-S557XQU">robots take over</a>.</p>
 <p>It should print out the following. </p>
-<div class="codehilite"><pre>[lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
+<div class="codehilite"><pre><span></span>[lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
@@ -450,6 +459,7 @@ duration:                   0:15:53
 </pre></div>
 
 
+<p>Congratulations! You followed the instructions.</p>
 <h2 id="now-what">Now what</h2>
 <p>Most likely you won't be satisfied by just running a test case.</p>
 <p>The next thing to do is figure out what kind of <a href="./02_input_files/index.html">input files</a> you need to run your own simulation.</p>

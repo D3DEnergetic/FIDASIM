@@ -101,6 +101,8 @@
         
         <li><a href='../page/02_input_files/index.html'>Input Files</a></li>
         
+        <li><a href='../page/./06_dependencies.html'>Namelist File</a></li>
+        
         <li><a href='../page/./01_getting_started.html'>Getting Started</a></li>
         
         <li><a href='../page/04_physics/index.html'>Physics</a></li>
@@ -166,6 +168,11 @@
             </li>
             
             <li role="presentation">
+            <a href='../page/./06_dependencies.html'>Namelist File</a>
+            
+            </li>
+            
+            <li role="presentation">
             <a href='../page/./01_getting_started.html'>Getting Started</a>
             
             </li>
@@ -197,16 +204,16 @@ where \(H^\ast(m)\) is an excited state of Hydrogen.
 The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excited to a lower state, emitting a doppler shifted photon as illustrated below.</p>
 <p style="text-align: center"><img alt="Charge Exchange Process" src="../media/fast_ion_process.svg" title="Charge Exchange Process" width="500"></p>
 <p>Both the fast-neutral and the photon contain information about the velocity of fast-ion before it was neutralized.
-There are two types diagnostics that take advantage of this fact: Fast-ion D-α (FIDA) diagnostics and Neutral Partile Analyzers (NPA).
+There are two types diagnostics that take advantage of this fact: Fast-ion D-α (FIDA) diagnostics and Neutral Particle Analyzers (NPA).
 The interpretation of the diagnostic signals requires modeling of the above process which has a complicated dependence on the plasma parameters, electromagnetic fields, and neutral beam and diagnostic geometry.</p>
 <p>Towards this end, FIDASIM was created.  </p>
 <h2 id="history">History</h2>
-<p>The very first implementation of FIDASIM was written by Yadong Luo as a part in his <a href="http://www.physics.uci.edu/~wwheidbr/papers/thesis_luo.pdf">thesis</a>.
-The code would be later be improved upon by <a href="http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf">Bill Heidbrink and Deyong Lui</a> for public use.</p>
+<p>The very first implementation of FIDASIM was written by Yadong Luo and Bill Heidbrink while Yadong was working on his <a href="http://www.physics.uci.edu/~wwheidbr/papers/thesis_luo.pdf">thesis</a>.
+Subsequently, Deyong Liu added features to simulate NPA signals. The IDL version of the code was distributed for public use and documented in a journal publication (http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf).</p>
 <p>Originally, FIDASIM was written in the IDL programming language and was prohibitively slow.
 As a part of his <a href="http://www.iaea.org/inis/collection/NCLCollectionStore/_Public/46/051/46051941.pdf">thesis</a> Ben Geiger wrote a version of FIDASIM written in Fortran 90.
 This prototype version was parallelized using OpenMP and was orders of magnitude faster but was not as easy to use as the IDL version and was difficult to port to different devices. </p>
-<p>Most recently, <a href="http://github.com/lstagner">Luke Stagner</a> as a part of his thesis has rewritten Ben Geigers Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
+<p>Most recently, <a href="http://github.com/lstagner">Luke Stagner</a> as a part of his thesis has rewritten Ben Geiger's Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
 Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful. </p>
 <h2 id="capabilities">Capabilities</h2>
 <p>Currently, FIDASIM has routines for calculating:</p>

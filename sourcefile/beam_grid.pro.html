@@ -196,6 +196,8 @@
           
           <a class="list-group-item" href="../sourcefile/line_basis.pro.html">line_basis.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/parallel_rng.f90.html">parallel_rng.f90</a>
           
           <a class="list-group-item" href="../sourcefile/prefida.pro.html">prefida.pro</a>
@@ -225,8 +227,6 @@
           <a class="list-group-item" href="../sourcefile/tb_zyx.pro.html">tb_zyx.pro</a>
           
           <a class="list-group-item" href="../sourcefile/tile_array.pro.html">tile_array.pro</a>
-          
-          <a class="list-group-item" href="../sourcefile/transp_geometry.pro.html">transp_geometry.pro</a>
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
@@ -271,12 +271,12 @@
 <h2 id="return-value">Return Value</h2>
 <p>Structure containing beam grid settings suitable for the <a href="../page/02_input_files/01_namelist_file.html">Namelist File</a></p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre>IDL<span class="o">&gt;</span> grid <span class="o">=</span> beam_grid(nbi,<span class="mf">200.0</span>,nx<span class="o">=</span><span class="mi">100</span>,ny<span class="o">=</span><span class="mi">50</span>,ny<span class="o">=</span><span class="mi">50</span>,length<span class="o">=</span><span class="mi">100</span>,width<span class="o">=</span><span class="mi">50</span>,height<span class="o">=</span><span class="mi">50</span>)
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> grid <span class="o">=</span> beam_grid(nbi,<span class="mf">200.0</span>,nx<span class="o">=</span><span class="mi">100</span>,ny<span class="o">=</span><span class="mi">50</span>,ny<span class="o">=</span><span class="mi">50</span>,length<span class="o">=</span><span class="mi">100</span>,width<span class="o">=</span><span class="mi">50</span>,height<span class="o">=</span><span class="mi">50</span>)
 </pre></div>
     <br>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">beam_grid</span><span class="p">,</span> <span class="s s-Atom">nbi</span><span class="p">,</span> <span class="s s-Atom">rstart</span><span class="p">,</span> <span class="err">$</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">beam_grid</span><span class="p">,</span> <span class="s s-Atom">nbi</span><span class="p">,</span> <span class="s s-Atom">rstart</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-2"></a>    <span class="s s-Atom">nx</span> <span class="o">=</span> <span class="s s-Atom">nx</span><span class="p">,</span> <span class="s s-Atom">ny</span> <span class="o">=</span> <span class="s s-Atom">ny</span><span class="p">,</span> <span class="s s-Atom">nz</span> <span class="o">=</span> <span class="s s-Atom">nz</span><span class="p">,</span> <span class="s s-Atom">dv</span><span class="o">=</span><span class="s s-Atom">dv</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-3"></a>    <span class="s s-Atom">length</span><span class="o">=</span><span class="s s-Atom">length</span><span class="p">,</span> <span class="s s-Atom">width</span><span class="o">=</span><span class="s s-Atom">width</span><span class="p">,</span> <span class="s s-Atom">height</span><span class="o">=</span><span class="s s-Atom">height</span>
 <a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+#beam_grid</span>
@@ -362,7 +362,7 @@
 <a name="ln-84"></a>    <span class="s s-Atom">t</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="s s-Atom">b</span> <span class="o">-</span> <span class="nf">sqrt</span><span class="p">(</span><span class="s s-Atom">b^</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">4</span><span class="o">*</span><span class="s s-Atom">a</span><span class="o">*</span><span class="s s-Atom">c</span><span class="p">))</span><span class="s s-Atom">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="s s-Atom">a</span><span class="p">)</span>
 <a name="ln-85"></a>    <span class="s s-Atom">origin</span> <span class="o">=</span> <span class="s s-Atom">src</span> <span class="o">+</span> <span class="s s-Atom">t</span><span class="o">*</span><span class="s s-Atom">axis</span>
 <a name="ln-86"></a>
-<a name="ln-87"></a>    <span class="s s-Atom">beam_grid</span> <span class="o">=</span> <span class="p">{</span><span class="nn">nx</span><span class="p">:</span><span class="s s-Atom">nx</span><span class="p">,</span> <span class="nn">ny</span><span class="p">:</span><span class="s s-Atom">ny</span><span class="p">,</span> <span class="nn">nz</span><span class="p">:</span><span class="s s-Atom">nz</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-87"></a>    <span class="s s-Atom">beam_grid</span> <span class="o">=</span> <span class="p">{</span><span class="nn">nx</span><span class="p">:</span><span class="nf">fix</span><span class="p">(</span><span class="s s-Atom">nx</span><span class="p">),</span> <span class="nn">ny</span><span class="p">:</span><span class="nf">fix</span><span class="p">(</span><span class="s s-Atom">ny</span><span class="p">),</span> <span class="nn">nz</span><span class="p">:</span><span class="nf">fix</span><span class="p">(</span><span class="s s-Atom">nz</span><span class="p">),</span> <span class="err">$</span>
 <a name="ln-88"></a>                 <span class="nn">xmin</span><span class="p">:</span><span class="s s-Atom">xmin</span><span class="p">,</span> <span class="nn">xmax</span><span class="p">:</span><span class="s s-Atom">xmax</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-89"></a>                 <span class="nn">ymin</span><span class="p">:</span><span class="s s-Atom">ymin</span><span class="p">,</span> <span class="nn">ymax</span><span class="p">:</span><span class="s s-Atom">ymax</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-90"></a>                 <span class="nn">zmin</span><span class="p">:</span><span class="s s-Atom">zmin</span><span class="p">,</span> <span class="nn">zmax</span><span class="p">:</span><span class="s s-Atom">zmax</span><span class="p">,</span> <span class="err">$</span>

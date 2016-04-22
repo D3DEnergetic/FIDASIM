@@ -196,6 +196,8 @@
           
           <a class="list-group-item" href="../sourcefile/line_basis.pro.html">line_basis.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/parallel_rng.f90.html">parallel_rng.f90</a>
           
           <a class="list-group-item" href="../sourcefile/prefida.pro.html">prefida.pro</a>
@@ -225,8 +227,6 @@
           <a class="list-group-item" href="../sourcefile/tb_zyx.pro.html">tb_zyx.pro</a>
           
           <a class="list-group-item" href="../sourcefile/tile_array.pro.html">tile_array.pro</a>
-          
-          <a class="list-group-item" href="../sourcefile/transp_geometry.pro.html">transp_geometry.pro</a>
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
@@ -264,7 +264,7 @@
 <p><strong>filename</strong>: Filename of output HDF5 file</p>
 <p><strong>clobber</strong>: Overwrite exisiting HDF5 file</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre>IDL<span class="o">&gt;</span> a <span class="o">=</span> [<span class="mi">1</span>,<span class="mi">2</span>,<span class="mi">3</span>]
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> a <span class="o">=</span> [<span class="mi">1</span>,<span class="mi">2</span>,<span class="mi">3</span>]
 IDL<span class="o">&gt;</span> write_hdf5,<span class="s2">&quot;a&quot;</span>,atts<span class="o">=</span>{attribute,obj<span class="o">:</span><span class="s2">&quot;/a&quot;</span>,name<span class="o">:</span><span class="s2">&quot;description&quot;</span>,data<span class="o">:</span><span class="s2">&quot;example variable&quot;</span>}
 IDL<span class="o">&gt;</span> s <span class="o">=</span> {a<span class="o">:</span><span class="mi">1</span>,b<span class="o">:</span>{a<span class="o">:</span><span class="mi">2</span>}}
 IDL<span class="o">&gt;</span> write_hdf5,s,<span class="o">/</span>clobber
@@ -272,7 +272,7 @@ IDL<span class="o">&gt;</span> write_hdf5,s,<span class="o">/</span>clobber
     <br>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">vars_to_struct</span><span class="p">,</span><span class="s s-Atom">vars</span><span class="o">=</span><span class="s s-Atom">vars</span><span class="p">,</span><span class="s s-Atom">level</span><span class="o">=</span><span class="s s-Atom">level</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">vars_to_struct</span><span class="p">,</span><span class="s s-Atom">vars</span><span class="o">=</span><span class="s s-Atom">vars</span><span class="p">,</span><span class="s s-Atom">level</span><span class="o">=</span><span class="s s-Atom">level</span>
 <a name="ln-2"></a>    <span class="p">;;</span> <span class="s s-Atom">struct_from_list</span>
 <a name="ln-3"></a>    <span class="p">;;</span> <span class="s s-Atom">creates</span> <span class="s s-Atom">structure</span> <span class="s s-Atom">from</span> <span class="s s-Atom">list</span> <span class="s s-Atom">of</span> <span class="s s-Atom">variables</span> <span class="s s-Atom">in</span> <span class="s s-Atom">specified</span> <span class="s s-Atom">scope</span>
 <a name="ln-4"></a>    <span class="p">;;</span> <span class="s s-Atom">if</span> <span class="s s-Atom">vars</span> <span class="o">not</span> <span class="s s-Atom">set</span> <span class="s s-Atom">then</span> <span class="s s-Atom">use</span> <span class="s s-Atom">all</span> <span class="s s-Atom">valid</span> <span class="s s-Atom">variables</span> <span class="s s-Atom">in</span> <span class="s s-Atom">specified</span> <span class="s s-Atom">scope</span>

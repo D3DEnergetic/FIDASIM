@@ -196,6 +196,8 @@
           
           <a class="list-group-item" href="../sourcefile/line_basis.pro.html">line_basis.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/parallel_rng.f90.html">parallel_rng.f90</a>
           
           <a class="list-group-item" href="../sourcefile/prefida.pro.html">prefida.pro</a>
@@ -225,8 +227,6 @@
           <a class="list-group-item" href="../sourcefile/tb_zyx.pro.html">tb_zyx.pro</a>
           
           <a class="list-group-item" href="../sourcefile/tile_array.pro.html">tile_array.pro</a>
-          
-          <a class="list-group-item" href="../sourcefile/transp_geometry.pro.html">transp_geometry.pro</a>
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
@@ -267,12 +267,12 @@
 <h2 id="return-value">Return Value</h2>
 <p>Distribution structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre>IDL<span class="o">&gt;</span> <span class="nb">dist</span> <span class="o">=</span> read_spiral(<span class="s2">&quot;./spiral_file.TXT&quot;</span>,time<span class="o">=</span><span class="mf">1.0</span>, ntotal<span class="o">=</span>1e19)
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> <span class="nb">dist</span> <span class="o">=</span> read_spiral(<span class="s2">&quot;./spiral_file.TXT&quot;</span>,time<span class="o">=</span><span class="mf">1.0</span>, ntotal<span class="o">=</span>1e19)
 </pre></div>
     <br>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">read_mc_nubeam</span><span class="p">,</span><span class="s s-Atom">infile</span><span class="p">,</span><span class="s s-Atom">ntotal</span><span class="o">=</span><span class="s s-Atom">ntotal</span><span class="p">,</span><span class="s s-Atom">e_range</span><span class="o">=</span><span class="s s-Atom">e_range</span><span class="p">,</span><span class="s s-Atom">particle_weight</span> <span class="o">=</span> <span class="s s-Atom">particle_weight</span><span class="p">,</span><span class="s s-Atom">btipsign</span><span class="o">=</span><span class="s s-Atom">btipsign</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">read_mc_nubeam</span><span class="p">,</span><span class="s s-Atom">infile</span><span class="p">,</span><span class="s s-Atom">ntotal</span><span class="o">=</span><span class="s s-Atom">ntotal</span><span class="p">,</span><span class="s s-Atom">e_range</span><span class="o">=</span><span class="s s-Atom">e_range</span><span class="p">,</span><span class="s s-Atom">particle_weight</span> <span class="o">=</span> <span class="s s-Atom">particle_weight</span><span class="p">,</span><span class="s s-Atom">btipsign</span><span class="o">=</span><span class="s s-Atom">btipsign</span>
 <a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#read_mc_nubeam</span>
 <a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Reads</span> <span class="s s-Atom">guiding</span> <span class="s s-Atom">center</span> <span class="nv">Monte</span> <span class="nv">Carlo</span> <span class="nv">NUBEAM</span> <span class="s s-Atom">fast</span><span class="o">-</span><span class="s s-Atom">ion</span> <span class="s s-Atom">distribution</span> <span class="s s-Atom">file</span>
 <a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>

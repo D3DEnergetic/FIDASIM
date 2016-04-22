@@ -1669,12 +1669,7 @@ subroutine read_chords
                                  beam_grid%ny, &
                                  beam_grid%nz) )
   
-    allocate(spec_chords%los_inter(beam_grid%nx, & 
-                                 beam_grid%ny, &
-                                 beam_grid%nz) )
-  
     spec_chords%dlength = 0.d0
-    spec_chords%los_inter = .False.
   
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -2756,23 +2751,25 @@ subroutine write_dcx
     integer :: error
   
     character(120) :: filename
-  
+    character(15) :: spec_str
     integer :: i
     real(Float64), dimension(:),   allocatable :: lambda_arr
     real(Float64), dimension(:,:), allocatable :: dcx_spec
   
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_dcx.h5"
-  
-    allocate(lambda_arr(inputs%nlambda))
-    do i=1,inputs%nlambda 
-        lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin ! [nm]
-    enddo 
-  
-    allocate(dcx_spec(inputs%nlambda,spec_chords%nchan))
-  
-    !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
-    dcx_spec = spec%bes(:,:,halo_type)/(inputs%dlambda)/(4.d0*pi)*1.d4
-  
+    spec_str = ""
+    if(inputs%calc_spec.ge.1) then 
+        spec_str = " spectra and"
+        allocate(lambda_arr(inputs%nlambda))
+        do i=1,inputs%nlambda 
+            lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin ! [nm]
+        enddo 
+ 
+        allocate(dcx_spec(inputs%nlambda,spec_chords%nchan))
+        !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
+        dcx_spec = spec%bes(:,:,halo_type)/(inputs%dlambda)/(4.d0*pi)*1.d4
+    endif
+ 
     !Open HDF5 interface
     call h5open_f(error)
     
@@ -2781,53 +2778,62 @@ subroutine write_dcx
   
     !Write variables
     call write_beam_grid(fid, error)
+
     d(1) =1 
     call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
-    call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
-    call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
-    dims(1) = inputs%nlambda
-    dims(2) = spec_chords%nchan
-    call h5ltmake_compressed_dataset_double_f(fid, "/spec", 2, dims(1:2), &
-         dcx_spec, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
-         lambda_arr, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
-         spec_chords%radius, error)
     dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz ] 
     call h5ltmake_compressed_dataset_double_f(fid, "/dens", 4, dims, &
          neut%dens(:,halo_type,:,:,:), error)
   
+    if(inputs%calc_spec.ge.1) then
+        call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
+        call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
+        dims(1) = inputs%nlambda
+        dims(2) = spec_chords%nchan
+        call h5ltmake_compressed_dataset_double_f(fid, "/spec", 2, dims(1:2), &
+             dcx_spec, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
+             lambda_arr, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
+             spec_chords%radius, error)
+    endif
+
     !Add attributes
     call h5ltset_attribute_string_f(fid,"/nlevel","description", &
          "Number of atomic energy levels", error)
-    call h5ltset_attribute_string_f(fid,"/nchan", "description", &
-         "Number of channels", error)
-    call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
-         "Number of wavelengths", error)
     call h5ltset_attribute_string_f(fid,"/dens", "description", &
          "Direct Charge Exchange (DCX) neutral density: dcx(level,x,y,z)", error)
     call h5ltset_attribute_string_f(fid,"/dens","units","neutrals*cm^-3", error)
-    call h5ltset_attribute_string_f(fid,"/spec","description", &
-         "Direct Charge Exchange (DCX) beam emission: spec(lambda, chan)", error)
-    call h5ltset_attribute_string_f(fid,"/spec","units","Ph/(s*nm*sr*m^2)",error)
-    call h5ltset_attribute_string_f(fid,"/lambda","description", &
-         "Wavelength array", error) 
-    call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
-    call h5ltset_attribute_string_f(fid,"/radius", "description", &
-         "Line of sight radius at midplane or tangency point", error)
-    call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
-  
+
+    if(inputs%calc_spec.ge.1) then
+        call h5ltset_attribute_string_f(fid,"/nchan", "description", &
+             "Number of channels", error)
+        call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
+             "Number of wavelengths", error)
+        call h5ltset_attribute_string_f(fid,"/spec","description", &
+             "Direct Charge Exchange (DCX) beam emission: spec(lambda, chan)", error)
+        call h5ltset_attribute_string_f(fid,"/spec","units","Ph/(s*nm*sr*m^2)",error)
+        call h5ltset_attribute_string_f(fid,"/lambda","description", &
+             "Wavelength array", error) 
+        call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
+        call h5ltset_attribute_string_f(fid,"/radius", "description", &
+             "Line of sight radius at midplane or tangency point", error)
+        call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
+    endif
+ 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description", &
-         "Direct Charge Exchange spectra and neutral density calculated by FIDASIM", error)
+         "Direct Charge Exchange (DCX)"//trim(spec_str)//" neutral density calculated by FIDASIM", error)
   
     !Close file
     call h5fclose_f(fid, error)
   
     !Close HDF5 interface
     call h5close_f(error)
-  
-    deallocate(dcx_spec,lambda_arr)
+ 
+    if(inputs%calc_spec.ge.1) then 
+        deallocate(dcx_spec,lambda_arr)
+    endif
     
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'dcx written to: ',trim(filename)
@@ -6161,7 +6167,7 @@ subroutine npa_f
         endif
     enddo loop_over_cells
     !$OMP END PARALLEL DO
-    write(*,'("Number of NPA particles that hit a detector: ",i8)') npa%npart
+    write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
 
 end subroutine npa_f
 
@@ -6866,6 +6872,8 @@ program fidasim
     call read_tables()
     call read_distribution()
     
+    allocate(spec_chords%los_inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    spec_chords%los_inter = .False.
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
         call read_chords()
     endif
@@ -6880,7 +6888,7 @@ program fidasim
     !! neutral density array!
     allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
     neut%dens = 0.d0
-  
+
     !! birth profile
     if(inputs%calc_birth.ge.1) then
         allocate(birth%dens(3, & 
@@ -6986,8 +6994,10 @@ program fidasim
         write(*,'(30X,a)') ''
     endif
   
-    if(inputs%calc_spec.ge.1) call write_spectra()
-    write(*,'(30X,a)') ''
+    if(inputs%calc_spec.ge.1) then
+        call write_spectra()
+        write(*,'(30X,a)') ''
+    endif
   
     !! -----------------------------------------------------------------------
     !! ----------------------- CALCULATE the NPA FLUX ------------------------
@@ -7006,8 +7016,10 @@ program fidasim
         write(*,'(30X,a)') ''
     endif
   
-    if(inputs%calc_npa.ge.1) call write_npa()
-    write(*,'(30X,a)') ''
+    if(inputs%calc_npa.ge.1) then
+        call write_npa()
+        write(*,'(30X,a)') ''
+    endif
   
     !! -------------------------------------------------------------------
     !! ----------- Calculation of weight functions -----------------------

@@ -196,6 +196,8 @@
           
           <a class="list-group-item" href="../sourcefile/line_basis.pro.html">line_basis.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/parallel_rng.f90.html">parallel_rng.f90</a>
           
           <a class="list-group-item" href="../sourcefile/prefida.pro.html">prefida.pro</a>
@@ -225,8 +227,6 @@
           <a class="list-group-item" href="../sourcefile/tb_zyx.pro.html">tb_zyx.pro</a>
           
           <a class="list-group-item" href="../sourcefile/tile_array.pro.html">tile_array.pro</a>
-          
-          <a class="list-group-item" href="../sourcefile/transp_geometry.pro.html">transp_geometry.pro</a>
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
@@ -265,13 +265,13 @@
 <h2 id="return-value">Return Value</h2>
 <p>Structure containing variables and attributes</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre>IDL<span class="o">&gt;</span> a <span class="o">=</span> read_hdf5(<span class="s2">&quot;./test_1a_geometry.h5&quot;</span>)
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> a <span class="o">=</span> read_hdf5(<span class="s2">&quot;./test_1a_geometry.h5&quot;</span>)
 IDL<span class="o">&gt;</span> b <span class="o">=</span> read_hdf5(<span class="s2">&quot;./test_1a_geometry.h5&quot;</span>,paths<span class="o">=</span><span class="s2">&quot;/spec/lens&quot;</span>,<span class="o">/</span>flatten)
 </pre></div>
     <br>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">valid_name</span><span class="p">,</span> <span class="s s-Atom">name</span><span class="p">,</span> <span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">bad_names</span><span class="p">,</span> <span class="s s-Atom">post</span> <span class="o">=</span> <span class="s s-Atom">post</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">valid_name</span><span class="p">,</span> <span class="s s-Atom">name</span><span class="p">,</span> <span class="s s-Atom">bad_names</span><span class="o">=</span><span class="s s-Atom">bad_names</span><span class="p">,</span> <span class="s s-Atom">post</span> <span class="o">=</span> <span class="s s-Atom">post</span>
 <a name="ln-2"></a>
 <a name="ln-3"></a>    <span class="s s-Atom">reserved</span><span class="o">=</span><span class="p">[</span><span class="s s-Atom">&#39;AND&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;BEGIN&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;BREAK&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;CASE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;COMMON&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;COMPILE_OPT&#39;</span><span class="p">,</span><span class="err">$</span>
 <a name="ln-4"></a>              <span class="s s-Atom">&#39;CONTINUE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;DO&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ELSE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;END&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDCASE&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;ENDELSE&#39;</span><span class="p">,</span><span class="err">$</span>

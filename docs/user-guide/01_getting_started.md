@@ -19,12 +19,13 @@ FIDASIM has the following dependencies:
 * Fortran, C, and C++ compilers.
   [GNU](https://gcc.gnu.org/) and [Intel](https://software.intel.com/en-us/intel-compilers) compilers are supported.
 * [IDL](http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx) for pre-processing.
-* [HDF5](https://www.hdfgroup.org/HDF5/) for reading and writing compressed data files
+* [zlib](http://zlib.net/) for file compression.
+* [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files
 * [Anaconda Python](https://www.continuum.io/why-anaconda) For python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
 
-
+Click [here](./06_dependencies.html) or more specific information about the dependencies.
 ##Getting FIDASIM source
 It is a fact of nature that you cannot run code you haven't installed. There are two ways correcting this.
 
@@ -72,12 +73,14 @@ export LD_LIBRARY_PATH=$HDF5_LIB:$HDF5_INCLUDE:$LD_LIBRARY_PATH
 
 #For using helper routines
 export PATH=$FIDASIM_DIR/lib:$PATH
-export IDL_PATH=+$FIDASIM_DIR:IDL_PATH
+export IDL_PATH="+$FIDASIM_DIR:$IDL_PATH:<IDL_DEFAULT>"
+
+ulimit -s unlimited #Omit this if you like segfaults
 ```
 replacing `/path/to/fidasim/install` with the real directory.
 
 ##Building FIDASIM
-Once you are in the source directory run the following
+Once you are in the source directory (and have all the dependencies installed) run the following
 ```bash
 make
 ```
@@ -98,7 +101,7 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
 
 usage: ./fidasim namelist_file [num_threads]
 ```
-Congrats you installed FIDASIM! But wait there's more.
+Good job! You installed FIDASIM! But wait there's more.
 
 ##Generating Atomic Tables
 Calculating reaction rates on the fly is time consuming so FIDASIM pre-computes them to save time.
@@ -282,6 +285,8 @@ npa weight function:     1:50:02
 END: hour, minute, second:  1:53:07
 duration:                   0:15:53
 ```
+
+Congratulations! You followed the instructions.
 
 ##Now what
 Most likely you won't be satisfied by just running a test case.

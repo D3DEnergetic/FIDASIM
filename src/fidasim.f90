@@ -460,7 +460,7 @@ type SpectralChords
         !+ Radius of each line of sight
     logical, dimension(:,:,:), allocatable         :: los_inter
         !+ Indicates whether a [[libfida:beam_grid]] cell intersects a LOS
-    real(Float64), dimension(:,:,:,:), allocatable :: dlength
+    real(Float32), dimension(:,:,:,:), allocatable :: dlength
         !+ [[libfida:beam_grid]] cell - LOS intersection length: dlength(x,y,z,chan)
 end type SpectralChords
 

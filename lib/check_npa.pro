@@ -1,4 +1,4 @@
-PRO check_npa, inp, npa, err_status
+PRO check_npa, inp, npa
     ;+#check_npa
     ;+Checks if NPA geometry structure is valid
     ;+***
@@ -7,12 +7,9 @@ PRO check_npa, inp, npa, err_status
     ;+
     ;+     **npa**: NPA geometry structure
     ;+ 
-    ;+##Output Arguments
-    ;+     **err**: error code
-    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> check_npa, inputs, npa, err
+    ;+IDL> check_npa, inputs, npa
     ;+```
 
     err_status=0
@@ -119,7 +116,7 @@ PRO check_npa, inp, npa, err_status
 
     GET_OUT:
     if err_status ne 0 then begin
-        error,'Invalid NPA geometry. Exiting...'
+        error,'Invalid NPA geometry. Exiting...',/halt
     endif else begin
         success,'NPA geometry is valid'
     endelse

@@ -1,4 +1,4 @@
-PRO check_plasma, inp, grid, plasma, err_status
+PRO check_plasma, inp, grid, plasma
     ;+#check_plasma
     ;+Checks if plasma paramters structure is valid
     ;+***
@@ -9,12 +9,9 @@ PRO check_plasma, inp, grid, plasma, err_status
     ;+
     ;+     **plasma**: Plasma parameters structure
     ;+ 
-    ;+##Output Arguments
-    ;+     **err**: error code
-    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> check_plasma, inputs, grid, plasma, err
+    ;+IDL> check_plasma, inputs, grid, plasma
     ;+```
     err_status=0
     info,'Checking plasma parameters...'
@@ -68,7 +65,7 @@ PRO check_plasma, inp, grid, plasma, err_status
 
     GET_OUT:
     if err_status ne 0 then begin
-        error,'Invalid plasma parameters. Exiting...'
+        error,'Invalid plasma parameters. Exiting...',/halt
     endif else begin
         success,'Plasma parameters are valid'
     endelse

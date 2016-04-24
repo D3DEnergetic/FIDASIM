@@ -1,4 +1,4 @@
-PRO check_fields, inp, grid, fields, err_status
+PRO check_fields, inp, grid, fields
     ;+#check_fields
     ;+Checks if electromagnetic fields structure is valid
     ;+***
@@ -9,12 +9,9 @@ PRO check_fields, inp, grid, fields, err_status
     ;+ 
     ;+     **fields**: Electromagnetic fields structure
     ;+ 
-    ;+##Output Arguments
-    ;+     **err**: error code
-    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> check_fields, inputs, grid, fields, err
+    ;+IDL> check_fields, inputs, grid, fields
     ;+```
 
     err_status=0
@@ -55,7 +52,7 @@ PRO check_fields, inp, grid, fields, err_status
     fields = create_struct(fields, grid)
     GET_OUT:
     if err_status ne 0 then begin
-        error,'Invalid electromagnetic fields. Exiting...'
+        error,'Invalid electromagnetic fields. Exiting...',/halt
     endif else begin
         success,'Electromagnetic fields are valid'
     endelse

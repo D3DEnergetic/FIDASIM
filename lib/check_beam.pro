@@ -1,4 +1,4 @@
-PRO check_beam, inp, nbi, err_status
+PRO check_beam, inp, nbi
     ;+#check_beam
     ;+Checks if neutral beam geometry structure is valid
     ;+***
@@ -6,13 +6,10 @@ PRO check_beam, inp, nbi, err_status
     ;+     **inputs**: input structure
     ;+
     ;+     **nbi**: neutral beam geometry structure
-    ;+ 
-    ;+##Output Arguments
-    ;+     **err**: error code
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> check_beam, inputs, nbi, err
+    ;+IDL> check_beam, inputs, nbi
     ;+```
     err_status = 0
     info,'Checking beam geometry...'
@@ -108,7 +105,7 @@ PRO check_beam, inp, nbi, err_status
 
     GET_OUT:
     if err_status ne 0 then begin
-        error,'Invalid beam geometry. Exiting...'
+        error,'Invalid beam geometry. Exiting...',/halt
     endif else begin
         success,'Beam geometry is valid'
     endelse

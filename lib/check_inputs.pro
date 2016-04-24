@@ -1,16 +1,13 @@
-PRO check_inputs, inputs, err_status
+PRO check_inputs, inputs
     ;+#check_inputs
     ;+Checks if input structure is valid
     ;+***
     ;+##Input Arguments
     ;+     **inputs**: input structure
     ;+ 
-    ;+##Output Arguments
-    ;+     **err**: error code
-    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> check_inputs, inputs, err
+    ;+IDL> check_inputs, inputs
     ;+```
     info,'Checking simulation settings...'
     err_status = 0
@@ -114,7 +111,7 @@ PRO check_inputs, inputs, err_status
 
     GET_OUT:
     if err_status ne 0 then begin
-        error,'Invalid simulation settings. Exiting...'
+        error,'Invalid simulation settings. Exiting...',/halt
     endif else begin
         success,'Simulation settings are valid'
     endelse

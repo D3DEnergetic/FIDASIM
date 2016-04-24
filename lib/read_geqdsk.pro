@@ -126,7 +126,7 @@ PRO calculate_bfield,bp,br,bt,bz,g
     return
 end
 
-FUNCTION read_geqdsk,filename,grid,flux=flux
+FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     ;+#read_geqdsk
     ;+Reads an EFIT GEQDSK file
     ;+***
@@ -137,6 +137,8 @@ FUNCTION read_geqdsk,filename,grid,flux=flux
     ;+
     ;+##Keyword Arguments
     ;+    **flux**: Set this keyword to a named variable to recieve the torodial flux mapped onto the interpolation grid
+    ;+
+    ;+    **g**: Set this keyword to a named variable to recieve the geqdsk structure
     ;+
     ;+##Return Value
     ;+Electronmagnetic fields structure

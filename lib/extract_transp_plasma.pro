@@ -1,5 +1,5 @@
 FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
-            no_omega=no_omega, doplot=doplot, profiles=profiles, $
+            doplot=doplot, profiles=profiles, $
             sne=sne, ste=ste, sti=sti, simp=simp, srot=srot
     ;+#extract_transp_plasma
     ;+Extracts `plasma` structure from a TRANSP run
@@ -14,8 +14,6 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+    **flux**: Torodial Flux mapped onto the interpolation grid 
     ;+
     ;+##Keyword Arguments
-    ;+    **no_omega**: Do not try to load omega from TRANSP file
-    ;+
     ;+    **doplot**: Plot profiles
     ;+
     ;+    **profiles**: Set this keyword to a named variable to recieve the plasma profiles as a function of rho
@@ -27,15 +25,9 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, flux)
     ;+```
 
-    var_list = ["X","TIME","NE","TE","TI","ZEFFI"]
-    if not keyword_set(no_omega) then begin
-        var_list = [var_list, "OMEGA"]
-    endif
+    var_list = ["X","TIME","NE","TE","TI","ZEFFI","OMEGA"]
 
     zz = read_ncdf(filename,vars = var_list)
-    if zz.err eq 1 then begin
-        return, 1
-    END
     
     transp_ne = zz.ne_ ;cm^-3
     transp_te = zz.te*1.d-3  ; kev
@@ -47,13 +39,14 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     dummy=min( abs(t-intime), idx)
     time = double(t[idx])
     x = double(x[*,idx])
-    if keyword_set(no_omega) then begin
+    
+    if total(strmatch(tag_names(zz),'OMEGA',/fold_case)) eq 0 then begin
+      warn,'OMEGA not found in TRANSP file. Assuming no plasma rotation'
       transp_omega=replicate(0.,n_elements(x),n_elements(t))
     endif else begin
       transp_omega = zz.omega  ; rad/s
     endelse
     print, ' * Selecting profiles at :', t[idx], ' s' ;pick the closest timeslice to TOI
-    
     
     if keyword_set(doplot) then begin
         !p.charsize=2 & !x.minor=-1 & !y.minor=-1

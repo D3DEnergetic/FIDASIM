@@ -91,7 +91,7 @@ FUNCTION hdf5_read_group,id,shallow=shallow
 
         obj_info = h5g_get_objinfo(id, obj_name)
         obj_type = obj_info.type
-
+ 
         CASE obj_type OF
             'GROUP': BEGIN
                 gid = h5g_open(id, obj_name)
@@ -115,6 +115,7 @@ FUNCTION hdf5_read_group,id,shallow=shallow
                     d = create_struct(d, var_name, var)
                 endif
             END
+            ELSE:
         ENDCASE
     endfor
 
@@ -132,12 +133,14 @@ FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten,shallow=shallow
 
     d = {}
     used_names = []
-    for i=0L,n_elements(var_paths)-1 do begin
+    i = 0L
+    while i lt n_elements(var_paths) do begin
         catch,err_status
         if err_status ne 0 then begin
             print,'Error reading '+var_paths[i]
             print,!ERROR_STATE.MSG
             catch,/cancel
+            i = i + 1
             continue
         endif
         path = var_paths[i]
@@ -145,6 +148,10 @@ FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten,shallow=shallow
         obj_type = obj_info.type
 
         CASE obj_type OF
+            'LINK': BEGIN
+                var_name = h5g_get_linkval(id,path)
+                var_paths = [var_paths,var_name]
+             END
             'GROUP': BEGIN
                 gid = h5g_open(id,path)
                 var = hdf5_read_group(gid,shallow=shallow)
@@ -194,8 +201,10 @@ FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten,shallow=shallow
                     endelse
                 endif
             END
+            ELSE:
         ENDCASE
-    endfor
+        i = i + 1
+    endwhile
 
     return, d
 

@@ -1,3 +1,46 @@
+FUNCTION read_spiral_header, file
+
+    openr,lun,file,/get_lun
+
+    npart = 0
+    gc = 0
+    err = 0
+    nheader = 0
+    line = ''
+    header = ''
+    readf, lun, line
+    while strmid(line,0,1) eq ';' do begin
+        nheader = nheader + 1
+        header = header + line + string(10B)
+        if stregex(line,"number",/fold_case) ne -1 then begin
+            npart = long(stregex(line,"[0-9]+",/extract))
+        endif
+        if stregex(line,"guiding center",/fold_case) ne -1 then begin
+            gc = 1
+        endif
+        if stregex(line,"R_[m]",/fold_case) ne -1 then begin
+            if n_elements(strsplit(line)) ne 6 then begin
+                err = 1
+            endif
+        endif
+        line = ''
+        readf, lun, line
+    endwhile
+    free_lun,lun
+    if gc eq 0 then begin
+        err = 1
+        print,'ERROR: Not a guiding center distribution'
+    endif
+
+    if npart eq 0 then begin
+        err = 1
+        print,'ERROR: Number of particles le 0'
+    endif
+
+    return, {err:err, nheader:nheader, npart:npart, header:header}
+
+END
+
 FUNCTION finite_struct, s
     n = N_TAGS(s)
     for i=0,n-1 do begin
@@ -56,28 +99,16 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, $
         time = 0.d0
     endif
 
+    header = read_spiral_header(file)
+    if header.err then goto, GET_OUT
+    npart = header.npart
+    nhead = header.nheader
+
     openr,unit,file, /get_lun
 
     ; Read header
-    header = strarr(4)
-    readf, unit, header
-
-    ; Read in number of particles
-    line=''
-    readf, unit, line
-    npart = long(stregex(line,"[0-9]+",/extract))
-
-    ; make sure its a guiding center distribution
-    line = ''
-    readf, unit, line
-    if stregex(line,"guiding center",/fold_case) eq -1 then begin
-        print, "ERROR: not a guiding center distribution"
-        goto, GET_OUT
-    endif
-
-    ; Skip a line
-    line = ''
-    readf, unit, line
+    head = strarr(nhead)
+    readf, unit, head
 
     ; Read in data
     r = dblarr(npart)

@@ -460,7 +460,7 @@ type SpectralChords
         !+ Radius of each line of sight
     logical, dimension(:,:,:), allocatable         :: los_inter
         !+ Indicates whether a [[libfida:beam_grid]] cell intersects a LOS
-    real(Float64), dimension(:,:,:,:), allocatable :: dlength
+    real(Float32), dimension(:,:,:,:), allocatable :: dlength
         !+ [[libfida:beam_grid]] cell - LOS intersection length: dlength(x,y,z,chan)
 end type SpectralChords
 
@@ -814,7 +814,7 @@ subroutine print_banner()
     endif
     write(*,'(a)') ""
     write(*,'(a)') "FIDASIM is released as open source code under the MIT Licence."
-    write(*,'(a)') "For more information visit ENTER WEBSITE HERE"
+    write(*,'(a)') "For more information visit http://d3denergetic.github.io/FIDASIM/"
     write(*,'(a)') ""
 end subroutine print_banner
                                      
@@ -1599,7 +1599,7 @@ subroutine read_beam
     nbi%alpha = atan2(pos(2)-nbi%src(2),pos(1)-nbi%src(1))
   
     call tb_zyx(nbi%alpha,nbi%beta,0.d0,nbi%basis,nbi%inv_basis)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Neutral beam settings ----'
         write(*,'(T2,"Beam: ",a)') nbi%name
@@ -2017,9 +2017,29 @@ subroutine read_equilibrium
     call h5ltread_dataset_int_f(gid, "/plasma/mask", p_mask, dims,error)
   
     impc = inputs%impurity_charge
+    where(equil%plasma%zeff.lt.1.0)
+        equil%plasma%zeff = 1
+    endwhere
+
+    where(equil%plasma%zeff.gt.impc)
+        equil%plasma%zeff = impc
+    endwhere
+
+    where(equil%plasma%dene.lt.0.0)
+        equil%plasma%dene = 0.0
+    endwhere
+
+    where(equil%plasma%te.lt.0.0)
+        equil%plasma%te = 0.0
+    endwhere
+
+    where(equil%plasma%ti.lt.0.0)
+        equil%plasma%ti = 0.0
+    endwhere
+
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
-  
+
     !!Close PLASMA group
     call h5gclose_f(gid, error)
   
@@ -2659,23 +2679,26 @@ subroutine write_birth_profile
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
-    integer :: error, i
+    integer :: error, i, npart
   
     character(120) :: filename
     real(Float64), dimension(:,:), allocatable :: ri
     real(Float64), dimension(:,:), allocatable :: vi
     real(Float64), dimension(3) :: xyz,uvw,v_uvw
 
-    allocate(ri(3,size(birth%ri,2)))
-    allocate(vi(3,size(birth%vi,2)))
+
+    npart = birth%cnt-1
+    allocate(ri(3,npart))
+    allocate(vi(3,npart))
   
-    do i=1,size(birth%ri,2)
+    do i=1,npart
         ! Convert position to rzphi
         xyz = birth%ri(:,i)
         call xyz_to_uvw(xyz,uvw)
         ri(1,i) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
         ri(2,i) = uvw(3)
         ri(3,i) = atan2(uvw(2),uvw(1))
+
         ! Convert velocity to rzphi
         v_uvw = matmul(beam_grid%basis, birth%vi(:,i))
         vi(1,i) = v_uvw(1)*cos(ri(3,i)) + v_uvw(2)*sin(ri(3,i))
@@ -2694,21 +2717,18 @@ subroutine write_birth_profile
     !Write variables
     call write_beam_grid(fid, error)
     d(1) = 1
-    call h5ltmake_dataset_int_f(fid, "/n_nbi", 0, d, [inputs%n_nbi], error)
-    call h5ltmake_dataset_int_f(fid, "/n_birth", 0, d, [inputs%n_birth], error)
+    call h5ltmake_dataset_int_f(fid, "/n_birth", 0, d, [npart], error)
     dim4 = shape(birth%dens)
     call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, birth%dens, error)
-    dim2 = shape(birth%ri)
+    dim2 = [3, npart]
     call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
     call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, birth%ind, error) 
     call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), birth%neut_type, error)
 
     !Add attributes
-    call h5ltset_attribute_string_f(fid, "/n_nbi", "description", &
-         "Number of beam mc particles", error)
     call h5ltset_attribute_string_f(fid, "/n_birth","description", &
-         "Number of birth mc particles deposited per beam mc particle", error)
+         "Number of birth mc particles deposited", error)
     call h5ltset_attribute_string_f(fid, "/dens", "description", &
          "Birth density: dens(beam_component,x,y,z)", error)
     call h5ltset_attribute_string_f(fid, "/dens", "units", &
@@ -3801,7 +3821,8 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
     length = 0.d0
     r_enter = r0
     r_exit  = r0
-  
+    ind1=0
+    ind2=0 
     if (sum(side_inter).ge.2) then
         ! Find first intersection side
         i=1
@@ -3812,7 +3833,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
         ind1=i
         !Find number of unique points
         nunique = 0
-        do i=ind1,6
+        do i=ind1+1,6
             if (side_inter(i).ne.1) cycle
             if (sqrt( sum( ( ipnts(:,i)-ipnts(:,ind1) )**2.0 ) ).gt.0.001) then
                 ind2=i
@@ -5422,7 +5443,7 @@ subroutine mc_halo(ind,vhalo,ri,plasma_in)
 
 end subroutine mc_halo
 
-subroutine mc_nbi(vnbi,efrac,rnbi)
+subroutine mc_nbi(vnbi,efrac,rnbi,err)
     !+ Generates a neutral beam particle trajectory
     integer, intent(in)                      :: efrac
         !+ Beam neutral type (1,2,3)
@@ -5430,7 +5451,9 @@ subroutine mc_nbi(vnbi,efrac,rnbi)
         !+ Velocity [cm/s]
     real(Float64), dimension(3), intent(out) :: rnbi  
         !+ Starting position on [[libfida:beam_grid]]
-  
+    logical, intent(out)                     :: err
+        !+ Error Code
+
     real(Float64), dimension(3) :: r_exit
     real(Float64), dimension(3) :: uvw_src    !! Start position on ion source
     real(Float64), dimension(3) :: xyz_src    !! Start position on ion source
@@ -5440,6 +5463,8 @@ subroutine mc_nbi(vnbi,efrac,rnbi)
     real(Float64), dimension(2) :: randomn    !! normal random numbers
     real(Float64) :: length, sqrt_rho, theta
   
+    err = .False.
+
     call randu(randomu)
     select case (nbi%shape)
         case (1)
@@ -5455,28 +5480,27 @@ subroutine mc_nbi(vnbi,efrac,rnbi)
             xyz_src(2) = nbi%widy*sqrt_rho*cos(theta)
             xyz_src(3) = nbi%widz*sqrt_rho*sin(theta)
     end select
-  
+
     !! Create random velocity vector
     call randn(randomn)
     xyz_ray(1)= 1.d0
-    xyz_ray(2)=(xyz_src(2)/nbi%focy + tan(nbi%divy(efrac)*randomn(1)))
-    xyz_ray(3)=(xyz_src(3)/nbi%focz + tan(nbi%divz(efrac)*randomn(2)))
+    xyz_ray(2)=(-xyz_src(2)/nbi%focy + tan(nbi%divy(efrac)*randomn(1)))
+    xyz_ray(3)=(-xyz_src(3)/nbi%focz + tan(nbi%divz(efrac)*randomn(2)))
   
     !! Convert to beam sightline coordinates to beam grid coordinates
     uvw_src = matmul(nbi%basis,xyz_src) + nbi%src
     uvw_ray = matmul(nbi%basis,xyz_ray)
     vnbi = uvw_ray/normp(uvw_ray)
-  
+
     !! Determine start postition on beam grid
     call grid_intersect(uvw_src,vnbi,length,rnbi,r_exit)
     if(length.le.0.0)then
-        rnbi=[-1.d0,0.d0,0.d0]
+        err = .True.
         nbi_outside = nbi_outside + 1
     endif
-  
+
     !! Determine velocity of neutrals corrected by efrac
     vnbi = vnbi*nbi%vinj/sqrt(real(efrac))
-    
 end subroutine mc_nbi
 
 !=============================================================================
@@ -5500,7 +5524,8 @@ subroutine ndmc
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(1) :: randomu
     integer, dimension(1) :: randi
-  
+    logical :: err
+
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi
     endif
@@ -5515,7 +5540,7 @@ subroutine ndmc
 
     !$OMP PARALLEL DO schedule(guided) & 
     !$OMP& private(vnbi,rnbi,tracks,ncell,plasma,nl_birth,randi, &
-    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind)
+    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
     loop_over_markers: do ii=1,inputs%n_nbi
         if(inputs%calc_birth.ge.1) then
             !! Determine the type of birth particle (1, 2, or 3)
@@ -5527,12 +5552,12 @@ subroutine ndmc
         endif
         energy_fractions: do neut_type=1,3 
             !! (type = 1: full energy, =2: half energy, =3: third energy
-            call mc_nbi(vnbi,neut_type,rnbi)
-            if(rnbi(1).eq.-1)cycle loop_over_markers
-  
+            call mc_nbi(vnbi,neut_type,rnbi,err)
+            if(err) cycle energy_fractions
+
             call track(rnbi,vnbi,tracks,ncell)
-            if(ncell.eq.0) cycle loop_over_markers
-  
+            if(ncell.eq.0) cycle energy_fractions
+
             !! Solve collisional radiative model along track
             states=0.d0
             states(1)=nneutrals*nbi%species_mix(neut_type)/beam_grid%dv
@@ -5555,6 +5580,7 @@ subroutine ndmc
             enddo loop_along_track
             if(inputs%calc_birth.ge.1) then
                 !! Sample according to deposited flux along neutral trajectory
+                !$OMP CRITICAL(ndmc_birth)
                 do kk=1,nl_birth(neut_type)
                     call randind(tracks(1:ncell)%flux,randi)
                     call randu(randomu)
@@ -5565,13 +5591,14 @@ subroutine ndmc
                                             vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
                     birth%cnt = birth%cnt+1
                 enddo
+                !$OMP END CRITICAL(ndmc_birth)
             endif
         enddo energy_fractions
     enddo loop_over_markers
     !$OMP END PARALLEL DO
   
     if(nbi_outside.gt.0)then
-         write(*,'(a, f6.2)') 'Percent of markers outside the grid: ', &
+         write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                               100.*nbi_outside/(3.*inputs%n_nbi)
          if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
     endif

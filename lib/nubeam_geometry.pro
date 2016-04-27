@@ -5,7 +5,9 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ;+##Arguments
     ;+     **NUBEAM**: Structure containing the following
     ;+
-    ;+     **NUBEAM.NBSHAP**: Ion source shape 1=rectangular, 2=circulare
+    ;+     **NUBEAM.NAME**: Ion source name
+    ;+
+    ;+     **NUBEAM.NBSHAP**: Ion source shape 1=rectangular, 2=circular
     ;+
     ;+     **NUBEAM.FOCLZ**: Vertical focal length [cm]
     ;+
@@ -23,7 +25,7 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ;+
     ;+     **NUBEAM.XLBAPA**: Distance from center of beam source grid to aperture [cm]
     ;+
-    ;+     **NUBEAM.XLBTNA**: Distance from center of beam source grid to tangency point
+    ;+     **NUBEAM.XLBTNA**: Distance from center of beam source grid to tangency point [cm]
     ;+
     ;+     **NUBEAM.XBZETA**: Torodial angle [deg] Positive angles defined to be in the counter-clockwise direction
     ;+
@@ -34,7 +36,7 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ;+     **NUBEAM.NLCO**: 1 for Co-beam, 0 or -1 for Counter-beam
     ;+
     ;+##Keyword Arguments
-    ;+     **angle**: Angle to add to XBZETA to rotate the beams into correct coordinates Ex. 90 for D3D,142.243 for NSTX
+    ;+     **angle**: Angle to add to XBZETA to rotate the beams into correct coordinates [deg]
     ;+
     ;+     **verbose**: Print out positions
     ;+
@@ -80,7 +82,7 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
         plot,[src[0],pos[0]],[src[1],pos[1]]
     endif
 
-    nbi = {data_source:"TRANSP/NUBEAM namelist",name:"Beam", $
+    nbi = {data_source:"TRANSP/NUBEAM namelist",name:nubeam.name, $
            shape:nubeam.nbshap,src:src,axis:axis, $
            focy:double(nubeam.foclr),focz:double(nubeam.foclz), $
            divy:replicate(double(nubeam.divr),3), $

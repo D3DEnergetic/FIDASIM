@@ -33,6 +33,11 @@ FUNCTION read_ncdf,file,vars=vars
         for i=0,nvars-1 do begin
             if keyword_set(vars) then begin
                 name=vars[i]
+                CATCH, err_status
+                if err_status ne 0 then begin
+                    CATCH,/CANCEL
+                    continue
+                endif
                 ncdf_varget,ncid,name,tmp
             endif else begin
                 var_info=ncdf_varinq(ncid,i)
@@ -43,7 +48,7 @@ FUNCTION read_ncdf,file,vars=vars
             d=create_struct(d,name,tmp)
         endfor
 	ncdf_close,ncid
-    endif else print,'FILE DOES NOT EXIST: '+file
+    endif else message,'FILE DOES NOT EXIST: '+file
     return,d
 END
 

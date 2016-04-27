@@ -644,7 +644,7 @@ on_ioerror,null
      alla = ecase[0] & for ipl=1,5 do alla = alla+ecase[ipl]
      alla = str_sep(alla," ")
      transpid = alla[2]
-     transptime=float(alla(6))
+     transptime=float(alla[6])
      transptime = long(transptime*1000)
      alphabet = ['a','b','c','d','e','f',$
                  'g','h','i','j','k','l','m','n','o','p',$
@@ -656,7 +656,7 @@ on_ioerror,null
      l2 = strarr(l1)
      for i = 0,l1-1 do l2[i] = strmid(transpid,i,1)
      l3 = intarr(l1)
-     for i = 0,l1-1 do l3[i] = where (l2(i) eq alphabet)
+     for i = 0,l1-1 do l3[i] = where (l2[i] eq alphabet)
      l4 = where(l3 ne -1)
      nshot6 = strmid(transpid,0,l4)
      shotuse = long(nshot6)

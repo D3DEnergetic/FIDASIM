@@ -6419,7 +6419,9 @@ subroutine fida_weights_mc
             ri = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)] + beam_grid%dr*(randomu3-0.5)
   
             fbm_denf = 0.0
-            call get_ep_denf(energy,pitch,fbm_denf,pos=ri)
+            if (inputs%dist_type.eq.1) then
+                call get_ep_denf(energy,pitch,fbm_denf,pos=ri)
+            endif
   
             !! Get velocity
             call get_fields(fields,pos=ri)
@@ -6569,12 +6571,14 @@ subroutine fida_weights_los
                         call get_fields(fields_cell,ind=ind)
                         plasma = plasma + wght*plasma_cell
                         fields = fields + wght*fields_cell
-                        do ipitch=1,inputs%np_wght
-                            do ienergy=1,inputs%ne_wght
-                                call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,ind=ind)
-                                mean_f(ienergy,ipitch) = mean_f(ienergy,ipitch) + wght*denf
+                        if (inputs%dist_type.eq.1) then
+                            do ipitch=1,inputs%np_wght
+                                do ienergy=1,inputs%ne_wght
+                                    call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,ind=ind)
+                                    mean_f(ienergy,ipitch) = mean_f(ienergy,ipitch) + wght*denf
+                                enddo
                             enddo
-                        enddo
+                        endif
                         wght_tot = wght_tot + wght
                     endif
                 enddo

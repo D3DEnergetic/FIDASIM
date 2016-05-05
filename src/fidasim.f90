@@ -19,8 +19,10 @@ integer, parameter, private   :: Float32 = 4
     !+ Defines a 32 bit floating point real
 integer, parameter, private   :: Float64 = 8
     !+ Defines a 64 bit floating point real 
+integer, parameter :: charlim = 150
+    !+ Defines character limit for files and directories
 
-character(120)     :: namelist_file
+character(charlim) :: namelist_file
     !+ Input namelist file
 integer, parameter :: nbif_type  = 1 
     !+ Identifier for full energy NBI neutral interaction
@@ -614,19 +616,19 @@ type SimulationInputs
         !+ Shot Number
     real(Float64)  :: time
         !+ Shot time [s]
-    character(120) :: runid = ''
+    character(charlim) :: runid = ''
         !+ FIDASIM run ID
-    character(120) :: result_dir = ''
+    character(charlim) :: result_dir = ''
         !+ Result directory
-    character(120) :: tables_file = ''
+    character(charlim) :: tables_file = ''
         !+ Atomic tables file
-    character(120) :: geometry_file = ''
+    character(charlim) :: geometry_file = ''
         !+ FIDASIM input file containing geometric quantities
-    character(120) :: equilibrium_file = ''
+    character(charlim) :: equilibrium_file = ''
         !+ FIDASIM input file containing the plasma parameters and fields
-    character(120) :: distribution_file = ''
+    character(charlim) :: distribution_file = ''
         !+ FIDASIM input file containing the fast-ion distribution
-    character(120) :: neutrals_file = ''
+    character(charlim) :: neutrals_file = ''
         !+ FIDASIM output/input file containing beam neutral density.
         !+ Used when [[SimulationInputs:load_neutrals]] is set.
 
@@ -1306,22 +1308,23 @@ end function lfs_divide
 subroutine read_inputs
     !+ Reads input namelist file and stores the results into [[libfida:inputs]],
     !+ [[libfida:nbi]], and [[libfida:beam_grid]]
-    character(120) :: runid,result_dir, tables_file
-    character(120) :: distribution_file, equilibrium_file
-    character(120) :: geometry_file, neutrals_file
-    integer        :: calc_brems,calc_bes,calc_fida,calc_npa
-    integer        :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer        :: load_neutrals,verbose,dump_dcx
-    integer(Int32) :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
-    integer(Int32) :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    real(Float64)  :: time,lambdamin,lambdamax,emax_wght
-    real(Float64)  :: lambdamin_wght,lambdamax_wght
-    real(Float64)  :: ai,ab,pinj,einj,species_mix(3)
-    integer(Int32) :: impurity_charge
-    integer(Int32) :: nx,ny,nz
-    real(Float64)  :: xmin,xmax,ymin,ymax,zmin,zmax
-    real(Float64)  :: alpha,beta,gamma,origin(3)
-    logical        :: exis, error
+    character(charlim) :: runid,result_dir, tables_file
+    character(charlim) :: distribution_file, equilibrium_file
+    character(charlim) :: geometry_file, neutrals_file
+    integer            :: pathlen
+    integer            :: calc_brems,calc_bes,calc_fida,calc_npa
+    integer            :: calc_birth,calc_fida_wght,calc_npa_wght
+    integer            :: load_neutrals,verbose,dump_dcx
+    integer(Int32)     :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
+    integer(Int32)     :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
+    real(Float64)      :: time,lambdamin,lambdamax,emax_wght
+    real(Float64)      :: lambdamin_wght,lambdamax_wght
+    real(Float64)      :: ai,ab,pinj,einj,species_mix(3)
+    integer(Int32)     :: impurity_charge
+    integer(Int32)     :: nx,ny,nz
+    real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
+    real(Float64)      :: alpha,beta,gamma,origin(3)
+    logical            :: exis, error
   
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -1477,6 +1480,15 @@ subroutine read_inputs
                          trim(inputs%distribution_file)
         error = .True.
     endif
+
+    pathlen = len_trim(inputs%result_dir)+len_trim(inputs%runid) + 20
+    !+20 for suffixes and seperators e.g. /, _npa.h5, ...
+    if(pathlen.gt.charlim) then
+        write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', & 
+                               pathlen-20,'>', charlim-20
+        error = .True.
+    endif
+
     if(inputs%verbose.ge.1) then
         write(*,*) ''
     endif
@@ -2681,7 +2693,7 @@ subroutine write_birth_profile
     integer(HSIZE_T), dimension(1) :: d
     integer :: error, i, npart
   
-    character(120) :: filename
+    character(charlim) :: filename
     real(Float64), dimension(:,:), allocatable :: ri
     real(Float64), dimension(:,:), allocatable :: vi
     real(Float64), dimension(3) :: xyz,uvw,v_uvw
@@ -2770,7 +2782,7 @@ subroutine write_dcx
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
   
-    character(120) :: filename
+    character(charlim) :: filename
     character(15) :: spec_str
     integer :: i
     real(Float64), dimension(:),   allocatable :: lambda_arr
@@ -2933,7 +2945,7 @@ subroutine write_npa
     integer, dimension(:), allocatable :: dcount
     real(Float64), dimension(:,:), allocatable :: ri, rf
     integer :: i, n
-    character(120) :: filename = ''
+    character(charlim) :: filename = ''
   
     allocate(dcount(npa_chords%nchan))
     do i=1,npa_chords%nchan
@@ -3057,7 +3069,7 @@ subroutine write_spectra
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
   
-    character(120) :: filename
+    character(charlim) :: filename
     integer :: i
     real(Float64), dimension(:), allocatable :: lambda_arr
   
@@ -3184,7 +3196,7 @@ subroutine write_fida_weights
     integer(HSIZE_T), dimension(1) :: dim1
     integer :: error
   
-    character(120) :: filename
+    character(charlim) :: filename
     integer :: i,ie,ip,ic
     real(Float64), dimension(:),   allocatable :: lambda_arr
     real(Float64), dimension(:),   allocatable :: ebarr,ptcharr
@@ -3349,7 +3361,7 @@ end subroutine write_fida_weights
 
 subroutine write_npa_weights
     !+ Writes [[libfida:fweight]] to a HDF5 file
-    character(120) :: filename
+    character(charlim) :: filename
     integer :: i
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr
    

@@ -104,9 +104,9 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
     endfor   
     free_lun, unit
 
-    r=reform(data[0,0:npts-1])
-    w=reform(data[1,0:npts-1])
-    pitch=reform(data[2,0:npts-1])*btipsign
+    r=double(reform(data[0,0:npts-1]))
+    w=double(reform(data[1,0:npts-1]))
+    pitch=double(reform(data[2,0:npts-1]))*btipsign
     energy=reform(data[3,0:npts-1])*1.d-3 ;keV
     weight = replicate(particle_weight,npts)
     orbit_class = replicate(1,npts)
@@ -122,7 +122,7 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
     print,'Number of markers: ',npts
     print,'Number of markers in energy range: ',nw
 
-    fbm_struct = {type:2,time:time,data_source:infile, $
+    fbm_struct = {type:2,time:double(time),data_source:infile, $
                   nparticle:long(nw),nclass:1,r:r[ww],z:w[ww],$
                   energy:energy[ww],pitch:pitch[ww],class:orbit_class[ww],$
                   weight:weight[ww]}

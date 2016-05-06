@@ -49,7 +49,15 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
 
     parts=str_sep(line, ' ')
     w=where(parts eq 'N=')
-    npts=long(parts[w[0]+1])
+    i=1
+    while 1 do begin
+        s = parts[w[0]+i]
+        if s ne '' and s ne '=' and s ne ' ' then begin
+            npts = long(s)
+            break
+        endif
+        i = i+1
+    endwhile
     if npts lt 5 then begin
         print,'ERROR: Too few points',npts
         goto, GET_OUT
@@ -76,7 +84,6 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
         endif
         i = i+1
     endwhile
-
     data=fltarr(4,npts)
     
     ready=0
@@ -85,7 +92,12 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
         pos=strpos(line,'R(cm)')
         if pos gt -1 then ready=1
     endwhile
-    
+ 
+    print, 'Time: ',time  
+    print, 'Number of MC particles: ',npts
+    print, 'Total Number of Fast-ions: ',ntotal
+    print, 'MC Particle weight: ',particle_weight
+ 
     for i=0L,npts-1 do begin
         readf,unit,line           ; read string
         line=strcompress(line)

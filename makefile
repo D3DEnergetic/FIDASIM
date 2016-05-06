@@ -20,6 +20,7 @@ ifeq ($(HAS_CXX),)
 endif
 
 # directories
+FIDASIM_DIR := $(shell pwd)
 SRC_DIR = $(FIDASIM_DIR)/src
 DEPS_DIR = $(FIDASIM_DIR)/deps
 TABLES_DIR = $(FIDASIM_DIR)/tables
@@ -33,6 +34,7 @@ NTHREADS = 1000
 # FORD documentation variables
 FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -d $(LIB_DIR) -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
 
+export FIDASIM_DIR
 export SRC_DIR
 export DEPS_DIR
 export TABLES_DIR

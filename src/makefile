@@ -2,13 +2,6 @@ SHELL = /bin/sh
 DEBUG = n
 EX = fidasim
 
-SRC_DIR = $(FIDASIM_DIR)/src
-HDF5_LIB = $(FIDASIM_DIR)/deps/hdf5/lib
-HDF5_INCLUDE = $(FIDASIM_DIR)/deps/hdf5/include
-HDF5_FLAGS = -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl
-export LD_LIBRARY_PATH=$(HDF5_LIB):$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=$(HDF5_INCLUDE):$LD_LIBRARY_PATH
-
 VERSION := $(shell [ -e $(FIDASIM_DIR)/VERSION ] && cat $(FIDASIM_DIR)/VERSION)
 ifneq ($(VERSION),)
 	UFLAGS = -D_VERSION=\"$(VERSION)\" 
@@ -23,14 +16,14 @@ ifneq ($(BUILD),)
 endif
 
 ifneq ($(findstring gfortran, $(FC)),)
-	LFLAGS = $(HDF5_FLAGS) -lm
-	CFLAGS = -Ofast -fopenmp -g -fbacktrace -cpp -D_OMP $(UFLAGS)
+	LFLAGS = $(HDF5_FLAGS) -L$(SRC_DIR) -lm 
+	CFLAGS = -Ofast -fopenmp -g -fbacktrace -cpp -D_OMP $(UFLAGS) #-pg #gprof profiling
 	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow
 endif
 
 ifneq ($(findstring ifort, $(FC)),)
-	LFLAGS = $(HDF5_FLAGS) -limf -lm
-	CFLAGS = -O2 -fpp -g -traceback -openmp -D_OMP $(UFLAGS)
+	LFLAGS = $(HDF5_FLAGS) -L$(SRC_DIR) -limf -lm
+	CFLAGS = -O2 -fpp -g -traceback -openmp -D_OMP $(UFLAGS) #-p #gprof profiling
 	DEBUG_CFLAGS = -O0 -fpp -g -traceback -debug all -check all -check bounds -fpe:0 -warn
 endif
 
@@ -40,7 +33,7 @@ ifeq ($(DEBUG),y)
 endif
 
 $(FIDASIM_DIR)/$(EX): fidasim.o eigensystem.o parallel_rng.o hdf5_extra.o
-	$(FC) $(CFLAGS) $^ -o $@ -L$(HDF5_LIB) $(LFLAGS) -L$(SRC_DIR)
+	$(FC) $(CFLAGS) $^ -o $@ $(LFLAGS)
 
 fidasim.o: fidasim.f90 eigensystem.mod parallel_rng.mod hdf5_extra.mod
 	$(FC) $(CFLAGS) -c -I$(HDF5_INCLUDE) -I$(SRC_DIR) $<

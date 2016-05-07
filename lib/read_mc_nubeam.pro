@@ -49,7 +49,15 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
 
     parts=str_sep(line, ' ')
     w=where(parts eq 'N=')
-    npts=long(parts[w[0]+1])
+    i=1
+    while 1 do begin
+        s = parts[w[0]+i]
+        if s ne '' and s ne '=' and s ne ' ' then begin
+            npts = long(s)
+            break
+        endif
+        i = i+1
+    endwhile
     if npts lt 5 then begin
         print,'ERROR: Too few points',npts
         goto, GET_OUT
@@ -76,7 +84,6 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
         endif
         i = i+1
     endwhile
-
     data=fltarr(4,npts)
     
     ready=0
@@ -85,7 +92,12 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
         pos=strpos(line,'R(cm)')
         if pos gt -1 then ready=1
     endwhile
-    
+ 
+    print, 'Time: ',time  
+    print, 'Number of MC particles: ',npts
+    print, 'Total Number of Fast-ions: ',ntotal
+    print, 'MC Particle weight: ',particle_weight
+ 
     for i=0L,npts-1 do begin
         readf,unit,line           ; read string
         line=strcompress(line)
@@ -104,9 +116,9 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
     endfor   
     free_lun, unit
 
-    r=reform(data[0,0:npts-1])
-    w=reform(data[1,0:npts-1])
-    pitch=reform(data[2,0:npts-1])*btipsign
+    r=double(reform(data[0,0:npts-1]))
+    w=double(reform(data[1,0:npts-1]))
+    pitch=double(reform(data[2,0:npts-1]))*btipsign
     energy=reform(data[3,0:npts-1])*1.d-3 ;keV
     weight = replicate(particle_weight,npts)
     orbit_class = replicate(1,npts)
@@ -122,7 +134,7 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,particle_weight = p
     print,'Number of markers: ',npts
     print,'Number of markers in energy range: ',nw
 
-    fbm_struct = {type:2,time:time,data_source:infile, $
+    fbm_struct = {type:2,time:double(time),data_source:infile, $
                   nparticle:long(nw),nclass:1,r:r[ww],z:w[ww],$
                   energy:energy[ww],pitch:pitch[ww],class:orbit_class[ww],$
                   weight:weight[ww]}

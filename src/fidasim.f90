@@ -725,7 +725,7 @@ end type ParticleTrack
 
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]],[LocalEMFields]],[[FastIon]], and [[NPAParticle]]
+    !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], and [[NPAParticle]]
     module procedure pp_assign, lpp_assign, plp_assign, lplp_assign, &
                      ff_assign, lff_assign, flf_assign, lflf_assign, &
                      fast_ion_assign,npa_part_assign

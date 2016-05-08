@@ -94,4 +94,4 @@ clean_tables:
 	@cd $(TABLES_DIR); make clean
 
 clean_docs:
-	-rm -f $(DOCS_DIR)/html
+	-rm -rf $(DOCS_DIR)/html

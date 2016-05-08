@@ -38,4 +38,4 @@ Currently, FIDASIM has routines for calculating:
 * FIDA and NPA phase-space sensitivities i.e. weight functions
 
 ##Installation
-For installation instructions check out our [Getting Started](./01_getting_started.html) guide.
+For installation instructions check out our [Getting Started](./01_getting_started/index.html) guide.

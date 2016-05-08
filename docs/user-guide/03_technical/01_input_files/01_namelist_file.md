@@ -36,7 +36,7 @@ distribution_file = '/home/lstagner/051_distribution.h5'       !! File containin
 neutrals_file = '/home/lstagner/051_neutrals.h5'               !! File containing the neutral density
 ```
 @note 
-The neutrals file is actually an [output file](../03_output_files/index.html).
+The neutrals file is actually an [output file](../02_output_files/index.html).
 It is listed here since there is an option to load the neutral density from a file instead of calculating it. 
 
 ##Simulation Switches
@@ -53,17 +53,20 @@ load_neutrals =  0   !! Load neutrals from a preexisting neutrals file
 dump_dcx =  1        !! Dump DCX neutrals and spectra
 verbose =  1         !! Verbose
 ```
+The simulation switches can take values 0, 1, or 2. A value of zero and one will turn the calculation off and on respectively. 
+A value of two will turn on additional functionality. Further information about the simulation routines can be found in the technical details section **TODO: Add link**
 
 ##Monte Carlo Settings
 ```fortran
 !! Monte Carlo Settings
-n_fida = 25000000 !! Number of FIDA mc particles
-n_npa = 2500000   !! Number of NPA mc particles
-n_nbi = 50000     !! Number of NBI mc particles
-n_halo = 500000   !! Number of HALO mc particles
-n_dcx = 500000    !! Number of DCX mc particles
-n_birth = 10000   !! Number of BIRTH mc particles
+n_fida = 5000000 !! Number of FIDA mc particles
+n_npa = 500000   !! Number of NPA mc particles
+n_nbi = 50000    !! Number of NBI mc particles
+n_halo = 500000  !! Number of HALO mc particles
+n_dcx = 500000   !! Number of DCX mc particles
+n_birth = 10000  !! Number of BIRTH mc particles
 ```
+More particles = Decreased Monte Carlo noise, Increased runtime. These settings provide a good balance between MC noise and runtime.
 
 ##Neutral Beam Settings
 ```fortran
@@ -75,15 +78,17 @@ species_mix(1) =   0.85000 !! Beam Species Mix (Full component)
 species_mix(2) =   0.10000 !! Beam Species Mix (Half component)
 species_mix(3) =   0.05000 !! Beam Species Mix (Third component)
 ```
+Mostly self explanitory. `species_mix` == current fractions.
 
 ##Plasma Settings
 ```fortran
 !! Plasma Settings
-ai = 2.01411        !! Ion Species mass [amu]
+ai = 2.01411        !! Thermal Ion Species mass [amu]
 impurity_charge = 6 !! Impurity Charge
 ```
 
 ##Beam Grid Settings
+This defines the grid in which the neutrals are stored. 
 ```fortran
 !! Beam Grid Settings
 nx =  80        !! Number of cells in X direction (Into Plasma)
@@ -99,13 +104,26 @@ zmax =  120.000 !! Maximum Z value [cm]
 !! Tait-Bryan Angles for z-y`-x`` rotation
 alpha = 0.00000 !! Rotation about z-axis [rad]
 beta  = 0.00000 !! Rotation about y`-axis [rad]
-gamma = 0.00000 !! Rotation about x"-axis [rad]
+gamma = 0.00000 !! Rotation about x``-axis [rad]
 
 !! Beam Grid origin in machine coordinates (cartesian)
 origin(1) = 0.000 !! X value [cm]
 origin(2) = 0.000 !! Y value [cm]
 origin(3) = 0.000 !! Z value [cm]
 ```
+The coordinates system used depends on the values of the rotation angles (`alpha`, `beta`, `gamma`) and `origin` variables.
+If all the rotation angles and `origin` are set to zero then the coordinate system is identical to machine coordinates. 
+The angles variables and `origin` define a rotated coordinate system. 
+The rotation angles and origin can best be described by an example. 
+
+1. With your right hand point your index finger pointing in the +x direction with your middle finger and thumb pointing in the +y and +z direction respectively.
+2. Rotate about your thumb (z-axis) by `alpha` (ccw = +angle, cw = -angle)
+3. Rotate about your middle finger (y'-axis) by `beta`
+4. Rotate about your index finger (x"-axis) by `gamma`
+5. Move your right hand to the `origin`
+6. Define `(x|y|z)_(min|max)` by this coordinate system with your index finger being the new +x-axis
+
+It is convienient to define the grid to be aligned with the beam sightline. To faciliate this an IDL routine [beam_grid.pro](|url|/sourcefile/beam_grid.pro.html) is available to automatically calculate the beam-aligned grid definition.
 
 ##Wavelength Grid Settings
 ```fortran
@@ -193,7 +211,7 @@ zmax =  120.000 !! Maximum Z value [cm]
 !! Tait-Bryan Angles for z-y`-x`` rotation
 alpha = 0.00000 !! Rotation about z-axis [rad]
 beta  = 0.00000 !! Rotation about y`-axis [rad]
-gamma = 0.00000 !! Rotation about x"-axis [rad]
+gamma = 0.00000 !! Rotation about x``-axis [rad]
 
 !! Beam Grid origin in machine coordinates (cartesian)
 origin(1) = 0.000 !! X value [cm]

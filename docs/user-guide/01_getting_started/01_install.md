@@ -1,4 +1,4 @@
-title: Getting Started
+title: Installation
 
 #Getting Started
 So you have decided to install FIDASIM. Don't worry this should be relatively painless.
@@ -20,12 +20,13 @@ FIDASIM has the following dependencies:
   [GNU](https://gcc.gnu.org/) and [Intel](https://software.intel.com/en-us/intel-compilers) compilers are supported.
 * [IDL](http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx) for pre-processing.
 * [zlib](http://zlib.net/) for file compression.
-* [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files
-* [Anaconda Python](https://www.continuum.io/why-anaconda) For python scripts (Optional)
+* [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
+* [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)
+* [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
 
-Click [here](./06_dependencies.html) or more specific information about the dependencies.
+Click [here](../03_technical/06_dependencies.html) or more specific information about the dependencies.
 ##Getting FIDASIM source
 It is a fact of nature that you cannot run code you haven't installed. There are two ways correcting this.
 
@@ -66,13 +67,8 @@ export FC=gfortran #use 'ifort' for Intel Fortran compiler
 export CC=gcc      #use 'icc' for Intel C compiler
 export CXX=g++     #use 'icpc' for Intel C++ compiler
 
-#For HDF5 dependency
-export HDF5_INCLUDE=$FIDASIM_DIR/deps/hdf5/include
-export HDF5_LIB=$FIDASIM_DIR/deps/hdf5/lib
-export LD_LIBRARY_PATH=$HDF5_LIB:$HDF5_INCLUDE:$LD_LIBRARY_PATH
-
 #For using helper routines
-export PATH=$FIDASIM_DIR/lib:$PATH
+export PATH=$FIDASIM_DIR/deps/hdf5/bin:$FIDASIM_DIR/lib:$PATH
 export IDL_PATH="+$FIDASIM_DIR:$IDL_PATH:<IDL_DEFAULT>"
 
 ulimit -s unlimited #Omit this if you like segfaults
@@ -137,14 +133,14 @@ Now do what the computer says.
 Think of as good practice for when the [robots take over](https://www.youtube.com/watch?v=7Pq-S557XQU).
 
 It should print out the following. 
-```text
+```
 [lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
 /_/  /___//____//_/ |_|/___//___//_/  /_/  
                                            
-Version: v0.3.2-64-g16005c5
+Version: 1.0.0
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -290,5 +286,3 @@ Congratulations! You followed the instructions.
 
 ##Now what
 Most likely you won't be satisfied by just running a test case.
-
-The next thing to do is figure out what kind of [input files](./02_input_files/index.html) you need to run your own simulation.

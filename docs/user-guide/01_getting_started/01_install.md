@@ -1,6 +1,6 @@
 title: Installation
 
-#Getting Started
+#Installation
 So you have decided to install FIDASIM. Don't worry this should be relatively painless.
 
 @note

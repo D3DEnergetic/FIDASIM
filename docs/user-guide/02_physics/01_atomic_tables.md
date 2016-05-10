@@ -1,11 +1,11 @@
 title: Atomic Tables
 #Atomic Tables
+[TOC]
 
 ##Hydrogen-Hydrogen Interactions
-@note Add equations
 
 ###Charge Exchange
-
+$$H^+ + H(n) \rightarrow H(m) + H^+$$
 ![](|media|/H_H_cx_1_m.svg H-H CX n=1 to m=1..6){: width="400"} ![](|media|/H_H_cx_2_m.svg H-H CX n=2 to m=1..6){: width="400"}
 {: style="text-align: center"}
 
@@ -13,6 +13,7 @@ title: Atomic Tables
 {: style="text-align: center"}
 
 ###Excitation
+$$H^+ + H(n) \rightarrow H^+ + H(m), \, m \gt n$$
 
 ![](|media|/H_H_excit_1_m.svg H-H Excitation n=1 to m=2..6){: width="400"} ![](|media|/H_H_excit_2_m.svg H-H Excitation n=2 to m=3..6){: width="400"}
 {: style="text-align: center"}
@@ -21,14 +22,15 @@ title: Atomic Tables
 {: style="text-align: center"}
 
 ###Ionization
+$$H^+ + H(n) \rightarrow H^+ + H^+ + e$$
 
 ![](|media|/H_H_ioniz.svg H-H Ionization){: width="400"}
 {: style="text-align: center"}
 
 ##Hydrogen-Electron Interactions
-@note Add equations
 
 ###Excitation
+$$e + H(n) \rightarrow e + H(m),\, m \gt n$$
 
 ![](|media|/H_e_excit_1_m.svg H-e Excitation n=1 to m=2..6){: width="400"} ![](|media|/H_e_excit_2_m.svg H-e Excitation n=2 to m=3..6){: width="400"}
 {: style="text-align: center"}
@@ -37,19 +39,21 @@ title: Atomic Tables
 {: style="text-align: center"}
 
 ###Ionization
+$$e + H(n) \rightarrow e + H^+ + e$$
 
 ![](|media|/H_e_ioniz.svg H-H Ionization){: width="400"}
 {: style="text-align: center"}
 
 ##Hydrogen-Carbon₆ Interactions
-@note Add equations
 
 ###Charge Exchange
+$$C^{6+} + H(n) \rightarrow C^{5+} + H^+$$
 
 ![](|media|/H_C6_cx.svg H-H CX){: width="400"}
 {: style="text-align: center"}
 
 ###Excitation
+$$C^{6+} + H(n) \rightarrow C^{6+} + H(m), \, m \gt n$$
 
 ![](|media|/H_C6_excit_1_m.svg H-C6 Excitation n=1 to m=2..6){: width="400"} ![](|media|/H_C6_excit_2_m.svg H-C6 Excitation n=2 to m=3..6){: width="400"}
 {: style="text-align: center"}
@@ -58,6 +62,7 @@ title: Atomic Tables
 {: style="text-align: center"}
 
 ###Ionization
+$$C^{6+} + H(n) \rightarrow C^{6+} + H^+ + e$$
 
 ![](|media|/H_C6_ioniz.svg H-C6 Ionization){: width="400"}
 {: style="text-align: center"}

@@ -1,6 +1,6 @@
 title: Installation
 
-#Installation
+#Installing FIDASIM
 So you have decided to install FIDASIM. Don't worry this should be relatively painless.
 
 @note
@@ -26,9 +26,8 @@ FIDASIM has the following dependencies:
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
 
-Click [here](../03_technical/06_dependencies.html) or more specific information about the dependencies.
 ##Getting FIDASIM source
-It is a fact of nature that you cannot run code you haven't installed. There are two ways correcting this.
+It's rather difficult to run software you haven't downloaded. There are two ways of getting the source code.
 
 ###Downloading source directly
 The most recent version of FIDASIM ({!../VERSION!}) can be downloaded from [here](https://github.com/D3DEnergetic/FIDASIM/releases)
@@ -285,4 +284,4 @@ duration:                   0:15:53
 Congratulations! You followed the instructions.
 
 ##Now what
-Most likely you won't be satisfied by just running a test case.
+Most likely you won't be satisfied by just running a test case. Click [here](./02_preprocess/index.html) to learn how to make the [input files](../03_technical/01_inputs.html) used by FIDASIM.

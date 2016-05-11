@@ -1,10 +1,12 @@
 title: Atomic Tables
-#Atomic Tables
+
+# Atomic Cross Sections
+
 [TOC]
 
-##Hydrogen-Hydrogen Interactions
+#Hydrogen-Hydrogen Interactions
 
-###Charge Exchange
+##Charge Exchange
 $$H^+ + H(n) \rightarrow H(m) + H^+$$
 ![](|media|/H_H_cx_1_m.svg H-H CX n=1 to m=1..6){: width="400"} ![](|media|/H_H_cx_2_m.svg H-H CX n=2 to m=1..6){: width="400"}
 {: style="text-align: center"}
@@ -12,7 +14,7 @@ $$H^+ + H(n) \rightarrow H(m) + H^+$$
 ![](|media|/H_H_cx_3_m.svg H-H CX n=3 to m=1..6){: width="400"} ![](|media|/H_H_cx_4_m.svg H-H CX n=4 to m=1..6){: width="400"}
 {: style="text-align: center"}
 
-###Excitation
+##Excitation
 $$H^+ + H(n) \rightarrow H^+ + H(m), \, m \gt n$$
 
 ![](|media|/H_H_excit_1_m.svg H-H Excitation n=1 to m=2..6){: width="400"} ![](|media|/H_H_excit_2_m.svg H-H Excitation n=2 to m=3..6){: width="400"}
@@ -21,15 +23,15 @@ $$H^+ + H(n) \rightarrow H^+ + H(m), \, m \gt n$$
 ![](|media|/H_H_excit_3_m.svg H-H Excitation n=3 to m=4..6){: width="400"} ![](|media|/H_H_excit_4_m.svg H-H Excitation n=4 to m=5..6){: width="400"}
 {: style="text-align: center"}
 
-###Ionization
+##Ionization
 $$H^+ + H(n) \rightarrow H^+ + H^+ + e$$
 
 ![](|media|/H_H_ioniz.svg H-H Ionization){: width="400"}
 {: style="text-align: center"}
 
-##Hydrogen-Electron Interactions
+#Hydrogen-Electron Interactions
 
-###Excitation
+##Excitation
 $$e + H(n) \rightarrow e + H(m),\, m \gt n$$
 
 ![](|media|/H_e_excit_1_m.svg H-e Excitation n=1 to m=2..6){: width="400"} ![](|media|/H_e_excit_2_m.svg H-e Excitation n=2 to m=3..6){: width="400"}
@@ -38,21 +40,21 @@ $$e + H(n) \rightarrow e + H(m),\, m \gt n$$
 ![](|media|/H_e_excit_3_m.svg H-e Excitation n=3 to m=4..6){: width="400"} ![](|media|/H_e_excit_4_m.svg H-e Excitation n=4 to m=5..6){: width="400"}
 {: style="text-align: center"}
 
-###Ionization
+##Ionization
 $$e + H(n) \rightarrow e + H^+ + e$$
 
 ![](|media|/H_e_ioniz.svg H-H Ionization){: width="400"}
 {: style="text-align: center"}
 
-##Hydrogen-Carbon₆ Interactions
+#Hydrogen-Carbon₆ Interactions
 
-###Charge Exchange
+##Charge Exchange
 $$C^{6+} + H(n) \rightarrow C^{5+} + H^+$$
 
 ![](|media|/H_C6_cx.svg H-H CX){: width="400"}
 {: style="text-align: center"}
 
-###Excitation
+##Excitation
 $$C^{6+} + H(n) \rightarrow C^{6+} + H(m), \, m \gt n$$
 
 ![](|media|/H_C6_excit_1_m.svg H-C6 Excitation n=1 to m=2..6){: width="400"} ![](|media|/H_C6_excit_2_m.svg H-C6 Excitation n=2 to m=3..6){: width="400"}
@@ -61,7 +63,7 @@ $$C^{6+} + H(n) \rightarrow C^{6+} + H(m), \, m \gt n$$
 ![](|media|/H_C6_excit_3_m.svg H-C6 Excitation n=3 to m=4..6){: width="400"} ![](|media|/H_C6_excit_4_m.svg H-C6 Excitation n=4 to m=5..6){: width="400"}
 {: style="text-align: center"}
 
-###Ionization
+##Ionization
 $$C^{6+} + H(n) \rightarrow C^{6+} + H^+ + e$$
 
 ![](|media|/H_C6_ioniz.svg H-C6 Ionization){: width="400"}

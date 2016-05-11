@@ -230,6 +230,8 @@
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/vars_to_struct.pro.html">vars_to_struct.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/warn.pro.html">warn.pro</a>
           
           <a class="list-group-item" href="../sourcefile/write_distribution.pro.html">write_distribution.pro</a>
@@ -304,19 +306,24 @@
 <a name="ln-33"></a>        <span class="s s-Atom">for</span> <span class="s s-Atom">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">nvars</span><span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
 <a name="ln-34"></a>            <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">vars</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
 <a name="ln-35"></a>                <span class="s s-Atom">name</span><span class="o">=</span><span class="s s-Atom">vars</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span>
-<a name="ln-36"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">tmp</span>
-<a name="ln-37"></a>            <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-38"></a>                <span class="s s-Atom">var_info</span><span class="o">=</span><span class="nf">ncdf_varinq</span><span class="p">(</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">)</span>
-<a name="ln-39"></a>                <span class="s s-Atom">name</span><span class="o">=</span><span class="s s-Atom">var_info</span><span class="p">.</span><span class="s s-Atom">name</span>
-<a name="ln-40"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">tmp</span>
-<a name="ln-41"></a>            <span class="s s-Atom">endelse</span>
-<a name="ln-42"></a>            <span class="s s-Atom">if</span> <span class="nf">total</span><span class="p">(</span><span class="nf">strmatch</span><span class="p">(</span><span class="s s-Atom">reserved</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="o">/</span><span class="nv">FOLD_CASE</span><span class="p">))</span> <span class="s s-Atom">gt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">name+=&#39;_&#39;</span>
-<a name="ln-43"></a>            <span class="s s-Atom">d</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">tmp</span><span class="p">)</span>
-<a name="ln-44"></a>        <span class="s s-Atom">endfor</span>
-<a name="ln-45"></a>	<span class="s s-Atom">ncdf_close</span><span class="p">,</span><span class="s s-Atom">ncid</span>
-<a name="ln-46"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;FILE DOES NOT EXIST: &#39;</span><span class="o">+</span><span class="s s-Atom">file</span>
-<a name="ln-47"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">d</span>
-<a name="ln-48"></a><span class="nv">END</span>
+<a name="ln-36"></a>                <span class="nv">CATCH</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
+<a name="ln-37"></a>                <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-38"></a>                    <span class="nv">CATCH</span><span class="p">,</span><span class="o">/</span><span class="nv">CANCEL</span>
+<a name="ln-39"></a>                    <span class="s s-Atom">continue</span>
+<a name="ln-40"></a>                <span class="s s-Atom">endif</span>
+<a name="ln-41"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">tmp</span>
+<a name="ln-42"></a>            <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-43"></a>                <span class="s s-Atom">var_info</span><span class="o">=</span><span class="nf">ncdf_varinq</span><span class="p">(</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">)</span>
+<a name="ln-44"></a>                <span class="s s-Atom">name</span><span class="o">=</span><span class="s s-Atom">var_info</span><span class="p">.</span><span class="s s-Atom">name</span>
+<a name="ln-45"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">tmp</span>
+<a name="ln-46"></a>            <span class="s s-Atom">endelse</span>
+<a name="ln-47"></a>            <span class="s s-Atom">if</span> <span class="nf">total</span><span class="p">(</span><span class="nf">strmatch</span><span class="p">(</span><span class="s s-Atom">reserved</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="o">/</span><span class="nv">FOLD_CASE</span><span class="p">))</span> <span class="s s-Atom">gt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">name+=&#39;_&#39;</span>
+<a name="ln-48"></a>            <span class="s s-Atom">d</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">d</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">tmp</span><span class="p">)</span>
+<a name="ln-49"></a>        <span class="s s-Atom">endfor</span>
+<a name="ln-50"></a>	<span class="s s-Atom">ncdf_close</span><span class="p">,</span><span class="s s-Atom">ncid</span>
+<a name="ln-51"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">message</span><span class="p">,</span><span class="s s-Atom">&#39;FILE DOES NOT EXIST: &#39;</span><span class="o">+</span><span class="s s-Atom">file</span>
+<a name="ln-52"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">d</span>
+<a name="ln-53"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

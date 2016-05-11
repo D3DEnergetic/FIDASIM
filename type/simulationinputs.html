@@ -372,7 +372,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-runid"></span>character(len=120),</td>
+  <td><span class="anchor" id="variable-runid"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -386,7 +386,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-result_dir"></span>character(len=120),</td>
+  <td><span class="anchor" id="variable-result_dir"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -400,7 +400,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-tables_file"></span>character(len=120),</td>
+  <td><span class="anchor" id="variable-tables_file"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -414,7 +414,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-geometry_file"></span>character(len=120),</td>
+  <td><span class="anchor" id="variable-geometry_file"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -428,7 +428,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-equilibrium_file"></span>character(len=120),</td>
+  <td><span class="anchor" id="variable-equilibrium_file"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -442,7 +442,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-distribution_file"></span>character(len=120),</td>
+  <td><span class="anchor" id="variable-distribution_file"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -456,7 +456,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-neutrals_file"></span>character(len=120),</td>
+  <td><span class="anchor" id="variable-neutrals_file"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -935,19 +935,19 @@
         <span class="c">!+ Shot Number</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="nb">time</span>
         <span class="c">!+ Shot time [s]</span>
-    <span class="kt">character</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span> <span class="kd">::</span> <span class="n">runid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">runid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ FIDASIM run ID</span>
-    <span class="kt">character</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span> <span class="kd">::</span> <span class="n">result_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">result_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ Result directory</span>
-    <span class="kt">character</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tables_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tables_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ Atomic tables file</span>
-    <span class="kt">character</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span> <span class="kd">::</span> <span class="n">geometry_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">geometry_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ FIDASIM input file containing geometric quantities</span>
-    <span class="kt">character</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span> <span class="kd">::</span> <span class="n">equilibrium_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">equilibrium_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ FIDASIM input file containing the plasma parameters and fields</span>
-    <span class="kt">character</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span> <span class="kd">::</span> <span class="n">distribution_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">distribution_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ FIDASIM input file containing the fast-ion distribution</span>
-    <span class="kt">character</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span> <span class="kd">::</span> <span class="n">neutrals_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">neutrals_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ FIDASIM output/input file containing beam neutral density.</span>
         <span class="c">!+ Used when [[SimulationInputs:load_neutrals]] is set.</span>
 

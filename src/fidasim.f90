@@ -19,8 +19,10 @@ integer, parameter, private   :: Float32 = 4
     !+ Defines a 32 bit floating point real
 integer, parameter, private   :: Float64 = 8
     !+ Defines a 64 bit floating point real 
+integer, parameter :: charlim = 150
+    !+ Defines character limit for files and directories
 
-character(120)     :: namelist_file
+character(charlim) :: namelist_file
     !+ Input namelist file
 integer, parameter :: nbif_type  = 1 
     !+ Identifier for full energy NBI neutral interaction
@@ -460,7 +462,7 @@ type SpectralChords
         !+ Radius of each line of sight
     logical, dimension(:,:,:), allocatable         :: los_inter
         !+ Indicates whether a [[libfida:beam_grid]] cell intersects a LOS
-    real(Float64), dimension(:,:,:,:), allocatable :: dlength
+    real(Float32), dimension(:,:,:,:), allocatable :: dlength
         !+ [[libfida:beam_grid]] cell - LOS intersection length: dlength(x,y,z,chan)
 end type SpectralChords
 
@@ -614,19 +616,19 @@ type SimulationInputs
         !+ Shot Number
     real(Float64)  :: time
         !+ Shot time [s]
-    character(120) :: runid = ''
+    character(charlim) :: runid = ''
         !+ FIDASIM run ID
-    character(120) :: result_dir = ''
+    character(charlim) :: result_dir = ''
         !+ Result directory
-    character(120) :: tables_file = ''
+    character(charlim) :: tables_file = ''
         !+ Atomic tables file
-    character(120) :: geometry_file = ''
+    character(charlim) :: geometry_file = ''
         !+ FIDASIM input file containing geometric quantities
-    character(120) :: equilibrium_file = ''
+    character(charlim) :: equilibrium_file = ''
         !+ FIDASIM input file containing the plasma parameters and fields
-    character(120) :: distribution_file = ''
+    character(charlim) :: distribution_file = ''
         !+ FIDASIM input file containing the fast-ion distribution
-    character(120) :: neutrals_file = ''
+    character(charlim) :: neutrals_file = ''
         !+ FIDASIM output/input file containing beam neutral density.
         !+ Used when [[SimulationInputs:load_neutrals]] is set.
 
@@ -723,7 +725,7 @@ end type ParticleTrack
 
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]],[LocalEMFields]],[[FastIon]], and [[NPAParticle]]
+    !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], and [[NPAParticle]]
     module procedure pp_assign, lpp_assign, plp_assign, lplp_assign, &
                      ff_assign, lff_assign, flf_assign, lflf_assign, &
                      fast_ion_assign,npa_part_assign
@@ -814,7 +816,7 @@ subroutine print_banner()
     endif
     write(*,'(a)') ""
     write(*,'(a)') "FIDASIM is released as open source code under the MIT Licence."
-    write(*,'(a)') "For more information visit ENTER WEBSITE HERE"
+    write(*,'(a)') "For more information visit http://d3denergetic.github.io/FIDASIM/"
     write(*,'(a)') ""
 end subroutine print_banner
                                      
@@ -1306,22 +1308,23 @@ end function lfs_divide
 subroutine read_inputs
     !+ Reads input namelist file and stores the results into [[libfida:inputs]],
     !+ [[libfida:nbi]], and [[libfida:beam_grid]]
-    character(120) :: runid,result_dir, tables_file
-    character(120) :: distribution_file, equilibrium_file
-    character(120) :: geometry_file, neutrals_file
-    integer        :: calc_brems,calc_bes,calc_fida,calc_npa
-    integer        :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer        :: load_neutrals,verbose,dump_dcx
-    integer(Int32) :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
-    integer(Int32) :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
-    real(Float64)  :: time,lambdamin,lambdamax,emax_wght
-    real(Float64)  :: lambdamin_wght,lambdamax_wght
-    real(Float64)  :: ai,ab,pinj,einj,species_mix(3)
-    integer(Int32) :: impurity_charge
-    integer(Int32) :: nx,ny,nz
-    real(Float64)  :: xmin,xmax,ymin,ymax,zmin,zmax
-    real(Float64)  :: alpha,beta,gamma,origin(3)
-    logical        :: exis, error
+    character(charlim) :: runid,result_dir, tables_file
+    character(charlim) :: distribution_file, equilibrium_file
+    character(charlim) :: geometry_file, neutrals_file
+    integer            :: pathlen
+    integer            :: calc_brems,calc_bes,calc_fida,calc_npa
+    integer            :: calc_birth,calc_fida_wght,calc_npa_wght
+    integer            :: load_neutrals,verbose,dump_dcx
+    integer(Int32)     :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
+    integer(Int32)     :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
+    real(Float64)      :: time,lambdamin,lambdamax,emax_wght
+    real(Float64)      :: lambdamin_wght,lambdamax_wght
+    real(Float64)      :: ai,ab,pinj,einj,species_mix(3)
+    integer(Int32)     :: impurity_charge
+    integer(Int32)     :: nx,ny,nz
+    real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
+    real(Float64)      :: alpha,beta,gamma,origin(3)
+    logical            :: exis, error
   
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -1477,6 +1480,15 @@ subroutine read_inputs
                          trim(inputs%distribution_file)
         error = .True.
     endif
+
+    pathlen = len_trim(inputs%result_dir)+len_trim(inputs%runid) + 20
+    !+20 for suffixes and seperators e.g. /, _npa.h5, ...
+    if(pathlen.gt.charlim) then
+        write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', & 
+                               pathlen-20,'>', charlim-20
+        error = .True.
+    endif
+
     if(inputs%verbose.ge.1) then
         write(*,*) ''
     endif
@@ -1599,7 +1611,7 @@ subroutine read_beam
     nbi%alpha = atan2(pos(2)-nbi%src(2),pos(1)-nbi%src(1))
   
     call tb_zyx(nbi%alpha,nbi%beta,0.d0,nbi%basis,nbi%inv_basis)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Neutral beam settings ----'
         write(*,'(T2,"Beam: ",a)') nbi%name
@@ -2017,9 +2029,29 @@ subroutine read_equilibrium
     call h5ltread_dataset_int_f(gid, "/plasma/mask", p_mask, dims,error)
   
     impc = inputs%impurity_charge
+    where(equil%plasma%zeff.lt.1.0)
+        equil%plasma%zeff = 1
+    endwhere
+
+    where(equil%plasma%zeff.gt.impc)
+        equil%plasma%zeff = impc
+    endwhere
+
+    where(equil%plasma%dene.lt.0.0)
+        equil%plasma%dene = 0.0
+    endwhere
+
+    where(equil%plasma%te.lt.0.0)
+        equil%plasma%te = 0.0
+    endwhere
+
+    where(equil%plasma%ti.lt.0.0)
+        equil%plasma%ti = 0.0
+    endwhere
+
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
-  
+
     !!Close PLASMA group
     call h5gclose_f(gid, error)
   
@@ -2659,23 +2691,26 @@ subroutine write_birth_profile
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
-    integer :: error, i
+    integer :: error, i, npart
   
-    character(120) :: filename
+    character(charlim) :: filename
     real(Float64), dimension(:,:), allocatable :: ri
     real(Float64), dimension(:,:), allocatable :: vi
     real(Float64), dimension(3) :: xyz,uvw,v_uvw
 
-    allocate(ri(3,size(birth%ri,2)))
-    allocate(vi(3,size(birth%vi,2)))
+
+    npart = birth%cnt-1
+    allocate(ri(3,npart))
+    allocate(vi(3,npart))
   
-    do i=1,size(birth%ri,2)
+    do i=1,npart
         ! Convert position to rzphi
         xyz = birth%ri(:,i)
         call xyz_to_uvw(xyz,uvw)
         ri(1,i) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
         ri(2,i) = uvw(3)
         ri(3,i) = atan2(uvw(2),uvw(1))
+
         ! Convert velocity to rzphi
         v_uvw = matmul(beam_grid%basis, birth%vi(:,i))
         vi(1,i) = v_uvw(1)*cos(ri(3,i)) + v_uvw(2)*sin(ri(3,i))
@@ -2694,21 +2729,18 @@ subroutine write_birth_profile
     !Write variables
     call write_beam_grid(fid, error)
     d(1) = 1
-    call h5ltmake_dataset_int_f(fid, "/n_nbi", 0, d, [inputs%n_nbi], error)
-    call h5ltmake_dataset_int_f(fid, "/n_birth", 0, d, [inputs%n_birth], error)
+    call h5ltmake_dataset_int_f(fid, "/n_birth", 0, d, [npart], error)
     dim4 = shape(birth%dens)
     call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, birth%dens, error)
-    dim2 = shape(birth%ri)
+    dim2 = [3, npart]
     call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
     call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, birth%ind, error) 
     call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), birth%neut_type, error)
 
     !Add attributes
-    call h5ltset_attribute_string_f(fid, "/n_nbi", "description", &
-         "Number of beam mc particles", error)
     call h5ltset_attribute_string_f(fid, "/n_birth","description", &
-         "Number of birth mc particles deposited per beam mc particle", error)
+         "Number of birth mc particles deposited", error)
     call h5ltset_attribute_string_f(fid, "/dens", "description", &
          "Birth density: dens(beam_component,x,y,z)", error)
     call h5ltset_attribute_string_f(fid, "/dens", "units", &
@@ -2750,7 +2782,7 @@ subroutine write_dcx
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
   
-    character(120) :: filename
+    character(charlim) :: filename
     character(15) :: spec_str
     integer :: i
     real(Float64), dimension(:),   allocatable :: lambda_arr
@@ -2913,7 +2945,7 @@ subroutine write_npa
     integer, dimension(:), allocatable :: dcount
     real(Float64), dimension(:,:), allocatable :: ri, rf
     integer :: i, n
-    character(120) :: filename = ''
+    character(charlim) :: filename = ''
   
     allocate(dcount(npa_chords%nchan))
     do i=1,npa_chords%nchan
@@ -3037,7 +3069,7 @@ subroutine write_spectra
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
   
-    character(120) :: filename
+    character(charlim) :: filename
     integer :: i
     real(Float64), dimension(:), allocatable :: lambda_arr
   
@@ -3164,7 +3196,7 @@ subroutine write_fida_weights
     integer(HSIZE_T), dimension(1) :: dim1
     integer :: error
   
-    character(120) :: filename
+    character(charlim) :: filename
     integer :: i,ie,ip,ic
     real(Float64), dimension(:),   allocatable :: lambda_arr
     real(Float64), dimension(:),   allocatable :: ebarr,ptcharr
@@ -3329,7 +3361,7 @@ end subroutine write_fida_weights
 
 subroutine write_npa_weights
     !+ Writes [[libfida:fweight]] to a HDF5 file
-    character(120) :: filename
+    character(charlim) :: filename
     integer :: i
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr
    
@@ -3801,7 +3833,8 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
     length = 0.d0
     r_enter = r0
     r_exit  = r0
-  
+    ind1=0
+    ind2=0 
     if (sum(side_inter).ge.2) then
         ! Find first intersection side
         i=1
@@ -3812,7 +3845,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
         ind1=i
         !Find number of unique points
         nunique = 0
-        do i=ind1,6
+        do i=ind1+1,6
             if (side_inter(i).ne.1) cycle
             if (sqrt( sum( ( ipnts(:,i)-ipnts(:,ind1) )**2.0 ) ).gt.0.001) then
                 ind2=i
@@ -5422,7 +5455,7 @@ subroutine mc_halo(ind,vhalo,ri,plasma_in)
 
 end subroutine mc_halo
 
-subroutine mc_nbi(vnbi,efrac,rnbi)
+subroutine mc_nbi(vnbi,efrac,rnbi,err)
     !+ Generates a neutral beam particle trajectory
     integer, intent(in)                      :: efrac
         !+ Beam neutral type (1,2,3)
@@ -5430,7 +5463,9 @@ subroutine mc_nbi(vnbi,efrac,rnbi)
         !+ Velocity [cm/s]
     real(Float64), dimension(3), intent(out) :: rnbi  
         !+ Starting position on [[libfida:beam_grid]]
-  
+    logical, intent(out)                     :: err
+        !+ Error Code
+
     real(Float64), dimension(3) :: r_exit
     real(Float64), dimension(3) :: uvw_src    !! Start position on ion source
     real(Float64), dimension(3) :: xyz_src    !! Start position on ion source
@@ -5440,6 +5475,8 @@ subroutine mc_nbi(vnbi,efrac,rnbi)
     real(Float64), dimension(2) :: randomn    !! normal random numbers
     real(Float64) :: length, sqrt_rho, theta
   
+    err = .False.
+
     call randu(randomu)
     select case (nbi%shape)
         case (1)
@@ -5455,28 +5492,27 @@ subroutine mc_nbi(vnbi,efrac,rnbi)
             xyz_src(2) = nbi%widy*sqrt_rho*cos(theta)
             xyz_src(3) = nbi%widz*sqrt_rho*sin(theta)
     end select
-  
+
     !! Create random velocity vector
     call randn(randomn)
     xyz_ray(1)= 1.d0
-    xyz_ray(2)=(xyz_src(2)/nbi%focy + tan(nbi%divy(efrac)*randomn(1)))
-    xyz_ray(3)=(xyz_src(3)/nbi%focz + tan(nbi%divz(efrac)*randomn(2)))
+    xyz_ray(2)=(-xyz_src(2)/nbi%focy + tan(nbi%divy(efrac)*randomn(1)))
+    xyz_ray(3)=(-xyz_src(3)/nbi%focz + tan(nbi%divz(efrac)*randomn(2)))
   
     !! Convert to beam sightline coordinates to beam grid coordinates
     uvw_src = matmul(nbi%basis,xyz_src) + nbi%src
     uvw_ray = matmul(nbi%basis,xyz_ray)
     vnbi = uvw_ray/normp(uvw_ray)
-  
+
     !! Determine start postition on beam grid
     call grid_intersect(uvw_src,vnbi,length,rnbi,r_exit)
     if(length.le.0.0)then
-        rnbi=[-1.d0,0.d0,0.d0]
+        err = .True.
         nbi_outside = nbi_outside + 1
     endif
-  
+
     !! Determine velocity of neutrals corrected by efrac
     vnbi = vnbi*nbi%vinj/sqrt(real(efrac))
-    
 end subroutine mc_nbi
 
 !=============================================================================
@@ -5500,7 +5536,8 @@ subroutine ndmc
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(1) :: randomu
     integer, dimension(1) :: randi
-  
+    logical :: err
+
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi
     endif
@@ -5515,7 +5552,7 @@ subroutine ndmc
 
     !$OMP PARALLEL DO schedule(guided) & 
     !$OMP& private(vnbi,rnbi,tracks,ncell,plasma,nl_birth,randi, &
-    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind)
+    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
     loop_over_markers: do ii=1,inputs%n_nbi
         if(inputs%calc_birth.ge.1) then
             !! Determine the type of birth particle (1, 2, or 3)
@@ -5527,12 +5564,12 @@ subroutine ndmc
         endif
         energy_fractions: do neut_type=1,3 
             !! (type = 1: full energy, =2: half energy, =3: third energy
-            call mc_nbi(vnbi,neut_type,rnbi)
-            if(rnbi(1).eq.-1)cycle loop_over_markers
-  
+            call mc_nbi(vnbi,neut_type,rnbi,err)
+            if(err) cycle energy_fractions
+
             call track(rnbi,vnbi,tracks,ncell)
-            if(ncell.eq.0) cycle loop_over_markers
-  
+            if(ncell.eq.0) cycle energy_fractions
+
             !! Solve collisional radiative model along track
             states=0.d0
             states(1)=nneutrals*nbi%species_mix(neut_type)/beam_grid%dv
@@ -5555,6 +5592,7 @@ subroutine ndmc
             enddo loop_along_track
             if(inputs%calc_birth.ge.1) then
                 !! Sample according to deposited flux along neutral trajectory
+                !$OMP CRITICAL(ndmc_birth)
                 do kk=1,nl_birth(neut_type)
                     call randind(tracks(1:ncell)%flux,randi)
                     call randu(randomu)
@@ -5565,13 +5603,14 @@ subroutine ndmc
                                             vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
                     birth%cnt = birth%cnt+1
                 enddo
+                !$OMP END CRITICAL(ndmc_birth)
             endif
         enddo energy_fractions
     enddo loop_over_markers
     !$OMP END PARALLEL DO
   
     if(nbi_outside.gt.0)then
-         write(*,'(a, f6.2)') 'Percent of markers outside the grid: ', &
+         write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                               100.*nbi_outside/(3.*inputs%n_nbi)
          if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
     endif
@@ -6392,7 +6431,9 @@ subroutine fida_weights_mc
             ri = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)] + beam_grid%dr*(randomu3-0.5)
   
             fbm_denf = 0.0
-            call get_ep_denf(energy,pitch,fbm_denf,pos=ri)
+            if (inputs%dist_type.eq.1) then
+                call get_ep_denf(energy,pitch,fbm_denf,pos=ri)
+            endif
   
             !! Get velocity
             call get_fields(fields,pos=ri)
@@ -6542,12 +6583,14 @@ subroutine fida_weights_los
                         call get_fields(fields_cell,ind=ind)
                         plasma = plasma + wght*plasma_cell
                         fields = fields + wght*fields_cell
-                        do ipitch=1,inputs%np_wght
-                            do ienergy=1,inputs%ne_wght
-                                call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,ind=ind)
-                                mean_f(ienergy,ipitch) = mean_f(ienergy,ipitch) + wght*denf
+                        if (inputs%dist_type.eq.1) then
+                            do ipitch=1,inputs%np_wght
+                                do ienergy=1,inputs%ne_wght
+                                    call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,ind=ind)
+                                    mean_f(ienergy,ipitch) = mean_f(ienergy,ipitch) + wght*denf
+                                enddo
                             enddo
-                        enddo
+                        endif
                         wght_tot = wght_tot + wght
                     endif
                 enddo

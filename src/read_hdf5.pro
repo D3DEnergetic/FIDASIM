@@ -60,7 +60,7 @@ FUNCTION hdf5_read_attributes,id,bad_names=bad_names
     return, atts
 END
 
-FUNCTION hdf5_read_dataset,id,name
+FUNCTION hdf5_read_dataset,id,name,shallow=shallow
 
     ;; Get data
     dataset_id = h5d_open(id,name)
@@ -72,10 +72,14 @@ FUNCTION hdf5_read_dataset,id,name
     ;; Close the dataset
     h5d_close, dataset_id
 
-    return, create_struct(atts, "data", data)
+    if keyword_set(shallow) then begin
+        return, data
+    endif else begin
+        return, create_struct(atts, "data", data)
+    endelse
 END
 
-FUNCTION hdf5_read_group,id
+FUNCTION hdf5_read_group,id,shallow=shallow
 
     FORWARD_FUNCTION hdf5_read_group
 
@@ -87,18 +91,18 @@ FUNCTION hdf5_read_group,id
 
         obj_info = h5g_get_objinfo(id, obj_name)
         obj_type = obj_info.type
-
+ 
         CASE obj_type OF
             'GROUP': BEGIN
                 gid = h5g_open(id, obj_name)
-                var = hdf5_read_group(gid)
+                var = hdf5_read_group(gid,shallow=shallow)
                 h5g_close, gid
                 if n_elements(var) ne 0 then begin
                     d = create_struct(d, var_name, var)
                 endif
             END
             'DATASET': BEGIN
-                var = hdf5_read_dataset(id,obj_name)
+                var = hdf5_read_dataset(id,obj_name,shallow=shallow)
                 if n_elements(var) ne 0 then begin
                     d = create_struct(d, var_name, var)
                 endif
@@ -111,6 +115,7 @@ FUNCTION hdf5_read_group,id
                     d = create_struct(d, var_name, var)
                 endif
             END
+            ELSE:
         ENDCASE
     endfor
 
@@ -124,16 +129,18 @@ FUNCTION hdf5_read_group,id
     
 END
 
-FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten
+FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten,shallow=shallow
 
     d = {}
     used_names = []
-    for i=0L,n_elements(var_paths)-1 do begin
+    i = 0L
+    while i lt n_elements(var_paths) do begin
         catch,err_status
         if err_status ne 0 then begin
             print,'Error reading '+var_paths[i]
             print,!ERROR_STATE.MSG
             catch,/cancel
+            i = i + 1
             continue
         endif
         path = var_paths[i]
@@ -141,9 +148,13 @@ FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten
         obj_type = obj_info.type
 
         CASE obj_type OF
+            'LINK': BEGIN
+                var_name = h5g_get_linkval(id,path)
+                var_paths = [var_paths,var_name]
+             END
             'GROUP': BEGIN
                 gid = h5g_open(id,path)
-                var = hdf5_read_group(gid)
+                var = hdf5_read_group(gid,shallow=shallow)
                 h5g_close, gid
                 if n_elements(var) ne 0 then begin
                     if keyword_set(flatten) then begin
@@ -159,7 +170,7 @@ FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten
                 endif
             END
             'DATASET': BEGIN
-                var = hdf5_read_dataset(id,path)
+                var = hdf5_read_dataset(id,path,shallow=shallow)
                 if n_elements(var) ne 0 then begin
                     if keyword_set(flatten) then begin
                         var_names = strsplit(path,'/',/extract)
@@ -190,14 +201,16 @@ FUNCTION hdf5_read_from_list, id, var_paths, flatten=flatten
                     endelse
                 endif
             END
+            ELSE:
         ENDCASE
-    endfor
+        i = i + 1
+    endwhile
 
     return, d
 
 END
 
-FUNCTION read_hdf5,filename,paths=paths,flatten=flatten
+FUNCTION read_hdf5,filename,paths=paths,flatten=flatten,shallow=shallow
     ;+#read_hdf5
     ;+Reads HDF5 file variables and attributes
     ;+***
@@ -209,13 +222,15 @@ FUNCTION read_hdf5,filename,paths=paths,flatten=flatten
     ;+
     ;+    **flatten**: Flatten tree structure
     ;+
+    ;+    **shallow**: Performs a shallow read i.e. no dataset/group attributes
+    ;+
     ;+##Return Value
     ;+Structure containing variables and attributes
     ;+
     ;+##Example Usage
     ;+```idl
     ;+IDL> a = read_hdf5("./test_1a_geometry.h5")
-    ;+IDL> b = read_hdf5("./test_1a_geometry.h5",paths="/spec/lens",/flatten)
+    ;+IDL> b = read_hdf5("./test_1a_geometry.h5",paths="/spec/lens",/flatten,/shallow)
     ;+```
     if file_test(filename) then begin
         ;; Open file
@@ -223,10 +238,10 @@ FUNCTION read_hdf5,filename,paths=paths,flatten=flatten
 
         if not keyword_set(paths) then begin
             ;; Read group and sub-groups
-            d = hdf5_read_group(fid)
+            d = hdf5_read_group(fid,shallow=shallow)
         endif else begin
             ;; Read datasets from list
-            d = hdf5_read_from_list(fid,paths,flatten=flatten)
+            d = hdf5_read_from_list(fid,paths,flatten=flatten,shallow=shallow)
         endelse
 
         ;; Close file

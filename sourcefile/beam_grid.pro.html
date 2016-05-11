@@ -230,6 +230,8 @@
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/vars_to_struct.pro.html">vars_to_struct.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/warn.pro.html">warn.pro</a>
           
           <a class="list-group-item" href="../sourcefile/write_distribution.pro.html">write_distribution.pro</a>
@@ -258,7 +260,7 @@
 <p>Calculates settings for a grid that aligns with the neutral beam.</p>
 <hr>
 <h2 id="arguments">Arguments</h2>
-<p><strong>nbi</strong>: Neutral beam geometry structure</p>
+<p><strong>nbi</strong>: <a href="../page/01_getting_started/02_preprocess/03_nbigeo.html">Neutral beam geometry structure</a></p>
 <p><strong>rstart</strong>: Radial start position of beam grid [cm]</p>
 <h2 id="keyword-arguments">Keyword Arguments</h2>
 <p><strong>dV</strong>: Cell volume [\(cm^3\)]: Defaults to 8.0</p>
@@ -269,9 +271,9 @@
 <p><strong>width</strong>: Width of grid [cm]: Defaults to 50 cm</p>
 <p><strong>height</strong>: Height of grid [cm]: Defaults to 50 cm</p>
 <h2 id="return-value">Return Value</h2>
-<p>Structure containing beam grid settings suitable for the <a href="../page/02_input_files/01_namelist_file.html">Namelist File</a></p>
+<p>Structure containing beam grid settings suitable for the <a href="../page/03_technical/01_inputs.html#namelist-file">Namelist File</a></p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> grid <span class="o">=</span> beam_grid(nbi,<span class="mf">200.0</span>,nx<span class="o">=</span><span class="mi">100</span>,ny<span class="o">=</span><span class="mi">50</span>,ny<span class="o">=</span><span class="mi">50</span>,length<span class="o">=</span><span class="mi">100</span>,width<span class="o">=</span><span class="mi">50</span>,height<span class="o">=</span><span class="mi">50</span>)
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> grid <span class="o">=</span> beam_grid(nbi,<span class="mf">200.0</span>,nx<span class="o">=</span><span class="mi">100</span>,ny<span class="o">=</span><span class="mi">50</span>,nz<span class="o">=</span><span class="mi">50</span>,length<span class="o">=</span><span class="mi">100</span>,width<span class="o">=</span><span class="mi">50</span>,height<span class="o">=</span><span class="mi">50</span>)
 </pre></div>
     <br>
     <section>
@@ -283,7 +285,7 @@
 <a name="ln-5"></a>    <span class="p">;</span><span class="o">+</span> <span class="nv">Calculates</span> <span class="s s-Atom">settings</span> <span class="s s-Atom">for</span> <span class="s s-Atom">a</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">that</span> <span class="s s-Atom">aligns</span> <span class="s s-Atom">with</span> <span class="s s-Atom">the</span> <span class="s s-Atom">neutral</span> <span class="s s-Atom">beam</span><span class="p">.</span>
 <a name="ln-6"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
 <a name="ln-7"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nbi**:</span> <span class="nv">Neutral</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">geometry</span> <span class="s s-Atom">structure</span>
+<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nbi**:</span> <span class="p">[</span><span class="nv">Neutral</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">geometry</span> <span class="s s-Atom">structure</span><span class="p">](|</span><span class="s s-Atom">url</span><span class="p">|</span><span class="o">/</span><span class="s s-Atom">page</span><span class="o">/</span><span class="mi">01</span><span class="k">_</span><span class="s s-Atom">getting_started</span><span class="o">/</span><span class="mi">02</span><span class="k">_</span><span class="s s-Atom">preprocess</span><span class="o">/</span><span class="mi">03</span><span class="k">_</span><span class="s s-Atom">nbigeo</span><span class="p">.</span><span class="s s-Atom">html</span><span class="p">)</span>
 <a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>
 <a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rstart**:</span> <span class="nv">Radial</span> <span class="s s-Atom">start</span> <span class="s s-Atom">position</span> <span class="s s-Atom">of</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">grid</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
 <a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>
@@ -303,11 +305,11 @@
 <a name="ln-25"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**height**:</span> <span class="nv">Height</span> <span class="s s-Atom">of</span> <span class="s s-Atom">grid</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span><span class="s s-Atom">:</span> <span class="nv">Defaults</span> <span class="s s-Atom">to</span> <span class="mi">50</span> <span class="s s-Atom">cm</span>
 <a name="ln-26"></a>    <span class="p">;</span><span class="o">+</span>
 <a name="ln-27"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span>
-<a name="ln-28"></a>    <span class="p">;</span><span class="o">+</span>    <span class="nv">Structure</span> <span class="s s-Atom">containing</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">settings</span> <span class="s s-Atom">suitable</span> <span class="s s-Atom">for</span> <span class="s s-Atom">the</span> <span class="p">[</span><span class="nv">Namelist</span> <span class="nv">File</span><span class="p">](|</span><span class="s s-Atom">url</span><span class="p">|</span><span class="o">/</span><span class="s s-Atom">page</span><span class="o">/</span><span class="mi">02</span><span class="k">_</span><span class="s s-Atom">input_files</span><span class="o">/</span><span class="mi">01</span><span class="k">_</span><span class="s s-Atom">namelist_file</span><span class="p">.</span><span class="s s-Atom">html</span><span class="p">)</span>
+<a name="ln-28"></a>    <span class="p">;</span><span class="o">+</span>    <span class="nv">Structure</span> <span class="s s-Atom">containing</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">settings</span> <span class="s s-Atom">suitable</span> <span class="s s-Atom">for</span> <span class="s s-Atom">the</span> <span class="p">[</span><span class="nv">Namelist</span> <span class="nv">File</span><span class="p">](|</span><span class="s s-Atom">url</span><span class="p">|</span><span class="o">/</span><span class="s s-Atom">page</span><span class="o">/</span><span class="mi">03</span><span class="k">_</span><span class="s s-Atom">technical</span><span class="o">/</span><span class="mi">01</span><span class="k">_</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">html#namelist</span><span class="o">-</span><span class="s s-Atom">file</span><span class="p">)</span>
 <a name="ln-29"></a>    <span class="p">;</span><span class="o">+</span>   
 <a name="ln-30"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
 <a name="ln-31"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-32"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">grid</span> <span class="o">=</span> <span class="nf">beam_grid</span><span class="p">(</span><span class="s s-Atom">nbi</span><span class="p">,</span><span class="mf">200.0</span><span class="p">,</span><span class="s s-Atom">nx</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="s s-Atom">ny</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">ny</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="s s-Atom">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">height</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<a name="ln-32"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">grid</span> <span class="o">=</span> <span class="nf">beam_grid</span><span class="p">(</span><span class="s s-Atom">nbi</span><span class="p">,</span><span class="mf">200.0</span><span class="p">,</span><span class="s s-Atom">nx</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="s s-Atom">ny</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="s s-Atom">width</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="s s-Atom">height</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <a name="ln-33"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
 <a name="ln-34"></a>
 <a name="ln-35"></a>

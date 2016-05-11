@@ -230,6 +230,8 @@
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/vars_to_struct.pro.html">vars_to_struct.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/warn.pro.html">warn.pro</a>
           
           <a class="list-group-item" href="../sourcefile/write_distribution.pro.html">write_distribution.pro</a>
@@ -260,15 +262,13 @@
 <h2 id="input-arguments">Input Arguments</h2>
 <p><strong>inputs</strong>: input structure</p>
 <p><strong>nbi</strong>: neutral beam geometry structure</p>
-<h2 id="output-arguments">Output Arguments</h2>
-<p><strong>err</strong>: error code</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> check_beam, inputs, nbi, err
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> check_beam, inputs, nbi
 </pre></div>
     <br>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">PRO</span> <span class="s s-Atom">check_beam</span><span class="p">,</span> <span class="s s-Atom">inp</span><span class="p">,</span> <span class="s s-Atom">nbi</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">PRO</span> <span class="s s-Atom">check_beam</span><span class="p">,</span> <span class="s s-Atom">inp</span><span class="p">,</span> <span class="s s-Atom">nbi</span>
 <a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#check_beam</span>
 <a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Checks</span> <span class="s s-Atom">if</span> <span class="s s-Atom">neutral</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">geometry</span> <span class="s s-Atom">structure</span> <span class="o">is</span> <span class="s s-Atom">valid</span>
 <a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
@@ -276,114 +276,111 @@
 <a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**inputs**:</span> <span class="s s-Atom">input</span> <span class="s s-Atom">structure</span>
 <a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
 <a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**nbi**:</span> <span class="s s-Atom">neutral</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">geometry</span> <span class="s s-Atom">structure</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span> 
-<a name="ln-10"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Output</span> <span class="nv">Arguments</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>     <span class="s s-Atom">**err**:</span> <span class="s s-Atom">error</span> <span class="s s-Atom">code</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-15"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">check_beam</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">nbi</span><span class="p">,</span> <span class="s s-Atom">err</span>
-<a name="ln-16"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
-<a name="ln-17"></a>    <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-18"></a>    <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;Checking beam geometry...&#39;</span>
-<a name="ln-19"></a>
-<a name="ln-20"></a>    <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
-<a name="ln-21"></a>    <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-22"></a>    <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-23"></a>    <span class="s s-Atom">three_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="mi">3</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-24"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">data_source:zero_string</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-25"></a>              <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">zero_string</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-26"></a>              <span class="nn">src</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span>  <span class="nn">axis</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-27"></a>              <span class="nn">divy</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span> <span class="nn">divz</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-28"></a>              <span class="nn">focy</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span>  <span class="nn">focz</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-29"></a>              <span class="nn">widz</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span>  <span class="nn">widy</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-30"></a>              <span class="nn">shape</span><span class="p">:</span><span class="s s-Atom">zero_int</span> <span class="p">}</span>
-<a name="ln-31"></a>
-<a name="ln-32"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">nbi</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;beam geometry&quot;</span>
-<a name="ln-33"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-34"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-35"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-36"></a>
-<a name="ln-37"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">axis^</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mi">1</span><span class="s s-Atom">d</span><span class="o">-</span><span class="mi">5</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-38"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid source axis. Expected norm(axis) == 1&#39;</span>
-<a name="ln-39"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-40"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-41"></a>
-<a name="ln-42"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">focz</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-43"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;focz cannot be in the range (-Inf,0.0]&#39;</span>
-<a name="ln-44"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-45"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-46"></a>   
-<a name="ln-47"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">focy</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-48"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;focy cannot be in the range (-Inf,0.0]&#39;</span>
-<a name="ln-49"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-50"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-51"></a>
-<a name="ln-52"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">shape</span> <span class="s s-Atom">gt</span> <span class="mi">2</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-53"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid source shape. Expected 1 (rectagular) or 2 (circular)&#39;</span>
-<a name="ln-54"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-55"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-56"></a>
-<a name="ln-57"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">widz</span> <span class="s s-Atom">lt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-58"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid widz. Expected widz &gt; 0&#39;</span>
-<a name="ln-59"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-60"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-61"></a>
-<a name="ln-62"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">widy</span> <span class="s s-Atom">lt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-63"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid widy. Expected widy &gt; 0&#39;</span>
-<a name="ln-64"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-65"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-66"></a>
-<a name="ln-67"></a>    <span class="s s-Atom">origin</span> <span class="o">=</span> <span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">origin</span>
-<a name="ln-68"></a>    <span class="s s-Atom">uvw_src</span> <span class="o">=</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">src</span>
-<a name="ln-69"></a>    <span class="s s-Atom">uvw_axis</span> <span class="o">=</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">axis</span>
-<a name="ln-70"></a>    <span class="s s-Atom">uvw_pos</span> <span class="o">=</span> <span class="s s-Atom">uvw_src</span> <span class="o">+</span> <span class="mi">200</span><span class="o">*</span><span class="s s-Atom">uvw_axis</span>
-<a name="ln-71"></a>
-<a name="ln-72"></a>    <span class="s s-Atom">xyz_src</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">uvw_src</span><span class="p">,</span> <span class="s s-Atom">origin</span><span class="o">=</span><span class="s s-Atom">origin</span><span class="p">)</span>
-<a name="ln-73"></a>    <span class="s s-Atom">xyz_axis</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">uvw_axis</span><span class="p">)</span>
-<a name="ln-74"></a>    <span class="s s-Atom">xyz_pos</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">uvw_pos</span><span class="p">,</span> <span class="s s-Atom">origin</span><span class="o">=</span><span class="s s-Atom">origin</span><span class="p">)</span>
-<a name="ln-75"></a>    <span class="s s-Atom">xyz_center</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">origin</span><span class="p">,</span> <span class="s s-Atom">origin</span><span class="o">=</span><span class="s s-Atom">origin</span><span class="p">)</span>
-<a name="ln-76"></a>
-<a name="ln-77"></a>    <span class="s s-Atom">dis</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">total</span><span class="p">((</span><span class="s s-Atom">xyz_src</span> <span class="o">-</span> <span class="s s-Atom">xyz_pos</span><span class="p">)</span><span class="s s-Atom">^</span><span class="mf">2.0</span><span class="p">))</span>
-<a name="ln-78"></a>    <span class="nv">BETA</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="nf">asin</span><span class="p">((</span><span class="s s-Atom">xyz_src</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">xyz_pos</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="s s-Atom">dis</span><span class="p">))</span>
-<a name="ln-79"></a>    <span class="nv">ALPHA</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="nf">atan</span><span class="p">((</span><span class="s s-Atom">xyz_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">xyz_src</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="s s-Atom">xyz_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">xyz_src</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
-<a name="ln-80"></a>
-<a name="ln-81"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam injection start point in machine coordinates&#39;</span>
-<a name="ln-82"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">uvw_src</span>
-<a name="ln-83"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Point 2m along beam centerline in machine coordinates&#39;</span>
-<a name="ln-84"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">uvw_pos</span>
-<a name="ln-85"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Machine center in beam grid coordinates&#39;</span>
-<a name="ln-86"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">xyz_center</span>
-<a name="ln-87"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam injection start point in beam grid coordinates&#39;</span>
-<a name="ln-88"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">xyz_src</span>
-<a name="ln-89"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Point 2m along beam centerline in beam grid coordinates&#39;</span>
-<a name="ln-90"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">xyz_pos</span>
-<a name="ln-91"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam grid rotation angles that would align it with the beam centerline&#39;</span>
-<a name="ln-92"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="nv">ALPHA</span><span class="s s-Atom">/</span><span class="p">!</span><span class="nv">DPI</span><span class="o">*</span><span class="mi">180</span><span class="p">,</span><span class="nv">FORMAT</span><span class="s s-Atom">=&#39;(&quot;    alpha = &quot;,F14.10,&quot;°&quot;)&#39;</span>
-<a name="ln-93"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="nv">BETA</span><span class="s s-Atom">/</span><span class="p">!</span><span class="nv">DPI</span><span class="o">*</span><span class="mi">180</span><span class="p">,</span><span class="nv">FORMAT</span><span class="s s-Atom">=&#39;(&quot;    beta = &quot;,F14.10,&quot;°&quot;)&#39;</span>
-<a name="ln-94"></a>
-<a name="ln-95"></a>    <span class="p">;;</span> <span class="nv">Calculate</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">center</span> <span class="s s-Atom">rc</span> <span class="s s-Atom">and</span> <span class="s s-Atom">sides</span> <span class="s s-Atom">length</span> <span class="s s-Atom">dr</span>
-<a name="ln-96"></a>    <span class="s s-Atom">dr</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">xmax</span><span class="o">-</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">xmin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">ymax</span><span class="o">-</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">ymin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">zmax</span><span class="o">-</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">zmin</span><span class="p">]</span>
-<a name="ln-97"></a>    <span class="s s-Atom">rc</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">xmin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">ymin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">zmin</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="s s-Atom">dr</span>
+<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-10"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
+<a name="ln-11"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
+<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">check_beam</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">nbi</span>
+<a name="ln-13"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
+<a name="ln-14"></a>    <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-15"></a>    <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;Checking beam geometry...&#39;</span>
+<a name="ln-16"></a>
+<a name="ln-17"></a>    <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
+<a name="ln-18"></a>    <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-19"></a>    <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-20"></a>    <span class="s s-Atom">three_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="mi">3</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-21"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">data_source:zero_string</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-22"></a>              <span class="nn">name</span><span class="p">:</span><span class="s s-Atom">zero_string</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-23"></a>              <span class="nn">src</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span>  <span class="nn">axis</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-24"></a>              <span class="nn">divy</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span> <span class="nn">divz</span><span class="p">:</span><span class="s s-Atom">three_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-25"></a>              <span class="nn">focy</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span>  <span class="nn">focz</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-26"></a>              <span class="nn">widz</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span>  <span class="nn">widy</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-27"></a>              <span class="nn">shape</span><span class="p">:</span><span class="s s-Atom">zero_int</span> <span class="p">}</span>
+<a name="ln-28"></a>
+<a name="ln-29"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">nbi</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;beam geometry&quot;</span>
+<a name="ln-30"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-31"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-32"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-33"></a>
+<a name="ln-34"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">axis^</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mi">1</span><span class="s s-Atom">d</span><span class="o">-</span><span class="mi">5</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-35"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid source axis. Expected norm(axis) == 1&#39;</span>
+<a name="ln-36"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-37"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-38"></a>
+<a name="ln-39"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">focz</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-40"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;focz cannot be in the range (-Inf,0.0]&#39;</span>
+<a name="ln-41"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-42"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-43"></a>   
+<a name="ln-44"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">focy</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-45"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;focy cannot be in the range (-Inf,0.0]&#39;</span>
+<a name="ln-46"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-47"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-48"></a>
+<a name="ln-49"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">shape</span> <span class="s s-Atom">gt</span> <span class="mi">2</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-50"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid source shape. Expected 1 (rectagular) or 2 (circular)&#39;</span>
+<a name="ln-51"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-52"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">widz</span> <span class="s s-Atom">lt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-55"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid widz. Expected widz &gt; 0&#39;</span>
+<a name="ln-56"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-57"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-58"></a>
+<a name="ln-59"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">widy</span> <span class="s s-Atom">lt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-60"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid widy. Expected widy &gt; 0&#39;</span>
+<a name="ln-61"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-62"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-63"></a>
+<a name="ln-64"></a>    <span class="s s-Atom">origin</span> <span class="o">=</span> <span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">origin</span>
+<a name="ln-65"></a>    <span class="s s-Atom">uvw_src</span> <span class="o">=</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">src</span>
+<a name="ln-66"></a>    <span class="s s-Atom">uvw_axis</span> <span class="o">=</span> <span class="s s-Atom">nbi</span><span class="p">.</span><span class="s s-Atom">axis</span>
+<a name="ln-67"></a>    <span class="s s-Atom">uvw_pos</span> <span class="o">=</span> <span class="s s-Atom">uvw_src</span> <span class="o">+</span> <span class="mi">200</span><span class="o">*</span><span class="s s-Atom">uvw_axis</span>
+<a name="ln-68"></a>
+<a name="ln-69"></a>    <span class="s s-Atom">xyz_src</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">uvw_src</span><span class="p">,</span> <span class="s s-Atom">origin</span><span class="o">=</span><span class="s s-Atom">origin</span><span class="p">)</span>
+<a name="ln-70"></a>    <span class="s s-Atom">xyz_axis</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">uvw_axis</span><span class="p">)</span>
+<a name="ln-71"></a>    <span class="s s-Atom">xyz_pos</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">uvw_pos</span><span class="p">,</span> <span class="s s-Atom">origin</span><span class="o">=</span><span class="s s-Atom">origin</span><span class="p">)</span>
+<a name="ln-72"></a>    <span class="s s-Atom">xyz_center</span> <span class="o">=</span> <span class="nf">uvw_to_xyz</span><span class="p">(</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">gamma</span><span class="p">,</span><span class="s s-Atom">origin</span><span class="p">,</span> <span class="s s-Atom">origin</span><span class="o">=</span><span class="s s-Atom">origin</span><span class="p">)</span>
+<a name="ln-73"></a>
+<a name="ln-74"></a>    <span class="s s-Atom">dis</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">total</span><span class="p">((</span><span class="s s-Atom">xyz_src</span> <span class="o">-</span> <span class="s s-Atom">xyz_pos</span><span class="p">)</span><span class="s s-Atom">^</span><span class="mf">2.0</span><span class="p">))</span>
+<a name="ln-75"></a>    <span class="nv">BETA</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="nf">asin</span><span class="p">((</span><span class="s s-Atom">xyz_src</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">xyz_pos</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="s s-Atom">dis</span><span class="p">))</span>
+<a name="ln-76"></a>    <span class="nv">ALPHA</span><span class="o">=</span><span class="nf">double</span><span class="p">(</span><span class="nf">atan</span><span class="p">((</span><span class="s s-Atom">xyz_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">xyz_src</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="s s-Atom">xyz_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">xyz_src</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+<a name="ln-77"></a>
+<a name="ln-78"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam injection start point in machine coordinates&#39;</span>
+<a name="ln-79"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">uvw_src</span>
+<a name="ln-80"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Point 2m along beam centerline in machine coordinates&#39;</span>
+<a name="ln-81"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">uvw_pos</span>
+<a name="ln-82"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Machine center in beam grid coordinates&#39;</span>
+<a name="ln-83"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">xyz_center</span>
+<a name="ln-84"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam injection start point in beam grid coordinates&#39;</span>
+<a name="ln-85"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">xyz_src</span>
+<a name="ln-86"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Point 2m along beam centerline in beam grid coordinates&#39;</span>
+<a name="ln-87"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">f=&#39;(&quot;    [&quot;,F9.3,&quot;,&quot;,F9.3,&quot;,&quot;,F9.3,&quot;]&quot;)&#39;</span><span class="p">,</span> <span class="s s-Atom">xyz_pos</span>
+<a name="ln-88"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam grid rotation angles that would align it with the beam centerline&#39;</span>
+<a name="ln-89"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="nv">ALPHA</span><span class="s s-Atom">/</span><span class="p">!</span><span class="nv">DPI</span><span class="o">*</span><span class="mi">180</span><span class="p">,</span><span class="nv">FORMAT</span><span class="s s-Atom">=&#39;(&quot;    alpha = &quot;,F14.10,&quot;°&quot;)&#39;</span>
+<a name="ln-90"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="nv">BETA</span><span class="s s-Atom">/</span><span class="p">!</span><span class="nv">DPI</span><span class="o">*</span><span class="mi">180</span><span class="p">,</span><span class="nv">FORMAT</span><span class="s s-Atom">=&#39;(&quot;    beta = &quot;,F14.10,&quot;°&quot;)&#39;</span>
+<a name="ln-91"></a>
+<a name="ln-92"></a>    <span class="p">;;</span> <span class="nv">Calculate</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">center</span> <span class="s s-Atom">rc</span> <span class="s s-Atom">and</span> <span class="s s-Atom">sides</span> <span class="s s-Atom">length</span> <span class="s s-Atom">dr</span>
+<a name="ln-93"></a>    <span class="s s-Atom">dr</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">xmax</span><span class="o">-</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">xmin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">ymax</span><span class="o">-</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">ymin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">zmax</span><span class="o">-</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">zmin</span><span class="p">]</span>
+<a name="ln-94"></a>    <span class="s s-Atom">rc</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">xmin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">ymin</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">zmin</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="s s-Atom">dr</span>
+<a name="ln-95"></a>
+<a name="ln-96"></a>    <span class="p">;;</span> <span class="nv">Check</span> <span class="s s-Atom">if</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">centerline</span> <span class="s s-Atom">intersects</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">grid</span>
+<a name="ln-97"></a>    <span class="s s-Atom">aabb_intersect</span><span class="p">,</span><span class="s s-Atom">rc</span><span class="p">,</span><span class="s s-Atom">dr</span><span class="p">,</span><span class="s s-Atom">xyz_src</span><span class="p">,</span><span class="s s-Atom">xyz_axis</span><span class="p">,</span><span class="s s-Atom">length</span><span class="p">,</span><span class="s s-Atom">r_enter</span><span class="p">,</span><span class="s s-Atom">r_exit</span>
 <a name="ln-98"></a>
-<a name="ln-99"></a>    <span class="p">;;</span> <span class="nv">Check</span> <span class="s s-Atom">if</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">centerline</span> <span class="s s-Atom">intersects</span> <span class="s s-Atom">beam</span> <span class="s s-Atom">grid</span>
-<a name="ln-100"></a>    <span class="s s-Atom">aabb_intersect</span><span class="p">,</span><span class="s s-Atom">rc</span><span class="p">,</span><span class="s s-Atom">dr</span><span class="p">,</span><span class="s s-Atom">xyz_src</span><span class="p">,</span><span class="s s-Atom">xyz_axis</span><span class="p">,</span><span class="s s-Atom">length</span><span class="p">,</span><span class="s s-Atom">r_enter</span><span class="p">,</span><span class="s s-Atom">r_exit</span>
-<a name="ln-101"></a>
-<a name="ln-102"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam centerline - grid intersection length&#39;</span>
-<a name="ln-103"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">f=&#39;(&quot;    length = &quot;,F8.3)&#39;</span><span class="p">,</span><span class="s s-Atom">length</span>
-<a name="ln-104"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">length</span> <span class="s s-Atom">le</span> <span class="mf">10.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-105"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Beam centerline does not intersect grid&#39;</span>
-<a name="ln-106"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-107"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-108"></a>
-<a name="ln-109"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-110"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-111"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid beam geometry. Exiting...&#39;</span>
-<a name="ln-112"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-113"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Beam geometry is valid&#39;</span>
-<a name="ln-114"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-115"></a>
-<a name="ln-116"></a><span class="nv">END</span>
+<a name="ln-99"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Beam centerline - grid intersection length&#39;</span>
+<a name="ln-100"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">f=&#39;(&quot;    length = &quot;,F8.3)&#39;</span><span class="p">,</span><span class="s s-Atom">length</span>
+<a name="ln-101"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">length</span> <span class="s s-Atom">le</span> <span class="mf">10.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-102"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Beam centerline does not intersect grid&#39;</span>
+<a name="ln-103"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-104"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-105"></a>
+<a name="ln-106"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
+<a name="ln-107"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-108"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid beam geometry. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
+<a name="ln-109"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-110"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Beam geometry is valid&#39;</span>
+<a name="ln-111"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-112"></a>
+<a name="ln-113"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

@@ -767,7 +767,7 @@
     
     <div class="col-lg-9" id='text'>
     <h2>
-public subroutine mc_nbi(vnbi, efrac, rnbi)
+public subroutine mc_nbi(vnbi, efrac, rnbi, err)
     
     
     
@@ -834,6 +834,21 @@ public subroutine mc_nbi(vnbi, efrac, rnbi)
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-err%7E11"></span>logical,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error Code</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -862,85 +877,85 @@ public subroutine mc_nbi(vnbi, efrac, rnbi)
 <polygon fill="none" stroke="black" points="54,-87 0,-87 0,-63 54,-63 54,-87"/>
 <text text-anchor="middle" x="27" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">mc_nbi</text>
 </g>
-<!-- proc~normp -->
-<g id="proc~~mc_nbi~~CallsGraph_node2" class="node"><title>proc~normp</title>
-<g id="a_proc~~mc_nbi~~CallsGraph_node2"><a xlink:href="../proc/normp.html" xlink:title="normp">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="155.5,-150 101.5,-150 101.5,-126 155.5,-126 155.5,-150"/>
-<text text-anchor="middle" x="128.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">normp</text>
-</a>
-</g>
-</g>
-<!-- proc~mc_nbi&#45;&gt;proc~normp -->
-<g id="proc~~mc_nbi~~CallsGraph_edge6" class="edge"><title>proc~mc_nbi&#45;&gt;proc~normp</title>
-<path fill="none" stroke="black" d="M45.1126,-87.1672C57.4204,-95.7757 74.5108,-107.441 90,-117 91.9605,-118.21 93.9936,-119.434 96.0532,-120.65"/>
-<polygon fill="black" stroke="black" points="94.6987,-123.909 105.11,-125.871 98.1947,-117.844 94.6987,-123.909"/>
-</g>
 <!-- proc~randu -->
-<g id="proc~~mc_nbi~~CallsGraph_node3" class="node"><title>proc~randu</title>
-<g id="a_proc~~mc_nbi~~CallsGraph_node3"><a xlink:href="../proc/randu.html" xlink:title="randu">
-<polygon fill="#d9534f" stroke="#d9534f" points="155.5,-108 101.5,-108 101.5,-84 155.5,-84 155.5,-108"/>
-<text text-anchor="middle" x="128.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+<g id="proc~~mc_nbi~~CallsGraph_node2" class="node"><title>proc~randu</title>
+<g id="a_proc~~mc_nbi~~CallsGraph_node2"><a xlink:href="../proc/randu.html" xlink:title="randu">
+<polygon fill="#d9534f" stroke="#d9534f" points="155.5,-150 101.5,-150 101.5,-126 155.5,-126 155.5,-150"/>
+<text text-anchor="middle" x="128.5" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
 </a>
 </g>
 </g>
 <!-- proc~mc_nbi&#45;&gt;proc~randu -->
-<g id="proc~~mc_nbi~~CallsGraph_edge7" class="edge"><title>proc~mc_nbi&#45;&gt;proc~randu</title>
-<path fill="none" stroke="black" d="M54.1425,-80.5175C65.4782,-82.91 78.9427,-85.7517 91.2227,-88.3435"/>
-<polygon fill="black" stroke="black" points="90.6794,-91.8059 101.187,-90.4464 92.125,-84.9567 90.6794,-91.8059"/>
-</g>
-<!-- proc~randn -->
-<g id="proc~~mc_nbi~~CallsGraph_node4" class="node"><title>proc~randn</title>
-<g id="a_proc~~mc_nbi~~CallsGraph_node4"><a xlink:href="../proc/randn.html" xlink:title="randn">
-<polygon fill="#d9534f" stroke="#d9534f" points="155.5,-66 101.5,-66 101.5,-42 155.5,-42 155.5,-66"/>
-<text text-anchor="middle" x="128.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randn</text>
-</a>
-</g>
-</g>
-<!-- proc~mc_nbi&#45;&gt;proc~randn -->
-<g id="proc~~mc_nbi~~CallsGraph_edge8" class="edge"><title>proc~mc_nbi&#45;&gt;proc~randn</title>
-<path fill="none" stroke="black" d="M54.1425,-69.4825C65.4782,-67.09 78.9427,-64.2483 91.2227,-61.6565"/>
-<polygon fill="black" stroke="black" points="92.125,-65.0433 101.187,-59.5536 90.6794,-58.1941 92.125,-65.0433"/>
+<g id="proc~~mc_nbi~~CallsGraph_edge6" class="edge"><title>proc~mc_nbi&#45;&gt;proc~randu</title>
+<path fill="none" stroke="black" d="M45.1126,-87.1672C57.4204,-95.7757 74.5108,-107.441 90,-117 91.9605,-118.21 93.9936,-119.434 96.0532,-120.65"/>
+<polygon fill="black" stroke="black" points="94.6987,-123.909 105.11,-125.871 98.1947,-117.844 94.6987,-123.909"/>
 </g>
 <!-- proc~grid_intersect -->
-<g id="proc~~mc_nbi~~CallsGraph_node5" class="node"><title>proc~grid_intersect</title>
-<g id="a_proc~~mc_nbi~~CallsGraph_node5"><a xlink:href="../proc/grid_intersect.html" xlink:title="grid_intersect">
-<polygon fill="#d9534f" stroke="#d9534f" points="167,-24 90,-24 90,-0 167,-0 167,-24"/>
-<text text-anchor="middle" x="128.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
+<g id="proc~~mc_nbi~~CallsGraph_node3" class="node"><title>proc~grid_intersect</title>
+<g id="a_proc~~mc_nbi~~CallsGraph_node3"><a xlink:href="../proc/grid_intersect.html" xlink:title="grid_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="167,-108 90,-108 90,-84 167,-84 167,-108"/>
+<text text-anchor="middle" x="128.5" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
 </a>
 </g>
 </g>
 <!-- proc~mc_nbi&#45;&gt;proc~grid_intersect -->
-<g id="proc~~mc_nbi~~CallsGraph_edge9" class="edge"><title>proc~mc_nbi&#45;&gt;proc~grid_intersect</title>
+<g id="proc~~mc_nbi~~CallsGraph_edge7" class="edge"><title>proc~mc_nbi&#45;&gt;proc~grid_intersect</title>
+<path fill="none" stroke="black" d="M54.1425,-80.5175C62.091,-82.1951 71.0861,-84.0936 79.9857,-85.9719"/>
+<polygon fill="black" stroke="black" points="79.4248,-89.4305 89.9321,-88.0711 80.8704,-82.5814 79.4248,-89.4305"/>
+</g>
+<!-- proc~normp -->
+<g id="proc~~mc_nbi~~CallsGraph_node4" class="node"><title>proc~normp</title>
+<g id="a_proc~~mc_nbi~~CallsGraph_node4"><a xlink:href="../proc/normp.html" xlink:title="normp">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="155.5,-66 101.5,-66 101.5,-42 155.5,-42 155.5,-66"/>
+<text text-anchor="middle" x="128.5" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">normp</text>
+</a>
+</g>
+</g>
+<!-- proc~mc_nbi&#45;&gt;proc~normp -->
+<g id="proc~~mc_nbi~~CallsGraph_edge8" class="edge"><title>proc~mc_nbi&#45;&gt;proc~normp</title>
+<path fill="none" stroke="black" d="M54.1425,-69.4825C65.4782,-67.09 78.9427,-64.2483 91.2227,-61.6565"/>
+<polygon fill="black" stroke="black" points="92.125,-65.0433 101.187,-59.5536 90.6794,-58.1941 92.125,-65.0433"/>
+</g>
+<!-- proc~randn -->
+<g id="proc~~mc_nbi~~CallsGraph_node5" class="node"><title>proc~randn</title>
+<g id="a_proc~~mc_nbi~~CallsGraph_node5"><a xlink:href="../proc/randn.html" xlink:title="randn">
+<polygon fill="#d9534f" stroke="#d9534f" points="155.5,-24 101.5,-24 101.5,-0 155.5,-0 155.5,-24"/>
+<text text-anchor="middle" x="128.5" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randn</text>
+</a>
+</g>
+</g>
+<!-- proc~mc_nbi&#45;&gt;proc~randn -->
+<g id="proc~~mc_nbi~~CallsGraph_edge9" class="edge"><title>proc~mc_nbi&#45;&gt;proc~randn</title>
 <path fill="none" stroke="black" d="M45.1126,-62.8328C57.4204,-54.2243 74.5108,-42.5595 90,-33 91.9605,-31.79 93.9936,-30.5665 96.0532,-29.3502"/>
 <polygon fill="black" stroke="black" points="98.1947,-32.1556 105.11,-24.1291 94.6987,-26.0911 98.1947,-32.1556"/>
 </g>
-<!-- omp_get_thread_num -->
-<g id="proc~~mc_nbi~~CallsGraph_node6" class="node"><title>omp_get_thread_num</title>
-<polygon fill="#777777" stroke="#777777" points="321,-88 203,-88 203,-64 321,-64 321,-88"/>
-<text text-anchor="middle" x="262" y="-73.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
-</g>
-<!-- proc~randu&#45;&gt;omp_get_thread_num -->
-<g id="proc~~mc_nbi~~CallsGraph_edge1" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="black" d="M155.795,-92.0008C166.605,-90.3566 179.674,-88.3689 192.871,-86.3618"/>
-<polygon fill="black" stroke="black" points="193.592,-89.7925 202.952,-84.8286 192.54,-82.8721 193.592,-89.7925"/>
-</g>
 <!-- proc~rng_uniform -->
-<g id="proc~~mc_nbi~~CallsGraph_node7" class="node"><title>proc~rng_uniform</title>
-<g id="a_proc~~mc_nbi~~CallsGraph_node7"><a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="427,-87 357,-87 357,-63 427,-63 427,-87"/>
-<text text-anchor="middle" x="392" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
+<g id="proc~~mc_nbi~~CallsGraph_node6" class="node"><title>proc~rng_uniform</title>
+<g id="a_proc~~mc_nbi~~CallsGraph_node6"><a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="427,-95 357,-95 357,-71 427,-71 427,-95"/>
+<text text-anchor="middle" x="392" y="-80.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
 </a>
 </g>
 </g>
 <!-- proc~randu&#45;&gt;proc~rng_uniform -->
-<g id="proc~~mc_nbi~~CallsGraph_edge2" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="black" d="M155.709,-98.7217C192.772,-101.986 262.505,-105.976 321,-97 330.626,-95.523 340.744,-92.9664 350.204,-90.1066"/>
-<polygon fill="black" stroke="black" points="351.313,-93.4264 359.774,-87.0492 349.183,-86.7584 351.313,-93.4264"/>
+<g id="proc~~mc_nbi~~CallsGraph_edge1" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
+<path fill="none" stroke="black" d="M155.52,-135.49C192.65,-131.556 262.787,-122.815 321,-108 331.036,-105.446 341.659,-102.036 351.514,-98.5587"/>
+<polygon fill="black" stroke="black" points="352.861,-101.793 361.063,-95.0876 350.469,-95.2145 352.861,-101.793"/>
+</g>
+<!-- omp_get_thread_num -->
+<g id="proc~~mc_nbi~~CallsGraph_node7" class="node"><title>omp_get_thread_num</title>
+<polygon fill="#777777" stroke="#777777" points="321,-99 203,-99 203,-75 321,-75 321,-99"/>
+<text text-anchor="middle" x="262" y="-84.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
+</g>
+<!-- proc~randu&#45;&gt;omp_get_thread_num -->
+<g id="proc~~mc_nbi~~CallsGraph_edge2" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
+<path fill="none" stroke="black" d="M155.795,-127.802C174.254,-120.643 199.297,-110.93 220.319,-102.777"/>
+<polygon fill="black" stroke="black" points="221.599,-106.035 229.656,-99.156 219.068,-99.5088 221.599,-106.035"/>
 </g>
 <!-- proc~randn&#45;&gt;omp_get_thread_num -->
 <g id="proc~~mc_nbi~~CallsGraph_edge4" class="edge"><title>proc~randn&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="black" d="M155.795,-58.3992C166.605,-60.2078 179.674,-62.3942 192.871,-64.602"/>
-<polygon fill="black" stroke="black" points="192.512,-68.0904 202.952,-66.2886 193.667,-61.1864 192.512,-68.0904"/>
+<path fill="none" stroke="black" d="M151.392,-24.0755C156.533,-26.9622 161.977,-30.0601 167,-33 183.183,-42.4715 186.787,-45.5797 203,-55 211.544,-59.9642 220.886,-65.2009 229.528,-69.968"/>
+<polygon fill="black" stroke="black" points="228.11,-73.1816 238.561,-74.9213 231.476,-67.044 228.11,-73.1816"/>
 </g>
 <!-- proc~rng_normal -->
 <g id="proc~~mc_nbi~~CallsGraph_node8" class="node"><title>proc~rng_normal</title>
@@ -952,13 +967,13 @@ public subroutine mc_nbi(vnbi, efrac, rnbi)
 </g>
 <!-- proc~randn&#45;&gt;proc~rng_normal -->
 <g id="proc~~mc_nbi~~CallsGraph_edge5" class="edge"><title>proc~randn&#45;&gt;proc~rng_normal</title>
-<path fill="none" stroke="black" d="M155.795,-50.0008C173.62,-47.2898 197.584,-43.645 218.138,-40.5189"/>
-<polygon fill="black" stroke="black" points="218.858,-43.9497 228.218,-38.9858 217.806,-37.0293 218.858,-43.9497"/>
+<path fill="none" stroke="black" d="M155.795,-16.3992C173.62,-19.3813 197.584,-23.3905 218.138,-26.8292"/>
+<polygon fill="black" stroke="black" points="217.778,-30.3175 228.218,-28.5156 218.933,-23.4134 217.778,-30.3175"/>
 </g>
 <!-- proc~rng_normal&#45;&gt;proc~rng_uniform -->
 <g id="proc~~mc_nbi~~CallsGraph_edge3" class="edge"><title>proc~rng_normal&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="black" d="M295.631,-44.4521C311.234,-49.45 330.142,-55.5064 346.994,-60.9043"/>
-<polygon fill="black" stroke="black" points="346.047,-64.276 356.638,-63.9934 348.182,-57.6097 346.047,-64.276"/>
+<path fill="none" stroke="black" d="M294.64,-46.1124C311.256,-52.473 331.821,-60.3454 349.679,-67.1819"/>
+<polygon fill="black" stroke="black" points="348.69,-70.5507 359.28,-70.8572 351.192,-64.0133 348.69,-70.5507"/>
 </g>
 </g>
 </svg>
@@ -1370,7 +1385,7 @@ implementation in a submodule of an interface in a parent module.</p>
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">mc_nbi</span><span class="p">(</span><span class="n">vnbi</span><span class="p">,</span><span class="n">efrac</span><span class="p">,</span><span class="n">rnbi</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">mc_nbi</span><span class="p">(</span><span class="n">vnbi</span><span class="p">,</span><span class="n">efrac</span><span class="p">,</span><span class="n">rnbi</span><span class="p">,</span><span class="n">err</span><span class="p">)</span>
     <span class="c">!+ Generates a neutral beam particle trajectory</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                      <span class="kd">::</span> <span class="n">efrac</span>
         <span class="c">!+ Beam neutral type (1,2,3)</span>
@@ -1378,7 +1393,9 @@ implementation in a submodule of an interface in a parent module.</p>
         <span class="c">!+ Velocity [cm/s]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rnbi</span>  
         <span class="c">!+ Starting position on [[libfida:beam_grid]]</span>
-  
+    <span class="kt">logical</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>                     <span class="kd">::</span> <span class="n">err</span>
+        <span class="c">!+ Error Code</span>
+
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r_exit</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">uvw_src</span>    <span class="c">!! Start position on ion source</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xyz_src</span>    <span class="c">!! Start position on ion source</span>
@@ -1388,6 +1405,8 @@ implementation in a submodule of an interface in a parent module.</p>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomn</span>    <span class="c">!! normal random numbers</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">length</span><span class="p">,</span> <span class="n">sqrt_rho</span><span class="p">,</span> <span class="n">theta</span>
   
+    <span class="n">err</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+
     <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
     <span class="k">select case</span> <span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="nb">shape</span><span class="p">)</span>
         <span class="k">case</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1403,28 +1422,27 @@ implementation in a submodule of an interface in a parent module.</p>
             <span class="n">xyz_src</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">nbi</span><span class="p">%</span><span class="n">widy</span><span class="o">*</span><span class="n">sqrt_rho</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
             <span class="n">xyz_src</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">nbi</span><span class="p">%</span><span class="n">widz</span><span class="o">*</span><span class="n">sqrt_rho</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
     <span class="k">end select</span>
-  
+
     <span class="c">!! Create random velocity vector</span>
     <span class="k">call </span><span class="n">randn</span><span class="p">(</span><span class="n">randomn</span><span class="p">)</span>
     <span class="n">xyz_ray</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">=</span> <span class="mf">1.</span><span class="n">d0</span>
-    <span class="n">xyz_ray</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">=</span><span class="p">(</span><span class="n">xyz_src</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">nbi</span><span class="p">%</span><span class="n">focy</span> <span class="o">+</span> <span class="nb">tan</span><span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="n">divy</span><span class="p">(</span><span class="n">efrac</span><span class="p">)</span><span class="o">*</span><span class="n">randomn</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
-    <span class="n">xyz_ray</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">=</span><span class="p">(</span><span class="n">xyz_src</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="n">nbi</span><span class="p">%</span><span class="n">focz</span> <span class="o">+</span> <span class="nb">tan</span><span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="n">divz</span><span class="p">(</span><span class="n">efrac</span><span class="p">)</span><span class="o">*</span><span class="n">randomn</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="n">xyz_ray</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">xyz_src</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">nbi</span><span class="p">%</span><span class="n">focy</span> <span class="o">+</span> <span class="nb">tan</span><span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="n">divy</span><span class="p">(</span><span class="n">efrac</span><span class="p">)</span><span class="o">*</span><span class="n">randomn</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">xyz_ray</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">xyz_src</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="n">nbi</span><span class="p">%</span><span class="n">focz</span> <span class="o">+</span> <span class="nb">tan</span><span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="n">divz</span><span class="p">(</span><span class="n">efrac</span><span class="p">)</span><span class="o">*</span><span class="n">randomn</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
   
     <span class="c">!! Convert to beam sightline coordinates to beam grid coordinates</span>
     <span class="n">uvw_src</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span><span class="n">xyz_src</span><span class="p">)</span> <span class="o">+</span> <span class="n">nbi</span><span class="p">%</span><span class="n">src</span>
     <span class="n">uvw_ray</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">nbi</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span><span class="n">xyz_ray</span><span class="p">)</span>
     <span class="n">vnbi</span> <span class="o">=</span> <span class="n">uvw_ray</span><span class="o">/</span><span class="n">normp</span><span class="p">(</span><span class="n">uvw_ray</span><span class="p">)</span>
-  
+
     <span class="c">!! Determine start postition on beam grid</span>
     <span class="k">call </span><span class="n">grid_intersect</span><span class="p">(</span><span class="n">uvw_src</span><span class="p">,</span><span class="n">vnbi</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">rnbi</span><span class="p">,</span><span class="n">r_exit</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">length</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span><span class="k">then</span>
-<span class="k">        </span><span class="n">rnbi</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">1.</span><span class="n">d0</span><span class="p">,</span><span class="mf">0.</span><span class="n">d0</span><span class="p">,</span><span class="mf">0.</span><span class="n">d0</span><span class="p">]</span>
+<span class="k">        </span><span class="n">err</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
         <span class="n">nbi_outside</span> <span class="o">=</span> <span class="n">nbi_outside</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">endif</span>
-  
+
     <span class="c">!! Determine velocity of neutrals corrected by efrac</span>
     <span class="n">vnbi</span> <span class="o">=</span> <span class="n">vnbi</span><span class="o">*</span><span class="n">nbi</span><span class="p">%</span><span class="n">vinj</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="kt">real</span><span class="p">(</span><span class="n">efrac</span><span class="p">))</span>
-    
 <span class="k">end subroutine </span><span class="n">mc_nbi</span>
 </pre></div>
 

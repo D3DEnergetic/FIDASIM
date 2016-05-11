@@ -1,4 +1,4 @@
-PRO check_spec, inp, chords, err_status
+PRO check_spec, inp, chords
     ;+#check_spec
     ;+Check if spectral geometry structure is valid
     ;+***
@@ -7,12 +7,9 @@ PRO check_spec, inp, chords, err_status
     ;+
     ;+     **chords**: spectral geometry structure
     ;+ 
-    ;+##Output Arguments
-    ;+     **err**: error code
-    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> check_spec, inputs, chords, err
+    ;+IDL> check_spec, inputs, chords
     ;+```
     err_status = 0
     info,'Checking FIDA/BES inputs...'
@@ -34,10 +31,10 @@ PRO check_spec, inp, chords, err_status
     nchan = chords.nchan
     nsys = size(chords.system,/dim)
     zero_string = {dims:0, type:'STRING'}
-    zero_int = {dims:0, type:'INT'}
+    zero_long = {dims:0, type:'LONG'}
     nchan_double = {dims:[nchan], type:'DOUBLE'}
     schema = {data_source:zero_string, $
-              nchan:zero_int, $
+              nchan:zero_long, $
               system:{dims:nsys,type:'STRING'}, $
               lens:{dims:[3,nchan], type:'DOUBLE'}, $
               axis:{dims:[3,nchan], type:'DOUBLE'}, $
@@ -88,7 +85,7 @@ PRO check_spec, inp, chords, err_status
 
     GET_OUT:
     if err_status ne 0 then begin
-        error,'Invalid FIDA/BES geometry. Exiting...'
+        error,'Invalid FIDA/BES geometry. Exiting...',/halt
     endif else begin
         success,'FIDA/BES geometry is valid'
     endelse

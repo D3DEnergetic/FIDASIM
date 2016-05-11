@@ -1,4 +1,4 @@
-PRO check_distribution, inp, grid, dist, err_status
+PRO check_distribution, inp, grid, dist
     ;+#check_distribution
     ;+Checks if distribution structure is valid
     ;+***
@@ -8,13 +8,10 @@ PRO check_distribution, inp, grid, dist, err_status
     ;+     **grid**: Interpolation grid structure
     ;+ 
     ;+     **dist**: Fast-ion distribution structure
-    ;+ 
-    ;+##Output Arguments
-    ;+     **err**: error code
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> check_distribution, inputs, grid, dist, err
+    ;+IDL> check_distribution, inputs, grid, dist
     ;+```
 
     err_status = 0
@@ -160,7 +157,7 @@ PRO check_distribution, inp, grid, dist, err_status
 
     GET_OUT:
     if err_status ne 0 then begin
-        error,'Invalid fast-ion distribution. Exiting...'
+        error,'Invalid fast-ion distribution. Exiting...',/halt
     endif else begin
         success,'Fast-ion distribution is valid'
     endelse

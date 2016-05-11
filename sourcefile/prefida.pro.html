@@ -230,6 +230,8 @@
           
           <a class="list-group-item" href="../sourcefile/uvw_to_xyz.pro.html">uvw_to_xyz.pro</a>
           
+          <a class="list-group-item" href="../sourcefile/vars_to_struct.pro.html">vars_to_struct.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/warn.pro.html">warn.pro</a>
           
           <a class="list-group-item" href="../sourcefile/write_distribution.pro.html">write_distribution.pro</a>
@@ -302,67 +304,58 @@
 <a name="ln-27"></a>    <span class="nv">COMPILE_OPT</span> <span class="nv">DEFINT32</span>
 <a name="ln-28"></a>
 <a name="ln-29"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">INPUTS</span>
-<a name="ln-30"></a>    <span class="s s-Atom">check_inputs</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">,</span><span class="s s-Atom">err_status</span>
-<a name="ln-31"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-32"></a>
-<a name="ln-33"></a>    <span class="p">;;</span><span class="nv">MAKE</span> <span class="nv">DIRECTORIES</span> <span class="nv">IF</span> <span class="nv">THEY</span> <span class="nv">DONT</span> <span class="nv">EXIST</span>
-<a name="ln-34"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">directory</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-35"></a>        <span class="s s-Atom">file_mkdir</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span>
-<a name="ln-36"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-37"></a>
-<a name="ln-38"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">INTERPOLATION</span> <span class="nv">GRID</span>
-<a name="ln-39"></a>    <span class="s s-Atom">check_grid</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-40"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-41"></a>
-<a name="ln-42"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">BEAM</span> <span class="nv">INPUTS</span>
-<a name="ln-43"></a>    <span class="s s-Atom">check_beam</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">nbi</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-44"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-30"></a>    <span class="s s-Atom">check_inputs</span><span class="p">,</span><span class="s s-Atom">inputs</span>
+<a name="ln-31"></a>
+<a name="ln-32"></a>    <span class="p">;;</span><span class="nv">MAKE</span> <span class="nv">DIRECTORIES</span> <span class="nv">IF</span> <span class="nv">THEY</span> <span class="nv">DONT</span> <span class="nv">EXIST</span>
+<a name="ln-33"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">directory</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-34"></a>        <span class="s s-Atom">file_mkdir</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span>
+<a name="ln-35"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-36"></a>
+<a name="ln-37"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">INTERPOLATION</span> <span class="nv">GRID</span>
+<a name="ln-38"></a>    <span class="s s-Atom">check_grid</span><span class="p">,</span> <span class="s s-Atom">grid</span>
+<a name="ln-39"></a>
+<a name="ln-40"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">BEAM</span> <span class="nv">INPUTS</span>
+<a name="ln-41"></a>    <span class="s s-Atom">check_beam</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">nbi</span>
+<a name="ln-42"></a>
+<a name="ln-43"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">PLASMA</span> <span class="nv">PARAMETERS</span>
+<a name="ln-44"></a>    <span class="s s-Atom">check_plasma</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">plasma</span>
 <a name="ln-45"></a>
-<a name="ln-46"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">PLASMA</span> <span class="nv">PARAMETERS</span>
-<a name="ln-47"></a>    <span class="s s-Atom">check_plasma</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">plasma</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-48"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-49"></a>
-<a name="ln-50"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">ELECTROMAGNETIC</span> <span class="nv">FIELDS</span>
-<a name="ln-51"></a>    <span class="s s-Atom">check_fields</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">fields</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-52"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-53"></a>
-<a name="ln-54"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">FAST</span><span class="o">-</span><span class="nv">ION</span> <span class="nv">DISTRIBUTION</span>
-<a name="ln-55"></a>    <span class="s s-Atom">check_distribution</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">fbm</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-56"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-57"></a>
-<a name="ln-58"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">FIDA</span><span class="o">/</span><span class="nv">BES</span>
-<a name="ln-59"></a>    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">spec</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-60"></a>        <span class="s s-Atom">check_spec</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">spec</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-61"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-62"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-63"></a>
-<a name="ln-64"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">NPA</span>
-<a name="ln-65"></a>    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">npa</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-66"></a>        <span class="s s-Atom">check_npa</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">npa</span><span class="p">,</span> <span class="s s-Atom">err_status</span>
-<a name="ln-67"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-68"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-69"></a>
-<a name="ln-70"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">FIDASIM</span> <span class="nv">INPUT</span> <span class="nv">FILES</span>
-<a name="ln-71"></a>    <span class="s s-Atom">write_namelist</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">input_file</span><span class="p">,</span> <span class="s s-Atom">inputs</span>
-<a name="ln-72"></a>
-<a name="ln-73"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">GEOMETRY</span> <span class="nv">FILE</span>
-<a name="ln-74"></a>    <span class="s s-Atom">write_geometry</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">geometry_file</span><span class="p">,</span> <span class="s s-Atom">nbi</span><span class="p">,</span> <span class="s s-Atom">spec</span><span class="o">=</span><span class="s s-Atom">spec</span><span class="p">,</span> <span class="s s-Atom">npa</span><span class="o">=</span><span class="s s-Atom">npa</span>
-<a name="ln-75"></a>
-<a name="ln-76"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">EQUILIBRIUM</span> <span class="nv">FILE</span>
-<a name="ln-77"></a>    <span class="s s-Atom">write_equilibrium</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">equilibrium_file</span><span class="p">,</span> <span class="s s-Atom">plasma</span><span class="p">,</span> <span class="s s-Atom">fields</span>
-<a name="ln-78"></a>  
-<a name="ln-79"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">DISTRIBUTION</span> <span class="nv">FILE</span>
-<a name="ln-80"></a>    <span class="s s-Atom">write_distribution</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">distribution_file</span><span class="p">,</span> <span class="s s-Atom">fbm</span>
-<a name="ln-81"></a>
-<a name="ln-82"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-83"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-84"></a>    <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;FIDASIM pre-processing completed&#39;</span>
-<a name="ln-85"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;To run FIDASIM use the following command&#39;</span>
-<a name="ln-86"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">install_dir+&#39;/fidasim &#39;</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir+&#39;/&#39;</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_inputs.dat&#39;</span>
-<a name="ln-87"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-88"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-89"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-90"></a><span class="nv">END</span>
+<a name="ln-46"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">ELECTROMAGNETIC</span> <span class="nv">FIELDS</span>
+<a name="ln-47"></a>    <span class="s s-Atom">check_fields</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">fields</span>
+<a name="ln-48"></a>
+<a name="ln-49"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">FAST</span><span class="o">-</span><span class="nv">ION</span> <span class="nv">DISTRIBUTION</span>
+<a name="ln-50"></a>    <span class="s s-Atom">check_distribution</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">fbm</span>
+<a name="ln-51"></a>
+<a name="ln-52"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">FIDA</span><span class="o">/</span><span class="nv">BES</span>
+<a name="ln-53"></a>    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">spec</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-54"></a>        <span class="s s-Atom">check_spec</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">spec</span>
+<a name="ln-55"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-56"></a>
+<a name="ln-57"></a>    <span class="p">;;</span><span class="nv">CHECK</span> <span class="nv">NPA</span>
+<a name="ln-58"></a>    <span class="s s-Atom">if</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">npa</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-59"></a>        <span class="s s-Atom">check_npa</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">npa</span>
+<a name="ln-60"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-61"></a>
+<a name="ln-62"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">FIDASIM</span> <span class="nv">INPUT</span> <span class="nv">FILES</span>
+<a name="ln-63"></a>    <span class="s s-Atom">write_namelist</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">input_file</span><span class="p">,</span> <span class="s s-Atom">inputs</span>
+<a name="ln-64"></a>
+<a name="ln-65"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">GEOMETRY</span> <span class="nv">FILE</span>
+<a name="ln-66"></a>    <span class="s s-Atom">write_geometry</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">geometry_file</span><span class="p">,</span> <span class="s s-Atom">nbi</span><span class="p">,</span> <span class="s s-Atom">spec</span><span class="o">=</span><span class="s s-Atom">spec</span><span class="p">,</span> <span class="s s-Atom">npa</span><span class="o">=</span><span class="s s-Atom">npa</span>
+<a name="ln-67"></a>
+<a name="ln-68"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">EQUILIBRIUM</span> <span class="nv">FILE</span>
+<a name="ln-69"></a>    <span class="s s-Atom">write_equilibrium</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">equilibrium_file</span><span class="p">,</span> <span class="s s-Atom">plasma</span><span class="p">,</span> <span class="s s-Atom">fields</span>
+<a name="ln-70"></a>  
+<a name="ln-71"></a>    <span class="p">;;</span><span class="nv">WRITE</span> <span class="nv">DISTRIBUTION</span> <span class="nv">FILE</span>
+<a name="ln-72"></a>    <span class="s s-Atom">write_distribution</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">distribution_file</span><span class="p">,</span> <span class="s s-Atom">fbm</span>
+<a name="ln-73"></a>
+<a name="ln-74"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-75"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-76"></a>    <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;FIDASIM pre-processing completed&#39;</span>
+<a name="ln-77"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;To run FIDASIM use the following command&#39;</span>
+<a name="ln-78"></a>    <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">install_dir+&#39;/fidasim &#39;</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir+&#39;/&#39;</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_inputs.dat&#39;</span>
+<a name="ln-79"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-80"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-81"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

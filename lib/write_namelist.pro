@@ -58,9 +58,9 @@ PRO write_namelist, filename, inputs
     printf,55,f='("ab = ",1f9.5,"     !! Beam Species mass [amu]")',inputs.ab
     printf,55,f='("pinj = ",1f9.3,"     !! Beam Power [MW]")',inputs.pinj
     printf,55,f='("einj = ",1f9.3,"     !! Beam Energy [keV]")',inputs.einj
-    printf,55,f='("species_mix(1) = ",1f9.5,"     !! Beam Species Mix (Full component)")',inputs.species_mix[0]
-    printf,55,f='("species_mix(2) = ",1f9.5,"     !! Beam Species Mix (Half component)")',inputs.species_mix[1]
-    printf,55,f='("species_mix(3) = ",1f9.5,"     !! Beam Species Mix (Third component)")',inputs.species_mix[2]
+    printf,55,f='("current_fractions(1) = ",1f9.5," !! Current Fractions (Full component)")',inputs.current_fractions[0]
+    printf,55,f='("current_fractions(2) = ",1f9.5," !! Current Fractions (Half component)")',inputs.current_fractions[1]
+    printf,55,f='("current_fractions(3) = ",1f9.5," !! Current Fractions (Third component)")',inputs.current_fractions[2]
     printf,55,''
     printf,55,'!! Plasma Settings'
     printf,55,f='("ai = ",1f9.5,"     !! Ion Species mass [amu]")',inputs.ai

@@ -25,7 +25,7 @@ PRO check_inputs, inputs
               alpha:zero_double, beta:zero_double, gamma:zero_double, $
               origin:three_double, xmin:zero_double, xmax:zero_double, $
               ymin:zero_double, ymax:zero_double, zmin:zero_double, zmax:zero_double, $
-              ab:zero_double, ai:zero_double, species_mix:three_double, $
+              ab:zero_double, ai:zero_double, current_fractions:three_double, $
               pinj:zero_double, einj:zero_double, impurity_charge:zero_int, $
               n_fida:zero_long, n_nbi:zero_long, n_dcx:zero_long, $
               n_npa:zero_long, n_halo:zero_long, n_birth:zero_long, $
@@ -85,9 +85,9 @@ PRO check_inputs, inputs
         err_status = 1
     endif
 
-    if abs(total(inputs.species_mix) - 1.0) gt 1.d-3 then begin
-        error,'species_mix does not sum to 1.0'
-        print,'sum(species_mix) = ',total(inputs.species_mix)
+    if abs(total(inputs.current_fractions) - 1.0) gt 1.d-3 then begin
+        error,'current_fractions do not sum to 1.0'
+        print,'sum(current_fractions) = ',total(inputs.current_fractions)
         err_status = 1
     endif
 

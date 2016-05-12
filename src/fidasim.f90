@@ -360,7 +360,7 @@ type NeutralBeam
         !+ Energy dependent divergence in y direction
     real(Float64), dimension(3)   :: divz    
         !+ Energy dependent divergence in z direction
-    real(Float64), dimension(3)   :: species_mix
+    real(Float64), dimension(3)   :: current_fractions
         !+ Fractions of full, half, and third energy neutrals
     real(Float64), dimension(3)   :: src
         !+ Position of source in beam grid coordinates [cm]
@@ -1319,7 +1319,7 @@ subroutine read_inputs
     integer(Int32)     :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
-    real(Float64)      :: ai,ab,pinj,einj,species_mix(3)
+    real(Float64)      :: ai,ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: impurity_charge
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
@@ -1331,7 +1331,7 @@ subroutine read_inputs
         calc_brems, calc_bes, calc_fida, calc_npa, calc_birth, &
         calc_fida_wght, calc_npa_wght, load_neutrals, dump_dcx, verbose, &
         n_fida,n_npa, n_nbi, n_halo, n_dcx, n_birth, &
-        ab, pinj, einj, species_mix, ai, impurity_charge, &
+        ab, pinj, einj, current_fractions, ai, impurity_charge, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
@@ -1392,7 +1392,7 @@ subroutine read_inputs
   
     !!Neutral Beam Settings
     inputs%ab=ab
-    nbi%species_mix=species_mix
+    nbi%current_fractions=current_fractions
     nbi%einj=einj
     nbi%pinj=pinj
   
@@ -5544,9 +5544,9 @@ subroutine ndmc
   
     !! # of injected neutrals = NBI power/energy_per_particle
     nneutrals=1.d6*nbi%pinj/ (1.d3*nbi%einj*e0 &
-         *( nbi%species_mix(1)      &
-         +  nbi%species_mix(2)/2.d0 &
-         +  nbi%species_mix(3)/3.d0 ) )
+         *( nbi%current_fractions(1)      &
+         +  nbi%current_fractions(2)/2.d0 &
+         +  nbi%current_fractions(3)/3.d0 ) )
   
     nlaunch=real(inputs%n_nbi)
 
@@ -5558,7 +5558,7 @@ subroutine ndmc
             !! Determine the type of birth particle (1, 2, or 3)
             nl_birth = 0
             do kk=1,inputs%n_birth
-                call randind(nbi%species_mix,randi)
+                call randind(nbi%current_fractions,randi)
                 nl_birth(randi(1)) = nl_birth(randi(1)) + 1
             enddo
         endif
@@ -5572,7 +5572,7 @@ subroutine ndmc
 
             !! Solve collisional radiative model along track
             states=0.d0
-            states(1)=nneutrals*nbi%species_mix(neut_type)/beam_grid%dv
+            states(1)=nneutrals*nbi%current_fractions(neut_type)/beam_grid%dv
             loop_along_track: do jj=1,ncell
                 iflux = sum(states)
                 ind = tracks(jj)%ind

@@ -17,10 +17,10 @@ PRO run_tests,result_dir,test_case=test_case
    ffracs=cgfitf[0]+cgfitf[1]*einj+cgfitf[2]*einj^2
    hfracs=cgfith[0]+cgfith[1]*einj+cgfith[2]*einj^2
    tfracs=1.0-ffracs-hfracs
-   species_mix = double([ffracs,hfracs,tfracs])
+   current_fractions = double([ffracs,hfracs,tfracs])
 
    basic_inputs = {device:"TEST",shot:1L,time:1.d0,$
-                   einj:einj,pinj:pinj,species_mix:species_mix,$
+                   einj:einj,pinj:pinj,current_fractions:current_fractions,$
                    ab:2.01410178d0,ai:2.0141078d0,impurity_charge:6,$
                    lambdamin:647.0d0,lambdamax:667.0d0,nlambda:2000,$
                    n_fida:5000000L,n_npa:500000L,n_nbi:50000L, $

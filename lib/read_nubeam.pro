@@ -31,7 +31,8 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
         goto,GET_OUT
     endif
 
-    vars = read_ncdf(filename,vars=["TIME","R2D","Z2D","E_D_NBI","A_D_NBI","F_D_NBI","RSURF","ZSURF"])
+    vars = read_ncdf(filename,vars=["TIME","R2D","Z2D","E_D_NBI","A_D_NBI", $
+                                    "F_D_NBI","RSURF","ZSURF","BMVOL"])
     ngrid=n_elements(vars.r2d)
 
     ;;-------------Convert eV-> keV
@@ -102,6 +103,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
 
     ;; DENF
     fdens=total(reform(total(fbm,1)),1)*dE*dP
+    print, 'Ntotal: ',total(fdens*vars.bmvol)
     denf=griddata(r2d,z2d,fdens,xout=rgrid,yout=zgrid $
                   ,/grid,/SHEPARDS,triangles=tr) >0.
 

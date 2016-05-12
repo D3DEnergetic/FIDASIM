@@ -22,20 +22,13 @@ PRO check_npa, inp, npa
         goto, GET_OUT
     endif
     
-    w = where("system" eq strlowcase(TAG_NAMES(npa)),nw)
-    if nw eq 0 then begin
-        error,'"system" is missing from the NPA geometry'
-        err_status = 1
-        goto, GET_OUT
-    endif
-
-    nsys = size(npa.system,/dim)
     nchan = npa.nchan
     zero_string = {dims:0, type:'STRING'}
     zero_long = {dims:0, type:'LONG'}
     schema = {data_source:zero_string, $
               nchan:zero_long, $
-              system:{dims:nsys, type:'STRING'}, $
+              system:zero_string, $
+              id:{dims:[nchan], type:'STRING'}, $
               a_shape:{dims:[nchan], type:'INT'},$
               d_shape:{dims:[nchan], type:'INT'}, $
               a_tedge:{dims:[3,nchan], type:'DOUBLE'}, $
@@ -110,8 +103,8 @@ PRO check_npa, inp, npa
     if nww gt 0 then begin
         warn,'Some channels did not intersect the beam grid'
         print,'Number missed: ',nww
-        print,'Missed indices:'
-        print,'    ',ww
+        print,'Missed channels:'
+        print,'    ',npa.id[ww]
     endif
 
     GET_OUT:

@@ -45,12 +45,7 @@ PRO hdf5_write_struct, id, struct
             hdf5_write_struct,gid,var
             h5g_close, gid
         endif else begin
-            if typeName eq 'STRING' then begin
-                data = strjoin(var,", ",/single)
-            endif else begin
-                data = var
-            endelse
-
+            data = var
             ndim = size(data,/n_dim)
             dims = size(data,/dim)
 

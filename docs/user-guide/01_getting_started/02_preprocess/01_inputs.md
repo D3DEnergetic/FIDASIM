@@ -5,6 +5,75 @@ The `inputs` structure contains the basic information needed by FIDASIM
 
 [TOC]
 
+#Useful Routines
+##beam_grid.pro
+It is convienient to define the grid to be aligned with the beam sightline. To faciliate this an IDL routine [beam_grid.pro](|url|/sourcefile/beam_grid.pro.html) is available to automatically calculate the beam-aligned grid definition.
+
+##vars_to_struct.pro
+The IDL routine [vars_to_struct.pro](|url|/sourcefile/vars_to_struct.pro.html) takes variables defined in the local scope and stores them into a structure. This is useful for creating input files.
+
+##check_inputs.pro
+[check_inputs.pro](|url|/sourcefile/check_inputs.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the inputs structure has the correct format.
+
+#Example Structure
+```
+IDL> help, inputs
+** Structure <44a4468>, 53 tags, length=392, data length=362, refs=3:
+   SHOT            LONG                 1
+   TIME            DOUBLE           1.0000000
+   RUNID           STRING    'test_1a'
+   DEVICE          STRING    'TEST'
+   COMMENT         STRING    'Non-rotated, Non-tilted grid; flat profiles'
+   INSTALL_DIR     STRING    '/home/lstagner/FIDASIM'
+   RESULT_DIR      STRING    '/home/lstagner/TEST'
+   TABLES_FILE     STRING    '/home/lstagner/FIDASIM/tables/atomic_tables.h5'
+   NX              INT             50
+   NY              INT             60
+   NZ              INT             70
+   XMIN            DOUBLE          -50.000000
+   XMAX            DOUBLE           50.000000
+   YMIN            DOUBLE          -230.00000
+   YMAX            DOUBLE          -110.00000
+   ZMIN            DOUBLE          -70.000000
+   ZMAX            DOUBLE           70.000000
+   ALPHA           DOUBLE           0.0000000
+   BETA            DOUBLE           0.0000000
+   GAMMA           DOUBLE           0.0000000
+   ORIGIN          DOUBLE    Array[3]
+   EINJ            DOUBLE           72.500000
+   PINJ            DOUBLE           1.7000000               
+   SPECIES_MIX     DOUBLE    Array[3]
+   AB              DOUBLE           2.0141018
+   AI              DOUBLE           2.0141078
+   IMPURITY_CHARGE INT              6
+   LAMBDAMIN       DOUBLE           647.00000
+   LAMBDAMAX       DOUBLE           667.00000
+   NLAMBDA         INT           2000
+   N_FIDA          LONG           5000000
+   N_NPA           LONG            500000
+   N_NBI           LONG             50000
+   N_HALO          LONG            500000
+   N_DCX           LONG            500000
+   N_BIRTH         LONG             10000
+   NE_WGHT         INT             50
+   NP_WGHT         INT             50
+   NPHI_WGHT       INT            100
+   EMAX_WGHT       DOUBLE           100.00000
+   NLAMBDA_WGHT    INT           1000
+   LAMBDAMIN_WGHT  DOUBLE           647.00000
+   LAMBDAMAX_WGHT  DOUBLE           667.00000               
+   CALC_NPA        INT              1
+   CALC_BREMS      INT              1
+   CALC_BES        INT              1
+   CALC_FIDA       INT              1
+   CALC_BIRTH      INT              1
+   CALC_FIDA_WGHT  INT              1
+   CALC_NPA_WGHT   INT              1
+   LOAD_NEUTRALS   INT              0
+   DUMP_DCX        INT              1
+   VERBOSE         INT              1
+```
+
 #Structure Variables
 
 The variables can be split up into several sections
@@ -315,73 +384,4 @@ The rotation angles and origin can best be described by an example.
 * type: `Float64`
 * rank: 0
 * units: nm
-
-#Useful Routines
-##beam_grid.pro
-It is convienient to define the grid to be aligned with the beam sightline. To faciliate this an IDL routine [beam_grid.pro](|url|/sourcefile/beam_grid.pro.html) is available to automatically calculate the beam-aligned grid definition.
-
-##vars_to_struct.pro
-The IDL routine [vars_to_struct.pro](|url|/sourcefile/vars_to_struct.pro.html) takes variables defined in the local scope and stores them into a structure. This is useful for creating input files.
-
-##check_inputs.pro
-[check_inputs.pro](|url|/sourcefile/check_inputs.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the inputs structure has the correct format.
-
-#Example Structure
-```
-IDL> help, inputs
-** Structure <44a4468>, 53 tags, length=392, data length=362, refs=3:
-   SHOT            LONG                 1
-   TIME            DOUBLE           1.0000000
-   RUNID           STRING    'test_1a'
-   DEVICE          STRING    'TEST'
-   COMMENT         STRING    'Non-rotated, Non-tilted grid; flat profiles'
-   INSTALL_DIR     STRING    '/home/lstagner/FIDASIM'
-   RESULT_DIR      STRING    '/home/lstagner/TEST'
-   TABLES_FILE     STRING    '/home/lstagner/FIDASIM/tables/atomic_tables.h5'
-   NX              INT             50
-   NY              INT             60
-   NZ              INT             70
-   XMIN            DOUBLE          -50.000000
-   XMAX            DOUBLE           50.000000
-   YMIN            DOUBLE          -230.00000
-   YMAX            DOUBLE          -110.00000
-   ZMIN            DOUBLE          -70.000000
-   ZMAX            DOUBLE           70.000000
-   ALPHA           DOUBLE           0.0000000
-   BETA            DOUBLE           0.0000000
-   GAMMA           DOUBLE           0.0000000
-   ORIGIN          DOUBLE    Array[3]
-   EINJ            DOUBLE           72.500000
-   PINJ            DOUBLE           1.7000000               
-   SPECIES_MIX     DOUBLE    Array[3]
-   AB              DOUBLE           2.0141018
-   AI              DOUBLE           2.0141078
-   IMPURITY_CHARGE INT              6
-   LAMBDAMIN       DOUBLE           647.00000
-   LAMBDAMAX       DOUBLE           667.00000
-   NLAMBDA         INT           2000
-   N_FIDA          LONG           5000000
-   N_NPA           LONG            500000
-   N_NBI           LONG             50000
-   N_HALO          LONG            500000
-   N_DCX           LONG            500000
-   N_BIRTH         LONG             10000
-   NE_WGHT         INT             50
-   NP_WGHT         INT             50
-   NPHI_WGHT       INT            100
-   EMAX_WGHT       DOUBLE           100.00000
-   NLAMBDA_WGHT    INT           1000
-   LAMBDAMIN_WGHT  DOUBLE           647.00000
-   LAMBDAMAX_WGHT  DOUBLE           667.00000               
-   CALC_NPA        INT              1
-   CALC_BREMS      INT              1
-   CALC_BES        INT              1
-   CALC_FIDA       INT              1
-   CALC_BIRTH      INT              1
-   CALC_FIDA_WGHT  INT              1
-   CALC_NPA_WGHT   INT              1
-   LOAD_NEUTRALS   INT              0
-   DUMP_DCX        INT              1
-   VERBOSE         INT              1
-```
 

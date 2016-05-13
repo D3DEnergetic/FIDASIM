@@ -4,6 +4,30 @@ title: NPA Geometry
 
 [TOC]
 
+#Useful Routines
+
+##check_npa.pro
+[check_npa.pro](|url|/sourcefile/check_npa.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the NPA geometry structure has the correct format.
+
+#Example Structure
+```
+IDL> help, npa
+** Structure <48833a8>, 12 tags, length=512, data length=504, refs=1:
+   NCHAN           LONG                 3
+   SYSTEM          STRING    'NPA'
+   DATA_SOURCE     STRING    'test_npa.pro'
+   ID              STRING    Array[3]
+   A_SHAPE         INT       Array[3]
+   D_SHAPE         INT       Array[3]
+   A_CENT          DOUBLE    Array[3, 3]
+   A_REDGE         DOUBLE    Array[3, 3]
+   A_TEDGE         DOUBLE    Array[3, 3]
+   D_CENT          DOUBLE    Array[3, 3]
+   D_REDGE         DOUBLE    Array[3, 3]
+   D_TEDGE         DOUBLE    Array[3, 3]
+   RADIUS          DOUBLE    Array[3]
+```
+
 #Structure Variables
 **nchan**: Number of Channels
 
@@ -13,13 +37,18 @@ title: NPA Geometry
 **system**: Name of NPA system(s)
 
 * type: `String`
-* rank: 0 or 1
-* dims: [`nsystem`]
+* rank: 0
 
 **data_source**: Source of NPA geometry
 
 * type: `String`
 * rank: 0
+
+**id**: Chord ID
+
+* type: `String`
+* rank: 1
+* dims: [`nchan`]
 
 **a_shape**:Shape of the aperture
 
@@ -85,25 +114,3 @@ The shapes of the detector and aperture can take the values
 * dims: [`nchan`]
 * units: cm
 
-#Useful Routines
-
-##check_npa.pro
-[check_npa.pro](|url|/sourcefile/check_npa.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the NPA geometry structure has the correct format.
-
-#Example Structure
-```
-IDL> help, npa
-** Structure <48833a8>, 12 tags, length=512, data length=504, refs=1:
-   NCHAN           LONG                 3
-   SYSTEM          STRING    'NPA'
-   DATA_SOURCE     STRING    'test_npa.pro'
-   A_SHAPE         INT       Array[3]
-   D_SHAPE         INT       Array[3]
-   A_CENT          DOUBLE    Array[3, 3]
-   A_REDGE         DOUBLE    Array[3, 3]
-   A_TEDGE         DOUBLE    Array[3, 3]
-   D_CENT          DOUBLE    Array[3, 3]
-   D_REDGE         DOUBLE    Array[3, 3]
-   D_TEDGE         DOUBLE    Array[3, 3]
-   RADIUS          DOUBLE    Array[3]
-```

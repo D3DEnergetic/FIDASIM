@@ -4,6 +4,29 @@ title: Neutral Beam Geometry
 
 [TOC]
 
+#Useful Routines
+## nubeam_geometry.pro
+For convienience, the IDL routine [nubeam_geometry.pro](|url|/sourcefile/nubeam_geometry.pro.html) is available to transform the nubeam beam geometry definition.
+
+##check_beam.pro
+[check_beam.pro](|url|/sourcefile/check_beam.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the beam structure has the correct format.
+
+#Example Structure
+```
+IDL> help, nbi
+** Structure <4882ea8>, 11 tags, length=168, data length=162, refs=1:
+   NAME            STRING    'test_beam'
+   SHAPE           INT              1
+   DATA_SOURCE     STRING    'test_beam.pro'
+   SRC             DOUBLE    Array[3]
+   AXIS            DOUBLE    Array[3]
+   WIDY            DOUBLE           6.0000000
+   WIDZ            DOUBLE           24.000000
+   DIVY            DOUBLE    Array[3]
+   DIVZ            DOUBLE    Array[3]
+   FOCY            DOUBLE           999999.90
+   FOCZ            DOUBLE           1000.0000
+```
 #Structure Variables
 **name**: Beam Name
 
@@ -76,26 +99,3 @@ The shape of the source grid take the value of
 * rank: 0
 * units: cm
 
-#Useful Routines
-## nubeam_geometry.pro
-For convienience, the IDL routine [nubeam_geometry.pro](|url|/sourcefile/nubeam_geometry.pro.html) is available to transform the nubeam beam geometry definition.
-
-##check_beam.pro
-[check_beam.pro](|url|/sourcefile/check_beam.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the beam structure has the correct format.
-
-#Example Structure
-```
-IDL> help, nbi
-** Structure <4882ea8>, 11 tags, length=168, data length=162, refs=1:
-   NAME            STRING    'test_beam'
-   SHAPE           INT              1
-   DATA_SOURCE     STRING    'test_beam.pro'
-   SRC             DOUBLE    Array[3]
-   AXIS            DOUBLE    Array[3]
-   WIDY            DOUBLE           6.0000000
-   WIDZ            DOUBLE           24.000000
-   DIVY            DOUBLE    Array[3]
-   DIVZ            DOUBLE    Array[3]
-   FOCY            DOUBLE           999999.90
-   FOCZ            DOUBLE           1000.0000
-```

@@ -4,66 +4,6 @@ title: Electromagnetic Fields
 
 [TOC]
 
-#Structure Variables
-**time**: Time
-
-* type: `Float64`
-* rank: 0
-* units: s
-
-**data_source**: Source of electromagnetic fields data
-
-* type: `String`
-* rank: 0
-
-**mask**: Boolean mask that indicates where the fields are well defined
-
-* type: `Int16`
-* rank: 2
-* dims: [`nr`,`nz`]
-
-**br**: Magnetic field in the r-direction
-
-* type: `Float64`
-* rank: 2
-* dims: [`nr`,`nz`]
-* units: T
-
-**bt**: Magnetic field in the torodial-direction
-
-* type: `Float64`
-* rank: 2
-* dims: [`nr`,`nz`]
-* units: T
-
-**bz**: Magnetic field in the z-direction
-
-* type: `Float64`
-* rank: 2
-* dims: [`nr`,`nz`]
-* units: T
-
-**er**: Electric field in the r-direction
-
-* type: `Float64`
-* rank: 2
-* dims: [`nr`,`nz`]
-* units: V/m
-
-**et**: Electric field in the torodial-direction
-
-* type: `Float64`
-* rank: 2
-* dims: [`nr`,`nz`]
-* units: V/m
-
-**ez**: Electric field in the z-direction
-
-* type: `Float64`
-* rank: 2
-* dims: [`nr`,`nz`]
-* units: V/m
-
 # Useful Routines
 
 ## extract_transp_geqdsk
@@ -143,3 +83,63 @@ IDL> help, fields
    ET              DOUBLE    Array[70, 100]
    EZ              DOUBLE    Array[70, 100]
 ```
+#Structure Variables
+**time**: Time
+
+* type: `Float64`
+* rank: 0
+* units: s
+
+**data_source**: Source of electromagnetic fields data
+
+* type: `String`
+* rank: 0
+
+**mask**: Boolean mask that indicates where the fields are well defined
+
+* type: `Int16`
+* rank: 2
+* dims: [`nr`,`nz`]
+
+**br**: Magnetic field in the r-direction
+
+* type: `Float64`
+* rank: 2
+* dims: [`nr`,`nz`]
+* units: T
+
+**bt**: Magnetic field in the torodial-direction
+
+* type: `Float64`
+* rank: 2
+* dims: [`nr`,`nz`]
+* units: T
+
+**bz**: Magnetic field in the z-direction
+
+* type: `Float64`
+* rank: 2
+* dims: [`nr`,`nz`]
+* units: T
+
+**er**: Electric field in the r-direction
+
+* type: `Float64`
+* rank: 2
+* dims: [`nr`,`nz`]
+* units: V/m
+
+**et**: Electric field in the torodial-direction
+
+* type: `Float64`
+* rank: 2
+* dims: [`nr`,`nz`]
+* units: V/m
+
+**ez**: Electric field in the z-direction
+
+* type: `Float64`
+* rank: 2
+* dims: [`nr`,`nz`]
+* units: V/m
+

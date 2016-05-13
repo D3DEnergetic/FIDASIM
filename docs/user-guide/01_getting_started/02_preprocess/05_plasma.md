@@ -4,6 +4,30 @@ title: Plasma Parameters
 
 [TOC]
 
+#Useful Routines
+
+##extract_transp_plasma.pro
+The IDL routine [extract_transp_plasma.pro](|url|/sourcefile/extract_transp_plasma.pro.html) is provided to extract the plasma parameters structure from a TRANSP run. 
+
+##check_plasma.pro
+[check_plasma.pro](|url|/sourcefile/check_plasma.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the plasma structure has the correct format.
+
+#Example Structure
+```
+IDL> help, plasma
+** Structure <448c508>, 10 tags, length=406024, data length=406024, refs=1:
+   TIME            DOUBLE           1.0000000
+   DATA_SOURCE     STRING    '/home/lstagner/FIDASIM/test/test_profiles.pro'
+   MASK            INT       Array[70, 100]
+   TE              DOUBLE    Array[70, 100]
+   TI              DOUBLE    Array[70, 100]
+   VR              DOUBLE    Array[70, 100]
+   VT              DOUBLE    Array[70, 100]
+   VZ              DOUBLE    Array[70, 100]
+   DENE            DOUBLE    Array[70, 100]
+   ZEFF            DOUBLE    Array[70, 100]
+```
+
 #Structure Variables
 **time**: Time when plasma parameters were extracted
 
@@ -70,26 +94,3 @@ title: Plasma Parameters
 * rank: 2
 * dims: [`nr`,`nz`]
 
-#Useful Routines
-
-##extract_transp_plasma.pro
-The IDL routine [extract_transp_plasma.pro](|url|/sourcefile/extract_transp_plasma.pro.html) is provided to extract the plasma parameters structure from a TRANSP run. 
-
-##check_plasma.pro
-[check_plasma.pro](|url|/sourcefile/check_plasma.pro.html) is an IDL routine used internally by [PREFIDA](|url|/sourcefile/prefida.pro.html) to check if the plasma structure has the correct format.
-
-#Example Structure
-```
-IDL> help, plasma
-** Structure <448c508>, 10 tags, length=406024, data length=406024, refs=1:
-   TIME            DOUBLE           1.0000000
-   DATA_SOURCE     STRING    '/home/lstagner/FIDASIM/test/test_profiles.pro'
-   MASK            INT       Array[70, 100]
-   TE              DOUBLE    Array[70, 100]
-   TI              DOUBLE    Array[70, 100]
-   VR              DOUBLE    Array[70, 100]
-   VT              DOUBLE    Array[70, 100]
-   VZ              DOUBLE    Array[70, 100]
-   DENE            DOUBLE    Array[70, 100]
-   ZEFF            DOUBLE    Array[70, 100]
-```

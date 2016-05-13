@@ -299,14 +299,36 @@
 <div class="toc">
 <ul>
 <li><a href="#npa-geometry-structure">NPA Geometry Structure</a></li>
-<li><a href="#structure-variables">Structure Variables</a></li>
 <li><a href="#useful-routines">Useful Routines</a><ul>
 <li><a href="#check_npapro">check_npa.pro</a></li>
 </ul>
 </li>
 <li><a href="#example-structure">Example Structure</a></li>
+<li><a href="#structure-variables">Structure Variables</a></li>
 </ul>
 </div>
+<h1 id="useful-routines">Useful Routines</h1>
+<h2 id="check_npapro">check_npa.pro</h2>
+<p><a href="../../../sourcefile/check_npa.pro.html">check_npa.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the NPA geometry structure has the correct format.</p>
+<h1 id="example-structure">Example Structure</h1>
+<div class="codehilite"><pre><span></span>IDL&gt; help, npa
+** Structure &lt;48833a8&gt;, 12 tags, length=512, data length=504, refs=1:
+   NCHAN           LONG                 3
+   SYSTEM          STRING    &#39;NPA&#39;
+   DATA_SOURCE     STRING    &#39;test_npa.pro&#39;
+   ID              STRING    Array[3]
+   A_SHAPE         INT       Array[3]
+   D_SHAPE         INT       Array[3]
+   A_CENT          DOUBLE    Array[3, 3]
+   A_REDGE         DOUBLE    Array[3, 3]
+   A_TEDGE         DOUBLE    Array[3, 3]
+   D_CENT          DOUBLE    Array[3, 3]
+   D_REDGE         DOUBLE    Array[3, 3]
+   D_TEDGE         DOUBLE    Array[3, 3]
+   RADIUS          DOUBLE    Array[3]
+</pre></div>
+
+
 <h1 id="structure-variables">Structure Variables</h1>
 <p><strong>nchan</strong>: Number of Channels</p>
 <ul>
@@ -316,13 +338,18 @@
 <p><strong>system</strong>: Name of NPA system(s)</p>
 <ul>
 <li>type: <code>String</code></li>
-<li>rank: 0 or 1</li>
-<li>dims: [<code>nsystem</code>]</li>
+<li>rank: 0</li>
 </ul>
 <p><strong>data_source</strong>: Source of NPA geometry</p>
 <ul>
 <li>type: <code>String</code></li>
 <li>rank: 0</li>
+</ul>
+<p><strong>id</strong>: Chord ID</p>
+<ul>
+<li>type: <code>String</code></li>
+<li>rank: 1</li>
+<li>dims: [<code>nchan</code>]</li>
 </ul>
 <p><strong>a_shape</strong>:Shape of the aperture</p>
 <ul>
@@ -388,25 +415,6 @@
 <li>dims: [<code>nchan</code>]</li>
 <li>units: cm</li>
 </ul>
-<h1 id="useful-routines">Useful Routines</h1>
-<h2 id="check_npapro">check_npa.pro</h2>
-<p><a href="../../../sourcefile/check_npa.pro.html">check_npa.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the NPA geometry structure has the correct format.</p>
-<h1 id="example-structure">Example Structure</h1>
-<div class="codehilite"><pre><span></span>IDL&gt; help, npa
-** Structure &lt;48833a8&gt;, 12 tags, length=512, data length=504, refs=1:
-   NCHAN           LONG                 3
-   SYSTEM          STRING    &#39;NPA&#39;
-   DATA_SOURCE     STRING    &#39;test_npa.pro&#39;
-   A_SHAPE         INT       Array[3]
-   D_SHAPE         INT       Array[3]
-   A_CENT          DOUBLE    Array[3, 3]
-   A_REDGE         DOUBLE    Array[3, 3]
-   A_TEDGE         DOUBLE    Array[3, 3]
-   D_CENT          DOUBLE    Array[3, 3]
-   D_REDGE         DOUBLE    Array[3, 3]
-   D_TEDGE         DOUBLE    Array[3, 3]
-   RADIUS          DOUBLE    Array[3]
-</pre></div>
     </div>
   </div>
 

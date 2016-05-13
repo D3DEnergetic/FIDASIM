@@ -300,6 +300,13 @@
 <div class="toc">
 <ul>
 <li><a href="#inputs-structure">Inputs Structure</a></li>
+<li><a href="#useful-routines">Useful Routines</a><ul>
+<li><a href="#beam_gridpro">beam_grid.pro</a></li>
+<li><a href="#vars_to_structpro">vars_to_struct.pro</a></li>
+<li><a href="#check_inputspro">check_inputs.pro</a></li>
+</ul>
+</li>
+<li><a href="#example-structure">Example Structure</a></li>
 <li><a href="#structure-variables">Structure Variables</a><ul>
 <li><a href="#shot-information">Shot Information</a></li>
 <li><a href="#directories-and-files">Directories and Files</a></li>
@@ -312,15 +319,74 @@
 <li><a href="#weight-function-settings">Weight Function Settings</a></li>
 </ul>
 </li>
-<li><a href="#useful-routines">Useful Routines</a><ul>
-<li><a href="#beam_gridpro">beam_grid.pro</a></li>
-<li><a href="#vars_to_structpro">vars_to_struct.pro</a></li>
-<li><a href="#check_inputspro">check_inputs.pro</a></li>
-</ul>
-</li>
-<li><a href="#example-structure">Example Structure</a></li>
 </ul>
 </div>
+<h1 id="useful-routines">Useful Routines</h1>
+<h2 id="beam_gridpro">beam_grid.pro</h2>
+<p>It is convienient to define the grid to be aligned with the beam sightline. To faciliate this an IDL routine <a href="../../../sourcefile/beam_grid.pro.html">beam_grid.pro</a> is available to automatically calculate the beam-aligned grid definition.</p>
+<h2 id="vars_to_structpro">vars_to_struct.pro</h2>
+<p>The IDL routine <a href="../../../sourcefile/vars_to_struct.pro.html">vars_to_struct.pro</a> takes variables defined in the local scope and stores them into a structure. This is useful for creating input files.</p>
+<h2 id="check_inputspro">check_inputs.pro</h2>
+<p><a href="../../../sourcefile/check_inputs.pro.html">check_inputs.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the inputs structure has the correct format.</p>
+<h1 id="example-structure">Example Structure</h1>
+<div class="codehilite"><pre><span></span>IDL&gt; help, inputs
+** Structure &lt;44a4468&gt;, 53 tags, length=392, data length=362, refs=3:
+   SHOT            LONG                 1
+   TIME            DOUBLE           1.0000000
+   RUNID           STRING    &#39;test_1a&#39;
+   DEVICE          STRING    &#39;TEST&#39;
+   COMMENT         STRING    &#39;Non-rotated, Non-tilted grid; flat profiles&#39;
+   INSTALL_DIR     STRING    &#39;/home/lstagner/FIDASIM&#39;
+   RESULT_DIR      STRING    &#39;/home/lstagner/TEST&#39;
+   TABLES_FILE     STRING    &#39;/home/lstagner/FIDASIM/tables/atomic_tables.h5&#39;
+   NX              INT             50
+   NY              INT             60
+   NZ              INT             70
+   XMIN            DOUBLE          -50.000000
+   XMAX            DOUBLE           50.000000
+   YMIN            DOUBLE          -230.00000
+   YMAX            DOUBLE          -110.00000
+   ZMIN            DOUBLE          -70.000000
+   ZMAX            DOUBLE           70.000000
+   ALPHA           DOUBLE           0.0000000
+   BETA            DOUBLE           0.0000000
+   GAMMA           DOUBLE           0.0000000
+   ORIGIN          DOUBLE    Array[3]
+   EINJ            DOUBLE           72.500000
+   PINJ            DOUBLE           1.7000000               
+   SPECIES_MIX     DOUBLE    Array[3]
+   AB              DOUBLE           2.0141018
+   AI              DOUBLE           2.0141078
+   IMPURITY_CHARGE INT              6
+   LAMBDAMIN       DOUBLE           647.00000
+   LAMBDAMAX       DOUBLE           667.00000
+   NLAMBDA         INT           2000
+   N_FIDA          LONG           5000000
+   N_NPA           LONG            500000
+   N_NBI           LONG             50000
+   N_HALO          LONG            500000
+   N_DCX           LONG            500000
+   N_BIRTH         LONG             10000
+   NE_WGHT         INT             50
+   NP_WGHT         INT             50
+   NPHI_WGHT       INT            100
+   EMAX_WGHT       DOUBLE           100.00000
+   NLAMBDA_WGHT    INT           1000
+   LAMBDAMIN_WGHT  DOUBLE           647.00000
+   LAMBDAMAX_WGHT  DOUBLE           667.00000               
+   CALC_NPA        INT              1
+   CALC_BREMS      INT              1
+   CALC_BES        INT              1
+   CALC_FIDA       INT              1
+   CALC_BIRTH      INT              1
+   CALC_FIDA_WGHT  INT              1
+   CALC_NPA_WGHT   INT              1
+   LOAD_NEUTRALS   INT              0
+   DUMP_DCX        INT              1
+   VERBOSE         INT              1
+</pre></div>
+
+
 <h1 id="structure-variables">Structure Variables</h1>
 <p>The variables can be split up into several sections</p>
 <h2 id="shot-information">Shot Information</h2>
@@ -628,70 +694,6 @@ The rotation angles and origin can best be described by an example. </p>
 <li>rank: 0</li>
 <li>units: nm</li>
 </ul>
-<h1 id="useful-routines">Useful Routines</h1>
-<h2 id="beam_gridpro">beam_grid.pro</h2>
-<p>It is convienient to define the grid to be aligned with the beam sightline. To faciliate this an IDL routine <a href="../../../sourcefile/beam_grid.pro.html">beam_grid.pro</a> is available to automatically calculate the beam-aligned grid definition.</p>
-<h2 id="vars_to_structpro">vars_to_struct.pro</h2>
-<p>The IDL routine <a href="../../../sourcefile/vars_to_struct.pro.html">vars_to_struct.pro</a> takes variables defined in the local scope and stores them into a structure. This is useful for creating input files.</p>
-<h2 id="check_inputspro">check_inputs.pro</h2>
-<p><a href="../../../sourcefile/check_inputs.pro.html">check_inputs.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the inputs structure has the correct format.</p>
-<h1 id="example-structure">Example Structure</h1>
-<div class="codehilite"><pre><span></span>IDL&gt; help, inputs
-** Structure &lt;44a4468&gt;, 53 tags, length=392, data length=362, refs=3:
-   SHOT            LONG                 1
-   TIME            DOUBLE           1.0000000
-   RUNID           STRING    &#39;test_1a&#39;
-   DEVICE          STRING    &#39;TEST&#39;
-   COMMENT         STRING    &#39;Non-rotated, Non-tilted grid; flat profiles&#39;
-   INSTALL_DIR     STRING    &#39;/home/lstagner/FIDASIM&#39;
-   RESULT_DIR      STRING    &#39;/home/lstagner/TEST&#39;
-   TABLES_FILE     STRING    &#39;/home/lstagner/FIDASIM/tables/atomic_tables.h5&#39;
-   NX              INT             50
-   NY              INT             60
-   NZ              INT             70
-   XMIN            DOUBLE          -50.000000
-   XMAX            DOUBLE           50.000000
-   YMIN            DOUBLE          -230.00000
-   YMAX            DOUBLE          -110.00000
-   ZMIN            DOUBLE          -70.000000
-   ZMAX            DOUBLE           70.000000
-   ALPHA           DOUBLE           0.0000000
-   BETA            DOUBLE           0.0000000
-   GAMMA           DOUBLE           0.0000000
-   ORIGIN          DOUBLE    Array[3]
-   EINJ            DOUBLE           72.500000
-   PINJ            DOUBLE           1.7000000               
-   SPECIES_MIX     DOUBLE    Array[3]
-   AB              DOUBLE           2.0141018
-   AI              DOUBLE           2.0141078
-   IMPURITY_CHARGE INT              6
-   LAMBDAMIN       DOUBLE           647.00000
-   LAMBDAMAX       DOUBLE           667.00000
-   NLAMBDA         INT           2000
-   N_FIDA          LONG           5000000
-   N_NPA           LONG            500000
-   N_NBI           LONG             50000
-   N_HALO          LONG            500000
-   N_DCX           LONG            500000
-   N_BIRTH         LONG             10000
-   NE_WGHT         INT             50
-   NP_WGHT         INT             50
-   NPHI_WGHT       INT            100
-   EMAX_WGHT       DOUBLE           100.00000
-   NLAMBDA_WGHT    INT           1000
-   LAMBDAMIN_WGHT  DOUBLE           647.00000
-   LAMBDAMAX_WGHT  DOUBLE           667.00000               
-   CALC_NPA        INT              1
-   CALC_BREMS      INT              1
-   CALC_BES        INT              1
-   CALC_FIDA       INT              1
-   CALC_BIRTH      INT              1
-   CALC_FIDA_WGHT  INT              1
-   CALC_NPA_WGHT   INT              1
-   LOAD_NEUTRALS   INT              0
-   DUMP_DCX        INT              1
-   VERBOSE         INT              1
-</pre></div>
     </div>
   </div>
 

@@ -299,7 +299,6 @@
 <div class="toc">
 <ul>
 <li><a href="#fields-structure">Fields Structure</a></li>
-<li><a href="#structure-variables">Structure Variables</a></li>
 <li><a href="#useful-routines">Useful Routines</a><ul>
 <li><a href="#extract_transp_geqdsk">extract_transp_geqdsk</a></li>
 <li><a href="#read_geqdskpro">read_geqdsk.pro</a></li>
@@ -307,68 +306,9 @@
 </ul>
 </li>
 <li><a href="#example-structure">Example Structure</a></li>
+<li><a href="#structure-variables">Structure Variables</a></li>
 </ul>
 </div>
-<h1 id="structure-variables">Structure Variables</h1>
-<p><strong>time</strong>: Time</p>
-<ul>
-<li>type: <code>Float64</code></li>
-<li>rank: 0</li>
-<li>units: s</li>
-</ul>
-<p><strong>data_source</strong>: Source of electromagnetic fields data</p>
-<ul>
-<li>type: <code>String</code></li>
-<li>rank: 0</li>
-</ul>
-<p><strong>mask</strong>: Boolean mask that indicates where the fields are well defined</p>
-<ul>
-<li>type: <code>Int16</code></li>
-<li>rank: 2</li>
-<li>dims: [<code>nr</code>,<code>nz</code>]</li>
-</ul>
-<p><strong>br</strong>: Magnetic field in the r-direction</p>
-<ul>
-<li>type: <code>Float64</code></li>
-<li>rank: 2</li>
-<li>dims: [<code>nr</code>,<code>nz</code>]</li>
-<li>units: T</li>
-</ul>
-<p><strong>bt</strong>: Magnetic field in the torodial-direction</p>
-<ul>
-<li>type: <code>Float64</code></li>
-<li>rank: 2</li>
-<li>dims: [<code>nr</code>,<code>nz</code>]</li>
-<li>units: T</li>
-</ul>
-<p><strong>bz</strong>: Magnetic field in the z-direction</p>
-<ul>
-<li>type: <code>Float64</code></li>
-<li>rank: 2</li>
-<li>dims: [<code>nr</code>,<code>nz</code>]</li>
-<li>units: T</li>
-</ul>
-<p><strong>er</strong>: Electric field in the r-direction</p>
-<ul>
-<li>type: <code>Float64</code></li>
-<li>rank: 2</li>
-<li>dims: [<code>nr</code>,<code>nz</code>]</li>
-<li>units: V/m</li>
-</ul>
-<p><strong>et</strong>: Electric field in the torodial-direction</p>
-<ul>
-<li>type: <code>Float64</code></li>
-<li>rank: 2</li>
-<li>dims: [<code>nr</code>,<code>nz</code>]</li>
-<li>units: V/m</li>
-</ul>
-<p><strong>ez</strong>: Electric field in the z-direction</p>
-<ul>
-<li>type: <code>Float64</code></li>
-<li>rank: 2</li>
-<li>dims: [<code>nr</code>,<code>nz</code>]</li>
-<li>units: V/m</li>
-</ul>
 <h1 id="useful-routines">Useful Routines</h1>
 <h2 id="extract_transp_geqdsk">extract_transp_geqdsk</h2>
 <p><code>extract_transp_geqdsk</code> is a python routine that extracts a GEQDSK file out of a TRANSP run.</p>
@@ -444,6 +384,68 @@ optional arguments:
    ET              DOUBLE    Array[70, 100]
    EZ              DOUBLE    Array[70, 100]
 </pre></div>
+
+
+<h1 id="structure-variables">Structure Variables</h1>
+<p><strong>time</strong>: Time</p>
+<ul>
+<li>type: <code>Float64</code></li>
+<li>rank: 0</li>
+<li>units: s</li>
+</ul>
+<p><strong>data_source</strong>: Source of electromagnetic fields data</p>
+<ul>
+<li>type: <code>String</code></li>
+<li>rank: 0</li>
+</ul>
+<p><strong>mask</strong>: Boolean mask that indicates where the fields are well defined</p>
+<ul>
+<li>type: <code>Int16</code></li>
+<li>rank: 2</li>
+<li>dims: [<code>nr</code>,<code>nz</code>]</li>
+</ul>
+<p><strong>br</strong>: Magnetic field in the r-direction</p>
+<ul>
+<li>type: <code>Float64</code></li>
+<li>rank: 2</li>
+<li>dims: [<code>nr</code>,<code>nz</code>]</li>
+<li>units: T</li>
+</ul>
+<p><strong>bt</strong>: Magnetic field in the torodial-direction</p>
+<ul>
+<li>type: <code>Float64</code></li>
+<li>rank: 2</li>
+<li>dims: [<code>nr</code>,<code>nz</code>]</li>
+<li>units: T</li>
+</ul>
+<p><strong>bz</strong>: Magnetic field in the z-direction</p>
+<ul>
+<li>type: <code>Float64</code></li>
+<li>rank: 2</li>
+<li>dims: [<code>nr</code>,<code>nz</code>]</li>
+<li>units: T</li>
+</ul>
+<p><strong>er</strong>: Electric field in the r-direction</p>
+<ul>
+<li>type: <code>Float64</code></li>
+<li>rank: 2</li>
+<li>dims: [<code>nr</code>,<code>nz</code>]</li>
+<li>units: V/m</li>
+</ul>
+<p><strong>et</strong>: Electric field in the torodial-direction</p>
+<ul>
+<li>type: <code>Float64</code></li>
+<li>rank: 2</li>
+<li>dims: [<code>nr</code>,<code>nz</code>]</li>
+<li>units: V/m</li>
+</ul>
+<p><strong>ez</strong>: Electric field in the z-direction</p>
+<ul>
+<li>type: <code>Float64</code></li>
+<li>rank: 2</li>
+<li>dims: [<code>nr</code>,<code>nz</code>]</li>
+<li>units: V/m</li>
+</ul>
     </div>
   </div>
 

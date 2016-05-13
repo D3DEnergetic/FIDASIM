@@ -300,15 +300,32 @@
 <div class="toc">
 <ul>
 <li><a href="#grid-structure">Grid Structure</a></li>
-<li><a href="#structure-variables">Structure Variables</a></li>
 <li><a href="#useful-routines">Useful Routines</a><ul>
 <li><a href="#rz_gridpro">rz_grid.pro</a></li>
 <li><a href="#check_gridpro">check_grid.pro</a></li>
 </ul>
 </li>
 <li><a href="#example-structure">Example Structure</a></li>
+<li><a href="#structure-variables">Structure Variables</a></li>
 </ul>
 </div>
+<h1 id="useful-routines">Useful Routines</h1>
+<h2 id="rz_gridpro">rz_grid.pro</h2>
+<p>An IDL routine <a href="../../../sourcefile/rz_grid.pro.html">rz_grid.pro</a> is provided to easily define the interpolation grid.</p>
+<h2 id="check_gridpro">check_grid.pro</h2>
+<p><a href="../../../sourcefile/check_grid.pro.html">check_grid.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the grid structure has the correct format.</p>
+<h1 id="example-structure">Example Structure</h1>
+<div class="codehilite"><pre><span></span>IDL&gt; help, grid
+** Structure &lt;44c8108&gt;, 6 tags, length=113368, data length=113364, refs=1:
+   R2D             DOUBLE    Array[70, 100]
+   Z2D             DOUBLE    Array[70, 100]
+   R               DOUBLE    Array[70]
+   Z               DOUBLE    Array[100]
+   NR              INT             70
+   NZ              INT            100
+</pre></div>
+
+
 <h1 id="structure-variables">Structure Variables</h1>
 <p><strong>nr</strong>: Number of radii</p>
 <ul>
@@ -348,21 +365,6 @@
 <li>dims: [<code>nz</code>]</li>
 <li>units: cm</li>
 </ul>
-<h1 id="useful-routines">Useful Routines</h1>
-<h2 id="rz_gridpro">rz_grid.pro</h2>
-<p>An IDL routine <a href="../../../sourcefile/rz_grid.pro.html">rz_grid.pro</a> is provided to easily define the interpolation grid.</p>
-<h2 id="check_gridpro">check_grid.pro</h2>
-<p><a href="../../../sourcefile/check_grid.pro.html">check_grid.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the grid structure has the correct format.</p>
-<h1 id="example-structure">Example Structure</h1>
-<div class="codehilite"><pre><span></span>IDL&gt; help, grid
-** Structure &lt;44c8108&gt;, 6 tags, length=113368, data length=113364, refs=1:
-   R2D             DOUBLE    Array[70, 100]
-   Z2D             DOUBLE    Array[70, 100]
-   R               DOUBLE    Array[70]
-   Z               DOUBLE    Array[100]
-   NR              INT             70
-   NZ              INT            100
-</pre></div>
     </div>
   </div>
 

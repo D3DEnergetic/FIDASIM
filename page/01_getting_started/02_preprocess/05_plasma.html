@@ -299,15 +299,36 @@
 <div class="toc">
 <ul>
 <li><a href="#plasma-structure">Plasma Structure</a></li>
-<li><a href="#structure-variables">Structure Variables</a></li>
 <li><a href="#useful-routines">Useful Routines</a><ul>
 <li><a href="#extract_transp_plasmapro">extract_transp_plasma.pro</a></li>
 <li><a href="#check_plasmapro">check_plasma.pro</a></li>
 </ul>
 </li>
 <li><a href="#example-structure">Example Structure</a></li>
+<li><a href="#structure-variables">Structure Variables</a></li>
 </ul>
 </div>
+<h1 id="useful-routines">Useful Routines</h1>
+<h2 id="extract_transp_plasmapro">extract_transp_plasma.pro</h2>
+<p>The IDL routine <a href="../../../sourcefile/extract_transp_plasma.pro.html">extract_transp_plasma.pro</a> is provided to extract the plasma parameters structure from a TRANSP run. </p>
+<h2 id="check_plasmapro">check_plasma.pro</h2>
+<p><a href="../../../sourcefile/check_plasma.pro.html">check_plasma.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the plasma structure has the correct format.</p>
+<h1 id="example-structure">Example Structure</h1>
+<div class="codehilite"><pre><span></span>IDL&gt; help, plasma
+** Structure &lt;448c508&gt;, 10 tags, length=406024, data length=406024, refs=1:
+   TIME            DOUBLE           1.0000000
+   DATA_SOURCE     STRING    &#39;/home/lstagner/FIDASIM/test/test_profiles.pro&#39;
+   MASK            INT       Array[70, 100]
+   TE              DOUBLE    Array[70, 100]
+   TI              DOUBLE    Array[70, 100]
+   VR              DOUBLE    Array[70, 100]
+   VT              DOUBLE    Array[70, 100]
+   VZ              DOUBLE    Array[70, 100]
+   DENE            DOUBLE    Array[70, 100]
+   ZEFF            DOUBLE    Array[70, 100]
+</pre></div>
+
+
 <h1 id="structure-variables">Structure Variables</h1>
 <p><strong>time</strong>: Time when plasma parameters were extracted</p>
 <ul>
@@ -374,25 +395,6 @@
 <li>rank: 2</li>
 <li>dims: [<code>nr</code>,<code>nz</code>]</li>
 </ul>
-<h1 id="useful-routines">Useful Routines</h1>
-<h2 id="extract_transp_plasmapro">extract_transp_plasma.pro</h2>
-<p>The IDL routine <a href="../../../sourcefile/extract_transp_plasma.pro.html">extract_transp_plasma.pro</a> is provided to extract the plasma parameters structure from a TRANSP run. </p>
-<h2 id="check_plasmapro">check_plasma.pro</h2>
-<p><a href="../../../sourcefile/check_plasma.pro.html">check_plasma.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the plasma structure has the correct format.</p>
-<h1 id="example-structure">Example Structure</h1>
-<div class="codehilite"><pre><span></span>IDL&gt; help, plasma
-** Structure &lt;448c508&gt;, 10 tags, length=406024, data length=406024, refs=1:
-   TIME            DOUBLE           1.0000000
-   DATA_SOURCE     STRING    &#39;/home/lstagner/FIDASIM/test/test_profiles.pro&#39;
-   MASK            INT       Array[70, 100]
-   TE              DOUBLE    Array[70, 100]
-   TI              DOUBLE    Array[70, 100]
-   VR              DOUBLE    Array[70, 100]
-   VT              DOUBLE    Array[70, 100]
-   VZ              DOUBLE    Array[70, 100]
-   DENE            DOUBLE    Array[70, 100]
-   ZEFF            DOUBLE    Array[70, 100]
-</pre></div>
     </div>
   </div>
 

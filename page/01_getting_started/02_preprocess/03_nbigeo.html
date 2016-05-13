@@ -299,15 +299,37 @@
 <div class="toc">
 <ul>
 <li><a href="#neutral-beam-geometry-structure">Neutral Beam Geometry Structure</a></li>
-<li><a href="#structure-variables">Structure Variables</a></li>
 <li><a href="#useful-routines">Useful Routines</a><ul>
 <li><a href="#nubeam_geometrypro">nubeam_geometry.pro</a></li>
 <li><a href="#check_beampro">check_beam.pro</a></li>
 </ul>
 </li>
 <li><a href="#example-structure">Example Structure</a></li>
+<li><a href="#structure-variables">Structure Variables</a></li>
 </ul>
 </div>
+<h1 id="useful-routines">Useful Routines</h1>
+<h2 id="nubeam_geometrypro">nubeam_geometry.pro</h2>
+<p>For convienience, the IDL routine <a href="../../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> is available to transform the nubeam beam geometry definition.</p>
+<h2 id="check_beampro">check_beam.pro</h2>
+<p><a href="../../../sourcefile/check_beam.pro.html">check_beam.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the beam structure has the correct format.</p>
+<h1 id="example-structure">Example Structure</h1>
+<div class="codehilite"><pre><span></span>IDL&gt; help, nbi
+** Structure &lt;4882ea8&gt;, 11 tags, length=168, data length=162, refs=1:
+   NAME            STRING    &#39;test_beam&#39;
+   SHAPE           INT              1
+   DATA_SOURCE     STRING    &#39;test_beam.pro&#39;
+   SRC             DOUBLE    Array[3]
+   AXIS            DOUBLE    Array[3]
+   WIDY            DOUBLE           6.0000000
+   WIDZ            DOUBLE           24.000000
+   DIVY            DOUBLE    Array[3]
+   DIVZ            DOUBLE    Array[3]
+   FOCY            DOUBLE           999999.90
+   FOCZ            DOUBLE           1000.0000
+</pre></div>
+
+
 <h1 id="structure-variables">Structure Variables</h1>
 <p><strong>name</strong>: Beam Name</p>
 <ul>
@@ -380,26 +402,6 @@
 <li>rank: 0</li>
 <li>units: cm</li>
 </ul>
-<h1 id="useful-routines">Useful Routines</h1>
-<h2 id="nubeam_geometrypro">nubeam_geometry.pro</h2>
-<p>For convienience, the IDL routine <a href="../../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> is available to transform the nubeam beam geometry definition.</p>
-<h2 id="check_beampro">check_beam.pro</h2>
-<p><a href="../../../sourcefile/check_beam.pro.html">check_beam.pro</a> is an IDL routine used internally by <a href="../../../sourcefile/prefida.pro.html">PREFIDA</a> to check if the beam structure has the correct format.</p>
-<h1 id="example-structure">Example Structure</h1>
-<div class="codehilite"><pre><span></span>IDL&gt; help, nbi
-** Structure &lt;4882ea8&gt;, 11 tags, length=168, data length=162, refs=1:
-   NAME            STRING    &#39;test_beam&#39;
-   SHAPE           INT              1
-   DATA_SOURCE     STRING    &#39;test_beam.pro&#39;
-   SRC             DOUBLE    Array[3]
-   AXIS            DOUBLE    Array[3]
-   WIDY            DOUBLE           6.0000000
-   WIDZ            DOUBLE           24.000000
-   DIVY            DOUBLE    Array[3]
-   DIVZ            DOUBLE    Array[3]
-   FOCY            DOUBLE           999999.90
-   FOCZ            DOUBLE           1000.0000
-</pre></div>
     </div>
   </div>
 

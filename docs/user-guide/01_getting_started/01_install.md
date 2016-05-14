@@ -9,6 +9,8 @@ If you experiance problems installing FIDASIM you did something wrong and you sh
 The following code snippets assumes you are using a BASH shell.
 To figure out what shell you currently have run `echo $SHELL` to find out. 
 
+[TOC]
+
 ---
 
 ##Dependencies
@@ -284,4 +286,4 @@ duration:                   0:15:53
 Congratulations! You followed the instructions.
 
 ##Now what
-Most likely you won't be satisfied by just running a test case. Click [here](./02_preprocess/index.html) to learn how to make the [input files](../03_technical/01_inputs.html) used by FIDASIM.
+Most likely you won't be satisfied by just running a test case. Click [here](./02_preprocess.html) to learn how to make the [input files](../03_technical/02_io.html) used by FIDASIM.

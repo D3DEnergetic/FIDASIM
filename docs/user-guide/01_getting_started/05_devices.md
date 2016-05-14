@@ -1,9 +1,14 @@
-title: Device Specific Routines
+title: Devices using FIDASIM
 
-#Supported Devices
+@note put recent papers for each device here?
 
-##DIII-D
-The device routines are available [here](https://github.com/D3DEnergetic/d3d-fidasim)
+#DIII-D
+FIDASIM is being used at DIII-D for simulating and validating their FIDA and NPA diagnostics. 
+It it also being used in charge exchange recombination spectroscopy to validate deuterium density measurements.
 
-##NSTX-U
-The device routines are available [here](https://github.com/D3DEnergetic/nstx-fidasim)
+The routines for running a DIII-D FIDASIM run are available [here](https://github.com/D3DEnergetic/d3d-fidasim)
+
+#NSTX-U
+FIDASIM is being used at NSTX-U for simulating and validating their FIDA and NPA diagnostics.
+
+The routines for running a NSTX-U FIDASIM run are available [here](https://github.com/D3DEnergetic/nstx-fidasim)

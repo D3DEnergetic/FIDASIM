@@ -183,7 +183,7 @@ END: hour, minute, second:  1:53:07
 duration:                   0:15:53
 ```
 
-##Submitting to a SGE scheduled cluster using `submit_fidasim`
+##Submitting to a SGE cluster using `submit_fidasim`
 
 `submit_fidasim` is a python routine that submits a FIDASIM job to a SGE cluster. For example
 
@@ -197,43 +197,5 @@ will submit any incomplete FIDASIM runs in the `/u/lstagner/TEST` directory. Alt
 lstagner@computer:~$ submit_fidasim /u/lstagner/TEST/test_1a_inputs.dat
 
 ```
-will submit just the `test_1a` FIDASIM run. See below for all the available options
-
-```
-lstagner@computer:~$ submit_fidasim -h
-usage: submit_fidasim [-h] [-w WALLTIME] [-n NODES] [-ppn PPN] [-mem MEMORY]
-                      [-ex EXECUTABLE] [-log LOG] [-pbs PBS] [-pre PRECALL]
-                      [-post POSTCALL] [-rids RUNIDS [RUNIDS ...]] [-j JOBS]
-                      [-c] [-v] [-db]
-                      path
-
-Creates a FIDASIM PBS job script and submits it using qsub
-
-positional arguments:
-  path                  Namelist file or result directory
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -w WALLTIME, --walltime WALLTIME
-                        Set walltime. Defaults to 5:00:00
-  -n NODES, --nodes NODES
-                        Set number of nodes. Defaults to 1
-  -ppn PPN              Set processors per node. Defaults to 8
-  -mem MEMORY, --memory MEMORY
-                        Set required memory. Defaults to 2048mb
-  -ex EXECUTABLE, --executable EXECUTABLE
-                        Set path to FIDASIM executable. Defaults to
-                        /home/lstagner/FIDASIM/fidasim
-  -log LOG              Set log directory. Defaults to result directory.
-  -pbs PBS              Additional PBS directive
-  -pre PRECALL, --precall PRECALL
-                        Command to run before code execution
-  -post POSTCALL, --postcall POSTCALL
-                        Command to run after code execution
-  -rids RUNIDS [RUNIDS ...], --runids RUNIDS [RUNIDS ...]
-                        List of run ids, accepts regex
-  -j JOBS, --jobs JOBS  Split runs into N jobs. Defaults to 1 job per namelist
-  -c, --clobber         Overwrite existing runs
-  -v, --verbose         Verbose
-  -db, --debug          Debug mode. Does not submit job
-```
+will submit just the `test_1a` FIDASIM run.
+Run `submit_fidasim -h` for the full documentation.

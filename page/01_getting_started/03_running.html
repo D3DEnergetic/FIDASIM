@@ -133,51 +133,7 @@
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/index.html'>Preprocessing Inputs</a>
-            
-            <ul class="nav nav-stacked nav-pills">
-              
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/01_inputs.html'>General Settings</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/02_grid.html'>Interpolation Grid</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/03_nbigeo.html'>Neutral Beam Geometry</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/04_fields.html'>Electromagnetic Fields</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/05_plasma.html'>Plasma Parameters</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/06_distribution.html'>Fast-ion Distribution</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/07_specgeo.html'>Spectral Geometry</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/08_npageo.html'>NPA Geometry</a>
-            
-            </li>
-            
-            </ul>
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
             
             </li>
             
@@ -192,7 +148,7 @@
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/05_devices.html'>Device Specific Routines</a>
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
             
             </li>
             
@@ -250,12 +206,12 @@
             <ul class="nav nav-stacked nav-pills">
               
             <li role="presentation">
-            <a href='../../page/03_technical/01_inputs.html'>Input Files</a>
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
             
             </li>
             
             <li role="presentation">
-            <a href='../../page/03_technical/02_outputs.html'>Output Files</a>
+            <a href='../../page/03_technical/02_io.html'>Input & Output Files</a>
             
             </li>
             
@@ -299,7 +255,7 @@
 <li><a href="#running-fidasim">Running FIDASIM</a><ul>
 <li><a href="#recommended-hardware">Recommended Hardware</a></li>
 <li><a href="#running-interactively">Running Interactively</a></li>
-<li><a href="#submitting-to-a-sge-scheduled-cluster-using-submit_fidasim">Submitting to a SGE scheduled cluster using submit_fidasim</a></li>
+<li><a href="#submitting-to-a-sge-cluster-using-submit_fidasim">Submitting to a SGE cluster using submit_fidasim</a></li>
 </ul>
 </li>
 </ul>
@@ -478,7 +434,7 @@ duration:                   0:15:53
 </pre></div>
 
 
-<h2 id="submitting-to-a-sge-scheduled-cluster-using-submit_fidasim">Submitting to a SGE scheduled cluster using <code>submit_fidasim</code></h2>
+<h2 id="submitting-to-a-sge-cluster-using-submit_fidasim">Submitting to a SGE cluster using <code>submit_fidasim</code></h2>
 <p><code>submit_fidasim</code> is a python routine that submits a FIDASIM job to a SGE cluster. For example</p>
 <div class="codehilite"><pre><span></span>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
 </pre></div>
@@ -489,44 +445,8 @@ duration:                   0:15:53
 </pre></div>
 
 
-<p>will submit just the <code>test_1a</code> FIDASIM run. See below for all the available options</p>
-<div class="codehilite"><pre><span></span>lstagner@computer:~$ submit_fidasim -h
-usage: submit_fidasim [-h] [-w WALLTIME] [-n NODES] [-ppn PPN] [-mem MEMORY]
-                      [-ex EXECUTABLE] [-log LOG] [-pbs PBS] [-pre PRECALL]
-                      [-post POSTCALL] [-rids RUNIDS [RUNIDS ...]] [-j JOBS]
-                      [-c] [-v] [-db]
-                      path
-
-Creates a FIDASIM PBS job script and submits it using qsub
-
-positional arguments:
-  path                  Namelist file or result directory
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -w WALLTIME, --walltime WALLTIME
-                        Set walltime. Defaults to 5:00:00
-  -n NODES, --nodes NODES
-                        Set number of nodes. Defaults to 1
-  -ppn PPN              Set processors per node. Defaults to 8
-  -mem MEMORY, --memory MEMORY
-                        Set required memory. Defaults to 2048mb
-  -ex EXECUTABLE, --executable EXECUTABLE
-                        Set path to FIDASIM executable. Defaults to
-                        /home/lstagner/FIDASIM/fidasim
-  -log LOG              Set log directory. Defaults to result directory.
-  -pbs PBS              Additional PBS directive
-  -pre PRECALL, --precall PRECALL
-                        Command to run before code execution
-  -post POSTCALL, --postcall POSTCALL
-                        Command to run after code execution
-  -rids RUNIDS [RUNIDS ...], --runids RUNIDS [RUNIDS ...]
-                        List of run ids, accepts regex
-  -j JOBS, --jobs JOBS  Split runs into N jobs. Defaults to 1 job per namelist
-  -c, --clobber         Overwrite existing runs
-  -v, --verbose         Verbose
-  -db, --debug          Debug mode. Does not submit job
-</pre></div>
+<p>will submit just the <code>test_1a</code> FIDASIM run.
+Run <code>submit_fidasim -h</code> for the full documentation.</p>
     </div>
   </div>
 

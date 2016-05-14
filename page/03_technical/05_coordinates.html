@@ -133,51 +133,7 @@
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/index.html'>Preprocessing Inputs</a>
-            
-            <ul class="nav nav-stacked nav-pills">
-              
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/01_inputs.html'>General Settings</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/02_grid.html'>Interpolation Grid</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/03_nbigeo.html'>Neutral Beam Geometry</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/04_fields.html'>Electromagnetic Fields</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/05_plasma.html'>Plasma Parameters</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/06_distribution.html'>Fast-ion Distribution</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/07_specgeo.html'>Spectral Geometry</a>
-            
-            </li>
-            
-            <li role="presentation">
-            <a href='../../page/01_getting_started/02_preprocess/08_npageo.html'>NPA Geometry</a>
-            
-            </li>
-            
-            </ul>
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
             
             </li>
             
@@ -192,7 +148,7 @@
             </li>
             
             <li role="presentation">
-            <a href='../../page/01_getting_started/05_devices.html'>Device Specific Routines</a>
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
             
             </li>
             
@@ -250,12 +206,12 @@
             <ul class="nav nav-stacked nav-pills">
               
             <li role="presentation">
-            <a href='../../page/03_technical/01_inputs.html'>Input Files</a>
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
             
             </li>
             
             <li role="presentation">
-            <a href='../../page/03_technical/02_outputs.html'>Output Files</a>
+            <a href='../../page/03_technical/02_io.html'>Input & Output Files</a>
             
             </li>
             
@@ -293,7 +249,19 @@
     </div>
     
     <div class="col-lg-9" id='text'>
-        
+        <h1 id="beam-grid">Beam Grid</h1>
+<p>The coordinates system used depends on the values of the rotation angles (<code>alpha</code>, <code>beta</code>, <code>gamma</code>) and <code>origin</code> variables.
+If all the rotation angles and <code>origin</code> are set to zero then the coordinate system is identical to machine coordinates. 
+The angles variables and <code>origin</code> define a rotated coordinate system. 
+The rotation angles and origin can best be described by an example. </p>
+<ol>
+<li>With your right hand point your index finger pointing in the +x direction with your middle finger and thumb pointing in the +y and +z direction respectively.</li>
+<li>Rotate about your thumb (z-axis) by <code>alpha</code> (ccw = +angle, cw = -angle)</li>
+<li>Rotate about your middle finger (y'-axis) by <code>beta</code></li>
+<li>Rotate about your index finger (x"-axis) by <code>gamma</code></li>
+<li>Move your right hand to the <code>origin</code></li>
+<li>Define <code>(x|y|z)_(min|max)</code> by this coordinate system with your index finger being the new +x-axis</li>
+</ol>
     </div>
   </div>
 

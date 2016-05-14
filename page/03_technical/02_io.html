@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="FIDASIM - A Neutral Beam and Fast-ion Diagnostic Modeling Suite">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Input & Output Files &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+				
+                
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+				
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Input & Output Files</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/03_technical/index.html'>Technical Details</a></li>
+      
+         <li class="active">Input & Output Files</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    
+    <div class="col-lg-3">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_neutral_beam.html'>Neutral Beam</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_halo.html'>Neutral Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_fida.html'>FIDA</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_NPA.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_approximations.html'>Approximations</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/03_technical/02_io.html'>Input & Output Files</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/03_sampling.html'>Sampling the Fast-ion Distribution Function</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/04_particles.html'>Particle Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/05_coordinates.html'>Coordinate Systems</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/06_interpolation.html'>Interpolation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/07_tracking.html'>Particle Tracking</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+    <div class="col-lg-9" id='text'>
+        <style>
+.codehilite {
+overflow-y: auto;
+height: 500px;
+}
+</style>
+
+<div class="toc">
+<ul>
+<li><a href="#input-files">Input Files</a><ul>
+<li><a href="#namelist-file">Namelist File</a></li>
+<li><a href="#geometry-file">Geometry File</a></li>
+<li><a href="#equilibrium-file">Equilibrium File</a></li>
+<li><a href="#distribution-file">Distribution File</a><ul>
+<li><a href="#distribution-function">Distribution Function</a></li>
+<li><a href="#guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</a></li>
+<li><a href="#full-orbit-monte-carlo-distribution">Full-Orbit Monte Carlo Distribution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#output-files">Output Files</a><ul>
+<li><a href="#birth-file">Birth File</a></li>
+<li><a href="#dcx-file">DCX File</a></li>
+<li><a href="#neutrals-file">Neutrals File</a></li>
+<li><a href="#spectra-file">Spectra File</a></li>
+<li><a href="#npa-file">NPA File</a></li>
+<li><a href="#fida-weight-file">FIDA Weight File</a></li>
+<li><a href="#npa-weight-file">NPA Weight File</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="input-files">Input Files</h1>
+<h2 id="namelist-file">Namelist File</h2>
+<p>The namelist file contains all the basic settings. 
+This file can be edited without having to re-create the other input files.</p>
+<div class="codehilite"><pre><span></span><span class="c">!! Created: Thu Mar 24 04:59:13 2016</span>
+<span class="c">!! FIDASIM version: 1.0.0</span>
+<span class="c">!! Comment: This is a comment</span>
+<span class="p">&amp;</span><span class="n">fidasim_inputs</span>
+<span class="n">shot</span> <span class="o">=</span>      <span class="mi">1</span>    <span class="c">!! Shot Number</span>
+<span class="nb">time</span> <span class="o">=</span>  <span class="mf">0.00051</span>    <span class="c">!! Time [s]</span>
+<span class="n">runid</span> <span class="o">=</span> <span class="s1">&#39;051&#39;</span>    <span class="c">!! runID</span>
+<span class="n">result_dir</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/&#39;</span>    <span class="c">!! Result Directory</span>
+
+<span class="c">!! Input Files</span>
+<span class="n">tables_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/FIDASIM/tables/atomic_tables.h5&#39;</span> <span class="c">!! Atomic Tables File</span>
+<span class="n">equilibrium_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_equilibrium.h5&#39;</span>         <span class="c">!! File containing plasma parameters and fields</span>
+<span class="n">geometry_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_geometry.h5&#39;</span>               <span class="c">!! File containing NBI and diagnostic geometry</span>
+<span class="n">distribution_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_distribution.h5&#39;</span>       <span class="c">!! File containing fast-ion distribution</span>
+<span class="n">neutrals_file</span> <span class="o">=</span> <span class="s1">&#39;/home/lstagner/051_neutrals.h5&#39;</span>               <span class="c">!! File containing the neutral density</span>
+
+<span class="c">!! Simulation Switches</span>
+<span class="n">calc_bes</span> <span class="o">=</span>  <span class="mi">1</span>        <span class="c">!! Calculate Beam Emission and Halo Spectra</span>
+<span class="n">calc_brems</span> <span class="o">=</span>  <span class="mi">1</span>      <span class="c">!! Calculate Bremsstrahlung</span>
+<span class="n">calc_fida</span> <span class="o">=</span>  <span class="mi">1</span>       <span class="c">!! Calculate FIDA Spectra</span>
+<span class="n">calc_npa</span> <span class="o">=</span>  <span class="mi">0</span>        <span class="c">!! Calculate NPA</span>
+<span class="n">calc_birth</span> <span class="o">=</span>  <span class="mi">1</span>      <span class="c">!! Calculate Birth Profile</span>
+<span class="n">calc_fida_wght</span> <span class="o">=</span>  <span class="mi">0</span>  <span class="c">!! Calculate FIDA weights</span>
+<span class="n">calc_npa_wght</span> <span class="o">=</span>  <span class="mi">0</span>   <span class="c">!! Calculate NPA weights</span>
+<span class="n">load_neutrals</span> <span class="o">=</span>  <span class="mi">0</span>   <span class="c">!! Load neutrals from a preexisting neutrals file</span>
+<span class="n">dump_dcx</span> <span class="o">=</span>  <span class="mi">1</span>        <span class="c">!! Dump DCX neutrals and spectra</span>
+<span class="n">verbose</span> <span class="o">=</span>  <span class="mi">1</span>         <span class="c">!! Verbose</span>
+
+<span class="c">!! Monte Carlo Settings</span>
+<span class="n">n_fida</span> <span class="o">=</span> <span class="mi">25000000</span> <span class="c">!! Number of FIDA mc particles</span>
+<span class="n">n_npa</span> <span class="o">=</span> <span class="mi">2500000</span>   <span class="c">!! Number of NPA mc particles</span>
+<span class="n">n_nbi</span> <span class="o">=</span> <span class="mi">50000</span>     <span class="c">!! Number of NBI mc particles</span>
+<span class="n">n_halo</span> <span class="o">=</span> <span class="mi">500000</span>   <span class="c">!! Number of HALO mc particles</span>
+<span class="n">n_dcx</span> <span class="o">=</span> <span class="mi">500000</span>    <span class="c">!! Number of DCX mc particles</span>
+<span class="n">n_birth</span> <span class="o">=</span> <span class="mi">10000</span>   <span class="c">!! Number of BIRTH mc particles</span>
+
+<span class="c">!! Neutral Beam Settings</span>
+<span class="n">ab</span> <span class="o">=</span>   <span class="mf">1.00728</span>             <span class="c">!! Beam Species mass [amu]</span>
+<span class="n">pinj</span> <span class="o">=</span>     <span class="mf">1.326</span>           <span class="c">!! Beam Power [MW]</span>
+<span class="n">einj</span> <span class="o">=</span>    <span class="mi">1</span><span class="mf">5.000</span>           <span class="c">!! Beam Energy [keV]</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.85000</span> <span class="c">!! Beam Species Mix (Full component)</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.10000</span> <span class="c">!! Beam Species Mix (Half component)</span>
+<span class="n">species_mix</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span>   <span class="mf">0.05000</span> <span class="c">!! Beam Species Mix (Third component)</span>
+
+<span class="c">!! Plasma Settings</span>
+<span class="n">ai</span> <span class="o">=</span> <span class="mf">2.01411</span>        <span class="c">!! Ion Species mass [amu]</span>
+<span class="n">impurity_charge</span> <span class="o">=</span> <span class="mi">6</span> <span class="c">!! Impurity Charge</span>
+
+<span class="c">!! Beam Grid Settings</span>
+<span class="n">nx</span> <span class="o">=</span>  <span class="mi">80</span>        <span class="c">!! Number of cells in X direction (Into Plasma)</span>
+<span class="n">ny</span> <span class="o">=</span>  <span class="mi">80</span>        <span class="c">!! Number of cells in Y direction</span>
+<span class="n">nz</span> <span class="o">=</span> <span class="mi">120</span>        <span class="c">!! Number of cells in Z direction</span>
+<span class="n">xmin</span> <span class="o">=</span>  <span class="o">-</span><span class="mi">8</span><span class="mf">0.000</span> <span class="c">!! Minimum X value [cm]</span>
+<span class="n">xmax</span> <span class="o">=</span>   <span class="mi">8</span><span class="mf">0.000</span> <span class="c">!! Maximum X value [cm]</span>
+<span class="n">ymin</span> <span class="o">=</span>  <span class="o">-</span><span class="mi">8</span><span class="mf">0.000</span> <span class="c">!! Minimum Y value [cm]</span>
+<span class="n">ymax</span> <span class="o">=</span>   <span class="mi">8</span><span class="mf">0.000</span> <span class="c">!! Maximum Y value [cm]</span>
+<span class="n">zmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">12</span><span class="mf">0.000</span> <span class="c">!! Minimum Z value [cm]</span>
+<span class="n">zmax</span> <span class="o">=</span>  <span class="mi">12</span><span class="mf">0.000</span> <span class="c">!! Maximum Z value [cm]</span>
+
+<span class="c">!! Tait-Bryan Angles for z-y`-x`` rotation</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.00000</span> <span class="c">!! Rotation about z-axis [rad]</span>
+<span class="n">beta</span>  <span class="o">=</span> <span class="mf">0.00000</span> <span class="c">!! Rotation about y`-axis [rad]</span>
+<span class="nb">gamma</span> <span class="o">=</span> <span class="mf">0.00000</span> <span class="c">!! Rotation about x``-axis [rad]</span>
+
+<span class="c">!! Beam Grid origin in machine coordinates (cartesian)</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.000</span> <span class="c">!! X value [cm]</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.000</span> <span class="c">!! Y value [cm]</span>
+<span class="n">origin</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.000</span> <span class="c">!! Z value [cm]</span>
+
+<span class="c">!! Wavelength Grid Settings</span>
+<span class="n">nlambda</span> <span class="o">=</span> <span class="mi">2000</span>      <span class="c">!! Number of Wavelengths</span>
+<span class="n">lambdamin</span> <span class="o">=</span> <span class="mi">64</span><span class="mf">7.000</span> <span class="c">!! Minimum Wavelength [nm]</span>
+<span class="n">lambdamax</span> <span class="o">=</span> <span class="mi">66</span><span class="mf">7.000</span> <span class="c">!! Maximum Wavelength [nm]</span>
+
+<span class="c">!! Weight Function Settings</span>
+<span class="n">ne_wght</span> <span class="o">=</span> <span class="mi">50</span>             <span class="c">!! Number of Energies for Weights</span>
+<span class="n">np_wght</span> <span class="o">=</span> <span class="mi">50</span>             <span class="c">!! Number of Pitches for Weights</span>
+<span class="n">nphi_wght</span> <span class="o">=</span> <span class="mi">100</span>          <span class="c">!! Number of Gyro-angles for Weights</span>
+<span class="n">emax_wght</span> <span class="o">=</span> <span class="mi">10</span><span class="mf">0.00</span>       <span class="c">!! Maximum Energy for Weights [keV]</span>
+<span class="n">nlambda_wght</span> <span class="o">=</span> <span class="mi">1000</span>      <span class="c">!! Number of Wavelengths for Weights </span>
+<span class="n">lambdamin_wght</span> <span class="o">=</span> <span class="mi">64</span><span class="mf">7.000</span> <span class="c">!! Minimum Wavelength for Weights [nm]</span>
+<span class="n">lambdamax_wght</span> <span class="o">=</span> <span class="mi">66</span><span class="mf">7.000</span> <span class="c">!! Maximum Wavelength for Weights [nm]</span>
+
+<span class="o">/</span>
+</pre></div>
+
+
+<h2 id="geometry-file">Geometry File</h2>
+<div class="codehilite"><pre><span></span>/                        Group
+    Attribute: description scalar
+        Type:      33-byte null-terminated ASCII string
+        Data:  &quot;Geometric quantities for FIDASIM&quot;
+    Location:  1:96
+    Links:     1
+/nbi                     Group
+    Attribute: coordinate_system scalar
+        Type:      23-byte null-terminated ASCII string
+        Data:  &quot;Right-handed cartesian&quot;
+    Attribute: description scalar
+        Type:      22-byte null-terminated ASCII string
+        Data:  &quot;Neutral Beam Geometry&quot;
+    Location:  1:800
+    Links:     1
+/nbi/axis                Dataset {3/3}
+    Attribute: description scalar
+        Type:      59-byte null-terminated ASCII string
+        Data:  &quot;Axis of the beam centerline: Centerline(t) = src + axis*t &quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:7392
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 16 allocated bytes, 150.00% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/nbi/data_source         Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      27-byte null-terminated ASCII string
+        Data:  &quot;Source of the NBI geometry&quot;
+    Location:  1:4752
+    Links:     1
+    Storage:   14 logical bytes, 14 allocated bytes, 100.00% utilization
+    Type:      14-byte null-terminated ASCII string
+/nbi/divy                Dataset {3/3}
+    Attribute: description scalar
+        Type:      65-byte null-terminated ASCII string
+        Data:  &quot;Horizonal divergences of the beam. One for each energy component&quot;
+    Attribute: units scalar
+        Type:      8-byte null-terminated ASCII string
+        Data:  &quot;radians&quot;
+    Location:  1:10304
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 33 allocated bytes, 72.73% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/nbi/divz                Dataset {3/3}
+    Attribute: description scalar
+        Type:      64-byte null-terminated ASCII string
+        Data:  &quot;Vertical divergences of the beam. One for each energy component&quot;
+    Attribute: units scalar
+        Type:      8-byte null-terminated ASCII string
+        Data:  &quot;radians&quot;
+    Location:  1:12848
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 33 allocated bytes, 72.73% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/nbi/focy                Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      35-byte null-terminated ASCII string
+        Data:  &quot;Horizonal focal length of the beam&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:15544
+    Links:     1
+    Storage:   8 logical bytes, 8 allocated bytes, 100.00% utilization
+    Type:      native double
+/nbi/focz                Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      34-byte null-terminated ASCII string
+        Data:  &quot;Vertical focal length of the beam&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:15816
+    Links:     1
+    Storage:   8 logical bytes, 8 allocated bytes, 100.00% utilization
+    Type:      native double
+/nbi/name                Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      10-byte null-terminated ASCII string
+        Data:  &quot;Beam name&quot;
+    Location:  1:1832
+    Links:     1
+    Storage:   10 logical bytes, 10 allocated bytes, 100.00% utilization
+    Type:      10-byte null-terminated ASCII string
+/nbi/shape               Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      61-byte null-terminated ASCII string
+        Data:  &quot;Shape of the beam source grid: 1=\&quot;rectangular\&quot;, 2=\&quot;circular\&quot;&quot;
+    Location:  1:4480
+    Links:     1
+    Storage:   2 logical bytes, 2 allocated bytes, 100.00% utilization
+    Type:      native short
+/nbi/src                 Dataset {3/3}
+    Attribute: description scalar
+        Type:      47-byte null-terminated ASCII string
+        Data:  &quot;Position of the center of the beam source grid&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:5024
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 19 allocated bytes, 126.32% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/nbi/widy                Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      35-byte null-terminated ASCII string
+        Data:  &quot;Half width of the beam source grid&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:9760
+    Links:     1
+    Storage:   8 logical bytes, 8 allocated bytes, 100.00% utilization
+    Type:      native double
+/nbi/widz                Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      36-byte null-terminated ASCII string
+        Data:  &quot;Half height of the beam source grid&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:10032
+    Links:     1
+    Storage:   8 logical bytes, 8 allocated bytes, 100.00% utilization
+    Type:      native double
+/npa                     Group
+    Attribute: coordinate_system scalar
+        Type:      23-byte null-terminated ASCII string
+        Data:  &quot;Right-handed cartesian&quot;
+    Attribute: description scalar
+        Type:      13-byte null-terminated ASCII string
+        Data:  &quot;NPA Geometry&quot;
+    Location:  1:16723
+    Links:     1
+/npa/a_cent              Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      23-byte null-terminated ASCII string
+        Data:  &quot;Center of the aperture&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:37536
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 21 allocated bytes, 342.86% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/npa/a_redge             Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      35-byte null-terminated ASCII string
+        Data:  &quot;Center of the apertures right edge&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:40424
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 34 allocated bytes, 211.76% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/npa/a_shape             Dataset {3/3}
+    Attribute: description scalar
+        Type:      53-byte null-terminated ASCII string
+        Data:  &quot;Shape of the aperture: 1=\&quot;rectangular\&quot;, 2=\&quot;circular\&quot;&quot;
+    Location:  1:32800
+    Links:     1
+    Chunks:    {3} 6 bytes
+    Storage:   6 logical bytes, 14 allocated bytes, 42.86% utilization
+    Filter-0:  shuffle-2 OPT {2}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native short
+/npa/a_tedge             Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      33-byte null-terminated ASCII string
+        Data:  &quot;Center of the apertures top edge&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:43312
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 75 allocated bytes, 96.00% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/npa/d_cent              Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      23-byte null-terminated ASCII string
+        Data:  &quot;Center of the detector&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:46376
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 77 allocated bytes, 93.51% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/npa/d_redge             Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      35-byte null-terminated ASCII string
+        Data:  &quot;Center of the detectors right edge&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:49592
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 78 allocated bytes, 92.31% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/npa/d_shape             Dataset {3/3}
+    Attribute: description scalar
+        Type:      53-byte null-terminated ASCII string
+        Data:  &quot;Shape of the detector: 1=\&quot;rectangular\&quot;, 2=\&quot;circular\&quot;&quot;
+    Location:  1:35168
+    Links:     1
+    Chunks:    {3} 6 bytes
+    Storage:   6 logical bytes, 14 allocated bytes, 42.86% utilization
+    Filter-0:  shuffle-2 OPT {2}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native short
+/npa/d_tedge             Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      33-byte null-terminated ASCII string
+        Data:  &quot;Center of the detectors top edge&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:52480
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 77 allocated bytes, 93.51% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/npa/data_source         Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      27-byte null-terminated ASCII string
+        Data:  &quot;Source of the NPA geometry&quot;
+    Location:  1:32528
+    Links:     1
+    Storage:   13 logical bytes, 13 allocated bytes, 100.00% utilization
+    Type:      13-byte null-terminated ASCII string
+/npa/nchan               Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      19-byte null-terminated ASCII string
+        Data:  &quot;Number of channels&quot;
+    Location:  1:31656
+    Links:     1
+    Storage:   4 logical bytes, 4 allocated bytes, 100.00% utilization
+    Type:      native int
+/npa/radius              Dataset {3/3}
+    Attribute: description scalar
+        Type:      51-byte null-terminated ASCII string
+        Data:  &quot;Line of sight radius at midplane or tangency point&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:55368
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 19 allocated bytes, 126.32% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/npa/system              Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      35-byte null-terminated ASCII string
+        Data:  &quot;Names of the different NPA systems&quot;
+    Location:  1:32256
+    Links:     1
+    Storage:   4 logical bytes, 4 allocated bytes, 100.00% utilization
+    Type:      4-byte null-terminated ASCII string
+/spec                    Group
+    Attribute: coordinate_system scalar
+        Type:      23-byte null-terminated ASCII string
+        Data:  &quot;Right-handed cartesian&quot;
+    Attribute: description scalar
+        Type:      24-byte null-terminated ASCII string
+        Data:  &quot;FIDA/BES Chord Geometry&quot;
+    Location:  1:16088
+    Links:     1
+/spec/axis               Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      60-byte null-terminated ASCII string
+        Data:  &quot;Optical axis of the lines of sight: LOS(t) = lens + axis*t &quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:20824
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 58 allocated bytes, 124.14% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/spec/data_source        Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      29-byte null-terminated ASCII string
+        Data:  &quot;Source of the chord geometry&quot;
+    Location:  1:17664
+    Links:     1
+    Storage:   16 logical bytes, 16 allocated bytes, 100.00% utilization
+    Type:      16-byte null-terminated ASCII string
+/spec/lens               Dataset {3/3, 3/3}
+    Attribute: description scalar
+        Type:      24-byte null-terminated ASCII string
+        Data:  &quot;Positions of the lenses&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:17936
+    Links:     1
+    Chunks:    {3, 3} 72 bytes
+    Storage:   72 logical bytes, 21 allocated bytes, 342.86% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/spec/nchan              Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      19-byte null-terminated ASCII string
+        Data:  &quot;Number of channels&quot;
+    Location:  1:16792
+    Links:     1
+    Storage:   4 logical bytes, 4 allocated bytes, 100.00% utilization
+    Type:      native int
+/spec/radius             Dataset {3/3}
+    Attribute: description scalar
+        Type:      51-byte null-terminated ASCII string
+        Data:  &quot;Line of sight radius at midplane or tangency point&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:28448
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 19 allocated bytes, 126.32% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/spec/sigma_pi           Dataset {3/3}
+    Attribute: description scalar
+        Type:      76-byte null-terminated ASCII string
+        Data:  &quot;Ratio of the intensities of the sigma and pi stark lines. Measured quantity&quot;
+    Location:  1:26080
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 18 allocated bytes, 133.33% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/spec/spot_size          Dataset {3/3}
+    Attribute: description scalar
+        Type:      20-byte null-terminated ASCII string
+        Data:  &quot;Radius of spot size&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:23712
+    Links:     1
+    Chunks:    {3} 24 bytes
+    Storage:   24 logical bytes, 11 allocated bytes, 218.18% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/spec/system             Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      44-byte null-terminated ASCII string
+        Data:  &quot;Names of the different spectrocopic systems&quot;
+    Location:  1:17392
+    Links:     1
+    Storage:   9 logical bytes, 9 allocated bytes, 100.00% utilization
+    Type:      9-byte null-terminated ASCII string
+</pre></div>
+
+
+<h2 id="equilibrium-file">Equilibrium File</h2>
+<div class="codehilite"><pre><span></span>/                        Group
+    Attribute: description scalar
+        Type:      57-byte null-terminated ASCII string
+        Data:  &quot;Plasma Parameters and Electromagnetic Fields for FIDASIM&quot;
+    Location:  1:96
+    Links:     1
+/fields                  Group
+    Attribute: coordinate_system scalar
+        Type:      12-byte null-terminated ASCII string
+        Data:  &quot;Cylindrical&quot;
+    Attribute: description scalar
+        Type:      23-byte null-terminated ASCII string
+        Data:  &quot;Electromagnetic Fields&quot;
+    Location:  1:37832
+    Links:     1
+/fields/br               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      43-byte null-terminated ASCII string
+        Data:  &quot;Magnetic field in the r-direction: Br(r,z)&quot;
+    Attribute: units scalar
+        Type:      2-byte null-terminated ASCII string
+        Data:  &quot;T&quot;
+    Location:  1:48832
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 21069 allocated bytes, 265.79% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/bt               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      56-byte null-terminated ASCII string
+        Data:  &quot;Magnetic field in the theta/torodial-direction: Bt(r,z)&quot;
+    Attribute: units scalar
+        Type:      2-byte null-terminated ASCII string
+        Data:  &quot;T&quot;
+    Location:  1:72789
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 11296 allocated bytes, 495.75% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/bz               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      43-byte null-terminated ASCII string
+        Data:  &quot;Magnetic field in the z-direction: Bz(r,z)&quot;
+    Attribute: units scalar
+        Type:      2-byte null-terminated ASCII string
+        Data:  &quot;T&quot;
+    Location:  1:86973
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 21322 allocated bytes, 262.64% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/data_source      Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      29-byte null-terminated ASCII string
+        Data:  &quot;Source of the EM equilibrium&quot;
+    Location:  1:45672
+    Links:     1
+    Storage:   40 logical bytes, 40 allocated bytes, 100.00% utilization
+    Type:      40-byte null-terminated ASCII string
+/fields/er               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      43-byte null-terminated ASCII string
+        Data:  &quot;Electric field in the r-direction: Er(r,z)&quot;
+    Attribute: units scalar
+        Type:      4-byte null-terminated ASCII string
+        Data:  &quot;V/m&quot;
+    Location:  1:111183
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 77 allocated bytes, 72727.27% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/et               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      56-byte null-terminated ASCII string
+        Data:  &quot;Electric field in the theta/torodial-direction: Et(r,z)&quot;
+    Attribute: units scalar
+        Type:      4-byte null-terminated ASCII string
+        Data:  &quot;V/m&quot;
+    Location:  1:114071
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 77 allocated bytes, 72727.27% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/ez               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      43-byte null-terminated ASCII string
+        Data:  &quot;Electric field in the z-direction: Ez(r,z)&quot;
+    Attribute: units scalar
+        Type:      4-byte null-terminated ASCII string
+        Data:  &quot;V/m&quot;
+    Location:  1:117135
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 77 allocated bytes, 72727.27% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/mask             Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      62-byte null-terminated ASCII string
+        Data:  &quot;Boolean mask that indicates where the fields are well defined&quot;
+    Location:  1:45944
+    Links:     1
+    Chunks:    {100, 70} 14000 bytes
+    Storage:   14000 logical bytes, 38 allocated bytes, 36842.11% utilization
+    Filter-0:  shuffle-2 OPT {2}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native short
+/fields/nr               Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      19-byte null-terminated ASCII string
+        Data:  &quot;Number of R values&quot;
+    Location:  1:134415
+    Links:     1
+    Storage:   2 logical bytes, 2 allocated bytes, 100.00% utilization
+    Type:      native short
+/fields/nz               Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      19-byte null-terminated ASCII string
+        Data:  &quot;Number of Z values&quot;
+    Location:  1:134687
+    Links:     1
+    Storage:   2 logical bytes, 2 allocated bytes, 100.00% utilization
+    Type:      native short
+/fields/r                Dataset {70/70}
+    Attribute: description scalar
+        Type:      7-byte null-terminated ASCII string
+        Data:  &quot;Radius&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:43575
+    Links:     1
+    Chunks:    {70} 560 bytes
+    Storage:   560 logical bytes, 499 allocated bytes, 112.22% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/r2d              Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      20-byte null-terminated ASCII string
+        Data:  &quot;Radius grid: R(r,z)&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:120351
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 723 allocated bytes, 7745.50% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/time             Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      5-byte null-terminated ASCII string
+        Data:  &quot;Time&quot;
+    Attribute: units scalar
+        Type:      2-byte null-terminated ASCII string
+        Data:  &quot;s&quot;
+    Location:  1:45072
+    Links:     1
+    Storage:   8 logical bytes, 8 allocated bytes, 100.00% utilization
+    Type:      native double
+/fields/z                Dataset {100/100}
+    Attribute: description scalar
+        Type:      2-byte null-terminated ASCII string
+        Data:  &quot;Z&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:43847
+    Links:     1
+    Chunks:    {100} 800 bytes
+    Storage:   800 logical bytes, 700 allocated bytes, 114.29% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/fields/z2d              Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      15-byte null-terminated ASCII string
+        Data:  &quot;Z grid: Z(r,z)&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:123239
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 1648 allocated bytes, 3398.06% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma                  Group
+    Attribute: coordinate_system scalar
+        Type:      12-byte null-terminated ASCII string
+        Data:  &quot;Cylindrical&quot;
+    Attribute: description scalar
+        Type:      18-byte null-terminated ASCII string
+        Data:  &quot;Plasma Parameters&quot;
+    Location:  1:800
+    Links:     1
+/plasma/data_source      Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      32-byte null-terminated ASCII string
+        Data:  &quot;Source of the plasma parameters&quot;
+    Location:  1:4480
+    Links:     1
+    Storage:   46 logical bytes, 46 allocated bytes, 100.00% utilization
+    Type:      46-byte null-terminated ASCII string
+/plasma/dene             Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      35-byte null-terminated ASCII string
+        Data:  &quot;Electron Number Density: Dene(r,z)&quot;
+    Attribute: units scalar
+        Type:      6-byte null-terminated ASCII string
+        Data:  &quot;cm^-3&quot;
+    Location:  1:22256
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 95 allocated bytes, 58947.37% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/mask             Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      73-byte null-terminated ASCII string
+        Data:  &quot;Boolean mask that indicates where the plasma parameters are well defined&quot;
+    Location:  1:4752
+    Links:     1
+    Chunks:    {100, 70} 14000 bytes
+    Storage:   14000 logical bytes, 191 allocated bytes, 7329.84% utilization
+    Filter-0:  shuffle-2 OPT {2}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native short
+/plasma/nr               Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      19-byte null-terminated ASCII string
+        Data:  &quot;Number of R values&quot;
+    Location:  1:37560
+    Links:     1
+    Storage:   2 logical bytes, 2 allocated bytes, 100.00% utilization
+    Type:      native short
+/plasma/nz               Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      19-byte null-terminated ASCII string
+        Data:  &quot;Number of Z values&quot;
+    Location:  1:32742
+    Links:     1
+    Storage:   2 logical bytes, 2 allocated bytes, 100.00% utilization
+    Type:      native short
+/plasma/r                Dataset {70/70}
+    Attribute: description scalar
+        Type:      7-byte null-terminated ASCII string
+        Data:  &quot;Radius&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:4173
+    Links:     1
+    Chunks:    {70} 560 bytes
+    Storage:   560 logical bytes, 499 allocated bytes, 112.22% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/r2d              Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      20-byte null-terminated ASCII string
+        Data:  &quot;Radius grid: R(r,z)&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:28360
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 723 allocated bytes, 7745.50% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/te               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      30-byte null-terminated ASCII string
+        Data:  &quot;Electron Temperature: Te(r,z)&quot;
+    Attribute: units scalar
+        Type:      4-byte null-terminated ASCII string
+        Data:  &quot;keV&quot;
+    Location:  1:7640
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 96 allocated bytes, 58333.33% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/ti               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      25-byte null-terminated ASCII string
+        Data:  &quot;Ion Temperature: Ti(r,z)&quot;
+    Attribute: units scalar
+        Type:      4-byte null-terminated ASCII string
+        Data:  &quot;keV&quot;
+    Location:  1:10528
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 95 allocated bytes, 58947.37% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/time             Dataset {SCALAR}
+    Attribute: description scalar
+        Type:      5-byte null-terminated ASCII string
+        Data:  &quot;Time&quot;
+    Attribute: units scalar
+        Type:      2-byte null-terminated ASCII string
+        Data:  &quot;s&quot;
+    Location:  1:1832
+    Links:     1
+    Storage:   8 logical bytes, 8 allocated bytes, 100.00% utilization
+    Type:      native double
+/plasma/vr               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      45-byte null-terminated ASCII string
+        Data:  &quot;Bulk plasma flow in the r-direction: Vr(r,z)&quot;
+    Attribute: units scalar
+        Type:      5-byte null-terminated ASCII string
+        Data:  &quot;cm/s&quot;
+    Location:  1:13416
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 77 allocated bytes, 72727.27% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/vt               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      58-byte null-terminated ASCII string
+        Data:  &quot;Bulk plasma flow in the theta/torodial-direction: Vt(r,z)&quot;
+    Attribute: units scalar
+        Type:      5-byte null-terminated ASCII string
+        Data:  &quot;cm/s&quot;
+    Location:  1:16304
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 765 allocated bytes, 7320.26% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/vz               Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      45-byte null-terminated ASCII string
+        Data:  &quot;Bulk plasma flow in the z-direction: Vz(r,z)&quot;
+    Attribute: units scalar
+        Type:      5-byte null-terminated ASCII string
+        Data:  &quot;cm/s&quot;
+    Location:  1:19192
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 77 allocated bytes, 72727.27% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/z                Dataset {100/100}
+    Attribute: description scalar
+        Type:      2-byte null-terminated ASCII string
+        Data:  &quot;Z&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:32470
+    Links:     1
+    Chunks:    {100} 800 bytes
+    Storage:   800 logical bytes, 700 allocated bytes, 114.29% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/z2d              Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      15-byte null-terminated ASCII string
+        Data:  &quot;Z grid: Z(r,z)&quot;
+    Attribute: units scalar
+        Type:      3-byte null-terminated ASCII string
+        Data:  &quot;cm&quot;
+    Location:  1:3901
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 1648 allocated bytes, 3398.06% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+/plasma/zeff             Dataset {100/100, 70/70}
+    Attribute: description scalar
+        Type:      36-byte null-terminated ASCII string
+        Data:  &quot;Effective Nuclear Charge: Zeff(r,z)&quot;
+    Location:  1:25472
+    Links:     1
+    Chunks:    {100, 70} 56000 bytes
+    Storage:   56000 logical bytes, 96 allocated bytes, 58333.33% utilization
+    Filter-0:  shuffle-2 OPT {8}
+    Filter-1:  deflate-1 OPT {9}
+    Type:      native double
+</pre></div>
+
+
+<h2 id="distribution-file">Distribution File</h2>
+<h3 id="distribution-function">Distribution Function</h3>
+<h3 id="guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</h3>
+<h3 id="full-orbit-monte-carlo-distribution">Full-Orbit Monte Carlo Distribution</h3>
+<h1 id="output-files">Output Files</h1>
+<h2 id="birth-file">Birth File</h2>
+<h2 id="dcx-file">DCX File</h2>
+<h2 id="neutrals-file">Neutrals File</h2>
+<h2 id="spectra-file">Spectra File</h2>
+<h2 id="npa-file">NPA File</h2>
+<h2 id="fida-weight-file">FIDA Weight File</h2>
+<h2 id="npa-weight-file">NPA Weight File</h2>
+    </div>
+  </div>
+
+    <hr>
+    <footer>
+        <div class="row">
+        <div class="col-md-4">&copy; 2016 </div>
+	<div class="col-md-4"><span class="text-center"> FIDASIM was developed by Luke Stagner</span></div>
+        <div class="col-md-4"><span class="pull-right">Documentation generated by <a href="https://github.com/cmacmackin/ford">FORD</a></span></div>
+        </div>
+        <br>
+    </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

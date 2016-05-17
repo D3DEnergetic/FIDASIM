@@ -16,14 +16,14 @@ def main():
     parser.add_argument('path',
                         help='Namelist file or result directory')
     parser.add_argument('-w','--walltime',
-                        default = '5:00:00',
-                        help = 'Set walltime. Defaults to 5:00:00')
+                        default = '2:00:00',
+                        help = 'Set walltime. Defaults to 2:00:00')
     parser.add_argument('-n','--nodes',
                         type=int,default = 1,
                         help = 'Set number of nodes. Defaults to 1')
     parser.add_argument('-ppn',
-                        type=int,default = 8,dest='ppn',
-                        help = 'Set processors per node. Defaults to 8')
+                        type=int,default = 16,dest='ppn',
+                        help = 'Set processors per node. Defaults to 16')
     parser.add_argument('-mem','--memory',
                         default = '2gb',
                         help = 'Set required memory. Defaults to 2048mb')

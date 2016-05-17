@@ -1,5 +1,8 @@
 title: User Guide
 
+![FIDASIM](|media|/fidasim-logo.png)
+{: style="text-align: center" }
+
 #Introduction
 In fusion plasmas fast-ions can undergo the following process with injected neutral Hydrogen:
 $$ H^+ + H(n) \rightarrow H^\ast(m) + H^+ $$

@@ -61,7 +61,7 @@ git checkout v{!../VERSION!}
 ```
 
 ##Setting up environmental variables
-FIDASIM needs to know where somethings are so you have to set the following environmental variables in your `.bashrc`
+FIDASIM needs to know where some things are so you have to set the following environmental variables in your `.bashrc`
 ```bash
 export FIDASIM_DIR=/path/to/fidasim/install
 export FC=gfortran #use 'ifort' for Intel Fortran compiler

@@ -7,7 +7,7 @@ title: Preprocessing Inputs
 #Create FIDASIM input files using PREFIDA
 
 FIDASIM requires inputs to be in a [specified format](../03_technical/02_io.html).
-[PREFIDA](|url|/sourcefile/prefida.pro.html) is an IDL routine that takes the required inputs, checks them validity, and transforms them into a form FIDASIM understands.
+[PREFIDA](|url|/sourcefile/prefida.pro.html) is an IDL routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.
 
 PREFIDA is called as follows
 ```
@@ -43,8 +43,8 @@ The IDL routine [rz_grid.pro](|url|/sourcefile/rz_grid.pro.html) can be used to 
 IDL> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
 ```
 
-The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beamlives and interacts with the plasma. 
-To maximize the resolution of this grid it is useful to align the beam grid with the beam sightline.
+The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
+To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.
 The IDL routine [beam_grid.pro](|url|/sourcefile/beam_grid.pro.html) calculates from the [neutral beam geometry](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure) the optimal [beam grid settings](../03_technical/01_prefida_inputs.html#beam-grid-settings) that would align the grid with the beam sightline.
 
 ```
@@ -58,10 +58,10 @@ To make things easy we provide the IDL routine [read_geqdsk.pro](|url|/sourcefil
 ```
 IDL> fields = read_geqdsk('g159243.00300',flux=flux)
 ```
-where `flux` is the outputted torodial flux.
+where the `flux` keyword is a named variable that recieves the torodial flux upon executation.
 
 #Extracting GEQDSK file and Plasma Parameters from TRANSP
-Its convenient to grab FIDASIM inputs from previously calculated TRANSP runs. 
+It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. 
 
 
 The python script, `extract_transp_geqdsk`, can be used to extract the MHD equilibrium from TRANSP's `.DATA* files`.
@@ -81,7 +81,7 @@ IDL> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,flux)
 where `grid` is the interpolation grid and `flux` is the torodial flux.
 
 #Translating NUBEAM Neutral Beam Geometry
-The IDL routine [nubeam_geometry.pro](|url|/sourcefile/nubeam_geometry.pro.html) can be used to tranlate NUBEAMS neutral bem geometry definition into the [correct format](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure).
+The IDL routine [nubeam_geometry.pro](|url|/sourcefile/nubeam_geometry.pro.html) can be used to translate the NUBEAM neutral beam geometry definition into the [correct format](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure).
 ```
 IDL> nbi = nubeam_geometry(nubeam)
 ```

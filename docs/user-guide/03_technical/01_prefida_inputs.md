@@ -52,7 +52,7 @@ A value of two will turn on additional functionality.
 | `verbose`           | Int16   | 0    | NA         | NA    | Verbose output                           |
 
 ##Monte Carlo Settings
-These settings control the number Monte Carlo particles used by FIDASIM.
+These settings control the number of Monte Carlo particles used by FIDASIM.
 Using too few particles will execute quickly but will be extremely noisy.
 Contrarily, using too many particles will increase runtime but will have small Monte Carlo noise.
 The following settings provide a good balance between runtime and Monte Carlo noise.

@@ -183,9 +183,9 @@ END: hour, minute, second:  1:53:07
 duration:                   0:15:53
 ```
 
-##Submitting to a SGE cluster using `submit_fidasim`
+##Submitting to a Sun Grid Engine cluster using `submit_fidasim`
 
-`submit_fidasim` is a python routine that submits a FIDASIM job to a SGE cluster. For example
+`submit_fidasim` is a python routine that submits a FIDASIM job to a SGE cluster using `qsub`. For example
 
 ```
 lstagner@computer:~$ submit_fidasim /u/lstagner/TEST

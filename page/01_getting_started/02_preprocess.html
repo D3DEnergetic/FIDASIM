@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	 
-	 <meta name="description" content="FIDASIM - A Neutral Beam and Fast-ion Diagnostic Modeling Suite">
+	 <meta name="description" content="">
     
     <meta name="author" content="Chris MacMackin" >
     <link rel="icon" href="../../favicon.png">
@@ -264,7 +264,7 @@
 </div>
 <h1 id="create-fidasim-input-files-using-prefida">Create FIDASIM input files using PREFIDA</h1>
 <p>FIDASIM requires inputs to be in a <a href="../03_technical/02_io.html">specified format</a>.
-<a href="../../sourcefile/prefida.pro.html">PREFIDA</a> is an IDL routine that takes the required inputs, checks them validity, and transforms them into a form FIDASIM understands.</p>
+<a href="../../sourcefile/prefida.pro.html">PREFIDA</a> is an IDL routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.</p>
 <p>PREFIDA is called as follows</p>
 <div class="codehilite"><pre><span></span>IDL&gt; prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
 </pre></div>
@@ -298,8 +298,8 @@ The IDL routine <a href="../../sourcefile/rz_grid.pro.html">rz_grid.pro</a> can 
 </pre></div>
 
 
-<p>The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beamlives and interacts with the plasma. 
-To maximize the resolution of this grid it is useful to align the beam grid with the beam sightline.
+<p>The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
+To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.
 The IDL routine <a href="../../sourcefile/beam_grid.pro.html">beam_grid.pro</a> calculates from the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">neutral beam geometry</a> the optimal <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">beam grid settings</a> that would align the grid with the beam sightline.</p>
 <div class="codehilite"><pre><span></span>IDL&gt; bgrid = beam_grid(nbi,rstart)
 </pre></div>
@@ -312,9 +312,9 @@ To make things easy we provide the IDL routine <a href="../../sourcefile/read_ge
 </pre></div>
 
 
-<p>where <code>flux</code> is the outputted torodial flux.</p>
+<p>where the <code>flux</code> keyword is a named variable that recieves the torodial flux upon executation.</p>
 <h1 id="extracting-geqdsk-file-and-plasma-parameters-from-transp">Extracting GEQDSK file and Plasma Parameters from TRANSP</h1>
-<p>Its convenient to grab FIDASIM inputs from previously calculated TRANSP runs. </p>
+<p>It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. </p>
 <p>The python script, <code>extract_transp_geqdsk</code>, can be used to extract the MHD equilibrium from TRANSP's <code>.DATA* files</code>.
 For example:</p>
 <div class="codehilite"><pre><span></span>extract_transp_geqdsk /p/transparch/result/NSTX/14 159243H06 
@@ -330,7 +330,7 @@ Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
 
 <p>where <code>grid</code> is the interpolation grid and <code>flux</code> is the torodial flux.</p>
 <h1 id="translating-nubeam-neutral-beam-geometry">Translating NUBEAM Neutral Beam Geometry</h1>
-<p>The IDL routine <a href="../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> can be used to tranlate NUBEAMS neutral bem geometry definition into the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">correct format</a>.</p>
+<p>The IDL routine <a href="../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> can be used to translate the NUBEAM neutral beam geometry definition into the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">correct format</a>.</p>
 <div class="codehilite"><pre><span></span>IDL&gt; nbi = nubeam_geometry(nubeam)
 </pre></div>
 

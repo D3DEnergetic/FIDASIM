@@ -292,8 +292,8 @@ The shapes of the detector and aperture can take the value 1 or 2 for a rectangu
 | `data_source`       | String  | 0    | NA           | NA    | Source of the NPA geometry data |
 | `id`                | String  | 1    | [`nchan`]    | NA    | Channel ID                      |
 | `radius`            | Float64 | 1    | [`nchan`]    | cm    | Line of sight radius at midplane or tangency point |
-| `a_shape`           | Int16   | 0    | NA           | NA    | Shape of the aperture           |
-| `d_shape`           | Int16   | 0    | NA           | NA    | Shape of the detector           |
+| `a_shape`           | Int16   | 1    | [`nchan`]    | NA    | Shape of the aperture           |
+| `d_shape`           | Int16   | 1    | [`nchan`]    | NA    | Shape of the detector           |
 | `a_cent`            | Float64 | 2    | [3,`nchan`]  | cm    | Position of the center of the aperture |
 | `a_redge`           | Float64 | 2    | [3,`nchan`]  | cm    | Position of the apertures right edge |
 | `a_tedge`           | Float64 | 2    | [3,`nchan`]  | cm    | Position of the apertures top edge |

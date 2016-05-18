@@ -4,9 +4,23 @@ import argparse
 import os
 import re
 import glob
+import tarfile
 import time as tm
 import subprocess
 
+def extract_time(file):
+    if file.endswith('tar.gz'):
+        tar = tarfile.open(file)
+        m = tar.getmembers()[0]
+        f = tar.extractfile(m)
+    else:
+        f = open(file,'r')
+  
+    time = float(f.readline().split()[2])
+    f.close()
+
+    return time
+    
 def main():
     parser = argparse.ArgumentParser(description="Extracts GEQDSK file from a TRANSP run using trxpl program")
 
@@ -79,18 +93,16 @@ def main():
     if not args.time:
        fileid_list = args.file_id
        times = []
-       if not fileid_list:
+       if fileid_list:
+           for id in fileid_list:
+               fname = glob.glob(args.directory+'/'+args.runid+'.DATA'+id+'*')[0]
+               t = extract_time(fname)
+               times.append(t)
+       else:
            file_list = glob.glob(args.directory+'/'+args.runid+'.DATA*')
-           try:
-               fileid_list=[re.match('.*?([0-9]+)$',s).group(1) for s in file_list]
-           except:
-               print('\033[91m'+'ERROR: Times could not be extracted from .DATA* files. Set times manually using -t option'+'\033[0m')
-               quit()
-               
-       for id in fileid_list:
-           f = open(args.directory+'/'+args.runid+'.DATA'+id,'r')
-           times.append(float(f.readline().split()[2]))
-           f.close()
+           for f in file_list:
+               t = extract_time(f)
+               times.append(t)
     else: times=args.time
 
     for time in times:

@@ -13,11 +13,13 @@ def extract_time(file):
         tar = tarfile.open(file)
         m = tar.getmembers()[0]
         f = tar.extractfile(m)
+        time = float(f.readline().split()[2])
+        f.close()
+        tar.close()
     else:
         f = open(file,'r')
-  
-    time = float(f.readline().split()[2])
-    f.close()
+        time = float(f.readline().split()[2])
+        f.close()
 
     return time
     

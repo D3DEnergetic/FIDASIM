@@ -6,6 +6,7 @@ import re
 import glob
 import tarfile
 import tempfile
+import shutil
 import subprocess
 
 def main():
@@ -28,6 +29,9 @@ def main():
     parser.add_argument('-t','--type',
                         default = 'c',
                         help = 'Type of distribution: c: Guiding Center (default) or p: Particle Location')
+    parser.add_argument('-tmp','--temp_dir',
+                        default=tempfile.gettempdir(),
+                        help = 'Temporary directory for extracting .tar.gz files')
     parser.add_argument('-v','--verbose',
                         action = 'store_true',
                         help = 'Verbose')
@@ -44,8 +48,10 @@ def main():
         print('\033[91m'+'ERROR: You do not have write permissions in the output directory ('+args.output_dir+')'+'\033[0m')
         exit()
 
+    tempfile.tempdir = args.temp_dir
     fileid_list = args.file_id
     paths = []
+    tmpdirs = []
     if not fileid_list:
        file_list = glob.glob(os.path.abspath(args.path)+'/'+args.runid+'.DATA*')
        for f in file_list:
@@ -54,8 +60,10 @@ def main():
            if f.endswith('tar.gz'):
                tar = tarfile.open(f)
                tmpdir = tempfile.mkdtemp()
+               tmpdirs.append(tmpdir)
                dirnum = tar.getmembers()[0].name.split('/')[0] 
                tar.extractall(path=tmpdir)
+               tar.close()
                paths.append(tmpdir+'/'+dirnum)
            else:
                paths.append(os.path.abspath(args.path))
@@ -66,8 +74,10 @@ def main():
            if f.endswith('tar.gz'):
                tar = tarfile.open(f)
                tmpdir = tempfile.mkdtemp()
+               tmpdirs.append(tmpdir)
                dirnum = tar.getmembers()[0].name.split('/')[0] 
                tar.extractall(path=tmpdir)
+               tar.close()
                paths.append(tmpdir+'/'+dirnum)
            else:
                paths.append(os.path.abspath(args.path))
@@ -106,6 +116,9 @@ def main():
            out, err = proc.communicate(input=fbm_script)
        else:
            print(fbm_script)
-         
+
+    for tmpdir in tmpdirs:
+        shutil.rmtree(tmpdir)
+
 if __name__=='__main__':
     main()

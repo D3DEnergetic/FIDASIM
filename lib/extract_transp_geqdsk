@@ -35,10 +35,10 @@ def main():
                         default = 'D3D',
                         help = 'Device Default = D3D')
     parser.add_argument('-y','--year',
-                        default = str(tm.localtime().tm_year)[2::],
-                        help = 'Run year Default = Current Year')
+                        help = 'Run year')
     parser.add_argument('-fid','--file_id',
                         nargs='+',
+                        default=[],
                         help='File ID list e.g. 1 2 3 ...')
     parser.add_argument('-t','--time',
                         nargs = '+', type=float,
@@ -90,17 +90,23 @@ def main():
         print('\033[91m'+'ERROR: You do not have write permissions in the output directory ('+args.output_dir+')'+'\033[0m')
         exit()
 
+    if not args.year:
+       year = args.directory.split('/')[-1]
+    else:
+       year = args.year
+
     if not args.time:
        fileid_list = args.file_id
        times = []
        if fileid_list:
            for id in fileid_list:
-               fname = glob.glob(args.directory+'/'+args.runid+'.DATA'+id+'*')[0]
+               fname = sorted(glob.glob(args.directory+'/'+args.runid+'.DATA'+id+'*'))[0]
                t = extract_time(fname)
                times.append(t)
        else:
            file_list = glob.glob(args.directory+'/'+args.runid+'.DATA*')
            for f in file_list:
+               if f[-1] == '~': continue
                t = extract_time(f)
                times.append(t)
     else: times=args.time
@@ -118,7 +124,7 @@ def main():
                      'ntheta':args.num_theta,'nr':args.num_r,'nz':args.num_r,
                      'bt_sign':args.bt_dir,'ip_sign':args.ip_dir,
                      'nh':args.num_horizontal,'nv':args.num_vertical,'nc':args.num_contours,
-                     'gfile':gfile,'dir':args.directory,'year':args.year,'device':args.device}
+                     'gfile':gfile,'dir':args.directory,'year':year,'device':args.device}
 
         trxpl_script = """
                          y
@@ -147,7 +153,7 @@ def main():
 
         if args.verbose:
             print('Device: '+args.device)
-            print('Year: '+args.year)
+            print('Year: '+year)
             print('Runid: '+args.runid)
             print('Time: '+str(time)+' +/- '+str(args.delta_time)+' [s]')
             print('GEQDSK file: '+gfile+'\n')

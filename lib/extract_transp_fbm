@@ -4,6 +4,8 @@ import argparse
 import os
 import re
 import glob
+import tarfile
+import tempfile
 import subprocess
 
 def main():
@@ -15,6 +17,7 @@ def main():
                         help='TRANSP run ID')
     parser.add_argument('-fid','--file_id',
                         nargs='+',
+                        default=[],
                         help='File ID list e.g. 1 2 3 ...')
     parser.add_argument('-d','--device',
                         default='D3D',
@@ -42,13 +45,35 @@ def main():
         exit()
 
     fileid_list = args.file_id
-
+    paths = []
     if not fileid_list:
-       file_list = glob.glob(args.path+'/'+args.runid+'.DATA*')
-       fileid_list=list(set([re.match('.*?([0-9]+)~?$',s).group(1) for s in file_list]))
-
-    for id in fileid_list:
-       args_dict = {'rid':args.runid,'path':args.path,
+       file_list = glob.glob(os.path.abspath(args.path)+'/'+args.runid+'.DATA*')
+       for f in file_list:
+           if f[-1] == '~':
+               continue
+           if f.endswith('tar.gz'):
+               tar = tarfile.open(f)
+               tmpdir = tempfile.mkdtemp()
+               dirnum = tar.getmembers()[0].name.split('/')[0] 
+               tar.extractall(path=tmpdir)
+               paths.append(tmpdir+'/'+dirnum)
+           else:
+               paths.append(os.path.abspath(args.path))
+           fileid_list.append(re.match('.*?([0-9]+)~?(.tar.gz)?$',f).group(1))
+    else:
+       for id in fileid_list:
+           f = sorted(glob.glob(os.path.abspath(args.path)+'/'+args.runid+'.DATA'+id+'*'))[0]
+           if f.endswith('tar.gz'):
+               tar = tarfile.open(f)
+               tmpdir = tempfile.mkdtemp()
+               dirnum = tar.getmembers()[0].name.split('/')[0] 
+               tar.extractall(path=tmpdir)
+               paths.append(tmpdir+'/'+dirnum)
+           else:
+               paths.append(os.path.abspath(args.path))
+               
+    for i, id in enumerate(fileid_list):
+       args_dict = {'rid':args.runid,'path':paths[i],
                     'fileid':id,'device':args.device,
                     'outdir':os.path.abspath(args.output_dir),
                     'type':args.type}
@@ -74,7 +99,7 @@ def main():
        fbm_script = "\n".join([line.lstrip() for line in fbm_script.splitlines()])
 
        if args.verbose:
-           print(args.path+'/'+args.runid+'.DATA'+id)
+           print(paths[i]+'/'+args.runid+'.DATA'+id)
 
        if not args.debug:
            proc = subprocess.Popen('get_fbm',stdin=subprocess.PIPE,stdout=subprocess.PIPE)

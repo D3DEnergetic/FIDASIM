@@ -77,7 +77,7 @@ atomic_tables:
 docs:
 	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
 	@echo "Checking for broken links..."
-	linkchecker --check-extern $(DOCS_DIR)/html/index.html
+	linkchecker $(DOCS_DIR)/html/index.html
 
 clean_all: clean clean_deps clean_docs
 

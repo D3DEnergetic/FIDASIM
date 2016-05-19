@@ -32,7 +32,6 @@ PRO write_namelist, filename, inputs
     printf,55,"equilibrium_file = '" + inputs.equilibrium_file +"'    !! File containing plasma parameters and fields"
     printf,55,"geometry_file = '" + inputs.geometry_file +"'    !! File containing NBI and diagnostic geometry"
     printf,55,"distribution_file = '" + inputs.distribution_file +"'    !! File containing fast-ion distribution"
-    printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"
     printf,55,''
     printf,55,'!! Simulation Switches'
     printf,55,f='("calc_bes = ",i2 , "    !! Calculate Beam Emission Spectra")',inputs.calc_bes
@@ -42,8 +41,11 @@ PRO write_namelist, filename, inputs
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
     printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght
-    printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from neutrals file")',inputs.load_neutrals
     printf,55,f='("dump_dcx = ",i2,"    !! Dump DCX neutrals and spectra")',inputs.dump_dcx
+    printf,55,''
+    printf,55,'!! Debugging Switches'
+    printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from neutrals file")',inputs.load_neutrals
+    printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"
     printf,55,f='("verbose = ",i2,"    !! Verbose")',inputs.verbose
     printf,55,''
     printf,55,'!! Monte Carlo Settings'

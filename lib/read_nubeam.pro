@@ -194,7 +194,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     endif
 
     fbm_struct={type:1,time:time,nenergy:fix(nenergy),energy:energy,npitch:fix(npitch),$
-                pitch:pitch,f:fbm_grid,denf:denf,data_source:filename}
+                pitch:pitch,f:fbm_grid,denf:denf,data_source:file_expand_path(filename)}
 
     return, fbm_struct
     GET_OUT:

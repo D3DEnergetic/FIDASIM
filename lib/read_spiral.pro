@@ -158,7 +158,7 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, $
     print,'Number of markers: ',npart
     print,'Number of markers in energy range: ',nw
 
-    dist_struct = {type:2,time:time,data_source:file, $
+    dist_struct = {type:2,time:time,data_source:file_expand_path(file), $
                    nparticle:npart,nclass:1,r:r,z:z,phi:phi,$
                    energy:energy,pitch:pitch,class:orbit_class,$
                    weight:weight}

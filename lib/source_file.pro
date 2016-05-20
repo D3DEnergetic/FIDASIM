@@ -5,7 +5,7 @@ FUNCTION source_file,name
         s = scope_traceback(/structure)
         nlevels = n_elements(s)
         sfile = s[nlevels-2].filename
-        return, sfile
+        return, file_expand_path(sfile)
     endif else begin
         help,/source_files,output=csf ;all compiled source files
         nc = n_elements(csf)
@@ -13,7 +13,7 @@ FUNCTION source_file,name
             has_name = stregex(csf[i],name,/fold_case) ne -1
             if has_name then begin
                 sfile = stregex(csf[i],"\/[\/a-z0-9_\-]*.[a-z0-9_\-]*",/extract,/fold_case)
-                return, sfile
+                return, file_expand_path(sfile)
             endif
         endfor
     endelse

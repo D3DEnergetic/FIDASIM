@@ -308,11 +308,11 @@ The IDL routine <a href="../../sourcefile/beam_grid.pro.html">beam_grid.pro</a> 
 <h1 id="reading-geqdsk-files">Reading GEQDSK files</h1>
 <p>Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine <a href="../../sourcefile/read_geqdsk.pro.html">read_geqdsk.pro</a> to calculate the <a href="../03_technical/01_prefida_inputs.html#fields-structure">fields structure</a> from EFITs GEQDSK file.</p>
-<div class="codehilite"><pre><span></span>IDL&gt; fields = read_geqdsk(&#39;g159243.00300&#39;,flux=flux)
+<div class="codehilite"><pre><span></span>IDL&gt; fields = read_geqdsk(&#39;g159243.00300&#39;,grid,flux=flux)
 </pre></div>
 
 
-<p>where the <code>flux</code> keyword is a named variable that recieves the torodial flux upon executation.</p>
+<p>where <code>grid</code> is the interpolation grid and the <code>flux</code> keyword is a named variable that recieves the torodial flux upon executation.</p>
 <h1 id="extracting-geqdsk-file-and-plasma-parameters-from-transp">Extracting GEQDSK file and Plasma Parameters from TRANSP</h1>
 <p>It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. </p>
 <p>The python script, <code>extract_transp_geqdsk</code>, can be used to extract the MHD equilibrium from TRANSP's <code>.DATA* files</code>.
@@ -352,7 +352,7 @@ We provide routines for:</p>
 <li><a href="../../sourcefile/read_mc_nubeam.pro.html">read_mc_nubeam.pro</a>: Monte Carlo TRANSP/NUBEAM Guiding Center distribution</li>
 <li><a href="../../sourcefile/read_spiral.pro.html">read_spiral.pro</a>: SPIRAL Guiding Center distribution</li>
 </ul>
-<div class="codehilite"><pre><span></span>IDL&gt; f = read_nubeam(nubeam_distribution,btipsign = -1) 
+<div class="codehilite"><pre><span></span>IDL&gt; f = read_nubeam(nubeam_distribution,grid,btipsign = -1) 
 IDL&gt; mcf = read_mc_nubeam(mc_nubeam_distribution,Ntotal=1e19,btipsign=-1)
 IDL&gt; s = read_spiral(spiral_file,Ntotal=1e19,btipsign=-1)
 </pre></div>

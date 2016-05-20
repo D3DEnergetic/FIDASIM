@@ -19,7 +19,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> dist = read_nubeam("./159245H02_fi_1.cdf")
+    ;+IDL> dist = read_nubeam("./159245H02_fi_1.cdf",grid,btipsign=-1)
     ;+```
 
     if not keyword_set(btipsign) then btipsign = -1

@@ -145,7 +145,7 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> fields = read_geqdsk("./g133223.00200",flux=flux)
+    ;+IDL> fields = read_geqdsk("./g133223.00200",grid,flux=flux)
     ;+```
 
     equil={err:1}

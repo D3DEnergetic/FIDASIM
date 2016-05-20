@@ -43,13 +43,11 @@ A value of two will turn on additional functionality.
 | `calc_bes`          | Int16   | 0    | NA         | NA    | Calculate Beam Emission and Halo spectra |
 | `calc_brems`        | Int16   | 0    | NA         | NA    | Calculate Bremsstrahlung                 |
 | `calc_fida`         | Int16   | 0    | NA         | NA    | Calculate FIDA spectra                   |
-| `calc_NPA`          | Int16   | 0    | NA         | NA    | Calculate NPA flux                       |
+| `calc_npa`          | Int16   | 0    | NA         | NA    | Calculate NPA flux                       |
 | `calc_birth`        | Int16   | 0    | NA         | NA    | Calculate Birth profile                  |
 | `calc_fida_wght`    | Int16   | 0    | NA         | NA    | Calculate FIDA weight functions          | 
 | `calc_npa_wght`     | Int16   | 0    | NA         | NA    | Calculate NPA weight functions           |
-| `load_neutrals`     | Int16   | 0    | NA         | NA    | Load neutrals from preexisiting run      |
 | `dump_dcx`          | Int16   | 0    | NA         | NA    | Dump DCX neutrals and spectra            |
-| `verbose`           | Int16   | 0    | NA         | NA    | Verbose output                           |
 
 ##Monte Carlo Settings
 These settings control the number of Monte Carlo particles used by FIDASIM.

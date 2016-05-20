@@ -56,9 +56,9 @@ Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine [read_geqdsk.pro](|url|/sourcefile/read_geqdsk.pro.html) to calculate the [fields structure](../03_technical/01_prefida_inputs.html#fields-structure) from EFITs GEQDSK file.
 
 ```
-IDL> fields = read_geqdsk('g159243.00300',flux=flux)
+IDL> fields = read_geqdsk('g159243.00300',grid,flux=flux)
 ```
-where the `flux` keyword is a named variable that recieves the torodial flux upon executation.
+where `grid` is the interpolation grid and the `flux` keyword is a named variable that recieves the torodial flux upon executation.
 
 #Extracting GEQDSK file and Plasma Parameters from TRANSP
 It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. 
@@ -104,7 +104,7 @@ We provide routines for:
 * [read_spiral.pro](|url|/sourcefile/read_spiral.pro.html): SPIRAL Guiding Center distribution
 
 ```
-IDL> f = read_nubeam(nubeam_distribution,btipsign = -1) 
+IDL> f = read_nubeam(nubeam_distribution,grid,btipsign = -1) 
 IDL> mcf = read_mc_nubeam(mc_nubeam_distribution,Ntotal=1e19,btipsign=-1)
 IDL> s = read_spiral(spiral_file,Ntotal=1e19,btipsign=-1)
 ```

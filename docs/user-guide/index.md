@@ -20,7 +20,7 @@ Towards this end, FIDASIM was created.
 
 ##History
 The very first implementation of FIDASIM was written by Yadong Luo and Bill Heidbrink while Yadong was working on his [thesis](http://www.physics.uci.edu/~wwheidbr/papers/thesis_luo.pdf).
-Subsequently, Deyong Liu added features to simulate NPA signals. The IDL version of the code was distributed for public use and documented in a journal publication (http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf).
+Subsequently, Deyong Liu added features to simulate NPA signals. The IDL version of the code was distributed for public use and documented in a [journal publication](http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf).
 
 Originally, FIDASIM was written in the IDL programming language and was prohibitively slow.
 As a part of his [thesis](http://www.iaea.org/inis/collection/NCLCollectionStore/_Public/46/051/46051941.pdf) Ben Geiger wrote a version of FIDASIM written in Fortran 90.

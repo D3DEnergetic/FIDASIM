@@ -17,10 +17,10 @@ PRO run_tests,result_dir,test_case=test_case
    ffracs=cgfitf[0]+cgfitf[1]*einj+cgfitf[2]*einj^2
    hfracs=cgfith[0]+cgfith[1]*einj+cgfith[2]*einj^2
    tfracs=1.0-ffracs-hfracs
-   species_mix = double([ffracs,hfracs,tfracs])
+   current_fractions = double([ffracs,hfracs,tfracs])
 
    basic_inputs = {device:"TEST",shot:1L,time:1.d0,$
-                   einj:einj,pinj:pinj,species_mix:species_mix,$
+                   einj:einj,pinj:pinj,current_fractions:current_fractions,$
                    ab:2.01410178d0,ai:2.0141078d0,impurity_charge:6,$
                    lambdamin:647.0d0,lambdamax:667.0d0,nlambda:2000,$
                    n_fida:5000000L,n_npa:500000L,n_nbi:50000L, $
@@ -28,8 +28,7 @@ PRO run_tests,result_dir,test_case=test_case
                    ne_wght:50,np_wght:50,nphi_wght:100,emax_wght:100.0d0,$
                    nlambda_wght:1000,lambdamin_wght:647.d0,lambdamax_wght:667.d0,$
                    calc_npa:1,calc_brems:1,calc_bes:1,calc_fida:1,$
-                   calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,$
-                   load_neutrals:0,dump_dcx:1,verbose:1,$
+                   calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,dump_dcx:1,$
                    install_dir:fida_dir,result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}
 
    ;; Non-rotated, Non-tilted Grid

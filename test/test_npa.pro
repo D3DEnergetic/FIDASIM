@@ -36,6 +36,7 @@ FUNCTION test_npa
     vlos = [-200.d0,-170.d0,-140.d0]
     wlos = dblarr(nchan)
     radius = sqrt(ulos^2.d0 + vlos^2.d0)
+    id = ["c1","c2","c3"]
 
     a_cent  = dblarr(3,nchan)
     a_redge = dblarr(3,nchan)
@@ -66,7 +67,7 @@ FUNCTION test_npa
         d_tedge[*,i] = transpose(R##transpose(dt)) + r0
     endfor
 
-    npa_chords = {nchan:3L,system:"NPA",data_source:"test_npa.pro", $
+    npa_chords = {nchan:3L,system:"NPA",data_source:"test_npa.pro", id:id, $
                   a_shape:replicate(2,nchan),d_shape:replicate(2,nchan), $
                   a_cent:a_cent,a_redge:a_redge,a_tedge:a_tedge, $
                   d_cent:d_cent,d_redge:d_redge,d_tedge:d_tedge, radius:radius}

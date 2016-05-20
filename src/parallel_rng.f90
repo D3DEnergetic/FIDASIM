@@ -9,21 +9,22 @@ implicit none
 private
 public :: rng_type, rng_init, rng, rng_uniform, rng_normal, randu, randn, randind, ind2sub
 
+integer, parameter :: Int32 = 4
 integer, parameter :: Int64 = kind(int8(1))
 integer, parameter :: Float32 = kind(1.e0)
 integer, parameter :: Float64 = kind(1.d0)
 
-integer, parameter :: IA = 16807
-integer, parameter :: IM = 2147483647
-integer, parameter :: IQ = 127773
-integer, parameter :: IR = 2836
+integer(Int32), parameter :: IA = 16807
+integer(Int32), parameter :: IM = 2147483647
+integer(Int32), parameter :: IQ = 127773
+integer(Int32), parameter :: IR = 2836
 real(Float64), protected :: AM = nearest(1.0,-1.0)/IM
 
 integer, parameter :: ns = 2
 
 type :: rng_type
     !+ Random Number Generator Derived Type
-    integer, dimension(ns) :: state
+    integer(Int32), dimension(ns) :: state
 end type rng_type
 
 type(rng_type), dimension(:), allocatable :: rng
@@ -41,7 +42,7 @@ subroutine rng_init(self, seed)
     !+ Procedure to initialize a random number generator with a seed
     type(rng_type), intent(inout) :: self
         !+ Random Number Generator
-    integer, intent(in)           :: seed
+    integer(Int32), intent(in)    :: seed
         !+ Initial Seed Value
 
     self%state(1) = ieor(777755555,abs(seed))
@@ -56,7 +57,7 @@ function rng_uniform(self) result(u)
     real(Float64)                 :: u
         !+ Uniform random deviate
 
-    integer :: ix,iy,k
+    integer(Int32) :: ix,iy,k
   
     ix = self%state(1)
     iy = self%state(2)

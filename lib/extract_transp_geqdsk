@@ -49,11 +49,11 @@ def main():
                         default = 0.005, type=float,
                         help = 'Averaging time window in seconds. Default = 0.005 s')
     parser.add_argument('-bt','--bt_dir',
-                        default = -1,
-                        help = 'Btorodial direction (1=ccw, -1=cw). Default = -1')
+                        default = 0,
+                        help = 'Btorodial direction (1=ccw, -1=cw, 0=read from TRANSP data archive). Default = 0')
     parser.add_argument('-ip','--ip_dir',
-                        default = 1,
-                        help = 'Plasma current direction (1=ccw, -1=cw). Default = 1')
+                        default = 0,
+                        help = 'Plasma current direction (1=ccw, -1=cw, 0=read from TRANSP data archive). Default = 0')
     parser.add_argument('-nr','--num_r',
                         default = 101,
                         help = 'Number of R points for cartesian overlay grid. Default = 101')

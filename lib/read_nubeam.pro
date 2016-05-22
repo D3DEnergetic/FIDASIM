@@ -146,7 +146,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
 
     ;; FBM & DENF
     fdens=total(reform(total(fbm,1)),1)*dE*dP
-    print, 'Ntotal: ',total(fdens*vars.bmvol)
+    print, 'Ntotal in phase space: ',total(fdens*vars.bmvol)
     fstr = grid_fbm(r2d,z2d,fbm,fdens,rgrid,zgrid)
     denf = fstr.denf
     fbm_grid=fstr.fbm

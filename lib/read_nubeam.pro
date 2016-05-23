@@ -143,13 +143,22 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     nz=grid.nz
     rgrid=grid.r
     zgrid=grid.z
-
+    dr = abs(rgrid[1]-rgrid[0])
+    dz = abs(zgrid[1]-zgrid[0])
+    
     ;; FBM & DENF
     fdens=total(reform(total(fbm,1)),1)*dE*dP
-    print, 'Ntotal in phase space: ',total(fdens*vars.bmvol)
+    ntot = total(fdens*vars.bmvol)
+    print, 'Ntotal in phase space: ',ntot
     fstr = grid_fbm(r2d,z2d,fbm,fdens,rgrid,zgrid)
     denf = fstr.denf
     fbm_grid=fstr.fbm
+    
+    ;; enforce correct normalization
+    ntot_denf = (2*!dpi*dr*dz)*total(rgrid*total(denf,2))
+    denf = denf*(ntot/ntot_denf)
+    ntot_fbm = (2*!dpi*dr*dz*dE*dP)*total(rgrid*total(total(total(fbm_grid,1),1),2))
+    fbm_grid = fbm_grid*(ntot/ntot_fbm)
 
     ;; sort out positions more than 2 cm outside the separatrix
     rmaxis=mean(rsurf[*,0])

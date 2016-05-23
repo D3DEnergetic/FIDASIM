@@ -266,10 +266,18 @@ type FastIonDistribution
         !+ Number of energies
     integer(Int32) :: npitch
         !+ Number of pitches
+    integer(Int32) :: nr
+        !+ Number of radii
+    integer(Int32) :: nz
+        !+ Number of z values
     real(Float64)  :: dE
         !+ Energy spacing [keV]
     real(Float64)  :: dp
         !+ Pitch spacing
+    real(Float64)  :: dr
+        !+ Radial spacing [cm]
+    real(Float64)  :: dz
+        !+ Z spacing [cm]
     real(Float64)  :: emin
         !+ Minimum energy [keV]
     real(Float64)  :: emax
@@ -286,6 +294,12 @@ type FastIonDistribution
         !+ Energy values [keV]
     real(Float64), dimension(:), allocatable       :: pitch
         !+ Pitch w.r.t. the magnetic field
+    real(Float64), dimension(:), allocatable       :: r
+        !+ Radius [cm]
+    real(Float64), dimension(:), allocatable       :: z
+        !+ Z [cm]
+    real(Float64), dimension(:,:), allocatable     :: denf
+        !+ Fast-ion density defined on the [[libfida:inter_grid]]: denf(R,Z)
     real(Float64), dimension(:,:,:,:), allocatable :: f
         !+ Fast-ion distribution function defined on the [[libfida:inter_grid]]: F(E,p,R,Z)
 end type FastIonDistribution
@@ -2068,7 +2082,7 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/fields/et", equil%fields%et, dims, error)
     call h5ltread_dataset_double_f(gid, "/fields/ez", equil%fields%ez, dims, error)
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
-  
+
     !!Close FIELDS group
     call h5gclose_f(gid, error)
   
@@ -2100,19 +2114,32 @@ subroutine read_f(fid, error)
   
     call h5ltread_dataset_int_scalar_f(fid,"/nenergy", fbm%nenergy, error)
     call h5ltread_dataset_int_scalar_f(fid,"/npitch", fbm%npitch, error)
+    call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error) 
+    call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
+
+    if((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)) then
+        write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
+        stop
+    endif
+
+    allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz))
+    allocate(fbm%denf(fbm%nr, fbm%nz))
+    allocate(fbm%f(fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz))
   
-    allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch))
-    allocate(fbm%f(fbm%nenergy, fbm%npitch, inter_grid%nr, inter_grid%nz))
-  
-    dims = [fbm%nenergy, fbm%npitch, inter_grid%nr, inter_grid%nz]
+    dims = [fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz]
     call h5ltread_dataset_double_f(fid, "/energy", fbm%energy, dims(1:1), error)
     call h5ltread_dataset_double_f(fid, "/pitch", fbm%pitch, dims(2:2), error)
-    call h5ltread_dataset_double_f(fid, "/f", fbm%f, dims, error)
-    call h5ltread_dataset_double_f(fid, "/denf",equil%plasma%denf, dims(3:4), error)
-  
+    call h5ltread_dataset_double_f(fid, "/r", fbm%r, dims(3:3), error)
+    call h5ltread_dataset_double_f(fid, "/z", fbm%z, dims(4:4), error)
+    call h5ltread_dataset_double_f(fid, "/denf",fbm%denf, dims(3:4), error)
+    call h5ltread_dataset_double_f(fid, "/f", fbm%f, dims, error) 
+    equil%plasma%denf = fbm%denf
+    
     fbm%dE = abs(fbm%energy(2) - fbm%energy(1))
     fbm%dp = abs(fbm%pitch(2) - fbm%pitch(1))
-  
+    fbm%dr = abs(fbm%r(2) - fbm%r(1))
+    fbm%dz = abs(fbm%z(2) - fbm%z(1))
+
     dummy = minval(fbm%energy)
     fbm%emin = dummy(1)
     dummy = maxval(fbm%energy)
@@ -2880,11 +2907,15 @@ subroutine write_neutrals
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
   
+    character(charlim) :: filename
+
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.h5"
+
     !Open HDF5 interface
     call h5open_f(error)
     
     !Create file overwriting any existing file
-    call h5fcreate_f(inputs%neutrals_file, H5F_ACC_TRUNC_F, fid, error)
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
   
     !Write variables
     call write_beam_grid(fid, error)
@@ -2930,7 +2961,7 @@ subroutine write_neutrals
     call h5close_f(error)
   
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'neutral density written to: ',trim(inputs%neutrals_file)
+        write(*,'(T4,a,a)') 'neutral density written to: ',trim(filename)
     endif
 
 end subroutine write_neutrals
@@ -4461,10 +4492,12 @@ subroutine get_fields(fields,pos,ind)
 
 end subroutine get_fields
 
-subroutine get_distribution(fbeam, pos, ind)
+subroutine get_distribution(fbeam, denf, pos, ind)
     !+ Gets electro-magnetic fields at position `pos` or [[libfida:beam_grid]] indices `ind`
     real(Float64), dimension(:,:), intent(out)         :: fbeam
-        !+ Fast-ion distribution at `pos`/`ind`: F(E,p)
+        !+ Guiding Center Fast-ion distribution at `pos`/`ind`: F(E,p)
+    real(Float64), intent(out)                         :: denf
+        !+ Guiding Center Fast-ion density at `pos`/`ind` [fast-ions/cm^3]
     real(Float64), dimension(3), intent(in), optional  :: pos
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
@@ -4486,9 +4519,11 @@ subroutine get_distribution(fbeam, pos, ind)
     in_plasma1= .False.
     call in_plasma(xyz,in_plasma1)
     if(in_plasma1) then
-        call interpol(inter_grid%r, inter_grid%z, fbm%f, R, Z, fbeam,err)
+        call interpol(fbm%r, fbm%z, fbm%f, R, Z, fbeam, err)
+        call interpol(fbm%r, fbm%z, fbm%denf, R, Z, denf, err)
     else
         fbeam = 0.0
+        denf = 0.0
     endif
 
 end subroutine get_distribution
@@ -5301,7 +5336,7 @@ subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
         !+ Normalized velocity vector
 
     real(Float64) :: sinus
-  
+ 
     sinus = sqrt(1.d0-pitch**2)
     vi_norm = (sinus*cos(gyroangle)*fields%a_norm + &
                pitch*fields%b_norm + &
@@ -5320,14 +5355,14 @@ subroutine gyro_correction(vi, fields, r_gyro)
 
     real(Float64), dimension(3) :: vxB
     real(Float64) :: one_over_omega
-  
+ 
     one_over_omega=inputs%ab*mass_u/(fields%b_abs*e0)
     vxB = cross_product(vi,fields%b_norm)
     r_gyro = vxB*one_over_omega
 
 end subroutine gyro_correction
 
-subroutine mc_fastion(ind,ri,vi,at_guiding_center)
+subroutine mc_fastion(ind,ri,vi,denf,at_guiding_center)
     !+ Samples Fast-ion distribution function in a given [[libfida:beam_grid]] index
     integer, dimension(3), intent(in)        :: ind
         !+ [[libfida:beam_grid]] index
@@ -5335,6 +5370,8 @@ subroutine mc_fastion(ind,ri,vi,at_guiding_center)
         !+ Fast-ion position
     real(Float64), dimension(3), intent(out) :: vi 
         !+ Fast-ion velocity [cm/s]
+    real(Float64), intent(out)               :: denf
+        !+ Fast-ion density at guiding center
     logical, intent(in), optional            :: at_guiding_center
         !+ Indicates that ri should be the particles gyrocenter. Defaults to true
 
@@ -5362,12 +5399,13 @@ subroutine mc_fastion(ind,ri,vi,at_guiding_center)
     ri(2) = beam_grid%yc(ind(2)) + beam_grid%dr(2)*(randomu3(2) - 0.5)
     ri(3) = beam_grid%zc(ind(3)) + beam_grid%dr(3)*(randomu3(3) - 0.5)
     vi=0.d0
-  
+    denf=0.d0 
+
     call get_fields(fields,pos=ri)
     if(.not.fields%in_plasma) return 
   
     if(use_inverse_sampler) then
-        call get_distribution(fbeam,pos=ri)
+        call get_distribution(fbeam,denf,pos=ri)
         call randind(fbeam,ep_ind)
         call randu(randomu3)
         eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
@@ -5400,7 +5438,7 @@ subroutine mc_fastion(ind,ri,vi,at_guiding_center)
             !! Move a gyro-orbit away and sample distribution there
             rp=ri+r_gyro
   
-            call get_distribution(fbeam,pos=rp)
+            call get_distribution(fbeam,denf,pos=rp)
             max_fbm = maxval(fbeam)
             !! Find new cell
             if(max_fbm(1).gt.0.0) then
@@ -5916,6 +5954,7 @@ subroutine fida_f
     integer(kind=8) :: iion,ip
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64) :: denf !! fast-ion density
     integer, dimension(3) :: ind      !! new actual cell
     integer, dimension(4) :: neut_types=[1,2,3,4]
     logical :: los_intersect
@@ -5970,7 +6009,7 @@ subroutine fida_f
     !! Loop over all cells that have neutrals
     cnt=0.d0
     !$OMP PARALLEL DO schedule(guided) private(ip,i,j,k,iion,ind,vi,ri, &
-    !$OMP tracks,ncell,jj,plasma,prob,denn,states,photons)
+    !$OMP tracks,ncell,jj,plasma,prob,denn,states,photons,denf)
     loop_over_cells: do ip = 1, int(pcnt)
         i = pcell(1,ip)
         j = pcell(2,ip)
@@ -5978,7 +6017,7 @@ subroutine fida_f
         ind = [i, j, k]
         loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
             !! Sample fast ion distribution for velocity and position
-            call mc_fastion(ind, ri, vi)
+            call mc_fastion(ind, ri, vi, denf)
             if(sum(vi).eq.0) cycle loop_over_fast_ions
   
             !! Find the particles path through the beam grid
@@ -5991,8 +6030,7 @@ subroutine fida_f
             if(sum(prob).le.0.) cycle loop_over_fast_ions
   
             !! Calculate initial states of particle
-            call get_plasma(plasma,pos=tracks(1)%pos)
-            states=prob*plasma%denf
+            states=prob*denf
   
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ncell
@@ -6118,6 +6156,7 @@ subroutine npa_f
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: rf      !! end position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64) :: denf                  !! fast-ion density
     integer, dimension(3) :: ind      !! new actual cell
     integer, dimension(3,beam_grid%ngrid) :: pcell
   
@@ -6170,7 +6209,7 @@ subroutine npa_f
     !! Loop over all cells that can contribute to NPA signal
     cnt=0.d0
     !$OMP PARALLEL DO schedule(guided) private(ip,i,j,k,inpa,iion,ind, &
-    !$OMP& vi,ri,rf,det,plasma,prob,states,flux)
+    !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf)
     loop_over_cells: do ip = 1, int(pcnt)
         i = pcell(1,ip)
         j = pcell(2,ip)
@@ -6179,7 +6218,7 @@ subroutine npa_f
         npa_loop: do inpa=1,npa%nloop
             loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k))
                 !! Sample fast ion distribution for velocity and position
-                call mc_fastion(ind, ri, vi, at_guiding_center = .False.)
+                call mc_fastion(ind, ri, vi, denf, at_guiding_center = .False.)
                 if(sum(vi).eq.0)cycle loop_over_fast_ions
   
                 !! Check if particle hits a NPA detector
@@ -6191,8 +6230,7 @@ subroutine npa_f
                 if(sum(prob).le.0.)cycle loop_over_fast_ions
   
                 !! Attenuate states as the particle move through plasma
-                call get_plasma(plasma,pos=ri)
-                states=prob*plasma%denf
+                states=prob*denf
                 call attenuate(ri,rf,vi,states)
   
                 !! Store NPA Flux
@@ -6274,20 +6312,19 @@ subroutine npa_mc
                     ri = xyz
                 endif
   
-                !! Get beam grid indices 
-                call get_indices(ri,ind)
-  
                 !! Check if particle hits a NPA detector
                 call hit_npa_detector(ri, vi ,det, rf)
                 if(det.eq.0) cycle phi_loop
                 
+                !! Get beam grid indices 
+                call get_indices(ri,ind)
+  
                 !! Calculate CX probability with beam and halo neutrals
                 call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
                 if(sum(prob).le.0.)cycle phi_loop
   
                 !! Attenuate states as the particle moves though plasma
-                call get_plasma(plasma,pos=ri)
-                states=prob*plasma%denf
+                states=prob*fast_ion%weight
                 call attenuate(ri,rf,vi,states)
   
                 !! Store NPA Flux

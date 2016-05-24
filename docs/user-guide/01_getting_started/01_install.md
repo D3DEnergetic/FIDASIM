@@ -286,4 +286,4 @@ duration:                   0:15:53
 Congratulations! You followed the instructions.
 
 ##Now what
-Most likely you won't be satisfied by just running a test case. Click [here](./02_preprocess.html) to learn how to make the [input files](../03_technical/02_io.html) used by FIDASIM.
+Most likely you won't be satisfied by just running a test case. Click [here](./02_preprocess.html) to learn how to make the input files used by FIDASIM.

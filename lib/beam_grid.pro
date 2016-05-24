@@ -25,7 +25,7 @@ FUNCTION beam_grid, nbi, rstart, $
     ;+    **height**: Height of grid [cm]: Defaults to 50 cm
     ;+
     ;+##Return Value
-    ;+    Structure containing beam grid settings suitable for the [Namelist File](|url|/page/03_technical/02_io.html#namelist-file)
+    ;+    Structure containing beam grid settings suitable for the Namelist File
     ;+   
     ;+##Example Usage
     ;+```idl

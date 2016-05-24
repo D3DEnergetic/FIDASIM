@@ -6,7 +6,7 @@ title: Preprocessing Inputs
 
 #Create FIDASIM input files using PREFIDA
 
-FIDASIM requires inputs to be in a [specified format](../03_technical/02_io.html).
+FIDASIM requires inputs to be in a specific format.
 [PREFIDA](|url|/sourcefile/prefida.pro.html) is an IDL routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.
 
 PREFIDA is called as follows
@@ -26,10 +26,10 @@ where arguments are defined as follows. Click the argument's description for ext
 
 PREFIDA will create the following files
 
-* [Namelist File](../03_technical/02_io.html#namelist-file)
-* [Geometry File](../03_technical/02_io.html#geometry-file)
-* [Equilibrium File](../03_technical/02_io.html#equilibrium-file)
-* [Distribution File](../03_technical/02_io.html#distribution-file)
+* Namelist File
+* Geometry File
+* Equilibrium File
+* Distribution File
 
 Most devices may have already setup helper routines to make running FIDASIM and Prefida easy. 
 Click [here](./05_devices.html) to find out if someone has done your work for you.

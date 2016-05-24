@@ -1,1 +1,0 @@
-title: Collisional Radiative Model

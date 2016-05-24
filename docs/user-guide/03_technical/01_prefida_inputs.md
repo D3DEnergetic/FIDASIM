@@ -235,7 +235,7 @@ The `class` variable can take values in the range of 1:`nclass`.
 | `type`              | Int16   | 0    | NA           | NA    | Distribution type (2)           |
 | `time`              | Float64 | 0    | NA           | s     | Time of the distribution        |
 | `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data |
-| `nparticle          | Int32   | 0    | NA           | NA    | Number of MC particles          |
+| `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles          |
 | `nclass`            | Int16   | 0    | NA           | NA    | Number of orbit classes         |
 | `class`             | Int16   | 1    | [`nparticle`]| NA    | Orbit class of the MC particle  |
 | `weight`            | Float64 | 1    | [`nparticle`]| fast-ions| Weight of the MC particle    |
@@ -254,7 +254,7 @@ The `class` variable can take values in the range of 1:`nclass`.
 | `type`              | Int16   | 0    | NA           | NA    | Distribution type (2)           |
 | `time`              | Float64 | 0    | NA           | s     | Time of the distribution        |
 | `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data |
-| `nparticle          | Int32   | 0    | NA           | NA    | Number of MC particles          |
+| `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles          |
 | `nclass`            | Int16   | 0    | NA           | NA    | Number of orbit classes         |
 | `class`             | Int16   | 1    | [`nparticle`]| NA    | Orbit class of the MC particle  |
 | `weight`            | Float64 | 1    | [`nparticle`]| fast-ions| Weight of the MC particle    |

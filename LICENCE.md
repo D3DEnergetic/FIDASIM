@@ -8,9 +8,6 @@ FIDASIM is licensed under the MIT License
 >sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
 >furnished to do so, subject to the following conditions:
 >
-> 1. Any use of the Software is properly cited as described in the README.md
-> 2. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
->
 >The above copyright notice and this permission notice shall be included in all copies or substantial
 >portions of the Software.
 >

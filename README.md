@@ -1,4 +1,6 @@
 ![FIDASIM](docs/media/fidasim-logo.png)
+
+
 FIDASIM is a code that models the signal that is produced by charge-exchange reactions between fast-ions and injected neutral beams in tokamak plasmas.
 It was originally developed in IDL at UC Irvine [1] and converted to Fortran 90 by Benedikt Geiger (AUGD) [2]. The model is described in Comm. Comp. Phys. 10 (2011) 716. The halo algorithm was improved by Geiger; a weight function calculation was also added.
 

@@ -7,7 +7,7 @@ PRO run_tests,result_dir,test_case=test_case
      test_case = strupcase(test_case)
    endelse
 
-   fida_dir = GETENV('FIDASIM_DIR')
+   fida_dir = get_fidasim_dir()
    test_dir = fida_dir+'/test/'
    einj = double(72.5)
    pinj = double(1.7)
@@ -29,7 +29,7 @@ PRO run_tests,result_dir,test_case=test_case
                    nlambda_wght:1000,lambdamin_wght:647.d0,lambdamax_wght:667.d0,$
                    calc_npa:1,calc_brems:1,calc_bes:1,calc_fida:1,$
                    calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,dump_dcx:1,$
-                   install_dir:fida_dir,result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}
+                   result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}
 
    ;; Non-rotated, Non-tilted Grid
    grid01 = {nx:50,ny:60,nz:70,$

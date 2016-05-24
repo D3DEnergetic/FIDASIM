@@ -13,7 +13,7 @@ PRO write_namelist, filename, inputs
     ;+```
     info,'Writing namelist file...'
 
-    fidasim_version = get_version(inputs.install_dir)
+    fidasim_version = get_version(get_fidasim_dir())
 
     openw,55,filename
     printf,55,'!! Created: ', systime()

@@ -75,7 +75,7 @@ PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa
     print,''
     success,'FIDASIM pre-processing completed'
     print, 'To run FIDASIM use the following command'
-    print, inputs.install_dir+'/fidasim '+inputs.result_dir+'/'+inputs.runid+'_inputs.dat'
+    print, get_fidasim_dir()+'/fidasim '+inputs.result_dir+'/'+inputs.runid+'_inputs.dat'
     print,''
     print,''
 END

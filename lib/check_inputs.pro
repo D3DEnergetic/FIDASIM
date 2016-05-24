@@ -19,7 +19,7 @@ PRO check_inputs, inputs
     schema = {comment:zero_string, $
               shot:zero_long, time:zero_double, $
               runid:zero_string, device:zero_string, $ 
-              install_dir:zero_string, tables_file:zero_string, result_dir:zero_string, $
+              tables_file:zero_string, result_dir:zero_string, $
               nlambda:zero_int, lambdamin:zero_double, lambdamax:zero_double, $
               nx:zero_int, ny:zero_int, nz:zero_int, $
               alpha:zero_double, beta:zero_double, gamma:zero_double, $
@@ -44,7 +44,6 @@ PRO check_inputs, inputs
 
     ;Normalize File Paths
     inputs.result_dir = expand_path(inputs.result_dir)
-    inputs.install_dir = expand_path(inputs.install_dir)
 
     if inputs.alpha gt 2*!DPI or $
        inputs.beta gt 2*!DPI or $

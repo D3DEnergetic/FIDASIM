@@ -30,7 +30,6 @@ text-align: center;
 | `time`              | Float64 | 0    | NA         | s     | Time                                     |
 | `runid`             | String  | 0    | NA         | NA    | Run ID                                   |
 | `comment`           | String  | 0    | NA         | NA    | Comment                                  |
-| `install_dir`       | String  | 0    | NA         | NA    | FIDASIM install directory                |
 | `result_dir`        | String  | 0    | NA         | NA    | Result directory                         |
 | `tables_file`       | String  | 0    | NA         | NA    | Atomic Tables file                       |
 

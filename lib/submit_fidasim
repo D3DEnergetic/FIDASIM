@@ -27,9 +27,10 @@ def main():
     parser.add_argument('-mem','--memory',
                         default = '2gb',
                         help = 'Set required memory. Defaults to 2048mb')
+    executable = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))+'/fidasim'
     parser.add_argument('-ex','--executable',
-                        default = os.path.normpath(os.environ['FIDASIM_DIR']+'/fidasim'),
-                        help = 'Set path to FIDASIM executable. Defaults to '+os.path.normpath(os.environ['FIDASIM_DIR']+'/fidasim'))
+                        default = executable,
+                        help = 'Set path to FIDASIM executable. Defaults to '+executable)
     parser.add_argument('-log',
                         default = '',
                         help = 'Set log directory. Defaults to result directory.')

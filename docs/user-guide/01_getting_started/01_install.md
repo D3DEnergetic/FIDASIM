@@ -1,6 +1,6 @@
-title: Getting Started
+title: Installation
 
-#Getting Started
+#Installing FIDASIM
 So you have decided to install FIDASIM. Don't worry this should be relatively painless.
 
 @note
@@ -9,20 +9,27 @@ If you experiance problems installing FIDASIM you did something wrong and you sh
 The following code snippets assumes you are using a BASH shell.
 To figure out what shell you currently have run `echo $SHELL` to find out. 
 
+[TOC]
+
 ---
 
 ##Dependencies
 FIDASIM has the following dependencies:
 
 * Linux because all other operating systems are inferior
-* [IDL](http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx) for pre-processing. Sorry.
-* [HDF5](https://www.hdfgroup.org/HDF5/) for reading and writing compressed data files
+* [Make](https://www.gnu.org/software/make/) for building FIDASIM. 
+* Fortran, C, and C++ compilers.
+  [GNU](https://gcc.gnu.org/) and [Intel](https://software.intel.com/en-us/intel-compilers) compilers are supported.
+* [IDL](http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx) for pre-processing.
+* [zlib](http://zlib.net/) for file compression.
+* [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
+* [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)
+* [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
-
-Fortunately for you (the user) FIDASIM bundles and builds HDF5 for you and only FIDASIM developers should need Ford.
+* [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
 
 ##Getting FIDASIM source
-It is a fact of nature that you cannot run code you haven't installed. There are two ways correcting this.
+It's rather difficult to run software you haven't downloaded. There are two ways of getting the source code.
 
 ###Downloading source directly
 The most recent version of FIDASIM ({!../VERSION!}) can be downloaded from [here](https://github.com/D3DEnergetic/FIDASIM/releases)
@@ -54,33 +61,23 @@ git checkout v{!../VERSION!}
 ```
 
 ##Setting up environmental variables
-FIDASIM needs to know where somethings are so you have to set the following environmental variables in your `.bashrc`
+FIDASIM needs to know where some things are so you have to set the following environmental variables in your `.bashrc`
 ```bash
 export FIDASIM_DIR=/path/to/fidasim/install
 export FC=gfortran #use 'ifort' for Intel Fortran compiler
 export CC=gcc      #use 'icc' for Intel C compiler
 export CXX=g++     #use 'icpc' for Intel C++ compiler
 
-#For HDF5 dependency
-export HDF5_INCLUDE=$FIDASIM_DIR/deps/hdf5/include
-export HDF5_LIB=$FIDASIM_DIR/deps/hdf5/lib
-export LD_LIBRARY_PATH=$HDF5_LIB:$HDF5_INCLUDE:$LD_LIBRARY_PATH
-
 #For using helper routines
-export PATH=$FIDASIM_DIR/lib:$PATH
-```
-replacing `/path/to/fidasim/install` with the real directory
+export PATH=$FIDASIM_DIR/deps/hdf5/bin:$FIDASIM_DIR/lib:$PATH
+export IDL_PATH="+$FIDASIM_DIR:$IDL_PATH:<IDL_DEFAULT>"
 
-While we are at it lets set up your IDL environment as well.
-Add the following to your `.idl_startup` file.
-```idl
-!path = !path + ":" + expand_path("+" + getenv("FIDASIM_DIR") + "/")
-.compile /path/to/fidasim/install/src/prefida.pro
+ulimit -s unlimited #Omit this if you like segfaults
 ```
-replacing `/path/to/fidasim/install` with the real directory
+replacing `/path/to/fidasim/install` with the real directory.
 
 ##Building FIDASIM
-Once you are in the source directory run the following
+Once you are in the source directory (and have all the dependencies installed) run the following
 ```bash
 make
 ```
@@ -101,7 +98,7 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
 
 usage: ./fidasim namelist_file [num_threads]
 ```
-Congrats you installed FIDASIM! But wait there's more.
+Good job! You installed FIDASIM! But wait there's more.
 
 ##Generating Atomic Tables
 Calculating reaction rates on the fly is time consuming so FIDASIM pre-computes them to save time.
@@ -137,14 +134,14 @@ Now do what the computer says.
 Think of as good practice for when the [robots take over](https://www.youtube.com/watch?v=7Pq-S557XQU).
 
 It should print out the following. 
-```text
+```
 [lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
 /_/  /___//____//_/ |_|/___//___//_/  /_/  
                                            
-Version: v0.3.2-64-g16005c5
+Version: 1.0.0
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -286,7 +283,7 @@ END: hour, minute, second:  1:53:07
 duration:                   0:15:53
 ```
 
-##Now what
-Most likely you won't be satisfied by just running a test case.
+Congratulations! You followed the instructions.
 
-To figure out what kind of input files are needed to run FIDASIM click [this](./input_files/index.html)
+##Now what
+Most likely you won't be satisfied by just running a test case. Click [here](./02_preprocess.html) to learn how to make the [input files](../03_technical/02_io.html) used by FIDASIM.

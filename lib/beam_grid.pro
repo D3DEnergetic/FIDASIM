@@ -5,7 +5,7 @@ FUNCTION beam_grid, nbi, rstart, $
     ;+ Calculates settings for a grid that aligns with the neutral beam.
     ;+***
     ;+##Arguments
-    ;+    **nbi**: Neutral beam geometry structure
+    ;+    **nbi**: [Neutral beam geometry structure](|url|/page/03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure)
     ;+
     ;+    **rstart**: Radial start position of beam grid [cm]
     ;+
@@ -25,7 +25,7 @@ FUNCTION beam_grid, nbi, rstart, $
     ;+    **height**: Height of grid [cm]: Defaults to 50 cm
     ;+
     ;+##Return Value
-    ;+    Structure containing beam grid settings suitable for the [Namelist File](|url|/page/02_input_files/01_namelist_file.html)
+    ;+    Structure containing beam grid settings suitable for the [Namelist File](|url|/page/03_technical/02_io.html#namelist-file)
     ;+   
     ;+##Example Usage
     ;+```idl

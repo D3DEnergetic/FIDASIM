@@ -76,6 +76,8 @@ atomic_tables:
 .PHONY: docs
 docs:
 	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
+	@echo "Checking for broken links..."
+	linkchecker $(DOCS_DIR)/html/index.html
 
 clean_all: clean clean_deps clean_docs
 
@@ -92,4 +94,4 @@ clean_tables:
 	@cd $(TABLES_DIR); make clean
 
 clean_docs:
-	-rm -f $(DOCS_DIR)/html
+	-rm -rf $(DOCS_DIR)/html

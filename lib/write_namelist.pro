@@ -34,7 +34,7 @@ PRO write_namelist, filename, inputs
     printf,55,"distribution_file = '" + inputs.distribution_file +"'    !! File containing fast-ion distribution"
     printf,55,''
     printf,55,'!! Simulation Switches'
-    printf,55,f='("calc_bes = ",i2 , "    !! Calculate Beam Emission Spectra")',inputs.calc_bes
+    printf,55,f='("calc_bes = ",i2 , "    !! Calculate Beam Emission and Halo Spectra")',inputs.calc_bes
     printf,55,f='("calc_brems = ",i2 , "    !! Calculate Bremsstrahlung")',inputs.calc_brems
     printf,55,f='("calc_fida = ",i2 , "    !! Calculate FIDA Spectra")',inputs.calc_fida
     printf,55,f='("calc_npa = ",i2 , "   !! Calculate NPA")',inputs.calc_npa

@@ -1,5 +1,8 @@
 title: User Guide
 
+![FIDASIM](|media|/fidasim-logo.png)
+{: style="text-align: center" }
+
 #Introduction
 In fusion plasmas fast-ions can undergo the following process with injected neutral Hydrogen:
 $$ H^+ + H(n) \rightarrow H^\ast(m) + H^+ $$
@@ -10,20 +13,20 @@ The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excite
 {: style="text-align: center" }
 
 Both the fast-neutral and the photon contain information about the velocity of fast-ion before it was neutralized.
-There are two types diagnostics that take advantage of this fact: Fast-ion D-α (FIDA) diagnostics and Neutral Partile Analyzers (NPA).
+There are two types diagnostics that take advantage of this fact: Fast-ion D-α (FIDA) diagnostics and Neutral Particle Analyzers (NPA).
 The interpretation of the diagnostic signals requires modeling of the above process which has a complicated dependence on the plasma parameters, electromagnetic fields, and neutral beam and diagnostic geometry.
 
 Towards this end, FIDASIM was created.  
 
 ##History
-The very first implementation of FIDASIM was written by Yadong Luo as a part in his [thesis](http://www.physics.uci.edu/~wwheidbr/papers/thesis_luo.pdf).
-The code would be later be improved upon by [Bill Heidbrink and Deyong Lui](http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf) for public use.
+The very first implementation of FIDASIM was written by Yadong Luo and Bill Heidbrink while Yadong was working on his [thesis](http://www.physics.uci.edu/~wwheidbr/papers/thesis_luo.pdf).
+Subsequently, Deyong Liu added features to simulate NPA signals. The IDL version of the code was distributed for public use and documented in a [journal publication](http://www.physics.uci.edu/~wwheidbr/papers/FIDASIM.pdf).
 
 Originally, FIDASIM was written in the IDL programming language and was prohibitively slow.
 As a part of his [thesis](http://www.iaea.org/inis/collection/NCLCollectionStore/_Public/46/051/46051941.pdf) Ben Geiger wrote a version of FIDASIM written in Fortran 90.
 This prototype version was parallelized using OpenMP and was orders of magnitude faster but was not as easy to use as the IDL version and was difficult to port to different devices. 
 
-Most recently, [Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geigers Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
+Most recently, [Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geiger's Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
 Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful. 
 
 ##Capabilities
@@ -38,4 +41,4 @@ Currently, FIDASIM has routines for calculating:
 * FIDA and NPA phase-space sensitivities i.e. weight functions
 
 ##Installation
-For installation instructions check out our [Getting Started](./getting_started.html) guide.
+For installation instructions check out our [Getting Started](./01_getting_started/index.html) guide.

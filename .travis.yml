@@ -23,6 +23,9 @@ addons:
     - python-pip
     - graphviz
 
+before_install:
+  - openssl aes-256-cbc -K $encrypted_60fa3eb19c83_key -iv $encrypted_60fa3eb19c83_iv -in travis_key.enc -out travis_key -d
+
 install:
   - export FC=gfortran
   - export CC=gcc
@@ -34,3 +37,9 @@ script:
   - make
   - ./fidasim
   - make docs CHECK_LINKS=n
+
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - git config --global user.name "TRAVIS-CI-for-$(git --no-pager show -s --format='%cn' $TRAVIS_COMMIT)"
+  - git config --global user.email "$(git --no-pager show -s --format='%ce' $TRAVIS_COMMIT)"
+  - bash ./deploy.sh

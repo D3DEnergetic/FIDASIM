@@ -1,0 +1,33 @@
+language: python
+
+python:
+  - 2.7
+
+cache:
+  apt: true
+  pip: true
+
+branches:
+  only:
+    - master
+
+addons:
+  apt:  
+    packages:
+    - git
+    - gcc
+    - g++
+    - gfortran
+    - zlib1g-dev
+    - linkchecker
+    - python-pip
+    - graphviz
+
+install:
+  - export FC=gfortran
+  - export CC=gcc
+  - export CXX=g++
+  - pip install --upgrade graphviz
+  - (pip install --upgrade ford && ford --version)
+
+script: make

@@ -21,21 +21,15 @@ PRO check_spec, inp, chords
         goto, GET_OUT
     endif
 
-    w = where("system" eq strlowcase(TAG_NAMES(chords)),nw)
-    if nw eq 0 then begin
-        error,'"system" is missing from the FIDA/BES geometry'
-        err_status = 1
-        goto, GET_OUT
-    endif
-
     nchan = chords.nchan
-    nsys = size(chords.system,/dim)
     zero_string = {dims:0, type:'STRING'}
     zero_long = {dims:0, type:'LONG'}
     nchan_double = {dims:[nchan], type:'DOUBLE'}
+    nchan_string = {dims:[nchan], type:'STRING'}
     schema = {data_source:zero_string, $
               nchan:zero_long, $
-              system:{dims:nsys,type:'STRING'}, $
+              system:zero_string, $
+              id:nchan_string, $
               lens:{dims:[3,nchan], type:'DOUBLE'}, $
               axis:{dims:[3,nchan], type:'DOUBLE'}, $
               sigma_pi:nchan_double, $
@@ -63,7 +57,7 @@ PRO check_spec, inp, chords
     for i=0,nchan-1 do begin
         chan_str = strcompress(string(i),/remove_all)
         if abs(total(uvw_axis[*,i]^2.0) - 1.0) gt 1d-5 then begin
-            error,'Invalid optical axis at index '+chan_str+'. Expected norm(axis) == 1'
+            error,'Invalid optical axis for chord "'+chords.id[i]+'". Expected norm(axis) == 1'
             print, total(uvw_axis[*,i]^2.0) - 1.0
             err_arr[i] = 1
         endif
@@ -71,7 +65,7 @@ PRO check_spec, inp, chords
         ;; Check if viewing chord intersects beam grid
         aabb_intersect,rc,dr,xyz_lens[*,i],xyz_axis[*,i],length,r_enter,r_exit
         if length le 0.0 then begin
-            warn,'Chord at index '+chan_str+' does not cross the beam grid'
+            warn,'Chord "'+ chords.id[i] +'" does not cross the beam grid'
             cross_arr[i] = 1
         endif
     endfor

@@ -19,13 +19,13 @@ PRO check_inputs, inputs
     schema = {comment:zero_string, $
               shot:zero_long, time:zero_double, $
               runid:zero_string, device:zero_string, $ 
-              install_dir:zero_string, tables_file:zero_string, result_dir:zero_string, $
+              tables_file:zero_string, result_dir:zero_string, $
               nlambda:zero_int, lambdamin:zero_double, lambdamax:zero_double, $
               nx:zero_int, ny:zero_int, nz:zero_int, $
               alpha:zero_double, beta:zero_double, gamma:zero_double, $
               origin:three_double, xmin:zero_double, xmax:zero_double, $
               ymin:zero_double, ymax:zero_double, zmin:zero_double, zmax:zero_double, $
-              ab:zero_double, ai:zero_double, species_mix:three_double, $
+              ab:zero_double, ai:zero_double, current_fractions:three_double, $
               pinj:zero_double, einj:zero_double, impurity_charge:zero_int, $
               n_fida:zero_long, n_nbi:zero_long, n_dcx:zero_long, $
               n_npa:zero_long, n_halo:zero_long, n_birth:zero_long, $
@@ -35,7 +35,7 @@ PRO check_inputs, inputs
               calc_npa:zero_int, calc_fida:zero_int, calc_bes:zero_int, $
               calc_brems:zero_int, calc_birth:zero_int, $
               calc_fida_wght:zero_int, calc_npa_wght:zero_int, $
-              dump_dcx:zero_int, load_neutrals:zero_int, verbose:zero_int}
+              dump_dcx:zero_int}
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"
     if err_status eq 1 then begin
@@ -44,7 +44,6 @@ PRO check_inputs, inputs
 
     ;Normalize File Paths
     inputs.result_dir = expand_path(inputs.result_dir)
-    inputs.install_dir = expand_path(inputs.install_dir)
 
     if inputs.alpha gt 2*!DPI or $
        inputs.beta gt 2*!DPI or $
@@ -85,9 +84,9 @@ PRO check_inputs, inputs
         err_status = 1
     endif
 
-    if abs(total(inputs.species_mix) - 1.0) gt 1.d-3 then begin
-        error,'species_mix does not sum to 1.0'
-        print,'sum(species_mix) = ',total(inputs.species_mix)
+    if abs(total(inputs.current_fractions) - 1.0) gt 1.d-3 then begin
+        error,'current_fractions do not sum to 1.0'
+        print,'sum(current_fractions) = ',total(inputs.current_fractions)
         err_status = 1
     endif
 
@@ -107,6 +106,8 @@ PRO check_inputs, inputs
                                   'equilibrium_file',equilibrium_file,$ 
                                   'geometry_file',geometry_file, $
                                   'distribution_file',distribution_file, $
+                                  'load_neutrals', 0, $
+                                  'verbose', 1, $
                                   'neutrals_file',neutrals_file)
 
     GET_OUT:

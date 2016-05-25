@@ -1,3 +1,50 @@
+FUNCTION grid_fbm,r2d,z2d,fbm,fdens,rout,zout
+    compile_opt idl2, logical_predicate
+
+    s = size(fbm,/dim)
+    nenergy = s[0]
+    npitch = s[1]
+    nr = n_elements(rout)
+    nz = n_elements(zout)
+    nr2d = n_elements(r2d)
+    dim = [nr,nz]
+    delta = abs([rout[1]-rout[0],zout[1]-zout[0]])
+    start = [min(rout),min(zout)]
+
+    triangulate, r2d, z2d, tr
+    index = lindgen(n_elements(tr))/3*3
+    r2dt = r2d[tr[*]]
+    z2dt = z2d[tr[*]]
+    linTr = lindgen(size(tr,/dim))
+    tr_num = round(griddata(r2dt,z2dt,float(index),triangles=linTr,/linear,$
+             start=start,delta=delta,dimension=dim))
+
+    wts = ptrarr(3)
+    for i=0,2 do begin
+        w = griddata(r2dt,z2dt,(lindgen(n_elements(r2dt)) mod 3) eq i,triangles=linTr,/linear,$
+            start=start,delta=delta,dimension=dim)
+        wts[i] = ptr_new(w,/no_copy)
+    endfor
+
+    denf = dblarr(nr,nz)
+    for i=0,2 do begin
+        denf = denf + fdens[tr[tr_num+i]]*(*wts[i])
+    endfor
+    denf = denf > 0
+
+    fbm_grid = dblarr(nenergy,npitch,nr,nz)
+    for i=0,nenergy-1 do begin
+        for j=0,npitch-1 do begin
+            for k=0,2 do begin
+                fbm_grid[i,j,*,*] = fbm_grid[i,j,*,*] + fbm[i,j,tr[tr_num+k]]*(*wts[k])
+            endfor
+        endfor
+    endfor
+    fbm_grid = fbm_grid > 0
+
+    return, {denf:denf, fbm:fbm_grid}
+END
+
 FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_range
     ;+#read_nubeam
     ;+Reads NUBEAM fast-ion distribution function
@@ -31,7 +78,8 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
         goto,GET_OUT
     endif
 
-    vars = read_ncdf(filename,vars=["TIME","R2D","Z2D","E_D_NBI","A_D_NBI","F_D_NBI","RSURF","ZSURF"])
+    vars = read_ncdf(filename,vars=["TIME","R2D","Z2D","E_D_NBI","A_D_NBI", $
+                                    "F_D_NBI","RSURF","ZSURF","BMVOL"])
     ngrid=n_elements(vars.r2d)
 
     ;;-------------Convert eV-> keV
@@ -95,27 +143,22 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     nz=grid.nz
     rgrid=grid.r
     zgrid=grid.z
-
-    denf_grid=dblarr(nr,nz)
-    fbm_grid =dblarr(nenergy,npitch,nr,nz)
-    TRIANGULATE, r2d, z2d, tr
-
-    ;; DENF
+    dr = abs(rgrid[1]-rgrid[0])
+    dz = abs(zgrid[1]-zgrid[0])
+    
+    ;; FBM & DENF
     fdens=total(reform(total(fbm,1)),1)*dE*dP
-    denf=griddata(r2d,z2d,fdens,xout=rgrid,yout=zgrid $
-                  ,/grid,/SHEPARDS,triangles=tr) >0.
-
-    ;; FBM
-    cnt=0.0
-    for i=0,nenergy-1 do begin
-        for j=0,npitch-1 do begin
-            fbm_grid[i,j,*,*]=griddata(r2d,z2d,fbm[i,j,*], $
-                              xout=rgrid,yout=zgrid, $
-                              /grid,/SHEPARDS,triangles=tr) >0.
-            cnt+=1
-            print,format='(f7.2,"%",A,$)',100.0*(cnt/(nenergy*npitch)),string(13b)
-        endfor
-    endfor
+    ntot = total(fdens*vars.bmvol)
+    print, 'Ntotal in phase space: ',ntot
+    fstr = grid_fbm(r2d,z2d,fbm,fdens,rgrid,zgrid)
+    denf = fstr.denf
+    fbm_grid=fstr.fbm
+    
+    ;; enforce correct normalization
+    ntot_denf = (2*!dpi*dr*dz)*total(rgrid*total(denf,2))
+    denf = denf*(ntot/ntot_denf)
+    ntot_fbm = (2*!dpi*dr*dz*dE*dP)*total(rgrid*total(total(total(fbm_grid,1),1),2))
+    fbm_grid = fbm_grid*(ntot/ntot_fbm)
 
     ;; sort out positions more than 2 cm outside the separatrix
     rmaxis=mean(rsurf[*,0])
@@ -160,7 +203,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     endif
 
     fbm_struct={type:1,time:time,nenergy:fix(nenergy),energy:energy,npitch:fix(npitch),$
-                pitch:pitch,f:fbm_grid,denf:denf,data_source:filename}
+                pitch:pitch,f:fbm_grid,denf:denf,data_source:file_expand_path(filename)}
 
     return, fbm_struct
     GET_OUT:

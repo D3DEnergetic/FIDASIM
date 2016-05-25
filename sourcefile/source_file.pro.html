@@ -188,6 +188,8 @@
           
           <a class="list-group-item" href="../sourcefile/fidasim.f90.html">fidasim.f90</a>
           
+          <a class="list-group-item" href="../sourcefile/get_fidasim_dir.pro.html">get_fidasim_dir.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/get_version.pro.html">get_version.pro</a>
           
           <a class="list-group-item" href="../sourcefile/hdf5_extra.f90.html">hdf5_extra.f90</a>
@@ -268,7 +270,7 @@ If name is not given then it returns the source file of caller routine</p>
 <a name="ln-5"></a>        <span class="s s-Atom">s</span> <span class="o">=</span> <span class="nf">scope_traceback</span><span class="p">(</span><span class="o">/</span><span class="s s-Atom">structure</span><span class="p">)</span>
 <a name="ln-6"></a>        <span class="s s-Atom">nlevels</span> <span class="o">=</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">)</span>
 <a name="ln-7"></a>        <span class="s s-Atom">sfile</span> <span class="o">=</span> <span class="s s-Atom">s</span><span class="p">[</span><span class="s s-Atom">nlevels</span><span class="o">-</span><span class="mi">2</span><span class="p">].</span><span class="s s-Atom">filename</span>
-<a name="ln-8"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">sfile</span>
+<a name="ln-8"></a>        <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">file_expand_path</span><span class="p">(</span><span class="s s-Atom">sfile</span><span class="p">)</span>
 <a name="ln-9"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
 <a name="ln-10"></a>        <span class="s s-Atom">help</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">source_files</span><span class="p">,</span><span class="s s-Atom">output</span><span class="o">=</span><span class="s s-Atom">csf</span> <span class="p">;</span><span class="s s-Atom">all</span> <span class="s s-Atom">compiled</span> <span class="s s-Atom">source</span> <span class="s s-Atom">files</span>
 <a name="ln-11"></a>        <span class="s s-Atom">nc</span> <span class="o">=</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">csf</span><span class="p">)</span>
@@ -276,7 +278,7 @@ If name is not given then it returns the source file of caller routine</p>
 <a name="ln-13"></a>            <span class="s s-Atom">has_name</span> <span class="o">=</span> <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">csf</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">],</span><span class="s s-Atom">name</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">fold_case</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="o">-</span><span class="mi">1</span>
 <a name="ln-14"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">has_name</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
 <a name="ln-15"></a>                <span class="s s-Atom">sfile</span> <span class="o">=</span> <span class="nf">stregex</span><span class="p">(</span><span class="s s-Atom">csf</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">],</span><span class="err">&quot;</span><span class="s s-Atom">\/</span><span class="p">[</span><span class="s s-Atom">\/a</span><span class="o">-</span><span class="s s-Atom">z0</span><span class="o">-</span><span class="mi">9</span><span class="k">_</span><span class="s s-Atom">\-</span><span class="p">]</span><span class="s s-Atom">*.</span><span class="p">[</span><span class="s s-Atom">a</span><span class="o">-</span><span class="s s-Atom">z0</span><span class="o">-</span><span class="mi">9</span><span class="k">_</span><span class="s s-Atom">\-</span><span class="p">]</span><span class="s s-Atom">*</span><span class="err">&quot;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">fold_case</span><span class="p">)</span>
-<a name="ln-16"></a>                <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">sfile</span>
+<a name="ln-16"></a>                <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">file_expand_path</span><span class="p">(</span><span class="s s-Atom">sfile</span><span class="p">)</span>
 <a name="ln-17"></a>            <span class="s s-Atom">endif</span>
 <a name="ln-18"></a>        <span class="s s-Atom">endfor</span>
 <a name="ln-19"></a>    <span class="s s-Atom">endelse</span>

@@ -191,7 +191,7 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     flux = fluxgrid
     mask = replicate(1,grid.nr,grid.nz)
 
-    equil={time:time,data_source:filename, mask:mask, $
+    equil={time:time,data_source:file_expand_path(filename), mask:mask, $
            br:b_r,bt:b_t,bz:b_z,er:e_r,et:e_t,ez:e_z}
     GET_OUT:
     return,equil

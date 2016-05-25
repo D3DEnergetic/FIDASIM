@@ -131,6 +131,10 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
                         name:'description', $
                         data:'Names of the different spectrocopic systems'}
 
+    spec_id_desc = {attribute,obj:'/spec/id', $
+                    name:'description', $
+                    data:'Line of sight ID'}
+
     spec_lens_desc = {attribute,obj:'/spec/lens', $
                       name:'description', $
                       data:'Positions of the lenses'}
@@ -165,6 +169,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
  
     spec_atts = [spec_desc,spec_cs, spec_ds_desc, $
                  spec_nchan_desc, spec_system_desc, $
+                 spec_id_desc, $
                  spec_lens_desc,spec_lens_unit, $
                  spec_axis_desc,spec_axis_unit, $
                  spec_radius_desc, spec_radius_unit, $
@@ -192,6 +197,9 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
                        name:'description', $
                        data:'Names of the different NPA systems'}
 
+    npa_id_desc = {attribute,obj:'/npa/id', $
+                   name:'description', $
+                   data:'Line of sight ID'}
 
     npa_dshape_desc = {attribute,obj:'/npa/d_shape', $
                        name:'description', $
@@ -252,6 +260,7 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
 
     npa_atts = [npa_desc, npa_cs, npa_ds_desc, $ 
                 npa_nchan_desc, npa_system_desc, $
+                npa_id_desc, $
                 npa_dshape_desc, npa_ashape_desc, $
                 npa_dcent_desc, npa_dcent_unit, $
                 npa_acent_desc, npa_acent_unit, $

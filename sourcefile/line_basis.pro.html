@@ -188,6 +188,8 @@
           
           <a class="list-group-item" href="../sourcefile/fidasim.f90.html">fidasim.f90</a>
           
+          <a class="list-group-item" href="../sourcefile/get_fidasim_dir.pro.html">get_fidasim_dir.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/get_version.pro.html">get_version.pro</a>
           
           <a class="list-group-item" href="../sourcefile/hdf5_extra.f90.html">hdf5_extra.f90</a>
@@ -296,7 +298,7 @@ IDL<span class="o">&gt;</span> <span class="nb">print</span>,x
 <a name="ln-21"></a>    <span class="s s-Atom">rf</span> <span class="o">=</span> <span class="s s-Atom">r0</span> <span class="o">+</span> <span class="s s-Atom">v0</span>
 <a name="ln-22"></a>    <span class="s s-Atom">dis</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">v0^</span><span class="mf">2.0</span><span class="p">))</span>
 <a name="ln-23"></a>    <span class="s s-Atom">beta</span> <span class="o">=</span> <span class="nf">asin</span><span class="p">((</span><span class="s s-Atom">r0</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="s s-Atom">rf</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">/</span><span class="s s-Atom">dis</span><span class="p">)</span>
-<a name="ln-24"></a>    <span class="s s-Atom">alpha</span> <span class="o">=</span> <span class="nf">atan</span><span class="p">((</span><span class="s s-Atom">rf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="s s-Atom">r0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="s s-Atom">rf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">rf</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<a name="ln-24"></a>    <span class="s s-Atom">alpha</span> <span class="o">=</span> <span class="nf">atan</span><span class="p">((</span><span class="s s-Atom">rf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="s s-Atom">r0</span><span class="p">[</span><span class="mi">1</span><span class="p">]),(</span><span class="s s-Atom">rf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="s s-Atom">r0</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 <a name="ln-25"></a>
 <a name="ln-26"></a>    <span class="nv">R</span> <span class="o">=</span> <span class="nf">tb_zyx</span><span class="p">(</span><span class="s s-Atom">alpha</span><span class="p">,</span><span class="s s-Atom">beta</span><span class="p">,</span><span class="mf">0.0</span><span class="p">)</span>
 <a name="ln-27"></a>    <span class="s s-Atom">inv_basis</span> <span class="o">=</span> <span class="nf">transpose</span><span class="p">(</span><span class="nv">R</span><span class="p">)</span>

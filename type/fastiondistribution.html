@@ -137,9 +137,17 @@
         
         <a class="list-group-item" href="../type/fastiondistribution.html#variable-npitch">npitch</a>
         
+        <a class="list-group-item" href="../type/fastiondistribution.html#variable-nr%7E2">nr</a>
+        
+        <a class="list-group-item" href="../type/fastiondistribution.html#variable-nz%7E3">nz</a>
+        
         <a class="list-group-item" href="../type/fastiondistribution.html#variable-de">dE</a>
         
         <a class="list-group-item" href="../type/fastiondistribution.html#variable-dp">dp</a>
+        
+        <a class="list-group-item" href="../type/fastiondistribution.html#variable-dr%7E3">dr</a>
+        
+        <a class="list-group-item" href="../type/fastiondistribution.html#variable-dz%7E2">dz</a>
         
         <a class="list-group-item" href="../type/fastiondistribution.html#variable-emin">emin</a>
         
@@ -156,6 +164,12 @@
         <a class="list-group-item" href="../type/fastiondistribution.html#variable-energy">energy</a>
         
         <a class="list-group-item" href="../type/fastiondistribution.html#variable-pitch">pitch</a>
+        
+        <a class="list-group-item" href="../type/fastiondistribution.html#variable-r%7E2">r</a>
+        
+        <a class="list-group-item" href="../type/fastiondistribution.html#variable-z%7E2">z</a>
+        
+        <a class="list-group-item" href="../type/fastiondistribution.html#variable-denf%7E2">denf</a>
         
         <a class="list-group-item" href="../type/fastiondistribution.html#variable-f">f</a>
         
@@ -316,6 +330,34 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-nr%7E2"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nr</strong></td><td></td><td></td><td><p>Number of radii</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nz%7E3"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nz</strong></td><td></td><td></td><td><p>Number of z values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-de"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -335,6 +377,34 @@
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>dp</strong></td><td></td><td></td><td><p>Pitch spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dr%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dr</strong></td><td></td><td></td><td><p>Radial spacing [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dz%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dz</strong></td><td></td><td></td><td><p>Z spacing [cm]</p></td>
   
 </tr>
 
@@ -456,6 +526,48 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-r%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>r</strong></td><td></td><td></td><td><p>Radius [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-z%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>z</strong></td><td></td><td></td><td><p>Z [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-denf%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>denf</strong></td><td></td><td></td><td><p>Fast-ion density defined on the <a href="../module/libfida.html#variable-inter_grid">inter_grid</a>: denf(R,Z)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-f"></span>real(kind=Float64),</td>
   
   <td>public,</td>
@@ -486,10 +598,18 @@
         <span class="c">!+ Number of energies</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">npitch</span>
         <span class="c">!+ Number of pitches</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nr</span>
+        <span class="c">!+ Number of radii</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nz</span>
+        <span class="c">!+ Number of z values</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dE</span>
         <span class="c">!+ Energy spacing [keV]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dp</span>
         <span class="c">!+ Pitch spacing</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dr</span>
+        <span class="c">!+ Radial spacing [cm]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dz</span>
+        <span class="c">!+ Z spacing [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">emin</span>
         <span class="c">!+ Minimum energy [keV]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">emax</span>
@@ -506,6 +626,12 @@
         <span class="c">!+ Energy values [keV]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">pitch</span>
         <span class="c">!+ Pitch w.r.t. the magnetic field</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">r</span>
+        <span class="c">!+ Radius [cm]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">z</span>
+        <span class="c">!+ Z [cm]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">denf</span>
+        <span class="c">!+ Fast-ion density defined on the [[libfida:inter_grid]]: denf(R,Z)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">f</span>
         <span class="c">!+ Fast-ion distribution function defined on the [[libfida:inter_grid]]: F(E,p,R,Z)</span>
 <span class="k">end type </span><span class="n">FastIonDistribution</span>

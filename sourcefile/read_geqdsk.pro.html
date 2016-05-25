@@ -188,6 +188,8 @@
           
           <a class="list-group-item" href="../sourcefile/fidasim.f90.html">fidasim.f90</a>
           
+          <a class="list-group-item" href="../sourcefile/get_fidasim_dir.pro.html">get_fidasim_dir.pro</a>
+          
           <a class="list-group-item" href="../sourcefile/get_version.pro.html">get_version.pro</a>
           
           <a class="list-group-item" href="../sourcefile/hdf5_extra.f90.html">hdf5_extra.f90</a>
@@ -466,7 +468,7 @@
 <a name="ln-191"></a>    <span class="s s-Atom">flux</span> <span class="o">=</span> <span class="s s-Atom">fluxgrid</span>
 <a name="ln-192"></a>    <span class="s s-Atom">mask</span> <span class="o">=</span> <span class="nf">replicate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nz</span><span class="p">)</span>
 <a name="ln-193"></a>
-<a name="ln-194"></a>    <span class="s s-Atom">equil=</span><span class="p">{</span><span class="nn">time</span><span class="p">:</span><span class="s s-Atom">time</span><span class="p">,</span><span class="s s-Atom">data_source:filename</span><span class="p">,</span> <span class="nn">mask</span><span class="p">:</span><span class="s s-Atom">mask</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-194"></a>    <span class="s s-Atom">equil=</span><span class="p">{</span><span class="nn">time</span><span class="p">:</span><span class="s s-Atom">time</span><span class="p">,</span><span class="s s-Atom">data_source:</span><span class="nf">file_expand_path</span><span class="p">(</span><span class="s s-Atom">filename</span><span class="p">),</span> <span class="nn">mask</span><span class="p">:</span><span class="s s-Atom">mask</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-195"></a>           <span class="nn">br</span><span class="p">:</span><span class="s s-Atom">b_r</span><span class="p">,</span><span class="nn">bt</span><span class="p">:</span><span class="s s-Atom">b_t</span><span class="p">,</span><span class="nn">bz</span><span class="p">:</span><span class="s s-Atom">b_z</span><span class="p">,</span><span class="nn">er</span><span class="p">:</span><span class="s s-Atom">e_r</span><span class="p">,</span><span class="nn">et</span><span class="p">:</span><span class="s s-Atom">e_t</span><span class="p">,</span><span class="nn">ez</span><span class="p">:</span><span class="s s-Atom">e_z</span><span class="p">}</span>
 <a name="ln-196"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
 <a name="ln-197"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">equil</span>

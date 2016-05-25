@@ -13,7 +13,7 @@ PRO write_namelist, filename, inputs
     ;+```
     info,'Writing namelist file...'
 
-    fidasim_version = get_version(inputs.install_dir)
+    fidasim_version = get_version(get_fidasim_dir())
 
     openw,55,filename
     printf,55,'!! Created: ', systime()
@@ -32,7 +32,6 @@ PRO write_namelist, filename, inputs
     printf,55,"equilibrium_file = '" + inputs.equilibrium_file +"'    !! File containing plasma parameters and fields"
     printf,55,"geometry_file = '" + inputs.geometry_file +"'    !! File containing NBI and diagnostic geometry"
     printf,55,"distribution_file = '" + inputs.distribution_file +"'    !! File containing fast-ion distribution"
-    printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"
     printf,55,''
     printf,55,'!! Simulation Switches'
     printf,55,f='("calc_bes = ",i2 , "    !! Calculate Beam Emission and Halo Spectra")',inputs.calc_bes
@@ -42,8 +41,11 @@ PRO write_namelist, filename, inputs
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
     printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght
-    printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from a preexisting neutrals file")',inputs.load_neutrals
     printf,55,f='("dump_dcx = ",i2,"    !! Dump DCX neutrals and spectra")',inputs.dump_dcx
+    printf,55,''
+    printf,55,'!! Debugging Switches'
+    printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from neutrals file")',inputs.load_neutrals
+    printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"
     printf,55,f='("verbose = ",i2,"    !! Verbose")',inputs.verbose
     printf,55,''
     printf,55,'!! Monte Carlo Settings'
@@ -58,9 +60,9 @@ PRO write_namelist, filename, inputs
     printf,55,f='("ab = ",1f9.5,"     !! Beam Species mass [amu]")',inputs.ab
     printf,55,f='("pinj = ",1f9.3,"     !! Beam Power [MW]")',inputs.pinj
     printf,55,f='("einj = ",1f9.3,"     !! Beam Energy [keV]")',inputs.einj
-    printf,55,f='("species_mix(1) = ",1f9.5,"     !! Beam Species Mix (Full component)")',inputs.species_mix[0]
-    printf,55,f='("species_mix(2) = ",1f9.5,"     !! Beam Species Mix (Half component)")',inputs.species_mix[1]
-    printf,55,f='("species_mix(3) = ",1f9.5,"     !! Beam Species Mix (Third component)")',inputs.species_mix[2]
+    printf,55,f='("current_fractions(1) = ",1f9.5," !! Current Fractions (Full component)")',inputs.current_fractions[0]
+    printf,55,f='("current_fractions(2) = ",1f9.5," !! Current Fractions (Half component)")',inputs.current_fractions[1]
+    printf,55,f='("current_fractions(3) = ",1f9.5," !! Current Fractions (Third component)")',inputs.current_fractions[2]
     printf,55,''
     printf,55,'!! Plasma Settings'
     printf,55,f='("ai = ",1f9.5,"     !! Ion Species mass [amu]")',inputs.ai

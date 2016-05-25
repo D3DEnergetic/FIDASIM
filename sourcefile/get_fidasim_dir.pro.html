@@ -10,7 +10,7 @@
     <meta name="author" content="Chris MacMackin" >
     <link rel="icon" href="../favicon.png">
 
-    <title>rz_grid.pro &ndash; FIDASIM</title>
+    <title>get_fidasim_dir.pro &ndash; FIDASIM</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -89,7 +89,7 @@
     
   
   <div class="row">
-    <h1>rz_grid.pro
+    <h1>get_fidasim_dir.pro
     <small>Source File</small>
     
     </h1>
@@ -104,12 +104,12 @@
      
     
     
-    <li><i class="fa fa-code"></i><a href="../src/rz_grid.pro"> Source File</a></li>
+    <li><i class="fa fa-code"></i><a href="../src/get_fidasim_dir.pro"> Source File</a></li>
      
   </ul>
   <ol class="breadcrumb in-well text-right">
   
-     <li class="active">rz_grid.pro</li>
+     <li class="active">get_fidasim_dir.pro</li>
   </ol>
 </div>
 </div>
@@ -143,7 +143,7 @@
   <div class="panel panel-primary">
     <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
     <div class="list-group">
-      <a class="list-group-item" href="../sourcefile/rz_grid.pro.html#src">rz_grid.pro</a>
+      <a class="list-group-item" href="../sourcefile/get_fidasim_dir.pro.html#src">get_fidasim_dir.pro</a>
     </div>
   </div>
   
@@ -258,62 +258,26 @@
 
     </div>
     <div class="col-lg-9" id='text'>
-    <h1 id="rz_grid">rz_grid</h1>
-<p>Creates interpolation grid</p>
+    <h1 id="get_fidasim_dir">get_fidasim_dir</h1>
+<p>Gets FIDASIM install directory</p>
 <hr>
-<h2 id="arguments">Arguments</h2>
-<p><strong>rmin</strong>: Minimum radius [cm]</p>
-<p><strong>rmax</strong>: Maximum radius [cm]</p>
-<p><strong>nr</strong>: Number of radii</p>
-<p><strong>zmin</strong>: Minimum Z value [cm]</p>
-<p><strong>zmax</strong>: Maximum Z value [cm]</p>
-<p><strong>nz</strong>: Number of z values</p>
-<h2 id="return-value">Return Value</h2>
-<p>Interpolation grid structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(<span class="mi">0</span>,<span class="mf">200.0</span>,<span class="mi">200</span>,<span class="o">-</span><span class="mi">100</span>,<span class="mi">100</span>,<span class="mi">200</span>)
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> fida_dir <span class="o">=</span> get_fidasim_dir()
 </pre></div>
     <br>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">rz_grid</span><span class="p">,</span><span class="s s-Atom">rmin</span><span class="p">,</span><span class="s s-Atom">rmax</span><span class="p">,</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">zmin</span><span class="p">,</span><span class="s s-Atom">zmax</span><span class="p">,</span><span class="s s-Atom">nz</span>
-<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#rz_grid</span>
-<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Creates</span> <span class="s s-Atom">interpolation</span> <span class="s s-Atom">grid</span>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">get_fidasim_dir</span>
+<a name="ln-2"></a>    <span class="p">;</span><span class="s s-Atom">+#get_fidasim_dir</span>
+<a name="ln-3"></a>    <span class="p">;</span><span class="o">+</span> <span class="nv">Gets</span> <span class="nv">FIDASIM</span> <span class="s s-Atom">install</span> <span class="s s-Atom">directory</span>
 <a name="ln-4"></a>    <span class="p">;</span><span class="s s-Atom">+***</span>
-<a name="ln-5"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Arguments</span>
-<a name="ln-6"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rmin**:</span> <span class="nv">Minimum</span> <span class="s s-Atom">radius</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-7"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**rmax**:</span> <span class="nv">Maximum</span> <span class="s s-Atom">radius</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-9"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-10"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nr**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">radii</span>
-<a name="ln-11"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-12"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**zmin**:</span> <span class="nv">Minimum</span> <span class="nv">Z</span> <span class="s s-Atom">value</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-13"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-14"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**zmax**:</span> <span class="nv">Maximum</span> <span class="nv">Z</span> <span class="s s-Atom">value</span> <span class="p">[</span><span class="s s-Atom">cm</span><span class="p">]</span>
-<a name="ln-15"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-16"></a>    <span class="p">;</span><span class="o">+</span>    <span class="s s-Atom">**nz**:</span> <span class="nv">Number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">z</span> <span class="s s-Atom">values</span>
-<a name="ln-17"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-18"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Return</span> <span class="nv">Value</span>
-<a name="ln-19"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">Interpolation</span> <span class="s s-Atom">grid</span> <span class="s s-Atom">structure</span>
-<a name="ln-20"></a>    <span class="p">;</span><span class="o">+</span>
-<a name="ln-21"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
-<a name="ln-22"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-23"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">grid</span> <span class="o">=</span> <span class="nf">rz_grid</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">200.0</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
-<a name="ln-24"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
-<a name="ln-25"></a>
-<a name="ln-26"></a>    <span class="s s-Atom">dr</span> <span class="o">=</span> <span class="p">(</span><span class="s s-Atom">rmax</span><span class="o">-</span><span class="s s-Atom">rmin</span><span class="p">)</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">nr</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-27"></a>    <span class="s s-Atom">dz</span> <span class="o">=</span> <span class="p">(</span><span class="s s-Atom">zmax</span><span class="o">-</span><span class="s s-Atom">zmin</span><span class="p">)</span><span class="s s-Atom">/</span><span class="p">(</span><span class="s s-Atom">nz</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-28"></a>    <span class="s s-Atom">r</span> <span class="o">=</span> <span class="s s-Atom">rmin</span> <span class="o">+</span> <span class="s s-Atom">dr</span><span class="o">*</span><span class="nf">dindgen</span><span class="p">(</span><span class="s s-Atom">nr</span><span class="p">)</span>
-<a name="ln-29"></a>    <span class="s s-Atom">z</span> <span class="o">=</span> <span class="s s-Atom">zmin</span> <span class="o">+</span> <span class="s s-Atom">dz</span><span class="o">*</span><span class="nf">dindgen</span><span class="p">(</span><span class="s s-Atom">nz</span><span class="p">)</span>
-<a name="ln-30"></a>
-<a name="ln-31"></a>    <span class="s s-Atom">r2d</span> <span class="o">=</span> <span class="s s-Atom">r</span> <span class="s s-Atom">#</span> <span class="nf">replicate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">)</span>
-<a name="ln-32"></a>    <span class="s s-Atom">z2d</span> <span class="o">=</span> <span class="nf">replicate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">nr</span><span class="p">)</span> <span class="s s-Atom">#</span> <span class="s s-Atom">z</span>
-<a name="ln-33"></a>
-<a name="ln-34"></a>
-<a name="ln-35"></a>    <span class="s s-Atom">grid</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">r2d:r2d</span><span class="p">,</span><span class="s s-Atom">z2d:z2d</span><span class="p">,</span><span class="nn">r</span><span class="p">:</span><span class="s s-Atom">r</span><span class="p">,</span><span class="nn">z</span><span class="p">:</span><span class="s s-Atom">z</span><span class="p">,</span><span class="nn">nr</span><span class="p">:</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="nn">nz</span><span class="p">:</span><span class="s s-Atom">nz</span><span class="p">}</span>
-<a name="ln-36"></a>    
-<a name="ln-37"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">grid</span>
-<a name="ln-38"></a><span class="nv">END</span>
+<a name="ln-5"></a>    <span class="p">;</span><span class="o">+</span>
+<a name="ln-6"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
+<a name="ln-7"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
+<a name="ln-8"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">fida_dir</span> <span class="o">=</span> <span class="nf">get_fidasim_dir</span><span class="p">()</span>
+<a name="ln-9"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span> 
+<a name="ln-10"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="nf">file_dirname</span><span class="p">(</span><span class="nf">file_dirname</span><span class="p">(</span><span class="nf">source_file</span><span class="p">()))</span>
+<a name="ln-11"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

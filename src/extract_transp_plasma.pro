@@ -121,7 +121,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
 
 
     ;;SAVE IN PROFILES STRUCTURE
-    plasma={data_source:filename,time:time,mask:mask, $
+    plasma={data_source:file_expand_path(filename),time:time,mask:mask, $
             dene:dene,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff} 
 
     return,plasma

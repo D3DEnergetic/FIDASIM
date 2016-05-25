@@ -33,7 +33,7 @@ if [ "$TRAVIS_BRANCH" = "master" ] && \
     cd gh-pages
     if [[ -z `diff -r $TRAVIS_BUILD_DIR/docs/html gh-pages` ]]; then
         echo "No changes in development documentation"
-        exit 1
+        exit 0
     fi
     rm -rf css favicon.png fonts index.html interface \
        js lists media module page proc program search.html \

@@ -1,4 +1,4 @@
-SHELL = /bin/sh
+SHELL = /bin/bash
 
 SUPPORTED_FC = gfortran ifort
 SUPPORTED_CC = gcc icc
@@ -38,6 +38,7 @@ NTHREADS = 1000
 
 # FORD documentation variables
 FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -d $(LIB_DIR) -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
+CHECK_LINKS = y
 
 export FIDASIM_DIR
 export SRC_DIR
@@ -48,6 +49,7 @@ export HDF5_INCLUDE
 export HDF5_FLAGS
 export OUTPUT_DIR
 export NTHREADS
+export CHECK_LINKS
 
 fidasim: deps src tables
 
@@ -76,8 +78,10 @@ atomic_tables:
 .PHONY: docs
 docs:
 	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
-	@echo "Checking for broken links..."
-	linkchecker $(DOCS_DIR)/html/index.html
+	@ if [[ $(CHECK_LINKS) == [yY]* ]]; then \
+		echo "Checking for broken links..."; \
+		linkchecker $(DOCS_DIR)/html/index.html ; \
+	  fi
 
 clean_all: clean clean_deps clean_docs
 

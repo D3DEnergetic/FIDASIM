@@ -1,4 +1,4 @@
-SHELL = /bin/sh
+SHELL = /bin/bash
 DEBUG = n
 EX = fidasim
 

@@ -1,4 +1,4 @@
-SHELL = /bin/sh
+SHELL = /bin/bash
 
 ifneq ($(findstring gfortran, $(FC)),)
 	LFLAGS = $(HDF5_FLAGS) -L$(SRC_DIR) -lm

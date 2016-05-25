@@ -30,4 +30,7 @@ install:
   - pip install --upgrade graphviz
   - (pip install --upgrade ford && ford --version)
 
-script: make
+script:
+  - make
+  - ./fidasim
+  - make docs CHECK_LINKS=n

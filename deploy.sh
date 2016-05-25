@@ -1,6 +1,8 @@
 #!/bin/bash
 # This script lets Travis CI deploy the FORD generated documentation website
 
+set -e
+
 if [ ! "$TRAVIS" ]; then
     echo "Documentation can only be deployed by Travis CI"
     exit 0
@@ -16,18 +18,23 @@ SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
 echo $REPO
 echo $SSH_REPO
 if [ ! -f $TRAVIS_BUILD_DIR/travis_key ]; then
-    echo "Missing Travis Key"
-    exit 0
+    echo "Missing Travis Deploy Key"
+    exit 1
 fi
 
 chmod 600 travis_key
 eval `ssh-agent -s`
 ssh-add travis_key
 
+git clone --branch=gh-pages $REPO gh-pages
+
 if [ "$TRAVIS_BRANCH" = "master" ] && \
    [ "(ls -A $TRAVIS_BUILD_DIR/docs/html)" ]; then
-    git clone --branch=gh-pages $REPO gh-pages
     cd gh-pages
+    if [[ -z `diff $TRAVIS_BUILD_DIR/docs/html .` ]]; then
+        echo "No changes in development documentation"
+        exit 0
+    fi
     rm -rf css favicon.png fonts index.html interface \
        js lists media module page proc program search.html \
        sourcefile src tipuesearch type
@@ -38,8 +45,11 @@ if [ "$TRAVIS_BRANCH" = "master" ] && \
 fi
 
 if [[ $TRAVIS_BRANCH == release-* ]]; then
-    git clone --branch=gh-pages $REPO gh-pages
     cd gh-pages
+    if [[ -z `diff $TRAVIS_BUILD_DIR/docs/html $TRAVIS_BRANCH` ]]; then
+        echo "No changes in $TRAVIS_BRANCH documentation"
+        exit 0
+    fi
     rm -rf $TRAVIS_BRANCH
     mkdir $TRAVIS_BRANCH
     cp -r "$TRAVIS_BUILD_DIR"/docs/html/* $TRAVIS_BRANCH

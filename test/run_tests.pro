@@ -31,115 +31,106 @@ PRO run_tests,result_dir,test_case=test_case
                    calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,dump_dcx:1,$
                    result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}
 
-   ;; Non-rotated, Non-tilted Grid
-   grid01 = {nx:50,ny:60,nz:70,$
-             xmin:-50.d0,xmax:50.d0,$
-             ymin:-230.d0,ymax:-110.d0,$
-             zmin:-70.d0,zmax:70.d0,$
-             alpha:0.d0,beta:0.d0,gamma:0.d0,$
-             origin:[0.d0,0.d0,0.d0]}
+   basic_bgrid = {nx:50,ny:60,nz:70,$
+                  xmin:-50.d0,xmax:50.d0,$
+                  ymin:-230.d0,ymax:-110.d0,$
+                  zmin:-70.d0,zmax:70.d0,$
+                  alpha:0.d0,beta:0.d0,gamma:0.d0,$
+                  origin:[0.d0,0.d0,0.d0]}
 
-   ;; Rotated, Non-tilted
-   grid02 = {nx:60,ny:50,nz:70,$
-             xmin:0.d0,xmax:120.d0,$
-             ymin:-50.d0,ymax:50.d0,$
-             zmin:-70.d0,zmax:70.d0,$
-             alpha:!DPI/2.0,beta:0.d0,gamma:0.d0,$
-             origin:[0.d0,-230.d0,0.d0]}
-      
-   ;; Rotated, Tilted down
-   grid03 = {nx:60,ny:50,nz:70,$
-             xmin:0.d0,xmax:120.d0,$
-             ymin:-50.d0,ymax:50.d0,$
-             zmin:-70.d0,zmax:70.d0,$
-             alpha:!DPI/2.0,beta:0.25d0,gamma:0.d0,$
-             origin:[0.d0,-230.d0,0.d0]}
-   
-   ;; Rotated, Tilted up
-   grid04 = {nx:60,ny:50,nz:70,$
-             xmin:0.d0,xmax:120.d0,$
-             ymin:-50.d0,ymax:50.d0,$
-             zmin:-70.d0,zmax:70.d0,$
-             alpha:!DPI/2.0,beta:-0.25d,gamma:0.d0,$
-             origin:[0.d0,-230.d0,0.d0]}
-   
-   inputs01a = create_struct("runid","test_1a",$
-                             "comment",'Non-rotated, Non-tilted grid; flat profiles',$
-                             grid01,basic_inputs)
-                          
-   inputs01b = create_struct("runid",'test_1b',$
-                             "comment",'Non-rotated, Non-tilted grid; realistic profiles',$
-                             grid01,basic_inputs)
+   test_ids = ['1A','1B','2A','2B','3A','3B','4A','4B']
+   test_cases = 'TEST_' + test_ids 
+   test_cases = [test_cases,'ALL']
+   run = strmatch(test_cases,test_case,/fold_case)
+   if total(run) eq 0 then begin
+       error, "Unknown test case",/halt
+   endif
+   if run[-1] eq 1 then run[*]=1
 
-   inputs02a = create_struct("runid",'test_2a',$
-                             "comment",'Rotated, Non-tilted grid; flat profiles',$
-                             grid02,basic_inputs)
-                          
-   inputs02b = create_struct("runid",'test_2b',$
-                             "comment",'Rotated, Non-tilted grid; realistic profiles',$
-                             grid02,basic_inputs)
-
-   inputs03a = create_struct("runid",'test_3a',$
-                             "comment",'Rotated, Tilted down grid; flat profiles',$
-                             grid03,basic_inputs)
-                          
-   inputs03b = create_struct("runid",'test_3b',$
-                             "comment",'Rotated, Tilted down grid; realistic profiles',$
-                             grid03,basic_inputs)
-
-   inputs04a = create_struct("runid",'test_4a',$
-                             "comment",'Rotated, Tilted up grid; flat profiles',$
-                             grid04,basic_inputs)
-                          
-   inputs04b = create_struct("runid",'test_4b',$
-                             "comment",'Rotated, Tilted down grid; realistic profiles',$
-                             grid04,basic_inputs)
-
-   test_cases = 'TEST_' + ['1A','1B','2A','2B','3A','3B','4A','4B']
-   input_str = [inputs01a,inputs01b, $
-                inputs02a,inputs02b, $
-                inputs03a,inputs03b, $
-                inputs04a,inputs04b]
-
-   run = intarr(8)
-   CASE test_case OF
-       'TEST_1A': run[0] = 1
-       'TEST_1B': run[1] = 1
-       'TEST_2A': run[2] = 1
-       'TEST_2B': run[3] = 1
-       'TEST_3A': run[4] = 1
-       'TEST_3B': run[5] = 1
-       'TEST_4A': run[6] = 1
-       'TEST_4B': run[7] = 1
-       'ALL': run[*] = 1
-       ELSE: BEGIN
-           PRINT, 'Unknown test case: ',test_case
-           return
-       END
-   ENDCASE
-
-   for i=0,7 do begin
+   for i=0,n_elements(test_ids)-1 do begin
        if run[i] eq 0 then continue
        PRINT, 'Preparing test case '+test_cases[i]
-       PRINT, input_str[i].comment
-       grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100) 
+       CASE test_cases[i] OF
+           "TEST_1A": BEGIN
+               inputs = create_struct("runid","test_1a",$
+                        "comment",'Non-rotated, Non-tilted grid; flat profiles',$
+                        basic_inputs, basic_bgrid)
+               nbi = test_beam(0.d0)
+           END
+           "TEST_1B": BEGIN
+               inputs = create_struct("runid",'test_1b',$
+                        "comment",'Non-rotated, Non-tilted grid; realistic profiles',$
+                        basic_inputs, basic_bgrid)
+               nbi = test_beam(0.d0)
+           END
+           "TEST_2A": BEGIN
+               nbi = test_beam(0.d0)
+               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
+                       length=120.d0,width=100.d0,height=140.d0)
+               inputs= create_struct("runid",'test_2a',$
+                       "comment",'Rotated, Non-tilted grid; flat profiles',$
+                       basic_inputs, bgrid)
+           END
+           "TEST_2B": BEGIN
+               nbi = test_beam(0.d0)
+               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
+                       length=120.d0,width=100.d0,height=140.d0)
+               inputs = create_struct("runid",'test_2b',$
+                        "comment",'Rotated, Non-tilted grid; realistic profiles',$
+                        basic_inputs, bgrid)
+           END
+           "TEST_3A": BEGIN
+               nbi = test_beam(0.25)
+               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
+                       length=120.d0,width=100.d0,height=140.d0)
+               inputs = create_struct("runid",'test_3a',$
+                        "comment",'Rotated, Tilted down grid; flat profiles',$
+                        basic_inputs, bgrid)
+           END
+           "TEST_3B": BEGIN
+               nbi = test_beam(0.25)
+               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
+                       length=120.d0,width=100.d0,height=140.d0)
+               inputs = create_struct("runid",'test_3b',$
+                        "comment",'Rotated, Tilted down grid; realistic profiles',$
+                        basic_inputs, bgrid)
 
+           END
+           "TEST_4A": BEGIN
+               nbi = test_beam(-0.25)
+               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
+                       length=120.d0,width=100.d0,height=140.d0)
+               inputs = create_struct("runid",'test_4a',$
+                        "comment",'Rotated, Tilted up grid; flat profiles',$
+                        basic_inputs, bgrid)
+                          
+           END
+           "TEST_4B": BEGIN
+               nbi = test_beam(-0.25)
+               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
+                       length=120.d0,width=100.d0,height=140.d0)
+               inputs = create_struct("runid",'test_4b',$
+                        "comment",'Rotated, Tilted down grid; realistic profiles',$
+                        basic_inputs, bgrid)
+           END
+       ENDCASE 
+       PRINT, inputs.comment
+
+       grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100) 
+       equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux,g=g)
+       equil = create_struct(equil,"geqdsk",g)
        fbm = read_nubeam(test_dir+'test_fi_1.cdf',grid,$
                          btipsign=-1.0,$
                          e_range=[67.0,77.0], $
                          p_range=[-0.1,0.1])
-
        spec = test_chords()
        npa = test_npa()
-
-       equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux)
-       nbi = test_beam(input_str[i].beta)
 
        tcb = byte(strlowcase(test_cases[i]))
        pfile = test_dir+'test_profiles_'+string(tcb[-1])+'.cdf'
        plasma = test_profiles(pfile,grid,flux)
        
-       prefida,input_str[i], grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
+       prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
    endfor
 
 end    

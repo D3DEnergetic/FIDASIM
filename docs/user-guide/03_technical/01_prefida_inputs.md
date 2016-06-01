@@ -216,8 +216,12 @@ The `dist` structure contains the fast-ion distribution which can be one of thre
 | `type`              | Int16   | 0    | NA                             | NA                     | Distribution type (1)           |
 | `time`              | Float64 | 0    | NA                             | s                      | Time of the distribution        |
 | `data_source`       | String  | 0    | NA                             | NA                     | Source of the distribution data |
+| `nr`                | Int16   | 0    | NA                             | NA                     | Number of radii                 |
+| `nz`                | Int16   | 0    | NA                             | NA                     | Number of z values              |
 | `nenergy`           | Int16   | 0    | NA                             | NA                     | Number of energy values         |
 | `npitch`            | Int16   | 0    | NA                             | NA                     | Number of pitch values          |
+| `R`                 | Float64 | 1    | [`nr`]                         | cm                     | R array                         |
+| `Z`                 | Float64 | 1    | [`nz`]                         | cm                     | Z array                         |
 | `energy`            | Float64 | 1    | [`nenergy`]                    | keV                    | Energy array                    |
 | `pitch`             | Float64 | 1    | [`npitch`]                     | NA                     | Pitch array w.r.t magnetic field|
 | `denf`              | Float64 | 2    | [`nr`,`nz`]                    | cm^-3                  | Fast-ion density                |

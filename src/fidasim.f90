@@ -2075,7 +2075,7 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/plasma/vt", equil%plasma%vt, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/vz", equil%plasma%vz, dims, error)
     call h5ltread_dataset_int_f(gid, "/plasma/mask", p_mask, dims,error)
-  
+
     impc = inputs%impurity_charge
     where(equil%plasma%zeff.lt.1.0)
         equil%plasma%zeff = 1
@@ -5381,8 +5381,8 @@ subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 
 end subroutine pitch_to_vec
 
-subroutine gyro_correction(vi, fields, r_gyro)
-    !+ Calculates gyro correction
+subroutine gyro_step(vi, fields, r_gyro)
+    !+ Calculates gyro-step
     real(Float64), dimension(3), intent(in)  :: vi
         !+ Ion velocity
     type(LocalEMFields), intent(in)          :: fields
@@ -5397,6 +5397,59 @@ subroutine gyro_correction(vi, fields, r_gyro)
     vxB = cross_product(vi,fields%b_norm)
     r_gyro = vxB*one_over_omega
 
+end subroutine gyro_step
+
+subroutine gyro_correction(rg, energy, pitch, rp, vp)
+    !+ Calculates gyro correction for Guiding Center MC distribution calculation
+    real(Float64), dimension(3), intent(in)  :: rg
+        !+ Gyro-center position
+    real(Float64), intent(in)                :: energy
+        !+ Energy of particle
+    real(Float64), intent(in)                :: pitch
+        !+ Particle pitch w.r.t the magnetic field
+    real(Float64), dimension(3), intent(out) :: rp
+        !+ Particle position 
+    real(Float64), dimension(3), intent(out) :: vp
+        !+ Particle velocity
+
+    integer, parameter :: ngyro = 100
+    real(Float64), dimension(ngyro) :: phi, r
+    real(Float64), dimension(3) :: uvw, vi, ri, r_step
+    real(Float64), dimension(1) :: randomu
+    integer, dimension(1) :: randi
+    real(Float64) :: vabs, dphi, phip
+    type(LocalEMFields) :: fields
+    integer :: i
+
+    vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
+    dphi = 2*pi/ngyro
+
+    call get_fields(fields,pos=rg)
+
+    !! Calculate radius of particle along gyro-ring
+    do i=1,ngyro
+        phi(i) = dphi*i
+        call pitch_to_vec(pitch,phi(i),fields, vi)
+        vi = vabs*vi
+        call gyro_step(vi, fields, r_step)
+        ri = rg - r_step
+        call xyz_to_uvw(ri, uvw)
+        r(i) = sqrt(uvw(1)**2 + uvw(2)**2)
+    enddo
+
+    !! Sample gyroangle according to radius to counter-act geometric effect
+    call randind(r, randi)
+    call randu(randomu)
+    phip = phi(randi(1)) + (randomu(1) - 0.5)*dphi
+
+    !! Calculate velocity vector
+    call pitch_to_vec(pitch, phip, fields, vi)
+    vp = vabs*vi
+
+    !! Move to particle location
+    call gyro_step(vp, fields, r_step)
+    rp = rg - r_step
+     
 end subroutine gyro_correction
 
 subroutine mc_fastion(ind,ri,vi,denf,at_guiding_center)
@@ -5447,16 +5500,16 @@ subroutine mc_fastion(ind,ri,vi,denf,at_guiding_center)
         call randu(randomu3)
         eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
         ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
-        phi = 2.d0*pi*randomu3(3)
-  
+        phi = 2*pi*randomu3(3)
+        
         !! Calculate gyroradius
         vabs  = sqrt(eb/(v2_to_E_per_amu*inputs%ab))
         call pitch_to_vec(ptch,phi,fields,vi)
         vi = vabs*vi
-        call gyro_correction(vi,fields,r_gyro)
-  
+
         !! Move a gyro-orbit away
-        ri=ri-r_gyro
+        call gyro_step(vi,fields,r_gyro)
+        ri = ri - r_gyro 
     else
         !! Use rejection method to determine velocity vector
         rejection_loop: do ii=1,10000
@@ -5470,7 +5523,7 @@ subroutine mc_fastion(ind,ri,vi,denf,at_guiding_center)
             vabs  = sqrt(eb/(v2_to_E_per_amu*inputs%ab))
             call pitch_to_vec(ptch,phi,fields,vi)
             vi = vabs*vi
-            call gyro_correction(vi,fields,r_gyro)
+            call gyro_step(vi,fields,r_gyro)
   
             !! Move a gyro-orbit away and sample distribution there
             rp=ri+r_gyro
@@ -6182,15 +6235,7 @@ subroutine fida_mc
                 call uvw_to_xyz(uvw,xyz)
   
                 if(particles%guiding_center) then          
-                    !! Pick random gyroangle
-                    theta = 2*pi*randomu(2)
-                    call get_fields(fields,pos=xyz)
-   
-                    call pitch_to_vec(fast_ion%pitch,theta,fields,vi_norm)
-                    vi = fast_ion%vabs*vi_norm
-   
-                    call gyro_correction(vi,fields,r_gyro)
-                    ri = xyz - r_gyro
+                    call gyro_correction(xyz, fast_ion%energy, fast_ion%pitch, ri, vi)
                 else
                     uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
                     uvw_vi(2) = s*fast_ion%vr + c*fast_ion%vt
@@ -6373,15 +6418,7 @@ subroutine npa_mc
                 call uvw_to_xyz(uvw,xyz)
   
                 if(particles%guiding_center) then          
-                    !! Pick random gyroangle
-                    theta = 2*pi*randomu(2)
-                    call get_fields(fields,pos=xyz)
-   
-                    call pitch_to_vec(fast_ion%pitch,theta,fields,vi_norm)
-                    vi = fast_ion%vabs*vi_norm
-   
-                    call gyro_correction(vi,fields,r_gyro)
-                    ri = xyz - r_gyro
+                    call gyro_correction(xyz, fast_ion%energy, fast_ion%pitch, ri, vi)
                 else
                     uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
                     uvw_vi(2) = s*fast_ion%vr + c*fast_ion%vt
@@ -6425,7 +6462,7 @@ subroutine fida_weights_mc
     integer :: i,j,k !! indices  x,y,z of cells
     integer(kind=8) :: iion,ip
     real(Float64), dimension(3) :: ri,r_gyro      !! start position
-    real(Float64), dimension(3) :: vi,vi_norm    !! velocity of fast ions
+    real(Float64), dimension(3) :: vi, vi_norm    !! velocity of fast ions
     integer,dimension(3) :: ind      !! new actual cell
     integer,dimension(4) :: neut_types=[1,2,3,4]
     logical :: los_intersect
@@ -6537,9 +6574,9 @@ subroutine fida_weights_mc
             call randind(inputs%ne_wght, ienergy)
             call randind(inputs%np_wght, ipitch)
             call randu(randomu3)
-            phi = 2*pi*randomu3(1)
-            energy = ebarr(ienergy(1)) + dE*(randomu3(2)-0.5)
-            pitch = ptcharr(ipitch(1)) + dP*(randomu3(3)-0.5)
+            energy = ebarr(ienergy(1)) + dE*(randomu3(1)-0.5)
+            pitch = ptcharr(ipitch(1)) + dP*(randomu3(2)-0.5)
+            if(energy.le.0) cycle loop_over_fast_ions
   
             call randu(randomu3)
             ri = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)] + beam_grid%dr*(randomu3-0.5)
@@ -6556,9 +6593,9 @@ subroutine fida_weights_mc
             if(energy.eq.0) cycle loop_over_fast_ions
   
             !! Correct for gyro motion
-            call gyro_correction(vi,fields,r_gyro)
+            call gyro_step(vi,fields,r_gyro)
             ri = ri - r_gyro
-  
+
             !! Find the particles path through the beam grid
             call track(ri, vi, tracks, ncell, los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
@@ -6899,7 +6936,7 @@ subroutine npa_weights
                             vabs = sqrt(ebarr(ic)/(v2_to_E_per_amu*inputs%ab))
                             vi = vi_norm*vabs
                             !!Correct for gyro orbit
-                            call gyro_correction(vi,fields,r_gyro)
+                            call gyro_step(vi,fields,r_gyro)
   
                             fbm_denf=0
                             if (inputs%dist_type.eq.1) then

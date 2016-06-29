@@ -205,7 +205,7 @@ To figure out what shell you currently have run <code>echo $SHELL</code> to find
 </li>
 <li><a href="#setting-up-environmental-variables">Setting up environmental variables</a></li>
 <li><a href="#building-fidasim">Building FIDASIM</a></li>
-<li><a href="#generating-atomic-tables">Generating Atomic Tables</a></li>
+<li><a href="#generating-custom-atomic-tables">Generating Custom Atomic Tables</a></li>
 <li><a href="#run-a-test-case">Run a test case</a></li>
 <li><a href="#now-what">Now what</a></li>
 </ul>
@@ -224,6 +224,8 @@ To figure out what shell you currently have run <code>echo $SHELL</code> to find
 <li><a href="http://zlib.net/">zlib</a> for file compression.</li>
 <li><a href="https://www.hdfgroup.org/HDF5/">HDF5 1.8.16</a> for reading and writing data files (Included)</li>
 <li><a href="https://fusion.gat.com/theory/Efit">EFIT</a> for electro-magnetic fields (Partially Included)</li>
+<li><a href="https://git-scm.com/">git</a> for version control (Optional)</li>
+<li><a href="https://git-lfs.github.com/">git-lfs</a> large file support for git (Optional)</li>
 <li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> for python scripts (Optional)</li>
 <li><a href="https://github.com/cmacmackin/ford">Ford</a> for creating HTML documentation (Optional)</li>
 <li><a href="http://wummel.github.io/linkchecker/">LinkChecker</a> for validating HTML documentation (Optional)</li>
@@ -300,10 +302,12 @@ usage: ./fidasim namelist_file <span class="o">[</span>num_threads<span class="o
 
 
 <p>Good job! You installed FIDASIM! But wait there's more.</p>
-<h2 id="generating-atomic-tables">Generating Atomic Tables</h2>
+<h2 id="generating-custom-atomic-tables">Generating Custom Atomic Tables</h2>
 <p>Calculating reaction rates on the fly is time consuming so FIDASIM pre-computes them to save time.
-The following code snippit will generate the atomic tables using the default settings.
-If you want to change the settings you can edit the <code>table_settings.dat</code> namelist file located in the <code>tables</code> directory.</p>
+FIDASIM comes with atomic tables (<code>tables/atomic_tables.h5</code>) that should be appropriate for most use cases (See the file <code>tables/default_settings.dat</code> for the specific table settings.)
+However, it may be necessary to generate custom atomic tables.
+For instance, the default tables are calculated assuming the main impurity is Carbon₆ so it would inappropriate to use the default tables if your main impurity is Boron₅.</p>
+<p>To generate custom atomic tables first edit the <code>tables/default_settings.dat</code> file with the desired settings and then run</p>
 <div class="codehilite"><pre><span></span>make atomic_tables
 </pre></div>
 

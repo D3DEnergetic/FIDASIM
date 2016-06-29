@@ -24,8 +24,7 @@ FIDASIM has the following dependencies:
 * [zlib](http://zlib.net/) for file compression.
 * [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
 * [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)
-* [git](https://git-scm.com/) for version control (Optional)
-* [git-lfs](https://git-lfs.github.com/) large file support for git (Optional)
+* [git](https://git-scm.com/) and [git-lfs](https://git-lfs.github.com/) for version control (Optional)
 * [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
@@ -50,7 +49,7 @@ cd FIDASIM-{!../VERSION!}
 ```
 
 ###Cloning the git repository
-If you are planning to develop FIDASIM it is best to use git.
+If you are planning to develop FIDASIM it is best to use git and git-lfs.
 ```bash
 git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
 cd FIDASIM

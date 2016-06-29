@@ -24,6 +24,8 @@ FIDASIM has the following dependencies:
 * [zlib](http://zlib.net/) for file compression.
 * [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
 * [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)
+* [git](https://git-scm.com/) for version control (Optional)
+* [git-lfs](https://git-lfs.github.com/) large file support for git (Optional)
 * [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
@@ -100,16 +102,18 @@ usage: ./fidasim namelist_file [num_threads]
 ```
 Good job! You installed FIDASIM! But wait there's more.
 
-##Generating Atomic Tables
+##Generating Custom Atomic Tables
 Calculating reaction rates on the fly is time consuming so FIDASIM pre-computes them to save time.
-The following code snippit will generate the atomic tables using the default settings.
-If you want to change the settings you can edit the `table_settings.dat` namelist file located in the `tables` directory.
+FIDASIM comes with atomic tables (`tables/atomic_tables.h5`) that should be appropriate for most use cases (See the file `tables/default_settings.dat` for the specific table settings.)
+However, it may be necessary to generate custom atomic tables.
+For instance, the default tables are calculated assuming the main impurity is Carbon₆ so it would inappropriate to use the default tables if your main impurity is Boron₅.
 
+To generate custom atomic tables first edit the `tables/default_settings.dat` file with the desired settings and then run
 ```bash
 make atomic_tables
 ```
 
-@warning 
+@warning
 This is computationally expensive so make sure you run this on a computer 
 where you won't get angry emails for using up all the CPU's.
 Optionally you can add `NTHREADS=#` to the command to set the number of threads.

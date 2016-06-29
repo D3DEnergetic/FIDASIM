@@ -37,6 +37,7 @@ if [ "$TRAVIS_BRANCH" = "master" ] && \
         echo "No changes in development documentation"
         exit 0
     fi
+    diff -r $TRAVIS_BUILD_DIR/docs/html gh-pages
     cd gh-pages
     rm -rf css favicon.png fonts index.html interface \
        js lists media module page proc program search.html \
@@ -53,6 +54,7 @@ if [[ $TRAVIS_BRANCH == release-* ]]; then
         echo "No changes in $TRAVIS_BRANCH documentation"
         exit 0
     fi
+    diff -r $TRAVIS_BUILD_DIR/docs/html $TRAVIS_BRANCH
     rm -rf $TRAVIS_BRANCH
     mkdir $TRAVIS_BRANCH
     cp -r "$TRAVIS_BUILD_DIR"/docs/html/* $TRAVIS_BRANCH

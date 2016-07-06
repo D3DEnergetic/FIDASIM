@@ -250,7 +250,7 @@ The `class` variable can take values in the range of 1:`nclass`.
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
-| `type`              | Int16   | 0    | NA           | NA    | Distribution type (2)           |
+| `type`              | Int16   | 0    | NA           | NA    | Distribution type (3)           |
 | `time`              | Float64 | 0    | NA           | s     | Time of the distribution        |
 | `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data |
 | `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles          |

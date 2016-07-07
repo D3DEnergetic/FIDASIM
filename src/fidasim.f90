@@ -5715,7 +5715,7 @@ subroutine bremsstrahlung
                     gaunt = 5.542-(3.108-log(plasma%te))*(0.6905-0.1323/plasma%zeff)
                     brems = 7.57d-9*gaunt*plasma%dene**2*plasma%zeff/(lambda_arr &
                             *sqrt(plasma%te*1000.0))*exp(-h_planck*c0/(lambda_arr*plasma%te*1000.0)) &
-                            *inputs%dlambda*(4.d0*pi)*1.d-4
+                            *dlambda*(4.d0*pi)*1.d-4
   
                     spec%brems(:,ichan)= spec%brems(:,ichan) + (brems*dlength*1.d-2)/nc
                 endif

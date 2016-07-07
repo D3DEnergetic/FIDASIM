@@ -14,6 +14,8 @@ module atomic_tables
 !+5. [R.K. Janev and J.J. Smith. *Cross sections for collision processes of hydrogen atoms 
 !+with electrons, protons and multiply charged ions.* Atomic and Plasma-Material Interaction Data for Fusion:
 !+Volume 4, 1993.](http://www-pub.iaea.org/books/IAEABooks/1839/Atomic-and-Plasma-Material-Interaction-Data-for-Fusion) 
+!+6. [Reinhold, C. O., R. E. Olson, and W. Fritsch. *Excitation of atomic hydrogen by fully stripped ions.* 
+!+Physical Review A 41.9 1990.](http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837)
 use H5LT
 use HDF5
 use hdf5_extra

@@ -2115,10 +2115,6 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/fields/ez", equil%fields%ez, dims, error)
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
 
-    equil%fields%br = 0.0
-    equil%fields%bt = 0.3
-    equil%fields%bz = 0.0
-
     !!Close FIELDS group
     call h5gclose_f(gid, error)
   

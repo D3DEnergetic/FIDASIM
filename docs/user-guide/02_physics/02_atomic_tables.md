@@ -14,6 +14,106 @@ As a neutral particle travels through a plasma it undergoes several different ty
 
 These cross sections, as well as Maxwellian averaged reaction rates, are pre-computed over a range of logarithmically spaced collision energies and target temperatures.
 
+# Approximate Hydrogen Charge Exchange Cross Sections 
+Some of atomic transitions needed by FIDASIM are not available.
+In particular, FIDASIM needs the n/m-resolved charge exchange cross sections.
+While certain transitions are available through ADAS [4] others are not, as such, certain approximations are needed to fill out the table.
+
+For instance, we use the equivalence principle (reversibility formula) to mirror the known ADAS cross sections.
+$$\sigma(n_f \rightarrow n_i) = \frac{E_i}{E_f} \frac{n_i^2}{n_f^2} \sigma(n_i \rightarrow n_f)$$
+This however is insufficient to completly fill out the table. 
+
+Additionally, since the total cross sections for a transition from a given \(n\) to any \(m\) are given by Janev[2] we can then also assume that the probability of a transition from the \(n \rightarrow m\) state decreases exponentially with energy difference between the states we can "spread" the total cross section amoung the different m levels.
+
+@note 
+Total cross sections for \(n>4\) are not available so the \(n=4\) total cross sections are used.
+Also we normalize the m levels to the Janev tables for consistancy.
+
+A summary of the various approximations used in the charge exchange tables is given in the table below. (Spreading is done over m/rows)
+<!-- Charge Exchange table made in http://www.tablesgenerator.com/html_tables -->
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;margin:0 auto;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-fo0g{font-weight:bold;background-color:#009901;color:#ffffff;text-align:center;vertical-align:top}
+.tg .tg-0mq6{font-weight:bold;background-color:#fe0000;color:#ffffff;text-align:center;vertical-align:top}
+.tg .tg-bq31{font-weight:bold;background-color:#3166ff;color:#ffffff;text-align:center;vertical-align:top}
+</style>
+<table class="tg" >
+  <caption>H-H Charge Exchange Data Source</caption>
+  <tr>
+    <th class="tg-amwm">n \ m</th>
+    <th class="tg-amwm">1</th>
+    <th class="tg-amwm">2</th>
+    <th class="tg-amwm">3</th>
+    <th class="tg-amwm">4</th>
+    <th class="tg-amwm">5</th>
+    <th class="tg-amwm">6</th>
+    <th class="tg-amwm">Total</th>
+  </tr>
+  <tr>
+    <td class="tg-amwm">1</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <th class="tg-amwm">Janev(n=1)</th>
+  </tr>
+  <tr>
+    <td class="tg-amwm">2</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <th class="tg-amwm">Janev(n=2)</th>
+  </tr>
+  <tr>
+    <td class="tg-amwm">3</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-0mq6">ADAS</td>
+    <td class="tg-bq31">Spread</td>
+    <th class="tg-amwm">ADAS/Janev(n=3)</th>
+  </tr>
+  <tr>
+    <td class="tg-amwm">4</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <th class="tg-amwm">Janev(n=4)</th>
+  </tr>
+  <tr>
+    <td class="tg-amwm">5</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <th class="tg-amwm">Janev(n=4)</th>
+  </tr>
+  <tr>
+    <td class="tg-amwm">6</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-fo0g">Equivalence</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <td class="tg-bq31">Spread</td>
+    <th class="tg-amwm">Janev(n=4)</th>
+  </tr>
+</table>
+
 #Generating Tables
 FIDASIM provides a routine, [[generate_tables(program)]] to generate the atomic tables. 
 To generate the atomic tables with the default settings all you need to do is, from the install directory, run
@@ -49,7 +149,9 @@ The atomic data is taken from a variety of sources [1-5]
 3. [M. O'Mullane. *Review of proton impact driven ionisation from the excited levels in neutral hydrogen beams*. ADAS note, 2009.](http://www.adas.ac.uk/notes/adas_c09-01.pdf)
 4. [ADAS: Atomic Data and Analysis Structure](http://www.adas.ac.uk/)
 5. [R.K. Janev and J.J. Smith. *Cross sections for collision processes of hydrogen atoms with electrons, protons and multiply charged ions.* Atomic and Plasma-Material Interaction Data for Fusion: Volume 4, 1993.](http://www-pub.iaea.org/books/IAEABooks/1839/Atomic-and-Plasma-Material-Interaction-Data-for-Fusion) 
+6. [Reinhold, C. O., R. E. Olson, and W. Fritsch. *Excitation of atomic hydrogen by fully stripped ions.* Physical Review A 41.9 1990.](http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837)
 
+A more precice references can be found in the Fortran function documentation. For example, [[p_cx_janev]]
 #Fortran References
 
 * [[atomic_tables(module)]]: Module containing routines to calculate atomic tables and reaction rates
@@ -60,7 +162,7 @@ The atomic data is taken from a variety of sources [1-5]
 * [[read_cross]]: Reads atomic cross section from file
 * [[read_rates]]: Reads atomic rates from file
 * [[read_tables]]: Reads all cross sections and rates needed by FIDASIM
-
+* [[m_spread]]: Spreads total n cross section amoung m states
 #Hydrogen-Hydrogen Interactions
 
 ##\(H^+ + H(n) \rightarrow H(m) + H^+\)

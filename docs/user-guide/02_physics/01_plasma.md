@@ -155,11 +155,21 @@ The sum(`weight`) = # of Fast-ions in phase space sampled by the MC particles.
 The `class` variable can take values in the range of 1:`nclass`.
 If there are multiple classes of particles the FIDA signal for each class will be calculated.
 
+# Relevent Namelist Settings
+* `ai`: Ion mass [amu]
+* `impurity_charge`: Impurity charge number 5=Boron, 6=Carbon, ...
+* `ab`: Fast/Beam-ion mass [amu]
+* `equilibrium_file`: Equilibrium file location
+* `distribution_file`: Distribution file location
+
 # Fortran References
 
 * [[InterpolationGrid]]: Definition of R-Z grid
 * [[Profiles]] and [[LocalProfiles]]: Derived type for Plasma parameters
 * [[EMFields]] and [[LocalEMFields]]: Derived type for Fields
+* [[get_plasma]]: Gets plasma parameters at a given position
+* [[get_fields]]: Gets fields at a given position
+* [[get_distribution]]: Gets fast-ion distribution at a given position
 * [[read_equilibrium]]: Reads equilbrium file into [[Equilibrium]] structure
 * [[FastIonDistribution]]: Derived type for describing GC distribution functions
 * [[FastIon]]: Derived type for describing a Monte Carlo particle

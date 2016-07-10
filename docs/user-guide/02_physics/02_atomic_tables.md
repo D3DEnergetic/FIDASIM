@@ -152,8 +152,11 @@ The atomic data is taken from a variety of sources [1-5]
 6. [Reinhold, C. O., R. E. Olson, and W. Fritsch. *Excitation of atomic hydrogen by fully stripped ions.* Physical Review A 41.9 1990.](http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837)
 
 A more precice references can be found in the Fortran function documentation. For example, [[p_cx_janev]]
-#Fortran References
 
+#Relevent Namelist Settings
+* `tables_file`: Location of atomic tables file
+
+#Fortran References
 * [[atomic_tables(module)]]: Module containing routines to calculate atomic tables and reaction rates
 * [[generate_tables(program)]]: Program to create atomic tables file
 * [[AtomicCrossSection]]: Defines a n/m-resolved atomic cross section table
@@ -163,6 +166,7 @@ A more precice references can be found in the Fortran function documentation. Fo
 * [[read_rates]]: Reads atomic rates from file
 * [[read_tables]]: Reads all cross sections and rates needed by FIDASIM
 * [[m_spread]]: Spreads total n cross section amoung m states
+
 #Hydrogen-Hydrogen Interactions
 
 ##\(H^+ + H(n) \rightarrow H(m) + H^+\)

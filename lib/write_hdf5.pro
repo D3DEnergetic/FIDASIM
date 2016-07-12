@@ -29,10 +29,12 @@ FUNCTION vars_to_struct,vars=vars,level=level
     return, s
 END
 
-PRO hdf5_write_struct, id, struct
+PRO hdf5_write_struct, id, struct, compress=compress
 
     ntags = n_tags(struct)
     if ntags eq 0 then goto, GET_OUT
+
+    if not keyword_set(compress) then compress = 9
 
     tags = strlowcase(TAG_NAMES(struct))
     for i=0,ntags-1 do begin
@@ -42,7 +44,7 @@ PRO hdf5_write_struct, id, struct
 
         if typeName eq 'STRUCT' then begin
             gid = h5g_create(id,tags[i])
-            hdf5_write_struct,gid,var
+            hdf5_write_struct,gid,var,compress=compress
             h5g_close, gid
         endif else begin
             data = var
@@ -56,7 +58,7 @@ PRO hdf5_write_struct, id, struct
             endif else begin
                 dataspace_id = h5s_create_simple(dims)
                 dataset_id = h5d_create(id, tags[i], datatype_id, dataspace_id, $
-                                        chunk_dimensions=dims, gzip=9,/shuffle)
+                                        chunk_dimensions=dims, gzip=compress,/shuffle)
             endelse
 
             h5d_write, dataset_id, data
@@ -153,7 +155,7 @@ PRO hdf5_write_attributes,id,atts
 
 END
 
-PRO write_hdf5,vars,atts=atts,filename=filename,clobber=clobber
+PRO write_hdf5,vars,atts=atts,filename=filename,clobber=clobber,compress=compress
     ;+#write_hdf5
     ;+Writes HDF5 files from variables in the local scope or a structure
     ;+***
@@ -166,6 +168,8 @@ PRO write_hdf5,vars,atts=atts,filename=filename,clobber=clobber
     ;+    **filename**: Filename of output HDF5 file
     ;+
     ;+    **clobber**: Overwrite exisiting HDF5 file
+    ;+
+    ;+    **compress**: Compression level(0-9). Defaults to 9
     ;+
     ;+##Example Usage
     ;+```idl
@@ -181,6 +185,8 @@ PRO write_hdf5,vars,atts=atts,filename=filename,clobber=clobber
         print,"File already exists. Use clobber keyword to overwrite"
         goto, GET_OUT
     endif
+
+    if not keyword_set(compress) then compress = 9
 
     nvars = n_elements(vars)
     if nvars eq 0 then goto, GET_OUT
@@ -204,7 +210,7 @@ PRO write_hdf5,vars,atts=atts,filename=filename,clobber=clobber
     end
 
     file_id = h5f_create(filename)
-    hdf5_write_struct, file_id, var_struct
+    hdf5_write_struct, file_id, var_struct, compress=compress
 
     if keyword_set(atts) then begin
         hdf5_write_attributes, file_id, atts

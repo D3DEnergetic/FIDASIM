@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Collisional Radiative Model &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0-rc1</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+				
+                
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+				
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Collisional Radiative Model</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/02_physics/index.html'>Physics</a></li>
+      
+         <li class="active">Collisional Radiative Model</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    
+    <div class="col-lg-3">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Phase-space Sensitivities</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+    <div class="col-lg-9" id='text'>
+        <div class="toc">
+<ul>
+<li><a href="#collisional-radiative-model">Collisional Radiative Model</a></li>
+<li><a href="#fortran-references">Fortran References</a></li>
+</ul>
+</div>
+<hr>
+<h1 id="collisional-radiative-model">Collisional Radiative Model</h1>
+<p>The collisions that a neutral particle experiences as it travels through a plasma changes the distribution of its energy level population.
+This process can be modeled as a system of differential equations
+$$
+\begin{bmatrix}
+\frac{\mathrm{d} f_1 }{\mathrm{d} t}\\
+\vdots\\ 
+\frac{\mathrm{d} f_n }{\mathrm{d} t}
+\end{bmatrix}
+=
+\begin{bmatrix}
+a_{11} &amp; \cdots &amp; a_{1n}\\ 
+\vdots &amp; \ddots &amp; \vdots\\ 
+a_{m1} &amp; \cdots &amp; a_{mn}
+\end{bmatrix}
+\begin{bmatrix}
+f_1\\
+\vdots\\ 
+f_n
+\end{bmatrix}
+$$
+where \(f_n\) is the flux of neutrals [1/s] in the \(n_{th}\) energy level and \(df_n/dt\) is the time derivative.
+The matrix \(A\) consists of rates, \(a_{mn}\) [1/s] that correspond to the transitions to different energy levels due to different collisional processes.
+The transition rates for a given atomic process is given by
+$$c_{mn} = \langle \sigma v \rangle(E_p,T_T) \cdot d_T $$
+where \(\langle \sigma v \rangle \) is the effective rate coefficient [cm³/s] at a given beam energy \(E_p\) and target temperature \(T\) and \(d_T\) is the density of the target.</p>
+<p>The off-diagonal coefficients of \(A\) given by 
+$$a_{mn} = \sum_k c_{mn}(k) $$
+describe a flow from the \(m_{th}\) state into the \(n_{th}\) state due to the different \(k\) atomic processes.
+In FIDASIM these are called populating transitions since they add to the population of the \(n_{th}\) state.
+Populating transitions are caused by electron-,ion-,impurity-impact excitation and de-excitation and spontaneous transitions (Einstein coeffecients).</p>
+<p>The diagonal elements of \(A\) given by
+$$a_{nn} = - \sum_k \sum_{m=1} c_{mn}(k) - \sum_j l_n(j)$$
+describe the the flow from the \(n_{th}\) state to the different \(m\) and unbounded(loss) states due to the different \(k\) and \(j\) atomic processes.
+In FIDASIM these are called de-populating transitions since the subtract from the population of the \(n_{th}\) state.
+De-populating transitions to different \(m\) states are caused by the same physical processes as the populating transitions.
+The de-populating transistions to the unbounded states i.e. loss mechanisms are caused by electron-,ion-,impurity-impact ionization and charge exchange with ions and impurities.</p>
+<p>The system of differential equations can be solved analytically to give
+$$F(t) = S^{-1} \cdot F(0)\cdot S \cdot \exp(\Lambda \,t)$$
+where \(F(t)\) is a vector of the flux of neutrals [1/s] for each energy state after a time \(t\), \(S\) is the matrix of the eigenvectors of \(A\) and \(\Lambda\) is a diagonal matrix containing the eigenvectors of \(A\). 
+The fractional flux of a neutral traveling through a uniform plasma is shown below.</p>
+<p style="text-align: center"><img alt="" src="../../media/neutral_attenuation.png"></p>
+<p>As you can see the relative flux between states converges fairly quickly.</p>
+<p>The number of neutrals in a given state after a time \(t\), \(N(t)\), is given by
+$$N(t) = S^{-1} \cdot N(0)\cdot S \cdot (\exp(\Lambda \,t) - 1)/\Lambda$$
+If \(t\) represents the time spent inside a grid cell the neutral density can be calculated by dividing the above equation by \(V_{cell}\).
+The total neutral density of a mc marker is shown below.</p>
+<p style="text-align: center"><img alt="" src="../../media/neutral_dens.png"></p>
+<p>As you can see over time the total number of neutrals decreases exponentially.</p>
+<h1 id="fortran-references">Fortran References</h1>
+<ul>
+<li><a href="../../proc/colrad.html">colrad</a>: Fortran implementation</li>
+<li><a href="../../proc/get_rate_matrix.html">get_rate_matrix</a>: Constructs rate matrix \(A\)</li>
+<li><a href="../../type/atomicrates.html">AtomicRates</a>: Derived type that stores populating and de-populating transitions</li>
+</ul>
+    </div>
+  </div>
+
+    <hr>
+    <footer>
+      <div class="row">
+        <div class="col-md-4">&copy; 2016 </div>
+        <div class="col-md-4"><span class="text-center"> FIDASIM was developed by Luke Stagner</span></div>
+        <div class="col-md-4">
+          <span class="pull-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </span>
+        </div>
+      </div>
+      <br>
+    </footer>
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

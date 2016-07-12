@@ -162,7 +162,37 @@
             <ul class="nav nav-stacked nav-pills">
               
             <li role="presentation">
-            <a href='../../page/02_physics/01_atomic_tables.html'>Atomic Tables</a>
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Phase-space Sensitivities</a>
             
             </li>
             
@@ -456,8 +486,9 @@ The following settings provide a good balance between runtime and Monte Carlo no
 </table>
 <h2 id="neutral-beam-settings">Neutral Beam Settings</h2>
 <p>These variables define the neutral beam properties.
-Currently the mass of the beam species, <code>ab</code>,  can only be the mass either protium or deuterium.
-The <code>current_fractions</code> variable must sum to one.</p>
+Currently the mass of the beam species, <code>ab</code>, can only be the mass either protium or deuterium.
+The <code>current_fractions</code> variable must sum to one.
+Click <a href="../02_physics/04_neutrals.html#neutral-beam-density">here</a> for more information.</p>
 <table>
 <thead>
 <tr>
@@ -506,7 +537,8 @@ The <code>current_fractions</code> variable must sum to one.</p>
 </table>
 <h2 id="plasma-settings">Plasma Settings</h2>
 <p>These variables define the properties of the thermal plasma species.
-Like the <code>ab</code> variable, <code>ai</code> can only be the mass of either protium or deuterium</p>
+Like the <code>ab</code> variable, <code>ai</code> can only be the mass of either protium or deuterium
+Click <a href="../02_physics/01_plasma.html#plasma-parameters-and-fields">here</a> for more information.</p>
 <table>
 <thead>
 <tr>
@@ -538,19 +570,8 @@ Like the <code>ab</code> variable, <code>ai</code> can only be the mass of eithe
 </tbody>
 </table>
 <h2 id="beam-grid-settings">Beam Grid Settings</h2>
-<p>These variables define a rotated coordinate system. 
-The <a href="https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles">Tait-Bryan rotation angles</a> (<code>alpha</code>,<code>beta</code>,<code>gamma</code>) define a intrinsic rotation matrix, \(R\), that is used to transform from beam grid coordinates(xyz) to machine coordinates(uvw)
-$$ \mathrm{uvw = R \cdot xyz + origin} $$
-If the rotation angles and <code>origin</code> are set to zero then the rotation matrix is the Identity matrix and the coordinate system is identical to machine coordinates. </p>
-<p>Understanding these variables can be difficult and can best be described by an example. </p>
-<ol>
-<li>With your right hand point your index finger pointing in the +x direction with your middle finger and thumb pointing in the +y and +z direction respectively.</li>
-<li>Rotate about your thumb (z-axis) by <code>alpha</code> (ccw = +angle, cw = -angle)</li>
-<li>Rotate about your middle finger (y'-axis) by <code>beta</code></li>
-<li>Rotate about your index finger (x"-axis) by <code>gamma</code></li>
-<li>Move your right hand to the <code>origin</code></li>
-<li>Define <code>(x|y|z)_(min|max)</code> by this coordinate system with your index finger being the new +x-axis</li>
-</ol>
+<p>These variables define a rotated coordinate system.
+Click <a href="../02_physics/04_neutrals.html#beam-grid">here</a> for more details.</p>
 <table>
 <thead>
 <tr>
@@ -670,7 +691,8 @@ If the rotation angles and <code>origin</code> are set to zero then the rotation
 </tbody>
 </table>
 <h2 id="wavelength-grid-settings">Wavelength Grid Settings</h2>
-<p>These variables define the wavelength grid. Using a fine wavelength has no performance penalty.</p>
+<p>These variables define the wavelength grid. Using a fine wavelength has no performance penalty.
+Click <a href="../02_physics/05_spectra.html">here</a> for more more information.</p>
 <table>
 <thead>
 <tr>
@@ -710,6 +732,8 @@ If the rotation angles and <code>origin</code> are set to zero then the rotation
 </tbody>
 </table>
 <h2 id="weight-function-settings">Weight Function Settings</h2>
+<p>These variables define the setting for the calculation of weight functions.
+Click <a href="../02_physics/07_weights.html">here</a> for more information.</p>
 <table>
 <thead>
 <tr>
@@ -846,7 +870,8 @@ If the rotation angles and <code>origin</code> are set to zero then the rotation
 </table>
 <h1 id="neutral-beam-geometry-structure">Neutral Beam Geometry Structure</h1>
 <p>The <code>nbi</code> structure contains the neutral beam geometry.
-The <code>shape</code> of the source grid take the value of 1 or 2 for a rectangular and circular source grid respectively.</p>
+The <code>shape</code> of the source grid take the value of 1 or 2 for a rectangular and circular source grid respectively.
+Click <a href="../02_physics/04_neutrals.html#neutral-beam-geometry">here</a> for more information.</p>
 <table>
 <thead>
 <tr>
@@ -950,7 +975,8 @@ The <code>shape</code> of the source grid take the value of 1 or 2 for a rectang
 </tbody>
 </table>
 <h1 id="fields-structure">Fields Structure</h1>
-<p>This structure contain the electromagnetic fields mapped onto the interpolation grid.</p>
+<p>This structure contain the electromagnetic fields mapped onto the interpolation grid.
+Click <a href="../02_physics/01_plasma.html#plasma-parameters-and-fields">here</a> for more information.</p>
 <table>
 <thead>
 <tr>
@@ -1038,7 +1064,8 @@ The <code>shape</code> of the source grid take the value of 1 or 2 for a rectang
 </tbody>
 </table>
 <h1 id="plasma-structure">Plasma Structure</h1>
-<p>This structure contain the plasma parameters mapped onto the interpolation grid.</p>
+<p>This structure contain the plasma parameters mapped onto the interpolation grid.
+Click <a href="../02_physics/01_plasma.html#plasma-parameters-and-fields">here</a> for more information.</p>
 <table>
 <thead>
 <tr>
@@ -1134,7 +1161,8 @@ The <code>shape</code> of the source grid take the value of 1 or 2 for a rectang
 </tbody>
 </table>
 <h1 id="distribution-structure">Distribution Structure</h1>
-<p>The <code>dist</code> structure contains the fast-ion distribution which can be one of three different types.</p>
+<p>The <code>dist</code> structure contains the fast-ion distribution which can be one of three different types.
+Click <a href="../02_physics/01_plasma.html#distributions">here</a> for more information.</p>
 <h2 id="fast-ion-distribution-function">Fast-ion Distribution Function</h2>
 <table>
 <thead>
@@ -1348,7 +1376,7 @@ The <code>shape</code> of the source grid take the value of 1 or 2 for a rectang
 <td align="center">0</td>
 <td align="center">NA</td>
 <td align="center">NA</td>
-<td align="left">Distribution type (2)</td>
+<td align="left">Distribution type (3)</td>
 </tr>
 <tr>
 <td align="center"><code>time</code></td>
@@ -1441,7 +1469,8 @@ The <code>shape</code> of the source grid take the value of 1 or 2 for a rectang
 </tbody>
 </table>
 <h1 id="spectral-geometry-structure">Spectral Geometry Structure</h1>
-<p>This structure contains the geometry of the spectroscopic systems </p>
+<p>This structure contains the geometry of the spectroscopic systems 
+Click <a href="../02_physics/05_spectra.html">here</a> for more more information.</p>
 <table>
 <thead>
 <tr>
@@ -1530,7 +1559,8 @@ The <code>shape</code> of the source grid take the value of 1 or 2 for a rectang
 </table>
 <h1 id="npa-geometry-structure">NPA Geometry Structure</h1>
 <p>This structure contains the geometry of the spectroscopic systems 
-The shapes of the detector and aperture can take the value 1 or 2 for a rectangular and circular aperture/detector respectively.</p>
+The shapes of the detector and aperture can take the value 1 or 2 for a rectangular and circular aperture/detector respectively.
+Click <a href="../02_physics/06_npa.html">here</a> for more more information.</p>
 <table>
 <thead>
 <tr>

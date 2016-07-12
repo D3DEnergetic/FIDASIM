@@ -72,8 +72,9 @@ The following settings provide a good balance between runtime and Monte Carlo no
 
 ##Neutral Beam Settings
 These variables define the neutral beam properties.
-Currently the mass of the beam species, `ab`,  can only be the mass either protium or deuterium.
+Currently the mass of the beam species, `ab`, can only be the mass either protium or deuterium.
 The `current_fractions` variable must sum to one.
+Click [here](../02_physics/04_neutrals.html#neutral-beam-density) for more information.
 
 |       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
@@ -85,6 +86,7 @@ The `current_fractions` variable must sum to one.
 ##Plasma Settings
 These variables define the properties of the thermal plasma species.
 Like the `ab` variable, `ai` can only be the mass of either protium or deuterium
+Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more information.
 
 |       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
@@ -93,20 +95,8 @@ Like the `ab` variable, `ai` can only be the mass of either protium or deuterium
 
 ##Beam Grid Settings
 
-These variables define a rotated coordinate system. 
-The [Tait-Bryan rotation angles](https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles) (`alpha`,`beta`,`gamma`) define a intrinsic rotation matrix, \(R\), that is used to transform from beam grid coordinates(xyz) to machine coordinates(uvw)
-$$ \mathrm{uvw = R \cdot xyz + origin} $$
-If the rotation angles and `origin` are set to zero then the rotation matrix is the Identity matrix and the coordinate system is identical to machine coordinates. 
-
-
-Understanding these variables can be difficult and can best be described by an example. 
-
-1. With your right hand point your index finger pointing in the +x direction with your middle finger and thumb pointing in the +y and +z direction respectively.
-2. Rotate about your thumb (z-axis) by `alpha` (ccw = +angle, cw = -angle)
-3. Rotate about your middle finger (y'-axis) by `beta`
-4. Rotate about your index finger (x"-axis) by `gamma`
-5. Move your right hand to the `origin`
-6. Define `(x|y|z)_(min|max)` by this coordinate system with your index finger being the new +x-axis
+These variables define a rotated coordinate system.
+Click [here](../02_physics/04_neutrals.html#beam-grid) for more details.
 
 |       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
@@ -126,6 +116,7 @@ Understanding these variables can be difficult and can best be described by an e
 
 ##Wavelength Grid Settings
 These variables define the wavelength grid. Using a fine wavelength has no performance penalty.
+Click [here](../02_physics/05_spectra.html) for more more information.
 
 |       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
@@ -134,6 +125,9 @@ These variables define the wavelength grid. Using a fine wavelength has no perfo
 | `lambdamax`         | Float64 | 0    | NA         | nm    | Maximum wavelength                       |
 
 ##Weight Function Settings
+These variables define the setting for the calculation of weight functions.
+Click [here](../02_physics/07_weights.html) for more information.
+
 |       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
 | `ne_wght`           | Int16   | 0    | NA         | NA    | Number of weight function energies       |
@@ -160,6 +154,7 @@ The `grid` structure contains the definition of the 2D R-Z grid that the plasma 
 #Neutral Beam Geometry Structure
 The `nbi` structure contains the neutral beam geometry.
 The `shape` of the source grid take the value of 1 or 2 for a rectangular and circular source grid respectively.
+Click [here](../02_physics/04_neutrals.html#neutral-beam-geometry) for more information.
 
 |       Variable      |   Type  | Rank |  Dimensions | Units |                    Description                     |
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:---------------------------------------------------|
@@ -178,6 +173,7 @@ The `shape` of the source grid take the value of 1 or 2 for a rectangular and ci
 
 #Fields Structure
 This structure contain the electromagnetic fields mapped onto the interpolation grid.
+Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more information.
 
 |       Variable      |   Type  | Rank |  Dimensions | Units |                           Description                         |
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:--------------------------------------------------------------| 
@@ -193,6 +189,7 @@ This structure contain the electromagnetic fields mapped onto the interpolation 
 
 #Plasma Structure
 This structure contain the plasma parameters mapped onto the interpolation grid.
+Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more information.
 
 |       Variable      |   Type  | Rank |  Dimensions | Units |                           Description                         |
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:--------------------------------------------------------------| 
@@ -209,6 +206,7 @@ This structure contain the plasma parameters mapped onto the interpolation grid.
 
 #Distribution Structure
 The `dist` structure contains the fast-ion distribution which can be one of three different types.
+Click [here](../02_physics/01_plasma.html#distributions) for more information.
 
 ##Fast-ion Distribution Function
 |       Variable      |   Type  | Rank |           Dimensions           |          Units         |           Description           |
@@ -250,7 +248,7 @@ The `class` variable can take values in the range of 1:`nclass`.
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
-| `type`              | Int16   | 0    | NA           | NA    | Distribution type (2)           |
+| `type`              | Int16   | 0    | NA           | NA    | Distribution type (3)           |
 | `time`              | Float64 | 0    | NA           | s     | Time of the distribution        |
 | `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data |
 | `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles          |
@@ -265,6 +263,7 @@ The `class` variable can take values in the range of 1:`nclass`.
 
 #Spectral Geometry Structure
 This structure contains the geometry of the spectroscopic systems 
+Click [here](../02_physics/05_spectra.html) for more more information.
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
@@ -281,6 +280,7 @@ This structure contains the geometry of the spectroscopic systems
 #NPA Geometry Structure
 This structure contains the geometry of the spectroscopic systems 
 The shapes of the detector and aperture can take the value 1 or 2 for a rectangular and circular aperture/detector respectively.
+Click [here](../02_physics/06_npa.html) for more more information.
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 

@@ -24,7 +24,7 @@ FIDASIM has the following dependencies:
 * [zlib](http://zlib.net/) for file compression.
 * [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
 * [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)
-* [git](https://git-scm.com/) and [git-lfs](https://git-lfs.github.com/) for version control (Optional)
+* [git](https://git-scm.com/) for version control (Optional)
 * [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
@@ -49,7 +49,7 @@ cd FIDASIM-{!../VERSION!}
 ```
 
 ###Cloning the git repository
-If you are planning to develop FIDASIM it is best to use git and git-lfs.
+If you are planning to develop FIDASIM it is best to use git.
 ```bash
 git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
 cd FIDASIM
@@ -101,13 +101,12 @@ usage: ./fidasim namelist_file [num_threads]
 ```
 Good job! You installed FIDASIM! But wait there's more.
 
-##Generating Custom Atomic Tables
-Calculating reaction rates on the fly is time consuming so FIDASIM pre-computes them to save time.
-FIDASIM comes with atomic tables (`tables/atomic_tables.h5`) that should be appropriate for most use cases (See the file `tables/default_settings.dat` for the specific table settings.)
-However, it may be necessary to generate custom atomic tables.
-For instance, the default tables are calculated assuming the main impurity is Carbon₆ so it would inappropriate to use the default tables if your main impurity is Boron₅.
+##Generating Atomic Tables
+Calculating reaction rates on the fly is time consuming so we need to pre-compute them to save time.
+The following code snippit will generate the atomic tables using the default settings.
+The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
+In that case edit the file `tables/default_settings.dat` before running the following command
 
-To generate custom atomic tables first edit the `tables/default_settings.dat` file with the desired settings and then run
 ```bash
 make atomic_tables
 ```

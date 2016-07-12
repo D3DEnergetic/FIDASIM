@@ -202,7 +202,7 @@ PRO write_distribution, filename, distri
                 c_desc, type_atts] 
     endelse
 
-    write_hdf5, distri, filename=filename,atts=atts, /clobber
+    write_hdf5, distri, filename=filename,atts=atts, /clobber, compress=4
    
     if file_test(filename) then begin
         success, 'Distribution file created: '+filename

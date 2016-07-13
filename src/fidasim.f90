@@ -5512,6 +5512,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     real(Float64), dimension(2) :: randomu    !! uniform random numbers
     real(Float64), dimension(2) :: randomn    !! normal random numbers
     real(Float64) :: length, sqrt_rho, theta
+    logical :: inp
   
     err = .False.
 
@@ -5542,11 +5543,19 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     uvw_ray = matmul(nbi%basis,xyz_ray)
     vnbi = uvw_ray/normp(uvw_ray)
 
-    !! Determine start postition on beam grid
+    !! Determine start position on beam grid
     call grid_intersect(uvw_src,vnbi,length,rnbi,r_exit)
     if(length.le.0.0)then
         err = .True.
         nbi_outside = nbi_outside + 1
+    endif
+    
+    !! Check if start position is in the plasma
+    call in_plasma(rnbi,inp)
+    if(inp)then
+        write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
+        write(*,'(a)') "Move the beam grid closer to the source to fix"
+        stop
     endif
 
     !! Determine velocity of neutrals corrected by efrac

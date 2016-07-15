@@ -14,17 +14,23 @@ PRO check_beam, inp, nbi
     err_status = 0
     info,'Checking beam geometry...'
 
+    na = nbi.naperture
     zero_string = {dims:0, type:'STRING'}
     zero_int = {dims:0, type:'INT'}
     zero_double = {dims:0, type:'DOUBLE'}
     three_double = {dims:[3], type:'DOUBLE'}
+    na_double = {dims:[na], type:'DOUBLE'}
+    na_int = {dims:[na], type:'INT'}
     schema = {data_source:zero_string, $
-              name:zero_string, $
+              name:zero_string, shape:zero_int, $
               src:three_double,  axis:three_double, $
               divy:three_double, divz:three_double, $
               focy:zero_double,  focz:zero_double, $
               widz:zero_double,  widy:zero_double, $
-              shape:zero_int }
+              naperture:zero_int, ashape:na_int, $
+              awidy:na_double, awidz:na_double, $
+              aoffy:na_double, aoffz:na_double, $
+              adist:na_double }
 
     check_struct_schema,schema,nbi,err_status, desc="beam geometry"
     if err_status eq 1 then begin
@@ -46,7 +52,7 @@ PRO check_beam, inp, nbi
         err_status = 1
     endif
 
-    if nbi.shape gt 2 then begin
+    if nbi.shape gt 2 or nbi.shape eq 0 then begin
         error,'Invalid source shape. Expected 1 (rectagular) or 2 (circular)'
         err_status = 1
     endif
@@ -58,6 +64,24 @@ PRO check_beam, inp, nbi
 
     if nbi.widy lt 0 then begin
         error,'Invalid widy. Expected widy > 0'
+        err_status = 1
+    endif
+
+    w = where(nbi.ashape gt 2 or nbi.ashape eq 0,nw)
+    if nw gt 0 then begin
+        error,'Invalid aperture shape. Expected 1 (rectangular) or 2 (circular)'
+        err_status = 1
+    endif
+
+    w = where(nbi.awidy lt 0, nw)
+    if nw gt 0 then begin
+        error, 'Invalid awidy. Expected awidy >= 0.0'
+        err_status = 1
+    endif
+
+    w = where(nbi.awidz lt 0, nw)
+    if nw gt 0 then begin
+        error, 'Invalid awidz. Expected awidz >= 0.0'
         err_status = 1
     endif
 

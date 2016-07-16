@@ -75,6 +75,10 @@ where \(y_s\) and \(z_s\) are random positions on the source plate in the horizo
 ![](|media|/beam_divergence.png)
 {: style="text-align: center"}
 
+Not shown above are the beam aperture(s) which collimates the neutral beam.
+Apertures are represented in FIDASIM by their shape (circular or rectangular), size (half width and
+height), offsets relative to the +x aligned beam centerline, and their distance from the source grid.
+It is assumed that the plane of the aperture(s) is parallel to the plane of the source grid.
 
 FIDASIM reads in the neutral beam geometry from a HDF5 file (`[runid]_geometry.h5`) that has the group `nbi` with the following datasets
 
@@ -92,6 +96,13 @@ FIDASIM reads in the neutral beam geometry from a HDF5 file (`[runid]_geometry.h
 | `divz`              | Float64 | 1    | [3]         | rad   | Vertical beam divergence                           |
 | `focy`              | Float64 | 0    | NA          | cm    | Horizontal focal length                            |
 | `focz`              | Float64 | 0    | NA          | cm    | Vertical focal length                              |
+| `naperture`         | Int16   | 0    | NA          | NA    | Number of apertures                                |
+| `ashape`            | Int16   | 1    |[`naperture`]| NA    | Shape of the aperture(s) (1=rect or 2=circ)        |
+| `awidy`             | Float64 | 1    |[`naperture`]| cm    | Half-width of the aperture(s)                      |
+| `awidz`             | Float64 | 1    |[`naperture`]| cm    | Half-height of the aperture(s)                     |
+| `aoffy` | Float64 | 1 |[`naperture`]| cm | Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline |
+| `aoffz` | Float64 | 1 |[`naperture`]| cm | Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline |
+| `adist` | Float64 | 1 |[`naperture`]| cm | Distance from the center of the beam source grid to the aperture(s) plane |
 
 
 #Neutral Beam Density

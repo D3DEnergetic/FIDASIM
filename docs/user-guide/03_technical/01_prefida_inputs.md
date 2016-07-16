@@ -153,7 +153,7 @@ The `grid` structure contains the definition of the 2D R-Z grid that the plasma 
 
 #Neutral Beam Geometry Structure
 The `nbi` structure contains the neutral beam geometry.
-The `shape` of the source grid take the value of 1 or 2 for a rectangular and circular source grid respectively.
+The `(a)shape` of the source grid and apertures take the value of 1 or 2 for a rectangular and circular respectively.
 Click [here](../02_physics/04_neutrals.html#neutral-beam-geometry) for more information.
 
 |       Variable      |   Type  | Rank |  Dimensions | Units |                    Description                     |
@@ -169,7 +169,13 @@ Click [here](../02_physics/04_neutrals.html#neutral-beam-geometry) for more info
 | `divz`              | Float64 | 1    | [3]         | rad   | Vertical beam divergence                           |
 | `focy`              | Float64 | 0    | NA          | cm    | Horizontal focal length                            |
 | `focz`              | Float64 | 0    | NA          | cm    | Vertical focal length                              |
-
+| `naperture`         | Int16   | 0    | NA          | NA    | Number of apertures                                |
+| `ashape`            | Int16   | 1    |[`naperture`]| NA    | Shape of the aperture(s) (1 or 2)                  |
+| `awidy`             | Float64 | 1    |[`naperture`]| cm    | Half-width of the aperture(s)                      |
+| `awidz`             | Float64 | 1    |[`naperture`]| cm    | Half-height of the aperture(s)                     |
+| `aoffy` | Float64 | 1 |[`naperture`]| cm | Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline |
+| `aoffz` | Float64 | 1 |[`naperture`]| cm | Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline |
+| `adist` | Float64 | 1 |[`naperture`]| cm | Distance from the center of the beam source grid to the aperture(s) plane |
 
 #Fields Structure
 This structure contain the electromagnetic fields mapped onto the interpolation grid.

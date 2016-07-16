@@ -1,18 +1,18 @@
 PRO write_geometry, filename, nbi, spec=spec, npa=npa
-    ;+##`write_geometry, filename, nbi, spec=spec, npa=npa`
+    ;+#write_geometry
     ;+Write geometry values to a HDF5 file
-    ;+
-    ;+###Input Arguments
+    ;+***
+    ;+##Input Arguments
     ;+     **filename**: Name of the geometry file
     ;+
     ;+     **nbi**: NBI geometry structure
     ;+
-    ;+###Keyword Arguments
+    ;+##Keyword Arguments
     ;+     **spec**: Optional, Spectral geometry structure
     ;+
     ;+     **npa**: Optional, NPA geometry structure
     ;+
-    ;+###Example Usage
+    ;+##Example Usage
     ;+```idl
     ;+IDL> write_geometry, filename, nbi, spec=spec, npa=npa
     ;+```
@@ -100,8 +100,51 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
                       name:'description', $
                       data:'Shape of the beam source grid: 1="rectangular", 2="circular"'}
 
+    nbi_naperture_desc = {attribute,obj:'/nbi/naperture', $
+                          name:'description', $
+                          data:'Number of apertures'}
+    
+    nbi_ashape_desc = {attribute,obj:'/nbi/ashape', $
+                       name:'description', $
+                       data:'Shape of the aperture(s): 1="rectangular", 2="circular"'}
+
+    nbi_awidy_desc = {attribute,obj:'/nbi/awidy', $
+                      name:'description', $
+                      data:'Half width of the aperture(s)'}
+    nbi_awidy_unit = {attribute,obj:'/nbi/awidy', $
+                      name:'units', $
+                      data:'cm'}
+
+    nbi_awidz_desc = {attribute,obj:'/nbi/awidz', $
+                      name:'description', $
+                      data:'Half height of the aperture(s)'}
+    nbi_awidz_unit = {attribute,obj:'/nbi/awidz', $
+                      name:'units', $
+                      data:'cm'}
+ 
+    nbi_aoffy_desc = {attribute,obj:'/nbi/aoffy', $
+                      name:'description', $
+                      data:'Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline'}
+    nbi_aoffy_unit = {attribute,obj:'/nbi/aoffy', $
+                      name:'units', $
+                      data:'cm'}
+
+    nbi_aoffz_desc = {attribute,obj:'/nbi/aoffz', $
+                      name:'description', $
+                      data:'Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline'}
+    nbi_aoffz_unit = {attribute,obj:'/nbi/aoffz', $
+                      name:'units', $
+                      data:'cm'}
+
+    nbi_adist_desc = {attribute,obj:'/nbi/adist', $
+                      name:'description', $
+                      data:'Distance from the center of the beam source grid to the aperture(s) plane'}
+    nbi_adist_unit = {attribute,obj:'/nbi/adist', $
+                      name:'units', $
+                      data:'cm'}
+
     nbi_atts = [nbi_desc, nbi_cs, nbi_ds_desc,nbi_name_desc, $
-                nbi_src_desc, nbi_src_unit, $
+                nbi_shape_desc, nbi_src_desc, nbi_src_unit,  $
                 nbi_axis_desc, nbi_axis_unit, $
                 nbi_focy_desc, nbi_focy_unit, $
                 nbi_focz_desc, nbi_focz_unit, $
@@ -109,7 +152,12 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
                 nbi_divz_desc, nbi_divz_unit, $
                 nbi_widy_desc, nbi_widy_unit, $
                 nbi_widz_desc, nbi_widz_unit, $
-                nbi_shape_desc]
+                nbi_naperture_desc, nbi_ashape_desc, $
+                nbi_awidy_desc, nbi_awidy_unit, $
+                nbi_awidz_desc, nbi_awidz_unit, $
+                nbi_aoffy_desc, nbi_aoffy_unit, $
+                nbi_aoffz_desc, nbi_aoffz_unit, $
+                nbi_adist_desc, nbi_adist_unit ]
 
     ;; Spectroscopic attributes
     spec_desc = {attribute,obj:'/spec', $

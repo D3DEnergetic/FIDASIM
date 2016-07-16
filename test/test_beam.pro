@@ -11,10 +11,18 @@ FUNCTION test_beam,beta
     divz = replicate(2.27d-2,3)
     widy=6d0
     widz=24d0
-
+    naperture = 1
+    ashape = [1]
+    awidy = [8.85d0]
+    awidz = [24d0]
+    aoffy = [0.d0]
+    aoffz = [0.d0]
+    adist = [186.1d0]
     nbi={name:'test_beam',shape:1,data_source:'test_beam.pro',$
          src:uvw_src,axis:uvw_axis,widy:widy,widz:widz,$
-         divy:divy,divz:divz,focy:focy,focz:focz}
+         divy:divy,divz:divz,focy:focy,focz:focz, $
+         naperture:naperture,ashape:ashape,adist:adist, $
+         awidy:awidy,awidz:awidz,aoffy:aoffy,aoffz:aoffz }
 
     return, nbi
 END

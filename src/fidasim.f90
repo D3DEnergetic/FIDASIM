@@ -353,9 +353,9 @@ type NeutralBeam
     integer       :: shape
         !+ Beam source shape 1="rectangular", 2="circular" 
     real(Float64) :: widy
-        !+ Half height in y direction
+        !+ Half width of source in y direction
     real(Float64) :: widz
-        !+ Half width in z direction
+        !+ Half height of source in z direction
     real(Float64) :: focy
         !+ Focal length in y direction
     real(Float64) :: focz
@@ -379,9 +379,23 @@ type NeutralBeam
     real(Float64), dimension(3)   :: src
         !+ Position of source in beam grid coordinates [cm]
     real(Float64), dimension(3)   :: axis
-        !+ Beam sightline
+        !+ Beam centerline
+    integer :: naperture
+        !+ Number of beam apertures
+    integer, dimension(:), allocatable       :: ashape
+        !+ Aperture shape 1="rectangular", 2="circular"
+    real(Float64), dimension(:), allocatable :: awidy
+        !+ Half width of the aperture(s) in y direction
+    real(Float64), dimension(:), allocatable :: awidz
+        !+ Half height of the aperture(s) in z direction
+    real(Float64), dimension(:), allocatable :: aoffy
+        !+ Horizontal (y) offset of the aperture(s) relative to the beam centerline [cm]
+    real(Float64), dimension(:), allocatable :: aoffz
+        !+ Vertical (z) offset of the aperture(s) relative to the beam centerline [cm]
+    real(Float64), dimension(:), allocatable :: adist
+        !+ Distance from the center of the beam source grid to the aperture(s) plane [cm]
     real(Float64), dimension(3,3) :: basis
-        !+ Beam basis for converting from sightline coordinates to beam grid coordinates
+        !+ Beam basis for converting from centerline coordinates to beam grid coordinates
     real(Float64), dimension(3,3) :: inv_basis
         !+ Inverse basis for reverse transfomation
 end type NeutralBeam
@@ -1580,7 +1594,7 @@ subroutine read_beam
   
     real(Float64), dimension(3) ::uvw_src, uvw_axis, pos
     real(Float64) :: dis
-  
+    logical :: path_valid 
     integer :: error
   
     !!Initialize HDF5 interface
@@ -1592,7 +1606,7 @@ subroutine read_beam
     !!Open NBI group
     call h5gopen_f(fid, "/nbi", gid, error)
   
-    !!Read in datasets
+    !!Read in beam definitions
     call h5ltread_dataset_string_f(gid, "/nbi/name",nbi%name, error)
     dims(1) = 3
     call h5ltread_dataset_double_f(gid, "/nbi/src", uvw_src, dims, error)
@@ -1604,7 +1618,29 @@ subroutine read_beam
     call h5ltread_dataset_double_scalar_f(gid, "/nbi/focz", nbi%focz, error)
     call h5ltread_dataset_double_scalar_f(gid, "/nbi/widy", nbi%widy, error)
     call h5ltread_dataset_double_scalar_f(gid, "/nbi/widz", nbi%widz, error)
-  
+
+    !!Read in aperture definitions
+    !! Check for naperture for compatibility with old runs
+    call h5ltpath_valid_f(gid, "/nbi/naperture", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_int_scalar_f(gid,"/nbi/naperture",nbi%naperture, error)
+    else
+        nbi%naperture = 0
+    endif
+    if(nbi%naperture.gt.0) then
+        allocate(nbi%ashape(nbi%naperture), nbi%adist(nbi%naperture), &
+                 nbi%awidy(nbi%naperture), nbi%awidz(nbi%naperture),  &
+                 nbi%aoffy(nbi%naperture), nbi%aoffz(nbi%naperture)   )
+
+        dims(1) = nbi%naperture
+        call h5ltread_dataset_int_f(gid, "/nbi/ashape", nbi%ashape, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/awidy", nbi%awidy, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/awidz", nbi%awidz, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/aoffy", nbi%aoffy, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/aoffz", nbi%aoffz, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/adist", nbi%adist, dims, error)
+    endif
+
     !!Close NBI group
     call h5gclose_f(gid, error)
   
@@ -5509,38 +5545,68 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     real(Float64), dimension(3) :: xyz_src    !! Start position on ion source
     real(Float64), dimension(3) :: uvw_ray    !! NBI velocity in uvw coords
     real(Float64), dimension(3) :: xyz_ray    !! NBI velocity in xyz coords
+    real(Float64), dimension(3) :: xyz_ape    !! Aperture plane intersection point
     real(Float64), dimension(2) :: randomu    !! uniform random numbers
     real(Float64), dimension(2) :: randomn    !! normal random numbers
     real(Float64) :: length, sqrt_rho, theta
-    logical :: inp
+    integer :: i, j
+    logical :: inp, valid_trajectory
   
     err = .False.
+    valid_trajectory = .False.
+    rejection_loop: do i=1,1000
+        call randu(randomu)
+        select case (nbi%shape)
+            case (1)
+                ! Uniformally sample in rectangle
+                xyz_src(1) =  0.d0
+                xyz_src(2) =  nbi%widy * 2.d0*(randomu(1)-0.5d0)
+                xyz_src(3) =  nbi%widz * 2.d0*(randomu(2)-0.5d0)
+            case (2)
+                ! Uniformally sample in ellipse
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                xyz_src(1) = 0.d0
+                xyz_src(2) = nbi%widy*sqrt_rho*cos(theta)
+                xyz_src(3) = nbi%widz*sqrt_rho*sin(theta)
+        end select
+    
+        !! Create random velocity vector
+        call randn(randomn)
+        xyz_ray(1)= 1.d0
+        xyz_ray(2)=(-xyz_src(2)/nbi%focy + tan(nbi%divy(efrac)*randomn(1)))
+        xyz_ray(3)=(-xyz_src(3)/nbi%focz + tan(nbi%divz(efrac)*randomn(2)))
 
-    call randu(randomu)
-    select case (nbi%shape)
-        case (1)
-            ! Uniformally sample in rectangle
-            xyz_src(1) =  0.d0
-            xyz_src(2) =  nbi%widy * 2.d0*(randomu(1)-0.5d0)
-            xyz_src(3) =  nbi%widz * 2.d0*(randomu(2)-0.5d0)
-        case (2)
-            ! Uniformally sample in ellipse
-            sqrt_rho = sqrt(randomu(1))
-            theta = 2*pi*randomu(2)
-            xyz_src(1) = 0.d0
-            xyz_src(2) = nbi%widy*sqrt_rho*cos(theta)
-            xyz_src(3) = nbi%widz*sqrt_rho*sin(theta)
-    end select
+        aperture_loop: do j=1,nbi%naperture
+            xyz_ape = xyz_ray*nbi%adist(j) + xyz_src
+            select case (nbi%ashape(j))
+                case (1)
+                    if ((abs(xyz_ape(2) - nbi%aoffy(j)).gt.nbi%awidy(j)).or.&
+                        (abs(xyz_ape(3) - nbi%aoffz(j)).gt.nbi%awidz(j))) then
+                        cycle rejection_loop
+                    endif
+                case (2)
+                    if ((((xyz_ape(2) - nbi%aoffy(j))*nbi%awidz(j))**2 + &
+                         ((xyz_ape(3) - nbi%aoffz(j))*nbi%awidy(j))**2).gt. &
+                         (nbi%awidy(j)*nbi%awidz(j))**2) then
+                        cycle rejection_loop
+                    endif
+            end select
+        enddo aperture_loop
+        valid_trajectory = .True.
 
-    !! Create random velocity vector
-    call randn(randomn)
-    xyz_ray(1)= 1.d0
-    xyz_ray(2)=(-xyz_src(2)/nbi%focy + tan(nbi%divy(efrac)*randomn(1)))
-    xyz_ray(3)=(-xyz_src(3)/nbi%focz + tan(nbi%divz(efrac)*randomn(2)))
-  
-    !! Convert to beam sightline coordinates to beam grid coordinates
-    uvw_src = matmul(nbi%basis,xyz_src) + nbi%src
-    uvw_ray = matmul(nbi%basis,xyz_ray)
+        !! Convert to beam centerline coordinates to beam grid coordinates
+        uvw_src = matmul(nbi%basis,xyz_src) + nbi%src
+        uvw_ray = matmul(nbi%basis,xyz_ray)
+        exit rejection_loop
+    enddo rejection_loop
+
+    !Set Default trajectory in case rejection sampling fails
+    if(.not.valid_trajectory)then
+        write(*,'(a)') "MC_NBI: Failed to find trajectory though aperture(s). Using beam centerline."
+        uvw_src = nbi%src
+        uvw_ray = nbi%axis
+    endif
     vnbi = uvw_ray/normp(uvw_ray)
 
     !! Determine start position on beam grid

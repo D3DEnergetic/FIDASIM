@@ -395,6 +395,10 @@ $$v_z = -\frac{z_s}{f_z} + \tan(\mathcal{N}(0,\beta_z^2))$$
 where \(y_s\) and \(z_s\) are random positions on the source plate in the horizontal and vertical directions respectively, 
 \(f_{y/z}\) are the focal lengths, and \(\beta_{y/z}\) are the divergences. Examples of different trajectories are shown below.</p>
 <p style="text-align: center"><img alt="" src="../../media/beam_divergence.png"></p>
+<p>Not shown above are the beam aperture(s) which collimates the neutral beam.
+Apertures are represented in FIDASIM by their shape (circular or rectangular), size (half width and
+height), offsets relative to the +x aligned beam centerline, and their distance from the source grid.
+It is assumed that the plane of the aperture(s) is parallel to the plane of the source grid.</p>
 <p>FIDASIM reads in the neutral beam geometry from a HDF5 file (<code>[runid]_geometry.h5</code>) that has the group <code>nbi</code> with the following datasets</p>
 <table>
 <thead>
@@ -495,6 +499,62 @@ where \(y_s\) and \(z_s\) are random positions on the source plate in the horizo
 <td align="center">NA</td>
 <td align="center">cm</td>
 <td align="left">Vertical focal length</td>
+</tr>
+<tr>
+<td align="center"><code>naperture</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of apertures</td>
+</tr>
+<tr>
+<td align="center"><code>ashape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the aperture(s) (1=rect or 2=circ)</td>
+</tr>
+<tr>
+<td align="center"><code>awidy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-width of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>awidz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-height of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>aoffy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>aoffz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>adist</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Distance from the center of the beam source grid to the aperture(s) plane</td>
 </tr>
 </tbody>
 </table>

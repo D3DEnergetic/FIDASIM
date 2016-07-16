@@ -870,7 +870,7 @@ Click <a href="../02_physics/07_weights.html">here</a> for more information.</p>
 </table>
 <h1 id="neutral-beam-geometry-structure">Neutral Beam Geometry Structure</h1>
 <p>The <code>nbi</code> structure contains the neutral beam geometry.
-The <code>shape</code> of the source grid take the value of 1 or 2 for a rectangular and circular source grid respectively.
+The <code>(a)shape</code> of the source grid and apertures take the value of 1 or 2 for a rectangular and circular respectively.
 Click <a href="../02_physics/04_neutrals.html#neutral-beam-geometry">here</a> for more information.</p>
 <table>
 <thead>
@@ -971,6 +971,62 @@ Click <a href="../02_physics/04_neutrals.html#neutral-beam-geometry">here</a> fo
 <td align="center">NA</td>
 <td align="center">cm</td>
 <td align="left">Vertical focal length</td>
+</tr>
+<tr>
+<td align="center"><code>naperture</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of apertures</td>
+</tr>
+<tr>
+<td align="center"><code>ashape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the aperture(s) (1 or 2)</td>
+</tr>
+<tr>
+<td align="center"><code>awidy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-width of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>awidz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-height of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>aoffy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>aoffz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>adist</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Distance from the center of the beam source grid to the aperture(s) plane</td>
 </tr>
 </tbody>
 </table>

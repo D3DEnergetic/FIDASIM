@@ -23,17 +23,27 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ;+
     ;+     **NUBEAM.RTCENA**: Radius of tangency point [cm]
     ;+
-    ;+     **NUBEAM.XLBAPA**: Distance from center of beam source grid to aperture [cm]
-    ;+
     ;+     **NUBEAM.XLBTNA**: Distance from center of beam source grid to tangency point [cm]
     ;+
     ;+     **NUBEAM.XBZETA**: Torodial angle [deg] Positive angles defined to be in the counter-clockwise direction
     ;+
-    ;+     **NUBEAM.XYBAPA**: Elevation above/below vacuum vessel midplane of beam centerline at aperture [cm]
-    ;+
     ;+     **NUBEAM.XYBSCA**: Elevation above/below vacuum vessel midplane of center of beam source grid [cm]
     ;+
     ;+     **NUBEAM.NLCO**: 1 for Co-beam, 0 or -1 for Counter-beam
+    ;+
+    ;+     **NUBEAM.NBAPSHA**: Vector of aperture shapes 1=rectangular, 2=circular
+    ;+
+    ;+     **NUBEAM.XLBAPA**: Vector of distances from center of beam source grid to the aperture plane [cm]
+    ;+
+    ;+     **NUBEAM.XYBAPA**: Vector of elevation above/below vacuum vessel midplane of beam centerline at aperture [cm]
+    ;+
+    ;+     **NUBEAM.RAPEDGA**: Vector of aperture half-widths [cm]
+    ;+
+    ;+     **NUBEAM.XZPEDGA**: Vector of aperture half-heigts [cm]
+    ;+
+    ;+     **NUBEAM.XRAPOFFA**: Vector of horizontal (y) offsets relative to the +x aligned beam centerline [cm]
+    ;+
+    ;+     **NUBEAM.XZAPOFFA**: Vector of vertical (z) offsets relative to the +x aligned beam centerline [cm]
     ;+
     ;+##Keyword Arguments
     ;+     **angle**: Angle to add to XBZETA to rotate the beams into correct coordinates [deg]
@@ -55,11 +65,11 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
 
     phi_s=(nubeam.XBZETA+angle)*!DPI/180.0
     zs=nubeam.XYBSCA
-    za=nubeam.XYBAPA
-    alpha=asin((zs-za)/nubeam.XLBAPA)
+    za=nubeam.XYBAPA[0]
+    alpha=asin((zs-za)/nubeam.XLBAPA[0])
     pdst=nubeam.XLBTNA*cos(alpha)
     rs=sqrt(nubeam.RTCENA^2.0 + pdst^2.0)
-    dat=nubeam.XLBTNA-nubeam.XLBAPA
+    dat=nubeam.XLBTNA-nubeam.XLBAPA[0]
     pdat=dat*cos(alpha)
     ra=sqrt(nubeam.RTCENA^2.0 + pdat^2.0)
     beta_s=acos(nubeam.RTCENA/rs)
@@ -74,7 +84,7 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
   
     if keyword_set(verbose) then begin
         print,'Source position: ',src
-        print,'Aperture position: ',aper_src
+        print,'1st Aperture position: ',aper_src
         print,'Tangency position: ', pos
     endif
 
@@ -87,8 +97,12 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
            focy:double(nubeam.foclr),focz:double(nubeam.foclz), $
            divy:replicate(double(nubeam.divr),3), $
            divz:replicate(double(nubeam.divz),3), $
-           widy:double(nubeam.bmwidr), $
-           widz:double(nubeam.bmwidz) } 
+           widy:double(nubeam.bmwidr), widz:double(nubeam.bmwidz) $
+           naperture:n_elements(nubeam.nbapsha),ashape:nubeam.nbapsha, $
+           awidy:double(nubeam.rapedga),awidz:double(nubeam.xzpedga), $
+           aoffy:double(nubeam.rapoffa),aoffz:double(nubeam.xzaoffa), $
+           adist:double(nubeam.xlbapa) }
+           } 
     
     return, nbi
 END

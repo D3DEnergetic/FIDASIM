@@ -165,6 +165,20 @@
         
         <a class="list-group-item" href="../type/neutralbeam.html#variable-axis">axis</a>
         
+        <a class="list-group-item" href="../type/neutralbeam.html#variable-naperture">naperture</a>
+        
+        <a class="list-group-item" href="../type/neutralbeam.html#variable-ashape">ashape</a>
+        
+        <a class="list-group-item" href="../type/neutralbeam.html#variable-awidy">awidy</a>
+        
+        <a class="list-group-item" href="../type/neutralbeam.html#variable-awidz">awidz</a>
+        
+        <a class="list-group-item" href="../type/neutralbeam.html#variable-aoffy">aoffy</a>
+        
+        <a class="list-group-item" href="../type/neutralbeam.html#variable-aoffz">aoffz</a>
+        
+        <a class="list-group-item" href="../type/neutralbeam.html#variable-adist">adist</a>
+        
         <a class="list-group-item" href="../type/neutralbeam.html#variable-basis%7E2">basis</a>
         
         <a class="list-group-item" href="../type/neutralbeam.html#variable-inv_basis%7E2">inv_basis</a>
@@ -330,7 +344,7 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>widy</strong></td><td></td><td></td><td><p>Half height in y direction</p></td>
+  <td><strong>widy</strong></td><td></td><td></td><td><p>Half width of source in y direction</p></td>
   
 </tr>
 
@@ -344,7 +358,7 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>widz</strong></td><td></td><td></td><td><p>Half width in z direction</p></td>
+  <td><strong>widz</strong></td><td></td><td></td><td><p>Half height of source in z direction</p></td>
   
 </tr>
 
@@ -512,7 +526,105 @@
   
   <td>public,</td>
   <td>dimension(3)</td><td>::</td>
-  <td><strong>axis</strong></td><td></td><td></td><td><p>Beam sightline</p></td>
+  <td><strong>axis</strong></td><td></td><td></td><td><p>Beam centerline</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-naperture"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>naperture</strong></td><td></td><td></td><td><p>Number of beam apertures</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ashape"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>ashape</strong></td><td></td><td></td><td><p>Aperture shape 1="rectangular", 2="circular"</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-awidy"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>awidy</strong></td><td></td><td></td><td><p>Half width of the aperture(s) in y direction</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-awidz"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>awidz</strong></td><td></td><td></td><td><p>Half height of the aperture(s) in z direction</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-aoffy"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>aoffy</strong></td><td></td><td></td><td><p>Horizontal (y) offset of the aperture(s) relative to the beam centerline [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-aoffz"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>aoffz</strong></td><td></td><td></td><td><p>Vertical (z) offset of the aperture(s) relative to the beam centerline [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-adist"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>adist</strong></td><td></td><td></td><td><p>Distance from the center of the beam source grid to the aperture(s) plane [cm]</p></td>
   
 </tr>
 
@@ -526,7 +638,7 @@
   
   <td>public,</td>
   <td>dimension(3,3)</td><td>::</td>
-  <td><strong>basis</strong></td><td></td><td></td><td><p>Beam basis for converting from sightline coordinates to beam grid coordinates</p></td>
+  <td><strong>basis</strong></td><td></td><td></td><td><p>Beam basis for converting from centerline coordinates to beam grid coordinates</p></td>
   
 </tr>
 
@@ -567,9 +679,9 @@
     <span class="kt">integer</span>       <span class="kd">::</span> <span class="nb">shape</span>
         <span class="c">!+ Beam source shape 1=&quot;rectangular&quot;, 2=&quot;circular&quot; </span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">widy</span>
-        <span class="c">!+ Half height in y direction</span>
+        <span class="c">!+ Half width of source in y direction</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">widz</span>
-        <span class="c">!+ Half width in z direction</span>
+        <span class="c">!+ Half height of source in z direction</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">focy</span>
         <span class="c">!+ Focal length in y direction</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">focz</span>
@@ -593,9 +705,23 @@
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">src</span>
         <span class="c">!+ Position of source in beam grid coordinates [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">axis</span>
-        <span class="c">!+ Beam sightline</span>
+        <span class="c">!+ Beam centerline</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">naperture</span>
+        <span class="c">!+ Number of beam apertures</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">ashape</span>
+        <span class="c">!+ Aperture shape 1=&quot;rectangular&quot;, 2=&quot;circular&quot;</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">awidy</span>
+        <span class="c">!+ Half width of the aperture(s) in y direction</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">awidz</span>
+        <span class="c">!+ Half height of the aperture(s) in z direction</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">aoffy</span>
+        <span class="c">!+ Horizontal (y) offset of the aperture(s) relative to the beam centerline [cm]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">aoffz</span>
+        <span class="c">!+ Vertical (z) offset of the aperture(s) relative to the beam centerline [cm]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">adist</span>
+        <span class="c">!+ Distance from the center of the beam source grid to the aperture(s) plane [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">basis</span>
-        <span class="c">!+ Beam basis for converting from sightline coordinates to beam grid coordinates</span>
+        <span class="c">!+ Beam basis for converting from centerline coordinates to beam grid coordinates</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">inv_basis</span>
         <span class="c">!+ Inverse basis for reverse transfomation</span>
 <span class="k">end type </span><span class="n">NeutralBeam</span>

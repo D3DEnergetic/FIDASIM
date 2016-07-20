@@ -1,5 +1,8 @@
 title: Neutral Beam and Halo
 
+![](|media|/neutral-beam.png)
+{: style="text-align: center"}
+
 <style>
 table {
 width: 100%;

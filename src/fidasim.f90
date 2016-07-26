@@ -1556,7 +1556,7 @@ subroutine make_beam_grid
     beam_grid%lwh(2) = abs(beam_grid%yc(beam_grid%ny) - beam_grid%yc(1)) + beam_grid%dr(2)
     beam_grid%lwh(3) = abs(beam_grid%zc(beam_grid%nz) - beam_grid%zc(1)) + beam_grid%dr(3)
   
-    beam_grid%volume = beam_grid%lwh(1)*beam_grid%lwh(3)*beam_grid%lwh(3)
+    beam_grid%volume = beam_grid%lwh(1)*beam_grid%lwh(2)*beam_grid%lwh(3)
   
     beam_grid%center(1) = (minval(beam_grid%xc) - 0.5*beam_grid%dr(1)) + 0.5*beam_grid%lwh(1)
     beam_grid%center(2) = (minval(beam_grid%yc) - 0.5*beam_grid%dr(2)) + 0.5*beam_grid%lwh(2)
@@ -6012,8 +6012,11 @@ subroutine halo
         neut%dens(:,s1type,:,:,:)= neut%dens(:,s2type,:,:,:)
         neut%dens(:,s2type,:,:,:)= 0.
   
-        if(halo_iteration_dens/dcx_dens.gt.1)exit iterations
-  
+        if(halo_iteration_dens/dcx_dens.gt.1)then
+            write(*,'(a)') "HALO: Halo generation density exceeded DCX density. This shouldn't happen."
+            exit iterations
+        endif
+ 
         inputs%n_halo=int(inputs%n_dcx*halo_iteration_dens/dcx_dens)
   
         if(inputs%n_halo.lt.inputs%n_dcx*0.01)exit iterations

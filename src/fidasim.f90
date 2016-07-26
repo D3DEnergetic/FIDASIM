@@ -616,10 +616,8 @@ end type NeutralDensity
 
 type FIDAWeights
     !+ FIDA weights structure
-    real(Float64), dimension(:,:), allocatable     :: fida
-        !+ FIDA emission calculated via weight function method
     real(Float64), dimension(:,:,:), allocatable   :: mean_f
-        !+ Mean fast-ion distribution function "seen" by LOS: mean_f(E,p,chan)
+        !+ Estimate of mean fast-ion distribution function "seen" by LOS: mean_f(E,p,chan)
     real(Float64), dimension(:,:,:,:), allocatable :: weight
         !+ FIDA weight function: weight(lambda,E,p,chan)
 end type FIDAWeights
@@ -3264,11 +3262,11 @@ subroutine write_fida_weights
     integer :: error
   
     character(charlim) :: filename
-    integer :: i,ie,ip,ic
+    integer :: i,ie,ip,ic,iwav
     real(Float64), dimension(:),   allocatable :: lambda_arr
     real(Float64), dimension(:),   allocatable :: ebarr,ptcharr
     real(Float64), dimension(:,:), allocatable :: jacobian,e_grid,p_grid
-    real(Float64), dimension(:,:), allocatable :: vpa_grid,vpe_grid
+    real(Float64), dimension(:,:), allocatable :: vpa_grid,vpe_grid,fida
     real(Float64) :: dlambda, wtot, dE, dP
   
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
@@ -3314,7 +3312,7 @@ subroutine write_fida_weights
     !! define jacobian to convert between E-p to velocity
     allocate(jacobian(inputs%ne_wght,inputs%np_wght))
     jacobian = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2.0 + vpe_grid**2.0)
-  
+ 
     !! normalize mean_f
     do ic=1,spec_chords%nchan
         do ip=1,inputs%np_wght
@@ -3326,10 +3324,13 @@ subroutine write_fida_weights
             enddo
         enddo
     enddo
-    if(inputs%calc_fida_wght.eq.1) then
-        fweight%mean_f = fweight%mean_f/(dE*dP)
-    endif
   
+    !! Calculate FIDA estimate  
+    allocate(fida(inputs%nlambda_wght,spec_chords%nchan))
+    do iwav=1,size(fida,1)
+        fida(iwav,:) = (dE*dP*1d4)*sum(sum(fweight%mean_f(:,:,:)*fweight%weight(iwav,:,:,:),1),1)
+    enddo
+
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.h5"
   
     !Open HDF5 interface
@@ -3345,7 +3346,7 @@ subroutine write_fida_weights
     call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[inputs%np_wght], error)
     call h5ltmake_dataset_int_f(fid,"/nchan",0,dim1,[spec_chords%nchan], error)
     call h5ltmake_compressed_dataset_double_f(fid,"/weight",4,dim4,fweight%weight,error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/fida",2,dim2,fweight%fida,error)
+    call h5ltmake_compressed_dataset_double_f(fid,"/fida",2,dim2,fida,error)
     call h5ltmake_compressed_dataset_double_f(fid,"/mean_f",3,dim4(2:4),fweight%mean_f,error)
     call h5ltmake_compressed_dataset_double_f(fid,"/lambda",1,dim4(1:1),lambda_arr,error)
     call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim4(2:2),ebarr, error)
@@ -3376,9 +3377,9 @@ subroutine write_fida_weights
     call h5ltset_attribute_string_f(fid,"/fida","units", &
          "Ph/(s*nm*sr*m^2)",error )
     call h5ltset_attribute_string_f(fid,"/fida","description", &
-         "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
+         "Estimate of Fast-ion D-alpha (FIDA) emmision calculated by 1e4*weight*mean_f*dEdP: fida(lambda,chan)", error)
     call h5ltset_attribute_string_f(fid,"/mean_f","description", &
-         "Mean fast-ion distribution function seen by los: mean_f(energy,pitch,chan)", error)
+         "Estimated mean fast-ion distribution function seen by los: mean_f(energy,pitch,chan)", error)
     call h5ltset_attribute_string_f(fid,"/mean_f","units", &
          "fast-ion/(dE*dP*cm^3)", error)
     call h5ltset_attribute_string_f(fid,"/lambda","description", &
@@ -5261,8 +5262,8 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
         bin=floor((lambda(i) - inputs%lambdamin_wght)/dlambda) + 1
         if (bin.lt.1)                   cycle loop_over_stark
         if (bin.gt.inputs%nlambda_wght) cycle loop_over_stark
-        fweight%fida(bin,ichan)= fweight%fida(bin,ichan) + & 
-          (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)
+        !fida(bin,ichan)= fida(bin,ichan) + & 
+        !  (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)
         fweight%weight(bin,eind,pind,ichan) = & 
           fweight%weight(bin,eind,pind,ichan) + intensity(i)*intens_fac !(ph*cm)/(s*nm*sr*fast-ion*dE*dp)
     enddo loop_over_stark
@@ -6083,13 +6084,13 @@ subroutine fida_f
   
     !! Loop over all cells that have neutrals
     cnt=0.d0
-    !$OMP PARALLEL DO schedule(guided) private(ip,i,j,k,iion,ind,vi,ri, &
-    !$OMP tracks,ncell,jj,plasma,prob,denn,states,photons,denf)
     loop_over_cells: do ip = 1, int(pcnt)
         i = pcell(1,ip)
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
+        !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri, &
+        !$OMP tracks,ncell,jj,plasma,prob,denn,states,photons,denf)
         loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, ri, vi, denf)
@@ -6116,13 +6117,13 @@ subroutine fida_f
                 call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
+        !$OMP END PARALLEL DO
         cnt=cnt+1
   
         if (inputs%verbose.eq.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
-    !$OMP END PARALLEL DO
 
 end subroutine fida_f
 
@@ -6474,7 +6475,6 @@ subroutine fida_weights_mc
   
     !! allocate storage arrays
     allocate(fweight%weight(nwav,inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
-    allocate(fweight%fida(nwav,spec_chords%nchan))
     allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
   
     if(inputs%verbose.ge.1) then
@@ -6487,7 +6487,6 @@ subroutine fida_weights_mc
   
     !! zero out arrays
     fweight%weight = 0.d0
-    fweight%fida = 0.d0
     fweight%mean_f = 0.d0
   
     etov2 = 1.d0/(v2_to_E_per_amu*inputs%ab)
@@ -6522,14 +6521,14 @@ subroutine fida_weights_mc
   
     !! Loop over all cells that have neutrals
     cnt=0.d0
-    !$OMP PARALLEL DO schedule(guided) private(ip,i,j,k,iion,ind,vi,vi_norm,ri,ienergy,ipitch, &
-    !$OMP tracks,ncell,jj,kk,plasma,fields,prob,denn,states,photons,energy,pitch,phi, &
-    !$OMP r_gyro,los_intersect,randomu3,fbm_denf)
     loop_over_cells: do ip = 1, int(pcnt)
         i = pcell(1,ip)
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
+        !$OMP PARALLEL DO schedule(guided) private(iion,vi,vi_norm,ri,ienergy,ipitch, &
+        !$OMP tracks,ncell,jj,kk,plasma,fields,prob,denn,states,photons,energy,pitch,phi, &
+        !$OMP r_gyro,los_intersect,randomu3,fbm_denf)
         loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
             !! Sample fast ion distribution uniformally
             call randind(inputs%ne_wght, ienergy)
@@ -6577,16 +6576,15 @@ subroutine fida_weights_mc
                      tracks(jj)%pos, vi, fbm_denf, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
+        !$OMP END PARALLEL DO
         cnt=cnt+1
   
         if(inputs%verbose.eq.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
-    !$OMP END PARALLEL DO
   
     fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight
-    fweight%fida = ((1.d-20)*phase_area)*fweight%fida
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
     call write_fida_weights()
   
@@ -6649,14 +6647,12 @@ subroutine fida_weights_los
     enddo
   
     !! allocate storage arrays
-    allocate(fweight%fida(nwav,spec_chords%nchan))
     allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
     allocate(fweight%weight(nwav,inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
   
     allocate(mean_f(inputs%ne_wght,inputs%np_wght))
     !! zero out arrays
     fweight%weight = 0.d0
-    fweight%fida = 0.d0
     fweight%mean_f = 0.d0
     mean_f = 0.d0
   
@@ -6682,7 +6678,7 @@ subroutine fida_weights_los
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
-                    if(spec_chords%los_inter(i,j,k)) then
+                    if(spec_chords%dlength(ichan,i,j,k).gt.0.0) then
                         ind = [i,j,k]
                         dlength = spec_chords%dlength(ichan,i,j,k)
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
@@ -6739,7 +6735,7 @@ subroutine fida_weights_los
         dlength = 1.d0
   
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(eb,vabs,ptch,phi,vi,vi_norm, &
-        !$OMP& ri,r_enter,r_exit,length,max_dens,ind,tracks,ncell,dt,icell,states,rates, &
+        !$OMP& r_enter,r_exit,length,max_dens,ind,tracks,ncell,dt,icell,states,rates, &
         !$OMP& vhalo,denn,denf,photons,ienergy,ipitch,igyro)
         do ienergy=1,inputs%ne_wght
             do ipitch=1,inputs%np_wght
@@ -6790,7 +6786,8 @@ subroutine fida_weights_los
         enddo
         !$OMP END PARALLEL DO
     enddo chan_loop
-  
+ 
+    fweight%mean_f = fweight%mean_f/(dEdP) 
     call write_fida_weights()
   
 end subroutine fida_weights_los

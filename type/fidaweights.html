@@ -133,8 +133,6 @@
     <div id="vars" class="panel-collapse collapse">
       <div class="list-group">
         
-        <a class="list-group-item" href="../type/fidaweights.html#variable-fida%7E2">fida</a>
-        
         <a class="list-group-item" href="../type/fidaweights.html#variable-mean_f">mean_f</a>
         
         <a class="list-group-item" href="../type/fidaweights.html#variable-weight%7E3">weight</a>
@@ -268,25 +266,11 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-fida%7E2"></span>real(kind=Float64),</td>
-  
-  <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>fida</strong></td><td></td><td></td><td><p>FIDA emission calculated via weight function method</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" id="variable-mean_f"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>mean_f</strong></td><td></td><td></td><td><p>Mean fast-ion distribution function "seen" by LOS: mean_f(E,p,chan)</p></td>
+  <td><strong>mean_f</strong></td><td></td><td></td><td><p>Estimate of mean fast-ion distribution function "seen" by LOS: mean_f(E,p,chan)</p></td>
   
 </tr>
 
@@ -322,10 +306,8 @@
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">FIDAWeights</span>
     <span class="c">!+ FIDA weights structure</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">fida</span>
-        <span class="c">!+ FIDA emission calculated via weight function method</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">mean_f</span>
-        <span class="c">!+ Mean fast-ion distribution function &quot;seen&quot; by LOS: mean_f(E,p,chan)</span>
+        <span class="c">!+ Estimate of mean fast-ion distribution function &quot;seen&quot; by LOS: mean_f(E,p,chan)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">weight</span>
         <span class="c">!+ FIDA weight function: weight(lambda,E,p,chan)</span>
 <span class="k">end type </span><span class="n">FIDAWeights</span>

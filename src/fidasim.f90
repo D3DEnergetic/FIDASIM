@@ -5445,21 +5445,22 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
     vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
     dphi = 2*pi/ngyro
 
-    !! Calculate radius of particle along gyro-ring
-    do i=1,ngyro
-        phi(i) = dphi*i
-        call pitch_to_vec(pitch,phi(i),fields, vi)
-        vi = vabs*vi
-        call gyro_step(vi, fields, r_step)
-        ri = rg + r_step
-        call xyz_to_uvw(ri, uvw)
-        r(i) = sqrt(uvw(1)**2 + uvw(2)**2)
-    enddo
+!    !! Calculate radius of particle along gyro-ring
+!    do i=1,ngyro
+!        phi(i) = dphi*i
+!        call pitch_to_vec(pitch,phi(i),fields, vi)
+!        vi = vabs*vi
+!        call gyro_step(vi, fields, r_step)
+!        ri = rg - r_step
+!        call xyz_to_uvw(ri, uvw)
+!        r(i) = sqrt(uvw(1)**2 + uvw(2)**2)
+!    enddo
 
     !! Sample gyroangle according to radius to counter-act geometric effect
     call randind(r, randi)
     call randu(randomu)
-    phip = phi(randi(1)) + (randomu(1) - 0.5)*dphi
+    phip = 2*pi*randomu(1)
+!    phip = phi(randi(1)) + (randomu(1) - 0.5)*dphi
 
     !! Calculate velocity vector
     call pitch_to_vec(pitch, phip, fields, vi)
@@ -5467,7 +5468,7 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
 
     !! Move to particle location
     call gyro_step(vp, fields, r_step)
-    rp = rg + r_step
+    rp = rg - r_step
      
 end subroutine gyro_correction
 
@@ -5484,7 +5485,7 @@ subroutine mc_fastion(ind,ri,vi,denf)
 
     type(LocalEMFields) :: fields
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
-    real(Float64), dimension(3) :: r_gyro, rp
+    real(Float64), dimension(3) :: r_gyro, rg
     real(Float64) :: eb ,ptch
     integer :: ii, ienergy, ipitch
     real(Float64) :: vabs, phi
@@ -5519,9 +5520,9 @@ subroutine mc_fastion(ind,ri,vi,denf)
         call gyro_step(vi,fields,r_gyro)
   
         !! Move a gyro-orbit away and sample distribution there
-        rp=ri-r_gyro
+        rg=ri+r_gyro !ri at particle location
   
-        call get_distribution(fbeam,denf,pos=rp)
+        call get_distribution(fbeam,denf,pos=rg)
         max_fbm = maxval(fbeam)
         !! Find new cell
         if(max_fbm(1).gt.0.0) then
@@ -6211,6 +6212,7 @@ subroutine fida_mc
     !$OMP& plasma,theta,randomu,xyz,uvw,uvw_vi,r_gyro,ncell,jj,prob,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=1,particles%nparticle
         fast_ion = particles%fast_ion(iion)
+        cnt=cnt+1
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         if(fast_ion%cross_grid) then
             !! Pick random torodial angle
@@ -6249,7 +6251,6 @@ subroutine fida_mc
                 call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class)
             enddo loop_along_track
         endif
-        cnt=cnt+1
         if (inputs%verbose.ge.2)then
           WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
@@ -6569,7 +6570,7 @@ subroutine fida_weights_mc
   
             !! Correct for gyro motion
             call gyro_step(vi,fields,r_gyro)
-            ri = ri + r_gyro
+            ri = ri - r_gyro !ri now at particle position
 
             !! Find the particles path through the beam grid
             call track(ri, vi, tracks, ncell, los_intersect)
@@ -6915,7 +6916,8 @@ subroutine npa_weights
   
                             fbm_denf=0
                             if (inputs%dist_type.eq.1) then
-                                call get_ep_denf(ebarr(ic),pitch,fbm_denf,pos=(pos-r_gyro))
+                                !get dist at guiding center
+                                call get_ep_denf(ebarr(ic),pitch,fbm_denf,pos=(pos+r_gyro))
                             endif
                             if (fbm_denf.ne.fbm_denf) cycle loop_over_energy
   

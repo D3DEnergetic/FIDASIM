@@ -5449,7 +5449,7 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
         call pitch_to_vec(pitch,phi(i),fields, vi)
         vi = vabs*vi
         call gyro_step(vi, fields, r_step)
-        ri = rg - r_step
+        ri = rg + r_step
         call xyz_to_uvw(ri, uvw)
         r(i) = sqrt(uvw(1)**2 + uvw(2)**2)
     enddo
@@ -5465,7 +5465,7 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
 
     !! Move to particle location
     call gyro_step(vp, fields, r_step)
-    rp = rg - r_step
+    rp = rg + r_step
      
 end subroutine gyro_correction
 
@@ -5517,7 +5517,7 @@ subroutine mc_fastion(ind,ri,vi,denf)
         call gyro_step(vi,fields,r_gyro)
   
         !! Move a gyro-orbit away and sample distribution there
-        rp=ri+r_gyro
+        rp=ri-r_gyro
   
         call get_distribution(fbeam,denf,pos=rp)
         max_fbm = maxval(fbeam)

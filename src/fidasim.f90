@@ -2246,6 +2246,7 @@ subroutine read_mc(fid, error)
         call h5ltread_dataset_double_f(fid, "/energy", energy, dims, error)
         call h5ltread_dataset_double_f(fid, "/pitch", pitch, dims, error)
         !! Transform to full orbit
+        !$OMP PARALLEL DO schedule(guided) private(i,uvw,fields,ri,vi,phi)
         do i=1, particles%nparticle
             uvw = [r(i), 0.d0, z(i)]
             call get_fields(fields,pos = uvw, machine_coords=.True.)
@@ -2257,6 +2258,7 @@ subroutine read_mc(fid, error)
             vt(i) = -vi(1)*sin(phi) + vi(2)*cos(phi)
             vz(i) =  vi(3)
         enddo
+        !$OMP END PARALLEL DO
     else
         dist_type_name = "Full Orbit Monte Carlo"
         call h5ltread_dataset_double_f(fid, "/vr", vr, dims, error)
@@ -6200,6 +6202,9 @@ subroutine fida_mc
   
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"# of markers: ",i9)') particles%nparticle
+    endif
   
     cnt=0.0
     !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,vi_norm,ri,phi,fields,tracks,s,c, &

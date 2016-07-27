@@ -13,8 +13,8 @@ source: true
 graph: true
 extra_filetypes: pro ;
 preprocess: false
-media_dir: ./docs/media
-favicon: ./docs/media/fidasim-favicon.png
+media_dir: ./media
+favicon: ./media/fidasim-favicon.png
 md_extensions: markdown.extensions.toc
 ---
 

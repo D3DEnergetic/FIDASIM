@@ -6569,7 +6569,7 @@ subroutine fida_weights_mc
   
             !! Correct for gyro motion
             call gyro_step(vi,fields,r_gyro)
-            ri = ri - r_gyro
+            ri = ri + r_gyro
 
             !! Find the particles path through the beam grid
             call track(ri, vi, tracks, ncell, los_intersect)
@@ -6915,7 +6915,7 @@ subroutine npa_weights
   
                             fbm_denf=0
                             if (inputs%dist_type.eq.1) then
-                                call get_ep_denf(ebarr(ic),pitch,fbm_denf,pos=(pos+r_gyro))
+                                call get_ep_denf(ebarr(ic),pitch,fbm_denf,pos=(pos-r_gyro))
                             endif
                             if (fbm_denf.ne.fbm_denf) cycle loop_over_energy
   

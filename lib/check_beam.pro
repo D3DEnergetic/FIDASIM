@@ -88,12 +88,12 @@ PRO check_beam, inp, nbi
     origin = inp.origin
     uvw_src = nbi.src
     uvw_axis = nbi.axis
-    uvw_pos = uvw_src + 200*uvw_axis
+    uvw_pos = uvw_src + nbi.adist[0]*uvw_axis
 
     xyz_src = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_src, origin=origin)
     xyz_axis = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_axis)
     xyz_pos = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_pos, origin=origin)
-    xyz_center = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,origin, origin=origin)
+    xyz_center = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,[0.0,0.0,0.0], origin=origin)
 
     dis = sqrt(total((xyz_src - xyz_pos)^2.0))
     BETA=double(asin((xyz_src[2]-xyz_pos[2])/dis))
@@ -101,13 +101,13 @@ PRO check_beam, inp, nbi
 
     print,'Beam injection start point in machine coordinates'
     print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_src
-    print,'Point 2m along beam centerline in machine coordinates'
+    print,'First aperture position in machine coordinates'
     print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_pos
     print,'Machine center in beam grid coordinates'
     print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_center
     print,'Beam injection start point in beam grid coordinates'
     print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_src
-    print,'Point 2m along beam centerline in beam grid coordinates'
+    print,'First aperture position in beam grid coordinates'
     print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_pos
     print,'Beam grid rotation angles that would align it with the beam centerline'
     print, ALPHA/!DPI*180,FORMAT='("    alpha = ",F14.10,"°")'

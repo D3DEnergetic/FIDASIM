@@ -97,12 +97,11 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
            focy:double(nubeam.foclr),focz:double(nubeam.foclz), $
            divy:replicate(double(nubeam.divr),3), $
            divz:replicate(double(nubeam.divz),3), $
-           widy:double(nubeam.bmwidr), widz:double(nubeam.bmwidz) $
-           naperture:n_elements(nubeam.nbapsha),ashape:nubeam.nbapsha, $
+           widy:double(nubeam.bmwidr), widz:double(nubeam.bmwidz), $
+           naperture:fix(n_elements(nubeam.nbapsha)),ashape:nubeam.nbapsha, $
            awidy:double(nubeam.rapedga),awidz:double(nubeam.xzpedga), $
-           aoffy:double(nubeam.rapoffa),aoffz:double(nubeam.xzaoffa), $
+           aoffy:double(nubeam.xrapoffa),aoffz:double(nubeam.xzapoffa), $
            adist:double(nubeam.xlbapa) }
-           } 
-    
+ 
     return, nbi
 END

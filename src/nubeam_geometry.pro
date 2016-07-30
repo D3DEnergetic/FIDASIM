@@ -39,7 +39,7 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ;+
     ;+     **NUBEAM.RAPEDGA**: Vector of aperture half-widths [cm]
     ;+
-    ;+     **NUBEAM.XZPEDGA**: Vector of aperture half-heigts [cm]
+    ;+     **NUBEAM.XZPEDGA**: Vector of aperture half-heights [cm]
     ;+
     ;+     **NUBEAM.XRAPOFFA**: Vector of horizontal (y) offsets relative to the +x aligned beam centerline [cm]
     ;+

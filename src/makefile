@@ -29,7 +29,7 @@ endif
 
 ifneq ($(findstring pgf90, $(FC)),)
 	LFLAGS = $(HDF5_FLAGS) -L$(SRC_DIR) -lm
-	CFLAGS = -fast -Mpreprocess -g -mp -acc -Minfo=accel -D_OMP $(UFLAGS) #-pg #gprof profiling
+	CFLAGS = -fast -Mpreprocess -Minline -g -mp -acc -Minfo=accel -D_OMP $(UFLAGS) #-pg #gprof profiling
 	DEBUG_CFLAGS = -O0 -Mpreprocess -g -C
 endif
 

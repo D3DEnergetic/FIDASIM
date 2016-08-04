@@ -1831,7 +1831,11 @@ subroutine read_npa
     real(Float64) :: total_prob, hh, hw, dprob, dx, dy, r
     integer :: ichan,i,j,k,ix,iy,d_index,nd,cnt
     integer :: error
-    
+   
+    real(Float64), dimension(beam_grid%nx) :: xc 
+    real(Float64), dimension(beam_grid%ny) :: yc 
+    real(Float64), dimension(beam_grid%nz) :: zc 
+
     !!Initialize HDF5 interface
     call h5open_f(error)
   
@@ -1958,15 +1962,18 @@ subroutine read_npa
         basis = npa_chords%det(ichan)%detector%basis
         inv_basis = npa_chords%det(ichan)%detector%inv_basis
         cnt = 0
-        !acc kernels private(i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d,rd_d,rd,d_index,v0,dprob,r)
+        xc = beam_grid%xc
+        yc = beam_grid%yc
+        zc = beam_grid%zc
         !$acc kernels 
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
+                !$acc loop private(ix,iy,total_prob,eff_rd,r0,r0_d,rd_d,rd,d_index,v0,dprob,r)
                 do i=1,beam_grid%nx
                     cnt = cnt+1
                     total_prob = 0.d0
                     eff_rd = eff_rd*0.d0
-                    r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
+                    r0 = [xc(i),yc(j),zc(k)]
                     r0_d = matmul(inv_basis,r0-xyz_d_cent)
                     do ix = 1, nd
                         do iy = 1, nd
@@ -3609,30 +3616,15 @@ function cross_product(u, v) result(s)
 
 end function cross_product
 
-function normp(u, p_in) result(n)
+function normp(u) result(n)
     !$acc routine seq
     !+ Calculates the p-norm of a vector defaults to p=2: \(||u||_p\)
     real(Float64), dimension(:), intent(in) :: u
-    integer, intent(in), optional           :: p_in
     real(Float64)                           :: n
   
     integer :: p
     
-    IF(present(p_in)) THEN
-        p = p_in
-    ELSE
-        p = 2
-    ENDIF
-  
-    SELECT CASE (p)
-        CASE (1)
-            n = sum(abs(u))
-        CASE (2)
-            n = sqrt(dot_product(u,u))
-        CASE DEFAULT
-            write(*,'("NORMP: Unknown p value: ",i2)'),p
-            stop
-    END SELECT
+    n = sqrt(dot_product(u,u))
 
 end function normp
 
@@ -3766,7 +3758,7 @@ function in_boundary(bplane, p) result(in_b)
                 in_b = .True.
             endif
         CASE DEFAULT
-            write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
+            !write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
             stop
     END SELECT
   

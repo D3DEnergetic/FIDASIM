@@ -2,120 +2,108 @@ make[1]: Entering directory `/home/etrain75/FIDASIM/deps'
 make[1]: `hdf5' is up to date.
 make[1]: Leaving directory `/home/etrain75/FIDASIM/deps'
 make[1]: Entering directory `/home/etrain75/FIDASIM/src'
-pgf90 -fast -Mpreprocess -g -mp -acc -Minfo=accel -D_OMP -D_VERSION=\"v1.0.0-rc2-1-g0f02956\"  -c -I/home/etrain75/FIDASIM/deps/hdf5/include -I/home/etrain75/FIDASIM/src fidasim.f90
-PGF90-W-0093-Type conversion of expression performed (fidasim.f90: 5344)
+pgf90 -fast -Mpreprocess -Minline -g -mp -acc -Minfo=accel -D_OMP -D_VERSION=\"v1.0.0-rc2-2-g0633775-dirty\"  -c -I/home/etrain75/FIDASIM/deps/hdf5/include -I/home/etrain75/FIDASIM/src fidasim.f90
+PGF90-W-0093-Type conversion of expression performed (fidasim.f90: 5336)
+  0 inform,   1 warnings,   0 severes, 0 fatal for get_nlaunch
+PGF90-W-0093-Type conversion of expression performed (fidasim.f90: 5336)
   0 inform,   1 warnings,   0 severes, 0 fatal for get_nlaunch
 read_npa:
-   1962, Generating copyin(inv_basis(:,:))
+   1968, Generating copyin(inv_basis(:,:))
          Generating copyout(z_a_2(:))
          Generating copy(r0$a)
          Generating copy(.g0013)
-         Generating copyin(beam_grid%zc(:),beam_grid%yc(:))
+         Generating copyin(zc(:),yc(:))
          Generating copyout(z_a_1(:))
-         Generating copyin(beam_grid%xc(:))
-         Generating copy(eff_rd(:))
-         Generating copyout(r0(:))
+         Generating copyin(xc(:))
          Generating copy(r0$a(:))
-         Generating copyin(xyz_d_cent(:))
-         Generating copyout(r0_d(:))
-         Generating copy(d_index)
-         Generating copyin(basis(:,:))
+         Generating copyin(xyz_d_cent(:),basis(:,:))
          Generating copyout(z_a_3(:))
          Generating copyin(yd(:),xd(:))
-         Generating copyout(rd_d(:))
-         Generating copy(v0(:))
-         Generating copyout(rd(:))
          Generating copy(rd_d$a,rd_d$a(:))
          Generating copy(npa_chords%hit(:,:,:),effrd(:,:,:,:,:))
          Generating copy(phit(:,:,:,ichan))
          Generating copyin(npa_chords%phit(:,:,:,:))
          Generating copyout(npa_chords%phit(:,:,:,ichan))
-   1963, Complex loop carried dependence of beam_grid%xc$p,beam_grid%yc$p,beam_grid%zc$p prevents parallelization
-         Loop carried dependence due to exposed use of r0$a(:) prevents parallelization
-         Loop carried scalar dependence for r0$a at line 1970
+   1969, Loop carried dependence due to exposed use of r0$a(:) prevents parallelization
+         Loop carried scalar dependence for r0$a at line 1977
          Complex loop carried dependence of npa_chords%phit$p%p,npa_chords%hit$p prevents parallelization
-         Loop carried dependence due to exposed use of eff_rd(:),rd_d$a$sd389(:) prevents parallelization
-         Loop carried scalar dependence for rd_d$a at line 1979
-         Loop carried dependence due to exposed use of v0(:),rd_d$a(:) prevents parallelization
-         Accelerator restriction: scalar variable live-out from loop: d_index
-         Parallelization would require privatization of array z_a_3(:),rd_d(:),r0_d(:),r0(:),z_a_2(:),z_a_1(:)
+         Loop carried dependence due to exposed use of rd_d$a$sd392(:) prevents parallelization
+         Loop carried scalar dependence for rd_d$a at line 1986
+         Loop carried dependence due to exposed use of rd_d$a(:) prevents parallelization
+         Parallelization would require privatization of array z_a_3(:),z_a_2(:),z_a_1(:)
          Accelerator kernel generated
          Generating Tesla code
-       1968, !$acc loop vector(32) ! threadidx%x
-       1969, !$acc loop vector(32) ! threadidx%x
-       1970, !$acc loop vector(32) ! threadidx%x
-       1973, !$acc loop vector(32) ! threadidx%x
-       1974, !$acc loop vector(32) ! threadidx%x
-       1979, !$acc loop vector(32) ! threadidx%x
+       1975, !$acc loop vector(32) ! threadidx%x
+       1976, !$acc loop vector(32) ! threadidx%x
+       1977, !$acc loop vector(32) ! threadidx%x
+       1980, !$acc loop vector(32) ! threadidx%x
        1981, !$acc loop vector(32) ! threadidx%x
-       1982, Sum reduction generated for total_prob
-       1987, !$acc loop vector(32) ! threadidx%x
-       1991, !$acc loop vector(32) ! threadidx%x
-   1964, Complex loop carried dependence of beam_grid%xc$p,beam_grid%yc$p,beam_grid%zc$p prevents parallelization
-         Loop carried dependence due to exposed use of r0$a(:) prevents parallelization
-         Loop carried scalar dependence for r0$a at line 1970
+       1986, !$acc loop vector(32) ! threadidx%x
+       1988, !$acc loop vector(32) ! threadidx%x
+       1989, Sum reduction generated for total_prob
+       1994, !$acc loop vector(32) ! threadidx%x
+       1998, !$acc loop vector(32) ! threadidx%x
+   1970, Loop carried dependence due to exposed use of r0$a(:) prevents parallelization
+         Loop carried scalar dependence for r0$a at line 1977
          Complex loop carried dependence of npa_chords%phit$p%p,npa_chords%hit$p prevents parallelization
-         Loop carried dependence due to exposed use of eff_rd(:),rd_d$a$sd389(:) prevents parallelization
-         Loop carried scalar dependence for rd_d$a at line 1979
-         Loop carried dependence due to exposed use of v0(:),rd_d$a(:) prevents parallelization
-         Accelerator restriction: scalar variable live-out from loop: d_index
-         Parallelization would require privatization of array z_a_3(:),rd_d(:),r0_d(:),r0(:),z_a_2(:),z_a_1(:)
-   1965, Complex loop carried dependence of beam_grid%xc$p,z_a_1,beam_grid%yc$p,beam_grid%zc$p prevents parallelization
+         Loop carried dependence due to exposed use of rd_d$a$sd392(:) prevents parallelization
+         Loop carried scalar dependence for rd_d$a at line 1986
+         Loop carried dependence due to exposed use of rd_d$a(:) prevents parallelization
+         Parallelization would require privatization of array z_a_3(:),z_a_2(:),z_a_1(:)
+   1972, Complex loop carried dependence of z_a_1 prevents parallelization
          Loop carried dependence due to exposed use of r0$a(:) prevents parallelization
-         Loop carried scalar dependence for r0$a at line 1970
+         Loop carried scalar dependence for r0$a at line 1977
          Complex loop carried dependence of npa_chords%phit$p%p,npa_chords%hit$p prevents parallelization
-         Loop carried dependence due to exposed use of eff_rd(:),rd_d$a$sd389(:) prevents parallelization
-         Loop carried scalar dependence for rd_d$a at line 1979
-         Loop carried dependence due to exposed use of v0(:),rd_d$a(:) prevents parallelization
-         Accelerator restriction: scalar variable live-out from loop: d_index
-         Parallelization would require privatization of array z_a_3(:),rd_d(:),r0_d(:),r0(:),z_a_2(:),z_a_1(:)
-   1968, Loop is parallelizable
-   1969, Loop is parallelizable
-   1970, Loop is parallelizable
-   1971, Parallelization requires privatization of z_a_1 as well as last value
-         Loop carried dependence due to exposed use of rd_d$a$sd389(:) prevents parallelization
-         Loop carried scalar dependence for rd_d$a at line 1979
-         Loop carried dependence due to exposed use of v0(:),rd_d$a(:) prevents parallelization
+         Loop carried dependence due to exposed use of rd_d$a$sd392(:) prevents parallelization
+         Loop carried scalar dependence for rd_d$a at line 1986
+         Loop carried dependence due to exposed use of rd_d$a(:) prevents parallelization
+         Parallelization would require privatization of array z_a_3(:),z_a_2(:),z_a_1(:)
+   1975, Loop is parallelizable
+   1976, Loop is parallelizable
+   1977, Loop is parallelizable
+   1978, Parallelization requires privatization of z_a_1 as well as last value
+         Loop carried dependence due to exposed use of rd_d$a$sd392(:) prevents parallelization
+         Loop carried scalar dependence for rd_d$a at line 1986
+         Loop carried dependence due to exposed use of rd_d$a(:) prevents parallelization
          Parallelization requires privatization of eff_rd as well as last value
-         Accelerator restriction: scalar variable live-out from loop: d_index
-         Parallelization would require privatization of array z_a_3(:),rd_d(:)
-   1972, Parallelization requires privatization of z_a_1 as well as last value
-         Loop carried dependence due to exposed use of rd_d$a$sd389(:) prevents parallelization
-         Complex loop carried dependence of rd_d$a$sd389 prevents parallelization
-         Loop carried scalar dependence for rd_d$a at line 1979
-         Loop carried dependence due to exposed use of v0(:),rd_d$a(:),eff_rd(:) prevents parallelization
-         Accelerator restriction: scalar variable live-out from loop: d_index
-         Parallelization would require privatization of array z_a_3(:),rd_d(:)
-   1973, Loop is parallelizable
-   1974, Loop is parallelizable
-   1979, Loop is parallelizable
+         Parallelization would require privatization of array v0(:),z_a_3(:),rd_d(:)
+   1979, Parallelization requires privatization of z_a_1 as well as last value
+         Loop carried dependence due to exposed use of rd_d$a$sd392(:) prevents parallelization
+         Complex loop carried dependence of rd_d$a$sd392 prevents parallelization
+         Loop carried scalar dependence for rd_d$a at line 1986
+         Loop carried dependence due to exposed use of rd_d$a(:),eff_rd(:) prevents parallelization
+         Parallelization would require privatization of array v0(:),z_a_3(:),rd_d(:)
+   1980, Loop is parallelizable
    1981, Loop is parallelizable
-   1987, Loop is parallelizable
-   1991, Loop is parallelizable
-PGF90-S-0000-Internal compiler error. Call in OpenACC region to support routine - pgf90io_encode_fmt (fidasim.f90: 3637)
-PGF90-S-0155-Compiler failed to translate accelerator region (see -Minfo messages): Missing branch target block (fidasim.f90: 1)
+   1986, Loop is parallelizable
+   1988, Loop is parallelizable
+   1994, Loop is parallelizable
+   1998, Loop is parallelizable
 normp:
-   3612, Generating acc routine seq
-   3629, Loop is parallelizable
-   3631, Loop is parallelizable
-   3633, Accelerator restriction: unsupported call to support routine 'pgf90io_encode_fmt'
-  0 inform,   0 warnings,   2 severes, 0 fatal for normp
+   3619, Generating acc routine seq
+   3627, Loop is parallelizable
 plane_intercept:
-   3720, Generating acc routine seq
-   3736, Loop is parallelizable
+   3712, Generating acc routine seq
+   3728, Loop is parallelizable
+   3730, Loop is parallelizable
 in_boundary:
-   3742, Generating acc routine seq
-   3756, Loop is parallelizable
-PGF90-S-0155-Module variables are not supported in acc routine - npa_chords (fidasim.f90: 3791)
+   3734, Generating acc routine seq
+   3748, Loop is parallelizable
+PGF90-S-0155-Module variables used in acc routine need to be in !$acc declare create() - npa_chords (fidasim.f90: 3797)
+PGF90-S-0155-Module variables used in acc routine need to be in !$acc declare create() - npa_chords (fidasim.f90: 3797)
+PGF90-S-0155-Accelerator region ignored; see -Minfo messages  (fidasim.f90)
 hit_npa_detector:
-   3775, Generating acc routine seq
-   3809, Loop is parallelizable
-  0 inform,   0 warnings,   1 severes, 0 fatal for hit_npa_detector
-PGF90-S-0155-Module variables used in acc routine need to be in !$acc declare create() - beam_grid (fidasim.f90: 3825)
+      0, Accelerator region ignored
+   3786, Accelerator restriction: loop has multiple exits
+         Accelerator restriction: loop contains induction variable live after the loop
+        3797, Accelerator restriction: loop contains induction variable live after the loop
+        3797, Accelerator restriction: loop contains induction variable live after the loop
+  0 inform,   0 warnings,   3 severes, 0 fatal for hit_npa_detector
+PGF90-S-0155-Module variables used in acc routine need to be in !$acc declare create() - beam_grid (fidasim.f90: 3817)
 PGF90-S-0155-Accelerator region ignored; see -Minfo messages  (fidasim.f90)
 xyz_to_uvw:
       0, Accelerator region ignored
-   3825, Accelerator restriction: invalid loop
+   3817, Accelerator restriction: invalid loop
   0 inform,   0 warnings,   2 severes, 0 fatal for xyz_to_uvw
 make[1]: *** [fidasim.o] Error 2
 make[1]: Leaving directory `/home/etrain75/FIDASIM/src'

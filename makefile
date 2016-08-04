@@ -1,22 +1,22 @@
 SHELL = /bin/bash
 
-SUPPORTED_FC = gfortran ifort
-SUPPORTED_CC = gcc icc
-SUPPORTED_CXX = g++ icpc
+SUPPORTED_FC = gfortran ifort pgf90
+SUPPORTED_CC = gcc icc pgcc
+SUPPORTED_CXX = g++ icpc pgc++
 
 HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
 ifeq ($(HAS_FC),)
-    $(error Fortran compiler $(FC) is not supported. Set FC to gfortran or ifort)
+    $(error Fortran compiler $(FC) is not supported. Set FC to gfortran, ifort,  or pgf90)
 endif
 
 HAS_CC := $(strip $(foreach SC, $(SUPPORTED_CC), $(findstring $(SC), $(CC))))
 ifeq ($(HAS_CC),)
-    $(error C compiler $(CC) is not supported. Set CC to gcc or icc)
+    $(error C compiler $(CC) is not supported. Set CC to gcc, icc, or pgcc)
 endif
 
 HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
 ifeq ($(HAS_CXX),)
-    $(error C++ compiler $(CXX) is not supported. Set CXX to g++ or icpc)
+    $(error C++ compiler $(CXX) is not supported. Set CXX to g++, icpc, pgc++)
 endif
 
 # directories

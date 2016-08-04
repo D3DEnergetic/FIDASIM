@@ -18,7 +18,6 @@ integer(Int32), parameter :: IA = 16807
 integer(Int32), parameter :: IM = 2147483647
 integer(Int32), parameter :: IQ = 127773
 integer(Int32), parameter :: IR = 2836
-real(Float64), protected :: AM = nearest(1.0,-1.0)/IM
 
 integer, parameter :: ns = 2
 
@@ -57,8 +56,10 @@ function rng_uniform(self) result(u)
     real(Float64)                 :: u
         !+ Uniform random deviate
 
+    real(Float64) :: AM 
     integer(Int32) :: ix,iy,k
   
+    AM = nearest(1.0,-1.0)/IM
     ix = self%state(1)
     iy = self%state(2)
   
@@ -71,7 +72,7 @@ function rng_uniform(self) result(u)
     self%state(1) = ix
     self%state(2) = iy
   
-    u = am*ior(iand(IM,ieor(ix,iy)),1)
+    u = AM*ior(iand(IM,ieor(ix,iy)),1)
 
 end function rng_uniform
 

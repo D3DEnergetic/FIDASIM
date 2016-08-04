@@ -1958,9 +1958,8 @@ subroutine read_npa
         basis = npa_chords%det(ichan)%detector%basis
         inv_basis = npa_chords%det(ichan)%detector%inv_basis
         cnt = 0
-        ! For each grid point find the probability of hitting the detector given an isotropic source
-        !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-        !$OMP& rd_d,rd,d_index,v0,dprob,r)
+        !acc kernels private(i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d,rd_d,rd,d_index,v0,dprob,r)
+        !$acc kernels 
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
@@ -1992,15 +1991,11 @@ subroutine read_npa
                         npa_chords%phit(i,j,k,ichan)%eff_rd = eff_rd
                         npa_chords%hit(i,j,k) = .True.
                     endif
-                    if(inputs%verbose.ge.2) then
-                        WRITE(*,'(T4,"Channel: ",i3," ",f7.2,"% completed",a,$)') &
-                                 ichan, cnt/real(beam_grid%ngrid)*100,char(13)
-                    endif
                 enddo !x loop
             enddo !y loop
         enddo !z loop
-        !$OMP END PARALLEL DO
-  
+        !$acc end kernels
+
         total_prob = sum(npa_chords%phit(:,:,:,ichan)%p)
         if(total_prob.le.0.d0) then
             WRITE(*,'("Channel ",i3," missed the beam grid")'),ichan
@@ -3615,6 +3610,7 @@ function cross_product(u, v) result(s)
 end function cross_product
 
 function normp(u, p_in) result(n)
+    !$acc routine seq
     !+ Calculates the p-norm of a vector defaults to p=2: \(||u||_p\)
     real(Float64), dimension(:), intent(in) :: u
     integer, intent(in), optional           :: p_in
@@ -3722,6 +3718,7 @@ subroutine plane_basis(center, redge, tedge, basis, inv_basis)
 end subroutine plane_basis
 
 subroutine plane_intercept(l0, l, p0, n, p, t)
+    !$acc routine seq
     !+ Calculates the intersection of a line and a plane
     real(Float64), dimension(3), intent(in)  :: l0 
         !+ Point on line
@@ -3743,6 +3740,7 @@ subroutine plane_intercept(l0, l, p0, n, p, t)
 end subroutine plane_intercept
 
 function in_boundary(bplane, p) result(in_b)
+    !$acc routine seq
     !+ Indicator function for determining if a point on a plane is within the plane boundary 
     type(BoundedPlane), intent(in)          :: bplane
         !+ Plane with boundary
@@ -3775,6 +3773,7 @@ function in_boundary(bplane, p) result(in_b)
 end function in_boundary
 
 subroutine hit_npa_detector(r0, v0, d_index, rd)
+    !$acc routine seq
     !+ Routine to check if a particle will hit a NPA detector
     real(Float64), dimension(3), intent(in)            :: r0
         !+ Starting point of particle
@@ -3815,6 +3814,7 @@ subroutine hit_npa_detector(r0, v0, d_index, rd)
 end subroutine hit_npa_detector
 
 subroutine xyz_to_uvw(xyz, uvw)
+    !$acc routine seq
     !+ Convert beam coordinate `xyz` to machine coordinate `uvw`
     real(Float64), dimension(3), intent(in)  :: xyz
     real(Float64), dimension(3), intent(out) :: uvw

@@ -10,6 +10,12 @@ ifneq ($(findstring ifort, $(FC)),)
 	CFLAGS = -O2 -fpp -g -traceback -openmp -D_OMP #-p #gprof profiling
 endif
 
+ifneq ($(findstring pgf90, $(FC)),)
+	LFLAGS = $(HDF5_FLAGS) -L$(SRC_DIR) -lm
+	CFLAGS = -fast -Mpreprocess -g -mp -D_OMP $(UFLAGS) #-pg #gprof profiling
+	DEBUG_CFLAGS = -O0 -Mpreprocess -g -C
+endif
+
 all: generate_tables table_settings
 
 generate_tables: atomic_tables.o $(SRC_DIR)/hdf5_extra.o

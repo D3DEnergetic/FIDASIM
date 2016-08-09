@@ -107,6 +107,7 @@ PRO check_inputs, inputs
                                   'geometry_file',geometry_file, $
                                   'distribution_file',distribution_file, $
                                   'load_neutrals', 0, $
+                                  'no_flr',0, $
                                   'verbose', 1, $
                                   'neutrals_file',neutrals_file)
 

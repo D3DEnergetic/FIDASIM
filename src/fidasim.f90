@@ -689,6 +689,8 @@ type SimulationInputs
         !+ Calculate NPA weights: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_birth
         !+ Calculate birth profile: 0 = off, 1=on
+    integer(Int32) :: no_flr
+        !+ Turns off Finite Larmor Radius effects: 0=off, 1=on
     integer(Int32) :: dump_dcx
         !+ Output DCX density and spectra: 0 = off, 1=on
     integer(Int32) :: verbose
@@ -1338,7 +1340,7 @@ subroutine read_inputs
     integer            :: pathlen
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer            :: load_neutrals,verbose,dump_dcx
+    integer            :: load_neutrals,verbose,dump_dcx,no_flr
     integer(Int32)     :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1352,7 +1354,7 @@ subroutine read_inputs
   
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
-        calc_brems, calc_bes, calc_fida, calc_npa, calc_birth, &
+        calc_brems, calc_bes, calc_fida, calc_npa, calc_birth, no_flr, &
         calc_fida_wght, calc_npa_wght, load_neutrals, dump_dcx, verbose, &
         n_fida,n_npa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
@@ -1367,7 +1369,10 @@ subroutine read_inputs
         write(*,'(a,a)') 'READ_INPUTS: Input file does not exist: ', trim(namelist_file)
         stop
     endif
-  
+
+    !!Set Defaults
+    no_flr = 0
+
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)
@@ -1401,7 +1406,8 @@ subroutine read_inputs
     inputs%load_neutrals=load_neutrals
     inputs%dump_dcx=dump_dcx
     inputs%verbose=verbose
-  
+    inputs%no_flr = no_flr
+
     !!Monte Carlo Settings
     inputs%n_fida=max(10,n_fida)
     inputs%n_npa=max(10,n_npa)
@@ -1652,7 +1658,7 @@ subroutine read_beam
   
     nbi%vinj=sqrt(2.d0*nbi%einj*1.d3 *e0/(inputs%ab*mass_u))*1.d2 !! [cm/s]
     pos = nbi%src + 200.0*nbi%axis
-    dis = sqrt(sum((pos - nbi%src)**2.0))
+    dis = sqrt(sum((pos - nbi%src)**2))
     nbi%beta = asin((nbi%src(3) - pos(3))/dis)
     nbi%alpha = atan2(pos(2)-nbi%src(2),pos(1)-nbi%src(1))
   
@@ -1755,7 +1761,7 @@ subroutine read_chords
   
         r0 = xyz_lens
         v0 = xyz_axis
-        v0 = v0/normp(v0)
+        v0 = v0/norm2(v0)
         call line_basis(r0,v0,basis)
   
         call grid_intersect(r0,v0,length,r_enter,r_exit)
@@ -1818,7 +1824,7 @@ subroutine read_npa
     integer, dimension(:), allocatable :: a_shape, d_shape
     character(len=20) :: system = ''
     
-    real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1.d0)
+    real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
     real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
     real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
     real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0, r0_d, v0
@@ -1926,11 +1932,11 @@ subroutine read_npa
         call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
   
         ! Define detector/aperture hh/hw
-        npa_chords%det(ichan)%detector%hw = normp(xyz_d_redge - xyz_d_cent)
-        npa_chords%det(ichan)%aperture%hw = normp(xyz_a_redge - xyz_a_cent)
+        npa_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
+        npa_chords%det(ichan)%aperture%hw = norm2(xyz_a_redge - xyz_a_cent)
   
-        npa_chords%det(ichan)%detector%hh = normp(xyz_d_tedge - xyz_d_cent)
-        npa_chords%det(ichan)%aperture%hh = normp(xyz_a_tedge - xyz_a_cent)
+        npa_chords%det(ichan)%detector%hh = norm2(xyz_d_tedge - xyz_d_cent)
+        npa_chords%det(ichan)%aperture%hh = norm2(xyz_a_tedge - xyz_a_cent)
   
         ! Define detector/aperture origin
         npa_chords%det(ichan)%detector%origin = xyz_d_cent
@@ -1975,8 +1981,8 @@ subroutine read_npa
                             d_index = 0
                             call hit_npa_detector(r0,v0,d_index)
                             if(d_index.ne.0) then
-                                r = normp(rd_d - r0_d)**2.0
-                                dprob = (dx*dy) * inv_4pi * r0_d(3) * (r**(-1.5))
+                                r = norm2(rd_d - r0_d)**2
+                                dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
                                 eff_rd = eff_rd + dprob*rd
                                 total_prob = total_prob + dprob
                             endif
@@ -2115,6 +2121,10 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/fields/ez", equil%fields%ez, dims, error)
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
 
+    equil%fields%br = 0.0
+    equil%fields%bt = -5.0
+    equil%fields%bz = 0.0
+
     !!Close FIELDS group
     call h5gclose_f(gid, error)
   
@@ -2202,12 +2212,10 @@ subroutine read_mc(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(1) :: dims
-    integer(Int32) :: i,ii,ir,iz,nphi
-    real(Float64) :: phi,xmin,xmax,ymin,ymax,zmin,zmax
-    real(Float64) :: phi_enter,delta_phi
-    real(Float64), dimension(3) :: uvw,xyz,ri,vi
+    integer(Int32) :: i,ir,iz
+    real(Float64) :: phi,phi_enter,phi_exit,delta_phi
+    real(Float64), dimension(3) :: uvw,ri,vi,e1_xyz,e2_xyz,C_xyz
     integer(Int32), dimension(1) :: minpos
-    logical :: in_grid
     real(Float64), dimension(:), allocatable :: weight
     real(Float64), dimension(:), allocatable :: r, z, vr, vt, vz
     real(Float64), dimension(:), allocatable :: energy, pitch
@@ -2251,6 +2259,7 @@ subroutine read_mc(fid, error)
             uvw = [r(i), 0.d0, z(i)]
             call get_fields(fields,pos = uvw, machine_coords=.True.)
             call gyro_correction(fields, uvw, energy(i), pitch(i), ri, vi)
+            weight(i) = weight(i)*sqrt(ri(1)**2 + ri(2)**2)/r(i)
             r(i) = sqrt(ri(1)**2 + ri(2)**2)
             z(i) = ri(3)
             phi = atan2(ri(2),ri(1))
@@ -2266,45 +2275,20 @@ subroutine read_mc(fid, error)
         call h5ltread_dataset_double_f(fid, "/vz", vz, dims, error)
     endif
   
-    xmin = beam_grid%xmin
-    xmax = beam_grid%xmax
-    ymin = beam_grid%ymin
-    ymax = beam_grid%ymax
-    zmin = beam_grid%zmin
-    zmax = beam_grid%zmax
-  
     cnt=0
-    num=0
-    nphi = 1000
-    !$OMP PARALLEL DO schedule(guided) private(i,ii,ir,iz,phi,uvw,xyz, &
-    !$OMP& in_grid,minpos,delta_phi,phi_enter) 
+    e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
+    e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
+    C_xyz = matmul(beam_grid%inv_basis,-beam_grid%origin)
+    !$OMP PARALLEL DO schedule(guided) private(i,ir,iz,minpos,delta_phi,phi_enter,phi_exit) 
     do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
         endif
-        delta_phi = 0.0
         phi_enter = 0.0
-        phi = 0.0
-        do ii=1,nphi
-            phi = phi + 2*pi/dble(nphi)
-            uvw(1) = r(i)*cos(phi)
-            uvw(2) = r(i)*sin(phi)
-            uvw(3) = z(i)
-            call uvw_to_xyz(uvw,xyz)
-            
-            if(((xyz(1).ge.xmin.and.xyz(1).le.xmax).and. &
-                (xyz(2).ge.ymin.and.xyz(2).le.ymax).and. &
-                (xyz(3).ge.zmin.and.xyz(3).le.zmax))) then
-                delta_phi = delta_phi + 2*pi/dble(nphi)
-                if(ii.ne.1)then
-                  if(.not.in_grid) phi_enter = phi
-                endif
-                in_grid = .True.
-            else
-                in_grid = .False.
-            endif
-        enddo
-  
+        phi_exit = 0.0
+        call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,r(i),phi_enter,phi_exit)
+        delta_phi = phi_exit-phi_enter
+ 
         minpos = minloc(abs(inter_grid%r - r(i)))
         ir = minpos(1)
         minpos = minloc(abs(inter_grid%z - z(i)))
@@ -2327,11 +2311,11 @@ subroutine read_mc(fid, error)
         particles%fast_ion(i)%vz = vz(i)
         particles%fast_ion(i)%vabs = sqrt(vr(i)**2 + vt(i)**2 + vz(i)**2)
         particles%fast_ion(i)%energy = v2_to_E_per_amu*inputs%ab*particles%fast_ion(i)%vabs**2
-        if(delta_phi.gt.0.d0) num = num + 1
         cnt=cnt+1
     enddo
     !$OMP END PARALLEL DO
-  
+ 
+    num = count(particles%fast_ion%cross_grid)
     if(num.le.0) then
         write(*,'(a)') 'READ_MC: No mc particles in beam grid'
         stop
@@ -2467,11 +2451,11 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
     tt_ind = 1
     bt_amu = [b_amu(1), t_amu]
     tt_amu = [b_amu(2), t_amu]
-    bt_min = normp(bt_amu - dummy2(:,1))
-    tt_min = normp(tt_amu - dummy2(:,1))
+    bt_min = norm2(bt_amu - dummy2(:,1))
+    tt_min = norm2(tt_amu - dummy2(:,1))
     do i=2, n_bt_amu
-        bt_dum = normp(bt_amu - dummy2(:,i))
-        tt_dum = normp(tt_amu - dummy2(:,i))
+        bt_dum = norm2(bt_amu - dummy2(:,i))
+        tt_dum = norm2(tt_amu - dummy2(:,i))
         if(bt_dum.lt.bt_min) then
             bt_min = bt_dum
             bt_ind = i
@@ -3313,11 +3297,11 @@ subroutine write_fida_weights
     allocate(vpe_grid(inputs%ne_wght,inputs%np_wght)) !! V perpendicular
     allocate(vpa_grid(inputs%ne_wght,inputs%np_wght)) !! V parallel
     vpa_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid)*p_grid ! [cm/s]
-    vpe_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid*(1.0-p_grid**2.0)) ![cm/s]
+    vpe_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid*(1.0-p_grid**2)) ![cm/s]
   
     !! define jacobian to convert between E-p to velocity
     allocate(jacobian(inputs%ne_wght,inputs%np_wght))
-    jacobian = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2.0 + vpe_grid**2.0)
+    jacobian = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2 + vpe_grid**2)
  
     !! normalize mean_f
     do ic=1,spec_chords%nchan
@@ -3608,6 +3592,51 @@ end subroutine read_neutrals
 !=============================================================================
 !-----------------------------Geometry Routines-------------------------------
 !=============================================================================
+function approx_eq(x,y,tol) result(a)
+    !+ Inexact equality comparison: `x ~= y` true if `abs(x-y) <= tol` else false
+    real(Float64), intent(in) :: x
+        !+First value in comparison
+    real(Float64), intent(in) :: y
+        !+Second value in comparison
+    real(Float64), intent(in) :: tol
+        !+Equality tolerance
+
+    logical :: a
+
+    a = abs(x-y).le.tol
+
+end function approx_eq
+
+function approx_ge(x,y,tol) result(a)
+    !+ Inexact greater than or equal to comparison: `x >~= y`
+    real(Float64), intent(in) :: x
+        !+First value in comparison
+    real(Float64), intent(in) :: y
+        !+Second value in comparison
+    real(Float64), intent(in) :: tol
+        !+Equality tolerance
+
+    logical :: a
+
+    a = (x.gt.y).or.(approx_eq(x,y,tol))
+
+end function approx_ge
+
+function approx_le(x,y,tol) result(a)
+    !+ Inexact less then or equal to comparison: `x <~= y`
+    real(Float64), intent(in) :: x
+        !+First value in comparison
+    real(Float64), intent(in) :: y
+        !+Second value in comparison
+    real(Float64), intent(in) :: tol
+        !+Equality tolerance
+
+    logical :: a
+
+    a = (x.lt.y).or.(approx_eq(x,y,tol))
+
+end function approx_le
+
 function cross_product(u, v) result(s)
     !+ Calculates the cross product of two vectors: `u`x`v`
     real(Float64), dimension(3), intent(in) :: u
@@ -3619,32 +3648,6 @@ function cross_product(u, v) result(s)
     s(3) = u(1)*v(2) - u(2)*v(1)
 
 end function cross_product
-
-function normp(u, p_in) result(n)
-    !+ Calculates the p-norm of a vector defaults to p=2: \(||u||_p\)
-    real(Float64), dimension(:), intent(in) :: u
-    integer, intent(in), optional           :: p_in
-    real(Float64)                           :: n
-  
-    integer :: p
-    
-    IF(present(p_in)) THEN
-        p = p_in
-    ELSE
-        p = 2
-    ENDIF
-  
-    SELECT CASE (p)
-        CASE (1)
-            n = sum(abs(u))
-        CASE (2)
-            n = sqrt(dot_product(u,u))
-        CASE DEFAULT
-            write(*,'("NORMP: Unknown p value: ",i2)'),p
-            stop
-    END SELECT
-
-end function normp
 
 subroutine tb_zyx(alpha, beta, gamma, basis, inv_basis)
     !+ Creates active rotation matrix for z-y'-x" rotation given Tait-Bryan angles
@@ -3687,7 +3690,7 @@ subroutine line_basis(r0, v0, basis, inv_basis)
     real(Float64) :: alpha, beta, dis
   
     rf = r0 + v0
-    dis = sqrt(sum((rf - r0)**2.0))
+    dis = sqrt(sum((rf - r0)**2))
     beta = asin((r0(3) - rf(3))/dis)
     alpha = atan2(rf(2)-r0(2),rf(1)-r0(1))
   
@@ -3713,11 +3716,11 @@ subroutine plane_basis(center, redge, tedge, basis, inv_basis)
     real(Float64), dimension(3) :: u1,u2,u3
   
     u1 = (redge - center)
-    u1 = u1/normp(u1)
+    u1 = u1/norm2(u1)
     u2 = (tedge - center)
-    u2 = u2/normp(u2)
+    u2 = u2/norm2(u2)
     u3 = cross_product(u1,u2)
-    u3 = u3/normp(u3)
+    u3 = u3/norm2(u3)
   
     basis(:,1) = u1
     basis(:,2) = u2
@@ -3770,7 +3773,7 @@ function in_boundary(bplane, p) result(in_b)
                 in_b = .True.
             endif
         CASE (2) !Circular/Ellipsoidal boundary
-            if(((hh*pp(1))**2.0 + (hw*pp(2))**2.0).le.((hh*hw)**2.0)) then
+            if(((hh*pp(1))**2 + (hw*pp(2))**2).le.((hh*hw)**2)) then
                 in_b = .True.
             endif
         CASE DEFAULT
@@ -3921,7 +3924,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
         nunique = 0
         do i=ind1+1,6
             if (side_inter(i).ne.1) cycle
-            if (sqrt( sum( ( ipnts(:,i)-ipnts(:,ind1) )**2.0 ) ).gt.0.001) then
+            if (sqrt( sum( ( ipnts(:,i)-ipnts(:,ind1) )**2 ) ).gt.0.001) then
                 ind2=i
                 nunique = 2
                 exit
@@ -3937,11 +3940,135 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
                 r_enter = ipnts(:,ind2)
                 r_exit  = ipnts(:,ind1)
             endif
-            length = sqrt(sum((r_exit - r_enter)**2.0))
+            length = sqrt(sum((r_exit - r_enter)**2))
         endif
     endif
   
 end subroutine grid_intersect
+
+function in_grid(xyz) result(ing)
+    !+ Determines if a position `pos` is in the [[libfida:beam_grid]]
+    real(Float64), dimension(3), intent(in) :: xyz
+        !+ Position in beam grid coordinates [cm]
+    logical :: ing
+        !+ Indicates whether the position is in the beam grid
+
+    real(Float64) :: tol = 1.0d-10
+
+    if((approx_ge(xyz(1),beam_grid%xmin,tol).and.approx_le(xyz(1),beam_grid%xmax,tol)).and. &
+       (approx_ge(xyz(2),beam_grid%ymin,tol).and.approx_le(xyz(2),beam_grid%ymax,tol)).and. &
+       (approx_ge(xyz(3),beam_grid%zmin,tol).and.approx_le(xyz(3),beam_grid%zmax,tol))) then
+        ing = .True.
+    else
+        ing = .False.
+    endif
+
+end function
+
+subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
+    !+ Calculates the intersection arclength of a circle with the [[libfida:beam_grid]]
+    real(Float64), dimension(3), intent(in) :: r0
+        !+ Position of center enter of the circle in beam grid coordinates [cm]
+    real(Float64), dimension(3), intent(in) :: e1
+        !+ Unit vector pointing towards (R, 0) (r,phi) position of the circle in beam grid coordinates 
+    real(Float64), dimension(3), intent(in) :: e2
+        !+ Unit vector pointing towards (R, pi/2) (r,phi) position of the circle in beam grid coordinates 
+    real(Float64), intent(in)               :: radius
+        !+ Radius of circle [cm]
+    real(Float64), intent(out)              :: phi_enter
+        !+ Phi value where the circle entered the [[libfida:beam_grid]] [rad]
+    real(Float64), intent(out)              :: phi_exit
+        !+ Phi value where the circle exits the [[libfida:beam_grid]] [rad]
+
+    real(Float64), dimension(3) :: i1_p,i1_n,i2_p,i2_n
+    real(Float64), dimension(6) :: p, gams
+    real(Float64), dimension(4,6) :: phi
+    logical, dimension(4,6) :: inter
+    integer, dimension(6) :: n
+    integer :: i
+    real(Float64) :: alpha,beta,delta,sinx1,cosx1,sinx2,cosx2,tmp
+    real(Float64) :: tol = 1.0d-10
+    logical :: r0_ing
+
+    p = [beam_grid%xmin, beam_grid%xmax, &
+         beam_grid%ymin, beam_grid%ymax, &
+         beam_grid%zmin, beam_grid%zmax ]
+    n = [1, 1, 2, 2, 3, 3]
+    inter = .False.
+    phi = 0.d0
+
+    r0_ing = in_grid(r0)
+    do i=1,6
+        alpha = e2(n(i))
+        beta = e1(n(i))
+        gams(i) = (p(i) - r0(n(i)))/radius
+        delta = alpha**4 + (alpha**2)*(beta**2 - gams(i)**2)
+        if (delta.ge.0.0) then
+            cosx1 = (gams(i)*beta + sqrt(delta))/(alpha**2 + beta**2)
+            if ((cosx1**2).le.1.0) then
+                sinx1 = sqrt(1 - cosx1**2)
+                i1_p = r0 + radius*cosx1*e1 + radius*sinx1*e2
+                i1_n = r0 + radius*cosx1*e1 - radius*sinx1*e2
+                if (approx_eq(i1_p(n(i)),p(i),tol).and.in_grid(i1_p)) then
+                    inter(1,i) = .True.
+                    phi(1,i) = atan2(sinx1,cosx1)
+                endif
+                if (approx_eq(i1_n(n(i)),p(i),tol).and.in_grid(i1_n)) then
+                    inter(2,i) = .True.
+                    phi(2,i) = atan2(-sinx1,cosx1)
+                endif
+            endif
+
+            if(delta.gt.0.0) then
+                cosx2 = (gams(i)*beta - sqrt(delta))/(alpha**2 + beta**2)
+                if ((cosx2**2).le.1.0) then
+                    sinx2 = sqrt(1 - cosx2**2)
+                    i2_p = r0 + radius*cosx2*e1 + radius*sinx2*e2
+                    i2_n = r0 + radius*cosx2*e1 - radius*sinx2*e2
+                    if (approx_eq(i2_p(n(i)),p(i),tol).and.in_grid(i2_p)) then
+                        inter(3,i) = .True.
+                        phi(3,i) = atan2(sinx2,cosx2)
+                    endif
+                    if (approx_eq(i2_n(n(i)),p(i),tol).and.in_grid(i2_n)) then
+                        inter(4,i) = .True.
+                        phi(4,i) = atan2(-sinx2,cosx2)
+                    endif
+                endif
+            endif
+        endif
+    enddo
+
+    phi_enter = 0.d0
+    phi_exit = 0.d0
+    if (count(inter).gt.2) return
+    if(any(inter)) then
+        phi_enter = minval(phi)
+        phi_exit = maxval(phi)
+        if(r0_ing.and.any(count(inter,1).ge.2)) then
+            if((phi_exit - phi_enter) .lt. pi) then
+                tmp = phi_enter
+                phi_enter = phi_exit
+                phi_exit = tmp + 2*pi
+            endif
+        else
+            if((phi_exit - phi_enter) .gt. pi) then
+                tmp = phi_enter
+                phi_enter = phi_exit
+                phi_exit = tmp + 2*pi
+            endif
+        endif
+        if(approx_eq(phi_exit-phi_enter,pi,tol).and.r0_ing) then
+            phi_enter = 0.0
+            phi_exit = 2*pi
+        endif
+    else
+        if(r0_ing.and.all(gams.ge.1.0)) then
+            phi_enter = 0.d0
+            phi_exit = 2.d0*pi
+        endif
+    endif
+
+end subroutine circle_grid_intersect
 
 subroutine get_indices(pos, ind)
     !+ Find closests [[libfida:beam_grid]] indices `ind` to position `pos`
@@ -4462,7 +4589,7 @@ subroutine calc_perp_vectors(b, a, c)
 
   real(Float64), dimension(3) :: bnorm
 
-  bnorm=b/normp(b)
+  bnorm=b/norm2(b)
 
   if (abs(bnorm(3)).eq.1) then
       a=[1.d0,0.d0,0.d0]
@@ -4474,7 +4601,7 @@ subroutine calc_perp_vectors(b, a, c)
       else
           a=[bnorm(2),-bnorm(1),0.d0]/sqrt(bnorm(1)**2+bnorm(2)**2)
           c=-[ a(2) , -a(1) , (a(1)*bnorm(2)-a(2)*bnorm(1))/bnorm(3) ]
-          c=c/normp(c)
+          c=c/norm2(c)
           if(bnorm(3).lt.0.0) then
               c=-c
           endif
@@ -4546,8 +4673,8 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         endif
  
         !Calculate field directions and magnitudes
-        fields%b_abs = normp(xyz_bfield)
-        fields%e_abs = normp(xyz_efield)
+        fields%b_abs = norm2(xyz_bfield)
+        fields%e_abs = norm2(xyz_efield)
         if(fields%b_abs.ne.0) fields%b_norm = xyz_bfield/fields%b_abs
         if(fields%e_abs.ne.0) fields%e_norm = xyz_efield/fields%e_abs
   
@@ -4706,7 +4833,7 @@ subroutine store_npa(det, ri, rf, vn, flux)
     ! Calculate pitch if distribution actually uses pitch
     if(inputs%dist_type.le.2) then
         call get_fields(fields, pos = ri)
-        vn_norm = vn/normp(vn)
+        vn_norm = vn/norm2(vn)
         pitch = dot_product(fields%b_norm,vn_norm)
     else
         pitch = 0.d0
@@ -4760,7 +4887,7 @@ subroutine neut_rates(denn, vi, vn, rates)
     integer :: ebi, neb, err
   
     !Eeff
-    vrel=normp(vi-vn)
+    vrel=norm2(vi-vn)
     eb=v2_to_E_per_amu*vrel**2  ! [kev/amu]
     logeb = log10(eb)
     logEmin = tables%H_H_cx%logemin
@@ -4803,7 +4930,7 @@ subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     real(Float64), dimension(3) :: vhalo, vnbi ,vn
   
     vnbi = pos - nbi%src
-    vnbi = vnbi/normp(vnbi)*nbi%vinj
+    vnbi = vnbi/norm2(vnbi)*nbi%vinj
   
     ntypes = size(types)
     prob = 0
@@ -5076,9 +5203,9 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
         dstep = sqrt(inter_grid%da) !cm
     endif
   
-    max_dis = normp(rf-ri)
+    max_dis = norm2(rf-ri)
   
-    vabs = normp(vi)
+    vabs = norm2(vi)
     dt = dstep/vabs
   
     call get_plasma(plasma,pos=ri)
@@ -5118,7 +5245,7 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
     integer, parameter, dimension(n_stark) :: stark_sign= +1*stark_sigma -1*stark_pi
   
     !! vector directing towards the optical head
-    vp=vecp/normp(vecp)
+    vp=vecp/norm2(vecp)
   
     ! Calculate Doppler shift
     vn=vi*0.01d0 ! [m/s]
@@ -5131,7 +5258,7 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
     efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
     efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
     efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
-    E = normp(efield)
+    E = norm2(efield)
   
     !Stark Splitting
     lambda =  lambda_shifted + E * stark_wavel ![nm]
@@ -5143,7 +5270,7 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
         cos_los_Efield = dot_product(vp,efield) / E
     endif
   
-    intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2.d0)
+    intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     !! E.g. mirrors may change the pi to sigma intensity ratio
     where (stark_sigma .eq. 1)
         intensity = intensity * sigma_pi
@@ -5412,10 +5539,14 @@ subroutine gyro_step(vi, fields, r_gyro)
 
     real(Float64), dimension(3) :: vxB
     real(Float64) :: one_over_omega
- 
-    one_over_omega=inputs%ab*mass_u/(fields%b_abs*e0)
-    vxB = cross_product(vi,fields%b_norm)
-    r_gyro = vxB*one_over_omega
+
+    if(inputs%no_flr.eq.1) then
+        one_over_omega=inputs%ab*mass_u/(fields%b_abs*e0)
+        vxB = cross_product(vi,fields%b_norm)
+        r_gyro = vxB*one_over_omega !points towards gyrocenter
+    else
+        r_gyro = 0.d0
+    endif
 
 end subroutine gyro_step
 
@@ -5445,22 +5576,9 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
     vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
     dphi = 2*pi/ngyro
 
-!    !! Calculate radius of particle along gyro-ring
-!    do i=1,ngyro
-!        phi(i) = dphi*i
-!        call pitch_to_vec(pitch,phi(i),fields, vi)
-!        vi = vabs*vi
-!        call gyro_step(vi, fields, r_step)
-!        ri = rg - r_step
-!        call xyz_to_uvw(ri, uvw)
-!        r(i) = sqrt(uvw(1)**2 + uvw(2)**2)
-!    enddo
-
     !! Sample gyroangle according to radius to counter-act geometric effect
-    call randind(r, randi)
     call randu(randomu)
     phip = 2*pi*randomu(1)
-!    phip = phi(randi(1)) + (randomu(1) - 0.5)*dphi
 
     !! Calculate velocity vector
     call pitch_to_vec(pitch, phip, fields, vi)
@@ -5469,7 +5587,7 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
     !! Move to particle location
     call gyro_step(vp, fields, r_step)
     rp = rg - r_step
-     
+
 end subroutine gyro_correction
 
 subroutine mc_fastion(ind,ri,vi,denf)
@@ -5536,6 +5654,7 @@ subroutine mc_fastion(ind,ri,vi,denf)
             endif
         endif
         vi=0.d0
+        denf=0.d0
     enddo rejection_loop
   
     write(*,'(a)') 'MC_FASTION: Rejection method found no solution!'
@@ -5654,7 +5773,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
         uvw_src = nbi%src
         uvw_ray = nbi%axis
     endif
-    vnbi = uvw_ray/normp(uvw_ray)
+    vnbi = uvw_ray/norm2(uvw_ray)
 
     !! Determine start position on beam grid
     call grid_intersect(uvw_src,vnbi,length,rnbi,r_exit)
@@ -5802,7 +5921,7 @@ subroutine bremsstrahlung
     loop_over_channels: do ichan=1,spec_chords%nchan
         xyz = spec_chords%los(ichan)%lens
         vi = spec_chords%los(ichan)%axis
-        vi = vi/normp(vi)
+        vi = vi/norm2(vi)
         spot_size = spec_chords%los(ichan)%spot_size
         call line_basis(xyz,vi,basis)
   
@@ -6143,17 +6262,17 @@ subroutine fida_f
         loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, ri, vi, denf)
-            if(sum(vi).eq.0) cycle loop_over_fast_ions
-  
+            if(denf.eq.0) cycle loop_over_fast_ions
+
             !! Find the particles path through the beam grid
             call track(ri, vi, tracks, ncell,los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ncell.eq.0) cycle loop_over_fast_ions
-  
+ 
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_prob(tracks(1)%ind, ri, vi, neut_types, prob)
             if(sum(prob).le.0.) cycle loop_over_fast_ions
-  
+
             !! Calculate initial states of particle
             states=prob*denf
   
@@ -6744,7 +6863,7 @@ subroutine fida_weights_los
         ri = plasma%pos
         vp = ri - spec_chords%los(ichan)%lens
         vnbi_f = ri - nbi%src
-        vnbi_f = vnbi_f/normp(vnbi_f)*nbi%vinj
+        vnbi_f = vnbi_f/norm2(vnbi_f)*nbi%vinj
         vnbi_h = vnbi_f/sqrt(2.d0)
         vnbi_t = vnbi_f/sqrt(3.d0)
         sigma_pi = spec_chords%los(ichan)%sigma_pi
@@ -6896,7 +7015,7 @@ subroutine npa_weights
   
                         !!Determine velocity vector
                         dpos = npa_chords%phit(ii,jj,kk,ichan)%eff_rd
-                        vi_norm = (dpos - pos)/normp(dpos - pos)
+                        vi_norm = (dpos - pos)/norm2(dpos - pos)
   
                         !!Check if it hits a detector just to make sure
                         call hit_npa_detector(pos,vi_norm,det)

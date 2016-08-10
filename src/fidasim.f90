@@ -2121,9 +2121,9 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/fields/ez", equil%fields%ez, dims, error)
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
 
-    equil%fields%br = 0.0
-    equil%fields%bt = -5.0
-    equil%fields%bz = 0.0
+    !equil%fields%br = 0.0
+    !equil%fields%bt = -5.0
+    !equil%fields%bz = 0.0
 
     !!Close FIELDS group
     call h5gclose_f(gid, error)
@@ -2212,8 +2212,8 @@ subroutine read_mc(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(1) :: dims
-    integer(Int32) :: i,ir,iz
-    real(Float64) :: phi,phi_enter,phi_exit,delta_phi
+    integer(Int32) :: i,j,ii,ir,iz
+    real(Float64) :: phi,phi_enter,phi_exit,delta_phi,r_ratio
     real(Float64), dimension(3) :: uvw,ri,vi,e1_xyz,e2_xyz,C_xyz
     integer(Int32), dimension(1) :: minpos
     real(Float64), dimension(:), allocatable :: weight
@@ -2222,26 +2222,30 @@ subroutine read_mc(fid, error)
     integer(Int32), dimension(:), allocatable :: orbit_class
     type(LocalEMFields) :: fields
     integer :: cnt,num
+    integer(Int32) :: npart,nrep
     character(len=32) :: dist_type_name = ''
   
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
     endif
   
-    call h5ltread_dataset_int_scalar_f(fid, "/nparticle", particles%nparticle, error)
+    call h5ltread_dataset_int_scalar_f(fid, "/nparticle", npart, error)
     call h5ltread_dataset_int_scalar_f(fid, "/nclass", particles%nclass, error)
   
+    nrep = ceiling(dble(inputs%n_fida)/npart)
+    particles%nparticle = int(nrep*npart)
+
     !!ALLOCATE SPACE
     allocate(particles%fast_ion(particles%nparticle))
-    allocate(r(particles%nparticle))
-    allocate(z(particles%nparticle))
-    allocate(vr(particles%nparticle))
-    allocate(vt(particles%nparticle))
-    allocate(vz(particles%nparticle))
-    allocate(weight(particles%nparticle))
-    allocate(orbit_class(particles%nparticle))
+    allocate(r(npart))
+    allocate(z(npart))
+    allocate(vr(npart))
+    allocate(vt(npart))
+    allocate(vz(npart))
+    allocate(weight(npart))
+    allocate(orbit_class(npart))
   
-    dims(1) = particles%nparticle
+    dims(1) = npart
     call h5ltread_dataset_double_f(fid, "/r", r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", z, dims, error)
     call h5ltread_dataset_double_f(fid, "/weight", weight, dims, error)
@@ -2249,25 +2253,10 @@ subroutine read_mc(fid, error)
   
     if(inputs%dist_type.eq.2) then
         dist_type_name = "Guiding Center Monte Carlo"
-        allocate(energy(particles%nparticle))
-        allocate(pitch(particles%nparticle))
+        allocate(energy(npart))
+        allocate(pitch(npart))
         call h5ltread_dataset_double_f(fid, "/energy", energy, dims, error)
         call h5ltread_dataset_double_f(fid, "/pitch", pitch, dims, error)
-        !! Transform to full orbit
-        !$OMP PARALLEL DO schedule(guided) private(i,uvw,fields,ri,vi,phi)
-        do i=1, particles%nparticle
-            uvw = [r(i), 0.d0, z(i)]
-            call get_fields(fields,pos = uvw, machine_coords=.True.)
-            call gyro_correction(fields, uvw, energy(i), pitch(i), ri, vi)
-            weight(i) = weight(i)*sqrt(ri(1)**2 + ri(2)**2)/r(i)
-            r(i) = sqrt(ri(1)**2 + ri(2)**2)
-            z(i) = ri(3)
-            phi = atan2(ri(2),ri(1))
-            vr(i) =  vi(1)*cos(phi) + vi(2)*sin(phi)
-            vt(i) = -vi(1)*sin(phi) + vi(2)*cos(phi)
-            vz(i) =  vi(3)
-        enddo
-        !$OMP END PARALLEL DO
     else
         dist_type_name = "Full Orbit Monte Carlo"
         call h5ltread_dataset_double_f(fid, "/vr", vr, dims, error)
@@ -2279,38 +2268,63 @@ subroutine read_mc(fid, error)
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
     C_xyz = matmul(beam_grid%inv_basis,-beam_grid%origin)
-    !$OMP PARALLEL DO schedule(guided) private(i,ir,iz,minpos,delta_phi,phi_enter,phi_exit) 
-    do i=1,particles%nparticle
+    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &
+    !$OMP& delta_phi,phi_enter,phi_exit,r_ratio) 
+    do i=1,npart
         if(inputs%verbose.ge.2) then
-            WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
+            WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(npart)*100,char(13)
         endif
-        phi_enter = 0.0
-        phi_exit = 0.0
-        call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,r(i),phi_enter,phi_exit)
-        delta_phi = phi_exit-phi_enter
- 
-        minpos = minloc(abs(inter_grid%r - r(i)))
-        ir = minpos(1)
-        minpos = minloc(abs(inter_grid%z - z(i)))
-        iz = minpos(1)
-        equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + weight(i)/(2*pi*r(i)*inter_grid%da)
-  
-        particles%fast_ion(i)%r = r(i)
-        particles%fast_ion(i)%z = z(i)
-        particles%fast_ion(i)%phi_enter = phi_enter
-        particles%fast_ion(i)%delta_phi = delta_phi
-        particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
-        particles%fast_ion(i)%class = orbit_class(i)
-        if(delta_phi.gt.0) then 
-            particles%fast_ion(i)%cross_grid = .True.
-        else
-            particles%fast_ion(i)%cross_grid = .False.
-        endif
-        particles%fast_ion(i)%vr = vr(i)
-        particles%fast_ion(i)%vt = vt(i)
-        particles%fast_ion(i)%vz = vz(i)
-        particles%fast_ion(i)%vabs = sqrt(vr(i)**2 + vt(i)**2 + vz(i)**2)
-        particles%fast_ion(i)%energy = v2_to_E_per_amu*inputs%ab*particles%fast_ion(i)%vabs**2
+        do ii=1,nrep
+            j = int((i-1)*nrep + ii)
+            if(inputs%dist_type.eq.2) then
+                !! Transform to full orbit
+                uvw = [r(i), 0.d0, z(i)]
+                call get_fields(fields,pos = uvw, machine_coords=.True.)
+                call gyro_correction(fields, uvw, energy(i), pitch(i), ri, vi)
+                particles%fast_ion(j)%r = sqrt(ri(1)**2 + ri(2)**2)
+                particles%fast_ion(j)%z = ri(3)
+                r_ratio = particles%fast_ion(j)%r/r(i)
+                !r_ratio = 1.0
+                phi = atan2(ri(2),ri(1))
+                particles%fast_ion(j)%vr =  vi(1)*cos(phi) + vi(2)*sin(phi)
+                particles%fast_ion(j)%vt = -vi(1)*sin(phi) + vi(2)*cos(phi)
+                particles%fast_ion(j)%vz =  vi(3)
+            else
+                particles%fast_ion(j)%r = r(i)
+                particles%fast_ion(j)%z = z(i)
+                particles%fast_ion(j)%vr = vr(i)
+                particles%fast_ion(j)%vt = vt(i)
+                particles%fast_ion(j)%vz = vz(i)
+                r_ratio = 1.0
+            endif
+            particles%fast_ion(j)%vabs = sqrt(particles%fast_ion(j)%vr**2 + &
+                                              particles%fast_ion(j)%vt**2 + &
+                                              particles%fast_ion(j)%vz**2)
+            particles%fast_ion(j)%energy = v2_to_E_per_amu*inputs%ab*particles%fast_ion(j)%vabs**2
+            particles%fast_ion(j)%class = orbit_class(i)
+
+            phi_enter = 0.0
+            phi_exit = 0.0
+            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,r(i),phi_enter,phi_exit)
+            delta_phi = phi_exit-phi_enter
+            if(delta_phi.gt.0) then 
+                particles%fast_ion(i)%cross_grid = .True.
+            else
+                particles%fast_ion(i)%cross_grid = .False.
+            endif
+            particles%fast_ion(j)%phi_enter = phi_enter
+            particles%fast_ion(j)%delta_phi = delta_phi
+            particles%fast_ion(j)%weight = (r_ratio*weight(i)/nrep) * &
+                                           (delta_phi/(2*pi))/beam_grid%dv
+
+            minpos = minloc(abs(inter_grid%r - particles%fast_ion(j)%r))
+            ir = minpos(1)
+            minpos = minloc(abs(inter_grid%z - particles%fast_ion(j)%z))
+            iz = minpos(1)
+            equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + &
+                                       (r_ratio*weight(i)/nrep) / &
+                                       (2*pi*particles%fast_ion(j)%r*inter_grid%da)
+        enddo
         cnt=cnt+1
     enddo
     !$OMP END PARALLEL DO
@@ -5566,15 +5580,13 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
         !+ Particle velocity
 
     integer, parameter :: ngyro = 100
-    real(Float64), dimension(ngyro) :: phi, r
     real(Float64), dimension(3) :: uvw, vi, ri, r_step
     real(Float64), dimension(1) :: randomu
     integer, dimension(1) :: randi
-    real(Float64) :: vabs, dphi, phip
+    real(Float64) :: vabs, phip
     integer :: i
 
     vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
-    dphi = 2*pi/ngyro
 
     !! Sample gyroangle according to radius to counter-act geometric effect
     call randu(randomu)
@@ -5590,7 +5602,7 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
 
 end subroutine gyro_correction
 
-subroutine mc_fastion(ind,ri,vi,denf)
+subroutine mc_fastion(ind,ri,vi,denf,at_guiding_center)
     !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:beam_grid]] index
     integer, dimension(3), intent(in)        :: ind
         !+ [[libfida:beam_grid]] index
@@ -5600,6 +5612,8 @@ subroutine mc_fastion(ind,ri,vi,denf)
         !+ Fast-ion particle velocity [cm/s]
     real(Float64), intent(out)               :: denf
         !+ Fast-ion density at guiding center
+    logical, intent(in), optional :: at_guiding_center
+    logical :: use_inverse_sampler
 
     type(LocalEMFields) :: fields
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
@@ -5612,6 +5626,12 @@ subroutine mc_fastion(ind,ri,vi,denf)
     integer, dimension(1) :: minpos
     integer, dimension(2,1) :: ep_ind
     real(Float64), dimension(1) :: max_fbm
+
+    if(present(at_guiding_center)) then
+        use_inverse_sampler = at_guiding_center
+    else
+        use_inverse_sampler = .True.
+    endif
    
     call randu(randomu3)
     ri(1) = beam_grid%xc(ind(1)) + beam_grid%dr(1)*(randomu3(1) - 0.5)
@@ -5622,43 +5642,50 @@ subroutine mc_fastion(ind,ri,vi,denf)
 
     call get_fields(fields,pos=ri)
     if(.not.fields%in_plasma) return 
-  
-    !! Use rejection method to determine velocity vector
-    rejection_loop: do ii=1,10000
-        call randu(randomu4)
-        !! Pick a random energy, pitch, and gyro angle
-        eb   = fbm%emin + fbm%e_range * randomu4(1)
-        ptch = fbm%pmin + fbm%p_range * randomu4(2)
-        phi  = 2.d0*pi*randomu4(3)
-  
-        !! Calculate gyroradius
-        vabs  = sqrt(eb/(v2_to_E_per_amu*inputs%ab))
-        call pitch_to_vec(ptch,phi,fields,vi)
-        vi = vabs*vi
-        call gyro_step(vi,fields,r_gyro)
-  
-        !! Move a gyro-orbit away and sample distribution there
-        rg=ri+r_gyro !ri at particle location
-  
-        call get_distribution(fbeam,denf,pos=rg)
-        max_fbm = maxval(fbeam)
-        !! Find new cell
-        if(max_fbm(1).gt.0.0) then
-            !! take point in FBM distribution closest to eb, ptch.
-            minpos=minloc(abs(eb - fbm%energy))
-            ienergy= minpos(1)
-            minpos=minloc(abs(ptch - fbm%pitch ))
-            ipitch = minpos(1)
-            if((fbeam(ienergy,ipitch)).gt.(randomu4(4)*max_fbm(1)))then
-                return
-            endif
-        endif
-        vi=0.d0
-        denf=0.d0
-    enddo rejection_loop
-  
-    write(*,'(a)') 'MC_FASTION: Rejection method found no solution!'
 
+    if(use_inverse_sampler) then
+        call get_distribution(fbeam,denf,pos=ri)
+        call randind(fbeam,ep_ind)
+        call randu(randomu3)
+        eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
+        ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
+        call gyro_correction(fields,ri,eb,ptch,ri,vi)
+    else
+        rejection_loop: do ii=1,10000
+            call randu(randomu4)
+            !! Pick a random energy, pitch, and gyro angle
+            eb   = fbm%emin + fbm%e_range * randomu4(1)
+            ptch = fbm%pmin + fbm%p_range * randomu4(2)
+            phi  = 2.d0*pi*randomu4(3)
+  
+            !! Calculate gyroradius
+            vabs  = sqrt(eb/(v2_to_E_per_amu*inputs%ab))
+            call pitch_to_vec(ptch,phi,fields,vi)
+            vi = vabs*vi
+            call gyro_step(vi,fields,r_gyro)
+  
+            !! Move a gyro-orbit away and sample distribution there
+            rg=ri+r_gyro !ri at particle location
+  
+            call get_distribution(fbeam,denf,pos=rg)
+            max_fbm = maxval(fbeam)
+            !! Find new cell
+            if(max_fbm(1).gt.0.0) then
+                !! take point in FBM distribution closest to eb, ptch.
+                minpos=minloc(abs(eb - fbm%energy))
+                ienergy= minpos(1)
+                minpos=minloc(abs(ptch - fbm%pitch ))
+                ipitch = minpos(1)
+                if((fbeam(ienergy,ipitch)).gt.(randomu4(4)*max_fbm(1)))then
+                    return
+                endif
+            endif
+            vi=0.d0
+            denf=0.d0
+        enddo rejection_loop
+        write(*,'(a)') 'MC_FASTION: Rejection method found no solution!'
+    endif
+ 
 end subroutine mc_fastion
 
 subroutine mc_halo(ind,vhalo,ri,plasma_in)

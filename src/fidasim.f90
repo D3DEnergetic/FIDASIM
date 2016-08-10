@@ -2289,6 +2289,7 @@ subroutine read_mc(fid, error)
                 particles%fast_ion(j)%vr =  vi(1)*cos(phi) + vi(2)*sin(phi)
                 particles%fast_ion(j)%vt = -vi(1)*sin(phi) + vi(2)*cos(phi)
                 particles%fast_ion(j)%vz =  vi(3)
+                particles%fast_ion(j)%pitch =  pitch(i)
             else
                 particles%fast_ion(j)%r = r(i)
                 particles%fast_ion(j)%z = z(i)
@@ -2305,7 +2306,7 @@ subroutine read_mc(fid, error)
 
             phi_enter = 0.0
             phi_exit = 0.0
-            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,r(i),phi_enter,phi_exit)
+            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(j)%r,phi_enter,phi_exit)
             delta_phi = phi_exit-phi_enter
             if(delta_phi.gt.0) then 
                 particles%fast_ion(i)%cross_grid = .True.
@@ -4056,8 +4057,8 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
     phi_exit = 0.d0
     if (count(inter).gt.2) return
     if(any(inter)) then
-        phi_enter = minval(phi)
-        phi_exit = maxval(phi)
+        phi_enter = minval(phi,inter)
+        phi_exit = maxval(phi,inter)
         if(r0_ing.and.any(count(inter,1).ge.2)) then
             if((phi_exit - phi_enter) .lt. pi) then
                 tmp = phi_enter

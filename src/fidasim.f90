@@ -2121,10 +2121,6 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/fields/ez", equil%fields%ez, dims, error)
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
 
-    !equil%fields%br = 0.0
-    !equil%fields%bt = -5.0
-    !equil%fields%bz = 0.0
-
     !!Close FIELDS group
     call h5gclose_f(gid, error)
   
@@ -5581,22 +5577,19 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
     real(Float64), dimension(3), intent(out) :: vp
         !+ Particle velocity
 
-    integer, parameter :: ngyro = 100
-    real(Float64), dimension(3) :: uvw, vi, ri, r_step
+    real(Float64), dimension(3) :: vi_norm, r_step
     real(Float64), dimension(1) :: randomu
-    integer, dimension(1) :: randi
-    real(Float64) :: vabs, phip
-    integer :: i
+    real(Float64) :: vabs, phi
 
     vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
 
     !! Sample gyroangle according to radius to counter-act geometric effect
     call randu(randomu)
-    phip = 2*pi*randomu(1)
+    phi = 2*pi*randomu(1)
 
     !! Calculate velocity vector
-    call pitch_to_vec(pitch, phip, fields, vi)
-    vp = vabs*vi
+    call pitch_to_vec(pitch, phi, fields, vi_norm)
+    vp = vabs*vi_norm
 
     !! Move to particle location
     call gyro_step(vp, fields, r_step)
@@ -5604,89 +5597,40 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
 
 end subroutine gyro_correction
 
-subroutine mc_fastion(ind,ri,vi,denf,at_guiding_center)
+subroutine mc_fastion(ind,rp,vi,denf)
     !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:beam_grid]] index
     integer, dimension(3), intent(in)        :: ind
         !+ [[libfida:beam_grid]] index
-    real(Float64), dimension(3), intent(out) :: ri
+    real(Float64), dimension(3), intent(out) :: rp
         !+ Fast-ion particle position [cm]
     real(Float64), dimension(3), intent(out) :: vi 
         !+ Fast-ion particle velocity [cm/s]
     real(Float64), intent(out)               :: denf
         !+ Fast-ion density at guiding center
-    logical, intent(in), optional :: at_guiding_center
-    logical :: use_inverse_sampler
 
     type(LocalEMFields) :: fields
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
-    real(Float64), dimension(3) :: r_gyro, rg
+    real(Float64), dimension(3) :: rg
     real(Float64) :: eb ,ptch
-    integer :: ii, ienergy, ipitch
-    real(Float64) :: vabs, phi
     real(Float64), dimension(3) :: randomu3
-    real(Float64), dimension(4) :: randomu4
-    integer, dimension(1) :: minpos
     integer, dimension(2,1) :: ep_ind
-    real(Float64), dimension(1) :: max_fbm
 
-    if(present(at_guiding_center)) then
-        use_inverse_sampler = at_guiding_center
-    else
-        use_inverse_sampler = .True.
-    endif
-   
     call randu(randomu3)
-    ri(1) = beam_grid%xc(ind(1)) + beam_grid%dr(1)*(randomu3(1) - 0.5)
-    ri(2) = beam_grid%yc(ind(2)) + beam_grid%dr(2)*(randomu3(2) - 0.5)
-    ri(3) = beam_grid%zc(ind(3)) + beam_grid%dr(3)*(randomu3(3) - 0.5)
+    rg(1) = beam_grid%xc(ind(1)) + beam_grid%dr(1)*(randomu3(1) - 0.5)
+    rg(2) = beam_grid%yc(ind(2)) + beam_grid%dr(2)*(randomu3(2) - 0.5)
+    rg(3) = beam_grid%zc(ind(3)) + beam_grid%dr(3)*(randomu3(3) - 0.5)
     vi=0.d0
     denf=0.d0 
 
-    call get_fields(fields,pos=ri)
+    call get_fields(fields,pos=rg)
     if(.not.fields%in_plasma) return 
 
-    if(use_inverse_sampler) then
-        call get_distribution(fbeam,denf,pos=ri)
-        call randind(fbeam,ep_ind)
-        call randu(randomu3)
-        eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
-        ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
-        call gyro_correction(fields,ri,eb,ptch,ri,vi)
-    else
-        rejection_loop: do ii=1,10000
-            call randu(randomu4)
-            !! Pick a random energy, pitch, and gyro angle
-            eb   = fbm%emin + fbm%e_range * randomu4(1)
-            ptch = fbm%pmin + fbm%p_range * randomu4(2)
-            phi  = 2.d0*pi*randomu4(3)
-  
-            !! Calculate gyroradius
-            vabs  = sqrt(eb/(v2_to_E_per_amu*inputs%ab))
-            call pitch_to_vec(ptch,phi,fields,vi)
-            vi = vabs*vi
-            call gyro_step(vi,fields,r_gyro)
-  
-            !! Move a gyro-orbit away and sample distribution there
-            rg=ri+r_gyro !ri at particle location
-  
-            call get_distribution(fbeam,denf,pos=rg)
-            max_fbm = maxval(fbeam)
-            !! Find new cell
-            if(max_fbm(1).gt.0.0) then
-                !! take point in FBM distribution closest to eb, ptch.
-                minpos=minloc(abs(eb - fbm%energy))
-                ienergy= minpos(1)
-                minpos=minloc(abs(ptch - fbm%pitch ))
-                ipitch = minpos(1)
-                if((fbeam(ienergy,ipitch)).gt.(randomu4(4)*max_fbm(1)))then
-                    return
-                endif
-            endif
-            vi=0.d0
-            denf=0.d0
-        enddo rejection_loop
-        write(*,'(a)') 'MC_FASTION: Rejection method found no solution!'
-    endif
+    call get_distribution(fbeam,denf,pos=rg)
+    call randind(fbeam,ep_ind)
+    call randu(randomu3)
+    eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
+    ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
+    call gyro_correction(fields,rg,eb,ptch,rp,vi)
  
 end subroutine mc_fastion
 
@@ -6328,11 +6272,10 @@ subroutine fida_mc
     !+ Calculate FIDA emission using a Monte Carlo Fast-ion distribution
     integer :: iion
     type(FastIon) :: fast_ion
-    type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
-    real(Float64) :: phi,theta
+    real(Float64) :: phi
     real(Float64), dimension(3) :: ri      !! start position
-    real(Float64), dimension(3) :: vi,vi_norm      !! velocity of fast ions
+    real(Float64), dimension(3) :: vi      !! velocity of fast ions
     !! Determination of the CX probability
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
     real(Float64), dimension(nlevs) :: prob    !! Prob. for CX 
@@ -6344,7 +6287,7 @@ subroutine fida_mc
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux 
     integer, dimension(4) :: neut_types=[1,2,3,4]
-    real(Float64), dimension(3) :: xyz, uvw, r_gyro, uvw_vi
+    real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: s, c
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(2) :: randomu
@@ -6356,8 +6299,8 @@ subroutine fida_mc
     endif
 
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,vi_norm,ri,phi,fields,tracks,s,c, &
-    !$OMP& plasma,theta,randomu,xyz,uvw,uvw_vi,r_gyro,ncell,jj,prob,denn,los_intersect,states,photons)
+    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,phi,tracks,s,c, &
+    !$OMP& plasma,randomu,uvw,uvw_vi,ncell,jj,prob,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=1,particles%nparticle
         fast_ion = particles%fast_ion(iion)
         cnt=cnt+1
@@ -6446,7 +6389,7 @@ subroutine npa_f
                                 sum(neut%dens(:,halo_type,i,j,k)))* &
                                 plasma%denf
   
-                if(papprox(i,j,k).gt.0.and.(npa_chords%hit(i,j,k))) then
+                if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
                     pcnt = pcnt + 1
                 endif
@@ -6510,18 +6453,16 @@ subroutine npa_mc
     !+ Calculate NPA flux using a Monte Carlo fast-ion distribution
     integer :: iion
     type(FastIon) :: fast_ion
-    type(LocalEMFields) :: fields
-    type(LocalProfiles) :: plasma
-    real(Float64) :: phi, theta
+    real(Float64) :: phi
     real(Float64), dimension(3) :: ri, rf      !! positions
-    real(Float64), dimension(3) :: vi, vi_norm !! velocity of fast ions
+    real(Float64), dimension(3) :: vi          !! velocity of fast ions
     integer :: det !! detector
     real(Float64), dimension(nlevs) :: prob    !! Prob. for CX 
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     real(Float64) :: flux
     integer, dimension(4) :: neut_types=[1,2,3,4]
     integer, dimension(3) :: ind
-    real(Float64), dimension(3) :: xyz, uvw, r_gyro, uvw_vi
+    real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64) :: s,c
     real(Float64) :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(2) :: randomu
@@ -6530,8 +6471,8 @@ subroutine npa_mc
     inv_maxcnt = 100.d0/maxcnt
   
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,ind,fast_ion,vi,vi_norm,ri,rf,phi,fields,s,c, &
-    !$OMP& plasma,theta,randomu,xyz,uvw,uvw_vi,r_gyro,prob,states,flux,det)
+    !$OMP PARALLEL DO schedule(guided) private(iion,ind,fast_ion,vi,ri,rf,phi,s,c, &
+    !$OMP& randomu,uvw,uvw_vi,prob,states,flux,det)
     loop_over_fast_ions: do iion=1,particles%nparticle
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0)cycle loop_over_fast_ions
@@ -6598,7 +6539,7 @@ subroutine fida_weights_mc
   
     !! Collisiional radiative model along track
     integer :: ncell
-    integer :: jj,kk      !! counter along track
+    integer :: jj      !! counter along track
     type(ParticleTrack),dimension(beam_grid%ntrack) :: tracks
   
     real(Float64) :: photons !! photon flux
@@ -6691,7 +6632,7 @@ subroutine fida_weights_mc
         k = pcell(3,ip)
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,vi,vi_norm,ri,ienergy,ipitch, &
-        !$OMP tracks,ncell,jj,kk,plasma,fields,prob,denn,states,photons,energy,pitch,phi, &
+        !$OMP tracks,ncell,jj,plasma,fields,prob,denn,states,photons,energy,pitch,phi, &
         !$OMP r_gyro,los_intersect,randomu3,fbm_denf)
         loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
             !! Sample fast ion distribution uniformally

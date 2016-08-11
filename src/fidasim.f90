@@ -2267,9 +2267,8 @@ subroutine read_mc(fid, error)
     cnt=0
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
-    C_xyz = matmul(beam_grid%inv_basis,-beam_grid%origin)
     !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &
-    !$OMP& delta_phi,phi_enter,phi_exit,r_ratio) 
+    !$OMP& delta_phi,phi_enter,phi_exit,r_ratio,C_xyz) 
     do i=1,npart
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(npart)*100,char(13)
@@ -2284,7 +2283,6 @@ subroutine read_mc(fid, error)
                 particles%fast_ion(j)%r = sqrt(ri(1)**2 + ri(2)**2)
                 particles%fast_ion(j)%z = ri(3)
                 r_ratio = particles%fast_ion(j)%r/r(i)
-                !r_ratio = 1.0
                 phi = atan2(ri(2),ri(1))
                 particles%fast_ion(j)%vr =  vi(1)*cos(phi) + vi(2)*sin(phi)
                 particles%fast_ion(j)%vt = -vi(1)*sin(phi) + vi(2)*cos(phi)
@@ -2306,12 +2304,13 @@ subroutine read_mc(fid, error)
 
             phi_enter = 0.0
             phi_exit = 0.0
+            call uvw_to_xyz([0.d0, 0.d0, particles%fast_ion(j)%z], C_xyz)
             call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(j)%r,phi_enter,phi_exit)
             delta_phi = phi_exit-phi_enter
             if(delta_phi.gt.0) then 
-                particles%fast_ion(i)%cross_grid = .True.
+                particles%fast_ion(j)%cross_grid = .True.
             else
-                particles%fast_ion(i)%cross_grid = .False.
+                particles%fast_ion(j)%cross_grid = .False.
             endif
             particles%fast_ion(j)%phi_enter = phi_enter
             particles%fast_ion(j)%delta_phi = delta_phi
@@ -2322,9 +2321,11 @@ subroutine read_mc(fid, error)
             ir = minpos(1)
             minpos = minloc(abs(inter_grid%z - particles%fast_ion(j)%z))
             iz = minpos(1)
+            !$OMP CRITICAL(mc_denf)
             equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + &
                                        (r_ratio*weight(i)/nrep) / &
                                        (2*pi*particles%fast_ion(j)%r*inter_grid%da)
+            !$OMP END CRITICAL(mc_denf)
         enddo
         cnt=cnt+1
     enddo
@@ -2338,7 +2339,7 @@ subroutine read_mc(fid, error)
   
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') dist_type_name
-        write(*,'(T2,"Number of mc particles: ",i9)') particles%nparticle
+        write(*,'(T2,"Number of mc particles: ",i9)') npart
         write(*,'(T2,"Number of orbit classes: ",i6)') particles%nclass
         write(*,*) ''
     endif
@@ -6353,7 +6354,7 @@ subroutine fida_mc
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') particles%nparticle
     endif
-  
+
     cnt=0.0
     !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,vi_norm,ri,phi,fields,tracks,s,c, &
     !$OMP& plasma,theta,randomu,xyz,uvw,uvw_vi,r_gyro,ncell,jj,prob,denn,los_intersect,states,photons)

@@ -5597,7 +5597,12 @@ subroutine gyro_step(vi, fields, r_gyro)
         vxB = cross_product(vi,fields%b_norm)
         r_gyro = vxB*one_over_omega !points towards gyrocenter
 
-        !! Second order correction
+        !! Second order correction approximation derived from
+        !! Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. 
+        !! "Self-consistent equilibrium model of low aspect-ratio 
+        !! toroidal plasma with energetic beam ions." 
+        !! Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251.
+        !! Appendix A: Last equation
         uvw = fields%uvw
         R = sqrt(uvw(1)**2 + uvw(2)**2)
         phi = atan2(uvw(2),uvw(1))

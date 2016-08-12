@@ -208,8 +208,12 @@ type, extends( Profiles ) :: LocalProfiles
     !+ Plasma parameters at given position
     logical :: in_plasma = .False.
         !+ Indicates whether plasma parameters are valid/known
+    logical :: machine_coords = .False.
+        !+ Indicates whether vectors are in machine coordinates
     real(Float64), dimension(3) :: pos = 0.d0
         !+ Position in beam grid coordinates
+    real(Float64), dimension(3) :: uvw = 0.d0
+        !+ Position in machine coordinates
     real(Float64), dimension(3) :: vrot = 0.d0
         !+ Plasma rotation in beam grid coordinates
 end type LocalProfiles
@@ -234,12 +238,18 @@ type, extends( EMFields ) :: LocalEMFields
     !+ Electro-magnetic fields at given position
     logical       :: in_plasma = .False.
         !+ Indicates whether fields are valid/known
+    logical       :: machine_coords = .False.
+        !+ Indicates whether vectors are in machine coordinates
+    logical       :: at_gc = .True.
+        !+ Indicates whether the fields are at the Guiding Center
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
     real(Float64) :: e_abs = 0.d0
         !+ Magnitude of electrin field
     real(Float64), dimension(3) :: pos = 0.d0
         !+ Position in beam grid coordinates
+    real(Float64), dimension(3) :: uvw = 0.d0
+        !+ Position in machine coordinates
     real(Float64), dimension(3) :: b_norm = 0.d0
         !+ Direction of magnetic field in beam grid coordinates
     real(Float64), dimension(3) :: a_norm = 0.d0
@@ -890,8 +900,8 @@ end subroutine npa_part_assign
 
 subroutine pp_assign(p1, p2)
     !+ Defines how to assign [[Profiles]] types to eachother
-    type(Profiles), intent(in)  :: p2
-    type(Profiles), intent(out) :: p1
+    type(Profiles), intent(in)    :: p2
+    type(Profiles), intent(inout) :: p1
   
     p1%dene   = p2%dene  
     p1%ti     = p2%ti    
@@ -908,8 +918,8 @@ end subroutine pp_assign
 
 subroutine lpp_assign(p1, p2)
     !+ Defines how to assign a [[Profiles]] type to a [[LocalProfiles]] type
-    type(Profiles), intent(in)       :: p2
-    type(LocalProfiles), intent(out) :: p1
+    type(Profiles), intent(in)         :: p2
+    type(LocalProfiles), intent(inout) :: p1
   
     p1%dene   = p2%dene  
     p1%ti     = p2%ti    
@@ -927,7 +937,7 @@ end subroutine lpp_assign
 subroutine plp_assign(p1, p2)
     !+ Defines how to assign a [[LocalProfiles]] type to a [[Profiles]] type
     type(LocalProfiles), intent(in) :: p2
-    type(Profiles), intent(out)     :: p1
+    type(Profiles), intent(inout)   :: p1
   
     p1%dene   = p2%dene  
     p1%ti     = p2%ti    
@@ -944,10 +954,11 @@ end subroutine plp_assign
 
 subroutine lplp_assign(p1, p2)
     !+ Defines how to assign [[LocalProfiles]] types to eachother
-    type(LocalProfiles), intent(in)  :: p2
-    type(LocalProfiles), intent(out) :: p1
+    type(LocalProfiles), intent(in)    :: p2
+    type(LocalProfiles), intent(inout) :: p1
   
     p1%pos    = p2%pos
+    p1%uvw    = p2%uvw
     p1%dene   = p2%dene  
     p1%ti     = p2%ti    
     p1%te     = p2%te    
@@ -964,8 +975,8 @@ end subroutine lplp_assign
 
 subroutine ff_assign(p1, p2)
     !+ Defines how to assign [[EMFields]] types to eachother
-    type(EMFields), intent(in)  :: p2
-    type(EMFields), intent(out) :: p1
+    type(EMFields), intent(in)    :: p2
+    type(EMFields), intent(inout) :: p1
   
     p1%br   = p2%br  
     p1%bt   = p2%bt  
@@ -978,8 +989,8 @@ end subroutine ff_assign
 
 subroutine lff_assign(p1, p2)
     !+ Defines how to assign a [[EMFields]] type to a [[LocalEMFields]] type
-    type(EMFields), intent(in)       :: p2
-    type(LocalEMFields), intent(out) :: p1
+    type(EMFields), intent(in)         :: p2
+    type(LocalEMFields), intent(inout) :: p1
   
     p1%br   = p2%br  
     p1%bt   = p2%bt  
@@ -993,7 +1004,7 @@ end subroutine lff_assign
 subroutine flf_assign(p1, p2)
     !+ Defines how to assign a [[LocalEMFields]] type to a [[EMFields]] type
     type(LocalEMFields), intent(in) :: p2
-    type(EMFields), intent(out)     :: p1
+    type(EMFields), intent(inout)   :: p1
   
     p1%br   = p2%br  
     p1%bt   = p2%bt  
@@ -1006,10 +1017,11 @@ end subroutine flf_assign
 
 subroutine lflf_assign(p1, p2)
     !+ Defines how to assign [[LocalEMFields]] types to eachother
-    type(LocalEMFields), intent(in)  :: p2
-    type(LocalEMFields), intent(out) :: p1
+    type(LocalEMFields), intent(in)    :: p2
+    type(LocalEMFields), intent(inout) :: p1
   
     p1%pos  = p2%pos
+    p1%uvw  = p2%uvw
     p1%br   = p2%br  
     p1%bt   = p2%bt  
     p1%bz   = p2%bz  
@@ -1067,6 +1079,7 @@ function lplp_add(p1, p2) result (p3)
     type(LocalProfiles)             :: p3
   
     p3%pos    = p1%pos    + p2%pos
+    p3%uvw    = p1%uvw    + p2%uvw
     p3%dene   = p1%dene   + p2%dene
     p3%ti     = p1%ti     + p2%ti
     p3%te     = p1%te     + p2%te
@@ -1087,6 +1100,7 @@ function lplp_subtract(p1, p2) result (p3)
     type(LocalProfiles)             :: p3
   
     p3%pos    = p1%pos    - p2%pos
+    p3%uvw    = p1%uvw    - p2%uvw
     p3%dene   = p1%dene   - p2%dene
     p3%ti     = p1%ti     - p2%ti
     p3%te     = p1%te     - p2%te
@@ -1147,6 +1161,7 @@ function lps_multiply(p1, real_scalar) result (p3)
     type(LocalProfiles)             :: p3
   
     p3%pos    = p1%pos    * real_scalar
+    p3%uvw    = p1%uvw    * real_scalar
     p3%dene   = p1%dene   * real_scalar
     p3%ti     = p1%ti     * real_scalar
     p3%te     = p1%te     * real_scalar
@@ -1250,6 +1265,7 @@ function lflf_add(p1, p2) result (p3)
     type(LocalEMFields)             :: p3
   
     p3%pos    = p1%pos    + p2%pos
+    p3%uvw    = p1%uvw    + p2%uvw
     p3%br     = p1%br     + p2%br
     p3%bt     = p1%bt     + p2%bt
     p3%bz     = p1%bz     + p2%bz
@@ -1271,6 +1287,7 @@ function lflf_subtract(p1, p2) result (p3)
     type(LocalEMFields)             :: p3
   
     p3%pos    = p1%pos    - p2%pos
+    p3%uvw    = p1%uvw    - p2%uvw
     p3%br     = p1%br     - p2%br
     p3%bt     = p1%bt     - p2%bt
     p3%bz     = p1%bz     - p2%bz
@@ -1293,6 +1310,7 @@ function lfs_multiply(p1, real_scalar) result (p3)
     type(LocalEMFields)             :: p3
   
     p3%pos  = p1%pos  * real_scalar
+    p3%uvw  = p1%uvw  * real_scalar
     p3%br   = p1%br   * real_scalar 
     p3%bt   = p1%bt   * real_scalar 
     p3%bz   = p1%bz   * real_scalar 
@@ -2273,12 +2291,14 @@ subroutine read_mc(fid, error)
             j = int((i-1)*nrep + ii)
             if(inputs%dist_type.eq.2) then
                 !! Transform to full orbit
+                fields%machine_coords = .True.
                 uvw = [r(i), 0.d0, z(i)]
-                call get_fields(fields,pos = uvw, machine_coords=.True.)
+                call get_fields(fields,pos = uvw)
                 call gyro_correction(fields, uvw, energy(i), pitch(i), ri, vi)
                 particles%fast_ion(j)%r = sqrt(ri(1)**2 + ri(2)**2)
                 particles%fast_ion(j)%z = ri(3)
-                r_ratio = particles%fast_ion(j)%r/r(i)
+                !r_ratio = particles%fast_ion(j)%r/r(i)
+                r_ratio = 1.0
                 phi = atan2(ri(2),ri(1))
                 particles%fast_ion(j)%vr =  vi(1)*cos(phi) + vi(2)*sin(phi)
                 particles%fast_ion(j)%vt = -vi(1)*sin(phi) + vi(2)*cos(phi)
@@ -4587,6 +4607,7 @@ subroutine get_plasma(plasma, pos, ind)
         vrot_uvw(3) = plasma%vz
         plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
         plasma%pos = xyz
+        plasma%uvw = uvw
         plasma%in_plasma = .True.
     endif
 
@@ -4622,18 +4643,16 @@ subroutine calc_perp_vectors(b, a, c)
 
 end subroutine calc_perp_vectors
 
-subroutine get_fields(fields, pos, ind, machine_coords)
+subroutine get_fields(fields, pos, ind)
     !+ Gets electro-magnetic fields at position `pos` or [[libfida:beam_grid]] indices `ind`
-    type(LocalEMFields),intent(out)                    :: fields
+    type(LocalEMFields),intent(inout)                  :: fields
         !+ Electro-magnetic fields at `pos`/`ind`
     real(Float64), dimension(3), intent(in), optional  :: pos
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
-    logical, intent(in), optional                      :: machine_coords
-        !+ If set `pos` and fields are in machine coordinates
 
-    logical :: inp, mc
+    logical :: inp
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(3) :: uvw_bfield, uvw_efield
     real(Float64), dimension(3) :: xyz_bfield, xyz_efield
@@ -4645,12 +4664,10 @@ subroutine get_fields(fields, pos, ind, machine_coords)
   
     if(present(ind)) call get_position(ind,xyz)
     if(present(pos)) xyz = pos
-    mc = .False.
-    if(present(machine_coords)) mc = machine_coords
 
-    call in_plasma(xyz, inp, machine_coords = mc)
+    call in_plasma(xyz, inp, machine_coords = fields%machine_coords)
     if(inp) then
-        if(mc) then
+        if(fields%machine_coords) then
             uvw = xyz
         else
             !! Convert to machine coordinates
@@ -4675,7 +4692,7 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         uvw_efield(2) = s*fields%er + c*fields%et
         uvw_efield(3) = fields%ez
  
-        if(mc) then
+        if(fields%machine_coords) then
             xyz_bfield = uvw_bfield
             xyz_efield = uvw_efield
         else 
@@ -4693,6 +4710,7 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         call calc_perp_vectors(fields%b_norm,fields%a_norm,fields%c_norm)
   
         fields%pos = xyz
+        fields%uvw = uvw
         fields%in_plasma = .True.
     endif
 
@@ -5549,13 +5567,30 @@ subroutine gyro_step(vi, fields, r_gyro)
     real(Float64), dimension(3), intent(out) :: r_gyro
         !+ Gyro-step
 
-    real(Float64), dimension(3) :: vxB
-    real(Float64) :: one_over_omega
+    real(Float64), dimension(3) :: vxB,rg_uvw,uvw
+    real(Float64) :: one_over_omega, phi, R, rg_r
 
-    if(inputs%no_flr.eq.1) then
+    if(inputs%no_flr.eq.0) then
         one_over_omega=inputs%ab*mass_u/(fields%b_abs*e0)
         vxB = cross_product(vi,fields%b_norm)
         r_gyro = vxB*one_over_omega !points towards gyrocenter
+
+        !! Correction is because we are using the fields at the
+        !! the guiding center. If we are using the fields at the
+        !! particle position then there is no need for the correction
+        if(fields%at_gc) then
+            !! Second order correction
+            uvw = fields%uvw
+            R = sqrt(uvw(1)**2 + uvw(2)**2)
+            phi = atan2(uvw(2),uvw(1))
+            if(fields%machine_coords) then
+                rg_uvw = r_gyro
+            else
+                rg_uvw = matmul(beam_grid%basis,r_gyro)
+            endif
+            rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
+            r_gyro = r_gyro*(1 - rg_r/(2*R))
+        endif
     else
         r_gyro = 0.d0
     endif
@@ -6981,6 +7016,7 @@ subroutine npa_weights
                     if(npa_chords%phit(ii,jj,kk,ichan)%p.gt.0.d0) then
                         pos = [beam_grid%xc(ii), beam_grid%yc(jj), beam_grid%zc(kk)]
                         call get_fields(fields,pos=pos)
+                        fields%at_gc = .False.
                         if(.not.fields%in_plasma) cycle loop_along_x
   
                         !!Determine velocity vector

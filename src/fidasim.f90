@@ -240,8 +240,6 @@ type, extends( EMFields ) :: LocalEMFields
         !+ Indicates whether fields are valid/known
     logical       :: machine_coords = .False.
         !+ Indicates whether vectors are in machine coordinates
-    logical       :: at_gc = .True.
-        !+ Indicates whether the fields are at the Guiding Center
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
     real(Float64) :: e_abs = 0.d0
@@ -5599,22 +5597,17 @@ subroutine gyro_step(vi, fields, r_gyro)
         vxB = cross_product(vi,fields%b_norm)
         r_gyro = vxB*one_over_omega !points towards gyrocenter
 
-        !! Correction is because we are using the fields at the
-        !! the guiding center. If we are using the fields at the
-        !! particle position then there is no need for the correction
-        if(fields%at_gc) then
-            !! Second order correction
-            uvw = fields%uvw
-            R = sqrt(uvw(1)**2 + uvw(2)**2)
-            phi = atan2(uvw(2),uvw(1))
-            if(fields%machine_coords) then
-                rg_uvw = r_gyro
-            else
-                rg_uvw = matmul(beam_grid%basis,r_gyro)
-            endif
-            rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
-            r_gyro = r_gyro*(1 - rg_r/(2*R))
+        !! Second order correction
+        uvw = fields%uvw
+        R = sqrt(uvw(1)**2 + uvw(2)**2)
+        phi = atan2(uvw(2),uvw(1))
+        if(fields%machine_coords) then
+            rg_uvw = r_gyro
+        else
+            rg_uvw = matmul(beam_grid%basis,r_gyro)
         endif
+        rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
+        r_gyro = r_gyro*(1 - rg_r/(2*R))
     else
         r_gyro = 0.d0
     endif
@@ -7034,7 +7027,6 @@ subroutine npa_weights
                     if(npa_chords%phit(ii,jj,kk,ichan)%p.gt.0.d0) then
                         pos = [beam_grid%xc(ii), beam_grid%yc(jj), beam_grid%zc(kk)]
                         call get_fields(fields,pos=pos)
-                        fields%at_gc = .False.
                         if(.not.fields%in_plasma) cycle loop_along_x
   
                         !!Determine velocity vector

@@ -1277,12 +1277,14 @@ function lflf_add(p1, p2) result (p3)
 
     bfield = p1%b_abs*p1%b_norm + p2%b_abs*p2%b_norm
     p3%b_abs = norm2(bfield)
-    if(p3%b_abs.ne.0) p3%b_norm = bfield/p3%b_abs
-    call calc_perp_vectors(p3%b_norm,p3%a_norm,p3%c_norm)
+    if(p3%b_abs.gt.0.d0) then
+        p3%b_norm = bfield/p3%b_abs
+        call calc_perp_vectors(p3%b_norm,p3%a_norm,p3%c_norm)
+    endif
 
     efield = p1%e_abs*p1%e_norm + p2%e_abs*p2%e_norm
     p3%e_abs = norm2(efield)
-    if(p3%b_abs.ne.0) p3%e_norm = efield/p3%e_abs
+    if(p3%e_abs.gt.0.d0) p3%e_norm = efield/p3%e_abs
 
 end function lflf_add
 
@@ -1304,12 +1306,14 @@ function lflf_subtract(p1, p2) result (p3)
 
     bfield = p1%b_abs*p1%b_norm - p2%b_abs*p2%b_norm
     p3%b_abs = norm2(bfield)
-    if(p3%b_abs.ne.0) p3%b_norm = bfield/p3%b_abs
-    call calc_perp_vectors(p3%b_norm,p3%a_norm,p3%c_norm)
+    if(p3%b_abs.gt.0.d0) then
+        p3%b_norm = bfield/p3%b_abs
+        call calc_perp_vectors(p3%b_norm,p3%a_norm,p3%c_norm)
+    endif
 
     efield = p1%e_abs*p1%e_norm - p2%e_abs*p2%e_norm
     p3%e_abs = norm2(efield)
-    if(p3%b_abs.ne.0) p3%e_norm = efield/p3%e_abs
+    if(p3%e_abs.gt.0.d0) p3%e_norm = efield/p3%e_abs
 
 end function lflf_subtract
 
@@ -2246,6 +2250,7 @@ subroutine read_mc(fid, error)
     integer(Int32), dimension(:), allocatable :: orbit_class
     type(LocalEMFields) :: fields
     integer :: cnt,num
+    logical :: inp
     integer(Int32) :: npart,nrep
     character(len=32) :: dist_type_name = ''
   
@@ -2293,10 +2298,12 @@ subroutine read_mc(fid, error)
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
     !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &
     !$OMP& delta_phi,phi_enter,phi_exit,r_ratio,C_xyz) 
-    do i=1,npart
+    particle_loop: do i=1,npart
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(npart)*100,char(13)
         endif
+        call in_plasma([r(i),0.d0,z(i)],inp,machine_coords=.True.)
+        if(.not.inp) cycle particle_loop
         do ii=1,nrep
             j = int((i-1)*nrep + ii)
             if(inputs%dist_type.eq.2) then
@@ -2354,7 +2361,7 @@ subroutine read_mc(fid, error)
             !$OMP END CRITICAL(mc_denf)
         enddo
         cnt=cnt+1
-    enddo
+    enddo particle_loop
     !$OMP END PARALLEL DO
  
     num = count(particles%fast_ion%cross_grid)
@@ -4714,8 +4721,8 @@ subroutine get_fields(fields, pos, ind)
         !Calculate field directions and magnitudes
         fields%b_abs = norm2(xyz_bfield)
         fields%e_abs = norm2(xyz_efield)
-        if(fields%b_abs.ne.0) fields%b_norm = xyz_bfield/fields%b_abs
-        if(fields%e_abs.ne.0) fields%e_norm = xyz_efield/fields%e_abs
+        if(fields%b_abs.gt.0.d0) fields%b_norm = xyz_bfield/fields%b_abs
+        if(fields%e_abs.gt.0.d0) fields%e_norm = xyz_efield/fields%e_abs
   
         call calc_perp_vectors(fields%b_norm,fields%a_norm,fields%c_norm)
   
@@ -4935,8 +4942,15 @@ subroutine neut_rates(denn, vi, vn, rates)
     neb = tables%H_H_cx%nenergy
     call interpol_coeff(logEmin,dlogE,neb,logeb,ebi,b1,b2,err)
     if(err.eq.1) then
-        write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table"
-        stop
+        write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
+        write(*,'("eb = ",f5.3," [keV]")') eb
+        if(ebi.lt.1) then
+            ebi=1
+            b1=1.0 ; b2=0.0
+        else
+            ebi=neb
+            b1=0.0 ; b2=1.0
+        endif
     endif
   
     neut(:,:) = (b1*tables%H_H_cx%log_cross(:,:,ebi) + &
@@ -6687,7 +6701,7 @@ subroutine fida_weights_mc
             energy = ebarr(ienergy(1)) + dE*(randomu3(1)-0.5)
             pitch = ptcharr(ipitch(1)) + dP*(randomu3(2)-0.5)
             if(energy.le.0) cycle loop_over_fast_ions
-  
+
             call randu(randomu3)
             ri = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)] + beam_grid%dr*(randomu3-0.5)
   
@@ -6698,6 +6712,7 @@ subroutine fida_weights_mc
   
             !! Get velocity
             call get_fields(fields,pos=ri)
+            if(.not.fields%in_plasma) cycle loop_over_fast_ions
             call pitch_to_vec(pitch,phi,fields,vi_norm)
             vi = sqrt(energy*etov2)*vi_norm 
             if(energy.eq.0) cycle loop_over_fast_ions

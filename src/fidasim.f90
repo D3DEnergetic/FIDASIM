@@ -1263,7 +1263,9 @@ function lflf_add(p1, p2) result (p3)
     !+ Defines how to add two [[LocalEMFields]] types
     type(LocalEMFields), intent(in) :: p1,p2
     type(LocalEMFields)             :: p3
-  
+
+    real(Float64), dimension(3) :: bfield,efield
+
     p3%pos    = p1%pos    + p2%pos
     p3%uvw    = p1%uvw    + p2%uvw
     p3%br     = p1%br     + p2%br
@@ -1272,12 +1274,15 @@ function lflf_add(p1, p2) result (p3)
     p3%er     = p1%er     + p2%er
     p3%et     = p1%et     + p2%et
     p3%ez     = p1%ez     + p2%ez
-    p3%b_abs  = p1%b_abs  + p2%b_abs
-    p3%e_abs  = p1%e_abs  + p2%e_abs
-    p3%a_norm = p1%a_norm + p2%a_norm
-    p3%b_norm = p1%b_norm + p2%b_norm
-    p3%c_norm = p1%c_norm + p2%c_norm
-    p3%e_norm = p1%e_norm + p2%e_norm
+
+    bfield = p1%b_abs*p1%b_norm + p2%b_abs*p2%b_norm
+    p3%b_abs = norm2(bfield)
+    if(p3%b_abs.ne.0) p3%b_norm = bfield/p3%b_abs
+    call calc_perp_vectors(p3%b_norm,p3%a_norm,p3%c_norm)
+
+    efield = p1%e_abs*p1%e_norm + p2%e_abs*p2%e_norm
+    p3%e_abs = norm2(efield)
+    if(p3%b_abs.ne.0) p3%e_norm = efield/p3%e_abs
 
 end function lflf_add
 
@@ -1285,7 +1290,9 @@ function lflf_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[LocalEMFields]] types
     type(LocalEMFields), intent(in) :: p1,p2
     type(LocalEMFields)             :: p3
-  
+
+    real(Float64), dimension(3) :: bfield,efield
+
     p3%pos    = p1%pos    - p2%pos
     p3%uvw    = p1%uvw    - p2%uvw
     p3%br     = p1%br     - p2%br
@@ -1294,12 +1301,15 @@ function lflf_subtract(p1, p2) result (p3)
     p3%er     = p1%er     - p2%er
     p3%et     = p1%et     - p2%et
     p3%ez     = p1%ez     - p2%ez
-    p3%b_abs  = p1%b_abs  - p2%b_abs
-    p3%e_abs  = p1%e_abs  - p2%e_abs
-    p3%a_norm = p1%a_norm - p2%a_norm
-    p3%b_norm = p1%b_norm - p2%b_norm
-    p3%c_norm = p1%c_norm - p2%c_norm
-    p3%e_norm = p1%e_norm - p2%e_norm  
+
+    bfield = p1%b_abs*p1%b_norm - p2%b_abs*p2%b_norm
+    p3%b_abs = norm2(bfield)
+    if(p3%b_abs.ne.0) p3%b_norm = bfield/p3%b_abs
+    call calc_perp_vectors(p3%b_norm,p3%a_norm,p3%c_norm)
+
+    efield = p1%e_abs*p1%e_norm - p2%e_abs*p2%e_norm
+    p3%e_abs = norm2(efield)
+    if(p3%b_abs.ne.0) p3%e_norm = efield/p3%e_abs
 
 end function lflf_subtract
 
@@ -1319,10 +1329,10 @@ function lfs_multiply(p1, real_scalar) result (p3)
     p3%ez   = p1%ez   * real_scalar 
     p3%b_abs  = p1%b_abs  * real_scalar
     p3%e_abs  = p1%e_abs  * real_scalar
-    p3%a_norm = p1%a_norm * real_scalar
-    p3%b_norm = p1%b_norm * real_scalar
-    p3%c_norm = p1%c_norm * real_scalar
-    p3%e_norm = p1%e_norm * real_scalar  
+    p3%a_norm = p1%a_norm
+    p3%b_norm = p1%b_norm
+    p3%c_norm = p1%c_norm
+    p3%e_norm = p1%e_norm
 
 end function lfs_multiply
 
@@ -6855,7 +6865,6 @@ subroutine fida_weights_los
             plasma%in_plasma = .True.
             fields = fields/wght_tot
             fields%in_plasma= .True.
-            call calc_perp_vectors(fields%b_norm,fields%a_norm,fields%c_norm)
             mean_f = mean_f/wght_tot  
             if(inputs%verbose.ge.1) then
                 write(*,'(T4,"Channel: ",i3)') ichan

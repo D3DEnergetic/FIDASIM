@@ -6585,8 +6585,8 @@ subroutine fida_weights_mc
     !+ Calculates FIDA weights
     integer :: i,j,k !! indices  x,y,z of cells
     integer(kind=8) :: iion,ip
-    real(Float64), dimension(3) :: ri,r_gyro      !! start position
-    real(Float64), dimension(3) :: vi, vi_norm    !! velocity of fast ions
+    real(Float64), dimension(3) :: ri,rg      !! start position
+    real(Float64), dimension(3) :: vi     !! velocity of fast ions
     integer,dimension(3) :: ind      !! new actual cell
     integer,dimension(4) :: neut_types=[1,2,3,4]
     logical :: los_intersect
@@ -6606,7 +6606,7 @@ subroutine fida_weights_mc
     real(Float64), dimension(nlevs) :: denn
   
     integer :: nwav
-    real(Float64) :: etov2, energy, pitch, phi
+    real(Float64) :: etov2, energy, pitch
     real(Float64) :: dE, dP, dEdP
     real(Float64), dimension(:), allocatable :: ebarr, ptcharr
     integer, dimension(1) :: ienergy, ipitch
@@ -6690,9 +6690,9 @@ subroutine fida_weights_mc
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        !$OMP PARALLEL DO schedule(guided) private(iion,vi,vi_norm,ri,ienergy,ipitch, &
-        !$OMP tracks,ncell,jj,plasma,fields,prob,denn,states,photons,energy,pitch,phi, &
-        !$OMP r_gyro,los_intersect,randomu3,fbm_denf)
+        !$OMP PARALLEL DO schedule(guided) private(iion,vi,ri,rg,ienergy,ipitch, &
+        !$OMP tracks,ncell,jj,plasma,fields,prob,denn,states,photons,energy,pitch, &
+        !$OMP los_intersect,randomu3,fbm_denf)
         loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
             !! Sample fast ion distribution uniformally
             call randind(inputs%ne_wght, ienergy)
@@ -6703,7 +6703,7 @@ subroutine fida_weights_mc
             if(energy.le.0) cycle loop_over_fast_ions
 
             call randu(randomu3)
-            ri = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)] + beam_grid%dr*(randomu3-0.5)
+            rg = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)] + beam_grid%dr*(randomu3-0.5)
   
             fbm_denf = 0.0
             if (inputs%dist_type.eq.1) then
@@ -6711,15 +6711,9 @@ subroutine fida_weights_mc
             endif
   
             !! Get velocity
-            call get_fields(fields,pos=ri)
+            call get_fields(fields,pos=rg)
             if(.not.fields%in_plasma) cycle loop_over_fast_ions
-            call pitch_to_vec(pitch,phi,fields,vi_norm)
-            vi = sqrt(energy*etov2)*vi_norm 
-            if(energy.eq.0) cycle loop_over_fast_ions
-  
-            !! Correct for gyro motion
-            call gyro_step(vi,fields,r_gyro)
-            ri = ri - r_gyro !ri now at particle position
+            call gyro_correction(fields,rg,energy,pitch,ri,vi)
 
             !! Find the particles path through the beam grid
             call track(ri, vi, tracks, ncell, los_intersect)

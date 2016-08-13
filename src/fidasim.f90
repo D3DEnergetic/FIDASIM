@@ -1979,7 +1979,7 @@ subroutine read_npa
         call plane_basis(xyz_a_cent, xyz_a_redge, xyz_a_tedge, &
              npa_chords%det(ichan)%aperture%basis, &
              npa_chords%det(ichan)%aperture%inv_basis)
-   
+
         hw = npa_chords%det(ichan)%detector%hw
         hh = npa_chords%det(ichan)%detector%hh
         nd = size(xd)
@@ -2009,7 +2009,7 @@ subroutine read_npa
                             rd = matmul(basis,rd_d) + xyz_d_cent
                             v0 = rd - r0
                             d_index = 0
-                            call hit_npa_detector(r0,v0,d_index)
+                            call hit_npa_detector(r0,v0,d_index,det=ichan)
                             if(d_index.ne.0) then
                                 r = norm2(rd_d - r0_d)**2
                                 dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
@@ -3791,9 +3791,9 @@ subroutine plane_intercept(l0, l, p0, n, p, t)
         !+ Line-plane intercept point
     real(Float64), intent(out)               :: t 
         !+ "time" to intercept
-  
+
     t = dot_product(p0 - l0, n)/dot_product(l, n)
-  
+ 
     p = l0 + t*l
   
 end subroutine plane_intercept
@@ -3830,7 +3830,7 @@ function in_boundary(bplane, p) result(in_b)
   
 end function in_boundary
 
-subroutine hit_npa_detector(r0, v0, d_index, rd)
+subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     !+ Routine to check if a particle will hit a NPA detector
     real(Float64), dimension(3), intent(in)            :: r0
         !+ Starting point of particle
@@ -3840,15 +3840,23 @@ subroutine hit_npa_detector(r0, v0, d_index, rd)
         !+ Index of NPA detector. Zero if particle doesn't hit
     real(Float64), dimension(3), intent(out), optional :: rd
         !+ Point where particle hit detector
+    integer, intent(in), optional :: det
+        !+ Index of NPA detector to check
 
     real(Float64), dimension(3) :: d, a
     real(Float64) :: t_a,t_d
-    integer :: i, ndet
-  
-    ndet = npa_chords%nchan
+    integer :: i, s, ndet
+
+    if(present(det)) then
+        s = det
+        ndet = det
+    else
+        s = 1
+        ndet = npa_chords%nchan
+    endif
   
     d_index = 0
-    detector_loop: do i=1,ndet
+    detector_loop: do i=s,ndet
         !! Find where trajectory crosses detector plane
         call plane_intercept(r0,v0,npa_chords%det(i)%detector%origin, &
              npa_chords%det(i)%detector%basis(:,3),d,t_d)

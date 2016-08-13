@@ -6454,7 +6454,11 @@ subroutine npa_f
                                 sum(neut%dens(:,halo_type,i,j,k)))* &
                                 plasma%denf
   
-                if(papprox(i,j,k).gt.0) then
+                if(papprox(i,j,k).gt.0.and.(npa_chords%hit(i,j,k))) then
+                    !the only doing viewable cells is techically wrong
+                    !since a guiding center not in a viewable cell
+                    !can gyrostep into one but this is ridiculously faster
+                    !and should be fine most of the time
                     pcell(:,pcnt)= ind
                     pcnt = pcnt + 1
                 endif
@@ -6469,47 +6473,45 @@ subroutine npa_f
   
     call get_nlaunch(inputs%n_npa,papprox,papprox_tot,nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
+        write(*,'(T6,"# of markers: ",i12)') int(sum(nlaunch))
     endif
   
     !! Loop over all cells that can contribute to NPA signal
     cnt=0.d0
-    !$OMP PARALLEL DO schedule(guided) private(ip,i,j,k,inpa,iion,ind, &
-    !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf)
     loop_over_cells: do ip = 1, int(pcnt)
         i = pcell(1,ip)
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        npa_loop: do inpa=1,npa%nloop
-            loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k))
-                !! Sample fast ion distribution for velocity and position
-                call mc_fastion(ind, ri, vi, denf)
-                if(sum(vi).eq.0)cycle loop_over_fast_ions
+        !$OMP PARALLEL DO schedule(guided) private(iion, &
+        !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf)
+        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k)*npa%nloop)
+            !! Sample fast ion distribution for velocity and position
+            call mc_fastion(ind, ri, vi, denf)
+            if(sum(vi).eq.0)cycle loop_over_fast_ions
+
+            !! Check if particle hits a NPA detector
+            call hit_npa_detector(ri, vi ,det, rf)
+            if(det.eq.0) cycle loop_over_fast_ions
+            
+            !! Calculate CX probability with beam and halo neutrals
+            call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
+            if(sum(prob).le.0.)cycle loop_over_fast_ions
   
-                !! Check if particle hits a NPA detector
-                call hit_npa_detector(ri, vi ,det, rf)
-                if(det.eq.0) cycle loop_over_fast_ions
-                
-                !! Calculate CX probability with beam and halo neutrals
-                call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
-                if(sum(prob).le.0.)cycle loop_over_fast_ions
+            !! Attenuate states as the particle move through plasma
+            states=prob*denf
+            call attenuate(ri,rf,vi,states)
   
-                !! Attenuate states as the particle move through plasma
-                states=prob*denf
-                call attenuate(ri,rf,vi,states)
-  
-                !! Store NPA Flux
-                flux = sum(states)*beam_grid%dv/(nlaunch(i,j,k)*real(npa%nloop))
-                call store_npa(det,ri,rf,vi,flux)
-            enddo loop_over_fast_ions
-        enddo npa_loop
+            !! Store NPA Flux
+            flux = sum(states)*beam_grid%dv/(nlaunch(i,j,k)*npa%nloop)
+            call store_npa(det,ri,rf,vi,flux)
+        enddo loop_over_fast_ions
+        !$OMP END PARALLEL DO
         cnt=cnt+1
         if (inputs%verbose.eq.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
-    !$OMP END PARALLEL DO
     write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
 
 end subroutine npa_f

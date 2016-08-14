@@ -198,14 +198,15 @@ subroutine randind_w_1(w,randomi)
         !+ Random indices
 
     integer :: i, nw
-    real(Float64) :: cdf_val
+    real(Float64) :: cdf_val, t
     real(Float64), dimension(size(w)) :: cdf
     real(Float64), dimension(1) :: randomu
   
     nw = size(w)
-    cdf(1) = w(1)
-    do i=2, nw
-        cdf(i) = cdf(i-1) + w(i)
+    t = 0.d0
+    do i=1, nw
+        cdf(i) = t + w(i)
+        t = cdf(i)
     enddo
 
     randomi = 0

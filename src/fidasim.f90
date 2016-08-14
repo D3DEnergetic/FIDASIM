@@ -15,28 +15,28 @@ integer, parameter, private   :: Int32   = 4
     !+ Defines a 32 bit integer
 integer, parameter, private   :: Int64   = 8
     !+ Defines a 64 bit integer
-integer, parameter, private   :: Float32 = 4 
+integer, parameter, private   :: Float32 = 4
     !+ Defines a 32 bit floating point real
 integer, parameter, private   :: Float64 = 8
-    !+ Defines a 64 bit floating point real 
+    !+ Defines a 64 bit floating point real
 integer, parameter :: charlim = 150
     !+ Defines character limit for files and directories
 
 character(charlim) :: namelist_file
     !+ Input namelist file
-integer, parameter :: nbif_type  = 1 
+integer, parameter :: nbif_type  = 1
     !+ Identifier for full energy NBI neutral interaction
 integer, parameter :: nbih_type  = 2
     !+ Identifier for half energy NBI neutral interaction
-integer, parameter :: nbit_type  = 3 
+integer, parameter :: nbit_type  = 3
     !+ Identifier for third energy NBI neutral interaction
-integer, parameter :: halo_type  = 4 
+integer, parameter :: halo_type  = 4
     !+ Identifier for halo neutral interaction
-integer, parameter :: fida_type  = 5 
+integer, parameter :: fida_type  = 5
     !+ Identifier for fida neutral interaction
-integer, parameter :: brems_type = 6 
+integer, parameter :: brems_type = 6
     !+ Identifier for bremsstrahlung interaction. Acts as dummy type
-integer, parameter :: ntypes     = 6 
+integer, parameter :: ntypes     = 6
     !+ Number of different types of neutrals
 
 integer, parameter :: beam_ion = 1
@@ -95,11 +95,37 @@ integer, parameter :: nlevs=6
 real(Float64), parameter :: n_halo_neutrate=20.
     !+ Number of times to average halo H_H_cx
 real(Float64) :: colrad_threshold=1.d6
-    !+ colrad threshold 
+    !+ colrad threshold
 real(Float64), dimension(ntypes) :: halo_iter_dens = 0.d0
     !+ Keeps track of how of each generations halo density
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
+
+type InterpolCoeffs1D
+    !+ Linear Interpolation Coefficients and indices
+    integer :: i = 0
+        !+ Index of position right before `xout`
+    real(Float64) :: b1 = 0.d0
+        !+ Coefficient for y(i) term
+    real(Float64) :: b2 = 0.d0
+        !+ Coefficient for y(i+1) term
+end type InterpolCoeffs1D
+
+type InterpolCoeffs2D
+    !+ 2D Linear Interpolation Coefficients and indices
+    integer :: i = 0
+        !+ Index of abscissa before `xout`
+    integer :: j = 0
+        !+ Index of ordinate before `yout`
+    real(Float64) :: b11 = 0.d0
+        !+ Coefficient for z(i,j) term
+    real(Float64) :: b12 = 0.d0
+        !+ Coefficient for z(i,j+1) term
+    real(Float64) :: b21 = 0.d0
+        !+ Coefficient for z(i+1,j) term
+    real(Float64) :: b22 = 0.d0
+        !+ Coefficient for z(i+1,j+1) term
+end type InterpolCoeffs2D
 
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
@@ -146,7 +172,7 @@ type BeamGrid
     real(Float64), dimension(3)   :: lwh
         !+ Grid [length(x), width(y), height(z)]
     real(Float64), dimension(3,3) :: basis
-        !+Beam grid basis for converting from beam coordinates(xyz) 
+        !+Beam grid basis for converting from beam coordinates(xyz)
         !+to machine coordinates(uvw): (\uvw = B*xyz + origin\)
     real(Float64), dimension(3,3) :: inv_basis
         !+Inverse basis for reverse transformation: (\xyz = B^{-1}*(uvw - origin)\)
@@ -216,6 +242,8 @@ type, extends( Profiles ) :: LocalProfiles
         !+ Position in machine coordinates
     real(Float64), dimension(3) :: vrot = 0.d0
         !+ Plasma rotation in beam grid coordinates
+    type(InterpolCoeffs2D) :: c
+        !+ Linear Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalProfiles
 
 type EMFields
@@ -238,7 +266,7 @@ type, extends( EMFields ) :: LocalEMFields
     !+ Electro-magnetic fields at given position
     logical       :: in_plasma = .False.
         !+ Indicates whether fields are valid/known
-    logical       :: machine_coords = .False.
+    logical :: machine_coords = .False.
         !+ Indicates whether vectors are in machine coordinates
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
@@ -256,6 +284,8 @@ type, extends( EMFields ) :: LocalEMFields
         !+ Vector perpendicular to `b_norm` and `a_norm`
     real(Float64), dimension(3) :: e_norm = 0.d0
         !+ Direction of electric field in beam grid coordinates
+    type(InterpolCoeffs2D) :: c
+        !+ Linear Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalEMFields
 
 type Equilibrium
@@ -332,9 +362,9 @@ type FastIon
         !+ Speed [cm/s]
     real(Float64)  :: vr = 0.d0
         !+ Radial velocity [cm/s]
-    real(Float64)  :: vt = 0.d0 
+    real(Float64)  :: vt = 0.d0
         !+ Torodial velocity [cm/s]
-    real(Float64)  :: vz = 0.d0 
+    real(Float64)  :: vz = 0.d0
         !+ Z velocity [cm/s]
     real(Float64)  :: weight = 0.d0
         !+ Particle weight: How many fast-ions does particle represent.
@@ -357,7 +387,7 @@ type NeutralBeam
     character(25) :: name = ''
         !+ Beam name
     integer       :: shape
-        !+ Beam source shape 1="rectangular", 2="circular" 
+        !+ Beam source shape 1="rectangular", 2="circular"
     real(Float64) :: widy
         !+ Half width of source in y direction
     real(Float64) :: widz
@@ -374,11 +404,11 @@ type NeutralBeam
         !+ NBI velocity [cm/s]
     real(Float64) :: alpha
         !+ Z rotation not same as [[libfida:beam_grid]] alpha
-    real(Float64) :: beta      
+    real(Float64) :: beta
         !+ Tilt rotation not same as [[libfida:beam_grid]] beta
     real(Float64), dimension(3)   :: divy
         !+ Energy dependent divergence in y direction
-    real(Float64), dimension(3)   :: divz    
+    real(Float64), dimension(3)   :: divz
         !+ Energy dependent divergence in z direction
     real(Float64), dimension(3)   :: current_fractions
         !+ Fractions of full, half, and third energy neutrals
@@ -412,7 +442,7 @@ type AtomicCrossSection
         !+ Number of beam energies
     real(Float64) :: logemin = 0.d0
         !+ Log-10 minimum energy
-    real(Float64) :: logemax = 0.d0 
+    real(Float64) :: logemax = 0.d0
         !+ Log-10 maximum energy
     integer       :: n_max = nlevs
         !+ Number of initial atomic energy levels
@@ -448,9 +478,9 @@ type AtomicRates
         !+ Log-10 energy spacing
     real(Float64) :: dlogT = 0.d0
         !+ Log-10 temperature spacing
-    real(Float64) :: minlog_pop = 0.d0 
+    real(Float64) :: minlog_pop = 0.d0
         !+ Log-10 minimum reaction rates for populating transistions
-    real(Float64) :: minlog_depop = 0.d0 
+    real(Float64) :: minlog_depop = 0.d0
         !+ Log-10 minimum reaction rates for de-populating transistions
     real(Float64), dimension(2) :: ab = 0.d0
         !+ Atomic mass of beam and thermal ions respectively [amu]
@@ -478,7 +508,7 @@ type LineOfSight
     !+ Defines a line of sight
     real(Float64) :: sigma_pi = 1.d0
         !+ Ratio of sigma to pi line intensity
-    real(Float64) :: spot_size = 0.d0 
+    real(Float64) :: spot_size = 0.d0
         !+ Radius of spot size [cm]
     real(Float64), dimension(3) :: lens = 0.d0
         !+ Lens location in beam grid coordinates
@@ -502,17 +532,17 @@ end type SpectralChords
 
 type BoundedPlane
     !+ Defines a plane with a circular or rectangular boundary
-    integer       :: shape    = 0 
+    integer       :: shape    = 0
         !+ Boundary shape 1="Rectangular", 2="circular"
     real(Float64) :: hh       = 0.d0
         !+ Half height of boundary [cm]
     real(Float64) :: hw       = 0.d0
         !+ Half width of boundary [cm]
-    real(Float64), dimension(3)   :: origin   = 0.d0 
+    real(Float64), dimension(3)   :: origin   = 0.d0
         !+ Origin of plane in machine coordinates
     real(Float64), dimension(3,3) :: basis    = 0.d0
         !+ Basis vectors basis(:,1) = u_1 is plane normal
-    real(Float64), dimension(3,3) :: inv_basis= 0.d0 
+    real(Float64), dimension(3,3) :: inv_basis= 0.d0
         !+ Inverse basis
 end type BoundedPlane
 
@@ -579,7 +609,7 @@ type NPAResults
     integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
     integer(Int32) :: nloop = 1000
-        !+ Increases number of MC markers by factor of `nloop` 
+        !+ Increases number of MC markers by factor of `nloop`
     type(NPAParticle), dimension(:), allocatable  :: part
         !+ Array of NPA particles
     real(Float64), dimension(:), allocatable      :: energy
@@ -711,7 +741,7 @@ type SimulationInputs
     !! Plasma parameters
     integer(Int32) :: impurity_charge
         !+ Impurity proton number
-    real(Float64)  :: ai   
+    real(Float64)  :: ai
         !+ Atomic mass of thermal ions
 
     !! Distribution settings
@@ -853,7 +883,7 @@ subroutine print_banner()
     write(*,'(a)') "For more information visit http://d3denergetic.github.io/FIDASIM/"
     write(*,'(a)') ""
 end subroutine print_banner
-                                     
+
 !============================================================================
 !---------------------------Operator Overloading-----------------------------
 !============================================================================
@@ -861,8 +891,8 @@ subroutine fast_ion_assign(p1, p2)
     !+ Defines how to assign [[FastIon]] types to eachother
     type(FastIon), intent(in)  :: p2
     type(FastIon), intent(out) :: p1
-  
-    p1%cross_grid = p2%cross_grid  
+
+    p1%cross_grid = p2%cross_grid
     p1%r          = p2%r
     p1%z          = p2%z
     p1%phi_enter  = p2%phi_enter
@@ -870,9 +900,9 @@ subroutine fast_ion_assign(p1, p2)
     p1%energy     = p2%energy
     p1%pitch      = p2%pitch
     p1%vabs       = p2%vabs
-    p1%vr         = p2%vr 
-    p1%vt         = p2%vt 
-    p1%vz         = p2%vz 
+    p1%vr         = p2%vr
+    p1%vt         = p2%vt
+    p1%vz         = p2%vz
     p1%weight     = p2%weight
     p1%class      = p2%class
 
@@ -882,10 +912,10 @@ subroutine npa_part_assign(p1, p2)
     !+ Defines how to assign [[NPAParticle]] types to eachother
     type(NPAParticle), intent(in)  :: p2
     type(NPAParticle), intent(out) :: p1
-  
-    p1%xi = p2%xi 
+
+    p1%xi = p2%xi
     p1%yi = p2%yi
-    p1%zi = p2%zi 
+    p1%zi = p2%zi
     p1%xf = p2%xf
     p1%yf = p2%yf
     p1%zf = p2%zf
@@ -900,16 +930,16 @@ subroutine pp_assign(p1, p2)
     !+ Defines how to assign [[Profiles]] types to eachother
     type(Profiles), intent(in)    :: p2
     type(Profiles), intent(inout) :: p1
-  
-    p1%dene   = p2%dene  
-    p1%ti     = p2%ti    
-    p1%te     = p2%te    
-    p1%denp   = p2%denp  
-    p1%denf   = p2%denf  
+
+    p1%dene   = p2%dene
+    p1%ti     = p2%ti
+    p1%te     = p2%te
+    p1%denp   = p2%denp
+    p1%denf   = p2%denf
     p1%denimp = p2%denimp
-    p1%zeff   = p2%zeff  
-    p1%vr     = p2%vr 
-    p1%vt     = p2%vt 
+    p1%zeff   = p2%zeff
+    p1%vr     = p2%vr
+    p1%vt     = p2%vt
     p1%vz     = p2%vz
 
 end subroutine pp_assign
@@ -918,16 +948,16 @@ subroutine lpp_assign(p1, p2)
     !+ Defines how to assign a [[Profiles]] type to a [[LocalProfiles]] type
     type(Profiles), intent(in)         :: p2
     type(LocalProfiles), intent(inout) :: p1
-  
-    p1%dene   = p2%dene  
-    p1%ti     = p2%ti    
-    p1%te     = p2%te    
-    p1%denp   = p2%denp  
-    p1%denf   = p2%denf  
+
+    p1%dene   = p2%dene
+    p1%ti     = p2%ti
+    p1%te     = p2%te
+    p1%denp   = p2%denp
+    p1%denf   = p2%denf
     p1%denimp = p2%denimp
-    p1%zeff   = p2%zeff  
-    p1%vr     = p2%vr 
-    p1%vt     = p2%vt 
+    p1%zeff   = p2%zeff
+    p1%vr     = p2%vr
+    p1%vt     = p2%vt
     p1%vz     = p2%vz
 
 end subroutine lpp_assign
@@ -936,16 +966,16 @@ subroutine plp_assign(p1, p2)
     !+ Defines how to assign a [[LocalProfiles]] type to a [[Profiles]] type
     type(LocalProfiles), intent(in) :: p2
     type(Profiles), intent(inout)   :: p1
-  
-    p1%dene   = p2%dene  
-    p1%ti     = p2%ti    
-    p1%te     = p2%te    
-    p1%denp   = p2%denp  
-    p1%denf   = p2%denf  
+
+    p1%dene   = p2%dene
+    p1%ti     = p2%ti
+    p1%te     = p2%te
+    p1%denp   = p2%denp
+    p1%denf   = p2%denf
     p1%denimp = p2%denimp
-    p1%zeff   = p2%zeff  
-    p1%vr     = p2%vr 
-    p1%vt     = p2%vt 
+    p1%zeff   = p2%zeff
+    p1%vr     = p2%vr
+    p1%vt     = p2%vt
     p1%vz     = p2%vz
 
 end subroutine plp_assign
@@ -954,18 +984,18 @@ subroutine lplp_assign(p1, p2)
     !+ Defines how to assign [[LocalProfiles]] types to eachother
     type(LocalProfiles), intent(in)    :: p2
     type(LocalProfiles), intent(inout) :: p1
-  
+
     p1%pos    = p2%pos
     p1%uvw    = p2%uvw
-    p1%dene   = p2%dene  
-    p1%ti     = p2%ti    
-    p1%te     = p2%te    
-    p1%denp   = p2%denp  
-    p1%denf   = p2%denf  
+    p1%dene   = p2%dene
+    p1%ti     = p2%ti
+    p1%te     = p2%te
+    p1%denp   = p2%denp
+    p1%denf   = p2%denf
     p1%denimp = p2%denimp
-    p1%zeff   = p2%zeff  
-    p1%vr     = p2%vr 
-    p1%vt     = p2%vt 
+    p1%zeff   = p2%zeff
+    p1%vr     = p2%vr
+    p1%vt     = p2%vt
     p1%vz     = p2%vz
     p1%vrot   = p2%vrot
 
@@ -975,13 +1005,13 @@ subroutine ff_assign(p1, p2)
     !+ Defines how to assign [[EMFields]] types to eachother
     type(EMFields), intent(in)    :: p2
     type(EMFields), intent(inout) :: p1
-  
-    p1%br   = p2%br  
-    p1%bt   = p2%bt  
-    p1%bz   = p2%bz  
-    p1%er   = p2%er  
-    p1%et   = p2%et  
-    p1%ez   = p2%ez  
+
+    p1%br   = p2%br
+    p1%bt   = p2%bt
+    p1%bz   = p2%bz
+    p1%er   = p2%er
+    p1%et   = p2%et
+    p1%ez   = p2%ez
 
 end subroutine ff_assign
 
@@ -989,13 +1019,13 @@ subroutine lff_assign(p1, p2)
     !+ Defines how to assign a [[EMFields]] type to a [[LocalEMFields]] type
     type(EMFields), intent(in)         :: p2
     type(LocalEMFields), intent(inout) :: p1
-  
-    p1%br   = p2%br  
-    p1%bt   = p2%bt  
-    p1%bz   = p2%bz  
-    p1%er   = p2%er  
-    p1%et   = p2%et  
-    p1%ez   = p2%ez  
+
+    p1%br   = p2%br
+    p1%bt   = p2%bt
+    p1%bz   = p2%bz
+    p1%er   = p2%er
+    p1%et   = p2%et
+    p1%ez   = p2%ez
 
 end subroutine lff_assign
 
@@ -1003,13 +1033,13 @@ subroutine flf_assign(p1, p2)
     !+ Defines how to assign a [[LocalEMFields]] type to a [[EMFields]] type
     type(LocalEMFields), intent(in) :: p2
     type(EMFields), intent(inout)   :: p1
-  
-    p1%br   = p2%br  
-    p1%bt   = p2%bt  
-    p1%bz   = p2%bz  
-    p1%er   = p2%er  
-    p1%et   = p2%et  
-    p1%ez   = p2%ez  
+
+    p1%br   = p2%br
+    p1%bt   = p2%bt
+    p1%bz   = p2%bz
+    p1%er   = p2%er
+    p1%et   = p2%et
+    p1%ez   = p2%ez
 
 end subroutine flf_assign
 
@@ -1017,21 +1047,21 @@ subroutine lflf_assign(p1, p2)
     !+ Defines how to assign [[LocalEMFields]] types to eachother
     type(LocalEMFields), intent(in)    :: p2
     type(LocalEMFields), intent(inout) :: p1
-  
+
     p1%pos  = p2%pos
     p1%uvw  = p2%uvw
-    p1%br   = p2%br  
-    p1%bt   = p2%bt  
-    p1%bz   = p2%bz  
-    p1%er   = p2%er  
-    p1%et   = p2%et  
+    p1%br   = p2%br
+    p1%bt   = p2%bt
+    p1%bz   = p2%bz
+    p1%er   = p2%er
+    p1%et   = p2%et
     p1%ez   = p2%ez
     p1%b_abs = p2%b_abs
     p1%e_abs = p2%e_abs
     p1%a_norm = p2%a_norm
     p1%b_norm = p2%b_norm
     p1%c_norm = p2%c_norm
-    p1%e_norm = p2%e_norm  
+    p1%e_norm = p2%e_norm
 
 end subroutine lflf_assign
 
@@ -1039,7 +1069,7 @@ function pp_add(p1, p2) result (p3)
     !+ Defines how to add two [[Profiles]] types
     type(Profiles), intent(in) :: p1,p2
     type(Profiles)             :: p3
-  
+
     p3%dene   = p1%dene   + p2%dene
     p3%ti     = p1%ti     + p2%ti
     p3%te     = p1%te     + p2%te
@@ -1057,7 +1087,7 @@ function pp_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[Profiles]] types
     type(Profiles), intent(in) :: p1,p2
     type(Profiles)             :: p3
-  
+
     p3%dene   = p1%dene   - p2%dene
     p3%ti     = p1%ti     - p2%ti
     p3%te     = p1%te     - p2%te
@@ -1075,7 +1105,7 @@ function lplp_add(p1, p2) result (p3)
     !+ Defines how to add two [[LocalProfiles]] types
     type(LocalProfiles), intent(in) :: p1,p2
     type(LocalProfiles)             :: p3
-  
+
     p3%pos    = p1%pos    + p2%pos
     p3%uvw    = p1%uvw    + p2%uvw
     p3%dene   = p1%dene   + p2%dene
@@ -1096,7 +1126,7 @@ function lplp_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[LocalProfiles]] types
     type(LocalProfiles), intent(in) :: p1,p2
     type(LocalProfiles)             :: p3
-  
+
     p3%pos    = p1%pos    - p2%pos
     p3%uvw    = p1%uvw    - p2%uvw
     p3%dene   = p1%dene   - p2%dene
@@ -1118,7 +1148,7 @@ function ps_multiply(p1, real_scalar) result (p3)
     type(Profiles), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
     type(Profiles)             :: p3
-  
+
     p3%dene   = p1%dene   * real_scalar
     p3%ti     = p1%ti     * real_scalar
     p3%te     = p1%te     * real_scalar
@@ -1126,9 +1156,9 @@ function ps_multiply(p1, real_scalar) result (p3)
     p3%denf   = p1%denf   * real_scalar
     p3%denimp = p1%denimp * real_scalar
     p3%zeff   = p1%zeff   * real_scalar
-    p3%vr     = p1%vr     * real_scalar 
-    p3%vt     = p1%vt     * real_scalar 
-    p3%vz     = p1%vz     * real_scalar 
+    p3%vr     = p1%vr     * real_scalar
+    p3%vt     = p1%vt     * real_scalar
+    p3%vz     = p1%vz     * real_scalar
 
 end function ps_multiply
 
@@ -1137,7 +1167,7 @@ function sp_multiply(real_scalar, p1) result (p3)
     type(Profiles), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
     type(Profiles)             :: p3
-  
+
     p3 = p1*real_scalar
 
 end function sp_multiply
@@ -1147,7 +1177,7 @@ function ps_divide(p1, real_scalar) result (p3)
     type(Profiles), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
     type(Profiles)             :: p3
-    
+
     p3 = p1*(1.d0/real_scalar)
 
 end function ps_divide
@@ -1157,7 +1187,7 @@ function lps_multiply(p1, real_scalar) result (p3)
     type(LocalProfiles), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
     type(LocalProfiles)             :: p3
-  
+
     p3%pos    = p1%pos    * real_scalar
     p3%uvw    = p1%uvw    * real_scalar
     p3%dene   = p1%dene   * real_scalar
@@ -1167,10 +1197,10 @@ function lps_multiply(p1, real_scalar) result (p3)
     p3%denf   = p1%denf   * real_scalar
     p3%denimp = p1%denimp * real_scalar
     p3%zeff   = p1%zeff   * real_scalar
-    p3%vr     = p1%vr     * real_scalar 
-    p3%vt     = p1%vt     * real_scalar 
-    p3%vz     = p1%vz     * real_scalar 
-    p3%vrot   = p1%vrot   * real_scalar 
+    p3%vr     = p1%vr     * real_scalar
+    p3%vt     = p1%vt     * real_scalar
+    p3%vz     = p1%vz     * real_scalar
+    p3%vrot   = p1%vrot   * real_scalar
 
 end function lps_multiply
 
@@ -1179,7 +1209,7 @@ function slp_multiply(real_scalar, p1) result (p3)
     type(LocalProfiles), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
     type(LocalProfiles)             :: p3
-  
+
     p3 = p1*real_scalar
 
 end function slp_multiply
@@ -1189,7 +1219,7 @@ function lps_divide(p1, real_scalar) result (p3)
     type(LocalProfiles), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
     type(LocalProfiles)             :: p3
-    
+
     p3 = p1*(1.d0/real_scalar)
 
 end function lps_divide
@@ -1198,7 +1228,7 @@ function ff_add(p1, p2) result (p3)
     !+ Defines how to add two [[EMFields]] types
     type(EMFields), intent(in) :: p1,p2
     type(EMFields)             :: p3
-  
+
     p3%br   = p1%br   + p2%br
     p3%bt   = p1%bt   + p2%bt
     p3%bz   = p1%bz   + p2%bz
@@ -1212,7 +1242,7 @@ function ff_subtract(p1, p2) result (p3)
     !+ Defines how to subtract two [[EMFields]] types
     type(EMFields), intent(in) :: p1,p2
     type(EMFields)             :: p3
-  
+
     p3%br   = p1%br   - p2%br
     p3%bt   = p1%bt   - p2%bt
     p3%bz   = p1%bz   - p2%bz
@@ -1227,13 +1257,13 @@ function fs_multiply(p1, real_scalar) result (p3)
     type(EMFields), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
     type(EMFields)             :: p3
-  
-    p3%br   = p1%br   * real_scalar 
-    p3%bt   = p1%bt   * real_scalar 
-    p3%bz   = p1%bz   * real_scalar 
-    p3%er   = p1%er   * real_scalar 
-    p3%et   = p1%et   * real_scalar 
-    p3%ez   = p1%ez   * real_scalar 
+
+    p3%br   = p1%br   * real_scalar
+    p3%bt   = p1%bt   * real_scalar
+    p3%bz   = p1%bz   * real_scalar
+    p3%er   = p1%er   * real_scalar
+    p3%et   = p1%et   * real_scalar
+    p3%ez   = p1%ez   * real_scalar
 
 end function fs_multiply
 
@@ -1242,7 +1272,7 @@ function sf_multiply(real_scalar, p1) result (p3)
     type(EMFields), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
     type(EMFields)             :: p3
-  
+
     p3 = p1*real_scalar
 
 end function sf_multiply
@@ -1252,7 +1282,7 @@ function fs_divide(p1, real_scalar) result (p3)
     type(EMFields), intent(in) :: p1
     real(Float64), intent(in)  :: real_scalar
     type(EMFields)             :: p3
-  
+
     p3 = p1*(1.d0/real_scalar)
 
 end function fs_divide
@@ -1320,15 +1350,15 @@ function lfs_multiply(p1, real_scalar) result (p3)
     type(LocalEMFields), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
     type(LocalEMFields)             :: p3
-  
+
     p3%pos  = p1%pos  * real_scalar
     p3%uvw  = p1%uvw  * real_scalar
-    p3%br   = p1%br   * real_scalar 
-    p3%bt   = p1%bt   * real_scalar 
-    p3%bz   = p1%bz   * real_scalar 
-    p3%er   = p1%er   * real_scalar 
-    p3%et   = p1%et   * real_scalar 
-    p3%ez   = p1%ez   * real_scalar 
+    p3%br   = p1%br   * real_scalar
+    p3%bt   = p1%bt   * real_scalar
+    p3%bz   = p1%bz   * real_scalar
+    p3%er   = p1%er   * real_scalar
+    p3%et   = p1%et   * real_scalar
+    p3%ez   = p1%ez   * real_scalar
     p3%b_abs  = p1%b_abs  * real_scalar
     p3%e_abs  = p1%e_abs  * real_scalar
     p3%a_norm = p1%a_norm
@@ -1343,7 +1373,7 @@ function slf_multiply(real_scalar, p1) result (p3)
     type(LocalEMFields), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
     type(LocalEMFields)             :: p3
-  
+
     p3 = p1*real_scalar
 
 end function slf_multiply
@@ -1353,7 +1383,7 @@ function lfs_divide(p1, real_scalar) result (p3)
     type(LocalEMFields), intent(in) :: p1
     real(Float64), intent(in)       :: real_scalar
     type(LocalEMFields)             :: p3
-  
+
     p3 = p1*(1.d0/real_scalar)
 
 end function lfs_divide
@@ -1381,7 +1411,7 @@ subroutine read_inputs
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
     real(Float64)      :: alpha,beta,gamma,origin(3)
     logical            :: exis, error
-  
+
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_bes, calc_fida, calc_npa, calc_birth, no_flr, &
@@ -1393,7 +1423,7 @@ subroutine read_inputs
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
         nlambda_wght,lambdamin_wght,lambdamax_wght
-  
+
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
         write(*,'(a,a)') 'READ_INPUTS: Input file does not exist: ', trim(namelist_file)
@@ -1406,20 +1436,20 @@ subroutine read_inputs
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)
-  
+
     !!General Information
     inputs%shot_number=shot
     inputs%time=time
     inputs%runid=runid
     inputs%result_dir=result_dir
-  
+
     !!Input Files
     inputs%tables_file=tables_file
     inputs%geometry_file=geometry_file
     inputs%equilibrium_file=equilibrium_file
     inputs%distribution_file=distribution_file
     inputs%neutrals_file=neutrals_file
-  
+
     !!Simulation Switches
     if((calc_brems+calc_bes+calc_fida).gt.0) then
         inputs%calc_spec=1
@@ -1445,17 +1475,17 @@ subroutine read_inputs
     inputs%n_halo=max(10,n_halo)
     inputs%n_dcx=max(10,n_dcx)
     inputs%n_birth= max(1,nint(n_birth/real(n_nbi)))
-  
+
     !!Plasma Settings
     inputs%ai=ai
     inputs%impurity_charge=impurity_charge
-  
+
     !!Neutral Beam Settings
     inputs%ab=ab
     nbi%current_fractions=current_fractions
     nbi%einj=einj
     nbi%pinj=pinj
-  
+
     !!Weight Function Settings
     inputs%ne_wght=ne_wght
     inputs%np_wght=np_wght
@@ -1464,13 +1494,13 @@ subroutine read_inputs
     inputs%nlambda_wght = nlambda_wght
     inputs%lambdamin_wght=lambdamin_wght
     inputs%lambdamax_wght=lambdamax_wght
-  
+
     !!Wavelength Grid Settings
     inputs%nlambda=nlambda
     inputs%lambdamin=lambdamin
     inputs%lambdamax=lambdamax
     inputs%dlambda=(inputs%lambdamax-inputs%lambdamin)/inputs%nlambda
-  
+
     !!Beam Grid Settings
     beam_grid%nx=nx
     beam_grid%ny=ny
@@ -1485,7 +1515,7 @@ subroutine read_inputs
     beam_grid%beta=beta
     beam_grid%gamma=gamma
     beam_grid%origin=origin
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Shot settings ----"
         write(*,'(T2,"Shot: ",i8)') inputs%shot_number
@@ -1494,7 +1524,7 @@ subroutine read_inputs
         write(*,*) ''
         write(*,'(a)') "---- Input files ----"
     endif
-  
+
     error = .False.
 
     inquire(file=inputs%tables_file,exist=exis)
@@ -1507,7 +1537,7 @@ subroutine read_inputs
                          trim(inputs%tables_file)
         error = .True.
     endif
-  
+
     inquire(file=inputs%geometry_file,exist=exis)
     if(exis) then
         if(inputs%verbose.ge.1) then
@@ -1518,7 +1548,7 @@ subroutine read_inputs
                          trim(inputs%geometry_file)
         error = .True.
     endif
-  
+
     inquire(file=inputs%equilibrium_file,exist=exis)
     if(exis) then
         if(inputs%verbose.ge.1) then
@@ -1529,7 +1559,7 @@ subroutine read_inputs
                          trim(inputs%equilibrium_file)
         error = .True.
     endif
-  
+
     inquire(file=inputs%distribution_file,exist=exis)
     if(exis) then
         if(inputs%verbose.ge.1) then
@@ -1544,7 +1574,7 @@ subroutine read_inputs
     pathlen = len_trim(inputs%result_dir)+len_trim(inputs%runid) + 20
     !+20 for suffixes and seperators e.g. /, _npa.h5, ...
     if(pathlen.gt.charlim) then
-        write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', & 
+        write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', &
                                pathlen-20,'>', charlim-20
         error = .True.
     endif
@@ -1552,8 +1582,8 @@ subroutine read_inputs
     if(inputs%verbose.ge.1) then
         write(*,*) ''
     endif
-  
-    if(error) then 
+
+    if(error) then
         stop
     endif
 
@@ -1563,47 +1593,47 @@ subroutine make_beam_grid
     !+ Makes [[libfida:beam_grid] from user defined inputs
     integer(Int32) :: i
     real(Float64) :: dx, dy, dz
-  
+
     allocate(beam_grid%xc(beam_grid%nx),  &
              beam_grid%yc(beam_grid%ny),  &
              beam_grid%zc(beam_grid%nz))
-  
+
     dx = (beam_grid%xmax - beam_grid%xmin)/beam_grid%nx
     dy = (beam_grid%ymax - beam_grid%ymin)/beam_grid%ny
     dz = (beam_grid%zmax - beam_grid%zmin)/beam_grid%nz
-  
+
     do i=1, beam_grid%nx
         beam_grid%xc(i) = beam_grid%xmin + (i-0.5)*dx
-    enddo    
+    enddo
     do i=1, beam_grid%ny
         beam_grid%yc(i) = beam_grid%ymin + (i-0.5)*dy
-    enddo    
+    enddo
     do i=1, beam_grid%nz
         beam_grid%zc(i) = beam_grid%zmin + (i-0.5)*dz
-    enddo    
-  
+    enddo
+
     beam_grid%dr(1) = abs(beam_grid%xc(2)-beam_grid%xc(1))
     beam_grid%dr(2) = abs(beam_grid%yc(2)-beam_grid%yc(1))
     beam_grid%dr(3) = abs(beam_grid%zc(2)-beam_grid%zc(1))
-  
+
     beam_grid%lwh(1) = abs(beam_grid%xc(beam_grid%nx) - beam_grid%xc(1)) + beam_grid%dr(1)
     beam_grid%lwh(2) = abs(beam_grid%yc(beam_grid%ny) - beam_grid%yc(1)) + beam_grid%dr(2)
     beam_grid%lwh(3) = abs(beam_grid%zc(beam_grid%nz) - beam_grid%zc(1)) + beam_grid%dr(3)
-  
+
     beam_grid%volume = beam_grid%lwh(1)*beam_grid%lwh(2)*beam_grid%lwh(3)
-  
+
     beam_grid%center(1) = (minval(beam_grid%xc) - 0.5*beam_grid%dr(1)) + 0.5*beam_grid%lwh(1)
     beam_grid%center(2) = (minval(beam_grid%yc) - 0.5*beam_grid%dr(2)) + 0.5*beam_grid%lwh(2)
     beam_grid%center(3) = (minval(beam_grid%zc) - 0.5*beam_grid%dr(3)) + 0.5*beam_grid%lwh(3)
-  
+
     beam_grid%drmin  = minval(beam_grid%dr)
     beam_grid%dv     = beam_grid%dr(1)*beam_grid%dr(2)*beam_grid%dr(3)
     beam_grid%ntrack = beam_grid%nx+beam_grid%ny+beam_grid%nz
     beam_grid%ngrid  = beam_grid%nx*beam_grid%ny*beam_grid%nz
-  
+
     call tb_zyx(beam_grid%alpha,beam_grid%beta,beam_grid%gamma, &
                 beam_grid%basis, beam_grid%inv_basis)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Beam grid settings ----"
         write(*,'(T2,"Nx: ", i3)') beam_grid%nx
@@ -1623,21 +1653,21 @@ subroutine read_beam
     !+ Reads neutral beam geometry and stores the quantities in [[libfida:nbi]]
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(1) :: dims
-  
+
     real(Float64), dimension(3) ::uvw_src, uvw_axis, pos
     real(Float64) :: dis
-    logical :: path_valid 
+    logical :: path_valid
     integer :: error
-  
+
     !!Initialize HDF5 interface
     call h5open_f(error)
-  
+
     !!Open HDF5 file
     call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, fid, error)
-  
+
     !!Open NBI group
     call h5gopen_f(fid, "/nbi", gid, error)
-  
+
     !!Read in beam definitions
     call h5ltread_dataset_string_f(gid, "/nbi/name",nbi%name, error)
     dims(1) = 3
@@ -1675,23 +1705,23 @@ subroutine read_beam
 
     !!Close NBI group
     call h5gclose_f(gid, error)
-  
+
     !!Close file id
     call h5fclose_f(fid, error)
-  
+
     !!Close HDF5 interface
     call h5close_f(error)
-  
+
     !!Convert to beam grid coordinates
     call uvw_to_xyz(uvw_src,nbi%src)
     nbi%axis = matmul(beam_grid%inv_basis,uvw_axis)
-  
+
     nbi%vinj=sqrt(2.d0*nbi%einj*1.d3 *e0/(inputs%ab*mass_u))*1.d2 !! [cm/s]
     pos = nbi%src + 200.0*nbi%axis
     dis = sqrt(sum((pos - nbi%src)**2))
     nbi%beta = asin((nbi%src(3) - pos(3))/dis)
     nbi%alpha = atan2(pos(2)-nbi%src(2),pos(1)-nbi%src(1))
-  
+
     call tb_zyx(nbi%alpha,nbi%beta,0.d0,nbi%basis,nbi%inv_basis)
 
     if(inputs%verbose.ge.1) then
@@ -1709,7 +1739,7 @@ subroutine read_chords
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid
-  
+
     real(Float64), dimension(:,:), allocatable :: lenses
     real(Float64), dimension(:,:), allocatable :: axes
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
@@ -1720,24 +1750,24 @@ subroutine read_chords
     real(Float64) :: theta, sqrt_rho
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
-  
+
     integer :: i, j, ic, nc, ncell, ind(3)
     integer :: error
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- FIDA/BES settings ----'
     endif
     !!Initialize HDF5 interface
     call h5open_f(error)
-  
+
     !!Open HDF5 file
     call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, fid, error)
-  
+
     !!Check if SPEC group exists
     call h5ltpath_valid_f(fid, "/spec", .True., path_valid, error)
     if(.not.path_valid) then
         write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
-        write(*,'(a)') 'Continuing without spectral diagnostics' 
+        write(*,'(a)') 'Continuing without spectral diagnostics'
         inputs%calc_spec = 0
         inputs%calc_fida = 0
         inputs%calc_bes = 0
@@ -1745,13 +1775,13 @@ subroutine read_chords
         inputs%calc_fida_wght = 0
         return
     endif
-  
+
     !!Open SPEC group
     call h5gopen_f(fid, "/spec", gid, error)
-  
+
     call h5ltread_dataset_string_f(gid, "/spec/system", system, error)
     call h5ltread_dataset_int_scalar_f(gid, "/spec/nchan", spec_chords%nchan, error)
-  
+
     allocate(lenses(3, spec_chords%nchan))
     allocate(axes(3, spec_chords%nchan))
     allocate(spot_size(spec_chords%nchan))
@@ -1759,28 +1789,28 @@ subroutine read_chords
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
     allocate(spec_chords%dlength(spec_chords%nchan, &
-                                 beam_grid%nx, & 
+                                 beam_grid%nx, &
                                  beam_grid%ny, &
                                  beam_grid%nz) )
-  
+
     spec_chords%dlength = 0.d0
-  
+
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
     call h5ltread_dataset_double_f(gid, "/spec/axis", axes, dims, error)
     call h5ltread_dataset_double_f(gid, "/spec/spot_size", spot_size, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/spec/sigma_pi", sigma_pi, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/spec/radius", spec_chords%radius, dims(2:2), error)
-  
+
     !!Close SPEC group
     call h5gclose_f(gid, error)
-  
+
     !!Close file id
     call h5fclose_f(fid, error)
-  
+
     !!Close HDF5 interface
     call h5close_f(error)
-  
+
     chan_loop: do i=1,spec_chords%nchan
         call uvw_to_xyz(lenses(:,i),xyz_lens)
         xyz_axis = matmul(beam_grid%inv_basis,axes(:,i))
@@ -1788,24 +1818,24 @@ subroutine read_chords
         spec_chords%los(i)%axis = xyz_axis
         spec_chords%los(i)%sigma_pi = sigma_pi(i)
         spec_chords%los(i)%spot_size = spot_size(i)
-  
+
         r0 = xyz_lens
         v0 = xyz_axis
         v0 = v0/norm2(v0)
         call line_basis(r0,v0,basis)
-  
+
         call grid_intersect(r0,v0,length,r_enter,r_exit)
         if(length.le.0.d0) then
             WRITE(*,'("Channel ",i3," missed the beam grid")'),i
-            cycle chan_loop 
+            cycle chan_loop
         endif
-  
-        if(spot_size(i).le.0.d0) then 
+
+        if(spot_size(i).le.0.d0) then
             nc = 1
         else
             nc = 100
         endif
-  
+
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
         !$OMP& length, r_enter, r_exit, j, tracks, ncell, ind)
         do ic=1,nc
@@ -1817,14 +1847,14 @@ subroutine read_chords
             r0(2) = spot_size(i)*sqrt_rho*cos(theta)
             r0(3) = spot_size(i)*sqrt_rho*sin(theta)
             r0 = matmul(basis,r0) + xyz_lens
-  
+
             call grid_intersect(r0, v0, length, r_enter, r_exit)
             call track(r_enter, v0, tracks, ncell)
             track_loop: do j=1, ncell
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
-                spec_chords%dlength(i,ind(1),ind(2),ind(3)) = & 
+                spec_chords%dlength(i,ind(1),ind(2),ind(3)) = &
                 spec_chords%dlength(i,ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
                 spec_chords%los_inter(ind(1),ind(2),ind(3)) = .True.
                 !$OMP END CRITICAL(read_chords_1)
@@ -1832,13 +1862,13 @@ subroutine read_chords
         enddo
         !$OMP END PARALLEL DO
     enddo chan_loop
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"FIDA/BES System: ",a)') trim(adjustl(system))
         write(*,'(T2,"Number of channels: ",i3)') spec_chords%nchan
         write(*,*) ''
     endif
-  
+
     deallocate(lenses,axes,spot_size,sigma_pi)
 
 end subroutine read_chords
@@ -1848,12 +1878,12 @@ subroutine read_npa
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid
-  
+
     real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
     real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
     integer, dimension(:), allocatable :: a_shape, d_shape
     character(len=20) :: system = ''
-    
+
     real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
     real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
     real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
@@ -1865,54 +1895,54 @@ subroutine read_npa
     real(Float64) :: total_prob, hh, hw, dprob, dx, dy, r
     integer :: ichan,i,j,k,ix,iy,d_index,nd,cnt
     integer :: error
-    
+
     !!Initialize HDF5 interface
     call h5open_f(error)
-  
+
     !!Open HDF5 file
     call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
-  
+
     !!Check if NPA group exists
     call h5ltpath_valid_f(fid, "/npa", .True., path_valid, error)
     if(.not.path_valid) then
         write(*,'(a)') 'NPA geometry is not in the geometry file'
-        write(*,'(a)') 'Continuing without NPA diagnostics' 
+        write(*,'(a)') 'Continuing without NPA diagnostics'
         inputs%calc_npa = 0
         inputs%calc_npa_wght = 0
         return
     endif
-  
+
     !!Open NPA group
     call h5gopen_f(fid, "/npa", gid, error)
-  
+
     call h5ltread_dataset_string_f(gid, "/npa/system", system, error)
     call h5ltread_dataset_int_scalar_f(gid, "/npa/nchan", npa_chords%nchan, error)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- NPA settings ----"
         write(*,'(T2,"NPA System: ", a)') trim(adjustl(system))
         write(*,'(T2,"Number of channels: ",i3)') npa_chords%nchan
     endif
-  
+
     allocate(a_tedge(3, npa_chords%nchan))
     allocate(a_redge(3, npa_chords%nchan))
     allocate(a_cent(3,  npa_chords%nchan))
-    allocate(a_shape(npa_chords%nchan))    
+    allocate(a_shape(npa_chords%nchan))
     allocate(d_tedge(3, npa_chords%nchan))
     allocate(d_redge(3, npa_chords%nchan))
     allocate(d_cent(3,  npa_chords%nchan))
     allocate(d_shape(npa_chords%nchan))
     allocate(npa_chords%radius(npa_chords%nchan))
     allocate(npa_chords%det(npa_chords%nchan))
-    allocate(npa_chords%phit(beam_grid%nx, & 
+    allocate(npa_chords%phit(beam_grid%nx, &
                              beam_grid%ny, &
                              beam_grid%nz, &
                              npa_chords%nchan) )
-    allocate(npa_chords%hit(beam_grid%nx, & 
+    allocate(npa_chords%hit(beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz) )
     npa_chords%hit = .False.
-  
+
     allocate(effrd(3,beam_grid%nx,&
                      beam_grid%ny,&
                      beam_grid%nz,&
@@ -1923,32 +1953,32 @@ subroutine read_npa
                   npa_chords%nchan) )
     effrd = 0.d0
     phit = 0.d0
-  
+
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid,"/npa/radius", npa_chords%radius, dims(2:2), error)
     call h5ltread_dataset_int_f(gid, "/npa/a_shape", a_shape, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/npa/a_tedge", a_tedge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/a_redge", a_redge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/a_cent",  a_cent, dims, error)
-  
+
     call h5ltread_dataset_int_f(gid, "/npa/d_shape", d_shape, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/npa/d_tedge", d_tedge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/d_redge", d_redge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/d_cent",  d_cent, dims, error)
-  
+
     !!Close NPA group
     call h5gclose_f(gid, error)
-  
+
     !!Close file id
     call h5fclose_f(fid, error)
-  
+
     !!Close HDF5 interface
     call h5close_f(error)
-  
+
     ! Define detector/aperture shape
     npa_chords%det%detector%shape = d_shape
     npa_chords%det%aperture%shape = a_shape
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,a)') "Calculating hit probabilities for NPA channels"
     endif
@@ -1960,18 +1990,18 @@ subroutine read_npa
         call uvw_to_xyz(d_cent(:,ichan), xyz_d_cent)
         call uvw_to_xyz(d_redge(:,ichan),xyz_d_redge)
         call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
-  
+
         ! Define detector/aperture hh/hw
         npa_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
         npa_chords%det(ichan)%aperture%hw = norm2(xyz_a_redge - xyz_a_cent)
-  
+
         npa_chords%det(ichan)%detector%hh = norm2(xyz_d_tedge - xyz_d_cent)
         npa_chords%det(ichan)%aperture%hh = norm2(xyz_a_tedge - xyz_a_cent)
-  
+
         ! Define detector/aperture origin
         npa_chords%det(ichan)%detector%origin = xyz_d_cent
         npa_chords%det(ichan)%aperture%origin = xyz_a_cent
-  
+
         ! Define detector/aperture basis
         call plane_basis(xyz_d_cent, xyz_d_redge, xyz_d_tedge, &
              npa_chords%det(ichan)%detector%basis, &
@@ -2034,16 +2064,16 @@ subroutine read_npa
             enddo !y loop
         enddo !z loop
         !$OMP END PARALLEL DO
-  
+
         total_prob = sum(npa_chords%phit(:,:,:,ichan)%p)
         if(total_prob.le.0.d0) then
             WRITE(*,'("Channel ",i3," missed the beam grid")'),ichan
-            cycle chan_loop 
+            cycle chan_loop
         endif
-  
+
     enddo chan_loop
     if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
-  
+
     deallocate(phit,effrd)
     deallocate(a_shape,a_cent,a_redge,a_tedge)
     deallocate(d_shape,d_cent,d_redge,d_tedge)
@@ -2051,45 +2081,45 @@ subroutine read_npa
 end subroutine read_npa
 
 subroutine read_equilibrium
-    !+ Reads in the interpolation grid, plasma parameters, and fields 
+    !+ Reads in the interpolation grid, plasma parameters, and fields
     !+ and stores the quantities in [[libfida:inter_grid]] and [[libfida:equil]]
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(2) :: dims
-  
+
     integer :: impc
     integer :: error
-    
+
     integer, dimension(:,:), allocatable :: p_mask, f_mask
-  
+
     !!Initialize HDF5 interface
     call h5open_f(error)
-  
+
     !!Open HDF5 file
     call h5fopen_f(inputs%equilibrium_file, H5F_ACC_RDONLY_F, fid, error)
-  
+
     !!Open PLASMA group
     call h5gopen_f(fid, "/plasma", gid, error)
-  
+
     !!Read in interpolation grid
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nr", inter_grid%nr, error)
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nz", inter_grid%nz, error)
-  
+
     allocate(inter_grid%r(inter_grid%nr),inter_grid%z(inter_grid%nz))
     allocate(inter_grid%r2d(inter_grid%nr,inter_grid%nz))
     allocate(inter_grid%z2d(inter_grid%nr,inter_grid%nz))
     allocate(p_mask(inter_grid%nr,inter_grid%nz))
     allocate(f_mask(inter_grid%nr,inter_grid%nz))
-  
+
     dims = [inter_grid%nr, inter_grid%nz]
     call h5ltread_dataset_double_f(gid, "/plasma/r", inter_grid%r, dims(1:1), error)
     call h5ltread_dataset_double_f(gid, "/plasma/z", inter_grid%z, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/plasma/r2d", inter_grid%r2d, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/z2d", inter_grid%z2d, dims, error)
-  
+
     inter_grid%dr = abs(inter_grid%r(2)-inter_grid%r(1))
     inter_grid%dz = abs(inter_grid%z(2)-inter_grid%z(1))
     inter_grid%da = inter_grid%dr*inter_grid%dz
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Interpolation grid settings ----'
         write(*,'(T2,"Nr: ",i3)') inter_grid%nr
@@ -2097,10 +2127,10 @@ subroutine read_equilibrium
         write(*,'(T2,"dA: ", f4.2," [cm^2]")') inter_grid%da
         write(*,*) ''
     endif
-  
+
     !!Read in plasma parameters
     allocate(equil%plasma(inter_grid%nr,inter_grid%nz))
-  
+
     call h5ltread_dataset_double_f(gid, "/plasma/dene", equil%plasma%dene, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/te", equil%plasma%te, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/ti", equil%plasma%ti, dims, error)
@@ -2136,12 +2166,12 @@ subroutine read_equilibrium
 
     !!Close PLASMA group
     call h5gclose_f(gid, error)
-  
+
     !!Open FIELDS group
     call h5gopen_f(fid, "/fields", gid, error)
-    
+
     allocate(equil%fields(inter_grid%nr,inter_grid%nz))
-  
+
     !!Read in electromagnetic fields
     call h5ltread_dataset_double_f(gid, "/fields/br", equil%fields%br, dims, error)
     call h5ltread_dataset_double_f(gid, "/fields/bt", equil%fields%bt, dims, error)
@@ -2153,17 +2183,17 @@ subroutine read_equilibrium
 
     !!Close FIELDS group
     call h5gclose_f(gid, error)
-  
+
     !!Close file
     call h5fclose_f(fid, error)
-  
+
     !!Close HDF5 interface
     call h5close_f(error)
-  
+
     allocate(equil%mask(inter_grid%nr,inter_grid%nz))
     equil%mask = 0.d0
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
-  
+
 end subroutine read_equilibrium
 
 subroutine read_f(fid, error)
@@ -2172,17 +2202,17 @@ subroutine read_f(fid, error)
         !+ HDF5 file ID
     integer, intent(out)          :: error
         !+ Error code
-  
+
     integer(HSIZE_T), dimension(4) :: dims
     real(Float64) :: dummy(1)
-  
-    if(inputs%verbose.ge.1) then 
+
+    if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
     endif
-  
+
     call h5ltread_dataset_int_scalar_f(fid,"/nenergy", fbm%nenergy, error)
     call h5ltread_dataset_int_scalar_f(fid,"/npitch", fbm%npitch, error)
-    call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error) 
+    call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
 
     if((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)) then
@@ -2193,16 +2223,16 @@ subroutine read_f(fid, error)
     allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz))
     allocate(fbm%denf(fbm%nr, fbm%nz))
     allocate(fbm%f(fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz))
-  
+
     dims = [fbm%nenergy, fbm%npitch, fbm%nr, fbm%nz]
     call h5ltread_dataset_double_f(fid, "/energy", fbm%energy, dims(1:1), error)
     call h5ltread_dataset_double_f(fid, "/pitch", fbm%pitch, dims(2:2), error)
     call h5ltread_dataset_double_f(fid, "/r", fbm%r, dims(3:3), error)
     call h5ltread_dataset_double_f(fid, "/z", fbm%z, dims(4:4), error)
     call h5ltread_dataset_double_f(fid, "/denf",fbm%denf, dims(3:4), error)
-    call h5ltread_dataset_double_f(fid, "/f", fbm%f, dims, error) 
+    call h5ltread_dataset_double_f(fid, "/f", fbm%f, dims, error)
     equil%plasma%denf = fbm%denf
-    
+
     fbm%dE = abs(fbm%energy(2) - fbm%energy(1))
     fbm%dp = abs(fbm%pitch(2) - fbm%pitch(1))
     fbm%dr = abs(fbm%r(2) - fbm%r(1))
@@ -2218,11 +2248,11 @@ subroutine read_f(fid, error)
     dummy = maxval(fbm%pitch)
     fbm%pmax = dummy(1)
     fbm%p_range = fbm%pmax - fbm%pmin
-  
-    if(inputs%verbose.ge.1) then 
+
+    if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z)"
         write(*,'(T2,"Nenergy = ",i3)'),fbm%nenergy
-        write(*,'(T2,"Npitch  = ",i3)'),fbm%npitch 
+        write(*,'(T2,"Npitch  = ",i3)'),fbm%npitch
         write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")'),fbm%emin,fbm%emax
         write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")'),fbm%pmin,fbm%pmax
         write(*,*) ''
@@ -2251,14 +2281,14 @@ subroutine read_mc(fid, error)
     logical :: inp
     integer(Int32) :: npart,nrep
     character(len=32) :: dist_type_name = ''
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
     endif
-  
+
     call h5ltread_dataset_int_scalar_f(fid, "/nparticle", npart, error)
     call h5ltread_dataset_int_scalar_f(fid, "/nclass", particles%nclass, error)
-  
+
     nrep = ceiling(dble(inputs%n_fida)/npart)
     particles%nparticle = int(nrep*npart)
 
@@ -2271,13 +2301,13 @@ subroutine read_mc(fid, error)
     allocate(vz(npart))
     allocate(weight(npart))
     allocate(orbit_class(npart))
-  
+
     dims(1) = npart
     call h5ltread_dataset_double_f(fid, "/r", r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", z, dims, error)
     call h5ltread_dataset_double_f(fid, "/weight", weight, dims, error)
     call h5ltread_dataset_int_f(fid, "/class", orbit_class, dims, error)
-  
+
     if(inputs%dist_type.eq.2) then
         dist_type_name = "Guiding Center Monte Carlo"
         allocate(energy(npart))
@@ -2290,12 +2320,12 @@ subroutine read_mc(fid, error)
         call h5ltread_dataset_double_f(fid, "/vt", vt, dims, error)
         call h5ltread_dataset_double_f(fid, "/vz", vz, dims, error)
     endif
-  
+
     cnt=0
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
     !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &
-    !$OMP& delta_phi,phi_enter,phi_exit,r_ratio,C_xyz) 
+    !$OMP& delta_phi,phi_enter,phi_exit,r_ratio,C_xyz)
     particle_loop: do i=1,npart
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(npart)*100,char(13)
@@ -2306,9 +2336,8 @@ subroutine read_mc(fid, error)
             j = int((i-1)*nrep + ii)
             if(inputs%dist_type.eq.2) then
                 !! Transform to full orbit
-                fields%machine_coords = .True.
                 uvw = [r(i), 0.d0, z(i)]
-                call get_fields(fields,pos = uvw)
+                call get_fields(fields,pos = uvw, machine_coords=.True.)
                 call gyro_correction(fields, uvw, energy(i), pitch(i), ri, vi)
                 particles%fast_ion(j)%r = sqrt(ri(1)**2 + ri(2)**2)
                 particles%fast_ion(j)%z = ri(3)
@@ -2338,7 +2367,7 @@ subroutine read_mc(fid, error)
             call uvw_to_xyz([0.d0, 0.d0, particles%fast_ion(j)%z], C_xyz)
             call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(j)%r,phi_enter,phi_exit)
             delta_phi = phi_exit-phi_enter
-            if(delta_phi.gt.0) then 
+            if(delta_phi.gt.0) then
                 particles%fast_ion(j)%cross_grid = .True.
             else
                 particles%fast_ion(j)%cross_grid = .False.
@@ -2361,52 +2390,52 @@ subroutine read_mc(fid, error)
         cnt=cnt+1
     enddo particle_loop
     !$OMP END PARALLEL DO
- 
+
     num = count(particles%fast_ion%cross_grid)
     if(num.le.0) then
         write(*,'(a)') 'READ_MC: No mc particles in beam grid'
         stop
     endif
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') dist_type_name
         write(*,'(T2,"Number of mc particles: ",i9)') npart
         write(*,'(T2,"Number of orbit classes: ",i6)') particles%nclass
         write(*,*) ''
     endif
-  
+
 end subroutine read_mc
 
 subroutine read_distribution
     !+ Reads in the fast-ion distribution
     integer(HID_T) :: fid
     integer :: error
-    
+
     !!Initialize HDF5 interface
     call h5open_f(error)
-  
+
     !!Open HDF5 file
     call h5fopen_f(inputs%distribution_file, H5F_ACC_RDONLY_F, fid, error)
-  
+
     !!Get distribution type
     call h5ltread_dataset_int_scalar_f(fid, "/type", inputs%dist_type, error)
-    
+
     if(inputs%dist_type.eq.1) then
         call read_f(fid, error)
     else !2 or 3
         call read_mc(fid, error)
     endif
-  
+
     !!Close file
     call h5fclose_f(fid, error)
-  
+
     !!Close HDF5 interface
     call h5close_f(error)
-  
+
 end subroutine read_distribution
 
 subroutine read_cross(fid, grp, cross)
-    !+ Reads in a cross section table from file 
+    !+ Reads in a cross section table from file
     !+ and puts it into a [[AtomicCrossSection]] type
     integer(HID_T), intent(in)              :: fid
         !+ HDF5 file ID
@@ -2414,12 +2443,12 @@ subroutine read_cross(fid, grp, cross)
         !+ HDF5 group to read from
     type(AtomicCrossSection), intent(inout) :: cross
         !+ Atomic cross section
-  
+
     integer(HSIZE_T), dimension(3) :: dim3
     real(Float64) :: emin, emax, rmin
     integer :: i, n_max, m_max, error
     real(Float64), dimension(:,:,:), allocatable :: dummy3
-  
+
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", cross%nenergy, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_max", n_max, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/m_max", m_max, error)
@@ -2428,11 +2457,11 @@ subroutine read_cross(fid, grp, cross)
     call h5ltread_dataset_double_scalar_f(fid,grp//"/dlogE", cross%dlogE, error)
     cross%logemin = log10(emin)
     cross%logemax = log10(emax)
-  
+
     allocate(dummy3(n_max, m_max, cross%nenergy))
-  
+
     allocate(cross%log_cross(cross%m_max,cross%n_max, cross%nenergy))
-  
+
     dim3 = [n_max, m_max, tables%H_H_cx%nenergy]
     call h5ltread_dataset_double_f(fid,grp//"/cx", dummy3, dim3, error)
     rmin = minval(dummy3,dummy3.gt.0.d0)
@@ -2473,12 +2502,12 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
     real(Float64), dimension(:,:), allocatable :: dummy2
     real(Float64), dimension(:,:,:,:), allocatable :: dummy4
     real(Float64), dimension(:,:,:,:,:), allocatable :: dummy5
-  
+
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
     allocate(dummy2(2, n_bt_amu))
     dim2 = [2, n_bt_amu]
     call h5ltread_dataset_double_f(fid, grp//"/bt_amu", dummy2, dim2, error)
-  
+
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_max", n_max, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/m_max", m_max, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", rates%nenergy, error)
@@ -2493,7 +2522,7 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
     rates%logemax = log10(emax)
     rates%logtmin = log10(tmin)
     rates%logtmax = log10(tmax)
-  
+
     bt_ind = 1
     tt_ind = 1
     bt_amu = [b_amu(1), t_amu]
@@ -2514,9 +2543,9 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
     enddo
     rates%ab(1) = dummy2(1,bt_ind)
     rates%ab(2) = dummy2(1,tt_ind)
-  
+
     deallocate(dummy2)
-  
+
     allocate(rates%log_pop(&
                     rates%m_max, &
                     rates%n_max, &
@@ -2528,7 +2557,7 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
                     rates%ntemp, 2))
     rates%log_pop = 0.d0
     rates%log_depop = 0.d0
-  
+
     !!Read CX
     call h5ltpath_valid_f(fid, grp//"/cx", .True., path_valid, error)
     if(path_valid) then
@@ -2566,7 +2595,7 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
             deallocate(dummy5)
         endif
     endif
-    
+
     !!Read ionization
     call h5ltpath_valid_f(fid, grp//"/ionization", .True., path_valid, error)
     if(path_valid) then
@@ -2587,7 +2616,7 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
         enddo
         deallocate(dummy4)
     endif
-  
+
     !!Read excitation
     call h5ltpath_valid_f(fid, grp//"/excitation", .True., path_valid, error)
     if(path_valid) then
@@ -2610,21 +2639,21 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
         enddo
         deallocate(dummy5)
     endif
-  
+
     rmin = minval(rates%log_depop, rates%log_depop.gt.0.d0)
     where (rates%log_depop.le.0.d0)
         rates%log_depop = 0.9*rmin
     end where
     rates%minlog_depop = log10(rmin)
     rates%log_depop = log10(rates%log_depop)
-  
+
     rmin = minval(rates%log_pop, rates%log_pop.gt.0.d0)
     where (rates%log_pop.le.0.d0)
         rates%log_pop = 0.9*rmin
     end where
     rates%minlog_pop = log10(rmin)
     rates%log_pop = log10(rates%log_pop)
-  
+
 end subroutine read_rates
 
 subroutine read_tables
@@ -2632,69 +2661,69 @@ subroutine read_tables
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(2) :: dim2
     integer :: error
-   
+
     integer :: n_max, m_max
     character(len=4) :: impname
     real(Float64) :: imp_amu
     real(Float64), dimension(2) :: b_amu
     real(Float64), dimension(:,:), allocatable :: dummy2
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Atomic tables settings ----"
     endif
-  
+
     !!Initialize HDF5 interface
     call h5open_f(error)
-  
+
     !!Open HDF5 file
     call h5fopen_f(inputs%tables_file, H5F_ACC_RDONLY_F, fid, error)
-  
+
     !!Read Hydrogen-Hydrogen CX Cross Sections
     call read_cross(fid,"/cross/H_H",tables%H_H_cx)
-  
+
     !!Read Hydrogen-Hydrogen Rates
     b_amu = [inputs%ab, inputs%ai]
-    call read_rates(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H) 
+    call read_rates(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
     inputs%ab = tables%H_H%ab(1)
     inputs%ai = tables%H_H%ab(2)
-  
+
     !!Read Hydrogen-Electron Rates
     call read_rates(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
-  
+
     !!Read Hydrogen-Impurity rates
     impname = ''
     select case (inputs%impurity_charge)
         case (5)
             impname = "B5"
             imp_amu = B5_amu
-        case (6) 
+        case (6)
             impname = "C6"
             imp_amu = C6_amu
         case DEFAULT
             impname = "Aq"
             imp_amu = 2.d0*inputs%impurity_charge
     end select
-  
+
     call read_rates(fid,"/rates/H_"//trim(adjustl(impname)), b_amu, imp_amu, tables%H_Aq)
-  
+
     !!Read Einstein coefficients
-    call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/n_max", n_max, error) 
-    call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/m_max", m_max, error) 
+    call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/n_max", n_max, error)
+    call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/m_max", m_max, error)
     allocate(dummy2(n_max,m_max))
     dim2 = [n_max, m_max]
     call h5ltread_dataset_double_f(fid,"/rates/spontaneous/einstein",dummy2, dim2, error)
     tables%einstein(:,:) = transpose(dummy2(1:nlevs,1:nlevs))
     deallocate(dummy2)
-  
+
     !!Close file
     call h5fclose_f(fid, error)
-  
+
     !!Close HDF5 interface
     call h5close_f(error)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Maximum n/m: ",i2)') nlevs
-        write(*,'(T2,"Beam/Fast-ion mass: ",f6.3," [amu]")') inputs%ab 
+        write(*,'(T2,"Beam/Fast-ion mass: ",f6.3," [amu]")') inputs%ab
         write(*,'(T2,"Thermal/Bulk-ion mass: ",f6.3," [amu]")') inputs%ai
         write(*,'(T2,"Impurity mass: ",f6.3," [amu]")') imp_amu
         write(*,*) ''
@@ -2714,7 +2743,7 @@ subroutine write_beam_grid(id, error)
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: u_grid, v_grid, w_grid
     real(Float64) :: xyz(3),uvw(3)
     integer :: i,j,k
-  
+
     !Create uvw grids
     do k=1, beam_grid%nz
         do j=1, beam_grid%ny
@@ -2729,25 +2758,25 @@ subroutine write_beam_grid(id, error)
            enddo
         enddo
     enddo
-  
+
     !Create grid group
     call h5gcreate_f(id, "grid", gid, error)
-  
+
     !Write variables
     dims(1) = 1
     call h5ltmake_dataset_int_f(gid,"nx", 0, dims(1:1), [beam_grid%nx], error)
     call h5ltmake_dataset_int_f(gid,"ny", 0, dims(1:1), [beam_grid%ny], error)
     call h5ltmake_dataset_int_f(gid,"nz", 0, dims(1:1), [beam_grid%nz], error)
-  
+
     dims = [beam_grid%nx, beam_grid%ny, beam_grid%nz]
     call h5ltmake_compressed_dataset_double_f(gid,"x", 1, dims(1:1), beam_grid%xc, error)
     call h5ltmake_compressed_dataset_double_f(gid,"y", 1, dims(2:2), beam_grid%yc, error)
     call h5ltmake_compressed_dataset_double_f(gid,"z", 1, dims(3:3), beam_grid%zc, error)
-  
+
     call h5ltmake_compressed_dataset_double_f(gid,"x_grid", 3, dims, u_grid, error)
     call h5ltmake_compressed_dataset_double_f(gid,"y_grid", 3, dims, v_grid, error)
     call h5ltmake_compressed_dataset_double_f(gid,"z_grid", 3, dims, w_grid, error)
-  
+
     !Write attributes
     call h5ltset_attribute_string_f(gid,"nx","description", &
          "Number of cells in the X direction", error)
@@ -2764,7 +2793,7 @@ subroutine write_beam_grid(id, error)
     call h5ltset_attribute_string_f(gid,"z","description", &
          "Z value of cell center in beam grid coordinates", error)
     call h5ltset_attribute_string_f(gid,"z","units", "cm", error)
-  
+
     call h5ltset_attribute_string_f(gid,"x_grid","description", &
          "X value of cell center in machine coordinates: x_grid(x,y,z)", error)
     call h5ltset_attribute_string_f(gid,"x_grid","units", "cm", error)
@@ -2774,13 +2803,13 @@ subroutine write_beam_grid(id, error)
     call h5ltset_attribute_string_f(gid,"z_grid","description", &
          "Z value of cell center in machine coordinates: z_grid(x,y,z)", error)
     call h5ltset_attribute_string_f(gid,"z_grid","units", "cm", error)
-  
+
     call h5ltset_attribute_string_f(id,"grid","coordinate_system", &
          "Right-handed cartesian",error)
-  
-    !Close grid group 
+
+    !Close grid group
     call h5gclose_f(gid, error)
-  
+
 end subroutine write_beam_grid
 
 subroutine write_birth_profile
@@ -2790,7 +2819,7 @@ subroutine write_birth_profile
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
     integer :: error, i, npart
-  
+
     character(charlim) :: filename
     real(Float64), dimension(:,:), allocatable :: ri
     real(Float64), dimension(:,:), allocatable :: vi
@@ -2800,7 +2829,7 @@ subroutine write_birth_profile
     npart = birth%cnt-1
     allocate(ri(3,npart))
     allocate(vi(3,npart))
-  
+
     do i=1,npart
         ! Convert position to rzphi
         xyz = birth%ri(:,i)
@@ -2815,15 +2844,15 @@ subroutine write_birth_profile
         vi(2,i) = v_uvw(3)
         vi(3,i) = -v_uvw(1)*sin(ri(3,i)) + v_uvw(2)*cos(ri(3,i))
     enddo
-  
+
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.h5"
-  
+
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-  
+
     !Write variables
     call write_beam_grid(fid, error)
     d(1) = 1
@@ -2833,7 +2862,7 @@ subroutine write_birth_profile
     dim2 = [3, npart]
     call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
-    call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, birth%ind, error) 
+    call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, birth%ind, error)
     call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), birth%neut_type, error)
 
     !Add attributes
@@ -2859,15 +2888,15 @@ subroutine write_birth_profile
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid, "/", "description", &
          "Birth density and particles calculated by FIDASIM", error)
-  
+
     !!Close file
     call h5fclose_f(fid, error)
-  
+
     !!Close HDF5 interface
     call h5close_f(error)
-    
+
     deallocate(ri,vi)
-    if(inputs%verbose.ge.1) then 
+    if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'birth profile written to: ',trim(filename)
     endif
 
@@ -2879,42 +2908,42 @@ subroutine write_dcx
     integer(HSIZE_T), dimension(4) :: dims
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
-  
+
     character(charlim) :: filename
     character(15) :: spec_str
     integer :: i
     real(Float64), dimension(:),   allocatable :: lambda_arr
     real(Float64), dimension(:,:), allocatable :: dcx_spec
-  
+
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_dcx.h5"
     spec_str = ""
-    if(inputs%calc_spec.ge.1) then 
+    if(inputs%calc_spec.ge.1) then
         spec_str = " spectra and"
         allocate(lambda_arr(inputs%nlambda))
-        do i=1,inputs%nlambda 
+        do i=1,inputs%nlambda
             lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin ! [nm]
-        enddo 
- 
+        enddo
+
         allocate(dcx_spec(inputs%nlambda,spec_chords%nchan))
         !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
         dcx_spec = spec%bes(:,:,halo_type)/(inputs%dlambda)/(4.d0*pi)*1.d4
     endif
- 
+
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-  
+
     !Write variables
     call write_beam_grid(fid, error)
 
-    d(1) =1 
+    d(1) =1
     call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
-    dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz ] 
+    dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz ]
     call h5ltmake_compressed_dataset_double_f(fid, "/dens", 4, dims, &
          neut%dens(:,halo_type,:,:,:), error)
-  
+
     if(inputs%calc_spec.ge.1) then
         call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
         call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
@@ -2944,27 +2973,27 @@ subroutine write_dcx
              "Direct Charge Exchange (DCX) beam emission: spec(lambda, chan)", error)
         call h5ltset_attribute_string_f(fid,"/spec","units","Ph/(s*nm*sr*m^2)",error)
         call h5ltset_attribute_string_f(fid,"/lambda","description", &
-             "Wavelength array", error) 
+             "Wavelength array", error)
         call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
         call h5ltset_attribute_string_f(fid,"/radius", "description", &
              "Line of sight radius at midplane or tangency point", error)
         call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
     endif
- 
+
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description", &
          "Direct Charge Exchange (DCX)"//trim(spec_str)//" neutral density calculated by FIDASIM", error)
-  
+
     !Close file
     call h5fclose_f(fid, error)
-  
+
     !Close HDF5 interface
     call h5close_f(error)
- 
-    if(inputs%calc_spec.ge.1) then 
+
+    if(inputs%calc_spec.ge.1) then
         deallocate(dcx_spec,lambda_arr)
     endif
-    
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'dcx written to: ',trim(filename)
     endif
@@ -2977,21 +3006,21 @@ subroutine write_neutrals
     integer(HSIZE_T), dimension(4) :: dims
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
-  
+
     character(charlim) :: filename
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.h5"
 
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-  
+
     !Write variables
     call write_beam_grid(fid, error)
     dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz]
-    d(1) =1 
+    d(1) =1
     call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
     call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
          neut%dens(:,nbif_type,:,:,:), error)
@@ -3001,36 +3030,36 @@ subroutine write_neutrals
          neut%dens(:,nbit_type,:,:,:), error)
     call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
          neut%dens(:,halo_type,:,:,:), error)
-  
+
     !Write attributes
     call h5ltset_attribute_string_f(fid,"/nlevel","description", &
          "Number of atomic energy levels", error)
     call h5ltset_attribute_string_f(fid,"/fdens","description", &
          "Neutral density for the full energy component of the beam: fdens(level,x,y,z)", error)
     call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
-    
+
     call h5ltset_attribute_string_f(fid,"/hdens","description", &
          "Neutral density for the half energy component of the beam: hdens(level,x,y,z)", error)
     call h5ltset_attribute_string_f(fid,"/hdens","units","neutrals*cm^-3",error)
-  
+
     call h5ltset_attribute_string_f(fid,"/tdens","description", &
          "Neutral density for the third energy component of the beam: tdens(level,x,y,z)", error)
     call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
-  
+
     call h5ltset_attribute_string_f(fid,"/halodens","description", &
          "Neutral density of the beam halo(including dcx): halodens(level,x,y,z)", error)
     call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
-  
+
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description", &
          "Beam neutral density calculated by FIDASIM", error)
-  
+
     !Close file
     call h5fclose_f(fid, error)
-  
+
     !Close HDF5 interface
     call h5close_f(error)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'neutral density written to: ',trim(filename)
     endif
@@ -3040,28 +3069,28 @@ end subroutine write_neutrals
 subroutine write_npa
     !+ Writes [[libfida:npa]] to a HDF5 file
     integer(HID_T) :: fid, gid
-    integer(HSIZE_T), dimension(2) :: dim2 
+    integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
-  
+
     integer, dimension(:), allocatable :: dcount
     real(Float64), dimension(:,:), allocatable :: ri, rf
     integer :: i, n
     character(charlim) :: filename = ''
-  
+
     allocate(dcount(npa_chords%nchan))
     do i=1,npa_chords%nchan
         dcount(i) = count(npa%part%detector.eq.i)
     enddo
-  
+
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.h5"
-  
+
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-  
+
     !Write variables
     d(1) = 1
     dim2 = [fbm%nenergy, npa%nchan]
@@ -3073,7 +3102,7 @@ subroutine write_npa
          npa_chords%radius, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/flux",2,dim2,npa%flux, error)
     call h5ltmake_compressed_dataset_int_f(fid,"/count",1,dim2(2:2), dcount, error)
-  
+
     !Add attributes
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description", &
@@ -3093,9 +3122,9 @@ subroutine write_npa
     call h5ltset_attribute_string_f(fid,"/flux", "units","neutrals/(s*dE)", error)
     call h5ltset_attribute_string_f(fid,"/count","description", &
          "Number of particles that hit the detector: count(chan)", error)
-  
+
     deallocate(dcount)
-  
+
     if((npa%npart.ne.0).and.(inputs%calc_npa.ge.2)) then
         n = npa%npart
         allocate(ri(3,n),rf(3,n))
@@ -3105,7 +3134,7 @@ subroutine write_npa
         rf(1,:) = npa%part(1:n)%xf
         rf(2,:) = npa%part(1:n)%yf
         rf(3,:) = npa%part(1:n)%zf
-  
+
         !Create Group
         call h5gcreate_f(fid,"/particles",gid, error)
         call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npa%npart], error)
@@ -3121,7 +3150,7 @@ subroutine write_npa
              npa%part(1:n)%weight, error)
         call h5ltmake_compressed_dataset_int_f(gid,"detector",1,d,&
              npa%part(1:n)%detector, error)
-  
+
         !Add attributes
         call h5ltset_attribute_string_f(gid,"nparticle","description", &
              "Number of particles that hit a detector", error)
@@ -3141,23 +3170,23 @@ subroutine write_npa
         call h5ltset_attribute_string_f(gid,"weight","units","neutrals/s",error)
         call h5ltset_attribute_string_f(gid,"detector","description", &
              "Detector that the neutral particle hit", error)
-  
+
         call h5ltset_attribute_string_f(fid,"/particles","coordinate_system", &
              "Right-handed cartesian",error)
         call h5ltset_attribute_string_f(fid,"/particles","description", &
              "Monte Carlo particles",error)
-  
+
         !Close group
         call h5gclose_f(gid, error)
         deallocate(ri,rf)
     endif
-  
+
     !Close file
     call h5fclose_f(fid, error)
-  
+
     !Close HDF5 interface
     call h5close_f(error)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'NPA data written to: ',trim(filename)
     endif
@@ -3170,30 +3199,30 @@ subroutine write_spectra
     integer(HSIZE_T), dimension(3) :: dims
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
-  
+
     character(charlim) :: filename
     integer :: i
     real(Float64), dimension(:), allocatable :: lambda_arr
-  
+
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
         lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin
     enddo
-  
+
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
     spec%brems=spec%brems/(inputs%dlambda)/(4.d0*pi)*1.d4
     spec%bes=spec%bes/(inputs%dlambda)/(4.d0*pi)*1.d4
     spec%fida=spec%fida/(inputs%dlambda)/(4.d0*pi)*1.d4
-  
+
     !! write to file
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.h5"
-  
+
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-  
+
     !Write variables
     d(1) = 1
     call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
@@ -3205,20 +3234,20 @@ subroutine write_spectra
          lambda_arr, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
          spec_chords%radius, error)
-  
+
     !Add attributes
     call h5ltset_attribute_string_f(fid,"/nchan", "description", &
          "Number of channels", error)
     call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
          "Number of wavelengths", error)
     call h5ltset_attribute_string_f(fid,"/lambda","description", &
-         "Wavelength array", error) 
+         "Wavelength array", error)
     call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
     call h5ltset_attribute_string_f(fid,"/radius", "description", &
          "Line of sight radius at midplane or tangency point", error)
     call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
-  
-    if(inputs%calc_brems.ge.1) then 
+
+    if(inputs%calc_brems.ge.1) then
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/brems", 2, &
              dims(1:2), spec%brems, error)
@@ -3228,7 +3257,7 @@ subroutine write_spectra
         call h5ltset_attribute_string_f(fid,"/brems","units",&
              "Ph/(s*nm*sr*m^2)",error )
     endif
-  
+
     if(inputs%calc_bes.ge.1) then
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
@@ -3253,7 +3282,7 @@ subroutine write_spectra
              "Halo component of the beam emmision (includes dcx): halo(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
     endif
-  
+
     if(inputs%calc_fida.ge.1) then
         !Write variables
         if(particles%nclass.le.1) then
@@ -3272,18 +3301,18 @@ subroutine write_spectra
        endif
         call h5ltset_attribute_string_f(fid,"/fida","units","Ph/(s*nm*sr*m^2)",error )
     endif
-  
+
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
          "Spectra calculated by FIDASIM", error)
-  
+
     !Close file
     call h5fclose_f(fid, error)
-  
+
     !Close HDF5 interface
     call h5close_f(error)
-  
-    if(inputs%verbose.ge.1) then 
+
+    if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'Spectra written to: ', trim(filename)
     endif
 
@@ -3297,7 +3326,7 @@ subroutine write_fida_weights
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: dim1
     integer :: error
-  
+
     character(charlim) :: filename
     integer :: i,ie,ip,ic,iwav
     real(Float64), dimension(:),   allocatable :: lambda_arr
@@ -3305,13 +3334,13 @@ subroutine write_fida_weights
     real(Float64), dimension(:,:), allocatable :: jacobian,e_grid,p_grid
     real(Float64), dimension(:,:), allocatable :: vpa_grid,vpe_grid,fida
     real(Float64) :: dlambda, wtot, dE, dP
-  
+
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     allocate(lambda_arr(inputs%nlambda_wght))
     do i=1,inputs%nlambda_wght
         lambda_arr(i)=(i-0.5)*dlambda + inputs%lambdamin_wght
     enddo
-  
+
     !! define arrays
     !! define energy - array
     allocate(ebarr(inputs%ne_wght))
@@ -3319,37 +3348,37 @@ subroutine write_fida_weights
         ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
     dE = abs(ebarr(2)-ebarr(1))
-  
+
     !! define pitch - array
     allocate(ptcharr(inputs%np_wght))
     do i=1,inputs%np_wght
         ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
     enddo
     dP = abs(ptcharr(2)-ptcharr(1))
-  
+
     !! define 2d grids
     !! define energy grid
     allocate(e_grid(inputs%ne_wght,inputs%np_wght))
     do i=1,inputs%ne_wght
         e_grid(i,:) = ebarr(i)
     enddo
-  
+
     !! define pitch grid
     allocate(p_grid(inputs%ne_wght,inputs%np_wght))
     do i=1,inputs%np_wght
         p_grid(:,i) = ptcharr(i)
     enddo
-  
+
     !! define velocity space grid
     allocate(vpe_grid(inputs%ne_wght,inputs%np_wght)) !! V perpendicular
     allocate(vpa_grid(inputs%ne_wght,inputs%np_wght)) !! V parallel
     vpa_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid)*p_grid ! [cm/s]
     vpe_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid*(1.0-p_grid**2)) ![cm/s]
-  
+
     !! define jacobian to convert between E-p to velocity
     allocate(jacobian(inputs%ne_wght,inputs%np_wght))
     jacobian = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2 + vpe_grid**2)
- 
+
     !! normalize mean_f
     do ic=1,spec_chords%nchan
         do ip=1,inputs%np_wght
@@ -3361,21 +3390,21 @@ subroutine write_fida_weights
             enddo
         enddo
     enddo
-  
-    !! Calculate FIDA estimate  
+
+    !! Calculate FIDA estimate
     allocate(fida(inputs%nlambda_wght,spec_chords%nchan))
     do iwav=1,size(fida,1)
         fida(iwav,:) = (dE*dP*1d4)*sum(sum(fweight%mean_f(:,:,:)*fweight%weight(iwav,:,:,:),1),1)
     enddo
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.h5"
-  
+
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-  
+
     dim1(1) = 1
     dim2 = [inputs%nlambda_wght, spec_chords%nchan]
     dim4 = [inputs%nlambda_wght, inputs%ne_wght, inputs%np_wght, spec_chords%nchan]
@@ -3395,10 +3424,10 @@ subroutine write_fida_weights
     call h5ltmake_compressed_dataset_double_f(fid,"/vpa_grid",2,dim2,vpa_grid, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/e_grid",2,dim2,e_grid, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/p_grid",2,dim2,p_grid, error)
-  
+
     !Add attributes
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    if(inputs%calc_fida_wght.eq.1) then 
+    if(inputs%calc_fida_wght.eq.1) then
         call h5ltset_attribute_string_f(fid,"/", "description", &
              "Line of Sight averaged FIDA E-p space sensitivity/weights " // &
              "and spectra calculated by FIDASIM", error)
@@ -3420,7 +3449,7 @@ subroutine write_fida_weights
     call h5ltset_attribute_string_f(fid,"/mean_f","units", &
          "fast-ion/(dE*dP*cm^3)", error)
     call h5ltset_attribute_string_f(fid,"/lambda","description", &
-         "Wavelength array", error) 
+         "Wavelength array", error)
     call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
     call h5ltset_attribute_string_f(fid,"/nchan", "description", &
          "Number of channels", error)
@@ -3429,10 +3458,10 @@ subroutine write_fida_weights
     call h5ltset_attribute_string_f(fid,"/npitch", "description", &
          "Number of pitch value", error)
     call h5ltset_attribute_string_f(fid,"/energy","description", &
-         "Energy array", error) 
+         "Energy array", error)
     call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
     call h5ltset_attribute_string_f(fid,"/pitch", "description", &
-         "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error) 
+         "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
     call h5ltset_attribute_string_f(fid,"/radius", "description", &
          "Line of sight radius at midplane or tangency point", error)
     call h5ltset_attribute_string_f(fid,"/radius", "units","cm", error)
@@ -3451,13 +3480,13 @@ subroutine write_fida_weights
     call h5ltset_attribute_string_f(fid,"/vpa_grid","description", &
          "2D parallel velocity grid", error)
     call h5ltset_attribute_string_f(fid,"/vpa_grid","units","cm/s", error)
-  
+
     !Close file
     call h5fclose_f(fid, error)
-  
+
     !Close HDF5 interface
     call h5close_f(error)
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'FIDA weights written to: ', trim(filename)
     endif
@@ -3469,7 +3498,7 @@ subroutine write_npa_weights
     character(charlim) :: filename
     integer :: i
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr
-   
+
     !! HDF5 variables
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(5) :: dim5
@@ -3477,27 +3506,27 @@ subroutine write_npa_weights
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
-  
+
     !! define energy - array
     allocate(ebarr(inputs%ne_wght))
     do i=1,inputs%ne_wght
         ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
-  
+
     !! define pitch - array
     allocate(ptcharr(inputs%np_wght))
     do i=1,inputs%np_wght
         ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
     enddo
-  
+
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.h5"
-  
+
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-  
+
     !Write variables
     d(1) = 1
     dim2 = [inputs%ne_wght, npa_chords%nchan]
@@ -3516,7 +3545,7 @@ subroutine write_npa_weights
          dim2, nweight%flux, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/weight", 3, &
          dim3, nweight%weight, error)
-  
+
     !Add attributes
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/", "description", &
@@ -3528,10 +3557,10 @@ subroutine write_npa_weights
     call h5ltset_attribute_string_f(fid,"/npitch", "description", &
          "Number of pitch value", error)
     call h5ltset_attribute_string_f(fid,"/energy","description", &
-         "Energy array", error) 
+         "Energy array", error)
     call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
     call h5ltset_attribute_string_f(fid,"/pitch", "description", &
-         "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error) 
+         "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
     call h5ltset_attribute_string_f(fid,"/radius", "description", &
          "Line of sight radius at midplane or tangency point", error)
     call h5ltset_attribute_string_f(fid,"/radius", "units","cm", error)
@@ -3543,7 +3572,7 @@ subroutine write_npa_weights
          "E-p space sensivity/weight of NPA diagnostics: weight(energy,pitch,chan)", error)
     call h5ltset_attribute_string_f(fid,"/weight","units", &
          "neutrals/(s*fast-ion*dE*dP)",error)
-  
+
     if(inputs%calc_npa_wght.ge.2) then !Write diagnostic variables
         call write_beam_grid(fid, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/emissivity", 4, &
@@ -3554,7 +3583,7 @@ subroutine write_npa_weights
              dim5, nweight%cx, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/phit", 4, &
              dim5(2:5), npa_chords%phit%p, error)
-  
+
         call h5ltset_attribute_string_f(fid,"/emissivity", "description", &
              "Neutral emissivity: emissivity(x,y,z,chan)", error)
         call h5ltset_attribute_string_f(fid,"/emissivity", "units", &
@@ -3567,16 +3596,16 @@ subroutine write_npa_weights
         call h5ltset_attribute_string_f(fid,"/phit","description", &
              "Probability of hitting the detector given an isotropic source: phit(x,y,z,chan)", error)
     endif
-  
+
     !Close file
     call h5fclose_f(fid, error)
-  
+
     !Close HDF5 interface
     call h5close_f(error)
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'NPA weights written to: ',trim(filename)
     endif
-  
+
 end subroutine write_npa_weights
 
 subroutine read_neutrals
@@ -3585,11 +3614,11 @@ subroutine read_neutrals
     integer(HSIZE_T), dimension(4) :: dims
     integer :: error,nx,ny,nz
     logical :: exis
-  
-    if(inputs%verbose.ge.1) then 
+
+    if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- loading neutrals ----'
     endif
-  
+
     inquire(file=inputs%neutrals_file,exist=exis)
     if(exis) then
         write(*,'(T2,"Neutrals file: ",a)') trim(inputs%neutrals_file)
@@ -3598,26 +3627,26 @@ subroutine read_neutrals
         write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
         stop
     endif
-  
+
     !Open HDF5 interface
     call h5open_f(error)
-    
+
     !Create file overwriting any existing file
     call h5fopen_f(inputs%neutrals_file, H5F_ACC_RDONLY_F, fid, error)
-  
+
     call h5gopen_f(fid, "/grid", gid, error)
-    call h5ltread_dataset_int_scalar_f(gid,"nx", nx, error) 
-    call h5ltread_dataset_int_scalar_f(gid,"ny", ny, error) 
+    call h5ltread_dataset_int_scalar_f(gid,"nx", nx, error)
+    call h5ltread_dataset_int_scalar_f(gid,"ny", ny, error)
     call h5ltread_dataset_int_scalar_f(gid,"nz", nz, error)
     call h5gclose_f(gid, error)
-  
+
     if((nx.ne.beam_grid%nx).or. &
        (ny.ne.beam_grid%ny).or. &
        (nz.ne.beam_grid%nz)) then
         write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
         stop
     endif
-  
+
     dims = [nlevs, nx, ny, nz]
     call h5ltread_dataset_double_f(fid,"/fdens", &
          neut%dens(:,nbif_type,:,:,:), dims, error)
@@ -3627,13 +3656,13 @@ subroutine read_neutrals
          neut%dens(:,nbit_type,:,:,:), dims, error)
     call h5ltread_dataset_double_f(fid,"/halodens", &
          neut%dens(:,halo_type,:,:,:), dims, error)
-  
+
     !Close file
     call h5fclose_f(fid, error)
-  
+
     !Close HDF5 interface
     call h5close_f(error)
-    
+
 end subroutine read_neutrals
 
 !=============================================================================
@@ -3689,7 +3718,7 @@ function cross_product(u, v) result(s)
     real(Float64), dimension(3), intent(in) :: u
     real(Float64), dimension(3), intent(in) :: v
     real(Float64), dimension(3)             :: s
-  
+
     s(1) = u(2)*v(3) - u(3)*v(2)
     s(2) = u(3)*v(1) - u(1)*v(3)
     s(3) = u(1)*v(2) - u(2)*v(1)
@@ -3705,21 +3734,21 @@ subroutine tb_zyx(alpha, beta, gamma, basis, inv_basis)
     real(Float64), intent(in)                            :: gamma
         !+ Angle of rotation about x"
     real(Float64), dimension(3,3), intent(out)           :: basis
-        !+ Rotation matrix/basis for transforming from rotated to non-rotated coordinates  
+        !+ Rotation matrix/basis for transforming from rotated to non-rotated coordinates
     real(Float64), dimension(3,3), intent(out), optional :: inv_basis
         !+ Inverse basis for reverse transformation
 
     real(Float64) :: sa, sb, sg, ca, cb, cg
-  
+
     sa = sin(alpha) ; sb = sin(beta) ; sg = sin(gamma)
     ca = cos(alpha) ; cb = cos(beta) ; cg = cos(gamma)
-  
+
     basis(1,1) = ca*cb ; basis(1,2) = ca*sb*sg - cg*sa ; basis(1,3) = sa*sg + ca*cg*sb
     basis(2,1) = cb*sa ; basis(2,2) = ca*cg + sa*sb*sg ; basis(2,3) = cg*sa*sb - ca*sg
     basis(3,1) = -sb   ; basis(3,2) = cb*sg            ; basis(3,3) = cb*cg
-  
+
     if(present(inv_basis)) inv_basis = transpose(basis)
-  
+
 end subroutine tb_zyx
 
 subroutine line_basis(r0, v0, basis, inv_basis)
@@ -3735,16 +3764,16 @@ subroutine line_basis(r0, v0, basis, inv_basis)
 
     real(Float64), dimension(3) :: rf
     real(Float64) :: alpha, beta, dis
-  
+
     rf = r0 + v0
     dis = sqrt(sum((rf - r0)**2))
     beta = asin((r0(3) - rf(3))/dis)
     alpha = atan2(rf(2)-r0(2),rf(1)-r0(1))
-  
+
     call tb_zyx(alpha,beta,0.d0,basis)
-  
+
     if(present(inv_basis)) inv_basis = transpose(basis)
-  
+
 end subroutine line_basis
 
 subroutine plane_basis(center, redge, tedge, basis, inv_basis)
@@ -3759,56 +3788,56 @@ subroutine plane_basis(center, redge, tedge, basis, inv_basis)
         !+ Basis for transforming from plane to cartesian coordinates
     real(Float64), dimension(3,3), intent(out), optional :: inv_basis
         !+ Inverse basis for the reverse transformation cartesian to plane
-  
+
     real(Float64), dimension(3) :: u1,u2,u3
-  
+
     u1 = (redge - center)
     u1 = u1/norm2(u1)
     u2 = (tedge - center)
     u2 = u2/norm2(u2)
     u3 = cross_product(u1,u2)
     u3 = u3/norm2(u3)
-  
+
     basis(:,1) = u1
     basis(:,2) = u2
     basis(:,3) = u3
-  
+
     if(present(inv_basis)) inv_basis = transpose(basis)
-  
+
 end subroutine plane_basis
 
 subroutine plane_intercept(l0, l, p0, n, p, t)
     !+ Calculates the intersection of a line and a plane
-    real(Float64), dimension(3), intent(in)  :: l0 
+    real(Float64), dimension(3), intent(in)  :: l0
         !+ Point on line
-    real(Float64), dimension(3), intent(in)  :: l  
+    real(Float64), dimension(3), intent(in)  :: l
         !+ Ray of line
-    real(Float64), dimension(3), intent(in)  :: p0 
+    real(Float64), dimension(3), intent(in)  :: p0
         !+ Point on plane
-    real(Float64), dimension(3), intent(in)  :: n  
+    real(Float64), dimension(3), intent(in)  :: n
         !+ Normal vector of plane
     real(Float64), dimension(3), intent(out) :: p
         !+ Line-plane intercept point
-    real(Float64), intent(out)               :: t 
+    real(Float64), intent(out)               :: t
         !+ "time" to intercept
 
     t = dot_product(p0 - l0, n)/dot_product(l, n)
- 
+
     p = l0 + t*l
-  
+
 end subroutine plane_intercept
 
 function in_boundary(bplane, p) result(in_b)
-    !+ Indicator function for determining if a point on a plane is within the plane boundary 
+    !+ Indicator function for determining if a point on a plane is within the plane boundary
     type(BoundedPlane), intent(in)          :: bplane
         !+ Plane with boundary
     real(Float64), dimension(3), intent(in) :: p
         !+ Point on plane
     logical :: in_b
-  
+
     real(Float64), dimension(3) :: pp
     real(Float64) :: hh, hw
-  
+
     hh = bplane%hh
     hw = bplane%hw
     pp = matmul(bplane%inv_basis, p - bplane%origin)
@@ -3827,7 +3856,7 @@ function in_boundary(bplane, p) result(in_b)
             write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
             stop
     END SELECT
-  
+
 end function in_boundary
 
 subroutine hit_npa_detector(r0, v0, d_index, rd, det)
@@ -3854,18 +3883,18 @@ subroutine hit_npa_detector(r0, v0, d_index, rd, det)
         s = 1
         ndet = npa_chords%nchan
     endif
-  
+
     d_index = 0
     detector_loop: do i=s,ndet
         !! Find where trajectory crosses detector plane
         call plane_intercept(r0,v0,npa_chords%det(i)%detector%origin, &
              npa_chords%det(i)%detector%basis(:,3),d,t_d)
-  
+
         !! Find where trajectory crosses aperture plane
         call plane_intercept(r0,v0,npa_chords%det(i)%aperture%origin, &
              npa_chords%det(i)%aperture%basis(:,3),a,t_a)
-  
-        !! If both points are in plane boundaries and the 
+
+        !! If both points are in plane boundaries and the
         !! particle is heading toward the detector then its a hit
         if(in_boundary(npa_chords%det(i)%aperture,a) .and. &
            in_boundary(npa_chords%det(i)%detector,d) .and. &
@@ -3882,30 +3911,30 @@ subroutine xyz_to_uvw(xyz, uvw)
     !+ Convert beam coordinate `xyz` to machine coordinate `uvw`
     real(Float64), dimension(3), intent(in)  :: xyz
     real(Float64), dimension(3), intent(out) :: uvw
-  
+
     real(Float64), dimension(3) :: origin
     real(Float64), dimension(3,3) :: basis
-  
+
     origin = beam_grid%origin
     basis = beam_grid%basis
     uvw = matmul(basis,xyz)
     uvw = uvw + origin
-  
+
 end subroutine xyz_to_uvw
 
 subroutine uvw_to_xyz(uvw,xyz)
     !+ Convert machine coordinate `uvw` to beam coordinate `xyz`
     real(Float64), dimension(3), intent(in)  :: uvw
     real(Float64), dimension(3), intent(out) :: xyz
-  
+
     real(Float64), dimension(3) :: origin, uvw_p
     real(Float64), dimension(3,3) :: basis
-  
+
     origin = beam_grid%origin
     basis = beam_grid%inv_basis
     uvw_p = uvw - origin
     xyz = matmul(basis,uvw_p)
-  
+
 end subroutine uvw_to_xyz
 
 subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
@@ -3932,19 +3961,19 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
     integer, dimension(6) :: side_inter
     integer, dimension(2) :: ind
     integer :: i, j, nunique, ind1, ind2
-  
+
     if (present(center_in)) then
         center = center_in
     else
         center = beam_grid%center
     endif
-  
+
     if (present(lwh_in)) then
         lwh = lwh_in
     else
         lwh = beam_grid%lwh
     endif
-  
+
     side_inter = 0
     ipnts = 0.d0
     do i=1,6
@@ -3961,12 +3990,12 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
             endif
         endif
     enddo
-  
+
     length = 0.d0
     r_enter = r0
     r_exit  = r0
     ind1=0
-    ind2=0 
+    ind2=0
     if (sum(side_inter).ge.2) then
         ! Find first intersection side
         i=1
@@ -3985,7 +4014,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
                 exit
             endif
         enddo
-  
+
         if(nunique.eq.2) then
             vi = ipnts(:,ind2) - ipnts(:,ind1)
             if (dot_product(v0,vi).gt.0.0) then
@@ -3998,7 +4027,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
             length = sqrt(sum((r_exit - r_enter)**2))
         endif
     endif
-  
+
 end subroutine grid_intersect
 
 function in_grid(xyz) result(ing)
@@ -4025,9 +4054,9 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
     real(Float64), dimension(3), intent(in) :: r0
         !+ Position of center enter of the circle in beam grid coordinates [cm]
     real(Float64), dimension(3), intent(in) :: e1
-        !+ Unit vector pointing towards (R, 0) (r,phi) position of the circle in beam grid coordinates 
+        !+ Unit vector pointing towards (R, 0) (r,phi) position of the circle in beam grid coordinates
     real(Float64), dimension(3), intent(in) :: e2
-        !+ Unit vector pointing towards (R, pi/2) (r,phi) position of the circle in beam grid coordinates 
+        !+ Unit vector pointing towards (R, pi/2) (r,phi) position of the circle in beam grid coordinates
     real(Float64), intent(in)               :: radius
         !+ Radius of circle [cm]
     real(Float64), intent(out)              :: phi_enter
@@ -4135,21 +4164,21 @@ subroutine get_indices(pos, ind)
     real(Float64),  dimension(3) :: mini
     integer(Int32), dimension(3) :: maxind
     integer :: i
-  
+
     maxind(1) = beam_grid%nx
     maxind(2) = beam_grid%ny
     maxind(3) = beam_grid%nz
-  
+
     mini(1) = minval(beam_grid%xc) - 0.5*beam_grid%dr(1)
     mini(2) = minval(beam_grid%yc) - 0.5*beam_grid%dr(2)
     mini(3) = minval(beam_grid%zc) - 0.5*beam_grid%dr(3)
-  
+
     do i=1,3
         ind(i) = floor((pos(i)-mini(i))/beam_grid%dr(i)) + 1
         if (ind(i).gt.maxind(i)) ind(i)=maxind(i)
         if (ind(i).lt.1) ind(i)=1
     enddo
-  
+
 end subroutine get_indices
 
 subroutine get_position(ind, pos)
@@ -4158,7 +4187,7 @@ subroutine get_position(ind, pos)
         !+ [[libfida:beam_grid]] indices
     real(Float64), dimension(3), intent(out) :: pos
         !+ Position [cm]
-  
+
     pos(1) = beam_grid%xc(ind(1))
     pos(2) = beam_grid%yc(ind(2))
     pos(3) = beam_grid%zc(ind(3))
@@ -4167,7 +4196,7 @@ end subroutine get_position
 
 subroutine track(rin, vin, tracks, ncell, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:beam_grid]]
-    real(Float64), dimension(3), intent(in)          :: rin  
+    real(Float64), dimension(3), intent(in)          :: rin
         !+ Initial position of particle
     real(Float64), dimension(3), intent(in)          :: vin
         !+ Initial velocity of particle
@@ -4176,7 +4205,7 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
     integer(Int32), intent(out)                      :: ncell
         !+ Number of cells that a particle crosses
     logical, intent(out), optional                   :: los_intersect
-        !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]] 
+        !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
 
     integer :: cc, i, ii, mind
     integer, dimension(3) :: ind
@@ -4184,33 +4213,33 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
     real(Float64) :: dT, dt1, inv_50
     real(Float64), dimension(3) :: dt_arr, dr
     real(Float64), dimension(3) :: vn, inv_vn
-    real(Float64), dimension(3) :: ri, ri_tmp, ri_cell 
+    real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
     integer, dimension(3) :: sgn
     integer, dimension(3) :: gdims
     integer, dimension(1) :: minpos
-  
+
     vn = vin ;  ri = rin ; sgn = 0 ; ncell = 0
-  
+
     if(dot_product(vin,vin).eq.0.0) then
         return
     endif
-    
+
     gdims(1) = beam_grid%nx
     gdims(2) = beam_grid%ny
     gdims(3) = beam_grid%nz
-  
+
     !! define actual cell
     call get_indices(ri,ind)
     ri_cell = [beam_grid%xc(ind(1)), &
                beam_grid%yc(ind(2)), &
                beam_grid%zc(ind(3))]
-  
+
     do i=1,3
         if (vn(i).gt.0.0) sgn(i) = 1
         if (vn(i).lt.0.0) sgn(i) =-1
         if (vn(i).eq.0.0) vn(i)  = 1.0d-3
     enddo
-  
+
     dr = beam_grid%dr*sgn
     inv_vn = 1/vn
     inv_50 = 1.0/50.0
@@ -4221,7 +4250,7 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
     call in_plasma(ri,in_plasma1)
     track_loop: do i=1,beam_grid%ntrack
         if(cc.gt.beam_grid%ntrack) exit track_loop
-  
+
         if(spec_chords%los_inter(ind(1),ind(2),ind(3)).and.(.not.los_inter))then
             los_inter = .True.
         endif
@@ -4253,11 +4282,11 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
             cc = cc + 1
         endif
         in_plasma1 = in_plasma2
-  
+
         ri = ri + dT*vn
         ind(mind) = ind(mind) + sgn(mind)
         ri_cell(mind) = ri_cell(mind) + dr(mind)
-  
+
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
     enddo track_loop
@@ -4271,140 +4300,121 @@ end subroutine track
 !============================================================================
 !---------------------------Interpolation Routines---------------------------
 !============================================================================
-subroutine interpol1D_coeff(xmin,dx,nx,xout,i,b1,b2,err)
+subroutine interpol1D_coeff(xmin,dx,nx,xout,c,err)
     !+ Linear interpolation coefficients and index for a 1D grid y(x)
-    real(Float64), intent(in)      :: xmin
+    real(Float64), intent(in)           :: xmin
         !+ Minimum abscissa value
-    real(Float64), intent(in)      :: dx
+    real(Float64), intent(in)           :: dx
         !+ Absissa spacing
-    integer, intent(in)            :: nx
+    integer, intent(in)                 :: nx
         !+ Number of abscissa
-    real(Float64), intent(in)      :: xout
+    real(Float64), intent(in)           :: xout
         !+ Abscissa value to interpolate
-    integer, intent(out)           :: i
-        !+ Index of position right before `xout`
-    real(Float64), intent(out)     :: b1
-        !+ Coefficient for y(i) term
-    real(Float64), intent(out)     :: b2
-        !+ Coefficient for y(i+1) term
-    integer, intent(out), optional :: err
+    type(InterpolCoeffs1D), intent(out) :: c
+        !+ Interpolation Coefficients
+    integer, intent(out), optional      :: err
         !+ Error code
-  
-    real(Float64) :: x1, xp
-    integer :: err_status
-  
+
+    real(Float64) :: x1, xp, b1, b2
+    integer :: i, err_status
+
     err_status = 1
     xp = max(xout,xmin)
     i = floor((xp - xmin)/dx)+1
-  
+
     if ((i.gt.0).and.(i.le.(nx-1))) then
         x1 = xmin + (i-1)*dx
-  
+
         b2 = (xp - x1)/dx
         b1 = (1.0 - b2)
-  
+
+        c%i = i
+        c%b1 = b1
+        c%b2 = b2
         err_status = 0
-    else
-        b1 = 0.d0 ; b2 = 0.d0
     endif
-  
+
     if(present(err)) err = err_status
 
 end subroutine interpol1D_coeff
 
-subroutine interpol1D_coeff_arr(x,xout,i,b1,b2,err)
+subroutine interpol1D_coeff_arr(x,xout,c,err)
     !+ Linear interpolation coefficients and index for a 1D grid y(x)
     real(Float64), dimension(:), intent(in) :: x
         !+ Abscissa values
     real(Float64), intent(in)               :: xout
         !+ Abscissa value to interpolate
-    integer, intent(out)                    :: i
-        !+ Index of position right before `xout`
-    real(Float64), intent(out)              :: b1
-        !+ Coefficient for y(i) term
-    real(Float64), intent(out)              :: b2
-        !+ Coefficient for y(i+1) term
+    type(InterpolCoeffs1D), intent(out)     :: c
+        !+ Interpolation Coefficients
     integer, intent(out), optional          :: err
         !+ Error code
-  
+
     real(Float64) :: xmin, dx
     integer :: sx,err_status
-  
+
     err_status = 1
     sx = size(x)
-    xmin = minval(x)
+    xmin = x(1)
     dx = abs(x(2)-x(1))
-  
-    call interpol1D_coeff(xmin, dx, sx, xout, &
-                          i, b1, b2, err_status)
-  
+
+    call interpol1D_coeff(xmin, dx, sx, xout, c, err_status)
+
     if(present(err)) err = err_status
 
 end subroutine interpol1D_coeff_arr
 
-subroutine interpol2D_coeff(xmin,dx,nx,ymin,dy,ny,xout,yout,i,j,b11,b12,b21,b22,err)
+subroutine interpol2D_coeff(xmin,dx,nx,ymin,dy,ny,xout,yout,c,err)
     !+ Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
-    real(Float64), intent(in)      :: xmin
+    real(Float64), intent(in)           :: xmin
         !+ Minimum abscissa
-    real(Float64), intent(in)      :: dx
+    real(Float64), intent(in)           :: dx
         !+ Abscissa spacing
-    integer, intent(in)            :: nx
+    integer, intent(in)                 :: nx
         !+ Number of abscissa
-    real(Float64), intent(in)      :: ymin
+    real(Float64), intent(in)           :: ymin
         !+ Minimum ordinate
-    real(Float64), intent(in)      :: dy
+    real(Float64), intent(in)           :: dy
         !+ Ordinate spacing
-    integer, intent(in)            :: ny
+    integer, intent(in)                 :: ny
         !+ Number of ordinates points
-    real(Float64), intent(in)      :: xout
+    real(Float64), intent(in)           :: xout
         !+ Abscissa value to interpolate
-    real(Float64), intent(in)      :: yout
+    real(Float64), intent(in)           :: yout
         !+ Ordinate value to interpolate
-    integer, intent(out)           :: i
-        !+ Index of abscissa before `xout`
-    integer, intent(out)           :: j
-        !+ Index of ordinate before `yout`
-    real(Float64), intent(out)     :: b11
-        !+ Coefficient for z(i,j) term
-    real(Float64), intent(out)     :: b12
-        !+ Coefficient for z(i,j+1) term
-    real(Float64), intent(out)     :: b21
-        !+ Coefficient for z(i+1,j) term
-    real(Float64), intent(out)     :: b22
-        !+ Coefficient for z(i+1,j+1) term
-    integer, intent(out), optional :: err
+    type(InterpolCoeffs2D), intent(out) :: c
+        !+ Interpolation Coefficients
+    integer, intent(out), optional      :: err
         !+ Error code
-  
+
     real(Float64) :: x1, x2, y1, y2, xp, yp
-    integer :: err_status
-  
+    integer :: i, j, err_status
+
     err_status = 1
     xp = max(xout,xmin)
     yp = max(yout,ymin)
     i = floor((xp-xmin)/dx)+1
     j = floor((yp-ymin)/dy)+1
-  
+
     if (((i.gt.0).and.(i.le.(nx-1))).and.((j.gt.0).and.(j.le.(ny-1)))) then
         x1 = xmin + (i-1)*dx
         x2 = x1 + dx
         y1 = ymin + (j-1)*dy
         y2 = y1 + dy
-  
-        b11 = ((x2 - xp) * (y2 - yp))/(dx*dy)
-        b21 = ((xp - x1) * (y2 - yp))/(dx*dy)
-        b12 = ((x2 - xp) * (yp - y1))/(dx*dy)
-        b22 = ((xp - x1) * (yp - y1))/(dx*dy)
-  
+
+        c%b11 = ((x2 - xp) * (y2 - yp))/(dx*dy)
+        c%b21 = ((xp - x1) * (y2 - yp))/(dx*dy)
+        c%b12 = ((x2 - xp) * (yp - y1))/(dx*dy)
+        c%b22 = ((xp - x1) * (yp - y1))/(dx*dy)
+        c%i = i
+        c%j = j
         err_status = 0
-    else
-        b11 = 0.d0 ; b12 = 0.d0 ; b21 = 0.d0 ; b22 = 0.d0
     endif
-  
+
     if(present(err)) err = err_status
 
 end subroutine interpol2D_coeff
 
-subroutine interpol2D_coeff_arr(x,y,xout,yout,i,j,b11,b12,b21,b22,err)
+subroutine interpol2D_coeff_arr(x,y,xout,yout,c,err)
     !!Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
     real(Float64), dimension(:), intent(in) :: x
         !+ Abscissa values
@@ -4414,74 +4424,71 @@ subroutine interpol2D_coeff_arr(x,y,xout,yout,i,j,b11,b12,b21,b22,err)
         !+ Abscissa value to interpolate
     real(Float64), intent(in)               :: yout
         !+ Ordinate value to interpolate
-    integer, intent(out)                    :: i
-        !+ Index of abscissa before `xout`
-    integer, intent(out)                    :: j
-        !+ Index of ordinate before `yout`
-    real(Float64), intent(out)              :: b11
-        !+ Coefficient for z(i,j) term
-    real(Float64), intent(out)              :: b12
-        !+ Coefficient for z(i,j+1) term
-    real(Float64), intent(out)              :: b21
-        !+ Coefficient for z(i+1,j) term
-    real(Float64), intent(out)              :: b22
-        !+ Coefficient for z(i+1,j+1) term
+    type(InterpolCoeffs2D), intent(out)     :: c
+        !+ Interpolation Coefficients
     integer, intent(out), optional          :: err
         !+ Error code
-  
+
     real(Float64) :: xmin, ymin, dx, dy
     integer :: sx, sy, err_status
-  
+
     err_status = 1
     sx = size(x)
     sy = size(y)
-    xmin = minval(x)
-    ymin = minval(y)
+    xmin = x(1)
+    ymin = y(1)
     dx = abs(x(2)-x(1))
     dy = abs(y(2)-y(1))
-  
-    call interpol2D_coeff(xmin, dx, sx, ymin, dy, sy, xout, yout, &
-                          i, j, b11, b12, b21, b22, err_status)
-  
+
+    call interpol2D_coeff(xmin, dx, sx, ymin, dy, sy, xout, yout, c, err_status)
+
     if(present(err)) err = err_status
 
 end subroutine interpol2D_coeff_arr
 
-subroutine interpol1D_arr(x, y, xout, yout, err)
+subroutine interpol1D_arr(x, y, xout, yout, err, coeffs)
     !+ Performs linear interpolation on a uniform 1D grid y(x)
-    real(Float64), dimension(:), intent(in) :: x
+    real(Float64), dimension(:), intent(in)      :: x
         !+ The abscissa values of `y`
-    real(Float64), dimension(:), intent(in) :: y
+    real(Float64), dimension(:), intent(in)      :: y
         !+ Values at abscissa values `x`: y(x)
-    real(Float64), intent(in)               :: xout
+    real(Float64), intent(in)                    :: xout
         !+ Abscissa value to interpolate
-    real(Float64), intent(out)              :: yout
+    real(Float64), intent(out)                   :: yout
         !+ Interpolant: y(xout)
-    integer, intent(out), optional          :: err
+    integer, intent(out), optional               :: err
         !+ Error code
+    type(InterpolCoeffs1D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
 
-    real(Float64) :: b1
-    real(Float64) :: b2
+    type(InterpolCoeffs1D) :: c
     integer :: i, err_status
-  
+
     err_status = 1
-    call interpol_coeff(x,xout,i,b1,b2,err_status)
+    if(present(coeffs)) then
+        c = coeffs
+        err_status = 0
+    else
+        call interpol_coeff(x,xout,c,err_status)
+    endif
+
     if(err_status.eq.0) then
-        yout = b1*y(i) + b2*y(i+1)
+        i = c%i
+        yout = c%b1*y(i) + c%b2*y(i+1)
     else
         yout = 0.d0
     endif
-  
+
     if(present(err)) err = err_status
-  
+
 end subroutine interpol1D_arr
 
-subroutine interpol2D_arr(x, y, z, xout, yout, zout, err)
+subroutine interpol2D_arr(x, y, z, xout, yout, zout, err, coeffs)
     !+ Performs bilinear interpolation on a 2D grid z(x,y)
     real(Float64), dimension(:), intent(in)   :: x
-        !+ The abscissa values of `z` 
+        !+ The abscissa values of `z`
     real(Float64), dimension(:), intent(in)   :: y
-        !+ The ordinate values of `z` 
+        !+ The ordinate values of `z`
     real(Float64), dimension(:,:), intent(in) :: z
         !+ Values at the abscissa/ordinates: z(x,y)
     real(Float64), intent(in)                 :: xout
@@ -4492,26 +4499,33 @@ subroutine interpol2D_arr(x, y, z, xout, yout, zout, err)
         !+ Interpolant: z(xout,yout)
     integer, intent(out), optional            :: err
         !+ Error code
+    type(InterpolCoeffs2D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
 
-    real(Float64) :: b11
-    real(Float64) :: b12
-    real(Float64) :: b21
-    real(Float64) :: b22
+    type(InterpolCoeffs2D) :: c
     integer :: i, j, err_status
-  
+
     err_status = 1
-    call interpol_coeff(x,y,xout,yout,i,j,b11,b12,b21,b22,err_status)
+    if(present(coeffs)) then
+        c = coeffs
+        err_status = 0
+    else
+        call interpol_coeff(x,y,xout,yout,c,err_status)
+    endif
+
     if(err_status.eq.0) then
-        zout = b11*z(i,j) + b12*z(i,j+1) + b21*z(i+1,j) + b22*z(i+1,j+1)
+        i = c%i
+        j = c%j
+        zout = c%b11*z(i,j) + c%b12*z(i,j+1) + c%b21*z(i+1,j) + c%b22*z(i+1,j+1)
     else
         zout = 0.d0
     endif
-  
+
     if(present(err)) err = err_status
 
 end subroutine interpol2D_arr
 
-subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err)
+subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err, coeffs)
     !+ Performs bilinear interpolation on a 2D grid of 2D arrays z(:,:,x,y)
     real(Float64), dimension(:), intent(in)       :: x
         !+ The abscissa values of `z`
@@ -4527,30 +4541,37 @@ subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err)
         !+ Interpolant: z(:,:,xout,yout)
     integer, intent(out), optional                :: err
         !+ Error code
+    type(InterpolCoeffs2D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
 
-    real(Float64) :: b11
-    real(Float64) :: b12
-    real(Float64) :: b21
-    real(Float64) :: b22
+    type(InterpolCoeffs2D) :: c
     integer :: i, j, err_status
-  
+
     err_status = 1
-    call interpol_coeff(x,y,xout,yout,i,j,b11,b12,b21,b22,err_status)
+    if(present(coeffs)) then
+        c = coeffs
+        err_status = 0
+    else
+        call interpol_coeff(x,y,xout,yout,c,err_status)
+    endif
+
     if(err_status.eq.0) then
-        zout = b11*z(:,:,i,j) + b12*z(:,:,i,j+1) + b21*z(:,:,i+1,j) + b22*z(:,:,i+1,j+1)
+        i = c%i
+        j = c%j
+        zout = c%b11*z(:,:,i,j) + c%b12*z(:,:,i,j+1) + c%b21*z(:,:,i+1,j) + c%b22*z(:,:,i+1,j+1)
     else
         zout = 0.0
     endif
-  
+
     if(present(err)) err = err_status
-  
+
 end subroutine interpol2D_2D_arr
 
 !=============================================================================
 !-------------------------Profiles and Fields Routines------------------------
 !=============================================================================
-subroutine in_plasma(xyz, inp, machine_coords)
-    !+ Indicator subroutine to determine if a position is in a region where 
+subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
+    !+ Indicator subroutine to determine if a position is in a region where
     !+ the plasma parameter and fields are valid/known
     real(Float64), dimension(3), intent(in) :: xyz
         !+ Position in beam coordinates
@@ -4558,12 +4579,17 @@ subroutine in_plasma(xyz, inp, machine_coords)
         !+ Indicates whether plasma parameters and fields are valid/known
     logical, intent(in), optional           :: machine_coords
         !+ Indicates that xyz is in machine coordinates
- 
+    type(InterpolCoeffs2D), intent(out), optional      :: coeffs
+        !+ Linear Interpolation coefficients used in calculation
+    real(Float64), dimension(3), intent(out), optional :: uvw_out
+        !+ Position in machine coordinates
+
     real(Float64), dimension(3) :: uvw
-    real(Float64) :: R, W, phi, mask
+    type(InterpolCoeffs2D) :: c
+    real(Float64) :: R, W, mask
     logical :: mc
-    integer :: err
-  
+    integer :: i, j, err
+
     err = 1
     mc = .False.
     if(present(machine_coords)) mc = machine_coords
@@ -4577,16 +4603,24 @@ subroutine in_plasma(xyz, inp, machine_coords)
 
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
-    phi = atan2(uvw(2),uvw(1))
-  
+
     !! Interpolate mask value
-    call interpol(inter_grid%r, inter_grid%z, equil%mask, R, W, mask, err)
-  
-    if((mask.ge.0.5).and.(err.eq.0)) then
-        inp = .True.
-    else
-        inp = .False.
+    call interpol_coeff(inter_grid%r, inter_grid%z, R, W, c, err)
+
+    inp = .False.
+    if(err.eq.0) then
+        i = c%i
+        j = c%j
+        mask = c%b11*equil%mask(i,j)   + c%b12*equil%mask(i,j+1) + &
+               c%b21*equil%mask(i+1,j) + c%b22*equil%mask(i+1,j+1)
+
+        if((mask.ge.0.5).and.(err.eq.0)) then
+            inp = .True.
+        endif
     endif
+
+    if(present(coeffs)) coeffs = c
+    if(present(uvw_out)) uvw_out = uvw
 
 end subroutine in_plasma
 
@@ -4600,38 +4634,34 @@ subroutine get_plasma(plasma, pos, ind)
         !+ [[libfida:beam_grid]] indices
 
     logical :: inp
+    type(InterpolCoeffs2D) :: coeffs
     real(Float64), dimension(3) :: xyz, uvw, vrot_uvw
-    real(Float64) :: R, W, phi, s, c
-    real(Float64) :: b11, b12, b21, b22
+    real(Float64) :: phi, s, c
     integer :: i, j
-  
+
     plasma%in_plasma = .False.
-  
+
     if(present(ind)) call get_position(ind,xyz)
     if(present(pos)) xyz = pos
-  
-    call in_plasma(xyz,inp)
+
+    call in_plasma(xyz,inp,.False.,coeffs,uvw)
     if(inp) then
-        !! Convert to machine coordinates
-        call xyz_to_uvw(xyz,uvw)
-        R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-        W = uvw(3)
         phi = atan2(uvw(2),uvw(1))
-  
-        call interpol_coeff(inter_grid%r, inter_grid%z, R, W, & 
-                              i, j, b11, b12, b21, b22)
-  
-        plasma = b11*equil%plasma(i,j)   + b12*equil%plasma(i,j+1) + &
-                 b21*equil%plasma(i+1,j) + b22*equil%plasma(i+1,j+1)
-  
+        i = coeffs%i
+        j = coeffs%j
+
+        plasma = coeffs%b11*equil%plasma(i,j)   + coeffs%b12*equil%plasma(i,j+1) + &
+                 coeffs%b21*equil%plasma(i+1,j) + coeffs%b22*equil%plasma(i+1,j+1)
+
         s = sin(phi) ; c = cos(phi)
-        vrot_uvw(1) = plasma%vr*c - plasma%vt*s 
+        vrot_uvw(1) = plasma%vr*c - plasma%vt*s
         vrot_uvw(2) = plasma%vr*s + plasma%vt*c
         vrot_uvw(3) = plasma%vz
         plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
         plasma%pos = xyz
         plasma%uvw = uvw
         plasma%in_plasma = .True.
+        plasma%c = coeffs
     endif
 
 end subroutine get_plasma
@@ -4666,47 +4696,45 @@ subroutine calc_perp_vectors(b, a, c)
 
 end subroutine calc_perp_vectors
 
-subroutine get_fields(fields, pos, ind)
+subroutine get_fields(fields, pos, ind, machine_coords)
     !+ Gets electro-magnetic fields at position `pos` or [[libfida:beam_grid]] indices `ind`
-    type(LocalEMFields),intent(inout)                  :: fields
+    type(LocalEMFields),intent(out)                    :: fields
         !+ Electro-magnetic fields at `pos`/`ind`
     real(Float64), dimension(3), intent(in), optional  :: pos
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
+    logical, intent(in), optional :: machine_coords
+        !+ Indicates that pos is machine coordinates
 
-    logical :: inp
+    logical :: inp, mc
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(3) :: uvw_bfield, uvw_efield
     real(Float64), dimension(3) :: xyz_bfield, xyz_efield
-    real(Float64) :: R, W, phi, s, c
-    real(Float64) :: b11, b12, b21, b22
+    real(Float64) :: phi, s, c
+    type(InterpolCoeffs2D) :: coeffs
     integer :: i, j
-  
+
     fields%in_plasma = .False.
-  
+
     if(present(ind)) call get_position(ind,xyz)
     if(present(pos)) xyz = pos
 
-    call in_plasma(xyz, inp, machine_coords = fields%machine_coords)
+    mc = .False.
+    if(present(machine_coords)) mc = machine_coords
+
+    call in_plasma(xyz,inp,mc,coeffs,uvw)
     if(inp) then
-        if(fields%machine_coords) then
-            uvw = xyz
-        else
-            !! Convert to machine coordinates
-            call xyz_to_uvw(xyz,uvw)
-        endif
-        R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-        W = uvw(3)
+        phi = atan2(uvw(2),uvw(1))
+        i = coeffs%i
+        j = coeffs%j
+
+        fields = coeffs%b11*equil%fields(i,j) + coeffs%b12*equil%fields(i,j+1) + &
+                 coeffs%b21*equil%fields(i+1,j) + coeffs%b22*equil%fields(i+1,j+1)
+
         phi = atan2(uvw(2),uvw(1))
         s = sin(phi) ; c = cos(phi)
-  
-        call interpol_coeff(inter_grid%r, inter_grid%z, R, W, & 
-                              i, j, b11, b12, b21, b22)
-  
-        fields = b11*equil%fields(i,j) + b12*equil%fields(i,j+1) + &
-                 b21*equil%fields(i+1,j) + b22*equil%fields(i+1,j+1)
-  
+
         !Convert cylindrical coordinates to uvw
         uvw_bfield(1) = c*fields%br - s*fields%bt
         uvw_bfield(2) = s*fields%br + c*fields%bt
@@ -4714,32 +4742,34 @@ subroutine get_fields(fields, pos, ind)
         uvw_efield(1) = c*fields%er - s*fields%et
         uvw_efield(2) = s*fields%er + c*fields%et
         uvw_efield(3) = fields%ez
- 
-        if(fields%machine_coords) then
+
+        if(mc) then
             xyz_bfield = uvw_bfield
             xyz_efield = uvw_efield
-        else 
+        else
             !Represent fields in beam grid coordinates
             xyz_bfield = matmul(beam_grid%inv_basis,uvw_bfield)
             xyz_efield = matmul(beam_grid%inv_basis,uvw_efield)
         endif
- 
+
         !Calculate field directions and magnitudes
         fields%b_abs = norm2(xyz_bfield)
         fields%e_abs = norm2(xyz_efield)
         if(fields%b_abs.gt.0.d0) fields%b_norm = xyz_bfield/fields%b_abs
         if(fields%e_abs.gt.0.d0) fields%e_norm = xyz_efield/fields%e_abs
-  
+
         call calc_perp_vectors(fields%b_norm,fields%a_norm,fields%c_norm)
-  
+
         fields%pos = xyz
         fields%uvw = uvw
         fields%in_plasma = .True.
+        fields%machine_coords = mc
+        fields%c = coeffs
     endif
 
 end subroutine get_fields
 
-subroutine get_distribution(fbeam, denf, pos, ind)
+subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
     !+ Gets Guiding Center distribution at position `pos` or [[libfida:beam_grid]] indices `ind`
     real(Float64), dimension(:,:), intent(out)         :: fbeam
         !+ Guiding Center Fast-ion distribution at `pos`/`ind`: F(E,p)
@@ -4749,26 +4779,33 @@ subroutine get_distribution(fbeam, denf, pos, ind)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
+    type(InterpolCoeffs2D), intent(in), optional       :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
 
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64) :: R, Z
     integer :: err
-  
-    if(present(ind)) call get_position(ind,xyz)
-    if(present(pos)) xyz = pos
-  
-    !! Convert to machine coordinates
-    call xyz_to_uvw(xyz,uvw)
-    R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-    Z = uvw(3)
-  
-    call interpol(fbm%r, fbm%z, fbm%f, R, Z, fbeam, err)
-    call interpol(fbm%r, fbm%z, fbm%denf, R, Z, denf, err)
+
+    if(present(coeffs)) then
+        call interpol(fbm%r, fbm%z, fbm%f, R, Z, fbeam, err, coeffs)
+        call interpol(fbm%r, fbm%z, fbm%denf, R, Z, denf, err, coeffs)
+    else
+        if(present(ind)) call get_position(ind,xyz)
+        if(present(pos)) xyz = pos
+
+        !! Convert to machine coordinates
+        call xyz_to_uvw(xyz,uvw)
+        R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
+        Z = uvw(3)
+
+        call interpol(fbm%r, fbm%z, fbm%f, R, Z, fbeam, err)
+        call interpol(fbm%r, fbm%z, fbm%denf, R, Z, denf, err)
+    endif
 
 end subroutine get_distribution
 
-subroutine get_ep_denf(energy, pitch, denf, pos,ind)
-    !+ Get guiding center fast-ion density at given energy and pitch 
+subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
+    !+ Get guiding center fast-ion density at given energy and pitch
     !+ at position `pos` or [[libfida:beam_grid]] indices `ind`
     real(Float64), intent(in)                          :: energy
         !+ Energy [keV]
@@ -4780,32 +4817,38 @@ subroutine get_ep_denf(energy, pitch, denf, pos,ind)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
-  
+    type(InterpolCoeffs2D), intent(in), optional       :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
+
     real(Float64), dimension(3) :: xyz, uvw
-    real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam 
+    real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam
     integer(Int32), dimension(2) :: epi
     integer(Int32), dimension(1) :: dummy
     real(Float64) :: R, Z
     real(Float64) :: dE, dp
     integer :: err
 
-    if(present(ind)) call get_position(ind,xyz)
-    if(present(pos)) xyz = pos
-  
-    !! Convert to machine coordinates
-    call xyz_to_uvw(xyz,uvw)
-    R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-    Z = uvw(3)
-  
     dummy = minloc(abs(fbm%energy - energy))
     epi(1) = dummy(1)
     dummy = minloc(abs(fbm%pitch - pitch))
     epi(2) = dummy(1)
     dE = abs(fbm%energy(epi(1)) - energy)
     dp = abs(fbm%pitch(epi(2)) - pitch)
-  
+
     if((dE.le.fbm%dE).and.(dp.le.fbm%dp)) then
-        call interpol(inter_grid%r, inter_grid%z, fbm%f, R, Z, fbeam, err)
+        if(present(coeffs)) then
+            call interpol(inter_grid%r, inter_grid%z, fbm%f, R, Z, fbeam, err, coeffs)
+        else
+            if(present(ind)) call get_position(ind,xyz)
+            if(present(pos)) xyz = pos
+
+            !! Convert to machine coordinates
+            call xyz_to_uvw(xyz,uvw)
+            R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
+            Z = uvw(3)
+
+            call interpol(inter_grid%r, inter_grid%z, fbm%f, R, Z, fbeam, err)
+        endif
         denf = fbeam(epi(1),epi(2))
     else
         denf = 0.0
@@ -4827,13 +4870,13 @@ subroutine store_neutrals(ind, neut_type, dens, store_iter)
     logical, intent(in), optional            :: store_iter
         !+ Store DCX/Halo iteration density in [[libfida:halo_iter_dens]]
     logical :: iter
-  
+
     if(present(store_iter)) then
         iter = store_iter
     else
         iter = .False.
     endif
-  
+
     !$OMP CRITICAL(store_neutrals_1)
     if(iter) halo_iter_dens(neut_type) = halo_iter_dens(neut_type) + sum(dens)
 
@@ -4850,7 +4893,7 @@ subroutine store_births(ind, neut_type, dflux)
         !+ Neutral type
     real(Float64), intent(in)                :: dflux
         !+ Deposited flux
-  
+
     !$OMP CRITICAL(store_births_1)
     birth%dens( neut_type,ind(1),ind(2),ind(3))= &
      birth%dens(neut_type,ind(1),ind(2),ind(3)) + dflux
@@ -4858,10 +4901,10 @@ subroutine store_births(ind, neut_type, dflux)
 end subroutine store_births
 
 subroutine store_npa(det, ri, rf, vn, flux)
-    !+ Store NPA particles in [[libfida:npa]] 
-    integer, intent(in)                     :: det 
+    !+ Store NPA particles in [[libfida:npa]]
+    integer, intent(in)                     :: det
         !+ Detector/Channel Number
-    real(Float64), dimension(3), intent(in) :: ri 
+    real(Float64), dimension(3), intent(in) :: ri
         !+ Birth position in beam coordinates [cm]
     real(Float64), dimension(3), intent(in) :: rf
         !+ Detector position in beam coordinates [cm]
@@ -4869,20 +4912,20 @@ subroutine store_npa(det, ri, rf, vn, flux)
         !+ Particle velocity [cm/s]
     real(Float64), intent(in)               :: flux
         !+ Neutral flux [neutrals/s]
-  
+
     type(LocalEMFields) :: fields
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
     real(Float64) :: energy, pitch
     integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
-  
+
     ! Convert to machine coordinates
     call xyz_to_uvw(ri,uvw_ri)
     call xyz_to_uvw(rf,uvw_rf)
-  
-    ! Calculate energy 
+
+    ! Calculate energy
     energy = inputs%ab*v2_to_E_per_amu*dot_product(vn,vn)
-  
+
     ! Calculate pitch if distribution actually uses pitch
     if(inputs%dist_type.le.2) then
         call get_fields(fields, pos = ri)
@@ -4891,7 +4934,7 @@ subroutine store_npa(det, ri, rf, vn, flux)
     else
         pitch = 0.d0
     endif
-  
+
     !$OMP CRITICAL(store_npa_1)
     npa%npart = npa%npart + 1
     if(npa%npart.gt.npa%nmax) then
@@ -4924,7 +4967,7 @@ end subroutine store_npa
 !=============================================================================
 subroutine neut_rates(denn, vi, vn, rates)
     !+ Get neutralization/cx rates
-    real(Float64), dimension(nlevs), intent(in)  :: denn  
+    real(Float64), dimension(nlevs), intent(in)  :: denn
         !+ Neutral density [cm^-3]
     real(Float64), dimension(3),     intent(in)  :: vi
         !+ Ion velocity [cm/s]
@@ -4932,13 +4975,14 @@ subroutine neut_rates(denn, vi, vn, rates)
         !+ Neutral velocity [cm/s]
     real(Float64), dimension(nlevs), intent(out) :: rates
         !+ Reaction rates [1/s]
-  
+
     real(Float64), dimension(nlevs,nlevs) :: neut  !!rate coeff
     real(Float64) :: eb !! relative Energy
-    real(Float64) :: b1, b2, dlogE, logEmin, logeb
+    type(InterpolCoeffs1D) :: c
+    real(Float64) :: dlogE, logEmin, logeb
     real(Float64) :: vrel !! relative velocity
     integer :: ebi, neb, err
-  
+
     !Eeff
     vrel=norm2(vi-vn)
     eb=v2_to_E_per_amu*vrel**2  ! [kev/amu]
@@ -4946,28 +4990,29 @@ subroutine neut_rates(denn, vi, vn, rates)
     logEmin = tables%H_H_cx%logemin
     dlogE = tables%H_H_cx%dlogE
     neb = tables%H_H_cx%nenergy
-    call interpol_coeff(logEmin,dlogE,neb,logeb,ebi,b1,b2,err)
+    call interpol_coeff(logEmin,dlogE,neb,logeb,c,err)
+    ebi = c%i
     if(err.eq.1) then
         write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
         write(*,'("eb = ",f5.3," [keV]")') eb
         if(ebi.lt.1) then
             ebi=1
-            b1=1.0 ; b2=0.0
+            c%b1=1.0 ; c%b2=0.0
         else
             ebi=neb
-            b1=0.0 ; b2=1.0
+            c%b1=0.0 ; c%b2=1.0
         endif
     endif
-  
-    neut(:,:) = (b1*tables%H_H_cx%log_cross(:,:,ebi) + &
-                 b2*tables%H_H_cx%log_cross(:,:,ebi+1))
-  
+
+    neut(:,:) = (c%b1*tables%H_H_cx%log_cross(:,:,ebi) + &
+                 c%b2*tables%H_H_cx%log_cross(:,:,ebi+1))
+
     where (neut.lt.tables%H_H_cx%minlog_cross)
         neut = 0.d0
     elsewhere
         neut = 10.d0**neut
     end where
-  
+
     rates=matmul(neut,denn)*vrel
 
 end subroutine neut_rates
@@ -4975,7 +5020,7 @@ end subroutine neut_rates
 subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     !+ Get probability of a thermal ion charge exchanging with `types` neutrals
     integer(Int32), dimension(3), intent(in)     :: ind
-        !+ [[libfida:beam_grid]] indices 
+        !+ [[libfida:beam_grid]] indices
     real(Float64), dimension(3), intent(in)      :: pos
         !+ Interaction position in beam grid coordinates
     real(Float64), dimension(3), intent(in)      :: v_ion
@@ -4983,18 +5028,18 @@ subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     integer(Int32), dimension(:), intent(in)     :: types
         !+ Neutral types
     real(Float64), dimension(nlevs), intent(out) :: prob
-        !+ Charge exchange rate/probability [1/s] 
+        !+ Charge exchange rate/probability [1/s]
 
     integer :: ntypes, i, ii
     real(Float64), dimension(nlevs) :: rates, denn
     real(Float64), dimension(3) :: vhalo, vnbi ,vn
-  
+
     vnbi = pos - nbi%src
     vnbi = vnbi/norm2(vnbi)*nbi%vinj
-  
+
     ntypes = size(types)
     prob = 0
-  
+
     do i=1,ntypes
         if((types(i).le.3).and.(types(i).ne.0)) then
             ! CX with full type'th energy NBI neutrals
@@ -5028,11 +5073,12 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     real(Float64) :: logEmin, dlogE, logeb
     real(Float64) :: logTmin, dlogT, logti, logte
     integer :: neb, nt
+    type(InterpolCoeffs2D) :: c
     real(Float64) :: b11, b12, b21, b22, dene, denp, denimp
     real(Float64), dimension(nlevs,nlevs) :: H_H_pop, H_e_pop, H_Aq_pop
     real(Float64), dimension(nlevs) :: H_H_depop, H_e_depop, H_Aq_depop
     integer :: ebi, tii, tei, n, err_status
-  
+
     H_H_pop = 0.d0
     H_e_pop = 0.d0
     H_Aq_pop = 0.d0
@@ -5054,15 +5100,20 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     neb = tables%H_H%nenergy
     nt = tables%H_H%ntemp
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logti, &
-                        ebi, tii, b11, b12, b21, b22, err_status)
+                        logeb, logti, c, err_status)
+    ebi = c%i
+    tii = c%j
+    b11 = c%b11
+    b12 = c%b12
+    b21 = c%b21
+    b22 = c%b22
     if(err_status.eq.1) then
         write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
         write(*,'("eb = ",f6.3," [keV]")') eb
         write(*,'("ti = ",f6.3," [keV]")') plasma%ti
         denp = 0.d0
     endif
-  
+
     H_H_pop = (b11*tables%H_H%log_pop(:,:,ebi,tii,i_type)   + &
                b12*tables%H_H%log_pop(:,:,ebi,tii+1,i_type) + &
                b21*tables%H_H%log_pop(:,:,ebi+1,tii,i_type) + &
@@ -5072,7 +5123,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     elsewhere
         H_H_pop = denp * 10.d0**H_H_pop
     end where
-  
+
     H_H_depop = (b11*tables%H_H%log_depop(:,ebi,tii,i_type)   + &
                  b12*tables%H_H%log_depop(:,ebi,tii+1,i_type) + &
                  b21*tables%H_H%log_depop(:,ebi+1,tii,i_type) + &
@@ -5082,7 +5133,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     elsewhere
         H_H_depop = denp * 10.d0**H_H_depop
     end where
-  
+
     !!H_e
     err_status = 1
     logEmin = tables%H_e%logemin
@@ -5092,15 +5143,20 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     neb = tables%H_e%nenergy
     nt = tables%H_e%ntemp
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logte, &
-                        ebi, tei, b11, b12, b21, b22, err_status)
+                        logeb, logte, c, err_status)
+    ebi = c%i
+    tei = c%j
+    b11 = c%b11
+    b12 = c%b12
+    b21 = c%b21
+    b22 = c%b22
     if(err_status.eq.1) then
         write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
         write(*,'("eb = ",f6.3," [keV]")') eb
         write(*,'("te = ",f6.3," [keV]")') plasma%te
         dene = 0.d0
     endif
-  
+
     H_e_pop = (b11*tables%H_e%log_pop(:,:,ebi,tei,i_type)   + &
                b12*tables%H_e%log_pop(:,:,ebi,tei+1,i_type) + &
                b21*tables%H_e%log_pop(:,:,ebi+1,tei,i_type) + &
@@ -5110,18 +5166,18 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     elsewhere
         H_e_pop = dene * 10.d0**H_e_pop
     end where
-  
+
     H_e_depop = (b11*tables%H_e%log_depop(:,ebi,tei,i_type)   + &
                  b12*tables%H_e%log_depop(:,ebi,tei+1,i_type) + &
                  b21*tables%H_e%log_depop(:,ebi+1,tei,i_type) + &
                  b22*tables%H_e%log_depop(:,ebi+1,tei+1,i_type))
-                         
+
     where (H_e_depop.lt.tables%H_e%minlog_depop)
         H_e_depop = 0.d0
     elsewhere
         H_e_depop = dene * 10.d0**H_e_depop
     end where
-  
+
     !!H_Aq
     err_status = 1
     logEmin = tables%H_Aq%logemin
@@ -5131,15 +5187,20 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     neb = tables%H_Aq%nenergy
     nt = tables%H_Aq%ntemp
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logti, &
-                        ebi, tii, b11, b12, b21, b22, err_status)
+                        logeb, logti, c, err_status)
+    ebi = c%i
+    tii = c%j
+    b11 = c%b11
+    b12 = c%b12
+    b21 = c%b21
+    b22 = c%b22
     if(err_status.eq.1) then
         write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
         write(*,'("eb = ",f6.3," [keV]")') eb
         write(*,'("ti = ",f6.3," [keV]")') plasma%ti
         denimp = 0.d0
     endif
-  
+
     H_Aq_pop = (b11*tables%H_Aq%log_pop(:,:,ebi,tii,i_type)   + &
                 b12*tables%H_Aq%log_pop(:,:,ebi,tii+1,i_type) + &
                 b21*tables%H_Aq%log_pop(:,:,ebi+1,tii,i_type) + &
@@ -5153,13 +5214,13 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
                   b12*tables%H_Aq%log_depop(:,ebi,tii+1,i_type) + &
                   b21*tables%H_Aq%log_depop(:,ebi+1,tii,i_type) + &
                   b22*tables%H_Aq%log_depop(:,ebi+1,tii+1,i_type))
-  
+
     where (H_Aq_depop.lt.tables%H_Aq%minlog_depop)
         H_Aq_depop = 0.d0
     elsewhere
         H_Aq_depop = denimp * 10.d0**H_Aq_depop
     end where
-  
+
     rmat = tables%einstein + H_H_pop + H_e_pop + H_Aq_pop
     do n=1,nlevs
         rmat(n,n) = -sum(tables%einstein(:,n)) - H_H_depop(n) - H_e_depop(n) - H_Aq_depop(n)
@@ -5169,11 +5230,11 @@ end subroutine get_rate_matrix
 
 subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     !+ Evolve density of states in time `dt` via collisional radiative model
-    type(LocalProfiles), intent(in)              :: plasma 
+    type(LocalProfiles), intent(in)              :: plasma
         !+ Plasma parameters
-    integer, intent(in)                          :: i_type 
+    integer, intent(in)                          :: i_type
         !+ Ion/Neutral type (beam,thermal)
-    real(Float64), dimension(:), intent(in)      :: vn  
+    real(Float64), dimension(:), intent(in)      :: vn
         !+ Neutral velocitiy [cm/s]
     real(Float64), intent(in)                    :: dt
         !+ Time interval [s]
@@ -5183,7 +5244,7 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
         !+ Density of neutrals
     real(Float64), intent(out)                   :: photons
         !+ Emitted photons(3->2)
-  
+
     real(Float64), dimension(nlevs,nlevs) :: matrix  !! Matrix
     real(Float64) :: b_amu
     real(Float64) :: vnet_square    !! net velocity of neutrals squared
@@ -5197,17 +5258,17 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
 
     photons=0.d0
     dens=0.d0
-  
+
     iflux=sum(states)
     if(iflux.lt.colrad_threshold .and. inputs%calc_npa.eq.0)then
         return
     endif
-  
+
     if(.not.plasma%in_plasma) then
         dens = states*dt
         return
     endif
-  
+
     if(i_type.eq.beam_ion) then
         b_amu = inputs%ab
     else
@@ -5216,7 +5277,7 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     vnet_square=dot_product(vn-plasma%vrot,vn-plasma%vrot)  ![cm/s]
     eb = v2_to_E_per_amu*b_amu*vnet_square ![kev]
     call get_rate_matrix(plasma, i_type, eb, matrix)
-  
+
     call eigen(nlevs,matrix, eigvec, eigval)
     call matinv(eigvec, eigvec_inv)
     coef = matmul(eigvec_inv, states)!coeffs determined from states at t=0
@@ -5224,19 +5285,19 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     do n=1,nlevs
         if(eigval(n).eq.0.0) eigval(n)=eigval(n)+1 !protect against dividing by zero
     enddo
-  
+
     states = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
     dens   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
-  
+
     if ((minval(states).lt.0).or.(minval(dens).lt.0)) then
         do n=1,nlevs
             if(states(n).lt.0) states(n)=0.d0
             if(dens(n).lt.0) dens(n)=0.d0
         enddo
     endif
-  
+
     photons=dens(3)*tables%einstein(2,3) !! - [Ph/(s*cm^3)] - !!
-  
+
 end subroutine colrad
 
 subroutine attenuate(ri, rf, vi, states, dstep_in)
@@ -5256,18 +5317,18 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
     real(Float64) :: photons, vabs, dt, dstep, dis,max_dis
     real(Float64), dimension(3) :: r0
     real(Float64), dimension(nlevs) :: dens
-  
+
     if(present(dstep_in)) then
         dstep=dstep_in
     else
         dstep = sqrt(inter_grid%da) !cm
     endif
-  
+
     max_dis = norm2(rf-ri)
-  
+
     vabs = norm2(vi)
     dt = dstep/vabs
-  
+
     call get_plasma(plasma,pos=ri)
     r0 = ri
     dis = 0.d0
@@ -5303,14 +5364,14 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
     real(Float64), dimension(3) :: bfield, efield
     real(Float64) :: E, cos_los_Efield, lambda_shifted
     integer, parameter, dimension(n_stark) :: stark_sign= +1*stark_sigma -1*stark_pi
-  
+
     !! vector directing towards the optical head
     vp=vecp/norm2(vecp)
-  
+
     ! Calculate Doppler shift
     vn=vi*0.01d0 ! [m/s]
     lambda_shifted = lambda0*(1.d0 + dot_product(vn,vp)/c0)
-  
+
     !! Calculate Stark Splitting
     ! Calculate E-field
     bfield = fields%b_norm*fields%b_abs
@@ -5319,23 +5380,23 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
     efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
     efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
     E = norm2(efield)
-  
+
     !Stark Splitting
     lambda =  lambda_shifted + E * stark_wavel ![nm]
-  
+
     !Intensities of stark components
     if (E .eq. 0.d0) then
         cos_los_Efield = 0.d0
     else
         cos_los_Efield = dot_product(vp,efield) / E
     endif
-  
+
     intensity = stark_intens*(1.d0+ stark_sign* cos_los_Efield**2)
     !! E.g. mirrors may change the pi to sigma intensity ratio
     where (stark_sigma .eq. 1)
         intensity = intensity * sigma_pi
     endwhere
-  
+
     !! normalize and multiply with photon density from colrad
     intensity = intensity/sum(intensity)*photons*dlength
 
@@ -5345,7 +5406,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     !+ Store BES photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
-    real(Float64), dimension(3), intent(in) :: vi 
+    real(Float64), dimension(3), intent(in) :: vi
         !+ Velocitiy of neutral [cm/s]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
@@ -5358,10 +5419,10 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
     integer :: ichan,i,bin
-  
+
     call get_indices(pos,ind)
     call get_fields(fields,pos=pos)
-  
+
     loop_over_channels: do ichan=1,spec_chords%nchan
         dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
         if(dlength.le.0.0) cycle loop_over_channels
@@ -5369,7 +5430,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
                       dlength,lambda,intensity)
-  
+
         loop_over_stark: do i=1,n_stark
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
@@ -5380,14 +5441,14 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
             !$OMP END CRITICAL(bes_spectrum)
         enddo loop_over_stark
     enddo loop_over_channels
-  
+
 end subroutine store_bes_photons
 
 subroutine store_fida_photons(pos, vi, photons, orbit_class)
     !+ Store fida photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
-    real(Float64), dimension(3), intent(in) :: vi 
+    real(Float64), dimension(3), intent(in) :: vi
         !+ Velocitiy of neutral [cm/s]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
@@ -5400,16 +5461,16 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
     integer :: ichan, i, bin, iclass
-  
+
     if(present(orbit_class)) then
         iclass = orbit_class
     else
         iclass = 1
     endif
-  
+
     call get_indices(pos,ind)
     call get_fields(fields,pos=pos)
-  
+
     loop_over_channels: do ichan=1,spec_chords%nchan
         dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
         if(dlength.le.0.0) cycle loop_over_channels
@@ -5417,7 +5478,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
                       dlength,lambda,intensity)
-  
+
         loop_over_stark: do i=1,n_stark
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
@@ -5428,7 +5489,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
             !$OMP END CRITICAL(fida_spectrum)
         enddo loop_over_stark
     enddo loop_over_channels
-  
+
 end subroutine store_fida_photons
 
 subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_pi,denf,photons)
@@ -5439,9 +5500,9 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
         !+ Energy index
     integer, intent(in)                     :: pind
         !+ Pitch index
-    real(Float64), dimension(3), intent(in) :: vp 
+    real(Float64), dimension(3), intent(in) :: vp
         !+ Vector pointing toward optical head
-    real(Float64), dimension(3), intent(in) :: vi 
+    real(Float64), dimension(3), intent(in) :: vi
         !+ Velocity of neutral [cm/s]
     type(LocalEMFields), intent(in)         :: fields
         !+ Electro-magnetic fields
@@ -5453,25 +5514,25 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
         !+ Fast-ion density [cm^-3]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
-  
+
     real(Float64), dimension(n_stark) :: lambda,intensity
     real(Float64) :: dlambda,intens_fac
     integer :: i,bin
-  
-  
+
+
     dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
     intens_fac = (1.d0)/(4.d0*pi*dlambda)
     call spectrum(vp,vi,fields,sigma_pi,photons, &
                   dlength,lambda,intensity)
-  
+
     !$OMP CRITICAL(fida_wght)
     loop_over_stark: do i=1,n_stark
         bin=floor((lambda(i) - inputs%lambdamin_wght)/dlambda) + 1
         if (bin.lt.1)                   cycle loop_over_stark
         if (bin.gt.inputs%nlambda_wght) cycle loop_over_stark
-        !fida(bin,ichan)= fida(bin,ichan) + & 
+        !fida(bin,ichan)= fida(bin,ichan) + &
         !  (denf*intens_fac*1.d4)*intensity(i) !ph/(s*nm*sr*m^2)
-        fweight%weight(bin,eind,pind,ichan) = & 
+        fweight%weight(bin,eind,pind,ichan) = &
           fweight%weight(bin,eind,pind,ichan) + intensity(i)*intens_fac !(ph*cm)/(s*nm*sr*fast-ion*dE*dp)
     enddo loop_over_stark
     if(denf.gt.0.d0) then
@@ -5479,7 +5540,7 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
                                           (denf*intens_fac)*sum(intensity)
     endif
     !$OMP END CRITICAL(fida_wght)
-  
+
 end subroutine store_fw_photons_at_chan
 
 subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
@@ -5490,22 +5551,22 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
         !+ Pitch index
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral
-    real(Float64), dimension(3), intent(in) :: vi 
+    real(Float64), dimension(3), intent(in) :: vi
         !+ Velocity of neutral [cm/s]
     real(Float64), intent(in)               :: denf
         !+ Fast-ion density [cm^-3]
     real(Float64), intent(in)               :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
-  
+
     real(Float64) :: dlength, sigma_pi
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
     integer :: ichan
-  
+
     call get_indices(pos,ind)
     call get_fields(fields,pos=pos)
-  
+
     loop_over_channels: do ichan=1,spec_chords%nchan
         dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
         if(dlength.le.0.0) cycle loop_over_channels
@@ -5514,7 +5575,7 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
         call store_fw_photons_at_chan(ichan, eind, pind, &
              vp, vi, fields, dlength, sigma_pi, denf, photons)
     enddo loop_over_channels
-  
+
 end subroutine store_fw_photons
 
 !=============================================================================
@@ -5536,7 +5597,7 @@ subroutine get_nlaunch(nr_markers,papprox,papprox_tot,nlaunch)
 
     do i=1,1000
        nlaunch(:,:,:)=papprox(:,:,:)/papprox_tot*nr_markers*(1.+i*0.01)
-       if(sum(nlaunch).gt.nr_markers) then 
+       if(sum(nlaunch).gt.nr_markers) then
           exit
        endif
     enddo
@@ -5580,7 +5641,7 @@ subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
         !+ Normalized velocity vector
 
     real(Float64) :: sinus
- 
+
     sinus = sqrt(1.d0-pitch**2)
     vi_norm = (sinus*cos(gyroangle)*fields%a_norm + &
                pitch*fields%b_norm + &
@@ -5606,9 +5667,9 @@ subroutine gyro_step(vi, fields, r_gyro)
         r_gyro = vxB*one_over_omega !points towards gyrocenter
 
         !! Second order correction approximation derived from
-        !! Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. 
-        !! "Self-consistent equilibrium model of low aspect-ratio 
-        !! toroidal plasma with energetic beam ions." 
+        !! Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng.
+        !! "Self-consistent equilibrium model of low aspect-ratio
+        !! toroidal plasma with energetic beam ions."
         !! Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251.
         !! Appendix A: Last equation
         uvw = fields%uvw
@@ -5638,7 +5699,7 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
     real(Float64), intent(in)                :: pitch
         !+ Particle pitch w.r.t the magnetic field
     real(Float64), dimension(3), intent(out) :: rp
-        !+ Particle position 
+        !+ Particle position
     real(Float64), dimension(3), intent(out) :: vp
         !+ Particle velocity
 
@@ -5668,7 +5729,7 @@ subroutine mc_fastion(ind,rp,vi,denf)
         !+ [[libfida:beam_grid]] index
     real(Float64), dimension(3), intent(out) :: rp
         !+ Fast-ion particle position [cm]
-    real(Float64), dimension(3), intent(out) :: vi 
+    real(Float64), dimension(3), intent(out) :: vi
         !+ Fast-ion particle velocity [cm/s]
     real(Float64), intent(out)               :: denf
         !+ Fast-ion density at guiding center
@@ -5685,18 +5746,18 @@ subroutine mc_fastion(ind,rp,vi,denf)
     rg(2) = beam_grid%yc(ind(2)) + beam_grid%dr(2)*(randomu3(2) - 0.5)
     rg(3) = beam_grid%zc(ind(3)) + beam_grid%dr(3)*(randomu3(3) - 0.5)
     vi=0.d0
-    denf=0.d0 
+    denf=0.d0
 
     call get_fields(fields,pos=rg)
-    if(.not.fields%in_plasma) return 
+    if(.not.fields%in_plasma) return
 
-    call get_distribution(fbeam,denf,pos=rg)
+    call get_distribution(fbeam,denf,pos=rg, coeffs=fields%c)
     call randind(fbeam,ep_ind)
     call randu(randomu3)
     eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
     ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
     call gyro_correction(fields,rg,eb,ptch,rp,vi)
- 
+
 end subroutine mc_fastion
 
 subroutine mc_halo(ind,vhalo,ri,plasma_in)
@@ -5712,7 +5773,7 @@ subroutine mc_halo(ind,vhalo,ri,plasma_in)
 
     type(LocalProfiles) :: plasma
     real(Float64), dimension(3) :: random3
-  
+
     if(.not.present(plasma_in)) then
         if(present(ri)) then
             call randu(random3)
@@ -5720,15 +5781,15 @@ subroutine mc_halo(ind,vhalo,ri,plasma_in)
             ri(2) = beam_grid%yc(ind(2)) + beam_grid%dr(2)*(random3(2) - 0.5)
             ri(3) = beam_grid%zc(ind(3)) + beam_grid%dr(3)*(random3(3) - 0.5)
             call get_plasma(plasma,pos=ri)
-        else 
+        else
             call get_plasma(plasma,ind=ind)
         endif
     else
         plasma=plasma_in
     endif
-  
+
     call randn(random3)
-  
+
     vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3 !![cm/s]
 
 end subroutine mc_halo
@@ -5739,7 +5800,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
         !+ Beam neutral type (1,2,3)
     real(Float64), dimension(3), intent(out) :: vnbi
         !+ Velocity [cm/s]
-    real(Float64), dimension(3), intent(out) :: rnbi  
+    real(Float64), dimension(3), intent(out) :: rnbi
         !+ Starting position on [[libfida:beam_grid]]
     logical, intent(out)                     :: err
         !+ Error Code
@@ -5755,7 +5816,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     real(Float64) :: length, sqrt_rho, theta
     integer :: i, j
     logical :: inp, valid_trajectory
-  
+
     err = .False.
     valid_trajectory = .False.
     rejection_loop: do i=1,1000
@@ -5774,7 +5835,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
                 xyz_src(2) = nbi%widy*sqrt_rho*cos(theta)
                 xyz_src(3) = nbi%widz*sqrt_rho*sin(theta)
         end select
-    
+
         !! Create random velocity vector
         call randn(randomn)
         xyz_ray(1)= 1.d0
@@ -5819,7 +5880,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
         err = .True.
         nbi_outside = nbi_outside + 1
     endif
-    
+
     !! Check if start position is in the plasma
     call in_plasma(rnbi,inp)
     if(inp)then
@@ -5842,7 +5903,7 @@ subroutine ndmc
     real(Float64)  :: nneutrals !! # NBI particles
     real(Float64), dimension(3) :: vnbi !! velocities(full..)
     real(Float64), dimension(3) :: rnbi !! initial position
-  
+
     integer :: jj, ii, kk
     integer :: ncell
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
@@ -5858,16 +5919,16 @@ subroutine ndmc
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi
     endif
-  
+
     !! # of injected neutrals = NBI power/energy_per_particle
     nneutrals=1.d6*nbi%pinj/ (1.d3*nbi%einj*e0 &
          *( nbi%current_fractions(1)      &
          +  nbi%current_fractions(2)/2.d0 &
          +  nbi%current_fractions(3)/3.d0 ) )
-  
+
     nlaunch=real(inputs%n_nbi)
 
-    !$OMP PARALLEL DO schedule(guided) & 
+    !$OMP PARALLEL DO schedule(guided) &
     !$OMP& private(vnbi,rnbi,tracks,ncell,plasma,nl_birth,randi, &
     !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
     loop_over_markers: do ii=1,inputs%n_nbi
@@ -5879,7 +5940,7 @@ subroutine ndmc
                 nl_birth(randi(1)) = nl_birth(randi(1)) + 1
             enddo
         endif
-        energy_fractions: do neut_type=1,3 
+        energy_fractions: do neut_type=1,3
             !! (type = 1: full energy, =2: half energy, =3: third energy
             call mc_nbi(vnbi,neut_type,rnbi,err)
             if(err) cycle energy_fractions
@@ -5894,15 +5955,15 @@ subroutine ndmc
                 iflux = sum(states)
                 ind = tracks(jj)%ind
                 call get_plasma(plasma,pos=tracks(jj)%pos)
-  
+
                 call colrad(plasma,beam_ion,vnbi,tracks(jj)%time,states,dens,photons)
                 call store_neutrals(ind,neut_type,dens/nlaunch)
                 tracks(jj)%flux = (iflux - sum(states))*beam_grid%dv/nlaunch
-  
+
                 if(inputs%calc_birth.ge.1) then
                     call store_births(ind,neut_type,tracks(jj)%flux)
                 endif
-  
+
                 if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                     call store_bes_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
                 endif
@@ -5925,7 +5986,7 @@ subroutine ndmc
         enddo energy_fractions
     enddo loop_over_markers
     !$OMP END PARALLEL DO
-  
+
     if(nbi_outside.gt.0)then
          write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                               100.*nbi_outside/(3.*inputs%n_nbi)
@@ -5944,10 +6005,10 @@ subroutine bremsstrahlung
     real(Float64), dimension(3) :: vi, xyz, r0
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(:), allocatable :: lambda_arr,brems
-  
+
     allocate(lambda_arr(inputs%nlambda))
     allocate(brems(inputs%nlambda))
-  
+
     do i=1,inputs%nlambda
         lambda_arr(i)= 10*((i-0.5)*inputs%dlambda+inputs%lambdamin) ! [A]
     enddo
@@ -5962,13 +6023,13 @@ subroutine bremsstrahlung
         vi = vi/norm2(vi)
         spot_size = spec_chords%los(ichan)%spot_size
         call line_basis(xyz,vi,basis)
-  
-        if(spot_size.le.0.d0) then 
+
+        if(spot_size.le.0.d0) then
             nc = 1
         else
             nc = 100
         endif
-        
+
         do ic=1,nc
             call randu(randomu)
             sqrt_rho = sqrt(randomu(1))
@@ -5977,7 +6038,7 @@ subroutine bremsstrahlung
             r0(2) = spot_size*sqrt_rho*cos(theta)
             r0(3) = spot_size*sqrt_rho*sin(theta)
             r0 = matmul(basis,r0) + xyz
-  
+
             ! Find edge of plasma
             call get_plasma(plasma,pos=r0)
             max_length=0.0
@@ -5987,7 +6048,7 @@ subroutine bremsstrahlung
                 max_length = max_length + dlength
                 if(max_length.gt.300) cycle loop_over_channels
             enddo
-  
+
             ! Calculate bremsstrahlung along los
             do while (plasma%in_plasma)
                 if(plasma%te.gt.0.0) then
@@ -5995,7 +6056,7 @@ subroutine bremsstrahlung
                     brems = 7.57d-9*gaunt*plasma%dene**2*plasma%zeff/(lambda_arr &
                             *sqrt(plasma%te*1000.0))*exp(-h_planck*c0/(lambda_arr*plasma%te*1000.0)) &
                             *dlambda*(4.d0*pi)*1.d-4
-  
+
                     spec%brems(:,ichan)= spec%brems(:,ichan) + (brems*dlength*1.d-2)/nc
                 endif
                 ! Take a step
@@ -6003,7 +6064,7 @@ subroutine bremsstrahlung
                 call get_plasma(plasma,pos=r0)
             enddo
         enddo
-  
+
         if (inputs%verbose.eq.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') 100*ichan/real(spec_chords%nchan),char(13)
         endif
@@ -6034,7 +6095,7 @@ subroutine dcx
     real(Float64):: tot_denn, photons  !! photon flux
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
     real(Float64) :: papprox_tot, ccnt, inv_ng
-  
+
     halo_iter_dens(halo_type) = 0.d0
     papprox=0.d0
     papprox_tot=0.d0
@@ -6052,49 +6113,50 @@ subroutine dcx
             enddo
         enddo
     enddo
-  
+
     call get_nlaunch(inputs%n_dcx,papprox,papprox_tot,nlaunch)
-  
+
     if(inputs%verbose.ge.1) then
        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
     endif
-  
+
     ccnt=0.d0
     inv_ng = 100.0/real(beam_grid%ngrid)
-    !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ncell,prob,denn,states,jj,photons,plasma)
     loop_along_z: do k = 1, beam_grid%nz
         loop_along_y: do j = 1, beam_grid%ny
             loop_along_x: do i = 1, beam_grid%nx
                 !! Loop over the markers
+                !$OMP PARALLEL DO schedule(guided) private(idcx,ind,vihalo, &
+                !$OMP& ri,tracks,ncell,prob,denn,states,jj,photons,plasma)
                 loop_over_dcx: do idcx=1,int(nlaunch(i,j,k))
                     !! Calculate ri,vhalo and track
                     ind = [i, j, k]
                     call mc_halo(ind,vihalo,ri)
                     call track(ri,vihalo,tracks,ncell)
                     if(ncell.eq.0) cycle loop_over_dcx
-  
+
                     !! Calculate CX probability
                     call get_beam_cx_prob(tracks(1)%ind,ri,vihalo,neut_types,prob)
                     if(sum(prob).le.0.) cycle loop_over_dcx
-  
+
                     !! Solve collisional radiative model along track
                     call get_plasma(plasma,pos=tracks(1)%pos)
-  
+
                     states = prob*(plasma%denp - plasma%denf)
-  
+
                     loop_along_track: do jj=1,ncell
                         call get_plasma(plasma,pos=tracks(jj)%pos)
-    
+
                         call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
                         call store_neutrals(tracks(jj)%ind,halo_type,denn/nlaunch(i,j,k),plasma%in_plasma)
-    
+
                         if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                           call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                         endif
-    
+
                     enddo loop_along_track
                 enddo loop_over_dcx
+                !$OMP END PARALLEL DO
                 ccnt=ccnt+1
                 if (inputs%verbose.eq.2)then
                     WRITE(*,'(f7.2,"% completed",a,$)') ccnt*inv_ng,char(13)
@@ -6102,7 +6164,6 @@ subroutine dcx
             enddo loop_along_x
         enddo loop_along_y
     enddo loop_along_z
-    !$OMP END PARALLEL DO
 
 end subroutine dcx
 
@@ -6130,10 +6191,10 @@ subroutine halo
     real(Float64) :: dcx_dens, halo_iteration_dens
     integer :: s1type  ! halo iteration
     integer :: s2type  ! halo iteration
-  
+
     s1type = fida_type
     s2type = brems_type
-  
+
     dcx_dens = halo_iter_dens(halo_type)
     if(dcx_dens.eq.0) then
         write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
@@ -6153,14 +6214,14 @@ subroutine halo
                     call get_plasma(plasma,ind=ind)
                     tot_denn = sum(neut%dens(:,s1type,i,j,k))
                     papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
-  
+
                     if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
                 enddo
             enddo
         enddo
-  
+
         call get_nlaunch(inputs%n_halo,papprox,papprox_tot,nlaunch)
-  
+
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
         endif
@@ -6170,34 +6231,34 @@ subroutine halo
         loop_along_z: do k = 1, beam_grid%nz
             loop_along_y: do j = 1, beam_grid%ny
                 loop_along_x: do i = 1, beam_grid%nx
-                    !! Loop over the markers 
+                    !! Loop over the markers
                     loop_over_halos: do ihalo=1,int(nlaunch(i,j,k))
                         !! Calculate ri,vhalo and track
                         ind = [i, j, k]
                         call mc_halo(ind,vihalo,ri)
                         call track(ri,vihalo,tracks,ncell)
                         if(ncell.eq.0)cycle loop_over_halos
-  
+
                         !! Calculate CX probability
                         call get_beam_cx_prob(tracks(1)%ind,ri,vihalo,[s1type],prob)
                         if(sum(prob).le.0.)cycle loop_over_halos
-  
+
                         !! Solve collisional radiative model along track
                         call get_plasma(plasma,pos=tracks(1)%pos)
-  
+
                         states = prob*plasma%denp
-  
+
                         loop_along_track: do jj=1,ncell
                             call get_plasma(plasma,pos=tracks(jj)%pos)
-    
+
                             call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
                             call store_neutrals(tracks(jj)%ind,s2type, &
                                  denn/nlaunch(i,j,k),plasma%in_plasma)
-    
+
                             if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                               call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                             endif
-    
+
                         enddo loop_along_track
                     enddo loop_over_halos
                     ccnt=ccnt+1
@@ -6208,20 +6269,20 @@ subroutine halo
             enddo loop_along_y
         enddo loop_along_z
         !$OMP END PARALLEL DO
-       
+
         halo_iteration_dens = halo_iter_dens(s2type)
         neut%dens(:,halo_type,:,:,:)= neut%dens(:,halo_type,:,:,:) &
                                            + neut%dens(:,s2type,:,:,:)
         neut%dens(:,s1type,:,:,:)= neut%dens(:,s2type,:,:,:)
         neut%dens(:,s2type,:,:,:)= 0.
-  
+
         if(halo_iteration_dens/dcx_dens.gt.1)then
             write(*,'(a)') "HALO: Halo generation density exceeded DCX density. This shouldn't happen."
             exit iterations
         endif
- 
+
         inputs%n_halo=int(inputs%n_dcx*halo_iteration_dens/dcx_dens)
-  
+
         if(inputs%n_halo.lt.inputs%n_dcx*0.01)exit iterations
     enddo iterations
     !! set the neutral density in s1type(fida_type) and s2type (brems) to 0!
@@ -6243,22 +6304,22 @@ subroutine fida_f
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     real(Float64), dimension(nlevs) :: prob !! Prob. for CX
-  
+
     !! Collisiional radiative model along track
     integer :: ncell
     integer :: jj      !! counter along track
     type(ParticleTrack),dimension(beam_grid%ntrack) :: tracks
-  
+
     real(Float64) :: photons !! photon flux
     real(Float64), dimension(nlevs) :: states  !! Density of n-states
     real(Float64), dimension(nlevs) :: denn
-  
+
     !! Number of particles to launch
     integer(kind=8) :: pcnt
     real(Float64) :: papprox_tot, inv_maxcnt, cnt
     integer, dimension(3,beam_grid%ngrid) :: pcell
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
-  
+
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
     papprox_tot=0.d0
@@ -6287,7 +6348,7 @@ subroutine fida_f
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
     endif
-  
+
     !! Loop over all cells that have neutrals
     cnt=0.d0
     loop_over_cells: do ip = 1, int(pcnt)
@@ -6306,26 +6367,26 @@ subroutine fida_f
             call track(ri, vi, tracks, ncell,los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ncell.eq.0) cycle loop_over_fast_ions
- 
+
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_prob(tracks(1)%ind, ri, vi, neut_types, prob)
             if(sum(prob).le.0.) cycle loop_over_fast_ions
 
             !! Calculate initial states of particle
             states=prob*denf
-  
+
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ncell
                 call get_plasma(plasma,pos=tracks(jj)%pos)
-  
+
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
-  
+
                 call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
         !$OMP END PARALLEL DO
         cnt=cnt+1
-  
+
         if (inputs%verbose.eq.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
@@ -6343,20 +6404,20 @@ subroutine fida_mc
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
     !! Determination of the CX probability
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
-    real(Float64), dimension(nlevs) :: prob    !! Prob. for CX 
+    real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     integer :: ncell
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     logical :: los_intersect
     integer :: jj      !! counter along track
-    real(Float64) :: photons !! photon flux 
+    real(Float64) :: photons !! photon flux
     integer, dimension(4) :: neut_types=[1,2,3,4]
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: s, c
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(2) :: randomu
-  
+
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
     if(inputs%verbose.ge.1) then
@@ -6381,29 +6442,29 @@ subroutine fida_mc
             uvw(2) = fast_ion%r*s
             uvw(3) = fast_ion%z
             call uvw_to_xyz(uvw, ri)
-  
+
             !! Calculate velocity vector
             uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
             uvw_vi(2) = s*fast_ion%vr + c*fast_ion%vt
             uvw_vi(3) = fast_ion%vz
             vi = matmul(beam_grid%inv_basis,uvw_vi)
-   
+
             !! Track particle through grid
             call track(ri, vi, tracks, ncell, los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ncell.eq.0)cycle loop_over_fast_ions
-  
+
             !! Calculate CX probability
             call get_beam_cx_prob(tracks(1)%ind,ri,vi,neut_types,prob)
             if(sum(prob).le.0.)cycle loop_over_fast_ions
-  
+
             !! Calculate the spectra produced in each cell along the path
             states=prob*fast_ion%weight
             loop_along_track: do jj=1,ncell
                 call get_plasma(plasma,pos=tracks(jj)%pos)
-  
+
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
-  
+
                 call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class)
             enddo loop_along_track
         endif
@@ -6425,23 +6486,23 @@ subroutine npa_f
     real(Float64) :: denf                  !! fast-ion density
     integer, dimension(3) :: ind      !! new actual cell
     integer, dimension(3,beam_grid%ngrid) :: pcell
-  
+
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     integer, dimension(4) :: neut_types=[1,2,3,4]
     real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
-  
+
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  !! Density of n-states
     real(Float64) :: flux !! flux
-  
+
     integer :: inpa,pcnt
     real(Float64) :: papprox_tot, maxcnt, cnt, inv_maxcnt
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
-  
+
     papprox=0.d0
     papprox_tot=0.d0
-  
+
     pcnt=1
     do k=1,beam_grid%nz
         do j=1,beam_grid%ny
@@ -6453,7 +6514,7 @@ subroutine npa_f
                                 sum(neut%dens(:,nbit_type,i,j,k)) + &
                                 sum(neut%dens(:,halo_type,i,j,k)))* &
                                 plasma%denf
-  
+
                 if(papprox(i,j,k).gt.0.and.(npa_chords%hit(i,j,k))) then
                     !the only doing viewable cells is techically wrong
                     !since a guiding center not in a viewable cell
@@ -6462,7 +6523,7 @@ subroutine npa_f
                     pcell(:,pcnt)= ind
                     pcnt = pcnt + 1
                 endif
-  
+
                 if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
             enddo
         enddo
@@ -6470,12 +6531,12 @@ subroutine npa_f
     pcnt = pcnt - 1
     maxcnt=real(pcnt)
     inv_maxcnt = 100.0/maxcnt
-  
+
     call get_nlaunch(inputs%n_npa,papprox,papprox_tot,nlaunch)
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i12)') int(sum(nlaunch))
     endif
-  
+
     !! Loop over all cells that can contribute to NPA signal
     cnt=0.d0
     loop_over_cells: do ip = 1, int(pcnt)
@@ -6493,15 +6554,15 @@ subroutine npa_f
             !! Check if particle hits a NPA detector
             call hit_npa_detector(ri, vi ,det, rf)
             if(det.eq.0) cycle loop_over_fast_ions
-            
+
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
             if(sum(prob).le.0.)cycle loop_over_fast_ions
-  
+
             !! Attenuate states as the particle move through plasma
             states=prob*denf
             call attenuate(ri,rf,vi,states)
-  
+
             !! Store NPA Flux
             flux = sum(states)*beam_grid%dv/(nlaunch(i,j,k)*npa%nloop)
             call store_npa(det,ri,rf,vi,flux)
@@ -6524,7 +6585,7 @@ subroutine npa_mc
     real(Float64), dimension(3) :: ri, rf      !! positions
     real(Float64), dimension(3) :: vi          !! velocity of fast ions
     integer :: det !! detector
-    real(Float64), dimension(nlevs) :: prob    !! Prob. for CX 
+    real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     real(Float64) :: flux
     integer, dimension(4) :: neut_types=[1,2,3,4]
@@ -6533,10 +6594,10 @@ subroutine npa_mc
     real(Float64) :: s,c
     real(Float64) :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(2) :: randomu
-  
+
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
-  
+
     cnt=0.0
     !$OMP PARALLEL DO schedule(guided) private(iion,ind,fast_ion,vi,ri,rf,phi,s,c, &
     !$OMP& randomu,uvw,uvw_vi,prob,states,flux,det)
@@ -6554,28 +6615,28 @@ subroutine npa_mc
             uvw(2) = fast_ion%r*s
             uvw(3) = fast_ion%z
             call uvw_to_xyz(uvw,ri)
-  
+
             !! Calculate velocity
             uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
             uvw_vi(2) = s*fast_ion%vr + c*fast_ion%vt
-            uvw_vi(3) = fast_ion%vz  
+            uvw_vi(3) = fast_ion%vz
             vi = matmul(beam_grid%inv_basis,uvw_vi)
-  
+
             !! Check if particle hits a NPA detector
             call hit_npa_detector(ri, vi ,det, rf)
             if(det.eq.0) cycle loop_over_fast_ions
-            
-            !! Get beam grid indices 
+
+            !! Get beam grid indices
             call get_indices(ri,ind)
-  
+
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
             if(sum(prob).le.0.)cycle loop_over_fast_ions
-  
+
             !! Attenuate states as the particle moves though plasma
             states=prob*fast_ion%weight
             call attenuate(ri,rf,vi,states)
-  
+
             !! Store NPA Flux
             flux = sum(states)*beam_grid%dv
             call store_npa(det,ri,rf,vi,flux)
@@ -6598,36 +6659,36 @@ subroutine fida_weights_mc
     integer,dimension(3) :: ind      !! new actual cell
     integer,dimension(4) :: neut_types=[1,2,3,4]
     logical :: los_intersect
-  
+
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64), dimension(nlevs) :: prob !! Prob. for CX
-  
+
     !! Collisiional radiative model along track
     integer :: ncell
     integer :: jj      !! counter along track
     type(ParticleTrack),dimension(beam_grid%ntrack) :: tracks
-  
+
     real(Float64) :: photons !! photon flux
     real(Float64), dimension(nlevs) :: states  !! Density of n-states
     real(Float64), dimension(nlevs) :: denn
-  
+
     integer :: nwav
     real(Float64) :: etov2, energy, pitch
     real(Float64) :: dE, dP, dEdP
     real(Float64), dimension(:), allocatable :: ebarr, ptcharr
     integer, dimension(1) :: ienergy, ipitch
     real(Float64), dimension(3) :: randomu3
-  
+
     !! Number of particles to launch
     integer(kind=8) :: pcnt
     real(Float64) :: papprox_tot,inv_maxcnt,cnt,fbm_denf,phase_area
     integer,dimension(3,beam_grid%ngrid) :: pcell
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox,nlaunch !! approx. density
-  
+
     nwav = inputs%nlambda_wght
-  
+
     !! define arrays
     !! define energy - array
     allocate(ebarr(inputs%ne_wght))
@@ -6635,7 +6696,7 @@ subroutine fida_weights_mc
         ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
     dE = abs(ebarr(2)-ebarr(1))
-  
+
     !! define pitch - array
     allocate(ptcharr(inputs%np_wght))
     do i=1,inputs%np_wght
@@ -6644,11 +6705,11 @@ subroutine fida_weights_mc
     dP = abs(ptcharr(2)-ptcharr(1))
     dEdP = dE*dP
     phase_area = dEdP*real(inputs%np_wght)*real(inputs%ne_wght)
-  
+
     !! allocate storage arrays
     allocate(fweight%weight(nwav,inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
     allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Number of Channels: ",i3)') spec_chords%nchan
         write(*,'(T2,"Nlambda: ",i4)') nwav
@@ -6656,13 +6717,13 @@ subroutine fida_weights_mc
         write(*,'(T2,"Maximum Energy: ",f7.2)') inputs%emax_wght
         write(*,'(T2,"LOS averaged: ",a)') "False"
     endif
-  
+
     !! zero out arrays
     fweight%weight = 0.d0
     fweight%mean_f = 0.d0
-  
+
     etov2 = 1.d0/(v2_to_E_per_amu*inputs%ab)
-  
+
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
     papprox_tot=0.d0
@@ -6690,7 +6751,7 @@ subroutine fida_weights_mc
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
     endif
-  
+
     !! Loop over all cells that have neutrals
     cnt=0.d0
     loop_over_cells: do ip = 1, int(pcnt)
@@ -6712,49 +6773,49 @@ subroutine fida_weights_mc
 
             call randu(randomu3)
             rg = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)] + beam_grid%dr*(randomu3-0.5)
-  
-            fbm_denf = 0.0
-            if (inputs%dist_type.eq.1) then
-                call get_ep_denf(energy,pitch,fbm_denf,pos=ri)
-            endif
-  
+
             !! Get velocity
             call get_fields(fields,pos=rg)
             if(.not.fields%in_plasma) cycle loop_over_fast_ions
             call gyro_correction(fields,rg,energy,pitch,ri,vi)
 
+            fbm_denf = 0.0
+            if (inputs%dist_type.eq.1) then
+                call get_ep_denf(energy,pitch,fbm_denf,coeffs=fields%c)
+            endif
+
             !! Find the particles path through the beam grid
             call track(ri, vi, tracks, ncell, los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ncell.eq.0) cycle loop_over_fast_ions
-  
+
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_prob(tracks(1)%ind, ri, vi, neut_types, prob)
             if(sum(prob).le.0.) cycle loop_over_fast_ions
             states=prob*1.d20
-  
+
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ncell
                 call get_plasma(plasma,pos=tracks(jj)%pos)
-  
+
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
-  
+
                 call store_fw_photons(ienergy(1), ipitch(1), &
                      tracks(jj)%pos, vi, fbm_denf, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
         !$OMP END PARALLEL DO
         cnt=cnt+1
-  
+
         if(inputs%verbose.eq.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
-  
+
     fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
     call write_fida_weights()
-  
+
 end subroutine fida_weights_mc
 
 subroutine fida_weights_los
@@ -6787,18 +6848,18 @@ subroutine fida_weights_los
     integer, dimension(3) :: ind  !!actual cell
     real(Float64), dimension(3) :: ri
     integer(Int32) :: ncell
-    
+
     real(Float64):: etov2, dEdP
-  
+
     nwav = inputs%nlambda_wght
-  
+
     !! Define energy array
     allocate(ebarr(inputs%ne_wght))
     do i=1,inputs%ne_wght
         ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
     dE = abs(ebarr(2)-ebarr(1))
-  
+
     !! Define pitch array
     allocate(ptcharr(inputs%np_wght))
     do i=1,inputs%np_wght
@@ -6806,23 +6867,23 @@ subroutine fida_weights_los
     enddo
     dP = abs(ptcharr(2)-ptcharr(1))
     dEdP = dE*dP
-  
+
     !! define gyro - array
     allocate(phiarr(inputs%nphi_wght))
     do i=1,inputs%nphi_wght
         phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nphi_wght)
     enddo
-  
+
     !! allocate storage arrays
     allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
     allocate(fweight%weight(nwav,inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
-  
+
     allocate(mean_f(inputs%ne_wght,inputs%np_wght))
     !! zero out arrays
     fweight%weight = 0.d0
     fweight%mean_f = 0.d0
     mean_f = 0.d0
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Number of Channels: ",i3)') spec_chords%nchan
         write(*,'(T2,"Nlambda: ",i4)') nwav
@@ -6833,10 +6894,10 @@ subroutine fida_weights_los
         write(*,'(T2,"LOS averaged: ",a)') "True"
         write(*,*) ''
     endif
-  
+
     etov2 = 1.0/(v2_to_E_per_amu*inputs%ab)
-  
-    chan_loop: do ichan=1,spec_chords%nchan 
+
+    chan_loop: do ichan=1,spec_chords%nchan
         fdens = 0.d0 ; hdens = 0.d0 ; tdens = 0.d0 ; halodens = 0.d0
         plasma = plasma*0.d0
         fields = fields*0.d0
@@ -6853,7 +6914,7 @@ subroutine fida_weights_los
                         tdens = tdens + neut%dens(:,nbit_type,i,j,k)*dlength
                         halodens = halodens + neut%dens(:,halo_type,i,j,k)*dlength
                         wght = sum(neut%dens(3,1:4,i,j,k))*dlength
-                        
+
                         call get_plasma(plasma_cell,ind=ind)
                         call get_fields(fields_cell,ind=ind)
                         plasma = plasma + wght*plasma_cell
@@ -6861,7 +6922,7 @@ subroutine fida_weights_los
                         if (inputs%dist_type.eq.1) then
                             do ipitch=1,inputs%np_wght
                                 do ienergy=1,inputs%ne_wght
-                                    call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,ind=ind)
+                                    call get_ep_denf(ebarr(ienergy),ptcharr(ipitch),denf,coeffs=fields_cell%c)
                                     mean_f(ienergy,ipitch) = mean_f(ienergy,ipitch) + wght*denf
                                 enddo
                             enddo
@@ -6871,8 +6932,8 @@ subroutine fida_weights_los
                 enddo
             enddo
         enddo
-  
-        if(wght_tot.le.0) then 
+
+        if(wght_tot.le.0) then
             if(inputs%verbose.ge.1) then
                 write(*,'(T4,"Skipping channel ",i3,": Neutral density is zero")') ichan
             endif
@@ -6882,15 +6943,15 @@ subroutine fida_weights_los
             plasma%in_plasma = .True.
             fields = fields/wght_tot
             fields%in_plasma= .True.
-            mean_f = mean_f/wght_tot  
+            mean_f = mean_f/wght_tot
             if(inputs%verbose.ge.1) then
                 write(*,'(T4,"Channel: ",i3)') ichan
                 write(*,'(T4,"Radius: ",f7.2)') spec_chords%radius(ichan)
-                write(*,'(T4,"Mean Fast-ion Density: ",ES14.5)') sum(mean_f)*dEdP 
+                write(*,'(T4,"Mean Fast-ion Density: ",ES14.5)') sum(mean_f)*dEdP
                 write(*,*)''
             endif
         endif
-  
+
         ri = plasma%pos
         vp = ri - spec_chords%los(ichan)%lens
         vnbi_f = ri - nbi%src
@@ -6899,7 +6960,7 @@ subroutine fida_weights_los
         vnbi_t = vnbi_f/sqrt(3.d0)
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         dlength = 1.d0
-  
+
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(eb,vabs,ptch,phi,vi,vi_norm, &
         !$OMP& r_enter,r_exit,length,max_dens,ind,tracks,ncell,dt,icell,states,rates, &
         !$OMP& vhalo,denn,denf,photons,ienergy,ipitch,igyro)
@@ -6912,7 +6973,7 @@ subroutine fida_weights_los
                     phi = phiarr(igyro)
                     call pitch_to_vec(ptch,phi,fields,vi_norm)
                     vi = vabs*vi_norm
-  
+
                     call grid_intersect(ri,vi,length,r_enter,r_exit)
                     call track(r_enter, vi, tracks, ncell)
                     max_dens = 0.d0
@@ -6927,7 +6988,7 @@ subroutine fida_weights_los
                             dt = dt + tracks(icell)%time
                         endif
                     enddo
-  
+
                     states=0.d0
                     call neut_rates(fdens,vi,vnbi_f,rates)
                     states = states + rates
@@ -6940,22 +7001,22 @@ subroutine fida_weights_los
                         call neut_rates(halodens,vi,vhalo,rates)
                         states = states + rates/real(n_halo_neutrate)
                     enddo
-  
+
                     call colrad(plasma,beam_ion,vi,dt,states,denn,photons)
                     denf = mean_f(ienergy,ipitch)*dEdP
                     photons = photons/real(inputs%nphi_wght)
                     call store_fw_photons_at_chan(ichan, ienergy, ipitch, &
                          vp, vi, fields, dlength, sigma_pi, denf, photons)
-                         
+
                 enddo
             enddo
         enddo
         !$OMP END PARALLEL DO
     enddo chan_loop
- 
-    fweight%mean_f = fweight%mean_f/(dEdP) 
+
+    fweight%mean_f = fweight%mean_f/(dEdP)
     call write_fida_weights()
-  
+
 end subroutine fida_weights_los
 
 subroutine npa_weights
@@ -6974,21 +7035,21 @@ subroutine npa_weights
     real(Float64), dimension(3) :: pos,dpos,r_gyro
     integer(Int32) :: ichan
     real(Float64), dimension(:), allocatable :: ebarr, ptcharr
-   
+
     !! define energy - array
     allocate(ebarr(inputs%ne_wght))
     do i=1,inputs%ne_wght
         ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
     enddo
     dE=abs(ebarr(2)-ebarr(1))
-  
+
     !! define pitch - array
     allocate(ptcharr(inputs%np_wght))
     do i=1,inputs%np_wght
         ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
     enddo
     dP=abs(ptcharr(2)-ptcharr(1))
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Number of Channels: ",i3)') npa_chords%nchan
         write(*,'(T2,"Nenergy: ",i3)') inputs%ne_wght
@@ -6996,46 +7057,46 @@ subroutine npa_weights
         write(*,'(T2,"Maximum energy: ",f7.2)') inputs%emax_wght
         write(*,*) ''
     endif
-  
+
     !! define storage arrays
     allocate(nweight%emissivity(beam_grid%nx, &
                                 beam_grid%ny, &
                                 beam_grid%nz, &
                                 npa_chords%nchan))
-  
+
     allocate(nweight%attenuation(inputs%ne_wght, &
                                  beam_grid%nx, &
                                  beam_grid%ny, &
                                  beam_grid%nz, &
                                  npa_chords%nchan))
-  
+
     allocate(nweight%cx(inputs%ne_wght, &
                         beam_grid%nx, &
                         beam_grid%ny, &
-                        beam_grid%nz, & 
+                        beam_grid%nz, &
                         npa_chords%nchan))
-  
+
     allocate(nweight%weight(inputs%ne_wght, &
                             inputs%np_wght, &
                             npa_chords%nchan))
-  
+
     allocate(nweight%flux(inputs%ne_wght, npa_chords%nchan))
-  
+
     nweight%emissivity = 0.d0
     nweight%attenuation = 0.d0
     nweight%cx = 0.d0
     nweight%weight = 0.d0
     nweight%flux = 0.d0
-  
+
     loop_over_channels: do ichan=1,npa_chords%nchan
         if(inputs%verbose.ge.1) then
             write(*,'(T4,"Channel: ",i3)') ichan
             write(*,'(T4,"Radius: ",f10.3)') npa_chords%radius(ichan)
         endif
-  
+
         ccnt=0.d0
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,fields, &
-        !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf)  
+        !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf)
         loop_along_z: do kk=1,beam_grid%nz
             loop_along_y: do jj=1,beam_grid%ny
                 loop_along_x: do ii=1,beam_grid%nx
@@ -7043,18 +7104,18 @@ subroutine npa_weights
                         pos = [beam_grid%xc(ii), beam_grid%yc(jj), beam_grid%zc(kk)]
                         call get_fields(fields,pos=pos)
                         if(.not.fields%in_plasma) cycle loop_along_x
-  
+
                         !!Determine velocity vector
                         dpos = npa_chords%phit(ii,jj,kk,ichan)%eff_rd
                         vi_norm = (dpos - pos)/norm2(dpos - pos)
-  
+
                         !!Check if it hits a detector just to make sure
                         call hit_npa_detector(pos,vi_norm,det)
                         if (det.ne.ichan) then
                             write(*,'(a)') 'NPA_WEIGHTS: Missed detector'
                             cycle loop_along_x
                         endif
-  
+
                         !! Determine the angle between the B-field and the Line of Sight
                         pitch = dot_product(fields%b_norm,vi_norm)
                         ipitch=minloc(abs(ptcharr - pitch))
@@ -7063,30 +7124,30 @@ subroutine npa_weights
                             vi = vi_norm*vabs
                             !!Correct for gyro orbit
                             call gyro_step(vi,fields,r_gyro)
-  
+
                             fbm_denf=0
                             if (inputs%dist_type.eq.1) then
                                 !get dist at guiding center
                                 call get_ep_denf(ebarr(ic),pitch,fbm_denf,pos=(pos+r_gyro))
                             endif
                             if (fbm_denf.ne.fbm_denf) cycle loop_over_energy
-  
+
                             !! -------------- calculate CX probability -------!!
                             call get_beam_cx_prob([ii,jj,kk],pos,vi,neut_types,pcx)
                             if(sum(pcx).le.0) cycle loop_over_energy
-  
+
                             !!Calculate attenuation
                             states = pcx*1.0d14 !!needs to be large aribitrary number so colrad works
                             states_i=states
                             call attenuate(pos,dpos,vi,states)
                             pcxa=sum(states)/sum(states_i)
-  
+
                             !$OMP CRITICAL(npa_wght)
                             nweight%attenuation(ic,ii,jj,kk,ichan) = pcxa
                             nweight%cx(ic,ii,jj,kk,ichan) = sum(pcx)
                             nweight%weight(ic,ipitch(1),ichan) = nweight%weight(ic,ipitch(1),ichan) + &
                                       2*sum(pcx)*pcxa*npa_chords%phit(ii,jj,kk,ichan)%p*beam_grid%dv/dP
-        
+
                             nweight%flux(ic,ichan) = nweight%flux(ic,ichan) + &
                                       2*beam_grid%dv*fbm_denf*sum(pcx)*pcxa*npa_chords%phit(ii,jj,kk,ichan)%p
                                       !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
@@ -7103,16 +7164,16 @@ subroutine npa_weights
             enddo loop_along_y
         enddo loop_along_z
         !$OMP END PARALLEL DO
-  
+
        if(inputs%verbose.ge.1) then
            write(*,'(T4,A,ES14.5)'),'Flux:   ',sum(nweight%flux(:,ichan))*dE
            write(*,'(T4,A,ES14.5)'),'Weight: ',sum(nweight%weight(:,:,ichan))*dE*dP
            write(*,*) ''
        endif
     enddo loop_over_channels
-  
+
     call write_npa_weights()
-  
+
 end subroutine npa_weights
 
 end module libfida
@@ -7132,29 +7193,29 @@ program fidasim
     integer, dimension(8) :: time_arr,time_start,time_end !Time array
     integer               :: i,narg,nthreads,max_threads
     integer               :: hour,minu,sec
-  
+
 #ifdef _VERSION
     version = _VERSION
 #endif
 
     call print_banner()
-  
+
     narg = command_argument_count()
     if(narg.eq.0) then
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
         stop
-    else 
+    else
         call get_command_argument(1,namelist_file)
     endif
-  
+
     !! Check if compression is possible
     call check_compression_availability()
-  
+
     !! measure time
     call date_and_time (values=time_start)
-  
+
     call read_inputs()
-  
+
 #ifdef _OMP
     max_threads = OMP_get_num_procs()
     if(narg.ge.2) then
@@ -7181,7 +7242,7 @@ program fidasim
     do i=1,max_threads
         call rng_init(rng(i),932117 + i)
     enddo
-  
+
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------
     !! ----------------------------------------------------------
@@ -7190,17 +7251,17 @@ program fidasim
     call read_beam()
     call read_tables()
     call read_distribution()
-    
+
     allocate(spec_chords%los_inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     spec_chords%los_inter = .False.
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
         call read_chords()
     endif
-  
+
     if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1)) then
         call read_npa()
     endif
-  
+
     !! ----------------------------------------------------------
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
     !! ----------------------------------------------------------
@@ -7210,7 +7271,7 @@ program fidasim
 
     !! birth profile
     if(inputs%calc_birth.ge.1) then
-        allocate(birth%dens(3, & 
+        allocate(birth%dens(3, &
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
@@ -7224,16 +7285,16 @@ program fidasim
         birth%ri = 0.d0
         birth%vi = 0.d0
     endif
-  
+
     if(inputs%calc_spec.ge.1) then
         allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
         allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4))
-        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass)) 
+        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
         spec%brems = 0.d0
         spec%bes = 0.d0
         spec%fida = 0.d0
     endif
-  
+
     if(inputs%calc_npa.ge.1)then
         npa%nchan = npa_chords%nchan
         allocate(npa%part(npa%nmax))
@@ -7242,7 +7303,7 @@ program fidasim
         npa%energy = fbm%energy
         npa%flux = 0.0
     endif
-  
+
     !! -----------------------------------------------------------------------
     !! --------------- CALCULATE/LOAD the BEAM and HALO DENSITY---------------
     !! -----------------------------------------------------------------------
@@ -7260,7 +7321,7 @@ program fidasim
             call write_birth_profile()
         endif
         write(*,'(30X,a)') ''
-  
+
         !! ---------- DCX (Direct charge exchange) ---------- !!
         call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
@@ -7270,7 +7331,7 @@ program fidasim
         call dcx()
         if(inputs%dump_dcx.eq.1) call write_dcx()
         write(*,'(30X,a)') ''
-  
+
         !! ---------- HALO ---------- !!
         call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
@@ -7282,7 +7343,7 @@ program fidasim
         call write_neutrals()
         write(*,'(30X,a)') ''
     endif
-  
+
     !! -----------------------------------------------------------------------
     !!----------------------------- BREMSSTRAHLUNG ---------------------------
     !! -----------------------------------------------------------------------
@@ -7295,7 +7356,7 @@ program fidasim
         call bremsstrahlung()
         write(*,'(30X,a)') ''
     endif
-  
+
     !! -----------------------------------------------------------------------
     !! --------------------- CALCULATE the FIDA RADIATION --------------------
     !! -----------------------------------------------------------------------
@@ -7312,12 +7373,12 @@ program fidasim
         endif
         write(*,'(30X,a)') ''
     endif
-  
+
     if(inputs%calc_spec.ge.1) then
         call write_spectra()
         write(*,'(30X,a)') ''
     endif
-  
+
     !! -----------------------------------------------------------------------
     !! ----------------------- CALCULATE the NPA FLUX ------------------------
     !! -----------------------------------------------------------------------
@@ -7334,12 +7395,12 @@ program fidasim
         endif
         write(*,'(30X,a)') ''
     endif
-  
+
     if(inputs%calc_npa.ge.1) then
         call write_npa()
         write(*,'(30X,a)') ''
     endif
-  
+
     !! -------------------------------------------------------------------
     !! ----------- Calculation of weight functions -----------------------
     !! -------------------------------------------------------------------
@@ -7357,7 +7418,7 @@ program fidasim
         endif
         write(*,'(30X,a)') ''
     endif
-  
+
     if(inputs%calc_npa_wght.eq.1) then
         call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
@@ -7367,7 +7428,7 @@ program fidasim
         call npa_weights()
         write(*,'(30X,a)') ''
     endif
-  
+
     call date_and_time (values=time_arr)
     if(inputs%verbose.ge.1) then
         write(*,'(A,I2,":",I2.2,":",I2.2)') 'END: hour, minute, second: ',&
@@ -7386,7 +7447,7 @@ program fidasim
         sec  = sec +60
         minu = minu -1
     endif
-  
+
     if(inputs%verbose.ge.1) then
         write(*,'(A,18X,I2,":",I2.2,":",I2.2)') 'duration:',hour,minu,sec
     endif

@@ -24,7 +24,7 @@ endif
 ifneq ($(findstring ifort, $(FC)),)
 	LFLAGS = $(HDF5_FLAGS) -L$(SRC_DIR) -limf -lm
 	CFLAGS = -O2 -fpp -g -traceback -openmp -D_OMP $(UFLAGS) #-p #gprof profiling
-	DEBUG_CFLAGS = -O0 -fpp -g -traceback -debug all -check all -check bounds -fpe:0 -warn
+	DEBUG_CFLAGS = -O0 -fpp -g -traceback -debug all -check all -check bounds -fpe0 -warn
 endif
 
 ifeq ($(DEBUG),y)

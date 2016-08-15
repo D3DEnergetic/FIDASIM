@@ -199,6 +199,12 @@
   <div id="allprocs-0" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
       <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
@@ -307,6 +313,8 @@
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -397,6 +405,8 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -442,6 +452,8 @@
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -510,8 +522,6 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -810,7 +820,7 @@ public subroutine pp_assign(p1, p2)
 <tr>
   
   <td><span class="anchor" id="variable-p1%7E23"></span>type(<a href='../type/profiles.html'>Profiles</a>),</td>
-  <td>intent(out)</td>
+  <td>intent(inout)</td>
   <td></td>
   
   <td></td><td>::</td>
@@ -998,18 +1008,18 @@ implementation in a submodule of an interface in a parent module.
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">pp_assign</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
     <span class="c">!+ Defines how to assign [[Profiles]] types to eachother</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">Profiles</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">p2</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">Profiles</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p1</span>
-  
-    <span class="n">p1</span><span class="p">%</span><span class="n">dene</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">dene</span>  
-    <span class="n">p1</span><span class="p">%</span><span class="n">ti</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">ti</span>    
-    <span class="n">p1</span><span class="p">%</span><span class="n">te</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">te</span>    
-    <span class="n">p1</span><span class="p">%</span><span class="n">denp</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">denp</span>  
-    <span class="n">p1</span><span class="p">%</span><span class="n">denf</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">denf</span>  
+    <span class="k">type</span><span class="p">(</span><span class="n">Profiles</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">p2</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">Profiles</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p1</span>
+
+    <span class="n">p1</span><span class="p">%</span><span class="n">dene</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">dene</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">ti</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">ti</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">te</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">te</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">denp</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">denp</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">denf</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">denf</span>
     <span class="n">p1</span><span class="p">%</span><span class="n">denimp</span> <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">denimp</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">zeff</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">zeff</span>  
-    <span class="n">p1</span><span class="p">%</span><span class="n">vr</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vr</span> 
-    <span class="n">p1</span><span class="p">%</span><span class="n">vt</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vt</span> 
+    <span class="n">p1</span><span class="p">%</span><span class="n">zeff</span>   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">zeff</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">vr</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vr</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">vt</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vt</span>
     <span class="n">p1</span><span class="p">%</span><span class="n">vz</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vz</span>
 
 <span class="k">end subroutine </span><span class="n">pp_assign</span>
@@ -1030,6 +1040,12 @@ implementation in a submodule of an interface in a parent module.
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
   <div id="allprocs-1" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -1139,6 +1155,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1229,6 +1247,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -1274,6 +1294,8 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -1342,8 +1364,6 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

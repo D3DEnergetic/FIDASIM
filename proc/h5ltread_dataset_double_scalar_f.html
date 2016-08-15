@@ -199,6 +199,12 @@
   <div id="allprocs-0" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
       <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
@@ -307,6 +313,8 @@
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -397,6 +405,8 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -442,6 +452,8 @@
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -510,8 +522,6 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -839,7 +849,7 @@ public subroutine h5ltread_dataset_double_scalar_f(loc_id, dset_name, x, error)
   
 <tr>
   
-  <td><span class="anchor" id="variable-x%7E7"></span>real(kind=double),</td>
+  <td><span class="anchor" id="variable-x%7E10"></span>real(kind=double),</td>
   <td>intent(inout)</td>
   <td></td>
   
@@ -987,29 +997,29 @@ implementation in a submodule of an interface in a parent module.
 <polygon fill="none" stroke="black" points="473,-70 299,-70 299,-44 473,-44 473,-70"/>
 <text text-anchor="middle" x="386" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">h5ltread_dataset_double_scalar_f</text>
 </g>
-<!-- proc~read_beam -->
-<g id="node2" class="node"><title>proc~read_beam</title>
-<a xlink:href="../proc/read_beam.html" xlink:title="read_beam">
-<polygon fill="#d9534f" stroke="#d9534f" points="158,-111 92,-111 92,-85 158,-85 158,-111"/>
-<text text-anchor="middle" x="125" y="-95.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_beam</text>
-</a>
-</g>
-<!-- proc~read_beam&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
-<g id="edge10" class="edge"><title>proc~read_beam&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
-<path fill="none" stroke="#000000" d="M158.552,-93.7065C186.32,-90.0669 226.779,-84.5648 262,-79 276.037,-76.7822 290.941,-74.2723 305.365,-71.7616"/>
-<polygon fill="#000000" stroke="#000000" points="306.013,-75.2015 315.258,-70.0269 304.804,-68.3067 306.013,-75.2015"/>
-</g>
 <!-- proc~read_cross -->
-<g id="node3" class="node"><title>proc~read_cross</title>
+<g id="node2" class="node"><title>proc~read_cross</title>
 <a xlink:href="../proc/read_cross.html" xlink:title="read_cross">
 <polygon fill="#d9534f" stroke="#d9534f" points="262,-70 196,-70 196,-44 262,-44 262,-70"/>
 <text text-anchor="middle" x="229" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_cross</text>
 </a>
 </g>
 <!-- proc~read_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
-<g id="edge12" class="edge"><title>proc~read_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
+<g id="edge10" class="edge"><title>proc~read_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
 <path fill="none" stroke="#000000" d="M262.296,-57C270.228,-57 279.094,-57 288.338,-57"/>
 <polygon fill="#000000" stroke="#000000" points="288.491,-60.5001 298.491,-57 288.491,-53.5001 288.491,-60.5001"/>
+</g>
+<!-- proc~read_beam -->
+<g id="node3" class="node"><title>proc~read_beam</title>
+<a xlink:href="../proc/read_beam.html" xlink:title="read_beam">
+<polygon fill="#d9534f" stroke="#d9534f" points="158,-111 92,-111 92,-85 158,-85 158,-111"/>
+<text text-anchor="middle" x="125" y="-95.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_beam</text>
+</a>
+</g>
+<!-- proc~read_beam&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
+<g id="edge12" class="edge"><title>proc~read_beam&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
+<path fill="none" stroke="#000000" d="M158.552,-93.7065C186.32,-90.0669 226.779,-84.5648 262,-79 276.037,-76.7822 290.941,-74.2723 305.365,-71.7616"/>
+<polygon fill="#000000" stroke="#000000" points="306.013,-75.2015 315.258,-70.0269 304.804,-68.3067 306.013,-75.2015"/>
 </g>
 <!-- proc~read_rates -->
 <g id="node4" class="node"><title>proc~read_rates</title>
@@ -1023,32 +1033,15 @@ implementation in a submodule of an interface in a parent module.
 <path fill="none" stroke="#000000" d="M261.15,-22.0102C280.932,-27.5541 306.831,-34.8125 329.91,-41.2804"/>
 <polygon fill="#000000" stroke="#000000" points="329.028,-44.6681 339.602,-43.9966 330.917,-37.9278 329.028,-44.6681"/>
 </g>
-<!-- program~fidasim -->
-<g id="node5" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-89 2.13163e-14,-89 0,-63 54,-63 54,-89"/>
-<text text-anchor="middle" x="27" y="-73.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
-</a>
-</g>
-<!-- program~fidasim&#45;&gt;proc~read_beam -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_beam</title>
-<path fill="none" stroke="#000000" d="M54.0384,-82.0698C62.526,-83.9752 72.1221,-86.1295 81.4513,-88.2238"/>
-<polygon fill="#000000" stroke="#000000" points="80.8808,-91.6827 91.4046,-90.4582 82.4141,-84.8527 80.8808,-91.6827"/>
-</g>
 <!-- proc~read_tables -->
-<g id="node7" class="node"><title>proc~read_tables</title>
+<g id="node5" class="node"><title>proc~read_tables</title>
 <a xlink:href="../proc/read_tables.html" xlink:title="read_tables">
 <polygon fill="#d9534f" stroke="#d9534f" points="159,-67 91,-67 91,-41 159,-41 159,-67"/>
 <text text-anchor="middle" x="125" y="-51.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_tables</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~read_tables -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~read_tables</title>
-<path fill="none" stroke="#000000" d="M54.0384,-69.9302C62.1887,-68.1005 71.3612,-66.0414 80.338,-64.0262"/>
-<polygon fill="#000000" stroke="#000000" points="81.3345,-67.3897 90.325,-61.7842 79.8011,-60.5596 81.3345,-67.3897"/>
-</g>
 <!-- proc~read_tables&#45;&gt;proc~read_cross -->
-<g id="edge6" class="edge"><title>proc~read_tables&#45;&gt;proc~read_cross</title>
+<g id="edge4" class="edge"><title>proc~read_tables&#45;&gt;proc~read_cross</title>
 <path fill="none" stroke="#000000" d="M159.63,-54.999C168.04,-55.2415 177.133,-55.5038 185.882,-55.7562"/>
 <polygon fill="#000000" stroke="#000000" points="185.834,-59.2562 195.931,-56.0461 186.036,-52.2591 185.834,-59.2562"/>
 </g>
@@ -1056,6 +1049,23 @@ implementation in a submodule of an interface in a parent module.
 <g id="edge8" class="edge"><title>proc~read_tables&#45;&gt;proc~read_rates</title>
 <path fill="none" stroke="#000000" d="M158.192,-40.9146C167.466,-37.2587 177.662,-33.2392 187.357,-29.417"/>
 <polygon fill="#000000" stroke="#000000" points="188.813,-32.6051 196.833,-25.6814 186.246,-26.0929 188.813,-32.6051"/>
+</g>
+<!-- program~fidasim -->
+<g id="node6" class="node"><title>program~fidasim</title>
+<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-89 2.13163e-14,-89 0,-63 54,-63 54,-89"/>
+<text text-anchor="middle" x="27" y="-73.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+<!-- program~fidasim&#45;&gt;proc~read_beam -->
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~read_beam</title>
+<path fill="none" stroke="#000000" d="M54.0384,-82.0698C62.526,-83.9752 72.1221,-86.1295 81.4513,-88.2238"/>
+<polygon fill="#000000" stroke="#000000" points="80.8808,-91.6827 91.4046,-90.4582 82.4141,-84.8527 80.8808,-91.6827"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~read_tables -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_tables</title>
+<path fill="none" stroke="#000000" d="M54.0384,-69.9302C62.1887,-68.1005 71.3612,-66.0414 80.338,-64.0262"/>
+<polygon fill="#000000" stroke="#000000" points="81.3345,-67.3897 90.325,-61.7842 79.8011,-60.5596 81.3345,-67.3897"/>
 </g>
 </g>
 </svg>
@@ -1221,6 +1231,12 @@ implementation in a submodule of an interface in a parent module.
   <div id="allprocs-1" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
       <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
@@ -1329,6 +1345,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1419,6 +1437,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -1464,6 +1484,8 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -1532,8 +1554,6 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

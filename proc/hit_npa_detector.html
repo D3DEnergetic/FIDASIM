@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.2% of total for procedures.">20 statements</a>
+	  title=" 0.3% of total for procedures.">27 statements</a>
      </li> 
      
      
@@ -198,6 +198,12 @@
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-0">All Procedures</a></h3></div>
   <div id="allprocs-0" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -307,6 +313,8 @@
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -397,6 +405,8 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -442,6 +452,8 @@
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -510,8 +522,6 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -778,7 +788,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine hit_npa_detector(r0, v0, d_index, rd)
+public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     
     
 	 
@@ -860,6 +870,21 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd)
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>rd</strong></td><td><p>Point where particle hit detector</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-det%7E2"></span>integer,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>det</strong></td><td><p>Index of NPA detector to check</p></td>
   
 </tr>
 
@@ -1025,27 +1050,27 @@ implementation in a submodule of an interface in a parent module.
 <path fill="none" stroke="#000000" d="M156.049,-95.6744C166.453,-93.7669 178.568,-91.5459 190.497,-89.3588"/>
 <polygon fill="#000000" stroke="#000000" points="191.228,-92.7832 200.433,-87.5373 189.966,-85.898 191.228,-92.7832"/>
 </g>
-<!-- proc~npa_mc -->
-<g id="node4" class="node"><title>proc~npa_mc</title>
-<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-70 100,-70 100,-44 154,-44 154,-70"/>
-<text text-anchor="middle" x="127" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
-</a>
-</g>
-<!-- proc~npa_mc&#45;&gt;proc~hit_npa_detector -->
-<g id="edge14" class="edge"><title>proc~npa_mc&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M154.23,-61.9921C164.924,-63.9528 177.623,-66.2808 190.138,-68.5754"/>
-<polygon fill="#000000" stroke="#000000" points="189.627,-72.04 200.095,-70.4007 190.89,-65.1547 189.627,-72.04"/>
-</g>
 <!-- proc~npa_f -->
-<g id="node5" class="node"><title>proc~npa_f</title>
+<g id="node4" class="node"><title>proc~npa_f</title>
 <a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-26 100,-26 100,-1.24345e-14 154,-3.55271e-15 154,-26"/>
-<text text-anchor="middle" x="127" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="154,-70 100,-70 100,-44 154,-44 154,-70"/>
+<text text-anchor="middle" x="127" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
 </a>
 </g>
 <!-- proc~npa_f&#45;&gt;proc~hit_npa_detector -->
-<g id="edge16" class="edge"><title>proc~npa_f&#45;&gt;proc~hit_npa_detector</title>
+<g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M154.23,-61.9921C164.924,-63.9528 177.623,-66.2808 190.138,-68.5754"/>
+<polygon fill="#000000" stroke="#000000" points="189.627,-72.04 200.095,-70.4007 190.89,-65.1547 189.627,-72.04"/>
+</g>
+<!-- proc~npa_mc -->
+<g id="node5" class="node"><title>proc~npa_mc</title>
+<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="154,-26 100,-26 100,-1.24345e-14 154,-3.55271e-15 154,-26"/>
+<text text-anchor="middle" x="127" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+</a>
+</g>
+<!-- proc~npa_mc&#45;&gt;proc~hit_npa_detector -->
+<g id="edge16" class="edge"><title>proc~npa_mc&#45;&gt;proc~hit_npa_detector</title>
 <path fill="none" stroke="#000000" d="M150.708,-26.0395C168.952,-36.0734 194.366,-50.0511 214.504,-61.1273"/>
 <polygon fill="#000000" stroke="#000000" points="212.892,-64.2351 223.341,-65.9876 216.266,-58.1016 212.892,-64.2351"/>
 </g>
@@ -1066,13 +1091,13 @@ implementation in a submodule of an interface in a parent module.
 <path fill="none" stroke="#000000" d="M54.0614,-84.9535C64.4243,-87.2333 76.4656,-89.8824 87.7418,-92.3632"/>
 <polygon fill="#000000" stroke="#000000" points="87.2938,-95.8483 97.8123,-94.5787 88.7979,-89.0118 87.2938,-95.8483"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
 <path fill="none" stroke="#000000" d="M54.0614,-73.0465C65.0669,-70.6253 77.9653,-67.7876 89.83,-65.1774"/>
 <polygon fill="#000000" stroke="#000000" points="90.9025,-68.5252 99.9169,-62.9583 89.3984,-61.6887 90.9025,-68.5252"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<!-- program~fidasim&#45;&gt;proc~npa_mc -->
+<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
 <path fill="none" stroke="#000000" d="M44.956,-65.9354C57.432,-56.9881 74.5305,-44.9821 90,-35 91.8878,-33.7819 93.8424,-32.5464 95.8222,-31.3146"/>
 <polygon fill="#000000" stroke="#000000" points="97.8186,-34.1966 104.533,-26.0014 94.1736,-28.2205 97.8186,-34.1966"/>
 </g>
@@ -1202,7 +1227,7 @@ implementation in a submodule of an interface in a parent module.
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">rd</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">d_index</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">det</span><span class="p">)</span>
     <span class="c">!+ Routine to check if a particle will hit a NPA detector</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">r0</span>
         <span class="c">!+ Starting point of particle</span>
@@ -1212,24 +1237,32 @@ implementation in a submodule of an interface in a parent module.
         <span class="c">!+ Index of NPA detector. Zero if particle doesn&#39;t hit</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">rd</span>
         <span class="c">!+ Point where particle hit detector</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">det</span>
+        <span class="c">!+ Index of NPA detector to check</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">d</span><span class="p">,</span> <span class="n">a</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">t_a</span><span class="p">,</span><span class="n">t_d</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">ndet</span>
-  
-    <span class="n">ndet</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
-  
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">ndet</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">det</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">s</span> <span class="o">=</span> <span class="n">det</span>
+        <span class="n">ndet</span> <span class="o">=</span> <span class="n">det</span>
+    <span class="k">else</span>
+<span class="k">        </span><span class="n">s</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">ndet</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
+    <span class="n">endif</span>
+
     <span class="n">d_index</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">detector_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ndet</span>
+    <span class="n">detector_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="n">ndet</span>
         <span class="c">!! Find where trajectory crosses detector plane</span>
         <span class="k">call </span><span class="n">plane_intercept</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="p">&amp;</span>
              <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span><span class="n">d</span><span class="p">,</span><span class="n">t_d</span><span class="p">)</span>
-  
+
         <span class="c">!! Find where trajectory crosses aperture plane</span>
         <span class="k">call </span><span class="n">plane_intercept</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="p">&amp;</span>
              <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span><span class="n">a</span><span class="p">,</span><span class="n">t_a</span><span class="p">)</span>
-  
-        <span class="c">!! If both points are in plane boundaries and the </span>
+
+        <span class="c">!! If both points are in plane boundaries and the</span>
         <span class="c">!! particle is heading toward the detector then its a hit</span>
         <span class="k">if</span><span class="p">(</span><span class="n">in_boundary</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">aperture</span><span class="p">,</span><span class="n">a</span><span class="p">)</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="p">&amp;</span>
            <span class="n">in_boundary</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">,</span><span class="n">d</span><span class="p">)</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="p">&amp;</span>
@@ -1258,6 +1291,12 @@ implementation in a submodule of an interface in a parent module.
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
   <div id="allprocs-1" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -1367,6 +1406,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1457,6 +1498,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -1502,6 +1545,8 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -1570,8 +1615,6 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

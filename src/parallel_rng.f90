@@ -148,6 +148,30 @@ subroutine randn(randomn)
 
 end subroutine randn
 
+function search_sorted_first(x, v) result(hi)
+    !+ Returns the index of the first value in `x` greater or equal to `v`.
+    !+ Returns `length(x)+1` if `v` is greater then all values in `x`.
+    real(Float64), dimension(:), intent(in) :: x
+        !+ Monotonically increasing array
+    real(Float64), intent(in)               :: v
+        !+ Value to search
+
+    integer :: hi, lo, m
+
+    lo = 0
+    hi = size(x)+1
+
+    do while (lo.lt.(hi-1))
+        m = rshift(lo+hi,1)
+        if(x(m).lt.v) then
+            lo = m
+        else
+            hi = m
+        endif
+    enddo
+
+end function search_sorted_first
+
 subroutine randind_n(n,randomi)
     !+ Generate a array of uniformally-distributed random integers in the range [1, n]
     integer, intent(in)                :: n
@@ -173,23 +197,23 @@ subroutine randind_w_1(w,randomi)
     integer, dimension(:), intent(out)      :: randomi
         !+ Random indices
 
-    integer :: i, j
-    real(Float64) :: dum, cdf_val, w_tot
+    integer :: i, nw
+    real(Float64) :: cdf_val, t
+    real(Float64), dimension(size(w)) :: cdf
     real(Float64), dimension(1) :: randomu
   
+    nw = size(w)
+    t = 0.d0
+    do i=1, nw
+        cdf(i) = t + w(i)
+        t = cdf(i)
+    enddo
+
     randomi = 0
-    w_tot = sum(w)
     do i=1,size(randomi)
         call randu(randomu)
-        cdf_val = randomu(1)*w_tot
-        j = 0
-        dum = 0.d0
-        elem_loop: do while (j.lt.size(w))
-            j = j + 1
-            dum = dum + w(j)
-            if (dum.ge.cdf_val) exit elem_loop
-        enddo elem_loop
-        randomi(i) = j
+        cdf_val = randomu(1)*cdf(nw)
+        randomi(i) = min(search_sorted_first(cdf,cdf_val),nw)
     enddo
 
 end subroutine randind_w_1
@@ -224,25 +248,16 @@ subroutine randind_w_2(w,randomi)
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts
   
-    integer :: i, j
+    integer :: i,nw
     integer, dimension(2) :: subs
-    real(Float64) :: dum, cdf_val, w_tot
-    real(Float64), dimension(1) :: randomu
-  
+    integer, dimension(size(randomi,2)) :: randi
+
     randomi = 0
-    w_tot = sum(w)
+    nw = size(w)
+
+    call randind_w_1(reshape(w,[nw]),randi)
     do i=1,size(randomi,2)
-        call randu(randomu)
-        cdf_val = randomu(1)*w_tot
-        j = 0
-        dum = 0.d0
-        subs = 0
-        elem_loop: do while (j.lt.size(w))
-            j = j + 1
-            call ind2sub(shape(w),j,subs)
-            dum = dum + w(subs(1),subs(2))
-            if (dum.ge.cdf_val) exit elem_loop
-        enddo elem_loop
+        call ind2sub(shape(w),randi(i),subs)
         randomi(:,i) = subs
     enddo
 

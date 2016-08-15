@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="56.3% of total for source files.">161 statements</a>
+	  title="57.7% of total for source files.">165 statements</a>
      </li> 
      
      
@@ -591,107 +591,122 @@ can be.
 <a name="ln-148"></a>
 <a name="ln-149"></a><span class="k">end subroutine </span><span class="n">randn</span>
 <a name="ln-150"></a>
-<a name="ln-151"></a><span class="k">subroutine </span><span class="n">randind_n</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-152"></a>    <span class="c">!+ Generate a array of uniformally-distributed random integers in the range [1, n]</span>
-<a name="ln-153"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">n</span>
-<a name="ln-154"></a>        <span class="c">!+ Largest possible value</span>
-<a name="ln-155"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomi</span>
-<a name="ln-156"></a>        <span class="c">!+ Array of uniform deviates</span>
-<a name="ln-157"></a>
-<a name="ln-158"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
-<a name="ln-159"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
-<a name="ln-160"></a>  
-<a name="ln-161"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span> 
-<a name="ln-162"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-163"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-<a name="ln-164"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
-<a name="ln-165"></a>    <span class="n">enddo</span>
-<a name="ln-166"></a>
-<a name="ln-167"></a><span class="k">end subroutine </span><span class="n">randind_n</span>
-<a name="ln-168"></a>
-<a name="ln-169"></a><span class="k">subroutine </span><span class="n">randind_w_1</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-170"></a>    <span class="c">!+ Generate an array of random indices of an 1D array distributed according to `w`</span>
-<a name="ln-171"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
-<a name="ln-172"></a>        <span class="c">!+ 1D array of index weights</span>
-<a name="ln-173"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
-<a name="ln-174"></a>        <span class="c">!+ Random indices</span>
-<a name="ln-175"></a>
-<a name="ln-176"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span>
-<a name="ln-177"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dum</span><span class="p">,</span> <span class="n">cdf_val</span><span class="p">,</span> <span class="n">w_tot</span>
-<a name="ln-178"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
-<a name="ln-179"></a>  
-<a name="ln-180"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-181"></a>    <span class="n">w_tot</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-<a name="ln-182"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-183"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-<a name="ln-184"></a>        <span class="n">cdf_val</span> <span class="o">=</span> <span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">w_tot</span>
-<a name="ln-185"></a>        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-186"></a>        <span class="n">dum</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
-<a name="ln-187"></a>        <span class="n">elem_loop</span><span class="p">:</span> <span class="k">do while</span> <span class="p">(</span><span class="n">j</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
-<a name="ln-188"></a>            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-189"></a>            <span class="n">dum</span> <span class="o">=</span> <span class="n">dum</span> <span class="o">+</span> <span class="n">w</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
-<a name="ln-190"></a>            <span class="k">if</span> <span class="p">(</span><span class="n">dum</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="n">cdf_val</span><span class="p">)</span> <span class="k">exit </span><span class="n">elem_loop</span>
-<a name="ln-191"></a>        <span class="n">enddo</span> <span class="n">elem_loop</span>
-<a name="ln-192"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">j</span>
-<a name="ln-193"></a>    <span class="n">enddo</span>
-<a name="ln-194"></a>
-<a name="ln-195"></a><span class="k">end subroutine </span><span class="n">randind_w_1</span>
-<a name="ln-196"></a>
-<a name="ln-197"></a><span class="k">subroutine </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">ind</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
-<a name="ln-198"></a>    <span class="c">!+ Calculate the subscripts `subs` into an array with dimensions `dims`</span>
-<a name="ln-199"></a>    <span class="c">!+ given the corresponding linear index `ind`</span>
-<a name="ln-200"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dims</span>
-<a name="ln-201"></a>        <span class="c">!+ Dimensions of array</span>
-<a name="ln-202"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">ind</span>
-<a name="ln-203"></a>        <span class="c">!+ Linear index</span>
-<a name="ln-204"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
-<a name="ln-205"></a>        <span class="c">!+ Subscripts corresponding to the linear index</span>
-<a name="ln-206"></a>
-<a name="ln-207"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span>
-<a name="ln-208"></a>  
-<a name="ln-209"></a>    <span class="n">ind1</span><span class="o">=</span><span class="n">ind</span>
-<a name="ln-210"></a>    <span class="n">ndims</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<a name="ln-211"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ndims</span><span class="o">-</span><span class="mi">1</span>
-<a name="ln-212"></a>        <span class="n">ind2</span> <span class="o">=</span> <span class="p">(</span><span class="n">ind1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-213"></a>        <span class="n">subs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span> <span class="o">-</span> <span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">ind2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-214"></a>        <span class="n">ind1</span> <span class="o">=</span> <span class="n">ind2</span>
-<a name="ln-215"></a>    <span class="n">enddo</span>
-<a name="ln-216"></a>    <span class="n">subs</span><span class="p">(</span><span class="n">ndims</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span>
-<a name="ln-217"></a>
-<a name="ln-218"></a><span class="k">end subroutine </span><span class="n">ind2sub</span>
-<a name="ln-219"></a>
-<a name="ln-220"></a><span class="k">subroutine </span><span class="n">randind_w_2</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-221"></a>    <span class="c">!+ Generate an array of random subscripts of an 2D array distributed according to `w`</span>
-<a name="ln-222"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
-<a name="ln-223"></a>        <span class="c">!+ 2D array of subscript weights</span>
-<a name="ln-224"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
-<a name="ln-225"></a>        <span class="c">!+ A 2D (ndim, :) array of random subscripts</span>
-<a name="ln-226"></a>  
-<a name="ln-227"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span>
-<a name="ln-228"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
-<a name="ln-229"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dum</span><span class="p">,</span> <span class="n">cdf_val</span><span class="p">,</span> <span class="n">w_tot</span>
-<a name="ln-230"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
-<a name="ln-231"></a>  
-<a name="ln-232"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-233"></a>    <span class="n">w_tot</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-<a name="ln-234"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-<a name="ln-235"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-<a name="ln-236"></a>        <span class="n">cdf_val</span> <span class="o">=</span> <span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">w_tot</span>
-<a name="ln-237"></a>        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-238"></a>        <span class="n">dum</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
-<a name="ln-239"></a>        <span class="n">subs</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-240"></a>        <span class="n">elem_loop</span><span class="p">:</span> <span class="k">do while</span> <span class="p">(</span><span class="n">j</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
-<a name="ln-241"></a>            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-242"></a>            <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">j</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
-<a name="ln-243"></a>            <span class="n">dum</span> <span class="o">=</span> <span class="n">dum</span> <span class="o">+</span> <span class="n">w</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-<a name="ln-244"></a>            <span class="k">if</span> <span class="p">(</span><span class="n">dum</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="n">cdf_val</span><span class="p">)</span> <span class="k">exit </span><span class="n">elem_loop</span>
-<a name="ln-245"></a>        <span class="n">enddo</span> <span class="n">elem_loop</span>
-<a name="ln-246"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
-<a name="ln-247"></a>    <span class="n">enddo</span>
-<a name="ln-248"></a>
-<a name="ln-249"></a><span class="k">end subroutine </span><span class="n">randind_w_2</span>
-<a name="ln-250"></a>
-<a name="ln-251"></a><span class="k">end module </span><span class="n">parallel_rng</span>
+<a name="ln-151"></a><span class="k">function </span><span class="n">search_sorted_first</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span>
+<a name="ln-152"></a>    <span class="c">!+ Returns the index of the first value in `x` greater or equal to `v`.</span>
+<a name="ln-153"></a>    <span class="c">!+ Returns `length(x)+1` if `v` is greater then all values in `x`.</span>
+<a name="ln-154"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<a name="ln-155"></a>        <span class="c">!+ Monotonically increasing array</span>
+<a name="ln-156"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">v</span>
+<a name="ln-157"></a>        <span class="c">!+ Value to search</span>
+<a name="ln-158"></a>
+<a name="ln-159"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">hi</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">m</span>
+<a name="ln-160"></a>
+<a name="ln-161"></a>    <span class="n">lo</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-162"></a>    <span class="n">hi</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<a name="ln-163"></a>
+<a name="ln-164"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">lo</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">hi</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<a name="ln-165"></a>        <span class="n">m</span> <span class="o">=</span> <span class="nb">rshift</span><span class="p">(</span><span class="n">lo</span><span class="o">+</span><span class="n">hi</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-166"></a>        <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">m</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="n">v</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-167"></a><span class="k">            </span><span class="n">lo</span> <span class="o">=</span> <span class="n">m</span>
+<a name="ln-168"></a>        <span class="k">else</span>
+<a name="ln-169"></a><span class="k">            </span><span class="n">hi</span> <span class="o">=</span> <span class="n">m</span>
+<a name="ln-170"></a>        <span class="n">endif</span>
+<a name="ln-171"></a>    <span class="n">enddo</span>
+<a name="ln-172"></a>
+<a name="ln-173"></a><span class="k">end function </span><span class="n">search_sorted_first</span>
+<a name="ln-174"></a>
+<a name="ln-175"></a><span class="k">subroutine </span><span class="n">randind_n</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-176"></a>    <span class="c">!+ Generate a array of uniformally-distributed random integers in the range [1, n]</span>
+<a name="ln-177"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">n</span>
+<a name="ln-178"></a>        <span class="c">!+ Largest possible value</span>
+<a name="ln-179"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomi</span>
+<a name="ln-180"></a>        <span class="c">!+ Array of uniform deviates</span>
+<a name="ln-181"></a>
+<a name="ln-182"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
+<a name="ln-183"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+<a name="ln-184"></a>  
+<a name="ln-185"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span> 
+<a name="ln-186"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-187"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+<a name="ln-188"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+<a name="ln-189"></a>    <span class="n">enddo</span>
+<a name="ln-190"></a>
+<a name="ln-191"></a><span class="k">end subroutine </span><span class="n">randind_n</span>
+<a name="ln-192"></a>
+<a name="ln-193"></a><span class="k">subroutine </span><span class="n">randind_w_1</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-194"></a>    <span class="c">!+ Generate an array of random indices of an 1D array distributed according to `w`</span>
+<a name="ln-195"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
+<a name="ln-196"></a>        <span class="c">!+ 1D array of index weights</span>
+<a name="ln-197"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
+<a name="ln-198"></a>        <span class="c">!+ Random indices</span>
+<a name="ln-199"></a>
+<a name="ln-200"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">nw</span>
+<a name="ln-201"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cdf_val</span><span class="p">,</span> <span class="n">t</span>
+<a name="ln-202"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">))</span> <span class="kd">::</span> <span class="n">cdf</span>
+<a name="ln-203"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+<a name="ln-204"></a>  
+<a name="ln-205"></a>    <span class="n">nw</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<a name="ln-206"></a>    <span class="n">t</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+<a name="ln-207"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nw</span>
+<a name="ln-208"></a>        <span class="n">cdf</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">w</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<a name="ln-209"></a>        <span class="n">t</span> <span class="o">=</span> <span class="n">cdf</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<a name="ln-210"></a>    <span class="n">enddo</span>
+<a name="ln-211"></a>
+<a name="ln-212"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-213"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-214"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+<a name="ln-215"></a>        <span class="n">cdf_val</span> <span class="o">=</span> <span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">cdf</span><span class="p">(</span><span class="n">nw</span><span class="p">)</span>
+<a name="ln-216"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">search_sorted_first</span><span class="p">(</span><span class="n">cdf</span><span class="p">,</span><span class="n">cdf_val</span><span class="p">),</span><span class="n">nw</span><span class="p">)</span>
+<a name="ln-217"></a>    <span class="n">enddo</span>
+<a name="ln-218"></a>
+<a name="ln-219"></a><span class="k">end subroutine </span><span class="n">randind_w_1</span>
+<a name="ln-220"></a>
+<a name="ln-221"></a><span class="k">subroutine </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">ind</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
+<a name="ln-222"></a>    <span class="c">!+ Calculate the subscripts `subs` into an array with dimensions `dims`</span>
+<a name="ln-223"></a>    <span class="c">!+ given the corresponding linear index `ind`</span>
+<a name="ln-224"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dims</span>
+<a name="ln-225"></a>        <span class="c">!+ Dimensions of array</span>
+<a name="ln-226"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">ind</span>
+<a name="ln-227"></a>        <span class="c">!+ Linear index</span>
+<a name="ln-228"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
+<a name="ln-229"></a>        <span class="c">!+ Subscripts corresponding to the linear index</span>
+<a name="ln-230"></a>
+<a name="ln-231"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span>
+<a name="ln-232"></a>  
+<a name="ln-233"></a>    <span class="n">ind1</span><span class="o">=</span><span class="n">ind</span>
+<a name="ln-234"></a>    <span class="n">ndims</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+<a name="ln-235"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ndims</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-236"></a>        <span class="n">ind2</span> <span class="o">=</span> <span class="p">(</span><span class="n">ind1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-237"></a>        <span class="n">subs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span> <span class="o">-</span> <span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">ind2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-238"></a>        <span class="n">ind1</span> <span class="o">=</span> <span class="n">ind2</span>
+<a name="ln-239"></a>    <span class="n">enddo</span>
+<a name="ln-240"></a>    <span class="n">subs</span><span class="p">(</span><span class="n">ndims</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span>
+<a name="ln-241"></a>
+<a name="ln-242"></a><span class="k">end subroutine </span><span class="n">ind2sub</span>
+<a name="ln-243"></a>
+<a name="ln-244"></a><span class="k">subroutine </span><span class="n">randind_w_2</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-245"></a>    <span class="c">!+ Generate an array of random subscripts of an 2D array distributed according to `w`</span>
+<a name="ln-246"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
+<a name="ln-247"></a>        <span class="c">!+ 2D array of subscript weights</span>
+<a name="ln-248"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
+<a name="ln-249"></a>        <span class="c">!+ A 2D (ndim, :) array of random subscripts</span>
+<a name="ln-250"></a>  
+<a name="ln-251"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">nw</span>
+<a name="ln-252"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
+<a name="ln-253"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span> <span class="kd">::</span> <span class="n">randi</span>
+<a name="ln-254"></a>
+<a name="ln-255"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-256"></a>    <span class="n">nw</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<a name="ln-257"></a>
+<a name="ln-258"></a>    <span class="k">call </span><span class="n">randind_w_1</span><span class="p">(</span><span class="nb">reshape</span><span class="p">(</span><span class="n">w</span><span class="p">,[</span><span class="n">nw</span><span class="p">]),</span><span class="n">randi</span><span class="p">)</span>
+<a name="ln-259"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-260"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">randi</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">subs</span><span class="p">)</span>
+<a name="ln-261"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
+<a name="ln-262"></a>    <span class="n">enddo</span>
+<a name="ln-263"></a>
+<a name="ln-264"></a><span class="k">end subroutine </span><span class="n">randind_w_2</span>
+<a name="ln-265"></a>
+<a name="ln-266"></a><span class="k">end module </span><span class="n">parallel_rng</span>
 </pre></div>
 
     </section>

@@ -199,6 +199,12 @@
   <div id="allprocs-0" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
       <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
@@ -307,6 +313,8 @@
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -397,6 +405,8 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -442,6 +452,8 @@
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -510,8 +522,6 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1135,17 +1145,17 @@ implementation in a submodule of an interface in a parent module.
         <span class="c">!+ HDF5 file ID</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">error</span>
         <span class="c">!+ Error code</span>
-  
+
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-  
-    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then </span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;---- Fast-ion distribution settings ----&#39;</span>
     <span class="n">endif</span>
-  
+
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/nenergy&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/npitch&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/nr&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> 
+    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/nr&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/nz&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
     <span class="k">if</span><span class="p">((</span><span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">).</span><span class="nb">or</span><span class="p">.(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span> <span class="k">then</span>
@@ -1156,16 +1166,16 @@ implementation in a submodule of an interface in a parent module.
     <span class="k">allocate</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">),</span> <span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">),</span> <span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">),</span> <span class="n">fbm</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">denf</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">f</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
-  
+
     <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">]</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/energy&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/pitch&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">2</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/r&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">3</span><span class="p">:</span><span class="mi">3</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/z&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">4</span><span class="p">:</span><span class="mi">4</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/denf&quot;</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">denf</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">3</span><span class="p">:</span><span class="mi">4</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/f&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">f</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span> 
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/f&quot;</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">f</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">denf</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">denf</span>
-    
+
     <span class="n">fbm</span><span class="p">%</span><span class="n">dE</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">dp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">dr</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
@@ -1181,11 +1191,11 @@ implementation in a submodule of an interface in a parent module.
     <span class="n">dummy</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">)</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">pmax</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">p_range</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">pmax</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">pmin</span>
-  
-    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then </span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Distribution type: &quot;,a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Fast-ion Density Function F(energy,pitch,R,Z)&quot;</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Nenergy = &quot;,i3)&#39;</span><span class="p">),</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Npitch  = &quot;,i3)&#39;</span><span class="p">),</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span> 
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Npitch  = &quot;,i3)&#39;</span><span class="p">),</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Energy range = [&quot;,f5.2,&quot;,&quot;,f6.2,&quot;]&quot;)&#39;</span><span class="p">),</span><span class="n">fbm</span><span class="p">%</span><span class="n">emin</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">emax</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Pitch  range = [&quot;,f5.2,&quot;,&quot;,f5.2,&quot;]&quot;)&#39;</span><span class="p">),</span><span class="n">fbm</span><span class="p">%</span><span class="n">pmin</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">pmax</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
@@ -1209,6 +1219,12 @@ implementation in a submodule of an interface in a parent module.
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
   <div id="allprocs-1" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -1318,6 +1334,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1408,6 +1426,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -1453,6 +1473,8 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -1521,8 +1543,6 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

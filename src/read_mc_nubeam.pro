@@ -46,17 +46,8 @@ FUNCTION read_mc_nubeam,infile,ntotal=ntotal,e_range=e_range,p_range=p_range,par
         error,'Second line is missing the number of points',/halt
     endif
 
-    parts=str_sep(line, ' ')
-    w=where(parts eq 'N=')
-    i=1
-    while 1 do begin
-        s = parts[w[0]+i]
-        if s ne '' and s ne '=' and s ne ' ' then begin
-            npts = long(s)
-            break
-        endif
-        i = i+1
-    endwhile
+    w = stregex(line,'N *= *([0-9]*)',/sub,/extract)
+    npts = long(w[1])
     if npts lt 5 then begin
         error,'Too few points '+strtrim(npts,2),/halt
     endif

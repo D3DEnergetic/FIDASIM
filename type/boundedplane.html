@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 2.5% of total for derived types.</p>Including implementation: 8 statements,  2.5% of total for derived types.">8 statements</a>
+	  title="<p> 2.4% of total for derived types.</p>Including implementation: 8 statements,  2.4% of total for derived types.">8 statements</a>
      </li> 
      
      
@@ -245,6 +245,10 @@
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
+      
+      <a class="list-group-item" href="../type/interpolcoeffs1d.html">InterpolCoeffs1D</a>
+      
+      <a class="list-group-item" href="../type/interpolcoeffs2d.html">InterpolCoeffs2D</a>
       
       <a class="list-group-item" href="../type/lineofsight.html">LineOfSight</a>
       
@@ -560,17 +564,17 @@ said component(s).
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">BoundedPlane</span>
     <span class="c">!+ Defines a plane with a circular or rectangular boundary</span>
-    <span class="kt">integer</span>       <span class="kd">::</span> <span class="nb">shape</span>    <span class="o">=</span> <span class="mi">0</span> 
+    <span class="kt">integer</span>       <span class="kd">::</span> <span class="nb">shape</span>    <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Boundary shape 1=&quot;Rectangular&quot;, 2=&quot;circular&quot;</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">hh</span>       <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Half height of boundary [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">hw</span>       <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Half width of boundary [cm]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">origin</span>   <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span> 
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">origin</span>   <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Origin of plane in machine coordinates</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">basis</span>    <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Basis vectors basis(:,1) = u_1 is plane normal</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">inv_basis</span><span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span> 
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">inv_basis</span><span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Inverse basis</span>
 <span class="k">end type </span><span class="n">BoundedPlane</span>
 </pre></div>
@@ -615,6 +619,10 @@ said component(s).
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
+      
+      <a class="list-group-item" href="../type/interpolcoeffs1d.html">InterpolCoeffs1D</a>
+      
+      <a class="list-group-item" href="../type/interpolcoeffs2d.html">InterpolCoeffs2D</a>
       
       <a class="list-group-item" href="../type/lineofsight.html">LineOfSight</a>
       

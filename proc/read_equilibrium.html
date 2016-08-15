@@ -199,6 +199,12 @@
   <div id="allprocs-0" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
       <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
@@ -307,6 +313,8 @@
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -397,6 +405,8 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -442,6 +452,8 @@
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -510,8 +522,6 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -788,7 +798,7 @@ public subroutine read_equilibrium()
 
 
     
-    <p>Reads in the interpolation grid, plasma parameters, and fields 
+    <p>Reads in the interpolation grid, plasma parameters, and fields
  and stores the quantities in <a href="../module/libfida.html#variable-inter_grid">inter_grid</a> and <a href="../module/libfida.html#variable-equil">equil</a></p>
     
 
@@ -816,102 +826,102 @@ public subroutine read_equilibrium()
 <polygon fill="none" stroke="black" points="92,-196 4.26326e-14,-196 0,-170 92,-170 92,-196"/>
 <text text-anchor="middle" x="46" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_equilibrium</text>
 </g>
-<!-- h5open_f -->
-<g id="node2" class="node"><title>h5open_f</title>
-<polygon fill="#777777" stroke="#777777" points="234,-372 176,-372 176,-346 234,-346 234,-372"/>
-<text text-anchor="middle" x="205" y="-356.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;h5open_f -->
-<g id="edge4" class="edge"><title>proc~read_equilibrium&#45;&gt;h5open_f</title>
-<path fill="none" stroke="#000000" d="M49.2921,-196.416C57.341,-226.342 80.891,-298.912 128,-337 138.769,-345.707 152.815,-350.969 165.958,-354.149"/>
-<polygon fill="#000000" stroke="#000000" points="165.259,-357.578 175.763,-356.197 166.69,-350.726 165.259,-357.578"/>
-</g>
 <!-- h5gclose_f -->
-<g id="node3" class="node"><title>h5gclose_f</title>
-<polygon fill="#777777" stroke="#777777" points="237,-328 173,-328 173,-302 237,-302 237,-328"/>
-<text text-anchor="middle" x="205" y="-312.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
+<g id="node2" class="node"><title>h5gclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="237,-372 173,-372 173,-346 237,-346 237,-372"/>
+<text text-anchor="middle" x="205" y="-356.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;h5gclose_f -->
-<g id="edge6" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gclose_f</title>
+<g id="edge4" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gclose_f</title>
+<path fill="none" stroke="#000000" d="M49.2921,-196.416C57.341,-226.342 80.891,-298.912 128,-337 137.882,-344.99 150.524,-350.079 162.695,-353.32"/>
+<polygon fill="#000000" stroke="#000000" points="162.207,-356.799 172.737,-355.631 163.777,-349.977 162.207,-356.799"/>
+</g>
+<!-- h5gopen_f -->
+<g id="node3" class="node"><title>h5gopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="237,-328 173,-328 173,-302 237,-302 237,-328"/>
+<text text-anchor="middle" x="205" y="-312.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;h5gopen_f -->
+<g id="edge6" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gopen_f</title>
 <path fill="none" stroke="#000000" d="M52.1143,-196.037C63.6274,-219.149 90.7567,-267.287 128,-293 138.279,-300.097 150.827,-304.922 162.786,-308.196"/>
 <polygon fill="#000000" stroke="#000000" points="162.085,-311.627 172.629,-310.597 163.743,-304.827 162.085,-311.627"/>
 </g>
-<!-- h5ltread_dataset_double_f -->
-<g id="node4" class="node"><title>h5ltread_dataset_double_f</title>
-<polygon fill="#777777" stroke="#777777" points="275,-284 135,-284 135,-258 275,-258 275,-284"/>
-<text text-anchor="middle" x="205" y="-268.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge8" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M58.7434,-196.028C73.9442,-210.867 100.74,-234.877 128,-249 131.75,-250.943 135.694,-252.734 139.733,-254.383"/>
-<polygon fill="#000000" stroke="#000000" points="138.692,-257.731 149.284,-257.974 141.156,-251.178 138.692,-257.731"/>
-</g>
-<!-- h5gopen_f -->
-<g id="node5" class="node"><title>h5gopen_f</title>
-<polygon fill="#777777" stroke="#777777" points="237,-240 173,-240 173,-214 237,-214 237,-240"/>
-<text text-anchor="middle" x="205" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;h5gopen_f -->
-<g id="edge10" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gopen_f</title>
-<path fill="none" stroke="#000000" d="M92.4168,-195.845C114.732,-202.02 141.279,-209.366 162.989,-215.374"/>
-<polygon fill="#000000" stroke="#000000" points="162.332,-218.824 172.903,-218.118 164.199,-212.078 162.332,-218.824"/>
-</g>
 <!-- h5fclose_f -->
-<g id="node6" class="node"><title>h5fclose_f</title>
-<polygon fill="#777777" stroke="#777777" points="235,-196 175,-196 175,-170 235,-170 235,-196"/>
-<text text-anchor="middle" x="205" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
+<g id="node4" class="node"><title>h5fclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="235,-284 175,-284 175,-258 235,-258 235,-284"/>
+<text text-anchor="middle" x="205" y="-268.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;h5fclose_f -->
-<g id="edge12" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fclose_f</title>
-<path fill="none" stroke="#000000" d="M92.4168,-183C115.103,-183 142.164,-183 164.069,-183"/>
-<polygon fill="#000000" stroke="#000000" points="164.367,-186.5 174.367,-183 164.367,-179.5 164.367,-186.5"/>
-</g>
-<!-- h5close_f -->
-<g id="node7" class="node"><title>h5close_f</title>
-<polygon fill="#777777" stroke="#777777" points="234,-152 176,-152 176,-126 234,-126 234,-152"/>
-<text text-anchor="middle" x="205" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;h5close_f -->
-<g id="edge14" class="edge"><title>proc~read_equilibrium&#45;&gt;h5close_f</title>
-<path fill="none" stroke="#000000" d="M92.4168,-170.155C115.786,-163.688 143.798,-155.936 166.034,-149.783"/>
-<polygon fill="#000000" stroke="#000000" points="167.102,-153.119 175.807,-147.079 165.235,-146.373 167.102,-153.119"/>
-</g>
-<!-- h5ltread_dataset_int_f -->
-<g id="node8" class="node"><title>h5ltread_dataset_int_f</title>
-<polygon fill="#777777" stroke="#777777" points="437,-90 319,-90 319,-64 437,-64 437,-90"/>
-<text text-anchor="middle" x="378" y="-74.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f -->
-<g id="edge16" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M57.9329,-169.931C72.7654,-154.581 99.6103,-129.616 128,-117 185.427,-91.48 256.684,-81.9888 308.412,-78.5825"/>
-<polygon fill="#000000" stroke="#000000" points="308.715,-82.0708 318.488,-77.9795 308.297,-75.0833 308.715,-82.0708"/>
+<g id="edge8" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fclose_f</title>
+<path fill="none" stroke="#000000" d="M58.7434,-196.028C73.9442,-210.867 100.74,-234.877 128,-249 139.284,-254.846 152.326,-259.322 164.433,-262.661"/>
+<polygon fill="#000000" stroke="#000000" points="163.767,-266.104 174.324,-265.204 165.51,-259.324 163.767,-266.104"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f -->
-<g id="node9" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="node5" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
 <a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="282,-70 128,-70 128,-44 282,-44 282,-70"/>
-<text text-anchor="middle" x="205" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="282,-240 128,-240 128,-214 282,-214 282,-240"/>
+<text text-anchor="middle" x="205" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
 </a>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="edge18" class="edge"><title>proc~read_equilibrium&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M53.6043,-169.822C66.3814,-148.786 94.115,-107.59 128,-84 133.468,-80.1934 139.526,-76.8742 145.772,-73.9917"/>
-<polygon fill="#000000" stroke="#000000" points="147.17,-77.2004 155.011,-70.0752 144.439,-70.7555 147.17,-77.2004"/>
+<g id="edge10" class="edge"><title>proc~read_equilibrium&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M92.4168,-195.845C109.899,-200.683 129.979,-206.239 148.295,-211.308"/>
+<polygon fill="#000000" stroke="#000000" points="147.403,-214.693 157.975,-213.987 149.27,-207.946 147.403,-214.693"/>
+</g>
+<!-- h5open_f -->
+<g id="node6" class="node"><title>h5open_f</title>
+<polygon fill="#777777" stroke="#777777" points="234,-196 176,-196 176,-170 234,-170 234,-196"/>
+<text text-anchor="middle" x="205" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;h5open_f -->
+<g id="edge12" class="edge"><title>proc~read_equilibrium&#45;&gt;h5open_f</title>
+<path fill="none" stroke="#000000" d="M92.4168,-183C115.681,-183 143.546,-183 165.733,-183"/>
+<polygon fill="#000000" stroke="#000000" points="165.807,-186.5 175.807,-183 165.807,-179.5 165.807,-186.5"/>
 </g>
 <!-- h5fopen_f -->
-<g id="node10" class="node"><title>h5fopen_f</title>
-<polygon fill="#777777" stroke="#777777" points="235,-26 175,-26 175,-1.24345e-14 235,-3.55271e-15 235,-26"/>
-<text text-anchor="middle" x="205" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+<g id="node7" class="node"><title>h5fopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="235,-152 175,-152 175,-126 235,-126 235,-152"/>
+<text text-anchor="middle" x="205" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;h5fopen_f -->
-<g id="edge20" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fopen_f</title>
-<path fill="none" stroke="#000000" d="M49.5794,-169.665C58.0722,-140.628 82.2384,-71.3721 128,-35 138.392,-26.7406 151.742,-21.5819 164.4,-18.3599"/>
-<polygon fill="#000000" stroke="#000000" points="165.321,-21.7409 174.332,-16.1688 163.813,-14.9052 165.321,-21.7409"/>
+<g id="edge14" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fopen_f</title>
+<path fill="none" stroke="#000000" d="M92.4168,-170.155C115.309,-163.82 142.657,-156.252 164.665,-150.162"/>
+<polygon fill="#000000" stroke="#000000" points="165.662,-153.517 174.367,-147.477 163.795,-146.771 165.662,-153.517"/>
+</g>
+<!-- h5ltread_dataset_int_f -->
+<g id="node8" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="437,-175 319,-175 319,-149 437,-149 437,-175"/>
+<text text-anchor="middle" x="378" y="-159.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f -->
+<g id="edge16" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M56.8667,-169.999C71.2176,-153.955 98.1827,-127.509 128,-117 192.552,-94.2486 215.193,-102.119 282,-117 305.516,-122.238 330.08,-133.883 348.474,-144.014"/>
+<polygon fill="#000000" stroke="#000000" points="346.808,-147.093 357.233,-148.982 350.261,-141.004 346.808,-147.093"/>
+</g>
+<!-- h5close_f -->
+<g id="node9" class="node"><title>h5close_f</title>
+<polygon fill="#777777" stroke="#777777" points="234,-70 176,-70 176,-44 234,-44 234,-70"/>
+<text text-anchor="middle" x="205" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;h5close_f -->
+<g id="edge18" class="edge"><title>proc~read_equilibrium&#45;&gt;h5close_f</title>
+<path fill="none" stroke="#000000" d="M53.6043,-169.822C66.3814,-148.786 94.115,-107.59 128,-84 139.395,-76.0668 153.353,-70.2505 166.239,-66.0929"/>
+<polygon fill="#000000" stroke="#000000" points="167.245,-69.4454 175.825,-63.2294 165.241,-62.7382 167.245,-69.4454"/>
+</g>
+<!-- h5ltread_dataset_double_f -->
+<g id="node10" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="275,-26 135,-26 135,-1.24345e-14 275,-3.55271e-15 275,-26"/>
+<text text-anchor="middle" x="205" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;h5ltread_dataset_double_f -->
+<g id="edge20" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M49.5794,-169.665C58.0722,-140.628 82.2384,-71.3721 128,-35 129.769,-33.5943 131.623,-32.2783 133.545,-31.0465"/>
+<polygon fill="#000000" stroke="#000000" points="135.301,-34.0752 142.35,-26.1663 131.907,-27.9527 135.301,-34.0752"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
 <g id="edge2" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M282.14,-65.9179C290.883,-66.9286 299.755,-67.9543 308.393,-68.9529"/>
-<polygon fill="#000000" stroke="#000000" points="308.068,-72.4386 318.404,-70.1103 308.872,-65.4849 308.068,-72.4386"/>
+<path fill="none" stroke="#000000" d="M254.628,-213.951C263.804,-211.219 273.249,-208.192 282,-205 302.267,-197.609 324.27,-187.883 342.092,-179.551"/>
+<polygon fill="#000000" stroke="#000000" points="343.982,-182.529 351.525,-175.09 340.989,-176.201 343.982,-182.529"/>
 </g>
 </g>
 </svg>
@@ -1142,45 +1152,45 @@ implementation in a submodule of an interface in a parent module.
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">read_equilibrium</span>
-    <span class="c">!+ Reads in the interpolation grid, plasma parameters, and fields </span>
+    <span class="c">!+ Reads in the interpolation grid, plasma parameters, and fields</span>
     <span class="c">!+ and stores the quantities in [[libfida:inter_grid]] and [[libfida:equil]]</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fid</span><span class="p">,</span> <span class="n">gid</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
-  
+
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">impc</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">error</span>
-    
+
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">p_mask</span><span class="p">,</span> <span class="n">f_mask</span>
-  
+
     <span class="c">!!Initialize HDF5 interface</span>
     <span class="k">call </span><span class="n">h5open_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-  
+
     <span class="c">!!Open HDF5 file</span>
     <span class="k">call </span><span class="n">h5fopen_f</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">equilibrium_file</span><span class="p">,</span> <span class="n">H5F_ACC_RDONLY_F</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-  
+
     <span class="c">!!Open PLASMA group</span>
     <span class="k">call </span><span class="n">h5gopen_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/plasma&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-  
+
     <span class="c">!!Read in interpolation grid</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/nr&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/nz&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-  
+
     <span class="k">allocate</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">),</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r2d</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z2d</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">p_mask</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">f_mask</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
-  
+
     <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">]</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/r&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/z&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">2</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/r2d&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">r2d</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/z2d&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">z2d</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-  
+
     <span class="n">inter_grid</span><span class="p">%</span><span class="n">dr</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">inter_grid</span><span class="p">%</span><span class="n">dz</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">inter_grid</span><span class="p">%</span><span class="n">da</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">dr</span><span class="o">*</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">dz</span>
-  
+
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;---- Interpolation grid settings ----&#39;</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Nr: &quot;,i3)&#39;</span><span class="p">)</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span>
@@ -1188,10 +1198,10 @@ implementation in a submodule of an interface in a parent module.
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;dA: &quot;, f4.2,&quot; [cm^2]&quot;)&#39;</span><span class="p">)</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">da</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
     <span class="n">endif</span>
-  
+
     <span class="c">!!Read in plasma parameters</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
-  
+
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/dene&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">dene</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/te&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">te</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/ti&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">ti</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -1200,7 +1210,7 @@ implementation in a submodule of an interface in a parent module.
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/vt&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">vt</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/vz&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">vz</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/mask&quot;</span><span class="p">,</span> <span class="n">p_mask</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span><span class="n">error</span><span class="p">)</span>
-  
+
     <span class="n">impc</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">%</span><span class="n">impurity_charge</span>
     <span class="k">where</span><span class="p">(</span><span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">zeff</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">1.0</span><span class="p">)</span>
         <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">zeff</span> <span class="o">=</span> <span class="mi">1</span>
@@ -1227,12 +1237,12 @@ implementation in a submodule of an interface in a parent module.
 
     <span class="c">!!Close PLASMA group</span>
     <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-  
+
     <span class="c">!!Open FIELDS group</span>
     <span class="k">call </span><span class="n">h5gopen_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/fields&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    
+
     <span class="k">allocate</span><span class="p">(</span><span class="n">equil</span><span class="p">%</span><span class="n">fields</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
-  
+
     <span class="c">!!Read in electromagnetic fields</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/fields/br&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/fields/bt&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -1244,17 +1254,17 @@ implementation in a submodule of an interface in a parent module.
 
     <span class="c">!!Close FIELDS group</span>
     <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-  
+
     <span class="c">!!Close file</span>
     <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-  
+
     <span class="c">!!Close HDF5 interface</span>
     <span class="k">call </span><span class="n">h5close_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-  
+
     <span class="k">allocate</span><span class="p">(</span><span class="n">equil</span><span class="p">%</span><span class="n">mask</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="n">equil</span><span class="p">%</span><span class="n">mask</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
     <span class="k">where</span> <span class="p">((</span><span class="n">p_mask</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">f_mask</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="n">equil</span><span class="p">%</span><span class="n">mask</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d0</span>
-  
+
 <span class="k">end subroutine </span><span class="n">read_equilibrium</span>
 </pre></div>
 
@@ -1273,6 +1283,12 @@ implementation in a submodule of an interface in a parent module.
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
   <div id="allprocs-1" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -1382,6 +1398,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1472,6 +1490,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -1517,6 +1537,8 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -1585,8 +1607,6 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

@@ -199,6 +199,12 @@
   <div id="allprocs-0" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
       <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
@@ -307,6 +313,8 @@
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -397,6 +405,8 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -442,6 +452,8 @@
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -510,8 +522,6 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1059,47 +1069,47 @@ implementation in a submodule of an interface in a parent module.
     <span class="c">!+ Makes [[libfida:beam_grid] from user defined inputs</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">dz</span>
-  
+
     <span class="k">allocate</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">),</span>  <span class="p">&amp;</span>
              <span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">),</span>  <span class="p">&amp;</span>
              <span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
-  
+
     <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">xmin</span><span class="p">)</span><span class="o">/</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span>
     <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ymax</span> <span class="o">-</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">ymin</span><span class="p">)</span><span class="o">/</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span>
     <span class="n">dz</span> <span class="o">=</span> <span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zmax</span> <span class="o">-</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">zmin</span><span class="p">)</span><span class="o">/</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
-  
+
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span>
         <span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">xmin</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">dx</span>
-    <span class="n">enddo</span>    
+    <span class="n">enddo</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span>
         <span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">ymin</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">dy</span>
-    <span class="n">enddo</span>    
+    <span class="n">enddo</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
         <span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">zmin</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">dz</span>
-    <span class="n">enddo</span>    
-  
+    <span class="n">enddo</span>
+
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-  
+
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">)</span> <span class="o">-</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">)</span> <span class="o">-</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span> <span class="o">-</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-  
+
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">volume</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-  
+
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">center</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="nb">minval</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">center</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="nb">minval</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">center</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="nb">minval</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">lwh</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-  
+
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">drmin</span>  <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">)</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">dv</span>     <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">ntrack</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="o">+</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="o">+</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
     <span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span>  <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
-  
+
     <span class="k">call </span><span class="n">tb_zyx</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">alpha</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">beta</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="nb">gamma</span><span class="p">,</span> <span class="p">&amp;</span>
                 <span class="n">beam_grid</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">inv_basis</span><span class="p">)</span>
-  
+
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Beam grid settings ----&quot;</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Nx: &quot;, i3)&#39;</span><span class="p">)</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span>
@@ -1131,6 +1141,12 @@ implementation in a submodule of an interface in a parent module.
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
   <div id="allprocs-1" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -1240,6 +1256,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1330,6 +1348,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -1375,6 +1395,8 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -1443,8 +1465,6 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

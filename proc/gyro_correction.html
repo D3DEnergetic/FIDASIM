@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.1% of total for procedures.">10 statements</a>
+	  title=" 0.2% of total for procedures.">18 statements</a>
      </li> 
      
      
@@ -198,6 +198,12 @@
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-0">All Procedures</a></h3></div>
   <div id="allprocs-0" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -307,6 +313,8 @@
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -397,6 +405,8 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -442,6 +452,8 @@
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -510,8 +522,6 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -778,7 +788,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine gyro_correction(vi, fields, r_gyro)
+public subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
     
     
 	 
@@ -788,7 +798,7 @@ public subroutine gyro_correction(vi, fields, r_gyro)
 
 
     
-    <p>Calculates gyro correction</p>
+    <p>Calculates gyro correction for Guiding Center MC distribution calculation</p>
     
 
     <h3>Arguments</h3>
@@ -809,27 +819,12 @@ public subroutine gyro_correction(vi, fields, r_gyro)
   
 <tr>
   
-  <td><span class="anchor" id="variable-vi%7E9"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>vi</strong></td><td><p>Ion velocity</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-fields%7E6"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td><span class="anchor" id="variable-fields%7E7"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
   <td>intent(in)</td>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>fields</strong></td><td><p>Electro-magnetic fields</p></td>
+  <td><strong>fields</strong></td><td><p>Electromagnetic fields at guiding center</p></td>
   
 </tr>
 
@@ -839,12 +834,72 @@ public subroutine gyro_correction(vi, fields, r_gyro)
   
 <tr>
   
-  <td><span class="anchor" id="variable-r_gyro"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-rg"></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>rg</strong></td><td><p>Gyro-center position</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-energy%7E6"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>energy</strong></td><td><p>Energy of particle</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pitch%7E6"></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rp"></span>real(kind=Float64),</td>
   <td>intent(out),</td>
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>r_gyro</strong></td><td><p>Gyro-step</p></td>
+  <td><strong>rp</strong></td><td><p>Particle position</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-vp%7E2"></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vp</strong></td><td><p>Particle velocity</p></td>
   
 </tr>
 
@@ -862,27 +917,85 @@ public subroutine gyro_correction(vi, fields, r_gyro)
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
 <!-- Title: proc~~gyro_correction~~CallsGraph Pages: 1 -->
-<svg id="procgyro_correctionCallsGraph" width="212pt" height="34pt"
- viewBox="0.00 0.00 212.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~gyro_correction~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="procgyro_correctionCallsGraph" width="360pt" height="122pt"
+ viewBox="0.00 0.00 360.00 122.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~gyro_correction~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 118)">
 <title>proc~~gyro_correction~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 209,-30 209,5 -4,5"/>
+<polygon fill="white" stroke="white" points="-4,5 -4,-118 357,-118 357,5 -4,5"/>
 <!-- proc~gyro_correction -->
 <g id="node1" class="node"><title>proc~gyro_correction</title>
-<polygon fill="none" stroke="black" points="87,-26 1,-26 1,-1.24345e-14 87,-3.55271e-15 87,-26"/>
-<text text-anchor="middle" x="44" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_correction</text>
+<polygon fill="none" stroke="black" points="87,-70 1,-70 1,-44 87,-44 87,-70"/>
+<text text-anchor="middle" x="44" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_correction</text>
 </g>
-<!-- proc~cross_product -->
-<g id="node2" class="node"><title>proc~cross_product</title>
-<a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="204,-26 124,-26 124,-1.24345e-14 204,-3.55271e-15 204,-26"/>
-<text text-anchor="middle" x="164" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+<!-- proc~pitch_to_vec -->
+<g id="node2" class="node"><title>proc~pitch_to_vec</title>
+<a xlink:href="../proc/pitch_to_vec.html" xlink:title="pitch_to_vec">
+<polygon fill="#d9534f" stroke="#d9534f" points="197,-114 125,-114 125,-88 197,-88 197,-114"/>
+<text text-anchor="middle" x="161" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pitch_to_vec</text>
 </a>
 </g>
-<!-- proc~gyro_correction&#45;&gt;proc~cross_product -->
-<g id="edge2" class="edge"><title>proc~gyro_correction&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M87.6622,-13C96.1394,-13 105.088,-13 113.757,-13"/>
-<polygon fill="#000000" stroke="#000000" points="113.76,-16.5001 123.76,-13 113.76,-9.5001 113.76,-16.5001"/>
+<!-- proc~gyro_correction&#45;&gt;proc~pitch_to_vec -->
+<g id="edge8" class="edge"><title>proc~gyro_correction&#45;&gt;proc~pitch_to_vec</title>
+<path fill="none" stroke="#000000" d="M78.7871,-70.0823C90.7035,-74.5637 104.2,-79.6394 116.762,-84.3636"/>
+<polygon fill="#000000" stroke="#000000" points="115.553,-87.648 126.145,-87.8921 118.017,-81.096 115.553,-87.648"/>
+</g>
+<!-- proc~randu -->
+<g id="node3" class="node"><title>proc~randu</title>
+<a xlink:href="../proc/randu.html" xlink:title="randu">
+<polygon fill="#d9534f" stroke="#d9534f" points="188,-70 134,-70 134,-44 188,-44 188,-70"/>
+<text text-anchor="middle" x="161" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+</a>
+</g>
+<!-- proc~gyro_correction&#45;&gt;proc~randu -->
+<g id="edge10" class="edge"><title>proc~gyro_correction&#45;&gt;proc~randu</title>
+<path fill="none" stroke="#000000" d="M87.5665,-57C99.4053,-57 112.119,-57 123.584,-57"/>
+<polygon fill="#000000" stroke="#000000" points="123.703,-60.5001 133.703,-57 123.702,-53.5001 123.703,-60.5001"/>
+</g>
+<!-- proc~gyro_step -->
+<g id="node4" class="node"><title>proc~gyro_step</title>
+<a xlink:href="../proc/gyro_step.html" xlink:title="gyro_step">
+<polygon fill="#d9534f" stroke="#d9534f" points="191,-26 131,-26 131,-1.24345e-14 191,-3.55271e-15 191,-26"/>
+<text text-anchor="middle" x="161" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
+</a>
+</g>
+<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
+<g id="edge12" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M78.7871,-43.9177C92.1212,-38.9031 107.434,-33.1445 121.202,-27.9667"/>
+<polygon fill="#000000" stroke="#000000" points="122.776,-31.1142 130.904,-24.3181 120.312,-24.5622 122.776,-31.1142"/>
+</g>
+<!-- proc~rng_uniform -->
+<g id="node5" class="node"><title>proc~rng_uniform</title>
+<a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="328,-114 258,-114 258,-88 328,-88 328,-114"/>
+<text text-anchor="middle" x="293" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
+</a>
+</g>
+<!-- proc~randu&#45;&gt;proc~rng_uniform -->
+<g id="edge2" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
+<path fill="none" stroke="#000000" d="M188.031,-66.0102C205.402,-71.8008 228.386,-79.4619 248.417,-86.1389"/>
+<polygon fill="#000000" stroke="#000000" points="247.382,-89.4833 257.976,-89.3252 249.596,-82.8425 247.382,-89.4833"/>
+</g>
+<!-- omp_get_thread_num -->
+<g id="node6" class="node"><title>omp_get_thread_num</title>
+<polygon fill="#777777" stroke="#777777" points="352,-70 234,-70 234,-44 352,-44 352,-70"/>
+<text text-anchor="middle" x="293" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
+</g>
+<!-- proc~randu&#45;&gt;omp_get_thread_num -->
+<g id="edge4" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
+<path fill="none" stroke="#000000" d="M188.031,-57C198.506,-57 211.021,-57 223.699,-57"/>
+<polygon fill="#000000" stroke="#000000" points="223.865,-60.5001 233.865,-57 223.865,-53.5001 223.865,-60.5001"/>
+</g>
+<!-- proc~cross_product -->
+<g id="node9" class="node"><title>proc~cross_product</title>
+<a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="333,-26 253,-26 253,-1.24345e-14 333,-3.55271e-15 333,-26"/>
+<text text-anchor="middle" x="293" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+</a>
+</g>
+<!-- proc~gyro_step&#45;&gt;proc~cross_product -->
+<g id="edge6" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M191.283,-13C206.554,-13 225.475,-13 242.841,-13"/>
+<polygon fill="#000000" stroke="#000000" points="242.847,-16.5001 252.847,-13 242.847,-9.5001 242.847,-16.5001"/>
 </g>
 </g>
 </svg>
@@ -964,136 +1077,114 @@ implementation in a submodule of an interface in a parent module.
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
 <!-- Title: proc~~gyro_correction~~CalledByGraph Pages: 1 -->
-<svg id="procgyro_correctionCalledByGraph" width="404pt" height="247pt"
- viewBox="0.00 0.00 404.00 247.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~gyro_correction~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 243)">
+<svg id="procgyro_correctionCalledByGraph" width="442pt" height="165pt"
+ viewBox="0.00 0.00 442.00 165.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~gyro_correction~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 161)">
 <title>proc~~gyro_correction~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-243 401,-243 401,5 -4,5"/>
+<polygon fill="white" stroke="white" points="-4,5 -4,-161 439,-161 439,5 -4,5"/>
 <!-- proc~gyro_correction -->
 <g id="node1" class="node"><title>proc~gyro_correction</title>
-<polygon fill="none" stroke="black" points="395,-151 309,-151 309,-125 395,-125 395,-151"/>
-<text text-anchor="middle" x="352" y="-135.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_correction</text>
+<polygon fill="none" stroke="black" points="433,-113 347,-113 347,-87 433,-87 433,-113"/>
+<text text-anchor="middle" x="390" y="-97.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_correction</text>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node2" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="272,-239 180,-239 180,-213 272,-213 272,-239"/>
-<text text-anchor="middle" x="226" y="-223.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+<!-- proc~read_mc -->
+<g id="node2" class="node"><title>proc~read_mc</title>
+<a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="291,-113 237,-113 237,-87 291,-87 291,-113"/>
+<text text-anchor="middle" x="264" y="-97.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
 </a>
 </g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge18" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M256.265,-212.826C261.631,-210.127 267.075,-207.143 272,-204 293.327,-190.391 315.343,-171.839 330.866,-157.869"/>
-<polygon fill="#000000" stroke="#000000" points="333.33,-160.36 338.354,-151.032 328.61,-155.19 333.33,-160.36"/>
-</g>
-<!-- proc~fida_mc -->
-<g id="node3" class="node"><title>proc~fida_mc</title>
-<a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="253,-195 199,-195 199,-169 253,-169 253,-195"/>
-<text text-anchor="middle" x="226" y="-179.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
-</a>
-</g>
-<!-- proc~fida_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge20" class="edge"><title>proc~fida_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M253.03,-172.561C268.161,-167.277 287.455,-160.539 304.982,-154.419"/>
-<polygon fill="#000000" stroke="#000000" points="306.213,-157.697 314.5,-151.095 303.905,-151.088 306.213,-157.697"/>
-</g>
-<!-- proc~npa_weights -->
-<g id="node4" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="262,-151 190,-151 190,-125 262,-125 262,-151"/>
-<text text-anchor="middle" x="226" y="-135.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
-</a>
-</g>
-<!-- proc~npa_weights&#45;&gt;proc~gyro_correction -->
-<g id="edge22" class="edge"><title>proc~npa_weights&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M262.783,-138C273.795,-138 286.107,-138 297.984,-138"/>
-<polygon fill="#000000" stroke="#000000" points="298.266,-141.5 308.266,-138 298.266,-134.5 298.266,-141.5"/>
+<!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge16" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M291.651,-100C304.6,-100 320.495,-100 335.7,-100"/>
+<polygon fill="#000000" stroke="#000000" points="336.072,-103.5 346.072,-100 336.072,-96.5001 336.072,-103.5"/>
 </g>
 <!-- proc~mc_fastion -->
-<g id="node5" class="node"><title>proc~mc_fastion</title>
+<g id="node3" class="node"><title>proc~mc_fastion</title>
 <a xlink:href="../proc/mc_fastion.html" xlink:title="mc_fastion">
-<polygon fill="#d9534f" stroke="#d9534f" points="258,-69 194,-69 194,-43 258,-43 258,-69"/>
-<text text-anchor="middle" x="226" y="-53.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_fastion</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="296,-69 232,-69 232,-43 296,-43 296,-69"/>
+<text text-anchor="middle" x="264" y="-53.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_fastion</text>
 </a>
 </g>
 <!-- proc~mc_fastion&#45;&gt;proc~gyro_correction -->
-<g id="edge24" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M249.125,-69.1399C256.502,-73.4469 264.655,-78.3282 272,-83 290.07,-94.4941 309.91,-108.128 325.312,-118.945"/>
-<polygon fill="#000000" stroke="#000000" points="323.633,-122.044 333.821,-124.952 327.67,-116.325 323.633,-122.044"/>
+<g id="edge18" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M296.121,-67.2169C310.371,-72.193 327.42,-78.1468 343.056,-83.607"/>
+<polygon fill="#000000" stroke="#000000" points="341.977,-86.9372 352.572,-86.9298 344.285,-80.3285 341.977,-86.9372"/>
 </g>
-<!-- proc~npa_mc -->
-<g id="node6" class="node"><title>proc~npa_mc</title>
-<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-114 90,-114 90,-88 144,-88 144,-114"/>
-<text text-anchor="middle" x="117" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<!-- proc~fida_weights_mc -->
+<g id="node4" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-157 218,-157 218,-131 310,-131 310,-157"/>
+<text text-anchor="middle" x="264" y="-141.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
 </a>
 </g>
-<!-- proc~npa_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge26" class="edge"><title>proc~npa_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M144.077,-102.209C175.167,-103.922 227.6,-107.809 272,-116 281.154,-117.689 290.785,-119.927 300.068,-122.329"/>
-<polygon fill="#000000" stroke="#000000" points="299.401,-125.774 309.966,-124.983 301.213,-119.013 299.401,-125.774"/>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge20" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M301.463,-130.918C314.422,-126.392 329.116,-121.261 342.757,-116.498"/>
+<polygon fill="#000000" stroke="#000000" points="344.177,-119.709 352.464,-113.108 341.869,-113.1 344.177,-119.709"/>
+</g>
+<!-- proc~read_distribution -->
+<g id="node5" class="node"><title>proc~read_distribution</title>
+<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
+<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
+</a>
+</g>
+<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
+<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.211,-100.639C196.705,-100.526 212.522,-100.402 226.35,-100.294"/>
+<polygon fill="#000000" stroke="#000000" points="226.51,-103.793 236.482,-100.215 226.455,-96.7933 226.51,-103.793"/>
 </g>
 <!-- program~fidasim -->
-<g id="node7" class="node"><title>program~fidasim</title>
+<g id="node6" class="node"><title>program~fidasim</title>
 <a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-134 2.13163e-14,-134 0,-108 54,-108 54,-134"/>
-<text text-anchor="middle" x="27" y="-118.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-92 2.13163e-14,-92 0,-66 54,-66 54,-92"/>
+<text text-anchor="middle" x="27" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M44.9998,-134.081C57.3526,-142.785 74.2907,-154.194 90,-163 120.964,-180.357 157.547,-197.105 184.967,-208.964"/>
-<polygon fill="#000000" stroke="#000000" points="183.689,-212.225 194.259,-212.948 186.447,-205.791 183.689,-212.225"/>
+<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M41.329,-92.1238C53.3808,-102.349 71.5552,-115.954 90,-123 127.642,-137.379 172.901,-142.501 207.824,-144.095"/>
+<polygon fill="#000000" stroke="#000000" points="207.723,-147.594 217.847,-144.47 207.985,-140.599 207.723,-147.594"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_mc -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
-<path fill="none" stroke="#000000" d="M54.2199,-130.309C65.292,-134.034 78.2291,-138.308 90,-142 123.317,-152.449 161.476,-163.602 188.877,-171.469"/>
-<polygon fill="#000000" stroke="#000000" points="188.243,-174.928 198.82,-174.315 190.169,-168.198 188.243,-174.928"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M54.2528,-123.328C86.4012,-126.074 140.381,-130.686 179.252,-134.006"/>
-<polygon fill="#000000" stroke="#000000" points="179.022,-137.499 189.284,-134.863 179.618,-130.525 179.022,-137.499"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge16" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M54.003,-114.999C62.1158,-113.196 71.1631,-111.186 79.8131,-109.264"/>
-<polygon fill="#000000" stroke="#000000" points="80.7024,-112.652 89.705,-107.066 79.1839,-105.818 80.7024,-112.652"/>
+<!-- program~fidasim&#45;&gt;proc~read_distribution -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<path fill="none" stroke="#000000" d="M54.2241,-84.4948C62.0126,-86.0668 70.8024,-87.8409 79.6572,-89.6281"/>
+<polygon fill="#000000" stroke="#000000" points="79.1374,-93.0936 89.6322,-91.6414 80.5223,-86.232 79.1374,-93.0936"/>
 </g>
 <!-- proc~fida_f -->
-<g id="node11" class="node"><title>proc~fida_f</title>
+<g id="node9" class="node"><title>proc~fida_f</title>
 <a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-70 90,-70 90,-44 144,-44 144,-70"/>
-<text text-anchor="middle" x="117" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
+<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M45.6481,-107.739C58.5247,-98.5824 75.8462,-86.2649 90.1979,-76.0593"/>
-<polygon fill="#000000" stroke="#000000" points="92.5625,-78.6725 98.6838,-70.0249 88.5058,-72.9678 92.5625,-78.6725"/>
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<path fill="none" stroke="#000000" d="M54.2241,-73.5052C67.6197,-70.8015 83.9774,-67.5 98.533,-64.5621"/>
+<polygon fill="#000000" stroke="#000000" points="99.6353,-67.9103 108.745,-62.501 98.2503,-61.0487 99.6353,-67.9103"/>
 </g>
 <!-- proc~npa_f -->
-<g id="node12" class="node"><title>proc~npa_f</title>
+<g id="node10" class="node"><title>proc~npa_f</title>
 <a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
-<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
+<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M35.0396,-107.973C46.2019,-90.41 67.5668,-58.6185 90,-35 90.6376,-34.3287 91.2956,-33.659 91.9691,-32.993"/>
-<polygon fill="#000000" stroke="#000000" points="94.5099,-35.4139 99.5685,-26.1047 89.8087,-30.2275 94.5099,-35.4139"/>
+<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M44.1447,-65.8796C56.5362,-56.6851 73.8651,-44.4079 90,-35 93.1689,-33.1523 96.5172,-31.3263 99.9037,-29.5635"/>
+<polygon fill="#000000" stroke="#000000" points="101.49,-32.6837 108.86,-25.073 98.3523,-26.4261 101.49,-32.6837"/>
 </g>
 <!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
-<g id="edge12" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
-<path fill="none" stroke="#000000" d="M144.224,-56.7502C156.066,-56.6416 170.223,-56.5117 183.403,-56.3908"/>
-<polygon fill="#000000" stroke="#000000" points="183.733,-59.888 193.701,-56.2963 183.669,-52.8883 183.733,-59.888"/>
+<g id="edge10" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
+<path fill="none" stroke="#000000" d="M163.146,-56.7879C180.19,-56.6548 202.524,-56.4803 221.842,-56.3294"/>
+<polygon fill="#000000" stroke="#000000" points="221.945,-59.8288 231.917,-56.2506 221.89,-52.829 221.945,-59.8288"/>
 </g>
 <!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
-<g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
-<path fill="none" stroke="#000000" d="M144.224,-23.7398C156.3,-28.5039 170.784,-34.2176 184.185,-39.504"/>
-<polygon fill="#000000" stroke="#000000" points="183.114,-42.8442 193.701,-43.2581 185.683,-36.3325 183.114,-42.8442"/>
+<g id="edge12" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
+<path fill="none" stroke="#000000" d="M163.146,-22.1192C180.347,-27.8978 202.936,-35.4864 222.375,-42.0167"/>
+<polygon fill="#000000" stroke="#000000" points="221.323,-45.3554 231.917,-45.2221 223.552,-38.7198 221.323,-45.3554"/>
 </g>
 </g>
 </svg>
@@ -1221,21 +1312,38 @@ implementation in a submodule of an interface in a parent module.
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">r_gyro</span><span class="p">)</span>
-    <span class="c">!+ Calculates gyro correction</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vi</span>
-        <span class="c">!+ Ion velocity</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="n">vp</span><span class="p">)</span>
+    <span class="c">!+ Calculates gyro correction for Guiding Center MC distribution calculation</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">fields</span>
-        <span class="c">!+ Electro-magnetic fields</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r_gyro</span>
-        <span class="c">!+ Gyro-step</span>
+        <span class="c">!+ Electromagnetic fields at guiding center</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">rg</span>
+        <span class="c">!+ Gyro-center position</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">energy</span>
+        <span class="c">!+ Energy of particle</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">pitch</span>
+        <span class="c">!+ Particle pitch w.r.t the magnetic field</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rp</span>
+        <span class="c">!+ Particle position</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vp</span>
+        <span class="c">!+ Particle velocity</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vxB</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">one_over_omega</span>
- 
-    <span class="n">one_over_omega</span><span class="o">=</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">*</span><span class="n">mass_u</span><span class="o">/</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span>
-    <span class="n">vxB</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span>
-    <span class="n">r_gyro</span> <span class="o">=</span> <span class="n">vxB</span><span class="o">*</span><span class="n">one_over_omega</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi_norm</span><span class="p">,</span> <span class="n">r_step</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">phi</span>
+
+    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="p">))</span>
+
+    <span class="c">!! Sample gyroangle according to radius to counter-act geometric effect</span>
+    <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c">!! Calculate velocity vector</span>
+    <span class="k">call </span><span class="n">pitch_to_vec</span><span class="p">(</span><span class="n">pitch</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">vi_norm</span><span class="p">)</span>
+    <span class="n">vp</span> <span class="o">=</span> <span class="n">vabs</span><span class="o">*</span><span class="n">vi_norm</span>
+
+    <span class="c">!! Move to particle location</span>
+    <span class="k">call </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">r_step</span><span class="p">)</span>
+    <span class="n">rp</span> <span class="o">=</span> <span class="n">rg</span> <span class="o">-</span> <span class="n">r_step</span>
 
 <span class="k">end subroutine </span><span class="n">gyro_correction</span>
 </pre></div>
@@ -1255,6 +1363,12 @@ implementation in a submodule of an interface in a parent module.
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
   <div id="allprocs-1" class="panel-collapse collapse">
     <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
       
       <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
       
@@ -1364,6 +1478,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
       
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1454,6 +1570,8 @@ implementation in a submodule of an interface in a parent module.
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
       <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
@@ -1499,6 +1617,8 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
       
       <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
@@ -1567,8 +1687,6 @@ implementation in a submodule of an interface in a parent module.
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
-      <a class="list-group-item" href="../proc/normp.html">normp</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

@@ -1,5 +1,19 @@
 SHELL = /bin/bash
 
+#Default compiling options
+USE_OPENMP = y
+PROFILE = n
+DEBUG = n
+
+# Directories
+FIDASIM_DIR := $(shell pwd)
+SRC_DIR = $(FIDASIM_DIR)/src
+DEPS_DIR = $(FIDASIM_DIR)/deps
+TABLES_DIR = $(FIDASIM_DIR)/tables
+LIB_DIR = $(FIDASIM_DIR)/lib
+DOCS_DIR = $(FIDASIM_DIR)/docs
+
+#Compilers
 SUPPORTED_FC = gfortran ifort
 SUPPORTED_CC = gcc icc
 SUPPORTED_CXX = g++ icpc
@@ -19,21 +33,60 @@ ifeq ($(HAS_CXX),)
     $(error C++ compiler $(CXX) is not supported. Set CXX to g++ or icpc)
 endif
 
-# directories
-FIDASIM_DIR := $(shell pwd)
-SRC_DIR = $(FIDASIM_DIR)/src
-DEPS_DIR = $(FIDASIM_DIR)/deps
-TABLES_DIR = $(FIDASIM_DIR)/tables
-LIB_DIR = $(FIDASIM_DIR)/lib
-DOCS_DIR = $(FIDASIM_DIR)/docs
+# Compiler Flags
+# User defined Flags
+VERSION := $(shell [ -e $(FIDASIM_DIR)/VERSION ] && cat $(FIDASIM_DIR)/VERSION)
+ifneq ($(VERSION),)
+	UFLAGS := -D_VERSION=\"$(VERSION)\" 
+endif
+
+BUILD := $(shell command -v git >/dev/null 2>&1 && \
+	[ -d $(FIDASIM_DIR)/.git ] && \
+	git describe --tags --always --dirty)
+
+ifneq ($(BUILD),)
+	UFLAGS := -D_VERSION=\"$(BUILD)\"
+endif
 
 # HDF5 variables
 HDF5_LIB = $(DEPS_DIR)/hdf5/lib
 HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
 HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl -Wl,-rpath,$(HDF5_LIB)
 
+ifneq ($(findstring gfortran, $(FC)),)
+	LFLAGS = -lm
+	CFLAGS = -Ofast -g -fbacktrace -cpp
+	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
+	OPENMP_FLAGS = -fopenmp -D_OMP
+	PROF_FLAGS = -pg -D_PROF
+endif
+
+ifneq ($(findstring ifort, $(FC)),)
+	LFLAGS = -limf -lm
+	CFLAGS = -O2 -g -traceback -fpp
+	DEBUG_CFLAGS = -O0 -g -fpp -traceback -debug all -check all -check bounds -fpe0 -warn -D_DEBUG
+	OPENMP_FLAGS = -openmp -D_OMP
+	PROF_FLAGS = -p -D_PROF
+endif
+
+ifeq ($(PROFILE),n)
+ifeq ($(USE_OPENMP),y)
+	CFLAGS := $(CFLAGS) $(UFLAGS) $(OPENMP_FLAGS)
+else
+	CFLAGS := $(CFLAGS) $(UFLAGS)
+endif
+else
+	CFLAGS := $(CFLAGS) $(UFLAGS) $(PROF_FLAGS)
+endif
+
+ifeq ($(DEBUG),y)
+	CFLAGS := $(DEBUG_CFLAGS) $(UFLAGS)
+endif
+
+LFLAGS := $(LFLAGS) $(HDF5_FLAGS) -L$(SRC_DIR)
+IFLAGS := -I$(HDF5_INCLUDE) -I$(SRC_DIR)
+
 # atomic table variables
-OUTPUT_DIR = $(TABLES_DIR)
 NTHREADS = 1000 
 
 # FORD documentation variables
@@ -44,20 +97,12 @@ export FIDASIM_DIR
 export SRC_DIR
 export DEPS_DIR
 export TABLES_DIR
-export HDF5_LIB
-export HDF5_INCLUDE
-export HDF5_FLAGS
-export OUTPUT_DIR
+export CFLAGS
+export LFLAGS
+export IFLAGS
 export NTHREADS
-export CHECK_LINKS
 
 fidasim: deps src tables
-
-debug: clean
-debug: fidasim_debug
-
-fidasim_debug: deps
-	@cd $(SRC_DIR); make DEBUG=y
 
 .PHONY: deps
 deps:

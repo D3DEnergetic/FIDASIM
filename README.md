@@ -10,6 +10,7 @@ Click [here](http://d3denergetic.github.io/FIDASIM/) for full user documentation
 
 ## Contributing Guidelines
 If you would like to add code to FIDASIM please follow these guidelines
+
 1. Use spaces to indent code not tabs
 2. Don't push directly to `master`. All new work should be on a feature branch prefixed with your initials, e.g. `ls/newfeature`. When you think you are done open a pull request so it can undergo code review.
 3. Add inline documentation as you go. Follow existing documentation format.

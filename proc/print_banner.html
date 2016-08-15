@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.2% of total for procedures.">14 statements</a>
+	  title=" 0.3% of total for procedures.">26 statements</a>
      </li> 
      
      
@@ -978,6 +978,29 @@ implementation in a submodule of an interface in a parent module.
     <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;FIDASIM is released as open source code under the MIT Licence.&quot;</span>
     <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;For more information visit http://d3denergetic.github.io/FIDASIM/&quot;</span>
     <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&quot;</span>
+
+<span class="cp">#ifdef _DEBUG</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;########################### ATTENTION ###########################&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;# Running in debug mode. All optimizations have been turned off #&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;#################################################################&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&quot;</span>
+<span class="cp">#endif</span>
+
+<span class="cp">#ifdef _PROF</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;########################### ATTENTION ###########################&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;#                   Running in profiling mode                   #&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;#################################################################&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&quot;</span>
+<span class="cp">#endif</span>
+
+<span class="cp">#ifdef _OMP</span>
+<span class="cp">#else</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;########################### ATTENTION ###########################&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;#              OpenMP threading has been disabled               #&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;#################################################################&quot;</span>
+    <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&quot;</span>
+<span class="cp">#endif</span>
+
 <span class="k">end subroutine </span><span class="n">print_banner</span>
 </pre></div>
 

@@ -882,6 +882,29 @@ subroutine print_banner()
     write(*,'(a)') "FIDASIM is released as open source code under the MIT Licence."
     write(*,'(a)') "For more information visit http://d3denergetic.github.io/FIDASIM/"
     write(*,'(a)') ""
+
+#ifdef _DEBUG
+    write(*,'(a)') "########################### ATTENTION ###########################"
+    write(*,'(a)') "# Running in debug mode. All optimizations have been turned off #"
+    write(*,'(a)') "#################################################################"
+    write(*,'(a)') ""
+#endif
+
+#ifdef _PROF
+    write(*,'(a)') "########################### ATTENTION ###########################"
+    write(*,'(a)') "#                   Running in profiling mode                   #"
+    write(*,'(a)') "#################################################################"
+    write(*,'(a)') ""
+#endif
+
+#ifdef _OMP
+#else
+    write(*,'(a)') "########################### ATTENTION ###########################"
+    write(*,'(a)') "#              OpenMP threading has been disabled               #"
+    write(*,'(a)') "#################################################################"
+    write(*,'(a)') ""
+#endif
+
 end subroutine print_banner
 
 !============================================================================

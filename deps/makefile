@@ -23,4 +23,4 @@ openblas:
 	@printf "OpenBLAS build complete\n\n"
 
 clean:
-	-rm -rf hdf5 hdf5-1.8.16 
+	-rm -rf hdf5 hdf5-1.8.16 openblas OpenBLAS-0.2.18

@@ -25,10 +25,10 @@ text-align: center;
 {: style="text-align: center"}
 
 An NPA detector is defined by an aperture for which neutral particles must pass through and an detector.
-The aperture/detectors are defined by three points and a shape as shown above.
+The aperture/detectors are defined by three points and a shape as shown in the figures above.
 It is assumed that between the aperture and the detector that particles travel in straight lines i.e. there is no stripping foil.
 
-The full definition of the NPA detector is given below
+The full definition of the NPA detector is given below (right and left as implied by looking through the aperture at the detector)
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 

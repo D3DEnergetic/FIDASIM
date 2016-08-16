@@ -19,7 +19,8 @@ FIDASIM has the following dependencies:
 * Linux because all other operating systems are inferior
 * [Make](https://www.gnu.org/software/make/) for building FIDASIM. 
 * Fortran, C, and C++ compilers.
-  [GNU(v4.6 and above)](https://gcc.gnu.org/) and [Intel](https://software.intel.com/en-us/intel-compilers) compilers are supported.
+  [GNU(>v4.6)](https://gcc.gnu.org/) and [Intel(>13)](https://software.intel.com/en-us/intel-compilers) compilers are supported.
+  Note you cannot mix and match different compilers.
 * [IDL](http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx) for pre-processing.
 * [zlib](http://zlib.net/) for file compression.
 * [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)

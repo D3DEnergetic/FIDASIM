@@ -10,7 +10,7 @@
     <meta name="author" content="Chris MacMackin" >
     <link rel="icon" href="../../favicon.png">
 
-    <title>Running FIDASIM &ndash; FIDASIM</title>
+    <title>Troubleshooting &ndash; FIDASIM</title>
 
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/pygments.css" rel="stylesheet">
@@ -113,7 +113,7 @@
     <div class="container">
     
   <div class="row">
-    <h1>Running FIDASIM</h1>
+    <h1>Troubleshooting</h1>
     <div class="row">
     <div class="col-lg-12">
     <div class="well well-sm" style="min-height: 40px;">
@@ -128,9 +128,9 @@
       
          <li><a href='../../page/index.html'>User Guide</a></li>
       
-         <li><a href='../../page/01_getting_started/index.html'>Getting Started</a></li>
+         <li><a href='../../page/03_technical/index.html'>Technical Details</a></li>
       
-         <li class="active">Running FIDASIM</li>
+         <li class="active">Troubleshooting</li>
       </ol>
     </div>
     </div>
@@ -139,204 +139,33 @@
   
   <div class="row">
     <div class="col-md-9 col-md-push-3" id='text'>
-      <h1 id="running-fidasim">Running FIDASIM</h1>
+      <p>This page documents the common problems people encounter while running FIDASIM.
+Please try these solutions before <a href="https://github.com/D3DEnergetic/FIDASIM/issues/new">opening an issue</a> on Github.</p>
 <div class="toc">
 <ul>
-<li><a href="#running-fidasim">Running FIDASIM</a><ul>
-<li><a href="#recommended-hardware">Recommended Hardware</a></li>
-<li><a href="#running-interactively">Running Interactively</a></li>
-<li><a href="#submitting-to-a-sun-grid-engine-cluster-using-submit_fidasim">Submitting to a Sun Grid Engine cluster using submit_fidasim</a></li>
-</ul>
-</li>
+<li><a href="#segfaults">Segfaults</a></li>
+<li><a href="#execution-hangs">Execution Hangs</a></li>
 </ul>
 </div>
-<p>Running FIDASIM is as easy as running</p>
-<div class="codehilite"><pre><span></span>lstagner@computer:~/FIDASIM$ ./fidasim 
-   ____ ____ ___   ___    ____ ____ __  ___
-  / __//  _// _ \ / _ |  / __//  _//  |/  /
- / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
-/_/  /___//____//_/ |_|/___//___//_/  /_/  
-
-Version: 1.0.0
-
-FIDASIM is released as open source code under the MIT Licence.
-For more information visit http://d3denergetic.github.io/FIDASIM/
-
-usage: ./fidasim namelist_file [num_threads]
+<hr>
+<h1 id="segfaults">Segfaults</h1>
+<p>If you encounter a segfault make sure you have set the stacksize limit to unlimited.</p>
+<p>To do this for the bash shell run</p>
+<div class="codehilite"><pre><span></span><span class="nb">ulimit</span> -s unlimited
 </pre></div>
 
 
-<p>Actually having FIDASIM produce something takes a bit of thought</p>
-<h2 id="recommended-hardware">Recommended Hardware</h2>
-<p>The following settings will give a reasonable runtime.</p>
-<ul>
-<li>32 threads on a shared memory node (All calculations are done on a single node)</li>
-<li>At least 2 GB of memory</li>
-</ul>
-<p></p><div class="alert alert-warning" role="alert"><h4>Warning</h4><p>By default FIDASIM will use all the threads available. If another process is hogging a core it will cause FIDASIM to stall. To prevent this use the <code>num_threads</code> optional argument</p></div>
-<h2 id="running-interactively">Running Interactively</h2>
-<div class="codehilite"><pre><span></span>[lstagner@dawson061]% ./fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat 16
-   ____ ____ ___   ___    ____ ____ __  ___
-  / __//  _// _ \ / _ |  / __//  _//  |/  /
- / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
-/_/  /___//____//_/ |_|/___//___//_/  /_/  
-
-Version: 1.0.0
-
-FIDASIM is released as open source code under the MIT Licence.
-For more information visit http://d3denergetic.github.io/FIDASIM/
-
----- Shot settings ----
- Shot:        1
- Time: 1000 [ms]
- Runid: test_1a
-
----- Input files ----
- Tables file: /u/lstagner/FIDASIM/tables/atomic_tables.h5
- Geometry file: /p/fida/lstagner/TEST/test_1a_geometry.h5
- Equilibrium file: /p/fida/lstagner/TEST/test_1a_equilibrium.h5
- Distribution file: /p/fida/lstagner/TEST/test_1a_distribution.h5
-
----- OpenMP settings ----
- Number of threads: 16
-
----- Beam grid settings ----
- Nx:  50
- Ny:  60
- Nz:  70
- dV:  8.00 [cm^3]
- alpha:  0.00 [rad]
- beta:   0.00 [rad]
- gamma:  0.00 [rad]
- origin: [   0.00,   0.00,   0.00] [cm]
-
----- Interpolation grid settings ----
- Nr:  70
- Nz: 100
- dA: 4.10 [cm^2]
-
----- Neutral beam settings ----
- Beam: test_beam               
- Power:    1.70 [MW]
- Voltage: 72.50 [keV]
-
----- Atomic tables settings ----
- Maximum n/m:  6
- Beam/Fast-ion mass:  2.014 [amu]
- Thermal/Bulk-ion mass:  2.014 [amu]
- Impurity mass: 12.011 [amu]
-
----- Fast-ion distribution settings ----
- Distribution type: Fast-ion Density Function F(energy,pitch,R,Z)
- Nenergy =   6
- Npitch  =   6
- Energy range = [67.33, 75.44]
- Pitch  range = [-0.10, 0.10]
-
----- FIDA/BES settings ----
- FIDA/BES System: SPECTRAL
- Number of channels:   3
-
----- NPA settings ----
- NPA System: NPA
- Number of channels:   3
- Calculating hit probabilities for NPA channels
-
-ndmc:     1:43:23
-     # of markers:     50000
-   birth profile written to: /p/fida/lstagner/TEST/test_1a_birth.h5
-
-dcx:      1:43:41
-     # of markers:    505020
-   dcx written to: /p/fida/lstagner/TEST/test_1a_dcx.h5
-
-halo:     1:44:32
-     # of markers:    505180
-     # of markers:    310573
-     # of markers:    188148
-     # of markers:    110872
-     # of markers:     62806
-     # of markers:     32484
-     # of markers:     13881
-   neutral density written to: /p/fida/lstagner/TEST/test_1a_neutrals.h5
-
-bremsstrahlung:     1:46:25
-
-fida:     1:46:25
-     # of markers:   5049813
-
-   Spectra written to: /p/fida/lstagner/TEST/test_1a_spectra.h5
-
-npa:     1:47:46
-     # of markers:    505074
-Number of NPA particles that hit a detector:   125638
-
-   NPA data written to: /p/fida/lstagner/TEST/test_1a_npa.h5
-
-fida weight function:     1:49:46
- Number of Channels:   3
- Nlambda: 1000
- Nenergy:  50
- Npitch:  50
- Ngyro: 100
- Maximum Energy:  100.00
- LOS averaged: True
-
-   Channel:   1
-   Radius:  200.00
-   Mean Fast-ion Density:    7.97429E+11
-
-   Channel:   2
-   Radius:  170.00
-   Mean Fast-ion Density:    7.98346E+11
-
-   Channel:   3
-   Radius:  140.00
-   Mean Fast-ion Density:    7.98330E+11
-
-   FIDA weights written to: /p/fida/lstagner/TEST/test_1a_fida_weights.h5
-
-npa weight function:     1:50:02
- Number of Channels:   3
- Nenergy:  50
- Npitch:  50
- Maximum energy:  100.00
-
-   Channel:   1
-   Radius:    200.000
-   Flux:      1.22243E+14
-   Weight:    3.79893E+03
-
-   Channel:   2
-   Radius:    170.000
-   Flux:      1.07364E+14
-   Weight:    1.85565E+03
-
-   Channel:   3
-   Radius:    140.000
-   Flux:      3.46488E+13
-   Weight:    8.81099E+02
-
-   NPA weights written to: /p/fida/lstagner/TEST/test_1a_npa_weights.h5
-
-END: hour, minute, second:  1:53:07
-duration:                   0:15:53
+<p>or for the tcsh shell run</p>
+<div class="codehilite"><pre><span></span><span class="nb">limit </span>stacksize unlimited
 </pre></div>
 
 
-<h2 id="submitting-to-a-sun-grid-engine-cluster-using-submit_fidasim">Submitting to a Sun Grid Engine cluster using <code>submit_fidasim</code></h2>
-<p><code>submit_fidasim</code> is a python routine that submits a FIDASIM job to a SGE cluster using <code>qsub</code>. For example</p>
-<div class="codehilite"><pre><span></span>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
+<h1 id="execution-hangs">Execution Hangs</h1>
+<p>By default FIDASIM will use all the threads available. 
+If another process is hogging a core it will cause FIDASIM to stall.
+To prevent this use the <code>num_threads</code> optional argument as shown below</p>
+<div class="codehilite"><pre><span></span>fidasim ./test_1a_inputs.dat 8
 </pre></div>
-
-
-<p>will submit any incomplete FIDASIM runs in the <code>/u/lstagner/TEST</code> directory. Alternatively</p>
-<div class="codehilite"><pre><span></span>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST/test_1a_inputs.dat
-</pre></div>
-
-
-<p>will submit just the <code>test_1a</code> FIDASIM run.
-Run <code>submit_fidasim -h</code> for the full documentation.</p>
     </div>
     
     <div class="col-md-3 col-md-pull-9">
@@ -363,7 +192,7 @@ Run <code>submit_fidasim -h</code> for the full documentation.</p>
             
             </li>
             
-            <li role="presentation" class="disabled">
+            <li role="presentation">
             <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
             
             </li>
@@ -436,7 +265,7 @@ Run <code>submit_fidasim -h</code> for the full documentation.</p>
             
             </li>
             
-            <li role="presentation">
+            <li role="presentation" class="disabled">
             <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
             
             </li>

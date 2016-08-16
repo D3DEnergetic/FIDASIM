@@ -17,10 +17,15 @@ hdf5:
 openblas:
 	@printf "Building OpenBLAS...\n"
 	tar -zxvf $(DEPS_DIR)/OpenBLAS-0.2.18.tar.gz > /dev/null 2>&1
-	cd $(DEPS_DIR)/OpenBLAS-0.2.18; make DYNAMIC_ARCH=1 USE_OPENMP=1
-	cd $(DEPS_DIR)/OpenBLAS-0.2.18; make install PREFIX=$(DEPS_DIR)/openblas
+	cd $(DEPS_DIR)/OpenBLAS-0.2.18; env -i PATH=$(PATH) make USE_OPENMP=1 FC=$(FC) CC=$(CC)
+	cd $(DEPS_DIR)/OpenBLAS-0.2.18; env -i PATH=$(PATH) make install PREFIX=$(DEPS_DIR)/openblas
 	-rm -rf OpenBLAS-0.2.18
 	@printf "OpenBLAS build complete\n\n"
 
-clean:
-	-rm -rf hdf5 hdf5-1.8.16 openblas OpenBLAS-0.2.18
+clean: clean_hdf5 clean_openblas
+
+clean_hdf5:
+	-rm -rf hdf5 hdf5-1.8.16
+
+clean_openblas:
+	-rm -rf openblas OpenBLAS-0.2.18

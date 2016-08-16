@@ -53,6 +53,11 @@ HDF5_LIB = $(DEPS_DIR)/hdf5/lib
 HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
 HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl -Wl,-rpath,$(HDF5_LIB)
 
+# OpenBLAS variables
+BLAS_LIB = $(DEPS_DIR)/openblas/lib
+BLAS_INCLUDE = $(DEPS_DIR)/openblas/include
+BLAS_FLAGS = -L$(BLAS_LIB) -lopenblas -Wl,-rpath,$(BLAS_LIB)
+
 ifneq ($(findstring gfortran, $(FC)),)
 	LFLAGS = -lm
 	CFLAGS = -Ofast -g -fbacktrace -cpp
@@ -83,8 +88,8 @@ ifeq ($(DEBUG),y)
 	CFLAGS := $(DEBUG_CFLAGS) $(UFLAGS)
 endif
 
-LFLAGS := $(LFLAGS) $(HDF5_FLAGS) -L$(SRC_DIR)
-IFLAGS := -I$(HDF5_INCLUDE) -I$(SRC_DIR)
+LFLAGS := $(LFLAGS) $(HDF5_FLAGS) $(BLAS_FLAGS) -L$(SRC_DIR)
+IFLAGS := -I$(HDF5_INCLUDE) -I$(BLAS_INCLUDE) -I$(SRC_DIR)
 
 # atomic table variables
 NTHREADS = 1000 

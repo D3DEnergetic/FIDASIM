@@ -5276,8 +5276,9 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     real(Float64), dimension(nlevs,nlevs) :: eigvec, eigvec_inv
     real(Float64), dimension(nlevs) :: eigval, coef
     real(Float64), dimension(nlevs) :: exp_eigval_dt
+    integer, dimension(nlevs) :: ipiv
     real(Float64) :: iflux !!Initial total flux
-    integer :: n
+    integer :: n,info
 
     photons=0.d0
     dens=0.d0
@@ -5302,8 +5303,10 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     call get_rate_matrix(plasma, i_type, eb, matrix)
 
     call eigen(nlevs,matrix, eigvec, eigval)
-    call matinv(eigvec, eigvec_inv)
-    coef = matmul(eigvec_inv, states)!coeffs determined from states at t=0
+    coef = states
+    call dgesv(nlevs,1,eigvec,nlevs,ipiv,coef,nlevs,info)
+    !call matinv(eigvec, eigvec_inv)
+    !coef = matmul(eigvec_inv, states)!coeffs determined from states at t=0
     exp_eigval_dt = exp(eigval*dt)   ! to improve speed (used twice)
     do n=1,nlevs
         if(eigval(n).eq.0.0) eigval(n)=eigval(n)+1 !protect against dividing by zero

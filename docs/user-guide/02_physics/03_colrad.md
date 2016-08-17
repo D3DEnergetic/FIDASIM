@@ -42,12 +42,14 @@ $$
 
 The system of differential equations can be compactly represented as a matrix multiplication.
 $$
-\frac{d \vec{f}}{dt} = C \cdot \vec{f}
+\frac{d \mathbf{f}}{dt} = \mathbf{C} \cdot \mathbf{f}
 $$
 
-The system of differential equations can be solved analytically to give
-$$\vec{f} (t) = S^{-1} \cdot \vec{f} (0) \cdot S \cdot \exp(\Lambda \,t)$$
-where \(\vec{f}(t)\) is a vector of the neutral population flux [1/s] for each energy state at time \(t\), \(S\) is the matrix of the eigenvectors of \(C\) and \(\Lambda\) is a diagonal matrix containing the eigenvales of \(C\). 
+The solution of this matrix differential equation takes the form of a matrix exponential
+
+$$\mathbf{f}(t) = e^{\mathbf{C} t} \cdot \mathbf{f}(0) = \mathbf{S} \cdot e^{\mathbf{\Lambda} t} \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0)$$
+
+where \(\mathbf{f}(t)\) is a vector of the neutral population flux [1/s] for each energy state at time \(t\), \(\mathbf{S}\) is the matrix of the eigenvectors of \( \mathbf{C} \) and \( \mathbf{\Lambda} \) is a diagonal matrix containing the eigenvalues of \( \mathbf{C} \). 
 The fractional flux of a neutral traveling through a uniform plasma is shown below.
 
 ![](|media|/neutral_attenuation.png)
@@ -55,8 +57,10 @@ The fractional flux of a neutral traveling through a uniform plasma is shown bel
 
 As you can see the relative populations between states converges fairly quickly.
 
-The number of neutrals in a given state after a time \(t\), \(\vec{n}(t)\), is given by
-$$\vec{n}(t) = S^{-1} \cdot \vec{n}(0)\cdot S \cdot (\exp(\Lambda \,t) - 1)/\Lambda$$
+The number of neutrals in a given state after a time \(t\), \(\mathbf{n}(t)\), is given by
+
+$$\mathbf{n}(t) = \mathbf{S} \cdot ( \mathbf{\Lambda}^{-1} \cdot e^{\mathbf{\Lambda} t} - \mathbf{\Lambda}^{-1} ) \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0) $$
+
 If \(t\) represents the time spent inside a grid cell the neutral density can be calculated by dividing the above equation by \(V_{cell}\).
 The total neutral density of a mc marker is shown below.
 

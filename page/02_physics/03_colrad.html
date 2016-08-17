@@ -182,17 +182,17 @@ C_{n,m} = A_{m \rightarrow n} + \sum_{k=e,i,Z} d_k q^k_{m \rightarrow n}
 $$</p>
 <p>The system of differential equations can be compactly represented as a matrix multiplication.
 $$
-\frac{d \vec{f}}{dt} = C \cdot \vec{f}
+\frac{d \mathbf{f}}{dt} = \mathbf{C} \cdot \mathbf{f}
 $$</p>
-<p>The system of differential equations can be solved analytically to give
-$$\vec{f} (t) = S^{-1} \cdot \vec{f} (0) \cdot S \cdot \exp(\Lambda \,t)$$
-where \(\vec{f}(t)\) is a vector of the neutral population flux [1/s] for each energy state at time \(t\), \(S\) is the matrix of the eigenvectors of \(C\) and \(\Lambda\) is a diagonal matrix containing the eigenvales of \(C\). 
+<p>The solution of this matrix differential equation takes the form of a matrix exponential</p>
+<p>$$\mathbf{f}(t) = e^{\mathbf{C} t} \cdot \mathbf{f}(0) = \mathbf{S} \cdot e^{\mathbf{\Lambda} t} \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0)$$</p>
+<p>where \(\mathbf{f}(t)\) is a vector of the neutral population flux [1/s] for each energy state at time \(t\), \(\mathbf{S}\) is the matrix of the eigenvectors of \( \mathbf{C} \) and \( \mathbf{\Lambda} \) is a diagonal matrix containing the eigenvalues of \( \mathbf{C} \). 
 The fractional flux of a neutral traveling through a uniform plasma is shown below.</p>
 <p style="text-align: center"><img alt="" src="../../media/neutral_attenuation.png"></p>
 <p>As you can see the relative populations between states converges fairly quickly.</p>
-<p>The number of neutrals in a given state after a time \(t\), \(\vec{n}(t)\), is given by
-$$\vec{n}(t) = S^{-1} \cdot \vec{n}(0)\cdot S \cdot (\exp(\Lambda \,t) - 1)/\Lambda$$
-If \(t\) represents the time spent inside a grid cell the neutral density can be calculated by dividing the above equation by \(V_{cell}\).
+<p>The number of neutrals in a given state after a time \(t\), \(\mathbf{n}(t)\), is given by</p>
+<p>$$\mathbf{n}(t) = \mathbf{S} \cdot ( \mathbf{\Lambda}^{-1} \cdot e^{\mathbf{\Lambda} t} - \mathbf{\Lambda}^{-1} ) \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0) $$</p>
+<p>If \(t\) represents the time spent inside a grid cell the neutral density can be calculated by dividing the above equation by \(V_{cell}\).
 The total neutral density of a mc marker is shown below.</p>
 <p style="text-align: center"><img alt="" src="../../media/neutral_dens.png"></p>
 <p>As you can see over time the total number of neutrals decreases exponentially.</p>

@@ -61,3 +61,12 @@ This can be difficult to parse so it sometimes helpful to use a profile visualiz
 The documentation is built using [FORD](https://github.com/cmacmackin/ford).
 FORD takes inline documentation, prefixed by `!+`, and the markdown files located in `docs/user_guide` and wraps them all up in a pretty website.
 The documentation website is automatically updated whenever a commit is added to the master branch. This is done through Travis-CI.
+
+To build the documentation locally run
+```
+make docs
+```
+This will build the documentation website in the `docs/html` directory.
+
+The above command will also check the website for dead links which requires [linkchecker](https://wummel.github.io/linkchecker/) to be installed.
+This functionality can be disabled by passing the `CHECK_LINKS=n` build option to the `make docs` command. 

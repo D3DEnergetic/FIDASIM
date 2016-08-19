@@ -7,6 +7,9 @@ import tempfile
 from subprocess import call
 import string
 
+def extract_runid(f):
+    return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[0:-1])
+
 def chunk(lst,n):
     return [ lst[i::n] for i in range(n) if lst[i::n] ]
 
@@ -74,11 +77,11 @@ def main():
     fileordir = os.path.abspath(args.path)
 
     if not os.access(fileordir, os.W_OK):
-        print('\033[91m'+'ERROR: You do not have write permissions in this directory. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'+'\033[0m') 
+        print('\033[91m'+'ERROR: You do not have write permissions in {}. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'.format(fileordir)+'\033[0m') 
         quit()
         
     if not os.access(fileordir, os.R_OK):
-        print('\033[91m'+'ERROR: You do not have read permissions in this directory. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'+'\033[0m') 
+        print('\033[91m'+'ERROR: You do not have read permissions in {}. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'.format(fileordir)+'\033[0m') 
         quit()
         
     if os.path.isfile(fileordir):
@@ -92,8 +95,8 @@ def main():
 
         if not args.clobber:
             sfiles=[fileordir+'/'+ f for f in allfiles if re.search('.*_spectra\.(cdf|h5)',f)]
-            frids = ['_'.join(os.path.basename(f).split(".")[0].split("_")[0:-1]) for f in files]
-            srids = ['_'.join(os.path.basename(f).split(".")[0].split("_")[0:-1]) for f in sfiles]
+            frids = [extract_runid(f) for f in files]
+            srids = [extract_runid(f) for f in sfiles]
             files = [fileordir+'/'+f+'_inputs.dat' for f in set(frids).difference(srids)]
     else:
         raise IOError('Not a file or directory')
@@ -109,7 +112,7 @@ def main():
         else:
             log_dir = args.log
 
-        output_files = ['_'.join(os.path.basename(file).split(".")[0].split("_")[0:-1])+".out" for file in job]
+        output_files = [extract_runid(file)+".out" for file in job]
 
         args_dict =  {'commands':"\n".join([args.executable+" "+z[0]+" "+str(args.ppn) + 
                                  " >& "+log_dir+"/"+z[1] for z in zip(job,output_files)]),

@@ -1796,6 +1796,8 @@ subroutine read_chords
         inputs%calc_bes = 0
         inputs%calc_brems = 0
         inputs%calc_fida_wght = 0
+        call h5fclose_f(fid, error)
+        call h5close_f(error)
         return
     endif
 
@@ -1932,6 +1934,8 @@ subroutine read_npa
         write(*,'(a)') 'Continuing without NPA diagnostics'
         inputs%calc_npa = 0
         inputs%calc_npa_wght = 0
+        call h5fclose_f(fid, error)
+        call h5close_f(error)
         return
     endif
 
@@ -3517,7 +3521,7 @@ subroutine write_fida_weights
 end subroutine write_fida_weights
 
 subroutine write_npa_weights
-    !+ Writes [[libfida:fweight]] to a HDF5 file
+    !+ Writes [[libfida:nweight]] to a HDF5 file
     character(charlim) :: filename
     integer :: i
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr

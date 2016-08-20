@@ -5251,6 +5251,61 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
 
 end subroutine get_rate_matrix
 
+subroutine solve_colrad(matrix, states, dt, dens)
+    !+ Solves collional radiative model
+    real(Float64), dimension(nlevs,nlevs), intent(in) :: matrix
+        !+ Rate matrix
+    real(Float64), dimension(nlevs), intent(inout)    :: states
+        !+ Density of states
+    real(Float64), intent(in)                         :: dt
+        !+ Time interval [s]
+    real(Float64), dimension(nlevs), intent(out)      :: dens
+        !+ Density of neutrals
+
+    real(Float64), dimension(nlevs,nlevs) :: eigvec, eigvec_inv, tmp2d
+    real(Float64), dimension(nlevs,nlevs) :: vr, vl
+    real(Float64), dimension(nlevs) :: eigval, coef, wr, wi, tmp1d
+    real(Float64), dimension(nlevs) :: exp_eigval_dt
+    integer, parameter :: lworkmax = 250
+    real(Float64), dimension(lworkmax)  :: work
+    integer, dimension(nlevs) :: ipiv
+    integer :: lwork, info
+
+    !+ Find eigenvalues and eigenvectors
+    tmp2d = matrix
+    !!query for optimal work space
+    lwork = -1
+    call dgeev('N','V',nlevs,tmp2d,nlevs,wr,wi,vl,nlevs,vr,nlevs,work,lwork,info)
+    lwork = min(lworkmax, int(work(1)))
+    !!do actual calculation
+    call dgeev('N','V',nlevs,tmp2d,nlevs,wr,wi,vl,nlevs,vr,nlevs,work,lwork,info)
+
+    eigvec = vr !right eigenvectors
+    eigval = wr !real part of eigenvalues
+    !call eigen(nlevs,matrix, eigvec, eigval)
+
+    !Solve for Coefficients
+    tmp2d = eigvec
+    coef = states
+    call dgesv(nlevs,1,tmp2d,nlevs,ipiv,coef,nlevs,info)
+    exp_eigval_dt = exp(eigval*dt)   ! to improve speed (used twice)
+
+    where(eigval.eq.0.0)
+        eigval = eigval + 1
+    endwhere
+
+    states = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
+    dens   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
+
+    where(states.lt.0.d0)
+        states = 0.d0
+    endwhere
+    where(dens.lt.0.d0)
+        dens = 0.d0
+    endwhere
+
+end subroutine solve_colrad
+
 subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     !+ Evolve density of states in time `dt` via collisional radiative model
     type(LocalProfiles), intent(in)              :: plasma
@@ -5273,12 +5328,7 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     real(Float64) :: vnet_square    !! net velocity of neutrals squared
     real(Float64) :: eb             !! Energy of the fast neutral
 
-    real(Float64), dimension(nlevs,nlevs) :: eigvec, eigvec_inv,eigvec2
-    real(Float64), dimension(nlevs) :: eigval, coef
-    real(Float64), dimension(nlevs) :: exp_eigval_dt,work
-    integer, dimension(nlevs) :: ipiv
     real(Float64) :: iflux !!Initial total flux
-    integer :: n,info
 
     photons=0.d0
     dens=0.d0
@@ -5298,28 +5348,12 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     else
         b_amu = inputs%ai
     endif
+
     vnet_square=dot_product(vn-plasma%vrot,vn-plasma%vrot)  ![cm/s]
     eb = v2_to_E_per_amu*b_amu*vnet_square ![kev]
     call get_rate_matrix(plasma, i_type, eb, matrix)
 
-    call eigen(nlevs,matrix, eigvec, eigval)
-    eigvec2 = eigvec
-    coef = states
-    call dgesv(nlevs,1,eigvec2,nlevs,ipiv,coef,nlevs,info)
-    exp_eigval_dt = exp(eigval*dt)   ! to improve speed (used twice)
-    do n=1,nlevs
-        if(eigval(n).eq.0.0) eigval(n)=eigval(n)+1 !protect against dividing by zero
-    enddo
-
-    states = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
-    dens   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
-
-    if ((minval(states).lt.0).or.(minval(dens).lt.0)) then
-        do n=1,nlevs
-            if(states(n).lt.0) states(n)=0.d0
-            if(dens(n).lt.0) dens(n)=0.d0
-        enddo
-    endif
+    call solve_colrad(matrix, states, dt, dens)
 
     photons=dens(3)*tables%einstein(2,3) !! - [Ph/(s*cm^3)] - !!
 
@@ -7256,6 +7290,7 @@ program fidasim
         write(*,*) ''
     endif
     call OMP_set_num_threads(max_threads)
+    call OMP_set_nested(.False.)
 #else
     max_threads = 1
 #endif

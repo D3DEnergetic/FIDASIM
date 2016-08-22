@@ -125,7 +125,7 @@ docs:
 	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
 	@ if [[ $(CHECK_LINKS) == [yY]* ]]; then \
 		echo "Checking for broken links..."; \
-		linkchecker $(DOCS_DIR)/html/index.html ; \
+		linkchecker --ignore-url=/release $(DOCS_DIR)/html/index.html ; \
 	  fi
 
 clean_all: clean clean_deps clean_docs

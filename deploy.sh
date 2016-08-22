@@ -33,10 +33,6 @@ git clone --branch=gh-pages $REPO gh-pages
 
 if [ "$TRAVIS_BRANCH" = release-* ] && \
    [ "(ls -A $TRAVIS_BUILD_DIR/docs/html)" ]; then
-    if [[ -z `diff -r $TRAVIS_BUILD_DIR/docs/html gh-pages` ]]; then
-        echo "No changes in development documentation"
-        exit 0
-    fi
     cd gh-pages
     rm -rf css favicon.png fonts index.html interface \
        js lists media module page proc program search.html \
@@ -49,10 +45,6 @@ fi
 
 if [[ $TRAVIS_BRANCH == "master" ]]; then
     cd gh-pages
-    if [[ -z `diff -r $TRAVIS_BUILD_DIR/docs/html $TRAVIS_BRANCH` ]]; then
-        echo "No changes in $TRAVIS_BRANCH documentation"
-        exit 0
-    fi
     rm -rf $TRAVIS_BRANCH
     mkdir $TRAVIS_BRANCH
     cp -r "$TRAVIS_BUILD_DIR"/docs/html/* $TRAVIS_BRANCH

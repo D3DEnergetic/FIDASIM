@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Neutral Particle Analyzer &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Neutral Particle Analyzer</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/02_physics/index.html'>Physics</a></li>
+      
+         <li class="active">Neutral Particle Analyzer</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-9 col-md-push-3" id='text'>
+      <style>
+table {
+width: 100%;
+}
+table,th,td {
+border: 1px solid black;
+border-collapse: collapse;
+}
+th, td {
+padding: 5px;
+}
+th {
+text-align: center;
+}
+</style>
+
+<div class="toc">
+<ul>
+<li><a href="#npa-geometry">NPA Geometry</a></li>
+<li><a href="#monte-carlo-npa-calculation">Monte Carlo NPA calculation</a></li>
+<li><a href="#relevant-namelist-settings">Relevant Namelist Settings</a></li>
+<li><a href="#fortran-references">Fortran References</a></li>
+</ul>
+</div>
+<hr>
+<h1 id="npa-geometry">NPA Geometry</h1>
+<p style="text-align: center"><img alt="Detector" src="../../media/npa_detector.png" width="250"> <img alt="Aperture" src="../../media/npa_aperture.png" width="250"></p>
+<p>An NPA detector is defined by an aperture for which neutral particles must pass through and an detector.
+The aperture/detectors are defined by three points and a shape as shown in the figures above.
+It is assumed that between the aperture and the detector that particles travel in straight lines i.e. there is no stripping foil.</p>
+<p>The full definition of the NPA detector is given below (right and left as implied by looking through the aperture at the detector)</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nchan</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of channels</td>
+</tr>
+<tr>
+<td align="center"><code>system</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Name of the NPA system(s)</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the NPA geometry data</td>
+</tr>
+<tr>
+<td align="center"><code>id</code></td>
+<td align="center">String</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Channel ID</td>
+</tr>
+<tr>
+<td align="center"><code>radius</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Line of sight radius at midplane or tangency point</td>
+</tr>
+<tr>
+<td align="center"><code>a_shape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the aperture (1=rect, 2=circ)</td>
+</tr>
+<tr>
+<td align="center"><code>d_shape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the detector (1=rect, 2=circ)</td>
+</tr>
+<tr>
+<td align="center"><code>a_cent</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the center of the aperture</td>
+</tr>
+<tr>
+<td align="center"><code>a_redge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the apertures right edge</td>
+</tr>
+<tr>
+<td align="center"><code>a_tedge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the apertures top edge</td>
+</tr>
+<tr>
+<td align="center"><code>d_cent</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the center of the detector</td>
+</tr>
+<tr>
+<td align="center"><code>d_redge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the detectors right edge</td>
+</tr>
+<tr>
+<td align="center"><code>d_tedge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the detectors top edge</td>
+</tr>
+</tbody>
+</table>
+<h1 id="monte-carlo-npa-calculation">Monte Carlo NPA calculation</h1>
+<p>The Monte Carlo method of calculating the NPA flux (MC-NPA) is as follows</p>
+<ol>
+<li>Sample Fast-ion distribution function and get initial position and velocity</li>
+<li>Determine if particle would go through the NPA aperture and hit the detecting region. If not increase counter and goto 1 else goto 3</li>
+<li>Charge exchange the ion (set initial state) and solve the collisional radiative model along particle track.</li>
+<li>Sum the final state of the neutral and bin the particle by its energy.</li>
+<li>Repeat N times</li>
+</ol>
+<p>This process works but is not very efficient. The main issue is that more often or not a particle would not hit the detector.
+This causes very bad Monte Carlo noise in the calculated NPA flux.
+The only way to get around this is to use a lot of particles which can be prohibitively expensive.</p>
+<p>It would be much faster to just fire the particles directly at the NPA detector and then scale the resultant flux by the probability of that trajectory occuring.
+This is approach taken in the weight function method (WF-NPA) detailed <a href="./07_weights.html#npa">here</a>.</p>
+<p>An example of the calculated NPA flux for the two different methods are shown below.</p>
+<p style="text-align: center"><img alt="NPA Flux" src="../../media/npa.png"></p>
+<p>As you can see the WF-NPA method produces superior results at a fraction of the runtime.</p>
+<h1 id="relevant-namelist-settings">Relevant Namelist Settings</h1>
+<ul>
+<li><code>n_npa</code>: Number of Monte Carlo particles used in MC-NPA calculation </li>
+<li><code>calc_npa</code>: Calculate NPA flux using the Monte Carlo Method</li>
+<li><code>calc_npa_wght</code>: Calculate NPA weight function and flux using the weight function method</li>
+<li><code>ne_wght</code>: Number of energies in weight function calculation</li>
+<li><code>np_wght</code>: Number of pitches in weight function calculation</li>
+<li><code>emax_wght</code>: Maximum energy in weight function calculation</li>
+</ul>
+<h1 id="fortran-references">Fortran References</h1>
+<ul>
+<li><a href="../../proc/read_npa.html">read_npa</a>: Reads NPA geometry and calculates NPA geometric factor</li>
+<li><a href="../../proc/npa_f.html">npa_f</a>: MC-NPA routine</li>
+<li><a href="../../proc/npa_weights.html">npa_weights</a>: WF-NPA routine</li>
+</ul>
+    </div>
+    
+    <div class="col-md-3 col-md-pull-9">
+      <hr class="visible-xs visible-sm">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

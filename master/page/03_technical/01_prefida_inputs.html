@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>PREFIDA Inputs &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>PREFIDA Inputs</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/03_technical/index.html'>Technical Details</a></li>
+      
+         <li class="active">PREFIDA Inputs</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-9 col-md-push-3" id='text'>
+      <h1 id="prefida-inputs">PREFIDA Inputs</h1>
+<div class="toc">
+<ul>
+<li><a href="#prefida-inputs">PREFIDA Inputs</a></li>
+<li><a href="#inputs-structure">Inputs Structure</a><ul>
+<li><a href="#general-settings">General Settings</a></li>
+<li><a href="#simulation-switches">Simulation Switches</a></li>
+<li><a href="#monte-carlo-settings">Monte Carlo Settings</a></li>
+<li><a href="#neutral-beam-settings">Neutral Beam Settings</a></li>
+<li><a href="#plasma-settings">Plasma Settings</a></li>
+<li><a href="#beam-grid-settings">Beam Grid Settings</a></li>
+<li><a href="#wavelength-grid-settings">Wavelength Grid Settings</a></li>
+<li><a href="#weight-function-settings">Weight Function Settings</a></li>
+</ul>
+</li>
+<li><a href="#interpolation-grid-structure">Interpolation Grid Structure</a></li>
+<li><a href="#neutral-beam-geometry-structure">Neutral Beam Geometry Structure</a></li>
+<li><a href="#fields-structure">Fields Structure</a></li>
+<li><a href="#plasma-structure">Plasma Structure</a></li>
+<li><a href="#distribution-structure">Distribution Structure</a><ul>
+<li><a href="#fast-ion-distribution-function">Fast-ion Distribution Function</a></li>
+<li><a href="#guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</a></li>
+<li><a href="#full-orbit-monte-carlo-distribution">Full-Orbit Monte Carlo Distribution</a></li>
+</ul>
+</li>
+<li><a href="#spectral-geometry-structure">Spectral Geometry Structure</a></li>
+<li><a href="#npa-geometry-structure">NPA Geometry Structure</a></li>
+</ul>
+</div>
+<h1 id="inputs-structure">Inputs Structure</h1>
+<p>The <code>inputs</code> structure contains the basic information needed by FIDASIM.</p>
+<h2 id="general-settings">General Settings</h2>
+<p><style>
+table {
+width: 100%;
+}
+table,th,td {
+border: 1px solid black;
+border-collapse: collapse;
+}
+th, td {
+padding: 5px;
+}
+th {
+text-align: center;
+}
+</style></p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>shot</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Shot Number</td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time</td>
+</tr>
+<tr>
+<td align="center"><code>runid</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Run ID</td>
+</tr>
+<tr>
+<td align="center"><code>comment</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Comment</td>
+</tr>
+<tr>
+<td align="center"><code>result_dir</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Result directory</td>
+</tr>
+<tr>
+<td align="center"><code>tables_file</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Atomic Tables file</td>
+</tr>
+</tbody>
+</table>
+<h2 id="simulation-switches">Simulation Switches</h2>
+<p>The simulation switches can take values 0, 1, or 2. A value of zero and one will turn the calculation off and on respectively. 
+A value of two will turn on additional functionality.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>calc_bes</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate Beam Emission and Halo spectra</td>
+</tr>
+<tr>
+<td align="center"><code>calc_brems</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate Bremsstrahlung</td>
+</tr>
+<tr>
+<td align="center"><code>calc_fida</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate FIDA spectra</td>
+</tr>
+<tr>
+<td align="center"><code>calc_npa</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate NPA flux</td>
+</tr>
+<tr>
+<td align="center"><code>calc_birth</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate Birth profile</td>
+</tr>
+<tr>
+<td align="center"><code>calc_fida_wght</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate FIDA weight functions</td>
+</tr>
+<tr>
+<td align="center"><code>calc_npa_wght</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Calculate NPA weight functions</td>
+</tr>
+<tr>
+<td align="center"><code>dump_dcx</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Dump DCX neutrals and spectra</td>
+</tr>
+</tbody>
+</table>
+<h2 id="monte-carlo-settings">Monte Carlo Settings</h2>
+<p>These settings control the number of Monte Carlo particles used by FIDASIM.
+Using too few particles will execute quickly but will be extremely noisy.
+Contrarily, using too many particles will increase runtime but will have small Monte Carlo noise.
+The following settings provide a good balance between runtime and Monte Carlo noise.</p>
+<ul>
+<li><code>n_fida</code> = 5000000L</li>
+<li><code>n_npa</code> = 5000000L</li>
+<li><code>n_nbi</code> = 50000L</li>
+<li><code>n_dcx</code> = 500000L</li>
+<li><code>n_halo</code> = 500000L</li>
+<li><code>n_birth</code> = 50000L</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>n_fida</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of FIDA MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>n_npa</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of NPA MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>n_nbi</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of NBI MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>n_dcx</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of DCX MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>n_halo</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of HALO MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>n_birth</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of Birth particles outputed</td>
+</tr>
+</tbody>
+</table>
+<h2 id="neutral-beam-settings">Neutral Beam Settings</h2>
+<p>These variables define the neutral beam properties.
+Currently the mass of the beam species, <code>ab</code>, can only be the mass either protium or deuterium.
+The <code>current_fractions</code> variable must sum to one.
+Click <a href="../02_physics/04_neutrals.html#neutral-beam-density">here</a> for more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>ab</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">amu</td>
+<td align="left">Beam species mass</td>
+</tr>
+<tr>
+<td align="center"><code>pinj</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">MW</td>
+<td align="left">Beam power</td>
+</tr>
+<tr>
+<td align="center"><code>einj</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">keV</td>
+<td align="left">Beam energy</td>
+</tr>
+<tr>
+<td align="center"><code>current_fractions</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">NA</td>
+<td align="left">Current fractions (Full, Half, Third)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="plasma-settings">Plasma Settings</h2>
+<p>These variables define the properties of the thermal plasma species.
+Like the <code>ab</code> variable, <code>ai</code> can only be the mass of either protium or deuterium
+Click <a href="../02_physics/01_plasma.html#plasma-parameters-and-fields">here</a> for more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>ai</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">amu</td>
+<td align="left">Thermal Ion species mass</td>
+</tr>
+<tr>
+<td align="center"><code>impurity_charge</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Impurity Charge</td>
+</tr>
+</tbody>
+</table>
+<h2 id="beam-grid-settings">Beam Grid Settings</h2>
+<p>These variables define a rotated coordinate system.
+Click <a href="../02_physics/04_neutrals.html#beam-grid">here</a> for more details.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nx</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of cells in the X direction</td>
+</tr>
+<tr>
+<td align="center"><code>ny</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of cells in the Y direction</td>
+</tr>
+<tr>
+<td align="center"><code>nz</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of cells in the Z direction</td>
+</tr>
+<tr>
+<td align="center"><code>xmin</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Minimum X value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>xmax</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Maximum X value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>ymin</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Minimum Y value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>ymax</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Maximum Y value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>zmin</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Minimum Z value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>zmax</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Maximum Z value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>alpha</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">rad</td>
+<td align="left">Tait-Bryan rotation angle about z-axis</td>
+</tr>
+<tr>
+<td align="center"><code>beta</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">rad</td>
+<td align="left">Tait-Bryan rotation angle about y'-axis</td>
+</tr>
+<tr>
+<td align="center"><code>gamma</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">rad</td>
+<td align="left">Tait-Bryan rotation angle about x"-axis</td>
+</tr>
+<tr>
+<td align="center"><code>origin</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">cm</td>
+<td align="left">Beam grid origin in Machine Coordinates</td>
+</tr>
+</tbody>
+</table>
+<h2 id="wavelength-grid-settings">Wavelength Grid Settings</h2>
+<p>These variables define the wavelength grid. Using a fine wavelength has no performance penalty.
+Click <a href="../02_physics/05_spectra.html">here</a> for more more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nlambda</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of wavelengths</td>
+</tr>
+<tr>
+<td align="center"><code>lambdamin</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">nm</td>
+<td align="left">Minimum wavelength</td>
+</tr>
+<tr>
+<td align="center"><code>lambdamax</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">nm</td>
+<td align="left">Maximum wavelength</td>
+</tr>
+</tbody>
+</table>
+<h2 id="weight-function-settings">Weight Function Settings</h2>
+<p>These variables define the setting for the calculation of weight functions.
+Click <a href="../02_physics/07_weights.html">here</a> for more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>ne_wght</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of weight function energies</td>
+</tr>
+<tr>
+<td align="center"><code>np_wght</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of weight function pitches</td>
+</tr>
+<tr>
+<td align="center"><code>nphi_wght</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of gyro-angles</td>
+</tr>
+<tr>
+<td align="center"><code>emax_wght</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">keV</td>
+<td align="left">Maximum energy of weight functions</td>
+</tr>
+<tr>
+<td align="center"><code>nlambda_wght</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of weight function wavelengths</td>
+</tr>
+<tr>
+<td align="center"><code>lambdamin_wght</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">nm</td>
+<td align="left">Minimum weight function wavelength</td>
+</tr>
+<tr>
+<td align="center"><code>lambdamax_wght</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">nm</td>
+<td align="left">Maximum weight function wavelength</td>
+</tr>
+</tbody>
+</table>
+<h1 id="interpolation-grid-structure">Interpolation Grid Structure</h1>
+<p>The <code>grid</code> structure contains the definition of the 2D R-Z grid that the plasma parameters and electromagnetic fields are mapped onto. </p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nr</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of radii</td>
+</tr>
+<tr>
+<td align="center"><code>nz</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nr</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of radii</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of radii <code>r = r2d(r,z)</code></td>
+</tr>
+<tr>
+<td align="center"><code>z2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of z values <code>z = z2d(r,z)</code></td>
+</tr>
+</tbody>
+</table>
+<h1 id="neutral-beam-geometry-structure">Neutral Beam Geometry Structure</h1>
+<p>The <code>nbi</code> structure contains the neutral beam geometry.
+The <code>(a)shape</code> of the source grid and apertures take the value of 1 or 2 for a rectangular and circular respectively.
+Click <a href="../02_physics/04_neutrals.html#neutral-beam-geometry">here</a> for more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>name</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Name of the neutral beam</td>
+</tr>
+<tr>
+<td align="center"><code>shape</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Shape of the beam source grid (1 or 2)</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the neutral beam geometry</td>
+</tr>
+<tr>
+<td align="center"><code>src</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">cm</td>
+<td align="left">Position of the source grid in machine coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>axis</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">NA</td>
+<td align="left">Direction of the beam center line</td>
+</tr>
+<tr>
+<td align="center"><code>widy</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Source grid half-width in the horizontal direction</td>
+</tr>
+<tr>
+<td align="center"><code>widz</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Source grid half-height in the vertical direction</td>
+</tr>
+<tr>
+<td align="center"><code>divy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">rad</td>
+<td align="left">Horizontal beam divergence</td>
+</tr>
+<tr>
+<td align="center"><code>divz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">rad</td>
+<td align="left">Vertical beam divergence</td>
+</tr>
+<tr>
+<td align="center"><code>focy</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Horizontal focal length</td>
+</tr>
+<tr>
+<td align="center"><code>focz</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Vertical focal length</td>
+</tr>
+<tr>
+<td align="center"><code>naperture</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of apertures</td>
+</tr>
+<tr>
+<td align="center"><code>ashape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the aperture(s) (1 or 2)</td>
+</tr>
+<tr>
+<td align="center"><code>awidy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-width of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>awidz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-height of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>aoffy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>aoffz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>adist</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Distance from the center of the beam source grid to the aperture(s) plane</td>
+</tr>
+</tbody>
+</table>
+<h1 id="fields-structure">Fields Structure</h1>
+<p>This structure contain the electromagnetic fields mapped onto the interpolation grid.
+Click <a href="../02_physics/01_plasma.html#plasma-parameters-and-fields">here</a> for more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time when the fields data were collected/reconstructed</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the fields data</td>
+</tr>
+<tr>
+<td align="center"><code>mask</code></td>
+<td align="center">Int16</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">NA</td>
+<td align="left">Boolean mask that indicates where the fields are well defined</td>
+</tr>
+<tr>
+<td align="center"><code>br</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">T</td>
+<td align="left">Radial component of the magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>bt</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">T</td>
+<td align="left">Torodial/Phi component of the magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>bz</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">T</td>
+<td align="left">Z component of the magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>er</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">V/m</td>
+<td align="left">Radial component of the electric field</td>
+</tr>
+<tr>
+<td align="center"><code>et</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">V/m</td>
+<td align="left">Torodial/Phi component of the electric field</td>
+</tr>
+<tr>
+<td align="center"><code>ez</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">V/m</td>
+<td align="left">Z component of the electric field</td>
+</tr>
+</tbody>
+</table>
+<h1 id="plasma-structure">Plasma Structure</h1>
+<p>This structure contain the plasma parameters mapped onto the interpolation grid.
+Click <a href="../02_physics/01_plasma.html#plasma-parameters-and-fields">here</a> for more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time when the plasma parameter data was collected</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the plasma parameter data</td>
+</tr>
+<tr>
+<td align="center"><code>mask</code></td>
+<td align="center">Int16</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">NA</td>
+<td align="left">Boolean mask that indicates where the plasma is well defined</td>
+</tr>
+<tr>
+<td align="center"><code>te</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">keV</td>
+<td align="left">Electron temperature</td>
+</tr>
+<tr>
+<td align="center"><code>ti</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">keV</td>
+<td align="left">Ion temperature</td>
+</tr>
+<tr>
+<td align="center"><code>dene</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm^-3</td>
+<td align="left">Electron density</td>
+</tr>
+<tr>
+<td align="center"><code>zeff</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">NA</td>
+<td align="left">Z-effective</td>
+</tr>
+<tr>
+<td align="center"><code>vr</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Radial component of the bulk plasma rotation/flow</td>
+</tr>
+<tr>
+<td align="center"><code>vt</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Torodial/Phi component of the bulk plasma rotation/flow</td>
+</tr>
+<tr>
+<td align="center"><code>vz</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Z component of the bulk plasma rotation/flow</td>
+</tr>
+</tbody>
+</table>
+<h1 id="distribution-structure">Distribution Structure</h1>
+<p>The <code>dist</code> structure contains the fast-ion distribution which can be one of three different types.
+Click <a href="../02_physics/01_plasma.html#distributions">here</a> for more information.</p>
+<h2 id="fast-ion-distribution-function">Fast-ion Distribution Function</h2>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>type</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Distribution type (1)</td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time of the distribution</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the distribution data</td>
+</tr>
+<tr>
+<td align="center"><code>nenergy</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of energy values</td>
+</tr>
+<tr>
+<td align="center"><code>npitch</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of pitch values</td>
+</tr>
+<tr>
+<td align="center"><code>energy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nenergy</code>]</td>
+<td align="center">keV</td>
+<td align="left">Energy array</td>
+</tr>
+<tr>
+<td align="center"><code>pitch</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>npitch</code>]</td>
+<td align="center">NA</td>
+<td align="left">Pitch array w.r.t magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>denf</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm^-3</td>
+<td align="left">Fast-ion density</td>
+</tr>
+<tr>
+<td align="center"><code>f</code></td>
+<td align="center">Float64</td>
+<td align="center">4</td>
+<td align="center">[<code>nenergy</code>,<code>npitch</code>,<code>nr</code>,<code>nz</code>]</td>
+<td align="center">fast-ions/(dE dP cm^3)</td>
+<td align="left">Fast-ion distribution F(E,p,R,Z)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</h2>
+<p>The sum(<code>weight</code>) = # of Fast-ions in phase space sampled by the MC particles.</p>
+<p>The <code>class</code> variable can take values in the range of 1:<code>nclass</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>type</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Distribution type (2)</td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time of the distribution</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the distribution data</td>
+</tr>
+<tr>
+<td align="center"><code>nparticle</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>nclass</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of orbit classes</td>
+</tr>
+<tr>
+<td align="center"><code>class</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">NA</td>
+<td align="left">Orbit class of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>weight</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">fast-ions</td>
+<td align="left">Weight of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">R positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">Z positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>energy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">keV</td>
+<td align="left">Energy of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>pitch</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">NA</td>
+<td align="left">Pitch w.r.t the magnetic field of the MC particle</td>
+</tr>
+</tbody>
+</table>
+<h2 id="full-orbit-monte-carlo-distribution">Full-Orbit Monte Carlo Distribution</h2>
+<p>The sum(<code>weight</code>) = # of Fast-ions in phase space sampled by the MC particles</p>
+<p>The <code>class</code> variable can take values in the range of 1:<code>nclass</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>type</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Distribution type (3)</td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time of the distribution</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the distribution data</td>
+</tr>
+<tr>
+<td align="center"><code>nparticle</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>nclass</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of orbit classes</td>
+</tr>
+<tr>
+<td align="center"><code>class</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">NA</td>
+<td align="left">Orbit class of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>weight</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">fast-ions</td>
+<td align="left">Weight of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">R positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">Z positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>vr</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Radial component of the MC particle velocity</td>
+</tr>
+<tr>
+<td align="center"><code>vt</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Torodial/Phi component of the MC particle velocity</td>
+</tr>
+<tr>
+<td align="center"><code>vz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Z component of the MC particle velocity</td>
+</tr>
+</tbody>
+</table>
+<h1 id="spectral-geometry-structure">Spectral Geometry Structure</h1>
+<p>This structure contains the geometry of the spectroscopic systems 
+Click <a href="../02_physics/05_spectra.html">here</a> for more more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nchan</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of channels</td>
+</tr>
+<tr>
+<td align="center"><code>system</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Name of the spectrocopic system(s)</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the spectral geometry data</td>
+</tr>
+<tr>
+<td align="center"><code>id</code></td>
+<td align="center">String</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Channel ID</td>
+</tr>
+<tr>
+<td align="center"><code>radius</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Line of sight radius at midplane or tangency point</td>
+</tr>
+<tr>
+<td align="center"><code>lens</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Lens location in machine coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>axis</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Optical axis/direction of the lines of sight</td>
+</tr>
+<tr>
+<td align="center"><code>spot_size</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Radius of the collecting volume</td>
+</tr>
+<tr>
+<td align="center"><code>sigma_pi</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Ratio of the intensities of the sigma and pi stark lines</td>
+</tr>
+</tbody>
+</table>
+<h1 id="npa-geometry-structure">NPA Geometry Structure</h1>
+<p>This structure contains the geometry of the spectroscopic systems 
+The shapes of the detector and aperture can take the value 1 or 2 for a rectangular and circular aperture/detector respectively.
+Click <a href="../02_physics/06_npa.html">here</a> for more more information.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nchan</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of channels</td>
+</tr>
+<tr>
+<td align="center"><code>system</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Name of the NPA system(s)</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the NPA geometry data</td>
+</tr>
+<tr>
+<td align="center"><code>id</code></td>
+<td align="center">String</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Channel ID</td>
+</tr>
+<tr>
+<td align="center"><code>radius</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Line of sight radius at midplane or tangency point</td>
+</tr>
+<tr>
+<td align="center"><code>a_shape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the aperture</td>
+</tr>
+<tr>
+<td align="center"><code>d_shape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the detector</td>
+</tr>
+<tr>
+<td align="center"><code>a_cent</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the center of the aperture</td>
+</tr>
+<tr>
+<td align="center"><code>a_redge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the apertures right edge</td>
+</tr>
+<tr>
+<td align="center"><code>a_tedge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the apertures top edge</td>
+</tr>
+<tr>
+<td align="center"><code>d_cent</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the center of the detector</td>
+</tr>
+<tr>
+<td align="center"><code>d_redge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the detectors right edge</td>
+</tr>
+<tr>
+<td align="center"><code>d_tedge</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Position of the detectors top edge</td>
+</tr>
+</tbody>
+</table>
+    </div>
+    
+    <div class="col-md-3 col-md-pull-9">
+      <hr class="visible-xs visible-sm">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation" class="disabled">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Plasma Parameters, Fields, and Distributions &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Plasma Parameters, Fields, and Distributions</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/02_physics/index.html'>Physics</a></li>
+      
+         <li class="active">Plasma Parameters, Fields, and Distributions</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-9 col-md-push-3" id='text'>
+      <div class="toc">
+<ul>
+<li><a href="#plasma-parameters-and-fields">Plasma Parameters and Fields</a></li>
+<li><a href="#distributions">Distributions</a><ul>
+<li><a href="#guiding-center-distribution-function-feprz">Guiding Center Distribution Function: F(E,p,R,Z)</a></li>
+<li><a href="#guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</a></li>
+<li><a href="#full-orbit-monte-carlo-distribution">Full-orbit Monte Carlo Distribution</a></li>
+</ul>
+</li>
+<li><a href="#relevent-namelist-settings">Relevent Namelist Settings</a></li>
+<li><a href="#fortran-references">Fortran References</a></li>
+</ul>
+</div>
+<hr>
+<style>
+table {
+width: 100%;
+}
+table,th,td {
+border: 1px solid black;
+border-collapse: collapse;
+}
+th, td {
+padding: 5px;
+}
+th {
+text-align: center;
+}
+</style>
+
+<h1 id="plasma-parameters-and-fields">Plasma Parameters and Fields</h1>
+<p><img alt="" src="../../media/cross_section.png" style="float: left">
+It is common in Tokamaks to input the plasma parameters and fields as flux functions.
+However, this approach makes several assumptions that may not be true in non-tokamak devices.
+In FIDASIM the plasma parameters and fields are mapped onto a 2D R-Z grid.
+This only assumes axisymmetric profiles within the region of interest.
+In addition to plasma parameters a boolean mask is used to indicate where the plasma and fields are well defined.</p>
+<p>FIDASIM reads the plasma parameters and fields from an HDF5 file structured as follows...</p>
+<div class="codehilite"><pre><span></span>[runid]_equilibrium.h5
+├── plasma          
+└── fields
+</pre></div>
+
+
+<p>where the <code>plasma</code> group has the following datasets</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nr</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of radii</td>
+</tr>
+<tr>
+<td align="center"><code>nz</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nr</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of radii</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of radii <code>r = r2d(r,z)</code></td>
+</tr>
+<tr>
+<td align="center"><code>z2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of z values <code>z = z2d(r,z)</code></td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time when the plasma parameter data was collected</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the plasma parameter data</td>
+</tr>
+<tr>
+<td align="center"><code>mask</code></td>
+<td align="center">Int16</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">NA</td>
+<td align="left">Boolean mask that indicates where the plasma is well defined</td>
+</tr>
+<tr>
+<td align="center"><code>te</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">keV</td>
+<td align="left">Electron temperature</td>
+</tr>
+<tr>
+<td align="center"><code>ti</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">keV</td>
+<td align="left">Ion temperature</td>
+</tr>
+<tr>
+<td align="center"><code>dene</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm^-3</td>
+<td align="left">Electron density</td>
+</tr>
+<tr>
+<td align="center"><code>zeff</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">NA</td>
+<td align="left">Z-effective</td>
+</tr>
+<tr>
+<td align="center"><code>vr</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Radial component of the bulk plasma rotation/flow</td>
+</tr>
+<tr>
+<td align="center"><code>vt</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Torodial/Phi component of the bulk plasma rotation/flow</td>
+</tr>
+<tr>
+<td align="center"><code>vz</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Z component of the bulk plasma rotation/flow</td>
+</tr>
+</tbody>
+</table>
+<p>and where the <code>fields</code> group has the following datasets</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nr</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of radii</td>
+</tr>
+<tr>
+<td align="center"><code>nz</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nr</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of radii</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of radii <code>r = r2d(r,z)</code></td>
+</tr>
+<tr>
+<td align="center"><code>z2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of z values <code>z = z2d(r,z)</code></td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time when the fields data were collected/reconstructed</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the fields data</td>
+</tr>
+<tr>
+<td align="center"><code>mask</code></td>
+<td align="center">Int16</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">NA</td>
+<td align="left">Boolean mask that indicates where the fields are well defined</td>
+</tr>
+<tr>
+<td align="center"><code>br</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">T</td>
+<td align="left">Radial component of the magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>bt</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">T</td>
+<td align="left">Torodial/Phi component of the magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>bz</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">T</td>
+<td align="left">Z component of the magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>er</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">V/m</td>
+<td align="left">Radial component of the electric field</td>
+</tr>
+<tr>
+<td align="center"><code>et</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">V/m</td>
+<td align="left">Torodial/Phi component of the electric field</td>
+</tr>
+<tr>
+<td align="center"><code>ez</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">V/m</td>
+<td align="left">Z component of the electric field</td>
+</tr>
+</tbody>
+</table>
+<h1 id="distributions">Distributions</h1>
+<p>The fast-ion distribution function typically does not have a functional form.
+This means that we need to input the fast-ion distribution function into FIDASIM.
+FIDASIM accepts three different types of fast-ion distributions.</p>
+<ol>
+<li>Guiding Center Distribution Function: F(E,p,R,Z)</li>
+<li>Guiding Center Monte Carlo distribution</li>
+<li>Full-orbit Monte Carlo distribution</li>
+</ol>
+<p>Supporting different types of distributions greatly facilitates the study of fast-ion transport.</p>
+<p>FIDASIM reads the fast-ion distribution from an HDF5 file that has the following variables depending on the distribution type.</p>
+<h2 id="guiding-center-distribution-function-feprz">Guiding Center Distribution Function: F(E,p,R,Z)</h2>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>type</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Distribution type (1)</td>
+</tr>
+<tr>
+<td align="center"><code>nr</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of radii</td>
+</tr>
+<tr>
+<td align="center"><code>nz</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nr</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of radii</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of z values</td>
+</tr>
+<tr>
+<td align="center"><code>r2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of radii <code>r = r2d(r,z)</code></td>
+</tr>
+<tr>
+<td align="center"><code>z2d</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm</td>
+<td align="left">2D array of z values <code>z = z2d(r,z)</code></td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time of the distribution</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the distribution data</td>
+</tr>
+<tr>
+<td align="center"><code>nenergy</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of energy values</td>
+</tr>
+<tr>
+<td align="center"><code>npitch</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of pitch values</td>
+</tr>
+<tr>
+<td align="center"><code>energy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nenergy</code>]</td>
+<td align="center">keV</td>
+<td align="left">Energy array</td>
+</tr>
+<tr>
+<td align="center"><code>pitch</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>npitch</code>]</td>
+<td align="center">NA</td>
+<td align="left">Pitch array w.r.t magnetic field</td>
+</tr>
+<tr>
+<td align="center"><code>denf</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm^-3</td>
+<td align="left">Fast-ion density</td>
+</tr>
+<tr>
+<td align="center"><code>f</code></td>
+<td align="center">Float64</td>
+<td align="center">4</td>
+<td align="center">[<code>nenergy</code>,<code>npitch</code>,<code>nr</code>,<code>nz</code>]</td>
+<td align="center">fast-ions/(dE dP cm^3)</td>
+<td align="left">Fast-ion distribution F(E,p,R,Z)</td>
+</tr>
+</tbody>
+</table>
+<p>The Guiding Center Distribution Function is a function of Energy, pitch, R, and Z.
+The distribution is mapped on the same R-Z grid as the plasma parameters and fields.</p>
+<h2 id="guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</h2>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>type</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Distribution type (2)</td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time of the distribution</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the distribution data</td>
+</tr>
+<tr>
+<td align="center"><code>nparticle</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>nclass</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of orbit classes</td>
+</tr>
+<tr>
+<td align="center"><code>class</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">NA</td>
+<td align="left">Orbit class of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>weight</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">fast-ions</td>
+<td align="left">Weight of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">R positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">Z positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>energy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">keV</td>
+<td align="left">Energy of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>pitch</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">NA</td>
+<td align="left">Pitch w.r.t the magnetic field of the MC particle</td>
+</tr>
+</tbody>
+</table>
+<p>The sum(<code>weight</code>) = # of Fast-ions in phase space sampled by the MC particles.</p>
+<p>The <code>class</code> variable can take values in the range of 1:<code>nclass</code>. 
+If there are multiple classes of particles the FIDA signal for each class will be calculated.</p>
+<h2 id="full-orbit-monte-carlo-distribution">Full-orbit Monte Carlo Distribution</h2>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>type</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Distribution type (3)</td>
+</tr>
+<tr>
+<td align="center"><code>time</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">s</td>
+<td align="left">Time of the distribution</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the distribution data</td>
+</tr>
+<tr>
+<td align="center"><code>nparticle</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of MC particles</td>
+</tr>
+<tr>
+<td align="center"><code>nclass</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of orbit classes</td>
+</tr>
+<tr>
+<td align="center"><code>class</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">NA</td>
+<td align="left">Orbit class of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>weight</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">fast-ions</td>
+<td align="left">Weight of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>r</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">R positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>z</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm</td>
+<td align="left">Z positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>vr</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Radial component of the MC particle velocity</td>
+</tr>
+<tr>
+<td align="center"><code>vt</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Torodial/Phi component of the MC particle velocity</td>
+</tr>
+<tr>
+<td align="center"><code>vz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">cm/s</td>
+<td align="left">Z component of the MC particle velocity</td>
+</tr>
+</tbody>
+</table>
+<p>The sum(<code>weight</code>) = # of Fast-ions in phase space sampled by the MC particles.</p>
+<p>The <code>class</code> variable can take values in the range of 1:<code>nclass</code>.
+If there are multiple classes of particles the FIDA signal for each class will be calculated.</p>
+<h1 id="relevent-namelist-settings">Relevent Namelist Settings</h1>
+<ul>
+<li><code>ai</code>: Ion mass [amu]</li>
+<li><code>impurity_charge</code>: Impurity charge number 5=Boron, 6=Carbon, ...</li>
+<li><code>ab</code>: Fast/Beam-ion mass [amu]</li>
+<li><code>equilibrium_file</code>: Equilibrium file location</li>
+<li><code>distribution_file</code>: Distribution file location</li>
+</ul>
+<h1 id="fortran-references">Fortran References</h1>
+<ul>
+<li><a href="../../type/interpolationgrid.html">InterpolationGrid</a>: Definition of R-Z grid</li>
+<li><a href="../../type/profiles.html">Profiles</a> and <a href="../../type/localprofiles.html">LocalProfiles</a>: Derived type for Plasma parameters</li>
+<li><a href="../../type/emfields.html">EMFields</a> and <a href="../../type/localemfields.html">LocalEMFields</a>: Derived type for Fields</li>
+<li><a href="../../proc/get_plasma.html">get_plasma</a>: Gets plasma parameters at a given position</li>
+<li><a href="../../proc/get_fields.html">get_fields</a>: Gets fields at a given position</li>
+<li><a href="../../proc/get_distribution.html">get_distribution</a>: Gets fast-ion distribution at a given position</li>
+<li><a href="../../proc/read_equilibrium.html">read_equilibrium</a>: Reads equilbrium file into <a href="../../type/equilibrium.html">Equilibrium</a> structure</li>
+<li><a href="../../type/fastiondistribution.html">FastIonDistribution</a>: Derived type for describing GC distribution functions</li>
+<li><a href="../../type/fastion.html">FastIon</a>: Derived type for describing a Monte Carlo particle</li>
+<li><a href="../../type/fastionparticles.html">FastIonParticles</a>: Defines a distribution of Monte Carlo particles</li>
+<li><a href="../../proc/read_distribution.html">read_distribution</a>: Reads distribution file</li>
+</ul>
+    </div>
+    
+    <div class="col-md-3 col-md-pull-9">
+      <hr class="visible-xs visible-sm">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation" class="disabled">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>read_npa &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>read_npa
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+	  data-placement="bottom" data-html="true"
+	  title=" 1.8% of total for procedures.">149 statements</a>
+     </li> 
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+  
+     <li><a href='../module/libfida.html'>libfida</a></li>
+  
+     <li class="active">read_npa</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/read_npa.html#src">read_npa</a>
+  </div>
+</div>
+
+
+  <hr>
+  
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-0">All Procedures</a></h3></div>
+  <div id="allprocs-0" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx_n_adas.html">Aq_cx_n_adas</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx_n_janev.html">Aq_cx_n_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit.html">Aq_excit</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_2_janev.html">Aq_excit_1_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_3_janev.html">Aq_excit_1_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_4_janev.html">Aq_excit_1_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_5_janev.html">Aq_excit_1_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_janev.html">Aq_excit_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_10_janev.html">Aq_excit_2_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_3_janev.html">Aq_excit_2_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_4_janev.html">Aq_excit_2_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_5_janev.html">Aq_excit_2_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_6_janev.html">Aq_excit_2_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_7_janev.html">Aq_excit_2_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_8_janev.html">Aq_excit_2_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_9_janev.html">Aq_excit_2_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_janev.html">Aq_excit_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_10_janev.html">Aq_excit_3_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_4_janev.html">Aq_excit_3_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_5_janev.html">Aq_excit_3_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_6_janev.html">Aq_excit_3_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_7_janev.html">Aq_excit_3_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_8_janev.html">Aq_excit_3_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_9_janev.html">Aq_excit_3_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_janev.html">Aq_excit_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_n.html">Aq_excit_n</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_n_janev.html">Aq_excit_n_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_n_m.html">Aq_excit_n_m</a>
+      
+      <a class="list-group-item" href="../proc/aq_ioniz.html">Aq_ioniz</a>
+      
+      <a class="list-group-item" href="../proc/aq_ioniz_n.html">Aq_ioniz_n</a>
+      
+      <a class="list-group-item" href="../proc/aq_ioniz_n_janev.html">Aq_ioniz_n_janev</a>
+      
+      <a class="list-group-item" href="../interface/assignment%28%3D%29.html">assignment(=)</a>
+      
+      <a class="list-group-item" href="../proc/attenuate.html">attenuate</a>
+      
+      <a class="list-group-item" href="../proc/b5_cx_1_adas.html">B5_cx_1_adas</a>
+      
+      <a class="list-group-item" href="../proc/b5_cx_1_janev.html">B5_cx_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/b5_cx_2_adas.html">B5_cx_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/b5_ioniz_1_janev.html">B5_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/balance.html">balance</a>
+      
+      <a class="list-group-item" href="../proc/balback.html">balback</a>
+      
+      <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_q_n.html">bt_maxwellian_q_n</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_q_n_m.html">bt_maxwellian_q_n_m</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_1_adas.html">C6_cx_1_adas</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_1_janev.html">C6_cx_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_2_adas.html">C6_cx_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_3_adas.html">C6_cx_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/c6_ioniz_1_janev.html">C6_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/calc_perp_vectors.html">calc_perp_vectors</a>
+      
+      <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
+      
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
+      <a class="list-group-item" href="../proc/colrad.html">colrad</a>
+      
+      <a class="list-group-item" href="../proc/comabs.html">comabs</a>
+      
+      <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
+      
+      <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_2_janev.html">e_excit_1_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_3_janev.html">e_excit_1_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_4_janev.html">e_excit_1_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_5_janev.html">e_excit_1_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_janev.html">e_excit_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_2_3_janev.html">e_excit_2_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_f.html">e_excit_f</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_n.html">e_excit_n</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_n_m.html">e_excit_n_m</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz.html">e_ioniz</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_1_janev.html">e_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_2_janev.html">e_ioniz_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_3_janev.html">e_ioniz_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_n.html">e_ioniz_n</a>
+      
+      <a class="list-group-item" href="../proc/eigen.html">eigen</a>
+      
+      <a class="list-group-item" href="../proc/elmhes.html">elmhes</a>
+      
+      <a class="list-group-item" href="../proc/elmtrans.html">elmtrans</a>
+      
+      <a class="list-group-item" href="../proc/fast_ion_assign.html">fast_ion_assign</a>
+      
+      <a class="list-group-item" href="../proc/ff_add.html">ff_add</a>
+      
+      <a class="list-group-item" href="../proc/ff_assign.html">ff_assign</a>
+      
+      <a class="list-group-item" href="../proc/ff_subtract.html">ff_subtract</a>
+      
+      <a class="list-group-item" href="../proc/fida_f.html">fida_f</a>
+      
+      <a class="list-group-item" href="../proc/fida_mc.html">fida_mc</a>
+      
+      <a class="list-group-item" href="../proc/fida_weights_los.html">fida_weights_los</a>
+      
+      <a class="list-group-item" href="../proc/fida_weights_mc.html">fida_weights_mc</a>
+      
+      <a class="list-group-item" href="../proc/flf_assign.html">flf_assign</a>
+      
+      <a class="list-group-item" href="../proc/fs_divide.html">fs_divide</a>
+      
+      <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
+      
+      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      
+      <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
+      
+      <a class="list-group-item" href="../proc/get_ep_denf.html">get_ep_denf</a>
+      
+      <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
+      
+      <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
+      
+      <a class="list-group-item" href="../proc/get_plasma.html">get_plasma</a>
+      
+      <a class="list-group-item" href="../proc/get_position.html">get_position</a>
+      
+      <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
+      
+      <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
+      
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_2.html">h5ltmake_compressed_dataset_double_f_2</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_3.html">h5ltmake_compressed_dataset_double_f_3</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_4.html">h5ltmake_compressed_dataset_double_f_4</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_5.html">h5ltmake_compressed_dataset_double_f_5</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_6.html">h5ltmake_compressed_dataset_double_f_6</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_7.html">h5ltmake_compressed_dataset_double_f_7</a>
+      
+      <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_int_f.html">h5ltmake_compressed_dataset_int_f</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_1.html">h5ltmake_compressed_dataset_int_f_1</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_2.html">h5ltmake_compressed_dataset_int_f_2</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_3.html">h5ltmake_compressed_dataset_int_f_3</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_4.html">h5ltmake_compressed_dataset_int_f_4</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_5.html">h5ltmake_compressed_dataset_int_f_5</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_6.html">h5ltmake_compressed_dataset_int_f_6</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_7.html">h5ltmake_compressed_dataset_int_f_7</a>
+      
+      <a class="list-group-item" href="../proc/h5ltread_dataset_double_scalar_f.html">h5ltread_dataset_double_scalar_f</a>
+      
+      <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
+      
+      <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
+      
+      <a class="list-group-item" href="../proc/hqr2.html">hqr2</a>
+      
+      <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
+      
+      <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
+      
+      <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
+      
+      <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
+      
+      <a class="list-group-item" href="../interface/interpol.html">interpol</a>
+      
+      <a class="list-group-item" href="../proc/interpol1d_arr.html">interpol1D_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol1d_coeff.html">interpol1D_coeff</a>
+      
+      <a class="list-group-item" href="../proc/interpol1d_coeff_arr.html">interpol1D_coeff_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_2d_arr.html">interpol2D_2D_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_arr.html">interpol2D_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_coeff.html">interpol2D_coeff</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_coeff_arr.html">interpol2D_coeff_arr</a>
+      
+      <a class="list-group-item" href="../interface/interpol_coeff.html">interpol_coeff</a>
+      
+      <a class="list-group-item" href="../proc/lff_assign.html">lff_assign</a>
+      
+      <a class="list-group-item" href="../proc/lflf_add.html">lflf_add</a>
+      
+      <a class="list-group-item" href="../proc/lflf_assign.html">lflf_assign</a>
+      
+      <a class="list-group-item" href="../proc/lflf_subtract.html">lflf_subtract</a>
+      
+      <a class="list-group-item" href="../proc/lfs_divide.html">lfs_divide</a>
+      
+      <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
+      
+      <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
+      
+      <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
+      
+      <a class="list-group-item" href="../proc/lplp_subtract.html">lplp_subtract</a>
+      
+      <a class="list-group-item" href="../proc/lpp_assign.html">lpp_assign</a>
+      
+      <a class="list-group-item" href="../proc/lps_divide.html">lps_divide</a>
+      
+      <a class="list-group-item" href="../proc/lps_multiply.html">lps_multiply</a>
+      
+      <a class="list-group-item" href="../proc/lubksb.html">lubksb</a>
+      
+      <a class="list-group-item" href="../proc/ludcmp.html">ludcmp</a>
+      
+      <a class="list-group-item" href="../proc/m_spread.html">m_spread</a>
+      
+      <a class="list-group-item" href="../proc/make_beam_grid.html">make_beam_grid</a>
+      
+      <a class="list-group-item" href="../proc/matinv.html">matinv</a>
+      
+      <a class="list-group-item" href="../proc/mc_fastion.html">mc_fastion</a>
+      
+      <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
+      
+      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
+      
+      <a class="list-group-item" href="../proc/npa_part_assign.html">npa_part_assign</a>
+      
+      <a class="list-group-item" href="../proc/npa_weights.html">npa_weights</a>
+      
+      <a class="list-group-item" href="../interface/operator%28%2A%29.html">operator(*)</a>
+      
+      <a class="list-group-item" href="../interface/operator%28%2B%29.html">operator(+)</a>
+      
+      <a class="list-group-item" href="../interface/operator%28-%29.html">operator(-)</a>
+      
+      <a class="list-group-item" href="../interface/operator%28SLASH%29.html">operator(/)</a>
+      
+      <a class="list-group-item" href="../proc/outerprod.html">outerprod</a>
+      
+      <a class="list-group-item" href="../proc/p_cx.html">p_cx</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1.html">p_cx_1</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_1_adas.html">p_cx_1_1_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_2_adas.html">p_cx_1_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_3_adas.html">p_cx_1_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_4_adas.html">p_cx_1_4_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_janev.html">p_cx_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2.html">p_cx_2</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2_2_adas.html">p_cx_2_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2_3_adas.html">p_cx_2_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2_janev.html">p_cx_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3.html">p_cx_3</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_2_adas.html">p_cx_3_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_3_adas.html">p_cx_3_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_4_adas.html">p_cx_3_4_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_5_adas.html">p_cx_3_5_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_6inf_adas.html">p_cx_3_6inf_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_janev.html">p_cx_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_janev.html">p_cx_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_n.html">p_cx_n</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_n_janev.html">p_cx_n_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_n_m.html">p_cx_n_m</a>
+      
+      <a class="list-group-item" href="../proc/p_excit.html">p_excit</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_2_janev.html">p_excit_1_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_3_janev.html">p_excit_1_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_4_janev.html">p_excit_1_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_5_janev.html">p_excit_1_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_6_janev.html">p_excit_1_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_janev.html">p_excit_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_10_janev.html">p_excit_2_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_3_janev.html">p_excit_2_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_4_janev.html">p_excit_2_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_5_janev.html">p_excit_2_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_6_janev.html">p_excit_2_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_7_janev.html">p_excit_2_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_8_janev.html">p_excit_2_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_9_janev.html">p_excit_2_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_janev.html">p_excit_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_10_janev.html">p_excit_3_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_4_janev.html">p_excit_3_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_5_janev.html">p_excit_3_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_6_janev.html">p_excit_3_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_7_janev.html">p_excit_3_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_8_janev.html">p_excit_3_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_9_janev.html">p_excit_3_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_janev.html">p_excit_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_n.html">p_excit_n</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_n_m.html">p_excit_n_m</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz.html">p_ioniz</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_1_janev.html">p_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_2_omullane.html">p_ioniz_2_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_3_omullane.html">p_ioniz_3_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_4_omullane.html">p_ioniz_4_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_5_omullane.html">p_ioniz_5_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
+      
+      <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
+      
+      <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
+      
+      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
+      
+      <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
+      
+      <a class="list-group-item" href="../proc/pp_assign.html">pp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pp_subtract.html">pp_subtract</a>
+      
+      <a class="list-group-item" href="../proc/print_banner.html">print_banner</a>
+      
+      <a class="list-group-item" href="../proc/print_default_namelist.html">print_default_namelist</a>
+      
+      <a class="list-group-item" href="../proc/ps_divide.html">ps_divide</a>
+      
+      <a class="list-group-item" href="../proc/ps_multiply.html">ps_multiply</a>
+      
+      <a class="list-group-item" href="../interface/randind.html">randind</a>
+      
+      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      
+      <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
+      
+      <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
+      
+      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
+      
+      <a class="list-group-item" href="../proc/read_equilibrium.html">read_equilibrium</a>
+      
+      <a class="list-group-item" href="../proc/read_f.html">read_f</a>
+      
+      <a class="list-group-item" href="../proc/read_inputs.html">read_inputs</a>
+      
+      <a class="list-group-item" href="../proc/read_mc.html">read_mc</a>
+      
+      <a class="list-group-item" href="../proc/read_neutrals.html">read_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
+      
+      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      
+      <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
+      
+      <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
+      
+      <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
+      
+      <a class="list-group-item" href="../proc/rswap.html">RSWAP</a>
+      
+      <a class="list-group-item" href="../proc/sf_multiply.html">sf_multiply</a>
+      
+      <a class="list-group-item" href="../proc/simpsons_rule.html">simpsons_rule</a>
+      
+      <a class="list-group-item" href="../proc/slf_multiply.html">slf_multiply</a>
+      
+      <a class="list-group-item" href="../proc/slp_multiply.html">slp_multiply</a>
+      
+      <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
+      
+      <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
+      
+      <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
+      
+      <a class="list-group-item" href="../proc/store_births.html">store_births</a>
+      
+      <a class="list-group-item" href="../proc/store_fida_photons.html">store_fida_photons</a>
+      
+      <a class="list-group-item" href="../proc/store_fw_photons.html">store_fw_photons</a>
+      
+      <a class="list-group-item" href="../proc/store_fw_photons_at_chan.html">store_fw_photons_at_chan</a>
+      
+      <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/swap.html">swap</a>
+      
+      <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/track.html">track</a>
+      
+      <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_h_h.html">write_bb_H_H</a>
+      
+      <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
+      
+      <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_h_e.html">write_bt_H_e</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_h_h.html">write_bt_H_H</a>
+      
+      <a class="list-group-item" href="../proc/write_dcx.html">write_dcx</a>
+      
+      <a class="list-group-item" href="../proc/write_einstein.html">write_einstein</a>
+      
+      <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
+      
+      <a class="list-group-item" href="../proc/write_npa_weights.html">write_npa_weights</a>
+      
+      <a class="list-group-item" href="../proc/write_spectra.html">write_spectra</a>
+      
+      <a class="list-group-item" href="../proc/xyz_to_uvw.html">xyz_to_uvw</a>
+      
+    </div>
+  </div>
+</div>
+
+
+</div>  
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine read_npa()
+    
+    
+	 
+</h2>
+    
+  
+
+
+    
+    <p>Reads the NPA geometry and stores the quantities in <a href="../module/libfida.html#variable-npa_chords">npa_chords</a></p>
+    
+
+    <h3>Arguments</h3>
+    
+      <em>None</em>
+    
+    
+    
+     <h3>Calls</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+ -->
+<!-- Title: proc~~read_npa~~CallsGraph Pages: 1 -->
+<svg id="procread_npaCallsGraph" width="412pt" height="644pt"
+ viewBox="0.00 0.00 412.00 644.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_npa~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 640)">
+<title>proc~~read_npa~~CallsGraph</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-640 409,-640 409,5 -4,5"/>
+<!-- proc~read_npa -->
+<g id="node1" class="node"><title>proc~read_npa</title>
+<polygon fill="none" stroke="black" points="58,-334 2.4869e-14,-334 0,-308 58,-308 58,-334"/>
+<text text-anchor="middle" x="29" y="-318.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_npa</text>
+</g>
+<!-- h5open_f -->
+<g id="node2" class="node"><title>h5open_f</title>
+<polygon fill="#777777" stroke="#777777" points="200,-636 142,-636 142,-610 200,-610 200,-636"/>
+<text text-anchor="middle" x="171" y="-620.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5open_f -->
+<g id="edge10" class="edge"><title>proc~read_npa&#45;&gt;h5open_f</title>
+<path fill="none" stroke="#000000" d="M30.2854,-334.032C35.451,-383.835 56.2563,-561.312 94,-601 103.773,-611.276 117.982,-616.856 131.54,-619.85"/>
+<polygon fill="#000000" stroke="#000000" points="131.237,-623.352 141.698,-621.672 132.472,-616.462 131.237,-623.352"/>
+</g>
+<!-- proc~hit_npa_detector -->
+<g id="node3" class="node"><title>proc~hit_npa_detector</title>
+<a xlink:href="../proc/hit_npa_detector.html" xlink:title="hit_npa_detector">
+<polygon fill="#d9534f" stroke="#d9534f" points="217,-592 125,-592 125,-566 217,-566 217,-592"/>
+<text text-anchor="middle" x="171" y="-576.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hit_npa_detector</text>
+</a>
+</g>
+<!-- proc~read_npa&#45;&gt;proc~hit_npa_detector -->
+<g id="edge12" class="edge"><title>proc~read_npa&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M30.8992,-334.096C37.632,-378.798 61.7006,-524.391 94,-557 99.7733,-562.829 106.976,-567.139 114.643,-570.322"/>
+<polygon fill="#000000" stroke="#000000" points="113.564,-573.653 124.159,-573.67 115.888,-567.049 113.564,-573.653"/>
+</g>
+<!-- h5gopen_f -->
+<g id="node4" class="node"><title>h5gopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="203,-548 139,-548 139,-522 203,-522 203,-548"/>
+<text text-anchor="middle" x="171" y="-532.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5gopen_f -->
+<g id="edge14" class="edge"><title>proc~read_npa&#45;&gt;h5gopen_f</title>
+<path fill="none" stroke="#000000" d="M31.7672,-334.06C40.2675,-373.023 67.0593,-487.326 94,-513 103.451,-522.006 116.328,-527.365 128.846,-530.541"/>
+<polygon fill="#000000" stroke="#000000" points="128.227,-533.988 138.736,-532.648 129.685,-527.142 128.227,-533.988"/>
+</g>
+<!-- h5gclose_f -->
+<g id="node5" class="node"><title>h5gclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="203,-504 139,-504 139,-478 203,-478 203,-504"/>
+<text text-anchor="middle" x="171" y="-488.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5gclose_f -->
+<g id="edge16" class="edge"><title>proc~read_npa&#45;&gt;h5gclose_f</title>
+<path fill="none" stroke="#000000" d="M30.975,-334.282C35.9876,-363.215 51.9277,-432.275 94,-469 103.752,-477.513 116.596,-482.743 128.993,-485.953"/>
+<polygon fill="#000000" stroke="#000000" points="128.252,-489.374 138.772,-488.118 129.765,-482.539 128.252,-489.374"/>
+</g>
+<!-- proc~h5ltread_dataset_int_scalar_f -->
+<g id="node6" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="248,-460 94,-460 94,-434 248,-434 248,-460"/>
+<text text-anchor="middle" x="171" y="-444.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+</a>
+</g>
+<!-- proc~read_npa&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
+<g id="edge18" class="edge"><title>proc~read_npa&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M34.3109,-334.215C43.4326,-355.304 64.033,-396.572 94,-420 98.7187,-423.689 103.979,-426.896 109.474,-429.68"/>
+<polygon fill="#000000" stroke="#000000" points="108.337,-433.008 118.887,-433.975 111.242,-426.639 108.337,-433.008"/>
+</g>
+<!-- h5ltread_dataset_int_f -->
+<g id="node7" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="403,-439 285,-439 285,-413 403,-413 403,-439"/>
+<text text-anchor="middle" x="344" y="-423.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5ltread_dataset_int_f -->
+<g id="edge20" class="edge"><title>proc~read_npa&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M37.8418,-334.117C48.9917,-349.513 69.6731,-374.523 94,-387 124.639,-402.714 211.508,-413.807 274.247,-420.047"/>
+<polygon fill="#000000" stroke="#000000" points="274.194,-423.558 284.487,-421.044 274.873,-416.591 274.194,-423.558"/>
+</g>
+<!-- h5ltpath_valid_f -->
+<g id="node8" class="node"><title>h5ltpath_valid_f</title>
+<polygon fill="#777777" stroke="#777777" points="215,-378 127,-378 127,-352 215,-352 215,-378"/>
+<text text-anchor="middle" x="171" y="-362.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5ltpath_valid_f -->
+<g id="edge22" class="edge"><title>proc~read_npa&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M58.0238,-331.156C69.2265,-334.988 82.1718,-339.311 94,-343 101.466,-345.328 109.368,-347.696 117.155,-349.973"/>
+<polygon fill="#000000" stroke="#000000" points="116.336,-353.379 126.915,-352.798 118.283,-346.655 116.336,-353.379"/>
+</g>
+<!-- h5ltread_dataset_double_f -->
+<g id="node9" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="241,-334 101,-334 101,-308 241,-308 241,-334"/>
+<text text-anchor="middle" x="171" y="-318.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5ltread_dataset_double_f -->
+<g id="edge24" class="edge"><title>proc~read_npa&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M58.0785,-321C67.7431,-321 79.0223,-321 90.6417,-321"/>
+<polygon fill="#000000" stroke="#000000" points="90.9084,-324.5 100.908,-321 90.9084,-317.5 90.9084,-324.5"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="node10" class="node"><title>proc~xyz_to_uvw</title>
+<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="205,-290 137,-290 137,-264 205,-264 205,-290"/>
+<text text-anchor="middle" x="171" y="-274.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+<!-- proc~read_npa&#45;&gt;proc~xyz_to_uvw -->
+<g id="edge26" class="edge"><title>proc~read_npa&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M58.0238,-310.844C69.2265,-307.012 82.1718,-302.689 94,-299 104.67,-295.672 116.232,-292.265 127.073,-289.156"/>
+<polygon fill="#000000" stroke="#000000" points="128.119,-292.498 136.78,-286.396 126.204,-285.765 128.119,-292.498"/>
+</g>
+<!-- h5fopen_f -->
+<g id="node11" class="node"><title>h5fopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="201,-246 141,-246 141,-220 201,-220 201,-246"/>
+<text text-anchor="middle" x="171" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5fopen_f -->
+<g id="edge28" class="edge"><title>proc~read_npa&#45;&gt;h5fopen_f</title>
+<path fill="none" stroke="#000000" d="M38.5254,-307.854C50.0337,-292.905 70.7663,-268.79 94,-255 105.022,-248.458 118.09,-243.775 130.303,-240.46"/>
+<polygon fill="#000000" stroke="#000000" points="131.43,-243.787 140.296,-237.987 129.748,-236.992 131.43,-243.787"/>
+</g>
+<!-- h5fclose_f -->
+<g id="node12" class="node"><title>h5fclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="201,-202 141,-202 141,-176 201,-176 201,-202"/>
+<text text-anchor="middle" x="171" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5fclose_f -->
+<g id="edge30" class="edge"><title>proc~read_npa&#45;&gt;h5fclose_f</title>
+<path fill="none" stroke="#000000" d="M33.0825,-307.973C40.9968,-284.877 60.6454,-236.764 94,-211 104.505,-202.886 117.885,-197.764 130.534,-194.531"/>
+<polygon fill="#000000" stroke="#000000" points="131.452,-197.912 140.452,-192.322 129.93,-191.08 131.452,-197.912"/>
+</g>
+<!-- proc~plane_basis -->
+<g id="node13" class="node"><title>proc~plane_basis</title>
+<a xlink:href="../proc/plane_basis.html" xlink:title="plane_basis">
+<polygon fill="#d9534f" stroke="#d9534f" points="206,-158 136,-158 136,-132 206,-132 206,-158"/>
+<text text-anchor="middle" x="171" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">plane_basis</text>
+</a>
+</g>
+<!-- proc~read_npa&#45;&gt;proc~plane_basis -->
+<g id="edge32" class="edge"><title>proc~read_npa&#45;&gt;proc~plane_basis</title>
+<path fill="none" stroke="#000000" d="M30.733,-307.641C35.3183,-277.83 50.5513,-205.482 94,-167 102.935,-159.086 114.537,-154.006 126.012,-150.749"/>
+<polygon fill="#000000" stroke="#000000" points="127.099,-154.087 135.994,-148.331 125.451,-147.284 127.099,-154.087"/>
+</g>
+<!-- h5ltread_dataset_string_f -->
+<g id="node14" class="node"><title>h5ltread_dataset_string_f</title>
+<polygon fill="#777777" stroke="#777777" points="238,-114 104,-114 104,-88 238,-88 238,-114"/>
+<text text-anchor="middle" x="171" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_string_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5ltread_dataset_string_f -->
+<g id="edge34" class="edge"><title>proc~read_npa&#45;&gt;h5ltread_dataset_string_f</title>
+<path fill="none" stroke="#000000" d="M31.6509,-307.819C39.9222,-267.925 66.3597,-149.586 94,-123 95.1273,-121.916 96.3042,-120.884 97.5242,-119.903"/>
+<polygon fill="#000000" stroke="#000000" points="99.7765,-122.607 106.132,-114.13 95.8774,-116.793 99.7765,-122.607"/>
+</g>
+<!-- h5close_f -->
+<g id="node15" class="node"><title>h5close_f</title>
+<polygon fill="#777777" stroke="#777777" points="200,-70 142,-70 142,-44 200,-44 200,-70"/>
+<text text-anchor="middle" x="171" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
+</g>
+<!-- proc~read_npa&#45;&gt;h5close_f -->
+<g id="edge36" class="edge"><title>proc~read_npa&#45;&gt;h5close_f</title>
+<path fill="none" stroke="#000000" d="M30.8056,-307.891C37.3172,-262.439 60.9667,-112.563 94,-79 103.947,-68.8931 118.192,-63.3476 131.73,-60.3331"/>
+<polygon fill="#000000" stroke="#000000" points="132.651,-63.723 141.862,-58.4876 131.397,-56.8363 132.651,-63.723"/>
+</g>
+<!-- proc~uvw_to_xyz -->
+<g id="node16" class="node"><title>proc~uvw_to_xyz</title>
+<a xlink:href="../proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="205,-26 137,-26 137,-1.24345e-14 205,-3.55271e-15 205,-26"/>
+<text text-anchor="middle" x="171" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
+</a>
+</g>
+<!-- proc~read_npa&#45;&gt;proc~uvw_to_xyz -->
+<g id="edge38" class="edge"><title>proc~read_npa&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M30.2443,-307.691C35.2587,-256.832 55.5822,-75.5839 94,-35 102.587,-25.9288 114.631,-20.515 126.647,-17.3088"/>
+<polygon fill="#000000" stroke="#000000" points="127.645,-20.6729 136.658,-15.1029 126.139,-13.8368 127.645,-20.6729"/>
+</g>
+<!-- proc~in_boundary -->
+<g id="node17" class="node"><title>proc~in_boundary</title>
+<a xlink:href="../proc/in_boundary.html" xlink:title="in_boundary">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="380,-614 308,-614 308,-588 380,-588 380,-614"/>
+<text text-anchor="middle" x="344" y="-598.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_boundary</text>
+</a>
+</g>
+<!-- proc~hit_npa_detector&#45;&gt;proc~in_boundary -->
+<g id="edge2" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~in_boundary</title>
+<path fill="none" stroke="#000000" d="M217.816,-584.954C242.596,-588.105 272.922,-591.961 297.634,-595.104"/>
+<polygon fill="#000000" stroke="#000000" points="297.486,-598.613 307.848,-596.403 298.369,-591.669 297.486,-598.613"/>
+</g>
+<!-- proc~plane_intercept -->
+<g id="node18" class="node"><title>proc~plane_intercept</title>
+<a xlink:href="../proc/plane_intercept.html" xlink:title="plane_intercept">
+<polygon fill="#d9534f" stroke="#d9534f" points="387,-570 301,-570 301,-544 387,-544 387,-570"/>
+<text text-anchor="middle" x="344" y="-554.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">plane_intercept</text>
+</a>
+</g>
+<!-- proc~hit_npa_detector&#45;&gt;proc~plane_intercept -->
+<g id="edge4" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~plane_intercept</title>
+<path fill="none" stroke="#000000" d="M217.816,-573.046C240.306,-570.187 267.364,-566.746 290.648,-563.785"/>
+<polygon fill="#000000" stroke="#000000" points="291.231,-567.239 300.709,-562.505 290.348,-560.295 291.231,-567.239"/>
+</g>
+<!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
+<g id="edge6" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M248.14,-437.636C256.883,-436.575 265.755,-435.498 274.393,-434.449"/>
+<polygon fill="#000000" stroke="#000000" points="274.899,-437.914 284.404,-433.234 274.055,-430.965 274.899,-437.914"/>
+</g>
+<!-- proc~cross_product -->
+<g id="node22" class="node"><title>proc~cross_product</title>
+<a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="384,-158 304,-158 304,-132 384,-132 384,-158"/>
+<text text-anchor="middle" x="344" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+</a>
+</g>
+<!-- proc~plane_basis&#45;&gt;proc~cross_product -->
+<g id="edge8" class="edge"><title>proc~plane_basis&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M206.009,-145C231.246,-145 265.677,-145 293.832,-145"/>
+<polygon fill="#000000" stroke="#000000" points="293.893,-148.5 303.893,-145 293.892,-141.5 293.893,-148.5"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="556pt" height="34pt"
+ viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
+<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
+<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
+<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
+<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
+<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
+<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
+     
+     <h3>Called By</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+ -->
+<!-- Title: proc~~read_npa~~CalledByGraph Pages: 1 -->
+<svg id="procread_npaCalledByGraph" width="156pt" height="34pt"
+ viewBox="0.00 0.00 156.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_npa~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<title>proc~~read_npa~~CalledByGraph</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-30 153,-30 153,5 -4,5"/>
+<!-- proc~read_npa -->
+<g id="node1" class="node"><title>proc~read_npa</title>
+<polygon fill="none" stroke="black" points="148,-26 90,-26 90,-1.24345e-14 148,-3.55271e-15 148,-26"/>
+<text text-anchor="middle" x="119" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_npa</text>
+</g>
+<!-- program~fidasim -->
+<g id="node2" class="node"><title>program~fidasim</title>
+<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
+<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+<!-- program~fidasim&#45;&gt;proc~read_npa -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
+<path fill="none" stroke="#000000" d="M54.1054,-13C62.094,-13 71.0028,-13 79.5978,-13"/>
+<polygon fill="#000000" stroke="#000000" points="79.8433,-16.5001 89.8432,-13 79.8432,-9.5001 79.8433,-16.5001"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+<p>Nodes of different colours represent the following: </p>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="556pt" height="34pt"
+ viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
+<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
+<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
+<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
+<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
+<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
+<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+
+<p>Solid arrows point from a procedure to one which it calls. Dashed 
+arrows point from an interface to procedures which implement that interface.
+This could include the module procedures in a generic interface or the
+implementation in a submodule of an interface in a parent module.
+</p>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/read_npa.html#src">read_npa</a>
+  </div>
+</div>
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">read_npa</span>
+    <span class="c">!+ Reads the NPA geometry and stores the quantities in [[libfida:npa_chords]]</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fid</span><span class="p">,</span> <span class="n">gid</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">path_valid</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">a_tedge</span><span class="p">,</span><span class="n">a_redge</span><span class="p">,</span><span class="n">a_cent</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">d_tedge</span><span class="p">,</span><span class="n">d_redge</span><span class="p">,</span><span class="n">d_cent</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">a_shape</span><span class="p">,</span> <span class="n">d_shape</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="kd">::</span> <span class="nb">system</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">inv_4pi</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.</span><span class="n">d0</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xyz_a_tedge</span><span class="p">,</span><span class="n">xyz_a_redge</span><span class="p">,</span><span class="n">xyz_a_cent</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xyz_d_tedge</span><span class="p">,</span><span class="n">xyz_d_redge</span><span class="p">,</span><span class="n">xyz_d_cent</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eff_rd</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">rd_d</span><span class="p">,</span> <span class="n">r0</span><span class="p">,</span> <span class="n">r0_d</span><span class="p">,</span> <span class="n">v0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">basis</span><span class="p">,</span> <span class="n">inv_basis</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xd</span><span class="p">,</span> <span class="n">yd</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">effrd</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">phit</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">total_prob</span><span class="p">,</span> <span class="n">hh</span><span class="p">,</span> <span class="n">hw</span><span class="p">,</span> <span class="n">dprob</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">r</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ichan</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">,</span><span class="n">d_index</span><span class="p">,</span><span class="n">nd</span><span class="p">,</span><span class="n">cnt</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">error</span>
+
+    <span class="c">!!Initialize HDF5 interface</span>
+    <span class="k">call </span><span class="n">h5open_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Open HDF5 file</span>
+    <span class="k">call </span><span class="n">h5fopen_f</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">geometry_file</span><span class="p">,</span> <span class="n">H5F_ACC_RDWR_F</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Check if NPA group exists</span>
+    <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/npa&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">path_valid</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;NPA geometry is not in the geometry file&#39;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;Continuing without NPA diagnostics&#39;</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa_wght</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5close_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
+
+    <span class="c">!!Open NPA group</span>
+    <span class="k">call </span><span class="n">h5gopen_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/npa&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="k">call </span><span class="n">h5ltread_dataset_string_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/system&quot;</span><span class="p">,</span> <span class="nb">system</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/nchan&quot;</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- NPA settings ----&quot;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;NPA System: &quot;, a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="nb">system</span><span class="p">))</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Number of channels: &quot;,i3)&#39;</span><span class="p">)</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
+    <span class="n">endif</span>
+
+    <span class="k">allocate</span><span class="p">(</span><span class="n">a_tedge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">a_redge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">a_cent</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>  <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">a_shape</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">d_tedge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">d_redge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">d_cent</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>  <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">d_shape</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">radius</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">hit</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span> <span class="p">&amp;</span>
+                            <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span> <span class="p">&amp;</span>
+                            <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">npa_chords</span><span class="p">%</span><span class="n">hit</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+
+    <span class="k">allocate</span><span class="p">(</span><span class="n">effrd</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,&amp;</span>
+                     <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,&amp;</span>
+                     <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,&amp;</span>
+                     <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">phit</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,&amp;</span>
+                  <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,&amp;</span>
+                  <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,&amp;</span>
+                  <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">effrd</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">phit</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">]</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span><span class="s2">&quot;/npa/radius&quot;</span><span class="p">,</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">radius</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">2</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/a_shape&quot;</span><span class="p">,</span> <span class="n">a_shape</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">2</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/a_tedge&quot;</span><span class="p">,</span> <span class="n">a_tedge</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/a_redge&quot;</span><span class="p">,</span> <span class="n">a_redge</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/a_cent&quot;</span><span class="p">,</span>  <span class="n">a_cent</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="k">call </span><span class="n">h5ltread_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/d_shape&quot;</span><span class="p">,</span> <span class="n">d_shape</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">2</span><span class="p">:</span><span class="mi">2</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/d_tedge&quot;</span><span class="p">,</span> <span class="n">d_tedge</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/d_redge&quot;</span><span class="p">,</span> <span class="n">d_redge</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/d_cent&quot;</span><span class="p">,</span>  <span class="n">d_cent</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Close NPA group</span>
+    <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Close file id</span>
+    <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Close HDF5 interface</span>
+    <span class="k">call </span><span class="n">h5close_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+    <span class="c">! Define detector/aperture shape</span>
+    <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">%</span><span class="n">detector</span><span class="p">%</span><span class="nb">shape</span> <span class="o">=</span> <span class="n">d_shape</span>
+    <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">%</span><span class="n">aperture</span><span class="p">%</span><span class="nb">shape</span> <span class="o">=</span> <span class="n">a_shape</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,a)&#39;</span><span class="p">)</span> <span class="s2">&quot;Calculating hit probabilities for NPA channels&quot;</span>
+    <span class="n">endif</span>
+    <span class="n">chan_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">ichan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
+        <span class="c">! Convert to beam grid coordinates</span>
+        <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">a_cent</span><span class="p">(:,</span><span class="n">ichan</span><span class="p">),</span> <span class="n">xyz_a_cent</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">a_redge</span><span class="p">(:,</span><span class="n">ichan</span><span class="p">),</span><span class="n">xyz_a_redge</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">a_tedge</span><span class="p">(:,</span><span class="n">ichan</span><span class="p">),</span><span class="n">xyz_a_tedge</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">d_cent</span><span class="p">(:,</span><span class="n">ichan</span><span class="p">),</span> <span class="n">xyz_d_cent</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">d_redge</span><span class="p">(:,</span><span class="n">ichan</span><span class="p">),</span><span class="n">xyz_d_redge</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">d_tedge</span><span class="p">(:,</span><span class="n">ichan</span><span class="p">),</span><span class="n">xyz_d_tedge</span><span class="p">)</span>
+
+        <span class="c">! Define detector/aperture hh/hw</span>
+        <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">hw</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">xyz_d_redge</span> <span class="o">-</span> <span class="n">xyz_d_cent</span><span class="p">)</span>
+        <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">hw</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">xyz_a_redge</span> <span class="o">-</span> <span class="n">xyz_a_cent</span><span class="p">)</span>
+
+        <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">hh</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">xyz_d_tedge</span> <span class="o">-</span> <span class="n">xyz_d_cent</span><span class="p">)</span>
+        <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">hh</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">xyz_a_tedge</span> <span class="o">-</span> <span class="n">xyz_a_cent</span><span class="p">)</span>
+
+        <span class="c">! Define detector/aperture origin</span>
+        <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span> <span class="o">=</span> <span class="n">xyz_d_cent</span>
+        <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">origin</span> <span class="o">=</span> <span class="n">xyz_a_cent</span>
+
+        <span class="c">! Define detector/aperture basis</span>
+        <span class="k">call </span><span class="n">plane_basis</span><span class="p">(</span><span class="n">xyz_d_cent</span><span class="p">,</span> <span class="n">xyz_d_redge</span><span class="p">,</span> <span class="n">xyz_d_tedge</span><span class="p">,</span> <span class="p">&amp;</span>
+             <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span> <span class="p">&amp;</span>
+             <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">inv_basis</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">plane_basis</span><span class="p">(</span><span class="n">xyz_a_cent</span><span class="p">,</span> <span class="n">xyz_a_redge</span><span class="p">,</span> <span class="n">xyz_a_tedge</span><span class="p">,</span> <span class="p">&amp;</span>
+             <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span> <span class="p">&amp;</span>
+             <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">inv_basis</span><span class="p">)</span>
+
+        <span class="n">hw</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">hw</span>
+        <span class="n">hh</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">hh</span>
+        <span class="n">nd</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">xd</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nd</span>
+            <span class="n">xd</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">hw</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">hw</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+            <span class="n">yd</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">hh</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">hh</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+        <span class="n">enddo</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xd</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">xd</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">yd</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">yd</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">basis</span>
+        <span class="n">inv_basis</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">inv_basis</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c">! For each grid point find the probability of hitting the detector given an isotropic source</span>
+        <span class="c">!$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &amp;</span>
+        <span class="c">!$OMP&amp; rd_d,rd,d_index,v0,dprob,r)</span>
+        <span class="k">do </span><span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
+            <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span>
+                <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span>
+                    <span class="n">cnt</span> <span class="o">=</span> <span class="n">cnt</span><span class="o">+</span><span class="mi">1</span>
+                    <span class="n">total_prob</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+                    <span class="n">eff_rd</span> <span class="o">=</span> <span class="n">eff_rd</span><span class="o">*</span><span class="mf">0.</span><span class="n">d0</span>
+                    <span class="n">r0</span> <span class="o">=</span> <span class="p">[</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="n">j</span><span class="p">),</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+                    <span class="n">r0_d</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">inv_basis</span><span class="p">,</span><span class="n">r0</span><span class="o">-</span><span class="n">xyz_d_cent</span><span class="p">)</span>
+                    <span class="k">do </span><span class="n">ix</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nd</span>
+                        <span class="k">do </span><span class="n">iy</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nd</span>
+                            <span class="n">rd_d</span> <span class="o">=</span> <span class="p">[</span><span class="n">xd</span><span class="p">(</span><span class="n">ix</span><span class="p">),</span><span class="n">yd</span><span class="p">(</span><span class="n">iy</span><span class="p">),</span><span class="mf">0.</span><span class="n">d0</span><span class="p">]</span>
+                            <span class="n">rd</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="n">rd_d</span><span class="p">)</span> <span class="o">+</span> <span class="n">xyz_d_cent</span>
+                            <span class="n">v0</span> <span class="o">=</span> <span class="n">rd</span> <span class="o">-</span> <span class="n">r0</span>
+                            <span class="n">d_index</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="k">call </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">d_index</span><span class="p">,</span><span class="n">det</span><span class="o">=</span><span class="n">ichan</span><span class="p">)</span>
+                            <span class="k">if</span><span class="p">(</span><span class="n">d_index</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                                </span><span class="n">r</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">rd_d</span> <span class="o">-</span> <span class="n">r0_d</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+                                <span class="n">dprob</span> <span class="o">=</span> <span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">inv_4pi</span> <span class="o">*</span> <span class="n">r0_d</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+                                <span class="n">eff_rd</span> <span class="o">=</span> <span class="n">eff_rd</span> <span class="o">+</span> <span class="n">dprob</span><span class="o">*</span><span class="n">rd</span>
+                                <span class="n">total_prob</span> <span class="o">=</span> <span class="n">total_prob</span> <span class="o">+</span> <span class="n">dprob</span>
+                            <span class="n">endif</span>
+                        <span class="n">enddo</span> <span class="c">!yd loop</span>
+                    <span class="n">enddo</span> <span class="c">!xd loop</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">total_prob</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                        </span><span class="n">eff_rd</span> <span class="o">=</span> <span class="n">eff_rd</span><span class="o">/</span><span class="n">total_prob</span>
+                        <span class="n">phit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">=</span> <span class="n">total_prob</span>
+                        <span class="k">call </span><span class="n">xyz_to_uvw</span><span class="p">(</span><span class="n">eff_rd</span><span class="p">,</span><span class="n">effrd</span><span class="p">(:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">))</span>
+                        <span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">)%</span><span class="n">p</span> <span class="o">=</span> <span class="n">total_prob</span>
+                        <span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">)%</span><span class="n">eff_rd</span> <span class="o">=</span> <span class="n">eff_rd</span>
+                        <span class="n">npa_chords</span><span class="p">%</span><span class="n">hit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
+                    <span class="n">endif</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                        WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T4,&quot;Channel: &quot;,i3,&quot; &quot;,f7.2,&quot;% completed&quot;,a,$)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
+                                 <span class="n">ichan</span><span class="p">,</span> <span class="n">cnt</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="nb">char</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+                    <span class="n">endif</span>
+                <span class="n">enddo</span> <span class="c">!x loop</span>
+            <span class="n">enddo</span> <span class="c">!y loop</span>
+        <span class="n">enddo</span> <span class="c">!z loop</span>
+        <span class="c">!$OMP END PARALLEL DO</span>
+
+        <span class="n">total_prob</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(:,:,:,</span><span class="n">ichan</span><span class="p">)%</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">total_prob</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.</span><span class="n">d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;Channel &quot;,i3,&quot; missed the beam grid&quot;)&#39;</span><span class="p">),</span><span class="n">ichan</span>
+            <span class="k">cycle </span><span class="n">chan_loop</span>
+        <span class="n">endif</span>
+
+    <span class="n">enddo</span> <span class="n">chan_loop</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(50X,a)&#39;</span><span class="p">)</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">deallocate</span><span class="p">(</span><span class="n">phit</span><span class="p">,</span><span class="n">effrd</span><span class="p">)</span>
+    <span class="k">deallocate</span><span class="p">(</span><span class="n">a_shape</span><span class="p">,</span><span class="n">a_cent</span><span class="p">,</span><span class="n">a_redge</span><span class="p">,</span><span class="n">a_tedge</span><span class="p">)</span>
+    <span class="k">deallocate</span><span class="p">(</span><span class="n">d_shape</span><span class="p">,</span><span class="n">d_cent</span><span class="p">,</span><span class="n">d_redge</span><span class="p">,</span><span class="n">d_tedge</span><span class="p">)</span>
+
+<span class="k">end subroutine </span><span class="n">read_npa</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+  <section class="visible-xs visible-sm hidden-md">
+    <hr>
+    
+
+<div class="panel panel-default">
+  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allprocs-1">All Procedures</a></h3></div>
+  <div id="allprocs-1" class="panel-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../proc/approx_eq.html">approx_eq</a>
+      
+      <a class="list-group-item" href="../proc/approx_ge.html">approx_ge</a>
+      
+      <a class="list-group-item" href="../proc/approx_le.html">approx_le</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx.html">Aq_cx</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx_n.html">Aq_cx_n</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx_n_adas.html">Aq_cx_n_adas</a>
+      
+      <a class="list-group-item" href="../proc/aq_cx_n_janev.html">Aq_cx_n_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit.html">Aq_excit</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_2_janev.html">Aq_excit_1_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_3_janev.html">Aq_excit_1_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_4_janev.html">Aq_excit_1_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_5_janev.html">Aq_excit_1_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_1_janev.html">Aq_excit_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_10_janev.html">Aq_excit_2_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_3_janev.html">Aq_excit_2_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_4_janev.html">Aq_excit_2_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_5_janev.html">Aq_excit_2_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_6_janev.html">Aq_excit_2_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_7_janev.html">Aq_excit_2_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_8_janev.html">Aq_excit_2_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_9_janev.html">Aq_excit_2_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_2_janev.html">Aq_excit_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_10_janev.html">Aq_excit_3_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_4_janev.html">Aq_excit_3_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_5_janev.html">Aq_excit_3_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_6_janev.html">Aq_excit_3_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_7_janev.html">Aq_excit_3_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_8_janev.html">Aq_excit_3_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_9_janev.html">Aq_excit_3_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_3_janev.html">Aq_excit_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_n.html">Aq_excit_n</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_n_janev.html">Aq_excit_n_janev</a>
+      
+      <a class="list-group-item" href="../proc/aq_excit_n_m.html">Aq_excit_n_m</a>
+      
+      <a class="list-group-item" href="../proc/aq_ioniz.html">Aq_ioniz</a>
+      
+      <a class="list-group-item" href="../proc/aq_ioniz_n.html">Aq_ioniz_n</a>
+      
+      <a class="list-group-item" href="../proc/aq_ioniz_n_janev.html">Aq_ioniz_n_janev</a>
+      
+      <a class="list-group-item" href="../interface/assignment%28%3D%29.html">assignment(=)</a>
+      
+      <a class="list-group-item" href="../proc/attenuate.html">attenuate</a>
+      
+      <a class="list-group-item" href="../proc/b5_cx_1_adas.html">B5_cx_1_adas</a>
+      
+      <a class="list-group-item" href="../proc/b5_cx_1_janev.html">B5_cx_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/b5_cx_2_adas.html">B5_cx_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/b5_ioniz_1_janev.html">B5_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/balance.html">balance</a>
+      
+      <a class="list-group-item" href="../proc/balback.html">balback</a>
+      
+      <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_q_n.html">bt_maxwellian_q_n</a>
+      
+      <a class="list-group-item" href="../proc/bt_maxwellian_q_n_m.html">bt_maxwellian_q_n_m</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_1_adas.html">C6_cx_1_adas</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_1_janev.html">C6_cx_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_2_adas.html">C6_cx_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/c6_cx_3_adas.html">C6_cx_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/c6_ioniz_1_janev.html">C6_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/calc_perp_vectors.html">calc_perp_vectors</a>
+      
+      <a class="list-group-item" href="../proc/check_compression_availability.html">check_compression_availability</a>
+      
+      <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
+      
+      <a class="list-group-item" href="../proc/colrad.html">colrad</a>
+      
+      <a class="list-group-item" href="../proc/comabs.html">comabs</a>
+      
+      <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
+      
+      <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_2_janev.html">e_excit_1_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_3_janev.html">e_excit_1_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_4_janev.html">e_excit_1_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_5_janev.html">e_excit_1_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_1_janev.html">e_excit_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_2_3_janev.html">e_excit_2_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_f.html">e_excit_f</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_n.html">e_excit_n</a>
+      
+      <a class="list-group-item" href="../proc/e_excit_n_m.html">e_excit_n_m</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz.html">e_ioniz</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_1_janev.html">e_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_2_janev.html">e_ioniz_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_3_janev.html">e_ioniz_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/e_ioniz_n.html">e_ioniz_n</a>
+      
+      <a class="list-group-item" href="../proc/eigen.html">eigen</a>
+      
+      <a class="list-group-item" href="../proc/elmhes.html">elmhes</a>
+      
+      <a class="list-group-item" href="../proc/elmtrans.html">elmtrans</a>
+      
+      <a class="list-group-item" href="../proc/fast_ion_assign.html">fast_ion_assign</a>
+      
+      <a class="list-group-item" href="../proc/ff_add.html">ff_add</a>
+      
+      <a class="list-group-item" href="../proc/ff_assign.html">ff_assign</a>
+      
+      <a class="list-group-item" href="../proc/ff_subtract.html">ff_subtract</a>
+      
+      <a class="list-group-item" href="../proc/fida_f.html">fida_f</a>
+      
+      <a class="list-group-item" href="../proc/fida_mc.html">fida_mc</a>
+      
+      <a class="list-group-item" href="../proc/fida_weights_los.html">fida_weights_los</a>
+      
+      <a class="list-group-item" href="../proc/fida_weights_mc.html">fida_weights_mc</a>
+      
+      <a class="list-group-item" href="../proc/flf_assign.html">flf_assign</a>
+      
+      <a class="list-group-item" href="../proc/fs_divide.html">fs_divide</a>
+      
+      <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
+      
+      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      
+      <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
+      
+      <a class="list-group-item" href="../proc/get_ep_denf.html">get_ep_denf</a>
+      
+      <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
+      
+      <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
+      
+      <a class="list-group-item" href="../proc/get_plasma.html">get_plasma</a>
+      
+      <a class="list-group-item" href="../proc/get_position.html">get_position</a>
+      
+      <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
+      
+      <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
+      
+      <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_1.html">h5ltmake_compressed_dataset_double_f_1</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_2.html">h5ltmake_compressed_dataset_double_f_2</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_3.html">h5ltmake_compressed_dataset_double_f_3</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_4.html">h5ltmake_compressed_dataset_double_f_4</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_5.html">h5ltmake_compressed_dataset_double_f_5</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_6.html">h5ltmake_compressed_dataset_double_f_6</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_double_f_7.html">h5ltmake_compressed_dataset_double_f_7</a>
+      
+      <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_int_f.html">h5ltmake_compressed_dataset_int_f</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_1.html">h5ltmake_compressed_dataset_int_f_1</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_2.html">h5ltmake_compressed_dataset_int_f_2</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_3.html">h5ltmake_compressed_dataset_int_f_3</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_4.html">h5ltmake_compressed_dataset_int_f_4</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_5.html">h5ltmake_compressed_dataset_int_f_5</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_6.html">h5ltmake_compressed_dataset_int_f_6</a>
+      
+      <a class="list-group-item" href="../proc/h5ltmake_compressed_dataset_int_f_7.html">h5ltmake_compressed_dataset_int_f_7</a>
+      
+      <a class="list-group-item" href="../proc/h5ltread_dataset_double_scalar_f.html">h5ltread_dataset_double_scalar_f</a>
+      
+      <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
+      
+      <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
+      
+      <a class="list-group-item" href="../proc/hqr2.html">hqr2</a>
+      
+      <a class="list-group-item" href="../proc/hqrvec.html">hqrvec</a>
+      
+      <a class="list-group-item" href="../proc/in_boundary.html">in_boundary</a>
+      
+      <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
+      
+      <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
+      
+      <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
+      
+      <a class="list-group-item" href="../interface/interpol.html">interpol</a>
+      
+      <a class="list-group-item" href="../proc/interpol1d_arr.html">interpol1D_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol1d_coeff.html">interpol1D_coeff</a>
+      
+      <a class="list-group-item" href="../proc/interpol1d_coeff_arr.html">interpol1D_coeff_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_2d_arr.html">interpol2D_2D_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_arr.html">interpol2D_arr</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_coeff.html">interpol2D_coeff</a>
+      
+      <a class="list-group-item" href="../proc/interpol2d_coeff_arr.html">interpol2D_coeff_arr</a>
+      
+      <a class="list-group-item" href="../interface/interpol_coeff.html">interpol_coeff</a>
+      
+      <a class="list-group-item" href="../proc/lff_assign.html">lff_assign</a>
+      
+      <a class="list-group-item" href="../proc/lflf_add.html">lflf_add</a>
+      
+      <a class="list-group-item" href="../proc/lflf_assign.html">lflf_assign</a>
+      
+      <a class="list-group-item" href="../proc/lflf_subtract.html">lflf_subtract</a>
+      
+      <a class="list-group-item" href="../proc/lfs_divide.html">lfs_divide</a>
+      
+      <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
+      
+      <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
+      
+      <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
+      
+      <a class="list-group-item" href="../proc/lplp_subtract.html">lplp_subtract</a>
+      
+      <a class="list-group-item" href="../proc/lpp_assign.html">lpp_assign</a>
+      
+      <a class="list-group-item" href="../proc/lps_divide.html">lps_divide</a>
+      
+      <a class="list-group-item" href="../proc/lps_multiply.html">lps_multiply</a>
+      
+      <a class="list-group-item" href="../proc/lubksb.html">lubksb</a>
+      
+      <a class="list-group-item" href="../proc/ludcmp.html">ludcmp</a>
+      
+      <a class="list-group-item" href="../proc/m_spread.html">m_spread</a>
+      
+      <a class="list-group-item" href="../proc/make_beam_grid.html">make_beam_grid</a>
+      
+      <a class="list-group-item" href="../proc/matinv.html">matinv</a>
+      
+      <a class="list-group-item" href="../proc/mc_fastion.html">mc_fastion</a>
+      
+      <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
+      
+      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
+      
+      <a class="list-group-item" href="../proc/npa_part_assign.html">npa_part_assign</a>
+      
+      <a class="list-group-item" href="../proc/npa_weights.html">npa_weights</a>
+      
+      <a class="list-group-item" href="../interface/operator%28%2A%29.html">operator(*)</a>
+      
+      <a class="list-group-item" href="../interface/operator%28%2B%29.html">operator(+)</a>
+      
+      <a class="list-group-item" href="../interface/operator%28-%29.html">operator(-)</a>
+      
+      <a class="list-group-item" href="../interface/operator%28SLASH%29.html">operator(/)</a>
+      
+      <a class="list-group-item" href="../proc/outerprod.html">outerprod</a>
+      
+      <a class="list-group-item" href="../proc/p_cx.html">p_cx</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1.html">p_cx_1</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_1_adas.html">p_cx_1_1_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_2_adas.html">p_cx_1_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_3_adas.html">p_cx_1_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_4_adas.html">p_cx_1_4_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_1_janev.html">p_cx_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2.html">p_cx_2</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2_2_adas.html">p_cx_2_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2_3_adas.html">p_cx_2_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_2_janev.html">p_cx_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3.html">p_cx_3</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_2_adas.html">p_cx_3_2_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_3_adas.html">p_cx_3_3_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_4_adas.html">p_cx_3_4_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_5_adas.html">p_cx_3_5_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_6inf_adas.html">p_cx_3_6inf_adas</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_3_janev.html">p_cx_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_janev.html">p_cx_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_n.html">p_cx_n</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_n_janev.html">p_cx_n_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_cx_n_m.html">p_cx_n_m</a>
+      
+      <a class="list-group-item" href="../proc/p_excit.html">p_excit</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_2_janev.html">p_excit_1_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_3_janev.html">p_excit_1_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_4_janev.html">p_excit_1_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_5_janev.html">p_excit_1_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_6_janev.html">p_excit_1_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_1_janev.html">p_excit_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_10_janev.html">p_excit_2_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_3_janev.html">p_excit_2_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_4_janev.html">p_excit_2_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_5_janev.html">p_excit_2_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_6_janev.html">p_excit_2_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_7_janev.html">p_excit_2_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_8_janev.html">p_excit_2_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_9_janev.html">p_excit_2_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_2_janev.html">p_excit_2_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_10_janev.html">p_excit_3_10_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_4_janev.html">p_excit_3_4_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_5_janev.html">p_excit_3_5_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_6_janev.html">p_excit_3_6_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_7_janev.html">p_excit_3_7_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_8_janev.html">p_excit_3_8_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_9_janev.html">p_excit_3_9_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_3_janev.html">p_excit_3_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_n.html">p_excit_n</a>
+      
+      <a class="list-group-item" href="../proc/p_excit_n_m.html">p_excit_n_m</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz.html">p_ioniz</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_1_janev.html">p_ioniz_1_janev</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_2_omullane.html">p_ioniz_2_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_3_omullane.html">p_ioniz_3_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_4_omullane.html">p_ioniz_4_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_5_omullane.html">p_ioniz_5_omullane</a>
+      
+      <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
+      
+      <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
+      
+      <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
+      
+      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
+      
+      <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
+      
+      <a class="list-group-item" href="../proc/pp_assign.html">pp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pp_subtract.html">pp_subtract</a>
+      
+      <a class="list-group-item" href="../proc/print_banner.html">print_banner</a>
+      
+      <a class="list-group-item" href="../proc/print_default_namelist.html">print_default_namelist</a>
+      
+      <a class="list-group-item" href="../proc/ps_divide.html">ps_divide</a>
+      
+      <a class="list-group-item" href="../proc/ps_multiply.html">ps_multiply</a>
+      
+      <a class="list-group-item" href="../interface/randind.html">randind</a>
+      
+      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      
+      <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
+      
+      <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
+      
+      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
+      
+      <a class="list-group-item" href="../proc/read_equilibrium.html">read_equilibrium</a>
+      
+      <a class="list-group-item" href="../proc/read_f.html">read_f</a>
+      
+      <a class="list-group-item" href="../proc/read_inputs.html">read_inputs</a>
+      
+      <a class="list-group-item" href="../proc/read_mc.html">read_mc</a>
+      
+      <a class="list-group-item" href="../proc/read_neutrals.html">read_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
+      
+      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      
+      <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
+      
+      <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
+      
+      <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
+      
+      <a class="list-group-item" href="../proc/rswap.html">RSWAP</a>
+      
+      <a class="list-group-item" href="../proc/sf_multiply.html">sf_multiply</a>
+      
+      <a class="list-group-item" href="../proc/simpsons_rule.html">simpsons_rule</a>
+      
+      <a class="list-group-item" href="../proc/slf_multiply.html">slf_multiply</a>
+      
+      <a class="list-group-item" href="../proc/slp_multiply.html">slp_multiply</a>
+      
+      <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
+      
+      <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
+      
+      <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
+      
+      <a class="list-group-item" href="../proc/store_births.html">store_births</a>
+      
+      <a class="list-group-item" href="../proc/store_fida_photons.html">store_fida_photons</a>
+      
+      <a class="list-group-item" href="../proc/store_fw_photons.html">store_fw_photons</a>
+      
+      <a class="list-group-item" href="../proc/store_fw_photons_at_chan.html">store_fw_photons_at_chan</a>
+      
+      <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/swap.html">swap</a>
+      
+      <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/track.html">track</a>
+      
+      <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_h_h.html">write_bb_H_H</a>
+      
+      <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
+      
+      <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_h_e.html">write_bt_H_e</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_h_h.html">write_bt_H_H</a>
+      
+      <a class="list-group-item" href="../proc/write_dcx.html">write_dcx</a>
+      
+      <a class="list-group-item" href="../proc/write_einstein.html">write_einstein</a>
+      
+      <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
+      
+      <a class="list-group-item" href="../proc/write_npa_weights.html">write_npa_weights</a>
+      
+      <a class="list-group-item" href="../proc/write_spectra.html">write_spectra</a>
+      
+      <a class="list-group-item" href="../proc/xyz_to_uvw.html">xyz_to_uvw</a>
+      
+    </div>
+  </div>
+</div>
+
+
+  </section>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

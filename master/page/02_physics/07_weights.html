@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Weight Functions &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Weight Functions</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/02_physics/index.html'>Physics</a></li>
+      
+         <li class="active">Weight Functions</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-9 col-md-push-3" id='text'>
+      <div class="toc">
+<ul>
+<li><a href="#weight-functions">Weight Functions</a></li>
+<li><a href="#fida">FIDA</a></li>
+<li><a href="#npa">NPA</a></li>
+</ul>
+</div>
+<hr>
+<h1 id="weight-functions">Weight Functions</h1>
+<p>FIDASIM is capable of calculating phase space sensitivities, also known as "weight" functions.
+These weight functions describe how sensitive a diagnostic is to a region of fast-ion phase space (Energy/pitch).
+Alternatively, you can think of weight functions as the probability of a region of phase space contributing to the diagnostic signal.</p>
+<p>When a weight function is convolved with a theoretical fast-ion distribution, the expected diagnostic signal is calculated.
+An example of this process is shown below.</p>
+<p style="text-align: center"><img alt="S = W x F" src="../../media/wf_integral.png" width="700"></p>
+<p>FIDASIM can calculate weight functions for the FIDA and NPA diagnostics.</p>
+<h1 id="fida">FIDA</h1>
+<p>The calculation of the FIDA weight function can be broken up into 3 parts.</p>
+<ol>
+<li>Probability of a fast-ion charge exchanging with a neutral to create a fast neutral.</li>
+<li>Probability of a fast neutral undergoing a Balmer-\(\alpha\) transition and emitting a photon within the LOS.</li>
+<li>Probability of a photon landing in a certain wavelength region.</li>
+</ol>
+<p>The product of these probabilities will be proportional to the FIDA weight function.</p>
+<p>The probabilities mentioned above are implicitly local quantities, however, in reality the neutral population and the diagnostic geometry have spatial extent. 
+The (exact) expected FIDA signal is given by</p>
+<p>$$
+S(\lambda) = \sum_{cells} \left (\sum_{E,p} W_i(E,p,\lambda) \times F_i(E,p) \, \Delta E \Delta p \right )
+$$</p>
+<p>In order to calculate a single representative weight function for a given diagnostic (\(W(\lambda,E,p)\), spatial averaging is needed.</p>
+<p>FIDASIM offers two different ways of calculating the FIDA weight functions; each using a different spatial averaging method.</p>
+<hr>
+<p><code>calc_fida_wght = 1</code></p>
+<p>With this switch the FIDA weight function is calculated using LOS integrated neutral density and weighted plasma parameters given by</p>
+<p>$$
+k_{mean} = \frac{\int k \times (d_{beam} + d_{halo}) \,dl}{\int (d_{beam} + d_{halo}) \, dl}
+$$</p>
+<p>where \(k\) represents the various plasma parameters and distribution function.</p>
+<p>Using this method the FIDA spectra can be estimated by 
+$$
+S_{approx}(\lambda) = \sum_{E,p} \overline{W}(E,p,\lambda) \times \overline{F}(E,p) \Delta E \Delta p
+$$</p>
+<p>where \(\overline{W}\) is the weight function calculated with LOS-averaged quantities and \(\overline{F}\) is the LOS-averaged fast-ion distribution function. </p>
+<hr>
+<p><code>calc_fida_wght = 2</code></p>
+<p>With this switch it is assumed that over the line of sight the fast-ion distribution is approximately constant.
+$$
+S_{approx}(\lambda) = \sum_{E,p} \overline{F}(E,p) \times \overline{W}(E,p,\lambda) \, \Delta E \Delta p
+$$
+where
+$$
+\overline{W} = \sum_{cells} W_i
+$$
+and
+$$
+\overline{F}(E,p) = \frac{\sum_{cells} \sum_{\lambda} W_i(E,p,\lambda) \times F_i(E,p)}{\sum_{\lambda}\overline{W}(E,p,\lambda)}
+$$</p>
+<p>This method is more computationally intensive and uses a Monte Carlo method which introduces some noise.
+Regardless, this method is more accurate then the previous method and should be used in analysis where accuracy is paramount, e.g. velocity space tomography. </p>
+<p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>The FIDA signal produced by <code>calc_fida = 1</code> will sometimes significantly differ from the estimated FIDA spectra produced by convolving the weight functions with the fast-ion distribution. This is due to the approximations made in the weight function calculation. In general you can use the <code>calc_fida=1</code> result to test the approximations used by <code>calc_fida_wght=1/2</code></p></div>
+<h1 id="npa">NPA</h1>
+<p>The calculation of the NPA weight function can be broken up into 3 parts.</p>
+<ol>
+<li>Probability of a fast-ion charge exchanging with a neutral to create a fast neutral.</li>
+<li>Probability of a the fast neutrals trajectory hitting the NPA detector. See this <a href="http://nstx.pppl.gov/DragNDrop/Publications_Presentations/Publications/2014%20Papers/Stagner_RSI.pdf">paper</a></li>
+<li>Probability of a the fast neutral not being reabsorbed back into the plasma.</li>
+</ol>
+<p>The product of these probabilities will be proportional to the NPA weight function.</p>
+<p>The probabilities mentioned above are implicitly local quantities, however, in reality the neutral population and the diagnostic geometry have spatial extent. 
+The (exact) expected NPA signal is given by</p>
+<p>$$
+flux(E) = \sum_{cells} \left (\sum_{p} W_i(E,p) \times F_i(E,p) \, \Delta p \right )
+$$</p>
+<p>The NPA weight functions are calculated using the same assumptions as the FIDA weight functions (<code>calc_fida_wght=2</code>).
+However, since the <code>calc_npa</code> calculation is very slow and inefficient the NPA flux calculated here is exact.</p>
+<p>If <code>calc_npa_wght = 2</code> is set then the individual compenents of the npa weight function are also outputed. </p>
+    </div>
+    
+    <div class="col-md-3 col-md-pull-9">
+      <hr class="visible-xs visible-sm">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

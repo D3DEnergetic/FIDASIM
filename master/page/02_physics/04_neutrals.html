@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Neutral Beam and Halo &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Neutral Beam and Halo</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/02_physics/index.html'>Physics</a></li>
+      
+         <li class="active">Neutral Beam and Halo</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-9 col-md-push-3" id='text'>
+      <p style="text-align: center"><img alt="" src="../../media/neutral-beam.png"></p>
+<style>
+table {
+width: 100%;
+}
+table,th,td {
+border: 1px solid black;
+border-collapse: collapse;
+}
+th, td {
+padding: 5px;
+}
+th {
+text-align: center;
+}
+</style>
+
+<div class="toc">
+<ul>
+<li><a href="#beam-grid">Beam Grid</a></li>
+<li><a href="#neutral-beam-geometry">Neutral Beam Geometry</a></li>
+<li><a href="#neutral-beam-density">Neutral Beam Density</a></li>
+<li><a href="#dcx-and-halo-density">DCX and Halo Density</a></li>
+<li><a href="#relevent-namelist-settings">Relevent Namelist Settings</a></li>
+<li><a href="#fortran-references">Fortran References</a></li>
+</ul>
+</div>
+<hr>
+<h1 id="beam-grid">Beam Grid</h1>
+<p>The neutrals densities calculated by FIDASIM are stored in a 3D grid.
+FIDASIM requires that the grid be axis-aligned to easily track particles through the grid.
+However, it is extremely useful to be able to align the grid along the beam centerline.
+To facilitate this FIDASIM allows the user to define arbitrary Cartesian coordinate system (beam grid coordinates) that all calculations are done in.</p>
+<p>FIDASIM uses <a href="https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles">Tait-Bryan rotation angles</a> (<code>alpha</code>,<code>beta</code>,<code>gamma</code>) to define a intrinsic rotation matrix, \(R\), that is used to transform from beam grid coordinates(xyz) to machine coordinates(uvw)
+$$ \mathrm{uvw = R \cdot xyz + origin} $$
+If the rotation angles and <code>origin</code> are set to zero then the rotation matrix is the Identity matrix and the coordinate system is identical to machine coordinates (Standard Cartesian). </p>
+<p>Understanding these variables can be difficult and can best be described by an example. </p>
+<ol>
+<li>With your right hand point your index finger pointing in the +x direction with your middle finger and thumb pointing in the +y and +z direction respectively.</li>
+<li>Rotate about your thumb (z-axis) by <code>alpha</code> (ccw = +angle, cw = -angle)</li>
+<li>Rotate about your middle finger (y'-axis) by <code>beta</code></li>
+<li>Rotate about your index finger (x"-axis) by <code>gamma</code></li>
+<li>Move your right hand to the <code>origin</code></li>
+<li>Define <code>(x|y|z)_(min|max)</code> by this coordinate system with your index finger being the new +x-axis</li>
+</ol>
+<p>The beam grid is defined in the namelist file (<code>[runid]_inputs.dat</code>) and are defined as follows</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nx</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of cells in the X direction</td>
+</tr>
+<tr>
+<td align="center"><code>ny</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of cells in the Y direction</td>
+</tr>
+<tr>
+<td align="center"><code>nz</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of cells in the Z direction</td>
+</tr>
+<tr>
+<td align="center"><code>xmin</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Minimum X value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>xmax</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Maximum X value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>ymin</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Minimum Y value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>ymax</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Maximum Y value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>zmin</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Minimum Z value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>zmax</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Maximum Z value in beam grid coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>alpha</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">rad</td>
+<td align="left">Tait-Bryan rotation angle about z-axis</td>
+</tr>
+<tr>
+<td align="center"><code>beta</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">rad</td>
+<td align="left">Tait-Bryan rotation angle about y'-axis</td>
+</tr>
+<tr>
+<td align="center"><code>gamma</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">rad</td>
+<td align="left">Tait-Bryan rotation angle about x"-axis</td>
+</tr>
+<tr>
+<td align="center"><code>origin</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">cm</td>
+<td align="left">Beam grid origin in Machine Coordinates</td>
+</tr>
+</tbody>
+</table>
+<h1 id="neutral-beam-geometry">Neutral Beam Geometry</h1>
+<p>A neutral beam is defined by a source position and an axis such that a position along the beam centerline is defined as
+$$\vec{C}(t) = \vec{s} + \vec{a} \cdot t$$
+where \(\vec{C}(t)\) is the position along the centerline parameterized by \(t\), \(\vec{s}\) is the source position in machine coordinates, and \(\vec{a}\) is the axis.</p>
+<p>The ion source is defined by its shape (circular or rectangular), size (half width and height), focal length (vertical and horizontal), and divergence (energy dependent).
+The neutral beam is simulated by firing particles from random positions on the source plate.
+The trajectory of the particles is determined by the following equations (+x into the plasma)
+$$v_x = 1$$
+$$v_y = -\frac{y_s}{f_y} + \tan(\mathcal{N}(0,\beta_y^2))$$
+$$v_z = -\frac{z_s}{f_z} + \tan(\mathcal{N}(0,\beta_z^2))$$
+where \(y_s\) and \(z_s\) are random positions on the source plate in the horizontal and vertical directions respectively, 
+\(f_{y/z}\) are the focal lengths, and \(\beta_{y/z}\) are the divergences. Examples of different trajectories are shown below.</p>
+<p style="text-align: center"><img alt="" src="../../media/beam_divergence.png"></p>
+<p>Not shown above are the beam aperture(s) which collimates the neutral beam.
+Apertures are represented in FIDASIM by their shape (circular or rectangular), size (half width and
+height), offsets relative to the +x aligned beam centerline, and their distance from the source grid.
+It is assumed that the plane of the aperture(s) is parallel to the plane of the source grid.</p>
+<p>FIDASIM reads in the neutral beam geometry from a HDF5 file (<code>[runid]_geometry.h5</code>) that has the group <code>nbi</code> with the following datasets</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>name</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Name of the neutral beam</td>
+</tr>
+<tr>
+<td align="center"><code>shape</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Shape of the beam source grid (1=rect or 2=circ)</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the neutral beam geometry</td>
+</tr>
+<tr>
+<td align="center"><code>src</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">cm</td>
+<td align="left">Position of the source grid in machine coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>axis</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">NA</td>
+<td align="left">Direction of the beam center line</td>
+</tr>
+<tr>
+<td align="center"><code>widy</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Source grid half-width in the horizontal direction</td>
+</tr>
+<tr>
+<td align="center"><code>widz</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Source grid half-height in the vertical direction</td>
+</tr>
+<tr>
+<td align="center"><code>divy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">rad</td>
+<td align="left">Horizontal beam divergence</td>
+</tr>
+<tr>
+<td align="center"><code>divz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[3]</td>
+<td align="center">rad</td>
+<td align="left">Vertical beam divergence</td>
+</tr>
+<tr>
+<td align="center"><code>focy</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Horizontal focal length</td>
+</tr>
+<tr>
+<td align="center"><code>focz</code></td>
+<td align="center">Float64</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">cm</td>
+<td align="left">Vertical focal length</td>
+</tr>
+<tr>
+<td align="center"><code>naperture</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of apertures</td>
+</tr>
+<tr>
+<td align="center"><code>ashape</code></td>
+<td align="center">Int16</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">NA</td>
+<td align="left">Shape of the aperture(s) (1=rect or 2=circ)</td>
+</tr>
+<tr>
+<td align="center"><code>awidy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-width of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>awidz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Half-height of the aperture(s)</td>
+</tr>
+<tr>
+<td align="center"><code>aoffy</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>aoffz</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline</td>
+</tr>
+<tr>
+<td align="center"><code>adist</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>naperture</code>]</td>
+<td align="center">cm</td>
+<td align="left">Distance from the center of the beam source grid to the aperture(s) plane</td>
+</tr>
+</tbody>
+</table>
+<h1 id="neutral-beam-density">Neutral Beam Density</h1>
+<p>Neutral Hydrogen beams usually contain atoms with different energies: \(H(E_{inj})\) (Full), \(H(E_{inj}/2)\) (Half),\(H(E_{inj}/3)\) (Third).
+This splitting of energy is due to multiple atomic and molecular species being accelerated to the same kinetic energy, \(E_{inj}\).
+Each beam species will attenuate differently into the plasma and need to be treated separetely.
+It is assumed that each neutral is in the ground state with initial flux given by
+$$ F_i(n=1) = \frac{dN_i}{dt} = C_i \cdot \frac{dN_{tot}}{dt} $$
+where \(C_i\) is current fraction for the \(i_{th}\) energy component and \(dN_{tot}/dt\) is the total flux of neutrals given by
+$$\frac{dN_{tot}}{dt} = \frac{P_{inj}}{C_1 E_{inj}+ C_2 E_{inj}/2 + C_3 E_{inj}/3} $$
+where \(P_{inj}\) is the beam power.</p>
+<p>Within each beam grid cell along the neutral trajectory the flux is modified using the <a href="./03_colrad.html">collisional radiative model</a> and the neutral density is calculated.
+The figure below illustrates the different beam attenuation profiles.</p>
+<p style="text-align: center"><img alt="" src="../../media/neutral_beam.png"></p>
+<h1 id="dcx-and-halo-density">DCX and Halo Density</h1>
+<p>A secondary source of neutrals come from the charge exchange reaction between beam neutrals and thermal ions (DCX).
+After neutralization, the newly created thermal neutrals travel ballistically and charge exchange with other thermal ions creating more neutrals (Halo).
+This process is then repeated multiple times in a recursive fashion producing fewer and fewer neutrals.
+The effect of this process is a Halo of neutrals surrounding the neutral beam.</p>
+<p>FIDASIM uses the following scheme to calculate the DCX+Halo contribution.</p>
+<p>\(\rm{DCX:\,\,\,} \quad H_{t_0}^+ + H_b \rightarrow H_{t_0} + H_b^+\)</p>
+<p>\(\rm{Halo\,1:} \quad H_{t_1}^+ + H_{t_0} \rightarrow H_{t_1} + H_{t_0}^+\)</p>
+<p>\(\rm{Halo\,2:} \quad H_{t_2}^+ + H_{t_1} \rightarrow H_{t_2} + H_{t_1}^+\)</p>
+<p>\(\vdots\)</p>
+<p>\(\rm{Halo\,n:} \quad H_{t_n}^+ + H_{t_{(n-1)}} \rightarrow H_{t_n} + H_{t_{(n-1)}}^+\)</p>
+<p>After a few iterations the halo density converges and the calculation ends.</p>
+<h1 id="relevent-namelist-settings">Relevent Namelist Settings</h1>
+<ul>
+<li><code>ab</code>: Beam/Fast-ion mass [amu]</li>
+<li><code>pinj</code>: Beam power [MW]</li>
+<li><code>einj</code>: Beam Energy [keV]</li>
+<li><code>current_fractions</code>: Current fractions</li>
+<li><code>load_neutrals</code>: Load neutrals from file</li>
+<li><code>neutrals_file</code>: Optional neutrals file</li>
+<li><code>dump_dcx</code>: Optionally dump DCX density and spectra</li>
+<li><code>n_nbi</code>: Number of NBI MC particles</li>
+<li><code>n_halo</code>: Number of HALO MC particles</li>
+<li><code>n_dcx</code>: Number of DCX MC particles</li>
+<li><code>calc_birth</code>: Calculate birth profile (density &amp; birth position and velocity)</li>
+<li><code>n_birth</code>: Number of birth particles outputed</li>
+</ul>
+<h1 id="fortran-references">Fortran References</h1>
+<ul>
+<li><a href="../../proc/xyz_to_uvw.html">xyz_to_uvw</a>: Transforms a point from beam grid coordinates to machine coordinates</li>
+<li><a href="../../proc/uvw_to_xyz.html">uvw_to_xyz</a>: Transforms a point from machine coordinates to beam grid coordinates</li>
+<li><a href="../../proc/mc_nbi.html">mc_nbi</a>: Generates beam neutral trajectory</li>
+<li><a href="../../proc/ndmc.html">ndmc</a>: Calculates neutral beam density</li>
+<li><a href="../../proc/dcx.html">dcx</a>: Calculates DCX contribution</li>
+<li><a href="../../proc/halo.html">halo</a>: Calculates Halo contribution</li>
+<li><a href="../../proc/write_dcx.html">write_dcx</a>: Writes DCX neutrals to file</li>
+<li><a href="../../proc/write_neutrals.html">write_neutrals</a>: Writes neutrals to file</li>
+</ul>
+    </div>
+    
+    <div class="col-md-3 col-md-pull-9">
+      <hr class="visible-xs visible-sm">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

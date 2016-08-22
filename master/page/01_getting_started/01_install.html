@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Installation &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Installation</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/01_getting_started/index.html'>Getting Started</a></li>
+      
+         <li class="active">Installation</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-9 col-md-push-3" id='text'>
+      <h1 id="installing-fidasim">Installing FIDASIM</h1>
+<p>So you have decided to install FIDASIM. Don't worry this should be relatively painless.</p>
+<p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>If you experiance problems installing FIDASIM you did something wrong and you should <a href="https://github.com/D3DEnergetic/FIDASIM/issues/new"><strong>let us know</strong></a> so we can laugh at you (and also help you)</p></div>
+<p>The following code snippets assumes you are using a BASH shell.
+To figure out what shell you currently have run <code>echo $SHELL</code> to find out. </p>
+<div class="toc">
+<ul>
+<li><a href="#installing-fidasim">Installing FIDASIM</a><ul>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#getting-fidasim-source">Getting FIDASIM source</a><ul>
+<li><a href="#downloading-source-directly">Downloading source directly</a></li>
+<li><a href="#cloning-the-git-repository">Cloning the git repository</a></li>
+</ul>
+</li>
+<li><a href="#setting-up-environmental-variables">Setting up environmental variables</a></li>
+<li><a href="#building-fidasim">Building FIDASIM</a></li>
+<li><a href="#generating-atomic-tables">Generating Atomic Tables</a></li>
+<li><a href="#run-a-test-case">Run a test case</a></li>
+<li><a href="#now-what">Now what</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<hr>
+<h2 id="dependencies">Dependencies</h2>
+<p>FIDASIM has the following dependencies:</p>
+<ul>
+<li>Linux because all other operating systems are inferior</li>
+<li><a href="https://www.gnu.org/software/make/">Make</a> for building FIDASIM. </li>
+<li>Fortran, C, and C++ compilers.
+  <a href="https://gcc.gnu.org/">GNU(&gt;v4.6)</a> and <a href="https://software.intel.com/en-us/intel-compilers">Intel(&gt;13)</a> compilers are supported.
+  Note you cannot mix and match different compilers.</li>
+<li><a href="http://www.harrisgeospatial.com/IntelliEarthSolutions/GeospatialProducts/IDL.aspx">IDL</a> for pre-processing.</li>
+<li><a href="http://zlib.net/">zlib</a> for file compression.</li>
+<li><a href="https://www.hdfgroup.org/HDF5/">HDF5 1.8.16</a> for reading and writing data files (Included)</li>
+<li><a href="https://fusion.gat.com/theory/Efit">EFIT</a> for electro-magnetic fields (Partially Included)</li>
+<li><a href="https://git-scm.com/">git</a> for version control (Optional)</li>
+<li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> for python scripts (Optional)</li>
+<li><a href="https://github.com/cmacmackin/ford">Ford</a> for creating HTML documentation (Optional)</li>
+<li><a href="http://wummel.github.io/linkchecker/">LinkChecker</a> for validating HTML documentation (Optional)</li>
+</ul>
+<h2 id="getting-fidasim-source">Getting FIDASIM source</h2>
+<p>It's rather difficult to run software you haven't downloaded. There are two ways of getting the source code.</p>
+<h3 id="downloading-source-directly">Downloading source directly</h3>
+<p>The most recent version of FIDASIM (1.0.0) can be downloaded from <a href="https://github.com/D3DEnergetic/FIDASIM/releases">here</a>
+Once you have downloaded the <code>.tar.gz</code> or <code>.zip</code> file unpack it using the following commands.</p>
+<div class="codehilite"><pre><span></span>tar -zxf FIDASIM-1.0.0.tar.gz
+</pre></div>
+
+
+<p>or if you downloaded the <code>.zip</code> file</p>
+<div class="codehilite"><pre><span></span>unzip FIDASIM-1.0.0.zip
+</pre></div>
+
+
+<p>There should now be a directory named <code>FIDASIM-1.0.0</code> in your current directory. Enter the directory using</p>
+<div class="codehilite"><pre><span></span><span class="nb">cd</span> FIDASIM-1.0.0
+</pre></div>
+
+
+<h3 id="cloning-the-git-repository">Cloning the git repository</h3>
+<p>If you are planning to develop FIDASIM it is best to use git.</p>
+<div class="codehilite"><pre><span></span>git clone https://github.com/D3DEnergetic/FIDASIM.git FIDASIM
+<span class="nb">cd</span> FIDASIM
+</pre></div>
+
+
+<p>By default you will be on the master branch which may or may not be in a usable state.
+To use the release version run the command</p>
+<div class="codehilite"><pre><span></span>git checkout v1.0.0
+</pre></div>
+
+
+<h2 id="setting-up-environmental-variables">Setting up environmental variables</h2>
+<p>FIDASIM needs to know where some things are so you have to set the following environmental variables in your <code>.bashrc</code></p>
+<div class="codehilite"><pre><span></span><span class="nb">export</span> <span class="nv">FIDASIM_DIR</span><span class="o">=</span>/path/to/fidasim/install
+<span class="nb">export</span> <span class="nv">FC</span><span class="o">=</span>gfortran <span class="c1">#use &#39;ifort&#39; for Intel Fortran compiler</span>
+<span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span>gcc      <span class="c1">#use &#39;icc&#39; for Intel C compiler</span>
+<span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>g++     <span class="c1">#use &#39;icpc&#39; for Intel C++ compiler</span>
+
+<span class="c1">#For using helper routines</span>
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$FIDASIM_DIR</span>/deps/hdf5/bin:<span class="nv">$FIDASIM_DIR</span>/lib:<span class="nv">$PATH</span>
+<span class="nb">export</span> <span class="nv">IDL_PATH</span><span class="o">=</span><span class="s2">&quot;+</span><span class="nv">$FIDASIM_DIR</span><span class="s2">:</span><span class="nv">$IDL_PATH</span><span class="s2">:&lt;IDL_DEFAULT&gt;&quot;</span>
+
+<span class="nb">ulimit</span> -s unlimited <span class="c1">#Omit this if you like segfaults</span>
+</pre></div>
+
+
+<p>replacing <code>/path/to/fidasim/install</code> with the real directory.</p>
+<h2 id="building-fidasim">Building FIDASIM</h2>
+<p>Once you are in the source directory (and have all the dependencies installed) run the following</p>
+<div class="codehilite"><pre><span></span>make
+</pre></div>
+
+
+<p>Once running, go get a coffee since it will take a while because HDF5 is being built as well.</p>
+<p>Once make has completed check if FIDASIM compiled correctly.</p>
+<div class="codehilite"><pre><span></span>user@computer:~/FIDASIM-1.0.0$ ./fidasim
+   ____ ____ ___   ___    ____ ____ __  ___
+  / __//  _// _ <span class="se">\ </span>/ _ <span class="p">|</span>  / __//  _//  <span class="p">|</span>/  /
+ / _/ _/ / / // // __ <span class="p">|</span> _<span class="se">\ \ </span>_/ / / /<span class="p">|</span>_/ / 
+/_/  /___//____//_/ <span class="p">|</span>_<span class="p">|</span>/___//___//_/  /_/  
+
+Version: 1.0.0
+
+FIDASIM is released as open <span class="nb">source</span> code under the MIT Licence.
+For more information visit http://d3denergetic.github.io/FIDASIM/
+
+usage: ./fidasim namelist_file <span class="o">[</span>num_threads<span class="o">]</span>
+</pre></div>
+
+
+<p>Good job! You installed FIDASIM! But wait there's more.</p>
+<h2 id="generating-atomic-tables">Generating Atomic Tables</h2>
+<p>Calculating reaction rates on the fly is time consuming so we need to pre-compute them to save time.
+The following code snippit will generate the atomic tables using the default settings.
+The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
+In that case edit the file <code>tables/default_settings.dat</code> before running the following command</p>
+<div class="codehilite"><pre><span></span>make atomic_tables
+</pre></div>
+
+
+<p></p><div class="alert alert-warning" role="alert"><h4>Warning</h4><p>This is computationally expensive so make sure you run this on a computer 
+where you won't get angry emails for using up all the CPU's.
+Optionally you can add <code>NTHREADS=#</code> to the command to set the number of threads.</p></div>
+<p>Now would be a good time to get more coffee... or maybe a nap. </p>
+<h2 id="run-a-test-case">Run a test case</h2>
+<p>From within IDL</p>
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> run_tests, <span class="s2">&quot;/place/where/you/want/the/output&quot;</span>
+</pre></div>
+
+
+<p>Some stuff that will make sense later will flash by and when its done you should see something like</p>
+<div class="codehilite"><pre><span></span>SUCCESS: FIDASIM pre-processing completed
+To run FIDASIM use the following command
+/u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
+</pre></div>
+
+
+<p>Now do what the computer says.
+Think of as good practice for when the <a href="https://www.youtube.com/watch?v=7Pq-S557XQU">robots take over</a>.</p>
+<p>It should print out the following. </p>
+<div class="codehilite"><pre><span></span>[lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
+   ____ ____ ___   ___    ____ ____ __  ___
+  / __//  _// _ \ / _ |  / __//  _//  |/  /
+ / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
+/_/  /___//____//_/ |_|/___//___//_/  /_/  
+
+Version: 1.0.0
+
+FIDASIM is released as open source code under the MIT Licence.
+For more information visit http://d3denergetic.github.io/FIDASIM/
+
+---- Shot settings ----
+ Shot:        1
+ Time: 1000 [ms]
+ Runid: test_1a
+
+---- Input files ----
+ Tables file: /u/lstagner/FIDASIM/tables/atomic_tables.h5
+ Geometry file: /p/fida/lstagner/TEST/test_1a_geometry.h5
+ Equilibrium file: /p/fida/lstagner/TEST/test_1a_equilibrium.h5
+ Distribution file: /p/fida/lstagner/TEST/test_1a_distribution.h5
+
+---- OpenMP settings ----
+ Number of threads: 16
+
+---- Beam grid settings ----
+ Nx:  50
+ Ny:  60
+ Nz:  70
+ dV:  8.00 [cm^3]
+ alpha:  0.00 [rad]
+ beta:   0.00 [rad]
+ gamma:  0.00 [rad]
+ origin: [   0.00,   0.00,   0.00] [cm]
+
+---- Interpolation grid settings ----
+ Nr:  70
+ Nz: 100
+ dA: 4.10 [cm^2]
+
+---- Neutral beam settings ----
+ Beam: test_beam               
+ Power:    1.70 [MW]
+ Voltage: 72.50 [keV]
+
+---- Atomic tables settings ----
+ Maximum n/m:  6
+ Beam/Fast-ion mass:  2.014 [amu]
+ Thermal/Bulk-ion mass:  2.014 [amu]
+ Impurity mass: 12.011 [amu]
+
+---- Fast-ion distribution settings ----
+ Distribution type: Fast-ion Density Function F(energy,pitch,R,Z)
+ Nenergy =   6
+ Npitch  =   6
+ Energy range = [67.33, 75.44]
+ Pitch  range = [-0.10, 0.10]
+
+---- FIDA/BES settings ----
+ FIDA/BES System: SPECTRAL
+ Number of channels:   3
+
+---- NPA settings ----
+ NPA System: NPA
+ Number of channels:   3
+ Calculating hit probabilities for NPA channels
+
+ndmc:     1:43:23
+     # of markers:     50000
+   birth profile written to: /p/fida/lstagner/TEST/test_1a_birth.h5
+
+dcx:      1:43:41
+     # of markers:    505020
+   dcx written to: /p/fida/lstagner/TEST/test_1a_dcx.h5
+
+halo:     1:44:32
+     # of markers:    505180
+     # of markers:    310573
+     # of markers:    188148
+     # of markers:    110872
+     # of markers:     62806
+     # of markers:     32484
+     # of markers:     13881
+   neutral density written to: /p/fida/lstagner/TEST/test_1a_neutrals.h5
+
+bremsstrahlung:     1:46:25
+
+fida:     1:46:25
+     # of markers:   5049813
+
+   Spectra written to: /p/fida/lstagner/TEST/test_1a_spectra.h5
+
+npa:     1:47:46
+     # of markers:    505074
+Number of NPA particles that hit a detector:   125638
+
+   NPA data written to: /p/fida/lstagner/TEST/test_1a_npa.h5
+
+fida weight function:     1:49:46
+ Number of Channels:   3
+ Nlambda: 1000
+ Nenergy:  50
+ Npitch:  50
+ Ngyro: 100
+ Maximum Energy:  100.00
+ LOS averaged: True
+
+   Channel:   1
+   Radius:  200.00
+   Mean Fast-ion Density:    7.97429E+11
+
+   Channel:   2
+   Radius:  170.00
+   Mean Fast-ion Density:    7.98346E+11
+
+   Channel:   3
+   Radius:  140.00
+   Mean Fast-ion Density:    7.98330E+11
+
+   FIDA weights written to: /p/fida/lstagner/TEST/test_1a_fida_weights.h5
+
+npa weight function:     1:50:02
+ Number of Channels:   3
+ Nenergy:  50
+ Npitch:  50
+ Maximum energy:  100.00
+
+   Channel:   1
+   Radius:    200.000
+   Flux:      1.22243E+14
+   Weight:    3.79893E+03
+
+   Channel:   2
+   Radius:    170.000
+   Flux:      1.07364E+14
+   Weight:    1.85565E+03
+
+   Channel:   3
+   Radius:    140.000
+   Flux:      3.46488E+13
+   Weight:    8.81099E+02
+
+   NPA weights written to: /p/fida/lstagner/TEST/test_1a_npa_weights.h5
+
+END: hour, minute, second:  1:53:07
+duration:                   0:15:53
+</pre></div>
+
+
+<p>Congratulations! You followed the instructions.</p>
+<h2 id="now-what">Now what</h2>
+<p>Most likely you won't be satisfied by just running a test case. Click <a href="./02_preprocess.html">here</a> to learn how to make the input files used by FIDASIM.</p>
+    </div>
+    
+    <div class="col-md-3 col-md-pull-9">
+      <hr class="visible-xs visible-sm">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation" class="disabled">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	 
+	 <meta name="description" content="">
+    
+    <meta name="author" content="Chris MacMackin" >
+    <link rel="icon" href="../../favicon.png">
+
+    <title>Spectra &ndash; FIDASIM</title>
+
+    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../css/pygments.css" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../../css/local.css" rel="stylesheet">
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../../js/jquery-2.1.3.min.js"></script>
+    <script src="../../js/svg-pan-zoom.min.js"></script>
+
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.0</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+				
+            <li><a href='../../page/index.html'>User Guide</a></li>
+	    
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+		 aria-expanded="false">Contents <span class="caret"></span></a>
+	      <ul class="dropdown-menu">
+              
+            <li><a href="../../lists/files.html">Source Files</a></li>
+				
+				
+            <li><a href="../../lists/modules.html">Modules</a></li>
+				
+            
+                                
+            <li><a href="../../lists/procedures.html">Procedures</a></li>
+				
+								
+            <li><a href="../../lists/types.html">Derived Types</a></li>
+				
+				
+            <li><a href="../../lists/programs.html">Programs</a></li>
+				
+            </ul>
+            </li>
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  <div class="row">
+    <h1>Spectra</h1>
+    <div class="row">
+    <div class="col-lg-12">
+    <div class="well well-sm" style="min-height: 40px;">
+      <ul class="list-inline" style="margin-bottom:0px; display:inline">
+         
+         
+<!--
+        
+-->
+      </ul>
+        <ol class="breadcrumb in-well">
+      
+         <li><a href='../../page/index.html'>User Guide</a></li>
+      
+         <li><a href='../../page/02_physics/index.html'>Physics</a></li>
+      
+         <li class="active">Spectra</li>
+      </ol>
+    </div>
+    </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-9 col-md-push-3" id='text'>
+      <style>
+table {
+width: 100%;
+}
+table,th,td {
+border: 1px solid black;
+border-collapse: collapse;
+}
+th, td {
+padding: 5px;
+}
+th {
+text-align: center;
+}
+</style>
+
+<div class="toc">
+<ul>
+<li><a href="#spectroscopic-geometry">Spectroscopic Geometry</a></li>
+<li><a href="#types-of-spectra">Types of Spectra</a><ul>
+<li><a href="#bremsstrahlung">Bremsstrahlung</a></li>
+<li><a href="#emission-by-neutrals">Emission by Neutrals</a></li>
+</ul>
+</li>
+<li><a href="#relevant-namelist-settings">Relevant Namelist Settings</a></li>
+<li><a href="#fortran-references">Fortran References</a></li>
+</ul>
+</div>
+<hr>
+<h1 id="spectroscopic-geometry">Spectroscopic Geometry</h1>
+<p>The spectroscopic geometry is defined similarily to the neutral beam.
+It is defined by the lens position in machine coordinates and an optical axis.
+The volume of the sightline is assumed to be cylindrical with radius, <code>spot_size</code>.</p>
+<p>If mirrors are present then the apparent positions of the lens as seen from the plasma are used.
+Additionally, mirrors reflect the sigma and pi Stark lines differently due to a difference in polarization.
+The experimentally determined ratio of the intensties of the sigma and pi lines, <code>sigma_pi</code>, is used to correct for this.
+If there are no mirrors then <code>sigma_pi</code> is set to 1.0 .</p>
+<p>The full geometry specification is given below.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Variable</th>
+<th align="center">Type</th>
+<th align="center">Rank</th>
+<th align="center">Dimensions</th>
+<th align="center">Units</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>nchan</code></td>
+<td align="center">Int32</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of channels</td>
+</tr>
+<tr>
+<td align="center"><code>system</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Name of the spectrocopic system(s)</td>
+</tr>
+<tr>
+<td align="center"><code>data_source</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Source of the spectral geometry data</td>
+</tr>
+<tr>
+<td align="center"><code>id</code></td>
+<td align="center">String</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Channel ID</td>
+</tr>
+<tr>
+<td align="center"><code>radius</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Line of sight radius at midplane or tangency point</td>
+</tr>
+<tr>
+<td align="center"><code>lens</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Lens location in machine coordinates</td>
+</tr>
+<tr>
+<td align="center"><code>axis</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[3,<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Optical axis/direction of the lines of sight</td>
+</tr>
+<tr>
+<td align="center"><code>spot_size</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">cm</td>
+<td align="left">Radius of the collecting volume</td>
+</tr>
+<tr>
+<td align="center"><code>sigma_pi</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nchan</code>]</td>
+<td align="center">NA</td>
+<td align="left">Ratio of the intensities of the sigma and pi stark lines</td>
+</tr>
+</tbody>
+</table>
+<h1 id="types-of-spectra">Types of Spectra</h1>
+<p>FIDASIM can calculate the following spectra</p>
+<ul>
+<li>Bremsstrahlung</li>
+<li>Beam Emission (BES: Full, Half, Third)</li>
+<li>Halo Emission</li>
+<li>Fast-ion D-\(\alpha\) (FIDA)</li>
+</ul>
+<p style="text-align: center"><img alt="Spectra" src="../../media/fidasim_spectra.png" width="400"></p>
+<h2 id="bremsstrahlung">Bremsstrahlung</h2>
+<p>The largest source of background emission is visible bremsstrahlung. The local bremsstrahlung emissivity per unit wavelength is given by </p>
+<p>$$\frac{dN_B}{d\lambda} = 7.57 \times 10^{-9} \,  g \,  \frac{n_e^2 \, Z_{eff}}{\lambda \, T_e^{1/2}} e^{-hc/\lambda \,T_e} $$</p>
+<p>where \(\lambda\) is the wavelength in angstroms, \(n_e\) is the electron density in \(cm^{-3}\), \(T_e\) is the electron temperature in eV.
+The gaunt factor, \(g\), depends on \(T_e\) and \(Z_{eff}\). It can be approximated by</p>
+<p>$$ g = 5.542 - (3.108 - \ln(T_e/1000))(0.6905 - 0.1323/Z_{eff}) $$</p>
+<p>To calculate the total emission "seen" by the line of sight the the local emissivity is integrated over the line of sight.</p>
+<h2 id="emission-by-neutrals">Emission by Neutrals</h2>
+<p>There are two processes in which neutrals can emit light: Excitation and Charge Exchange.</p>
+<p style="text-align: center"><img alt="Excitation" src="../../media/beam_emission.png" width="250">
+<img alt="Charge Exchange" src="../../media/fida_halo_emission.png" width="250"></p>
+<p>Excitation is the primary method in which beam neutrals emit light (BES).
+In short, a neutral particle collides with a charged particle, exciting into a higher energy (\(n=3\)) state.
+When the neutral particle relaxes (\(n: 3 \rightarrow 2\)) it emits a doppler shifted (656.1 nm) photon.</p>
+<p>Charge Exchange is the process by which the Halo and FIDA light is created.
+In a charge exchange reaction a thermal (Halo) or fast (FIDA) ion steals a electron from a neutral particle.
+The newly created neutral is born in an excited (\(n=3\) state and like the collisionally excited neutral it relaxes to a lower energy state (\n=2) and emits a doppler shifted (656.1 nm) photon.</p>
+<p style="text-align: center"><img alt="Stark Splitting and Doppler Shift" src="../../media/stark_doppler.png" width="400"></p>
+<p><img _=";" alt="Stark Splitting" src="../../media/stark_splitting.png" style="float: right" width="250">
+The motion of a ion in a magnetic field induces an electric field which causes Stark Spitting of the the atoms energy levels.
+Most atoms the strength of the Stark effect is quadratic in low electric fields and linear for strong electric fields. 
+Usually atoms never the linear regime but, due to degenerency between states of different angular momentum, hydrogenic atoms exhibit a linear Stark effect.
+The linear Stark energy component shifts are given by the following equations.</p>
+<p>$$\Delta \mathcal{E} = 3nk\frac{E}{Ze/4\pi\epsilon_0a_0^2}R_y\;\, \mathrm{for} \;\,k=0,\pm 1,\dots,\pm (n-1)$$</p>
+<p>As seen from the above equation, each energy level is split into \(2n-1\) parts.
+For the Balmer-alpha transition, this creates 15 distinct transitions from the \(n=3 \rightarrow 2\) state. </p>
+<p>The relative intensity of the different Stark lines is given by</p>
+<p>$$ I_{rel}(i) = S_I(i)\,(1 \pm (\vec{v}_{ph} \cdot \vec{E})^2) $$
+$$ I_{rel}(i) = \frac{I_{rel}(i)}{\sum_i I_{rel}(i)} $$</p>
+<p>where positive and negative sums refer to \(\sigma\) and \(\pi\) lines respectively and \(S_I\) are the calculated relative Stark intensities for each transition given by</p>
+<p>$$S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 1] $$</p>
+<h1 id="relevant-namelist-settings">Relevant Namelist Settings</h1>
+<ul>
+<li><code>calc_fida</code>: Calculate FIDA spectra</li>
+<li><code>calc_brems</code>: Calculate Bremsstrahlung</li>
+<li><code>calc_bes</code>: Calculate Beam Emission and Halo</li>
+<li><code>dump_dcx</code>: Dump DCX spectra</li>
+<li><code>n_fida</code>: Number of Monte Carlo particles used in FIDA spectra calculation</li>
+<li><code>n_nbi</code>: Number of Monte Carlo particles used in BES spectra calculation</li>
+<li><code>n_dcx</code> and <code>n_halo</code>: Number of particles used in Halo spectra calculation</li>
+<li><code>nlambda</code>: Number of wavelength bins</li>
+<li><code>lambdamin</code>: Minimum wavelength [nm]</li>
+<li><code>lambdamax</code>: Maximum wavelength [nm]</li>
+</ul>
+<h1 id="fortran-references">Fortran References</h1>
+<ul>
+<li><a href="../../proc/bremsstrahlung.html">bremsstrahlung</a>: Calculates Bremsstrahlung</li>
+<li><a href="../../proc/spectrum.html">spectrum</a>: Calculates Doppler shift and Stark splitting.</li>
+<li><a href="../../proc/ndmc.html">ndmc</a>: Calculates BES spectra</li>
+<li><a href="../../proc/dcx.html">dcx</a>: Calculates DCX neutrals contribution to the Halo spectra</li>
+<li><a href="../../proc/halo.html">halo</a>: Calculates thermal neutrals contribution to the Halo Spectra</li>
+<li><a href="../../proc/fida_f.html">fida_f</a>: Calculates FIDA light using a distribution function</li>
+<li><a href="../../proc/fida_mc.html">fida_mc</a>: Calculates FIDA light using a particle distribution</li>
+</ul>
+    </div>
+    
+    <div class="col-md-3 col-md-pull-9">
+      <hr class="visible-xs visible-sm">
+        <div class="well toc">
+          <ul class="nav nav-stacked nav-pills">
+            <li role="presentation" class="title"><a href='../../page/index.html'>User Guide</a></li>
+          </ul>
+          <hr>
+          <ul class="nav nav-stacked nav-pills">
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/index.html'>Getting Started</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/01_getting_started/01_install.html'>Installation</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/02_preprocess.html'>Preprocessing Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/03_running.html'>Running FIDASIM</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/04_reading.html'>Reading Outputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/01_getting_started/05_devices.html'>Devices using FIDASIM</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/index.html'>Physics</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a>
+            
+            </li>
+            
+            <li role="presentation" class="disabled">
+            <a href='../../page/02_physics/05_spectra.html'>Spectra</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/index.html'>Technical Details</a>
+            
+            <ul class="nav nav-stacked nav-pills">
+              
+            <li role="presentation">
+            <a href='../../page/03_technical/01_prefida_inputs.html'>PREFIDA Inputs</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/03_technical/02_trouble.html'>Troubleshooting</a>
+            
+            </li>
+            
+            </ul>
+            
+            </li>
+            
+          </ul>
+        </div>
+    </div>
+    
+  </div>
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
+        'HTML-CSS': { 
+           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
+        }
+      });
+    </script>
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  </body>
+</html>

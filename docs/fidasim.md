@@ -19,8 +19,8 @@ md_extensions: markdown.extensions.toc
 ---
 
 @note 
-This is the documentation for the development version of FIDASIM.
-Click [here](./release-1.0/index.html) for the documentation for the current release.
+This is the documentation for the release version of FIDASIM.
+Click [here](|url|/master/index.html) for the current development documentation.
 
 FIDASIM is a fast Fortran 90 code that simulates neutral beam deposition and various fast-ion diagnostics in axisyimmetric fusion devices. 
 

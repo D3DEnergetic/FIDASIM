@@ -31,7 +31,7 @@ ssh-add travis_key
 
 git clone --branch=gh-pages $REPO gh-pages
 
-if [ "$TRAVIS_BRANCH" = "master" ] && \
+if [ "$TRAVIS_BRANCH" = release-* ] && \
    [ "(ls -A $TRAVIS_BUILD_DIR/docs/html)" ]; then
     if [[ -z `diff -r $TRAVIS_BUILD_DIR/docs/html gh-pages` ]]; then
         echo "No changes in development documentation"
@@ -47,7 +47,7 @@ if [ "$TRAVIS_BRANCH" = "master" ] && \
     git push $SSH_REPO gh-pages
 fi
 
-if [[ $TRAVIS_BRANCH == release-* ]]; then
+if [[ $TRAVIS_BRANCH == "master" ]]; then
     cd gh-pages
     if [[ -z `diff -r $TRAVIS_BUILD_DIR/docs/html $TRAVIS_BRANCH` ]]; then
         echo "No changes in $TRAVIS_BRANCH documentation"

@@ -31,8 +31,7 @@ ssh-add travis_key
 
 git clone --branch=gh-pages $REPO gh-pages
 
-if [ "$TRAVIS_BRANCH" = release-* ] && \
-   [ "(ls -A $TRAVIS_BUILD_DIR/docs/html)" ]; then
+if [[ $TRAVIS_BRANCH = release-* ]]; then
     cd gh-pages
     rm -rf css favicon.png fonts index.html interface \
        js lists media module page proc program search.html \

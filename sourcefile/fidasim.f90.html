@@ -341,29 +341,29 @@
 <polygon fill="none" stroke="black" points="192,-70 128,-70 128,-44 192,-44 192,-70"/>
 <text text-anchor="middle" x="160" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">fidasim.f90</text>
 </g>
-<!-- sourcefile~eigensystem.f90 -->
-<g id="node2" class="node"><title>sourcefile~eigensystem.f90</title>
-<a xlink:href="../sourcefile/eigensystem.f90.html" xlink:title="eigensystem.f90">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="91,-114 1,-114 1,-88 91,-88 91,-114"/>
-<text text-anchor="middle" x="46" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem.f90</text>
-</a>
-</g>
-<!-- sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90 -->
-<g id="edge2" class="edge"><title>sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M79.8951,-87.9177C92.029,-83.2344 105.844,-77.9022 118.545,-73.0002"/>
-<polygon fill="#000000" stroke="#000000" points="119.925,-76.2195 127.993,-69.3534 117.404,-69.689 119.925,-76.2195"/>
-</g>
 <!-- sourcefile~hdf5_extra.f90 -->
-<g id="node3" class="node"><title>sourcefile~hdf5_extra.f90</title>
+<g id="node2" class="node"><title>sourcefile~hdf5_extra.f90</title>
 <a xlink:href="../sourcefile/hdf5_extra.f90.html" xlink:title="hdf5_extra.f90">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="87,-70 5,-70 5,-44 87,-44 87,-70"/>
-<text text-anchor="middle" x="46" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_extra.f90</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="87,-114 5,-114 5,-88 87,-88 87,-114"/>
+<text text-anchor="middle" x="46" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_extra.f90</text>
 </a>
 </g>
 <!-- sourcefile~hdf5_extra.f90&#45;&gt;sourcefile~fidasim.f90 -->
-<g id="edge4" class="edge"><title>sourcefile~hdf5_extra.f90&#45;&gt;sourcefile~fidasim.f90</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M87.1566,-57C97.0969,-57 107.735,-57 117.726,-57"/>
-<polygon fill="#000000" stroke="#000000" points="117.846,-60.5001 127.846,-57 117.846,-53.5001 117.846,-60.5001"/>
+<g id="edge2" class="edge"><title>sourcefile~hdf5_extra.f90&#45;&gt;sourcefile~fidasim.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M79.8951,-87.9177C92.029,-83.2344 105.844,-77.9022 118.545,-73.0002"/>
+<polygon fill="#000000" stroke="#000000" points="119.925,-76.2195 127.993,-69.3534 117.404,-69.689 119.925,-76.2195"/>
+</g>
+<!-- sourcefile~eigensystem.f90 -->
+<g id="node3" class="node"><title>sourcefile~eigensystem.f90</title>
+<a xlink:href="../sourcefile/eigensystem.f90.html" xlink:title="eigensystem.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="91,-70 1,-70 1,-44 91,-44 91,-70"/>
+<text text-anchor="middle" x="46" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem.f90</text>
+</a>
+</g>
+<!-- sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90 -->
+<g id="edge4" class="edge"><title>sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M91.7113,-57C100.343,-57 109.334,-57 117.85,-57"/>
+<polygon fill="#000000" stroke="#000000" points="117.946,-60.5001 127.946,-57 117.946,-53.5001 117.946,-60.5001"/>
 </g>
 <!-- sourcefile~parallel_rng.f90 -->
 <g id="node4" class="node"><title>sourcefile~parallel_rng.f90</title>
@@ -7935,7 +7935,7 @@ can be.
 <a name="ln-7446"></a>        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
 <a name="ln-7447"></a>    <span class="n">endif</span>
 <a name="ln-7448"></a>
-<a name="ln-7449"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa_wght</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-7449"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa_wght</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-7450"></a><span class="k">        call </span><span class="nb">date_and_time</span> <span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="n">time_arr</span><span class="p">)</span>
 <a name="ln-7451"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-7452"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(A,I2,&quot;:&quot;,I2.2,&quot;:&quot;,I2.2)&#39;</span><span class="p">)</span> <span class="s1">&#39;npa weight function:    &#39;</span><span class="p">,</span>  <span class="p">&amp;</span>

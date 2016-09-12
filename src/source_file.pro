@@ -12,7 +12,7 @@ FUNCTION source_file,name
         for i=2,nc-1 do begin
             has_name = stregex(csf[i],name,/fold_case) ne -1
             if has_name then begin
-                sfile = stregex(csf[i],"\/[\/a-z0-9_\-]*.[a-z0-9_\-]*",/extract,/fold_case)
+                sfile = stregex(csf[i],"(/[^/ ]*)+/?$",/extract,/fold_case)
                 return, file_expand_path(sfile)
             endif
         endfor

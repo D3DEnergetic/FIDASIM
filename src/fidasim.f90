@@ -7446,7 +7446,7 @@ program fidasim
         write(*,'(30X,a)') ''
     endif
 
-    if(inputs%calc_npa_wght.eq.1) then
+    if(inputs%calc_npa_wght.ge.1) then
         call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
             write(*,'(A,I2,":",I2.2,":",I2.2)') 'npa weight function:    ',  &

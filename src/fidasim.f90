@@ -4092,6 +4092,7 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
         !+ Phi value where the circle exits the [[libfida:beam_grid]] [rad]
 
     real(Float64), dimension(3) :: i1_p,i1_n,i2_p,i2_n
+    real(Float64), dimension(4) :: d
     real(Float64), dimension(6) :: p, gams
     real(Float64), dimension(4,6) :: phi
     logical, dimension(4,6) :: inter
@@ -4112,6 +4113,7 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
     do i=1,6
         alpha = e2(n(i))
         beta = e1(n(i))
+        if((alpha.eq.0.0).and.(beta.eq.0.0)) cycle
         gams(i) = (p(i) - r0(n(i)))/radius
         delta = alpha**4 + (alpha**2)*(beta**2 - gams(i)**2)
         if (delta.ge.0.0) then
@@ -4173,9 +4175,17 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
             phi_exit = 2*pi
         endif
     else
-        if(r0_ing.and.all(gams.ge.1.0)) then
-            phi_enter = 0.d0
-            phi_exit = 2.d0*pi
+        if(r0_ing) then
+            call grid_intersect(r0, e1, tmp, i1_n,i1_p)
+            call grid_intersect(r0, e2, tmp, i2_n,i2_p)
+            d(1) = norm2(r0 - i1_n)/radius
+            d(2) = norm2(r0 - i1_p)/radius
+            d(3) = norm2(r0 - i2_n)/radius
+            d(4) = norm2(r0 - i2_p)/radius
+            if(all(d.ge.1.0)) then
+                phi_enter = 0.d0
+                phi_exit = 2.d0*pi
+            endif
         endif
     endif
 

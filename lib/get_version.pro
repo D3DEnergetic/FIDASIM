@@ -13,7 +13,7 @@ FUNCTION get_version, fidasim_dir
 
     version = ''
     git_dir = fidasim_dir+'/.git'
-    if !VERSION.OS_FAMILY eq 'Windows' then begin
+    if strcmp(!VERSION.OS_FAMILY ,'windows', /fold_case) then begin
         spawn,'command -v git ',git_command
     endif else begin
         spawn,'command -v git ',git_command,/sh

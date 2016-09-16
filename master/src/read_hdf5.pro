@@ -18,6 +18,9 @@ FUNCTION valid_name, name, bad_names=bad_names, post = post
         valid_name = name
     endelse
 
+    ; added 2016-09-15 by NGB to fix invalid structure tags
+    valid_name = idl_validname(valid_name, /convert_all)
+    
     return, valid_name
 
 END

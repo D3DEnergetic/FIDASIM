@@ -1539,15 +1539,6 @@ subroutine read_inputs
     beam_grid%gamma=gamma
     beam_grid%origin=origin
 
-    error = .False.
-
-    inquire(directory=inputs%result_dir,exist=exis)
-    if(.not.exis) then
-        write(*,'(a,a)') 'READ_INPUTS: Result directory does not exist: ', &
-                         trim(inputs%result_dir)
-        error = .True.
-    endif
-
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Shot settings ----"
         write(*,'(T2,"Shot: ",i8)') inputs%shot_number
@@ -1556,6 +1547,8 @@ subroutine read_inputs
         write(*,*) ''
         write(*,'(a)') "---- Input files ----"
     endif
+
+    error = .False.
 
     inquire(file=inputs%tables_file,exist=exis)
     if(exis) then

@@ -3320,7 +3320,7 @@ subroutine write_spectra
                  "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
         else
             call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
+            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                  dims, spec%fida, error)
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fida","description", &

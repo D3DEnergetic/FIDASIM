@@ -1539,6 +1539,15 @@ subroutine read_inputs
     beam_grid%gamma=gamma
     beam_grid%origin=origin
 
+    error = .False.
+
+    inquire(directory=inputs%result_dir,exist=exis)
+    if(.not.exis) then
+        write(*,'(a,a)') 'READ_INPUTS: Result directory does not exist: ', &
+                         trim(inputs%result_dir)
+        error = .True.
+    endif
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Shot settings ----"
         write(*,'(T2,"Shot: ",i8)') inputs%shot_number
@@ -1547,8 +1556,6 @@ subroutine read_inputs
         write(*,*) ''
         write(*,'(a)') "---- Input files ----"
     endif
-
-    error = .False.
 
     inquire(file=inputs%tables_file,exist=exis)
     if(exis) then
@@ -3320,7 +3327,7 @@ subroutine write_spectra
                  "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
         else
             call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
+            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                  dims, spec%fida, error)
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fida","description", &

@@ -1751,7 +1751,7 @@ subroutine read_beam
         write(*,'(a)') '---- Neutral beam settings ----'
         write(*,'(T2,"Beam: ",a)') nbi%name
         write(*,'(T2,"Power:   ",f5.2," [MW]")') nbi%pinj
-        write(*,'(T2,"Voltage: ",f5.2," [keV]")') nbi%einj
+        write(*,'(T2,"Voltage: ",f6.2," [keV]")') nbi%einj
         write(*,*) ''
     endif
 
@@ -3320,7 +3320,7 @@ subroutine write_spectra
                  "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
         else
             call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
+            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
                  dims, spec%fida, error)
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fida","description", &
@@ -5146,7 +5146,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b22 = c%b22
     if(err_status.eq.1) then
         write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
-        write(*,'("eb = ",f6.3," [keV]")') eb
+        write(*,'("eb = ",f7.3," [keV]")') eb
         write(*,'("ti = ",f6.3," [keV]")') plasma%ti
         denp = 0.d0
     endif
@@ -5189,7 +5189,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b22 = c%b22
     if(err_status.eq.1) then
         write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
-        write(*,'("eb = ",f6.3," [keV]")') eb
+        write(*,'("eb = ",f7.3," [keV]")') eb
         write(*,'("te = ",f6.3," [keV]")') plasma%te
         dene = 0.d0
     endif
@@ -5233,7 +5233,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b22 = c%b22
     if(err_status.eq.1) then
         write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
-        write(*,'("eb = ",f6.3," [keV]")') eb
+        write(*,'("eb = ",f7.3," [keV]")') eb
         write(*,'("ti = ",f6.3," [keV]")') plasma%ti
         denimp = 0.d0
     endif

@@ -7,7 +7,7 @@
 	 
 	 <meta name="description" content="">
     
-    <meta name="author" content="Chris MacMackin" >
+    <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
     <title>get_version.pro &ndash; FIDASIM</title>
@@ -356,22 +356,26 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-13"></a>
 <a name="ln-14"></a>    <span class="s s-Atom">version</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
 <a name="ln-15"></a>    <span class="s s-Atom">git_dir</span> <span class="o">=</span> <span class="s s-Atom">fidasim_dir+&#39;/.git&#39;</span>
-<a name="ln-16"></a>    <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">&#39;command -v git &#39;</span><span class="p">,</span><span class="s s-Atom">git_command</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">sh</span>
-<a name="ln-17"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">git_command</span><span class="p">)</span> <span class="s s-Atom">and</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">git_dir</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">dir</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-18"></a>        <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">git_command+&#39; --git-dir=&#39;</span><span class="o">+</span><span class="s s-Atom">git_dir+&#39; describe --tags --always --dirty&#39;</span><span class="p">,</span><span class="s s-Atom">version</span><span class="p">,</span><span class="s s-Atom">err_status</span>
-<a name="ln-19"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-20"></a>        <span class="s s-Atom">version_file</span> <span class="o">=</span> <span class="s s-Atom">fidasim_dir+&#39;/VERSION&#39;</span>
-<a name="ln-21"></a>        <span class="s s-Atom">version</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
-<a name="ln-22"></a>        <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">version_file</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-23"></a>            <span class="s s-Atom">openr</span><span class="p">,</span> <span class="s s-Atom">lun</span><span class="p">,</span> <span class="s s-Atom">version_file</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">get_lun</span>
-<a name="ln-24"></a>            <span class="s s-Atom">readf</span><span class="p">,</span> <span class="s s-Atom">lun</span><span class="p">,</span> <span class="s s-Atom">version</span>
-<a name="ln-25"></a>            <span class="s s-Atom">free_lun</span><span class="p">,</span> <span class="s s-Atom">lun</span>
-<a name="ln-26"></a>        <span class="s s-Atom">endif</span>
-<a name="ln-27"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-28"></a>
-<a name="ln-29"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">version</span>
-<a name="ln-30"></a>
-<a name="ln-31"></a><span class="nv">END</span>
+<a name="ln-16"></a>    <span class="s s-Atom">if</span> <span class="nf">strcmp</span><span class="p">(!</span><span class="nv">VERSION</span><span class="p">.</span><span class="nv">OS_FAMILY</span> <span class="p">,</span><span class="s s-Atom">&#39;windows&#39;</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">fold_case</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-17"></a>        <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">&#39;command -v git &#39;</span><span class="p">,</span><span class="s s-Atom">git_command</span>
+<a name="ln-18"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-19"></a>        <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">&#39;command -v git &#39;</span><span class="p">,</span><span class="s s-Atom">git_command</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">sh</span>
+<a name="ln-20"></a>    <span class="s s-Atom">endelse</span>    
+<a name="ln-21"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">git_command</span><span class="p">)</span> <span class="s s-Atom">and</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">git_dir</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">dir</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-22"></a>        <span class="s s-Atom">spawn</span><span class="p">,</span><span class="s s-Atom">git_command+&#39; --git-dir=&#39;</span><span class="o">+</span><span class="s s-Atom">git_dir+&#39; describe --tags --always --dirty&#39;</span><span class="p">,</span><span class="s s-Atom">version</span><span class="p">,</span><span class="s s-Atom">err_status</span>
+<a name="ln-23"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-24"></a>        <span class="s s-Atom">version_file</span> <span class="o">=</span> <span class="s s-Atom">fidasim_dir+&#39;/VERSION&#39;</span>
+<a name="ln-25"></a>        <span class="s s-Atom">version</span> <span class="o">=</span> <span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-26"></a>        <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">version_file</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-27"></a>            <span class="s s-Atom">openr</span><span class="p">,</span> <span class="s s-Atom">lun</span><span class="p">,</span> <span class="s s-Atom">version_file</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">get_lun</span>
+<a name="ln-28"></a>            <span class="s s-Atom">readf</span><span class="p">,</span> <span class="s s-Atom">lun</span><span class="p">,</span> <span class="s s-Atom">version</span>
+<a name="ln-29"></a>            <span class="s s-Atom">free_lun</span><span class="p">,</span> <span class="s s-Atom">lun</span>
+<a name="ln-30"></a>        <span class="s s-Atom">endif</span>
+<a name="ln-31"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-32"></a>
+<a name="ln-33"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">version</span>
+<a name="ln-34"></a>
+<a name="ln-35"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

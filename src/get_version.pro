@@ -13,7 +13,11 @@ FUNCTION get_version, fidasim_dir
 
     version = ''
     git_dir = fidasim_dir+'/.git'
-    spawn,'command -v git ',git_command,/sh
+    if strcmp(!VERSION.OS_FAMILY ,'windows', /fold_case) then begin
+        spawn,'command -v git ',git_command
+    endif else begin
+        spawn,'command -v git ',git_command,/sh
+    endelse    
     if file_test(git_command) and file_test(git_dir,/dir) then begin
         spawn,git_command+' --git-dir='+git_dir+' describe --tags --always --dirty',version,err_status
     endif else begin

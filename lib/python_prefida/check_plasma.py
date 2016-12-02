@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from lib import success
-from lib import info
-from lib import check_dict_schema
-from lib import error
-from lib import warn
+from python_prefida import success
+from python_prefida import info
+from python_prefida import check_dict_schema
+from python_prefida import error
+from python_prefida import warn
 
 
 def check_plasma(inp, grid, plasma):
@@ -75,8 +75,8 @@ def check_plasma(inp, grid, plasma):
 
     if (np.abs(plasma['time'] - inp['time']) > 0.02):
         warn('Plasma time and input time do not match')
-        print 'Input time: ', inp['time']
-        print 'Plasma time: ', plasma['time']
+        print('Input time: ', inp['time'])
+        print('Plasma time: ', plasma['time'])
 
     #plasma = create_struct(plasma, grid)
     plasma['grid'] = grid

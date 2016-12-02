@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import info
-from lib import error
+from python_prefida import info
+from python_prefida import error
 import numpy as np
 
 
@@ -61,7 +61,7 @@ def check_dict_schema(schema, s, desc=None):
 #                      strjoin(strcompress(string(schema.(i).dims),/remove_all),',')+')'
                 error('"{}" has the wrong dimensions. Expected ({})'.format(schema_keys[i], schema[schema_keys[i]]['dims']))
 #                print 'size('+schema_keys[i]+') = ',size(s.(w),/dim)
-                print 'size({}) = {}'.format(schema_keys[i], s[skeys[w]].ndim)
+                print('size({}) = {}'.format(schema_keys[i], s[skeys[w]].ndim))
                 err_status = 1
 
             # Check type
@@ -71,7 +71,7 @@ def check_dict_schema(schema, s, desc=None):
 #                error,'"'+schema_keys[i]+'" has the wrong type. Expected '+schema.(i).type
                 error('"{}" has the wrong type. Expected {}'.format(schema_keys[i], schema[schema_keys[i]]['type']))
 #                print 'type('+schema_keys[i]+') = '+tname
-                print 'type({}) = {}'.format(schema_keys[i], type(s[skeys[w]]))
+                print('type({}) = {}'.format(schema_keys[i], type(s[skeys[w]])))
                 err_status = 1
 
             # Check for NaNs or Inf

@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import info
-from lib import check_dict_schema
-from lib import error
-from lib import uvw_to_xyz
-from lib import aabb_intersect
-from lib import success
+from __future__ import print_function
+from python_prefida import info
+from python_prefida import check_dict_schema
+from python_prefida import error
+from python_prefida import uvw_to_xyz
+from python_prefida import aabb_intersect
+from python_prefida import success
 import numpy as np
 
 
@@ -107,31 +108,31 @@ def check_beam(inp, nbi):
     BETA = np.float64(np.arcsin((xyz_src[2] - xyz_pos[2]) / dis))
     ALPHA = np.float64(np.arctan((xyz_pos[1] - xyz_src[1]), (xyz_pos[0] - xyz_src[0])))
 
-#    print 'Beam injection start point in machine coordinates'
-#    print  f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_src
-#    print 'First aperture position in machine coordinates'
-#    print  f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_pos
-#    print 'Machine center in beam grid coordinates'
-#    print  f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_center
-#    print 'Beam injection start point in beam grid coordinates'
-#    print  f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_src
-#    print 'First aperture position in beam grid coordinates'
-#    print  f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_pos
+#    print('Beam injection start point in machine coordinates'
+#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_src
+#    print('First aperture position in machine coordinates'
+#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_pos
+#    print('Machine center in beam grid coordinates'
+#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_center
+#    print('Beam injection start point in beam grid coordinates'
+#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_src
+#    print('First aperture position in beam grid coordinates'
+#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_pos
 
-    print 'Beam injection start point in machine coordinates'
-    print uvw_src
-    print 'First aperture position in machine coordinates'
-    print uvw_pos
-    print 'Machine center in beam grid coordinates'
-    print xyz_center
-    print 'Beam injection start point in beam grid coordinates'
-    print xyz_src
-    print 'First aperture position in beam grid coordinates'
-    print xyz_pos
+    print('Beam injection start point in machine coordinates')
+    print(uvw_src)
+    print('First aperture position in machine coordinates')
+    print(uvw_pos)
+    print('Machine center in beam grid coordinates')
+    print(xyz_center)
+    print('Beam injection start point in beam grid coordinates')
+    print(xyz_src)
+    print('First aperture position in beam grid coordinates')
+    print(xyz_pos)
 
-    print 'Beam grid rotation angles that would align it with the beam centerline'
-    print '{} deg.'.format(ALPHA / np.pi * 180.)  # ,FORMAT='("    alpha = ",F14.10,"°")'
-    print '{} deg.'.format(BETA / np.pi * 180.)  # ,FORMAT='("    beta = ",F14.10,"°")'
+    print('Beam grid rotation angles that would align it with the beam centerline')
+    print('{} deg.'.format(ALPHA / np.pi * 180.))  # ,FORMAT='("    alpha = ",F14.10,"°")'
+    print('{} deg.'.format(BETA / np.pi * 180.))  # ,FORMAT='("    beta = ",F14.10,"°")'
 
     # Calculate grid center rc and sides length dr
     dr = np.array([inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']], dtype=np.float64)
@@ -141,9 +142,9 @@ def check_beam(inp, nbi):
 #    aabb_intersect,rc,dr,xyz_src,xyz_axis,length,r_enter,r_exit
     length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_src, xyz_axis)
 
-    print 'Beam centerline - grid intersection length'
-#    print f='("    length = ",F8.3)',length
-    print length
+    print('Beam centerline - grid intersection length')
+#    print(f='("    length = ",F8.3)',length
+    print(length)
     if length <= 10.0:
         error('Beam centerline does not intersect grid')
         err_status = 1

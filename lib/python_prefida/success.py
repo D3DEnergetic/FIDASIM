@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import colored
+from python_prefida import colored
 
 
 def success(string):
@@ -17,4 +17,4 @@ def success(string):
     #+```
     """
 
-    print colored('SUCCESS: ' + string, c='g')
+    print(colored('SUCCESS: ' + string, c='g'))

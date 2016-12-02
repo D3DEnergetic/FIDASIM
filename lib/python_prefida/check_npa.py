@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from lib import info
-from lib import error
-from lib import check_dict_schema
-from lib import uvw_to_xyz
-from lib import aabb_intersect
-from lib import warn
-from lib import success
+from python_prefida import info
+from python_prefida import error
+from python_prefida import check_dict_schema
+from python_prefida import uvw_to_xyz
+from python_prefida import aabb_intersect
+from python_prefida import warn
+from python_prefida import success
 
 
 def check_npa(inp, npa):
@@ -40,7 +40,7 @@ def check_npa(inp, npa):
 
     nchan = npa['nchan']
     zero_string = {'dims': 0, 'type': str}
-    zero_long = {'dims': 0, 'type': long}
+    zero_long = {'dims': 0, 'type': int}
     schema = {'data_source': zero_string,
               'nchan': zero_long,
               'system': zero_string,
@@ -65,14 +65,14 @@ def check_npa(inp, npa):
     if nw != 0:
 #    if npa['d_shape'] not in [1, 2]:
         error('Invalid detector shape. Expected 1 (rectagular) or 2 (circular)')
-        print 'Invalid indices: {}'.format(np.arange(len(npa['d_shape']))[w])
+        print('Invalid indices: {}'.format(np.arange(len(npa['d_shape']))[w]))
         err_status = 1
 
     w = (npa['a_shape'] > 2) or (npa['a_shape'] == 0)
     nw = len(npa['a_shape'])
     if nw != 0:
         error('Invalid aperture shape. Expected 1 (rectagular) or 2 (circular)')
-        print 'Invalid indices: {}'.format(np.arange(len(npa['a_shape']))[w])
+        print('Invalid indices: {}'.format(np.arange(len(npa['a_shape']))[w]))
         err_status = 1
 
     # Calculate grid center rc and sides length dr
@@ -111,16 +111,16 @@ def check_npa(inp, npa):
     ww = (err_arr != 0)
     nww = err_arr[ww].size
 #    print f='(i3," out of ",i3," channels crossed the beam grid")',nw,nchan
-    print '{} out of {} channels crossed the beam grid'.format(nw, nchan)
+    print('{} out of {} channels crossed the beam grid'.format(nw, nchan))
     if nw == 0:
         error('No channels intersect the beam grid')
         err_status = 1
 
     if nww > 0:
         warn('Some channels did not intersect the beam grid')
-        print 'Number missed: {}'.format(nww)
-        print 'Missed channels:'
-        print '    {}'.format(npa['id'][ww])
+        print('Number missed: {}'.format(nww))
+        print('Missed channels:')
+        print('    {}'.format(npa['id'][ww]))
 
 #    GET_OUT:
     if err_status != 0:

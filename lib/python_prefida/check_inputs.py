@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import numpy as np
 #import matplotlib.pyplot as plt
 #import scipy as sp
@@ -8,10 +9,10 @@ import numpy as np
 #import IPython.utils.path.expand_path as expand_path
 import IPython.utils.path
 import os
-from lib import info
-from lib import check_dict_schema
-from lib import error
-from lib import success
+from python_prefida import info
+from python_prefida import check_dict_schema
+from python_prefida import error
+from python_prefida import success
 
 
 def check_inputs(inputs):
@@ -102,13 +103,13 @@ def check_inputs(inputs):
 
     if (inputs['pinj'] <= 0.) or (inputs['einj'] <= 0.0):
         error('The selected source is not on')
-        print 'einj = {}'.format(inputs['einj'])
-        print 'pinj = {}'.format(inputs['pinj'])
+        print('einj = {}'.format(inputs['einj']))
+        print('pinj = {}'.format(inputs['pinj']))
         err_status = 1
 
     if np.abs(np.sum(inputs['current_fractions']) - 1.0) > 1e-3:
         error('current_fractions do not sum to 1.0')
-        print 'sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions']))
+        print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
         err_status = 1
 
     if inputs['impurity_charge'] <= 1:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import colored
+from python_prefida import colored
 
 
 def warn(string):
@@ -16,4 +16,4 @@ def warn(string):
     #+IDL> warn, "This may be a problem"
     #+```
     """
-    print colored('WARNING: ' + string, c='y')
+    print(colored('WARNING: ' + string, c='y'))

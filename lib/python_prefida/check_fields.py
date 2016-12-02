@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from lib import info
-from lib import error
-from lib import warn
-from lib import success
-from lib import check_dict_schema
+from python_prefida import info
+from python_prefida import error
+from python_prefida import warn
+from python_prefida import success
+from python_prefida import check_dict_schema
 
 
 def check_fields(inp, grid, fields):
@@ -55,8 +55,8 @@ def check_fields(inp, grid, fields):
 
     if np.abs(fields['time'] - inp['time']) > 0.02:
         warn('Electromagnetic fields time and input time do not match')
-        print 'Input time: {}'.format(inp['time'])
-        print 'Electromagnetic fields time: {}'.format(fields['time'])
+        print('Input time: {}'.format(inp['time']))
+        print('Electromagnetic fields time: {}'.format(fields['time']))
 
 #    fields = create_struct(fields, grid)
     fields['grid'] = grid

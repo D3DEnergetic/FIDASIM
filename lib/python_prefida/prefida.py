@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import os
-from lib import check_inputs
-from lib import check_grid
-from lib import check_beam
-from lib import check_plasma
-from lib import check_fields
-from lib import check_distribution
-from lib import check_spec
-from lib import check_npa
-from lib import write_namelist
-from lib import write_geometry
-from lib import write_equilibrium
-from lib import write_distribution
-from lib import get_fidasim_dir
-from lib import success
+from python_prefida import check_inputs
+from python_prefida import check_grid
+from python_prefida import check_beam
+from python_prefida import check_plasma
+from python_prefida import check_fields
+from python_prefida import check_distribution
+from python_prefida import check_spec
+from python_prefida import check_npa
+from python_prefida import write_namelist
+from python_prefida import write_geometry
+from python_prefida import write_equilibrium
+from python_prefida import write_distribution
+from python_prefida import get_fidasim_dir
+from python_prefida import success
 
 
 def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
@@ -97,13 +98,13 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
     # WRITE DISTRIBUTION FILE
     write_distribution(inputs.distribution_file, fbm)
 
-    print ''
-    print ''
+    print('')
+    print('')
     success('FIDASIM pre-processing completed')
-    print 'To run FIDASIM use the following command'
-    print get_fidasim_dir() + '/fidasim ' + inputs['result_dir'] + '/' + inputs['runid'] + '_inputs.dat'
-    print ''
-    print ''
+    print('To run FIDASIM use the following command')
+    print(get_fidasim_dir() + '/fidasim ' + inputs['result_dir'] + '/' + inputs['runid'] + '_inputs.dat')
+    print('')
+    print('')
 ###############################################################################
 if __name__ == "__main__":
     prefida()

@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import info
-from lib import check_dict_schema
-from lib import uvw_to_xyz
-from lib import error
-from lib import warn
-from lib import success
-from lib import aabb_intersect
+from python_prefida import info
+from python_prefida import check_dict_schema
+from python_prefida import uvw_to_xyz
+from python_prefida import error
+from python_prefida import warn
+from python_prefida import success
+from python_prefida import aabb_intersect
 import numpy as np
 
 
@@ -74,7 +74,7 @@ def check_spec(inp, chords):
 #        chan_str = strcompress(string(i),/remove_all)
         if np.abs(np.sum(uvw_axis[:, i] ** 2.) - 1.) > 1e-5:
             error('Invalid optical axis for chord "' + chords['id'][i] + '". Expected norm(axis) == 1')
-            print np.sum(uvw_axis[:, i] ** 2.) - 1.
+            print(np.sum(uvw_axis[:, i] ** 2.) - 1.)
             err_arr[i] = 1
 
         # Check if viewing chord intersects beam grid
@@ -87,7 +87,7 @@ def check_spec(inp, chords):
 #    print f='(i3," out of ",i3," chords crossed the beam grid")',nw,nchan
     w = (cross_arr == 0)
     nw = cross_arr[w].size
-    print '{} out of {} chords crossed the beam grid")'.format(nw, nchan)
+    print('{} out of {} chords crossed the beam grid")'.format(nw, nchan))
     if nw == 0:
 #    if 1 not in cross_arr:
         error('No channels intersect the beam grid')

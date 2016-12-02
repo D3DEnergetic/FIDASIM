@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import info
-from lib import check_dict_schema
-from lib import warn
-from lib import error
-from lib import success
+from python_prefida import info
+from python_prefida import check_dict_schema
+from python_prefida import warn
+from python_prefida import error
+from python_prefida import success
 import numpy as np
 
 
@@ -43,7 +43,7 @@ def check_distribution(inp, grid, dist):
 #    CASE dist_type OF
     if dist_type == 1:
 #        1: BEGIN
-        print 'Using a Guiding Center Fast-ion Density Function'
+        print('Using a Guiding Center Fast-ion Density Function')
 #        w = where("nenergy" eq strlowcase(TAG_names(dist)),nw)
         if 'nenergy' not in dist_keys.lower():
 #        if nw eq 0:
@@ -85,7 +85,7 @@ def check_distribution(inp, grid, dist):
 #        END
 #        2: BEGIN
     elif dist_type == 2:
-        print 'Using Guiding Center Monte Carlo fast-ion distribution'
+        print('Using Guiding Center Monte Carlo fast-ion distribution')
 #        w = where("nparticle" == strlowcase(TAG_names(dist)),nw)
 #        if nw == 0:
         if 'nparticle' not in dist_keys.lower():
@@ -116,11 +116,11 @@ def check_distribution(inp, grid, dist):
         if err_status == 1:
             error('Invalid fast-ion distribution. Exiting...', halt=True)
 
-        print 'Number of MC particles: {}'.format(npart)
+        print('Number of MC particles: {}'.format(npart))
 #        END
 #        3: BEGIN
     elif dist_type == 3:
-        print 'Using Full Orbit Monte Carlo fast-ion distribution'
+        print('Using Full Orbit Monte Carlo fast-ion distribution')
 #        w = where("nparticle" == strlowcase(TAG_names(dist)),nw)
 #        if nw == 0:
         if 'nparticle' not in dist_keys.lower():
@@ -152,7 +152,7 @@ def check_distribution(inp, grid, dist):
         if err_status == 1:
             error('Invalid fast-ion distribution. Exiting...', halt=True)
 
-        print 'Number of MC particles: {}'.format(npart)
+        print('Number of MC particles: {}'.format(npart))
 #        END
 #        ELSE: BEGIN
     else:
@@ -171,8 +171,8 @@ def check_distribution(inp, grid, dist):
 
     if np.abs(dist['time'] - inp['time']) > 0.02:
         warn('Distribution time and input time do not match')
-        print 'Input time: {}'.format(inp['time'])
-    print 'Distribution time: {}'.format(dist['time'])
+        print('Input time: {}'.format(inp['time']))
+    print('Distribution time: {}'.format(dist['time']))
 
 #    GET_OUT:
     if err_status != 0:

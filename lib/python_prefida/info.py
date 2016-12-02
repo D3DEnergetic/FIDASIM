@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import colored
+from python_prefida import colored
 
 
 def info(string):
@@ -17,4 +17,4 @@ def info(string):
     ;+IDL> info, "This is an informative message"
     ;+```
     """
-    print colored('INFO: ' + string, c='b')
+    print(colored('INFO: ' + string, c='b'))

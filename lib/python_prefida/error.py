@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib import colored
+from python_prefida import colored
 
 
 def error(string, halt=False):
@@ -18,7 +18,7 @@ def error(string, halt=False):
 #+```idl
 #+IDL> error, "=("
 #+```
-    print colored('ERROR: {}'.format(string), c='r')
+    print(colored('ERROR: {}'.format(string), c='r'))
 
     if halt:
         raise Exception(string)

@@ -22,12 +22,12 @@ def get_version(fidasim_dir):
     version = ''
     git_dir = '{}{}.git'.format(fidasim_dir, os.path.sep)
 
-    print git_dir
+    print(git_dir)
 
     test = subprocess.Popen(["command","-v","git"])  # , stdout=subprocess.PIPE)
-    print test
+    print(test)
     output = test.communicate()[0]
-    print output
+    print(output)
 
 #    if strcmp(!VERSION.OS_FAMILY ,'windows', /fold_case) then begin
 #        spawn,'command -v git ', git_command
@@ -53,4 +53,4 @@ def get_version(fidasim_dir):
 ###############################################################################
 if __name__ == "__main__":
     from lib.get_fidasim_dir import get_fidasim_dir
-    print get_version(get_fidasim_dir())
+    print(get_version(get_fidasim_dir()))

@@ -5,9 +5,45 @@ import h5py
 
 
 def write_geometry(filename, nbi, spec=None, npa=None):
+    """Brief Description
+
+    Expanded description
+
+    Sample usage:
+    -------------
+    >>> Description
+
+    Notes
+    -----
+
+    Parameters
+    ----------
+    parameter : type
+
+        Description
+
+    keyword : type
+
+        Description
+
+    Returns
+    -------
+    result : type
+
+        Description
+
+    History
+    -------
+    Created on Fri Dec  2 09:44:20 2016 by nbolte
+
+    To Do
+    -----
+    * Consider setting h5 driver according to current OS
+
+    """
     """
     #write_geometry
-    Write geometry values to a HDF5 file
+    Write geometry values to a HDF5 file with up to 3 groups: nbi, spec, npa
     ***
     ##Input Arguments
          **filename**: Name of the geometry file
@@ -26,137 +62,113 @@ def write_geometry(filename, nbi, spec=None, npa=None):
     """
     info('Writing geometry file...')
 
-    # example using dict 2 deep, no attriutes
+    # Create and open h5 file
     with h5py.File(filename, 'w') as hf:
-        for key in b.keys():
-            g = hf.create_group(key)
-            for subkey in b[key]:
-                g.create_dataset(subkey, data = b[key][subkey])
+        # Root att
+        hf.attrs['description'] = 'Geometric quantities for FIDASIM'
 
-    # Create attributes
-    root_atts = {attribute,obj:'/',
-                name:'description',
-                data:'Geometric quantities for FIDASIM'}
+        # Create nbi group
+        g_nbi = hf.create_group('nbi')
 
-    # NBI attributes
-    nbi_desc = {attribute,obj:'/nbi',
-                name:'description',
-                data:'Neutral Beam Geometry'}
+        # nbi att
+        g_nbi.attrs['description'] = 'Neutral Beam Geometry'
+        g_nbi.attrs['coordinate_system'] = 'Right-handed cartesian'
 
-    nbi_cs = {attribute,obj:'/nbi',
-              name:'coordinate_system',
-              data:'Right-handed cartesian'}
+        # Save nbi data
+        key = 'data_source'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Source of the NBI geometry'
 
-    nbi_ds_desc = {attribute,obj:'/nbi/data_source',
-                   name:'description',
-                   data:'Source of the NBI geometry'}
+        key = 'name'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Beam name'
 
-    nbi_name_desc = {attribute,obj:'/nbi/name',
-                     name:'description',
-                     data:'Beam name'}
+        key = 'src'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Position of the center of the beam source grid'
+        ds.attrs['units'] = 'cm'
 
-    nbi_src_desc = {attribute,obj:'/nbi/src',
-                    name:'description',
-                    data:'Position of the center of the beam source grid'}
-    nbi_src_unit = {attribute,obj:'/nbi/src',
-                    name:'units',
-                    data:'cm'}
+        key = 'axis'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Axis of the beam centerline: Centerline(t) = src + axis*t '
+        ds.attrs['units'] = 'cm'
 
-    nbi_axis_desc = {attribute,obj:'/nbi/axis',
-                     name:'description',
-                     data:'Axis of the beam centerline: Centerline(t) = src + axis*t '}
-    nbi_axis_unit = {attribute,obj:'/nbi/axis',
-                     name:'units',
-                     data:'cm'}
+        key = 'focy'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Horizonal focal length of the beam'
+        ds.attrs['units'] = 'cm'
 
-    nbi_focy_desc = {attribute,obj:'/nbi/focy',
-                     name:'description',
-                     data:'Horizonal focal length of the beam'}
-    nbi_focy_unit = {attribute,obj:'/nbi/focy',
-                     name:'units',
-                     data:'cm'}
+        key = 'focz'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Vertical focal length of the beam'
+        ds.attrs['units'] = 'cm'
 
-    nbi_focz_desc = {attribute,obj:'/nbi/focz',
-                     name:'description',
-                     data:'Vertical focal length of the beam'}
-    nbi_focz_unit = {attribute,obj:'/nbi/focz',
-                     name:'units',
-                     data:'cm'}
+        key = 'divy'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Horizonal divergences of the beam. One for each energy component'
+        ds.attrs['units'] = 'radians'
 
-    nbi_divy_desc = {attribute,obj:'/nbi/divy',
-                     name:'description',
-                     data:'Horizonal divergences of the beam. One for each energy component'}
-    nbi_divy_unit = {attribute,obj:'/nbi/divy',
-                     name:'units',
-                     data:'radians'}
+        key = 'divz'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Vertical divergences of the beam. One for each energy component'
+        ds.attrs['units'] = 'radians'
 
-    nbi_divz_desc = {attribute,obj:'/nbi/divz',
-                     name:'description',
-                     data:'Vertical divergences of the beam. One for each energy component'}
-    nbi_divz_unit = {attribute,obj:'/nbi/divz',
-                     name:'units',
-                     data:'radians'}
+        key = 'widy'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Half width of the beam source grid'
+        ds.attrs['units'] = 'cm'
 
-    nbi_widy_desc = {attribute,obj:'/nbi/widy',
-                     name:'description',
-                     data:'Half width of the beam source grid'}
-    nbi_widy_unit = {attribute,obj:'/nbi/widy',
-                     name:'units',
-                     data:'cm'}
+        key = 'widz'
+        ds = g_nbi.create_dataset(key, data = nbi[key])
+        ds.attrs['description'] = 'Half height of the beam source grid'
+        ds.attrs['units'] = 'cm'
 
-    nbi_widz_desc = {attribute,obj:'/nbi/widz',
-                     name:'description',
-                     data:'Half height of the beam source grid'}
-    nbi_widz_unit = {attribute,obj:'/nbi/widz',
-                     name:'units',
-                     data:'cm'}
-
-    nbi_shape_desc = {attribute,obj:'/nbi/shape',
-                      name:'description',
-                      data:'Shape of the beam source grid: 1="rectangular", 2="circular"'}
-
-    nbi_naperture_desc = {attribute,obj:'/nbi/naperture',
+        nbi_shape_desc = {attribute,obj:'/nbi/shape',
                           name:'description',
-                          data:'Number of apertures'}
+                          data:'Shape of the beam source grid: 1="rectangular", 2="circular"'}
 
-    nbi_ashape_desc = {attribute,obj:'/nbi/ashape',
-                       name:'description',
-                       data:'Shape of the aperture(s): 1="rectangular", 2="circular"'}
+        nbi_naperture_desc = {attribute,obj:'/nbi/naperture',
+                              name:'description',
+                              data:'Number of apertures'}
 
-    nbi_awidy_desc = {attribute,obj:'/nbi/awidy',
-                      name:'description',
-                      data:'Half width of the aperture(s)'}
-    nbi_awidy_unit = {attribute,obj:'/nbi/awidy',
-                      name:'units',
-                      data:'cm'}
+        nbi_ashape_desc = {attribute,obj:'/nbi/ashape',
+                           name:'description',
+                           data:'Shape of the aperture(s): 1="rectangular", 2="circular"'}
 
-    nbi_awidz_desc = {attribute,obj:'/nbi/awidz',
-                      name:'description',
-                      data:'Half height of the aperture(s)'}
-    nbi_awidz_unit = {attribute,obj:'/nbi/awidz',
-                      name:'units',
-                      data:'cm'}
+        nbi_awidy_desc = {attribute,obj:'/nbi/awidy',
+                          name:'description',
+                          data:'Half width of the aperture(s)'}
+        nbi_awidy_unit = {attribute,obj:'/nbi/awidy',
+                          name:'units',
+                          data:'cm'}
 
-    nbi_aoffy_desc = {attribute,obj:'/nbi/aoffy',
-                      name:'description',
-                      data:'Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline'}
-    nbi_aoffy_unit = {attribute,obj:'/nbi/aoffy',
-                      name:'units',
-                      data:'cm'}
+        nbi_awidz_desc = {attribute,obj:'/nbi/awidz',
+                          name:'description',
+                          data:'Half height of the aperture(s)'}
+        nbi_awidz_unit = {attribute,obj:'/nbi/awidz',
+                          name:'units',
+                          data:'cm'}
 
-    nbi_aoffz_desc = {attribute,obj:'/nbi/aoffz',
-                      name:'description',
-                      data:'Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline'}
-    nbi_aoffz_unit = {attribute,obj:'/nbi/aoffz',
-                      name:'units',
-                      data:'cm'}
+        nbi_aoffy_desc = {attribute,obj:'/nbi/aoffy',
+                          name:'description',
+                          data:'Horizontal (y) offset of the aperture(s) relative to the +x aligned beam centerline'}
+        nbi_aoffy_unit = {attribute,obj:'/nbi/aoffy',
+                          name:'units',
+                          data:'cm'}
 
-    nbi_adist_desc = {attribute,obj:'/nbi/adist',
-                      name:'description',
-                      data:'Distance from the center of the beam source grid to the aperture(s) plane'}
-    nbi_adist_unit = {attribute,obj:'/nbi/adist',
-                      name:'units',
-                      data:'cm'}
+        nbi_aoffz_desc = {attribute,obj:'/nbi/aoffz',
+                          name:'description',
+                          data:'Vertical (z) offset of the aperture(s) relative to the +x aligned beam centerline'}
+        nbi_aoffz_unit = {attribute,obj:'/nbi/aoffz',
+                          name:'units',
+                          data:'cm'}
+
+        nbi_adist_desc = {attribute,obj:'/nbi/adist',
+                          name:'description',
+                          data:'Distance from the center of the beam source grid to the aperture(s) plane'}
+        nbi_adist_unit = {attribute,obj:'/nbi/adist',
+                          name:'units',
+                          data:'cm'}
 
     nbi_atts = [nbi_desc, nbi_cs, nbi_ds_desc,nbi_name_desc,
                 nbi_shape_desc, nbi_src_desc, nbi_src_unit,
@@ -173,6 +185,22 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                 nbi_aoffy_desc, nbi_aoffy_unit,
                 nbi_aoffz_desc, nbi_aoffz_unit,
                 nbi_adist_desc, nbi_adist_unit ]
+
+    if spec is not None:
+            # Create spec group
+            g_spec = hf.create_group('spec')
+
+            # Save spec data
+            for key in spec:
+                g_spec.create_dataset('spec/' + key, data = spec[key])
+
+        if npa is not None:
+            # Create npa group
+            g_npa = hf.create_group('npa')
+
+            # Save npa data
+            for key in npa:
+                g_npa.create_dataset('npa/' + key, data = npa[key])
 
     # Spectroscopic attributes
     spec_desc = {attribute,obj:'/spec',

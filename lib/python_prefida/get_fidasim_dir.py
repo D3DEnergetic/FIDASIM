@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from lib.source_file import source_file
+from python_prefida import source_file
 
 
 def get_fidasim_dir():
@@ -24,4 +24,4 @@ def get_fidasim_dir():
 
 ###############################################################################
 if __name__ == "__main__":
-    print get_fidasim_dir()
+    print(get_fidasim_dir())

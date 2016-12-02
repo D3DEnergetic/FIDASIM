@@ -1,4 +1,46 @@
-PRO write_equilibrium, filename, plasma, fields
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from info import info
+import h5py
+
+
+def write_equilibrium(filename, plasma, fields):
+    """Brief Description
+
+    Expanded description
+
+    Sample usage:
+    -------------
+    >>> Description
+
+    Notes
+    -----
+    Two groups: 'plasma' and 'fields'
+
+    Parameters
+    ----------
+    parameter : type
+
+        Description
+
+    keyword : type
+
+        Description
+
+    Returns
+    -------
+    result : type
+
+        Description
+
+    History
+    -------
+    Created on Fri Dec  2 13:57:20 2016 by nbolte
+
+    To Do
+    -----
+
     ;+##`write_equilibrium, filename, plasma, fields`
     ;+Write MHD equilibrium values to a HDF5 file
     ;+
@@ -13,141 +55,82 @@ PRO write_equilibrium, filename, plasma, fields
     ;+```idl
     ;+IDL> write_equilibrium, filename, plasma, fields
     ;+```
+    """
+    info('Writing equilibrium file...')
 
-    info, 'Writing equilibrium file...'
+    with h5py.File(filename, 'w') as hf:
+        # File attribute
+        hf.attrs['description'] = 'Plasma Parameters and Electromagnetic Fields for FIDASIM'
 
-    root_atts = {attribute,obj:'/', $
-                 name:'description', $
-                 data:'Plasma Parameters and Electromagnetic Fields for FIDASIM'}
+        # Create plasma group
+        g_plasma = hf.create_group('plasma')
 
-    ;; Plasma Attributes
-    plasma_desc = {attribute,obj:'/plasma', $
-                   name:'description', $
-                   data:'Plasma Parameters'}
-    
-    plasma_cs = {attribute,obj:'/plasma', $
-                 name:'coordinate_system', $
-                 data:'Cylindrical'}
+        # Plasma Attributes
+        g_plasma.attrs['description'] = 'Plasma Parameters'
+        g_plasma.attrs['coordinate_system'] = 'Cylindrical'
 
-    plasma_ds_desc = {attribute, obj:'/plasma/data_source', $
-                      name:'description', $
-                      data:'Source of the plasma parameters'}
+        # Dataset attributes
+        plasma_description = {'data_source': 'Source of the plasma parameters',
+                              'time': 'Time'
+                              'dene': 'Electron Number Density: Dene(r,z)',
+                              'te': 'Electron Temperature: Te(r,z)',
+                              'ti': 'Ion Temperature: Ti(r,z)',
+                              'zeff': 'Effective Nuclear Charge: Zeff(r,z)',
+                              'vr': 'Bulk plasma flow in the r-direction: Vr(r,z)',
+                              'vt': 'Bulk plasma flow in the theta/torodial-direction: Vt(r,z)',
+                              'vz': 'Bulk plasma flow in the z-direction: Vz(r,z)',
+                              'nr': 'Number of R values',
+                              'nz': 'Number of Z values',
+                              'r': 'Radius',
+                              'z': 'Z',
+                              'r2d': 'Radius grid: R(r,z)',
+                              'z2d': 'Z grid: Z(r,z)',
+                              'mask': 'Boolean mask that indicates where the plasma parameters are well defined'}
 
-    plasma_time_desc = {attribute,obj:'/plasma/time', $
-                        name:'description', $
-                        data:'Time'}
+
+    plasma_units =
     plasma_time_unit = {attribute,obj:'/plasma/time', $
                         name:'units', $
                         data:'s'}
 
-    plasma_dene_desc = {attribute,obj:'/plasma/dene', $
-                        name:'description', $
-                        data:'Electron Number Density: Dene(r,z)'}
     plasma_dene_unit = {attribute,obj:'/plasma/dene', $
                         name:'units', $
                         data:'cm^-3'}
-
-    plasma_te_desc = {attribute,obj:'/plasma/te', $
-                      name:'description', $
-                      data:'Electron Temperature: Te(r,z)'}
     plasma_te_unit = {attribute,obj:'/plasma/te', $
                       name:'units', $
                       data:'keV'}
-
-    plasma_ti_desc = {attribute,obj:'/plasma/ti', $
-                      name:'description', $
-                      data:'Ion Temperature: Ti(r,z)'}
     plasma_ti_unit = {attribute,obj:'/plasma/ti', $
                       name:'units', $
                       data:'keV'}
-
-    plasma_zeff_desc = {attribute,obj:'/plasma/zeff', $
-                        name:'description', $
-                        data:'Effective Nuclear Charge: Zeff(r,z)'}
-
-    plasma_vr_desc = {attribute,obj:'/plasma/vr', $
-                      name:'description', $
-                      data:'Bulk plasma flow in the r-direction: Vr(r,z)'}
     plasma_vr_unit = {attribute,obj:'/plasma/vr', $
                       name:'units', $
                       data:'cm/s'}
-
-    plasma_vt_desc = {attribute,obj:'/plasma/vt', $
-                      name:'description', $
-                      data:'Bulk plasma flow in the theta/torodial-direction: Vt(r,z)'}
     plasma_vt_unit = {attribute,obj:'/plasma/vt', $
                       name:'units', $
                       data:'cm/s'}
-
-    plasma_vz_desc = {attribute,obj:'/plasma/vz', $
-                      name:'description', $
-                      data:'Bulk plasma flow in the z-direction: Vz(r,z)'}
     plasma_vz_unit = {attribute,obj:'/plasma/vz', $
                       name:'units', $
                       data:'cm/s'}
-
-    plasma_nr_desc = {attribute,obj:'/plasma/nr', $
-                      name:'description', $
-                      data:'Number of R values'}
-   
-    plasma_nz_desc = {attribute,obj:'/plasma/nz', $
-                      name:'description', $
-                      data:'Number of Z values'}
-
-    plasma_r_desc = {attribute,obj:'/plasma/r', $
-                     name:'description', $
-                     data:'Radius'}
     plasma_r_unit = {attribute,obj:'/plasma/r', $
                      name:'units', $
                      data:'cm'}
-
-    plasma_z_desc = {attribute,obj:'/plasma/z', $
-                     name:'description', $
-                     data:'Z'}
-    plasma_z_unit = {attribute,obj:'/plasma/z', $
+                      plasma_z_unit = {attribute,obj:'/plasma/z', $
                      name:'units', $
                      data:'cm'}
-
-    plasma_r2d_desc = {attribute,obj:'/plasma/r2d', $
-                       name:'description', $
-                       data:'Radius grid: R(r,z)'}
-    plasma_r2d_unit = {attribute,obj:'/plasma/r2d', $
+                     plasma_r2d_unit = {attribute,obj:'/plasma/r2d', $
+                       name:'units', $
+                       data:'cm'}
+                      plasma_z2d_unit = {attribute,obj:'/plasma/z2d', $
                        name:'units', $
                        data:'cm'}
 
-    plasma_z2d_desc = {attribute,obj:'/plasma/z2d', $
-                       name:'description', $
-                       data:'Z grid: Z(r,z)'}
-    plasma_z2d_unit = {attribute,obj:'/plasma/z2d', $
-                       name:'units', $
-                       data:'cm'}
 
-    plasma_mask_desc = {attribute,obj:'/plasma/mask',$
-                         name:'description', $
-                         data:'Boolean mask that indicates where' +$ 
-                         ' the plasma parameters are well defined'}
-
-    plasma_atts = [plasma_desc, plasma_cs, plasma_ds_desc, $
-                   plasma_time_desc, plasma_time_unit, $
-                   plasma_mask_desc, $
-                   plasma_dene_desc, plasma_dene_unit, $
-                   plasma_te_desc, plasma_te_unit, $
-                   plasma_ti_desc, plasma_ti_unit, $
-                   plasma_zeff_desc, $
-                   plasma_vr_desc, plasma_vr_unit, $
-                   plasma_vt_desc, plasma_vt_unit, $
-                   plasma_vz_desc, plasma_vz_unit, $
-                   plasma_nr_desc, plasma_nz_desc, $
-                   plasma_r_desc, plasma_r_unit, $
-                   plasma_z_desc, plasma_z_unit, $
-                   plasma_r2d_desc, plasma_r2d_unit, $
-                   plasma_z2d_desc, plasma_z2d_unit ]
 
     ;; Electromagnetic fields attributes
     fields_desc = {attribute,obj:'/fields', $
                    name:'description', $
                    data:'Electromagnetic Fields'}
-    
+
     fields_cs = {attribute,obj:'/fields', $
                  name:'coordinate_system', $
                  data:'Cylindrical'}
@@ -158,7 +141,7 @@ PRO write_equilibrium, filename, plasma, fields
 
     fields_mask_desc = {attribute,obj:'/fields/mask',$
                         name:'description', $
-                        data:'Boolean mask that indicates where' +$ 
+                        data:'Boolean mask that indicates where' +$
                         ' the fields are well defined'}
 
     fields_time_desc = {attribute,obj:'/fields/time', $
@@ -213,7 +196,7 @@ PRO write_equilibrium, filename, plasma, fields
     fields_nr_desc = {attribute,obj:'/fields/nr', $
                       name:'description', $
                       data:'Number of R values'}
-   
+
     fields_nz_desc = {attribute,obj:'/fields/nz', $
                       name:'description', $
                       data:'Number of Z values'}

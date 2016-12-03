@@ -3,9 +3,9 @@
 
 import h5py
 import os
-from success import success
-from info import info
-from error import error
+from lib.python_prefida.success import success
+from lib.python_prefida.info import info
+from lib.python_prefida.error import error
 
 
 def write_geometry(filename, nbi, spec=None, npa=None):

@@ -3,20 +3,20 @@
 
 from __future__ import print_function
 import os
-from python_prefida import check_inputs
-from python_prefida import check_grid
-from python_prefida import check_beam
-from python_prefida import check_plasma
-from python_prefida import check_fields
-from python_prefida import check_distribution
-from python_prefida import check_spec
-from python_prefida import check_npa
-from python_prefida import write_namelist
-from python_prefida import write_geometry
-from python_prefida import write_equilibrium
-from python_prefida import write_distribution
-from python_prefida import get_fidasim_dir
-from python_prefida import success
+from lib.python_prefida.check_inputs import check_inputs
+from lib.python_prefida.check_grid import check_grid
+from lib.python_prefida.check_beam import check_beam
+from lib.python_prefida.check_plasma import check_plasma
+from lib.python_prefida.check_fields import check_fields
+from lib.python_prefida.check_distribution import check_distribution
+from lib.python_prefida.check_spec import check_spec
+from lib.python_prefida.check_npa import check_npa
+from lib.python_prefida.write_namelist import write_namelist
+from lib.python_prefida.write_geometry import write_geometry
+from lib.python_prefida.write_equilibrium import write_equilibrium
+from lib.python_prefida.write_distribution import write_distribution
+from lib.python_prefida.get_fidasim_dir import get_fidasim_dir
+from lib.python_prefida.success import success
 
 
 def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from info import info
+from lib.python_prefida import info
 import h5py
 import os
-from success import success
-from error import error
+from lib.python_prefida import success
+from lib.python_prefida import error
 
 
 def write_equilibrium(filename, plasma, fields):

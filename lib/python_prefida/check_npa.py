@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from python_prefida import info
-from python_prefida import error
-from python_prefida import check_dict_schema
-from python_prefida import uvw_to_xyz
-from python_prefida import aabb_intersect
-from python_prefida import warn
-from python_prefida import success
+from lib.python_prefida import info
+from lib.python_prefida import error
+from lib.python_prefida import check_dict_schema
+from lib.python_prefida import uvw_to_xyz
+from lib.python_prefida import aabb_intersect
+from lib.python_prefida import warn
+from lib.python_prefida import success
 
 
 def check_npa(inp, npa):

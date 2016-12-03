@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from python_prefida import colored
+from lib.python_prefida.colored import colored
 
 
 def success(string):

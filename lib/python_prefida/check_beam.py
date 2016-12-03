@@ -2,49 +2,68 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from python_prefida import info
-from python_prefida import check_dict_schema
-from python_prefida import error
-from python_prefida import uvw_to_xyz
-from python_prefida import aabb_intersect
-from python_prefida import success
+from lib.python_prefida.info import info
+from lib.python_prefida.check_dict_schema import check_dict_schema
+from lib.python_prefida.error import error
+from lib.python_prefida.uvw_to_xyz import uvw_to_xyz
+from lib.python_prefida.aabb_intersect import aabb_intersect
+from lib.python_prefida.success import success
 import numpy as np
 
 
 def check_beam(inp, nbi):
-    """
-    #check_beam
-    Checks if neutral beam geometry structure is valid
-    ***
-    ##Input Arguments
-         **inputs**: input structure
-
-         **nbi**: neutral beam geometry structure
-
-    ##Example Usage
-    ```idl
-    IDL> check_beam, inputs, nbi
-    ```
-    """
+    #+#check_beam
+    #+Checks if neutral beam geometry structure is valid
+    #+***
+    #+##Input Arguments
+    #+     **inputs**: input structure
+    #+
+    #+     **nbi**: neutral beam geometry structure
+    #+
+    #+##Example Usage
+    #+```idl
+    #+IDL> check_beam, inputs, nbi
+    #+```
     err_status = 0
     info('Checking beam geometry...')
 
     na = nbi['naperture']
-    zero_string = {'dims': 0, 'type': str}
-    zero_int = {'dims': 0, 'type': int}
-    zero_double = {'dims': 0, 'type': np.float64}
-    three_double = {'dims': [3], 'type': np.float64}
-    na_double = {'dims': [na], 'type': np.float64}
-    na_int = {'dims': [na], 'type': int}
+
+    zero_string = {'dims': 0,
+                   'type': str}
+
+    zero_int = {'dims': 0,
+                'type': int}
+
+    zero_double = {'dims': 0,
+                   'type': float}
+
+    three_double = {'dims': [3],
+                    'type': float}
+
+    na_double = {'dims': [na],
+                 'type': float}
+
+    na_int = {'dims': [na],
+              'type': int}
+
     schema = {'data_source': zero_string,
-              'name': zero_string, 'shape': zero_int,
-              'src': three_double, ' axis': three_double,
-              'divy': three_double, 'divz': three_double,
-              'focy': zero_double, ' focz': zero_double,
-              'widz': zero_double, ' widy': zero_double,
-              'naperture': zero_int, 'ashape': na_int,
-              'awidy': na_double, 'awidz': na_double,
-              'aoffy': na_double, 'aoffz': na_double,
+              'name': zero_string,
+              'shape': zero_int,
+              'src': three_double,
+              'axis': three_double,
+              'divy': three_double,
+              'divz': three_double,
+              'focy': zero_double,
+              'focz': zero_double,
+              'widz': zero_double,
+              'widy': zero_double,
+              'naperture': zero_int,
+              'ashape': na_int,
+              'awidy': na_double,
+              'awidz': na_double,
+              'aoffy': na_double,
+              'aoffz': na_double,
               'adist': na_double}
 
     err_status = check_dict_schema(schema, nbi, desc="beam geometry")

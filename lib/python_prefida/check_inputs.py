@@ -3,16 +3,12 @@
 
 from __future__ import print_function
 import numpy as np
-#import matplotlib.pyplot as plt
-#import scipy as sp
-#import pandas as pd
-#import IPython.utils.path.expand_path as expand_path
 import IPython.utils.path
 import os
-from python_prefida import info
-from python_prefida import check_dict_schema
-from python_prefida import error
-from python_prefida import success
+from lib.python_prefida.info import info
+from lib.python_prefida.check_dict_schema import check_dict_schema
+from lib.python_prefida.error import error
+from lib.python_prefida.success import success
 
 
 def check_inputs(inputs):
@@ -39,39 +35,75 @@ def check_inputs(inputs):
     """
     info('Checking simulation settings...')
     err_status = 0
+
     zero_string = {'dims': 0,
                    'type': str}
+
     zero_int = {'dims': 0,
                 'type': int}
+
     zero_long = {'dims': 0,
-                 'type': long}
+                 'type': int}
+
     zero_double = {'dims': 0,
-                   'type': np.float64}
+                   'type': float}
+
     three_double = {'dims': [3],
-                    'type': np.float64}
+                    'type': float}
+
     schema = {'comment': zero_string,
-              'shot': zero_long, 'time': zero_double,
-              'runid': zero_string, 'device': zero_string,
-              'tables_file': zero_string, 'result_dir': zero_string,
-              'nlambda': zero_int, 'lambdamin': zero_double, 'lambdamax': zero_double,
-              'nx': zero_int, 'ny': zero_int, 'nz': zero_int,
-              'alpha': zero_double, 'beta': zero_double, 'gamma': zero_double,
-              'origin': three_double, 'xmin': zero_double, 'xmax': zero_double,
-              'ymin': zero_double, 'ymax': zero_double, 'zmin': zero_double, 'zmax': zero_double,
-              'ab': zero_double, 'ai': zero_double, 'current_fractions': three_double,
-              'pinj': zero_double, 'einj': zero_double, 'impurity_charge': zero_int,
-              'n_fida': zero_long, 'n_nbi': zero_long, 'n_dcx': zero_long,
-              'n_npa': zero_long, 'n_halo': zero_long, 'n_birth': zero_long,
-              'ne_wght': zero_int, 'np_wght': zero_int, 'nphi_wght': zero_int,
-              'emax_wght': zero_double, 'nlambda_wght': zero_int,
-              'lambdamin_wght': zero_double, 'lambdamax_wght': zero_double,
-              'calc_npa': zero_int, 'calc_fida': zero_int, 'calc_bes': zero_int,
-              'calc_brems': zero_int, 'calc_birth': zero_int,
-              'calc_fida_wght': zero_int, 'calc_npa_wght': zero_int,
+              'shot': zero_long,
+              'time': zero_double,
+              'runid': zero_string,
+              'device': zero_string,
+              'tables_file': zero_string,
+              'result_dir': zero_string,
+              'nlambda': zero_int,
+              'lambdamin': zero_double,
+              'lambdamax': zero_double,
+              'nx': zero_int,
+              'ny': zero_int,
+              'nz': zero_int,
+              'alpha': zero_double,
+              'beta': zero_double,
+              'gamma': zero_double,
+              'origin': three_double,
+              'xmin': zero_double,
+              'xmax': zero_double,
+              'ymin': zero_double,
+              'ymax': zero_double,
+              'zmin': zero_double,
+              'zmax': zero_double,
+              'ab': zero_double,
+              'ai': zero_double,
+              'current_fractions': three_double,
+              'pinj': zero_double,
+              'einj': zero_double,
+              'impurity_charge': zero_int,
+              'n_fida': zero_long,
+              'n_nbi': zero_long,
+              'n_dcx': zero_long,
+              'n_npa': zero_long,
+              'n_halo': zero_long,
+              'n_birth': zero_long,
+              'ne_wght': zero_int,
+              'np_wght': zero_int,
+              'nphi_wght': zero_int,
+              'emax_wght': zero_double,
+              'nlambda_wght': zero_int,
+              'lambdamin_wght': zero_double,
+              'lambdamax_wght': zero_double,
+              'calc_npa': zero_int,
+              'calc_fida': zero_int,
+              'calc_bes': zero_int,
+              'calc_brems': zero_int,
+              'calc_birth': zero_int,
+              'calc_fida_wght': zero_int,
+              'calc_npa_wght': zero_int,
               'dump_dcx': zero_int}
 
     err_status = check_dict_schema(schema, inputs, desc="simulation settings")
-    if err_status == 1:
+    if err_status:
         error('Invalid simulation settings. Exiting...', halt=True)
 
     # Normalize File Paths

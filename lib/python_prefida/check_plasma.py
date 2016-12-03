@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from python_prefida import success
-from python_prefida import info
-from python_prefida import check_dict_schema
-from python_prefida import error
-from python_prefida import warn
+from lib.python_prefida import success
+from lib.python_prefida import info
+from lib.python_prefida import check_dict_schema
+from lib.python_prefida import error
+from lib.python_prefida import warn
 
 
 def check_plasma(inp, grid, plasma):

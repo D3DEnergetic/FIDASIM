@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from python_prefida import info
-from python_prefida import get_version
-from python_prefida import get_fidasim_dir
-from python_prefida import success
+from lib.python_prefida import info
+from lib.python_prefida import get_version
+from lib.python_prefida import get_fidasim_dir
+from lib.python_prefida import success
 import datetime
 
 

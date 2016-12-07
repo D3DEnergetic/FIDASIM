@@ -11,9 +11,9 @@ from lib.python_prefida.success import success
 import numpy as np
 
 
-def check_beam(inp, nbi):
+def check_beam(inputs, nbi):
     #+#check_beam
-    #+Checks if neutral beam geometry structure is valid
+    #+Checks if neutral beam geometry structure is valid. Converts lists to numpy ndarrays
     #+***
     #+##Input Arguments
     #+     **inputs**: input structure
@@ -57,14 +57,25 @@ def check_beam(inp, nbi):
               'focy': zero_double,
               'focz': zero_double,
               'widz': zero_double,
-              'widy': zero_double,
-              'naperture': zero_int,
-              'ashape': na_int,
-              'awidy': na_double,
-              'awidz': na_double,
-              'aoffy': na_double,
-              'aoffz': na_double,
-              'adist': na_double}
+              'widy': zero_double}
+
+    # Add to schema if aperatures are present
+    if nbi['naperture'] > 0:
+        schema['naperture'] = zero_int
+        schema['ashape'] = na_int
+        schema['awidy'] = na_double
+        schema['awidz'] = na_double
+        schema['aoffy'] = na_double
+        schema['aoffz'] = na_double
+        schema['adist'] = na_double
+
+    # Convert to np arrays for indexing
+    nbi['ashape'] = np.array(nbi['ashape'], dtype=int)
+    nbi['awidy'] = np.array(nbi['awidy'], dtype=float)
+    nbi['awidz'] = np.array(nbi['awidz'], dtype=float)
+    nbi['aoffy'] = np.array(nbi['aoffy'], dtype=float)
+    nbi['aoffz'] = np.array(nbi['aoffz'], dtype=float)
+    nbi['adist'] = np.array(nbi['adist'], dtype=float)
 
     err_status = check_dict_schema(schema, nbi, desc="beam geometry")
     if err_status:
@@ -113,19 +124,19 @@ def check_beam(inp, nbi):
         error('Invalid awidz. Expected awidz >= 0.0')
         err_status = 1
 
-    origin = inp['origin']
+    origin = inputs['origin']
     uvw_src = nbi['src']
     uvw_axis = nbi['axis']
     uvw_pos = uvw_src + nbi['adist'][0] * uvw_axis
 
-    xyz_src = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_src, origin=origin)
-    xyz_axis = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_axis)
-    xyz_pos = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_pos, origin=origin)
-    xyz_center = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], [0., 0., 0.], origin=origin)
+    xyz_src = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_src, origin=origin)
+    xyz_axis = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_axis)
+    xyz_pos = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_pos, origin=origin)
+    xyz_center = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], [0., 0., 0.], origin=origin)
 
     dis = np.sqrt(np.sum((xyz_src - xyz_pos) ** 2.))
-    BETA = np.float64(np.arcsin((xyz_src[2] - xyz_pos[2]) / dis))
-    ALPHA = np.float64(np.arctan((xyz_pos[1] - xyz_src[1]), (xyz_pos[0] - xyz_src[0])))
+    beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
+    alpha = np.arctan2((xyz_pos[1] - xyz_src[1]), (xyz_pos[0] - xyz_src[0]))
 
 #    print('Beam injection start point in machine coordinates'
 #    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_src
@@ -150,12 +161,12 @@ def check_beam(inp, nbi):
     print(xyz_pos)
 
     print('Beam grid rotation angles that would align it with the beam centerline')
-    print('{} deg.'.format(ALPHA / np.pi * 180.))  # ,FORMAT='("    alpha = ",F14.10,"°")'
-    print('{} deg.'.format(BETA / np.pi * 180.))  # ,FORMAT='("    beta = ",F14.10,"°")'
+    print('alpha = {} deg.'.format(alpha / np.pi * 180.))  # ,FORMAT='("    alpha = ",F14.10,"°")'
+    print('beta = {} deg.'.format(beta / np.pi * 180.))  # ,FORMAT='("    beta = ",F14.10,"°")'
 
     # Calculate grid center rc and sides length dr
-    dr = np.array([inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']], dtype=np.float64)
-    rc = np.array([inp['xmin'], inp['ymin'], inp['zmin']], dtype=np.float64) + 0.5 * dr
+    dr = np.array([inputs['xmax'] - inputs['xmin'], inputs['ymax'] - inputs['ymin'], inputs['zmax'] - inputs['zmin']], dtype=np.float64)
+    rc = np.array([inputs['xmin'], inputs['ymin'], inputs['zmin']], dtype=np.float64) + 0.5 * dr
 
     # Check if beam centerline intersects beam grid
 #    aabb_intersect,rc,dr,xyz_src,xyz_axis,length,r_enter,r_exit
@@ -173,3 +184,5 @@ def check_beam(inp, nbi):
         error('Invalid beam geometry. Exiting...', halt=True)
     else:
         success('Beam geometry is valid')
+
+    return nbi

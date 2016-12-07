@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from lib.python_prefida import success
-from lib.python_prefida import info
-from lib.python_prefida import check_dict_schema
-from lib.python_prefida import error
-from lib.python_prefida import warn
+from lib.python_prefida.success import success
+from lib.python_prefida.info import info
+from lib.python_prefida.check_dict_schema import check_dict_schema
+from lib.python_prefida.error import error
+from lib.python_prefida.warn import warn
 
 
 def check_plasma(inp, grid, plasma):
@@ -31,10 +31,19 @@ def check_plasma(inp, grid, plasma):
 
     nr = grid['nr']
     nz = grid['nz']
-    zero_string = {'dims': 0, 'type': str}
-    zero_double = {'dims': 0, 'type': np.float64}
-    nrnz_double = {'dims': [nr, nz], 'type': np.float64}
-    nrnz_int = {'dims': [nr, nz], 'type': int}
+
+    zero_string = {'dims': 0,
+                   'type': str}
+
+    zero_double = {'dims': 0,
+                   'type': float}
+
+    nrnz_double = {'dims': [nr, nz],
+                   'type': float}
+
+    nrnz_int = {'dims': [nr, nz],
+                'type': int}
+
     schema = {'time': zero_double,
               'vr': nrnz_double,
               'vt': nrnz_double,

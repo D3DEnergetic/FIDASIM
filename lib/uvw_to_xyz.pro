@@ -20,7 +20,7 @@ FUNCTION uvw_to_xyz, alpha, beta, gamma, uvw, origin=origin
     if not keyword_set(origin) then origin=[0.0,0.0,0.0]
     s = size(uvw,/dim)
     if n_elements(s) ne 2 then s=[s,1]
-    uvw_shifted = transpose(uvw - tile_array(origin,1,s[1])) 
+    uvw_shifted = transpose(uvw - tile_array(origin,1,s[1]))
 
     R = transpose(tb_zyx(alpha,beta,gamma))
 

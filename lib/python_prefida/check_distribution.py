@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib.python_prefida import info
-from lib.python_prefida import check_dict_schema
-from lib.python_prefida import warn
-from lib.python_prefida import error
-from lib.python_prefida import success
+from lib.python_prefida.info import info
+from lib.python_prefida.check_dict_schema import check_dict_schema
+from lib.python_prefida.warn import warn
+from lib.python_prefida.error import error
+from lib.python_prefida.success import success
 import numpy as np
 
 
@@ -27,13 +27,13 @@ def check_distribution(inp, grid, dist):
     ```
     """
     err_status = 0
-    info('Checking fast-ion distribution')
+    info('Checking fast-ion distribution...')
 
-    dist_keys = dist.keys()
+    dist_keys = np.char.lower(np.array(list(dist.keys()), dtype=str))
 #    w = where("type" eq strlowcase(TAG_names(dist)),nw)
 #    w = where("type" eq strlowcase(TAG_names(dist)),nw)
 #    if nw eq 0:
-    if 'type' not in dist_keys.lower():
+    if 'type' not in dist_keys:
         error('"type" is missing from the fast-ion distribution')
         err_status = 1
         error('Invalid fast-ion distribution. Exiting...', halt=True)
@@ -45,7 +45,7 @@ def check_distribution(inp, grid, dist):
 #        1: BEGIN
         print('Using a Guiding Center Fast-ion Density Function')
 #        w = where("nenergy" eq strlowcase(TAG_names(dist)),nw)
-        if 'nenergy' not in dist_keys.lower():
+        if 'nenergy' not in dist_keys:
 #        if nw eq 0:
             error('"nenergy" is missing from the fast-ion distribution')
             err_status = 1
@@ -53,7 +53,7 @@ def check_distribution(inp, grid, dist):
 
 #        w = where("npitch" eq strlowcase(TAG_names(dist)),nw)
 #        if nw eq 0:
-        if 'npitch' not in dist_keys.lower():
+        if 'npitch' not in dist_keys:
             error('"npitch" is missing from the fast-ion distribution')
             err_status = 1
             error('Invalid fast-ion distribution. Exiting...', halt=True)
@@ -62,17 +62,29 @@ def check_distribution(inp, grid, dist):
         nen = dist['nenergy']
         nr = grid['nr']
         nz = grid['nz']
-        zero_string = {'dims': 0, 'type': str}
-        zero_int = {'dims': 0, 'type': int}
-        zero_double = {'dims': 0, 'type': np.float64}
-        nrnz_double = {'dims': [nr, nz], 'type': np.float64}
+
+        zero_string = {'dims': 0,
+                       'type': str}
+
+        zero_int = {'dims': 0,
+                    'type': int}
+
+        zero_double = {'dims': 0,
+                       'type': np.float64}
+
+        nrnz_double = {'dims': [nr, nz],
+                       'type': np.float64}
+
         schema = {'type': zero_int,
                   'nenergy': zero_int,
                   'npitch': zero_int,
-                  'energy': {'dims': [nen], 'type': np.float64},
-                  'pitch': {'dims': [npitch], 'type': np.float64},
+                  'energy': {'dims': [nen],
+                             'type': np.float64},
+                  'pitch': {'dims': [npitch],
+                            'type': np.float64},
                   'denf': nrnz_double,
-                  'f': {'dims': [nen, npitch, nr, nz], 'type': np.float64},
+                  'f': {'dims': [nen, npitch, nr, nz],
+                        'type': np.float64},
                   'time': zero_double,
                   'data_source': zero_string}
 
@@ -88,18 +100,31 @@ def check_distribution(inp, grid, dist):
         print('Using Guiding Center Monte Carlo fast-ion distribution')
 #        w = where("nparticle" == strlowcase(TAG_names(dist)),nw)
 #        if nw == 0:
-        if 'nparticle' not in dist_keys.lower():
+        if 'nparticle' not in dist_keys:
             error('"nparticle" is missing from the fast-ion distribution')
             err_status = 1
             error('Invalid fast-ion distribution. Exiting...', halt=True)
 
         npart = dist['nparticle']
-        zero_int = {'dims': 0, 'type': int}
-        zero_long = {'dims': 0, 'type': long}
-        zero_string = {'dims': 0, 'type': str}
-        zero_double = {'dims': 0, 'type': np.float64}
-        npart_double = {'dims': [npart], 'type': np.float64}
-        npart_int = {'dims': [npart], 'type': int}
+
+        zero_int = {'dims': 0,
+                    'type': int}
+
+        zero_long = {'dims': 0,
+                     'type': int}
+
+        zero_string = {'dims': 0,
+                       'type': str}
+
+        zero_double = {'dims': 0,
+                       'type': np.float64}
+
+        npart_double = {'dims': [npart],
+                        'type': np.float64}
+
+        npart_int = {'dims': [npart],
+                     'type': int}
+
         schema = {'type': zero_int,
                   'nparticle': zero_long,
                   'nclass': zero_int,
@@ -123,18 +148,31 @@ def check_distribution(inp, grid, dist):
         print('Using Full Orbit Monte Carlo fast-ion distribution')
 #        w = where("nparticle" == strlowcase(TAG_names(dist)),nw)
 #        if nw == 0:
-        if 'nparticle' not in dist_keys.lower():
+        if 'nparticle' not in dist_keys:
             error('"nparticle" is missing from the fast-ion distribution')
             err_status = 1
             error('Invalid fast-ion distribution. Exiting...', halt=True)
 
         npart = dist['nparticle']
-        zero_int = {'dims': 0, 'type': int}
-        zero_long = {'dims': 0, 'type': 'LONG'}
-        zero_string = {'dims': 0, 'type': str}
-        zero_double = {'dims': 0, 'type': np.float64}
-        npart_double = {'dims': [npart], 'type': np.float64}
-        npart_int = {'dims': [npart], 'type': int}
+
+        zero_int = {'dims': 0,
+                    'type': int}
+
+        zero_long = {'dims': 0,
+                     'type': int}
+
+        zero_string = {'dims': 0,
+                       'type': str}
+
+        zero_double = {'dims': 0,
+                       'type': np.float64}
+
+        npart_double = {'dims': [npart],
+                        'type': np.float64}
+
+        npart_int = {'dims': [npart],
+                     'type': int}
+
         schema = {'type': zero_int,
                   'nparticle': zero_long,
                   'nclass': zero_int,

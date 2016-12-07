@@ -67,7 +67,7 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
     check_grid(grid)
 
     # CHECK BEAM INPUTS
-    check_beam(inputs, nbi)
+    nbi = check_beam(inputs, nbi)
 
     # CHECK PLASMA PARAMETERS
     plasma = check_plasma(inputs, grid, plasma)

@@ -48,9 +48,10 @@ def aabb_intersect(rc, dr, r0, d0):
     for i in range(6):
         j = np.floor(i / 2)
         ind = ([0, 1, 2] != j)
-        if np.abs(v0[j]) > 0:
+        if np.abs(v0[j]) > 0.:   # just v0[j] != 0 right?
             # Intersection point with plane
             # ipnts[*,i] = r0 + v0*( ( (rc[j] + ( (i mod 2)-0.5)*dr[j] ) - r0[j])/v0[j] )
+#            print(r0.shape, v0.shape)
             ipnts[:, i] = r0 + v0 * (((rc[j] + (np.mod(i, 2) - 0.5) * dr[j]) - r0[j]) / v0[j])
 
             # Check if point on plane is within grid side

@@ -26,23 +26,23 @@ def check_fields(inp, grid, fields):
     IDL> check_fields, inputs, grid, fields
     ```
     """
-    err_status = 0
+    err_status = False
     info('Checking electromagnetic fields...')
 
     nr = grid['nr']
     nz = grid['nz']
 
     zero_string = {'dims': 0,
-                   'type': str}
+                   'type': [str]}
 
     zero_double = {'dims': 0,
-                   'type': float}
+                   'type': [float, np.float64]}
 
     nrnz_double = {'dims': [nr, nz],
-                   'type': float}
+                   'type': [float, np.float64]}
 
     nrnz_int = {'dims': [nr, nz],
-                'type': int}
+                'type': [int, np.int32]}
 
     schema = {'time': zero_double,
               'br': nrnz_double,
@@ -55,23 +55,24 @@ def check_fields(inp, grid, fields):
               'data_source': zero_string}
 
     err_status = check_dict_schema(schema, fields, desc="electromagnetic fields")
-    if err_status == 1:
+    if err_status:
         error('Invalid electromagnetic fields. Exiting...', halt=True)
 
     if fields['data_source'] == '':
         error('Invalid data source. An empty string is not a data source.')
-        err_status = 1
+        err_status = True
 
     if np.abs(fields['time'] - inp['time']) > 0.02:
         warn('Electromagnetic fields time and input time do not match')
         print('Input time: {}'.format(inp['time']))
         print('Electromagnetic fields time: {}'.format(fields['time']))
 
-#    fields = create_struct(fields, grid)
-    fields['grid'] = grid
+    # Add grid elements to fields dict
+    for key in grid:
+        fields[key] = grid[key]
 
 #    GET_OUT:
-    if err_status != 0:
+    if err_status:
         error('Invalid electromagnetic fields. Exiting...', halt=True)
     else:
         success('Electromagnetic fields are valid')

@@ -11,7 +11,7 @@ from lib.python_prefida.aabb_intersect import aabb_intersect
 import numpy as np
 
 
-def check_spec(inp, chords):
+def check_spec(inputs, chords):
     """
     #check_spec
     Check if spectral geometry structure is valid
@@ -41,25 +41,25 @@ def check_spec(inp, chords):
     nchan = chords['nchan']
 
     zero_string = {'dims': 0,
-                   'type': str}
+                   'type': [str]}
 
     zero_long = {'dims': 0,
-                 'type': int}
+                 'type': [int, np.int32]}
 
     nchan_double = {'dims': [nchan],
-                    'type': np.float64}
+                    'type': [float, np.float64]}
 
     nchan_string = {'dims': [nchan],
-                    'type': np.str_}
+                    'type': [str, np.str_, np.bytes_]}
 
     schema = {'data_source': zero_string,
               'nchan': zero_long,
               'system': zero_string,
               'id': nchan_string,
               'lens': {'dims': [3, nchan],
-                       'type': np.float64},
+                       'type': [float, np.float64]},
               'axis': {'dims': [3, nchan],
-                       'type': np.float64},
+                       'type': [float, np.float64]},
               'sigma_pi': nchan_double,
               'spot_size': nchan_double,
               'radius': nchan_double}
@@ -74,12 +74,12 @@ def check_spec(inp, chords):
     uvw_axis = chords['axis']
 
     #ROTATE CHORDS INTO BEAM GRID COORDINATES
-    xyz_lens = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_lens, origin=inp['origin'])
-    xyz_axis = uvw_to_xyz(inp['alpha'], inp['beta'], inp['gamma'], uvw_axis)
+    xyz_lens = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_lens, origin=inputs['origin'])
+    xyz_axis = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_axis)
 
     # Calculate grid center rc and sides length dr
-    dr = [inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']]
-    rc = [inp['xmin'], inp['ymin'], inp['zmin']] + 0.5 * dr
+    dr = np.array([inputs['xmax'] - inputs['xmin'], inputs['ymax'] - inputs['ymin'], inputs['zmax'] - inputs['zmin']], dtype=float)
+    rc = np.array([inputs['xmin'], inputs['ymin'], inputs['zmin']], dtype=float) + 0.5 * dr
 
     for i in range(nchan):
 #        chan_str = strcompress(string(i),/remove_all)
@@ -91,14 +91,15 @@ def check_spec(inp, chords):
         # Check if viewing chord intersects beam grid
         length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_lens[:, i], xyz_axis[:, i])
         if length <= 0.0:
-            warn('Chord "' + chords['id'][i] + '" does not cross the beam grid')
+            warn('Chord "{}" does not cross the beam grid'.format(chords['id'][i]))
+#            warn('Chord "' + chords['id'][i] + '" does not cross the beam grid')
             cross_arr[i] = 1
 
 #    w = where(cross_arr == 0.0, nw, complement=ww, ncomplement=nww)
 #    print f='(i3," out of ",i3," chords crossed the beam grid")',nw,nchan
     w = (cross_arr == 0)
     nw = cross_arr[w].size
-    print('{} out of {} chords crossed the beam grid")'.format(nw, nchan))
+    print('{} out of {} chords crossed the beam grid'.format(nw, nchan))
     if nw == 0:
 #    if 1 not in cross_arr:
         error('No channels intersect the beam grid')

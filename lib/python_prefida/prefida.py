@@ -87,16 +87,16 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
         check_npa(inputs, npa)
 
     # WRITE FIDASIM INPUT FILES
-    write_namelist(inputs.input_file, inputs)
+    write_namelist(inputs['input_file'], inputs)
 
     # WRITE GEOMETRY FILE
-    write_geometry(inputs.geometry_file, nbi, spec=spec, npa=npa)
+    write_geometry(inputs['geometry_file'], nbi, spec=spec, npa=npa)
 
     # WRITE EQUILIBRIUM FILE
-    write_equilibrium(inputs.equilibrium_file, plasma, fields)
+    write_equilibrium(inputs['equilibrium_file'], plasma, fields)
 
     # WRITE DISTRIBUTION FILE
-    write_distribution(inputs.distribution_file, fbm)
+    write_distribution(inputs['distribution_file'], fbm)
 
     print('')
     print('')

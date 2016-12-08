@@ -30,22 +30,22 @@ def check_beam(inputs, nbi):
     na = nbi['naperture']
 
     zero_string = {'dims': 0,
-                   'type': str}
+                   'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': int}
+                'type': [int, np.int32]}
 
     zero_double = {'dims': 0,
-                   'type': float}
+                   'type': [float, np.float64]}
 
     three_double = {'dims': [3],
-                    'type': float}
+                    'type': [float, np.float64]}
 
     na_double = {'dims': [na],
-                 'type': float}
+                 'type': [float, np.float64]}
 
     na_int = {'dims': [na],
-              'type': int}
+              'type': [int, np.int32]}
 
     schema = {'data_source': zero_string,
               'name': zero_string,
@@ -71,11 +71,11 @@ def check_beam(inputs, nbi):
 
     # Convert to np arrays for indexing
     nbi['ashape'] = np.array(nbi['ashape'], dtype=int)
-    nbi['awidy'] = np.array(nbi['awidy'], dtype=float)
-    nbi['awidz'] = np.array(nbi['awidz'], dtype=float)
-    nbi['aoffy'] = np.array(nbi['aoffy'], dtype=float)
-    nbi['aoffz'] = np.array(nbi['aoffz'], dtype=float)
-    nbi['adist'] = np.array(nbi['adist'], dtype=float)
+    nbi['awidy'] = np.array(nbi['awidy'], dtype=np.float64)
+    nbi['awidz'] = np.array(nbi['awidz'], dtype=np.float64)
+    nbi['aoffy'] = np.array(nbi['aoffy'], dtype=np.float64)
+    nbi['aoffz'] = np.array(nbi['aoffz'], dtype=np.float64)
+    nbi['adist'] = np.array(nbi['adist'], dtype=np.float64)
 
     err_status = check_dict_schema(schema, nbi, desc="beam geometry")
     if err_status:

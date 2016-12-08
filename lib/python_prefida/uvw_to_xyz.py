@@ -15,7 +15,7 @@ def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
     #+
     #+     **gamma**: Rotation angle about x" [radians]
     #+
-    #+     **uvw**: Point in rotated coordinate system, (3)
+    #+     **uvw**: Point in rotated coordinate system, (3, n)
     #+
     #+###Keyword Arguments
     #+     **origin**: Origin of rotated coordinate system in non-rotated (uvw) coordinates, (3)
@@ -32,26 +32,26 @@ def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
     origin = np.array(origin, dtype=float)
 
     # Do checks as this code does not allow multiple points to be entered (yet)
-    if uvw.ndim != 1:
-        raise ValueError('uvw must be 1D, but it has shape {}'.format(uvw.shape))
+    if uvw.ndim == 2:
+        s = uvw.shape
+        if s[0] != 3:
+            raise ValueError('uvw must be (3, n), but it has shape {}'.format(uvw.shape))
+        n = s[1]
+    elif uvw.ndim == 1:
+        if uvw.size != 3:
+            raise ValueError('uvw must have length 3, but it has length {}'.format(uvw.size))
+        n = 1
+    else:
+        raise ValueError('uvw must be (3) or (3, n)')
+
     if origin.ndim != 1:
         raise ValueError('origin must be 1D, but it has shape {}'.format(origin.shape))
-    if uvw.size != 3:
-        raise ValueError('uvw must have length 3, but it has length {}'.format(uvw.size))
+
     if origin.size != 3:
         raise ValueError('origin must have length 3, but it has length {}'.format(origin.size))
 
-#    s = uvw.shape  # size(uvw,/dim)
-
-#    if s.size != 2:
-#        s = [s, 1]
-
-#    if uvw.ndim != 2:
-
     # Shift origin
-#    uvw_shifted = transpose(uvw - tile_array(origin,1,s[1]))
-#    uvw_shifted = np.transpose(uvw - np.tile(origin, (1, s[1])))
-    uvw_shifted = uvw - origin
+    uvw_shifted = uvw - np.squeeze(np.tile(origin, (n, 1)).T)
 
     # Get rotation matrix
     r = tb_zyx(alpha, beta, gamma)
@@ -60,9 +60,10 @@ def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
 #    xyz = R ## uvw_shifted
     xyz = np.dot(r, uvw_shifted)
 
-    return np.transpose(xyz)
+    return xyz
 ###############################################################################
 if __name__ == "__main__":
 
-    a = uvw_to_xyz(1., 0.2, 0.1, [1.2, 2.3, 2.1], origin=[.1, .2, 0.])
-    print(a)
+    uvw = np.tile(np.array([1.2, 2.3, 2.1]), (5, 1)).T      # (3, 5)
+    a = uvw_to_xyz(1., 0.2, 0.1, uvw, origin=[.1, .2, 0.])
+    print(a.shape)

@@ -95,7 +95,7 @@ PRO check_beam, inp, nbi
     xyz_pos = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_pos, origin=origin)
     xyz_center = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,[0.0,0.0,0.0], origin=origin)
 
-    dis = sqrt(total((xyz_src - xyz_pos)^2.0)) & print, xyz_src[2]-xyz_pos[2], dis & stop
+    dis = sqrt(total((xyz_src - xyz_pos)^2.0))
     BETA=double(asin((xyz_src[2]-xyz_pos[2])/dis))
     ALPHA=double(atan((xyz_pos[1]-xyz_src[1]),(xyz_pos[0]-xyz_src[0])))
 

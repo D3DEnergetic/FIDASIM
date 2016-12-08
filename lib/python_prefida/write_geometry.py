@@ -190,6 +190,7 @@ def write_geometry(filename, nbi, spec=None, npa=None):
 
             for key in spec:
                 # Create dataset
+#                print(key, type(spec[key]))
                 ds = g_spec.create_dataset(key, data = spec[key])
 
                 # Add descrption attr

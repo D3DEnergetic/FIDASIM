@@ -33,16 +33,16 @@ def check_plasma(inp, grid, plasma):
     nz = grid['nz']
 
     zero_string = {'dims': 0,
-                   'type': str}
+                   'type': [str]}
 
     zero_double = {'dims': 0,
-                   'type': float}
+                   'type': [float, np.float64]}
 
     nrnz_double = {'dims': [nr, nz],
-                   'type': float}
+                   'type': [float, np.float64]}
 
     nrnz_int = {'dims': [nr, nz],
-                'type': int}
+                'type': [int, np.int32]}
 
     schema = {'time': zero_double,
               'vr': nrnz_double,
@@ -87,8 +87,11 @@ def check_plasma(inp, grid, plasma):
         print('Input time: ', inp['time'])
         print('Plasma time: ', plasma['time'])
 
+    # Add grid elements to plasma dict
     #plasma = create_struct(plasma, grid)
-    plasma['grid'] = grid
+#    plasma['grid'] = grid
+    for key in grid:
+        plasma[key] = grid[key]
 
     if err_status != 0:
         error('Invalid plasma parameters. Exiting...', halt=True)

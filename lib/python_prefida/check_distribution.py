@@ -64,16 +64,16 @@ def check_distribution(inp, grid, dist):
         nz = grid['nz']
 
         zero_string = {'dims': 0,
-                       'type': str}
+                       'type': [str]}
 
         zero_int = {'dims': 0,
-                    'type': int}
+                    'type': [int, np.int32]}
 
         zero_double = {'dims': 0,
-                       'type': np.float64}
+                       'type': [float, np.float64]}
 
         nrnz_double = {'dims': [nr, nz],
-                       'type': np.float64}
+                       'type': [float, np.float64]}
 
         schema = {'type': zero_int,
                   'nenergy': zero_int,
@@ -108,22 +108,22 @@ def check_distribution(inp, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': int}
+                    'type': [int, np.int32]}
 
         zero_long = {'dims': 0,
-                     'type': int}
+                     'type': [int, np.int32]}
 
         zero_string = {'dims': 0,
-                       'type': str}
+                       'type': [str]}
 
         zero_double = {'dims': 0,
-                       'type': np.float64}
+                       'type':[float,  np.float64]}
 
         npart_double = {'dims': [npart],
-                        'type': np.float64}
+                        'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': int}
+                     'type': [int, np.int32]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,
@@ -156,22 +156,22 @@ def check_distribution(inp, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': int}
+                    'type': [int, np.int32]}
 
         zero_long = {'dims': 0,
-                     'type': int}
+                     'type': [int, np.int32]}
 
         zero_string = {'dims': 0,
-                       'type': str}
+                       'type': [str]}
 
         zero_double = {'dims': 0,
-                       'type': np.float64}
+                       'type': [float, np.float64]}
 
         npart_double = {'dims': [npart],
-                        'type': np.float64}
+                        'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': int}
+                     'type': [int, np.int32]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,

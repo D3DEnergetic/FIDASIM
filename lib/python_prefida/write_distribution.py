@@ -1,75 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib.python_prefida import info
 import h5py
 import os
-from lib.python_prefida import success
-from lib.python_prefida import error
+from lib.python_prefida.success import success
+from lib.python_prefida.error import error
+from lib.python_prefida.info import info
 
 
 def write_distribution(filename, distri):
-    """Brief Description
-
-    Expanded description
-
-    Sample usage:
-    -------------
-    >>> Description
-
-    Notes
-    -----
-    No groups, just datasets
-
-    Parameters
-    ----------
-    parameter : type
-
-        Description
-
-    keyword : type
-
-        Description
-
-    Returns
-    -------
-    result : type
-
-        Description
-
-    History
-    -------
-    Created on Fri Dec  2 14:45:28 2016 by nbolte
-
-    To Do
-    -----
-
-    ;+##`write_distribution, filename, dist`
-    ;+Write fast-ion distribution to a HDF5 file
-    ;+
-    ;+###Input Arguments
-    ;+     **filename**: Name of the distribution file
-    ;+
-    ;+     **dist**: Fast-ion distribution structure
-    ;+
-    ;+###Example Usage
-    ;+```idl
-    ;+IDL> write_distribution, filename, distri
-    ;+```
-    """
+    #+##`write_distribution, filename, dist`
+    #+Write fast-ion distribution to a HDF5 file
+    #+
+    #+###Input Arguments
+    #+     **filename**: Name of the distribution file
+    #+
+    #+     **dist**: Fast-ion distribution structure
+    #+
+    #+###Example Usage
+    #+```idl
+    #+IDL> write_distribution, filename, distri
+    #+```
     info('Writing fast-ion distribution file...')
 
-    with h5py.File(filename, 'w') as hf:
-        # File attr
-        hf.attrs['description'] = 'Fast-ion distribution for FIDASIM'
-        hf.attrs['coordinate_system'] = 'Cylindrical'
+    description = {'data_source': 'Source of the fast-ion distribution',
+                   'type': 'Distribution type: 1="Guiding Center Density Function", 2="Guiding Center ' \
+                           'Monte Carlo", 3="Full Orbit Monte Carlo"',
+                   'time': 'Distribution time'}
 
-        description = {'data_source': 'Source of the fast-ion distribution',
-                       'type': 'Distribution type: 1="Guiding Center Density Function", 2="Guiding Center ' \
-                               'Monte Carlo", 3="Full Orbit Monte Carlo"',
-                       'time': 'Distribution time'}
-
-        units = {'time': 's'}
+    units = {'time': 's'}
 
     if distri['type'] == 1:
         description['nenergy'] = 'Number of energy values'
@@ -115,6 +74,22 @@ def write_distribution(filename, distri):
             units['vr'] = 'cm/s'
             units['vt'] = 'cm/s'
             units['vz'] = 'cm/s'
+
+    with h5py.File(filename, 'w') as hf:
+        # File attr
+        hf.attrs['description'] = 'Fast-ion distribution for FIDASIM'
+        hf.attrs['coordinate_system'] = 'Cylindrical'
+
+        for key in distri:
+            # Create dataset
+            ds = hf.create_dataset(key, data = distri[key])
+
+            # Add descrption attr
+            ds.attrs['description'] = description[key]
+
+            # Add units attr
+            if key in units:
+                ds.attrs['units'] = units[key]
 
     if os.path.isfile(filename):
         success('Distribution file created: ' + filename)

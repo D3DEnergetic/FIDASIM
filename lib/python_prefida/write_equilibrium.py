@@ -1,64 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from lib.python_prefida import info
+import sys
 import h5py
 import os
-from lib.python_prefida import success
-from lib.python_prefida import error
+from lib.python_prefida.success import success
+from lib.python_prefida.error import error
+from lib.python_prefida.info import info
 
 
 def write_equilibrium(filename, plasma, fields):
-    """Brief Description
+    #+##`write_equilibrium, filename, plasma, fields`
+    #+Write MHD equilibrium values to a HDF5 file
+    #+
+    #+###Input Arguments
+    #+     **filename**: Name of the equilibrium file
+    #+
+    #+     **plasma**: Plasma structure
+    #+
+    #+     **fields**: Electromagnetic fields structure
+    #+
+    #+###Example Usage
+    #+```idl
+    #+IDL> write_equilibrium, filename, plasma, fields
+    #+```
+    # Name of this function for error reporting
+    funcname = '[' + sys._getframe().f_code.co_name + ']'
 
-    Expanded description
-
-    Sample usage:
-    -------------
-    >>> Description
-
-    Notes
-    -----
-    Two groups: 'plasma' and 'fields'
-
-    Parameters
-    ----------
-    parameter : type
-
-        Description
-
-    keyword : type
-
-        Description
-
-    Returns
-    -------
-    result : type
-
-        Description
-
-    History
-    -------
-    Created on Fri Dec  2 13:57:20 2016 by nbolte
-
-    To Do
-    -----
-
-    ;+##`write_equilibrium, filename, plasma, fields`
-    ;+Write MHD equilibrium values to a HDF5 file
-    ;+
-    ;+###Input Arguments
-    ;+     **filename**: Name of the equilibrium file
-    ;+
-    ;+     **plasma**: Plasma structure
-    ;+
-    ;+     **fields**: Electromagnetic fields structure
-    ;+
-    ;+###Example Usage
-    ;+```idl
-    ;+IDL> write_equilibrium, filename, plasma, fields
-    ;+```
-    """
     info('Writing equilibrium file...')
 
     with h5py.File(filename, 'w') as hf:
@@ -104,6 +72,7 @@ def write_equilibrium(filename, plasma, fields):
 
         for key in plasma:
                 # Create dataset
+#                print(funcname, key, type(plasma[key]))
                 ds = g_plasma.create_dataset(key, data = plasma[key])
 
                 # Add descrption attr
@@ -150,16 +119,16 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-    for key in fields:
-                # Create dataset
-                ds = g_fields.create_dataset(key, data = fields[key])
+        for key in fields:
+            # Create dataset
+            ds = g_fields.create_dataset(key, data = fields[key])
 
-                # Add descrption attr
-                ds.attrs['description'] = fields_description[key]
+            # Add descrption attr
+            ds.attrs['description'] = fields_description[key]
 
-                # Add units attr
-                if key in fields_units:
-                    ds.attrs['units'] = fields_units[key]
+            # Add units attr
+            if key in fields_units:
+                ds.attrs['units'] = fields_units[key]
 
     if os.path.isfile(filename):
         success('Equilibrium file created: '+filename)

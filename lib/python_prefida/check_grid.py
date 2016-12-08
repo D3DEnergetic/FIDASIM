@@ -38,19 +38,19 @@ def check_grid(grid):
     nz = grid['nz']
 
     zero_int = {'dims': 0,
-                'type': int}
+                'type': [int, np.int32]}
 
     nrnz_doub = {'dims': [nr, nz],
-                 'type': float}
+                 'type': [float, np.float64]}
 
     schema = {'nr': zero_int,
               'nz': zero_int,
               'r2d': nrnz_doub,
               'z2d': nrnz_doub,
               'r': {'dims': [nr],
-                    'type': float},
+                    'type': [float, np.float64]},
               'z': {'dims': [nz],
-                    'type': float}}
+                    'type': [float, np.float64]}}
 
     err_status = check_dict_schema(schema, grid, desc="interpolation grid")
     if err_status == 1:

@@ -37,19 +37,19 @@ def check_inputs(inputs):
     err_status = 0
 
     zero_string = {'dims': 0,
-                   'type': str}
+                   'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': int}
+                'type': [int]}
 
     zero_long = {'dims': 0,
-                 'type': int}
+                 'type': [int]}
 
     zero_double = {'dims': 0,
-                   'type': float}
+                   'type': [float, np.float64]}
 
     three_double = {'dims': [3],
-                    'type': float}
+                    'type': [float, np.float64]}
 
     schema = {'comment': zero_string,
               'shot': zero_long,

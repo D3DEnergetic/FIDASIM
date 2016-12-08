@@ -58,20 +58,20 @@ def check_dict_schema(schema, dic, desc=None):
 #                err = True
 #            print(key)
             if (schema[key]['dims'] == 0):  # or (schema[key]['dims'] ==[0]):
-#                print(schema[key]['type'], type(schema[key]['type']))
-                if not isinstance(dic[key], schema[key]['type']):
+#                print(key, schema[key]['type'], schema[key]['type'])
+                if not isinstance(dic[key], tuple(schema[key]['type'])):
                     error('"{}" has the wrong type of {}. Expected {}'.format(key, type(dic[key]), schema[key]['type']))
 #                    print('type({}) = {}'.format(key, type(dic[key])))
                     err = True
-            elif dic[key].dtype != schema[key]['type']:
-                error('"{}" has the wrong type of {}. Expected {}'.format(key, dic[key].dtype, schema[key]['type']))
+            elif dic[key].dtype.type not in schema[key]['type']:
+                error('"{}" has the wrong type of {}. Expected {}'.format(key, dic[key].dtype.type, schema[key]['type']))
 #                print('type({}) = {}'.format(key, type(dic[key])))
                 err = True
 
             # Check for NaNs or Inf
 #            if (not isinstance(dic[key], str)) and (not isinstance(dic[key], dict)):
-            if not isinstance(dic[key], (str, dict, float, int)):
-#                print(key, type(dic[key]))
+            if (not isinstance(dic[key], (str, dict, float, int))) and (str not in schema[key]['type']):
+#                print(key, type(dic[key]), dic[key].dtype)
                 if (dic[key][np.isnan(dic[key])].size > 0) or (dic[key][np.isinf(dic[key])].size > 0):
 #                    print(np.isnan(dic[key]))
 #                    print(np.isinf(dic[key]))

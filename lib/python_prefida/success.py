@@ -5,7 +5,6 @@ from lib.python_prefida.colored import colored
 
 
 def success(string):
-    """
     #+##`success, str`
     #+Print a success message
     #+###Arguments
@@ -15,6 +14,7 @@ def success(string):
     #+```idl
     #+IDL> success, "Yay!!!"
     #+```
-    """
-
-    print(colored('SUCCESS: ' + string, c='g'))
+    print(colored('SUCCESS: ' + string, 'green'))
+###############################################################################
+if __name__ == "__main__":
+    success('yay')

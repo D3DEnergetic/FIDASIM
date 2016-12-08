@@ -2,40 +2,39 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import copy
 
 
 def aabb_intersect(rc, dr, r0, d0):
-    """
-    #aabb_intersect
-    Calculates intersection length of a ray and an axis aligned bounding box (AABB)
-    ***
-    ##Input Arguments
-         **rc**: Center of AABB
-
-         **dr**: [length, width, height] of AABB
-
-         **r0**: starting point of ray
-
-         **d0**: direction of ray
-
-    ##Output Arguments
-         **intersect**: Intersection length of ray and AABB
-
-         **ri**: Optional, ray enterence point
-
-         **rf**: Optional, ray exit point
-
-    ##Example Usage
-    ```idl
-    IDL> aabb_intersect, [0,0,0], [1,1,1], [-1,0,0], [1,0,0], intersect, ri, rf
-    IDL> print, intersect
-        1.0
-    IDL> print, ri
-        -0.5  0.0  0.0
-    IDL> print, rf
-         0.5  0.0  0.0
-    ```
-    """
+    #+#aabb_intersect
+    #+Calculates intersection length of a ray and an axis aligned bounding box (AABB)
+    #+***
+    #+##Input Arguments
+    #+     **rc**: Center of AABB
+    #+
+    #+     **dr**: [length, width, height] of AABB
+    #+
+    #+     **r0**: starting point of ray
+    #+
+    #+     **d0**: direction of ray
+    #+
+    #+##Output Arguments
+    #+     **intersect**: Intersection length of ray and AABB
+    #+
+    #+     **ri**: Optional, ray enterence point
+    #+
+    #+     **rf**: Optional, ray exit point
+    #+
+    #+##Example Usage
+    #+```python
+    #+>>> intersect, r_enter, r_exit = aabb_intersect([0,0,0], [1,1,1], [-1,0,0], [1,0,0])
+    #+>>> print(intersect)
+    #+    1.0
+    #+>>> print(r_enter)
+    #+    -0.5  0.0  0.0
+    #+>>> print(r_exit)
+    #+     0.5  0.0  0.0
+    #+```
     v0 = d0 / np.sqrt(np.sum(d0 ** 2.))
 
     # There are 6 sides to a cube/grid
@@ -50,20 +49,16 @@ def aabb_intersect(rc, dr, r0, d0):
         ind = ([0, 1, 2] != j)
         if np.abs(v0[j]) > 0.:   # just v0[j] != 0 right?
             # Intersection point with plane
-            # ipnts[*,i] = r0 + v0*( ( (rc[j] + ( (i mod 2)-0.5)*dr[j] ) - r0[j])/v0[j] )
-#            print(r0.shape, v0.shape)
             ipnts[:, i] = r0 + v0 * (((rc[j] + (np.mod(i, 2) - 0.5) * dr[j]) - r0[j]) / v0[j])
 
             # Check if point on plane is within grid side
-#            if abs(ipnts[ind[0],i] - rc[ind[0]]) <= 0.5*dr[ind[0]] and $
-#               abs(ipnts[ind[1],i] - rc[ind[1]]) <= 0.5*dr[ind[1]] then side_inter[i]=1
             if (np.abs(ipnts[ind[0], i] - rc[ind[0]]) <= 0.5 * dr[ind[0]]) and \
                (np.abs(ipnts[ind[1], i] - rc[ind[1]]) <= 0.5 * dr[ind[1]]):
                 side_inter[i] = 1
 
     intersect = 0.0
-    r_enter = r0
-    r_exit = r0
+    r_enter = copy.deepcopy(r0)
+    r_exit = copy.deepcopy(r0)
     w = (side_inter != 0)
     nw = side_inter[w].size
     if nw >= 2:

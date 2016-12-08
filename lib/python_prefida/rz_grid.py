@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 def rz_grid(rmin, rmax, nr, zmin, zmax, nz):
     #+Creates interpolation grid
     #+***

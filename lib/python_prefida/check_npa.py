@@ -12,68 +12,75 @@ from lib.python_prefida import success
 
 
 def check_npa(inp, npa):
-    """
-    ;+#check_npa
-    ;+Checks if NPA geometry structure is valid
-    ;+***
-    ;+##Input Arguments
-    ;+     **inputs**: input structure
-    ;+
-    ;+     **npa**: NPA geometry structure
-    ;+
-    ;+##Example Usage
-    ;+```idl
-    ;+IDL> check_npa, inputs, npa
-    ;+```
-    """
-    err_status = 0
+    #+#check_npa
+    #+Checks if NPA geometry structure is valid
+    #+***
+    #+##Input Arguments
+    #+     **inputs**: input structure
+    #+
+    #+     **npa**: NPA geometry structure
+    #+
+    #+##Example Usage
+    #+```idl
+    #+IDL> check_npa, inputs, npa
+    #+```
+    err = False
     info('Checking NPA geometry...')
 
     npa_keys = npa.keys()
 
-#    w = where("nchan" eq strlowcase(TAG_NAMES(npa)),nw)
-#    if nw eq 0:
     if 'nchan' not in npa_keys:
         error('"nchan" is missing from the NPA geometry')
-        err_status = 1
+        err = True
         error('Invalid NPA geometry. Exiting...', halt=True)
 
     nchan = npa['nchan']
-    zero_string = {'dims': 0, 'type': str}
-    zero_long = {'dims': 0, 'type': int}
+
+    zero_string = {'dims': 0,
+                   'type': [str]}
+
+    zero_long = {'dims': 0,
+                 'type': [int]}
+
+    three_float = {'dims': [3, nchan],
+                   'type': [float, np.float64]}
+
+    nchan_int = {'dims': [nchan],
+                 'type': [int]}
+
     schema = {'data_source': zero_string,
               'nchan': zero_long,
               'system': zero_string,
-              'id': {'dims': [nchan], 'type': str},
-              'a_shape': {'dims': [nchan], 'type': int},
-              'd_shape': {'dims': [nchan], 'type': int},
-              'a_tedge': {'dims': [3, nchan], 'type': np.float64},
-              'a_redge': {'dims': [3, nchan], 'type': np.float64},
-              'a_cent': {'dims': [3, nchan], 'type': np.float64},
-              'd_tedge': {'dims': [3, nchan], 'type': np.float64},
-              'd_redge': {'dims': [3, nchan], 'type': np.float64},
-              'd_cent': {'dims': [3, nchan], 'type': np.float64},
-              'radius': {'dims': [nchan], 'type': np.float64}}
+              'id': {'dims': [nchan],
+                     'type': [str]},
+              'a_shape': nchan_int,
+              'd_shape': nchan_int,
+              'a_tedge': three_float,
+              'a_redge': three_float,
+              'a_cent': three_float,
+              'd_tedge': three_float,
+              'd_redge': three_float,
+              'd_cent': three_float,
+              'radius': three_float}
 
-    err_status = check_dict_schema(schema, npa, desc="NPA geometry")
-    if err_status == 1:
+    err = check_dict_schema(schema, npa, desc="NPA geometry")
+    if err:
         error('Invalid NPA geometry. Exiting...', halt=True)
 
     # Check detector/aperture shape
     w = (npa['d_shape'] > 2) or (npa['d_shape'] == 0)
     nw = len(npa['d_shape'][w])
     if nw != 0:
-#    if npa['d_shape'] not in [1, 2]:
         error('Invalid detector shape. Expected 1 (rectagular) or 2 (circular)')
         print('Invalid indices: {}'.format(np.arange(len(npa['d_shape']))[w]))
-        err_status = 1
+        err = True
 
     w = (npa['a_shape'] > 2) or (npa['a_shape'] == 0)
     nw = len(npa['a_shape'])
     if nw != 0:
         error('Invalid aperture shape. Expected 1 (rectagular) or 2 (circular)')
         print('Invalid indices: {}'.format(np.arange(len(npa['a_shape']))[w]))
-        err_status = 1
+        err = True
 
     # Calculate grid center rc and sides length dr
     dr = [inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']]
@@ -110,11 +117,10 @@ def check_npa(inp, npa):
     nw = err_arr[w].size
     ww = (err_arr != 0)
     nww = err_arr[ww].size
-#    print f='(i3," out of ",i3," channels crossed the beam grid")',nw,nchan
     print('{} out of {} channels crossed the beam grid'.format(nw, nchan))
     if nw == 0:
         error('No channels intersect the beam grid')
-        err_status = 1
+        err = True
 
     if nww > 0:
         warn('Some channels did not intersect the beam grid')
@@ -122,8 +128,7 @@ def check_npa(inp, npa):
         print('Missed channels:')
         print('    {}'.format(npa['id'][ww]))
 
-#    GET_OUT:
-    if err_status != 0:
+    if err:
         error('Invalid NPA geometry. Exiting...', halt=True)
     else:
         success('NPA geometry is valid')

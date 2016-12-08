@@ -9,29 +9,25 @@ from lib.python_prefida.success import success
 
 
 def check_grid(grid):
-    """
-    ;+#check_grid
-    ;+Checks if interpolation grid structure is valid
-    ;+***
-    ;+##Input Arguments
-    ;+     **grid**: Interpolation grid structure
-    ;+
-    ;+##Example Usage
-    ;+```idl
-    ;+IDL> check_grid, grid
-    ;+```
-    """
-    err_status = 0
+    #+#check_grid
+    #+Checks if interpolation grid structure is valid
+    #+***
+    #+##Input Arguments
+    #+     **grid**: Interpolation grid structure
+    #+
+    #+##Example Usage
+    #+```idl
+    #+IDL> check_grid, grid
+    #+```
+    err = False
     info('Checking interpolation grid...')
 
     if 'nr' not in grid:
         error('"nr" is missing from the interpolation grid')
-        err_status = 1
         error('Invalid interpolation grid. Exiting...', halt=True)
 
     if 'nz' not in grid:
         error('"nz" is missing from the interpolation grid')
-        err_status = 1
         error('Invalid interpolation grid. Exiting...', halt=True)
 
     nr = grid['nr']
@@ -52,27 +48,27 @@ def check_grid(grid):
               'z': {'dims': [nz],
                     'type': [float, np.float64]}}
 
-    err_status = check_dict_schema(schema, grid, desc="interpolation grid")
-    if err_status == 1:
+    err = check_dict_schema(schema, grid, desc="interpolation grid")
+    if err:
         error('Invalid interpolation grid. Exiting...', halt=True)
 
     if not np.array_equal(grid['r'], np.sort(grid['r'])):
         error('r is not in ascending order')
-        err_status = 1
+        err = True
 
     if not np.array_equal(grid['z'], np.sort(grid['z'])):
         error('z is not in ascending order')
-        err_status = 1
+        err = True
 
     if not np.array_equal(grid['r'], grid['r2d'][:, 0]):
         error('r2d is defined incorrectly. Expected r == r2d[:, 0]')
-        err_status = 1
+        err = True
 
     if not np.array_equal(grid['z'], grid['z2d'][0, :]):
         error('z2d is defined incorrectly. Expected z == z2d[0, :]')
-        err_status = 1
+        err = True
 
-    if err_status != 0:
+    if err:
         error('Invalid interpolation grid. Exiting...', halt=True)
     else:
         success('Interpolation grid is valid')

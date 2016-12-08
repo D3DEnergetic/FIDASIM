@@ -10,23 +10,21 @@ from lib.python_prefida.check_dict_schema import check_dict_schema
 
 
 def check_fields(inp, grid, fields):
-    """
-    #check_fields
-    Checks if electromagnetic fields structure is valid
-    ***
-    ##Input Arguments
-         **inputs**: Input structure
-
-         **grid**: Interpolation grid structure
-
-         **fields**: Electromagnetic fields structure
-
-    ##Example Usage
-    ```idl
-    IDL> check_fields, inputs, grid, fields
-    ```
-    """
-    err_status = False
+    #+#check_fields
+    #+Checks if electromagnetic fields structure is valid
+    #+***
+    #+##Input Arguments
+    #+     **inputs**: Input structure
+    #+
+    #+     **grid**: Interpolation grid structure
+    #+
+    #+     **fields**: Electromagnetic fields structure
+    #+
+    #+##Example Usage
+    #+```idl
+    #+IDL> check_fields, inputs, grid, fields
+    #+```
+    err = False
     info('Checking electromagnetic fields...')
 
     nr = grid['nr']
@@ -54,13 +52,13 @@ def check_fields(inp, grid, fields):
               'mask': nrnz_int,
               'data_source': zero_string}
 
-    err_status = check_dict_schema(schema, fields, desc="electromagnetic fields")
-    if err_status:
+    err = check_dict_schema(schema, fields, desc="electromagnetic fields")
+    if err:
         error('Invalid electromagnetic fields. Exiting...', halt=True)
 
     if fields['data_source'] == '':
         error('Invalid data source. An empty string is not a data source.')
-        err_status = True
+        err = True
 
     if np.abs(fields['time'] - inp['time']) > 0.02:
         warn('Electromagnetic fields time and input time do not match')
@@ -71,8 +69,7 @@ def check_fields(inp, grid, fields):
     for key in grid:
         fields[key] = grid[key]
 
-#    GET_OUT:
-    if err_status:
+    if err:
         error('Invalid electromagnetic fields. Exiting...', halt=True)
     else:
         success('Electromagnetic fields are valid')

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#import sys
 import h5py
 import os
 from lib.python_prefida.success import success
@@ -25,8 +24,6 @@ def write_equilibrium(filename, plasma, fields):
     #+```idl
     #+IDL> write_equilibrium, filename, plasma, fields
     #+```
-    # Name of this function for error reporting
-#    funcname = '[' + sys._getframe().f_code.co_name + ']'
     info('Writing equilibrium file...')
 
     with h5py.File(filename, 'w') as hf:
@@ -72,18 +69,6 @@ def write_equilibrium(filename, plasma, fields):
 
         write_data(g_plasma, plasma, plasma_description, plasma_units, name='plasma')
 
-#        for key in plasma:
-#                # Create dataset
-##                print(funcname, key, type(plasma[key]))
-#                ds = g_plasma.create_dataset(key, data = plasma[key])
-#
-#                # Add descrption attr
-#                ds.attrs['description'] = plasma_description[key]
-#
-#                # Add units attr
-#                if key in plasma_units:
-#                    ds.attrs['units'] = plasma_units[key]
-
         # Create fields group
         g_fields = hf.create_group('fields')
 
@@ -122,17 +107,6 @@ def write_equilibrium(filename, plasma, fields):
                         'z2d': 'cm'}
 
         write_data(g_fields, fields, fields_description, fields_units, name='fields')
-
-#        for key in fields:
-#            # Create dataset
-#            ds = g_fields.create_dataset(key, data = fields[key])
-#
-#            # Add descrption attr
-#            ds.attrs['description'] = fields_description[key]
-#
-#            # Add units attr
-#            if key in fields_units:
-#                ds.attrs['units'] = fields_units[key]
 
     if os.path.isfile(filename):
         success('Equilibrium file created: '+filename)

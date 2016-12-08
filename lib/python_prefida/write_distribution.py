@@ -83,17 +83,6 @@ def write_distribution(filename, distri):
 
         write_data(hf, distri, description, units, name='distribution')
 
-#        for key in distri:
-#            # Create dataset
-#            ds = hf.create_dataset(key, data = distri[key])
-#
-#            # Add descrption attr
-#            ds.attrs['description'] = description[key]
-#
-#            # Add units attr
-#            if key in units:
-#                ds.attrs['units'] = units[key]
-
     if os.path.isfile(filename):
         success('Distribution file created: ' + filename)
     else:

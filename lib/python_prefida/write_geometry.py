@@ -76,17 +76,6 @@ def write_geometry(filename, nbi, spec=None, npa=None):
 
         write_data(g_nbi, nbi, nbi_description, nbi_units, name='nbi')
 
-#        for key in nbi:
-#            # Create dataset
-#            ds = g_nbi.create_dataset(key, data = nbi[key])
-#
-#            # Add descrption attr
-#            ds.attrs['description'] = nbi_description[key]
-#
-#            # Add units attr
-#            if key in nbi_units:
-#                ds.attrs['units'] = nbi_units[key]
-
         if spec is not None:
             # Create spec group
             g_spec = hf.create_group('spec')
@@ -112,18 +101,6 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                           'spot_size': 'cm'}
 
             write_data(g_spec, spec, spec_description, spec_units, name='spec')
-
-#            for key in spec:
-#                # Create dataset
-##                print(key, type(spec[key]))
-#                ds = g_spec.create_dataset(key, data = spec[key])
-#
-#                # Add descrption attr
-#                ds.attrs['description'] = spec_description[key]
-#
-#                # Add units attr
-#                if key in spec_units:
-#                    ds.attrs['units'] = spec_units[key]
 
         if npa is not None:
             # Create npa group
@@ -157,17 +134,6 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                          'a_redge': 'cm'}
 
             write_data(g_npa, npa, npa_description, npa_units, name='npa')
-
-#            for key in npa:
-#                # Create dataset
-#                ds = g_npa.create_dataset(key, data = npa[key])
-#
-#                # Add descrption attr
-#                ds.attrs['description'] = npa_description[key]
-#
-#                # Add units attr
-#                if key in npa_units:
-#                    ds.attrs['units'] = npa_units[key]
 
     if os.path.isfile(filename):
         success('Geometry file created: ' + filename)

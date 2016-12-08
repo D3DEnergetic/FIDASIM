@@ -24,7 +24,7 @@ def check_beam(inputs, nbi):
     #+```idl
     #+IDL> check_beam, inputs, nbi
     #+```
-    err_status = 0
+    err = False
     info('Checking beam geometry...')
 
     na = nbi['naperture']
@@ -77,52 +77,49 @@ def check_beam(inputs, nbi):
     nbi['aoffz'] = np.array(nbi['aoffz'], dtype=np.float64)
     nbi['adist'] = np.array(nbi['adist'], dtype=np.float64)
 
-    err_status = check_dict_schema(schema, nbi, desc="beam geometry")
-    if err_status:
-#        goto, GET_OUT
+    err = check_dict_schema(schema, nbi, desc="beam geometry")
+    if err:
         error('Invalid beam geometry. Exiting...', halt=True)
 
     if np.abs(np.sum(nbi['axis'] ** 2.) - 1.) > 1e-5:
         error('Invalid source axis. Expected norm(axis) == 1')
-        err_status = 1
+        err = True
 
     if nbi['focz'] <= 0.0:
         error('focz cannot be in the range (-Inf,0.0]')
-        err_status = 1
+        err = True
 
     if nbi['focy'] <= 0.0:
         error('focy cannot be in the range (-Inf,0.0]')
-        err_status = 1
+        err = True
 
     if nbi['shape'] not in [1, 2]:
         error('Invalid source shape. Expected 1 (rectagular) or 2 (circular)')
-        err_status = 1
+        err = True
 
     if nbi['widz'] < 0.:
         error('Invalid widz. Expected widz > 0')
-        err_status = 1
+        err = True
 
     if nbi['widy'] < 0:
         error('Invalid widy. Expected widy > 0')
-        err_status = 1
+        err = True
 
-#    w = where(nbi.ashape > 2 or nbi.ashape eq 0,nw)
     if nbi['ashape'] not in [1, 2]:
         error('Invalid aperture shape. Expected 1 (rectangular) or 2 (circular)')
-        err_status = 1
+        err = True
 
     w = nbi['awidy'] < 0
     nw = len(nbi['awidy'][w])
     if nw > 0:
         error('Invalid awidy. Expected awidy >= 0.0')
-        err_status = 1
+        err = True
 
-#    w = where(nbi.awidz < 0, nw)
     w = nbi['awidz'] < 0
     nw = len(nbi['awidz'][w])
     if nw > 0:
         error('Invalid awidz. Expected awidz >= 0.0')
-        err_status = 1
+        err = True
 
     origin = inputs['origin']
     uvw_src = nbi['src']
@@ -137,17 +134,6 @@ def check_beam(inputs, nbi):
     dis = np.sqrt(np.sum((xyz_src - xyz_pos) ** 2.))
     beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
     alpha = np.arctan2((xyz_pos[1] - xyz_src[1]), (xyz_pos[0] - xyz_src[0]))
-
-#    print('Beam injection start point in machine coordinates'
-#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_src
-#    print('First aperture position in machine coordinates'
-#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_pos
-#    print('Machine center in beam grid coordinates'
-#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_center
-#    print('Beam injection start point in beam grid coordinates'
-#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_src
-#    print('First aperture position in beam grid coordinates'
-#    print( f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_pos
 
     print('Beam injection start point in machine coordinates')
     print(uvw_src)
@@ -169,18 +155,15 @@ def check_beam(inputs, nbi):
     rc = np.array([inputs['xmin'], inputs['ymin'], inputs['zmin']], dtype=np.float64) + 0.5 * dr
 
     # Check if beam centerline intersects beam grid
-#    aabb_intersect,rc,dr,xyz_src,xyz_axis,length,r_enter,r_exit
     length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_src, xyz_axis)
 
     print('Beam centerline - grid intersection length')
-#    print(f='("    length = ",F8.3)',length
     print(length)
     if length <= 10.0:
         error('Beam centerline does not intersect grid')
-        err_status = 1
+        err = True
 
-#    GET_OUT:
-    if err_status != 0:
+    if err:
         error('Invalid beam geometry. Exiting...', halt=True)
     else:
         success('Beam geometry is valid')

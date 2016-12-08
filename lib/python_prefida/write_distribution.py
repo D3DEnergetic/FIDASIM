@@ -6,6 +6,7 @@ import os
 from lib.python_prefida.success import success
 from lib.python_prefida.error import error
 from lib.python_prefida.info import info
+from lib.python_prefida.write_data import write_data
 
 
 def write_distribution(filename, distri):
@@ -80,16 +81,18 @@ def write_distribution(filename, distri):
         hf.attrs['description'] = 'Fast-ion distribution for FIDASIM'
         hf.attrs['coordinate_system'] = 'Cylindrical'
 
-        for key in distri:
-            # Create dataset
-            ds = hf.create_dataset(key, data = distri[key])
+        write_data(hf, distri, description, units, name='distribution')
 
-            # Add descrption attr
-            ds.attrs['description'] = description[key]
-
-            # Add units attr
-            if key in units:
-                ds.attrs['units'] = units[key]
+#        for key in distri:
+#            # Create dataset
+#            ds = hf.create_dataset(key, data = distri[key])
+#
+#            # Add descrption attr
+#            ds.attrs['description'] = description[key]
+#
+#            # Add units attr
+#            if key in units:
+#                ds.attrs['units'] = units[key]
 
     if os.path.isfile(filename):
         success('Distribution file created: ' + filename)

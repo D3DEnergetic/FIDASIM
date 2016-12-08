@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
+#import sys
 import h5py
 import os
 from lib.python_prefida.success import success
 from lib.python_prefida.error import error
 from lib.python_prefida.info import info
+from lib.python_prefida.write_data import write_data
 
 
 def write_equilibrium(filename, plasma, fields):
@@ -25,8 +26,7 @@ def write_equilibrium(filename, plasma, fields):
     #+IDL> write_equilibrium, filename, plasma, fields
     #+```
     # Name of this function for error reporting
-    funcname = '[' + sys._getframe().f_code.co_name + ']'
-
+#    funcname = '[' + sys._getframe().f_code.co_name + ']'
     info('Writing equilibrium file...')
 
     with h5py.File(filename, 'w') as hf:
@@ -70,17 +70,19 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        for key in plasma:
-                # Create dataset
-#                print(funcname, key, type(plasma[key]))
-                ds = g_plasma.create_dataset(key, data = plasma[key])
+        write_data(g_plasma, plasma, plasma_description, plasma_units, name='plasma')
 
-                # Add descrption attr
-                ds.attrs['description'] = plasma_description[key]
-
-                # Add units attr
-                if key in plasma_units:
-                    ds.attrs['units'] = plasma_units[key]
+#        for key in plasma:
+#                # Create dataset
+##                print(funcname, key, type(plasma[key]))
+#                ds = g_plasma.create_dataset(key, data = plasma[key])
+#
+#                # Add descrption attr
+#                ds.attrs['description'] = plasma_description[key]
+#
+#                # Add units attr
+#                if key in plasma_units:
+#                    ds.attrs['units'] = plasma_units[key]
 
         # Create fields group
         g_fields = hf.create_group('fields')
@@ -119,16 +121,18 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        for key in fields:
-            # Create dataset
-            ds = g_fields.create_dataset(key, data = fields[key])
+        write_data(g_fields, fields, fields_description, fields_units, name='fields')
 
-            # Add descrption attr
-            ds.attrs['description'] = fields_description[key]
-
-            # Add units attr
-            if key in fields_units:
-                ds.attrs['units'] = fields_units[key]
+#        for key in fields:
+#            # Create dataset
+#            ds = g_fields.create_dataset(key, data = fields[key])
+#
+#            # Add descrption attr
+#            ds.attrs['description'] = fields_description[key]
+#
+#            # Add units attr
+#            if key in fields_units:
+#                ds.attrs['units'] = fields_units[key]
 
     if os.path.isfile(filename):
         success('Equilibrium file created: '+filename)

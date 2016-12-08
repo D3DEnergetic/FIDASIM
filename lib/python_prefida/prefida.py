@@ -102,7 +102,7 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
     print('')
     success('FIDASIM pre-processing completed')
     print('To run FIDASIM use the following command')
-    print(get_fidasim_dir() + '/fidasim ' + inputs['result_dir'] + '/' + inputs['runid'] + '_inputs.dat')
+    print(get_fidasim_dir() + os.sep + 'fidasim ' + inputs['result_dir'] + os.sep + inputs['runid'] + '_inputs.dat')
     print('')
     print('')
 ###############################################################################

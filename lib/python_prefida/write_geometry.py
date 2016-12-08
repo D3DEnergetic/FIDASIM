@@ -6,6 +6,7 @@ import os
 from lib.python_prefida.success import success
 from lib.python_prefida.info import info
 from lib.python_prefida.error import error
+from lib.python_prefida.write_data import write_data
 
 
 def write_geometry(filename, nbi, spec=None, npa=None):
@@ -73,16 +74,18 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                      'aoffz': 'cm',
                      'adist': 'cm'}
 
-        for key in nbi:
-            # Create dataset
-            ds = g_nbi.create_dataset(key, data = spec[key])
+        write_data(g_nbi, nbi, nbi_description, nbi_units, name='nbi')
 
-            # Add descrption attr
-            ds.attrs['description'] = nbi_description[key]
-
-            # Add units attr
-            if key in nbi_units:
-                ds.attrs['units'] = nbi_units[key]
+#        for key in nbi:
+#            # Create dataset
+#            ds = g_nbi.create_dataset(key, data = nbi[key])
+#
+#            # Add descrption attr
+#            ds.attrs['description'] = nbi_description[key]
+#
+#            # Add units attr
+#            if key in nbi_units:
+#                ds.attrs['units'] = nbi_units[key]
 
         if spec is not None:
             # Create spec group
@@ -108,17 +111,19 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                           'radius': 'cm',
                           'spot_size': 'cm'}
 
-            for key in spec:
-                # Create dataset
-#                print(key, type(spec[key]))
-                ds = g_spec.create_dataset(key, data = spec[key])
+            write_data(g_spec, spec, spec_description, spec_units, name='spec')
 
-                # Add descrption attr
-                ds.attrs['description'] = spec_description[key]
-
-                # Add units attr
-                if key in spec_units:
-                    ds.attrs['units'] = spec_units[key]
+#            for key in spec:
+#                # Create dataset
+##                print(key, type(spec[key]))
+#                ds = g_spec.create_dataset(key, data = spec[key])
+#
+#                # Add descrption attr
+#                ds.attrs['description'] = spec_description[key]
+#
+#                # Add units attr
+#                if key in spec_units:
+#                    ds.attrs['units'] = spec_units[key]
 
         if npa is not None:
             # Create npa group
@@ -151,16 +156,18 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                          'radius': 'cm',
                          'a_redge': 'cm'}
 
-            for key in npa:
-                # Create dataset
-                ds = g_npa.create_dataset(key, data = npa[key])
+            write_data(g_npa, npa, npa_description, npa_units, name='npa')
 
-                # Add descrption attr
-                ds.attrs['description'] = npa_description[key]
-
-                # Add units attr
-                if key in npa_units:
-                    ds.attrs['units'] = npa_units[key]
+#            for key in npa:
+#                # Create dataset
+#                ds = g_npa.create_dataset(key, data = npa[key])
+#
+#                # Add descrption attr
+#                ds.attrs['description'] = npa_description[key]
+#
+#                # Add units attr
+#                if key in npa_units:
+#                    ds.attrs['units'] = npa_units[key]
 
     if os.path.isfile(filename):
         success('Geometry file created: ' + filename)

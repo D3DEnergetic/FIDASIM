@@ -23,29 +23,25 @@ def write_namelist(filename, inputs):
     #+```
     info("Writing namelist file...")
 
-    fidasim_version = ''  # get_version(get_fidasim_dir())
+    fidasim_version = get_version(get_fidasim_dir())
 
     with open(filename, "w") as f:
-
         f.write("!! Created: {}\n".format(datetime.datetime.now()))
         f.write("!! FIDASIM version: {}\n".format(fidasim_version))
         f.write("!! Comment: {}\n".format(inputs['comment']))
         f.write("&fidasim_inputs\n\n")
-#        f.write("")
 
         f.write("!! Shot Info\n")
         f.write("shot = {:d}    !! Shot Number\n".format(inputs['shot']))
         f.write("time = {:f}    !! Time [s]\n".format(inputs['time']))
         f.write("runid = {}   !! runID\n".format(inputs['runid']))
         f.write("result_dir = '{}'    !! Result Directory\n\n".format(inputs['result_dir']))
-#        f.write("")
 
         f.write("!! Input Files\n")
         f.write("tables_file = '{}'   !! Atomic Tables File\n".format(inputs['tables_file']))
         f.write("equilibrium_file = '" + inputs['equilibrium_file'] + "'    !! File containing plasma parameters and fields\n")
         f.write("geometry_file = '" + inputs['geometry_file'] + "'    !! File containing NBI and diagnostic geometry\n")
         f.write("distribution_file = '" + inputs['distribution_file'] + "'    !! File containing fast-ion distribution\n\n")
-#        f.write("")
 
         f.write("!! Simulation Switches\n")
         f.write("calc_bes = {:d}    !! Calculate Beam Emission and Halo Spectra\n".format(inputs['calc_bes']))
@@ -56,14 +52,12 @@ def write_namelist(filename, inputs):
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
         f.write("dump_dcx = {:d}    !! Dump DCX neutrals and spectra\n\n".format(inputs['dump_dcx']))
-#        f.write("")
 
         f.write("!! Debugging Switches\n")
         f.write("no_flr = {:d}    !! Turn off Finite Larmor Radius effects\n".format(inputs['no_flr']))
         f.write("load_neutrals = {:d}    !! Load neutrals from neutrals file\n".format(inputs['load_neutrals']))
         f.write("neutrals_file = '" + inputs['neutrals_file'] + "'    !! File containing the neutral density\n")
         f.write("verbose = {:d}    !! Verbose\n\n".format(inputs['verbose']))
-#        f.write("")
 
         f.write("!! Monte Carlo Settings\n")
         f.write("n_fida = {:d}    !! Number of FIDA mc particles\n".format(inputs['n_fida']))
@@ -72,7 +66,6 @@ def write_namelist(filename, inputs):
         f.write("n_halo = {:d}    !! Number of HALO mc particles\n".format(inputs['n_halo']))
         f.write("n_dcx = {:d}     !! Number of DCX mc particles\n".format(inputs['n_dcx']))
         f.write("n_birth = {:d}    !! Number of BIRTH mc particles\n\n".format(inputs['n_birth']))
-#        f.write("")
 
         f.write("!! Neutral Beam Settings\n")
         f.write("ab = {:f}     !! Beam Species mass [amu]\n".format(inputs['ab']))
@@ -81,12 +74,10 @@ def write_namelist(filename, inputs):
         f.write("current_fractions(1) = {:f} !! Current Fractions (Full component)\n".format(inputs['current_fractions'][0]))
         f.write("current_fractions(2) = {:f} !! Current Fractions (Half component)\n".format(inputs['current_fractions'][1]))
         f.write("current_fractions(3) = {:f} !! Current Fractions (Third component)\n\n".format(inputs['current_fractions'][2]))
-#        f.write("")
 
         f.write("!! Plasma Settings\n")
         f.write("ai = {:f}     !! Ion Species mass [amu]\n".format(inputs['ai']))
         f.write("impurity_charge = {:d}     !! Impurity Charge\n\n".format(inputs['impurity_charge']))
-#        f.write("")
 
         f.write("!! Beam Grid Settings\n")
         f.write("nx = {:d}    !! Number of cells in X direction (Into Plasma)\n".format(inputs['nx']))
@@ -108,13 +99,11 @@ def write_namelist(filename, inputs):
         f.write("origin(1) = {:f}     !! U value [cm]\n".format(inputs['origin'][0]))
         f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
         f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))
-#        f.write("")
 
         f.write("!! Wavelength Grid Settings\n")
         f.write("nlambda = {:d}    !! Number of Wavelengths\n".format(inputs['nlambda']))
         f.write("lambdamin = {:f}    !! Minimum Wavelength [nm]\n".format(inputs['lambdamin']))
         f.write("lambdamax = {:f}    !! Maximum Wavelength [nm]\n\n".format(inputs['lambdamax']))
-#        f.write("")
 
         f.write("!! Weight Function Settings\n")
         f.write("ne_wght = {:d}    !! Number of Energies for Weights\n".format(inputs['ne_wght']))
@@ -124,10 +113,6 @@ def write_namelist(filename, inputs):
         f.write("nlambda_wght = {:d}    !! Number of Wavelengths for Weights \n".format(inputs['nlambda_wght']))
         f.write("lambdamin_wght = {:f}    !! Minimum Wavelength for Weights [nm]\n".format(inputs['lambdamin_wght']))
         f.write("lambdamax_wght = {:f}    !! Maximum Wavelength for Weights [nm]\n\n".format(inputs['lambdamax_wght']))
-#        f.write("")
         f.write("/\n\n")
-#        f.write("")
-
-#    f.close()
 
     success("Namelist file created: {}\n".format(filename))

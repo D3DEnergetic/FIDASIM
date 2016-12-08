@@ -20,42 +20,31 @@ from lib.python_prefida.success import success
 
 
 def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
-    """Brief Description
-
-    #prefida
-    Checks FIDASIM inputs and writes FIDASIM input files
-    ***
-    ##Input Arguments
-         **inputs**: Inputs structure
-
-         **grid**: Interpolation grid structure
-
-         **nbi**: Neutral beam geometry structure
-
-         **plasma**: Plasma parameters structure
-
-         **fields**: Electromagnetic fields structure
-
-         **dist**: Fast-ion distribution structure
-
-    ##Keyword Arguments
-         **spec**: Optional, Spectral geometry structure
-
-         **npa**: Optional, NPA geometry structure
-
-    ##Example Usage
-    ```idl
-    IDL> prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
-    ```
-
-    History
-    -------
-    Created on Mon Sep 12 18:20:13 2016 by Nathan Bolte
-
-    To Do
-    -----
-
-    """
+    #+#prefida
+    #+Checks FIDASIM inputs and writes FIDASIM input files
+    #+***
+    #+##Input Arguments
+    #+     **inputs**: Inputs structure
+    #+
+    #+     **grid**: Interpolation grid structure
+    #+
+    #+     **nbi**: Neutral beam geometry structure
+    #+
+    #+     **plasma**: Plasma parameters structure
+    #+
+    #+     **fields**: Electromagnetic fields structure
+    #+
+    #+     **fbm**: Fast-ion distribution structure
+    #+
+    #+##Keyword Arguments
+    #+     **spec**: Optional, Spectral geometry structure
+    #+
+    #+     **npa**: Optional, NPA geometry structure
+    #+
+    #+##Example Usage
+    #+```idl
+    #+IDL> prefida, inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa
+    #+```
     # CHECK INPUTS
     inputs = check_inputs(inputs)
 
@@ -105,6 +94,3 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
     print(get_fidasim_dir() + os.sep + 'fidasim ' + inputs['result_dir'] + os.sep + inputs['runid'] + '_inputs.dat')
     print('')
     print('')
-###############################################################################
-if __name__ == "__main__":
-    prefida()

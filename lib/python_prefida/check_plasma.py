@@ -10,23 +10,21 @@ from lib.python_prefida.warn import warn
 
 
 def check_plasma(inp, grid, plasma):
-    """
-    #check_plasma
-    Checks if plasma paramters structure is valid
-    ***
-    ##Input Arguments
-         **inputs**: Input structure
-
-         **grid**: Interpolation grid structure
-
-         **plasma**: Plasma parameters structure
-
-    ##Example Usage
-    ```idl
-    IDL> check_plasma, inputs, grid, plasma
-    ```
-    """
-    err_status = 0
+    #+#check_plasma
+    #+Checks if plasma paramters structure is valid
+    #+***
+    #+##Input Arguments
+    #+     **inputs**: Input structure
+    #+
+    #+     **grid**: Interpolation grid structure
+    #+
+    #+     **plasma**: Plasma parameters structure
+    #+
+    #+##Example Usage
+    #+```idl
+    #+IDL> check_plasma, inputs, grid, plasma
+    #+```
+    err = False
     info('Checking plasma parameters...')
 
     nr = grid['nr']
@@ -55,13 +53,13 @@ def check_plasma(inp, grid, plasma):
               'mask': nrnz_int,
               'data_source': zero_string}
 
-    err_status = check_dict_schema(schema, plasma, desc="plasma parameters")
-    if err_status == 1:
+    err = check_dict_schema(schema, plasma, desc="plasma parameters")
+    if err:
         error('Invalid plasma parameters. Exiting...', halt=True)
 
     if plasma['data_source'] == '':
-        error, 'Invalid data source. An empty string is not a data source.'
-        err_status = 1
+        error('Invalid data source. An empty string is not a data source.')
+        err = True
 
     # Electron density
     w = (plasma['dene'] < 0.)
@@ -88,12 +86,10 @@ def check_plasma(inp, grid, plasma):
         print('Plasma time: ', plasma['time'])
 
     # Add grid elements to plasma dict
-    #plasma = create_struct(plasma, grid)
-#    plasma['grid'] = grid
     for key in grid:
         plasma[key] = grid[key]
 
-    if err_status != 0:
+    if err:
         error('Invalid plasma parameters. Exiting...', halt=True)
     else:
         success('Plasma parameters are valid')

@@ -41,4 +41,3 @@ def write_data(h5_obj, dic, desc, units, name=''):
         # Add units attribute (if present)
         if key in units:
             ds.attrs['units'] = units[key]
-

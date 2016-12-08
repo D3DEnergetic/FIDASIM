@@ -12,29 +12,18 @@ from lib.python_prefida.success import success
 
 
 def check_inputs(inputs):
-    """Brief Description
-
-    +#check_inputs
-    +Checks if input structure is valid
-    +***
-    +##Input Arguments
-    +     **inputs**: input structure
-    +
-    +##Example Usage
-    +```idl
-    +IDL> check_inputs, inputs
-    +```
-
-    History
-    -------
-    Created on Mon Sep 12 18:24:21 2016 by Nathan Bolte
-
-    To Do
-    -----
-
-    """
+    #+#check_inputs
+    #+Checks if input structure is valid
+    #+***
+    #+##Input Arguments
+    #+     **inputs**: input structure
+    #+
+    #+##Example Usage
+    #+```idl
+    #+IDL> check_inputs, inputs
+    #+```
     info('Checking simulation settings...')
-    err_status = 0
+    err = False
 
     zero_string = {'dims': 0,
                    'type': [str]}
@@ -102,8 +91,8 @@ def check_inputs(inputs):
               'calc_npa_wght': zero_int,
               'dump_dcx': zero_int}
 
-    err_status = check_dict_schema(schema, inputs, desc="simulation settings")
-    if err_status:
+    err = check_dict_schema(schema, inputs, desc="simulation settings")
+    if err:
         error('Invalid simulation settings. Exiting...', halt=True)
 
     # Normalize File Paths
@@ -111,42 +100,42 @@ def check_inputs(inputs):
 
     if (inputs['alpha'] > 2. * np.pi) or (inputs['beta'] > 2. * np.pi) or (inputs['gamma'] > 2. * np.pi):
         error('Angles must be in radians')
-        err_status = 1
+        err = True
 
     if inputs['lambdamin'] >= inputs['lambdamax']:
         error('Invalid wavelength range. Expected lambdamin < lamdbdamax')
-        err_status = 1
+        err = True
 
     if inputs['lambdamin_wght'] >= inputs['lambdamax_wght']:
         error('Invalid wavelength range. Expected lambdamin_wght < lamdbdamax_wght')
-        err_status = 1
+        err = True
 
     if inputs['xmin'] >= inputs['xmax']:
         error('Invalid x range. Expected xmin < xmax')
-        err_status = 1
+        err = True
 
     if inputs['ymin'] >= inputs['ymax']:
         error('Invalid y range. Expected ymin < ymax')
-        err_status = 1
+        err = True
 
     if inputs['zmin'] >= inputs['zmax']:
         error('Invalid z range. Expected zmin < zmax')
-        err_status = 1
+        err = True
 
     if (inputs['pinj'] <= 0.) or (inputs['einj'] <= 0.0):
         error('The selected source is not on')
         print('einj = {}'.format(inputs['einj']))
         print('pinj = {}'.format(inputs['pinj']))
-        err_status = 1
+        err = True
 
     if np.abs(np.sum(inputs['current_fractions']) - 1.0) > 1e-3:
         error('current_fractions do not sum to 1.0')
         print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
-        err_status = 1
+        err = True
 
     if inputs['impurity_charge'] <= 1:
         error('Invalid impurity charge. Expected impurity charge > 1')
-        err_status = 1
+        err = True
 
     ps = os.path.sep
     input_file = inputs['result_dir'] + ps + inputs['runid'] + '_inputs.dat'
@@ -164,12 +153,9 @@ def check_inputs(inputs):
     inputs['verbose'] = 1
     inputs['neutrals_file'] = neutrals_file
 
-    if err_status != 0:
+    if err:
         error('Invalid simulation settings. Exiting...', halt=True)
     else:
         success('Simulation settings are valid')
 
     return inputs
-###############################################################################
-if __name__ == "__main__":
-    check_inputs()

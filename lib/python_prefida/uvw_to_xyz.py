@@ -57,7 +57,6 @@ def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
     r = tb_zyx(alpha, beta, gamma)
 
     # Apply rotation matrix
-#    xyz = R ## uvw_shifted
     xyz = np.dot(r, uvw_shifted)
 
     return xyz

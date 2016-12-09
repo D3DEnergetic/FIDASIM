@@ -34,7 +34,7 @@ def write_namelist(filename, inputs):
         f.write("!! Shot Info\n")
         f.write("shot = {:d}    !! Shot Number\n".format(inputs['shot']))
         f.write("time = {:f}    !! Time [s]\n".format(inputs['time']))
-        f.write("runid = {}   !! runID\n".format(inputs['runid']))
+        f.write("runid = '{}'   !! runID\n".format(inputs['runid']))
         f.write("result_dir = '{}'    !! Result Directory\n\n".format(inputs['result_dir']))
 
         f.write("!! Input Files\n")

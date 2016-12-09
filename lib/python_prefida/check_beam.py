@@ -33,7 +33,7 @@ def check_beam(inputs, nbi):
                    'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': [int, np.int32]}
+                'type': [int, np.int32, np.int64]}
 
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
@@ -45,7 +45,7 @@ def check_beam(inputs, nbi):
                  'type': [float, np.float64]}
 
     na_int = {'dims': [na],
-              'type': [int, np.int32]}
+              'type': [int, np.int32, np.int64]}
 
     schema = {'data_source': zero_string,
               'name': zero_string,

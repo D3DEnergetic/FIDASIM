@@ -54,7 +54,7 @@ def check_distribution(inp, grid, dist):
                        'type': [str]}
 
         zero_int = {'dims': 0,
-                    'type': [int, np.int32]}
+                    'type': [int, np.int32, np.int64]}
 
         zero_double = {'dims': 0,
                        'type': [float, np.float64]}
@@ -89,10 +89,10 @@ def check_distribution(inp, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': [int, np.int32]}
+                    'type': [int, np.int32, np.int64]}
 
         zero_long = {'dims': 0,
-                     'type': [int, np.int32]}
+                     'type': [int, np.int32, np.int64]}
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -104,7 +104,7 @@ def check_distribution(inp, grid, dist):
                         'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': [int, np.int32]}
+                     'type': [int, np.int32, np.int64]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,
@@ -132,10 +132,10 @@ def check_distribution(inp, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': [int, np.int32]}
+                    'type': [int, np.int32, np.int64]}
 
         zero_long = {'dims': 0,
-                     'type': [int, np.int32]}
+                     'type': [int, np.int32, np.int64]}
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -147,7 +147,7 @@ def check_distribution(inp, grid, dist):
                         'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': [int, np.int32]}
+                     'type': [int, np.int32, np.int64]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,

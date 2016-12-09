@@ -40,13 +40,13 @@ def check_npa(inp, npa):
                    'type': [str]}
 
     zero_long = {'dims': 0,
-                 'type': [int]}
+                 'type': [int, np.int32, np.int64]}
 
     three_float = {'dims': [3, nchan],
                    'type': [float, np.float64]}
 
     nchan_int = {'dims': [nchan],
-                 'type': [int]}
+                 'type': [int, np.int32, np.int64]}
 
     schema = {'data_source': zero_string,
               'nchan': zero_long,

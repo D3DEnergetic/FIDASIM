@@ -29,10 +29,10 @@ def check_inputs(inputs):
                    'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': [int]}
+                'type': [int, np.int32, np.int64]}
 
     zero_long = {'dims': 0,
-                 'type': [int]}
+                 'type': [int, np.int32, np.int64]}
 
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}

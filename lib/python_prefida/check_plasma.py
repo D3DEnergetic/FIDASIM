@@ -40,7 +40,7 @@ def check_plasma(inp, grid, plasma):
                    'type': [float, np.float64]}
 
     nrnz_int = {'dims': [nr, nz],
-                'type': [int, np.int32]}
+                'type': [int, np.int32, np.int64]}
 
     schema = {'time': zero_double,
               'vr': nrnz_double,

@@ -40,7 +40,7 @@ def check_spec(inputs, chords):
                    'type': [str]}
 
     zero_long = {'dims': 0,
-                 'type': [int, np.int32]}
+                 'type': [int, np.int32, np.int64]}
 
     nchan_double = {'dims': [nchan],
                     'type': [float, np.float64]}

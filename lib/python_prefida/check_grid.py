@@ -34,7 +34,7 @@ def check_grid(grid):
     nz = grid['nz']
 
     zero_int = {'dims': 0,
-                'type': [int, np.int32]}
+                'type': [int, np.int32, np.int64]}
 
     nrnz_doub = {'dims': [nr, nz],
                  'type': [float, np.float64]}

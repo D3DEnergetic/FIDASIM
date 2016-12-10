@@ -132,8 +132,11 @@ def check_beam(inputs, nbi):
     xyz_center = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], [0., 0., 0.], origin=origin)
 
     dis = np.sqrt(np.sum((xyz_src - xyz_pos) ** 2.))
-    beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
     alpha = np.arctan2((xyz_pos[1] - xyz_src[1]), (xyz_pos[0] - xyz_src[0]))
+    if dis != 0.:
+        beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
+    else:
+        beta = np.nan
 
     print('Beam injection start point in machine coordinates')
     print(uvw_src)
@@ -147,8 +150,8 @@ def check_beam(inputs, nbi):
     print(xyz_pos)
 
     print('Beam grid rotation angles that would align it with the beam centerline')
-    print('alpha = {} deg.'.format(alpha / np.pi * 180.))  # ,FORMAT='("    alpha = ",F14.10,"°")'
-    print('beta = {} deg.'.format(beta / np.pi * 180.))  # ,FORMAT='("    beta = ",F14.10,"°")'
+    print('alpha = {} deg.'.format(alpha / np.pi * 180.))
+    print('beta = {} deg.'.format(beta / np.pi * 180.))
 
     # Calculate grid center rc and sides length dr
     dr = np.array([inputs['xmax'] - inputs['xmin'], inputs['ymax'] - inputs['ymin'], inputs['zmax'] - inputs['zmin']], dtype=np.float64)

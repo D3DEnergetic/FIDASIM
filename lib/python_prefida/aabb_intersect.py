@@ -45,8 +45,10 @@ def aabb_intersect(rc, dr, r0, d0):
 
     # Find whether ray intersects each side
     for i in range(6):
-        j = np.floor(i / 2)
-        ind = ([0, 1, 2] != j)
+        j = int(np.floor(i / 2))
+#        ind = ([0, 1, 2] != j)
+        ind = np.arange(3, dtype=int)
+        ind = ind[ind != j]
         if np.abs(v0[j]) > 0.:   # just v0[j] != 0 right?
             # Intersection point with plane
             ipnts[:, i] = r0 + v0 * (((rc[j] + (np.mod(i, 2) - 0.5) * dr[j]) - r0[j]) / v0[j])
@@ -59,27 +61,28 @@ def aabb_intersect(rc, dr, r0, d0):
     intersect = 0.0
     r_enter = copy.deepcopy(r0)
     r_exit = copy.deepcopy(r0)
-    w = (side_inter != 0)
-    nw = side_inter[w].size
+    ind = np.arange(side_inter.size)
+    ind = ind[side_inter != 0]
+    nw = side_inter[ind].size
     if nw >= 2:
         #Find two unique intersection points
         nunique = 0
         for i in range(nw - 1):
-            if np.sum(ipnts[:, w[0]] == ipnts[:, w[i + 1]]) != 3:
-                w = [w[0], w[i + 1]]
+            if np.sum(ipnts[:, ind[0]] == ipnts[:, ind[i + 1]]) != 3:
+                ind = [ind[0], ind[i + 1]]
                 nunique = 2
                 break
 
         if nunique == 2:
-            vi = ipnts[:, w[1]] - ipnts[:, w[0]]
+            vi = ipnts[:, ind[1]] - ipnts[:, ind[0]]
             vi = vi / np.sqrt(np.sum(vi ** 2.))
             dot_prod = np.sum(v0 * vi)
             if dot_prod > 0.0:
-                r_enter = ipnts[:, w[0]]
-                r_exit = ipnts[:, w[1]]
+                r_enter = ipnts[:, ind[0]]
+                r_exit = ipnts[:, ind[1]]
             else:
-                r_enter = ipnts[:, w[1]]
-                r_exit = ipnts[:, w[0]]
+                r_enter = ipnts[:, ind[1]]
+                r_exit = ipnts[:, ind[0]]
 
             # Calculate intersection length
             intersect = np.sqrt(np.sum((r_exit - r_enter) ** 2.))

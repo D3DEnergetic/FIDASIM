@@ -9,20 +9,23 @@ from lib.python_prefida.error import error
 from lib.python_prefida.warn import warn
 
 
-def check_plasma(inp, grid, plasma):
+def check_plasma(inputs, grid, plasma):
     #+#check_plasma
-    #+Checks if plasma paramters structure is valid
+    #+Checks if plasma paramters dictionary is valid
     #+***
     #+##Input Arguments
-    #+     **inputs**: Input structure
+    #+     **inputs**: Input dictionary
     #+
-    #+     **grid**: Interpolation grid structure
+    #+     **grid**: Interpolation grid dictionary
     #+
-    #+     **plasma**: Plasma parameters structure
+    #+     **plasma**: Plasma parameters dictionary
+    #+
+    #+##Output Arguments
+    #+     **plasma**: Updated plasma dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_plasma, inputs, grid, plasma
+    #+```python
+    #+>>> plasma = check_plasma(inputs, grid, plasma)
     #+```
     err = False
     info('Checking plasma parameters...')
@@ -63,26 +66,23 @@ def check_plasma(inp, grid, plasma):
 
     # Electron density
     w = (plasma['dene'] < 0.)
-    plasma['dene'][w] = 0.  # [1/cm^3]
+    plasma['dene'][w] = 0.
 
     # Zeff
     w = (plasma['zeff'] < 1.)
-    # plasma['zeff'] = plasma['zeff'] > 1.0
     plasma['zeff'][w] = 1.
 
     # Electron temperature
-    #plasma['te'] = plasma['te'] > 0.  # [keV]
     w = (plasma['te'] < 0.)
     plasma['te'][w] = 0.
 
     # Ion temperature
-    #plasma['ti'] = plasma['ti'] > 0.  # [keV]
     w = (plasma['ti'] < 0.)
     plasma['ti'][w] = 0.
 
-    if (np.abs(plasma['time'] - inp['time']) > 0.02):
+    if (np.abs(plasma['time'] - inputs['time']) > 0.02):
         warn('Plasma time and input time do not match')
-        print('Input time: ', inp['time'])
+        print('Input time: ', inputs['time'])
         print('Plasma time: ', plasma['time'])
 
     # Add grid elements to plasma dict

@@ -21,11 +21,11 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz):
     #+    **nz**: Number of z values
     #+
     #+##Return Value
-    #+Interpolation grid structure
+    #+Interpolation grid dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> grid = rz_grid(0,200.0,200,-100,100,200)
+    #+```python
+    #+>>> grid = rz_grid(0,200.0,200,-100,100,200)
     #+```
     dr = (rmax - rmin) / (nr - 1)
     dz = (zmax - zmin) / (nz - 1)
@@ -43,11 +43,3 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz):
             'nz': nz}
 
     return grid
-###############################################################################
-if __name__ == "__main__":
-
-    a = rz_grid(0., 70., 80, 0., 100., 82)
-
-    from Bolte.explore_dict import explore_dict
-
-    explore_dict(a)

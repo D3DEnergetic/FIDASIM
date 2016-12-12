@@ -13,7 +13,3 @@ def source_file(name=None):
         return os.path.abspath(__file__)
     else:
         Exception('Feature not created yet')
-###############################################################################
-if __name__ == "__main__":
-    print(source_file())
-

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
 import os
+import subprocess
 
 
 def get_version(fidasim_dir):
@@ -13,22 +13,36 @@ def get_version(fidasim_dir):
     #+##Input Arguments
     #+    **fidasim_dir**: FIDASIM install directory
     #+
+    #+##Output Arguments
+    #+     **version**: FIDAIM version number.
+    #+
     #+##Example Usage
-    #+```idl
-    #+IDL> version = get_version(getenv("FIDASIM_DIR"))
+    #+```python
+    #+>>> version = get_version(get_fidasim_dir())
     #+```
     version = ''
+    alt = False
 
-    ver_file = '{}{}VERSION'.format(fidasim_dir, os.path.sep)
+    # Location of .git folder
+    git_dir = r'{}{}.git'.format(fidasim_dir, os.path.sep)
 
-    if os.path.isfile(ver_file):
-        with open(ver_file) as f:
-            version = f.read()
+    # Check that git is installed
+
+    # Check that .git folder is present
+    if os.path.isdir(git_dir):
+        try:
+            subprocess.check_output(['git', '--git-dir={}'.format(git_dir), 'describe', '--tags', '--always', '--dirty'])
+        except:
+            alt = True
+    else:
+        alt = True
+
+    if alt:
+        # Git 'version' filepath
+        ver_file = '{}{}VERSION'.format(fidasim_dir, os.path.sep)
+
+        if os.path.isfile(ver_file):
+            with open(ver_file) as f:
+                version = f.read()
 
     return version
-###############################################################################
-if __name__ == "__main__":
-    from lib.python_prefida.get_fidasim_dir import get_fidasim_dir
-    a = get_version(get_fidasim_dir())
-
-    print(a)

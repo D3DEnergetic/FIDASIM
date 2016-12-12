@@ -13,16 +13,19 @@ import numpy as np
 
 def check_beam(inputs, nbi):
     #+#check_beam
-    #+Checks if neutral beam geometry structure is valid. Converts lists to numpy ndarrays
+    #+Checks if neutral beam geometry dictionary is valid. Converts lists to numpy ndarrays
     #+***
     #+##Input Arguments
-    #+     **inputs**: input structure
+    #+     **inputs**: input dictionary
     #+
-    #+     **nbi**: neutral beam geometry structure
+    #+     **nbi**: neutral beam geometry dictionary
+    #+
+    #+##Output Arguments
+    #+     **nbi**: Updated nbi dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_beam, inputs, nbi
+    #+```python
+    #+>>> nbi = check_beam(inputs, nbi)
     #+```
     err = False
     info('Checking beam geometry...')

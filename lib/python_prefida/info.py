@@ -13,10 +13,7 @@ def info(string):
     #+     **str**: message
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> info, "This is an informative message"
+    #+```python
+    #+>>> info("This is an informative message")
     #+```
     print(colored('INFO: ' + string, 'cyan'))
-###############################################################################
-if __name__ == "__main__":
-    info('hello')

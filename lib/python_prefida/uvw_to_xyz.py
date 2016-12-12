@@ -21,6 +21,9 @@ def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
     #+###Keyword Arguments
     #+     **origin**: Origin of rotated coordinate system in non-rotated (uvw) coordinates, (3)
     #+
+    #+##Output Arguments
+    #+     **xyz**: 'uvw' in 'xyz' coordinates
+    #+
     #+###Example Usage
     #+```python
     #+>>> xyz = uvw_to_xyz(np.pi/2., 0.0, np.pi/3., uvw, origin=[.1, .2, 0.])
@@ -61,9 +64,3 @@ def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
     xyz = np.dot(r, uvw_shifted)
 
     return xyz
-###############################################################################
-if __name__ == "__main__":
-
-    uvw = np.tile(np.array([1.2, 2.3, 2.1]), (5, 1)).T      # (3, 5)
-    a = uvw_to_xyz(1., 0.2, 0.1, uvw, origin=[.1, .2, 0.])
-    print(a.shape)

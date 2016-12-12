@@ -13,14 +13,17 @@ from lib.python_prefida.success import success
 
 def check_inputs(inputs):
     #+#check_inputs
-    #+Checks if input structure is valid
+    #+Checks if input dictionary is valid
     #+***
     #+##Input Arguments
-    #+     **inputs**: input structure
+    #+     **inputs**: input dictionary
+    #+
+    #+##Output Arguments
+    #+     **inputs**: Updated inputs dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_inputs, inputs
+    #+```dist
+    #+>>> inputs = check_inputs(inputs)
     #+```
     info('Checking simulation settings...')
     err = False

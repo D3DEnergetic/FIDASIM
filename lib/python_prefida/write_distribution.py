@@ -16,11 +16,11 @@ def write_distribution(filename, distri):
     #+###Input Arguments
     #+     **filename**: Name of the distribution file
     #+
-    #+     **dist**: Fast-ion distribution structure
+    #+     **dist**: Fast-ion distribution distionary
     #+
     #+###Example Usage
-    #+```idl
-    #+IDL> write_distribution, filename, distri
+    #+```dist
+    #+>>> write_distribution(filename, distri)
     #+```
     info('Writing fast-ion distribution file...')
 

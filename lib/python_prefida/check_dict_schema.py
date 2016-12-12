@@ -24,12 +24,12 @@ def check_dict_schema(schema, dic, desc=None):
     #+
     #+##Example usage
     #+```python
-    #+>>> dic = {a:0, b:[1.d0,2.d0], c:"example"}
-    #+>>> schema = {a:{dims:0,type:[int]}, b:{dims:[2],type:[float, np.float64]}, c:{dims:0,type:str}  }
+    #+>>> dic = {'a':0, 'b':[1.d0,2.d0], 'c':"example"}
+    #+>>> schema = {'a':{'dims':0,'type':[int]}, 'b':{'dims':[2],'type':[float, np.float64]}, 'c':{'dims':0,'type':[str]}  }
     #+
     #+>>> err = check_dict_schema(schema, dic, desc="Example dict")
     #+>>> print(err)
-    #+    0
+    #+    False
     #+```
     if desc is None:
         desc = 'dict'

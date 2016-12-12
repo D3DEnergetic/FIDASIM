@@ -42,8 +42,8 @@ def prefida(inputs, grid, nbi, plasma, fields, fbm, spec=None, npa=None):
     #+     **npa**: Optional, NPA geometry structure
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> prefida, inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa
+    #+```python
+    #+>>> prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa)
     #+```
     # CHECK INPUTS
     inputs = check_inputs(inputs)

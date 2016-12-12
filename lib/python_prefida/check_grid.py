@@ -16,8 +16,8 @@ def check_grid(grid):
     #+     **grid**: Interpolation grid structure
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_grid, grid
+    #+```python
+    #+>>> check_grid(grid)
     #+```
     err = False
     info('Checking interpolation grid...')

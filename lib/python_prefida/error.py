@@ -10,19 +10,16 @@ def error(string, halt=False):
     #+Print a error message
     #+***
     #+##Arguments
-    #+     **str**: message
+    #+     **string**: message
     #+
     #+##Keyword Arguments
     #+     **halt**: Halt program execution
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> error, "=("
+    #+```python
+    #+>>> error("Error message")
     #+```
     print(colored('ERROR: {}'.format(string), 'red'))
 
     if halt:
         raise Exception()
-###############################################################################
-if __name__ == "__main__":
-    error('wrong', halt=True)

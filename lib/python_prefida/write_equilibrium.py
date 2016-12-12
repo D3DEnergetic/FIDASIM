@@ -16,13 +16,13 @@ def write_equilibrium(filename, plasma, fields):
     #+###Input Arguments
     #+     **filename**: Name of the equilibrium file
     #+
-    #+     **plasma**: Plasma structure
+    #+     **plasma**: Plasma dictionary
     #+
-    #+     **fields**: Electromagnetic fields structure
+    #+     **fields**: Electromagnetic fields dictionary
     #+
     #+###Example Usage
-    #+```idl
-    #+IDL> write_equilibrium, filename, plasma, fields
+    #+```python
+    #+>>> write_equilibrium(filename, plasma, fields)
     #+```
     info('Writing equilibrium file...')
 

@@ -9,20 +9,23 @@ from lib.python_prefida.success import success
 import numpy as np
 
 
-def check_distribution(inp, grid, dist):
+def check_distribution(inputs, grid, dist):
     #+#check_distribution
-    #+Checks if distribution structure is valid
+    #+Checks if distribution dictionary is valid
     #+***
     #+##Input Arguments
-    #+     **inputs**: Input structure
+    #+     **inputs**: Input dictionary
     #+
-    #+     **grid**: Interpolation grid structure
+    #+     **grid**: Interpolation grid dictionary
     #+
-    #+     **dist**: Fast-ion distribution structure
+    #+     **dist**: Fast-ion distribution dictionary
+    #+
+    #+##Output Arguments
+    #+     **dist**: Updated dist dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_distribution, inputs, grid, dist
+    #+```python
+    #+>>> dist = check_distribution(inputs, grid, dist)
     #+```
     err = False
     info('Checking fast-ion distribution...')
@@ -178,9 +181,9 @@ def check_distribution(inp, grid, dist):
         error('Invalid data source. An empty string is not a data source.')
         err = True
 
-    if np.abs(dist['time'] - inp['time']) > 0.02:
+    if np.abs(dist['time'] - inputs['time']) > 0.02:
         warn('Distribution time and input time do not match')
-        print('Input time: {}'.format(inp['time']))
+        print('Input time: {}'.format(inputs['time']))
         print('Distribution time: {}'.format(dist['time']))
 
     if err:

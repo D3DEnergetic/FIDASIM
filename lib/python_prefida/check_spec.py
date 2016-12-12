@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 from lib.python_prefida.info import info
 from lib.python_prefida.check_dict_schema import check_dict_schema
 from lib.python_prefida.uvw_to_xyz import uvw_to_xyz
@@ -13,16 +14,16 @@ import numpy as np
 
 def check_spec(inputs, chords):
     #+#check_spec
-    #+Check if spectral geometry structure is valid
+    #+Check if spectral geometry dictionary is valid
     #+***
     #+##Input Arguments
-    #+     **inputs**: input structure
+    #+     **inputs**: input dictionary
     #+
-    #+     **chords**: spectral geometry structure
+    #+     **chords**: spectral geometry dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_spec, inputs, chords
+    #+```python
+    #+>>> check_spec(inputs, chords)
     #+```
     err = False
     info('Checking FIDA/BES inputs...')

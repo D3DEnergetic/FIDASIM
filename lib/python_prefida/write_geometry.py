@@ -24,8 +24,8 @@ def write_geometry(filename, nbi, spec=None, npa=None):
     #+     **npa**: Optional, NPA geometry structure
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> write_geometry, filename, nbi, spec=spec, npa=npa
+    #+```python
+    #+>>> write_geometry(filename, nbi, spec=spec, npa=npa)
     #+```
     info('Writing geometry file...')
 

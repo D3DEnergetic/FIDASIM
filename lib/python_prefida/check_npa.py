@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import numpy as np
 from lib.python_prefida import info
 from lib.python_prefida import error
@@ -13,16 +14,16 @@ from lib.python_prefida import success
 
 def check_npa(inp, npa):
     #+#check_npa
-    #+Checks if NPA geometry structure is valid
+    #+Checks if NPA geometry dictionary is valid
     #+***
     #+##Input Arguments
-    #+     **inputs**: input structure
+    #+     **inputs**: input dictionary
     #+
-    #+     **npa**: NPA geometry structure
+    #+     **npa**: NPA geometry dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_npa, inputs, npa
+    #+```python
+    #+>>> check_npa(inputs, npa)
     #+```
     err = False
     info('Checking NPA geometry...')

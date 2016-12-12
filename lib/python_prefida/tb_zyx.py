@@ -18,8 +18,8 @@ def tb_zyx(alpha, beta, gamma):
     #+     Rotation Matrix [prefida](|url|/sourcefile/prefida.pro.html)
     #+
     #+##Example Usage
-    #+```idl
-    #+ IDL> rot_mat = tb_zyx(!DPI/2, 0.0, !DPI/3)
+    #+```dist
+    #+ >>> rot_mat = tb_zyx(!DPI/2, 0.0, !DPI/3)
     #+```
     sa = np.sin(alpha)
     ca = np.cos(alpha)

@@ -10,18 +10,14 @@ def get_fidasim_dir():
     #+#get_fidasim_dir
     #+ Gets FIDASIM install directory
     #+***
-    #+
+    #+##Output Arguments
+    #+     **directory**: FIDASIM install directory.
     #+##Example Usage
-    #+```idl
-    #+IDL> fida_dir = get_fidasim_dir()
+    #+```python
+    #+>>> fida_dir = get_fidasim_dir()
     #+```
-
     filepath = source_file()
 
     directory = os.path.dirname(os.path.dirname(os.path.dirname(filepath)))
 
     return directory
-
-###############################################################################
-if __name__ == "__main__":
-    print(get_fidasim_dir())

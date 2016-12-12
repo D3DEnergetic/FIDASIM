@@ -9,13 +9,10 @@ def success(string):
     #+##`success, str`
     #+Print a success message
     #+###Arguments
-    #+     **str**: message
+    #+     **string**: message
     #+
     #+###Example Usage
-    #+```idl
-    #+IDL> success, "Yay!!!"
+    #+```python
+    #+>>> success("Yay!!!")
     #+```
     print(colored('SUCCESS: ' + string, 'green'))
-###############################################################################
-if __name__ == "__main__":
-    success('yay')

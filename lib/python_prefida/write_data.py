@@ -21,9 +21,8 @@ def write_data(h5_obj, dic, desc, units, name=''):
     #+
     #+###Example Usage
     #+```python
-    #+>>>import h5py
-    #+>>>
     #+>>> uvw_to_xyz(h5_obj, dic, desc, units)
+    #+```
     for key in dic:
         # Transpose data to match expected by Fortran and historically provided by IDL
         if isinstance(dic[key], np.ndarray):

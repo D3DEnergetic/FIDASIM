@@ -15,11 +15,11 @@ def write_namelist(filename, inputs):
     #+###Input Arguments
     #+     **filename**: Name of the namelist file
     #+
-    #+     **inputs**: Input structure
+    #+     **inputs**: Input dictionary
     #+
     #+###Example Usage
-    #+```idl
-    #+IDL> write_namelist, filename, inputs
+    #+```python
+    #+>>> write_namelist(filename, inputs)
     #+```
     info("Writing namelist file...")
 

@@ -12,10 +12,7 @@ def warn(string):
     #+     **string**: message
     #+
     #+###Example Usage
-    #+```idl
-    #+IDL> warn, "This may be a problem"
+    #+```python
+    #+>>> warn("This may be a problem")
     #+```
     print(colored('WARNING: ' + string, 'magenta'))
-###############################################################################
-if __name__ == "__main__":
-    warn('test')

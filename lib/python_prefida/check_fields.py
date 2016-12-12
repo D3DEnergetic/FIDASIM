@@ -9,20 +9,23 @@ from lib.python_prefida.success import success
 from lib.python_prefida.check_dict_schema import check_dict_schema
 
 
-def check_fields(inp, grid, fields):
+def check_fields(inputs, grid, fields):
     #+#check_fields
-    #+Checks if electromagnetic fields structure is valid
+    #+Checks if electromagnetic fields dictionary is valid
     #+***
     #+##Input Arguments
-    #+     **inputs**: Input structure
+    #+     **inputs**: Input dictionary
     #+
-    #+     **grid**: Interpolation grid structure
+    #+     **grid**: Interpolation grid dictionary
     #+
-    #+     **fields**: Electromagnetic fields structure
+    #+     **fields**: Electromagnetic fields dictionary
+    #+
+    #+##Output Arguments
+    #+     **fields**: Updated fields dictionary
     #+
     #+##Example Usage
-    #+```idl
-    #+IDL> check_fields, inputs, grid, fields
+    #+```python
+    #+>>> fields = check_fields(inputs, grid, fields)
     #+```
     err = False
     info('Checking electromagnetic fields...')
@@ -60,9 +63,9 @@ def check_fields(inp, grid, fields):
         error('Invalid data source. An empty string is not a data source.')
         err = True
 
-    if np.abs(fields['time'] - inp['time']) > 0.02:
+    if np.abs(fields['time'] - inputs['time']) > 0.02:
         warn('Electromagnetic fields time and input time do not match')
-        print('Input time: {}'.format(inp['time']))
+        print('Input time: {}'.format(inputs['time']))
         print('Electromagnetic fields time: {}'.format(fields['time']))
 
     # Add grid elements to fields dict

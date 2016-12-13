@@ -88,8 +88,8 @@ def beam_grid(nbi, rstart,
         error("Source radius cannot be less then rstart", halt=True)
 
     dis = np.sqrt(np.sum((src - pos) ** 2.0))
-    beta = np.asin((src[2] - pos[2]) / dis)
-    alpha = np.atan2((pos[1] - src[1]), (pos[0] - src[0]))
+    beta = np.arcsin((src[2] - pos[2]) / dis)
+    alpha = np.arctan2((pos[1] - src[1]), (pos[0] - src[0]))
     gamma = 0.
     a = axis[0] ** 2 + axis[1] ** 2
     b = 2. * (src[0] * axis[0] + src[1] * axis[1])

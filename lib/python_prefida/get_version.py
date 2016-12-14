@@ -26,17 +26,22 @@ def get_version(fidasim_dir):
     # Location of .git folder
     git_dir = r'{}{}.git'.format(fidasim_dir, os.path.sep)
 
-    # Check that git is installed
+    # git is installed if git_file is a file
+    proc = subprocess.Popen('command -v git', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    git_file = proc.communicate()[0]
+    git_file = git_file.replace('\n', '')
 
-    # Check that .git folder is present
-    if os.path.isdir(git_dir):
+    # Check that .git folder is present and git is installed
+    if os.path.isfile(git_file) and os.path.isdir(git_dir):
         try:
-            subprocess.check_output(['git', '--git-dir={}'.format(git_dir), 'describe', '--tags', '--always', '--dirty'])
+            version = subprocess.check_output(['git', '--git-dir={}'.format(git_dir), 'describe', '--tags', '--always', '--dirty'])
+            version = version.replace('\n', '')
         except:
             alt = True
     else:
         alt = True
 
+    # If above didn't work, read version file
     if alt:
         # Git 'version' filepath
         ver_file = '{}{}VERSION'.format(fidasim_dir, os.path.sep)

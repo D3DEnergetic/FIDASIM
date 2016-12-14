@@ -124,22 +124,28 @@ def check_beam(inputs, nbi):
         error('Invalid awidz. Expected awidz >= 0.0')
         err = True
 
+    # Machine coordinates
     origin = inputs['origin']
     uvw_src = nbi['src']
     uvw_axis = nbi['axis']
     uvw_pos = uvw_src + nbi['adist'][0] * uvw_axis
+    uvw_arbitrary = uvw_src + 100. * uvw_axis
 
+    # Convert to beam coordinates
     xyz_src = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_src, origin=origin)
     xyz_axis = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_axis)
     xyz_pos = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_pos, origin=origin)
     xyz_center = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], [0., 0., 0.], origin=origin)
+    xyz_arbitrary = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_arbitrary, origin=origin)
 
-    dis = np.sqrt(np.sum((xyz_src - xyz_pos) ** 2.))
+#    dis = np.sqrt(np.sum((xyz_src - xyz_pos) ** 2.))
+    dis = np.sqrt(np.sum((xyz_src - xyz_arbitrary) ** 2.))  # now dis can never be zero
     alpha = np.arctan2((xyz_pos[1] - xyz_src[1]), (xyz_pos[0] - xyz_src[0]))
-    if dis != 0.:
-        beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
-    else:
-        beta = np.nan
+#    if dis != 0.:
+#        beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
+#    else:
+#        beta = np.nan
+    beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
 
     print('Beam injection start point in machine coordinates')
     print(uvw_src)

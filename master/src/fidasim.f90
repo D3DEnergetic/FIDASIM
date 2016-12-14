@@ -1890,7 +1890,7 @@ subroutine read_chords
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"FIDA/BES System: ",a)') trim(adjustl(system))
-        write(*,'(T2,"Number of channels: ",i3)') spec_chords%nchan
+        write(*,'(T2,"Number of channels: ",i5)') spec_chords%nchan
         write(*,*) ''
     endif
 
@@ -2084,7 +2084,7 @@ subroutine read_npa
                         npa_chords%hit(i,j,k) = .True.
                     endif
                     if(inputs%verbose.ge.2) then
-                        WRITE(*,'(T4,"Channel: ",i3," ",f7.2,"% completed",a,$)') &
+                        WRITE(*,'(T4,"Channel: ",i5," ",f7.2,"% completed",a,$)') &
                                  ichan, cnt/real(beam_grid%ngrid)*100,char(13)
                     endif
                 enddo !x loop
@@ -6748,7 +6748,7 @@ subroutine fida_weights_mc
     allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T2,"Number of Channels: ",i3)') spec_chords%nchan
+        write(*,'(T2,"Number of Channels: ",i5)') spec_chords%nchan
         write(*,'(T2,"Nlambda: ",i4)') nwav
         write(*,'(T2,"Nenergy: ",i3)') inputs%ne_wght
         write(*,'(T2,"Maximum Energy: ",f7.2)') inputs%emax_wght
@@ -6922,7 +6922,7 @@ subroutine fida_weights_los
     mean_f = 0.d0
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T2,"Number of Channels: ",i3)') spec_chords%nchan
+        write(*,'(T2,"Number of Channels: ",i5)') spec_chords%nchan
         write(*,'(T2,"Nlambda: ",i4)') nwav
         write(*,'(T2,"Nenergy: ",i3)') inputs%ne_wght
         write(*,'(T2,"Npitch: ",i3)') inputs%np_wght
@@ -6972,7 +6972,7 @@ subroutine fida_weights_los
 
         if(wght_tot.le.0) then
             if(inputs%verbose.ge.1) then
-                write(*,'(T4,"Skipping channel ",i3,": Neutral density is zero")') ichan
+                write(*,'(T4,"Skipping channel ",i5,": Neutral density is zero")') ichan
             endif
             cycle chan_loop
         else
@@ -6982,7 +6982,7 @@ subroutine fida_weights_los
             fields%in_plasma= .True.
             mean_f = mean_f/wght_tot
             if(inputs%verbose.ge.1) then
-                write(*,'(T4,"Channel: ",i3)') ichan
+                write(*,'(T4,"Channel: ",i5)') ichan
                 write(*,'(T4,"Radius: ",f7.2)') spec_chords%radius(ichan)
                 write(*,'(T4,"Mean Fast-ion Density: ",ES14.5)') sum(mean_f)*dEdP
                 write(*,*)''

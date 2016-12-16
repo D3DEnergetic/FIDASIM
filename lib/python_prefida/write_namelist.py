@@ -95,7 +95,7 @@ def write_namelist(filename, inputs):
         f.write("beta  = {:f}     !! Rotation about y`-axis [rad]\n".format(inputs['beta']))
         f.write("gamma = {:f}     !! Rotation about x``-axis [rad]\n\n".format(inputs['gamma']))
 
-        f.write("!! Beam Grid origin in machine coordinates (cartesian)")
+        f.write("!! Beam Grid origin in machine coordinates (cartesian)\n")
         f.write("origin(1) = {:f}     !! U value [cm]\n".format(inputs['origin'][0]))
         f.write("origin(2) = {:f}     !! V value [cm]\n".format(inputs['origin'][1]))
         f.write("origin(3) = {:f}     !! W value [cm]\n\n".format(inputs['origin'][2]))

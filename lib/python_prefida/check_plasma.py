@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import numpy as np
 from lib.python_prefida.success import success
 from lib.python_prefida.info import info

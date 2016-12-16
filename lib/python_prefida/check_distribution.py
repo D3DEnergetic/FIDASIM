@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 from lib.python_prefida.info import info
 from lib.python_prefida.check_dict_schema import check_dict_schema
 from lib.python_prefida.warn import warn

@@ -73,12 +73,12 @@ def check_beam(inputs, nbi):
         schema['adist'] = na_double
 
     # Convert to np arrays for indexing
-    nbi['ashape'] = np.array(nbi['ashape'], dtype=int)
-    nbi['awidy'] = np.array(nbi['awidy'], dtype=np.float64)
-    nbi['awidz'] = np.array(nbi['awidz'], dtype=np.float64)
-    nbi['aoffy'] = np.array(nbi['aoffy'], dtype=np.float64)
-    nbi['aoffz'] = np.array(nbi['aoffz'], dtype=np.float64)
-    nbi['adist'] = np.array(nbi['adist'], dtype=np.float64)
+    nbi['ashape'] = np.array(nbi['ashape'], dtype=int, ndmin=1)
+    nbi['awidy'] = np.array(nbi['awidy'], dtype=float, ndmin=1)
+    nbi['awidz'] = np.array(nbi['awidz'], dtype=float, ndmin=1)
+    nbi['aoffy'] = np.array(nbi['aoffy'], dtype=float, ndmin=1)
+    nbi['aoffz'] = np.array(nbi['aoffz'], dtype=float, ndmin=1)
+    nbi['adist'] = np.array(nbi['adist'], dtype=float, ndmin=1)
 
     err = check_dict_schema(schema, nbi, desc="beam geometry")
     if err:

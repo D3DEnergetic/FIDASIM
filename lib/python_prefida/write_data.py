@@ -31,6 +31,11 @@ def write_data(h5_obj, dic, desc, units, name=''):
             elif dic[key].ndim != 1:
                 raise ValueError('Dict {}, key {}, has shape {}, need fix.'.format(name, key, dic[key].shape))
 
+        # Make strings of fixed length as required by Fortran.
+        # See http://docs.h5py.org/en/latest/strings.html#fixed-length-ascii
+        if isinstance(dic[key], str):
+            dic[key] = np.string_(dic[key])
+
         # Create dataset
         ds = h5_obj.create_dataset(key, data = dic[key])
 

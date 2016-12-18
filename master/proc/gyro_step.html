@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -1008,44 +1008,56 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <path fill="none" stroke="#000000" d="M426.628,-161.344C437.347,-158.226 449.117,-154.802 460.032,-151.627"/>
 <polygon fill="#000000" stroke="#000000" points="461.136,-154.951 469.76,-148.797 459.18,-148.23 461.136,-154.951"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node4" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="310,-155 218,-155 218,-129 310,-129 310,-155"/>
-<text text-anchor="middle" x="264" y="-139.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge16" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M310.202,-129.533C318.775,-127.219 327.796,-124.785 336.564,-122.419"/>
-<polygon fill="#000000" stroke="#000000" points="337.575,-125.772 346.318,-119.787 335.752,-119.013 337.575,-125.772"/>
-</g>
 <!-- proc~read_mc -->
-<g id="node5" class="node"><title>proc~read_mc</title>
+<g id="node4" class="node"><title>proc~read_mc</title>
 <a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
 <polygon fill="#d9534f" stroke="#d9534f" points="291,-111 237,-111 237,-85 291,-85 291,-111"/>
 <text text-anchor="middle" x="264" y="-95.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
 </a>
 </g>
 <!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge18" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
+<g id="edge16" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
 <path fill="none" stroke="#000000" d="M291.651,-100.195C304.6,-101.222 320.495,-102.484 335.7,-103.691"/>
 <polygon fill="#000000" stroke="#000000" points="335.827,-107.211 346.072,-104.514 336.381,-100.233 335.827,-107.211"/>
 </g>
 <!-- proc~mc_fastion -->
-<g id="node6" class="node"><title>proc~mc_fastion</title>
+<g id="node5" class="node"><title>proc~mc_fastion</title>
 <a xlink:href="../proc/mc_fastion.html" xlink:title="mc_fastion">
 <polygon fill="#d9534f" stroke="#d9534f" points="296,-67 232,-67 232,-41 296,-41 296,-67"/>
 <text text-anchor="middle" x="264" y="-51.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_fastion</text>
 </a>
 </g>
 <!-- proc~mc_fastion&#45;&gt;proc~gyro_correction -->
-<g id="edge20" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
+<g id="edge18" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
 <path fill="none" stroke="#000000" d="M294.501,-67.0719C311.093,-74.1828 331.827,-83.0686 349.731,-90.742"/>
 <polygon fill="#000000" stroke="#000000" points="348.773,-94.1391 359.343,-94.8613 351.53,-87.7051 348.773,-94.1391"/>
 </g>
+<!-- proc~fida_weights_mc -->
+<g id="node6" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-155 218,-155 218,-129 310,-129 310,-155"/>
+<text text-anchor="middle" x="264" y="-139.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge20" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M310.202,-129.533C318.775,-127.219 327.796,-124.785 336.564,-122.419"/>
+<polygon fill="#000000" stroke="#000000" points="337.575,-125.772 346.318,-119.787 335.752,-119.013 337.575,-125.772"/>
+</g>
+<!-- proc~read_distribution -->
+<g id="node7" class="node"><title>proc~read_distribution</title>
+<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
+<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
+</a>
+</g>
+<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
+<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.211,-99.9169C196.705,-99.5772 212.522,-99.2065 226.35,-98.8824"/>
+<polygon fill="#000000" stroke="#000000" points="226.567,-102.378 236.482,-98.645 226.403,-95.3803 226.567,-102.378"/>
+</g>
 <!-- program~fidasim -->
-<g id="node7" class="node"><title>program~fidasim</title>
+<g id="node8" class="node"><title>program~fidasim</title>
 <a xlink:href="../program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-114 2.13163e-14,-114 0,-88 54,-88 54,-114"/>
 <text text-anchor="middle" x="27" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
@@ -1057,58 +1069,46 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <polygon fill="#000000" stroke="#000000" points="343.59,-178.75 353.414,-174.784 343.261,-171.757 343.59,-178.75"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
 <path fill="none" stroke="#000000" d="M54.2042,-112.019C65.1621,-116.054 78.022,-120.292 90,-123 128.68,-131.746 173.14,-136.512 207.436,-139.084"/>
 <polygon fill="#000000" stroke="#000000" points="207.514,-142.598 217.736,-139.813 208.008,-135.615 207.514,-142.598"/>
 </g>
-<!-- proc~read_distribution -->
-<g id="node9" class="node"><title>proc~read_distribution</title>
-<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
-</a>
-</g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
 <path fill="none" stroke="#000000" d="M54.2241,-101C61.9289,-101 70.6135,-101 79.3716,-101"/>
 <polygon fill="#000000" stroke="#000000" points="79.6322,-104.5 89.6322,-101 79.6322,-97.5001 79.6322,-104.5"/>
+</g>
+<!-- proc~npa_f -->
+<g id="node11" class="node"><title>proc~npa_f</title>
+<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
+<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+</a>
+</g>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M54.2241,-90.0104C67.8798,-84.498 84.6138,-77.7431 99.3789,-71.7828"/>
+<polygon fill="#000000" stroke="#000000" points="100.782,-74.9908 108.745,-68.002 98.162,-68.4997 100.782,-74.9908"/>
 </g>
 <!-- proc~fida_f -->
 <g id="node12" class="node"><title>proc~fida_f</title>
 <a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
-<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
+<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_f -->
 <g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M54.2241,-90.0104C67.8798,-84.498 84.6138,-77.7431 99.3789,-71.7828"/>
-<polygon fill="#000000" stroke="#000000" points="100.782,-74.9908 108.745,-68.002 98.162,-68.4997 100.782,-74.9908"/>
-</g>
-<!-- proc~npa_f -->
-<g id="node13" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
-</a>
-</g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
 <path fill="none" stroke="#000000" d="M36.9915,-87.9871C48.5423,-73.6045 68.7121,-50.436 90,-35 93.0458,-32.7914 96.3482,-30.7098 99.7379,-28.7739"/>
 <polygon fill="#000000" stroke="#000000" points="101.581,-31.7589 108.799,-24.0026 98.3197,-25.5652 101.581,-31.7589"/>
 </g>
-<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge6" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.211,-99.9169C196.705,-99.5772 212.522,-99.2065 226.35,-98.8824"/>
-<polygon fill="#000000" stroke="#000000" points="226.567,-102.378 236.482,-98.645 226.403,-95.3803 226.567,-102.378"/>
-</g>
-<!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
-<g id="edge12" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
+<!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
+<g id="edge10" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
 <path fill="none" stroke="#000000" d="M163.146,-56.3638C180.19,-55.9643 202.524,-55.4408 221.842,-54.9881"/>
 <polygon fill="#000000" stroke="#000000" points="222.002,-58.4854 231.917,-54.7519 221.838,-51.4873 222.002,-58.4854"/>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
-<g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
+<!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
+<g id="edge12" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
 <path fill="none" stroke="#000000" d="M163.146,-21.695C180.347,-27.2049 202.936,-34.4406 222.375,-40.6671"/>
 <polygon fill="#000000" stroke="#000000" points="221.326,-44.0061 231.917,-43.7234 223.461,-37.3397 221.326,-44.0061"/>
 </g>

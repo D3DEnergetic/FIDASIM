@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -896,15 +896,15 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
 <polygon fill="none" stroke="black" points="261,-70 181,-70 181,-44 261,-44 261,-70"/>
 <text text-anchor="middle" x="221" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">store_neutrals</text>
 </g>
-<!-- proc~dcx -->
-<g id="node2" class="node"><title>proc~dcx</title>
-<a xlink:href="../proc/dcx.html" xlink:title="dcx">
+<!-- proc~halo -->
+<g id="node2" class="node"><title>proc~halo</title>
+<a xlink:href="../proc/halo.html" xlink:title="halo">
 <polygon fill="#d9534f" stroke="#d9534f" points="144,-114 90,-114 90,-88 144,-88 144,-114"/>
-<text text-anchor="middle" x="117" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+<text text-anchor="middle" x="117" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
 </a>
 </g>
-<!-- proc~dcx&#45;&gt;proc~store_neutrals -->
-<g id="edge8" class="edge"><title>proc~dcx&#45;&gt;proc~store_neutrals</title>
+<!-- proc~halo&#45;&gt;proc~store_neutrals -->
+<g id="edge8" class="edge"><title>proc~halo&#45;&gt;proc~store_neutrals</title>
 <path fill="none" stroke="#000000" d="M144.053,-89.5544C155.166,-84.8529 168.271,-79.3086 180.485,-74.1409"/>
 <polygon fill="#000000" stroke="#000000" points="182.189,-77.2203 190.035,-70.1005 179.462,-70.7735 182.189,-77.2203"/>
 </g>
@@ -920,15 +920,15 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
 <path fill="none" stroke="#000000" d="M144.053,-57C152.099,-57 161.19,-57 170.23,-57"/>
 <polygon fill="#000000" stroke="#000000" points="170.358,-60.5001 180.358,-57 170.358,-53.5001 170.358,-60.5001"/>
 </g>
-<!-- proc~halo -->
-<g id="node4" class="node"><title>proc~halo</title>
-<a xlink:href="../proc/halo.html" xlink:title="halo">
+<!-- proc~dcx -->
+<g id="node4" class="node"><title>proc~dcx</title>
+<a xlink:href="../proc/dcx.html" xlink:title="dcx">
 <polygon fill="#d9534f" stroke="#d9534f" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
-<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
+<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
 </a>
 </g>
-<!-- proc~halo&#45;&gt;proc~store_neutrals -->
-<g id="edge12" class="edge"><title>proc~halo&#45;&gt;proc~store_neutrals</title>
+<!-- proc~dcx&#45;&gt;proc~store_neutrals -->
+<g id="edge12" class="edge"><title>proc~dcx&#45;&gt;proc~store_neutrals</title>
 <path fill="none" stroke="#000000" d="M144.053,-24.4456C155.166,-29.1471 168.271,-34.6914 180.485,-39.8591"/>
 <polygon fill="#000000" stroke="#000000" points="179.462,-43.2265 190.035,-43.8995 182.189,-36.7797 179.462,-43.2265"/>
 </g>
@@ -939,8 +939,8 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
 <text text-anchor="middle" x="27" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~dcx -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<!-- program~fidasim&#45;&gt;proc~halo -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
 <path fill="none" stroke="#000000" d="M54.003,-70.2015C62.5341,-74.3722 72.0985,-79.0481 81.1476,-83.4721"/>
 <polygon fill="#000000" stroke="#000000" points="79.8051,-86.7117 90.3262,-87.9595 82.8796,-80.423 79.8051,-86.7117"/>
 </g>
@@ -949,8 +949,8 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
 <path fill="none" stroke="#000000" d="M54.003,-57C62.0277,-57 70.9665,-57 79.5309,-57"/>
 <polygon fill="#000000" stroke="#000000" points="79.7051,-60.5001 89.705,-57 79.705,-53.5001 79.7051,-60.5001"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~halo -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
+<!-- program~fidasim&#45;&gt;proc~dcx -->
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
 <path fill="none" stroke="#000000" d="M54.003,-43.7985C62.5341,-39.6278 72.0985,-34.9519 81.1476,-30.5279"/>
 <polygon fill="#000000" stroke="#000000" points="82.8796,-33.577 90.3262,-26.0405 79.8051,-27.2883 82.8796,-33.577"/>
 </g>

@@ -12,7 +12,7 @@ def main():
     parser.add_argument('-var',
                        	help = 'Variable to edit')
     parser.add_argument('-val',
-                        help = 'Value to set')					
+                        help = 'Value to set')
     parser.add_argument('-v','--verbose',
                         action = 'store_true',
                         help = 'Verbose')
@@ -20,7 +20,7 @@ def main():
     args = parser.parse_args()
 
     fileordir = args.path
-	
+
     if os.path.isfile(fileordir):
         files=[fileordir]
     elif os.path.isdir(fileordir):
@@ -33,11 +33,11 @@ def main():
         lines = f.read().splitlines()
         f.close()
 
-        newlines = []       
+        newlines = []
         for line in lines:
             words=line.split()
             if not words:
-                newlines.append("") 
+                newlines.append("")
                 if args.verbose: print("")
                 continue
             if words[0] == args.var and words[1] == "=":
@@ -48,10 +48,10 @@ def main():
 
         newlines.append('\n')
         text = '\n'.join(newlines)
-        
+
         f = open(file,'wb')
         f.write(text)
-        f.close()        
-         
+        f.close()
+
 if __name__=='__main__':
     main()

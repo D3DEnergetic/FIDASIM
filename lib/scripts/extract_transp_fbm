@@ -61,7 +61,7 @@ def main():
                tar = tarfile.open(f)
                tmpdir = tempfile.mkdtemp()
                tmpdirs.append(tmpdir)
-               dirnum = tar.getmembers()[0].name.split('/')[0] 
+               dirnum = tar.getmembers()[0].name.split('/')[0]
                tar.extractall(path=tmpdir)
                tar.close()
                paths.append(tmpdir+'/'+dirnum)
@@ -75,19 +75,19 @@ def main():
                tar = tarfile.open(f)
                tmpdir = tempfile.mkdtemp()
                tmpdirs.append(tmpdir)
-               dirnum = tar.getmembers()[0].name.split('/')[0] 
+               dirnum = tar.getmembers()[0].name.split('/')[0]
                tar.extractall(path=tmpdir)
                tar.close()
                paths.append(tmpdir+'/'+dirnum)
            else:
                paths.append(os.path.abspath(args.path))
-               
+
     for i, id in enumerate(fileid_list):
        args_dict = {'rid':args.runid,'path':paths[i],
                     'fileid':id,'device':args.device,
                     'outdir':os.path.abspath(args.output_dir),
                     'type':args.type}
-    
+
        fbm_script = """
                     %(rid)s
                     %(path)s

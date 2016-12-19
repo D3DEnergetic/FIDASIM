@@ -177,7 +177,9 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     ;; Interpolate cylindrical fields onto (r,w) mesh
     b_r=dblarr(grid.nr,grid.nz) & b_t=b_r & b_z=b_r
     e_r=dblarr(grid.nr,grid.nz) & e_t=e_r & e_z=e_r
-
+    dbr_dr=dblarr(grid.nr,grid.nz)  & dbr_dz=dblarr(grid.nr,grid.nz)
+    dbt_dr=dblarr(grid.nr,grid.nz)  & dbt_dz=dblarr(grid.nr,grid.nz)
+    dbz_dr=dblarr(grid.nr,grid.nz)  & dbz_dz=dblarr(grid.nr,grid.nz)    
     for i=0L,grid.nr-1 do for j=0L,grid.nz-1 do begin
             rgrid=(.01*grid.r2d[i,j] - g.r[0])/(g.r[1]-g.r[0]) ; in grid units
             zgrid=(.01*grid.z2d[i,j] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
@@ -190,9 +192,25 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
   
     flux = fluxgrid
     mask = replicate(1,grid.nr,grid.nz)
+    
+    for iz=0L,grid.nz-1 do begin
+        dbr_dr[*,iz]=Deriv(grid.r,reform(b_r[*,iz]))
+	dbt_dr[*,iz]=Deriv(grid.r,reform(b_t[*,iz]))
+	dbz_dr[*,iz]=Deriv(grid.r,reform(b_z[*,iz]))
+    endfor
+     
+    for ir=0L,grid.nr-1 do begin
+        dbr_dz[ir,*]=Deriv(grid.z,reform(b_r[ir,*]))
+	dbt_dz[ir,*]=Deriv(grid.z,reform(b_t[ir,*]))
+	dbz_dz[ir,*]=Deriv(grid.z,reform(b_z[ir,*]))
+    endfor
 
     equil={time:time,data_source:file_expand_path(filename), mask:mask, $
-           br:b_r,bt:b_t,bz:b_z,er:e_r,et:e_t,ez:e_z}
+           br:b_r,bt:b_t,bz:b_z,er:e_r,et:e_t,ez:e_z,$
+	   dbr_dr:dbr_dr,dbr_dz:dbr_dz,$
+	   dbt_dr:dbt_dr,dbt_dz:dbt_dz,$
+	   dbz_dr:dbz_dr,dbz_dz:dbz_dz }
+  
     GET_OUT:
     return,equil
 END

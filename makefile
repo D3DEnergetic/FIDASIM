@@ -90,7 +90,7 @@ IFLAGS := -I$(HDF5_INCLUDE) -I$(SRC_DIR)
 NTHREADS = 1000 
 
 # FORD documentation variables
-FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -d $(LIB_DIR) -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
+FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -d $(LIB_DIR)/idl -d $(LIB_DIR)/python/fidasim -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html
 CHECK_LINKS = y
 
 export FIDASIM_DIR

@@ -7,7 +7,7 @@ So you have decided to install FIDASIM. Don't worry this should be relatively pa
 If you experiance problems installing FIDASIM you did something wrong and you should [**let us know**](https://github.com/D3DEnergetic/FIDASIM/issues/new) so we can laugh at you (and also help you)
 
 The following code snippets assumes you are using a BASH shell.
-To figure out what shell you currently have run `echo $SHELL` to find out. 
+To figure out what shell you currently have run `echo $SHELL` to find out.
 
 [TOC]
 
@@ -17,16 +17,16 @@ To figure out what shell you currently have run `echo $SHELL` to find out.
 FIDASIM has the following dependencies:
 
 * Linux because all other operating systems are inferior
-* [Make](https://www.gnu.org/software/make/) for building FIDASIM. 
+* [Make](https://www.gnu.org/software/make/) for building FIDASIM.
 * Fortran, C, and C++ compilers.
   [GNU(>v4.6)](https://gcc.gnu.org/) and [Intel(>13)](https://software.intel.com/en-us/intel-compilers) compilers are supported.
   Note you cannot mix and match different compilers.
 * [IDL](http://www.harrisgeospatial.com/ProductsandSolutions/GeospatialProducts/IDL.aspx) for pre-processing.
+* [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts and pre-processing.
 * [zlib](http://zlib.net/) for file compression.
 * [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
 * [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)
 * [git](https://git-scm.com/) for version control (Optional)
-* [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
 
@@ -71,8 +71,9 @@ export CC=gcc      #use 'icc' for Intel C compiler
 export CXX=g++     #use 'icpc' for Intel C++ compiler
 
 #For using helper routines
-export PATH=$FIDASIM_DIR/deps/hdf5/bin:$FIDASIM_DIR/lib:$PATH
+export PATH=$FIDASIM_DIR/deps/hdf5/bin:$FIDASIM_DIR/lib/scripts:$PATH
 export IDL_PATH="+$FIDASIM_DIR:$IDL_PATH:<IDL_DEFAULT>"
+export PYTHONPATH=$FIDASIM_DIR/lib/python:$PYTHONPATH
 
 ulimit -s unlimited #Omit this if you like segfaults
 ```
@@ -90,10 +91,10 @@ Once make has completed check if FIDASIM compiled correctly.
 user@computer:~/FIDASIM-{!../VERSION!}$ ./fidasim
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
- / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
-/_/  /___//____//_/ |_|/___//___//_/  /_/  
-                                           
-Version: 1.0.0
+ / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
+/_/  /___//____//_/ |_|/___//___//_/  /_/
+
+Version: 1.0.1
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -113,11 +114,11 @@ make atomic_tables
 ```
 
 @warning
-This is computationally expensive so make sure you run this on a computer 
+This is computationally expensive so make sure you run this on a computer
 where you won't get angry emails for using up all the CPU's.
 Optionally you can add `NTHREADS=#` to the command to set the number of threads.
 
-Now would be a good time to get more coffee... or maybe a nap. 
+Now would be a good time to get more coffee... or maybe a nap.
 
 ##Run a test case
 From within IDL
@@ -136,14 +137,14 @@ To run FIDASIM use the following command
 Now do what the computer says.
 Think of as good practice for when the [robots take over](https://www.youtube.com/watch?v=7Pq-S557XQU).
 
-It should print out the following. 
+It should print out the following.
 ```
 [lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
- / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
-/_/  /___//____//_/ |_|/___//___//_/  /_/  
-                                           
+ / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
+/_/  /___//____//_/ |_|/___//___//_/  /_/
+
 Version: 1.0.0
 
 FIDASIM is released as open source code under the MIT Licence.
@@ -153,16 +154,16 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  Shot:        1
  Time: 1000 [ms]
  Runid: test_1a
- 
+
 ---- Input files ----
  Tables file: /u/lstagner/FIDASIM/tables/atomic_tables.h5
  Geometry file: /p/fida/lstagner/TEST/test_1a_geometry.h5
  Equilibrium file: /p/fida/lstagner/TEST/test_1a_equilibrium.h5
  Distribution file: /p/fida/lstagner/TEST/test_1a_distribution.h5
- 
+
 ---- OpenMP settings ----
  Number of threads: 16
- 
+
 ---- Beam grid settings ----
  Nx:  50
  Ny:  60
@@ -172,47 +173,47 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  beta:   0.00 [rad]
  gamma:  0.00 [rad]
  origin: [   0.00,   0.00,   0.00] [cm]
- 
+
 ---- Interpolation grid settings ----
  Nr:  70
  Nz: 100
  dA: 4.10 [cm^2]
- 
+
 ---- Neutral beam settings ----
- Beam: test_beam               
+ Beam: test_beam
  Power:    1.70 [MW]
  Voltage: 72.50 [keV]
- 
+
 ---- Atomic tables settings ----
  Maximum n/m:  6
  Beam/Fast-ion mass:  2.014 [amu]
  Thermal/Bulk-ion mass:  2.014 [amu]
  Impurity mass: 12.011 [amu]
- 
+
 ---- Fast-ion distribution settings ----
  Distribution type: Fast-ion Density Function F(energy,pitch,R,Z)
  Nenergy =   6
  Npitch  =   6
  Energy range = [67.33, 75.44]
  Pitch  range = [-0.10, 0.10]
- 
+
 ---- FIDA/BES settings ----
  FIDA/BES System: SPECTRAL
  Number of channels:   3
- 
+
 ---- NPA settings ----
  NPA System: NPA
  Number of channels:   3
  Calculating hit probabilities for NPA channels
-                                                  
+
 ndmc:     1:43:23
      # of markers:     50000
    birth profile written to: /p/fida/lstagner/TEST/test_1a_birth.h5
-                              
+
 dcx:      1:43:41
      # of markers:    505020
    dcx written to: /p/fida/lstagner/TEST/test_1a_dcx.h5
-                              
+
 halo:     1:44:32
      # of markers:    505180
      # of markers:    310573
@@ -222,18 +223,18 @@ halo:     1:44:32
      # of markers:     32484
      # of markers:     13881
    neutral density written to: /p/fida/lstagner/TEST/test_1a_neutrals.h5
-                              
+
 bremsstrahlung:     1:46:25
-                              
+
 fida:     1:46:25
      # of markers:   5049813
-                              
+
    Spectra written to: /p/fida/lstagner/TEST/test_1a_spectra.h5
 
 npa:     1:47:46
      # of markers:    505074
 Number of NPA particles that hit a detector:   125638
-                              
+
    NPA data written to: /p/fida/lstagner/TEST/test_1a_npa.h5
 
 fida weight function:     1:49:46
@@ -244,44 +245,44 @@ fida weight function:     1:49:46
  Ngyro: 100
  Maximum Energy:  100.00
  LOS averaged: True
- 
+
    Channel:   1
    Radius:  200.00
    Mean Fast-ion Density:    7.97429E+11
- 
+
    Channel:   2
    Radius:  170.00
    Mean Fast-ion Density:    7.98346E+11
- 
+
    Channel:   3
    Radius:  140.00
    Mean Fast-ion Density:    7.98330E+11
- 
+
    FIDA weights written to: /p/fida/lstagner/TEST/test_1a_fida_weights.h5
-                              
+
 npa weight function:     1:50:02
  Number of Channels:   3
  Nenergy:  50
  Npitch:  50
  Maximum energy:  100.00
- 
+
    Channel:   1
    Radius:    200.000
    Flux:      1.22243E+14
    Weight:    3.79893E+03
- 
+
    Channel:   2
    Radius:    170.000
    Flux:      1.07364E+14
    Weight:    1.85565E+03
- 
+
    Channel:   3
    Radius:    140.000
    Flux:      3.46488E+13
    Weight:    8.81099E+02
- 
+
    NPA weights written to: /p/fida/lstagner/TEST/test_1a_npa_weights.h5
-                              
+
 END: hour, minute, second:  1:53:07
 duration:                   0:15:53
 ```

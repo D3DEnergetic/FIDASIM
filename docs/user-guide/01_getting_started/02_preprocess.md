@@ -7,11 +7,16 @@ title: Preprocessing Inputs
 #Create FIDASIM input files using PREFIDA
 
 FIDASIM requires inputs to be in a specific format.
-[PREFIDA](|url|/sourcefile/prefida.pro.html) is an IDL routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.
+PREFIDA([IDL](|url|/sourcefile/prefida.pro.html),[Python](|url|/sourcefile/preprocessing.py.html#prefida)) is an routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.
 
 PREFIDA is called as follows
-```
+```idl
 IDL> prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
+```
+or using Python
+```python
+>>> import fidasim
+>>> fidasim.prefida(inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa)
 ```
 where arguments are defined as follows. Click the argument's description for extreme detail.
 
@@ -37,18 +42,28 @@ Click [here](./05_devices.html) to find out if someone has done your work for yo
 #Making Grids
 PREFIDA uses two types of grids: the [Interpolation Grid](../03_technical/01_prefida_inputs.html#interpolation-grid-structure) and the [Beam Grid](../03_technical/01_prefida_inputs.html#beam-grid-settings). 
 The Interpolation Grid is 2D grid in the R-Z plane and as the name suggests it is used for interpolating the [plasma parameters](../03_technical/01_prefida_inputs.html#plasma-structure) and the [electromagnetic fields](../03_technical/01_prefida_inputs.html#fields-structure). 
-The IDL routine [rz_grid.pro](|url|/sourcefile/rz_grid.pro.html) can be used to easily create the interpolation `grid` structure.
+The routine `rz_grid`([IDL](|url|/sourcefile/rz_grid.pro.html),[Python](|url|/sourcefile/utils.py.html#rz_grid)) can be used to easily create the interpolation `grid` structure.
 
-```
+```idl
 IDL> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+```
+or in Python
+```python
+>>> from fidasim.utils import rz_grid
+>>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
 ```
 
 The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
 To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.
-The IDL routine [beam_grid.pro](|url|/sourcefile/beam_grid.pro.html) calculates from the [neutral beam geometry](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure) the optimal [beam grid settings](../03_technical/01_prefida_inputs.html#beam-grid-settings) that would align the grid with the beam sightline.
+The routine `beam_grid`([IDL](|url|/sourcefile/beam_grid.pro.html),[Python](|url|/sourcefile/utils.py.html#beam_grid)) calculates from the [neutral beam geometry](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure) the optimal [beam grid settings](../03_technical/01_prefida_inputs.html#beam-grid-settings) that would align the grid with the beam sightline.
 
-```
+```idl
 IDL> bgrid = beam_grid(nbi,rstart)
+```
+or in Python
+```python
+>>> from fidasim.utils import beam_grid
+>>> bgrid = beam_grid(nbi,rstart)
 ```
 
 #Reading GEQDSK files

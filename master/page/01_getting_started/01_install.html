@@ -143,7 +143,7 @@
 <p>So you have decided to install FIDASIM. Don't worry this should be relatively painless.</p>
 <p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>If you experiance problems installing FIDASIM you did something wrong and you should <a href="https://github.com/D3DEnergetic/FIDASIM/issues/new"><strong>let us know</strong></a> so we can laugh at you (and also help you)</p></div>
 <p>The following code snippets assumes you are using a BASH shell.
-To figure out what shell you currently have run <code>echo $SHELL</code> to find out. </p>
+To figure out what shell you currently have run <code>echo $SHELL</code> to find out.</p>
 <div class="toc">
 <ul>
 <li><a href="#installing-fidasim">Installing FIDASIM</a><ul>
@@ -167,16 +167,16 @@ To figure out what shell you currently have run <code>echo $SHELL</code> to find
 <p>FIDASIM has the following dependencies:</p>
 <ul>
 <li>Linux because all other operating systems are inferior</li>
-<li><a href="https://www.gnu.org/software/make/">Make</a> for building FIDASIM. </li>
+<li><a href="https://www.gnu.org/software/make/">Make</a> for building FIDASIM.</li>
 <li>Fortran, C, and C++ compilers.
   <a href="https://gcc.gnu.org/">GNU(&gt;v4.6)</a> and <a href="https://software.intel.com/en-us/intel-compilers">Intel(&gt;13)</a> compilers are supported.
   Note you cannot mix and match different compilers.</li>
 <li><a href="http://www.harrisgeospatial.com/ProductsandSolutions/GeospatialProducts/IDL.aspx">IDL</a> for pre-processing.</li>
+<li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> for python scripts and pre-processing.</li>
 <li><a href="http://zlib.net/">zlib</a> for file compression.</li>
 <li><a href="https://www.hdfgroup.org/HDF5/">HDF5 1.8.16</a> for reading and writing data files (Included)</li>
 <li><a href="https://fusion.gat.com/theory/Efit">EFIT</a> for electro-magnetic fields (Partially Included)</li>
 <li><a href="https://git-scm.com/">git</a> for version control (Optional)</li>
-<li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> for python scripts (Optional)</li>
 <li><a href="https://github.com/cmacmackin/ford">Ford</a> for creating HTML documentation (Optional)</li>
 <li><a href="http://wummel.github.io/linkchecker/">LinkChecker</a> for validating HTML documentation (Optional)</li>
 </ul>
@@ -220,8 +220,9 @@ To use the release version run the command</p>
 <span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>g++     <span class="c1">#use &#39;icpc&#39; for Intel C++ compiler</span>
 
 <span class="c1">#For using helper routines</span>
-<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$FIDASIM_DIR</span>/deps/hdf5/bin:<span class="nv">$FIDASIM_DIR</span>/lib:<span class="nv">$PATH</span>
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$FIDASIM_DIR</span>/deps/hdf5/bin:<span class="nv">$FIDASIM_DIR</span>/lib/scripts:<span class="nv">$PATH</span>
 <span class="nb">export</span> <span class="nv">IDL_PATH</span><span class="o">=</span><span class="s2">&quot;+</span><span class="nv">$FIDASIM_DIR</span><span class="s2">:</span><span class="nv">$IDL_PATH</span><span class="s2">:&lt;IDL_DEFAULT&gt;&quot;</span>
+<span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$FIDASIM_DIR</span>/lib/python:<span class="nv">$PYTHONPATH</span>
 
 <span class="nb">ulimit</span> -s unlimited <span class="c1">#Omit this if you like segfaults</span>
 </pre></div>
@@ -239,10 +240,10 @@ To use the release version run the command</p>
 <div class="codehilite"><pre><span></span>user@computer:~/FIDASIM-1.0.1$ ./fidasim
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ <span class="se">\ </span>/ _ <span class="p">|</span>  / __//  _//  <span class="p">|</span>/  /
- / _/ _/ / / // // __ <span class="p">|</span> _<span class="se">\ \ </span>_/ / / /<span class="p">|</span>_/ / 
-/_/  /___//____//_/ <span class="p">|</span>_<span class="p">|</span>/___//___//_/  /_/  
+ / _/ _/ / / // // __ <span class="p">|</span> _<span class="se">\ \ </span>_/ / / /<span class="p">|</span>_/ /
+/_/  /___//____//_/ <span class="p">|</span>_<span class="p">|</span>/___//___//_/  /_/
 
-Version: 1.0.0
+Version: 1.0.1
 
 FIDASIM is released as open <span class="nb">source</span> code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -261,10 +262,10 @@ In that case edit the file <code>tables/default_settings.dat</code> before runni
 </pre></div>
 
 
-<p></p><div class="alert alert-warning" role="alert"><h4>Warning</h4><p>This is computationally expensive so make sure you run this on a computer 
+<p></p><div class="alert alert-warning" role="alert"><h4>Warning</h4><p>This is computationally expensive so make sure you run this on a computer
 where you won't get angry emails for using up all the CPU's.
 Optionally you can add <code>NTHREADS=#</code> to the command to set the number of threads.</p></div>
-<p>Now would be a good time to get more coffee... or maybe a nap. </p>
+<p>Now would be a good time to get more coffee... or maybe a nap.</p>
 <h2 id="run-a-test-case">Run a test case</h2>
 <p>From within IDL</p>
 <div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> run_tests, <span class="s2">&quot;/place/where/you/want/the/output&quot;</span>
@@ -280,12 +281,12 @@ To run FIDASIM use the following command
 
 <p>Now do what the computer says.
 Think of as good practice for when the <a href="https://www.youtube.com/watch?v=7Pq-S557XQU">robots take over</a>.</p>
-<p>It should print out the following. </p>
+<p>It should print out the following.</p>
 <div class="codehilite"><pre><span></span>[lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
- / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
-/_/  /___//____//_/ |_|/___//___//_/  /_/  
+ / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
+/_/  /___//____//_/ |_|/___//___//_/  /_/
 
 Version: 1.0.0
 
@@ -322,7 +323,7 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  dA: 4.10 [cm^2]
 
 ---- Neutral beam settings ----
- Beam: test_beam               
+ Beam: test_beam
  Power:    1.70 [MW]
  Voltage: 72.50 [keV]
 

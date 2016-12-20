@@ -12,16 +12,17 @@ docmark: +
 source: true
 graph: true
 extra_filetypes: pro ;
+                 py  #
 preprocess: false
 media_dir: ./media
 favicon: ./media/fidasim-favicon.png
 md_extensions: markdown.extensions.toc
 ---
 
-@note 
+@note
 This is the documentation for the release version of FIDASIM.
 Click [here](|url|/master/index.html) for the current development documentation.
 
-FIDASIM is a fast Fortran 90 code that simulates neutral beam deposition and various fast-ion diagnostics in axisyimmetric fusion devices. 
+FIDASIM is a fast Fortran 90 code that simulates neutral beam deposition and various fast-ion diagnostics in axisyimmetric fusion devices.
 
 For more information, check out the [user guide](./page/index.html).

@@ -6,6 +6,7 @@ import re
 import tempfile
 from subprocess import call
 import string
+from os.path import dirname
 
 def extract_runid(f):
     return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[0:-1])
@@ -30,7 +31,7 @@ def main():
     parser.add_argument('-mem','--memory',
                         default = '2gb',
                         help = 'Set required memory. Defaults to 2048mb')
-    executable = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))+'/fidasim'
+    executable = dirname(dirname(dirname(os.path.abspath(__file__))))+'/fidasim'
     parser.add_argument('-ex','--executable',
                         default = executable,
                         help = 'Set path to FIDASIM executable. Defaults to '+executable)
@@ -77,13 +78,13 @@ def main():
     fileordir = os.path.abspath(args.path)
 
     if not os.access(fileordir, os.W_OK):
-        print('\033[91m'+'ERROR: You do not have write permissions in {}. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'.format(fileordir)+'\033[0m') 
+        print('\033[91m'+'ERROR: You do not have write permissions in {}. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'.format(fileordir)+'\033[0m')
         quit()
-        
+
     if not os.access(fileordir, os.R_OK):
-        print('\033[91m'+'ERROR: You do not have read permissions in {}. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'.format(fileordir)+'\033[0m') 
+        print('\033[91m'+'ERROR: You do not have read permissions in {}. Either change the permissions or move the input files into a new directory and edit the *_inputs.dat file accordingly.'.format(fileordir)+'\033[0m')
         quit()
-        
+
     if os.path.isfile(fileordir):
         files=[fileordir]
     elif os.path.isdir(fileordir):
@@ -108,13 +109,13 @@ def main():
 
     for job in jobs:
         if not args.log:
-            log_dir = os.path.dirname(job[0])
+            log_dir = dirname(job[0])
         else:
             log_dir = args.log
 
         output_files = [extract_runid(file)+".out" for file in job]
 
-        args_dict =  {'commands':"\n".join([args.executable+" "+z[0]+" "+str(args.ppn) + 
+        args_dict =  {'commands':"\n".join([args.executable+" "+z[0]+" "+str(args.ppn) +
                                  " >& "+log_dir+"/"+z[1] for z in zip(job,output_files)]),
                       'nodes':str(args.nodes),
                       'ppn':str(args.ppn),'mem':args.memory,
@@ -156,7 +157,7 @@ def main():
                      echo -n 'Started job at : ' ; date
 
                      %(precall)s
-                     
+
                      limit stacksize unlimited
 
                      %(commands)s

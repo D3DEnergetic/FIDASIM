@@ -6029,7 +6029,7 @@ subroutine write_bt_D_D(id, namelist_file)
     call h5ltset_attribute_string_f(gid, "bt_amu", "units", "amu", error)
 
     call h5ltset_attribute_string_f(gid, "fusion", "description", &
-         "Beam-Target reaction rates for the Tritium[1] and He3[2] branches of D-D nuclear reactions: fusion(energy, temp, branch)", error)
+         "Beam-Target reaction rates for T/He3 branches of D-D nuclear reactions: fusion(energy, temp, branch)", error)
     call h5ltset_attribute_string_f(gid, "fusion", "units", "cm^3/s", error)
     call h5ltset_attribute_string_f(gid, "fusion", "reaction", &
          "D + D -> [1] T(1.01 MeV) + p(3.02 MeV) (50%); [2] He3(0.82 MeV) + n(2.45 MeV) (50%)", error)

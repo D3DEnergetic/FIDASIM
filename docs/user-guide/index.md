@@ -9,7 +9,7 @@ $$ H^+ + H(n) \rightarrow H^\ast(m) + H^+ $$
 where \(H^\ast(m)\) is an excited state of Hydrogen.
 The newly created fast-neutral \(H^\ast(m)\) can then be collisionally de-excited to a lower state, emitting a doppler shifted photon as illustrated below.
 
-![Charge Exchange Process](|media|/fast_ion_process.svg Charge Exchange Process){: width="500" }
+![Charge Exchange Process](|media|/fast_ion_process.svg "Charge Exchange Process"){: width="500" }
 {: style="text-align: center" }
 
 Both the fast-neutral and the photon contain information about the velocity of fast-ion before it was neutralized.

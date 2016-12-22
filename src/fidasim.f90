@@ -328,6 +328,8 @@ type FastIonDistribution
         !+ Maximum pitch
     real(Float64)  :: p_range
         !+ Pitch interval length
+    real(Float64)  :: n_tot = 0.d0
+        !+ Total Number of fast-ions
     real(Float64), dimension(:), allocatable       :: energy
         !+ Energy values [keV]
     real(Float64), dimension(:), allocatable       :: pitch
@@ -490,6 +492,34 @@ type AtomicRates
         !+ Log-10 reaction rates for de-populating transistions
 end type AtomicRates
 
+type NuclearRates
+    !+ Nuclear reaction rates
+    integer       :: nbranch = 1
+        !+ Number of reaction branches
+    integer       :: nenergy = 1
+        !+ Number of beam energies
+    real(Float64) :: logemin = 0.d0
+        !+ Log-10 minimum energy
+    real(Float64) :: logemax = 0.d0
+        !+ Log-10 maximum energy
+    integer       :: ntemp = 1
+        !+ Number of target temperatures
+    real(Float64) :: logtmin = 0.d0
+        !+ Log-10 minimum temperature
+    real(Float64) :: logtmax = 0.d0
+        !+ Log-10 maximum temperature
+    real(Float64) :: dlogE = 0.d0
+        !+ Log-10 energy spacing
+    real(Float64) :: dlogT = 0.d0
+        !+ Log-10 temperature spacing
+    real(Float64) :: minlog_rate = 0.d0
+        !+ Log-10 minimum reaction rate
+    real(Float64), dimension(2) :: bt_amu = 0.d0
+        !+ Isotope mass of beam and thermal ions respectively [amu]
+    real(Float64), dimension(:,:,:), allocatable :: log_rate
+        !+ Log-10 reaction rates: log_rate(energy, temperature, branch)
+end type NuclearRates
+
 type AtomicTables
     !+ Atomic tables for various types of interactions
     type(AtomicCrossSection) :: H_H_cx
@@ -502,6 +532,8 @@ type AtomicTables
         !+ Hydrogen-Impurity reaction rates
     real(Float64), dimension(nlevs,nlevs) :: einstein
         !+ Einstein coefficients for spontaneous emission
+    type(NuclearRates)       :: D_D
+        !+ Deuterium-Deuterium reaction rates
 end type AtomicTables
 
 type LineOfSight
@@ -558,8 +590,12 @@ type NPAProbability
     !+ Type to contain the probability of hitting a NPA detector
     real(Float64) :: p = 0.d0
         !+ Hit probability
+    real(Float64) :: pitch = -2.d0
+        !+ Pitch
     real(Float64), dimension(3) :: eff_rd = 0.d0
         !+ Effective position of detector
+    real(Float64), dimension(3) :: dir = 0.d0
+        !+ Trajectory direction
 end type NPAProbability
 
 type NPAChords
@@ -610,6 +646,8 @@ type NPAResults
         !+ Maximum allowed number of particles grows if necessary
     integer(Int32) :: nloop = 1000
         !+ Increases number of MC markers by factor of `nloop`
+    integer(Int32) :: nenergy = 100
+        !+ Number of energy values
     type(NPAParticle), dimension(:), allocatable  :: part
         !+ Array of NPA particles
     real(Float64), dimension(:), allocatable      :: energy
@@ -643,6 +681,12 @@ type Spectra
     real(Float64), dimension(:,:,:), allocatable :: fida
         !+ FIDA emission: fida(lambda,chan,orbit_type)
 end type Spectra
+
+type NeutronRate
+    !+ Neutron storage structure
+    real(Float64), dimension(:), allocatable :: rate
+        !+ Neutron rate: rate(orbit_type) [neutrons/sec]
+end type NeutronRate
 
 type NeutralDensity
     !+ Neutral density structure
@@ -727,6 +771,8 @@ type SimulationInputs
         !+ Calculate NPA weights: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_birth
         !+ Calculate birth profile: 0 = off, 1=on
+    integer(Int32) :: calc_neutron
+        !+ Calculate neutron flux: 0 = off, 1=on
     integer(Int32) :: no_flr
         !+ Turns off Finite Larmor Radius effects: 0=off, 1=on
     integer(Int32) :: dump_dcx
@@ -861,6 +907,8 @@ type(NeutralDensity), save      :: neut
     !+ Variable for storing the calculated beam density
 type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
+type(NeutronRate), save         :: neutron
+    !+ Variable for storing the neutron rate
 type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
 type(NPAWeights), save          :: nweight
@@ -1420,7 +1468,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen
+    integer            :: pathlen, calc_neutron
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,dump_dcx,no_flr
@@ -1439,7 +1487,7 @@ subroutine read_inputs
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_bes, calc_fida, calc_npa, calc_birth, no_flr, &
         calc_fida_wght, calc_npa_wght, load_neutrals, dump_dcx, verbose, &
-        n_fida,n_npa, n_nbi, n_halo, n_dcx, n_birth, &
+        calc_neutron, n_fida,n_npa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
@@ -1453,8 +1501,9 @@ subroutine read_inputs
         stop
     endif
 
-    !!Set Defaults
+    !!Set Defaults TODO: remove at next major release
     no_flr = 0
+    calc_neutron = 0
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -1486,6 +1535,7 @@ subroutine read_inputs
     inputs%calc_birth=calc_birth
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
+    inputs%calc_neutron=calc_neutron
     inputs%load_neutrals=load_neutrals
     inputs%dump_dcx=dump_dcx
     inputs%verbose=verbose
@@ -1915,9 +1965,8 @@ subroutine read_npa
     real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0, r0_d, v0
     real(Float64), dimension(3,3) :: basis, inv_basis
     real(Float64), dimension(50) :: xd, yd
-    real(Float64), dimension(:,:,:,:,:), allocatable :: effrd
-    real(Float64), dimension(:,:,:,:), allocatable :: phit
-    real(Float64) :: total_prob, hh, hw, dprob, dx, dy, r
+    type(LocalEMFields) :: fields
+    real(Float64) :: total_prob, hh, hw, dprob, dx, dy, r, pitch
     integer :: ichan,i,j,k,ix,iy,d_index,nd,cnt
     integer :: error
 
@@ -1969,17 +2018,6 @@ subroutine read_npa
                             beam_grid%ny, &
                             beam_grid%nz) )
     npa_chords%hit = .False.
-
-    allocate(effrd(3,beam_grid%nx,&
-                     beam_grid%ny,&
-                     beam_grid%nz,&
-                     npa_chords%nchan) )
-    allocate(phit(beam_grid%nx,&
-                  beam_grid%ny,&
-                  beam_grid%nz,&
-                  npa_chords%nchan) )
-    effrd = 0.d0
-    phit = 0.d0
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid,"/npa/radius", npa_chords%radius, dims(2:2), error)
@@ -2051,7 +2089,7 @@ subroutine read_npa
         cnt = 0
         ! For each grid point find the probability of hitting the detector given an isotropic source
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-        !$OMP& rd_d,rd,d_index,v0,dprob,r)
+        !$OMP& rd_d,rd,d_index,v0,dprob,r,fields)
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
@@ -2077,9 +2115,11 @@ subroutine read_npa
                     enddo !xd loop
                     if(total_prob.gt.0.0) then
                         eff_rd = eff_rd/total_prob
-                        phit(i,j,k,ichan) = total_prob
-                        call xyz_to_uvw(eff_rd,effrd(:,i,j,k,ichan))
+                        call get_fields(fields,pos=r0)
+                        v0 = (eff_rd - r0)/norm2(eff_rd - r0)
+                        npa_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
                         npa_chords%phit(i,j,k,ichan)%p = total_prob
+                        npa_chords%phit(i,j,k,ichan)%dir = v0
                         npa_chords%phit(i,j,k,ichan)%eff_rd = eff_rd
                         npa_chords%hit(i,j,k) = .True.
                     endif
@@ -2099,9 +2139,9 @@ subroutine read_npa
         endif
 
     enddo chan_loop
+
     if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
 
-    deallocate(phit,effrd)
     deallocate(a_shape,a_cent,a_redge,a_tedge)
     deallocate(d_shape,d_cent,d_redge,d_tedge)
 
@@ -2151,7 +2191,7 @@ subroutine read_equilibrium
         write(*,'(a)') '---- Interpolation grid settings ----'
         write(*,'(T2,"Nr: ",i3)') inter_grid%nr
         write(*,'(T2,"Nz: ",i3)') inter_grid%nz
-        write(*,'(T2,"dA: ", f4.2," [cm^2]")') inter_grid%da
+        write(*,'(T2,"dA: ", f5.2," [cm^2]")') inter_grid%da
         write(*,*) ''
     endif
 
@@ -2232,6 +2272,7 @@ subroutine read_f(fid, error)
 
     integer(HSIZE_T), dimension(4) :: dims
     real(Float64) :: dummy(1)
+    integer :: ir
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
@@ -2276,12 +2317,17 @@ subroutine read_f(fid, error)
     fbm%pmax = dummy(1)
     fbm%p_range = fbm%pmax - fbm%pmin
 
+    do ir=1,fbm%nr
+        fbm%n_tot = fbm%n_tot + 2*pi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:))*fbm%r(ir)
+    enddo
+
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z)"
         write(*,'(T2,"Nenergy = ",i3)'),fbm%nenergy
         write(*,'(T2,"Npitch  = ",i3)'),fbm%npitch
         write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")'),fbm%emin,fbm%emax
         write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")'),fbm%pmin,fbm%pmax
+        write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
     endif
 
@@ -2297,7 +2343,7 @@ subroutine read_mc(fid, error)
     integer(HSIZE_T), dimension(1) :: dims
     integer(Int32) :: i,j,ii,ir,iz
     real(Float64) :: phi,phi_enter,phi_exit,delta_phi,r_ratio
-    real(Float64), dimension(3) :: uvw,ri,vi,e1_xyz,e2_xyz,C_xyz
+    real(Float64), dimension(3) :: uvw,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
     integer(Int32), dimension(1) :: minpos
     real(Float64), dimension(:), allocatable :: weight
     real(Float64), dimension(:), allocatable :: r, z, vr, vt, vz
@@ -2335,6 +2381,11 @@ subroutine read_mc(fid, error)
     call h5ltread_dataset_double_f(fid, "/weight", weight, dims, error)
     call h5ltread_dataset_int_f(fid, "/class", orbit_class, dims, error)
 
+    if(any(orbit_class.gt.particles%nclass)) then
+        write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
+        stop
+    endif
+
     if(inputs%dist_type.eq.2) then
         dist_type_name = "Guiding Center Monte Carlo"
         allocate(energy(npart))
@@ -2357,13 +2408,13 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(npart)*100,char(13)
         endif
-        call in_plasma([r(i),0.d0,z(i)],inp,machine_coords=.True.)
+        uvw = [r(i), 0.d0, z(i)]
+        call in_plasma(uvw,inp,machine_coords=.True.)
         if(.not.inp) cycle particle_loop
         do ii=1,nrep
             j = int((i-1)*nrep + ii)
             if(inputs%dist_type.eq.2) then
                 !! Transform to full orbit
-                uvw = [r(i), 0.d0, z(i)]
                 call get_fields(fields,pos = uvw, machine_coords=.True.)
                 call gyro_correction(fields, uvw, energy(i), pitch(i), ri, vi)
                 particles%fast_ion(j)%r = sqrt(ri(1)**2 + ri(2)**2)
@@ -2391,13 +2442,15 @@ subroutine read_mc(fid, error)
 
             phi_enter = 0.0
             phi_exit = 0.0
-            call uvw_to_xyz([0.d0, 0.d0, particles%fast_ion(j)%z], C_xyz)
+            dum = [0.d0, 0.d0, particles%fast_ion(j)%z]
+            call uvw_to_xyz(dum, C_xyz)
             call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(j)%r,phi_enter,phi_exit)
             delta_phi = phi_exit-phi_enter
             if(delta_phi.gt.0) then
                 particles%fast_ion(j)%cross_grid = .True.
             else
                 particles%fast_ion(j)%cross_grid = .False.
+                delta_phi = 2*pi
             endif
             particles%fast_ion(j)%phi_enter = phi_enter
             particles%fast_ion(j)%delta_phi = delta_phi
@@ -2461,7 +2514,7 @@ subroutine read_distribution
 
 end subroutine read_distribution
 
-subroutine read_cross(fid, grp, cross)
+subroutine read_atomic_cross(fid, grp, cross)
     !+ Reads in a cross section table from file
     !+ and puts it into a [[AtomicCrossSection]] type
     integer(HID_T), intent(in)              :: fid
@@ -2501,10 +2554,10 @@ subroutine read_cross(fid, grp, cross)
     enddo
     deallocate(dummy3)
 
-end subroutine read_cross
+end subroutine read_atomic_cross
 
-subroutine read_rates(fid, grp, b_amu, t_amu, rates)
-    !+ Reads in a reaction rates table from file
+subroutine read_atomic_rates(fid, grp, b_amu, t_amu, rates)
+    !+ Reads in a atomic reaction rates table from file
     !+ and puts it into a [[AtomicRates]] type
     integer(HID_T), intent(in)              :: fid
         !+ HDF5 file ID
@@ -2681,7 +2734,66 @@ subroutine read_rates(fid, grp, b_amu, t_amu, rates)
     rates%minlog_pop = log10(rmin)
     rates%log_pop = log10(rates%log_pop)
 
-end subroutine read_rates
+end subroutine read_atomic_rates
+
+subroutine read_nuclear_rates(fid, grp, rates)
+    !+ Reads in a nuclear reaction rates table from file
+    !+ and puts it into a [[NuclearRates]] type
+    integer(HID_T), intent(in)              :: fid
+        !+ HDF5 file ID
+    character(len=*), intent(in)            :: grp
+        !+ HDF5 group to read from
+    type(NuclearRates), intent(inout)       :: rates
+        !+ Atomic reaction rates
+
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(3) :: dim3
+    logical :: path_valid
+    integer :: i, j, error
+    real(Float64) :: emin, emax, tmin, tmax, rmin
+
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/nbranch", rates%nbranch, error)
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", rates%nenergy, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/emin", emin, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/emax", emax, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/dlogE", rates%dlogE, error)
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/ntemp", rates%ntemp, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/tmin", tmin, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/tmax", tmax, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/dlogT", rates%dlogT, error)
+    rates%logemin = log10(emin)
+    rates%logemax = log10(emax)
+    rates%logtmin = log10(tmin)
+    rates%logtmax = log10(tmax)
+
+    allocate(rates%log_rate(rates%nenergy, &
+                            rates%ntemp,   &
+                            rates%nbranch))
+
+    dim1 = [2]
+    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", rates%bt_amu, dim1, error)
+
+    if(abs(inputs%ab-rates%bt_amu(1)).gt.0.2) then
+        write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
+            rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
+    endif
+
+    if(abs(inputs%ai-rates%bt_amu(2)).gt.0.2) then
+        write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
+            rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
+    endif
+
+    dim3 = [rates%nenergy, rates%ntemp, rates%nbranch]
+    call h5ltread_dataset_double_f(fid, grp//"/fusion", rates%log_rate, dim3, error)
+
+    rmin = minval(rates%log_rate, rates%log_rate.gt.0.d0)
+    where (rates%log_rate.le.0.d0)
+        rates%log_rate = 0.9*rmin
+    end where
+    rates%minlog_rate = log10(rmin)
+    rates%log_rate = log10(rates%log_rate)
+
+end subroutine read_nuclear_rates
 
 subroutine read_tables
     !+ Reads in atomic tables from file and stores them in [[libfida:tables]]
@@ -2706,16 +2818,16 @@ subroutine read_tables
     call h5fopen_f(inputs%tables_file, H5F_ACC_RDONLY_F, fid, error)
 
     !!Read Hydrogen-Hydrogen CX Cross Sections
-    call read_cross(fid,"/cross/H_H",tables%H_H_cx)
+    call read_atomic_cross(fid,"/cross/H_H",tables%H_H_cx)
 
     !!Read Hydrogen-Hydrogen Rates
     b_amu = [inputs%ab, inputs%ai]
-    call read_rates(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
+    call read_atomic_rates(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
     inputs%ab = tables%H_H%ab(1)
     inputs%ai = tables%H_H%ab(2)
 
     !!Read Hydrogen-Electron Rates
-    call read_rates(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
+    call read_atomic_rates(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
 
     !!Read Hydrogen-Impurity rates
     impname = ''
@@ -2731,7 +2843,7 @@ subroutine read_tables
             imp_amu = 2.d0*inputs%impurity_charge
     end select
 
-    call read_rates(fid,"/rates/H_"//trim(adjustl(impname)), b_amu, imp_amu, tables%H_Aq)
+    call read_atomic_rates(fid,"/rates/H_"//trim(adjustl(impname)), b_amu, imp_amu, tables%H_Aq)
 
     !!Read Einstein coefficients
     call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/n_max", n_max, error)
@@ -2741,6 +2853,9 @@ subroutine read_tables
     call h5ltread_dataset_double_f(fid,"/rates/spontaneous/einstein",dummy2, dim2, error)
     tables%einstein(:,:) = transpose(dummy2(1:nlevs,1:nlevs))
     deallocate(dummy2)
+
+    !!Read nuclear Deuterium-Deuterium rates
+    call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
 
     !!Close file
     call h5fclose_f(fid, error)
@@ -3120,8 +3235,8 @@ subroutine write_npa
 
     !Write variables
     d(1) = 1
-    dim2 = [fbm%nenergy, npa%nchan]
-    call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [fbm%nenergy], error)
+    dim2 = [npa%nenergy, npa%nchan]
+    call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [npa%nenergy], error)
     call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [npa%nchan], error)
     call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim2(1:1),&
          npa%energy, error)
@@ -3344,6 +3459,54 @@ subroutine write_spectra
     endif
 
 end subroutine write_spectra
+
+subroutine write_neutrons
+    !+ Writes [[libfida:neutron]] to a HDF5 file
+    integer(HID_T) :: fid
+    integer(HSIZE_T), dimension(1) :: dim1
+    integer :: error
+
+    character(charlim) :: filename
+
+    !! write to file
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrons.h5"
+
+    !Open HDF5 interface
+    call h5open_f(error)
+
+    !Create file overwriting any existing file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+
+    !Write variables
+    if(particles%nclass.gt.1) then
+        dim1(1) = particles%nclass
+        call h5ltmake_compressed_dataset_double_f(fid, "/rate", 1, dim1, neutron%rate, error)
+        call h5ltset_attribute_string_f(fid,"/rate","description", &
+             "Neutron rate: rate(orbit_class)", error)
+    else
+        dim1(1) = 1
+        call h5ltmake_dataset_double_f(fid, "/rate", 0, dim1, neutron%rate, error)
+        call h5ltset_attribute_string_f(fid,"/rate","description", &
+             "Neutron rate", error)
+    endif
+
+    call h5ltset_attribute_string_f(fid,"/rate","units","neutrons/s",error )
+
+    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+    call h5ltset_attribute_string_f(fid,"/","description",&
+         "Neutron rate calculated by FIDASIM", error)
+
+    !Close file
+    call h5fclose_f(fid, error)
+
+    !Close HDF5 interface
+    call h5close_f(error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,a,a)') 'Neutrons written to: ', trim(filename)
+    endif
+
+end subroutine write_neutrons
 
 subroutine write_fida_weights
     !+ Writes [[libfida:fweight]] to a HDF5 file
@@ -4952,7 +5115,7 @@ subroutine store_npa(det, ri, rf, vn, flux)
 
     type(LocalEMFields) :: fields
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
-    real(Float64) :: energy, pitch
+    real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
 
@@ -4962,6 +5125,7 @@ subroutine store_npa(det, ri, rf, vn, flux)
 
     ! Calculate energy
     energy = inputs%ab*v2_to_E_per_amu*dot_product(vn,vn)
+    dE = npa%energy(2)-npa%energy(1)
 
     ! Calculate pitch if distribution actually uses pitch
     if(inputs%dist_type.le.2) then
@@ -4994,7 +5158,7 @@ subroutine store_npa(det, ri, rf, vn, flux)
     npa%part(npa%npart)%pitch = pitch
     npa%part(npa%npart)%weight = flux
     ienergy = minloc(abs(npa%energy - energy))
-    npa%flux(ienergy(1),det) = npa%flux(ienergy(1),det) + flux/fbm%dE
+    npa%flux(ienergy(1),det) = npa%flux(ienergy(1),det) + flux/dE
     !$OMP END CRITICAL(store_npa_1)
 
 end subroutine store_npa
@@ -5031,7 +5195,7 @@ subroutine neut_rates(denn, vi, vn, rates)
     ebi = c%i
     if(err.eq.1) then
         write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
-        write(*,'("eb = ",f5.3," [keV]")') eb
+        write(*,'("eb = ",f6.3," [keV]")') eb
         if(ebi.lt.1) then
             ebi=1
             c%b1=1.0 ; c%b2=0.0
@@ -5053,6 +5217,61 @@ subroutine neut_rates(denn, vi, vn, rates)
     rates=matmul(neut,denn)*vrel
 
 end subroutine neut_rates
+
+subroutine get_neutron_rate(plasma, eb, rate)
+    !+ Gets neutron rate for a beam with energy `eb` interacting with a target plasma
+    type(LocalProfiles), intent(in) :: plasma
+        !+ Plasma Paramters
+    real(Float64), intent(in)       :: eb
+        !+ Beam energy [keV]
+    real(Float64), intent(out)      :: rate
+        !+ Neutron reaction rate [1/s]
+
+    integer :: err_status, neb, nt, ebi, tii
+    real(Float64) :: dlogE, dlogT, logEmin, logTmin
+    real(Float64) :: logeb, logti, lograte, denp
+    type(InterpolCoeffs2D) :: c
+    real(Float64) :: b11, b12, b21, b22
+
+    logeb = log10(eb)
+    logti = log10(plasma%ti)
+    denp = plasma%denp
+
+    !!D_D
+    err_status = 1
+    logEmin = tables%D_D%logemin
+    logTmin = tables%D_D%logtmin
+    dlogE = tables%D_D%dlogE
+    dlogT = tables%D_D%dlogT
+    neb = tables%D_D%nenergy
+    nt = tables%D_D%ntemp
+    call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
+                        logeb, logti, c, err_status)
+    ebi = c%i
+    tii = c%j
+    b11 = c%b11
+    b12 = c%b12
+    b21 = c%b21
+    b22 = c%b22
+    if(err_status.eq.1) then
+        write(*,'(a)') "GET_NEUTRON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+        write(*,'("eb = ",f6.3," [keV]")') eb
+        write(*,'("ti = ",f6.3," [keV]")') plasma%ti
+        denp = 0.d0
+    endif
+
+    lograte = (b11*tables%D_D%log_rate(ebi,tii,2)   + &
+               b12*tables%D_D%log_rate(ebi,tii+1,2) + &
+               b21*tables%D_D%log_rate(ebi+1,tii,2) + &
+               b22*tables%D_D%log_rate(ebi+1,tii+1,2))
+
+    if (lograte.lt.tables%D_D%minlog_rate) then
+        rate = 0.d0
+    else
+        rate = denp * 10.d0**lograte
+    endif
+
+end subroutine get_neutron_rate
 
 subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     !+ Get probability of a thermal ion charge exchanging with `types` neutrals
@@ -5529,6 +5748,27 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
 
 end subroutine store_fida_photons
 
+subroutine store_neutrons(rate, orbit_class)
+    !+ Store neutron rate in [[libfida:neutron]]
+    real(Float64), intent(in)     :: rate
+        !+ Neutron rate [neutrons/sec]
+    integer, intent(in), optional :: orbit_class
+        !+ Orbit class ID
+
+    integer :: iclass
+
+    if(present(orbit_class)) then
+        iclass = orbit_class
+    else
+        iclass = 1
+    endif
+
+    !$OMP CRITICAL(neutron_rate)
+    neutron%rate(iclass)= neutron%rate(iclass) + rate
+    !$OMP END CRITICAL(neutron_rate)
+
+end subroutine store_neutrons
+
 subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_pi,denf,photons)
     !+ Store FIDA weight photons in [[libfida:fweight]] for a specific channel
     integer, intent(in)                     :: ichan
@@ -5679,7 +5919,7 @@ subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 
     real(Float64) :: sinus
 
-    sinus = sqrt(1.d0-pitch**2)
+    sinus = sqrt(max(1.d0-pitch**2,0.d0))
     vi_norm = (sinus*cos(gyroangle)*fields%a_norm + &
                pitch*fields%b_norm + &
                sinus*sin(gyroangle)*fields%c_norm)
@@ -6616,12 +6856,12 @@ end subroutine npa_f
 
 subroutine npa_mc
     !+ Calculate NPA flux using a Monte Carlo fast-ion distribution
-    integer :: iion
+    integer :: iion,iloop
     type(FastIon) :: fast_ion
     real(Float64) :: phi
     real(Float64), dimension(3) :: ri, rf      !! positions
     real(Float64), dimension(3) :: vi          !! velocity of fast ions
-    integer :: det !! detector
+    integer :: det,j !! detector
     real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     real(Float64) :: flux
@@ -6634,11 +6874,15 @@ subroutine npa_mc
 
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"# of markers: ",i9)') particles%nparticle
+    endif
 
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,ind,fast_ion,vi,ri,rf,phi,s,c, &
+    !$OMP PARALLEL DO schedule(guided) private(iion,iloop,ind,fast_ion,vi,ri,rf,phi,s,c, &
     !$OMP& randomu,uvw,uvw_vi,prob,states,flux,det)
     loop_over_fast_ions: do iion=1,particles%nparticle
+        cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0)cycle loop_over_fast_ions
         if(fast_ion%cross_grid) then
@@ -6668,7 +6912,7 @@ subroutine npa_mc
 
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
-            if(sum(prob).le.0.)cycle loop_over_fast_ions
+            if(sum(prob).le.0.) cycle loop_over_fast_ions
 
             !! Attenuate states as the particle moves though plasma
             states=prob*fast_ion%weight
@@ -6678,7 +6922,6 @@ subroutine npa_mc
             flux = sum(states)*beam_grid%dv
             call store_npa(det,ri,rf,vi,flux)
         endif
-        cnt=cnt+1
         if (inputs%verbose.ge.2)then
           WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
@@ -6686,6 +6929,147 @@ subroutine npa_mc
     !$OMP END PARALLEL DO
 
 end subroutine npa_mc
+
+subroutine neutron_f
+    !+ Calculate neutron emission rate using a fast-ion distribution function F(E,p,r,z)
+    integer :: ir, iz, ie, ip, iphi, nphi
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64) :: eb,pitch,r,z
+    real(Float64) :: erel, rate
+    real(Float64), dimension(3) :: rg, ri
+    real(Float64), dimension(3) :: vi
+    real(Float64), dimension(3) :: uvw, uvw_vi
+    real(Float64)  :: vnet_square, factor
+    real(Float64)  :: maxcnt, inv_maxcnt, cnt
+
+    nphi = 20
+    maxcnt=fbm%nr*fbm%nz
+    inv_maxcnt = 100.d0/maxcnt
+    cnt=0.0
+    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
+    !$OMP& ir,iz,ie,ip,iphi,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel)
+    z_loop: do iz = 1, fbm%nz
+        r_loop: do ir=1, fbm%nr
+            cnt = cnt+1
+            !! Calculate position
+            uvw(1) = fbm%r(ir)
+            uvw(2) = 0.d0
+            uvw(3) = fbm%z(iz)
+            call uvw_to_xyz(uvw, rg)
+
+            !! Get fields
+            call get_fields(fields,pos=rg)
+            if(.not.fields%in_plasma) cycle r_loop
+
+            factor = 2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz
+            !! Loop over energy/pitch/phi
+            pitch_loop: do ip = 1, fbm%npitch
+                pitch = fbm%pitch(ip)
+                energy_loop: do ie =1, fbm%nenergy
+                    eb = fbm%energy(ie)
+                    gyro_loop: do iphi=1, nphi 
+                        call gyro_correction(fields,rg,eb,pitch,ri,vi)
+
+                        !! Get plasma parameters at particle position
+                        call get_plasma(plasma,pos=ri)
+                        if(.not.plasma%in_plasma) cycle gyro_loop
+
+                        !! Calculate effective beam energy
+                        vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                        erel = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
+
+                        !! Get neutron production rate
+                        call get_neutron_rate(plasma, erel, rate)
+                        rate = rate*fbm%f(ie,ip,ir,iz)*factor
+
+                        !! Store neutrons
+                        call store_neutrons(rate/nphi)
+                    enddo gyro_loop
+                enddo energy_loop
+            enddo pitch_loop
+            if (inputs%verbose.ge.2)then
+              WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
+            endif
+        enddo r_loop
+    enddo z_loop
+    !$OMP END PARALLEL DO
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,A,ES14.5," [neutrons/s]")'),'Rate:   ',sum(neutron%rate)
+        write(*,'(30X,a)') ''
+    endif
+
+    call write_neutrons()
+
+end subroutine neutron_f
+
+subroutine neutron_mc
+    !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
+    integer :: iion
+    type(FastIon) :: fast_ion
+    type(LocalProfiles) :: plasma
+    real(Float64) :: eb, rate
+    real(Float64), dimension(3) :: ri      !! start position
+    real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64), dimension(3) :: uvw, uvw_vi
+    real(Float64)  :: vnet_square
+    real(Float64)  :: maxcnt, inv_maxcnt, cnt
+    real(Float64), dimension(1) :: randomu
+
+    maxcnt=particles%nparticle
+    inv_maxcnt = 100.d0/maxcnt
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"# of markers: ",i9)') particles%nparticle
+    endif
+
+    cnt=0.0
+    rate=0.0
+    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri, &
+    !$OMP& plasma,randomu,uvw,uvw_vi,vnet_square,rate,eb)
+    loop_over_fast_ions: do iion=1,particles%nparticle
+        cnt=cnt+1
+        fast_ion = particles%fast_ion(iion)
+        if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
+
+        !! Calculate position
+        uvw(1) = fast_ion%r
+        uvw(2) = 0.0
+        uvw(3) = fast_ion%z
+        call uvw_to_xyz(uvw, ri)
+
+        !! Get plasma parameters
+        call get_plasma(plasma,pos=ri)
+
+        !! Calculate effective beam energy
+        uvw_vi(1) = fast_ion%vr
+        uvw_vi(2) = fast_ion%vt
+        uvw_vi(3) = fast_ion%vz
+        vi = matmul(beam_grid%inv_basis,uvw_vi)
+        vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+        eb = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
+
+        !! Get neutron production rate
+        call get_neutron_rate(plasma, eb, rate)
+        rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv
+
+        !! Store neutrons
+        call store_neutrons(rate, fast_ion%class)
+
+        if (inputs%verbose.ge.2)then
+          WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
+        endif
+    enddo loop_over_fast_ions
+    !$OMP END PARALLEL DO
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,A,ES14.5," [neutrons/s]")'),'Rate:   ',sum(neutron%rate)
+        write(*,'(30X,a)') ''
+    endif
+
+    call write_neutrons()
+
+end subroutine neutron_mc
 
 subroutine fida_weights_mc
     !+ Calculates FIDA weights
@@ -7059,6 +7443,7 @@ end subroutine fida_weights_los
 subroutine npa_weights
     !+ Calculates NPA weights
     type(LocalEMFields) :: fields
+    type(NPAProbability) :: phit
     real(Float64) :: pitch
     real(Float64) :: pcxa
     integer(Int32) :: det
@@ -7132,21 +7517,19 @@ subroutine npa_weights
         endif
 
         ccnt=0.d0
-        !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,fields, &
+        !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,fields,phit,&
         !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf)
         loop_along_z: do kk=1,beam_grid%nz
             loop_along_y: do jj=1,beam_grid%ny
                 loop_along_x: do ii=1,beam_grid%nx
-                    if(npa_chords%phit(ii,jj,kk,ichan)%p.gt.0.d0) then
+                    phit = npa_chords%phit(ii,jj,kk,ichan)
+                    if(phit%p.gt.0.d0) then
                         pos = [beam_grid%xc(ii), beam_grid%yc(jj), beam_grid%zc(kk)]
                         call get_fields(fields,pos=pos)
                         if(.not.fields%in_plasma) cycle loop_along_x
 
-                        !!Determine velocity vector
-                        dpos = npa_chords%phit(ii,jj,kk,ichan)%eff_rd
-                        vi_norm = (dpos - pos)/norm2(dpos - pos)
-
                         !!Check if it hits a detector just to make sure
+                        vi_norm = phit%dir
                         call hit_npa_detector(pos,vi_norm,det)
                         if (det.ne.ichan) then
                             write(*,'(a)') 'NPA_WEIGHTS: Missed detector'
@@ -7154,7 +7537,7 @@ subroutine npa_weights
                         endif
 
                         !! Determine the angle between the B-field and the Line of Sight
-                        pitch = dot_product(fields%b_norm,vi_norm)
+                        pitch = phit%pitch
                         ipitch=minloc(abs(ptcharr - pitch))
                         loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
                             vabs = sqrt(ebarr(ic)/(v2_to_E_per_amu*inputs%ab))
@@ -7183,13 +7566,13 @@ subroutine npa_weights
                             nweight%attenuation(ic,ii,jj,kk,ichan) = pcxa
                             nweight%cx(ic,ii,jj,kk,ichan) = sum(pcx)
                             nweight%weight(ic,ipitch(1),ichan) = nweight%weight(ic,ipitch(1),ichan) + &
-                                      2*sum(pcx)*pcxa*npa_chords%phit(ii,jj,kk,ichan)%p*beam_grid%dv/dP
+                                      2*sum(pcx)*pcxa*phit%p*beam_grid%dv/dP
 
                             nweight%flux(ic,ichan) = nweight%flux(ic,ichan) + &
-                                      2*beam_grid%dv*fbm_denf*sum(pcx)*pcxa*npa_chords%phit(ii,jj,kk,ichan)%p
+                                      2*beam_grid%dv*fbm_denf*sum(pcx)*pcxa*phit%p
                                       !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
                             nweight%emissivity(ii,jj,kk,ichan)=nweight%emissivity(ii,jj,kk,ichan)+ &
-                                      2*fbm_denf*sum(pcx)*pcxa*npa_chords%phit(ii,jj,kk,ichan)%p*dE
+                                      2*fbm_denf*sum(pcx)*pcxa*phit%p*dE
                             !$OMP END CRITICAL(npa_wght)
                         enddo loop_over_energy
                     endif
@@ -7335,10 +7718,23 @@ program fidasim
     if(inputs%calc_npa.ge.1)then
         npa%nchan = npa_chords%nchan
         allocate(npa%part(npa%nmax))
-        allocate(npa%energy(fbm%nenergy))
-        allocate(npa%flux(fbm%nenergy,npa%nchan))
-        npa%energy = fbm%energy
+        if(inputs%dist_type.eq.1) then
+            npa%nenergy = fbm%nenergy
+            allocate(npa%energy(npa%nenergy))
+            npa%energy = fbm%energy
+        else
+            allocate(npa%energy(npa%nenergy))
+            do i=1,npa%nenergy
+                npa%energy(i)=real(i-0.5)
+            enddo
+        endif
+        allocate(npa%flux(npa%nenergy,npa%nchan))
         npa%flux = 0.0
+    endif
+
+    if(inputs%calc_neutron.ge.1)then
+        allocate(neutron%rate(particles%nclass))
+        neutron%rate = 0.d0
     endif
 
     !! -----------------------------------------------------------------------
@@ -7435,6 +7831,23 @@ program fidasim
 
     if(inputs%calc_npa.ge.1) then
         call write_npa()
+        write(*,'(30X,a)') ''
+    endif
+
+    !! -------------------------------------------------------------------
+    !! ------------------- Calculation of neutron flux -------------------
+    !! -------------------------------------------------------------------
+    if(inputs%calc_neutron.ge.1) then
+        call date_and_time (values=time_arr)
+        if(inputs%verbose.ge.1) then
+            write(*,'(A,I2,":",I2.2,":",I2.2)') 'neutron rate:    ',  &
+                  time_arr(5),time_arr(6),time_arr(7)
+        endif
+        if(inputs%dist_type.eq.1) then
+            call neutron_f()
+        else
+            call neutron_mc()
+        endif
         write(*,'(30X,a)') ''
     endif
 

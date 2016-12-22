@@ -686,6 +686,8 @@ type NeutronRate
     !+ Neutron storage structure
     real(Float64), dimension(:), allocatable :: rate
         !+ Neutron rate: rate(orbit_type) [neutrons/sec]
+    real(Float64), dimension(:,:,:,:), allocatable :: weight
+        !+ Neutron rate weight: weight(E,p,R,Z)
 end type NeutronRate
 
 type NeutralDensity
@@ -3464,6 +3466,7 @@ subroutine write_neutrons
     !+ Writes [[libfida:neutron]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(4) :: dim4
     integer :: error
 
     character(charlim) :: filename
@@ -3489,8 +3492,45 @@ subroutine write_neutrons
         call h5ltset_attribute_string_f(fid,"/rate","description", &
              "Neutron rate", error)
     endif
-
     call h5ltset_attribute_string_f(fid,"/rate","units","neutrons/s",error )
+
+    if(inputs%dist_type.eq.1) then
+        dim1(1) = 1
+        call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
+        call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
+        call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
+        call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
+        dim4 = shape(neutron%weight)
+        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, neutron%weight, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(1:1), fbm%energy, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(2:2), fbm%pitch, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim4(3:3), fbm%r, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim4(4:4), fbm%z, error)
+
+        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
+             "Number of energy values", error)
+        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
+             "Number of pitch values", error)
+        call h5ltset_attribute_string_f(fid,"/nr", "description", &
+             "Number of R values", error)
+        call h5ltset_attribute_string_f(fid,"/nz", "description", &
+             "Number of Z values", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "description", &
+             "Neutron Weight Function: weight(E,p,R,Z), rate = sum(f*weight)", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "units","neutrons*cm^3*dE*dp/fast-ion*s", error)
+
+        call h5ltset_attribute_string_f(fid,"/energy","description", &
+             "Energy array", error)
+        call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
+        call h5ltset_attribute_string_f(fid,"/pitch", "description", &
+             "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
+        call h5ltset_attribute_string_f(fid,"/r","description", &
+             "Radius array", error)
+        call h5ltset_attribute_string_f(fid,"/r", "units","cm", error)
+        call h5ltset_attribute_string_f(fid,"/z","description", &
+             "Z array", error)
+        call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
+    endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description",&
@@ -6943,6 +6983,9 @@ subroutine neutron_f
     real(Float64)  :: vnet_square, factor
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
 
+    allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz))
+    neutron%weight = 0.d0
+
     nphi = 20
     maxcnt=fbm%nr*fbm%nz
     inv_maxcnt = 100.d0/maxcnt
@@ -6962,13 +7005,13 @@ subroutine neutron_f
             call get_fields(fields,pos=rg)
             if(.not.fields%in_plasma) cycle r_loop
 
-            factor = 2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz
+            factor = 2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/nphi
             !! Loop over energy/pitch/phi
             pitch_loop: do ip = 1, fbm%npitch
                 pitch = fbm%pitch(ip)
                 energy_loop: do ie =1, fbm%nenergy
                     eb = fbm%energy(ie)
-                    gyro_loop: do iphi=1, nphi 
+                    gyro_loop: do iphi=1, nphi
                         call gyro_correction(fields,rg,eb,pitch,ri,vi)
 
                         !! Get plasma parameters at particle position
@@ -6981,10 +7024,12 @@ subroutine neutron_f
 
                         !! Get neutron production rate
                         call get_neutron_rate(plasma, erel, rate)
+                        neutron%weight(ie,ip,ir,iz) = neutron%weight(ie,ip,ir,iz) &
+                                                    + rate*factor
                         rate = rate*fbm%f(ie,ip,ir,iz)*factor
 
                         !! Store neutrons
-                        call store_neutrons(rate/nphi)
+                        call store_neutrons(rate)
                     enddo gyro_loop
                 enddo energy_loop
             enddo pitch_loop

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.3% of total for procedures.">22 statements</a>
+	  title=" 0.2% of total for procedures.">22 statements</a>
      </li> 
      
      
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -917,181 +945,181 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
 <!-- Title: proc~~store_fw_photons~~CallsGraph Pages: 1 -->
-<svg id="procstore_fw_photonsCallsGraph" width="641pt" height="188pt"
- viewBox="0.00 0.00 641.00 188.02" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~store_fw_photons~~CallsGraph" class="graph" transform="scale(0.793317 0.793317) rotate(0) translate(4 233)">
+<svg id="procstore_fw_photonsCallsGraph" width="641pt" height="132pt"
+ viewBox="0.00 0.00 641.00 131.69" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~store_fw_photons~~CallsGraph" class="graph" transform="scale(0.793317 0.793317) rotate(0) translate(4 162)">
 <title>proc~~store_fw_photons~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-233 805,-233 805,5 -4,5"/>
+<polygon fill="white" stroke="white" points="-4,5 -4,-162 805,-162 805,5 -4,5"/>
 <!-- proc~store_fw_photons -->
 <g id="node1" class="node"><title>proc~store_fw_photons</title>
-<polygon fill="none" stroke="black" points="97,-185 1,-185 1,-159 97,-159 97,-185"/>
-<text text-anchor="middle" x="49" y="-169.55" font-family="Helvetica,sans-Serif" font-size="10.50">store_fw_photons</text>
+<polygon fill="none" stroke="black" points="97,-103 1,-103 1,-77 97,-77 97,-103"/>
+<text text-anchor="middle" x="49" y="-87.55" font-family="Helvetica,sans-Serif" font-size="10.50">store_fw_photons</text>
 </g>
 <!-- proc~get_indices -->
 <g id="node2" class="node"><title>proc~get_indices</title>
 <a xlink:href="../proc/get_indices.html" xlink:title="get_indices">
-<polygon fill="#d9534f" stroke="#d9534f" points="238,-229 172,-229 172,-203 238,-203 238,-229"/>
-<text text-anchor="middle" x="205" y="-213.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="238,-147 172,-147 172,-121 238,-121 238,-147"/>
+<text text-anchor="middle" x="205" y="-131.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
 </a>
 </g>
 <!-- proc~store_fw_photons&#45;&gt;proc~get_indices -->
 <g id="edge26" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~get_indices</title>
-<path fill="none" stroke="#000000" d="M95.3828,-185.082C116.377,-191.004 141.049,-197.963 161.665,-203.777"/>
-<polygon fill="#000000" stroke="#000000" points="160.852,-207.184 171.426,-206.53 162.752,-200.447 160.852,-207.184"/>
-</g>
-<!-- proc~store_fw_photons_at_chan -->
-<g id="node3" class="node"><title>proc~store_fw_photons_at_chan</title>
-<a xlink:href="../proc/store_fw_photons_at_chan.html" xlink:title="store_fw_photons_at_chan">
-<polygon fill="#d9534f" stroke="#d9534f" points="276,-185 134,-185 134,-159 276,-159 276,-185"/>
-<text text-anchor="middle" x="205" y="-169.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons_at_chan</text>
-</a>
-</g>
-<!-- proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan -->
-<g id="edge28" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan</title>
-<path fill="none" stroke="#000000" d="M97.5042,-172C105.887,-172 114.803,-172 123.777,-172"/>
-<polygon fill="#000000" stroke="#000000" points="123.906,-175.5 133.906,-172 123.906,-168.5 123.906,-175.5"/>
+<path fill="none" stroke="#000000" d="M95.3828,-103.082C116.377,-109.004 141.049,-115.963 161.665,-121.777"/>
+<polygon fill="#000000" stroke="#000000" points="160.852,-125.184 171.426,-124.53 162.752,-118.447 160.852,-125.184"/>
 </g>
 <!-- proc~get_fields -->
-<g id="node4" class="node"><title>proc~get_fields</title>
+<g id="node3" class="node"><title>proc~get_fields</title>
 <a xlink:href="../proc/get_fields.html" xlink:title="get_fields">
-<polygon fill="#d9534f" stroke="#d9534f" points="234,-119 176,-119 176,-93 234,-93 234,-119"/>
-<text text-anchor="middle" x="205" y="-103.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="234,-103 176,-103 176,-77 234,-77 234,-103"/>
+<text text-anchor="middle" x="205" y="-87.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
 </a>
 </g>
 <!-- proc~store_fw_photons&#45;&gt;proc~get_fields -->
-<g id="edge30" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~get_fields</title>
-<path fill="none" stroke="#000000" d="M79.8206,-158.961C104.653,-148.455 139.704,-133.625 166.402,-122.33"/>
-<polygon fill="#000000" stroke="#000000" points="167.98,-125.463 175.826,-118.343 165.253,-119.016 167.98,-125.463"/>
+<g id="edge28" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M97.5042,-90C119.387,-90 144.903,-90 165.583,-90"/>
+<polygon fill="#000000" stroke="#000000" points="165.609,-93.5001 175.609,-90 165.609,-86.5001 165.609,-93.5001"/>
 </g>
-<!-- proc~spectrum -->
-<g id="node5" class="node"><title>proc~spectrum</title>
-<a xlink:href="../proc/spectrum.html" xlink:title="spectrum">
-<polygon fill="#d9534f" stroke="#d9534f" points="390,-196 334,-196 334,-170 390,-170 390,-196"/>
-<text text-anchor="middle" x="362" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spectrum</text>
+<!-- proc~store_fw_photons_at_chan -->
+<g id="node4" class="node"><title>proc~store_fw_photons_at_chan</title>
+<a xlink:href="../proc/store_fw_photons_at_chan.html" xlink:title="store_fw_photons_at_chan">
+<polygon fill="#d9534f" stroke="#d9534f" points="276,-48 134,-48 134,-22 276,-22 276,-48"/>
+<text text-anchor="middle" x="205" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons_at_chan</text>
 </a>
 </g>
-<!-- proc~store_fw_photons_at_chan&#45;&gt;proc~spectrum -->
-<g id="edge2" class="edge"><title>proc~store_fw_photons_at_chan&#45;&gt;proc~spectrum</title>
-<path fill="none" stroke="#000000" d="M276.15,-176.985C292.184,-178.108 308.631,-179.261 322.783,-180.252"/>
-<polygon fill="#000000" stroke="#000000" points="322.892,-183.768 333.112,-180.976 323.381,-176.786 322.892,-183.768"/>
+<!-- proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan -->
+<g id="edge30" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan</title>
+<path fill="none" stroke="#000000" d="M85.9698,-76.9658C107.65,-69.322 135.243,-59.5939 158.402,-51.4288"/>
+<polygon fill="#000000" stroke="#000000" points="159.758,-54.6618 168.026,-48.0359 157.431,-48.0601 159.758,-54.6618"/>
 </g>
 <!-- proc~get_position -->
-<g id="node7" class="node"><title>proc~get_position</title>
+<g id="node5" class="node"><title>proc~get_position</title>
 <a xlink:href="../proc/get_position.html" xlink:title="get_position">
-<polygon fill="#d9534f" stroke="#d9534f" points="397,-152 327,-152 327,-126 397,-126 397,-152"/>
-<text text-anchor="middle" x="362" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="397,-158 327,-158 327,-132 397,-132 397,-158"/>
+<text text-anchor="middle" x="362" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
 </a>
 </g>
 <!-- proc~get_fields&#45;&gt;proc~get_position -->
-<g id="edge20" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
-<path fill="none" stroke="#000000" d="M234.163,-112.13C257.438,-117.022 290.445,-123.96 317.089,-129.56"/>
-<polygon fill="#000000" stroke="#000000" points="316.449,-133.002 326.955,-131.634 317.889,-126.152 316.449,-133.002"/>
+<g id="edge18" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="#000000" d="M234.158,-98.5616C247.046,-102.467 262.343,-107.27 276,-112 290.488,-117.018 306.186,-122.906 320.156,-128.309"/>
+<polygon fill="#000000" stroke="#000000" points="318.927,-131.586 329.516,-131.955 321.468,-125.063 318.927,-131.586"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="node6" class="node"><title>proc~in_plasma</title>
+<a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="392,-114 332,-114 332,-88 392,-88 392,-114"/>
+<text text-anchor="middle" x="362" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
+<g id="edge20" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M234.163,-92.0432C258.696,-93.7621 294.041,-96.2386 321.351,-98.152"/>
+<polygon fill="#000000" stroke="#000000" points="321.165,-101.647 331.385,-98.855 321.654,-94.6646 321.165,-101.647"/>
 </g>
 <!-- proc~calc_perp_vectors -->
-<g id="node8" class="node"><title>proc~calc_perp_vectors</title>
+<g id="node7" class="node"><title>proc~calc_perp_vectors</title>
 <a xlink:href="../proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
-<polygon fill="#d9534f" stroke="#d9534f" points="412,-108 312,-108 312,-82 412,-82 412,-108"/>
-<text text-anchor="middle" x="362" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="412,-70 312,-70 312,-44 412,-44 412,-70"/>
+<text text-anchor="middle" x="362" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
 </a>
 </g>
 <!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
 <g id="edge22" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
-<path fill="none" stroke="#000000" d="M234.163,-103.957C253.088,-102.631 278.448,-100.854 301.589,-99.2326"/>
-<polygon fill="#000000" stroke="#000000" points="301.958,-102.715 311.689,-98.525 301.469,-95.7325 301.958,-102.715"/>
+<path fill="none" stroke="#000000" d="M234.163,-83.8703C253.173,-79.8745 278.675,-74.5141 301.9,-69.6324"/>
+<polygon fill="#000000" stroke="#000000" points="302.623,-73.0571 311.689,-67.5749 301.183,-66.2068 302.623,-73.0571"/>
 </g>
-<!-- proc~in_plasma -->
-<g id="node9" class="node"><title>proc~in_plasma</title>
-<a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
-<polygon fill="#d9534f" stroke="#d9534f" points="392,-64 332,-64 332,-38 392,-38 392,-64"/>
-<text text-anchor="middle" x="362" y="-48.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+<!-- proc~spectrum -->
+<g id="node25" class="node"><title>proc~spectrum</title>
+<a xlink:href="../proc/spectrum.html" xlink:title="spectrum">
+<polygon fill="#d9534f" stroke="#d9534f" points="390,-26 334,-26 334,-1.24345e-14 390,-3.55271e-15 390,-26"/>
+<text text-anchor="middle" x="362" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spectrum</text>
 </a>
 </g>
-<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
-<g id="edge24" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M234.163,-95.7838C258.804,-87.1515 294.353,-74.698 321.712,-65.1137"/>
-<polygon fill="#000000" stroke="#000000" points="323.105,-68.3343 331.385,-61.7249 320.79,-61.728 323.105,-68.3343"/>
+<!-- proc~store_fw_photons_at_chan&#45;&gt;proc~spectrum -->
+<g id="edge24" class="edge"><title>proc~store_fw_photons_at_chan&#45;&gt;proc~spectrum</title>
+<path fill="none" stroke="#000000" d="M276.15,-25.0299C292.341,-22.7611 308.953,-20.4333 323.198,-18.4372"/>
+<polygon fill="#000000" stroke="#000000" points="323.695,-21.9019 333.112,-17.048 322.723,-14.9696 323.695,-21.9019"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="node8" class="node"><title>proc~xyz_to_uvw</title>
+<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="521,-136 453,-136 453,-110 521,-110 521,-136"/>
+<text text-anchor="middle" x="487" y="-120.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="edge14" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M392.578,-106.382C407.662,-109.036 426.136,-112.288 442.731,-115.209"/>
+<polygon fill="#000000" stroke="#000000" points="442.318,-118.69 452.773,-116.976 443.532,-111.796 442.318,-118.69"/>
 </g>
 <!-- interface~interpol_coeff -->
-<g id="node10" class="node"><title>interface~interpol_coeff</title>
+<g id="node9" class="node"><title>interface~interpol_coeff</title>
 <a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="525,-86 449,-86 449,-60 525,-60 525,-86"/>
-<text text-anchor="middle" x="487" y="-70.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="525,-92 449,-92 449,-66 525,-66 525,-92"/>
+<text text-anchor="middle" x="487" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
 </a>
 </g>
 <!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
 <g id="edge16" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M392.578,-56.3818C406.334,-58.8027 422.909,-61.72 438.307,-64.4301"/>
-<polygon fill="#000000" stroke="#000000" points="437.759,-67.8873 448.215,-66.1738 438.973,-60.9933 437.759,-67.8873"/>
-</g>
-<!-- proc~xyz_to_uvw -->
-<g id="node11" class="node"><title>proc~xyz_to_uvw</title>
-<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="521,-42 453,-42 453,-16 521,-16 521,-42"/>
-<text text-anchor="middle" x="487" y="-26.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
-</a>
-</g>
-<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
-<g id="edge18" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M392.578,-45.6182C407.662,-42.9635 426.136,-39.7121 442.731,-36.7914"/>
-<polygon fill="#000000" stroke="#000000" points="443.532,-40.2043 452.773,-35.0239 442.318,-33.3103 443.532,-40.2043"/>
+<path fill="none" stroke="#000000" d="M392.578,-95.6182C406.334,-93.1973 422.909,-90.28 438.307,-87.5699"/>
+<polygon fill="#000000" stroke="#000000" points="438.973,-91.0067 448.215,-85.8262 437.759,-84.1127 438.973,-91.0067"/>
 </g>
 <!-- proc~interpol2d_coeff_arr -->
-<g id="node12" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="node10" class="node"><title>proc~interpol2d_coeff_arr</title>
 <a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="672,-146 562,-146 562,-120 672,-120 672,-146"/>
-<text text-anchor="middle" x="617" y="-130.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="672,-154 562,-154 562,-128 672,-128 672,-154"/>
+<text text-anchor="middle" x="617" y="-138.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M515.208,-86.0191C533.903,-94.6477 558.653,-106.071 579.067,-115.492"/>
-<polygon fill="#000000" stroke="#000000" points="577.852,-118.786 588.398,-119.799 580.785,-112.431 577.852,-118.786"/>
+<g id="edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M514.57,-92.1486C533.701,-101.273 559.395,-113.527 580.263,-123.479"/>
+<polygon fill="#000000" stroke="#000000" points="578.937,-126.725 589.47,-127.87 581.951,-120.406 578.937,-126.725"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="node11" class="node"><title>proc~interpol1d_coeff_arr</title>
+<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="672,-72 562,-72 562,-46 672,-46 672,-72"/>
+<text text-anchor="middle" x="617" y="-56.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.652,-73.0535C533.918,-71.7819 542.868,-70.4049 551.822,-69.0273"/>
+<polygon fill="#000000" stroke="#000000" points="552.546,-72.4572 561.898,-67.4773 551.482,-65.5386 552.546,-72.4572"/>
 </g>
 <!-- proc~interpol1d_coeff -->
-<g id="node13" class="node"><title>proc~interpol1d_coeff</title>
+<g id="node12" class="node"><title>proc~interpol1d_coeff</title>
 <a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="799,-55 709,-55 709,-29 799,-29 799,-55"/>
-<text text-anchor="middle" x="754" y="-39.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="799,-61 709,-61 709,-35 799,-35 799,-61"/>
+<text text-anchor="middle" x="754" y="-45.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
 <g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.539,-68.5254C570.894,-63.2595 646.569,-54.4733 698.301,-48.4669"/>
-<polygon fill="#000000" stroke="#000000" points="698.783,-51.9346 708.313,-47.3045 697.976,-44.9813 698.783,-51.9346"/>
-</g>
-<!-- proc~interpol1d_coeff_arr -->
-<g id="node14" class="node"><title>proc~interpol1d_coeff_arr</title>
-<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="672,-26 562,-26 562,-1.24345e-14 672,-3.55271e-15 672,-26"/>
-<text text-anchor="middle" x="617" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M515.208,-59.9809C533.903,-51.3523 558.653,-39.9293 579.067,-30.5076"/>
-<polygon fill="#000000" stroke="#000000" points="580.785,-33.5694 588.398,-26.2009 577.852,-27.2137 580.785,-33.5694"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M504.372,-65.8593C518.901,-55.7428 540.629,-42.5765 562,-37 606.781,-25.3151 659.358,-29.5089 698.159,-35.8119"/>
+<polygon fill="#000000" stroke="#000000" points="697.768,-39.2958 708.216,-37.5423 698.955,-32.3972 697.768,-39.2958"/>
 </g>
 <!-- proc~interpol2d_coeff -->
-<g id="node15" class="node"><title>proc~interpol2d_coeff</title>
+<g id="node13" class="node"><title>proc~interpol2d_coeff</title>
 <a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="799,-116 709,-116 709,-90 799,-90 799,-116"/>
-<text text-anchor="middle" x="754" y="-100.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="799,-124 709,-124 709,-98 799,-98 799,-124"/>
+<text text-anchor="middle" x="754" y="-108.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge14" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.539,-77.3302C570.894,-82.4263 646.569,-90.9291 698.301,-96.7417"/>
-<polygon fill="#000000" stroke="#000000" points="697.984,-100.228 708.313,-97.8666 698.766,-93.2718 697.984,-100.228"/>
+<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.539,-83.6189C570.894,-89.0547 646.569,-98.1244 698.301,-104.325"/>
+<polygon fill="#000000" stroke="#000000" points="697.967,-107.809 708.313,-105.524 698.8,-100.859 697.967,-107.809"/>
 </g>
 <!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge4" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M672.328,-120.884C680.868,-119.014 689.693,-117.082 698.242,-115.21"/>
-<polygon fill="#000000" stroke="#000000" points="699.099,-118.605 708.119,-113.047 697.602,-111.767 699.099,-118.605"/>
+<g id="edge2" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M672.328,-128.884C680.868,-127.014 689.693,-125.082 698.242,-123.21"/>
+<polygon fill="#000000" stroke="#000000" points="699.099,-126.605 708.119,-121.047 697.602,-119.767 699.099,-126.605"/>
 </g>
 <!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge6" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M672.328,-24.7118C680.868,-26.5196 689.693,-28.3875 698.242,-30.1972"/>
-<polygon fill="#000000" stroke="#000000" points="697.611,-33.6411 708.119,-32.288 699.061,-26.7929 697.611,-33.6411"/>
+<g id="edge4" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M672.328,-54.5576C680.776,-53.8793 689.501,-53.1788 697.963,-52.4993"/>
+<polygon fill="#000000" stroke="#000000" points="698.431,-55.9731 708.119,-51.6839 697.871,-48.9955 698.431,-55.9731"/>
 </g>
 </g>
 </svg>
@@ -1483,6 +1511,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1514,6 +1544,12 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1584,6 +1620,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1714,6 +1752,10 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1871,11 +1913,13 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1891,7 +1935,7 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1927,6 +1971,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1937,6 +1983,10 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1946,6 +1996,10 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1960,6 +2014,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       

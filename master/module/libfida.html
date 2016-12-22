@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="53.6% of total for modules and submodules.">4787 statements</a>
+	  title="52.1% of total for modules and submodules.">5040 statements</a>
      </li> 
      
      
@@ -172,7 +172,7 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-charlim">charlim</a>
       
-      <a class="list-group-item" href="../module/libfida.html#variable-namelist_file%7E7">namelist_file</a>
+      <a class="list-group-item" href="../module/libfida.html#variable-namelist_file%7E11">namelist_file</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nbif_type">nbif_type</a>
       
@@ -264,6 +264,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-spec">spec</a>
       
+      <a class="list-group-item" href="../module/libfida.html#variable-neutron">neutron</a>
+      
       <a class="list-group-item" href="../module/libfida.html#variable-fweight">fweight</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nweight">nweight</a>
@@ -339,6 +341,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-atomicrates">AtomicRates</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-nuclearrates">NuclearRates</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-atomictables">AtomicTables</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-lineofsight">LineOfSight</a>
@@ -360,6 +364,8 @@
       <a class="list-group-item" href="../module/libfida.html#type-birthprofile">BirthProfile</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-spectra">Spectra</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#type-neutronrate">NeutronRate</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-neutraldensity">NeutralDensity</a>
       
@@ -483,9 +489,11 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_distribution">read_distribution</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-read_cross">read_cross</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_cross">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-read_rates">read_rates</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_rates">read_atomic_rates</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-read_nuclear_rates">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_tables">read_tables</a>
       
@@ -500,6 +508,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-write_npa">write_npa</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_spectra">write_spectra</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-write_neutrons">write_neutrons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_fida_weights">write_fida_weights</a>
       
@@ -565,6 +575,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-neut_rates">neut_rates</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-get_neutron_rate">get_neutron_rate</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-get_beam_cx_prob">get_beam_cx_prob</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_rate_matrix">get_rate_matrix</a>
@@ -578,6 +590,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-store_bes_photons">store_bes_photons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_fida_photons">store_fida_photons</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-store_neutrons">store_neutrons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_fw_photons_at_chan">store_fw_photons_at_chan</a>
       
@@ -612,6 +626,10 @@
       <a class="list-group-item" href="../module/libfida.html#proc-npa_f">npa_f</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-npa_mc">npa_mc</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-neutron_f">neutron_f</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-neutron_mc">neutron_mc</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-fida_weights_mc">fida_weights_mc</a>
       
@@ -693,13 +711,13 @@
 <polygon fill="none" stroke="black" points="254,-111 200,-111 200,-85 254,-85 254,-111"/>
 <text text-anchor="middle" x="227" y="-95.55" font-family="Helvetica,sans-Serif" font-size="10.50">libfida</text>
 </g>
-<!-- H5LT -->
-<g id="node2" class="node"><title>H5LT</title>
+<!-- HDF5 -->
+<g id="node2" class="node"><title>HDF5</title>
 <polygon fill="#337ab7" stroke="#337ab7" points="54,-184 2.13163e-14,-184 0,-158 54,-158 54,-184"/>
-<text text-anchor="middle" x="27" y="-168.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">H5LT</text>
+<text text-anchor="middle" x="27" y="-168.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HDF5</text>
 </g>
-<!-- H5LT&#45;&gt;module~libfida -->
-<g id="edge8" class="edge"><title>H5LT&#45;&gt;module~libfida</title>
+<!-- HDF5&#45;&gt;module~libfida -->
+<g id="edge8" class="edge"><title>HDF5&#45;&gt;module~libfida</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.1097,-174.403C82.7765,-176.806 128.652,-177.174 164,-161 183.871,-151.908 200.996,-133.665 212.355,-119.14"/>
 <polygon fill="#000000" stroke="#000000" points="215.17,-121.22 218.353,-111.114 209.563,-117.029 215.17,-121.22"/>
 </g>
@@ -710,8 +728,8 @@
 <text text-anchor="middle" x="127" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_extra</text>
 </a>
 </g>
-<!-- H5LT&#45;&gt;module~hdf5_extra -->
-<g id="edge4" class="edge"><title>H5LT&#45;&gt;module~hdf5_extra</title>
+<!-- HDF5&#45;&gt;module~hdf5_extra -->
+<g id="edge4" class="edge"><title>HDF5&#45;&gt;module~hdf5_extra</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0614,-162.34C63.7157,-159.251 74.8267,-155.695 85.4187,-152.306"/>
 <polygon fill="#000000" stroke="#000000" points="86.486,-155.639 94.9435,-149.258 84.3525,-148.972 86.486,-155.639"/>
 </g>
@@ -727,18 +745,18 @@
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.916,-70.0854C168.878,-74.1701 179.948,-78.7087 190.217,-82.9188"/>
 <polygon fill="#000000" stroke="#000000" points="189.174,-86.2739 199.754,-86.8292 191.829,-79.7972 189.174,-86.2739"/>
 </g>
-<!-- HDF5 -->
-<g id="node4" class="node"><title>HDF5</title>
+<!-- H5LT -->
+<g id="node4" class="node"><title>H5LT</title>
 <polygon fill="#337ab7" stroke="#337ab7" points="54,-123 2.13163e-14,-123 0,-97 54,-97 54,-123"/>
-<text text-anchor="middle" x="27" y="-107.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HDF5</text>
+<text text-anchor="middle" x="27" y="-107.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">H5LT</text>
 </g>
-<!-- HDF5&#45;&gt;module~libfida -->
-<g id="edge12" class="edge"><title>HDF5&#45;&gt;module~libfida</title>
+<!-- H5LT&#45;&gt;module~libfida -->
+<g id="edge12" class="edge"><title>H5LT&#45;&gt;module~libfida</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.3898,-108.357C89.4729,-106.252 150.425,-102.594 189.717,-100.237"/>
 <polygon fill="#000000" stroke="#000000" points="190.169,-103.716 199.941,-99.6235 189.749,-96.7288 190.169,-103.716"/>
 </g>
-<!-- HDF5&#45;&gt;module~hdf5_extra -->
-<g id="edge6" class="edge"><title>HDF5&#45;&gt;module~hdf5_extra</title>
+<!-- H5LT&#45;&gt;module~hdf5_extra -->
+<g id="edge6" class="edge"><title>H5LT&#45;&gt;module~hdf5_extra</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0614,-117.848C63.6172,-120.619 74.6001,-123.804 85.0943,-126.847"/>
 <polygon fill="#000000" stroke="#000000" points="84.3644,-130.28 94.9435,-129.704 86.3141,-123.557 84.3644,-130.28"/>
 </g>
@@ -961,7 +979,7 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-charlim">charlim</a>
       
-      <a class="list-group-item" href="../module/libfida.html#variable-namelist_file%7E7">namelist_file</a>
+      <a class="list-group-item" href="../module/libfida.html#variable-namelist_file%7E11">namelist_file</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nbif_type">nbif_type</a>
       
@@ -1053,6 +1071,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#variable-spec">spec</a>
       
+      <a class="list-group-item" href="../module/libfida.html#variable-neutron">neutron</a>
+      
       <a class="list-group-item" href="../module/libfida.html#variable-fweight">fweight</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nweight">nweight</a>
@@ -1128,6 +1148,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-atomicrates">AtomicRates</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-nuclearrates">NuclearRates</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-atomictables">AtomicTables</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-lineofsight">LineOfSight</a>
@@ -1149,6 +1171,8 @@
       <a class="list-group-item" href="../module/libfida.html#type-birthprofile">BirthProfile</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-spectra">Spectra</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#type-neutronrate">NeutronRate</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-neutraldensity">NeutralDensity</a>
       
@@ -1272,9 +1296,11 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_distribution">read_distribution</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-read_cross">read_cross</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_cross">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-read_rates">read_rates</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_rates">read_atomic_rates</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-read_nuclear_rates">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_tables">read_tables</a>
       
@@ -1289,6 +1315,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-write_npa">write_npa</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_spectra">write_spectra</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-write_neutrons">write_neutrons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-write_fida_weights">write_fida_weights</a>
       
@@ -1354,6 +1382,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-neut_rates">neut_rates</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-get_neutron_rate">get_neutron_rate</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-get_beam_cx_prob">get_beam_cx_prob</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_rate_matrix">get_rate_matrix</a>
@@ -1367,6 +1397,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-store_bes_photons">store_bes_photons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_fida_photons">store_fida_photons</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-store_neutrons">store_neutrons</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_fw_photons_at_chan">store_fw_photons_at_chan</a>
       
@@ -1401,6 +1433,10 @@
       <a class="list-group-item" href="../module/libfida.html#proc-npa_f">npa_f</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-npa_mc">npa_mc</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-neutron_f">neutron_f</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-neutron_mc">neutron_mc</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-fida_weights_mc">fida_weights_mc</a>
       
@@ -1472,7 +1508,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-namelist_file%7E7"></span>character(len=charlim),</td>
+  <td><span class="anchor" id="variable-namelist_file%7E11"></span>character(len=charlim),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -2107,6 +2143,20 @@
   <td>public,</td>
   <td>save</td><td>::</td>
   <td><strong>spec</strong></td><td></td><td></td><td><p>Variable for storing the calculated spectra</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-neutron"></span>type(<a href='../type/neutronrate.html'>NeutronRate</a>),</td>
+  
+  <td>public,</td>
+  <td>save</td><td>::</td>
+  <td><strong>neutron</strong></td><td></td><td></td><td><p>Variable for storing the neutron rate</p></td>
   
 </tr>
 
@@ -7481,6 +7531,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-n_tot"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>n_tot</strong></td><td> =</td><td>0.d0</td><td><p>Total Number of fast-ions</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-energy"></span>real(kind=Float64),</td>
   
   <td>public,</td>
@@ -8633,6 +8697,207 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
      
 	   
 <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-nuclearrates"></span><h3>type, public :: <a href='../type/nuclearrates.html'>NuclearRates</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Nuclear reaction rates</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nbranch"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nbranch</strong></td><td> =</td><td>1</td><td><p>Number of reaction branches</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nenergy%7E4"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nenergy</strong></td><td> =</td><td>1</td><td><p>Number of beam energies</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logemin%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logemin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum energy</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logemax%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logemax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum energy</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ntemp%7E2"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ntemp</strong></td><td> =</td><td>1</td><td><p>Number of target temperatures</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logtmin%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logtmin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum temperature</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logtmax%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logtmax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum temperature</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dloge%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dlogE</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 energy spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dlogt%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dlogT</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 temperature spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-minlog_rate"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>minlog_rate</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum reaction rate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-bt_amu"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(2)</td><td>::</td>
+  <td><strong>bt_amu</strong></td><td> =</td><td>0.d0</td><td><p>Isotope mass of beam and thermal ions respectively [amu]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-log_rate"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>log_rate</strong></td><td></td><td></td><td><p>Log-10 reaction rates: log_rate(energy, temperature, branch)</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="type-atomictables"></span><h3>type, public :: <a href='../type/atomictables.html'>AtomicTables</a>
     
   </h3></div>
@@ -8720,6 +8985,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public,</td>
   <td>dimension(nlevs,nlevs)</td><td>::</td>
   <td><strong>einstein</strong></td><td></td><td></td><td><p>Einstein coefficients for spontaneous emission</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-d_d"></span>type(<a href='../type/nuclearrates.html'>NuclearRates</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>D_D</strong></td><td></td><td></td><td><p>Deuterium-Deuterium reaction rates</p></td>
   
 </tr>
 
@@ -9146,11 +9425,39 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-pitch%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>pitch</strong></td><td> =</td><td>-2.d0</td><td><p>Pitch</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-eff_rd"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(3)</td><td>::</td>
   <td><strong>eff_rd</strong></td><td> =</td><td>0.d0</td><td><p>Effective position of detector</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dir"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>dir</strong></td><td> =</td><td>0.d0</td><td><p>Trajectory direction</p></td>
   
 </tr>
 
@@ -9422,7 +9729,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-pitch%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-pitch%7E4"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -9516,6 +9823,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>nloop</strong></td><td> =</td><td>1000</td><td><p>Increases number of MC markers by factor of <code>nloop</code></p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nenergy%7E5"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nenergy</strong></td><td> =</td><td>100</td><td><p>Number of energy values</p></td>
   
 </tr>
 
@@ -9750,6 +10071,53 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public,</td>
   <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>fida</strong></td><td></td><td></td><td><p>FIDA emission: fida(lambda,chan,orbit_type)</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-neutronrate"></span><h3>type, public :: <a href='../type/neutronrate.html'>NeutronRate</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Neutron storage structure</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rate"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>rate</strong></td><td></td><td></td><td><p>Neutron rate: rate(orbit_type) [neutrons/sec]</p></td>
   
 </tr>
 
@@ -10331,6 +10699,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>calc_birth</strong></td><td></td><td></td><td><p>Calculate birth profile: 0 = off, 1=on</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_neutron"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>calc_neutron</strong></td><td></td><td></td><td><p>Calculate neutron flux: 0 = off, 1=on</p></td>
   
 </tr>
 
@@ -14023,8 +14405,8 @@ public subroutine <a href='../proc/read_distribution.html'>read_distribution</a>
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-read_cross"></span><h3>
-public subroutine <a href='../proc/read_cross.html'>read_cross</a>(fid, grp, cross)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-read_atomic_cross"></span><h3>
+public subroutine <a href='../proc/read_atomic_cross.html'>read_atomic_cross</a>(fid, grp, cross)
     
     
 	 
@@ -14113,8 +14495,8 @@ public subroutine <a href='../proc/read_cross.html'>read_cross</a>(fid, grp, cro
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-read_rates"></span><h3>
-public subroutine <a href='../proc/read_rates.html'>read_rates</a>(fid, grp, b_amu, t_amu, rates)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-read_atomic_rates"></span><h3>
+public subroutine <a href='../proc/read_atomic_rates.html'>read_atomic_rates</a>(fid, grp, b_amu, t_amu, rates)
     
     
 	 
@@ -14129,7 +14511,7 @@ public subroutine <a href='../proc/read_rates.html'>read_rates</a>(fid, grp, b_a
 
 
 
-<p>Reads in a reaction rates table from file
+<p>Reads in a atomic reaction rates table from file
  and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
     
     <h4>Arguments</h4>
@@ -14212,6 +14594,96 @@ public subroutine <a href='../proc/read_rates.html'>read_rates</a>(fid, grp, b_a
 <tr>
   
   <td><span class="anchor" ></span>type(<a href='../type/atomicrates.html'>AtomicRates</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rates</strong></td><td><p>Atomic reaction rates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-read_nuclear_rates"></span><h3>
+public subroutine <a href='../proc/read_nuclear_rates.html'>read_nuclear_rates</a>(fid, grp, rates)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Reads in a nuclear reaction rates table from file
+ and puts it into a <a href="../type/nuclearrates.html">NuclearRates</a> type</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=HID_T),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fid</strong></td><td><p>HDF5 file ID</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grp</strong></td><td><p>HDF5 group to read from</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/nuclearrates.html'>NuclearRates</a>),</td>
   <td>intent(inout)</td>
   <td></td>
   
@@ -14474,6 +14946,36 @@ public subroutine <a href='../proc/write_spectra.html'>write_spectra</a>()
 
 
 <p>Writes <a href="../module/libfida.html#type-spectra">Spectra</a> to a HDF5 file</p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-write_neutrons"></span><h3>
+public subroutine <a href='../proc/write_neutrons.html'>write_neutrons</a>()
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Writes <a href="../module/libfida.html#variable-neutron">neutron</a> to a HDF5 file</p>
     
     <h4>Arguments</h4>
     
@@ -17955,6 +18457,95 @@ public subroutine <a href='../proc/neut_rates.html'>neut_rates</a>(denn, vi, vn,
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_neutron_rate"></span><h3>
+public subroutine <a href='../proc/get_neutron_rate.html'>get_neutron_rate</a>(plasma, eb, rate)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Gets neutron rate for a beam with energy <code>eb</code> interacting with a target plasma</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>plasma</strong></td><td><p>Plasma Paramters</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>eb</strong></td><td><p>Beam energy [keV]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rate</strong></td><td><p>Neutron reaction rate [1/s]</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-get_beam_cx_prob"></span><h3>
 public subroutine <a href='../proc/get_beam_cx_prob.html'>get_beam_cx_prob</a>(ind, pos, v_ion, types, prob)
     
@@ -18787,6 +19378,80 @@ public subroutine <a href='../proc/store_fida_photons.html'>store_fida_photons</
   
   <td></td><td>::</td>
   <td><strong>photons</strong></td><td><p>Photons from <a href="../module/libfida.html#proc-colrad">colrad</a> [Ph/(s*cm^3)]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>orbit_class</strong></td><td><p>Orbit class ID</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-store_neutrons"></span><h3>
+public subroutine <a href='../proc/store_neutrons.html'>store_neutrons</a>(rate, orbit_class)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Store neutron rate in <a href="../module/libfida.html#variable-neutron">neutron</a></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rate</strong></td><td><p>Neutron rate [neutrons/sec]</p></td>
   
 </tr>
 
@@ -20116,6 +20781,66 @@ public subroutine <a href='../proc/npa_mc.html'>npa_mc</a>()
 
 
 <p>Calculate NPA flux using a Monte Carlo fast-ion distribution</p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-neutron_f"></span><h3>
+public subroutine <a href='../proc/neutron_f.html'>neutron_f</a>()
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculate neutron emission rate using a fast-ion distribution function F(E,p,r,z)</p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-neutron_mc"></span><h3>
+public subroutine <a href='../proc/neutron_mc.html'>neutron_mc</a>()
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculate neutron flux using a Monte Carlo Fast-ion distribution</p>
     
     <h4>Arguments</h4>
     

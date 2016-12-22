@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -826,7 +854,7 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E20"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E21"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -847,7 +875,7 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
     
 	 <h3>Return Value <small><span class="anchor" id="variable-sigma%7E41"></span>real(kind=Float64)
   </small></h3>
-    <p>Cross Section [\(cm^2\)] </p>
+    <p>Cross Section [\(cm^2\)]</p>
     
     
      <h3>Calls</h3>
@@ -994,53 +1022,53 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
 <path fill="none" stroke="#000000" d="M410.189,-35C418.058,-35 426.838,-35 435.63,-35"/>
 <polygon fill="#000000" stroke="#000000" points="435.904,-38.5001 445.904,-35 435.904,-31.5001 435.904,-38.5001"/>
 </g>
-<!-- proc~p_excit_n_m -->
-<g id="node4" class="node"><title>proc~p_excit_n_m</title>
-<a xlink:href="../proc/p_excit_n_m.html" xlink:title="p_excit_n_m">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="315,-70 243,-70 243,-44 315,-44 315,-70"/>
-<text text-anchor="middle" x="279" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_excit_n_m</text>
-</a>
-</g>
-<!-- proc~p_excit_n_m&#45;&gt;proc~p_excit_n -->
-<g id="edge6" class="edge"><title>proc~p_excit_n_m&#45;&gt;proc~p_excit_n</title>
-<path fill="none" stroke="#000000" d="M315.536,-49.1196C324.082,-47.2764 333.219,-45.3057 341.873,-43.4392"/>
-<polygon fill="#000000" stroke="#000000" points="342.708,-46.8396 351.745,-41.3098 341.232,-39.997 342.708,-46.8396"/>
-</g>
 <!-- proc~p_excit -->
-<g id="node5" class="node"><title>proc~p_excit</title>
+<g id="node4" class="node"><title>proc~p_excit</title>
 <a xlink:href="../proc/p_excit.html" xlink:title="p_excit">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="306,-26 252,-26 252,-1.24345e-14 306,-3.55271e-15 306,-26"/>
-<text text-anchor="middle" x="279" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_excit</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="306,-70 252,-70 252,-44 306,-44 306,-70"/>
+<text text-anchor="middle" x="279" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_excit</text>
 </a>
 </g>
 <!-- proc~p_excit&#45;&gt;proc~p_excit_n -->
-<g id="edge8" class="edge"><title>proc~p_excit&#45;&gt;proc~p_excit_n</title>
-<path fill="none" stroke="#000000" d="M306.066,-18.8378C316.931,-21.1811 329.669,-23.9285 341.529,-26.4867"/>
-<polygon fill="#000000" stroke="#000000" points="341.143,-29.9839 351.657,-28.671 342.619,-23.1413 341.143,-29.9839"/>
+<g id="edge6" class="edge"><title>proc~p_excit&#45;&gt;proc~p_excit_n</title>
+<path fill="none" stroke="#000000" d="M306.066,-51.1622C316.931,-48.8189 329.669,-46.0715 341.529,-43.5133"/>
+<polygon fill="#000000" stroke="#000000" points="342.619,-46.8587 351.657,-41.329 341.143,-40.0161 342.619,-46.8587"/>
+</g>
+<!-- proc~p_excit_n_m -->
+<g id="node5" class="node"><title>proc~p_excit_n_m</title>
+<a xlink:href="../proc/p_excit_n_m.html" xlink:title="p_excit_n_m">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="315,-26 243,-26 243,-1.24345e-14 315,-3.55271e-15 315,-26"/>
+<text text-anchor="middle" x="279" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_excit_n_m</text>
+</a>
+</g>
+<!-- proc~p_excit_n_m&#45;&gt;proc~p_excit_n -->
+<g id="edge8" class="edge"><title>proc~p_excit_n_m&#45;&gt;proc~p_excit_n</title>
+<path fill="none" stroke="#000000" d="M315.536,-20.8804C324.082,-22.7236 333.219,-24.6943 341.873,-26.5608"/>
+<polygon fill="#000000" stroke="#000000" points="341.232,-30.003 351.745,-28.6902 342.708,-23.1604 341.232,-30.003"/>
 </g>
 <!-- proc~write_bb_h_h -->
 <g id="node6" class="node"><title>proc~write_bb_h_h</title>
 <a xlink:href="../proc/write_bb_h_h.html" xlink:title="write_bb_H_H">
-<polygon fill="#d9534f" stroke="#d9534f" points="206,-26 126,-26 126,-1.24345e-14 206,-3.55271e-15 206,-26"/>
-<text text-anchor="middle" x="166" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_H</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="206,-70 126,-70 126,-44 206,-44 206,-70"/>
+<text text-anchor="middle" x="166" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_H</text>
 </a>
 </g>
 <!-- proc~write_bb_h_h&#45;&gt;proc~p_excit -->
 <g id="edge4" class="edge"><title>proc~write_bb_h_h&#45;&gt;proc~p_excit</title>
-<path fill="none" stroke="#000000" d="M206.158,-13C217.717,-13 230.275,-13 241.656,-13"/>
-<polygon fill="#000000" stroke="#000000" points="241.716,-16.5001 251.716,-13 241.716,-9.5001 241.716,-16.5001"/>
+<path fill="none" stroke="#000000" d="M206.158,-57C217.717,-57 230.275,-57 241.656,-57"/>
+<polygon fill="#000000" stroke="#000000" points="241.716,-60.5001 251.716,-57 241.716,-53.5001 241.716,-60.5001"/>
 </g>
 <!-- program~generate_tables -->
 <g id="node7" class="node"><title>program~generate_tables</title>
 <a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-26 4.26326e-14,-26 0,-1.24345e-14 90,-3.55271e-15 90,-26"/>
-<text text-anchor="middle" x="45" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-70 4.26326e-14,-70 0,-44 90,-44 90,-70"/>
+<text text-anchor="middle" x="45" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
 </a>
 </g>
 <!-- program~generate_tables&#45;&gt;proc~write_bb_h_h -->
 <g id="edge2" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_h</title>
-<path fill="none" stroke="#000000" d="M90.0559,-13C98.3677,-13 107.096,-13 115.555,-13"/>
-<polygon fill="#000000" stroke="#000000" points="115.693,-16.5001 125.693,-13 115.693,-9.5001 115.693,-16.5001"/>
+<path fill="none" stroke="#000000" d="M90.0559,-57C98.3677,-57 107.096,-57 115.555,-57"/>
+<polygon fill="#000000" stroke="#000000" points="115.693,-60.5001 125.693,-57 115.693,-53.5001 115.693,-60.5001"/>
 </g>
 </g>
 </svg>
@@ -1187,12 +1215,12 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span>
         <span class="c">!+ Relative collision energy [keV/amu]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
-        <span class="c">!+ Cross Section [\(cm^2\)] </span>
-  
+        <span class="c">!+ Cross Section [\(cm^2\)]</span>
+
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="mf">1.465</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span>
-  
+
     <span class="n">sigma</span> <span class="o">=</span> <span class="n">A</span><span class="o">*</span><span class="n">p_excit_2_5_janev</span><span class="p">(</span><span class="n">eb</span><span class="p">)</span>
-  
+
 <span class="k">end function </span><span class="n">p_excit_2_8_janev</span>
 </pre></div>
 
@@ -1304,6 +1332,8 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1335,6 +1365,12 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1405,6 +1441,8 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1535,6 +1573,10 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1692,11 +1734,13 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1712,7 +1756,7 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1748,6 +1792,8 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1758,6 +1804,10 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1767,6 +1817,10 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1781,6 +1835,8 @@ the \(n=2\) state to the \(m=8\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       

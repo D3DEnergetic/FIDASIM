@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 1.2% of total for derived types.</p>Including implementation: 4 statements,  1.2% of total for derived types.">4 statements</a>
+	  title="<p> 1.7% of total for derived types.</p>Including implementation: 6 statements,  1.7% of total for derived types.">6 statements</a>
      </li> 
      
      
@@ -172,7 +172,11 @@
       
       <a class="list-group-item" href="../type/npaprobability.html#variable-p">p</a>
       
+      <a class="list-group-item" href="../type/npaprobability.html#variable-pitch%7E3">pitch</a>
+      
       <a class="list-group-item" href="../type/npaprobability.html#variable-eff_rd">eff_rd</a>
+      
+      <a class="list-group-item" href="../type/npaprobability.html#variable-dir">dir</a>
       
     </div>
   </div>
@@ -252,6 +256,8 @@
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
       
+      <a class="list-group-item" href="../type/neutronrate.html">NeutronRate</a>
+      
       <a class="list-group-item" href="../type/npachords.html">NPAChords</a>
       
       <a class="list-group-item" href="../type/npadetector.html">NPADetector</a>
@@ -263,6 +269,8 @@
       <a class="list-group-item" href="../type/nparesults.html">NPAResults</a>
       
       <a class="list-group-item" href="../type/npaweights.html">NPAWeights</a>
+      
+      <a class="list-group-item" href="../type/nuclearrates.html">NuclearRates</a>
       
       <a class="list-group-item" href="../type/particletrack.html">ParticleTrack</a>
       
@@ -385,7 +393,11 @@
       
       <a class="list-group-item" href="../type/npaprobability.html#variable-p">p</a>
       
+      <a class="list-group-item" href="../type/npaprobability.html#variable-pitch%7E3">pitch</a>
+      
       <a class="list-group-item" href="../type/npaprobability.html#variable-eff_rd">eff_rd</a>
+      
+      <a class="list-group-item" href="../type/npaprobability.html#variable-dir">dir</a>
       
     </div>
   </div>
@@ -453,11 +465,39 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-pitch%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>pitch</strong></td><td> =</td><td>-2.d0</td><td><p>Pitch</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-eff_rd"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(3)</td><td>::</td>
   <td><strong>eff_rd</strong></td><td> =</td><td>0.d0</td><td><p>Effective position of detector</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dir"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>dir</strong></td><td> =</td><td>0.d0</td><td><p>Trajectory direction</p></td>
   
 </tr>
 
@@ -481,8 +521,12 @@
     <span class="c">!+ Type to contain the probability of hitting a NPA detector</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Hit probability</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">pitch</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.</span><span class="n">d0</span>
+        <span class="c">!+ Pitch</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eff_rd</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
         <span class="c">!+ Effective position of detector</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dir</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+        <span class="c">!+ Trajectory direction</span>
 <span class="k">end type </span><span class="n">NPAProbability</span>
 </pre></div>
 
@@ -541,6 +585,8 @@
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
       
+      <a class="list-group-item" href="../type/neutronrate.html">NeutronRate</a>
+      
       <a class="list-group-item" href="../type/npachords.html">NPAChords</a>
       
       <a class="list-group-item" href="../type/npadetector.html">NPADetector</a>
@@ -552,6 +598,8 @@
       <a class="list-group-item" href="../type/nparesults.html">NPAResults</a>
       
       <a class="list-group-item" href="../type/npaweights.html">NPAWeights</a>
+      
+      <a class="list-group-item" href="../type/nuclearrates.html">NuclearRates</a>
       
       <a class="list-group-item" href="../type/particletrack.html">ParticleTrack</a>
       

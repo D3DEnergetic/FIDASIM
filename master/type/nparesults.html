@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 2.7% of total for derived types.</p>Including implementation: 9 statements,  2.7% of total for derived types.">9 statements</a>
+	  title="<p> 2.8% of total for derived types.</p>Including implementation: 10 statements,  2.8% of total for derived types.">10 statements</a>
      </li> 
      
      
@@ -177,6 +177,8 @@
       <a class="list-group-item" href="../type/nparesults.html#variable-nmax">nmax</a>
       
       <a class="list-group-item" href="../type/nparesults.html#variable-nloop">nloop</a>
+      
+      <a class="list-group-item" href="../type/nparesults.html#variable-nenergy%7E5">nenergy</a>
       
       <a class="list-group-item" href="../type/nparesults.html#variable-part">part</a>
       
@@ -262,6 +264,8 @@
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
       
+      <a class="list-group-item" href="../type/neutronrate.html">NeutronRate</a>
+      
       <a class="list-group-item" href="../type/npachords.html">NPAChords</a>
       
       <a class="list-group-item" href="../type/npadetector.html">NPADetector</a>
@@ -273,6 +277,8 @@
       <a class="list-group-item" href="../type/nparesults.html">NPAResults</a>
       
       <a class="list-group-item" href="../type/npaweights.html">NPAWeights</a>
+      
+      <a class="list-group-item" href="../type/nuclearrates.html">NuclearRates</a>
       
       <a class="list-group-item" href="../type/particletrack.html">ParticleTrack</a>
       
@@ -401,6 +407,8 @@
       
       <a class="list-group-item" href="../type/nparesults.html#variable-nloop">nloop</a>
       
+      <a class="list-group-item" href="../type/nparesults.html#variable-nenergy%7E5">nenergy</a>
+      
       <a class="list-group-item" href="../type/nparesults.html#variable-part">part</a>
       
       <a class="list-group-item" href="../type/nparesults.html#variable-energy%7E4">energy</a>
@@ -515,6 +523,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-nenergy%7E5"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nenergy</strong></td><td> =</td><td>100</td><td><p>Number of energy values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-part"></span>type(<a href='../type/npaparticle.html'>NPAParticle</a>),</td>
   
   <td>public,</td>
@@ -577,6 +599,8 @@
         <span class="c">!+ Maximum allowed number of particles grows if necessary</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nloop</span> <span class="o">=</span> <span class="mi">1000</span>
         <span class="c">!+ Increases number of MC markers by factor of `nloop`</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nenergy</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="c">!+ Number of energy values</span>
     <span class="k">type</span><span class="p">(</span><span class="n">NPAParticle</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">part</span>
         <span class="c">!+ Array of NPA particles</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">energy</span>
@@ -641,6 +665,8 @@
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
       
+      <a class="list-group-item" href="../type/neutronrate.html">NeutronRate</a>
+      
       <a class="list-group-item" href="../type/npachords.html">NPAChords</a>
       
       <a class="list-group-item" href="../type/npadetector.html">NPADetector</a>
@@ -652,6 +678,8 @@
       <a class="list-group-item" href="../type/nparesults.html">NPAResults</a>
       
       <a class="list-group-item" href="../type/npaweights.html">NPAWeights</a>
+      
+      <a class="list-group-item" href="../type/nuclearrates.html">NuclearRates</a>
       
       <a class="list-group-item" href="../type/particletrack.html">ParticleTrack</a>
       

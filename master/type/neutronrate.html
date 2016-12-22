@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 0.8% of total for derived types.</p>Including implementation: 3 statements,  0.8% of total for derived types.">3 statements</a>
+	  title="<p> 1.1% of total for derived types.</p>Including implementation: 4 statements,  1.1% of total for derived types.">4 statements</a>
      </li> 
      
      
@@ -171,6 +171,8 @@
     <div class="list-group">
       
       <a class="list-group-item" href="../type/neutronrate.html#variable-rate">rate</a>
+      
+      <a class="list-group-item" href="../type/neutronrate.html#variable-weight%7E3">weight</a>
       
     </div>
   </div>
@@ -305,6 +307,8 @@
       
       <a class="list-group-item" href="../type/neutronrate.html#variable-rate">rate</a>
       
+      <a class="list-group-item" href="../type/neutronrate.html#variable-weight%7E3">weight</a>
+      
     </div>
   </div>
 </div>
@@ -365,6 +369,20 @@
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-weight%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>weight</strong></td><td></td><td></td><td><p>Neutron rate weight: weight(E,p,R,Z)</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -385,6 +403,8 @@
     <span class="c">!+ Neutron storage structure</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">rate</span>
         <span class="c">!+ Neutron rate: rate(orbit_type) [neutrons/sec]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">weight</span>
+        <span class="c">!+ Neutron rate weight: weight(E,p,R,Z)</span>
 <span class="k">end type </span><span class="n">NeutronRate</span>
 </pre></div>
 

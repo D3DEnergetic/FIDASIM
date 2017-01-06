@@ -183,9 +183,9 @@ END: hour, minute, second:  1:53:07
 duration:                   0:15:53
 ```
 
-##Submitting to a Sun Grid Engine cluster using `submit_fidasim`
+##Submitting to a clusters job schedular using `submit_fidasim`
 
-`submit_fidasim` is a python routine that submits a FIDASIM job to a SGE cluster using `qsub`. For example
+`submit_fidasim` is a python routine that schedules a FIDASIM job on a cluster. For example
 
 ```
 lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
@@ -198,4 +198,4 @@ lstagner@computer:~$ submit_fidasim /u/lstagner/TEST/test_1a_inputs.dat
 
 ```
 will submit just the `test_1a` FIDASIM run.
-Run `submit_fidasim -h` for the full documentation.
+Slurm and PBS resource managers are supported. Run `submit_fidasim -h` for the full documentation.

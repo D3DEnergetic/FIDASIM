@@ -7,6 +7,7 @@ import tempfile
 from subprocess import call
 import string
 from os.path import dirname
+from distutils.spawn import find_executable
 
 def extract_runid(f):
     return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[0:-1])
@@ -14,8 +15,78 @@ def extract_runid(f):
 def chunk(lst,n):
     return [ lst[i::n] for i in range(n) if lst[i::n] ]
 
+def pbs_jobscript(args):
+    if args['partition']:
+        args['partition'] = '#PBS -q %(partition)s'%args
+
+    if 'G' in args['mem']:
+        args['mem'] = args['mem'].replace('G','gb')
+    if 'M' in args['mem']:
+        args['mem'] = args['mem'].replace('M','mb')
+
+    job_script = """
+                 #!/bin/bash
+                 #PBS -N %(job_name)s
+                 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
+                 #PBS -l mem=%(mem)s
+                 #PBS -l walltime=%(walltime)s
+                 #PBS -r n
+                 %(partition)s
+                 #PBS -V
+                 #PBS -o /dev/null
+                 #PBS -e /dev/null
+                 %(directive)s
+
+                 %(precall)s
+
+                 ulimit -s unlimited
+
+                 %(commands)s
+
+                 %(postcall)s
+
+                 exit
+                 """%args
+
+    job_script = "\n".join([line.lstrip() for line in job_script.splitlines()])
+    return os.linesep.join([s for s in job_script.splitlines() if s])
+
+def slurm_jobscript(args):
+    if args['partition']:
+        args['partition'] = '#SBATCH -p %(partition)s'%args
+
+    if 'gb' in args['mem'].lower():
+        args['mem'] = args['mem'].lower().replace('gb','G')
+    if 'mb' in args['mem'].lower():
+        args['mem'] = args['mem'].lower().replace('mb','M')
+
+    job_script = """
+                 #!/bin/bash
+                 #SBATCH -J %(job_name)s
+                 #SBATCH -N %(nodes)s
+                 #SBATCH -n %(ppn)s
+                 #SBATCH --mem=%(mem)s
+                 #SBATCH -t %(walltime)s
+                 %(partition)s
+                 #SBATCH -o /dev/null -e /dev/null
+                 %(directive)s
+
+                 %(precall)s
+
+                 ulimit -s unlimited
+
+                 %(commands)s
+
+                 %(postcall)s
+
+                 exit
+                 """%args
+
+    job_script = "\n".join([line.lstrip() for line in job_script.splitlines()])
+    return os.linesep.join([s for s in job_script.splitlines() if s])
+
 def main():
-    parser = argparse.ArgumentParser(description="Creates a FIDASIM PBS job script and submits it using qsub")
+    parser = argparse.ArgumentParser(description="Creates a FIDASIM job script and submits it to the resource manager")
 
     parser.add_argument('path',
                         help='Namelist file or result directory')
@@ -28,9 +99,12 @@ def main():
     parser.add_argument('-ppn',
                         type=int,default = 16,dest='ppn',
                         help = 'Set processors per node. Defaults to 16')
+    parser.add_argument('-p','--partition',
+                        default = '',
+                        help = 'Set partition/queue')
     parser.add_argument('-mem','--memory',
-                        default = '2gb',
-                        help = 'Set required memory. Defaults to 2048mb')
+                        default = '2G',
+                        help = 'Set required memory in G or M. Defaults to 2G')
     executable = dirname(dirname(dirname(os.path.abspath(__file__))))+'/fidasim'
     parser.add_argument('-ex','--executable',
                         default = executable,
@@ -38,10 +112,13 @@ def main():
     parser.add_argument('-log',
                         default = '',
                         help = 'Set log directory. Defaults to result directory.')
-    parser.add_argument('-pbs',
+    parser.add_argument('-r','--resource-manager',
+                        default = 'slurm',
+                        help = 'Set resource manager(Slurm|PBS)')
+    parser.add_argument('-d','--directive',
                         action = 'append',
                         default = [],
-                        help = 'Additional PBS directive')
+                        help = 'Additional batch directives')
     parser.add_argument('-pre','--precall',
                         action = 'append',
                         default = [],
@@ -68,6 +145,30 @@ def main():
                         help = 'Debug mode. Does not submit job')
 
     args = parser.parse_args()
+
+    rm_executable = find_executable('sbatch') or find_executable('qsub')
+    if rm_executable:
+        if 'sbatch' in rm_executable:
+            rm = 'slurm'
+        else:
+            rm = 'pbs'
+    else:
+        rm = args.resource_manager.lower()
+        if 'slurm' in rm:
+            rm_executable = find_executable('sbatch')
+        elif "pbs" in rm:
+            rm_executable = find_executable('qsub')
+        else:
+            rm = ''
+            rm_executable = ''
+
+    if not rm:
+        print('\033[91m'+'ERROR: Unknown resource manager. Expected Slurm or PBS.\033[0m')
+        quit()
+
+    if not rm_executable:
+        print('\033[91m'+'ERROR: Resource manager executable (sbatch|qsub) not found\033[0m')
+        quit()
 
     if args.verbose:
         print('Walltime: '+args.walltime)
@@ -119,67 +220,27 @@ def main():
                                  " >& "+log_dir+"/"+z[1] for z in zip(job,output_files)]),
                       'nodes':str(args.nodes),
                       'ppn':str(args.ppn),'mem':args.memory,
-                      'walltime':args.walltime,
-                      'pbs':"\n".join(item for item in args.pbs),
+                      'walltime':args.walltime,'partition':args.partition,
+                      'directive':"\n".join(item for item in args.directive),
                       'precall':"\n".join(item for item in args.precall),
                       'postcall':"\n".join(item for item in args.postcall),
                       'job_name':'fidasim'}
 
-        pbs_script = """
-                     #!/bin/tcsh
-                     #PBS -N %(job_name)s
-                     #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
-                     #PBS -l mem=%(mem)s
-                     #PBS -l walltime=%(walltime)s
-                     #PBS -r n
-                     #PBS -V
-                     #PBS -o /dev/null
-                     #PBS -e /dev/null
-                     %(pbs)s
-
-                     echo " "
-                     echo "-------------------"
-                     echo "This is a $PBS_ENVIRONMENT job"
-                     echo "This job was submitted to the queue: $PBS_QUEUE"
-                     echo "The job's id is: $PBS_JOBID"
-                     echo "-------------------"
-                     echo "The master node of this job is: $PBS_O_HOST"
-
-                     set NPROCS=`wc -l < $PBS_NODEFILE`
-
-                     set NNODES=`uniq $PBS_NODEFILE | wc -l`
-
-                     echo "This job is using $NPROCS CPU(s) on the following $NNODES node(s):"
-                     echo "-----------------------"
-                     uniq $PBS_NODEFILE | sort
-                     echo "-----------------------"
-
-                     echo -n 'Started job at : ' ; date
-
-                     %(precall)s
-
-                     limit stacksize unlimited
-
-                     %(commands)s
-
-                     %(postcall)s
-
-                     echo -n 'Ended job at  : ' ; date
-                     echo " "
-
-                     exit
-                     """%args_dict
+        if 'slurm' in rm:
+            job_script = slurm_jobscript(args_dict)
+        else:
+            job_script = pbs_jobscript(args_dict)
 
         if args.verbose:
             print('Submitting: \n\t'+'\n\t'.join(file for file in job))
 
         if not args.debug:
             tfile = tempfile.NamedTemporaryFile(mode='w+t',dir=os.path.expanduser("~"))
-            tfile.file.write("\n".join([line.lstrip() for line in pbs_script.splitlines()]))
+            tfile.file.write(job_script)
             tfile.file.close()
-            call(['qsub',tfile.name])
+            call([rm_executable,tfile.name])
             tfile.close()
-        else: print("\n".join([item.lstrip() for item in pbs_script.splitlines()]))
+        else: print(job_script)
 
 if __name__=='__main__':
     main()

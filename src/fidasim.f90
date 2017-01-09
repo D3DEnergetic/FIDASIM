@@ -2530,6 +2530,13 @@ subroutine read_atomic_cross(fid, grp, cross)
     real(Float64) :: emin, emax, rmin
     integer :: i, n_max, m_max, error
     real(Float64), dimension(:,:,:), allocatable :: dummy3
+    logical :: path_valid
+
+    call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
+    if(.not.path_valid) then
+        write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
+        stop
+    endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", cross%nenergy, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_max", n_max, error)
@@ -2584,6 +2591,12 @@ subroutine read_atomic_rates(fid, grp, b_amu, t_amu, rates)
     real(Float64), dimension(:,:), allocatable :: dummy2
     real(Float64), dimension(:,:,:,:), allocatable :: dummy4
     real(Float64), dimension(:,:,:,:,:), allocatable :: dummy5
+
+    call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
+    if(.not.path_valid) then
+        write(*,'(a,a)') 'READ_ATOMIC_RATES: Unknown atomic interaction: ', trim(grp)
+        stop
+    endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
     allocate(dummy2(2, n_bt_amu))
@@ -2753,6 +2766,14 @@ subroutine read_nuclear_rates(fid, grp, rates)
     logical :: path_valid
     integer :: i, j, error
     real(Float64) :: emin, emax, tmin, tmax, rmin
+
+    call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
+    if(.not.path_valid) then
+        write(*,'(a,a)') 'READ_NUCLEAR_RATES: Unknown nuclear interaction: ', trim(grp)
+        write(*,'(a)') 'Continuing without neutron calculation'
+        inputs%calc_neutron=0
+        return
+    endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nbranch", rates%nbranch, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", rates%nenergy, error)

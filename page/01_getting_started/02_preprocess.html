@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -154,9 +154,15 @@
 </div>
 <h1 id="create-fidasim-input-files-using-prefida">Create FIDASIM input files using PREFIDA</h1>
 <p>FIDASIM requires inputs to be in a specific format.
-<a href="../../sourcefile/prefida.pro.html">PREFIDA</a> is an IDL routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.</p>
+PREFIDA(<a href="../../sourcefile/prefida.pro.html">IDL</a>,<a href="../../sourcefile/preprocessing.py.html#prefida">Python</a>) is an routine that takes the required inputs, checks their validity, and transforms them into a form FIDASIM understands.</p>
 <p>PREFIDA is called as follows</p>
-<div class="codehilite"><pre><span></span>IDL&gt; prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> prefida, inputs, grid, nbi, plasma, fields, <span class="nb">dist</span>, spec<span class="o">=</span>spec, npa<span class="o">=</span>npa
+</pre></div>
+
+
+<p>or using Python</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">fidasim</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">fidasim</span><span class="o">.</span><span class="n">prefida</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">nbi</span><span class="p">,</span> <span class="n">plasma</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">dist</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span> <span class="n">npa</span><span class="o">=</span><span class="n">npa</span><span class="p">)</span>
 </pre></div>
 
 
@@ -183,15 +189,27 @@ Click <a href="./05_devices.html">here</a> to find out if someone has done your 
 <h1 id="making-grids">Making Grids</h1>
 <p>PREFIDA uses two types of grids: the <a href="../03_technical/01_prefida_inputs.html#interpolation-grid-structure">Interpolation Grid</a> and the <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">Beam Grid</a>. 
 The Interpolation Grid is 2D grid in the R-Z plane and as the name suggests it is used for interpolating the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma parameters</a> and the <a href="../03_technical/01_prefida_inputs.html#fields-structure">electromagnetic fields</a>. 
-The IDL routine <a href="../../sourcefile/rz_grid.pro.html">rz_grid.pro</a> can be used to easily create the interpolation <code>grid</code> structure.</p>
-<div class="codehilite"><pre><span></span>IDL&gt; grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+The routine <code>rz_grid</code>(<a href="../../sourcefile/rz_grid.pro.html">IDL</a>,<a href="../../sourcefile/utils.py.html#rz_grid">Python</a>) can be used to easily create the interpolation <code>grid</code> structure.</p>
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> grid <span class="o">=</span> rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+</pre></div>
+
+
+<p>or in Python</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">rz_grid</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">grid</span> <span class="o">=</span> <span class="n">rz_grid</span><span class="p">(</span><span class="n">rmin</span><span class="p">,</span><span class="n">rmax</span><span class="p">,</span><span class="n">nr</span><span class="p">,</span><span class="n">zmin</span><span class="p">,</span><span class="n">zmax</span><span class="p">,</span><span class="n">nz</span><span class="p">)</span>
 </pre></div>
 
 
 <p>The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
 To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.
-The IDL routine <a href="../../sourcefile/beam_grid.pro.html">beam_grid.pro</a> calculates from the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">neutral beam geometry</a> the optimal <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">beam grid settings</a> that would align the grid with the beam sightline.</p>
-<div class="codehilite"><pre><span></span>IDL&gt; bgrid = beam_grid(nbi,rstart)
+The routine <code>beam_grid</code>(<a href="../../sourcefile/beam_grid.pro.html">IDL</a>,<a href="../../sourcefile/utils.py.html#beam_grid">Python</a>) calculates from the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">neutral beam geometry</a> the optimal <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">beam grid settings</a> that would align the grid with the beam sightline.</p>
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> bgrid <span class="o">=</span> beam_grid(nbi,rstart)
+</pre></div>
+
+
+<p>or in Python</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">beam_grid</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">bgrid</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">(</span><span class="n">nbi</span><span class="p">,</span><span class="n">rstart</span><span class="p">)</span>
 </pre></div>
 
 
@@ -365,7 +383,7 @@ IDL&gt; s = read_spiral(spiral_file,Ntotal=1e19,btipsign=-1)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

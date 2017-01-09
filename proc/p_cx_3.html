@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -798,9 +826,9 @@ public function p_cx_3(Erel, m_max) result(sigma)
 
 
     
-    <p>Calculates an array of cross sections for proton-Hydrogen charge exchange interactions 
+    <p>Calculates an array of cross sections for proton-Hydrogen charge exchange interactions
 from the \(n=3\) state to m = 1..<code>m_max</code> states at energy <code>Erel</code></p>
-<p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>Cross sections are normalized to the total cross sections calculated by 
+<p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>Cross sections are normalized to the total cross sections calculated by
 <a href="../proc/p_cx_janev.html">p_cx_janev</a>.</p></div>
 <p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>Cross sections for the \(n=3 \rightarrow m=1\) states are calculated via
 equivalence principle using <a href="../proc/p_cx_1_3_adas.html">p_cx_1_3_adas</a>.</p></div>
@@ -879,217 +907,217 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
 <!-- Title: proc~~p_cx_3~~CallsGraph Pages: 1 -->
-<svg id="procp_cx_3CallsGraph" width="438pt" height="443pt"
- viewBox="0.00 0.00 438.00 443.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~p_cx_3~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 439)">
+<svg id="procp_cx_3CallsGraph" width="438pt" height="449pt"
+ viewBox="0.00 0.00 438.00 449.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~p_cx_3~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 445)">
 <title>proc~~p_cx_3~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-439 435,-439 435,5 -4,5"/>
+<polygon fill="white" stroke="white" points="-4,5 -4,-445 435,-445 435,5 -4,5"/>
 <!-- proc~p_cx_3 -->
 <g id="node1" class="node"><title>proc~p_cx_3</title>
-<polygon fill="none" stroke="black" points="54,-196 2.13163e-14,-196 0,-170 54,-170 54,-196"/>
-<text text-anchor="middle" x="27" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50">p_cx_3</text>
+<polygon fill="none" stroke="black" points="54,-202 2.13163e-14,-202 0,-176 54,-176 54,-202"/>
+<text text-anchor="middle" x="27" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50">p_cx_3</text>
 </g>
 <!-- proc~p_cx_janev -->
 <g id="node2" class="node"><title>proc~p_cx_janev</title>
 <a xlink:href="../proc/p_cx_janev.html" xlink:title="p_cx_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="303,-369 237,-369 237,-343 303,-343 303,-369"/>
-<text text-anchor="middle" x="270" y="-353.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_janev</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="303,-375 237,-375 237,-349 303,-349 303,-375"/>
+<text text-anchor="middle" x="270" y="-359.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_janev</text>
 </a>
 </g>
 <!-- proc~p_cx_3&#45;&gt;proc~p_cx_janev -->
 <g id="edge20" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_janev</title>
-<path fill="none" stroke="#000000" d="M28.0438,-196.444C31.2082,-227.088 43.5612,-302.148 90,-337 128.99,-366.262 186.827,-367.036 226.35,-363.103"/>
-<polygon fill="#000000" stroke="#000000" points="226.939,-366.559 236.48,-361.953 226.149,-359.604 226.939,-366.559"/>
-</g>
-<!-- proc~m_spread -->
-<g id="node3" class="node"><title>proc~m_spread</title>
-<a xlink:href="../proc/m_spread.html" xlink:title="m_spread">
-<polygon fill="#d9534f" stroke="#d9534f" points="170,-328 110,-328 110,-302 170,-302 170,-328"/>
-<text text-anchor="middle" x="140" y="-312.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">m_spread</text>
-</a>
-</g>
-<!-- proc~p_cx_3&#45;&gt;proc~m_spread -->
-<g id="edge22" class="edge"><title>proc~p_cx_3&#45;&gt;proc~m_spread</title>
-<path fill="none" stroke="#000000" d="M31.4629,-196.303C39.6827,-218.976 59.2405,-265.329 90,-293 93.1331,-295.819 96.6851,-298.321 100.416,-300.533"/>
-<polygon fill="#000000" stroke="#000000" points="98.8479,-303.663 109.334,-305.178 102.082,-297.454 98.8479,-303.663"/>
-</g>
-<!-- proc~p_cx_1 -->
-<g id="node4" class="node"><title>proc~p_cx_1</title>
-<a xlink:href="../proc/p_cx_1.html" xlink:title="p_cx_1">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="167,-284 113,-284 113,-258 167,-258 167,-284"/>
-<text text-anchor="middle" x="140" y="-268.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1</text>
-</a>
-</g>
-<!-- proc~p_cx_3&#45;&gt;proc~p_cx_1 -->
-<g id="edge24" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_1</title>
-<path fill="none" stroke="#000000" d="M36.902,-196.138C48.3727,-210.633 68.4709,-233.902 90,-249 94.2111,-251.953 98.8821,-254.642 103.629,-257.047"/>
-<polygon fill="#000000" stroke="#000000" points="102.209,-260.247 112.75,-261.315 105.176,-253.907 102.209,-260.247"/>
+<path fill="none" stroke="#000000" d="M29.0931,-202.27C34.1701,-229.793 49.8152,-293.172 90,-325 128.799,-355.73 186.676,-362.803 226.261,-363.606"/>
+<polygon fill="#000000" stroke="#000000" points="226.381,-367.107 236.408,-363.683 226.435,-360.107 226.381,-367.107"/>
 </g>
 <!-- proc~p_cx_3_4_adas -->
-<g id="node5" class="node"><title>proc~p_cx_3_4_adas</title>
+<g id="node3" class="node"><title>proc~p_cx_3_4_adas</title>
 <a xlink:href="../proc/p_cx_3_4_adas.html" xlink:title="p_cx_3_4_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-240 96,-240 96,-214 184,-214 184,-240"/>
-<text text-anchor="middle" x="140" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_4_adas</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-246 96,-246 96,-220 184,-220 184,-246"/>
+<text text-anchor="middle" x="140" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_4_adas</text>
 </a>
 </g>
 <!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_4_adas -->
-<g id="edge26" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_4_adas</title>
-<path fill="none" stroke="#000000" d="M54.0663,-193.539C66.7985,-198.497 82.2973,-204.532 96.6086,-210.104"/>
-<polygon fill="#000000" stroke="#000000" points="95.6895,-213.502 106.278,-213.869 98.2295,-206.979 95.6895,-213.502"/>
+<g id="edge22" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_4_adas</title>
+<path fill="none" stroke="#000000" d="M54.0663,-199.539C66.7985,-204.497 82.2973,-210.532 96.6086,-216.104"/>
+<polygon fill="#000000" stroke="#000000" points="95.6895,-219.502 106.278,-219.869 98.2295,-212.979 95.6895,-219.502"/>
 </g>
-<!-- proc~p_cx_3_6inf_adas -->
-<g id="node6" class="node"><title>proc~p_cx_3_6inf_adas</title>
-<a xlink:href="../proc/p_cx_3_6inf_adas.html" xlink:title="p_cx_3_6inf_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="190,-196 90,-196 90,-170 190,-170 190,-196"/>
-<text text-anchor="middle" x="140" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_6inf_adas</text>
+<!-- proc~p_cx_3_2_adas -->
+<g id="node4" class="node"><title>proc~p_cx_3_2_adas</title>
+<a xlink:href="../proc/p_cx_3_2_adas.html" xlink:title="p_cx_3_2_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-202 96,-202 96,-176 184,-176 184,-202"/>
+<text text-anchor="middle" x="140" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_2_adas</text>
 </a>
 </g>
-<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_6inf_adas -->
-<g id="edge28" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_6inf_adas</title>
-<path fill="none" stroke="#000000" d="M54.0663,-183C61.8464,-183 70.6595,-183 79.6035,-183"/>
-<polygon fill="#000000" stroke="#000000" points="79.7091,-186.5 89.709,-183 79.709,-179.5 79.7091,-186.5"/>
+<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_2_adas -->
+<g id="edge24" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_2_adas</title>
+<path fill="none" stroke="#000000" d="M54.0663,-189C63.6644,-189 74.8347,-189 85.8834,-189"/>
+<polygon fill="#000000" stroke="#000000" points="85.9472,-192.5 95.9472,-189 85.9472,-185.5 85.9472,-192.5"/>
+</g>
+<!-- proc~p_cx_3_3_adas -->
+<g id="node5" class="node"><title>proc~p_cx_3_3_adas</title>
+<a xlink:href="../proc/p_cx_3_3_adas.html" xlink:title="p_cx_3_3_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-158 96,-158 96,-132 184,-132 184,-158"/>
+<text text-anchor="middle" x="140" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_3_adas</text>
+</a>
+</g>
+<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_3_adas -->
+<g id="edge26" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_3_adas</title>
+<path fill="none" stroke="#000000" d="M54.0663,-178.461C66.7985,-173.503 82.2973,-167.468 96.6086,-161.896"/>
+<polygon fill="#000000" stroke="#000000" points="98.2295,-165.021 106.278,-158.131 95.6895,-158.498 98.2295,-165.021"/>
+</g>
+<!-- proc~p_cx_3_5_adas -->
+<g id="node6" class="node"><title>proc~p_cx_3_5_adas</title>
+<a xlink:href="../proc/p_cx_3_5_adas.html" xlink:title="p_cx_3_5_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-114 96,-114 96,-88 184,-88 184,-114"/>
+<text text-anchor="middle" x="140" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_5_adas</text>
+</a>
+</g>
+<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_5_adas -->
+<g id="edge28" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_5_adas</title>
+<path fill="none" stroke="#000000" d="M36.902,-175.862C48.3727,-161.367 68.4709,-138.098 90,-123 92.0722,-121.547 94.2557,-120.158 96.5049,-118.835"/>
+<polygon fill="#000000" stroke="#000000" points="98.2453,-121.873 105.408,-114.066 94.9405,-115.702 98.2453,-121.873"/>
 </g>
 <!-- proc~p_cx_1_3_adas -->
 <g id="node7" class="node"><title>proc~p_cx_1_3_adas</title>
 <a xlink:href="../proc/p_cx_1_3_adas.html" xlink:title="p_cx_1_3_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-174 226,-174 226,-148 314,-148 314,-174"/>
-<text text-anchor="middle" x="270" y="-158.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_3_adas</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-331 226,-331 226,-305 314,-305 314,-331"/>
+<text text-anchor="middle" x="270" y="-315.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_3_adas</text>
 </a>
 </g>
 <!-- proc~p_cx_3&#45;&gt;proc~p_cx_1_3_adas -->
 <g id="edge30" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_1_3_adas</title>
-<path fill="none" stroke="#000000" d="M54.0708,-171.307C65.0104,-167.178 77.8925,-163.053 90,-161 131.642,-153.938 179.487,-154.333 215.378,-156.279"/>
-<polygon fill="#000000" stroke="#000000" points="215.448,-159.79 225.64,-156.896 215.867,-152.802 215.448,-159.79"/>
+<path fill="none" stroke="#000000" d="M30.3126,-202.232C37.0516,-226.107 54.7919,-276.037 90,-299 126.93,-323.086 177.449,-326.477 215.568,-324.623"/>
+<polygon fill="#000000" stroke="#000000" points="216.207,-328.09 225.97,-323.974 215.771,-321.104 216.207,-328.09"/>
 </g>
-<!-- proc~p_cx_3_3_adas -->
-<g id="node8" class="node"><title>proc~p_cx_3_3_adas</title>
-<a xlink:href="../proc/p_cx_3_3_adas.html" xlink:title="p_cx_3_3_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-114 96,-114 96,-88 184,-88 184,-114"/>
-<text text-anchor="middle" x="140" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_3_adas</text>
+<!-- proc~p_cx_1 -->
+<g id="node8" class="node"><title>proc~p_cx_1</title>
+<a xlink:href="../proc/p_cx_1.html" xlink:title="p_cx_1">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="167,-290 113,-290 113,-264 167,-264 167,-290"/>
+<text text-anchor="middle" x="140" y="-274.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1</text>
 </a>
 </g>
-<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_3_adas -->
-<g id="edge32" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_3_adas</title>
-<path fill="none" stroke="#000000" d="M40.2842,-169.833C52.561,-158.058 71.6274,-140.743 90,-128 94.5091,-124.872 99.4194,-121.829 104.343,-118.982"/>
-<polygon fill="#000000" stroke="#000000" points="106.1,-122.01 113.138,-114.091 102.698,-115.892 106.1,-122.01"/>
+<!-- proc~p_cx_3&#45;&gt;proc~p_cx_1 -->
+<g id="edge32" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_1</title>
+<path fill="none" stroke="#000000" d="M36.902,-202.138C48.3727,-216.633 68.4709,-239.902 90,-255 94.2111,-257.953 98.8821,-260.642 103.629,-263.047"/>
+<polygon fill="#000000" stroke="#000000" points="102.209,-266.247 112.75,-267.315 105.176,-259.907 102.209,-266.247"/>
 </g>
-<!-- proc~p_cx_3_5_adas -->
-<g id="node9" class="node"><title>proc~p_cx_3_5_adas</title>
-<a xlink:href="../proc/p_cx_3_5_adas.html" xlink:title="p_cx_3_5_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-70 96,-70 96,-44 184,-44 184,-70"/>
-<text text-anchor="middle" x="140" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_5_adas</text>
+<!-- proc~p_cx_3_6inf_adas -->
+<g id="node9" class="node"><title>proc~p_cx_3_6inf_adas</title>
+<a xlink:href="../proc/p_cx_3_6inf_adas.html" xlink:title="p_cx_3_6inf_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="190,-70 90,-70 90,-44 190,-44 190,-70"/>
+<text text-anchor="middle" x="140" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_6inf_adas</text>
 </a>
 </g>
-<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_5_adas -->
-<g id="edge34" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_5_adas</title>
-<path fill="none" stroke="#000000" d="M31.9358,-169.734C40.604,-148.065 60.4891,-104.9 90,-79 91.4701,-77.7098 93.0279,-76.4846 94.6497,-75.3225"/>
-<polygon fill="#000000" stroke="#000000" points="96.5314,-78.274 103.182,-70.0268 92.84,-72.3263 96.5314,-78.274"/>
+<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_6inf_adas -->
+<g id="edge34" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_6inf_adas</title>
+<path fill="none" stroke="#000000" d="M31.4629,-175.697C39.6827,-153.024 59.2405,-106.671 90,-79 91.3088,-77.8226 92.6906,-76.7004 94.1281,-75.6313"/>
+<polygon fill="#000000" stroke="#000000" points="96.2923,-78.4026 102.847,-70.0788 92.5323,-72.4982 96.2923,-78.4026"/>
 </g>
-<!-- proc~p_cx_3_2_adas -->
-<g id="node10" class="node"><title>proc~p_cx_3_2_adas</title>
-<a xlink:href="../proc/p_cx_3_2_adas.html" xlink:title="p_cx_3_2_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-26 96,-26 96,-1.24345e-14 184,-3.55271e-15 184,-26"/>
-<text text-anchor="middle" x="140" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_2_adas</text>
+<!-- proc~m_spread -->
+<g id="node10" class="node"><title>proc~m_spread</title>
+<a xlink:href="../proc/m_spread.html" xlink:title="m_spread">
+<polygon fill="#d9534f" stroke="#d9534f" points="170,-26 110,-26 110,-1.24345e-14 170,-3.55271e-15 170,-26"/>
+<text text-anchor="middle" x="140" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">m_spread</text>
 </a>
 </g>
-<!-- proc~p_cx_3&#45;&gt;proc~p_cx_3_2_adas -->
-<g id="edge36" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_3_2_adas</title>
-<path fill="none" stroke="#000000" d="M29.2519,-169.709C34.7041,-141.357 51.1389,-74.3328 90,-35 91.0623,-33.9248 92.1861,-32.8982 93.3597,-31.9184"/>
-<polygon fill="#000000" stroke="#000000" points="95.4955,-34.6961 101.702,-26.1096 91.4955,-28.9515 95.4955,-34.6961"/>
+<!-- proc~p_cx_3&#45;&gt;proc~m_spread -->
+<g id="edge36" class="edge"><title>proc~p_cx_3&#45;&gt;proc~m_spread</title>
+<path fill="none" stroke="#000000" d="M29.0132,-175.62C34.069,-146.393 49.8878,-76.1766 90,-35 93.0151,-31.9048 96.5408,-29.2146 100.3,-26.8831"/>
+<polygon fill="#000000" stroke="#000000" points="102.172,-29.8521 109.364,-22.0723 98.89,-23.6689 102.172,-29.8521"/>
 </g>
-<!-- proc~p_cx_3_janev -->
-<g id="node11" class="node"><title>proc~p_cx_3_janev</title>
-<a xlink:href="../proc/p_cx_3_janev.html" xlink:title="p_cx_3_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-435 351,-435 351,-409 429,-409 429,-435"/>
-<text text-anchor="middle" x="390" y="-419.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_janev</text>
+<!-- proc~p_cx_n_janev -->
+<g id="node11" class="node"><title>proc~p_cx_n_janev</title>
+<a xlink:href="../proc/p_cx_n_janev.html" xlink:title="p_cx_n_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-441 351,-441 351,-415 429,-415 429,-441"/>
+<text text-anchor="middle" x="390" y="-425.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_n_janev</text>
 </a>
 </g>
-<!-- proc~p_cx_janev&#45;&gt;proc~p_cx_3_janev -->
-<g id="edge2" class="edge"><title>proc~p_cx_janev&#45;&gt;proc~p_cx_3_janev</title>
-<path fill="none" stroke="#000000" d="M293.708,-369.039C311.952,-379.073 337.366,-393.051 357.504,-404.127"/>
-<polygon fill="#000000" stroke="#000000" points="355.892,-407.235 366.341,-408.988 359.266,-401.102 355.892,-407.235"/>
+<!-- proc~p_cx_janev&#45;&gt;proc~p_cx_n_janev -->
+<g id="edge2" class="edge"><title>proc~p_cx_janev&#45;&gt;proc~p_cx_n_janev</title>
+<path fill="none" stroke="#000000" d="M293.708,-375.039C311.952,-385.073 337.366,-399.051 357.504,-410.127"/>
+<polygon fill="#000000" stroke="#000000" points="355.892,-413.235 366.341,-414.988 359.266,-407.102 355.892,-413.235"/>
 </g>
 <!-- proc~p_cx_1_janev -->
 <g id="node12" class="node"><title>proc~p_cx_1_janev</title>
 <a xlink:href="../proc/p_cx_1_janev.html" xlink:title="p_cx_1_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-391 351,-391 351,-365 429,-365 429,-391"/>
-<text text-anchor="middle" x="390" y="-375.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_janev</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-397 351,-397 351,-371 429,-371 429,-397"/>
+<text text-anchor="middle" x="390" y="-381.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_janev</text>
 </a>
 </g>
 <!-- proc~p_cx_janev&#45;&gt;proc~p_cx_1_janev -->
 <g id="edge4" class="edge"><title>proc~p_cx_janev&#45;&gt;proc~p_cx_1_janev</title>
-<path fill="none" stroke="#000000" d="M303.746,-362.187C315.011,-364.252 327.814,-366.599 340.044,-368.841"/>
-<polygon fill="#000000" stroke="#000000" points="339.668,-372.331 350.136,-370.692 340.931,-365.446 339.668,-372.331"/>
+<path fill="none" stroke="#000000" d="M303.746,-368.187C315.011,-370.252 327.814,-372.599 340.044,-374.841"/>
+<polygon fill="#000000" stroke="#000000" points="339.668,-378.331 350.136,-376.692 340.931,-371.446 339.668,-378.331"/>
 </g>
-<!-- proc~p_cx_n_janev -->
-<g id="node13" class="node"><title>proc~p_cx_n_janev</title>
-<a xlink:href="../proc/p_cx_n_janev.html" xlink:title="p_cx_n_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-347 351,-347 351,-321 429,-321 429,-347"/>
-<text text-anchor="middle" x="390" y="-331.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_n_janev</text>
+<!-- proc~p_cx_3_janev -->
+<g id="node13" class="node"><title>proc~p_cx_3_janev</title>
+<a xlink:href="../proc/p_cx_3_janev.html" xlink:title="p_cx_3_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-353 351,-353 351,-327 429,-327 429,-353"/>
+<text text-anchor="middle" x="390" y="-337.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3_janev</text>
 </a>
 </g>
-<!-- proc~p_cx_janev&#45;&gt;proc~p_cx_n_janev -->
-<g id="edge6" class="edge"><title>proc~p_cx_janev&#45;&gt;proc~p_cx_n_janev</title>
-<path fill="none" stroke="#000000" d="M303.746,-349.813C315.011,-347.748 327.814,-345.401 340.044,-343.159"/>
-<polygon fill="#000000" stroke="#000000" points="340.931,-346.554 350.136,-341.308 339.668,-339.669 340.931,-346.554"/>
+<!-- proc~p_cx_janev&#45;&gt;proc~p_cx_3_janev -->
+<g id="edge6" class="edge"><title>proc~p_cx_janev&#45;&gt;proc~p_cx_3_janev</title>
+<path fill="none" stroke="#000000" d="M303.746,-355.813C315.011,-353.748 327.814,-351.401 340.044,-349.159"/>
+<polygon fill="#000000" stroke="#000000" points="340.931,-352.554 350.136,-347.308 339.668,-345.669 340.931,-352.554"/>
 </g>
 <!-- proc~p_cx_2_janev -->
 <g id="node14" class="node"><title>proc~p_cx_2_janev</title>
 <a xlink:href="../proc/p_cx_2_janev.html" xlink:title="p_cx_2_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-303 351,-303 351,-277 429,-277 429,-303"/>
-<text text-anchor="middle" x="390" y="-287.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_2_janev</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="429,-309 351,-309 351,-283 429,-283 429,-309"/>
+<text text-anchor="middle" x="390" y="-293.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_2_janev</text>
 </a>
 </g>
 <!-- proc~p_cx_janev&#45;&gt;proc~p_cx_2_janev -->
 <g id="edge8" class="edge"><title>proc~p_cx_janev&#45;&gt;proc~p_cx_2_janev</title>
-<path fill="none" stroke="#000000" d="M297.181,-342.862C302.788,-340.025 308.622,-336.981 314,-334 330.401,-324.91 333.781,-321.41 350,-312 352.219,-310.712 354.517,-309.399 356.838,-308.086"/>
-<polygon fill="#000000" stroke="#000000" points="358.765,-311.019 365.787,-303.085 355.35,-304.908 358.765,-311.019"/>
+<path fill="none" stroke="#000000" d="M297.181,-348.862C302.788,-346.025 308.622,-342.981 314,-340 330.401,-330.91 333.781,-327.41 350,-318 352.219,-316.712 354.517,-315.399 356.838,-314.086"/>
+<polygon fill="#000000" stroke="#000000" points="358.765,-317.019 365.787,-309.085 355.35,-310.908 358.765,-317.019"/>
 </g>
 <!-- proc~p_cx_1&#45;&gt;proc~p_cx_janev -->
 <g id="edge12" class="edge"><title>proc~p_cx_1&#45;&gt;proc~p_cx_janev</title>
-<path fill="none" stroke="#000000" d="M167.121,-280.391C174.891,-283.738 183.115,-287.955 190,-293 209.56,-307.333 206.798,-319.191 226,-334 227.572,-335.213 229.222,-336.387 230.922,-337.519"/>
-<polygon fill="#000000" stroke="#000000" points="229.345,-340.654 239.716,-342.817 232.957,-334.659 229.345,-340.654"/>
+<path fill="none" stroke="#000000" d="M156.231,-290.175C173.107,-303.561 200.564,-324.477 226,-340 228.312,-341.411 230.727,-342.81 233.184,-344.179"/>
+<polygon fill="#000000" stroke="#000000" points="231.682,-347.345 242.152,-348.967 234.979,-341.17 231.682,-347.345"/>
 </g>
 <!-- proc~p_cx_1&#45;&gt;proc~p_cx_1_3_adas -->
 <g id="edge18" class="edge"><title>proc~p_cx_1&#45;&gt;proc~p_cx_1_3_adas</title>
-<path fill="none" stroke="#000000" d="M167.08,-262.007C174.934,-258.652 183.213,-254.331 190,-249 210.692,-232.746 208.313,-221.481 226,-202 232.457,-194.888 239.956,-187.592 246.913,-181.164"/>
-<polygon fill="#000000" stroke="#000000" points="249.675,-183.385 254.738,-174.079 244.976,-178.197 249.675,-183.385"/>
+<path fill="none" stroke="#000000" d="M167.252,-285.595C182.266,-290.33 201.392,-296.362 219.062,-301.935"/>
+<polygon fill="#000000" stroke="#000000" points="218.104,-305.303 228.693,-304.973 220.209,-298.627 218.104,-305.303"/>
 </g>
 <!-- proc~p_cx_1_2_adas -->
 <g id="node19" class="node"><title>proc~p_cx_1_2_adas</title>
 <a xlink:href="../proc/p_cx_1_2_adas.html" xlink:title="p_cx_1_2_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-325 226,-325 226,-299 314,-299 314,-325"/>
-<text text-anchor="middle" x="270" y="-309.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_2_adas</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-287 226,-287 226,-261 314,-261 314,-287"/>
+<text text-anchor="middle" x="270" y="-271.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_2_adas</text>
 </a>
 </g>
 <!-- proc~p_cx_1&#45;&gt;proc~p_cx_1_2_adas -->
 <g id="edge10" class="edge"><title>proc~p_cx_1&#45;&gt;proc~p_cx_1_2_adas</title>
-<path fill="none" stroke="#000000" d="M167.252,-279.595C182.266,-284.33 201.392,-290.362 219.062,-295.935"/>
-<polygon fill="#000000" stroke="#000000" points="218.104,-299.303 228.693,-298.973 220.209,-292.627 218.104,-299.303"/>
-</g>
-<!-- proc~p_cx_1_1_adas -->
-<g id="node20" class="node"><title>proc~p_cx_1_1_adas</title>
-<a xlink:href="../proc/p_cx_1_1_adas.html" xlink:title="p_cx_1_1_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-281 226,-281 226,-255 314,-255 314,-281"/>
-<text text-anchor="middle" x="270" y="-265.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_1_adas</text>
-</a>
-</g>
-<!-- proc~p_cx_1&#45;&gt;proc~p_cx_1_1_adas -->
-<g id="edge14" class="edge"><title>proc~p_cx_1&#45;&gt;proc~p_cx_1_1_adas</title>
-<path fill="none" stroke="#000000" d="M167.252,-270.371C181.31,-270.047 198.973,-269.639 215.67,-269.254"/>
-<polygon fill="#000000" stroke="#000000" points="215.984,-272.748 225.9,-269.018 215.822,-265.749 215.984,-272.748"/>
+<path fill="none" stroke="#000000" d="M167.252,-276.371C181.31,-276.047 198.973,-275.639 215.67,-275.254"/>
+<polygon fill="#000000" stroke="#000000" points="215.984,-278.748 225.9,-275.018 215.822,-271.749 215.984,-278.748"/>
 </g>
 <!-- proc~p_cx_1_4_adas -->
-<g id="node21" class="node"><title>proc~p_cx_1_4_adas</title>
+<g id="node20" class="node"><title>proc~p_cx_1_4_adas</title>
 <a xlink:href="../proc/p_cx_1_4_adas.html" xlink:title="p_cx_1_4_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-237 226,-237 226,-211 314,-211 314,-237"/>
-<text text-anchor="middle" x="270" y="-221.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_4_adas</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-243 226,-243 226,-217 314,-217 314,-243"/>
+<text text-anchor="middle" x="270" y="-227.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_4_adas</text>
 </a>
 </g>
 <!-- proc~p_cx_1&#45;&gt;proc~p_cx_1_4_adas -->
-<g id="edge16" class="edge"><title>proc~p_cx_1&#45;&gt;proc~p_cx_1_4_adas</title>
-<path fill="none" stroke="#000000" d="M167.252,-261.147C183.812,-255.16 205.375,-247.364 224.468,-240.461"/>
-<polygon fill="#000000" stroke="#000000" points="225.684,-243.744 233.898,-237.052 223.304,-237.161 225.684,-243.744"/>
+<g id="edge14" class="edge"><title>proc~p_cx_1&#45;&gt;proc~p_cx_1_4_adas</title>
+<path fill="none" stroke="#000000" d="M167.252,-267.147C183.812,-261.16 205.375,-253.364 224.468,-246.461"/>
+<polygon fill="#000000" stroke="#000000" points="225.684,-249.744 233.898,-243.052 223.304,-243.161 225.684,-249.744"/>
+</g>
+<!-- proc~p_cx_1_1_adas -->
+<g id="node21" class="node"><title>proc~p_cx_1_1_adas</title>
+<a xlink:href="../proc/p_cx_1_1_adas.html" xlink:title="p_cx_1_1_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-199 226,-199 226,-173 314,-173 314,-199"/>
+<text text-anchor="middle" x="270" y="-183.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_1_1_adas</text>
+</a>
+</g>
+<!-- proc~p_cx_1&#45;&gt;proc~p_cx_1_1_adas -->
+<g id="edge16" class="edge"><title>proc~p_cx_1&#45;&gt;proc~p_cx_1_1_adas</title>
+<path fill="none" stroke="#000000" d="M167.08,-268.007C174.934,-264.652 183.213,-260.331 190,-255 210.692,-238.746 205.713,-224.757 226,-208 227.358,-206.878 228.783,-205.794 230.255,-204.75"/>
+<polygon fill="#000000" stroke="#000000" points="232.468,-207.492 239.066,-199.202 228.738,-201.569 232.468,-207.492"/>
 </g>
 </g>
 </svg>
@@ -1368,11 +1396,11 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">p_cx_3</span><span class="p">(</span><span class="n">Erel</span><span class="p">,</span><span class="n">m_max</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
-    <span class="c">!+Calculates an array of cross sections for proton-Hydrogen charge exchange interactions </span>
+    <span class="c">!+Calculates an array of cross sections for proton-Hydrogen charge exchange interactions</span>
     <span class="c">!+from the \(n=3\) state to m = 1..`m_max` states at energy `Erel`</span>
     <span class="c">!+</span>
-    <span class="c">!+@note </span>
-    <span class="c">!+Cross sections are normalized to the total cross sections calculated by </span>
+    <span class="c">!+@note</span>
+    <span class="c">!+Cross sections are normalized to the total cross sections calculated by</span>
     <span class="c">!+[[p_cx_janev(proc)]].</span>
     <span class="c">!+</span>
     <span class="c">!+@note</span>
@@ -1393,32 +1421,32 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
         <span class="c">!+ Number of `m` states to calculate</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">m_max</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Array of cross sections where the index refers to the `m`&#39;th state [\(cm^2\)]</span>
-  
+
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n2</span> <span class="o">=</span> <span class="mf">9.</span><span class="n">d0</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span><span class="p">,</span> <span class="n">En</span><span class="p">,</span> <span class="n">Em</span><span class="p">,</span> <span class="n">sigma_m6</span><span class="p">,</span> <span class="n">norm_fac</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">m_max</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sigma1</span>
-  
+
     <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
     <span class="n">sigma1</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
     <span class="n">sigma1</span> <span class="o">=</span> <span class="n">p_cx_1</span><span class="p">(</span><span class="n">Erel</span><span class="o">*</span><span class="n">n2</span><span class="p">,</span><span class="n">m_max</span><span class="p">)</span>
     <span class="n">sigma</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">p_cx_1_3_adas</span><span class="p">(</span><span class="n">Erel</span><span class="o">*</span><span class="n">n2</span><span class="p">)</span><span class="o">/</span><span class="n">n2</span>
-  
+
     <span class="n">sigma</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">p_cx_3_2_adas</span><span class="p">(</span><span class="n">Erel</span><span class="p">)</span>
     <span class="n">sigma</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">p_cx_3_3_adas</span><span class="p">(</span><span class="n">Erel</span><span class="p">)</span>
     <span class="n">sigma</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">=</span> <span class="n">p_cx_3_4_adas</span><span class="p">(</span><span class="n">Erel</span><span class="p">)</span>
-  
+
     <span class="k">if</span><span class="p">(</span><span class="n">m_max</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">sigma</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">=</span> <span class="n">p_cx_3_5_adas</span><span class="p">(</span><span class="n">Erel</span><span class="p">)</span>
     <span class="n">endif</span>
-  
+
     <span class="k">if</span><span class="p">(</span><span class="n">m_max</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">6</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">sigma_m6</span> <span class="o">=</span> <span class="n">p_cx_3_6inf_adas</span><span class="p">(</span><span class="n">Erel</span><span class="p">)</span>
         <span class="k">call </span><span class="n">m_spread</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">sigma_m6</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
     <span class="n">endif</span>
-  
+
     <span class="n">norm_fac</span> <span class="o">=</span> <span class="n">p_cx_janev</span><span class="p">(</span><span class="n">Erel</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
     <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span><span class="o">*</span><span class="n">norm_fac</span>
-  
+
 <span class="k">end function </span><span class="n">p_cx_3</span>
 </pre></div>
 
@@ -1530,6 +1558,8 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1561,6 +1591,12 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1631,6 +1667,8 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1761,6 +1799,10 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1918,11 +1960,13 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1938,7 +1982,7 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1974,6 +2018,8 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1984,6 +2030,10 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1993,6 +2043,10 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -2007,6 +2061,8 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -2028,7 +2084,7 @@ expected total cross sections among the \( m \geq 6\) states.</p></div>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

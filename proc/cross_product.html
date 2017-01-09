@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -867,99 +895,162 @@ public function cross_product(u, v) result(s)
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
 <!-- Title: proc~~cross_product~~CalledByGraph Pages: 1 -->
-<svg id="proccross_productCalledByGraph" width="641pt" height="238pt"
- viewBox="0.00 0.00 641.00 238.17" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~cross_product~~CalledByGraph" class="graph" transform="scale(0.980122 0.980122) rotate(0) translate(4 239)">
+<svg id="proccross_productCalledByGraph" width="641pt" height="255pt"
+ viewBox="0.00 0.00 641.00 254.86" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~cross_product~~CalledByGraph" class="graph" transform="scale(0.965361 0.965361) rotate(0) translate(4 260)">
 <title>proc~~cross_product~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-239 651,-239 651,5 -4,5"/>
+<polygon fill="white" stroke="white" points="-4,5 -4,-260 661,-260 661,5 -4,5"/>
 <!-- proc~cross_product -->
 <g id="node1" class="node"><title>proc~cross_product</title>
-<polygon fill="none" stroke="black" points="646,-212 566,-212 566,-186 646,-186 646,-212"/>
-<text text-anchor="middle" x="606" y="-196.55" font-family="Helvetica,sans-Serif" font-size="10.50">cross_product</text>
-</g>
-<!-- proc~plane_basis -->
-<g id="node2" class="node"><title>proc~plane_basis</title>
-<a xlink:href="../proc/plane_basis.html" xlink:title="plane_basis">
-<polygon fill="#d9534f" stroke="#d9534f" points="425,-235 355,-235 355,-209 425,-209 425,-235"/>
-<text text-anchor="middle" x="390" y="-219.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">plane_basis</text>
-</a>
-</g>
-<!-- proc~plane_basis&#45;&gt;proc~cross_product -->
-<g id="edge32" class="edge"><title>proc~plane_basis&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M425.185,-218.253C460.595,-214.483 515.554,-208.631 555.59,-204.368"/>
-<polygon fill="#000000" stroke="#000000" points="556.11,-207.832 565.683,-203.293 555.368,-200.872 556.11,-207.832"/>
+<polygon fill="none" stroke="black" points="656,-117 576,-117 576,-91 656,-91 656,-117"/>
+<text text-anchor="middle" x="616" y="-101.55" font-family="Helvetica,sans-Serif" font-size="10.50">cross_product</text>
 </g>
 <!-- proc~gyro_step -->
-<g id="node3" class="node"><title>proc~gyro_step</title>
+<g id="node2" class="node"><title>proc~gyro_step</title>
 <a xlink:href="../proc/gyro_step.html" xlink:title="gyro_step">
-<polygon fill="#d9534f" stroke="#d9534f" points="530,-191 470,-191 470,-165 530,-165 530,-191"/>
-<text text-anchor="middle" x="500" y="-175.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="535,-170 475,-170 475,-144 535,-144 535,-170"/>
+<text text-anchor="middle" x="505" y="-154.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
 </a>
 </g>
 <!-- proc~gyro_step&#45;&gt;proc~cross_product -->
-<g id="edge34" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M530.092,-183.962C538.186,-185.565 547.162,-187.343 556.025,-189.099"/>
-<polygon fill="#000000" stroke="#000000" points="555.441,-192.552 565.931,-191.062 556.802,-185.685 555.441,-192.552"/>
+<g id="edge36" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M532.438,-143.899C546.58,-137.146 564.021,-128.819 579.304,-121.521"/>
+<polygon fill="#000000" stroke="#000000" points="580.977,-124.601 588.493,-117.134 577.961,-118.285 580.977,-124.601"/>
 </g>
-<!-- proc~read_npa -->
-<g id="node4" class="node"><title>proc~read_npa</title>
-<a xlink:href="../proc/read_npa.html" xlink:title="read_npa">
-<polygon fill="#d9534f" stroke="#d9534f" points="293,-235 235,-235 235,-209 293,-209 293,-235"/>
-<text text-anchor="middle" x="264" y="-219.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
+<!-- proc~plane_basis -->
+<g id="node3" class="node"><title>proc~plane_basis</title>
+<a xlink:href="../proc/plane_basis.html" xlink:title="plane_basis">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-65 470,-65 470,-39 540,-39 540,-65"/>
+<text text-anchor="middle" x="505" y="-49.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">plane_basis</text>
 </a>
 </g>
-<!-- proc~read_npa&#45;&gt;proc~plane_basis -->
-<g id="edge4" class="edge"><title>proc~read_npa&#45;&gt;proc~plane_basis</title>
-<path fill="none" stroke="#000000" d="M293.224,-222C308.395,-222 327.276,-222 344.323,-222"/>
-<polygon fill="#000000" stroke="#000000" points="344.651,-225.5 354.651,-222 344.651,-218.5 344.651,-225.5"/>
+<!-- proc~plane_basis&#45;&gt;proc~cross_product -->
+<g id="edge38" class="edge"><title>proc~plane_basis&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M533.01,-65.1218C546.813,-71.5882 563.651,-79.4763 578.544,-86.4533"/>
+<polygon fill="#000000" stroke="#000000" points="577.459,-89.8096 587.999,-90.8824 580.428,-83.4706 577.459,-89.8096"/>
 </g>
-<!-- program~fidasim -->
-<g id="node5" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-134 2.13163e-14,-134 0,-108 54,-108 54,-134"/>
-<text text-anchor="middle" x="27" y="-118.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<!-- proc~gyro_correction -->
+<g id="node4" class="node"><title>proc~gyro_correction</title>
+<a xlink:href="../proc/gyro_correction.html" xlink:title="gyro_correction">
+<polygon fill="#d9534f" stroke="#d9534f" points="433,-170 347,-170 347,-144 433,-144 433,-170"/>
+<text text-anchor="middle" x="390" y="-154.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~read_npa -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
-<path fill="none" stroke="#000000" d="M34.1894,-134.21C44.2505,-151.303 64.2268,-180.593 90,-195 131.772,-218.351 187.523,-223.24 224.535,-223.514"/>
-<polygon fill="#000000" stroke="#000000" points="224.93,-227.013 234.917,-223.474 224.903,-220.013 224.93,-227.013"/>
+<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
+<g id="edge28" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M433.805,-157C443.98,-157 454.764,-157 464.777,-157"/>
+<polygon fill="#000000" stroke="#000000" points="464.874,-160.5 474.874,-157 464.874,-153.5 464.874,-160.5"/>
 </g>
 <!-- proc~npa_weights -->
-<g id="node9" class="node"><title>proc~npa_weights</title>
+<g id="node5" class="node"><title>proc~npa_weights</title>
 <a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="426,-191 354,-191 354,-165 426,-165 426,-191"/>
-<text text-anchor="middle" x="390" y="-175.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="426,-256 354,-256 354,-230 426,-230 426,-256"/>
+<text text-anchor="middle" x="390" y="-240.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+</a>
+</g>
+<!-- proc~npa_weights&#45;&gt;proc~gyro_step -->
+<g id="edge30" class="edge"><title>proc~npa_weights&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M407.466,-229.938C426.548,-215.669 457.307,-192.666 479.178,-176.31"/>
+<polygon fill="#000000" stroke="#000000" points="481.457,-178.976 487.37,-170.184 477.265,-173.37 481.457,-178.976"/>
+</g>
+<!-- proc~read_mc -->
+<g id="node6" class="node"><title>proc~read_mc</title>
+<a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="291,-149 237,-149 237,-123 291,-123 291,-149"/>
+<text text-anchor="middle" x="264" y="-133.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
+</a>
+</g>
+<!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge18" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M291.651,-140.609C304.725,-142.787 320.801,-145.467 336.139,-148.023"/>
+<polygon fill="#000000" stroke="#000000" points="335.633,-151.487 346.072,-149.679 336.784,-144.582 335.633,-151.487"/>
+</g>
+<!-- proc~neutron_f -->
+<g id="node7" class="node"><title>proc~neutron_f</title>
+<a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="293,-237 235,-237 235,-211 293,-211 293,-237"/>
+<text text-anchor="middle" x="264" y="-221.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
+</a>
+</g>
+<!-- proc~neutron_f&#45;&gt;proc~gyro_correction -->
+<g id="edge20" class="edge"><title>proc~neutron_f&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M292.365,-210.797C298.231,-207.965 304.344,-204.939 310,-202 326.394,-193.481 344.347,-183.449 359.084,-175.021"/>
+<polygon fill="#000000" stroke="#000000" points="360.877,-178.027 367.802,-170.009 357.388,-171.959 360.877,-178.027"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="node8" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-193 218,-193 218,-167 310,-167 310,-193"/>
+<text text-anchor="middle" x="264" y="-177.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge22" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M310.202,-171.566C318.683,-170.018 327.602,-168.39 336.281,-166.806"/>
+<polygon fill="#000000" stroke="#000000" points="337.109,-170.213 346.318,-164.974 335.852,-163.326 337.109,-170.213"/>
+</g>
+<!-- proc~mc_fastion -->
+<g id="node9" class="node"><title>proc~mc_fastion</title>
+<a xlink:href="../proc/mc_fastion.html" xlink:title="mc_fastion">
+<polygon fill="#d9534f" stroke="#d9534f" points="296,-105 232,-105 232,-79 296,-79 296,-105"/>
+<text text-anchor="middle" x="264" y="-89.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_fastion</text>
+</a>
+</g>
+<!-- proc~mc_fastion&#45;&gt;proc~gyro_correction -->
+<g id="edge24" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M291.834,-105.053C297.85,-107.946 304.158,-111.035 310,-114 325.687,-121.961 342.894,-131.15 357.318,-138.984"/>
+<polygon fill="#000000" stroke="#000000" points="355.895,-142.195 366.35,-143.911 359.247,-136.05 355.895,-142.195"/>
+</g>
+<!-- proc~read_distribution -->
+<g id="node10" class="node"><title>proc~read_distribution</title>
+<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-158 90,-158 90,-132 182,-132 182,-158"/>
+<text text-anchor="middle" x="136" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
+</a>
+</g>
+<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
+<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.211,-141.751C196.705,-140.732 212.522,-139.62 226.35,-138.647"/>
+<polygon fill="#000000" stroke="#000000" points="226.752,-142.128 236.482,-137.935 226.261,-135.145 226.752,-142.128"/>
+</g>
+<!-- program~fidasim -->
+<g id="node11" class="node"><title>program~fidasim</title>
+<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-158 2.13163e-14,-158 0,-132 54,-132 54,-158"/>
+<text text-anchor="middle" x="27" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_weights -->
 <g id="edge26" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M54.2603,-131.781C65.226,-135.784 78.0765,-140.061 90,-143 177.893,-164.664 283.67,-173.026 343.241,-176.175"/>
-<polygon fill="#000000" stroke="#000000" points="343.295,-179.682 353.458,-176.687 343.646,-172.69 343.295,-179.682"/>
+<path fill="none" stroke="#000000" d="M35.8538,-158.165C46.7937,-173.405 66.8269,-198.176 90,-212 169.015,-259.138 280.901,-256.17 343.306,-249.673"/>
+<polygon fill="#000000" stroke="#000000" points="343.703,-253.151 353.254,-248.564 342.927,-246.194 343.703,-253.151"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node10" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="310,-153 218,-153 218,-127 310,-127 310,-153"/>
-<text text-anchor="middle" x="264" y="-137.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
+<!-- program~fidasim&#45;&gt;proc~neutron_f -->
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<path fill="none" stroke="#000000" d="M43.4403,-158.091C55.6361,-167.186 73.0236,-178.903 90,-186 134.14,-204.453 188.486,-214.481 224.576,-219.528"/>
+<polygon fill="#000000" stroke="#000000" points="224.328,-223.026 234.703,-220.88 225.254,-216.087 224.328,-223.026"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M54.1869,-123.18C91.4189,-126.164 159.166,-131.596 207.609,-135.479"/>
-<polygon fill="#000000" stroke="#000000" points="207.388,-138.973 217.636,-136.283 207.947,-131.995 207.388,-138.973"/>
-</g>
-<!-- proc~read_distribution -->
-<g id="node14" class="node"><title>proc~read_distribution</title>
-<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
-</a>
+<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M54.1583,-156.23C65.1099,-160.295 77.9775,-164.497 90,-167 128.702,-175.058 173.162,-178.279 207.452,-179.5"/>
+<polygon fill="#000000" stroke="#000000" points="207.647,-183.008 217.75,-179.818 207.863,-176.011 207.647,-183.008"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
-<path fill="none" stroke="#000000" d="M54.2241,-116.005C62.0126,-114.576 70.8024,-112.963 79.6572,-111.338"/>
-<polygon fill="#000000" stroke="#000000" points="80.4281,-114.755 89.6322,-109.508 79.1647,-107.87 80.4281,-114.755"/>
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<path fill="none" stroke="#000000" d="M54.2241,-145C61.9289,-145 70.6135,-145 79.3716,-145"/>
+<polygon fill="#000000" stroke="#000000" points="79.6322,-148.5 89.6322,-145 79.6322,-141.5 79.6322,-148.5"/>
+</g>
+<!-- proc~npa_f -->
+<g id="node16" class="node"><title>proc~npa_f</title>
+<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-114 109,-114 109,-88 163,-88 163,-114"/>
+<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+</a>
+</g>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M54.2241,-134.01C67.8798,-128.498 84.6138,-121.743 99.3789,-115.783"/>
+<polygon fill="#000000" stroke="#000000" points="100.782,-118.991 108.745,-112.002 98.162,-112.5 100.782,-118.991"/>
 </g>
 <!-- proc~fida_f -->
 <g id="node17" class="node"><title>proc~fida_f</title>
@@ -970,81 +1061,35 @@ public function cross_product(u, v) result(s)
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_f -->
 <g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M45.0351,-107.982C57.4032,-99.3048 74.3452,-87.9022 90,-79 93.1887,-77.1867 96.5504,-75.384 99.9454,-73.636"/>
-<polygon fill="#000000" stroke="#000000" points="101.525,-76.7595 108.915,-69.167 98.4031,-70.4941 101.525,-76.7595"/>
+<path fill="none" stroke="#000000" d="M36.9915,-131.987C48.5423,-117.605 68.7121,-94.436 90,-79 93.0458,-76.7914 96.3482,-74.7098 99.7379,-72.7739"/>
+<polygon fill="#000000" stroke="#000000" points="101.581,-75.7589 108.799,-68.0026 98.3197,-69.5652 101.581,-75.7589"/>
 </g>
-<!-- proc~npa_f -->
-<g id="node18" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<!-- proc~read_npa -->
+<g id="node29" class="node"><title>proc~read_npa</title>
+<a xlink:href="../proc/read_npa.html" xlink:title="read_npa">
+<polygon fill="#d9534f" stroke="#d9534f" points="165,-26 107,-26 107,-1.24345e-14 165,-3.55271e-15 165,-26"/>
+<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M33.9191,-107.771C44.0887,-89.3924 64.6406,-56.0295 90,-35 93.0558,-32.466 96.4525,-30.1446 99.9769,-28.0393"/>
-<polygon fill="#000000" stroke="#000000" points="101.729,-31.0709 108.879,-23.2525 98.4144,-24.9056 101.729,-31.0709"/>
+<!-- program~fidasim&#45;&gt;proc~read_npa -->
+<g id="edge32" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
+<path fill="none" stroke="#000000" d="M31.5563,-131.799C39.917,-109.28 59.6815,-63.1535 90,-35 92.4002,-32.7712 95.0675,-30.7271 97.8745,-28.8609"/>
+<polygon fill="#000000" stroke="#000000" points="99.7059,-31.8447 106.588,-23.789 96.1843,-25.795 99.7059,-31.8447"/>
 </g>
-<!-- proc~gyro_correction -->
-<g id="node8" class="node"><title>proc~gyro_correction</title>
-<a xlink:href="../proc/gyro_correction.html" xlink:title="gyro_correction">
-<polygon fill="#d9534f" stroke="#d9534f" points="433,-128 347,-128 347,-102 433,-102 433,-128"/>
-<text text-anchor="middle" x="390" y="-112.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
-</a>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
-<g id="edge28" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M412.792,-128.054C428.868,-137.261 450.613,-149.715 468.368,-159.883"/>
-<polygon fill="#000000" stroke="#000000" points="466.82,-163.03 477.237,-164.963 470.299,-156.956 466.82,-163.03"/>
-</g>
-<!-- proc~npa_weights&#45;&gt;proc~gyro_step -->
-<g id="edge30" class="edge"><title>proc~npa_weights&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M426.628,-178C437.237,-178 448.877,-178 459.697,-178"/>
-<polygon fill="#000000" stroke="#000000" points="459.76,-181.5 469.76,-178 459.76,-174.5 459.76,-181.5"/>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge20" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M310.202,-130.833C318.683,-129.15 327.602,-127.381 336.281,-125.659"/>
-<polygon fill="#000000" stroke="#000000" points="337.19,-129.046 346.318,-123.667 335.828,-122.18 337.19,-129.046"/>
-</g>
-<!-- proc~read_mc -->
-<g id="node11" class="node"><title>proc~read_mc</title>
-<a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="291,-109 237,-109 237,-83 291,-83 291,-109"/>
-<text text-anchor="middle" x="264" y="-93.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
-</a>
-</g>
-<!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge22" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M291.651,-100.17C304.725,-102.141 320.801,-104.565 336.139,-106.878"/>
-<polygon fill="#000000" stroke="#000000" points="335.662,-110.346 346.072,-108.376 336.706,-103.424 335.662,-110.346"/>
-</g>
-<!-- proc~mc_fastion -->
-<g id="node12" class="node"><title>proc~mc_fastion</title>
-<a xlink:href="../proc/mc_fastion.html" xlink:title="mc_fastion">
-<polygon fill="#d9534f" stroke="#d9534f" points="296,-65 232,-65 232,-39 296,-39 296,-65"/>
-<text text-anchor="middle" x="264" y="-49.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_fastion</text>
-</a>
-</g>
-<!-- proc~mc_fastion&#45;&gt;proc~gyro_correction -->
-<g id="edge24" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M291.79,-65.1396C297.81,-68.0278 304.13,-71.0926 310,-74 325.144,-81.5001 341.789,-89.9907 355.957,-97.292"/>
-<polygon fill="#000000" stroke="#000000" points="354.377,-100.416 364.868,-101.896 357.59,-94.1964 354.377,-100.416"/>
-</g>
-<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge10" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.211,-99.1949C196.705,-98.6287 212.522,-98.0109 226.35,-97.4707"/>
-<polygon fill="#000000" stroke="#000000" points="226.626,-100.963 236.482,-97.0749 226.353,-93.968 226.626,-100.963"/>
+<!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
+<g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
+<path fill="none" stroke="#000000" d="M163.146,-99.0913C180.19,-97.8929 202.524,-96.3225 221.842,-94.9642"/>
+<polygon fill="#000000" stroke="#000000" points="222.187,-98.4487 231.917,-94.2558 221.696,-91.4659 222.187,-98.4487"/>
 </g>
 <!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
 <g id="edge16" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
-<path fill="none" stroke="#000000" d="M163.146,-55.9396C180.19,-55.2738 202.524,-54.4014 221.842,-53.6468"/>
-<polygon fill="#000000" stroke="#000000" points="222.061,-57.141 231.917,-53.2532 221.788,-50.1463 222.061,-57.141"/>
+<path fill="none" stroke="#000000" d="M163.146,-64.4226C180.268,-69.1046 202.73,-75.2465 222.109,-80.5454"/>
+<polygon fill="#000000" stroke="#000000" points="221.348,-83.9657 231.917,-83.2273 223.194,-77.2136 221.348,-83.9657"/>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
-<g id="edge18" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
-<path fill="none" stroke="#000000" d="M163.146,-21.2709C180.268,-26.488 202.73,-33.3319 222.109,-39.2363"/>
-<polygon fill="#000000" stroke="#000000" points="221.331,-42.6581 231.917,-42.2247 223.371,-35.962 221.331,-42.6581"/>
+<!-- proc~read_npa&#45;&gt;proc~plane_basis -->
+<g id="edge34" class="edge"><title>proc~read_npa&#45;&gt;proc~plane_basis</title>
+<path fill="none" stroke="#000000" d="M165.263,-16.0929C229.408,-22.8724 382.78,-39.0825 459.573,-47.1988"/>
+<polygon fill="#000000" stroke="#000000" points="459.571,-50.718 469.884,-48.2885 460.307,-43.7568 459.571,-50.718"/>
 </g>
 </g>
 </svg>
@@ -1299,6 +1344,8 @@ public function cross_product(u, v) result(s)
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1330,6 +1377,12 @@ public function cross_product(u, v) result(s)
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1400,6 +1453,8 @@ public function cross_product(u, v) result(s)
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1530,6 +1585,10 @@ public function cross_product(u, v) result(s)
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1687,11 +1746,13 @@ public function cross_product(u, v) result(s)
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1707,7 +1768,7 @@ public function cross_product(u, v) result(s)
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1743,6 +1804,8 @@ public function cross_product(u, v) result(s)
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1753,6 +1816,10 @@ public function cross_product(u, v) result(s)
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1762,6 +1829,10 @@ public function cross_product(u, v) result(s)
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1776,6 +1847,8 @@ public function cross_product(u, v) result(s)
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1797,7 +1870,7 @@ public function cross_product(u, v) result(s)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

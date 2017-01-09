@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -798,7 +826,7 @@ public function Aq_cx_n(eb, q, n) result(sigma)
 
 
     
-    <p>Calculates the total charge exchange cross section for a Neutral Hydrogen atom 
+    <p>Calculates the total charge exchange cross section for a Neutral Hydrogen atom
 in the <code>n</code> state colliding with a ion with charge <code>q</code> at energy <code>eb</code></p>
 <p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>Uses ADAS(Ref. 4) cross sections if available else uses Janev (Ref. 5) cross sections</p></div>
 <h3 id="equation">Equation</h3>
@@ -830,7 +858,7 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E58"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E59"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -881,7 +909,7 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
     
 	 <h3>Return Value <small><span class="anchor" id="variable-sigma%7E79"></span>real(kind=Float64)
   </small></h3>
-    <p>Cross Section [\(cm^2\)]  </p>
+    <p>Cross Section [\(cm^2\)]</p>
     
     
      <h3>Calls</h3>
@@ -926,39 +954,39 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
 <path fill="none" stroke="#000000" d="M52.1205,-98.9658C66.0122,-91.7578 83.4761,-82.6964 98.6176,-74.8399"/>
 <polygon fill="#000000" stroke="#000000" points="100.428,-77.8436 107.692,-70.1313 97.2042,-71.6302 100.428,-77.8436"/>
 </g>
-<!-- proc~c6_cx_3_adas -->
-<g id="node4" class="node"><title>proc~c6_cx_3_adas</title>
-<a xlink:href="../proc/c6_cx_3_adas.html" xlink:title="C6_cx_3_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="297,-290 213,-290 213,-264 297,-264 297,-290"/>
-<text text-anchor="middle" x="255" y="-274.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_3_adas</text>
+<!-- proc~b5_cx_2_adas -->
+<g id="node4" class="node"><title>proc~b5_cx_2_adas</title>
+<a xlink:href="../proc/b5_cx_2_adas.html" xlink:title="B5_cx_2_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="296,-290 214,-290 214,-264 296,-264 296,-290"/>
+<text text-anchor="middle" x="255" y="-274.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">B5_cx_2_adas</text>
 </a>
 </g>
-<!-- proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_3_adas -->
-<g id="edge2" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_3_adas</title>
+<!-- proc~aq_cx_n_adas&#45;&gt;proc~b5_cx_2_adas -->
+<g id="edge2" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~b5_cx_2_adas</title>
 <path fill="none" stroke="#000000" d="M142.238,-180.01C155.858,-198.49 182.879,-232.582 212,-255 213.595,-256.228 215.268,-257.419 216.992,-258.569"/>
 <polygon fill="#000000" stroke="#000000" points="215.529,-261.774 225.895,-263.962 219.156,-255.787 215.529,-261.774"/>
 </g>
-<!-- proc~c6_cx_2_adas -->
-<g id="node5" class="node"><title>proc~c6_cx_2_adas</title>
-<a xlink:href="../proc/c6_cx_2_adas.html" xlink:title="C6_cx_2_adas">
+<!-- proc~c6_cx_3_adas -->
+<g id="node5" class="node"><title>proc~c6_cx_3_adas</title>
+<a xlink:href="../proc/c6_cx_3_adas.html" xlink:title="C6_cx_3_adas">
 <polygon fill="#d94e8f" stroke="#d94e8f" points="297,-246 213,-246 213,-220 297,-220 297,-246"/>
-<text text-anchor="middle" x="255" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_2_adas</text>
+<text text-anchor="middle" x="255" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_3_adas</text>
 </a>
 </g>
-<!-- proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_2_adas -->
-<g id="edge4" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_2_adas</title>
+<!-- proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_3_adas -->
+<g id="edge4" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_3_adas</title>
 <path fill="none" stroke="#000000" d="M156.043,-180.115C171.737,-188.979 193.028,-200.868 212,-211 214.566,-212.37 217.226,-213.773 219.907,-215.175"/>
 <polygon fill="#000000" stroke="#000000" points="218.512,-218.394 229.001,-219.885 221.731,-212.178 218.512,-218.394"/>
 </g>
-<!-- proc~c6_cx_1_adas -->
-<g id="node6" class="node"><title>proc~c6_cx_1_adas</title>
-<a xlink:href="../proc/c6_cx_1_adas.html" xlink:title="C6_cx_1_adas">
+<!-- proc~c6_cx_2_adas -->
+<g id="node6" class="node"><title>proc~c6_cx_2_adas</title>
+<a xlink:href="../proc/c6_cx_2_adas.html" xlink:title="C6_cx_2_adas">
 <polygon fill="#d94e8f" stroke="#d94e8f" points="297,-202 213,-202 213,-176 297,-176 297,-202"/>
-<text text-anchor="middle" x="255" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_1_adas</text>
+<text text-anchor="middle" x="255" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_2_adas</text>
 </a>
 </g>
-<!-- proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_1_adas -->
-<g id="edge6" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_1_adas</title>
+<!-- proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_2_adas -->
+<g id="edge6" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_2_adas</title>
 <path fill="none" stroke="#000000" d="M174.644,-174.51C183.668,-176.137 193.321,-177.878 202.695,-179.568"/>
 <polygon fill="#000000" stroke="#000000" points="202.252,-183.044 212.714,-181.375 203.494,-176.155 202.252,-183.044"/>
 </g>
@@ -974,39 +1002,39 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
 <path fill="none" stroke="#000000" d="M174.644,-159.49C183.769,-157.845 193.538,-156.083 203.011,-154.375"/>
 <polygon fill="#000000" stroke="#000000" points="203.909,-157.77 213.129,-152.55 202.667,-150.881 203.909,-157.77"/>
 </g>
-<!-- proc~b5_cx_2_adas -->
-<g id="node8" class="node"><title>proc~b5_cx_2_adas</title>
-<a xlink:href="../proc/b5_cx_2_adas.html" xlink:title="B5_cx_2_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="296,-114 214,-114 214,-88 296,-88 296,-114"/>
-<text text-anchor="middle" x="255" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">B5_cx_2_adas</text>
+<!-- proc~c6_cx_1_adas -->
+<g id="node8" class="node"><title>proc~c6_cx_1_adas</title>
+<a xlink:href="../proc/c6_cx_1_adas.html" xlink:title="C6_cx_1_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="297,-114 213,-114 213,-88 297,-88 297,-114"/>
+<text text-anchor="middle" x="255" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_1_adas</text>
 </a>
 </g>
-<!-- proc~aq_cx_n_adas&#45;&gt;proc~b5_cx_2_adas -->
-<g id="edge10" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~b5_cx_2_adas</title>
+<!-- proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_1_adas -->
+<g id="edge10" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_1_adas</title>
 <path fill="none" stroke="#000000" d="M156.043,-153.885C171.737,-145.021 193.028,-133.132 212,-123 214.566,-121.63 217.226,-120.227 219.907,-118.825"/>
 <polygon fill="#000000" stroke="#000000" points="221.731,-121.822 229.001,-114.115 218.512,-115.606 221.731,-121.822"/>
 </g>
-<!-- proc~b5_cx_1_janev -->
-<g id="node14" class="node"><title>proc~b5_cx_1_janev</title>
-<a xlink:href="../proc/b5_cx_1_janev.html" xlink:title="B5_cx_1_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="297,-70 213,-70 213,-44 297,-44 297,-70"/>
-<text text-anchor="middle" x="255" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">B5_cx_1_janev</text>
-</a>
-</g>
-<!-- proc~aq_cx_n_janev&#45;&gt;proc~b5_cx_1_janev -->
-<g id="edge12" class="edge"><title>proc~aq_cx_n_janev&#45;&gt;proc~b5_cx_1_janev</title>
-<path fill="none" stroke="#000000" d="M175.67,-57C184.164,-57 193.182,-57 201.975,-57"/>
-<polygon fill="#000000" stroke="#000000" points="202.148,-60.5001 212.148,-57 202.148,-53.5001 202.148,-60.5001"/>
-</g>
 <!-- proc~c6_cx_1_janev -->
-<g id="node15" class="node"><title>proc~c6_cx_1_janev</title>
+<g id="node14" class="node"><title>proc~c6_cx_1_janev</title>
 <a xlink:href="../proc/c6_cx_1_janev.html" xlink:title="C6_cx_1_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="298,-26 212,-26 212,-1.24345e-14 298,-3.55271e-15 298,-26"/>
-<text text-anchor="middle" x="255" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_1_janev</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="298,-70 212,-70 212,-44 298,-44 298,-70"/>
+<text text-anchor="middle" x="255" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">C6_cx_1_janev</text>
 </a>
 </g>
 <!-- proc~aq_cx_n_janev&#45;&gt;proc~c6_cx_1_janev -->
-<g id="edge14" class="edge"><title>proc~aq_cx_n_janev&#45;&gt;proc~c6_cx_1_janev</title>
+<g id="edge12" class="edge"><title>proc~aq_cx_n_janev&#45;&gt;proc~c6_cx_1_janev</title>
+<path fill="none" stroke="#000000" d="M175.67,-57C184.066,-57 192.972,-57 201.668,-57"/>
+<polygon fill="#000000" stroke="#000000" points="201.735,-60.5001 211.735,-57 201.735,-53.5001 201.735,-60.5001"/>
+</g>
+<!-- proc~b5_cx_1_janev -->
+<g id="node15" class="node"><title>proc~b5_cx_1_janev</title>
+<a xlink:href="../proc/b5_cx_1_janev.html" xlink:title="B5_cx_1_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="297,-26 213,-26 213,-1.24345e-14 297,-3.55271e-15 297,-26"/>
+<text text-anchor="middle" x="255" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">B5_cx_1_janev</text>
+</a>
+</g>
+<!-- proc~aq_cx_n_janev&#45;&gt;proc~b5_cx_1_janev -->
+<g id="edge14" class="edge"><title>proc~aq_cx_n_janev&#45;&gt;proc~b5_cx_1_janev</title>
 <path fill="none" stroke="#000000" d="M169.274,-43.9177C181.699,-39.4363 195.773,-34.3606 208.872,-29.6364"/>
 <polygon fill="#000000" stroke="#000000" points="210.436,-32.793 218.655,-26.1079 208.061,-26.2082 210.436,-32.793"/>
 </g>
@@ -1263,7 +1291,7 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">Aq_cx_n</span><span class="p">(</span><span class="n">eb</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
-    <span class="c">!+ Calculates the total charge exchange cross section for a Neutral Hydrogen atom </span>
+    <span class="c">!+ Calculates the total charge exchange cross section for a Neutral Hydrogen atom</span>
     <span class="c">!+in the `n` state colliding with a ion with charge `q` at energy `eb`</span>
     <span class="c">!+</span>
     <span class="c">!+@note Uses ADAS(Ref. 4) cross sections if available else uses Janev (Ref. 5) cross sections</span>
@@ -1283,13 +1311,13 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">n</span>
         <span class="c">!+ Initial atomic energy level/state</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
-        <span class="c">!+ Cross Section [\(cm^2\)]  </span>
-  
+        <span class="c">!+ Cross Section [\(cm^2\)]</span>
+
     <span class="n">sigma</span> <span class="o">=</span> <span class="n">Aq_cx_n_adas</span><span class="p">(</span><span class="n">eb</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">sigma</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.</span><span class="n">d0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">sigma</span> <span class="o">=</span> <span class="n">Aq_cx_n_janev</span><span class="p">(</span><span class="n">eb</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
     <span class="n">endif</span>
-  
+
 <span class="k">end function </span><span class="n">Aq_cx_n</span>
 </pre></div>
 
@@ -1401,6 +1429,8 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1432,6 +1462,12 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1502,6 +1538,8 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1632,6 +1670,10 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1789,11 +1831,13 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1809,7 +1853,7 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1845,6 +1889,8 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1855,6 +1901,10 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1864,6 +1914,10 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1878,6 +1932,8 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1899,7 +1955,7 @@ in the <code>n</code> state colliding with a ion with charge <code>q</code> at e
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -858,136 +886,170 @@ public subroutine uvw_to_xyz(uvw, xyz)
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
 <!-- Title: proc~~uvw_to_xyz~~CalledByGraph Pages: 1 -->
-<svg id="procuvw_to_xyzCalledByGraph" width="404pt" height="245pt"
- viewBox="0.00 0.00 404.00 245.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~uvw_to_xyz~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 241)">
+<svg id="procuvw_to_xyzCalledByGraph" width="400pt" height="331pt"
+ viewBox="0.00 0.00 400.00 331.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~uvw_to_xyz~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 327)">
 <title>proc~~uvw_to_xyz~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-241 401,-241 401,5 -4,5"/>
+<polygon fill="white" stroke="white" points="-4,5 -4,-327 397,-327 397,5 -4,5"/>
 <!-- proc~uvw_to_xyz -->
 <g id="node1" class="node"><title>proc~uvw_to_xyz</title>
-<polygon fill="none" stroke="black" points="396,-128 328,-128 328,-102 396,-102 396,-128"/>
-<text text-anchor="middle" x="362" y="-112.55" font-family="Helvetica,sans-Serif" font-size="10.50">uvw_to_xyz</text>
+<polygon fill="none" stroke="black" points="392,-170 324,-170 324,-144 392,-144 392,-170"/>
+<text text-anchor="middle" x="358" y="-154.55" font-family="Helvetica,sans-Serif" font-size="10.50">uvw_to_xyz</text>
 </g>
-<!-- proc~npa_mc -->
-<g id="node2" class="node"><title>proc~npa_mc</title>
-<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="282,-237 228,-237 228,-211 282,-211 282,-237"/>
-<text text-anchor="middle" x="255" y="-221.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<!-- proc~neutron_mc -->
+<g id="node2" class="node"><title>proc~neutron_mc</title>
+<a xlink:href="../proc/neutron_mc.html" xlink:title="neutron_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="288,-323 218,-323 218,-297 288,-297 288,-323"/>
+<text text-anchor="middle" x="253" y="-307.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_mc</text>
 </a>
 </g>
-<!-- proc~npa_mc&#45;&gt;proc~uvw_to_xyz -->
-<g id="edge16" class="edge"><title>proc~npa_mc&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M279.735,-210.976C284.012,-208.262 288.275,-205.233 292,-202 314.395,-182.561 335.02,-155.29 347.994,-136.487"/>
-<polygon fill="#000000" stroke="#000000" points="351.024,-138.254 353.722,-128.008 345.224,-134.335 351.024,-138.254"/>
+<!-- proc~neutron_mc&#45;&gt;proc~uvw_to_xyz -->
+<g id="edge20" class="edge"><title>proc~neutron_mc&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M277.609,-296.855C281.349,-294.224 284.966,-291.255 288,-288 318.087,-255.716 339.23,-208.053 349.942,-180"/>
+<polygon fill="#000000" stroke="#000000" points="353.35,-180.874 353.533,-170.281 346.784,-178.448 353.35,-180.874"/>
 </g>
-<!-- proc~fida_mc -->
-<g id="node3" class="node"><title>proc~fida_mc</title>
-<a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="282,-193 228,-193 228,-167 282,-167 282,-193"/>
-<text text-anchor="middle" x="255" y="-177.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
+<!-- proc~neutron_f -->
+<g id="node3" class="node"><title>proc~neutron_f</title>
+<a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="282,-279 224,-279 224,-253 282,-253 282,-279"/>
+<text text-anchor="middle" x="253" y="-263.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
 </a>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~uvw_to_xyz -->
-<g id="edge18" class="edge"><title>proc~fida_mc&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M277.336,-166.79C282.179,-163.906 287.267,-160.861 292,-158 305.26,-149.986 319.871,-141.03 332.299,-133.375"/>
-<polygon fill="#000000" stroke="#000000" points="334.238,-136.291 340.912,-128.063 330.564,-130.333 334.238,-136.291"/>
-</g>
-<!-- proc~read_chords -->
-<g id="node4" class="node"><title>proc~read_chords</title>
-<a xlink:href="../proc/read_chords.html" xlink:title="read_chords">
-<polygon fill="#d9534f" stroke="#d9534f" points="291,-149 219,-149 219,-123 291,-123 291,-149"/>
-<text text-anchor="middle" x="255" y="-133.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_chords</text>
-</a>
-</g>
-<!-- proc~read_chords&#45;&gt;proc~uvw_to_xyz -->
-<g id="edge20" class="edge"><title>proc~read_chords&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M291.524,-128.832C299.966,-127.175 309.037,-125.395 317.768,-123.681"/>
-<polygon fill="#000000" stroke="#000000" points="318.664,-127.072 327.803,-121.712 317.316,-120.203 318.664,-127.072"/>
-</g>
-<!-- proc~read_mc -->
-<g id="node5" class="node"><title>proc~read_mc</title>
-<a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="282,-27 228,-27 228,-1 282,-1 282,-27"/>
-<text text-anchor="middle" x="255" y="-11.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
-</a>
-</g>
-<!-- proc~read_mc&#45;&gt;proc~uvw_to_xyz -->
-<g id="edge22" class="edge"><title>proc~read_mc&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M272.711,-27.1043C278.956,-31.9259 285.93,-37.5444 292,-43 310.161,-59.3225 329.403,-79.3368 343.108,-94.1171"/>
-<polygon fill="#000000" stroke="#000000" points="340.765,-96.7401 350.109,-101.733 345.918,-92.0026 340.765,-96.7401"/>
+<!-- proc~neutron_f&#45;&gt;proc~uvw_to_xyz -->
+<g id="edge22" class="edge"><title>proc~neutron_f&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M276.373,-252.837C280.421,-250.137 284.461,-247.149 288,-244 310.029,-224.397 330.593,-197.374 343.656,-178.67"/>
+<polygon fill="#000000" stroke="#000000" points="346.676,-180.453 349.439,-170.225 340.901,-176.498 346.676,-180.453"/>
 </g>
 <!-- proc~read_npa -->
-<g id="node6" class="node"><title>proc~read_npa</title>
+<g id="node4" class="node"><title>proc~read_npa</title>
 <a xlink:href="../proc/read_npa.html" xlink:title="read_npa">
-<polygon fill="#d9534f" stroke="#d9534f" points="165,-114 107,-114 107,-88 165,-88 165,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="282,-235 224,-235 224,-209 282,-209 282,-235"/>
+<text text-anchor="middle" x="253" y="-219.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
 </a>
 </g>
 <!-- proc~read_npa&#45;&gt;proc~uvw_to_xyz -->
 <g id="edge24" class="edge"><title>proc~read_npa&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M165.083,-102.802C203.793,-105.2 272.604,-109.462 317.767,-112.26"/>
-<polygon fill="#000000" stroke="#000000" points="317.668,-115.76 327.865,-112.885 318.101,-108.774 317.668,-115.76"/>
+<path fill="none" stroke="#000000" d="M274.248,-208.846C289.761,-199.243 310.998,-186.097 328.204,-175.445"/>
+<polygon fill="#000000" stroke="#000000" points="330.123,-178.374 336.783,-170.134 326.438,-172.422 330.123,-178.374"/>
+</g>
+<!-- proc~npa_mc -->
+<g id="node5" class="node"><title>proc~npa_mc</title>
+<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="280,-191 226,-191 226,-165 280,-165 280,-191"/>
+<text text-anchor="middle" x="253" y="-175.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+</a>
+</g>
+<!-- proc~npa_mc&#45;&gt;proc~uvw_to_xyz -->
+<g id="edge26" class="edge"><title>proc~npa_mc&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M280.04,-172.592C290.379,-170.524 302.457,-168.109 313.975,-165.805"/>
+<polygon fill="#000000" stroke="#000000" points="314.777,-169.214 323.896,-163.821 313.404,-162.35 314.777,-169.214"/>
+</g>
+<!-- proc~read_mc -->
+<g id="node6" class="node"><title>proc~read_mc</title>
+<a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="280,-28 226,-28 226,-2 280,-2 280,-28"/>
+<text text-anchor="middle" x="253" y="-12.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
+</a>
+</g>
+<!-- proc~read_mc&#45;&gt;proc~uvw_to_xyz -->
+<g id="edge28" class="edge"><title>proc~read_mc&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M271.094,-28.131C276.857,-32.7824 283.023,-38.2884 288,-44 312.917,-72.5963 334.692,-111.051 347.09,-134.918"/>
+<polygon fill="#000000" stroke="#000000" points="344.003,-136.57 351.664,-143.889 350.24,-133.39 344.003,-136.57"/>
 </g>
 <!-- proc~read_beam -->
 <g id="node7" class="node"><title>proc~read_beam</title>
 <a xlink:href="../proc/read_beam.html" xlink:title="read_beam">
-<polygon fill="#d9534f" stroke="#d9534f" points="169,-70 103,-70 103,-44 169,-44 169,-70"/>
-<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_beam</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="169,-158 103,-158 103,-132 169,-132 169,-158"/>
+<text text-anchor="middle" x="136" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_beam</text>
 </a>
 </g>
 <!-- proc~read_beam&#45;&gt;proc~uvw_to_xyz -->
-<g id="edge26" class="edge"><title>proc~read_beam&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M169.834,-65.6832C209.361,-75.8272 274.858,-92.6362 318.226,-103.766"/>
-<polygon fill="#000000" stroke="#000000" points="317.378,-107.162 327.934,-106.257 319.118,-100.381 317.378,-107.162"/>
+<g id="edge30" class="edge"><title>proc~read_beam&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M169.717,-146.823C208.265,-148.906 271.498,-152.324 313.922,-154.617"/>
+<polygon fill="#000000" stroke="#000000" points="313.791,-158.115 323.966,-155.16 314.169,-151.126 313.791,-158.115"/>
 </g>
-<!-- program~fidasim -->
-<g id="node8" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-134 2.13163e-14,-134 0,-108 54,-108 54,-134"/>
-<text text-anchor="middle" x="27" y="-118.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<!-- proc~fida_mc -->
+<g id="node8" class="node"><title>proc~fida_mc</title>
+<a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-114 109,-114 109,-88 163,-88 163,-114"/>
+<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M42.1934,-134.107C54.45,-144.167 72.477,-157.841 90,-167 131.745,-188.82 183.619,-205.155 217.937,-214.623"/>
-<polygon fill="#000000" stroke="#000000" points="217.426,-218.11 227.993,-217.339 219.251,-211.352 217.426,-218.11"/>
+<!-- proc~fida_mc&#45;&gt;proc~uvw_to_xyz -->
+<g id="edge32" class="edge"><title>proc~fida_mc&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M163.222,-107.867C200.788,-117.343 268.963,-134.54 313.867,-145.867"/>
+<polygon fill="#000000" stroke="#000000" points="313.08,-149.278 323.632,-148.331 314.792,-142.491 313.08,-149.278"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_mc -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
-<path fill="none" stroke="#000000" d="M54.1132,-130.668C65.1698,-134.445 78.1242,-138.661 90,-142 133.598,-154.256 184.479,-165.523 218.087,-172.553"/>
-<polygon fill="#000000" stroke="#000000" points="217.433,-175.992 227.936,-174.595 218.854,-169.137 217.433,-175.992"/>
+<!-- proc~read_chords -->
+<g id="node9" class="node"><title>proc~read_chords</title>
+<a xlink:href="../proc/read_chords.html" xlink:title="read_chords">
+<polygon fill="#d9534f" stroke="#d9534f" points="172,-70 100,-70 100,-44 172,-44 172,-70"/>
+<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_chords</text>
+</a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~read_chords -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~read_chords</title>
-<path fill="none" stroke="#000000" d="M54.0499,-122.78C91.9939,-125.276 161.579,-129.854 208.069,-132.912"/>
-<polygon fill="#000000" stroke="#000000" points="207.989,-136.415 218.198,-133.579 208.449,-129.43 207.989,-136.415"/>
+<!-- proc~read_chords&#45;&gt;proc~uvw_to_xyz -->
+<g id="edge34" class="edge"><title>proc~read_chords&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M172.177,-70.0405C203.325,-81.6167 249.245,-99.5187 288,-118 301.208,-124.299 315.38,-132.006 327.494,-138.9"/>
+<polygon fill="#000000" stroke="#000000" points="325.895,-142.018 336.307,-143.977 329.389,-135.952 325.895,-142.018"/>
+</g>
+<!-- program~fidasim -->
+<g id="node10" class="node"><title>program~fidasim</title>
+<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-178 2.13163e-14,-178 0,-152 54,-152 54,-178"/>
+<text text-anchor="middle" x="27" y="-162.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_mc -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_mc</title>
+<path fill="none" stroke="#000000" d="M35.0709,-178.206C45.8031,-194.818 66.2104,-223.304 90,-241 125.794,-267.625 173.408,-286.242 207.927,-297.371"/>
+<polygon fill="#000000" stroke="#000000" points="207.153,-300.796 217.742,-300.448 209.247,-294.117 207.153,-300.796"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_f -->
+<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<path fill="none" stroke="#000000" d="M43.0615,-178.07C55.3498,-187.598 73.0173,-200.309 90,-209 130.389,-229.671 179.992,-245.822 213.798,-255.574"/>
+<polygon fill="#000000" stroke="#000000" points="213.18,-259.036 223.755,-258.393 215.087,-252.301 213.18,-259.036"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~read_npa -->
-<g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
-<path fill="none" stroke="#000000" d="M54.2241,-116.005C67.1123,-113.64 82.7425,-110.772 96.8715,-108.18"/>
-<polygon fill="#000000" stroke="#000000" points="97.6295,-111.599 106.834,-106.352 96.3662,-104.714 97.6295,-111.599"/>
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
+<path fill="none" stroke="#000000" d="M54.1404,-174.167C65.2009,-177.758 78.1509,-181.78 90,-185 131.946,-196.397 180.61,-207.124 213.77,-214.064"/>
+<polygon fill="#000000" stroke="#000000" points="213.46,-217.574 223.963,-216.18 214.883,-210.72 213.46,-217.574"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~npa_mc -->
+<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<path fill="none" stroke="#000000" d="M54.2609,-166.568C94.6689,-168.892 170.562,-173.258 215.969,-175.87"/>
+<polygon fill="#000000" stroke="#000000" points="215.81,-179.366 225.994,-176.447 216.212,-172.378 215.81,-179.366"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~read_beam -->
 <g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~read_beam</title>
-<path fill="none" stroke="#000000" d="M45.0351,-107.982C57.4032,-99.3048 74.3452,-87.9022 90,-79 92.525,-77.5641 95.1584,-76.1349 97.831,-74.7343"/>
-<polygon fill="#000000" stroke="#000000" points="99.6235,-77.7499 106.968,-70.1138 96.4645,-71.5032 99.6235,-77.7499"/>
+<path fill="none" stroke="#000000" d="M54.2241,-160.005C65.6679,-157.905 79.2735,-155.409 92.0705,-153.06"/>
+<polygon fill="#000000" stroke="#000000" points="92.8993,-156.467 102.103,-151.22 91.6359,-149.582 92.8993,-156.467"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_mc -->
+<g id="edge16" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
+<path fill="none" stroke="#000000" d="M45.0351,-151.982C57.4032,-143.305 74.3452,-131.902 90,-123 93.1887,-121.187 96.5504,-119.384 99.9454,-117.636"/>
+<polygon fill="#000000" stroke="#000000" points="101.525,-120.759 108.915,-113.167 98.4031,-114.494 101.525,-120.759"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~read_chords -->
+<g id="edge18" class="edge"><title>program~fidasim&#45;&gt;proc~read_chords</title>
+<path fill="none" stroke="#000000" d="M33.9191,-151.771C44.0887,-133.392 64.6406,-100.029 90,-79 91.3586,-77.8734 92.7846,-76.7888 94.2592,-75.7465"/>
+<polygon fill="#000000" stroke="#000000" points="96.4647,-78.4966 103.107,-70.2421 92.7668,-72.553 96.4647,-78.4966"/>
 </g>
 <!-- proc~read_distribution -->
-<g id="node12" class="node"><title>proc~read_distribution</title>
+<g id="node15" class="node"><title>proc~read_distribution</title>
 <a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
 <polygon fill="#d9534f" stroke="#d9534f" points="182,-26 90,-26 90,-1.24345e-14 182,-3.55271e-15 182,-26"/>
 <text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
-<path fill="none" stroke="#000000" d="M33.9191,-107.771C44.0887,-89.3924 64.6406,-56.0295 90,-35 91.3586,-33.8734 92.7846,-32.7888 94.2592,-31.7465"/>
-<polygon fill="#000000" stroke="#000000" points="96.4647,-34.4966 103.107,-26.2421 92.7668,-28.553 96.4647,-34.4966"/>
+<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<path fill="none" stroke="#000000" d="M30.2263,-151.856C37.1128,-126.278 55.5069,-69.3156 90,-35 91.059,-33.9464 92.1783,-32.9361 93.3453,-31.968"/>
+<polygon fill="#000000" stroke="#000000" points="95.4259,-34.7839 101.607,-26.1789 91.4088,-29.0513 95.4259,-34.7839"/>
 </g>
 <!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge10" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.009,-13.3866C193.606,-13.4841 205.926,-13.5876 217.077,-13.6813"/>
-<polygon fill="#000000" stroke="#000000" points="217.318,-17.1834 227.347,-13.7676 217.377,-10.1836 217.318,-17.1834"/>
+<g id="edge12" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.241,-13.7905C193.164,-13.9772 204.683,-14.1741 215.183,-14.3535"/>
+<polygon fill="#000000" stroke="#000000" points="215.224,-17.8547 225.282,-14.5262 215.343,-10.8557 215.224,-17.8547"/>
 </g>
 </g>
 </svg>
@@ -1239,6 +1301,8 @@ public subroutine uvw_to_xyz(uvw, xyz)
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1270,6 +1334,12 @@ public subroutine uvw_to_xyz(uvw, xyz)
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1340,6 +1410,8 @@ public subroutine uvw_to_xyz(uvw, xyz)
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1470,6 +1542,10 @@ public subroutine uvw_to_xyz(uvw, xyz)
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1627,11 +1703,13 @@ public subroutine uvw_to_xyz(uvw, xyz)
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1647,7 +1725,7 @@ public subroutine uvw_to_xyz(uvw, xyz)
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1683,6 +1761,8 @@ public subroutine uvw_to_xyz(uvw, xyz)
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1693,6 +1773,10 @@ public subroutine uvw_to_xyz(uvw, xyz)
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1702,6 +1786,10 @@ public subroutine uvw_to_xyz(uvw, xyz)
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1716,6 +1804,8 @@ public subroutine uvw_to_xyz(uvw, xyz)
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1737,7 +1827,7 @@ public subroutine uvw_to_xyz(uvw, xyz)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -892,22 +920,17 @@ public function p_cx_2_janev(Erel) result(sigma)
 <path fill="none" stroke="#000000" d="M574.02,-89.1503C582.166,-87.3868 591.325,-85.4039 600.266,-83.4683"/>
 <polygon fill="#000000" stroke="#000000" points="601.169,-86.8539 610.202,-81.3171 599.688,-80.0124 601.169,-86.8539"/>
 </g>
-<!-- proc~p_cx_3 -->
-<g id="node4" class="node"><title>proc~p_cx_3</title>
-<a xlink:href="../proc/p_cx_3.html" xlink:title="p_cx_3">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="484,-67 430,-67 430,-41 484,-41 484,-67"/>
-<text text-anchor="middle" x="457" y="-51.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3</text>
+<!-- proc~p_cx_2 -->
+<g id="node4" class="node"><title>proc~p_cx_2</title>
+<a xlink:href="../proc/p_cx_2.html" xlink:title="p_cx_2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="574,-26 520,-26 520,-1.24345e-14 574,-3.55271e-15 574,-26"/>
+<text text-anchor="middle" x="547" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_2</text>
 </a>
 </g>
-<!-- proc~p_cx_3&#45;&gt;proc~p_cx_janev -->
-<g id="edge20" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_janev</title>
-<path fill="none" stroke="#000000" d="M484.191,-56.9082C514.616,-60.1621 564.34,-65.4802 600.25,-69.3208"/>
-<polygon fill="#000000" stroke="#000000" points="600.133,-72.8282 610.448,-70.4116 600.877,-65.8679 600.133,-72.8282"/>
-</g>
-<!-- proc~p_cx_3&#45;&gt;proc~p_cx_1 -->
-<g id="edge2" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_1</title>
-<path fill="none" stroke="#000000" d="M484.003,-66.3014C492.292,-70.0776 501.557,-74.2982 510.377,-78.316"/>
-<polygon fill="#000000" stroke="#000000" points="509.154,-81.605 519.705,-82.5656 512.056,-75.2348 509.154,-81.605"/>
+<!-- proc~p_cx_2&#45;&gt;proc~p_cx_janev -->
+<g id="edge20" class="edge"><title>proc~p_cx_2&#45;&gt;proc~p_cx_janev</title>
+<path fill="none" stroke="#000000" d="M568.048,-26.2361C581.742,-34.8478 599.789,-46.1974 614.856,-55.6722"/>
+<polygon fill="#000000" stroke="#000000" points="612.998,-58.6386 623.327,-60.9993 616.725,-52.7129 612.998,-58.6386"/>
 </g>
 <!-- proc~p_cx_n -->
 <g id="node5" class="node"><title>proc~p_cx_n</title>
@@ -926,27 +949,32 @@ public function p_cx_2_janev(Erel) result(sigma)
 <path fill="none" stroke="#000000" d="M394.338,-77.1894C425.177,-80.7873 475.501,-86.6584 509.877,-90.669"/>
 <polygon fill="#000000" stroke="#000000" points="509.656,-94.1669 519.994,-91.8493 510.467,-87.214 509.656,-94.1669"/>
 </g>
-<!-- proc~p_cx_n&#45;&gt;proc~p_cx_3 -->
-<g id="edge6" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_3</title>
-<path fill="none" stroke="#000000" d="M394.003,-67.9993C402.116,-66.1965 411.163,-64.186 419.813,-62.2638"/>
-<polygon fill="#000000" stroke="#000000" points="420.702,-65.6516 429.705,-60.0655 419.184,-58.8183 420.702,-65.6516"/>
-</g>
-<!-- proc~p_cx_2 -->
-<g id="node6" class="node"><title>proc~p_cx_2</title>
-<a xlink:href="../proc/p_cx_2.html" xlink:title="p_cx_2">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="574,-26 520,-26 520,-1.24345e-14 574,-3.55271e-15 574,-26"/>
-<text text-anchor="middle" x="547" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_2</text>
-</a>
-</g>
 <!-- proc~p_cx_n&#45;&gt;proc~p_cx_2 -->
-<g id="edge16" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_2</title>
+<g id="edge6" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_2</title>
 <path fill="none" stroke="#000000" d="M382.508,-60.8931C394.651,-51.3479 412.383,-38.9243 430,-32 455.411,-22.0123 485.91,-17.2737 509.397,-15.0262"/>
 <polygon fill="#000000" stroke="#000000" points="509.982,-18.4893 519.652,-14.1589 509.392,-11.5142 509.982,-18.4893"/>
 </g>
-<!-- proc~p_cx_2&#45;&gt;proc~p_cx_janev -->
-<g id="edge24" class="edge"><title>proc~p_cx_2&#45;&gt;proc~p_cx_janev</title>
-<path fill="none" stroke="#000000" d="M568.048,-26.2361C581.742,-34.8478 599.789,-46.1974 614.856,-55.6722"/>
-<polygon fill="#000000" stroke="#000000" points="612.998,-58.6386 623.327,-60.9993 616.725,-52.7129 612.998,-58.6386"/>
+<!-- proc~p_cx_3 -->
+<g id="node6" class="node"><title>proc~p_cx_3</title>
+<a xlink:href="../proc/p_cx_3.html" xlink:title="p_cx_3">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="484,-67 430,-67 430,-41 484,-41 484,-67"/>
+<text text-anchor="middle" x="457" y="-51.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3</text>
+</a>
+</g>
+<!-- proc~p_cx_n&#45;&gt;proc~p_cx_3 -->
+<g id="edge16" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_3</title>
+<path fill="none" stroke="#000000" d="M394.003,-67.9993C402.116,-66.1965 411.163,-64.186 419.813,-62.2638"/>
+<polygon fill="#000000" stroke="#000000" points="420.702,-65.6516 429.705,-60.0655 419.184,-58.8183 420.702,-65.6516"/>
+</g>
+<!-- proc~p_cx_3&#45;&gt;proc~p_cx_janev -->
+<g id="edge24" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_janev</title>
+<path fill="none" stroke="#000000" d="M484.191,-56.9082C514.616,-60.1621 564.34,-65.4802 600.25,-69.3208"/>
+<polygon fill="#000000" stroke="#000000" points="600.133,-72.8282 610.448,-70.4116 600.877,-65.8679 600.133,-72.8282"/>
+</g>
+<!-- proc~p_cx_3&#45;&gt;proc~p_cx_1 -->
+<g id="edge2" class="edge"><title>proc~p_cx_3&#45;&gt;proc~p_cx_1</title>
+<path fill="none" stroke="#000000" d="M484.003,-66.3014C492.292,-70.0776 501.557,-74.2982 510.377,-78.316"/>
+<polygon fill="#000000" stroke="#000000" points="509.154,-81.605 519.705,-82.5656 512.056,-75.2348 509.154,-81.605"/>
 </g>
 <!-- proc~p_cx_n_m -->
 <g id="node10" class="node"><title>proc~p_cx_n_m</title>
@@ -1144,12 +1172,12 @@ public function p_cx_2_janev(Erel) result(sigma)
         <span class="c">!+ Fitting Parameters from Table 9 in Ref. 2</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">2.</span><span class="n">d0</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">Ehat</span>
-  
+
     <span class="n">Ehat</span> <span class="o">=</span> <span class="n">Erel</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span>
-  
+
     <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">16</span><span class="o">*</span><span class="n">a</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">Ehat</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">/</span> <span class="p">&amp;</span>
-            <span class="p">(</span><span class="mf">1.</span><span class="n">d0</span><span class="o">+</span><span class="n">a</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">Ehat</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">Ehat</span><span class="o">**</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">Ehat</span><span class="o">**</span><span class="p">(</span><span class="mf">5.4</span><span class="p">))</span> 
-  
+            <span class="p">(</span><span class="mf">1.</span><span class="n">d0</span><span class="o">+</span><span class="n">a</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">Ehat</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">Ehat</span><span class="o">**</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">Ehat</span><span class="o">**</span><span class="p">(</span><span class="mf">5.4</span><span class="p">))</span>
+
 <span class="k">end function </span><span class="n">p_cx_2_janev</span>
 </pre></div>
 
@@ -1261,6 +1289,8 @@ public function p_cx_2_janev(Erel) result(sigma)
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1292,6 +1322,12 @@ public function p_cx_2_janev(Erel) result(sigma)
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1362,6 +1398,8 @@ public function p_cx_2_janev(Erel) result(sigma)
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1492,6 +1530,10 @@ public function p_cx_2_janev(Erel) result(sigma)
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1649,11 +1691,13 @@ public function p_cx_2_janev(Erel) result(sigma)
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1669,7 +1713,7 @@ public function p_cx_2_janev(Erel) result(sigma)
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1705,6 +1749,8 @@ public function p_cx_2_janev(Erel) result(sigma)
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1715,6 +1761,10 @@ public function p_cx_2_janev(Erel) result(sigma)
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1724,6 +1774,10 @@ public function p_cx_2_janev(Erel) result(sigma)
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1738,6 +1792,8 @@ public function p_cx_2_janev(Erel) result(sigma)
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1759,7 +1815,7 @@ public function p_cx_2_janev(Erel) result(sigma)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

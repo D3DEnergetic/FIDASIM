@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -826,7 +854,7 @@ the <code>n</code> state to the m=1..<code>m_max</code> states due to a collisio
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E87"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E88"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -893,7 +921,7 @@ the <code>n</code> state to the m=1..<code>m_max</code> states due to a collisio
 	 <h3>Return Value <small><span class="anchor" id="variable-sigma%7E108"></span>real(kind=Float64),
   dimension(m_max)</small></h3>
     <p>Array of cross sections where the m'th index refers to
-an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
+an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
     
     
      
@@ -1121,12 +1149,12 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
         <span class="c">!+ Number of m states to calculate</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">m_max</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Array of cross sections where the m&#39;th index refers to</span>
-        <span class="c">!+an excitation from the `n` state to the m&#39;th state [\(cm^2\)] </span>
-  
+        <span class="c">!+an excitation from the `n` state to the m&#39;th state [\(cm^2\)]</span>
+
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">m</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nf</span><span class="p">,</span> <span class="n">mf</span><span class="p">,</span> <span class="n">qf</span><span class="p">,</span> <span class="n">etil</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">s</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">D</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">F</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">zpl</span><span class="p">,</span> <span class="n">zmi</span><span class="p">,</span> <span class="n">C2pl</span><span class="p">,</span> <span class="n">C2mi</span>
-  
+
     <span class="n">nf</span> <span class="o">=</span> <span class="kt">real</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
     <span class="n">qf</span> <span class="o">=</span> <span class="kt">real</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
     <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
@@ -1146,7 +1174,7 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
         <span class="n">G</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">etil</span><span class="o">*</span><span class="n">nf</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">mf</span> <span class="o">-</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">mf</span><span class="p">))</span><span class="o">**</span><span class="mf">3.0</span>
         <span class="n">L</span> <span class="o">=</span> <span class="nb">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.53</span><span class="o">*</span><span class="n">etil</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">nf</span><span class="o">*</span><span class="p">(</span><span class="n">mf</span> <span class="o">-</span> <span class="mf">2.0</span><span class="o">/</span><span class="n">mf</span> <span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.4</span><span class="o">*</span><span class="n">etil</span><span class="p">))</span>
         <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">0.3</span><span class="o">*</span><span class="n">s</span><span class="o">*</span><span class="n">D</span><span class="o">/</span><span class="p">(</span><span class="n">nf</span><span class="o">*</span><span class="n">mf</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">s</span><span class="p">)</span>
-        
+
         <span class="n">y</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">D</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="mi">18</span><span class="o">*</span><span class="n">s</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.0</span><span class="o">*</span><span class="n">s</span><span class="p">))</span>
         <span class="n">zpl</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">/</span><span class="p">(</span><span class="n">etil</span><span class="o">*</span><span class="n">nf</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">-</span> <span class="n">nf</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">mf</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">))</span>
         <span class="n">zmi</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">/</span><span class="p">(</span><span class="n">etil</span><span class="o">*</span><span class="n">nf</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="nb">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">-</span> <span class="n">nf</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">mf</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
@@ -1156,7 +1184,7 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
 
         <span class="n">sigma</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">=</span> <span class="n">q</span><span class="o">*</span><span class="n">hi</span><span class="o">*</span><span class="mf">8.86e-17</span><span class="o">*</span><span class="n">nf</span><span class="o">**</span><span class="mi">4</span><span class="o">/</span><span class="n">etil</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">L</span><span class="o">+</span><span class="n">F</span><span class="o">*</span><span class="n">G</span><span class="o">*</span><span class="n">H</span><span class="p">)</span>
     <span class="n">enddo</span> <span class="n">m_loop</span>
-  
+
 <span class="k">end function </span><span class="n">Aq_excit_n_janev</span>
 </pre></div>
 
@@ -1268,6 +1296,8 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1299,6 +1329,12 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1369,6 +1405,8 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1499,6 +1537,10 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1656,11 +1698,13 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1676,7 +1720,7 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1712,6 +1756,8 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1722,6 +1768,10 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1731,6 +1781,10 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1745,6 +1799,8 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1766,7 +1822,7 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)] </p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

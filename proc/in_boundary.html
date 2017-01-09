@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -889,51 +917,51 @@ public function in_boundary(bplane, p) result(in_b)
 <path fill="none" stroke="#000000" d="M293.69,-79C302.208,-79 311.094,-79 319.603,-79"/>
 <polygon fill="#000000" stroke="#000000" points="319.746,-82.5001 329.746,-79 319.746,-75.5001 319.746,-82.5001"/>
 </g>
-<!-- proc~npa_weights -->
-<g id="node3" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-158 91,-158 91,-132 163,-132 163,-158"/>
-<text text-anchor="middle" x="127" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
-</a>
-</g>
-<!-- proc~npa_weights&#45;&gt;proc~hit_npa_detector -->
-<g id="edge10" class="edge"><title>proc~npa_weights&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M150.708,-131.961C168.952,-121.927 194.366,-107.949 214.504,-96.8727"/>
-<polygon fill="#000000" stroke="#000000" points="216.266,-99.8984 223.341,-92.0124 212.892,-93.7649 216.266,-99.8984"/>
-</g>
 <!-- proc~read_npa -->
-<g id="node4" class="node"><title>proc~read_npa</title>
+<g id="node3" class="node"><title>proc~read_npa</title>
 <a xlink:href="../proc/read_npa.html" xlink:title="read_npa">
-<polygon fill="#d9534f" stroke="#d9534f" points="156,-114 98,-114 98,-88 156,-88 156,-114"/>
-<text text-anchor="middle" x="127" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="156,-158 98,-158 98,-132 156,-132 156,-158"/>
+<text text-anchor="middle" x="127" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
 </a>
 </g>
 <!-- proc~read_npa&#45;&gt;proc~hit_npa_detector -->
-<g id="edge12" class="edge"><title>proc~read_npa&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M156.049,-95.6744C166.453,-93.7669 178.568,-91.5459 190.497,-89.3588"/>
-<polygon fill="#000000" stroke="#000000" points="191.228,-92.7832 200.433,-87.5373 189.966,-85.898 191.228,-92.7832"/>
+<g id="edge10" class="edge"><title>proc~read_npa&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M150.708,-131.961C168.952,-121.927 194.366,-107.949 214.504,-96.8727"/>
+<polygon fill="#000000" stroke="#000000" points="216.266,-99.8984 223.341,-92.0124 212.892,-93.7649 216.266,-99.8984"/>
 </g>
-<!-- proc~npa_f -->
-<g id="node5" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-70 100,-70 100,-44 154,-44 154,-70"/>
-<text text-anchor="middle" x="127" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<!-- proc~npa_weights -->
+<g id="node4" class="node"><title>proc~npa_weights</title>
+<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-114 91,-114 91,-88 163,-88 163,-114"/>
+<text text-anchor="middle" x="127" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
 </a>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~hit_npa_detector -->
-<g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M154.23,-61.9921C164.924,-63.9528 177.623,-66.2808 190.138,-68.5754"/>
-<polygon fill="#000000" stroke="#000000" points="189.627,-72.04 200.095,-70.4007 190.89,-65.1547 189.627,-72.04"/>
+<!-- proc~npa_weights&#45;&gt;proc~hit_npa_detector -->
+<g id="edge12" class="edge"><title>proc~npa_weights&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M163.656,-94.2797C172.069,-92.7373 181.208,-91.0619 190.248,-89.4045"/>
+<polygon fill="#000000" stroke="#000000" points="191.164,-92.7951 200.369,-87.5491 189.901,-85.9098 191.164,-92.7951"/>
 </g>
 <!-- proc~npa_mc -->
-<g id="node6" class="node"><title>proc~npa_mc</title>
+<g id="node5" class="node"><title>proc~npa_mc</title>
 <a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-26 100,-26 100,-1.24345e-14 154,-3.55271e-15 154,-26"/>
-<text text-anchor="middle" x="127" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="154,-70 100,-70 100,-44 154,-44 154,-70"/>
+<text text-anchor="middle" x="127" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
 </g>
 <!-- proc~npa_mc&#45;&gt;proc~hit_npa_detector -->
-<g id="edge16" class="edge"><title>proc~npa_mc&#45;&gt;proc~hit_npa_detector</title>
+<g id="edge14" class="edge"><title>proc~npa_mc&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M154.23,-61.9921C164.924,-63.9528 177.623,-66.2808 190.138,-68.5754"/>
+<polygon fill="#000000" stroke="#000000" points="189.627,-72.04 200.095,-70.4007 190.89,-65.1547 189.627,-72.04"/>
+</g>
+<!-- proc~npa_f -->
+<g id="node6" class="node"><title>proc~npa_f</title>
+<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="154,-26 100,-26 100,-1.24345e-14 154,-3.55271e-15 154,-26"/>
+<text text-anchor="middle" x="127" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+</a>
+</g>
+<!-- proc~npa_f&#45;&gt;proc~hit_npa_detector -->
+<g id="edge16" class="edge"><title>proc~npa_f&#45;&gt;proc~hit_npa_detector</title>
 <path fill="none" stroke="#000000" d="M150.708,-26.0395C168.952,-36.0734 194.366,-50.0511 214.504,-61.1273"/>
 <polygon fill="#000000" stroke="#000000" points="212.892,-64.2351 223.341,-65.9876 216.266,-58.1016 212.892,-64.2351"/>
 </g>
@@ -944,23 +972,23 @@ public function in_boundary(bplane, p) result(in_b)
 <text text-anchor="middle" x="27" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<!-- program~fidasim&#45;&gt;proc~read_npa -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
 <path fill="none" stroke="#000000" d="M44.956,-92.0646C57.432,-101.012 74.5305,-113.018 90,-123 91.8878,-124.218 93.8424,-125.454 95.8222,-126.685"/>
 <polygon fill="#000000" stroke="#000000" points="94.1736,-129.78 104.533,-131.999 97.8186,-123.803 94.1736,-129.78"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~read_npa -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
-<path fill="none" stroke="#000000" d="M54.0614,-84.9535C64.4243,-87.2333 76.4656,-89.8824 87.7418,-92.3632"/>
-<polygon fill="#000000" stroke="#000000" points="87.2938,-95.8483 97.8123,-94.5787 88.7979,-89.0118 87.2938,-95.8483"/>
+<!-- program~fidasim&#45;&gt;proc~npa_weights -->
+<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<path fill="none" stroke="#000000" d="M54.0614,-84.9535C62.1305,-86.7287 71.2171,-88.7278 80.1678,-90.6969"/>
+<polygon fill="#000000" stroke="#000000" points="79.6358,-94.1635 90.1542,-92.8939 81.1398,-87.327 79.6358,-94.1635"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<!-- program~fidasim&#45;&gt;proc~npa_mc -->
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
 <path fill="none" stroke="#000000" d="M54.0614,-73.0465C65.0669,-70.6253 77.9653,-67.7876 89.83,-65.1774"/>
 <polygon fill="#000000" stroke="#000000" points="90.9025,-68.5252 99.9169,-62.9583 89.3984,-61.6887 90.9025,-68.5252"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
 <path fill="none" stroke="#000000" d="M44.956,-65.9354C57.432,-56.9881 74.5305,-44.9821 90,-35 91.8878,-33.7819 93.8424,-32.5464 95.8222,-31.3146"/>
 <polygon fill="#000000" stroke="#000000" points="97.8186,-34.1966 104.533,-26.0014 94.1736,-28.2205 97.8186,-34.1966"/>
 </g>
@@ -1231,6 +1259,8 @@ public function in_boundary(bplane, p) result(in_b)
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1262,6 +1292,12 @@ public function in_boundary(bplane, p) result(in_b)
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1332,6 +1368,8 @@ public function in_boundary(bplane, p) result(in_b)
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1462,6 +1500,10 @@ public function in_boundary(bplane, p) result(in_b)
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1619,11 +1661,13 @@ public function in_boundary(bplane, p) result(in_b)
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1639,7 +1683,7 @@ public function in_boundary(bplane, p) result(in_b)
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1675,6 +1719,8 @@ public function in_boundary(bplane, p) result(in_b)
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1685,6 +1731,10 @@ public function in_boundary(bplane, p) result(in_b)
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1694,6 +1744,10 @@ public function in_boundary(bplane, p) result(in_b)
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1708,6 +1762,8 @@ public function in_boundary(bplane, p) result(in_b)
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1729,7 +1785,7 @@ public function in_boundary(bplane, p) result(in_b)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

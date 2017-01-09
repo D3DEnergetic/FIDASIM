@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -827,7 +855,7 @@ the \(n=3\) state to the m=1..<code>m_max</code> states due to a collision an io
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E86"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E87"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -879,7 +907,7 @@ the \(n=3\) state to the m=1..<code>m_max</code> states due to a collision an io
 	 <h3>Return Value <small><span class="anchor" id="variable-sigma%7E107"></span>real(kind=Float64),
   dimension(m_max)</small></h3>
     <p>Array of cross sections where the m'th index refers to
-an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
+an excitation from the \(n=3\) state to the m'th state [\(cm^2\)]</p>
     
     
      <h3>Calls</h3>
@@ -897,8 +925,8 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
 <polygon fill="white" stroke="white" points="-4,5 -4,-288 401,-288 401,5 -4,5"/>
 <!-- proc~aq_excit_3_janev -->
 <g id="node1" class="node"><title>proc~aq_excit_3_janev</title>
-<polygon fill="none" stroke="black" points="97,-155 1,-155 1,-129 97,-129 97,-155"/>
-<text text-anchor="middle" x="49" y="-139.55" font-family="Helvetica,sans-Serif" font-size="10.50">Aq_excit_3_janev</text>
+<polygon fill="none" stroke="black" points="97,-152 1,-152 1,-126 97,-126 97,-152"/>
+<text text-anchor="middle" x="49" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50">Aq_excit_3_janev</text>
 </g>
 <!-- proc~aq_excit_3_4_janev -->
 <g id="node2" class="node"><title>proc~aq_excit_3_4_janev</title>
@@ -909,100 +937,100 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
 </g>
 <!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_4_janev -->
 <g id="edge10" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_4_janev</title>
-<path fill="none" stroke="#000000" d="M56.183,-155.068C69.0271,-177.315 97.987,-222.686 134,-249 136.054,-250.501 138.223,-251.912 140.469,-253.238"/>
-<polygon fill="#000000" stroke="#000000" points="138.942,-256.389 149.424,-257.932 142.192,-250.189 138.942,-256.389"/>
-</g>
-<!-- proc~aq_excit_3_8_janev -->
-<g id="node3" class="node"><title>proc~aq_excit_3_8_janev</title>
-<a xlink:href="../proc/aq_excit_3_8_janev.html" xlink:title="Aq_excit_3_8_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-240 138,-240 138,-214 246,-214 246,-240"/>
-<text text-anchor="middle" x="192" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_8_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_8_janev -->
-<g id="edge12" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_8_janev</title>
-<path fill="none" stroke="#000000" d="M64.101,-155.217C80.4515,-169.026 107.728,-190.641 134,-205 137.07,-206.678 140.294,-208.284 143.585,-209.81"/>
-<polygon fill="#000000" stroke="#000000" points="142.395,-213.109 152.961,-213.89 145.188,-206.69 142.395,-213.109"/>
-</g>
-<!-- proc~aq_excit_3_9_janev -->
-<g id="node4" class="node"><title>proc~aq_excit_3_9_janev</title>
-<a xlink:href="../proc/aq_excit_3_9_janev.html" xlink:title="Aq_excit_3_9_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-196 138,-196 138,-170 246,-170 246,-196"/>
-<text text-anchor="middle" x="192" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_9_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_9_janev -->
-<g id="edge14" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_9_janev</title>
-<path fill="none" stroke="#000000" d="M94.6393,-155.085C107.926,-158.895 122.589,-163.099 136.415,-167.063"/>
-<polygon fill="#000000" stroke="#000000" points="135.726,-170.507 146.304,-169.898 137.656,-163.778 135.726,-170.507"/>
-</g>
-<!-- proc~aq_excit_3_6_janev -->
-<g id="node5" class="node"><title>proc~aq_excit_3_6_janev</title>
-<a xlink:href="../proc/aq_excit_3_6_janev.html" xlink:title="Aq_excit_3_6_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="395,-155 287,-155 287,-129 395,-129 395,-155"/>
-<text text-anchor="middle" x="341" y="-139.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_6_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge16" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M97.5456,-142C146.451,-142 222.204,-142 276.212,-142"/>
-<polygon fill="#000000" stroke="#000000" points="276.371,-145.5 286.371,-142 276.371,-138.5 276.371,-145.5"/>
-</g>
-<!-- proc~aq_excit_3_10_janev -->
-<g id="node6" class="node"><title>proc~aq_excit_3_10_janev</title>
-<a xlink:href="../proc/aq_excit_3_10_janev.html" xlink:title="Aq_excit_3_10_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="249,-114 135,-114 135,-88 249,-88 249,-114"/>
-<text text-anchor="middle" x="192" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_10_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev -->
-<g id="edge18" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev</title>
-<path fill="none" stroke="#000000" d="M94.6393,-128.915C107.926,-125.105 122.589,-120.901 136.415,-116.937"/>
-<polygon fill="#000000" stroke="#000000" points="137.656,-120.222 146.304,-114.102 135.726,-113.493 137.656,-120.222"/>
-</g>
-<!-- proc~aq_excit_3_5_janev -->
-<g id="node7" class="node"><title>proc~aq_excit_3_5_janev</title>
-<a xlink:href="../proc/aq_excit_3_5_janev.html" xlink:title="Aq_excit_3_5_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-70 138,-70 138,-44 246,-44 246,-70"/>
-<text text-anchor="middle" x="192" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_5_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev -->
-<g id="edge20" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev</title>
-<path fill="none" stroke="#000000" d="M64.101,-128.783C80.4515,-114.974 107.728,-93.3591 134,-79 137.07,-77.3222 140.294,-75.716 143.585,-74.1902"/>
-<polygon fill="#000000" stroke="#000000" points="145.188,-77.3099 152.961,-70.1104 142.395,-70.8913 145.188,-77.3099"/>
+<path fill="none" stroke="#000000" d="M55.8881,-152.079C68.4867,-174.828 97.3513,-221.843 134,-249 136.044,-250.515 138.205,-251.937 140.444,-253.272"/>
+<polygon fill="#000000" stroke="#000000" points="138.904,-256.417 149.381,-257.991 142.172,-250.227 138.904,-256.417"/>
 </g>
 <!-- proc~aq_excit_3_7_janev -->
-<g id="node8" class="node"><title>proc~aq_excit_3_7_janev</title>
+<g id="node3" class="node"><title>proc~aq_excit_3_7_janev</title>
 <a xlink:href="../proc/aq_excit_3_7_janev.html" xlink:title="Aq_excit_3_7_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-26 138,-26 138,-1.24345e-14 246,-3.55271e-15 246,-26"/>
-<text text-anchor="middle" x="192" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_7_janev</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-240 138,-240 138,-214 246,-214 246,-240"/>
+<text text-anchor="middle" x="192" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_7_janev</text>
 </a>
 </g>
 <!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_7_janev -->
-<g id="edge22" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_7_janev</title>
-<path fill="none" stroke="#000000" d="M56.183,-128.932C69.0271,-106.685 97.987,-61.3136 134,-35 136.054,-33.499 138.223,-32.0876 140.469,-30.7622"/>
-<polygon fill="#000000" stroke="#000000" points="142.192,-33.8105 149.424,-26.0678 138.942,-27.6107 142.192,-33.8105"/>
+<g id="edge12" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_7_janev</title>
+<path fill="none" stroke="#000000" d="M63.1018,-152.109C79.243,-166.577 106.954,-189.822 134,-205 137.002,-206.685 140.159,-208.292 143.386,-209.815"/>
+<polygon fill="#000000" stroke="#000000" points="142.028,-213.041 152.59,-213.876 144.854,-206.637 142.028,-213.041"/>
 </g>
-<!-- proc~aq_excit_3_8_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge2" class="edge"><title>proc~aq_excit_3_8_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M230.334,-213.975C237.015,-211.279 243.804,-208.258 250,-205 273.824,-192.474 298.822,-174.793 316.576,-161.35"/>
-<polygon fill="#000000" stroke="#000000" points="318.874,-163.998 324.673,-155.131 314.61,-158.446 318.874,-163.998"/>
+<!-- proc~aq_excit_3_5_janev -->
+<g id="node4" class="node"><title>proc~aq_excit_3_5_janev</title>
+<a xlink:href="../proc/aq_excit_3_5_janev.html" xlink:title="Aq_excit_3_5_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-196 138,-196 138,-170 246,-170 246,-196"/>
+<text text-anchor="middle" x="192" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_5_janev</text>
+</a>
 </g>
-<!-- proc~aq_excit_3_9_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge4" class="edge"><title>proc~aq_excit_3_9_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M239.554,-169.915C253.602,-166.049 269.126,-161.777 283.718,-157.762"/>
-<polygon fill="#000000" stroke="#000000" points="284.929,-161.059 293.642,-155.031 283.072,-154.31 284.929,-161.059"/>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev -->
+<g id="edge14" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev</title>
+<path fill="none" stroke="#000000" d="M91.5175,-152.082C106.653,-156.739 123.875,-162.038 139.733,-166.918"/>
+<polygon fill="#000000" stroke="#000000" points="138.812,-170.296 149.399,-169.892 140.871,-163.606 138.812,-170.296"/>
 </g>
-<!-- proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge6" class="edge"><title>proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M239.554,-114.085C253.602,-117.951 269.126,-122.223 283.718,-126.238"/>
-<polygon fill="#000000" stroke="#000000" points="283.072,-129.69 293.642,-128.969 284.929,-122.941 283.072,-129.69"/>
+<!-- proc~aq_excit_3_10_janev -->
+<g id="node5" class="node"><title>proc~aq_excit_3_10_janev</title>
+<a xlink:href="../proc/aq_excit_3_10_janev.html" xlink:title="Aq_excit_3_10_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="249,-152 135,-152 135,-126 249,-126 249,-152"/>
+<text text-anchor="middle" x="192" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_10_janev</text>
+</a>
+</g>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev -->
+<g id="edge16" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev</title>
+<path fill="none" stroke="#000000" d="M97.8125,-139C106.187,-139 115.024,-139 123.795,-139"/>
+<polygon fill="#000000" stroke="#000000" points="124.03,-142.5 134.03,-139 124.03,-135.5 124.03,-142.5"/>
+</g>
+<!-- proc~aq_excit_3_8_janev -->
+<g id="node6" class="node"><title>proc~aq_excit_3_8_janev</title>
+<a xlink:href="../proc/aq_excit_3_8_janev.html" xlink:title="Aq_excit_3_8_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-108 138,-108 138,-82 246,-82 246,-108"/>
+<text text-anchor="middle" x="192" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_8_janev</text>
+</a>
+</g>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_8_janev -->
+<g id="edge18" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_8_janev</title>
+<path fill="none" stroke="#000000" d="M91.5175,-125.918C106.653,-121.261 123.875,-115.962 139.733,-111.082"/>
+<polygon fill="#000000" stroke="#000000" points="140.871,-114.394 149.399,-108.108 138.812,-107.704 140.871,-114.394"/>
+</g>
+<!-- proc~aq_excit_3_6_janev -->
+<g id="node7" class="node"><title>proc~aq_excit_3_6_janev</title>
+<a xlink:href="../proc/aq_excit_3_6_janev.html" xlink:title="Aq_excit_3_6_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="395,-108 287,-108 287,-82 395,-82 395,-108"/>
+<text text-anchor="middle" x="341" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_6_janev</text>
+</a>
+</g>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev -->
+<g id="edge20" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M60.3688,-125.989C75.3551,-109.935 103.423,-83.4772 134,-73 187.127,-54.7958 252.029,-66.7982 294.835,-79.0432"/>
+<polygon fill="#000000" stroke="#000000" points="293.837,-82.3979 304.42,-81.895 295.833,-75.6885 293.837,-82.3979"/>
+</g>
+<!-- proc~aq_excit_3_9_janev -->
+<g id="node8" class="node"><title>proc~aq_excit_3_9_janev</title>
+<a xlink:href="../proc/aq_excit_3_9_janev.html" xlink:title="Aq_excit_3_9_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="246,-26 138,-26 138,-1.24345e-14 246,-3.55271e-15 246,-26"/>
+<text text-anchor="middle" x="192" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_9_janev</text>
+</a>
+</g>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_9_janev -->
+<g id="edge22" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_9_janev</title>
+<path fill="none" stroke="#000000" d="M57.5056,-125.886C71.4025,-105.305 100.78,-65.1761 134,-40 138.426,-36.6457 143.336,-33.5717 148.371,-30.7964"/>
+<polygon fill="#000000" stroke="#000000" points="150.186,-33.7992 157.494,-26.1277 146.997,-27.5679 150.186,-33.7992"/>
 </g>
 <!-- proc~aq_excit_3_7_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge8" class="edge"><title>proc~aq_excit_3_7_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M234.167,-26.076C239.722,-28.6235 245.16,-31.586 250,-35 283.074,-58.3278 311.512,-96.3815 327.423,-120.262"/>
-<polygon fill="#000000" stroke="#000000" points="324.692,-122.482 333.079,-128.955 330.559,-118.664 324.692,-122.482"/>
+<g id="edge2" class="edge"><title>proc~aq_excit_3_7_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M234.21,-213.985C239.759,-211.428 245.183,-208.447 250,-205 283.78,-180.828 312.331,-141.163 328.023,-116.648"/>
+<polygon fill="#000000" stroke="#000000" points="331.059,-118.393 333.391,-108.058 325.123,-114.683 331.059,-118.393"/>
+</g>
+<!-- proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev -->
+<g id="edge4" class="edge"><title>proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M236.301,-125.918C252.293,-121.195 270.518,-115.813 287.232,-110.878"/>
+<polygon fill="#000000" stroke="#000000" points="288.27,-114.221 296.869,-108.032 286.287,-107.507 288.27,-114.221"/>
+</g>
+<!-- proc~aq_excit_3_8_janev&#45;&gt;proc~aq_excit_3_6_janev -->
+<g id="edge6" class="edge"><title>proc~aq_excit_3_8_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M246.636,-95C256.252,-95 266.345,-95 276.207,-95"/>
+<polygon fill="#000000" stroke="#000000" points="276.371,-98.5001 286.371,-95 276.371,-91.5001 276.371,-98.5001"/>
+</g>
+<!-- proc~aq_excit_3_9_janev&#45;&gt;proc~aq_excit_3_6_janev -->
+<g id="edge8" class="edge"><title>proc~aq_excit_3_9_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M221.809,-26.1279C230.955,-30.3552 240.982,-35.1939 250,-40 271.225,-51.3121 294.417,-65.356 312.075,-76.4209"/>
+<polygon fill="#000000" stroke="#000000" points="310.44,-79.5281 320.765,-81.9054 314.176,-73.6084 310.44,-79.5281"/>
 </g>
 </g>
 </svg>
@@ -1299,10 +1327,10 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
         <span class="c">!+ Number of m states to calculate</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">m_max</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Array of cross sections where the m&#39;th index refers to</span>
-        <span class="c">!+an excitation from the \(n=3\) state to the m&#39;th state [\(cm^2\)] </span>
-  
+        <span class="c">!+an excitation from the \(n=3\) state to the m&#39;th state [\(cm^2\)]</span>
+
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">m</span>
-  
+
     <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
     <span class="k">do </span><span class="n">m</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">m_max</span>
         <span class="k">select case</span> <span class="p">(</span><span class="n">m</span><span class="p">)</span>
@@ -1330,7 +1358,7 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
                 <span class="n">sigma</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="mf">0.0</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="mf">3.0</span>
         <span class="k">end select</span>
 <span class="k">    </span><span class="n">enddo</span>
-  
+
 <span class="k">end function </span><span class="n">Aq_excit_3_janev</span>
 </pre></div>
 
@@ -1442,6 +1470,8 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1473,6 +1503,12 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1543,6 +1579,8 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1673,6 +1711,10 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1830,11 +1872,13 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1850,7 +1894,7 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1886,6 +1930,8 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1896,6 +1942,10 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1905,6 +1955,10 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1919,6 +1973,8 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1940,7 +1996,7 @@ an excitation from the \(n=3\) state to the m'th state [\(cm^2\)] </p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

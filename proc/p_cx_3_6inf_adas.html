@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -291,6 +291,8 @@
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -322,6 +324,12 @@
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -392,6 +400,8 @@
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -522,6 +532,10 @@
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -679,11 +693,13 @@
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -699,7 +715,7 @@
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -735,6 +751,8 @@
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -745,6 +763,10 @@
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -754,6 +776,10 @@
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -768,6 +794,8 @@
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -798,7 +826,7 @@ public function p_cx_3_6inf_adas(Erel) result(sigma)
 
 
     
-    <p>Calculates total cross section for a proton-Hydrogen charge exchange interaction 
+    <p>Calculates total cross section for a proton-Hydrogen charge exchange interaction
 from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</code></p>
 <h3 id="equation">Equation</h3>
 <p>$$H^+ + H(3) \rightarrow H(\forall \; m \geq 6) + H^+$$</p>
@@ -847,7 +875,7 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
     
 	 <h3>Return Value <small><span class="anchor" id="variable-sigma%7E18"></span>real(kind=Float64)
   </small></h3>
-    <p>Cross Section [\(cm^2\)] </p>
+    <p>Cross Section [\(cm^2\)]</p>
     
     
      
@@ -1068,7 +1096,7 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">p_cx_3_6inf_adas</span><span class="p">(</span><span class="n">Erel</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
-    <span class="c">!+Calculates total cross section for a proton-Hydrogen charge exchange interaction </span>
+    <span class="c">!+Calculates total cross section for a proton-Hydrogen charge exchange interaction</span>
     <span class="c">!+from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy `Erel`</span>
     <span class="c">!+</span>
     <span class="c">!+###Equation</span>
@@ -1078,8 +1106,8 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">Erel</span>
         <span class="c">!+ Relative collision energy [keV/amu]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
-        <span class="c">!+ Cross Section [\(cm^2\)] </span>
-  
+        <span class="c">!+ Cross Section [\(cm^2\)]</span>
+
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">7.146969470</span><span class="n">d5</span><span class="p">,</span><span class="o">-</span><span class="mf">1.665413326</span><span class="n">d6</span><span class="p">,</span> <span class="p">&amp;</span>
                                                      <span class="mf">1.735840441</span><span class="n">d6</span><span class="p">,</span><span class="o">-</span><span class="mf">1.065792786</span><span class="n">d6</span><span class="p">,</span> <span class="p">&amp;</span>
                                                      <span class="mf">4.269334710</span><span class="n">d5</span><span class="p">,</span><span class="o">-</span><span class="mf">1.165954977</span><span class="n">d5</span><span class="p">,</span> <span class="p">&amp;</span>
@@ -1088,7 +1116,7 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
                                                      <span class="mf">2.596865877</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span> <span class="p">]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">3.0</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ee</span><span class="p">,</span> <span class="n">fac</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span>
-  
+
     <span class="k">if</span><span class="p">(</span><span class="n">Erel</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">9</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">ee</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">Erel</span> <span class="o">*</span> <span class="mf">1.</span><span class="n">d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.</span><span class="n">d3</span><span class="p">)</span> <span class="c">!keV to eV</span>
         <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d0</span>
@@ -1096,15 +1124,15 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
 <span class="k">        </span><span class="n">ee</span> <span class="o">=</span> <span class="mi">9</span><span class="mf">0.0</span> <span class="o">*</span> <span class="mf">1.</span><span class="n">d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span>
         <span class="n">fac</span> <span class="o">=</span> <span class="mf">2.</span><span class="n">d20</span> <span class="o">*</span><span class="p">(</span><span class="n">Erel</span><span class="o">*</span><span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">7.0</span><span class="p">)</span>
     <span class="n">endif</span>
-  
+
     <span class="n">l</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">ee</span><span class="p">)</span>
-  
+
     <span class="n">p</span> <span class="o">=</span> <span class="n">a</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">l</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">3.0</span> <span class="o">+</span> <span class="p">&amp;</span>
         <span class="n">a</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">4.0</span>   <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">5.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">6.0</span> <span class="o">+</span> <span class="p">&amp;</span>
         <span class="n">a</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">7.0</span>   <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">8.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">9.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mi">1</span><span class="mf">0.0</span>
-  
+
     <span class="n">sigma</span> <span class="o">=</span> <span class="n">fac</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span><span class="o">**</span><span class="n">p</span><span class="p">)</span>
-  
+
 <span class="k">end function </span><span class="n">p_cx_3_6inf_adas</span>
 </pre></div>
 
@@ -1216,6 +1244,8 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
+      <a class="list-group-item" href="../proc/bt_maxwellian_eb.html">bt_maxwellian_eb</a>
+      
       <a class="list-group-item" href="../proc/bt_maxwellian_n.html">bt_maxwellian_n</a>
       
       <a class="list-group-item" href="../proc/bt_maxwellian_n_m.html">bt_maxwellian_n_m</a>
@@ -1247,6 +1277,12 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       <a class="list-group-item" href="../proc/comdiv.html">Comdiv</a>
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
+      
+      <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
+      
+      <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
       
@@ -1317,6 +1353,8 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       <a class="list-group-item" href="../proc/get_fields.html">get_fields</a>
       
       <a class="list-group-item" href="../proc/get_indices.html">get_indices</a>
+      
+      <a class="list-group-item" href="../proc/get_neutron_rate.html">get_neutron_rate</a>
       
       <a class="list-group-item" href="../proc/get_nlaunch.html">get_nlaunch</a>
       
@@ -1447,6 +1485,10 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
       <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
+      
+      <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
+      
+      <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1604,11 +1646,13 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       
       <a class="list-group-item" href="../proc/randu.html">randu</a>
       
+      <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
       <a class="list-group-item" href="../proc/read_chords.html">read_chords</a>
-      
-      <a class="list-group-item" href="../proc/read_cross.html">read_cross</a>
       
       <a class="list-group-item" href="../proc/read_distribution.html">read_distribution</a>
       
@@ -1624,7 +1668,7 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       
       <a class="list-group-item" href="../proc/read_npa.html">read_npa</a>
       
-      <a class="list-group-item" href="../proc/read_rates.html">read_rates</a>
+      <a class="list-group-item" href="../proc/read_nuclear_rates.html">read_nuclear_rates</a>
       
       <a class="list-group-item" href="../proc/read_tables.html">read_tables</a>
       
@@ -1660,6 +1704,8 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       
       <a class="list-group-item" href="../proc/store_neutrals.html">store_neutrals</a>
       
+      <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
+      
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
@@ -1670,6 +1716,10 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       
       <a class="list-group-item" href="../proc/uvw_to_xyz.html">uvw_to_xyz</a>
       
+      <a class="list-group-item" href="../proc/write_bb_d_d.html">write_bb_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bb_d_t.html">write_bb_D_T</a>
+      
       <a class="list-group-item" href="../proc/write_bb_h_aq.html">write_bb_H_Aq</a>
       
       <a class="list-group-item" href="../proc/write_bb_h_e.html">write_bb_H_e</a>
@@ -1679,6 +1729,10 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       <a class="list-group-item" href="../proc/write_beam_grid.html">write_beam_grid</a>
       
       <a class="list-group-item" href="../proc/write_birth_profile.html">write_birth_profile</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_d.html">write_bt_D_D</a>
+      
+      <a class="list-group-item" href="../proc/write_bt_d_t.html">write_bt_D_T</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_aq.html">write_bt_H_Aq</a>
       
@@ -1693,6 +1747,8 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
       
       <a class="list-group-item" href="../proc/write_neutrals.html">write_neutrals</a>
+      
+      <a class="list-group-item" href="../proc/write_neutrons.html">write_neutrons</a>
       
       <a class="list-group-item" href="../proc/write_npa.html">write_npa</a>
       
@@ -1714,7 +1770,7 @@ from the \(n=3\) state to \(\forall \; m \geq 6\) states at energy <code>Erel</c
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2016 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2017 </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 

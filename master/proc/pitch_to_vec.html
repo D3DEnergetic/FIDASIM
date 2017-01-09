@@ -950,29 +950,29 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 <path fill="none" stroke="#000000" d="M437.668,-191.719C446.526,-189.338 455.816,-186.839 464.694,-184.452"/>
 <polygon fill="#000000" stroke="#000000" points="465.749,-187.793 474.497,-181.816 463.932,-181.033 465.749,-187.793"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node4" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="310,-197 218,-197 218,-171 310,-171 310,-197"/>
-<text text-anchor="middle" x="264" y="-181.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge18" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M302.058,-170.918C315.35,-166.348 330.44,-161.161 344.41,-156.359"/>
-<polygon fill="#000000" stroke="#000000" points="345.549,-159.669 353.868,-153.108 343.273,-153.049 345.549,-159.669"/>
-</g>
 <!-- proc~read_mc -->
-<g id="node5" class="node"><title>proc~read_mc</title>
+<g id="node4" class="node"><title>proc~read_mc</title>
 <a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
 <polygon fill="#d9534f" stroke="#d9534f" points="291,-109 237,-109 237,-83 291,-83 291,-109"/>
 <text text-anchor="middle" x="264" y="-93.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
 </a>
 </g>
 <!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge20" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
+<g id="edge18" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
 <path fill="none" stroke="#000000" d="M291.774,-105.547C307.16,-110.836 326.71,-117.557 344.451,-123.655"/>
 <polygon fill="#000000" stroke="#000000" points="343.488,-127.025 354.083,-126.966 345.764,-120.405 343.488,-127.025"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="node5" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-197 218,-197 218,-171 310,-171 310,-197"/>
+<text text-anchor="middle" x="264" y="-181.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge20" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M302.058,-170.918C315.35,-166.348 330.44,-161.161 344.41,-156.359"/>
+<polygon fill="#000000" stroke="#000000" points="345.549,-159.669 353.868,-153.108 343.273,-153.049 345.549,-159.669"/>
 </g>
 <!-- proc~neutron_f -->
 <g id="node6" class="node"><title>proc~neutron_f</title>
@@ -998,8 +998,20 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 <path fill="none" stroke="#000000" d="M294.233,-65.2229C299.603,-67.9169 305.056,-70.887 310,-74 331.597,-87.5979 354.034,-106.002 369.967,-119.921"/>
 <polygon fill="#000000" stroke="#000000" points="367.861,-122.731 377.667,-126.742 372.503,-117.491 367.861,-122.731"/>
 </g>
+<!-- proc~read_distribution -->
+<g id="node8" class="node"><title>proc~read_distribution</title>
+<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
+<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
+</a>
+</g>
+<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
+<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.211,-99.1949C196.705,-98.6287 212.522,-98.0109 226.35,-97.4707"/>
+<polygon fill="#000000" stroke="#000000" points="226.626,-100.963 236.482,-97.0749 226.353,-93.968 226.626,-100.963"/>
+</g>
 <!-- program~fidasim -->
-<g id="node8" class="node"><title>program~fidasim</title>
+<g id="node9" class="node"><title>program~fidasim</title>
 <a xlink:href="../program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-134 2.13163e-14,-134 0,-108 54,-108 54,-134"/>
 <text text-anchor="middle" x="27" y="-118.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
@@ -1011,7 +1023,7 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 <polygon fill="#000000" stroke="#000000" points="336.545,-209.037 346.462,-205.308 336.384,-202.039 336.545,-209.037"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
 <path fill="none" stroke="#000000" d="M54.088,-131.157C65.1409,-135.118 78.0993,-139.53 90,-143 129.05,-154.385 173.722,-164.859 208.025,-172.371"/>
 <polygon fill="#000000" stroke="#000000" points="207.349,-175.806 217.864,-174.507 208.834,-168.965 207.349,-175.806"/>
 </g>
@@ -1020,15 +1032,8 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 <path fill="none" stroke="#000000" d="M54.1869,-123.18C96.0986,-126.54 176.678,-133 224.862,-136.862"/>
 <polygon fill="#000000" stroke="#000000" points="224.669,-140.358 234.917,-137.668 225.229,-133.38 224.669,-140.358"/>
 </g>
-<!-- proc~read_distribution -->
-<g id="node10" class="node"><title>proc~read_distribution</title>
-<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
-</a>
-</g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
 <path fill="none" stroke="#000000" d="M54.2241,-116.005C62.0126,-114.576 70.8024,-112.963 79.6572,-111.338"/>
 <polygon fill="#000000" stroke="#000000" points="80.4281,-114.755 89.6322,-109.508 79.1647,-107.87 80.4281,-114.755"/>
 </g>
@@ -1055,11 +1060,6 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 <g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
 <path fill="none" stroke="#000000" d="M33.9191,-107.771C44.0887,-89.3924 64.6406,-56.0295 90,-35 93.0558,-32.466 96.4525,-30.1446 99.9769,-28.0393"/>
 <polygon fill="#000000" stroke="#000000" points="101.729,-31.0709 108.879,-23.2525 98.4144,-24.9056 101.729,-31.0709"/>
-</g>
-<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge6" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.211,-99.1949C196.705,-98.6287 212.522,-98.0109 226.35,-97.4707"/>
-<polygon fill="#000000" stroke="#000000" points="226.626,-100.963 236.482,-97.0749 226.353,-93.968 226.626,-100.963"/>
 </g>
 <!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
 <g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>

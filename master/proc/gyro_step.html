@@ -1036,29 +1036,29 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <path fill="none" stroke="#000000" d="M426.628,-193.344C437.347,-190.226 449.117,-186.802 460.032,-183.627"/>
 <polygon fill="#000000" stroke="#000000" points="461.136,-186.951 469.76,-180.797 459.18,-180.23 461.136,-186.951"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node4" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="310,-197 218,-197 218,-171 310,-171 310,-197"/>
-<text text-anchor="middle" x="264" y="-181.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge18" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M301.463,-170.918C314.422,-166.392 329.116,-161.261 342.757,-156.498"/>
-<polygon fill="#000000" stroke="#000000" points="344.177,-159.709 352.464,-153.108 341.869,-153.1 344.177,-159.709"/>
-</g>
 <!-- proc~read_mc -->
-<g id="node5" class="node"><title>proc~read_mc</title>
+<g id="node4" class="node"><title>proc~read_mc</title>
 <a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
 <polygon fill="#d9534f" stroke="#d9534f" points="291,-109 237,-109 237,-83 291,-83 291,-109"/>
 <text text-anchor="middle" x="264" y="-93.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
 </a>
 </g>
 <!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge20" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
+<g id="edge18" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
 <path fill="none" stroke="#000000" d="M291.651,-105.656C306.548,-110.858 325.344,-117.422 342.503,-123.414"/>
 <polygon fill="#000000" stroke="#000000" points="341.781,-126.869 352.376,-126.861 344.089,-120.26 341.781,-126.869"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="node5" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-197 218,-197 218,-171 310,-171 310,-197"/>
+<text text-anchor="middle" x="264" y="-181.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge20" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M301.463,-170.918C314.422,-166.392 329.116,-161.261 342.757,-156.498"/>
+<polygon fill="#000000" stroke="#000000" points="344.177,-159.709 352.464,-153.108 341.869,-153.1 344.177,-159.709"/>
 </g>
 <!-- proc~neutron_f -->
 <g id="node6" class="node"><title>proc~neutron_f</title>
@@ -1084,8 +1084,20 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <path fill="none" stroke="#000000" d="M294.265,-65.1736C299.631,-67.8726 305.075,-70.8572 310,-74 331.327,-87.6085 353.343,-106.161 368.866,-120.131"/>
 <polygon fill="#000000" stroke="#000000" points="366.61,-122.81 376.354,-126.968 371.33,-117.64 366.61,-122.81"/>
 </g>
+<!-- proc~read_distribution -->
+<g id="node8" class="node"><title>proc~read_distribution</title>
+<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
+<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
+</a>
+</g>
+<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
+<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.211,-99.1949C196.705,-98.6287 212.522,-98.0109 226.35,-97.4707"/>
+<polygon fill="#000000" stroke="#000000" points="226.626,-100.963 236.482,-97.0749 226.353,-93.968 226.626,-100.963"/>
+</g>
 <!-- program~fidasim -->
-<g id="node8" class="node"><title>program~fidasim</title>
+<g id="node9" class="node"><title>program~fidasim</title>
 <a xlink:href="../program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-134 2.13163e-14,-134 0,-108 54,-108 54,-134"/>
 <text text-anchor="middle" x="27" y="-118.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
@@ -1097,7 +1109,7 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <polygon fill="#000000" stroke="#000000" points="343.456,-208.861 353.364,-205.108 343.278,-201.863 343.456,-208.861"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
 <path fill="none" stroke="#000000" d="M54.088,-131.157C65.1409,-135.118 78.0993,-139.53 90,-143 129.05,-154.385 173.722,-164.859 208.025,-172.371"/>
 <polygon fill="#000000" stroke="#000000" points="207.349,-175.806 217.864,-174.507 208.834,-168.965 207.349,-175.806"/>
 </g>
@@ -1106,15 +1118,8 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <path fill="none" stroke="#000000" d="M54.1869,-123.18C96.0986,-126.54 176.678,-133 224.862,-136.862"/>
 <polygon fill="#000000" stroke="#000000" points="224.669,-140.358 234.917,-137.668 225.229,-133.38 224.669,-140.358"/>
 </g>
-<!-- proc~read_distribution -->
-<g id="node10" class="node"><title>proc~read_distribution</title>
-<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
-</a>
-</g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
 <path fill="none" stroke="#000000" d="M54.2241,-116.005C62.0126,-114.576 70.8024,-112.963 79.6572,-111.338"/>
 <polygon fill="#000000" stroke="#000000" points="80.4281,-114.755 89.6322,-109.508 79.1647,-107.87 80.4281,-114.755"/>
 </g>
@@ -1141,11 +1146,6 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
 <path fill="none" stroke="#000000" d="M33.9191,-107.771C44.0887,-89.3924 64.6406,-56.0295 90,-35 93.0558,-32.466 96.4525,-30.1446 99.9769,-28.0393"/>
 <polygon fill="#000000" stroke="#000000" points="101.729,-31.0709 108.879,-23.2525 98.4144,-24.9056 101.729,-31.0709"/>
-</g>
-<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge6" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.211,-99.1949C196.705,-98.6287 212.522,-98.0109 226.35,-97.4707"/>
-<polygon fill="#000000" stroke="#000000" points="226.626,-100.963 236.482,-97.0749 226.353,-93.968 226.626,-100.963"/>
 </g>
 <!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
 <g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>

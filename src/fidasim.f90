@@ -5,7 +5,7 @@ USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_extra !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, matinv
-USE parallel_rng
+USE utilities
 
 implicit none
 
@@ -546,6 +546,8 @@ type LineOfSight
         !+ Lens location in beam grid coordinates
     real(Float64), dimension(3) :: axis = 0.d0
         !+ Optical axis in beam grid coordinates
+    type(SparseArray) :: dlength
+        !+ Sparse array containing cell-LOS intersection length
 end type LineOfSight
 
 type SpectralChords
@@ -558,8 +560,6 @@ type SpectralChords
         !+ Radius of each line of sight
     logical, dimension(:,:,:), allocatable         :: los_inter
         !+ Indicates whether a [[libfida:beam_grid]] cell intersects a LOS
-    real(Float32), dimension(:,:,:,:), allocatable :: dlength
-        !+ [[libfida:beam_grid]] cell - LOS intersection length: dlength(x,y,z,chan)
 end type SpectralChords
 
 type BoundedPlane
@@ -1818,6 +1818,7 @@ subroutine read_chords
     real(Float64), dimension(:,:), allocatable :: lenses
     real(Float64), dimension(:,:), allocatable :: axes
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
+    real(Float64), dimension(:,:,:), allocatable :: dlength
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
@@ -1865,12 +1866,9 @@ subroutine read_chords
     allocate(sigma_pi(spec_chords%nchan))
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
-    allocate(spec_chords%dlength(spec_chords%nchan, &
-                                 beam_grid%nx, &
-                                 beam_grid%ny, &
-                                 beam_grid%nz) )
-
-    spec_chords%dlength = 0.d0
+    allocate(dlength(beam_grid%nx, &
+                     beam_grid%ny, &
+                     beam_grid%nz) )
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -1913,6 +1911,7 @@ subroutine read_chords
             nc = 100
         endif
 
+        dlength = 0.d0
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
         !$OMP& length, r_enter, r_exit, j, tracks, ncell, ind)
         do ic=1,nc
@@ -1931,13 +1930,14 @@ subroutine read_chords
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
-                spec_chords%dlength(i,ind(1),ind(2),ind(3)) = &
-                spec_chords%dlength(i,ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                dlength(ind(1),ind(2),ind(3)) = &
+                dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
                 spec_chords%los_inter(ind(1),ind(2),ind(3)) = .True.
                 !$OMP END CRITICAL(read_chords_1)
             enddo track_loop
         enddo
         !$OMP END PARALLEL DO
+        call create_sparse_array(dlength,spec_chords%los(i)%dlength)
     enddo chan_loop
 
     if(inputs%verbose.ge.1) then
@@ -5738,10 +5738,11 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     integer :: ichan,i,bin
 
     call get_indices(pos,ind)
+    if(.not.spec_chords%los_inter(ind(1),ind(2),ind(3))) return
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
+        dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
         if(dlength.le.0.0) cycle loop_over_channels
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
@@ -5786,10 +5787,11 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     endif
 
     call get_indices(pos,ind)
+    if(.not.spec_chords%los_inter(ind(1),ind(2),ind(3))) return
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
+        dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
         if(dlength.le.0.0) cycle loop_over_channels
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
@@ -5903,10 +5905,11 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
     integer :: ichan
 
     call get_indices(pos,ind)
+    if(.not.spec_chords%los_inter(ind(1),ind(2),ind(3))) return
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
+        dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
         if(dlength.le.0.0) cycle loop_over_channels
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
@@ -7393,9 +7396,9 @@ subroutine fida_weights_los
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
-                    if(spec_chords%dlength(ichan,i,j,k).gt.0.0) then
-                        ind = [i,j,k]
-                        dlength = spec_chords%dlength(ichan,i,j,k)
+                    ind = [i,j,k]
+                    dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
+                    if(dlength.gt.0.0) then
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
                         hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength
                         tdens = tdens + neut%dens(:,nbit_type,i,j,k)*dlength

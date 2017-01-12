@@ -780,7 +780,7 @@ type SimulationInputs
     integer(Int32) :: dump_dcx
         !+ Output DCX density and spectra: 0 = off, 1=on
     integer(Int32) :: verbose
-        !+ Verbosity: 0 = off, 1=on, 2=on++
+        !+ Verbosity: <0 = off++, 0 = off, 1=on, 2=on++
 
     !! Neutral Beam Settings
     real(Float64)    :: ab
@@ -1608,8 +1608,10 @@ subroutine read_inputs
             write(*,'(T2,"Tables file: ",a)') trim(inputs%tables_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Tables file does not exist: ', &
-                         trim(inputs%tables_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Tables file does not exist: ', &
+                             trim(inputs%tables_file)
+        endif
         error = .True.
     endif
 
@@ -1619,8 +1621,10 @@ subroutine read_inputs
             write(*,'(T2,"Geometry file: ",a)') trim(inputs%geometry_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Geometry file does not exist: ', &
-                         trim(inputs%geometry_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Geometry file does not exist: ', &
+                             trim(inputs%geometry_file)
+        endif
         error = .True.
     endif
 
@@ -1630,8 +1634,10 @@ subroutine read_inputs
             write(*,'(T2,"Equilibrium file: ",a)') trim(inputs%equilibrium_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Equilibrium file does not exist: ', &
-                         trim(inputs%equilibrium_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Equilibrium file does not exist: ', &
+                              trim(inputs%equilibrium_file)
+        endif
         error = .True.
     endif
 
@@ -1641,16 +1647,20 @@ subroutine read_inputs
             write(*,'(T2,"Distribution file: ",a)') trim(inputs%distribution_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Distribution file does not exist: ', &
-                         trim(inputs%distribution_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Distribution file does not exist: ', &
+                             trim(inputs%distribution_file)
+        endif
         error = .True.
     endif
 
     pathlen = len_trim(inputs%result_dir)+len_trim(inputs%runid) + 20
     !+20 for suffixes and seperators e.g. /, _npa.h5, ...
     if(pathlen.gt.charlim) then
-        write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', &
-                               pathlen-20,'>', charlim-20
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', &
+                                   pathlen-20,'>', charlim-20
+        endif
         error = .True.
     endif
 
@@ -1841,8 +1851,10 @@ subroutine read_chords
     !!Check if SPEC group exists
     call h5ltpath_valid_f(fid, "/spec", .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
-        write(*,'(a)') 'Continuing without spectral diagnostics'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without spectral diagnostics'
+        endif
         inputs%calc_spec = 0
         inputs%calc_fida = 0
         inputs%calc_bes = 0
@@ -1903,7 +1915,9 @@ subroutine read_chords
 
         call grid_intersect(r0,v0,length,r_enter,r_exit)
         if(length.le.0.d0) then
-            WRITE(*,'("Channel ",i3," missed the beam grid")'),i
+            if(inputs%verbose.ge.0) then
+                WRITE(*,'("Channel ",i3," missed the beam grid")'),i
+            endif
             cycle chan_loop
         endif
 
@@ -1981,8 +1995,10 @@ subroutine read_npa
     !!Check if NPA group exists
     call h5ltpath_valid_f(fid, "/npa", .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a)') 'NPA geometry is not in the geometry file'
-        write(*,'(a)') 'Continuing without NPA diagnostics'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'NPA geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without NPA diagnostics'
+        endif
         inputs%calc_npa = 0
         inputs%calc_npa_wght = 0
         call h5fclose_f(fid, error)
@@ -2136,7 +2152,9 @@ subroutine read_npa
 
         total_prob = sum(npa_chords%phit(:,:,:,ichan)%p)
         if(total_prob.le.0.d0) then
-            WRITE(*,'("Channel ",i3," missed the beam grid")'),ichan
+            if(inputs%verbose.ge.0) then
+                WRITE(*,'("Channel ",i3," missed the beam grid")'),ichan
+            endif
             cycle chan_loop
         endif
 
@@ -2286,7 +2304,9 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
 
     if((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)) then
-        write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
+        endif
         stop
     endif
 
@@ -2384,7 +2404,9 @@ subroutine read_mc(fid, error)
     call h5ltread_dataset_int_f(fid, "/class", orbit_class, dims, error)
 
     if(any(orbit_class.gt.particles%nclass)) then
-        write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
+        endif
         stop
     endif
 
@@ -2475,7 +2497,9 @@ subroutine read_mc(fid, error)
 
     num = count(particles%fast_ion%cross_grid)
     if(num.le.0) then
-        write(*,'(a)') 'READ_MC: No mc particles in beam grid'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_MC: No mc particles in beam grid'
+        endif
         stop
     endif
 
@@ -2534,7 +2558,9 @@ subroutine read_atomic_cross(fid, grp, cross)
 
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
+        endif
         stop
     endif
 
@@ -2594,7 +2620,9 @@ subroutine read_atomic_rates(fid, grp, b_amu, t_amu, rates)
 
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a,a)') 'READ_ATOMIC_RATES: Unknown atomic interaction: ', trim(grp)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_ATOMIC_RATES: Unknown atomic interaction: ', trim(grp)
+        endif
         stop
     endif
 
@@ -2769,8 +2797,10 @@ subroutine read_nuclear_rates(fid, grp, rates)
 
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a,a)') 'READ_NUCLEAR_RATES: Unknown nuclear interaction: ', trim(grp)
-        write(*,'(a)') 'Continuing without neutron calculation'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_NUCLEAR_RATES: Unknown nuclear interaction: ', trim(grp)
+            write(*,'(a)') 'Continuing without neutron calculation'
+        endif
         inputs%calc_neutron=0
         return
     endif
@@ -2797,13 +2827,17 @@ subroutine read_nuclear_rates(fid, grp, rates)
     call h5ltread_dataset_double_f(fid, grp//"/bt_amu", rates%bt_amu, dim1, error)
 
     if(abs(inputs%ab-rates%bt_amu(1)).gt.0.2) then
-        write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
-            rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
+                rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
+        endif
     endif
 
     if(abs(inputs%ai-rates%bt_amu(2)).gt.0.2) then
-        write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
-            rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
+                 rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
+        endif
     endif
 
     dim3 = [rates%nenergy, rates%ntemp, rates%nbranch]
@@ -3872,10 +3906,14 @@ subroutine read_neutrals
 
     inquire(file=inputs%neutrals_file,exist=exis)
     if(exis) then
-        write(*,'(T2,"Neutrals file: ",a)') trim(inputs%neutrals_file)
-        write(*,*) ''
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,"Neutrals file: ",a)') trim(inputs%neutrals_file)
+            write(*,*) ''
+        endif
     else
-        write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
+        endif
         stop
     endif
 
@@ -3894,7 +3932,9 @@ subroutine read_neutrals
     if((nx.ne.beam_grid%nx).or. &
        (ny.ne.beam_grid%ny).or. &
        (nz.ne.beam_grid%nz)) then
-        write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
+        endif
         stop
     endif
 
@@ -4104,7 +4144,9 @@ function in_boundary(bplane, p) result(in_b)
                 in_b = .True.
             endif
         CASE DEFAULT
-            write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
+            if(inputs%verbose.ge.0) then
+                write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
+            endif
             stop
     END SELECT
 
@@ -5255,8 +5297,10 @@ subroutine neut_rates(denn, vi, vn, rates)
     call interpol_coeff(logEmin,dlogE,neb,logeb,c,err)
     ebi = c%i
     if(err.eq.1) then
-        write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
-        write(*,'("eb = ",f6.3," [keV]")') eb
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+        endif
         if(ebi.lt.1) then
             ebi=1
             c%b1=1.0 ; c%b2=0.0
@@ -5315,9 +5359,11 @@ subroutine get_neutron_rate(plasma, eb, rate)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_NEUTRON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
-        write(*,'("eb = ",f6.3," [keV]")') eb
-        write(*,'("ti = ",f6.3," [keV]")') plasma%ti
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_NEUTRON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
         denp = 0.d0
     endif
 
@@ -5425,9 +5471,11 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
-        write(*,'("eb = ",f7.3," [keV]")') eb
-        write(*,'("ti = ",f6.3," [keV]")') plasma%ti
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
         denp = 0.d0
     endif
 
@@ -5468,9 +5516,11 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
-        write(*,'("eb = ",f7.3," [keV]")') eb
-        write(*,'("te = ",f6.3," [keV]")') plasma%te
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("te = ",ES10.3," [keV]")') plasma%te
+        endif
         dene = 0.d0
     endif
 
@@ -5512,9 +5562,11 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
-        write(*,'("eb = ",f7.3," [keV]")') eb
-        write(*,'("ti = ",f6.3," [keV]")') plasma%ti
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
         denimp = 0.d0
     endif
 
@@ -6206,7 +6258,9 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
 
     !Set Default trajectory in case rejection sampling fails
     if(.not.valid_trajectory)then
-        write(*,'(a)') "MC_NBI: Failed to find trajectory though aperture(s). Using beam centerline."
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "MC_NBI: Failed to find trajectory though aperture(s). Using beam centerline."
+        endif
         uvw_src = nbi%src
         uvw_ray = nbi%axis
     endif
@@ -6222,8 +6276,10 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     !! Check if start position is in the plasma
     call in_plasma(rnbi,inp)
     if(inp)then
-        write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
-        write(*,'(a)') "Move the beam grid closer to the source to fix"
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
+            write(*,'(a)') "Move the beam grid closer to the source to fix"
+        endif
         stop
     endif
 
@@ -6326,9 +6382,11 @@ subroutine ndmc
     !$OMP END PARALLEL DO
 
     if(nbi_outside.gt.0)then
-         write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
-                              100.*nbi_outside/(3.*inputs%n_nbi)
-         if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
+        if(inputs%verbose.ge.0) then
+            write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
+                                  100.*nbi_outside/(3.*inputs%n_nbi)
+        endif
+        if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
     endif
 
 end subroutine ndmc
@@ -6535,7 +6593,9 @@ subroutine halo
 
     dcx_dens = halo_iter_dens(halo_type)
     if(dcx_dens.eq.0) then
-        write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
+        endif
         stop
     endif
     inv_ng = 100.0/real(beam_grid%ngrid)
@@ -6615,7 +6675,9 @@ subroutine halo
         neut%dens(:,s2type,:,:,:)= 0.
 
         if(halo_iteration_dens/dcx_dens.gt.1)then
-            write(*,'(a)') "HALO: Halo generation density exceeded DCX density. This shouldn't happen."
+            if(inputs%verbose.ge.0) then
+                write(*,'(a)') "HALO: Halo generation density exceeded DCX density. This shouldn't happen."
+            endif
             exit iterations
         endif
 
@@ -6911,7 +6973,9 @@ subroutine npa_f
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
-    write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
+    endif
 
 end subroutine npa_f
 
@@ -7819,7 +7883,7 @@ program fidasim
         if(inputs%calc_birth.eq.1)then
             call write_birth_profile()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
         !! ---------- DCX (Direct charge exchange) ---------- !!
         call date_and_time (values=time_arr)
@@ -7829,7 +7893,7 @@ program fidasim
         endif
         call dcx()
         if(inputs%dump_dcx.eq.1) call write_dcx()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
         !! ---------- HALO ---------- !!
         call date_and_time (values=time_arr)
@@ -7840,7 +7904,7 @@ program fidasim
         call halo()
         !! ---------- WRITE NEUTRALS ---------- !!
         call write_neutrals()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -----------------------------------------------------------------------
@@ -7853,7 +7917,7 @@ program fidasim
                   time_arr(5),time_arr(6),time_arr(7)
         endif
         call bremsstrahlung()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -----------------------------------------------------------------------
@@ -7870,7 +7934,7 @@ program fidasim
         else
             call fida_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     if(inputs%calc_spec.ge.1) then
@@ -7892,12 +7956,12 @@ program fidasim
         else
             call npa_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     if(inputs%calc_npa.ge.1) then
         call write_npa()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -------------------------------------------------------------------
@@ -7914,7 +7978,7 @@ program fidasim
         else
             call neutron_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -------------------------------------------------------------------
@@ -7932,7 +7996,7 @@ program fidasim
         else
             call fida_weights_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     if(inputs%calc_npa_wght.ge.1) then
@@ -7942,7 +8006,7 @@ program fidasim
                   time_arr(5),time_arr(6),time_arr(7)
         endif
         call npa_weights()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     call date_and_time (values=time_arr)

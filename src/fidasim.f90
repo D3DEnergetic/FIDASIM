@@ -1937,7 +1937,7 @@ subroutine read_chords
             enddo track_loop
         enddo
         !$OMP END PARALLEL DO
-        call create_sparse_array(dlength,spec_chords%los(i)%dlength)
+        call sparse(dlength,spec_chords%los(i)%dlength)
     enddo chan_loop
 
     if(inputs%verbose.ge.1) then
@@ -5742,7 +5742,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
+        dlength = get_value(spec_chords%los(ichan)%dlength,ind)
         if(dlength.le.0.0) cycle loop_over_channels
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
@@ -5791,7 +5791,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
+        dlength = get_value(spec_chords%los(ichan)%dlength,ind)
         if(dlength.le.0.0) cycle loop_over_channels
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
@@ -5909,7 +5909,7 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
+        dlength = get_value(spec_chords%los(ichan)%dlength,ind)
         if(dlength.le.0.0) cycle loop_over_channels
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
@@ -7397,7 +7397,7 @@ subroutine fida_weights_los
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
                     ind = [i,j,k]
-                    dlength = get_sparse_value(spec_chords%los(ichan)%dlength,ind)
+                    dlength = get_value(spec_chords%los(ichan)%dlength,ind)
                     if(dlength.gt.0.0) then
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
                         hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength

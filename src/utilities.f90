@@ -10,7 +10,7 @@ implicit none
 private
 public :: ind2sub, sub2ind
 public :: rng_type, rng_init, rng, rng_uniform, rng_normal, randu, randn, randind
-public :: SparseArray, get_sparse_value, create_sparse_array
+public :: SparseArray, get_value, sparse
 
 integer, parameter :: Int32 = 4
 integer, parameter :: Int64 = kind(int8(1))
@@ -58,12 +58,12 @@ interface search_sorted_first
     module procedure search_sorted_first_float64
 end interface
 
-interface create_sparse_array
+interface sparse
     !+ Creates a sparse array from a dense array
-    module procedure create_sparse_array_1
-    module procedure create_sparse_array_2
-    module procedure create_sparse_array_3
-    module procedure create_sparse_array_4
+    module procedure sparse_1
+    module procedure sparse_2
+    module procedure sparse_3
+    module procedure sparse_4
 end interface
 
 contains
@@ -352,7 +352,7 @@ end subroutine randind_w_2
 !============================================================================
 !------------------------------Sparse Routines-------------------------------
 !============================================================================
-subroutine create_sparse_array_1(A,SA)
+subroutine sparse_1(A,SA)
     !+ Routine to create a 1D sparse array from a 1D dense array
     real(Float64), dimension(:), intent(in) :: A
         !+ Dense Array
@@ -379,9 +379,9 @@ subroutine create_sparse_array_1(A,SA)
         if(c.gt.SA%nnz) exit
     enddo
             
-end subroutine create_sparse_array_1
+end subroutine sparse_1
     
-subroutine create_sparse_array_2(A,SA)
+subroutine sparse_2(A,SA)
     !+ Routine to create a 2D sparse array from a 2D dense array
     real(Float64), dimension(:,:), intent(in) :: A
         !+ Dense Array
@@ -410,9 +410,9 @@ subroutine create_sparse_array_2(A,SA)
         if(c.gt.SA%nnz) exit
     enddo
             
-end subroutine create_sparse_array_2
+end subroutine sparse_2
 
-subroutine create_sparse_array_3(A,SA)
+subroutine sparse_3(A,SA)
     !+ Routine to create a 3D sparse array from a 3D dense array
     real(Float64), dimension(:,:,:), intent(in) :: A
         !+ Dense Array
@@ -441,9 +441,9 @@ subroutine create_sparse_array_3(A,SA)
         if(c.gt.SA%nnz) exit
     enddo
             
-end subroutine create_sparse_array_3
+end subroutine sparse_3
 
-subroutine create_sparse_array_4(A,SA)
+subroutine sparse_4(A,SA)
     !+ Routine to create a 4D sparse array from a 4D dense array
     real(Float64), dimension(:,:,:,:), intent(in) :: A
         !+ Dense Array
@@ -472,9 +472,9 @@ subroutine create_sparse_array_4(A,SA)
         if(c.gt.SA%nnz) exit
     enddo
             
-end subroutine create_sparse_array_4
+end subroutine sparse_4
 
-function get_sparse_value(SA, subs) result (val)
+function get_value(SA, subs) result (val)
     !+ Gets value of sparse array `SA` at the subscripts `subs`
     type(SparseArray), intent(in)     :: SA
         !+ Sparse Array
@@ -493,6 +493,6 @@ function get_sparse_value(SA, subs) result (val)
         val = 0.d0
     endif
 
-end function get_sparse_value
+end function get_value
 
 end module utilities

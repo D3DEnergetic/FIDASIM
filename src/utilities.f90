@@ -485,12 +485,13 @@ function get_value(SA, subs) result (val)
 
     integer :: ind, cind
 
+    val = 0.d0
+    if(SA%nnz.eq.0) return
+        
     ind = sub2ind(SA%dims, subs)
     cind = search_sorted_first(SA%inds, ind)
     if(ind.eq.SA%inds(cind))then
         val = SA%vals(cind)
-    else
-        val = 0.d0
     endif
 
 end function get_value

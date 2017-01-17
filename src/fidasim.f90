@@ -1901,7 +1901,7 @@ subroutine read_chords
 
         call grid_intersect(r0,v0,length,r_enter,r_exit)
         if(length.le.0.d0) then
-            WRITE(*,'("Channel ",i3," missed the beam grid")'),i
+            WRITE(*,'("Channel ",i5," missed the beam grid")'),i
             cycle chan_loop
         endif
 

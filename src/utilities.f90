@@ -361,14 +361,15 @@ subroutine sparse_1(A,SA)
 
     integer :: n,i,c
 
-    SA%nnz = count(A.ne.0.d0)
     SA%nd = 1
-
-    n = size(A)
-    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
     allocate(SA%dims(SA%nd))
     SA%dims = shape(A)
 
+    SA%nnz = count(A.ne.0.d0)
+    if(SA%nnz.eq.0) return
+    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
+
+    n = size(A)
     c = 1
     do i=1,n
         if(A(i).ne.0.d0)then
@@ -391,14 +392,15 @@ subroutine sparse_2(A,SA)
     integer :: subs(2)
     integer :: n,i,c
 
-    SA%nnz = count(A.ne.0.d0)
     SA%nd = 2
-
-    n = size(A)
-    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
     allocate(SA%dims(SA%nd))
     SA%dims = shape(A)
 
+    SA%nnz = count(A.ne.0.d0)
+    if(SA%nnz.eq.0) return
+    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
+
+    n = size(A)
     c = 1
     do i=1,n
         call ind2sub(SA%dims,i,subs)
@@ -422,14 +424,15 @@ subroutine sparse_3(A,SA)
     integer :: subs(3)
     integer :: n,i,c
 
-    SA%nnz = count(A.ne.0.d0)
     SA%nd = 3
-
-    n = size(A)
-    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
     allocate(SA%dims(SA%nd))
     SA%dims = shape(A)
 
+    SA%nnz = count(A.ne.0.d0)
+    if(SA%nnz.eq.0) return
+    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
+
+    n = size(A)
     c = 1
     do i=1,n
         call ind2sub(SA%dims,i,subs)
@@ -453,14 +456,15 @@ subroutine sparse_4(A,SA)
     integer :: subs(4)
     integer :: n,i,c
 
-    SA%nnz = count(A.ne.0.d0)
     SA%nd = 4
-
-    n = size(A)
-    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
     allocate(SA%dims(SA%nd))
     SA%dims = shape(A)
 
+    SA%nnz = count(A.ne.0.d0)
+    if(SA%nnz.eq.0) return
+    allocate(SA%vals(SA%nnz),SA%inds(SA%nnz))
+
+    n = size(A)
     c = 1
     do i=1,n
         call ind2sub(SA%dims,i,subs)

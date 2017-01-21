@@ -6298,7 +6298,7 @@ subroutine ndmc
     real(Float64), dimension(3) :: vnbi !! velocities(full..)
     real(Float64), dimension(3) :: rnbi !! initial position
 
-    integer :: jj, ii, kk
+    integer :: jj, ii, kk, cnt
     integer :: ncell
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer, dimension(3) :: nl_birth
@@ -6321,7 +6321,7 @@ subroutine ndmc
          +  nbi%current_fractions(3)/3.d0 ) )
 
     nlaunch=real(inputs%n_nbi)
-
+    cnt = 0
     !$OMP PARALLEL DO schedule(guided) &
     !$OMP& private(vnbi,rnbi,tracks,ncell,plasma,nl_birth,randi, &
     !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
@@ -6378,6 +6378,10 @@ subroutine ndmc
                 !$OMP END CRITICAL(ndmc_birth)
             endif
         enddo energy_fractions
+        if (inputs%verbose.eq.2)then
+            cnt = cnt + 1
+            WRITE(*,'(f7.2,"% completed",a,$)') 100*cnt/nlaunch,char(13)
+        endif
     enddo loop_over_markers
     !$OMP END PARALLEL DO
 

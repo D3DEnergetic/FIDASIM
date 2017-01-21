@@ -5,7 +5,7 @@ USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_extra !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, matinv
-USE parallel_rng
+USE utilities
 
 implicit none
 
@@ -548,18 +548,32 @@ type LineOfSight
         !+ Optical axis in beam grid coordinates
 end type LineOfSight
 
+type LOSElement
+    !+ Defines a element of a line of sight and cell intersection
+    integer :: id
+        !+ Line of sight index
+    real(Float64) :: length
+        !+ Length of crossing
+end type LOSElement
+
+type LOSInters
+    !+ Defines the channels that intersect a cell
+    integer :: nchan = 0
+        !+ Number of channels that intersect
+    type(LOSElement), dimension(:), allocatable :: los_elem
+        !+ Array of crossing
+end type LOSInters
+
 type SpectralChords
     !+ Defines an spectral diagnostic system
     integer :: nchan = 0
         !+ Number of channels
-    type(LineOfSight), dimension(:), allocatable   :: los
+    type(LineOfSight), dimension(:), allocatable :: los
         !+ Line of sight array
-    real(Float64), dimension(:), allocatable       :: radius
+    real(Float64), dimension(:), allocatable     :: radius
         !+ Radius of each line of sight
-    logical, dimension(:,:,:), allocatable         :: los_inter
-        !+ Indicates whether a [[libfida:beam_grid]] cell intersects a LOS
-    real(Float32), dimension(:,:,:,:), allocatable :: dlength
-        !+ [[libfida:beam_grid]] cell - LOS intersection length: dlength(x,y,z,chan)
+    type(LOSInters), dimension(:,:,:), allocatable :: inter
+        !+ Array of LOS intersections with [[libfida:beam_grid]]
 end type SpectralChords
 
 type BoundedPlane
@@ -1827,7 +1841,9 @@ subroutine read_chords
 
     real(Float64), dimension(:,:), allocatable :: lenses
     real(Float64), dimension(:,:), allocatable :: axes
+    real(Float64), dimension(:,:,:), allocatable :: dlength
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
+    type(LOSElement), dimension(:), allocatable :: los_elem
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
@@ -1836,7 +1852,7 @@ subroutine read_chords
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
 
-    integer :: i, j, ic, nc, ncell, ind(3)
+    integer :: i, j, ic, nc, ncell, ind(3), ii, jj, kk
     integer :: error
 
     if(inputs%verbose.ge.1) then
@@ -1877,12 +1893,9 @@ subroutine read_chords
     allocate(sigma_pi(spec_chords%nchan))
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
-    allocate(spec_chords%dlength(spec_chords%nchan, &
-                                 beam_grid%nx, &
-                                 beam_grid%ny, &
-                                 beam_grid%nz) )
-
-    spec_chords%dlength = 0.d0
+    allocate(dlength(beam_grid%nx, &
+                     beam_grid%ny, &
+                     beam_grid%nz) )
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -1916,7 +1929,7 @@ subroutine read_chords
         call grid_intersect(r0,v0,length,r_enter,r_exit)
         if(length.le.0.d0) then
             if(inputs%verbose.ge.0) then
-                WRITE(*,'("Channel ",i3," missed the beam grid")'),i
+                WRITE(*,'("Channel ",i5," missed the beam grid")'),i
             endif
             cycle chan_loop
         endif
@@ -1927,6 +1940,7 @@ subroutine read_chords
             nc = 100
         endif
 
+        dlength = 0.d0
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
         !$OMP& length, r_enter, r_exit, j, tracks, ncell, ind)
         do ic=1,nc
@@ -1945,13 +1959,32 @@ subroutine read_chords
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
-                spec_chords%dlength(i,ind(1),ind(2),ind(3)) = &
-                spec_chords%dlength(i,ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                spec_chords%los_inter(ind(1),ind(2),ind(3)) = .True.
+                dlength(ind(1),ind(2),ind(3)) = &
+                dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
                 !$OMP END CRITICAL(read_chords_1)
             enddo track_loop
         enddo
         !$OMP END PARALLEL DO
+        do kk=1,beam_grid%nz
+            do jj=1,beam_grid%ny
+                xloop: do ii=1, beam_grid%nx
+                    if(dlength(ii,jj,kk).ne.0.d0) then
+                        nc = spec_chords%inter(ii,jj,kk)%nchan + 1
+                        if(nc.eq.1) then
+                            allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
+                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dlength(ii,jj,kk))
+                        else
+                            allocate(los_elem(nc))
+                            los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
+                            los_elem(nc) = LOSElement(i, dlength(ii,jj,kk))
+                            deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
+                            call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
+                        endif
+                        spec_chords%inter(ii,jj,kk)%nchan = nc
+                    endif
+                enddo xloop
+            enddo
+        enddo
     enddo chan_loop
 
     if(inputs%verbose.ge.1) then
@@ -4554,7 +4587,8 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
     track_loop: do i=1,beam_grid%ntrack
         if(cc.gt.beam_grid%ntrack) exit track_loop
 
-        if(spec_chords%los_inter(ind(1),ind(2),ind(3)).and.(.not.los_inter))then
+        if((spec_chords%inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
+            .and.(.not.los_inter))then
             los_inter = .True.
         endif
         dt_arr = abs(( (ri_cell + 0.5*dr) - ri)*inv_vn)
@@ -5242,13 +5276,11 @@ subroutine store_npa(det, ri, rf, vn, flux)
     !$OMP CRITICAL(store_npa_1)
     npa%npart = npa%npart + 1
     if(npa%npart.gt.npa%nmax) then
-        allocate(parts(npa%npart-1))
-        parts = npa%part
-        deallocate(npa%part)
         npa%nmax = int(npa%nmax*2)
-        allocate(npa%part(npa%nmax))
-        npa%part(1:(npa%npart-1)) = parts
-        deallocate(parts)
+        allocate(parts(npa%nmax))
+        parts(1:(npa%npart-1)) = npa%part
+        deallocate(npa%part)
+        call move_alloc(parts, npa%part)
     endif
     npa%part(npa%npart)%detector = det
     npa%part(npa%npart)%xi = uvw_ri(1)
@@ -5787,14 +5819,17 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
-    integer :: ichan,i,bin
+    integer :: ichan,i,j,bin,nchan
 
     call get_indices(pos,ind)
+    nchan = spec_chords%inter(ind(1),ind(2),ind(3))%nchan
+    if(nchan.eq.0) return
+
     call get_fields(fields,pos=pos)
 
-    loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
-        if(dlength.le.0.0) cycle loop_over_channels
+    loop_over_channels: do j=1,nchan
+        ichan = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%id
+        dlength = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
@@ -5829,7 +5864,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
-    integer :: ichan, i, bin, iclass
+    integer :: ichan, i, j, bin, iclass, nchan
 
     if(present(orbit_class)) then
         iclass = orbit_class
@@ -5838,11 +5873,14 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     endif
 
     call get_indices(pos,ind)
+    nchan = spec_chords%inter(ind(1),ind(2),ind(3))%nchan
+    if(nchan.eq.0) return
+
     call get_fields(fields,pos=pos)
 
-    loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
-        if(dlength.le.0.0) cycle loop_over_channels
+    loop_over_channels: do j=1,nchan
+        ichan = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%id
+        dlength = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
@@ -5952,14 +5990,17 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
-    integer :: ichan
+    integer :: ichan,nchan,i
 
     call get_indices(pos,ind)
+    nchan = spec_chords%inter(ind(1),ind(2),ind(3))%nchan
+    if(nchan.eq.0) return
+
     call get_fields(fields,pos=pos)
 
-    loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
-        if(dlength.le.0.0) cycle loop_over_channels
+    loop_over_channels: do i=1,nchan
+        ichan = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(i)%id
+        dlength = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(i)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call store_fw_photons_at_chan(ichan, eind, pind, &
@@ -7383,7 +7424,7 @@ subroutine fida_weights_los
     real(Float64) :: length
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer :: nwav
-    integer(Int32) :: i, j, k, ienergy
+    integer(Int32) :: i, j, k, ienergy, cid,cind
     integer(Int32) :: ipitch, igyro, icell, ichan
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr,phiarr
     real(Float64), dimension(:,:), allocatable :: mean_f
@@ -7461,9 +7502,15 @@ subroutine fida_weights_los
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
-                    if(spec_chords%dlength(ichan,i,j,k).gt.0.0) then
+                    cid = 0
+                    cind = 0
+                    do while (cid.ne.ichan)
+                        cind = cind + 1
+                        cid = spec_chords%inter(i,j,k)%los_elem(cind)%id
+                    enddo
+                    if(cid.eq.ichan) then
                         ind = [i,j,k]
-                        dlength = spec_chords%dlength(ichan,i,j,k)
+                        dlength = spec_chords%inter(i,j,k)%los_elem(cind)%length
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
                         hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength
                         tdens = tdens + neut%dens(:,nbit_type,i,j,k)*dlength
@@ -7806,8 +7853,7 @@ program fidasim
     call read_tables()
     call read_distribution()
 
-    allocate(spec_chords%los_inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    spec_chords%los_inter = .False.
+    allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
         call read_chords()
     endif

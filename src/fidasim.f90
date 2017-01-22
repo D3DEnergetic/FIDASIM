@@ -5819,17 +5819,19 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
+    type(LOSInters) :: inter
     integer :: ichan,i,j,bin,nchan
 
     call get_indices(pos,ind)
-    nchan = spec_chords%inter(ind(1),ind(2),ind(3))%nchan
+    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    nchan = inter%nchan
     if(nchan.eq.0) return
 
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do j=1,nchan
-        ichan = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%id
-        dlength = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%length
+        ichan = inter%los_elem(j)%id
+        dlength = inter%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
@@ -5864,6 +5866,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
+    type(LOSInters) :: inter
     integer :: ichan, i, j, bin, iclass, nchan
 
     if(present(orbit_class)) then
@@ -5873,14 +5876,15 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     endif
 
     call get_indices(pos,ind)
-    nchan = spec_chords%inter(ind(1),ind(2),ind(3))%nchan
+    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    nchan = inter%nchan
     if(nchan.eq.0) return
 
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do j=1,nchan
-        ichan = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%id
-        dlength = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(j)%length
+        ichan = inter%los_elem(j)%id
+        dlength = inter%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
@@ -5990,17 +5994,19 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
+    type(LOSInters) :: inter
     integer :: ichan,nchan,i
 
     call get_indices(pos,ind)
-    nchan = spec_chords%inter(ind(1),ind(2),ind(3))%nchan
+    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    nchan = inter%nchan
     if(nchan.eq.0) return
 
     call get_fields(fields,pos=pos)
 
     loop_over_channels: do i=1,nchan
-        ichan = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(i)%id
-        dlength = spec_chords%inter(ind(1),ind(2),ind(3))%los_elem(i)%length
+        ichan = inter%los_elem(i)%id
+        dlength = inter%los_elem(i)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call store_fw_photons_at_chan(ichan, eind, pind, &

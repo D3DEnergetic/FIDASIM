@@ -200,6 +200,8 @@ def main():
             frids = [extract_runid(f) for f in files]
             srids = [extract_runid(f) for f in sfiles]
             files = [fileordir+'/'+f+'_inputs.dat' for f in set(frids).difference(srids)]
+            if not files:
+                print('\034[94m'+'INFO: All runs have completed. Use -c option to overwrite runs.'+'\034[0m')
     else:
         raise IOError('Not a file or directory')
 

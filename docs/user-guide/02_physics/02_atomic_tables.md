@@ -162,8 +162,8 @@ A more precice references can be found in the Fortran function documentation. Fo
 * [[AtomicCrossSection]]: Defines a n/m-resolved atomic cross section table
 * [[AtomicRates]]: Defines an atomic table for populating and de-populating reaction rates
 * [[AtomicTables]]: Atomic tables for various types of interactions need by FIDASIM
-* [[read_cross]]: Reads atomic cross section from file
-* [[read_rates]]: Reads atomic rates from file
+* [[read_atomic_cross]]: Reads atomic cross section from file
+* [[read_atomic_rates]]: Reads atomic rates from file
 * [[read_tables]]: Reads all cross sections and rates needed by FIDASIM
 * [[m_spread]]: Spreads total n cross section amoung m states
 

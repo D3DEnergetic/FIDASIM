@@ -7430,7 +7430,7 @@ subroutine fida_weights_los
     real(Float64) :: length
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer :: nwav
-    integer(Int32) :: i, j, k, ienergy, cid,cind
+    integer(Int32) :: i, j, k, ienergy, cid, cind
     integer(Int32) :: ipitch, igyro, icell, ichan
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr,phiarr
     real(Float64), dimension(:,:), allocatable :: mean_f
@@ -7445,6 +7445,7 @@ subroutine fida_weights_los
     real(Float64), dimension(nlevs) :: denn  ! Density of n-states
     !! COLRAD
     real(Float64) :: dt, max_dens, dlength, sigma_pi
+    type(LOSInters) :: inter
     real(Float64) :: eb, ptch, phi
     !! Solution of differential equation
     integer, dimension(3) :: ind  !!actual cell
@@ -7508,15 +7509,16 @@ subroutine fida_weights_los
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
+                    inter = spec_chords%inter(i,j,k)
                     cid = 0
                     cind = 0
-                    do while (cid.ne.ichan)
+                    do while (cid.ne.ichan.and.cind.lt.inter%nchan)
                         cind = cind + 1
-                        cid = spec_chords%inter(i,j,k)%los_elem(cind)%id
+                        cid = inter%los_elem(cind)%id
                     enddo
                     if(cid.eq.ichan) then
                         ind = [i,j,k]
-                        dlength = spec_chords%inter(i,j,k)%los_elem(cind)%length
+                        dlength = inter%los_elem(cind)%length
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
                         hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength
                         tdens = tdens + neut%dens(:,nbit_type,i,j,k)*dlength

@@ -865,29 +865,29 @@ public subroutine fida_mc()
 <path fill="none" stroke="#000000" d="M54.2567,-447.329C118.987,-462.359 282.447,-500.312 361.639,-518.7"/>
 <polygon fill="#000000" stroke="#000000" points="361.247,-522.202 371.779,-521.054 362.83,-515.383 361.247,-522.202"/>
 </g>
-<!-- proc~store_fida_photons -->
-<g id="node3" class="node"><title>proc~store_fida_photons</title>
-<a xlink:href="../proc/store_fida_photons.html" xlink:title="store_fida_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="336,-454 232,-454 232,-428 336,-428 336,-454"/>
-<text text-anchor="middle" x="284" y="-438.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
-</a>
-</g>
-<!-- proc~fida_mc&#45;&gt;proc~store_fida_photons -->
-<g id="edge98" class="edge"><title>proc~fida_mc&#45;&gt;proc~store_fida_photons</title>
-<path fill="none" stroke="#000000" d="M54.0178,-441C93.4871,-441 168.027,-441 221.558,-441"/>
-<polygon fill="#000000" stroke="#000000" points="221.632,-444.5 231.632,-441 221.632,-437.5 221.632,-444.5"/>
-</g>
 <!-- proc~track -->
-<g id="node4" class="node"><title>proc~track</title>
+<g id="node3" class="node"><title>proc~track</title>
 <a xlink:href="../proc/track.html" xlink:title="track">
 <polygon fill="#d9534f" stroke="#d9534f" points="311,-410 257,-410 257,-384 311,-384 311,-410"/>
 <text text-anchor="middle" x="284" y="-394.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track</text>
 </a>
 </g>
 <!-- proc~fida_mc&#45;&gt;proc~track -->
-<g id="edge100" class="edge"><title>proc~fida_mc&#45;&gt;proc~track</title>
+<g id="edge98" class="edge"><title>proc~fida_mc&#45;&gt;proc~track</title>
 <path fill="none" stroke="#000000" d="M54.0178,-436.374C100.292,-428.452 194.771,-412.277 247.085,-403.32"/>
 <polygon fill="#000000" stroke="#000000" points="247.693,-406.767 256.959,-401.63 246.511,-399.867 247.693,-406.767"/>
+</g>
+<!-- proc~store_fida_photons -->
+<g id="node4" class="node"><title>proc~store_fida_photons</title>
+<a xlink:href="../proc/store_fida_photons.html" xlink:title="store_fida_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="336,-454 232,-454 232,-428 336,-428 336,-454"/>
+<text text-anchor="middle" x="284" y="-438.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
+</a>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~store_fida_photons -->
+<g id="edge100" class="edge"><title>proc~fida_mc&#45;&gt;proc~store_fida_photons</title>
+<path fill="none" stroke="#000000" d="M54.0178,-441C93.4871,-441 168.027,-441 221.558,-441"/>
+<polygon fill="#000000" stroke="#000000" points="221.632,-444.5 231.632,-441 221.632,-437.5 221.632,-444.5"/>
 </g>
 <!-- proc~randu -->
 <g id="node5" class="node"><title>proc~randu</title>
@@ -961,6 +961,11 @@ public subroutine fida_mc()
 <path fill="none" stroke="#000000" d="M428.312,-515.989C432.367,-513.233 436.436,-510.187 440,-507 458.834,-490.156 455.45,-477.701 476,-463 481.675,-458.94 488.188,-455.537 494.768,-452.716"/>
 <polygon fill="#000000" stroke="#000000" points="496.311,-455.871 504.367,-448.99 493.778,-449.346 496.311,-455.871"/>
 </g>
+<!-- proc~track&#45;&gt;proc~in_plasma -->
+<g id="edge24" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M311.084,-386.119C342.67,-375.031 396.151,-361.263 440,-375 468.751,-384.007 496.43,-405.124 514.419,-421.063"/>
+<polygon fill="#000000" stroke="#000000" points="512.228,-423.802 521.972,-427.961 516.948,-418.633 512.228,-423.802"/>
+</g>
 <!-- proc~get_indices -->
 <g id="node27" class="node"><title>proc~get_indices</title>
 <a xlink:href="../proc/get_indices.html" xlink:title="get_indices">
@@ -968,44 +973,39 @@ public subroutine fida_mc()
 <text text-anchor="middle" x="406" y="-394.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
 </a>
 </g>
+<!-- proc~track&#45;&gt;proc~get_indices -->
+<g id="edge22" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="#000000" d="M311.076,-397C326.074,-397 345.085,-397 362.148,-397"/>
+<polygon fill="#000000" stroke="#000000" points="362.466,-400.5 372.466,-397 362.466,-393.5 362.466,-400.5"/>
+</g>
 <!-- proc~store_fida_photons&#45;&gt;proc~get_indices -->
-<g id="edge28" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~get_indices</title>
+<g id="edge32" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~get_indices</title>
 <path fill="none" stroke="#000000" d="M320.274,-427.918C333.499,-423.148 348.592,-417.705 362.389,-412.728"/>
 <polygon fill="#000000" stroke="#000000" points="363.942,-415.889 372.162,-409.204 361.567,-409.304 363.942,-415.889"/>
 </g>
 <!-- proc~spectrum -->
-<g id="node28" class="node"><title>proc~spectrum</title>
+<g id="node30" class="node"><title>proc~spectrum</title>
 <a xlink:href="../proc/spectrum.html" xlink:title="spectrum">
 <polygon fill="#d9534f" stroke="#d9534f" points="434,-454 378,-454 378,-428 434,-428 434,-454"/>
 <text text-anchor="middle" x="406" y="-438.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spectrum</text>
 </a>
 </g>
 <!-- proc~store_fida_photons&#45;&gt;proc~spectrum -->
-<g id="edge30" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~spectrum</title>
+<g id="edge34" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~spectrum</title>
 <path fill="none" stroke="#000000" d="M336.093,-441C346.461,-441 357.18,-441 367.017,-441"/>
 <polygon fill="#000000" stroke="#000000" points="367.287,-444.5 377.287,-441 367.287,-437.5 367.287,-444.5"/>
 </g>
 <!-- proc~get_fields -->
-<g id="node29" class="node"><title>proc~get_fields</title>
+<g id="node31" class="node"><title>proc~get_fields</title>
 <a xlink:href="../proc/get_fields.html" xlink:title="get_fields">
 <polygon fill="#d9534f" stroke="#d9534f" points="435,-498 377,-498 377,-472 435,-472 435,-498"/>
 <text text-anchor="middle" x="406" y="-482.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
 </a>
 </g>
 <!-- proc~store_fida_photons&#45;&gt;proc~get_fields -->
-<g id="edge32" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~get_fields</title>
+<g id="edge36" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~get_fields</title>
 <path fill="none" stroke="#000000" d="M320.274,-454.082C335.024,-459.402 352.096,-465.559 367.104,-470.972"/>
 <polygon fill="#000000" stroke="#000000" points="366.028,-474.305 376.623,-474.405 368.403,-467.72 366.028,-474.305"/>
-</g>
-<!-- proc~track&#45;&gt;proc~in_plasma -->
-<g id="edge36" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M311.084,-386.119C342.67,-375.031 396.151,-361.263 440,-375 468.751,-384.007 496.43,-405.124 514.419,-421.063"/>
-<polygon fill="#000000" stroke="#000000" points="512.228,-423.802 521.972,-427.961 516.948,-418.633 512.228,-423.802"/>
-</g>
-<!-- proc~track&#45;&gt;proc~get_indices -->
-<g id="edge34" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
-<path fill="none" stroke="#000000" d="M311.076,-397C326.074,-397 345.085,-397 362.148,-397"/>
-<polygon fill="#000000" stroke="#000000" points="362.466,-400.5 372.466,-397 362.466,-393.5 362.466,-400.5"/>
 </g>
 <!-- omp_get_thread_num -->
 <g id="node39" class="node"><title>omp_get_thread_num</title>
@@ -1172,24 +1172,24 @@ public subroutine fida_mc()
 <polygon fill="#000000" stroke="#000000" points="879.602,-422.233 890.119,-420.953 881.099,-415.395 879.602,-422.233"/>
 </g>
 <!-- proc~get_fields&#45;&gt;proc~get_position -->
-<g id="edge22" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
+<g id="edge26" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
 <path fill="none" stroke="#000000" d="M435.272,-494.984C451.529,-500.529 472.093,-507.543 490.319,-513.76"/>
 <polygon fill="#000000" stroke="#000000" points="489.286,-517.106 499.881,-517.021 491.546,-510.48 489.286,-517.106"/>
 </g>
 <!-- proc~get_fields&#45;&gt;proc~in_plasma -->
-<g id="edge24" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
+<g id="edge28" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
 <path fill="none" stroke="#000000" d="M435.272,-475.016C452.87,-469.013 475.515,-461.289 494.778,-454.719"/>
 <polygon fill="#000000" stroke="#000000" points="496.163,-457.945 504.498,-451.404 493.903,-451.32 496.163,-457.945"/>
 </g>
 <!-- proc~calc_perp_vectors -->
-<g id="node30" class="node"><title>proc~calc_perp_vectors</title>
+<g id="node32" class="node"><title>proc~calc_perp_vectors</title>
 <a xlink:href="../proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
 <polygon fill="#d9534f" stroke="#d9534f" points="585,-498 485,-498 485,-472 585,-472 585,-498"/>
 <text text-anchor="middle" x="535" y="-482.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
 </a>
 </g>
 <!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
-<g id="edge26" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
+<g id="edge30" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
 <path fill="none" stroke="#000000" d="M435.272,-485C446.942,-485 460.831,-485 474.481,-485"/>
 <polygon fill="#000000" stroke="#000000" points="474.832,-488.5 484.832,-485 474.832,-481.5 474.832,-488.5"/>
 </g>

@@ -2,6 +2,7 @@
 project: FIDASIM
 version: {!../VERSION!}
 project_github: https://github.com/D3DEnergetic/FIDASIM
+project_download: https://github.com/D3DEnergetic/FIDASIM/releases
 summary: ![FIDASIM](|media|/fidasim-logo.png)
          {: style="text-align: center" }
 author: Luke Stagner

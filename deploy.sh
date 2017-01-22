@@ -18,7 +18,7 @@ SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
 echo $REPO
 echo $SSH_REPO
 
-openssl aes-256-cbc -K $encrypted_60fa3eb19c83_key -iv $encrypted_60fa3eb19c83_iv -in travis_key.enc -out travis_key -d
+openssl aes-256-cbc -K $encrypted_60fa3eb19c83_key -iv $encrypted_60fa3eb19c83_iv -in .travis_key.enc -out travis_key -d
 
 if [ ! -f $TRAVIS_BUILD_DIR/travis_key ]; then
     echo "Missing Travis Deploy Key"

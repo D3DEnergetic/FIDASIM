@@ -628,6 +628,10 @@ type NPAParticle
         !+ Final y position
     real(Float64) :: zf = 0.d0
         !+ Final z position
+    real(Float64) :: r = 0.d0
+        !+ Guiding Center R position
+    real(Float64) :: z = 0.d0
+        !+ Guiding Center Z postion
     real(Float64) :: weight = 0.d0
         !+ NPA particle weight
     real(Float64) :: energy = 0.d0
@@ -3265,6 +3269,73 @@ subroutine write_neutrals
 
 end subroutine write_neutrals
 
+subroutine write_npa_particles(gid, part)
+    !+ Writes NPA particle data to HDF5 file
+    integer(HID_T) :: gid
+    type(NPAParticle), dimension(:), intent(in) :: part
+
+    integer(HSIZE_T), dimension(1) :: d
+    integer(HSIZE_T), dimension(2) :: dim2
+    integer :: n, error
+    real(Float64), dimension(:,:), allocatable :: ri, rf
+
+    n = size(part)
+    if(n.eq.0) return
+    allocate(ri(3,n),rf(3,n))
+    ri(1,:) = part%xi
+    ri(2,:) = part%yi
+    ri(3,:) = part%zi
+    rf(1,:) = part%xf
+    rf(2,:) = part%yf
+    rf(3,:) = part%zf
+
+    !Create Group
+    call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [n], error)
+    d(1) = n
+    dim2 = [3, n]
+    call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
+    call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+    call h5ltmake_compressed_dataset_double_f(gid,"r",1,d, &
+         part%r, error)
+    call h5ltmake_compressed_dataset_double_f(gid,"z",1,d, &
+         part%z, error)
+    call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, &
+         part%pitch, error)
+    call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d,&
+         part%energy, error)
+    call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d,&
+         part%weight, error)
+    call h5ltmake_compressed_dataset_int_f(gid,"detector",1,d,&
+         part%detector, error)
+
+    !Add attributes
+    call h5ltset_attribute_string_f(gid,"nparticle","description", &
+         "Number of particles that hit a detector", error)
+    call h5ltset_attribute_string_f(gid,"ri","description", &
+         "Neutral particle's birth position in machine coordinates: ri([x,y,z],particle)", error)
+    call h5ltset_attribute_string_f(gid,"ri","units", "cm", error)
+    call h5ltset_attribute_string_f(gid,"rf","description", &
+         "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
+    call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+    call h5ltset_attribute_string_f(gid,"r","description", &
+         "Gyrocenter R position", error)
+    call h5ltset_attribute_string_f(gid,"r","units","cm",error)
+    call h5ltset_attribute_string_f(gid,"z","description", &
+         "Gyrocenter Z position", error)
+    call h5ltset_attribute_string_f(gid,"z","units","cm",error)
+    call h5ltset_attribute_string_f(gid,"pitch","description", &
+         "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
+    call h5ltset_attribute_string_f(gid,"energy","description", &
+         "Energy value of the neutral particle", error)
+    call h5ltset_attribute_string_f(gid,"energy","units","keV",error)
+    call h5ltset_attribute_string_f(gid,"weight","description", &
+         "Neutral particle's contribution to the flux", error)
+    call h5ltset_attribute_string_f(gid,"weight","units","neutrals/s",error)
+    call h5ltset_attribute_string_f(gid,"detector","description", &
+         "Detector that the neutral particle hit", error)
+
+end subroutine write_npa_particles
+
 subroutine write_npa
     !+ Writes [[libfida:npa]] to a HDF5 file
     integer(HID_T) :: fid, gid
@@ -3273,7 +3344,6 @@ subroutine write_npa
     integer :: error
 
     integer, dimension(:), allocatable :: dcount
-    real(Float64), dimension(:,:), allocatable :: ri, rf
     integer :: i, n
     character(charlim) :: filename = ''
 
@@ -3325,59 +3395,14 @@ subroutine write_npa
     deallocate(dcount)
 
     if((npa%npart.ne.0).and.(inputs%calc_npa.ge.2)) then
-        n = npa%npart
-        allocate(ri(3,n),rf(3,n))
-        ri(1,:) = npa%part(1:n)%xi
-        ri(2,:) = npa%part(1:n)%yi
-        ri(3,:) = npa%part(1:n)%zi
-        rf(1,:) = npa%part(1:n)%xf
-        rf(2,:) = npa%part(1:n)%yf
-        rf(3,:) = npa%part(1:n)%zf
-
-        !Create Group
         call h5gcreate_f(fid,"/particles",gid, error)
-        call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npa%npart], error)
-        d(1) = npa%npart
-        dim2 = [3, n]
-        call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, &
-             npa%part(1:n)%pitch, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d,&
-             npa%part(1:n)%energy, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d,&
-             npa%part(1:n)%weight, error)
-        call h5ltmake_compressed_dataset_int_f(gid,"detector",1,d,&
-             npa%part(1:n)%detector, error)
-
-        !Add attributes
-        call h5ltset_attribute_string_f(gid,"nparticle","description", &
-             "Number of particles that hit a detector", error)
-        call h5ltset_attribute_string_f(gid,"ri","description", &
-             "Neutral particle's birth position in machine coordinates: ri([x,y,z],particle)", error)
-        call h5ltset_attribute_string_f(gid,"ri","units", "cm", error)
-        call h5ltset_attribute_string_f(gid,"rf","description", &
-             "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
-        call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
-        call h5ltset_attribute_string_f(gid,"pitch","description", &
-             "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
-        call h5ltset_attribute_string_f(gid,"energy","description", &
-             "Energy value of the neutral particle", error)
-        call h5ltset_attribute_string_f(gid,"energy","units","keV",error)
-        call h5ltset_attribute_string_f(gid,"weight","description", &
-             "Neutral particle's contribution to the flux", error)
-        call h5ltset_attribute_string_f(gid,"weight","units","neutrals/s",error)
-        call h5ltset_attribute_string_f(gid,"detector","description", &
-             "Detector that the neutral particle hit", error)
-
+        call write_npa_particles(gid, npa%part(1:npa%npart))
         call h5ltset_attribute_string_f(fid,"/particles","coordinate_system", &
              "Right-handed cartesian",error)
         call h5ltset_attribute_string_f(fid,"/particles","description", &
              "Monte Carlo particles",error)
-
         !Close group
         call h5gclose_f(gid, error)
-        deallocate(ri,rf)
     endif
 
     !Close file
@@ -4118,20 +4143,32 @@ subroutine plane_intercept(l0, l, p0, n, p, t)
 
 end subroutine plane_intercept
 
-function in_boundary(bplane, p) result(in_b)
+function in_boundary(bplane, p, plane_coords) result(in_b)
     !+ Indicator function for determining if a point on a plane is within the plane boundary
     type(BoundedPlane), intent(in)          :: bplane
         !+ Plane with boundary
     real(Float64), dimension(3), intent(in) :: p
         !+ Point on plane
-    logical :: in_b
+    logical, intent(in), optional :: plane_coords
+        !+ Indicates that p is in plane coordinates
+    logical :: in_b, pc
 
     real(Float64), dimension(3) :: pp
     real(Float64) :: hh, hw
 
+    if(present(plane_coords)) then
+        pc = plane_coords
+    else
+        pc = .False.
+    endif
+
     hh = bplane%hh
     hw = bplane%hw
-    pp = matmul(bplane%inv_basis, p - bplane%origin)
+    if(.not.pc) then
+        pp = matmul(bplane%inv_basis, p - bplane%origin)
+    else
+        pp = p
+    endif
     in_b = .False.
     SELECT CASE (bplane%shape)
         CASE (1) !Rectangular boundary
@@ -5217,8 +5254,9 @@ subroutine store_npa(det, ri, rf, vn, flux)
         !+ Neutral flux [neutrals/s]
 
     type(LocalEMFields) :: fields
-    real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
-    real(Float64) :: energy, pitch, dE
+    real(Float64), dimension(3) :: uvw_ri, uvw_rf, vn_norm
+    real(Float64), dimension(3) :: uvw_rg, r_step
+    real(Float64) :: energy, pitch, dE, r, z
     integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
 
@@ -5230,14 +5268,13 @@ subroutine store_npa(det, ri, rf, vn, flux)
     energy = inputs%ab*v2_to_E_per_amu*dot_product(vn,vn)
     dE = npa%energy(2)-npa%energy(1)
 
-    ! Calculate pitch if distribution actually uses pitch
-    if(inputs%dist_type.le.2) then
-        call get_fields(fields, pos = ri)
-        vn_norm = vn/norm2(vn)
-        pitch = dot_product(fields%b_norm,vn_norm)
-    else
-        pitch = 0.d0
-    endif
+    call get_fields(fields, pos = ri)
+    vn_norm = vn/norm2(vn)
+    pitch = dot_product(fields%b_norm,vn_norm)
+    call gyro_step(vn, fields, r_step)
+    call xyz_to_uvw(ri + r_step,uvw_rg)
+    r = sqrt(uvw_rg(1)**2 + uvw_rg(2)**2)
+    z = uvw_rg(3)
 
     !$OMP CRITICAL(store_npa_1)
     npa%npart = npa%npart + 1
@@ -5257,6 +5294,8 @@ subroutine store_npa(det, ri, rf, vn, flux)
     npa%part(npa%npart)%xf = uvw_rf(1)
     npa%part(npa%npart)%yf = uvw_rf(2)
     npa%part(npa%npart)%zf = uvw_rf(3)
+    npa%part(npa%npart)%r = r
+    npa%part(npa%npart)%z = z
     npa%part(npa%npart)%energy = energy
     npa%part(npa%npart)%pitch = pitch
     npa%part(npa%npart)%weight = flux
@@ -7059,6 +7098,137 @@ subroutine npa_mc
 
 end subroutine npa_mc
 
+subroutine npa_particles
+    !+ Calculates all particles that could hit the NPA detectors
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    type(BoundedPlane)  :: detector, aperture
+    integer :: n,i,ixd,iyd,ixa,iya,ie,idet
+    integer, dimension(3) :: ind
+    integer, dimension(4) :: neut_types=[1,2,3,4]
+    real(Float64) :: pcxa,cnt
+    real(Float64), dimension(nlevs) :: pcx, states, states_i
+    real(Float64), dimension(10) :: xd,yd,xa,ya
+    real(Float64), dimension(3) :: ri,vn,vn_norm
+    real(Float64), dimension(3) :: rd,ra
+    real(Float64) :: vabs, hhd, hwd, hha, hwa,maxcnt
+    real(Float64) :: dlength, max_length, flux
+    character(charlim) :: filename = ''
+    integer(HID_T) :: fid
+    integer :: error
+
+    dlength = 2.0d0
+    n = size(xd)
+    maxcnt = real(n*n*n*n)
+    do idet=1, npa_chords%nchan
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,"Channel: ",i3)') idet
+            write(*,'(T4,"Radius: ",f10.3)') npa_chords%radius(idet)
+        endif
+        detector = npa_chords%det(idet)%detector
+        aperture = npa_chords%det(idet)%aperture
+        do i=1, n
+            xd(i) = -detector%hw + 2*detector%hw*(i-0.5)/n
+            yd(i) = -detector%hh + 2*detector%hh*(i-0.5)/n
+            xa(i) = -aperture%hw + 2*aperture%hw*(i-0.5)/n
+            ya(i) = -aperture%hh + 2*aperture%hh*(i-0.5)/n
+        enddo
+        cnt = 0.0
+        xd_loop: do ixd=1, n
+            yd_loop: do iyd=1, n
+                rd = [xd(ixd),yd(iyd),0.d0]
+                if(.not.in_boundary(detector,rd,.True.)) then
+                    cnt = cnt + n*n
+                    cycle yd_loop
+                endif
+                rd = matmul(detector%basis,rd) + detector%origin
+                xa_loop: do ixa=1, n
+                    ya_loop: do iya=1, n
+                        cnt = cnt + 1
+                        ra = [xa(ixa),ya(iya),0.d0]
+
+                        if(.not.in_boundary(aperture,ra,.True.)) cycle ya_loop
+                        ra = matmul(aperture%basis,ra) + aperture%origin
+
+                        vn_norm = ra - rd
+                        vn_norm = vn_norm/norm2(vn_norm)
+
+                        ! Find edge of plasma
+                        ri = ra
+                        call get_plasma(plasma,pos=ri)
+                        max_length=0.0
+                        do while (.not.plasma%in_plasma)
+                            ri = ri + vn_norm*dlength
+                            call get_plasma(plasma,pos=ri)
+                            max_length = max_length + dlength
+                            if(max_length.gt.300) cycle ya_loop
+                        enddo
+
+                        trajectory_loop: do while(plasma%in_plasma)
+                            call get_indices(ri, ind)
+                            if(sum(neut%dens(:,1:4,ind(1),ind(2),ind(3))).ge.0.d0) then
+                                call get_fields(fields, pos=ri)
+                                !$OMP PARALLEL DO schedule(guided) private(vabs, vn, &
+                                !$OMP& states,pcx,flux)
+                                energy_loop: do ie = 1, npa%nenergy
+                                    vabs = sqrt(npa%energy(ie)/(v2_to_E_per_amu*inputs%ab))
+                                    vn = -vn_norm*vabs
+
+                                    !! Get initial states
+                                    call get_beam_cx_prob(ind,ri,vn,neut_types,pcx)
+                                    if(sum(pcx).le.0) cycle energy_loop
+
+                                    !! Attenuate states
+                                    states = pcx*1.0d14 !!needs to be large aribitrary number so colrad works
+                                    call attenuate(ri,rd,vn,states)
+                                    flux = 1.0d-14*sum(states)
+                                    if(flux.le.0.d0) cycle energy_loop
+                                    call store_npa(idet,ri,rd,vn,flux)
+                                enddo energy_loop
+                                !$OMP END PARALLEL DO
+                            endif
+                            ri = ri + dlength*vn_norm
+                            call get_plasma(plasma, ri)
+                        enddo trajectory_loop
+                        if (inputs%verbose.eq.2)then
+                            WRITE(*,'(f7.2,"% completed",a,$)') cnt/maxcnt*100,char(13)
+                        endif
+                    enddo ya_loop
+                enddo xa_loop
+            enddo yd_loop
+        enddo xd_loop
+    enddo
+
+    if(npa%npart.eq.0) then
+        WRITE(*,*) 'ERROR: No particle hit the NPA detectors'
+        stop
+    endif
+    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_particles.h5"
+
+    !! Open HDF5 interface
+    call h5open_f(error)
+
+    !! Create file overwriting any existing file
+    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+
+    !! Write particles to file
+    call write_npa_particles(fid, npa%part(1:npa%npart))
+
+    !! Add attributes
+    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+    call h5ltset_attribute_string_f(fid,"/","description", &
+         "NPA particles calculated by FIDASIM",error)
+
+    !! Close File & Interface
+    call h5fclose_f(fid, error)
+    call h5close_f(error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,a,a)') 'NPA particle data written to: ',trim(filename)
+    endif
+
+end subroutine npa_particles
+
 subroutine neutron_f
     !+ Calculate neutron emission rate using a fast-ion distribution function F(E,p,r,z)
     integer :: ir, iz, ie, ip, iphi, nphi
@@ -7955,17 +8125,20 @@ program fidasim
             write(*,'(A,I2,":",I2.2,":",I2.2)') 'npa:    ' , &
             time_arr(5),time_arr(6),time_arr(7)
         endif
-        if(inputs%dist_type.eq.1) then
-            call npa_f()
+        if(inputs%calc_npa.le.2) then
+            if(inputs%dist_type.eq.1) then
+                call npa_f()
+            else
+                call npa_mc()
+            endif
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            if(inputs%calc_npa.ge.1) then
+                call write_npa()
+                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            endif
         else
-            call npa_mc()
+            call npa_particles()
         endif
-        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
-    endif
-
-    if(inputs%calc_npa.ge.1) then
-        call write_npa()
-        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -------------------------------------------------------------------

@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -962,41 +968,41 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 <path fill="none" stroke="#000000" d="M291.774,-105.547C307.16,-110.836 326.71,-117.557 344.451,-123.655"/>
 <polygon fill="#000000" stroke="#000000" points="343.488,-127.025 354.083,-126.966 345.764,-120.405 343.488,-127.025"/>
 </g>
-<!-- proc~neutron_f -->
-<g id="node5" class="node"><title>proc~neutron_f</title>
-<a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="293,-197 235,-197 235,-171 293,-171 293,-197"/>
-<text text-anchor="middle" x="264" y="-181.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
-</a>
-</g>
-<!-- proc~neutron_f&#45;&gt;proc~gyro_correction -->
-<g id="edge20" class="edge"><title>proc~neutron_f&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M293.045,-174.016C308.09,-168.844 326.852,-162.395 343.983,-156.506"/>
-<polygon fill="#000000" stroke="#000000" points="345.52,-159.678 353.84,-153.118 343.245,-153.059 345.52,-159.678"/>
-</g>
-<!-- proc~fida_weights_mc -->
-<g id="node6" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="310,-153 218,-153 218,-127 310,-127 310,-153"/>
-<text text-anchor="middle" x="264" y="-137.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge22" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M310.211,-140C319.361,-140 329.039,-140 338.41,-140"/>
-<polygon fill="#000000" stroke="#000000" points="338.419,-143.5 348.419,-140 338.419,-136.5 338.419,-143.5"/>
-</g>
 <!-- proc~mc_fastion -->
-<g id="node7" class="node"><title>proc~mc_fastion</title>
+<g id="node5" class="node"><title>proc~mc_fastion</title>
 <a xlink:href="../proc/mc_fastion.html" xlink:title="mc_fastion">
 <polygon fill="#d9534f" stroke="#d9534f" points="296,-65 232,-65 232,-39 296,-39 296,-65"/>
 <text text-anchor="middle" x="264" y="-49.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_fastion</text>
 </a>
 </g>
 <!-- proc~mc_fastion&#45;&gt;proc~gyro_correction -->
-<g id="edge24" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
+<g id="edge20" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
 <path fill="none" stroke="#000000" d="M294.233,-65.2229C299.603,-67.9169 305.056,-70.887 310,-74 331.597,-87.5979 354.034,-106.002 369.967,-119.921"/>
 <polygon fill="#000000" stroke="#000000" points="367.861,-122.731 377.667,-126.742 372.503,-117.491 367.861,-122.731"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="node6" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="310,-197 218,-197 218,-171 310,-171 310,-197"/>
+<text text-anchor="middle" x="264" y="-181.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="edge22" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M302.058,-170.918C315.35,-166.348 330.44,-161.161 344.41,-156.359"/>
+<polygon fill="#000000" stroke="#000000" points="345.549,-159.669 353.868,-153.108 343.273,-153.049 345.549,-159.669"/>
+</g>
+<!-- proc~neutron_f -->
+<g id="node7" class="node"><title>proc~neutron_f</title>
+<a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="293,-153 235,-153 235,-127 293,-127 293,-153"/>
+<text text-anchor="middle" x="264" y="-137.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
+</a>
+</g>
+<!-- proc~neutron_f&#45;&gt;proc~gyro_correction -->
+<g id="edge24" class="edge"><title>proc~neutron_f&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M293.045,-140C306.478,-140 322.874,-140 338.425,-140"/>
+<polygon fill="#000000" stroke="#000000" points="338.484,-143.5 348.484,-140 338.484,-136.5 338.484,-143.5"/>
 </g>
 <!-- proc~read_distribution -->
 <g id="node8" class="node"><title>proc~read_distribution</title>
@@ -1022,52 +1028,52 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 <path fill="none" stroke="#000000" d="M41.5378,-134.204C53.7109,-144.653 71.9464,-158.948 90,-168 178.7,-212.475 210.782,-207.21 310,-206 318.495,-205.896 327.483,-205.733 336.274,-205.542"/>
 <polygon fill="#000000" stroke="#000000" points="336.545,-209.037 346.462,-205.308 336.384,-202.039 336.545,-209.037"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~neutron_f -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
-<path fill="none" stroke="#000000" d="M54.088,-131.157C65.1409,-135.118 78.0993,-139.53 90,-143 135.83,-156.362 189.403,-168.468 224.869,-176.004"/>
-<polygon fill="#000000" stroke="#000000" points="224.311,-179.464 234.818,-178.099 225.754,-172.614 224.311,-179.464"/>
-</g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M54.1869,-123.18C91.4189,-126.164 159.166,-131.596 207.609,-135.479"/>
-<polygon fill="#000000" stroke="#000000" points="207.388,-138.973 217.636,-136.283 207.947,-131.995 207.388,-138.973"/>
+<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M54.088,-131.157C65.1409,-135.118 78.0993,-139.53 90,-143 129.05,-154.385 173.722,-164.859 208.025,-172.371"/>
+<polygon fill="#000000" stroke="#000000" points="207.349,-175.806 217.864,-174.507 208.834,-168.965 207.349,-175.806"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_f -->
+<g id="edge16" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<path fill="none" stroke="#000000" d="M54.1869,-123.18C96.0986,-126.54 176.678,-133 224.862,-136.862"/>
+<polygon fill="#000000" stroke="#000000" points="224.669,-140.358 234.917,-137.668 225.229,-133.38 224.669,-140.358"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
 <g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
 <path fill="none" stroke="#000000" d="M54.2241,-116.005C62.0126,-114.576 70.8024,-112.963 79.6572,-111.338"/>
 <polygon fill="#000000" stroke="#000000" points="80.4281,-114.755 89.6322,-109.508 79.1647,-107.87 80.4281,-114.755"/>
 </g>
-<!-- proc~npa_f -->
-<g id="node14" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
-<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
-</a>
-</g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M45.0351,-107.982C57.4032,-99.3048 74.3452,-87.9022 90,-79 93.1887,-77.1867 96.5504,-75.384 99.9454,-73.636"/>
-<polygon fill="#000000" stroke="#000000" points="101.525,-76.7595 108.915,-69.167 98.4031,-70.4941 101.525,-76.7595"/>
-</g>
 <!-- proc~fida_f -->
-<g id="node15" class="node"><title>proc~fida_f</title>
+<g id="node12" class="node"><title>proc~fida_f</title>
 <a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
+<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<path fill="none" stroke="#000000" d="M45.0351,-107.982C57.4032,-99.3048 74.3452,-87.9022 90,-79 93.1887,-77.1867 96.5504,-75.384 99.9454,-73.636"/>
+<polygon fill="#000000" stroke="#000000" points="101.525,-76.7595 108.915,-69.167 98.4031,-70.4941 101.525,-76.7595"/>
+</g>
+<!-- proc~npa_f -->
+<g id="node13" class="node"><title>proc~npa_f</title>
+<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
+<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+</a>
+</g>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
 <path fill="none" stroke="#000000" d="M33.9191,-107.771C44.0887,-89.3924 64.6406,-56.0295 90,-35 93.0558,-32.466 96.4525,-30.1446 99.9769,-28.0393"/>
 <polygon fill="#000000" stroke="#000000" points="101.729,-31.0709 108.879,-23.2525 98.4144,-24.9056 101.729,-31.0709"/>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
-<g id="edge14" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
+<!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
+<g id="edge10" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
 <path fill="none" stroke="#000000" d="M163.146,-55.9396C180.19,-55.2738 202.524,-54.4014 221.842,-53.6468"/>
 <polygon fill="#000000" stroke="#000000" points="222.061,-57.141 231.917,-53.2532 221.788,-50.1463 222.061,-57.141"/>
 </g>
-<!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
-<g id="edge16" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
+<!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
+<g id="edge12" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
 <path fill="none" stroke="#000000" d="M163.146,-21.2709C180.268,-26.488 202.73,-33.3319 222.109,-39.2363"/>
 <polygon fill="#000000" stroke="#000000" points="221.331,-42.6581 231.917,-42.2247 223.371,-35.962 221.331,-42.6581"/>
 </g>
@@ -1210,7 +1216,7 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sinus</span>
 
-    <span class="n">sinus</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mf">1.</span><span class="n">d0</span><span class="o">-</span><span class="n">pitch</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.</span><span class="n">d0</span><span class="p">))</span>
+    <span class="n">sinus</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mf">1.d0</span><span class="o">-</span><span class="n">pitch</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="mf">0.d0</span><span class="p">))</span>
     <span class="n">vi_norm</span> <span class="o">=</span> <span class="p">(</span><span class="n">sinus</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">gyroangle</span><span class="p">)</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">a_norm</span> <span class="o">+</span> <span class="p">&amp;</span>
                <span class="n">pitch</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span> <span class="o">+</span> <span class="p">&amp;</span>
                <span class="n">sinus</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">gyroangle</span><span class="p">)</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">c_norm</span><span class="p">)</span>
@@ -1446,6 +1452,8 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -1772,6 +1780,8 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1789,6 +1799,8 @@ public subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -924,27 +930,27 @@ the <code>n</code> state at energy <code>eb</code></p>
 <path fill="none" stroke="#000000" d="M58.1892,-68.6757C69.9562,-73.3825 83.7617,-78.9047 96.5994,-84.0397"/>
 <polygon fill="#000000" stroke="#000000" points="95.5933,-87.4069 106.178,-87.8712 98.1931,-80.9075 95.5933,-87.4069"/>
 </g>
-<!-- proc~e_ioniz_2_janev -->
-<g id="node3" class="node"><title>proc~e_ioniz_2_janev</title>
-<a xlink:href="../proc/e_ioniz_2_janev.html" xlink:title="e_ioniz_2_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-70 94,-70 94,-44 184,-44 184,-70"/>
-<text text-anchor="middle" x="139" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_2_janev</text>
-</a>
-</g>
-<!-- proc~e_ioniz_n&#45;&gt;proc~e_ioniz_2_janev -->
-<g id="edge4" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_2_janev</title>
-<path fill="none" stroke="#000000" d="M58.1892,-57C66.0577,-57 74.8378,-57 83.6305,-57"/>
-<polygon fill="#000000" stroke="#000000" points="83.9042,-60.5001 93.9042,-57 83.9042,-53.5001 83.9042,-60.5001"/>
-</g>
 <!-- proc~e_ioniz_3_janev -->
-<g id="node4" class="node"><title>proc~e_ioniz_3_janev</title>
+<g id="node3" class="node"><title>proc~e_ioniz_3_janev</title>
 <a xlink:href="../proc/e_ioniz_3_janev.html" xlink:title="e_ioniz_3_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-26 94,-26 94,-1.24345e-14 184,-3.55271e-15 184,-26"/>
-<text text-anchor="middle" x="139" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_3_janev</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-70 94,-70 94,-44 184,-44 184,-70"/>
+<text text-anchor="middle" x="139" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_3_janev</text>
 </a>
 </g>
 <!-- proc~e_ioniz_n&#45;&gt;proc~e_ioniz_3_janev -->
-<g id="edge6" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_3_janev</title>
+<g id="edge4" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_3_janev</title>
+<path fill="none" stroke="#000000" d="M58.1892,-57C66.0577,-57 74.8378,-57 83.6305,-57"/>
+<polygon fill="#000000" stroke="#000000" points="83.9042,-60.5001 93.9042,-57 83.9042,-53.5001 83.9042,-60.5001"/>
+</g>
+<!-- proc~e_ioniz_2_janev -->
+<g id="node4" class="node"><title>proc~e_ioniz_2_janev</title>
+<a xlink:href="../proc/e_ioniz_2_janev.html" xlink:title="e_ioniz_2_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="184,-26 94,-26 94,-1.24345e-14 184,-3.55271e-15 184,-26"/>
+<text text-anchor="middle" x="139" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_2_janev</text>
+</a>
+</g>
+<!-- proc~e_ioniz_n&#45;&gt;proc~e_ioniz_2_janev -->
+<g id="edge6" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_2_janev</title>
 <path fill="none" stroke="#000000" d="M58.1892,-45.3243C69.9562,-40.6175 83.7617,-35.0953 96.5994,-29.9603"/>
 <polygon fill="#000000" stroke="#000000" points="98.1931,-33.0925 106.178,-26.1288 95.5933,-26.5931 98.1931,-33.0925"/>
 </g>
@@ -1233,7 +1239,7 @@ the <code>n</code> state at energy <code>eb</code></p>
         <span class="k">case </span><span class="n">DEFAULT</span>
             <span class="n">rn</span> <span class="o">=</span> <span class="mf">1.94</span><span class="o">/</span><span class="n">n</span><span class="o">**</span><span class="mf">1.57</span>
             <span class="n">Edn2</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">3.6</span><span class="o">/</span><span class="n">n</span><span class="o">**</span><span class="mf">2.0</span>
-            <span class="n">xn</span> <span class="o">=</span> <span class="p">(</span><span class="n">eb</span><span class="o">*</span><span class="mf">1.</span><span class="n">d3</span><span class="p">)</span><span class="o">/</span><span class="n">Edn2</span>
+            <span class="n">xn</span> <span class="o">=</span> <span class="p">(</span><span class="n">eb</span><span class="o">*</span><span class="mf">1.d3</span><span class="p">)</span><span class="o">/</span><span class="n">Edn2</span>
 
             <span class="n">g0</span> <span class="o">=</span> <span class="mf">0.9935</span> <span class="o">+</span> <span class="mf">0.2328</span><span class="o">/</span><span class="n">n</span> <span class="o">-</span> <span class="mf">0.1296</span><span class="o">/</span><span class="n">n</span><span class="o">**</span><span class="mf">2.0</span>
             <span class="n">g1</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">0.6282</span> <span class="o">-</span> <span class="mf">0.5598</span><span class="o">/</span><span class="n">n</span> <span class="o">+</span> <span class="mf">0.5299</span><span class="o">/</span><span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span>
@@ -1248,7 +1254,7 @@ the <code>n</code> state at energy <code>eb</code></p>
                         <span class="p">(</span><span class="n">An</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">xn</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">Bn</span> <span class="o">-</span> <span class="n">An</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="p">&amp;</span>
                         <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">xn</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mf">1.e-16</span>
             <span class="k">else</span>
-<span class="k">                </span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+<span class="k">                </span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.d0</span>
             <span class="n">endif</span>
     <span class="k">end select</span>
 
@@ -1482,6 +1488,8 @@ the <code>n</code> state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1809,6 +1817,8 @@ the <code>n</code> state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1826,6 +1836,8 @@ the <code>n</code> state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

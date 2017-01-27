@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1108,31 +1114,31 @@ from the \(n=3\) state to the \(m=2\) state at energy <code>Erel</code></p>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.149224555</span><span class="n">d6</span><span class="p">,</span> <span class="mf">2.750368877</span><span class="n">d6</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="o">-</span><span class="mf">2.942222842</span><span class="n">d6</span><span class="p">,</span> <span class="mf">1.852584954</span><span class="n">d6</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="o">-</span><span class="mf">7.603284323</span><span class="n">d5</span><span class="p">,</span> <span class="mf">2.125284465</span><span class="n">d5</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="o">-</span><span class="mf">4.097580431</span><span class="n">d4</span><span class="p">,</span> <span class="mf">5.380901722</span><span class="n">d3</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="o">-</span><span class="mf">4.606297192</span><span class="n">d2</span><span class="p">,</span> <span class="mf">2.321345254</span><span class="n">d1</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="o">-</span><span class="mf">5.230186707</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.149224555d6</span><span class="p">,</span> <span class="mf">2.750368877d6</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mf">2.942222842d6</span><span class="p">,</span> <span class="mf">1.852584954d6</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mf">7.603284323d5</span><span class="p">,</span> <span class="mf">2.125284465d5</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mf">4.097580431d4</span><span class="p">,</span> <span class="mf">5.380901722d3</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mf">4.606297192d2</span><span class="p">,</span> <span class="mf">2.321345254d1</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mf">5.230186707d-1</span> <span class="p">]</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">3.0</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ee</span><span class="p">,</span> <span class="n">fac</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">Erel</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">9</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">ee</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">Erel</span> <span class="o">*</span> <span class="mf">1.</span><span class="n">d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.</span><span class="n">d3</span><span class="p">)</span> <span class="c">!keV to eV</span>
-        <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d0</span>
+<span class="k">        </span><span class="n">ee</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">Erel</span> <span class="o">*</span> <span class="mf">1.d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.d3</span><span class="p">)</span> <span class="c">!keV to eV</span>
+        <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.d0</span>
     <span class="k">else</span>
-<span class="k">        </span><span class="n">ee</span> <span class="o">=</span> <span class="mi">9</span><span class="mf">0.0</span> <span class="o">*</span> <span class="mf">1.</span><span class="n">d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span>
-        <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d16</span> <span class="o">*</span> <span class="p">(</span><span class="n">Erel</span><span class="o">*</span><span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">5.5</span><span class="p">)</span>
+<span class="k">        </span><span class="n">ee</span> <span class="o">=</span> <span class="mi">9</span><span class="mf">0.0</span> <span class="o">*</span> <span class="mf">1.d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span>
+        <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.d16</span> <span class="o">*</span> <span class="p">(</span><span class="n">Erel</span><span class="o">*</span><span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mf">5.5</span><span class="p">)</span>
     <span class="n">endif</span>
 
     <span class="n">l</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">ee</span><span class="p">)</span>
 
     <span class="n">p</span> <span class="o">=</span> <span class="n">a</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">l</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">3.0</span> <span class="o">+</span> <span class="p">&amp;</span>
         <span class="n">a</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">4.0</span>   <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">5.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">6.0</span> <span class="o">+</span> <span class="p">&amp;</span>
-        <span class="n">a</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">7.0</span>   <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">8.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">9.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span>
+        <span class="n">a</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">7.0</span>   <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">8.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">9.0</span> <span class="o">+</span> <span class="n">a</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mi">1</span><span class="mf">0.d0</span>
 
-    <span class="n">sigma</span> <span class="o">=</span> <span class="n">fac</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span><span class="o">**</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">fac</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="mf">0.d0</span><span class="o">**</span><span class="n">p</span><span class="p">)</span>
 
 <span class="k">end function </span><span class="n">p_cx_3_2_adas</span>
 </pre></div>
@@ -1364,6 +1370,8 @@ from the \(n=3\) state to the \(m=2\) state at energy <code>Erel</code></p>
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1691,6 +1699,8 @@ from the \(n=3\) state to the \(m=2\) state at energy <code>Erel</code></p>
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1708,6 +1718,8 @@ from the \(n=3\) state to the \(m=2\) state at energy <code>Erel</code></p>
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

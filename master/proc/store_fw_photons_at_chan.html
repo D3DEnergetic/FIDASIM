@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -937,7 +943,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
   
 <tr>
   
-  <td><span class="anchor" id="variable-dlength%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-dlength%7E2"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -1325,7 +1331,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
 
 
     <span class="n">dlambda</span><span class="o">=</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamax_wght</span><span class="o">-</span><span class="n">inputs</span><span class="p">%</span><span class="n">lambdamin_wght</span><span class="p">)</span><span class="o">/</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda_wght</span>
-    <span class="n">intens_fac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="n">d0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.</span><span class="n">d0</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">dlambda</span><span class="p">)</span>
+    <span class="n">intens_fac</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.d0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.d0</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">dlambda</span><span class="p">)</span>
     <span class="k">call </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">,</span><span class="n">sigma_pi</span><span class="p">,</span><span class="n">photons</span><span class="p">,</span> <span class="p">&amp;</span>
                   <span class="n">dlength</span><span class="p">,</span><span class="n">lambda</span><span class="p">,</span><span class="n">intensity</span><span class="p">)</span>
 
@@ -1339,7 +1345,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
         <span class="n">fweight</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">=</span> <span class="p">&amp;</span>
           <span class="n">fweight</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">+</span> <span class="n">intensity</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">intens_fac</span> <span class="c">!(ph*cm)/(s*nm*sr*fast-ion*dE*dp)</span>
     <span class="n">enddo</span> <span class="n">loop_over_stark</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">denf</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.</span><span class="n">d0</span><span class="p">)</span> <span class="k">then</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">denf</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">fweight</span><span class="p">%</span><span class="n">mean_f</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">=</span> <span class="n">fweight</span><span class="p">%</span><span class="n">mean_f</span><span class="p">(</span><span class="n">eind</span><span class="p">,</span><span class="n">pind</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
                                           <span class="p">(</span><span class="n">denf</span><span class="o">*</span><span class="n">intens_fac</span><span class="p">)</span><span class="o">*</span><span class="nb">sum</span><span class="p">(</span><span class="n">intensity</span><span class="p">)</span>
     <span class="n">endif</span>
@@ -1575,6 +1581,8 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1902,6 +1910,8 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1919,6 +1929,8 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

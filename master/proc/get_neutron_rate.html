@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -934,29 +940,29 @@ public subroutine get_neutron_rate(plasma, eb, rate)
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M187.738,-87.0314C202.235,-97.4389 224.245,-111.206 246,-117 290.721,-128.911 343.303,-124.698 382.122,-118.331"/>
 <polygon fill="#000000" stroke="#000000" points="382.931,-121.743 392.184,-116.582 381.732,-114.846 382.931,-121.743"/>
 </g>
-<!-- proc~interpol2d_coeff_arr -->
-<g id="node4" class="node"><title>proc~interpol2d_coeff_arr</title>
-<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="356,-108 246,-108 246,-82 356,-82 356,-108"/>
-<text text-anchor="middle" x="301" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M209.652,-80.2438C217.918,-81.5791 226.868,-83.0248 235.822,-84.4713"/>
-<polygon fill="#000000" stroke="#000000" points="235.468,-87.9593 245.898,-86.0989 236.584,-81.0489 235.468,-87.9593"/>
-</g>
 <!-- proc~interpol1d_coeff -->
-<g id="node5" class="node"><title>proc~interpol1d_coeff</title>
+<g id="node4" class="node"><title>proc~interpol1d_coeff</title>
 <a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
 <polygon fill="#d9534f" stroke="#d9534f" points="483,-56 393,-56 393,-30 483,-30 483,-56"/>
 <text text-anchor="middle" x="438" y="-40.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M209.539,-69.5254C254.894,-64.2595 330.569,-55.4733 382.301,-49.4669"/>
 <polygon fill="#000000" stroke="#000000" points="382.783,-52.9346 392.313,-48.3045 381.976,-45.9813 382.783,-52.9346"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="node5" class="node"><title>proc~interpol2d_coeff_arr</title>
+<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="356,-108 246,-108 246,-82 356,-82 356,-108"/>
+<text text-anchor="middle" x="301" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M209.652,-80.2438C217.918,-81.5791 226.868,-83.0248 235.822,-84.4713"/>
+<polygon fill="#000000" stroke="#000000" points="235.468,-87.9593 245.898,-86.0989 236.584,-81.0489 235.468,-87.9593"/>
 </g>
 <!-- proc~interpol1d_coeff_arr -->
 <g id="node6" class="node"><title>proc~interpol1d_coeff_arr</title>
@@ -1278,7 +1284,7 @@ public subroutine get_neutron_rate(plasma, eb, rate)
             <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;eb = &quot;,ES10.3,&quot; [keV]&quot;)&#39;</span><span class="p">)</span> <span class="n">eb</span>
             <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;ti = &quot;,ES10.3,&quot; [keV]&quot;)&#39;</span><span class="p">)</span> <span class="n">plasma</span><span class="p">%</span><span class="n">ti</span>
         <span class="n">endif</span>
-        <span class="n">denp</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+        <span class="n">denp</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">endif</span>
 
     <span class="n">lograte</span> <span class="o">=</span> <span class="p">(</span><span class="n">b11</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(</span><span class="n">ebi</span><span class="p">,</span><span class="n">tii</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>   <span class="o">+</span> <span class="p">&amp;</span>
@@ -1287,9 +1293,9 @@ public subroutine get_neutron_rate(plasma, eb, rate)
                <span class="n">b22</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">%</span><span class="n">log_rate</span><span class="p">(</span><span class="n">ebi</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">tii</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">lograte</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">%</span><span class="n">minlog_rate</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">rate</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+<span class="k">        </span><span class="n">rate</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="k">else</span>
-<span class="k">        </span><span class="n">rate</span> <span class="o">=</span> <span class="n">denp</span> <span class="o">*</span> <span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span><span class="o">**</span><span class="n">lograte</span>
+<span class="k">        </span><span class="n">rate</span> <span class="o">=</span> <span class="n">denp</span> <span class="o">*</span> <span class="mi">1</span><span class="mf">0.d0</span><span class="o">**</span><span class="n">lograte</span>
     <span class="n">endif</span>
 
 <span class="k">end subroutine </span><span class="n">get_neutron_rate</span>
@@ -1522,6 +1528,8 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1849,6 +1857,8 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1866,6 +1876,8 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

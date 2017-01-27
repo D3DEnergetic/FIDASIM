@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.5% of total for procedures.">45 statements</a>
+	  title=" 0.5% of total for procedures.">43 statements</a>
      </li> 
      
      
@@ -410,6 +410,8 @@
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1029,29 +1035,29 @@ public subroutine store_npa(det, ri, rf, vn, flux)
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M383.738,-91.0314C398.235,-101.439 420.245,-115.206 442,-121 486.721,-132.911 539.303,-128.698 578.122,-122.331"/>
 <polygon fill="#000000" stroke="#000000" points="578.931,-125.743 588.184,-120.582 577.732,-118.846 578.931,-125.743"/>
 </g>
-<!-- proc~interpol2d_coeff_arr -->
-<g id="node9" class="node"><title>proc~interpol2d_coeff_arr</title>
-<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="552,-112 442,-112 442,-86 552,-86 552,-112"/>
-<text text-anchor="middle" x="497" y="-96.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M405.652,-84.2438C413.918,-85.5791 422.868,-87.0248 431.822,-88.4713"/>
-<polygon fill="#000000" stroke="#000000" points="431.468,-91.9593 441.898,-90.0989 432.584,-85.0489 431.468,-91.9593"/>
-</g>
 <!-- proc~interpol1d_coeff -->
-<g id="node10" class="node"><title>proc~interpol1d_coeff</title>
+<g id="node9" class="node"><title>proc~interpol1d_coeff</title>
 <a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
 <polygon fill="#d9534f" stroke="#d9534f" points="679,-60 589,-60 589,-34 679,-34 679,-60"/>
 <text text-anchor="middle" x="634" y="-44.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M405.539,-73.5254C450.894,-68.2595 526.569,-59.4733 578.301,-53.4669"/>
 <polygon fill="#000000" stroke="#000000" points="578.783,-56.9346 588.313,-52.3045 577.976,-49.9813 578.783,-56.9346"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="node10" class="node"><title>proc~interpol2d_coeff_arr</title>
+<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="552,-112 442,-112 442,-86 552,-86 552,-112"/>
+<text text-anchor="middle" x="497" y="-96.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M405.652,-84.2438C413.918,-85.5791 422.868,-87.0248 431.822,-88.4713"/>
+<polygon fill="#000000" stroke="#000000" points="431.468,-91.9593 441.898,-90.0989 432.584,-85.0489 431.468,-91.9593"/>
 </g>
 <!-- proc~interpol1d_coeff_arr -->
 <g id="node11" class="node"><title>proc~interpol1d_coeff_arr</title>
@@ -1371,19 +1377,17 @@ public subroutine store_npa(det, ri, rf, vn, flux)
         <span class="n">vn_norm</span> <span class="o">=</span> <span class="n">vn</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vn</span><span class="p">)</span>
         <span class="n">pitch</span> <span class="o">=</span> <span class="nb">dot_product</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">,</span><span class="n">vn_norm</span><span class="p">)</span>
     <span class="k">else</span>
-<span class="k">        </span><span class="n">pitch</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+<span class="k">        </span><span class="n">pitch</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">endif</span>
 
     <span class="c">!$OMP CRITICAL(store_npa_1)</span>
     <span class="n">npa</span><span class="p">%</span><span class="n">npart</span> <span class="o">=</span> <span class="n">npa</span><span class="p">%</span><span class="n">npart</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="k">if</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">npart</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">npa</span><span class="p">%</span><span class="n">nmax</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        allocate</span><span class="p">(</span><span class="n">parts</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">npart</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="n">npa</span><span class="p">%</span><span class="n">part</span>
+<span class="k">        </span><span class="n">npa</span><span class="p">%</span><span class="n">nmax</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">nmax</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">allocate</span><span class="p">(</span><span class="n">parts</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">nmax</span><span class="p">))</span>
+        <span class="n">parts</span><span class="p">(</span><span class="mi">1</span><span class="p">:(</span><span class="n">npa</span><span class="p">%</span><span class="n">npart</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">=</span> <span class="n">npa</span><span class="p">%</span><span class="n">part</span>
         <span class="k">deallocate</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">part</span><span class="p">)</span>
-        <span class="n">npa</span><span class="p">%</span><span class="n">nmax</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">nmax</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">allocate</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">part</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">nmax</span><span class="p">))</span>
-        <span class="n">npa</span><span class="p">%</span><span class="n">part</span><span class="p">(</span><span class="mi">1</span><span class="p">:(</span><span class="n">npa</span><span class="p">%</span><span class="n">npart</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">=</span> <span class="n">parts</span>
-        <span class="k">deallocate</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+        <span class="k">call </span><span class="nb">move_alloc</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span> <span class="n">npa</span><span class="p">%</span><span class="n">part</span><span class="p">)</span>
     <span class="n">endif</span>
     <span class="n">npa</span><span class="p">%</span><span class="n">part</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">npart</span><span class="p">)%</span><span class="n">detector</span> <span class="o">=</span> <span class="n">det</span>
     <span class="n">npa</span><span class="p">%</span><span class="n">part</span><span class="p">(</span><span class="n">npa</span><span class="p">%</span><span class="n">npart</span><span class="p">)%</span><span class="n">xi</span> <span class="o">=</span> <span class="n">uvw_ri</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -1629,6 +1633,8 @@ public subroutine store_npa(det, ri, rf, vn, flux)
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1956,6 +1962,8 @@ public subroutine store_npa(det, ri, rf, vn, flux)
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1973,6 +1981,8 @@ public subroutine store_npa(det, ri, rf, vn, flux)
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

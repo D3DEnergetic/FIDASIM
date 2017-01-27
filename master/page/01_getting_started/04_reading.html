@@ -253,16 +253,16 @@ IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
 <div class="codehilite"><pre><span></span><span class="n">julia</span><span class="o">&gt;</span> <span class="k">using</span> <span class="n">HDF5</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">h5open</span><span class="p">(</span><span class="s">&quot;test_1a_geometry.h5&quot;</span><span class="p">)</span>
-<span class="n">HDF5</span> <span class="n">data</span> <span class="n">file</span><span class="p">:</span> <span class="n">test_1a_geometry</span><span class="o">.</span><span class="n">h5</span>
+<span class="n">HDF5</span> <span class="n">data</span> <span class="n">file</span><span class="o">:</span> <span class="n">test_1a_geometry</span><span class="o">.</span><span class="n">h5</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">names</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="n">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
 <span class="s">&quot;nbi&quot;</span> 
 <span class="s">&quot;npa&quot;</span> 
 <span class="s">&quot;spec&quot;</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">names</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&quot;/nbi&quot;</span><span class="p">])</span>
-<span class="mi">11</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="n">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+<span class="mi">11</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="n">ByteString</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
 <span class="s">&quot;axis&quot;</span>       
 <span class="s">&quot;data_source&quot;</span>
 <span class="s">&quot;divy&quot;</span>       
@@ -276,13 +276,13 @@ IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
 <span class="s">&quot;widz&quot;</span>       
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">read</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&quot;/nbi/src&quot;</span><span class="p">])</span>
-<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
 <span class="mf">0.0</span>
 <span class="o">-</span><span class="mf">502.0</span>
 <span class="mf">0.0</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">h5read</span><span class="p">(</span><span class="s">&quot;test_1a_geometry.h5&quot;</span><span class="p">,</span><span class="s">&quot;/nbi/src&quot;</span><span class="p">)</span>
-<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="n">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}:</span>
+<span class="mi">3</span><span class="o">-</span><span class="n">element</span> <span class="kt">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="mi">1</span><span class="p">}</span><span class="o">:</span>
 <span class="mf">0.0</span>
 <span class="o">-</span><span class="mf">502.0</span>
 <span class="mf">0.0</span>

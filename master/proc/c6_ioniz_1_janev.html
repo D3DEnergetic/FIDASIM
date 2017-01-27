@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1083,12 +1089,12 @@ in the \(n=1\) state colliding with a fully stripped Carbon ion at energy <code>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">43</span><span class="mf">8.36</span><span class="n">d0</span><span class="p">,</span> <span class="mi">32</span><span class="mf">7.10</span><span class="n">d0</span><span class="p">,</span>    <span class="p">&amp;</span>
-                                                    <span class="mf">1.4444</span><span class="n">d5</span><span class="p">,</span> <span class="mf">3.5212</span><span class="n">d</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span>   <span class="p">&amp;</span>
-                                                    <span class="mf">8.3031</span><span class="n">d</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.63731</span><span class="n">d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="mf">1.9116</span><span class="n">d4</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.1003</span><span class="n">d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">43</span><span class="mf">8.36d0</span><span class="p">,</span> <span class="mi">32</span><span class="mf">7.10d0</span><span class="p">,</span>    <span class="p">&amp;</span>
+                                                    <span class="mf">1.4444d5</span><span class="p">,</span> <span class="mf">3.5212d-3</span><span class="p">,</span>   <span class="p">&amp;</span>
+                                                    <span class="mf">8.3031d-3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.63731d0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="mf">1.9116d4</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.1003d0</span> <span class="p">]</span>
 
-    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">16</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">eb</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span><span class="o">/</span><span class="n">eb</span> <span class="p">&amp;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.d-16</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">eb</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span><span class="o">/</span><span class="n">eb</span> <span class="p">&amp;</span>
           <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">eb</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">eb</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">8</span><span class="p">))))</span>
 
 <span class="k">end function </span><span class="n">C6_ioniz_1_janev</span>
@@ -1321,6 +1327,8 @@ in the \(n=1\) state colliding with a fully stripped Carbon ion at energy <code>
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1648,6 +1656,8 @@ in the \(n=1\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1665,6 +1675,8 @@ in the \(n=1\) state colliding with a fully stripped Carbon ion at energy <code>
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

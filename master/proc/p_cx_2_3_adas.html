@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1108,37 +1114,37 @@ from the \(n=2\) state to the \(m=3\) state at energy <code>Erel</code></p>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a2s</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.513030327</span><span class="n">d5</span><span class="p">,</span> <span class="mf">9.281116596</span><span class="n">d5</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">1.086843398</span><span class="n">d6</span><span class="p">,</span> <span class="mf">7.437325055</span><span class="n">d5</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">3.296609685</span><span class="n">d5</span><span class="p">,</span> <span class="mf">9.897503768</span><span class="n">d4</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">2.039707143</span><span class="n">d4</span><span class="p">,</span> <span class="mf">2.850670244</span><span class="n">d3</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">2.587092857</span><span class="n">d2</span><span class="p">,</span> <span class="mf">1.377382945</span><span class="n">d1</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">3.268306303</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a2s</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.513030327d5</span><span class="p">,</span> <span class="mf">9.281116596d5</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">1.086843398d6</span><span class="p">,</span> <span class="mf">7.437325055d5</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">3.296609685d5</span><span class="p">,</span> <span class="mf">9.897503768d4</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">2.039707143d4</span><span class="p">,</span> <span class="mf">2.850670244d3</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">2.587092857d2</span><span class="p">,</span> <span class="mf">1.377382945d1</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">3.268306303d-1</span> <span class="p">]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a2p</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.901264631</span><span class="n">d5</span><span class="p">,</span> <span class="mf">5.124716103</span><span class="n">d5</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">6.101921504</span><span class="n">d5</span><span class="p">,</span> <span class="mf">4.234717934</span><span class="n">d5</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">1.899866398</span><span class="n">d5</span><span class="p">,</span> <span class="mf">5.764464326</span><span class="n">d4</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">1.199087959</span><span class="n">d4</span><span class="p">,</span> <span class="mf">1.689900512</span><span class="n">d3</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">1.545334374</span><span class="n">d2</span><span class="p">,</span> <span class="mf">8.285001228</span><span class="n">d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                      <span class="o">-</span><span class="mf">1.978656474</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a2p</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.901264631d5</span><span class="p">,</span> <span class="mf">5.124716103d5</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">6.101921504d5</span><span class="p">,</span> <span class="mf">4.234717934d5</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">1.899866398d5</span><span class="p">,</span> <span class="mf">5.764464326d4</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">1.199087959d4</span><span class="p">,</span> <span class="mf">1.689900512d3</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">1.545334374d2</span><span class="p">,</span> <span class="mf">8.285001228d0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                      <span class="o">-</span><span class="mf">1.978656474d-1</span> <span class="p">]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">2.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">2.d0</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ee</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">sigma2s</span><span class="p">,</span> <span class="n">sigma2p</span>
 
-    <span class="n">ee</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">Erel</span> <span class="o">*</span> <span class="mf">1.</span><span class="n">d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.</span><span class="n">d0</span><span class="p">,</span> <span class="mf">1.</span><span class="n">d3</span><span class="p">)</span>
+    <span class="n">ee</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">Erel</span> <span class="o">*</span> <span class="mf">1.d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.d0</span><span class="p">,</span> <span class="mf">1.d3</span><span class="p">)</span>
 
     <span class="n">l</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">ee</span><span class="p">)</span>
 
     <span class="n">sigma2s</span> <span class="o">=</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">l</span> <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">3.0</span> <span class="o">+</span> <span class="p">&amp;</span>
               <span class="n">a2s</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">4.0</span>     <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">5.0</span> <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">6.0</span> <span class="o">+</span> <span class="p">&amp;</span>
               <span class="n">a2s</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">7.0</span>     <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">8.0</span> <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">9.0</span> <span class="o">+</span> <span class="n">a2s</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mi">1</span><span class="mf">0.0</span>
-    <span class="n">sigma2s</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span><span class="o">**</span><span class="p">(</span><span class="n">sigma2s</span><span class="p">)</span>
+    <span class="n">sigma2s</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">0.d0</span><span class="o">**</span><span class="p">(</span><span class="n">sigma2s</span><span class="p">)</span>
 
     <span class="n">sigma2p</span> <span class="o">=</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">l</span> <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">3.0</span> <span class="o">+</span> <span class="p">&amp;</span>
               <span class="n">a2p</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">4.0</span>     <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">5.0</span> <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">6.0</span> <span class="o">+</span> <span class="p">&amp;</span>
               <span class="n">a2p</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">7.0</span>     <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">8.0</span> <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mf">9.0</span> <span class="o">+</span> <span class="n">a2p</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span><span class="o">*</span><span class="n">l</span><span class="o">**</span><span class="mi">1</span><span class="mf">0.0</span>
-    <span class="n">sigma2p</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">0.</span><span class="n">d0</span><span class="o">**</span><span class="p">(</span><span class="n">sigma2p</span><span class="p">)</span>
+    <span class="n">sigma2p</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">0.d0</span><span class="o">**</span><span class="p">(</span><span class="n">sigma2p</span><span class="p">)</span>
 
     <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.25</span><span class="o">*</span><span class="n">sigma2s</span> <span class="o">+</span> <span class="mf">0.75</span><span class="o">*</span><span class="n">sigma2p</span><span class="p">)</span>
 
@@ -1372,6 +1378,8 @@ from the \(n=2\) state to the \(m=3\) state at energy <code>Erel</code></p>
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1699,6 +1707,8 @@ from the \(n=2\) state to the \(m=3\) state at energy <code>Erel</code></p>
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1716,6 +1726,8 @@ from the \(n=2\) state to the \(m=3\) state at energy <code>Erel</code></p>
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

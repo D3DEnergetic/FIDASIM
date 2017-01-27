@@ -170,8 +170,6 @@ Falls back to reading VERSION file when git is not available</p></td></tr>
 			 
 			   <tr><td><a href='../sourcefile/nubeam_geometry.pro.html'>nubeam_geometry.pro</a></td><td><p>Calculates the FIDASIM beam geometry from the beam geometry variables in the TRANSP/NUBEAM namelist</p></td></tr>
 			 
-			   <tr><td><a href='../sourcefile/parallel_rng.f90.html'>parallel_rng.f90</a></td><td><p>This file contains routines for parallel random number generation</p></td></tr>
-			 
 			   <tr><td><a href='../sourcefile/prefida.pro.html'>prefida.pro</a></td><td><p>Checks FIDASIM inputs and writes FIDASIM input files</p></td></tr>
 			 
 			   <tr><td><a href='../sourcefile/preprocessing.py.html'>preprocessing.py</a></td><td><p>This file contains the source code for PREFIDA</p></td></tr>
@@ -202,6 +200,9 @@ If name is not given then it returns the source file of caller routine</p></td><
 			   <tr><td><a href='../sourcefile/tb_zyx.pro.html'>tb_zyx.pro</a></td><td><p>Calculates Tait-Bryan z-y'-x" active rotation matrix given rotation angles <code>alpha</code>,<code>beta</code>,<code>gamma</code> in radians</p></td></tr>
 			 
 			   <tr><td><a href='../sourcefile/tile_array.pro.html'>tile_array.pro</a></td><td><p>Creates a tiled matrix out of an array or matrix</p></td></tr>
+			 
+			   <tr><td><a href='../sourcefile/utilities.f90.html'>utilities.f90</a></td><td><p>This file contains routines for parallel random number generation and a basic
+sparse array implementation</p></td></tr>
 			 
 			   <tr><td><a href='../sourcefile/utils.py.html'>utils.py</a></td><td><p>This file contains useful FIDASIM utilities</p></td></tr>
 			 
@@ -238,11 +239,11 @@ If name is not given then it returns the source file of caller routine</p></td><
 <g id="file~~graph~~FileGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 118)">
 <title>file~~graph~~FileGraph</title>
 <polygon fill="white" stroke="white" points="-4,5 -4,-118 231,-118 231,5 -4,5"/>
-<!-- sourcefile~eigensystem.f90 -->
-<g id="node1" class="node"><title>sourcefile~eigensystem.f90</title>
-<a xlink:href="../sourcefile/eigensystem.f90.html" xlink:title="eigensystem.f90">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="91,-114 1,-114 1,-88 91,-88 91,-114"/>
-<text text-anchor="middle" x="46" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem.f90</text>
+<!-- sourcefile~utilities.f90 -->
+<g id="node1" class="node"><title>sourcefile~utilities.f90</title>
+<a xlink:href="../sourcefile/utilities.f90.html" xlink:title="utilities.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="77,-114 15,-114 15,-88 77,-88 77,-114"/>
+<text text-anchor="middle" x="46" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">utilities.f90</text>
 </a>
 </g>
 <!-- sourcefile~fidasim.f90 -->
@@ -252,32 +253,20 @@ If name is not given then it returns the source file of caller routine</p></td><
 <text text-anchor="middle" x="177" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim.f90</text>
 </a>
 </g>
-<!-- sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90 -->
-<g id="edge8" class="edge"><title>sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90</title>
-<path fill="none" stroke="#000000" d="M84.9496,-87.9177C100.689,-82.6312 118.89,-76.5178 134.932,-71.1298"/>
-<polygon fill="#000000" stroke="#000000" points="136.234,-74.3845 144.6,-67.8826 134.006,-67.7488 136.234,-74.3845"/>
-</g>
-<!-- sourcefile~parallel_rng.f90 -->
-<g id="node2" class="node"><title>sourcefile~parallel_rng.f90</title>
-<a xlink:href="../sourcefile/parallel_rng.f90.html" xlink:title="parallel_rng.f90">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="89,-70 3,-70 3,-44 89,-44 89,-70"/>
-<text text-anchor="middle" x="46" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_rng.f90</text>
-</a>
-</g>
-<!-- sourcefile~parallel_rng.f90&#45;&gt;sourcefile~fidasim.f90 -->
-<g id="edge4" class="edge"><title>sourcefile~parallel_rng.f90&#45;&gt;sourcefile~fidasim.f90</title>
-<path fill="none" stroke="#000000" d="M89.6211,-57C104.115,-57 120.224,-57 134.623,-57"/>
-<polygon fill="#000000" stroke="#000000" points="134.757,-60.5001 144.757,-57 134.757,-53.5001 134.757,-60.5001"/>
+<!-- sourcefile~utilities.f90&#45;&gt;sourcefile~fidasim.f90 -->
+<g id="edge8" class="edge"><title>sourcefile~utilities.f90&#45;&gt;sourcefile~fidasim.f90</title>
+<path fill="none" stroke="#000000" d="M77.7114,-90.3488C94.9134,-84.5711 116.397,-77.3552 134.976,-71.1148"/>
+<polygon fill="#000000" stroke="#000000" points="136.305,-74.3607 144.671,-67.8588 134.077,-67.725 136.305,-74.3607"/>
 </g>
 <!-- sourcefile~hdf5_extra.f90 -->
-<g id="node3" class="node"><title>sourcefile~hdf5_extra.f90</title>
+<g id="node2" class="node"><title>sourcefile~hdf5_extra.f90</title>
 <a xlink:href="../sourcefile/hdf5_extra.f90.html" xlink:title="hdf5_extra.f90">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="87,-26 5,-26 5,-1.24345e-14 87,-3.55271e-15 87,-26"/>
 <text text-anchor="middle" x="46" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_extra.f90</text>
 </a>
 </g>
 <!-- sourcefile~atomic_tables.f90 -->
-<g id="node4" class="node"><title>sourcefile~atomic_tables.f90</title>
+<g id="node3" class="node"><title>sourcefile~atomic_tables.f90</title>
 <a xlink:href="../sourcefile/atomic_tables.f90.html" xlink:title="atomic_tables.f90">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="225,-26 129,-26 129,-1.24345e-14 225,-3.55271e-15 225,-26"/>
 <text text-anchor="middle" x="177" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">atomic_tables.f90</text>
@@ -289,9 +278,21 @@ If name is not given then it returns the source file of caller routine</p></td><
 <polygon fill="#000000" stroke="#000000" points="118.254,-16.5001 128.254,-13 118.254,-9.5001 118.254,-16.5001"/>
 </g>
 <!-- sourcefile~hdf5_extra.f90&#45;&gt;sourcefile~fidasim.f90 -->
-<g id="edge6" class="edge"><title>sourcefile~hdf5_extra.f90&#45;&gt;sourcefile~fidasim.f90</title>
+<g id="edge4" class="edge"><title>sourcefile~hdf5_extra.f90&#45;&gt;sourcefile~fidasim.f90</title>
 <path fill="none" stroke="#000000" d="M84.9496,-26.0823C100.689,-31.3688 118.89,-37.4822 134.932,-42.8702"/>
 <polygon fill="#000000" stroke="#000000" points="134.006,-46.2512 144.6,-46.1174 136.234,-39.6155 134.006,-46.2512"/>
+</g>
+<!-- sourcefile~eigensystem.f90 -->
+<g id="node4" class="node"><title>sourcefile~eigensystem.f90</title>
+<a xlink:href="../sourcefile/eigensystem.f90.html" xlink:title="eigensystem.f90">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="91,-70 1,-70 1,-44 91,-44 91,-70"/>
+<text text-anchor="middle" x="46" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem.f90</text>
+</a>
+</g>
+<!-- sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90 -->
+<g id="edge6" class="edge"><title>sourcefile~eigensystem.f90&#45;&gt;sourcefile~fidasim.f90</title>
+<path fill="none" stroke="#000000" d="M91.8174,-57C105.693,-57 120.868,-57 134.516,-57"/>
+<polygon fill="#000000" stroke="#000000" points="134.607,-60.5001 144.607,-57 134.607,-53.5001 134.607,-60.5001"/>
 </g>
 </g>
 </svg>

@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1103,14 +1109,14 @@ in the \(n=1\) state colliding with a fully stripped Boron ion at energy <code>e
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="mf">1.226</span><span class="n">d0</span><span class="p">,</span> <span class="mf">1.1442</span><span class="n">d0</span><span class="p">,</span>    <span class="p">&amp;</span>
-                                                    <span class="mf">4.8372</span><span class="n">d</span><span class="o">-</span><span class="mi">8</span><span class="p">,</span> <span class="mf">3.0961</span><span class="n">d</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="mf">4.7205</span><span class="n">d0</span><span class="p">,</span> <span class="mf">6.2844</span><span class="n">d</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span>   <span class="p">&amp;</span>
-                                                    <span class="mf">3.1297</span><span class="n">d0</span><span class="p">,</span> <span class="mf">0.12556</span><span class="n">d0</span><span class="p">,</span>   <span class="p">&amp;</span>
-                                                    <span class="mf">0.30098</span><span class="n">d0</span><span class="p">,</span> <span class="mf">5.9607</span><span class="n">d</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span>  <span class="p">&amp;</span>
-                                                   <span class="o">-</span><span class="mf">0.57923</span><span class="n">d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="mf">1.226d0</span><span class="p">,</span> <span class="mf">1.1442d0</span><span class="p">,</span>    <span class="p">&amp;</span>
+                                                    <span class="mf">4.8372d-8</span><span class="p">,</span> <span class="mf">3.0961d-10</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="mf">4.7205d0</span><span class="p">,</span> <span class="mf">6.2844d-7</span><span class="p">,</span>   <span class="p">&amp;</span>
+                                                    <span class="mf">3.1297d0</span><span class="p">,</span> <span class="mf">0.12556d0</span><span class="p">,</span>   <span class="p">&amp;</span>
+                                                    <span class="mf">0.30098d0</span><span class="p">,</span> <span class="mf">5.9607d-2</span><span class="p">,</span>  <span class="p">&amp;</span>
+                                                   <span class="o">-</span><span class="mf">0.57923d0</span> <span class="p">]</span>
 
-    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">16</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">eb</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span> <span class="o">/</span>  <span class="p">&amp;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.d-16</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">eb</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span> <span class="o">/</span>  <span class="p">&amp;</span>
            <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span>  <span class="p">&amp;</span>
             <span class="n">A</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span> <span class="o">/</span><span class="n">eb</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">11</span><span class="p">))</span>
 
@@ -1344,6 +1350,8 @@ in the \(n=1\) state colliding with a fully stripped Boron ion at energy <code>e
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1671,6 +1679,8 @@ in the \(n=1\) state colliding with a fully stripped Boron ion at energy <code>e
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1688,6 +1698,8 @@ in the \(n=1\) state colliding with a fully stripped Boron ion at energy <code>e
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

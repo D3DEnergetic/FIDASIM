@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 3.3% of total for derived types.</p>Including implementation: 12 statements,  3.3% of total for derived types.">12 statements</a>
+	  title="<p> 3.2% of total for derived types.</p>Including implementation: 12 statements,  3.2% of total for derived types.">12 statements</a>
      </li> 
      
      
@@ -264,6 +264,10 @@
       
       <a class="list-group-item" href="../type/localprofiles.html">LocalProfiles</a>
       
+      <a class="list-group-item" href="../type/loselement.html">LOSElement</a>
+      
+      <a class="list-group-item" href="../type/losinters.html">LOSInters</a>
+      
       <a class="list-group-item" href="../type/neutralbeam.html">NeutralBeam</a>
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
@@ -291,6 +295,8 @@
       <a class="list-group-item" href="../type/rng_type.html">rng_type</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html">SimulationInputs</a>
+      
+      <a class="list-group-item" href="../type/sparsearray.html">SparseArray</a>
       
       <a class="list-group-item" href="../type/spectra.html">Spectra</a>
       
@@ -629,23 +635,23 @@
     <span class="c">!+ Defines a NPA particle</span>
     <span class="kt">integer</span>       <span class="kd">::</span> <span class="n">detector</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Detector NPA particle hit</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xi</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xi</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Initial x position</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">yi</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">yi</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Initial y position</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zi</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zi</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Initial z position</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xf</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xf</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Final x position</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">yf</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">yf</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Final y position</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zf</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zf</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Final z position</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">weight</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">weight</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ NPA particle weight</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">energy</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">energy</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Birth Energy [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">pitch</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">pitch</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Birth Pitch</span>
 <span class="k">end type </span><span class="n">NPAParticle</span>
 </pre></div>
@@ -701,6 +707,10 @@
       
       <a class="list-group-item" href="../type/localprofiles.html">LocalProfiles</a>
       
+      <a class="list-group-item" href="../type/loselement.html">LOSElement</a>
+      
+      <a class="list-group-item" href="../type/losinters.html">LOSInters</a>
+      
       <a class="list-group-item" href="../type/neutralbeam.html">NeutralBeam</a>
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
@@ -728,6 +738,8 @@
       <a class="list-group-item" href="../type/rng_type.html">rng_type</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html">SimulationInputs</a>
+      
+      <a class="list-group-item" href="../type/sparsearray.html">SparseArray</a>
       
       <a class="list-group-item" href="../type/spectra.html">Spectra</a>
       

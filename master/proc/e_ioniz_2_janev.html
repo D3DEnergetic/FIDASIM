@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1087,9 +1093,9 @@ the \(n=2\) state at energy <code>eb</code></p>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="c">!+ Initial atomic energy level/state</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">0.14784</span><span class="n">d0</span><span class="p">,</span> <span class="mf">0.0080871</span><span class="n">d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                   <span class="o">-</span><span class="mf">0.062270</span><span class="n">d0</span><span class="p">,</span> <span class="mf">1.9414</span><span class="n">d0</span><span class="p">,</span>   <span class="p">&amp;</span>
-                                                   <span class="o">-</span><span class="mf">2.1980</span><span class="n">d0</span><span class="p">,</span> <span class="mf">0.95894</span><span class="n">d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">0.14784d0</span><span class="p">,</span> <span class="mf">0.0080871d0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                   <span class="o">-</span><span class="mf">0.062270d0</span><span class="p">,</span> <span class="mf">1.9414d0</span><span class="p">,</span>   <span class="p">&amp;</span>
+                                                   <span class="o">-</span><span class="mf">2.1980d0</span><span class="p">,</span> <span class="mf">0.95894d0</span> <span class="p">]</span>
         <span class="c">!+ Fitting parameters from Table 3 in Ref. 2</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">Edn2</span>
@@ -1097,12 +1103,12 @@ the \(n=2\) state at energy <code>eb</code></p>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">s</span>
 
     <span class="n">Edn2</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">3.6</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
-    <span class="n">e</span> <span class="o">=</span> <span class="n">eb</span> <span class="o">*</span> <span class="mf">1.</span><span class="n">d3</span> <span class="c">!keV to eV</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">eb</span> <span class="o">*</span> <span class="mf">1.d3</span> <span class="c">!keV to eV</span>
 
     <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">Edn2</span><span class="o">/</span><span class="n">e</span><span class="p">)</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mf">3.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mf">4.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mf">5.0</span><span class="p">)</span>
-    <span class="n">sigma</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">13</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">Edn2</span><span class="o">*</span><span class="n">e</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">e</span><span class="o">/</span><span class="n">Edn2</span><span class="p">)</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
-    <span class="n">sigma</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="mf">0.</span><span class="n">d0</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="p">((</span><span class="mf">1.d-13</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">Edn2</span><span class="o">*</span><span class="n">e</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">e</span><span class="o">/</span><span class="n">Edn2</span><span class="p">)</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="mf">0.d0</span><span class="p">)</span>
 
 <span class="k">end function </span><span class="n">e_ioniz_2_janev</span>
 </pre></div>
@@ -1334,6 +1340,8 @@ the \(n=2\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1661,6 +1669,8 @@ the \(n=2\) state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1678,6 +1688,8 @@ the \(n=2\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

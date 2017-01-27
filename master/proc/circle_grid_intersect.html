@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -955,29 +961,29 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
 <polygon fill="none" stroke="black" points="108,-43.3493 4.26326e-14,-43.3493 0,-17.3493 108,-17.3493 108,-43.3493"/>
 <text text-anchor="middle" x="54" y="-27.8993" font-family="Helvetica,sans-Serif" font-size="10.50">circle_grid_intersect</text>
 </g>
-<!-- proc~in_grid -->
-<g id="node2" class="node"><title>proc~in_grid</title>
-<a xlink:href="../proc/in_grid.html" xlink:title="in_grid">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="210,-87.3493 156,-87.3493 156,-61.3493 210,-61.3493 210,-87.3493"/>
-<text text-anchor="middle" x="183" y="-71.8993" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_grid</text>
-</a>
-</g>
-<!-- proc~circle_grid_intersect&#45;&gt;proc~in_grid -->
-<g id="edge10" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~in_grid</title>
-<path fill="none" stroke="#000000" d="M92.355,-43.4316C109.366,-49.2338 129.298,-56.0322 146.132,-61.7743"/>
-<polygon fill="#000000" stroke="#000000" points="145.047,-65.1019 155.641,-65.0176 147.306,-58.4767 145.047,-65.1019"/>
-</g>
 <!-- proc~grid_intersect -->
-<g id="node3" class="node"><title>proc~grid_intersect</title>
+<g id="node2" class="node"><title>proc~grid_intersect</title>
 <a xlink:href="../proc/grid_intersect.html" xlink:title="grid_intersect">
-<polygon fill="#d9534f" stroke="#d9534f" points="221,-43.3493 145,-43.3493 145,-17.3493 221,-17.3493 221,-43.3493"/>
-<text text-anchor="middle" x="183" y="-27.8993" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-87.3493 145,-87.3493 145,-61.3493 221,-61.3493 221,-87.3493"/>
+<text text-anchor="middle" x="183" y="-71.8993" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
 </a>
 </g>
 <!-- proc~circle_grid_intersect&#45;&gt;proc~grid_intersect -->
-<g id="edge12" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~grid_intersect</title>
-<path fill="none" stroke="#000000" d="M108.334,-30.3493C116.949,-30.3493 125.813,-30.3493 134.29,-30.3493"/>
-<polygon fill="#000000" stroke="#000000" points="134.394,-33.8494 144.394,-30.3493 134.394,-26.8494 134.394,-33.8494"/>
+<g id="edge10" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~grid_intersect</title>
+<path fill="none" stroke="#000000" d="M92.355,-43.4316C105.751,-48.0009 120.959,-53.1879 135.039,-57.9904"/>
+<polygon fill="#000000" stroke="#000000" points="133.976,-61.3257 144.57,-61.2414 136.235,-54.7005 133.976,-61.3257"/>
+</g>
+<!-- proc~in_grid -->
+<g id="node3" class="node"><title>proc~in_grid</title>
+<a xlink:href="../proc/in_grid.html" xlink:title="in_grid">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="210,-43.3493 156,-43.3493 156,-17.3493 210,-17.3493 210,-43.3493"/>
+<text text-anchor="middle" x="183" y="-27.8993" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_grid</text>
+</a>
+</g>
+<!-- proc~circle_grid_intersect&#45;&gt;proc~in_grid -->
+<g id="edge12" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~in_grid</title>
+<path fill="none" stroke="#000000" d="M108.334,-30.3493C120.881,-30.3493 133.954,-30.3493 145.59,-30.3493"/>
+<polygon fill="#000000" stroke="#000000" points="145.816,-33.8494 155.816,-30.3493 145.816,-26.8494 145.816,-33.8494"/>
 </g>
 <!-- proc~approx_eq -->
 <g id="node4" class="node"><title>proc~approx_eq</title>
@@ -1000,8 +1006,8 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
 </g>
 <!-- proc~in_grid&#45;&gt;proc~approx_ge -->
 <g id="edge6" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_ge</title>
-<path fill="none" stroke="#000000" d="M210.001,-74.3493C221.319,-74.3493 234.753,-74.3493 247.35,-74.3493"/>
-<polygon fill="#000000" stroke="#000000" points="247.67,-77.8494 257.67,-74.3493 247.67,-70.8494 247.67,-77.8494"/>
+<path fill="none" stroke="#000000" d="M210.001,-41.4523C221.644,-46.2401 235.527,-51.949 248.433,-57.2564"/>
+<polygon fill="#000000" stroke="#000000" points="247.48,-60.6487 258.06,-61.2149 250.142,-54.1746 247.48,-60.6487"/>
 </g>
 <!-- proc~approx_le -->
 <g id="node6" class="node"><title>proc~approx_le</title>
@@ -1012,8 +1018,8 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
 </g>
 <!-- proc~in_grid&#45;&gt;proc~approx_le -->
 <g id="edge8" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_le</title>
-<path fill="none" stroke="#000000" d="M210.001,-63.2462C222.256,-58.2067 236.993,-52.1465 250.461,-46.6083"/>
-<polygon fill="#000000" stroke="#000000" points="252.072,-49.7301 259.99,-42.6898 249.41,-43.2561 252.072,-49.7301"/>
+<path fill="none" stroke="#000000" d="M210.001,-30.3493C222.018,-30.3493 236.422,-30.3493 249.675,-30.3493"/>
+<polygon fill="#000000" stroke="#000000" points="249.99,-33.8494 259.99,-30.3493 249.99,-26.8494 249.99,-33.8494"/>
 </g>
 <!-- proc~approx_ge&#45;&gt;proc~approx_eq -->
 <g id="edge2" class="edge"><title>proc~approx_ge&#45;&gt;proc~approx_eq</title>
@@ -1300,7 +1306,7 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">alpha</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="n">delta</span><span class="p">,</span><span class="n">sinx1</span><span class="p">,</span><span class="n">cosx1</span><span class="p">,</span><span class="n">sinx2</span><span class="p">,</span><span class="n">cosx2</span><span class="p">,</span><span class="n">tmp</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">1.0</span><span class="n">d</span><span class="o">-</span><span class="mi">10</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tol</span> <span class="o">=</span> <span class="mf">1.0d-10</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">r0_ing</span>
 
     <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xmin</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">xmax</span><span class="p">,</span> <span class="p">&amp;</span>
@@ -1308,7 +1314,7 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
          <span class="n">beam_grid</span><span class="p">%</span><span class="n">zmin</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">zmax</span> <span class="p">]</span>
     <span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
     <span class="n">inter</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
-    <span class="n">phi</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="mf">0.d0</span>
 
     <span class="n">r0_ing</span> <span class="o">=</span> <span class="n">in_grid</span><span class="p">(</span><span class="n">r0</span><span class="p">)</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span>
@@ -1352,8 +1358,8 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
         <span class="n">endif</span>
     <span class="n">enddo</span>
 
-    <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
-    <span class="n">phi_exit</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="n">phi_exit</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="n">inter</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">return</span>
 <span class="k">    if</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">inter</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">phi_enter</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span><span class="n">inter</span><span class="p">)</span>
@@ -1384,8 +1390,8 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
             <span class="n">d</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">r0</span> <span class="o">-</span> <span class="n">i2_n</span><span class="p">)</span><span class="o">/</span><span class="n">radius</span>
             <span class="n">d</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">r0</span> <span class="o">-</span> <span class="n">i2_p</span><span class="p">)</span><span class="o">/</span><span class="n">radius</span>
             <span class="k">if</span><span class="p">(</span><span class="k">all</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mf">1.0</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">                </span><span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
-                <span class="n">phi_exit</span> <span class="o">=</span> <span class="mf">2.</span><span class="n">d0</span><span class="o">*</span><span class="n">pi</span>
+<span class="k">                </span><span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.d0</span>
+                <span class="n">phi_exit</span> <span class="o">=</span> <span class="mf">2.d0</span><span class="o">*</span><span class="n">pi</span>
             <span class="n">endif</span>
         <span class="n">endif</span>
     <span class="n">endif</span>
@@ -1620,6 +1626,8 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1947,6 +1955,8 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1964,6 +1974,8 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

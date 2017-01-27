@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.2% of total for procedures.">22 statements</a>
+	  title=" 0.3% of total for procedures.">26 statements</a>
      </li> 
      
      
@@ -410,6 +410,8 @@
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1075,29 +1081,29 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M503.738,-92.0314C518.235,-102.439 540.245,-116.206 562,-122 606.721,-133.911 659.303,-129.698 698.122,-123.331"/>
 <polygon fill="#000000" stroke="#000000" points="698.931,-126.743 708.184,-121.582 697.732,-119.846 698.931,-126.743"/>
 </g>
-<!-- proc~interpol2d_coeff_arr -->
-<g id="node13" class="node"><title>proc~interpol2d_coeff_arr</title>
-<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="672,-113 562,-113 562,-87 672,-87 672,-113"/>
-<text text-anchor="middle" x="617" y="-97.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.652,-85.2438C533.918,-86.5791 542.868,-88.0248 551.822,-89.4713"/>
-<polygon fill="#000000" stroke="#000000" points="551.468,-92.9593 561.898,-91.0989 552.584,-86.0489 551.468,-92.9593"/>
-</g>
 <!-- proc~interpol1d_coeff -->
-<g id="node14" class="node"><title>proc~interpol1d_coeff</title>
+<g id="node13" class="node"><title>proc~interpol1d_coeff</title>
 <a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
 <polygon fill="#d9534f" stroke="#d9534f" points="799,-61 709,-61 709,-35 799,-35 799,-61"/>
 <text text-anchor="middle" x="754" y="-45.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
 <path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.539,-74.5254C570.894,-69.2595 646.569,-60.4733 698.301,-54.4669"/>
 <polygon fill="#000000" stroke="#000000" points="698.783,-57.9346 708.313,-53.3045 697.976,-50.9813 698.783,-57.9346"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="node14" class="node"><title>proc~interpol2d_coeff_arr</title>
+<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="672,-113 562,-113 562,-87 672,-87 672,-113"/>
+<text text-anchor="middle" x="617" y="-97.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.652,-85.2438C533.918,-86.5791 542.868,-88.0248 551.822,-89.4713"/>
+<polygon fill="#000000" stroke="#000000" points="551.468,-92.9593 561.898,-91.0989 552.584,-86.0489 551.468,-92.9593"/>
 </g>
 <!-- proc~interpol1d_coeff_arr -->
 <g id="node15" class="node"><title>proc~interpol1d_coeff_arr</title>
@@ -1386,14 +1392,19 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vp</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ichan</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LOSInters</span><span class="p">)</span> <span class="kd">::</span> <span class="n">inter</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ichan</span><span class="p">,</span><span class="n">nchan</span><span class="p">,</span><span class="n">i</span>
 
     <span class="k">call </span><span class="n">get_indices</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">)</span>
+    <span class="n">inter</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">nchan</span> <span class="o">=</span> <span class="n">inter</span><span class="p">%</span><span class="n">nchan</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">nchan</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
 
-    <span class="n">loop_over_channels</span><span class="p">:</span> <span class="k">do </span><span class="n">ichan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span>
-        <span class="n">dlength</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">dlength</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dlength</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_channels</span>
+<span class="k">    call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">)</span>
+
+    <span class="n">loop_over_channels</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nchan</span>
+        <span class="n">ichan</span> <span class="o">=</span> <span class="n">inter</span><span class="p">%</span><span class="n">los_elem</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">id</span>
+        <span class="n">dlength</span> <span class="o">=</span> <span class="n">inter</span><span class="p">%</span><span class="n">los_elem</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">length</span>
         <span class="n">sigma_pi</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">sigma_pi</span>
         <span class="n">vp</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">lens</span>
         <span class="k">call </span><span class="n">store_fw_photons_at_chan</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span> <span class="n">eind</span><span class="p">,</span> <span class="n">pind</span><span class="p">,</span> <span class="p">&amp;</span>
@@ -1630,6 +1641,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1957,6 +1970,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1974,6 +1989,8 @@ public subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

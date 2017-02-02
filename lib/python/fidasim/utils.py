@@ -57,7 +57,7 @@ def get_version(fidasim_dir):
 
         # git is installed if git_file is a file
         proc = subprocess.Popen('command -v git', stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        git_file = proc.communicate()[0]
+        git_file = proc.communicate()[0].decode('utf-8')
         git_file = git_file.replace('\n', '')
 
         # Check that .git folder is present and git is installed

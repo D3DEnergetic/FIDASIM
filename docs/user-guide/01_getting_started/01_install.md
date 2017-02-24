@@ -63,9 +63,9 @@ git checkout v{!../VERSION!}
 ```
 
 ##Setting up environmental variables
-FIDASIM needs to know where some things are so you have to set the following environmental variables in your `.bashrc`
+FIDASIM needs to know where some things are so you have to set the following environmental variables in your `.bashrc` file located in your home directory.
 ```bash
-export FIDASIM_DIR=/path/to/fidasim/install
+export FIDASIM_DIR=/path/to/fidasim/install/directory
 export FC=gfortran #use 'ifort' for Intel Fortran compiler
 export CC=gcc      #use 'icc' for Intel C compiler
 export CXX=g++     #use 'icpc' for Intel C++ compiler
@@ -77,7 +77,10 @@ export PYTHONPATH=$FIDASIM_DIR/lib/python:$PYTHONPATH
 
 ulimit -s unlimited #Omit this if you like segfaults
 ```
-replacing `/path/to/fidasim/install` with the real directory.
+replacing `/path/to/fidasim/install/directory` with the real directory. To set the environmental variables in the current shell run
+```
+source ~/.bashrc
+```
 
 ##Building FIDASIM
 Once you are in the source directory (and have all the dependencies installed) run the following

@@ -11,6 +11,7 @@ private
 public :: ind2sub, sub2ind
 public :: rng_type, rng_init, rng, rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
+public :: deriv
 
 integer, parameter :: Int32 = 4
 integer, parameter :: Int64 = kind(int8(1))
@@ -499,5 +500,38 @@ function get_value(SA, subs) result (val)
     endif
 
 end function get_value
+
+subroutine deriv(x,y,yp)
+    !+ Uses 3 point lagrangian method to calculate the derivative of an array
+    real(Float64), dimension(:),intent(in)  :: x
+        !+ X Values
+    real(Float64), dimension(:),intent(in)  :: y
+        !+ Y Values
+    real(FLoat64), dimension(:),intent(out) :: yp
+        !+ Derivative of Y w.r.t. X
+
+    integer :: i,n
+        !! temporary values for loops
+    real(Float64) :: p1,p2,p3
+        !! intermeadiate values for 3 point lagrangian
+
+    n = size(X)-1
+    do i = 2,n
+        p1 = x(i-1)
+        P2 = x(i)
+        P3 = x(i+1)
+        yp(i) = (y(i-1)*(p2-p1)/((p1-p2)*(p1-P3))) + &
+                (Y(i)*((1/(p2-p3))-(1/(p1-p2)))) -   &
+                (y(i+1)*(p1-p2)/((p1-p3)*(p2-p3)))
+    enddo
+
+    yp(1) = (y(1)*((x(1)-X(2))+(x(1)-x(3)))/((x(1)-X(2))*(x(1)-x(3)))) - &
+            (y(2)*(x(1)-x(3))/((x(1)-x(2))*(x(2)-x(3)))) +               &
+            (y(3)*(x(1)-x(2))/((x(1)-x(3))*(x(2)-x(3))))
+    yp(n+1) = (y(n-1)*(x(n)-x(n+1))/((x(n-1)-x(n))*(x(n-1)-x(n+1)))) + &
+              (y(n)*(x(n-1)-x(n+1))/((x(n-1)-x(n))*(x(n)-x(n+1)))) +   &
+              (y(n+1)*((x(n-1)-x(n+1))+(x(n)-x(n+1)))/((x(n-1)-x(n+1))*(x(n)-x(n+1))))
+
+end subroutine deriv
 
 end module utilities

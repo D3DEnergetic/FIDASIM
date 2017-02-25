@@ -260,6 +260,18 @@ type EMFields
         !+ Torodial electric field [V/m]
     real(Float64) :: ez = 0.d0
         !+ Vertical electric field [V/m]
+    real(Float64) :: dbr_dr = 0.d0
+        !+ Radial derivative of the radial magnetic field [T/m]
+    real(Float64) :: dbr_dz = 0.d0
+        !+ Vertical derivative of the radial magnetic field [T/m]
+    real(Float64) :: dbt_dr = 0.d0
+        !+ Radial derivative of the torodial magnetic field [T/m]
+    real(Float64) :: dbt_dz = 0.d0
+        !+ Vertical derivative of the torodial magnetic field [T/m]
+    real(Float64) :: dbz_dr = 0.d0
+        !+ Radial derivative of the radial magnetic field [T/m]
+    real(Float64) :: dbz_dz = 0.d0
+        !+ Vertical derivative of the vertical magnetic field [T/m]
 end type EMFields
 
 type, extends( EMFields ) :: LocalEMFields
@@ -1120,6 +1132,13 @@ subroutine ff_assign(p1, p2)
     p1%et   = p2%et
     p1%ez   = p2%ez
 
+    p1%dbr_dr   = p2%dbr_dr
+    p1%dbr_dz   = p2%dbr_dz
+    p1%dbt_dr   = p2%dbt_dr
+    p1%dbt_dz   = p2%dbt_dz
+    p1%dbz_dr   = p2%dbz_dr
+    p1%dbz_dz   = p2%dbz_dz
+
 end subroutine ff_assign
 
 subroutine lff_assign(p1, p2)
@@ -1134,6 +1153,13 @@ subroutine lff_assign(p1, p2)
     p1%et   = p2%et
     p1%ez   = p2%ez
 
+    p1%dbr_dr   = p2%dbr_dr
+    p1%dbr_dz   = p2%dbr_dz
+    p1%dbt_dr   = p2%dbt_dr
+    p1%dbt_dz   = p2%dbt_dz
+    p1%dbz_dr   = p2%dbz_dr
+    p1%dbz_dz   = p2%dbz_dz
+
 end subroutine lff_assign
 
 subroutine flf_assign(p1, p2)
@@ -1147,6 +1173,13 @@ subroutine flf_assign(p1, p2)
     p1%er   = p2%er
     p1%et   = p2%et
     p1%ez   = p2%ez
+
+    p1%dbr_dr   = p2%dbr_dr
+    p1%dbr_dz   = p2%dbr_dz
+    p1%dbt_dr   = p2%dbt_dr
+    p1%dbt_dz   = p2%dbt_dz
+    p1%dbz_dr   = p2%dbz_dr
+    p1%dbz_dz   = p2%dbz_dz
 
 end subroutine flf_assign
 
@@ -1169,6 +1202,13 @@ subroutine lflf_assign(p1, p2)
     p1%b_norm = p2%b_norm
     p1%c_norm = p2%c_norm
     p1%e_norm = p2%e_norm
+
+    p1%dbr_dr   = p2%dbr_dr
+    p1%dbr_dz   = p2%dbr_dz
+    p1%dbt_dr   = p2%dbt_dr
+    p1%dbt_dz   = p2%dbt_dz
+    p1%dbz_dr   = p2%dbz_dr
+    p1%dbz_dz   = p2%dbz_dz
 
 end subroutine lflf_assign
 
@@ -1343,6 +1383,13 @@ function ff_add(p1, p2) result (p3)
     p3%et   = p1%et   + p2%et
     p3%ez   = p1%ez   + p2%ez
 
+    p3%dbr_dr   = p1%dbr_dr + p2%dbr_dr
+    p3%dbr_dz   = p1%dbr_dz + p2%dbr_dz
+    p3%dbt_dr   = p1%dbt_dr + p2%dbt_dr
+    p3%dbt_dz   = p1%dbt_dz + p2%dbt_dz
+    p3%dbz_dr   = p1%dbz_dr + p2%dbz_dr
+    p3%dbz_dz   = p1%dbz_dz + p2%dbz_dz
+
 end function ff_add
 
 function ff_subtract(p1, p2) result (p3)
@@ -1356,6 +1403,13 @@ function ff_subtract(p1, p2) result (p3)
     p3%er   = p1%er   - p2%er
     p3%et   = p1%et   - p2%et
     p3%ez   = p1%ez   - p2%ez
+
+    p3%dbr_dr   = p1%dbr_dr - p2%dbr_dr
+    p3%dbr_dz   = p1%dbr_dz - p2%dbr_dz
+    p3%dbt_dr   = p1%dbt_dr - p2%dbt_dr
+    p3%dbt_dz   = p1%dbt_dz - p2%dbt_dz
+    p3%dbz_dr   = p1%dbz_dr - p2%dbz_dr
+    p3%dbz_dz   = p1%dbz_dz - p2%dbz_dz
 
 end function ff_subtract
 
@@ -1371,6 +1425,13 @@ function fs_multiply(p1, real_scalar) result (p3)
     p3%er   = p1%er   * real_scalar
     p3%et   = p1%et   * real_scalar
     p3%ez   = p1%ez   * real_scalar
+
+    p3%dbr_dr   = p1%dbr_dr * real_scalar
+    p3%dbr_dz   = p1%dbr_dz * real_scalar
+    p3%dbt_dr   = p1%dbt_dr * real_scalar
+    p3%dbt_dz   = p1%dbt_dz * real_scalar
+    p3%dbz_dr   = p1%dbz_dr * real_scalar
+    p3%dbz_dz   = p1%dbz_dz * real_scalar
 
 end function fs_multiply
 
@@ -1421,6 +1482,13 @@ function lflf_add(p1, p2) result (p3)
     p3%e_abs = norm2(efield)
     if(p3%e_abs.gt.0.d0) p3%e_norm = efield/p3%e_abs
 
+    p3%dbr_dr   = p1%dbr_dr + p2%dbr_dr
+    p3%dbr_dz   = p1%dbr_dz + p2%dbr_dz
+    p3%dbt_dr   = p1%dbt_dr + p2%dbt_dr
+    p3%dbt_dz   = p1%dbt_dz + p2%dbt_dz
+    p3%dbz_dr   = p1%dbz_dr + p2%dbz_dr
+    p3%dbz_dz   = p1%dbz_dz + p2%dbz_dz
+
 end function lflf_add
 
 function lflf_subtract(p1, p2) result (p3)
@@ -1450,6 +1518,13 @@ function lflf_subtract(p1, p2) result (p3)
     p3%e_abs = norm2(efield)
     if(p3%e_abs.gt.0.d0) p3%e_norm = efield/p3%e_abs
 
+    p3%dbr_dr   = p1%dbr_dr - p2%dbr_dr
+    p3%dbr_dz   = p1%dbr_dz - p2%dbr_dz
+    p3%dbt_dr   = p1%dbt_dr - p2%dbt_dr
+    p3%dbt_dz   = p1%dbt_dz - p2%dbt_dz
+    p3%dbz_dr   = p1%dbz_dr - p2%dbz_dr
+    p3%dbz_dz   = p1%dbz_dz - p2%dbz_dz
+
 end function lflf_subtract
 
 function lfs_multiply(p1, real_scalar) result (p3)
@@ -1472,6 +1547,13 @@ function lfs_multiply(p1, real_scalar) result (p3)
     p3%b_norm = p1%b_norm
     p3%c_norm = p1%c_norm
     p3%e_norm = p1%e_norm
+
+    p3%dbr_dr   = p1%dbr_dr * real_scalar
+    p3%dbr_dz   = p1%dbr_dz * real_scalar
+    p3%dbt_dr   = p1%dbt_dr * real_scalar
+    p3%dbt_dz   = p1%dbt_dz * real_scalar
+    p3%dbz_dr   = p1%dbz_dr * real_scalar
+    p3%dbz_dz   = p1%dbz_dz * real_scalar
 
 end function lfs_multiply
 
@@ -2238,6 +2320,8 @@ subroutine read_equilibrium
 
     integer, dimension(:,:), allocatable :: p_mask, f_mask
 
+    integer :: iz, ir
+
     !!Initialize HDF5 interface
     call h5open_f(error)
 
@@ -2327,6 +2411,11 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/fields/et", equil%fields%et, dims, error)
     call h5ltread_dataset_double_f(gid, "/fields/ez", equil%fields%ez, dims, error)
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
+
+    !!Calculate B field derivatives
+    call deriv(inter_grid%r, inter_grid%z, equil%fields%br, equil%fields%dbr_dr, equil%fields%dbr_dz)
+    call deriv(inter_grid%r, inter_grid%z, equil%fields%bt, equil%fields%dbt_dr, equil%fields%dbt_dz)
+    call deriv(inter_grid%r, inter_grid%z, equil%fields%bz, equil%fields%dbz_dr, equil%fields%dbz_dz)
 
     !!Close FIELDS group
     call h5gclose_f(gid, error)
@@ -6445,13 +6534,15 @@ subroutine gyro_step(vi, fields, r_gyro)
         !+ Electro-magnetic fields
     real(Float64), dimension(3), intent(out) :: r_gyro
         !+ Gyro-step
+        !+ Gyro-radius vector from particle position to guiding center
 
-    real(Float64), dimension(3) :: vxB,rg_uvw,uvw
-    real(Float64) :: one_over_omega, phi, R, rg_r
+    real(Float64), dimension(3) :: vxB, rg_uvw, uvw, cuvrxb, b_rtz, grad_B, rg_rtz
+    real(Float64) :: one_over_omega, phi, R, rg_r, vpar, term1, term2
 
     if(inputs%no_flr.eq.0) then
         one_over_omega=inputs%ab*mass_u/(fields%b_abs*e0)
         vxB = cross_product(vi,fields%b_norm)
+        vpar =  dot_product(vi,fields%b_norm)
         r_gyro = vxB*one_over_omega !points towards gyrocenter
 
         !! Second order correction approximation derived from
@@ -6469,7 +6560,28 @@ subroutine gyro_step(vi, fields, r_gyro)
             rg_uvw = matmul(beam_grid%basis,r_gyro)
         endif
         rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
-        r_gyro = r_gyro*(1 - rg_r/(2*R))
+        b_rtz(1) = fields%br/fields%b_abs
+        b_rtz(2) = fields%bt/fields%b_abs
+        b_rtz(3) = fields%bz/fields%b_abs
+        cuvrxb(1) = -fields%dbt_dz/fields%b_abs
+        cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
+        cuvrxb(3) = fields%dbt_dr/fields%b_abs
+        term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
+        grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
+                    fields%b_abs
+        grad_B(2) = 0.0
+        grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
+                    fields%b_abs
+        rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
+        rg_rtz(2) = 0.0
+        rg_rtz(3) = rg_uvw(3)
+        term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
+        r_gyro = r_gyro * (1.0 - term1 - term2)
+        if (1.0 - term1 - term2 .le. 0.0) then
+            write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
+                          1.0-term1-term2
+            stop
+        endif
     else
         r_gyro = 0.d0
     endif
@@ -7161,11 +7273,11 @@ subroutine fida_f
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
-                papprox(i,j,k)=(sum(neut%dens(:,nbif_type,i,j,k)) + &
-                                sum(neut%dens(:,nbih_type,i,j,k)) + &
-                                sum(neut%dens(:,nbit_type,i,j,k)) + &
-                                sum(neut%dens(:,halo_type,i,j,k)))* &
-                                plasma%denf
+                papprox(i,j,k) = (sum(neut%dens(:,nbif_type,i,j,k)) + &
+                                  sum(neut%dens(:,nbih_type,i,j,k)) + &
+                                  sum(neut%dens(:,nbit_type,i,j,k)) + &
+                                  sum(neut%dens(:,halo_type,i,j,k)))* &
+                                  plasma%denf
                 if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
                     pcnt=pcnt+1

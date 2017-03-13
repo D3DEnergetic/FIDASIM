@@ -78,7 +78,8 @@ real(Float64), parameter, dimension(n_stark) :: stark_wavel = &
        2.75700d-08, 5.51500d-08, 8.27400d-08, 1.10300d-07, &
        1.38000d-07, 1.65600d-07, 2.20900d-07               ]
     !+ Stark wavelengths [nm*m/V]
-real(Float64), parameter, dimension(n_stark) :: stark_intens= [ 1.000d0, 18.00d0, 16.00d0, 1681.d0, 2304.d0, &
+real(Float64), parameter, dimension(n_stark) :: stark_intens= &
+     [ 1.000d0, 18.00d0, 16.00d0, 1681.d0, 2304.d0, &
        729.0d0, 1936.d0, 5490.d0, 1936.d0, 729.0d0, &
        2304.d0, 1681.d0, 16.00d0, 18.00d0, 1.000d0  ]
     !+ Stark Intensities
@@ -6189,6 +6190,7 @@ subroutine gyro_step(vi, fields, r_gyro)
     type(LocalEMFields), intent(in)          :: fields
         !+ Electro-magnetic fields
     real(Float64), dimension(3), intent(out) :: r_gyro
+        !+ Gyro-step
         !+ Gyro-radius vector from partile position to guiding center
         !+ vec\tho = (\hat b cross \vec v)/Omega
 

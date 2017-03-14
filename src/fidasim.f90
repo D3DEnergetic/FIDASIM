@@ -2386,17 +2386,9 @@ subroutine read_equilibrium
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
 
     !!Calculate B field derivatives
-    do iz=1,inter_grid%nz
-        call deriv(inter_grid%r, equil%fields(:,iz)%br, equil%fields(:,iz)%dbr_dr)
-        call deriv(inter_grid%r, equil%fields(:,iz)%bt, equil%fields(:,iz)%dbt_dr)
-        call deriv(inter_grid%r, equil%fields(:,iz)%bz, equil%fields(:,iz)%dbz_dr)
-    enddo
-
-    do ir=1,inter_grid%nr
-        call deriv(inter_grid%z, equil%fields(ir,:)%br, equil%fields(ir,:)%dbr_dz)
-        call deriv(inter_grid%z, equil%fields(ir,:)%bt, equil%fields(ir,:)%dbt_dz)
-        call deriv(inter_grid%z, equil%fields(ir,:)%bz, equil%fields(ir,:)%dbz_dz)
-    enddo
+    call deriv(inter_grid%r, inter_grid%z, equil%fields%br, equil%fields%dbr_dr, equil%fields%dbr_dz)
+    call deriv(inter_grid%r, inter_grid%z, equil%fields%bt, equil%fields%dbt_dr, equil%fields%dbt_dz)
+    call deriv(inter_grid%r, inter_grid%z, equil%fields%bz, equil%fields%dbz_dr, equil%fields%dbz_dz)
 
     !!Close FIELDS group
     call h5gclose_f(gid, error)
@@ -6191,8 +6183,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         !+ Electro-magnetic fields
     real(Float64), dimension(3), intent(out) :: r_gyro
         !+ Gyro-step
-        !+ Gyro-radius vector from partile position to guiding center
-        !+ vec\tho = (\hat b cross \vec v)/Omega
+        !+ Gyro-radius vector from particle position to guiding center
 
     real(Float64), dimension(3) :: vxB, rg_uvw, uvw, cuvrxb, b_rtz, grad_B, rg_rtz
     real(Float64) :: one_over_omega, phi, R, rg_r, vpar, term1, term2
@@ -6217,26 +6208,27 @@ subroutine gyro_step(vi, fields, r_gyro)
         else
             rg_uvw = matmul(beam_grid%basis,r_gyro)
         endif
-        rg_r = rg_uvw(1) * cos(phi) + rg_uvw(2) * sin(phi)
-        b_rtz(1) = fields%br / fields%b_abs
-        b_rtz(2) = fields%bt / fields%b_abs
-        b_rtz(3) = fields%bz / fields%b_abs
-        cuvrxb(1) = -fields%dbt_dz / fields%b_abs
-        cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr) / fields%b_abs
-        cuvrxb(3) = fields%dbt_dr / fields%b_abs
-        term1 = vpar * one_over_omega * dot_product(b_rtz,cuvrxb)
-        grad_B(1) = (fields%br*fields%dbr_dr + fields%dbt_dr+fields%bz*fields%dbz_dr) /&
+        rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
+        b_rtz(1) = fields%br/fields%b_abs
+        b_rtz(2) = fields%bt/fields%b_abs
+        b_rtz(3) = fields%bz/fields%b_abs
+        cuvrxb(1) = -fields%dbt_dz/fields%b_abs
+        cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
+        cuvrxb(3) = fields%dbt_dr/fields%b_abs
+        term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
+        grad_B(1) = (fields%br*fields%dbr_dr + fields%dbt_dr + fields%bz*fields%dbz_dr)/&
                     fields%b_abs
         grad_B(2) = 0.0
-        grad_B(3) = (fields%br * fields%dbz_dr + fields%dbt_dz + fields%bz*fields%dbz_dz) /&
+        grad_B(3) = (fields%br*fields%dbz_dr + fields%dbt_dz + fields%bz*fields%dbz_dz)/&
                     fields%b_abs
-        rg_rtz(1) = rg_uvw(1) * cos(phi) + rg_uvw(2) * sin(phi)
+        rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
         rg_rtz(2) = 0.0
         rg_rtz(3) = rg_uvw(3)
-        term2 = -1.0 / (2.0 * fields%b_abs) * dot_product(rg_rtz,grad_B)
-        r_gyro = r_gyro * (1.0 - term1 - term2)
+        term2 = -1.0/(2.0*fields%b_abs)*dot_product(rg_rtz,grad_B)
+        r_gyro = r_gyro*(1.0 - term1 - term2)
         if(1.0 - term1 - term2 .le. 0.0) then
-            write(*,'(a)') '---- Error in subroutine gyro_step ----'
+            write(*,'(a)') 'GYRO_STEP: Gyro correction results in negative distances: ', &
+                           (1 - term1 - term2)
             stop
         endif
     else

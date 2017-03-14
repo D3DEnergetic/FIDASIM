@@ -849,6 +849,20 @@ type ParticleTrack
         !+ Midpoint of track in cell [cm]
 end type ParticleTrack
 
+type Hyperboloid
+    !+ Defines a hyperboloid (x-center)'*A*(x-center) = 1
+    real(Float64), dimension(3)   :: axes
+        !+ Semi-axes of the hyperboloid, i.e. a, b, c coefficients
+    real(Float64), dimension(3)   :: center = 0.d0
+        !+ Center of the hyperboloid
+    real(Float64), dimension(3,3) :: A = 0.d0
+        !+ Coefficients of quartic surface i.e. `basis*diagm(1/a^2,1/b^2,1/c^2)*basis'`
+    real(Float64), dimension(3,3) :: basis = 0.d0
+        !+ Basis of coordinate system of hyperboloid
+    real(Float64), dimension(3,3) :: inv_basis= 0.d0
+        !+ Inverse basis
+end type Hyperboloid
+
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
     !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], and [[NPAParticle]]
@@ -4130,7 +4144,7 @@ subroutine plane_basis(center, redge, tedge, basis, inv_basis)
 
 end subroutine plane_basis
 
-subroutine plane_intercept(l0, l, p0, n, p, t)
+subroutine line_plane_intersect(l0, l, p0, n, p, t)
     !+ Calculates the intersection of a line and a plane
     real(Float64), dimension(3), intent(in)  :: l0
         !+ Point on line
@@ -4141,15 +4155,110 @@ subroutine plane_intercept(l0, l, p0, n, p, t)
     real(Float64), dimension(3), intent(in)  :: n
         !+ Normal vector of plane
     real(Float64), dimension(3), intent(out) :: p
-        !+ Line-plane intercept point
+        !+ Line-plane intersect point
     real(Float64), intent(out)               :: t
-        !+ "time" to intercept
+        !+ "time" to intersect
 
-    t = dot_product(p0 - l0, n)/dot_product(l, n)
+    real(Float64) :: ldotn
 
+    ldotn = dot_product(l, n)
+    if(ldotn.eq.0.0)then
+        t = 0.0
+    else
+        t = dot_product(p0 - l0, n)/ldotn
+    endif
     p = l0 + t*l
 
-end subroutine plane_intercept
+end subroutine line_plane_intersect
+
+subroutine line_hyperboloid_intersect(r0, v0, h, p, t)
+    !+ Calculates the first intersection of a line and a hyperboloid
+    real(Float64), dimension(3), intent(in)  :: r0
+        !+ Point on line
+    real(Float64), dimension(3), intent(in)  :: v0
+        !+ Ray of line
+    type(Hyperboloid), intent(in)            :: h
+        !+ Hyperboloid
+    real(Float64), dimension(3), intent(out) :: p
+        !+ Line-hyperboloid intersect point
+    real(Float64), intent(out)               :: t
+        !+ "time" to intersect
+
+    integer :: i
+    real(Float64), dimension(3) :: rr
+    real(Float64), dimension(2) :: tpm
+    real(Float64) :: a, b, c, d
+
+    rr = r0 - h%center
+    a = dot_product(v0, matmul(h%A,v0))
+    b = dot_product(rr, matmul(h%A,v0)) + dot_product(v0,matmul(h%A,rr))
+    c = dot_product(rr, matmul(h%A,rr)) - 1.0
+
+    d = b**2 - 4*a*c
+    if(d.lt.0.0) then
+        p = r0
+        t = 0.0
+        return
+    endif
+
+    tpm(1) = (-b + sqrt(d))/(2*a)
+    tpm(2) = (-b - sqrt(d))/(2*a)
+    i = minloc(abs(tpm),1)
+    t = tpm(i)
+    p = r0 + v0*t
+
+end subroutine line_hyperboloid_intersect
+
+subroutine hyperboloid_coordinates(h, p, u)
+    !+ Calculates the parametric coordinates, `u`, of point `p` on the hyperboloid
+    type(Hyperboloid), intent(in)            :: h
+        !+ Hyperboloid
+    real(Float64), dimension(3), intent(in)  :: p
+        !+ Point on hyperboloid
+    real(Float64), dimension(2), intent(out) :: u
+        !+ Parametric coordinates (theta, t)
+
+    real(Float64), dimension(3) :: pp
+    real(Float64) :: t, a, b, c, d, thm, thp, dp, dm, th
+    integer :: i
+
+    pp = matmul(h%inv_basis,p - h%center)
+    t = pp(3)/h%axes(3)
+    a = h%axes(1) + h%axes(2)*t
+    b = h%axes(2) - h%axes(1)*t
+    c = max(min(d/sqrt(a**2 + b**2),1.d0),-1.d0)
+
+    thm = -acos(c) + atan2(b,a)
+    thp =  acos(c) + atan2(b,a)
+    dm = norm2([h%axes(1)*(cos(thm) - t*sin(thm)), &
+                h%axes(2)*(sin(thm) + t*cos(thm)), &
+                h%axes(3)*t ] - p)
+    dp = norm2([h%axes(1)*(cos(thp) - t*sin(thp)), &
+                h%axes(2)*(sin(thp) + t*cos(thp)), &
+                h%axes(3)*t ] - p)
+
+    th = thm
+    if(dp.le.dm) th = thp
+    if(th.lt.0.0) th = th + 2*pi
+
+    u = [th, t]
+
+end subroutine hyperboloid_coordinates
+
+function in_hyperboloid(h, p) result(in_h)
+    !+ Indicator function for determining if a point is inside the hyperboloid
+    type(Hyperboloid), intent(in)           :: h
+        !+ Hyperboloid
+    real(Float64), dimension(3), intent(in) :: p
+        !+ Point
+    logical :: in_h
+
+    real(Float64), dimension(3) :: pp
+
+    pp = p - h%center
+    in_h = dot_product(pp, matmul(h%A, p)).le.1.d0
+
+end function in_hyperboloid
 
 function in_boundary(bplane, p) result(in_b)
     !+ Indicator function for determining if a point on a plane is within the plane boundary
@@ -4185,6 +4294,157 @@ function in_boundary(bplane, p) result(in_b)
 
 end function in_boundary
 
+subroutine boundary_edge(bplane, bedge, nb)
+    !+ Returns 3 x `nb` array containing points along the BoundedPlane's boundary edge
+    type(BoundedPlane), intent(in)             :: bplane
+        !+ Bounded plane
+    real(Float64), dimension(:,:), intent(out) :: bedge
+        !+ Boundary edge points of bounded plane
+    integer, intent(out)                       :: nb
+        !+ Number of points in boundary edge
+
+    integer :: i
+    real(Float64) :: th, dth, x, y
+    real(Float64), dimension(4) :: xx, yy
+
+    select case (bplane%shape)
+        case (1) !Rectangular boundary
+            nb = 4
+            if(nb.gt.size(bedge,2)) then
+                if(inputs%verbose.ge.0) then
+                    write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
+                endif
+                stop
+            endif
+            xx = [-bplane%hw,-bplane%hw,bplane%hw,bplane%hw]
+            yy = [-bplane%hh,bplane%hh,bplane%hh,-bplane%hh]
+            do i=1,nb
+                bedge(:,i) = matmul(bplane%basis,[xx(i),yy(i),0.d0]) + bplane%origin
+            enddo
+        case (2)
+            nb = 50
+            if(nb.gt.size(bedge,2)) then
+                if(inputs%verbose.ge.0) then
+                    write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
+                endif
+                stop
+            endif
+            dth = 2*pi/nb
+            do i=1,nb
+                th = i*dth
+                x = bplane%hw*cos(th)
+                y = bplane%hh*sin(th)
+                bedge(:,i) = matmul(bplane%basis,[x,y,0.d0]) + bplane%origin
+            enddo
+        case default
+            if(inputs%verbose.ge.0) then
+                write(*,'("BOUNDARY_EDGE: Unknown boundary shape: ",i2)'),bplane%shape
+            endif
+            stop
+    end select
+
+end subroutine boundary_edge
+
+subroutine boundary_gyro_range(b, h, gyro_range, nrange)
+    !+ Calculates the range(s) of gyro-angles that would land within the bounded plane
+    type(BoundedPlane), intent(in)             :: b
+        !+ Bounded Plane
+    type(Hyperboloid), intent(in)              :: h
+        !+ Hyperboloid
+    real(Float64), dimension(2,4), intent(out) :: gyro_range
+        !+ (theta, dtheta) values
+    integer, intent(out) :: nrange
+        !+ Number of ranges. `1 <= nrange <= 4`
+
+    integer :: nb, i, j, ninter
+    logical :: inb_cur, inb_pre, binh
+    logical, dimension(8) :: cross = .False.
+    real(Float64) :: t_p, t_i, t_h, th1, th2, dth
+    real(Float64), dimension(2) :: u_cur
+    real(Float64), dimension(3) :: rc, p_pre, p_cur, v0, ri
+    real(Float64), dimension(2,8) :: u
+    real(Float64), dimension(3,50) :: bedge
+
+    nrange = 0
+    call line_plane_intersect(h%center, h%basis(:,3), b%origin, b%basis(:,3), rc, t_p)
+    if(t_p.le.0.d0) return
+
+    call boundary_edge(b, bedge, nb)
+    p_pre = bedge(:,nb)
+    inb_pre = in_hyperboloid(h, p_pre)
+    binh = .False.
+
+    ninter = 0
+    boundary_loop: do i=1,nb
+        p_cur = bedge(:,i)
+        inb_cur = in_hyperboloid(h, p_cur)
+        if(inb_cur) binh = .True.
+        if(inb_cur.neqv.inb_pre) then
+            v0 = p_cur - p_pre
+            call line_hyperboloid_intersect(p_pre, v0, h, ri, t_i)
+            call hyperboloid_coordinates(h, ri, u_cur)
+            if(u_cur(2).gt.0.d0) then
+                ninter = ninter + 1
+                cross(ninter) = inb_cur
+                u(:,ninter) = u_cur
+            endif
+        endif
+        inb_pre = inb_cur
+        p_pre = p_cur
+    enddo boundary_loop
+
+    if((ninter.eq.0).and.(.not.binh)) then
+        if(in_boundary(b, rc)) then
+            nrange = 1
+            gyro_range(:,1) = [0.d0,2*pi]
+        endif
+        return
+    endif
+
+    do i=1, ninter
+        if(cross(i)) then
+            th1 = u(1,i)
+            j = modulo(i,ninter) + 1
+            th2 = u(1,j)
+            dth = th2-th1
+            if(dth.le.0.0) then
+                dth = 2*pi + dth
+            endif
+            nrange = nrange + 1
+            gyro_range(:,nrange) = [th1, dth]
+        endif
+    enddo
+
+end subroutine boundary_gyro_range
+
+subroutine gyro_surface(fields, energy, pitch, hyper)
+    !+ Calculates the surface of all possible trajectories
+    type(LocalEMFields), intent(in)          :: fields
+        !+ Electromagnetic fields at guiding center
+    real(Float64), intent(in)                :: energy
+        !+ Energy of particle
+    real(Float64), intent(in)                :: pitch
+        !+ Particle pitch w.r.t the magnetic field
+    type(Hyperboloid), intent(out)           :: hyper
+        !+ Surface representing all possible trajectories i.e. a hyperboloid
+
+    real(Float64) :: radius
+
+    radius = gyro_radius(fields, energy, pitch)
+
+end subroutine gyro_surface
+
+subroutine npa_gyro_range(det, eb, ptch, rg, gyro_range, nrange)
+    !+ Calculates range of gyro-angles that would hit the NPA detector
+    integer, intent(in) :: det
+        !+ Index of NPA detector
+    real(Float64), intent(in) :: eb
+    real(Float64), intent(in) :: ptch
+    real(Float64), dimension(3), intent(in) :: rg
+    real(Float64), dimension(2,4), intent(out) :: gyro_range
+    integer, intent(out) :: nrange
+end subroutine npa_gyro_range
+
 subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     !+ Routine to check if a particle will hit a NPA detector
     real(Float64), dimension(3), intent(in)            :: r0
@@ -4213,11 +4473,11 @@ subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     d_index = 0
     detector_loop: do i=s,ndet
         !! Find where trajectory crosses detector plane
-        call plane_intercept(r0,v0,npa_chords%det(i)%detector%origin, &
+        call line_plane_intersect(r0,v0,npa_chords%det(i)%detector%origin, &
              npa_chords%det(i)%detector%basis(:,3),d,t_d)
 
         !! Find where trajectory crosses aperture plane
-        call plane_intercept(r0,v0,npa_chords%det(i)%aperture%origin, &
+        call line_plane_intersect(r0,v0,npa_chords%det(i)%aperture%origin, &
              npa_chords%det(i)%aperture%basis(:,3),a,t_a)
 
         !! If both points are in plane boundaries and the
@@ -6159,6 +6419,35 @@ subroutine gyro_correction(fields, rg, energy, pitch, rp, vp)
     rp = rg - r_step
 
 end subroutine gyro_correction
+
+function gyro_radius(fields, energy, pitch) result (gyro_rad)
+    !+ Calculates mean gyro-radius
+    type(LocalEMFields), intent(in)          :: fields
+        !+ Electromagnetic fields at guiding center
+    real(Float64), intent(in)                :: energy
+        !+ Energy of particle
+    real(Float64), intent(in)                :: pitch
+        !+ Particle pitch w.r.t the magnetic field
+    real(Float64) :: gyro_rad
+        !+ Mean gyro-radius
+
+    real(Float64), dimension(3) :: vi_norm, r_step, r_step_tmp
+    real(Float64) :: vabs, phi
+    integer :: i,n
+
+    vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
+
+    r_step = 0.d0
+    n = 5
+    do i=1,n
+        phi = i*2*pi/n
+        call pitch_to_vec(pitch, phi, fields, vi_norm)
+        call gyro_step(vabs*vi_norm, fields, r_step_tmp)
+        r_step = r_step + r_step_tmp/n
+    enddo
+    gyro_rad = norm2(r_step)
+
+end function gyro_radius
 
 subroutine mc_fastion(ind,rp,vi,denf)
     !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:beam_grid]] index

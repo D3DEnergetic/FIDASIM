@@ -23,7 +23,7 @@ PRO run_tests,result_dir,test_case=test_case
                    einj:einj,pinj:pinj,current_fractions:current_fractions,$
                    ab:2.01410178d0,ai:2.0141078d0,impurity_charge:6,$
                    lambdamin:647.0d0,lambdamax:667.0d0,nlambda:2000,$
-                   n_fida:5000000L,n_npa:500000L,n_nbi:50000L, $
+                   n_fida:5000000L,n_npa:5000000L,n_nbi:50000L, $
                    n_halo:500000L,n_dcx:500000L,n_birth:10000L,$
                    ne_wght:50,np_wght:50,nphi_wght:100,emax_wght:100.0d0,$
                    nlambda_wght:1000,lambdamin_wght:647.d0,lambdamax_wght:667.d0,$

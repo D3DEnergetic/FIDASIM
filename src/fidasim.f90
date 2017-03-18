@@ -658,8 +658,6 @@ type NPAResults
         !+ Number of particles that hit a detector
     integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
-    integer(Int32) :: nloop = 1000
-        !+ Increases number of MC markers by factor of `nloop`
     integer(Int32) :: nenergy = 100
         !+ Number of energy values
     type(NPAParticle), dimension(:), allocatable  :: part
@@ -2439,7 +2437,7 @@ subroutine read_mc(fid, error)
     call h5ltread_dataset_int_scalar_f(fid, "/nparticle", npart, error)
     call h5ltread_dataset_int_scalar_f(fid, "/nclass", particles%nclass, error)
 
-    nrep = ceiling(dble(inputs%n_fida)/npart)
+    nrep = ceiling(dble(max(inputs%n_fida,inputs%n_npa))/npart)
     particles%nparticle = int(nrep*npart)
 
     !!ALLOCATE SPACE
@@ -7397,7 +7395,7 @@ subroutine npa_f
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
         !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,phi,gs,ir,dphi)
-        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k)*npa%nloop)
+        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k))
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
@@ -7428,7 +7426,7 @@ subroutine npa_f
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
-                    flux = (dphi/(2*pi))*sum(states)*beam_grid%dv/(nlaunch(i,j,k)*npa%nloop)
+                    flux = (dphi/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
                     call store_npa(det,ri,rf,vi,flux)
                 enddo gyro_range_loop
             enddo detector_loop

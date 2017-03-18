@@ -1508,8 +1508,8 @@ subroutine read_inputs
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,dump_dcx,no_flr
-    integer(Int32)     :: shot,n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
-    integer(Int32)     :: nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
+    integer(Int32)     :: n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
+    integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ai,ab,pinj,einj,current_fractions(3)
@@ -6804,7 +6804,7 @@ subroutine ndmc
                 !$OMP END CRITICAL(ndmc_birth)
             endif
         enddo energy_fractions
-        if (inputs%verbose.eq.2)then
+        if (inputs%verbose.ge.2)then
             cnt = cnt + 1
             WRITE(*,'(f7.2,"% completed",a,$)') 100*cnt/nlaunch,char(13)
         endif
@@ -6891,7 +6891,7 @@ subroutine bremsstrahlung
             enddo
         enddo
 
-        if (inputs%verbose.eq.2)then
+        if (inputs%verbose.ge.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') 100*ichan/real(spec_chords%nchan),char(13)
         endif
     enddo loop_over_channels
@@ -6984,7 +6984,7 @@ subroutine dcx
                 enddo loop_over_dcx
                 !$OMP END PARALLEL DO
                 ccnt=ccnt+1
-                if (inputs%verbose.eq.2)then
+                if (inputs%verbose.ge.2)then
                     WRITE(*,'(f7.2,"% completed",a,$)') ccnt*inv_ng,char(13)
                 endif
             enddo loop_along_x
@@ -7090,7 +7090,7 @@ subroutine halo
                         enddo loop_along_track
                     enddo loop_over_halos
                     ccnt=ccnt+1
-                    if (inputs%verbose.eq.2)then
+                    if (inputs%verbose.ge.2)then
                         WRITE(*,'(f7.2,"% completed",a,$)') ccnt*inv_ng,char(13)
                     endif
                 enddo loop_along_x
@@ -7221,7 +7221,7 @@ subroutine fida_f
         !$OMP END PARALLEL DO
         cnt=cnt+1
 
-        if (inputs%verbose.eq.2)then
+        if (inputs%verbose.ge.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
@@ -7323,31 +7323,24 @@ end subroutine fida_mc
 
 subroutine npa_f
     !+ Calculate NPA flux using a fast-ion distribution function F(E,p,r,z)
-    integer :: i,j,k  !! indices  x,y,z  of cells
+    integer :: i,j,k
     integer :: iion, det, ip
-    real(Float64), dimension(3) :: rg      !! guiding center position
-    real(Float64), dimension(3) :: ri      !! start position
-    real(Float64), dimension(3) :: rf      !! end position
-    real(Float64), dimension(3) :: vi      !! velocity of fast ions
-    real(Float64) :: denf                  !! fast-ion density
-    integer, dimension(3) :: ind      !! new actual cell
+    real(Float64), dimension(3) :: rg,ri,rf,vi
+    integer, dimension(3) :: ind
+    real(Float64) :: denf
     integer, dimension(3,beam_grid%ngrid) :: pcell
-
-    !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
     real(Float64), dimension(2,4) :: gyrange
     integer, dimension(4) :: neut_types=[1,2,3,4]
-    real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
-
-    !! Collisiional radiative model along track
-    real(Float64), dimension(nlevs) :: states  !! Density of n-states
-    real(Float64) :: flux, phi, dphi, eb, ptch !! flux
+    real(Float64), dimension(nlevs) :: prob
+    real(Float64), dimension(nlevs) :: states
+    real(Float64) :: flux, phi, dphi, eb, ptch
 
     integer :: inpa,pcnt,ichan,nrange,ir
     real(Float64) :: papprox_tot, maxcnt, cnt, inv_maxcnt
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch
 
     papprox=0.d0
     papprox_tot=0.d0
@@ -7364,11 +7357,7 @@ subroutine npa_f
                                 sum(neut%dens(:,halo_type,i,j,k)))* &
                                 plasma%denf
 
-                if((papprox(i,j,k).gt.0).and.(npa_chords%hit(i,j,k))) then
-                    !the only doing viewable cells is techically wrong
-                    !since a guiding center not in a viewable cell
-                    !can gyrostep into one but this is ridiculously faster
-                    !and should be fine most of the time
+                if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
                     pcnt = pcnt + 1
                 endif
@@ -7413,7 +7402,9 @@ subroutine npa_f
                     !! Check if particle hits a NPA detector
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
                     if(det.ne.ichan) then
-                        write(*,*) "NPA_F: Missed Detector ",ichan
+                        if (inputs%verbose.ge.0)then
+                            write(*,*) "NPA_F: Missed Detector ",ichan
+                        endif
                         cycle gyro_range_loop
                     endif
 
@@ -7433,7 +7424,7 @@ subroutine npa_f
         enddo loop_over_fast_ions
         !$OMP END PARALLEL DO
         cnt=cnt+1
-        if (inputs%verbose.eq.2)then
+        if (inputs%verbose.ge.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
@@ -7448,13 +7439,12 @@ subroutine npa_mc
     integer :: iion,iloop
     type(FastIon) :: fast_ion
     real(Float64) :: phi,dphi
-    real(Float64), dimension(3) :: ri, rf      !! positions
-    real(Float64), dimension(3) :: vi          !! velocity of fast ions
-    integer :: det,j,ichan,ir,nrange !! detector
+    real(Float64), dimension(3) :: ri, rf, rg, vi
+    integer :: det,j,ichan,ir,nrange
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
-    real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
-    real(Float64), dimension(nlevs) :: states  ! Density of n-states
+    real(Float64), dimension(nlevs) :: prob
+    real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux
     integer, dimension(4) :: neut_types=[1,2,3,4]
     integer, dimension(3) :: ind
@@ -7472,7 +7462,7 @@ subroutine npa_mc
 
     cnt=0.0
     !$OMP PARALLEL DO schedule(guided) private(iion,iloop,ind,fast_ion,vi,ri,rf,phi,s,c,ir, &
-    !$OMP& fields,randomu,uvw,uvw_vi,prob,states,flux,det,ichan,gs,nrange,gyrange,dphi)
+    !$OMP& rg,fields,randomu,uvw,uvw_vi,prob,states,flux,det,ichan,gs,nrange,gyrange,dphi)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
@@ -7488,12 +7478,12 @@ subroutine npa_mc
             uvw(2) = fast_ion%r*s
             uvw(3) = fast_ion%z
 
-            !! Convert to beam grid coordinates
-            call uvw_to_xyz(uvw, ri)
-
             if(inputs%dist_type.eq.2) then
+                !! Convert to beam grid coordinates
+                call uvw_to_xyz(uvw, rg)
+
                 !! Get electomagnetic fields
-                call get_fields(fields, pos=ri)
+                call get_fields(fields, pos=rg)
 
                 !! Correct for gyro motion and get position and velocity
                 call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, gs)
@@ -7510,9 +7500,14 @@ subroutine npa_mc
                         !! Check if particle hits a NPA detector
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
                         if(det.ne.ichan) then
-                            write(*,*) "NPA_MC: Missed Detector ",ichan
+                            if (inputs%verbose.ge.0)then
+                                write(*,*) "NPA_MC: Missed Detector ",ichan
+                            endif
                             cycle gyro_range_loop
                         endif
+
+                        !! Get beam grid indices
+                        call get_indices(ri,ind)
 
                         !! Calculate CX probability with beam and halo neutrals
                         call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
@@ -7528,6 +7523,9 @@ subroutine npa_mc
                     enddo gyro_range_loop
                 enddo detector_loop
             else !! Full Orbit
+                !! Convert to beam grid coordinates
+                call uvw_to_xyz(uvw, ri)
+
                 !! Calculate velocity vector
                 uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
                 uvw_vi(2) = s*fast_ion%vr + c*fast_ion%vt
@@ -7559,6 +7557,9 @@ subroutine npa_mc
         endif
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
+    endif
 
 end subroutine npa_mc
 
@@ -7865,7 +7866,7 @@ subroutine fida_weights_mc
         !$OMP END PARALLEL DO
         cnt=cnt+1
 
-        if(inputs%verbose.eq.2) then
+        if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
@@ -8178,7 +8179,9 @@ subroutine npa_weights
                         vi_norm = phit%dir
                         call hit_npa_detector(pos,vi_norm,det)
                         if (det.ne.ichan) then
-                            write(*,'(a)') 'NPA_WEIGHTS: Missed detector'
+                            if(inputs%verbose.ge.0) then
+                                write(*,'(a)') 'NPA_WEIGHTS: Missed detector'
+                            endif
                             cycle loop_along_x
                         endif
 
@@ -8223,7 +8226,7 @@ subroutine npa_weights
                         enddo loop_over_energy
                     endif
                     ccnt=ccnt+1
-                    if (inputs%verbose.eq.2)then
+                    if (inputs%verbose.ge.2)then
                         WRITE(*,'(f7.2,"% completed",a,$)') ccnt/real(beam_grid%ngrid)*100,char(13)
                     endif
                 enddo loop_along_x

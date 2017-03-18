@@ -7718,6 +7718,7 @@ subroutine npa_weights
                         if(.not.fields%in_plasma) cycle loop_along_x
 
                         !!Check if it hits a detector just to make sure
+                        dpos = phit%eff_rd
                         vi_norm = phit%dir
                         call hit_npa_detector(pos,vi_norm,det)
                         if (det.ne.ichan) then

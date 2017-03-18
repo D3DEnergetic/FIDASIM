@@ -849,17 +849,27 @@ type ParticleTrack
         !+ Midpoint of track in cell [cm]
 end type ParticleTrack
 
-type Hyperboloid
-    !+ Defines a hyperboloid (x-center)'*A*(x-center) = 1
+type GyroSurface
+    !+ Surface containing the fast-ion velocity vectors for all values of the
+    !+ gyro-angle. It takes the form of a hyperboloid 
+    !+ \((x(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(cos(\gamma + \pi/2) - \omega_i t sin(\gamma + \pi/2)) \)
+    !+ \((y(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(sin(\gamma + \pi/2) + \omega_i t cos(\gamma + \pi/2)) \)
+    !+ \((z(\gamma,t) = \alpha \omega_i \rm{pitch} t\)
+    !+ where \(\gamma\) is the gyro-angle, \(\omega_i\) is the ion
+    !+ gyro-frequency and \(\alpha = V/\omega_i \)
+    real(Float64) :: v = 0.d0
+        !+ Particle speed
+    real(Float64) :: omega = 0.d0
+        !+ Ion gyro-frequency
     real(Float64), dimension(3)   :: axes
         !+ Semi-axes of the hyperboloid, i.e. a, b, c coefficients
     real(Float64), dimension(3)   :: center = 0.d0
-        !+ Center of the hyperboloid
+        !+ Center of the gyrosurface
     real(Float64), dimension(3,3) :: A = 0.d0
         !+ Coefficients of quartic surface i.e. `basis*diagm(1/a^2,1/b^2,1/c^2)*basis'`
     real(Float64), dimension(3,3) :: basis = 0.d0
-        !+ Basis of coordinate system of hyperboloid
-end type Hyperboloid
+        !+ Basis of coordinate system of gyrosurface
+end type GyroSurface
 
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
@@ -4157,95 +4167,6 @@ subroutine line_plane_intersect(l0, l, p0, n, p, t)
 
 end subroutine line_plane_intersect
 
-subroutine line_hyperboloid_intersect(r0, v0, h, p, t)
-    !+ Calculates the first intersection of a line and a hyperboloid
-    real(Float64), dimension(3), intent(in)  :: r0
-        !+ Point on line
-    real(Float64), dimension(3), intent(in)  :: v0
-        !+ Ray of line
-    type(Hyperboloid), intent(in)            :: h
-        !+ Hyperboloid
-    real(Float64), dimension(3), intent(out) :: p
-        !+ Line-hyperboloid intersect point
-    real(Float64), intent(out)               :: t
-        !+ "time" to intersect
-
-    integer :: i
-    real(Float64), dimension(3) :: rr
-    real(Float64), dimension(2) :: tpm
-    real(Float64) :: a, b, c, d
-
-    rr = r0 - h%center
-    a = dot_product(v0, matmul(h%A,v0))
-    b = dot_product(rr, matmul(h%A,v0)) + dot_product(v0,matmul(h%A,rr))
-    c = dot_product(rr, matmul(h%A,rr)) - 1.0
-
-    d = b**2 - 4*a*c
-    if(d.lt.0.0) then
-        p = r0
-        t = 0.0
-        return
-    endif
-
-    tpm(1) = (-b + sqrt(d))/(2*a)
-    tpm(2) = (-b - sqrt(d))/(2*a)
-    i = minloc(abs(tpm),1)
-    t = tpm(i)
-    p = r0 + v0*t
-
-end subroutine line_hyperboloid_intersect
-
-subroutine hyperboloid_coordinates(h, p, u)
-    !+ Calculates the parametric coordinates, `u`, of point `p` on the hyperboloid
-    type(Hyperboloid), intent(in)            :: h
-        !+ Hyperboloid
-    real(Float64), dimension(3), intent(in)  :: p
-        !+ Point on hyperboloid
-    real(Float64), dimension(2), intent(out) :: u
-        !+ Parametric coordinates (theta, t)
-
-    real(Float64), dimension(3) :: pp
-    real(Float64) :: t, a, b, c, d, thm, thp, dp, dm, th
-    integer :: i
-
-    pp = matmul(transpose(h%basis),p - h%center)
-    t = pp(3)/h%axes(3)
-    a = h%axes(1) + h%axes(2)*t
-    b = h%axes(2) - h%axes(1)*t
-    c = max(min(d/sqrt(a**2 + b**2),1.d0),-1.d0)
-
-    thm = -acos(c) + atan2(b,a)
-    thp =  acos(c) + atan2(b,a)
-    dm = norm2([h%axes(1)*(cos(thm) - t*sin(thm)), &
-                h%axes(2)*(sin(thm) + t*cos(thm)), &
-                h%axes(3)*t ] - p)
-    dp = norm2([h%axes(1)*(cos(thp) - t*sin(thp)), &
-                h%axes(2)*(sin(thp) + t*cos(thp)), &
-                h%axes(3)*t ] - p)
-
-    th = thm
-    if(dp.le.dm) th = thp
-    if(th.lt.0.0) th = th + 2*pi
-
-    u = [th, t]
-
-end subroutine hyperboloid_coordinates
-
-function in_hyperboloid(h, p) result(in_h)
-    !+ Indicator function for determining if a point is inside the hyperboloid
-    type(Hyperboloid), intent(in)           :: h
-        !+ Hyperboloid
-    real(Float64), dimension(3), intent(in) :: p
-        !+ Point
-    logical :: in_h
-
-    real(Float64), dimension(3) :: pp
-
-    pp = p - h%center
-    in_h = dot_product(pp, matmul(h%A, p)).le.1.d0
-
-end function in_hyperboloid
-
 function in_boundary(bplane, p) result(in_b)
     !+ Indicator function for determining if a point on a plane is within the plane boundary
     type(BoundedPlane), intent(in)          :: bplane
@@ -4331,55 +4252,201 @@ subroutine boundary_edge(bplane, bedge, nb)
 
 end subroutine boundary_edge
 
-subroutine gyro_range(b, h, gyrange, nrange)
+subroutine gyro_surface(fields, energy, pitch, gs)
+    !+ Calculates the surface of all possible trajectories
+    type(LocalEMFields), intent(in) :: fields
+        !+ Electromagnetic fields at guiding center
+    real(Float64), intent(in)       :: energy
+        !+ Energy of particle
+    real(Float64), intent(in)       :: pitch
+        !+ Particle pitch w.r.t the magnetic field
+    type(GyroSurface), intent(out)  :: gs
+        !+ Gyro-surface
+
+    integer :: i
+    real(Float64) :: alpha, vabs, omega
+    real(Float64), dimension(3,3) :: s
+
+    vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
+    omega= (fields%b_abs*e0)/(inputs%ab*mass_u)
+    alpha = vabs/omega
+
+    gs%omega = omega
+    gs%v = vabs
+    gs%axes(1) = alpha*sqrt(1-pitch**2)
+    gs%axes(2) = alpha*sqrt(1-pitch**2)
+    gs%axes(3) = pitch*alpha
+
+    s = 0.d0
+    s(1,1) = gs%axes(1)**-2
+    s(2,2) = gs%axes(2)**-2
+    s(3,3) = -gs%axes(3)**-2
+
+    gs%center = fields%pos
+
+    gs%basis(:,1) = fields%a_norm
+    gs%basis(:,2) = fields%c_norm
+    gs%basis(:,3) = fields%b_norm
+
+    gs%A = matmul(gs%basis,matmul(s,transpose(gs%basis)))
+
+end subroutine gyro_surface
+
+subroutine line_gyro_surface_intersect(r0, v0, gs, t)
+    !+ Calculates the times of intersection of a line and a gyro-surface
+    real(Float64), dimension(3), intent(in)  :: r0
+        !+ Point on line
+    real(Float64), dimension(3), intent(in)  :: v0
+        !+ Direction of line
+    type(GyroSurface), intent(in)            :: gs
+        !+ Gyro-surface
+    real(Float64), dimension(2), intent(out) :: t
+        !+ "time" to intersect
+
+    real(Float64), dimension(3) :: rr
+    real(Float64) :: a, b, c, d, tp, tm
+
+    rr = r0 - gs%center
+    a = dot_product(v0, matmul(gs%A,v0))
+    b = dot_product(rr, matmul(gs%A,v0)) + dot_product(v0,matmul(gs%A,rr))
+    c = dot_product(rr, matmul(gs%A,rr)) - 1.0
+
+    d = b**2 - 4*a*c
+    if(d.lt.0.0) then
+        t = 0.0
+        return
+    endif
+
+    t(1) = (-b - sqrt(d))/(2*a)
+    t(2) = (-b + sqrt(d))/(2*a)
+    
+end subroutine line_gyro_surface_intersect
+
+subroutine gyro_surface_coordinates(gs, p, u)
+    !+ Calculates the parametric coordinates, `u`, of point `p` on the gyro_surface
+    type(GyroSurface), intent(in)            :: gs
+        !+ Gyro_surface
+    real(Float64), dimension(3), intent(in)  :: p
+        !+ Point on gyro_surface
+    real(Float64), dimension(2), intent(out) :: u
+        !+ Parametric coordinates (gyro-angle, t)
+
+    real(Float64), dimension(3) :: pp
+    real(Float64) :: t, a, b, c, d, thm, thp, dp, dm, th
+    integer :: i
+
+    pp = matmul(transpose(gs%basis),p - gs%center)
+    t = pp(3)/gs%axes(3)
+    a = gs%axes(1) + gs%axes(2)*t
+    b = gs%axes(2) - gs%axes(1)*t
+    d = pp(1) + pp(2)
+    c = max(min(d/sqrt(a**2 + b**2),1.d0),-1.d0)
+
+    thm = -acos(c) + atan2(b,a)
+    thp =  acos(c) + atan2(b,a)
+
+    dm = norm2([gs%axes(1)*(cos(thm) - t*sin(thm)), &
+                gs%axes(2)*(sin(thm) + t*cos(thm)), &
+                gs%axes(3)*t ] - pp)
+    dp = norm2([gs%axes(1)*(cos(thp) - t*sin(thp)), &
+                gs%axes(2)*(sin(thp) + t*cos(thp)), &
+                gs%axes(3)*t ] - pp)
+
+    th = thm - pi/2
+    if(dp.le.dm) th = thp - pi/2
+    if(th.lt.0.0) th = th + 2*pi
+    u = [th, t/gs%omega]
+
+end subroutine gyro_surface_coordinates
+
+subroutine gyro_trajectory(gs, theta, ri, vi)
+    !+ Calculate particle trajectory for a given gyro-angle and gyro-surface
+    type(GyroSurface), intent(in) :: gs
+        !+ Gyro-Surface
+    real(Float64), intent(in) :: theta
+        !+ Gyro-angle
+    real(Float64), dimension(3) :: ri
+        !+ Particle position
+    real(Float64), dimension(3) :: vi
+        !+ Particle Velocity
+
+    real(Float64) :: a,b,c,th
+    a = gs%axes(1)
+    b = gs%axes(2)
+    c = gs%axes(3)
+    th = theta + pi/2
+    ri = matmul(gs%basis, [a*cos(th), b*sin(th), 0.d0]) + gs%center
+    vi = gs%omega*matmul(gs%basis, [-a*sin(th), b*cos(th), c])
+
+end subroutine gyro_trajectory
+    
+function in_gyro_surface(gs, p) result(in_gs)
+    !+ Indicator function for determining if a point is inside the gyro_surface
+    type(GyroSurface), intent(in)           :: gs
+        !+ Gyro-surface
+    real(Float64), dimension(3), intent(in) :: p
+        !+ Point
+    logical :: in_gs
+
+    real(Float64), dimension(3) :: pp
+
+    pp = p - gs%center
+    in_gs = dot_product(pp, matmul(gs%A, pp)).le.1.d0
+
+end function in_gyro_surface
+
+subroutine gyro_range(b, gs, gyrange, nrange)
     !+ Calculates the range(s) of gyro-angles that would land within a bounded plane
     type(BoundedPlane), intent(in)             :: b
         !+ Bounded Plane
-    type(Hyperboloid), intent(in)              :: h
-        !+ Hyperboloid
+    type(GyroSurface), intent(in)              :: gs
+        !+ Gyro-surface
     real(Float64), dimension(2,4), intent(out) :: gyrange
         !+ (theta, dtheta) values
     integer, intent(out) :: nrange
         !+ Number of ranges. `1 <= nrange <= 4`
 
     integer :: nb, i, j, ninter
-    logical :: inb_cur, inb_pre, binh
+    logical :: in_gs, bin_gs
     logical, dimension(8) :: cross = .False.
-    real(Float64) :: t_p, t_i, t_h, th1, th2, dth
-    real(Float64), dimension(2) :: u_cur
+    real(Float64) :: t_p, th1, th2, dth
+    real(Float64), dimension(2) :: u_cur, t_i
     real(Float64), dimension(3) :: rc, p_pre, p_cur, v0, ri
     real(Float64), dimension(2,8) :: u
     real(Float64), dimension(3,50) :: bedge
 
     nrange = 0
-    call line_plane_intersect(h%center, h%basis(:,3), b%origin, b%basis(:,3), rc, t_p)
-    if(t_p.le.0.d0) return
+    call line_plane_intersect(gs%center, gs%basis(:,3), b%origin, b%basis(:,3), rc, t_p)
+    if(t_p.eq.0.0) return
 
     call boundary_edge(b, bedge, nb)
-    p_pre = bedge(:,nb)
-    inb_pre = in_hyperboloid(h, p_pre)
-    binh = .False.
+    p_pre = bedge(:,1)
+    in_gs = in_gyro_surface(gs, p_pre)
+    bin_gs = .False.
 
     ninter = 0
+    u = 0.d0
     boundary_loop: do i=1,nb
-        p_cur = bedge(:,i)
-        inb_cur = in_hyperboloid(h, p_cur)
-        if(inb_cur) binh = .True.
-        if(inb_cur.neqv.inb_pre) then
-            v0 = p_cur - p_pre
-            call line_hyperboloid_intersect(p_pre, v0, h, ri, t_i)
-            call hyperboloid_coordinates(h, ri, u_cur)
-            if(u_cur(2).gt.0.d0) then
-                ninter = ninter + 1
-                cross(ninter) = inb_cur
-                u(:,ninter) = u_cur
+        p_cur = bedge(:,modulo(i,nb)+1)
+        v0 = p_cur - p_pre
+        call line_gyro_surface_intersect(p_pre, v0, gs, t_i)
+        do j=1,2
+            if((t_i(j).gt.0.0).and.(t_i(j).lt.1.0)) then
+                ri = p_pre + t_i(j)*v0
+                call gyro_surface_coordinates(gs, ri, u_cur)
+                if(u_cur(2).gt.0.0) then
+                    in_gs = .not.in_gs
+                    ninter = ninter + 1
+                    cross(ninter) = in_gs
+                    u(:,ninter) = u_cur
+                endif
             endif
-        endif
-        inb_pre = inb_cur
+        enddo
         p_pre = p_cur
     enddo boundary_loop
 
-    if((ninter.eq.0).and.(.not.binh)) then
+    gyrange = 0.d0
+    if((ninter.eq.0).and.(.not.bin_gs)) then
         if(in_boundary(b, rc)) then
             nrange = 1
             gyrange(:,1) = [0.d0,2*pi]
@@ -4393,53 +4460,22 @@ subroutine gyro_range(b, h, gyrange, nrange)
             j = modulo(i,ninter) + 1
             th2 = u(1,j)
             dth = th2-th1
-            if(dth.le.0.0) then
-                dth = 2*pi + dth
-            endif
             nrange = nrange + 1
-            gyrange(:,nrange) = [th1, dth]
+            if(dth.gt.0.0) then
+                gyrange(:,nrange) = [th1, dth]
+            else
+                gyrange(:,nrange) = [th2, -dth]
+            endif
         endif
     enddo
 
 end subroutine gyro_range
 
-subroutine gyro_surface(fields, energy, pitch, hyper)
-    !+ Calculates the surface of all possible trajectories
-    type(LocalEMFields), intent(in)          :: fields
-        !+ Electromagnetic fields at guiding center
-    real(Float64), intent(in)                :: energy
-        !+ Energy of particle
-    real(Float64), intent(in)                :: pitch
-        !+ Particle pitch w.r.t the magnetic field
-    type(Hyperboloid), intent(out)           :: hyper
-        !+ Surface representing all possible trajectories i.e. a hyperboloid
-
-    integer :: i
-    real(Float64) :: radius, vabs
-    real(Float64), dimension(3,3) :: s
-
-    vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
-    radius = gyro_radius(fields, energy, pitch)
-    hyper%axes(1) = radius
-    hyper%axes(2) = radius
-    hyper%axes(3) = pitch*vabs
-    forall(i=1:3) s(i,i) = 1/(hyper%axes(i)**2)
-
-    hyper%center = fields%pos
-
-    hyper%basis(:,1) = fields%a_norm
-    hyper%basis(:,2) = fields%c_norm
-    hyper%basis(:,3) = fields%b_norm
-
-    hyper%A = matmul(hyper%basis,matmul(s,transpose(hyper%basis)))
-
-end subroutine gyro_surface
-
-subroutine npa_gyro_range(idet, traj_surf, gyrange, nrange)
+subroutine npa_gyro_range(ichan, gs, gyrange, nrange)
     !+ Calculates range of gyro-angles that would hit the NPA detector
-    integer, intent(in) :: idet
+    integer, intent(in) :: ichan
         !+ Index of NPA detector
-    type(Hyperboloid), intent(in) :: traj_surf
+    type(GyroSurface), intent(in) :: gs
     real(Float64), dimension(2,4), intent(out) :: gyrange
     integer, intent(out) :: nrange
 
@@ -4451,19 +4487,19 @@ subroutine npa_gyro_range(idet, traj_surf, gyrange, nrange)
     nrange = 0
     gyrange = 0.d0
 
-    call gyro_range(npa_chords%det(idet)%aperture, traj_surf, a_gyrange, a_nrange)
+    call gyro_range(npa_chords%det(ichan)%aperture, gs, a_gyrange, a_nrange)
     if(a_nrange.eq.0) return
 
-    call gyro_range(npa_chords%det(idet)%detector, traj_surf, d_gyrange, d_nrange)
+    call gyro_range(npa_chords%det(ichan)%detector, gs, d_gyrange, d_nrange)
     if(d_nrange.eq.0) return
 
-    if((a_nrange.eq.1).and.approx_eq(a_gyrange(2,1),2*pi,1d-3)) then
+    if((a_nrange.eq.1).and.approx_eq(a_gyrange(2,1),2*pi,1d-6)) then
         gyrange = d_gyrange
         nrange = d_nrange
         return
     endif
 
-    if((d_nrange.eq.1).and.approx_eq(d_gyrange(2,1),2*pi,1d-3)) then
+    if((d_nrange.eq.1).and.approx_eq(d_gyrange(2,1),2*pi,1d-6)) then
         gyrange = a_gyrange
         nrange = a_nrange
         return
@@ -4475,15 +4511,15 @@ subroutine npa_gyro_range(idet, traj_surf, gyrange, nrange)
             if(d_gyrange(1,j).gt.a_gyrange(1,i)) then
                 a0 = a_gyrange(1,i)
                 a = 0.d0
-                b = modulo(a_gyrange(2,i)-a0,2*pi)
-                c = modulo(d_gyrange(1,j)-a0,2*pi)
-                d = modulo(d_gyrange(2,j)-a0,2*pi)
+                b = modulo(a_gyrange(1,i) + a_gyrange(2,i) - a0, 2*pi)
+                c = modulo(d_gyrange(1,j) - a0, 2*pi)
+                d = modulo(d_gyrange(1,j) + d_gyrange(2,j) - a0, 2*pi)
             else
                 a0 = d_gyrange(1,j)
                 a = 0.d0
-                b = modulo(d_gyrange(2,j)-a0,2*pi)
-                c = modulo(a_gyrange(1,i)-a0,2*pi)
-                d = modulo(a_gyrange(2,i)-a0,2*pi)
+                b = modulo(d_gyrange(1,j) + d_gyrange(2,j) - a0, 2*pi)
+                c = modulo(a_gyrange(1,i) - a0, 2*pi)
+                d = modulo(a_gyrange(1,i) + a_gyrange(2,i) - a0, 2*pi)
             endif
             if((c.lt.b).or.(d.lt.c)) then
                 if(c.lt.d) then
@@ -4542,10 +4578,10 @@ subroutine hit_npa_detector(r0, v0, d_index, rd, det)
            in_boundary(npa_chords%det(i)%detector,d) .and. &
            (t_d.gt.0.0) ) then
             d_index = i
-            if(present(rd)) rd = d
             exit detector_loop
         endif
     enddo detector_loop
+    if(present(rd)) rd = d
 
 end subroutine hit_npa_detector
 
@@ -7302,7 +7338,7 @@ subroutine npa_f
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    type(Hyperboloid) :: traj_surf
+    type(GyroSurface) :: gs
     real(Float64), dimension(2,4) :: gyrange
     integer, dimension(4) :: neut_types=[1,2,3,4]
     real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
@@ -7311,7 +7347,7 @@ subroutine npa_f
     real(Float64), dimension(nlevs) :: states  !! Density of n-states
     real(Float64) :: flux, phi, dphi, eb, ptch !! flux
 
-    integer :: inpa,pcnt,idet,nrange,ir
+    integer :: inpa,pcnt,ichan,nrange,ir
     real(Float64) :: papprox_tot, maxcnt, cnt, inv_maxcnt
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
 
@@ -7330,7 +7366,7 @@ subroutine npa_f
                                 sum(neut%dens(:,halo_type,i,j,k)))* &
                                 plasma%denf
 
-                if(papprox(i,j,k).gt.0.and.(npa_chords%hit(i,j,k))) then
+                if(papprox(i,j,k).gt.0)then!.and.(npa_chords%hit(i,j,k))) then
                     !the only doing viewable cells is techically wrong
                     !since a guiding center not in a viewable cell
                     !can gyrostep into one but this is ridiculously faster
@@ -7359,30 +7395,67 @@ subroutine npa_f
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        !$OMP PARALLEL DO schedule(guided) private(iion,idet,fields,nrange,gyrange, &
-        !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,phi,traj_surf,ir)
+        !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
+        !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,phi,gs,ir,dphi)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k)*npa%nloop)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
 
-            call gyro_surface(fields, eb, ptch, traj_surf)
+            call gyro_surface(fields, eb, ptch, gs)
 
-            detector_loop: do idet=1,npa_chords%nchan
-                call npa_gyro_range(idet, traj_surf, gyrange, nrange)
+            detector_loop: do ichan=1,npa_chords%nchan
+                call npa_gyro_range(ichan, gs, gyrange, nrange)
                 if(nrange.eq.0) cycle detector_loop
-
                 gyro_range_loop: do ir=1,nrange
                     dphi = gyrange(2,ir)
                     phi = gyrange(1,ir) + 0.5*dphi
-                    call gyro_correction(fields, eb, ptch, ri, vi, phi_in=phi)
+                    call gyro_trajectory(gs, phi, ri, vi)
 
                     !! Check if particle hits a NPA detector
-                    call hit_npa_detector(ri, vi ,det, rf)
-                    if(det.ne.idet) then
-                        write(*,*) "NPA_F: uh oh"
-                        print*, det, idet
-                        stop
+                    call hit_npa_detector(ri, vi ,det, rf, ichan)
+                    if(det.ne.ichan) then
+                        write(*,*) "NPA_F: Missed Detector ",ichan
+                        print*, "ir=",ir
+                        print*, "ichan = ",ichan
+                        print*, "det = ", det
+                        call line_plane_intersect(ri,vi,npa_chords%det(ichan)%detector%origin, &
+                             npa_chords%det(i)%detector%basis(:,3),rf,phi)
+                                        print*,'det miss:',norm2(rf-npa_chords%det(ichan)%detector%origin)
+                        !! Find where trajectory crosses aperture plane
+                        call line_plane_intersect(ri,vi,npa_chords%det(ichan)%aperture%origin, &
+                             npa_chords%det(i)%aperture%basis(:,3),rf,phi)
+                        print*,'ape miss:',norm2(rf-npa_chords%det(ichan)%aperture%origin)
+                        print*,'center'
+                        print*,gs%center
+                        print*,'Axes'
+                        print*,gs%axes
+                        print*,'GS Basis'
+                        print*,gs%basis(:,1)
+                        print*,gs%basis(:,2)
+                        print*,gs%basis(:,3)
+                        print*,'detector origin'
+                        print*,npa_chords%det(ichan)%detector%origin
+                        print*,'aperture origin'
+                        print*,npa_chords%det(ichan)%aperture%origin
+                        print*,'Detector Basis'
+                        print*,npa_chords%det(ichan)%detector%basis(:,1)
+                        print*,npa_chords%det(ichan)%detector%basis(:,2)
+                        print*,npa_chords%det(ichan)%detector%basis(:,3)
+                        print*,'Aperture Basis'
+                        print*,npa_chords%det(ichan)%aperture%basis(:,1)
+                        print*,npa_chords%det(ichan)%aperture%basis(:,2)
+                        print*,npa_chords%det(ichan)%aperture%basis(:,3)
+                        print*,'nrange',nrange
+                        print*,"gyrange"
+                        print*,gyrange(:,1:nrange)
+                        print*,"phi=",phi
+                        print*,"ri= ",ri
+                        print*,"vi_norm =",vi/norm2(vi)
+                        print*, "eb=",eb
+                        print*, "ptch=",ptch
+                        print*, "ri = [",fields%pos(1),",",fields%pos(2),",",fields%pos(3),"]"
+                        cycle gyro_range_loop
                     endif
 
                     !! Calculate CX probability with beam and halo neutrals
@@ -7418,9 +7491,9 @@ subroutine npa_mc
     real(Float64) :: phi,dphi
     real(Float64), dimension(3) :: ri, rf      !! positions
     real(Float64), dimension(3) :: vi          !! velocity of fast ions
-    integer :: det,j,idet,ir,nrange !! detector
+    integer :: det,j,ichan,ir,nrange !! detector
     type(LocalEMFields) :: fields
-    type(Hyperboloid) :: traj_surf
+    type(GyroSurface) :: gs
     real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     real(Float64) :: flux
@@ -7440,7 +7513,7 @@ subroutine npa_mc
 
     cnt=0.0
     !$OMP PARALLEL DO schedule(guided) private(iion,iloop,ind,fast_ion,vi,ri,rf,phi,s,c,ir, &
-    !$OMP& fields,randomu,uvw,uvw_vi,prob,states,flux,det,idet,traj_surf,nrange,gyrange,dphi)
+    !$OMP& fields,randomu,uvw,uvw_vi,prob,states,flux,det,ichan,gs,nrange,gyrange,dphi)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
@@ -7464,24 +7537,22 @@ subroutine npa_mc
                 call get_fields(fields, pos=ri)
 
                 !! Correct for gyro motion and get position and velocity
-                call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, traj_surf)
+                call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, gs)
 
-                detector_loop: do idet=1,npa_chords%nchan
-                    call npa_gyro_range(idet, traj_surf, gyrange, nrange)
+                detector_loop: do ichan=1,npa_chords%nchan
+                    call npa_gyro_range(ichan, gs, gyrange, nrange)
                     if(nrange.eq.0) cycle detector_loop
 
                     gyro_range_loop: do ir=1,nrange
                         dphi = gyrange(2,ir)
                         phi = gyrange(1,ir) + 0.5*dphi
-                        call gyro_correction(fields, fast_ion%energy, &
-                                             fast_ion%pitch, ri, vi, phi_in=phi)
+                        call gyro_trajectory(gs, phi, ri, vi)
 
                         !! Check if particle hits a NPA detector
-                        call hit_npa_detector(ri, vi ,det, rf)
-                        if(det.ne.idet) then
-                            write(*,*) "NPA_MC: uh oh"
-                            print*, det, idet
-                            stop
+                        call hit_npa_detector(ri, vi ,det, rf, det=ichan)
+                        if(det.ne.ichan) then
+                            write(*,*) "NPA_MC: Missed Detector ",ichan
+                            cycle gyro_range_loop
                         endif
 
                         !! Calculate CX probability with beam and halo neutrals

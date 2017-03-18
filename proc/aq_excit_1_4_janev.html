@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1133,15 +1139,15 @@ the \(n=1\) state to the \(m=4\) state due to a collision an ion with charge <co
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.3730</span><span class="n">d0</span><span class="p">,</span> <span class="mi">6</span><span class="mf">0.710</span><span class="n">d0</span><span class="p">,</span>  <span class="p">&amp;</span>
-                                                   <span class="mi">3</span><span class="mf">1.797</span><span class="n">d0</span><span class="p">,</span> <span class="mf">2.0207</span><span class="n">d</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                   <span class="mf">0.082513</span><span class="n">d0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.3055</span><span class="n">d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.3730d0</span><span class="p">,</span> <span class="mi">6</span><span class="mf">0.710d0</span><span class="p">,</span>  <span class="p">&amp;</span>
+                                                   <span class="mi">3</span><span class="mf">1.797d0</span><span class="p">,</span> <span class="mf">2.0207d-4</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                   <span class="mf">0.082513d0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.3055d0</span> <span class="p">]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">Etil</span><span class="p">,</span> <span class="n">xsi</span><span class="p">,</span> <span class="n">qf</span>
 
     <span class="n">qf</span> <span class="o">=</span> <span class="kt">real</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
     <span class="n">etil</span> <span class="o">=</span> <span class="n">eb</span><span class="o">/</span><span class="n">qf</span>
     <span class="n">xsi</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">**</span><span class="p">(</span><span class="mf">0.5238</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="o">/</span><span class="n">qf</span><span class="p">)))</span>
-    <span class="n">sigma</span> <span class="o">=</span> <span class="n">qf</span><span class="o">*</span><span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">16</span><span class="o">*</span><span class="n">xsi</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">etil</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">etil</span><span class="p">)</span><span class="o">/</span><span class="n">etil</span> <span class="p">&amp;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">qf</span><span class="o">*</span><span class="mf">1.d-16</span><span class="o">*</span><span class="n">xsi</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">etil</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">etil</span><span class="p">)</span><span class="o">/</span><span class="n">etil</span> <span class="p">&amp;</span>
           <span class="o">+</span> <span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="o">-</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">etil</span><span class="p">)</span><span class="o">/</span><span class="n">etil</span><span class="o">**</span><span class="n">A</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
 
 <span class="k">end function </span><span class="n">Aq_excit_1_4_janev</span>
@@ -1374,6 +1380,8 @@ the \(n=1\) state to the \(m=4\) state due to a collision an ion with charge <co
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1701,6 +1709,8 @@ the \(n=1\) state to the \(m=4\) state due to a collision an ion with charge <co
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1718,6 +1728,8 @@ the \(n=1\) state to the \(m=4\) state due to a collision an ion with charge <co
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

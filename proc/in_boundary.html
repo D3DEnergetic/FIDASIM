@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.3% of total for procedures.">24 statements</a>
+	  title=" 0.3% of total for procedures.">26 statements</a>
      </li> 
      
      
@@ -410,6 +410,8 @@
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1144,8 +1150,10 @@ public function in_boundary(bplane, p) result(in_b)
 <span class="k">                </span><span class="n">in_b</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
             <span class="n">endif</span>
         <span class="k">CASE </span><span class="n">DEFAULT</span>
-            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;IN_BOUNDARY: Unknown boundary shape: &quot;,i2)&#39;</span><span class="p">),</span><span class="n">bplane</span><span class="p">%</span><span class="nb">shape</span>
-<span class="nb">            </span><span class="k">stop</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;IN_BOUNDARY: Unknown boundary shape: &quot;,i2)&#39;</span><span class="p">),</span><span class="n">bplane</span><span class="p">%</span><span class="nb">shape</span>
+<span class="nb">            </span><span class="n">endif</span>
+            <span class="k">stop</span>
 <span class="k">    END SELECT</span>
 
 <span class="k">end function </span><span class="n">in_boundary</span>
@@ -1378,6 +1386,8 @@ public function in_boundary(bplane, p) result(in_b)
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1705,6 +1715,8 @@ public function in_boundary(bplane, p) result(in_b)
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1722,6 +1734,8 @@ public function in_boundary(bplane, p) result(in_b)
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

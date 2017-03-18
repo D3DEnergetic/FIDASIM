@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 1.6% of total for procedures.">148 statements</a>
+	  title=" 1.7% of total for procedures.">158 statements</a>
      </li> 
      
      
@@ -410,6 +410,8 @@
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1124,7 +1130,7 @@ public subroutine read_inputs()
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Shot settings ----&quot;</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Shot: &quot;,i8)&#39;</span><span class="p">)</span> <span class="n">inputs</span><span class="p">%</span><span class="n">shot_number</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Time: &quot;,i4,&quot; [ms]&quot;)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="nb">time</span><span class="o">*</span><span class="mf">1.</span><span class="n">d3</span><span class="p">)</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Time: &quot;,i4,&quot; [ms]&quot;)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="nb">time</span><span class="o">*</span><span class="mf">1.d3</span><span class="p">)</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Runid: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">runid</span><span class="p">))</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Input files ----&quot;</span>
@@ -1138,8 +1144,10 @@ public subroutine read_inputs()
 <span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Tables file: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">tables_file</span><span class="p">)</span>
         <span class="n">endif</span>
     <span class="k">else</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Tables file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
-                         <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">tables_file</span><span class="p">)</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Tables file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">tables_file</span><span class="p">)</span>
+        <span class="n">endif</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
     <span class="n">endif</span>
 
@@ -1149,8 +1157,10 @@ public subroutine read_inputs()
 <span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Geometry file: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">geometry_file</span><span class="p">)</span>
         <span class="n">endif</span>
     <span class="k">else</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Geometry file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
-                         <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">geometry_file</span><span class="p">)</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Geometry file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">geometry_file</span><span class="p">)</span>
+        <span class="n">endif</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
     <span class="n">endif</span>
 
@@ -1160,8 +1170,10 @@ public subroutine read_inputs()
 <span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Equilibrium file: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">equilibrium_file</span><span class="p">)</span>
         <span class="n">endif</span>
     <span class="k">else</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Equilibrium file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
-                         <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">equilibrium_file</span><span class="p">)</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Equilibrium file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
+                              <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">equilibrium_file</span><span class="p">)</span>
+        <span class="n">endif</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
     <span class="n">endif</span>
 
@@ -1171,16 +1183,20 @@ public subroutine read_inputs()
 <span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Distribution file: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">distribution_file</span><span class="p">)</span>
         <span class="n">endif</span>
     <span class="k">else</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Distribution file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
-                         <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">distribution_file</span><span class="p">)</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Distribution file does not exist: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="nb">trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">distribution_file</span><span class="p">)</span>
+        <span class="n">endif</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
     <span class="n">endif</span>
 
     <span class="n">pathlen</span> <span class="o">=</span> <span class="nb">len_trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">result_dir</span><span class="p">)</span><span class="o">+</span><span class="nb">len_trim</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">runid</span><span class="p">)</span> <span class="o">+</span> <span class="mi">20</span>
     <span class="c">!+20 for suffixes and seperators e.g. /, _npa.h5, ...</span>
     <span class="k">if</span><span class="p">(</span><span class="n">pathlen</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">charlim</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,i3,a,i3)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Result directory path + runID use too many characters: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
-                               <span class="n">pathlen</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="n">charlim</span><span class="o">-</span><span class="mi">20</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,i3,a,i3)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Result directory path + runID use too many characters: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
+                                   <span class="n">pathlen</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="n">charlim</span><span class="o">-</span><span class="mi">20</span>
+        <span class="n">endif</span>
         <span class="n">error</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
     <span class="n">endif</span>
 
@@ -1422,6 +1438,8 @@ public subroutine read_inputs()
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1749,6 +1767,8 @@ public subroutine read_inputs()
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1766,6 +1786,8 @@ public subroutine read_inputs()
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

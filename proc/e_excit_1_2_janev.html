@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1116,37 +1122,37 @@ the \(n=1\) state to the \(m=2\) state at energy <code>eb</code></p>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">sigma0</span><span class="o">=</span><span class="mf">5.984</span><span class="n">d0</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">deltaE</span><span class="o">=</span><span class="mi">1</span><span class="mf">0.2</span><span class="n">d0</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.228</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">sigma0</span><span class="o">=</span><span class="mf">5.984d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">deltaE</span><span class="o">=</span><span class="mi">1</span><span class="mf">0.2d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a</span><span class="o">=</span><span class="mf">0.228d0</span>
         <span class="c">!+ Fitting parameter from Table 2 in Ref. 2</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.1865</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">b</span><span class="o">=</span><span class="mf">0.1865d0</span>
         <span class="c">!+ Fitting paramter from Table 2 in Ref. 2</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.5025</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">c</span><span class="o">=</span><span class="mf">0.5025d0</span>
         <span class="c">!+ Fitting paramter from Table 2 in Ref. 2</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">An</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">4.4979</span><span class="n">d0</span><span class="p">,</span> <span class="mf">1.4182</span><span class="n">d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="o">-</span><span class="mi">2</span><span class="mf">0.877</span><span class="n">d0</span><span class="p">,</span> <span class="mi">4</span><span class="mf">9.735</span><span class="n">d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                    <span class="o">-</span><span class="mi">4</span><span class="mf">6.249</span><span class="n">d0</span><span class="p">,</span> <span class="mi">1</span><span class="mf">7.442</span><span class="n">d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">An</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">4.4979d0</span><span class="p">,</span> <span class="mf">1.4182d0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mi">2</span><span class="mf">0.877d0</span><span class="p">,</span> <span class="mi">4</span><span class="mf">9.735d0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mi">4</span><span class="mf">6.249d0</span><span class="p">,</span> <span class="mi">1</span><span class="mf">7.442d0</span> <span class="p">]</span>
         <span class="c">!+ Fitting parameters from Table 2 in Ref. 2</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ecoll</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">s</span>
 
-    <span class="n">ecoll</span> <span class="o">=</span> <span class="n">eb</span><span class="o">*</span><span class="mf">1.</span><span class="n">d3</span>
+    <span class="n">ecoll</span> <span class="o">=</span> <span class="n">eb</span><span class="o">*</span><span class="mf">1.d3</span>
     <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">ecoll</span><span class="p">)</span><span class="o">/</span><span class="n">deltaE</span>
 
     <span class="k">if</span><span class="p">((</span><span class="n">ecoll</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">1</span><span class="mf">0.2</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">ecoll</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mi">1</span><span class="mf">1.56</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">16</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="p">(</span><span class="n">ecoll</span> <span class="o">-</span> <span class="n">deltaE</span><span class="p">))</span>
+<span class="k">        </span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.d-16</span> <span class="o">*</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="p">(</span><span class="n">ecoll</span> <span class="o">-</span> <span class="n">deltaE</span><span class="p">))</span>
         <span class="k">return</span>
 <span class="k">    </span><span class="n">endif</span>
 
     <span class="k">if</span><span class="p">((</span><span class="n">ecoll</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="mf">1.56</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">ecoll</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mi">1</span><span class="mf">2.23</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">16</span> <span class="o">*</span> <span class="n">c</span>
+<span class="k">        </span><span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.d-16</span> <span class="o">*</span> <span class="n">c</span>
         <span class="k">return</span>
 <span class="k">    </span><span class="n">endif</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">ecoll</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="mf">2.23</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">s</span> <span class="o">=</span> <span class="n">An</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">An</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="n">x</span> <span class="o">+</span> <span class="n">An</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">/</span><span class="n">x</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="n">An</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">/</span><span class="n">x</span><span class="o">**</span><span class="mf">3.0</span> <span class="o">+</span> <span class="n">An</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">/</span><span class="n">x</span><span class="o">**</span><span class="mf">4.0</span>
-        <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.</span><span class="n">d</span><span class="o">-</span><span class="mi">16</span> <span class="o">*</span> <span class="n">sigma0</span><span class="o">/</span><span class="p">(</span><span class="n">deltaE</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">An</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="mf">1.d-16</span> <span class="o">*</span> <span class="n">sigma0</span><span class="o">/</span><span class="p">(</span><span class="n">deltaE</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">An</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">s</span><span class="p">)</span>
         <span class="k">return</span>
 <span class="k">    </span><span class="n">endif</span>
 
@@ -1385,6 +1391,8 @@ the \(n=1\) state to the \(m=2\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1712,6 +1720,8 @@ the \(n=1\) state to the \(m=2\) state at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1729,6 +1739,8 @@ the \(n=1\) state to the \(m=2\) state at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

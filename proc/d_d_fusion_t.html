@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -411,6 +411,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
+      
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
@@ -737,6 +739,8 @@
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -754,6 +758,8 @@
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
@@ -1061,11 +1067,11 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="mf">6.097</span><span class="n">d0</span><span class="p">,</span> <span class="mi">37</span><span class="mf">2.0</span><span class="n">d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                   <span class="mf">4.36</span><span class="n">d</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="mf">1.22</span><span class="n">d0</span><span class="p">,</span>   <span class="p">&amp;</span>
-                                                   <span class="mf">0.</span><span class="n">d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="mf">6.097d0</span><span class="p">,</span> <span class="mi">37</span><span class="mf">2.0d0</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                   <span class="mf">4.36d-4</span><span class="p">,</span> <span class="mf">1.22d0</span><span class="p">,</span>   <span class="p">&amp;</span>
+                                                   <span class="mf">0.d0</span> <span class="p">]</span>
 
-    <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="n">d</span><span class="o">-</span><span class="mi">24</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)))</span> <span class="o">/</span> <span class="p">&amp;</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0d-24</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)))</span> <span class="o">/</span> <span class="p">&amp;</span>
             <span class="p">(</span><span class="n">eb</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">eb</span><span class="p">))</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
 
 <span class="k">end function </span><span class="n">d_d_fusion_t</span>
@@ -1298,6 +1304,8 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       <a class="list-group-item" href="../proc/get_position.html">get_position</a>
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
+      
+      <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
       
@@ -1625,6 +1633,8 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       
       <a class="list-group-item" href="../proc/sp_multiply.html">sp_multiply</a>
       
+      <a class="list-group-item" href="../interface/sparse.html">sparse</a>
+      
       <a class="list-group-item" href="../proc/spectrum.html">spectrum</a>
       
       <a class="list-group-item" href="../proc/store_bes_photons.html">store_bes_photons</a>
@@ -1642,6 +1652,8 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       <a class="list-group-item" href="../proc/store_neutrons.html">store_neutrons</a>
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
+      
+      <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       

@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.0</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 3.3% of total for derived types.</p>Including implementation: 12 statements,  3.3% of total for derived types.">12 statements</a>
+	  title="<p> 3.2% of total for derived types.</p>Including implementation: 12 statements,  3.2% of total for derived types.">12 statements</a>
      </li> 
      
      
@@ -264,6 +264,10 @@
       
       <a class="list-group-item" href="../type/localprofiles.html">LocalProfiles</a>
       
+      <a class="list-group-item" href="../type/loselement.html">LOSElement</a>
+      
+      <a class="list-group-item" href="../type/losinters.html">LOSInters</a>
+      
       <a class="list-group-item" href="../type/neutralbeam.html">NeutralBeam</a>
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
@@ -291,6 +295,8 @@
       <a class="list-group-item" href="../type/rng_type.html">rng_type</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html">SimulationInputs</a>
+      
+      <a class="list-group-item" href="../type/sparsearray.html">SparseArray</a>
       
       <a class="list-group-item" href="../type/spectra.html">Spectra</a>
       
@@ -639,25 +645,25 @@
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">Profiles</span>
     <span class="c">!+ Torodial symmetric plasma parameters at a given R-Z</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dene</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dene</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Electron density [\(cm^{-3}\)]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denp</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denp</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Ion density [\(cm^{-3}\)]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denimp</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denimp</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Impurity density [\(cm^{-3}\)]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denf</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denf</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Fast-ion density [\(cm^{-3}\)]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">te</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">te</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Electron temperature [kev]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ti</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ti</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Ion temperature [kev]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zeff</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zeff</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Effective Nuclear Charge</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vr</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vr</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Plasma rotation in radial direction</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vt</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vt</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Plasma rotation in torodial/phi direction</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Plasma rotation in z direction</span>
 <span class="k">end type </span><span class="n">Profiles</span>
 </pre></div>
@@ -713,6 +719,10 @@
       
       <a class="list-group-item" href="../type/localprofiles.html">LocalProfiles</a>
       
+      <a class="list-group-item" href="../type/loselement.html">LOSElement</a>
+      
+      <a class="list-group-item" href="../type/losinters.html">LOSInters</a>
+      
       <a class="list-group-item" href="../type/neutralbeam.html">NeutralBeam</a>
       
       <a class="list-group-item" href="../type/neutraldensity.html">NeutralDensity</a>
@@ -740,6 +750,8 @@
       <a class="list-group-item" href="../type/rng_type.html">rng_type</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html">SimulationInputs</a>
+      
+      <a class="list-group-item" href="../type/sparsearray.html">SparseArray</a>
       
       <a class="list-group-item" href="../type/spectra.html">Spectra</a>
       

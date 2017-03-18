@@ -5,7 +5,7 @@ USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_extra !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, matinv
-USE parallel_rng
+USE utilities
 
 implicit none
 
@@ -548,18 +548,32 @@ type LineOfSight
         !+ Optical axis in beam grid coordinates
 end type LineOfSight
 
+type LOSElement
+    !+ Defines a element of a line of sight and cell intersection
+    integer :: id
+        !+ Line of sight index
+    real(Float64) :: length
+        !+ Length of crossing
+end type LOSElement
+
+type LOSInters
+    !+ Defines the channels that intersect a cell
+    integer :: nchan = 0
+        !+ Number of channels that intersect
+    type(LOSElement), dimension(:), allocatable :: los_elem
+        !+ Array of crossing
+end type LOSInters
+
 type SpectralChords
     !+ Defines an spectral diagnostic system
     integer :: nchan = 0
         !+ Number of channels
-    type(LineOfSight), dimension(:), allocatable   :: los
+    type(LineOfSight), dimension(:), allocatable :: los
         !+ Line of sight array
-    real(Float64), dimension(:), allocatable       :: radius
+    real(Float64), dimension(:), allocatable     :: radius
         !+ Radius of each line of sight
-    logical, dimension(:,:,:), allocatable         :: los_inter
-        !+ Indicates whether a [[libfida:beam_grid]] cell intersects a LOS
-    real(Float32), dimension(:,:,:,:), allocatable :: dlength
-        !+ [[libfida:beam_grid]] cell - LOS intersection length: dlength(x,y,z,chan)
+    type(LOSInters), dimension(:,:,:), allocatable :: inter
+        !+ Array of LOS intersections with [[libfida:beam_grid]]
 end type SpectralChords
 
 type BoundedPlane
@@ -780,7 +794,7 @@ type SimulationInputs
     integer(Int32) :: dump_dcx
         !+ Output DCX density and spectra: 0 = off, 1=on
     integer(Int32) :: verbose
-        !+ Verbosity: 0 = off, 1=on, 2=on++
+        !+ Verbosity: <0 = off++, 0 = off, 1=on, 2=on++
 
     !! Neutral Beam Settings
     real(Float64)    :: ab
@@ -1608,8 +1622,10 @@ subroutine read_inputs
             write(*,'(T2,"Tables file: ",a)') trim(inputs%tables_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Tables file does not exist: ', &
-                         trim(inputs%tables_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Tables file does not exist: ', &
+                             trim(inputs%tables_file)
+        endif
         error = .True.
     endif
 
@@ -1619,8 +1635,10 @@ subroutine read_inputs
             write(*,'(T2,"Geometry file: ",a)') trim(inputs%geometry_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Geometry file does not exist: ', &
-                         trim(inputs%geometry_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Geometry file does not exist: ', &
+                             trim(inputs%geometry_file)
+        endif
         error = .True.
     endif
 
@@ -1630,8 +1648,10 @@ subroutine read_inputs
             write(*,'(T2,"Equilibrium file: ",a)') trim(inputs%equilibrium_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Equilibrium file does not exist: ', &
-                         trim(inputs%equilibrium_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Equilibrium file does not exist: ', &
+                              trim(inputs%equilibrium_file)
+        endif
         error = .True.
     endif
 
@@ -1641,16 +1661,20 @@ subroutine read_inputs
             write(*,'(T2,"Distribution file: ",a)') trim(inputs%distribution_file)
         endif
     else
-        write(*,'(a,a)') 'READ_INPUTS: Distribution file does not exist: ', &
-                         trim(inputs%distribution_file)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_INPUTS: Distribution file does not exist: ', &
+                             trim(inputs%distribution_file)
+        endif
         error = .True.
     endif
 
     pathlen = len_trim(inputs%result_dir)+len_trim(inputs%runid) + 20
     !+20 for suffixes and seperators e.g. /, _npa.h5, ...
     if(pathlen.gt.charlim) then
-        write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', &
-                               pathlen-20,'>', charlim-20
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,i3,a,i3)') 'READ_INPUTS: Result directory path + runID use too many characters: ', &
+                                   pathlen-20,'>', charlim-20
+        endif
         error = .True.
     endif
 
@@ -1817,7 +1841,9 @@ subroutine read_chords
 
     real(Float64), dimension(:,:), allocatable :: lenses
     real(Float64), dimension(:,:), allocatable :: axes
+    real(Float64), dimension(:,:,:), allocatable :: dlength
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
+    type(LOSElement), dimension(:), allocatable :: los_elem
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
@@ -1826,7 +1852,7 @@ subroutine read_chords
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
 
-    integer :: i, j, ic, nc, ncell, ind(3)
+    integer :: i, j, ic, nc, ncell, ind(3), ii, jj, kk
     integer :: error
 
     if(inputs%verbose.ge.1) then
@@ -1841,8 +1867,10 @@ subroutine read_chords
     !!Check if SPEC group exists
     call h5ltpath_valid_f(fid, "/spec", .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
-        write(*,'(a)') 'Continuing without spectral diagnostics'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without spectral diagnostics'
+        endif
         inputs%calc_spec = 0
         inputs%calc_fida = 0
         inputs%calc_bes = 0
@@ -1865,12 +1893,9 @@ subroutine read_chords
     allocate(sigma_pi(spec_chords%nchan))
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
-    allocate(spec_chords%dlength(spec_chords%nchan, &
-                                 beam_grid%nx, &
-                                 beam_grid%ny, &
-                                 beam_grid%nz) )
-
-    spec_chords%dlength = 0.d0
+    allocate(dlength(beam_grid%nx, &
+                     beam_grid%ny, &
+                     beam_grid%nz) )
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -1903,7 +1928,9 @@ subroutine read_chords
 
         call grid_intersect(r0,v0,length,r_enter,r_exit)
         if(length.le.0.d0) then
-            WRITE(*,'("Channel ",i3," missed the beam grid")'),i
+            if(inputs%verbose.ge.0) then
+                WRITE(*,'("Channel ",i5," missed the beam grid")'),i
+            endif
             cycle chan_loop
         endif
 
@@ -1913,6 +1940,7 @@ subroutine read_chords
             nc = 100
         endif
 
+        dlength = 0.d0
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
         !$OMP& length, r_enter, r_exit, j, tracks, ncell, ind)
         do ic=1,nc
@@ -1931,13 +1959,32 @@ subroutine read_chords
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
-                spec_chords%dlength(i,ind(1),ind(2),ind(3)) = &
-                spec_chords%dlength(i,ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                spec_chords%los_inter(ind(1),ind(2),ind(3)) = .True.
+                dlength(ind(1),ind(2),ind(3)) = &
+                dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
                 !$OMP END CRITICAL(read_chords_1)
             enddo track_loop
         enddo
         !$OMP END PARALLEL DO
+        do kk=1,beam_grid%nz
+            do jj=1,beam_grid%ny
+                xloop: do ii=1, beam_grid%nx
+                    if(dlength(ii,jj,kk).ne.0.d0) then
+                        nc = spec_chords%inter(ii,jj,kk)%nchan + 1
+                        if(nc.eq.1) then
+                            allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
+                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dlength(ii,jj,kk))
+                        else
+                            allocate(los_elem(nc))
+                            los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
+                            los_elem(nc) = LOSElement(i, dlength(ii,jj,kk))
+                            deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
+                            call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
+                        endif
+                        spec_chords%inter(ii,jj,kk)%nchan = nc
+                    endif
+                enddo xloop
+            enddo
+        enddo
     enddo chan_loop
 
     if(inputs%verbose.ge.1) then
@@ -1981,8 +2028,10 @@ subroutine read_npa
     !!Check if NPA group exists
     call h5ltpath_valid_f(fid, "/npa", .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a)') 'NPA geometry is not in the geometry file'
-        write(*,'(a)') 'Continuing without NPA diagnostics'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'NPA geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without NPA diagnostics'
+        endif
         inputs%calc_npa = 0
         inputs%calc_npa_wght = 0
         call h5fclose_f(fid, error)
@@ -2136,7 +2185,9 @@ subroutine read_npa
 
         total_prob = sum(npa_chords%phit(:,:,:,ichan)%p)
         if(total_prob.le.0.d0) then
-            WRITE(*,'("Channel ",i3," missed the beam grid")'),ichan
+            if(inputs%verbose.ge.0) then
+                WRITE(*,'("Channel ",i3," missed the beam grid")'),ichan
+            endif
             cycle chan_loop
         endif
 
@@ -2286,7 +2337,9 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
 
     if((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)) then
-        write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
+        endif
         stop
     endif
 
@@ -2384,7 +2437,9 @@ subroutine read_mc(fid, error)
     call h5ltread_dataset_int_f(fid, "/class", orbit_class, dims, error)
 
     if(any(orbit_class.gt.particles%nclass)) then
-        write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
+        endif
         stop
     endif
 
@@ -2475,7 +2530,9 @@ subroutine read_mc(fid, error)
 
     num = count(particles%fast_ion%cross_grid)
     if(num.le.0) then
-        write(*,'(a)') 'READ_MC: No mc particles in beam grid'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_MC: No mc particles in beam grid'
+        endif
         stop
     endif
 
@@ -2534,7 +2591,9 @@ subroutine read_atomic_cross(fid, grp, cross)
 
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
+        endif
         stop
     endif
 
@@ -2594,7 +2653,9 @@ subroutine read_atomic_rates(fid, grp, b_amu, t_amu, rates)
 
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a,a)') 'READ_ATOMIC_RATES: Unknown atomic interaction: ', trim(grp)
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_ATOMIC_RATES: Unknown atomic interaction: ', trim(grp)
+        endif
         stop
     endif
 
@@ -2769,8 +2830,10 @@ subroutine read_nuclear_rates(fid, grp, rates)
 
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
-        write(*,'(a,a)') 'READ_NUCLEAR_RATES: Unknown nuclear interaction: ', trim(grp)
-        write(*,'(a)') 'Continuing without neutron calculation'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_NUCLEAR_RATES: Unknown nuclear interaction: ', trim(grp)
+            write(*,'(a)') 'Continuing without neutron calculation'
+        endif
         inputs%calc_neutron=0
         return
     endif
@@ -2797,13 +2860,17 @@ subroutine read_nuclear_rates(fid, grp, rates)
     call h5ltread_dataset_double_f(fid, grp//"/bt_amu", rates%bt_amu, dim1, error)
 
     if(abs(inputs%ab-rates%bt_amu(1)).gt.0.2) then
-        write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
-            rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
+                rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
+        endif
     endif
 
     if(abs(inputs%ai-rates%bt_amu(2)).gt.0.2) then
-        write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
-            rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
+                 rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
+        endif
     endif
 
     dim3 = [rates%nenergy, rates%ntemp, rates%nbranch]
@@ -3872,10 +3939,14 @@ subroutine read_neutrals
 
     inquire(file=inputs%neutrals_file,exist=exis)
     if(exis) then
-        write(*,'(T2,"Neutrals file: ",a)') trim(inputs%neutrals_file)
-        write(*,*) ''
+        if(inputs%verbose.ge.1) then
+            write(*,'(T2,"Neutrals file: ",a)') trim(inputs%neutrals_file)
+            write(*,*) ''
+        endif
     else
-        write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
+        endif
         stop
     endif
 
@@ -3894,7 +3965,9 @@ subroutine read_neutrals
     if((nx.ne.beam_grid%nx).or. &
        (ny.ne.beam_grid%ny).or. &
        (nz.ne.beam_grid%nz)) then
-        write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
+        endif
         stop
     endif
 
@@ -4104,7 +4177,9 @@ function in_boundary(bplane, p) result(in_b)
                 in_b = .True.
             endif
         CASE DEFAULT
-            write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
+            if(inputs%verbose.ge.0) then
+                write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
+            endif
             stop
     END SELECT
 
@@ -4512,7 +4587,8 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
     track_loop: do i=1,beam_grid%ntrack
         if(cc.gt.beam_grid%ntrack) exit track_loop
 
-        if(spec_chords%los_inter(ind(1),ind(2),ind(3)).and.(.not.los_inter))then
+        if((spec_chords%inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
+            .and.(.not.los_inter))then
             los_inter = .True.
         endif
         dt_arr = abs(( (ri_cell + 0.5*dr) - ri)*inv_vn)
@@ -5200,13 +5276,11 @@ subroutine store_npa(det, ri, rf, vn, flux)
     !$OMP CRITICAL(store_npa_1)
     npa%npart = npa%npart + 1
     if(npa%npart.gt.npa%nmax) then
-        allocate(parts(npa%npart-1))
-        parts = npa%part
-        deallocate(npa%part)
         npa%nmax = int(npa%nmax*2)
-        allocate(npa%part(npa%nmax))
-        npa%part(1:(npa%npart-1)) = parts
-        deallocate(parts)
+        allocate(parts(npa%nmax))
+        parts(1:(npa%npart-1)) = npa%part
+        deallocate(npa%part)
+        call move_alloc(parts, npa%part)
     endif
     npa%part(npa%npart)%detector = det
     npa%part(npa%npart)%xi = uvw_ri(1)
@@ -5255,8 +5329,10 @@ subroutine neut_rates(denn, vi, vn, rates)
     call interpol_coeff(logEmin,dlogE,neb,logeb,c,err)
     ebi = c%i
     if(err.eq.1) then
-        write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
-        write(*,'("eb = ",f6.3," [keV]")') eb
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+        endif
         if(ebi.lt.1) then
             ebi=1
             c%b1=1.0 ; c%b2=0.0
@@ -5315,9 +5391,11 @@ subroutine get_neutron_rate(plasma, eb, rate)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_NEUTRON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
-        write(*,'("eb = ",f6.3," [keV]")') eb
-        write(*,'("ti = ",f6.3," [keV]")') plasma%ti
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_NEUTRON_RATE: Eb or Ti out of range of D_D table. Setting D_D rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
         denp = 0.d0
     endif
 
@@ -5425,9 +5503,11 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
-        write(*,'("eb = ",f7.3," [keV]")') eb
-        write(*,'("ti = ",f6.3," [keV]")') plasma%ti
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
         denp = 0.d0
     endif
 
@@ -5468,9 +5548,11 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
-        write(*,'("eb = ",f7.3," [keV]")') eb
-        write(*,'("te = ",f6.3," [keV]")') plasma%te
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("te = ",ES10.3," [keV]")') plasma%te
+        endif
         dene = 0.d0
     endif
 
@@ -5512,9 +5594,11 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     b21 = c%b21
     b22 = c%b22
     if(err_status.eq.1) then
-        write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
-        write(*,'("eb = ",f7.3," [keV]")') eb
-        write(*,'("ti = ",f6.3," [keV]")') plasma%ti
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
         denimp = 0.d0
     endif
 
@@ -5735,14 +5819,19 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
-    integer :: ichan,i,bin
+    type(LOSInters) :: inter
+    integer :: ichan,i,j,bin,nchan
 
     call get_indices(pos,ind)
+    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
     call get_fields(fields,pos=pos)
 
-    loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
-        if(dlength.le.0.0) cycle loop_over_channels
+    loop_over_channels: do j=1,nchan
+        ichan = inter%los_elem(j)%id
+        dlength = inter%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
@@ -5777,7 +5866,8 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
-    integer :: ichan, i, bin, iclass
+    type(LOSInters) :: inter
+    integer :: ichan, i, j, bin, iclass, nchan
 
     if(present(orbit_class)) then
         iclass = orbit_class
@@ -5786,11 +5876,15 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     endif
 
     call get_indices(pos,ind)
+    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
     call get_fields(fields,pos=pos)
 
-    loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
-        if(dlength.le.0.0) cycle loop_over_channels
+    loop_over_channels: do j=1,nchan
+        ichan = inter%los_elem(j)%id
+        dlength = inter%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call spectrum(vp,vi,fields,sigma_pi,photons, &
@@ -5900,14 +5994,19 @@ subroutine store_fw_photons(eind, pind, pos, vi, denf, photons)
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
     real(Float64), dimension(3) :: vp
-    integer :: ichan
+    type(LOSInters) :: inter
+    integer :: ichan,nchan,i
 
     call get_indices(pos,ind)
+    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
     call get_fields(fields,pos=pos)
 
-    loop_over_channels: do ichan=1,spec_chords%nchan
-        dlength = spec_chords%dlength(ichan,ind(1),ind(2),ind(3))
-        if(dlength.le.0.0) cycle loop_over_channels
+    loop_over_channels: do i=1,nchan
+        ichan = inter%los_elem(i)%id
+        dlength = inter%los_elem(i)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         vp = pos - spec_chords%los(ichan)%lens
         call store_fw_photons_at_chan(ichan, eind, pind, &
@@ -6206,7 +6305,9 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
 
     !Set Default trajectory in case rejection sampling fails
     if(.not.valid_trajectory)then
-        write(*,'(a)') "MC_NBI: Failed to find trajectory though aperture(s). Using beam centerline."
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "MC_NBI: Failed to find trajectory though aperture(s). Using beam centerline."
+        endif
         uvw_src = nbi%src
         uvw_ray = nbi%axis
     endif
@@ -6222,8 +6323,10 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     !! Check if start position is in the plasma
     call in_plasma(rnbi,inp)
     if(inp)then
-        write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
-        write(*,'(a)') "Move the beam grid closer to the source to fix"
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
+            write(*,'(a)') "Move the beam grid closer to the source to fix"
+        endif
         stop
     endif
 
@@ -6242,7 +6345,7 @@ subroutine ndmc
     real(Float64), dimension(3) :: vnbi !! velocities(full..)
     real(Float64), dimension(3) :: rnbi !! initial position
 
-    integer :: jj, ii, kk
+    integer :: jj, ii, kk, cnt
     integer :: ncell
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer, dimension(3) :: nl_birth
@@ -6265,7 +6368,7 @@ subroutine ndmc
          +  nbi%current_fractions(3)/3.d0 ) )
 
     nlaunch=real(inputs%n_nbi)
-
+    cnt = 0
     !$OMP PARALLEL DO schedule(guided) &
     !$OMP& private(vnbi,rnbi,tracks,ncell,plasma,nl_birth,randi, &
     !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
@@ -6322,13 +6425,19 @@ subroutine ndmc
                 !$OMP END CRITICAL(ndmc_birth)
             endif
         enddo energy_fractions
+        if (inputs%verbose.eq.2)then
+            cnt = cnt + 1
+            WRITE(*,'(f7.2,"% completed",a,$)') 100*cnt/nlaunch,char(13)
+        endif
     enddo loop_over_markers
     !$OMP END PARALLEL DO
 
     if(nbi_outside.gt.0)then
-         write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
-                              100.*nbi_outside/(3.*inputs%n_nbi)
-         if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
+        if(inputs%verbose.ge.0) then
+            write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
+                                  100.*nbi_outside/(3.*inputs%n_nbi)
+        endif
+        if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
     endif
 
 end subroutine ndmc
@@ -6535,7 +6644,9 @@ subroutine halo
 
     dcx_dens = halo_iter_dens(halo_type)
     if(dcx_dens.eq.0) then
-        write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
+        endif
         stop
     endif
     inv_ng = 100.0/real(beam_grid%ngrid)
@@ -6615,7 +6726,9 @@ subroutine halo
         neut%dens(:,s2type,:,:,:)= 0.
 
         if(halo_iteration_dens/dcx_dens.gt.1)then
-            write(*,'(a)') "HALO: Halo generation density exceeded DCX density. This shouldn't happen."
+            if(inputs%verbose.ge.0) then
+                write(*,'(a)') "HALO: Halo generation density exceeded DCX density. This shouldn't happen."
+            endif
             exit iterations
         endif
 
@@ -6911,7 +7024,9 @@ subroutine npa_f
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_cells
-    write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
+    endif
 
 end subroutine npa_f
 
@@ -7315,7 +7430,7 @@ subroutine fida_weights_los
     real(Float64) :: length
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer :: nwav
-    integer(Int32) :: i, j, k, ienergy
+    integer(Int32) :: i, j, k, ienergy, cid, cind
     integer(Int32) :: ipitch, igyro, icell, ichan
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr,phiarr
     real(Float64), dimension(:,:), allocatable :: mean_f
@@ -7330,6 +7445,7 @@ subroutine fida_weights_los
     real(Float64), dimension(nlevs) :: denn  ! Density of n-states
     !! COLRAD
     real(Float64) :: dt, max_dens, dlength, sigma_pi
+    type(LOSInters) :: inter
     real(Float64) :: eb, ptch, phi
     !! Solution of differential equation
     integer, dimension(3) :: ind  !!actual cell
@@ -7393,9 +7509,16 @@ subroutine fida_weights_los
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
-                    if(spec_chords%dlength(ichan,i,j,k).gt.0.0) then
+                    inter = spec_chords%inter(i,j,k)
+                    cid = 0
+                    cind = 0
+                    do while (cid.ne.ichan.and.cind.lt.inter%nchan)
+                        cind = cind + 1
+                        cid = inter%los_elem(cind)%id
+                    enddo
+                    if(cid.eq.ichan) then
                         ind = [i,j,k]
-                        dlength = spec_chords%dlength(ichan,i,j,k)
+                        dlength = inter%los_elem(cind)%length
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
                         hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength
                         tdens = tdens + neut%dens(:,nbit_type,i,j,k)*dlength
@@ -7595,6 +7718,7 @@ subroutine npa_weights
                         if(.not.fields%in_plasma) cycle loop_along_x
 
                         !!Check if it hits a detector just to make sure
+                        dpos = phit%eff_rd
                         vi_norm = phit%dir
                         call hit_npa_detector(pos,vi_norm,det)
                         if (det.ne.ichan) then
@@ -7738,8 +7862,7 @@ program fidasim
     call read_tables()
     call read_distribution()
 
-    allocate(spec_chords%los_inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    spec_chords%los_inter = .False.
+    allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
         call read_chords()
     endif
@@ -7819,7 +7942,7 @@ program fidasim
         if(inputs%calc_birth.eq.1)then
             call write_birth_profile()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
         !! ---------- DCX (Direct charge exchange) ---------- !!
         call date_and_time (values=time_arr)
@@ -7829,7 +7952,7 @@ program fidasim
         endif
         call dcx()
         if(inputs%dump_dcx.eq.1) call write_dcx()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
         !! ---------- HALO ---------- !!
         call date_and_time (values=time_arr)
@@ -7840,7 +7963,7 @@ program fidasim
         call halo()
         !! ---------- WRITE NEUTRALS ---------- !!
         call write_neutrals()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -----------------------------------------------------------------------
@@ -7853,7 +7976,7 @@ program fidasim
                   time_arr(5),time_arr(6),time_arr(7)
         endif
         call bremsstrahlung()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -----------------------------------------------------------------------
@@ -7870,7 +7993,7 @@ program fidasim
         else
             call fida_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     if(inputs%calc_spec.ge.1) then
@@ -7892,12 +8015,12 @@ program fidasim
         else
             call npa_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     if(inputs%calc_npa.ge.1) then
         call write_npa()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -------------------------------------------------------------------
@@ -7914,7 +8037,7 @@ program fidasim
         else
             call neutron_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -------------------------------------------------------------------
@@ -7932,7 +8055,7 @@ program fidasim
         else
             call fida_weights_mc()
         endif
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     if(inputs%calc_npa_wght.ge.1) then
@@ -7942,7 +8065,7 @@ program fidasim
                   time_arr(5),time_arr(6),time_arr(7)
         endif
         call npa_weights()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     call date_and_time (values=time_arr)

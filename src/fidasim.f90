@@ -7366,7 +7366,7 @@ subroutine npa_f
                                 sum(neut%dens(:,halo_type,i,j,k)))* &
                                 plasma%denf
 
-                if(papprox(i,j,k).gt.0)then!.and.(npa_chords%hit(i,j,k))) then
+                if((papprox(i,j,k).gt.0).and.(npa_chords%hit(i,j,k))) then
                     !the only doing viewable cells is techically wrong
                     !since a guiding center not in a viewable cell
                     !can gyrostep into one but this is ridiculously faster

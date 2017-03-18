@@ -7416,45 +7416,6 @@ subroutine npa_f
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
                     if(det.ne.ichan) then
                         write(*,*) "NPA_F: Missed Detector ",ichan
-                        print*, "ir=",ir
-                        print*, "ichan = ",ichan
-                        print*, "det = ", det
-                        call line_plane_intersect(ri,vi,npa_chords%det(ichan)%detector%origin, &
-                             npa_chords%det(i)%detector%basis(:,3),rf,phi)
-                                        print*,'det miss:',norm2(rf-npa_chords%det(ichan)%detector%origin)
-                        !! Find where trajectory crosses aperture plane
-                        call line_plane_intersect(ri,vi,npa_chords%det(ichan)%aperture%origin, &
-                             npa_chords%det(i)%aperture%basis(:,3),rf,phi)
-                        print*,'ape miss:',norm2(rf-npa_chords%det(ichan)%aperture%origin)
-                        print*,'center'
-                        print*,gs%center
-                        print*,'Axes'
-                        print*,gs%axes
-                        print*,'GS Basis'
-                        print*,gs%basis(:,1)
-                        print*,gs%basis(:,2)
-                        print*,gs%basis(:,3)
-                        print*,'detector origin'
-                        print*,npa_chords%det(ichan)%detector%origin
-                        print*,'aperture origin'
-                        print*,npa_chords%det(ichan)%aperture%origin
-                        print*,'Detector Basis'
-                        print*,npa_chords%det(ichan)%detector%basis(:,1)
-                        print*,npa_chords%det(ichan)%detector%basis(:,2)
-                        print*,npa_chords%det(ichan)%detector%basis(:,3)
-                        print*,'Aperture Basis'
-                        print*,npa_chords%det(ichan)%aperture%basis(:,1)
-                        print*,npa_chords%det(ichan)%aperture%basis(:,2)
-                        print*,npa_chords%det(ichan)%aperture%basis(:,3)
-                        print*,'nrange',nrange
-                        print*,"gyrange"
-                        print*,gyrange(:,1:nrange)
-                        print*,"phi=",phi
-                        print*,"ri= ",ri
-                        print*,"vi_norm =",vi/norm2(vi)
-                        print*, "eb=",eb
-                        print*, "ptch=",ptch
-                        print*, "ri = [",fields%pos(1),",",fields%pos(2),",",fields%pos(3),"]"
                         cycle gyro_range_loop
                     endif
 

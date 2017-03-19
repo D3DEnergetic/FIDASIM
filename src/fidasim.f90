@@ -2421,42 +2421,28 @@ subroutine read_mc(fid, error)
     real(Float64), dimension(3) :: uvw,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
     integer(Int32), dimension(1) :: minpos
     real(Float64), dimension(:), allocatable :: weight
-    real(Float64), dimension(:), allocatable :: r, z, vr, vt, vz
-    real(Float64), dimension(:), allocatable :: energy, pitch
-    integer(Int32), dimension(:), allocatable :: orbit_class
     type(LocalEMFields) :: fields
     integer :: cnt,num
     logical :: inp
-    integer(Int32) :: npart,nrep
     character(len=32) :: dist_type_name = ''
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
     endif
 
-    call h5ltread_dataset_int_scalar_f(fid, "/nparticle", npart, error)
+    call h5ltread_dataset_int_scalar_f(fid, "/nparticle", particles%nparticle, error)
     call h5ltread_dataset_int_scalar_f(fid, "/nclass", particles%nclass, error)
-
-    nrep = ceiling(dble(max(inputs%n_fida,inputs%n_npa))/npart)
-    particles%nparticle = int(nrep*npart)
 
     !!ALLOCATE SPACE
     allocate(particles%fast_ion(particles%nparticle))
-    allocate(r(npart))
-    allocate(z(npart))
-    allocate(vr(npart))
-    allocate(vt(npart))
-    allocate(vz(npart))
-    allocate(weight(npart))
-    allocate(orbit_class(npart))
+    allocate(weight(particles%nparticle))
 
-    dims(1) = npart
-    call h5ltread_dataset_double_f(fid, "/r", r, dims, error)
-    call h5ltread_dataset_double_f(fid, "/z", z, dims, error)
-    call h5ltread_dataset_double_f(fid, "/weight", weight, dims, error)
-    call h5ltread_dataset_int_f(fid, "/class", orbit_class, dims, error)
+    dims(1) = particles%nparticle
+    call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
+    call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
+    call h5ltread_dataset_int_f(fid, "/class", particles%fast_ion%class, dims, error)
 
-    if(any(orbit_class.gt.particles%nclass)) then
+    if(any(particles%fast_ion%class.gt.particles%nclass)) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
         endif
@@ -2465,73 +2451,59 @@ subroutine read_mc(fid, error)
 
     if(inputs%dist_type.eq.2) then
         dist_type_name = "Guiding Center Monte Carlo"
-        allocate(energy(npart))
-        allocate(pitch(npart))
-        call h5ltread_dataset_double_f(fid, "/energy", energy, dims, error)
-        call h5ltread_dataset_double_f(fid, "/pitch", pitch, dims, error)
+        call h5ltread_dataset_double_f(fid, "/energy", particles%fast_ion%energy, dims, error)
+        call h5ltread_dataset_double_f(fid, "/pitch", particles%fast_ion%pitch, dims, error)
+        particles%fast_ion%vabs  = sqrt(particles%fast_ion%energy/(v2_to_E_per_amu*inputs%ab))
     else
         dist_type_name = "Full Orbit Monte Carlo"
-        call h5ltread_dataset_double_f(fid, "/vr", vr, dims, error)
-        call h5ltread_dataset_double_f(fid, "/vt", vt, dims, error)
-        call h5ltread_dataset_double_f(fid, "/vz", vz, dims, error)
+        call h5ltread_dataset_double_f(fid, "/vr", particles%fast_ion%vr, dims, error)
+        call h5ltread_dataset_double_f(fid, "/vt", particles%fast_ion%vt, dims, error)
+        call h5ltread_dataset_double_f(fid, "/vz", particles%fast_ion%vz, dims, error)
+        particles%fast_ion%vabs = sqrt(particles%fast_ion%vr**2 + &
+                                       particles%fast_ion%vt**2 + &
+                                       particles%fast_ion%vz**2)
+        particles%fast_ion%energy = v2_to_E_per_amu*inputs%ab*particles%fast_ion%vabs**2
     endif
+
+    call h5ltread_dataset_double_f(fid, "/weight", weight, dims, error)
 
     cnt=0
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
     !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &
     !$OMP& delta_phi,phi_enter,phi_exit,C_xyz)
-    particle_loop: do i=1,npart
+    particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
-            WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(npart)*100,char(13)
+            WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
         endif
-        uvw = [r(i), 0.d0, z(i)]
+        uvw = [particles%fast_ion(i)%r, 0.d0, particles%fast_ion(i)%z]
         call in_plasma(uvw,inp,machine_coords=.True.)
         if(.not.inp) cycle particle_loop
-        do ii=1,nrep
-            j = int((i-1)*nrep + ii)
-            particles%fast_ion(j)%class = orbit_class(i)
-            particles%fast_ion(j)%r = r(i)
-            particles%fast_ion(j)%z = z(i)
-            if(inputs%dist_type.eq.2) then
-                particles%fast_ion(j)%pitch =  pitch(i)
-                particles%fast_ion(j)%energy = energy(i)
-                particles%fast_ion(j)%vabs  = sqrt(energy(i)/(v2_to_E_per_amu*inputs%ab))
-            else
-                particles%fast_ion(j)%vr = vr(i)
-                particles%fast_ion(j)%vt = vt(i)
-                particles%fast_ion(j)%vz = vz(i)
-                particles%fast_ion(j)%vabs = sqrt(vr(i)**2 + vt(i)**2 + vz(i)**2)
-                particles%fast_ion(j)%energy = v2_to_E_per_amu*inputs%ab*particles%fast_ion(j)%vabs**2
-            endif
 
-            phi_enter = 0.0
-            phi_exit = 0.0
-            dum = [0.d0, 0.d0, particles%fast_ion(j)%z]
-            call uvw_to_xyz(dum, C_xyz)
-            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(j)%r,phi_enter,phi_exit)
-            delta_phi = phi_exit-phi_enter
-            if(delta_phi.gt.0) then
-                particles%fast_ion(j)%cross_grid = .True.
-            else
-                particles%fast_ion(j)%cross_grid = .False.
-                delta_phi = 2*pi
-            endif
-            particles%fast_ion(j)%phi_enter = phi_enter
-            particles%fast_ion(j)%delta_phi = delta_phi
-            particles%fast_ion(j)%weight = (weight(i)/nrep) * &
-                                           (delta_phi/(2*pi))/beam_grid%dv
+        phi_enter = 0.0
+        phi_exit = 0.0
+        dum = [0.d0, 0.d0, particles%fast_ion(i)%z]
+        call uvw_to_xyz(dum, C_xyz)
+        call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(i)%r,phi_enter,phi_exit)
+        delta_phi = phi_exit-phi_enter
+        if(delta_phi.gt.0) then
+            particles%fast_ion(i)%cross_grid = .True.
+        else
+            particles%fast_ion(i)%cross_grid = .False.
+            delta_phi = 2*pi
+        endif
+        particles%fast_ion(i)%phi_enter = phi_enter
+        particles%fast_ion(i)%delta_phi = delta_phi
+        particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
 
-            minpos = minloc(abs(inter_grid%r - particles%fast_ion(j)%r))
-            ir = minpos(1)
-            minpos = minloc(abs(inter_grid%z - particles%fast_ion(j)%z))
-            iz = minpos(1)
-            !$OMP CRITICAL(mc_denf)
-            equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + &
-                                       (weight(i)/nrep) / &
-                                       (2*pi*particles%fast_ion(j)%r*inter_grid%da)
-            !$OMP END CRITICAL(mc_denf)
-        enddo
+        minpos = minloc(abs(inter_grid%r - particles%fast_ion(i)%r))
+        ir = minpos(1)
+        minpos = minloc(abs(inter_grid%z - particles%fast_ion(i)%z))
+        iz = minpos(1)
+        !$OMP CRITICAL(mc_denf)
+        equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + weight(i) / &
+                                   (2*pi*particles%fast_ion(i)%r*inter_grid%da)
+        !$OMP END CRITICAL(mc_denf)
         cnt=cnt+1
     enddo particle_loop
     !$OMP END PARALLEL DO
@@ -2546,7 +2518,7 @@ subroutine read_mc(fid, error)
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') dist_type_name
-        write(*,'(T2,"Number of mc particles: ",i9)') npart
+        write(*,'(T2,"Number of mc particles: ",i9)') particles%nparticle
         write(*,'(T2,"Number of orbit classes: ",i6)') particles%nclass
         write(*,*) ''
     endif
@@ -7230,7 +7202,7 @@ end subroutine fida_f
 
 subroutine fida_mc
     !+ Calculate FIDA emission using a Monte Carlo Fast-ion distribution
-    integer :: iion
+    integer :: iion,iphi,nphi
     type(FastIon) :: fast_ion
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
@@ -7251,22 +7223,24 @@ subroutine fida_mc
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: s, c
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
-    real(Float64), dimension(2) :: randomu
+    real(Float64), dimension(1) :: randomu
 
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
+    nphi = ceiling(dble(inputs%n_fida)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') particles%nparticle
+        write(*,'(T6,"# of markers: ",i9)') particles%nparticle*nphi
     endif
 
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& plasma,fields,randomu,uvw,uvw_vi,ncell,jj,prob,denn,los_intersect,states,photons)
+    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
+    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ncell,jj,prob,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=1,particles%nparticle
         fast_ion = particles%fast_ion(iion)
         cnt=cnt+1
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(fast_ion%cross_grid) then
+        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        phi_loop: do iphi=1,nphi
             !! Pick random torodial angle
             call randu(randomu)
             phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
@@ -7296,15 +7270,15 @@ subroutine fida_mc
 
             !! Track particle through grid
             call track(ri, vi, tracks, ncell, los_intersect)
-            if(.not.los_intersect) cycle loop_over_fast_ions
-            if(ncell.eq.0)cycle loop_over_fast_ions
+            if(.not.los_intersect) cycle phi_loop
+            if(ncell.eq.0)cycle phi_loop
 
             !! Calculate CX probability
             call get_beam_cx_prob(tracks(1)%ind,ri,vi,neut_types,prob)
-            if(sum(prob).le.0.)cycle loop_over_fast_ions
+            if(sum(prob).le.0.)cycle phi_loop
 
             !! Calculate the spectra produced in each cell along the path
-            states=prob*fast_ion%weight
+            states=prob*fast_ion%weight/nphi
             loop_along_track: do jj=1,ncell
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
@@ -7312,7 +7286,7 @@ subroutine fida_mc
 
                 call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class)
             enddo loop_along_track
-        endif
+        enddo phi_loop
         if (inputs%verbose.ge.2)then
           WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
@@ -7336,7 +7310,7 @@ subroutine npa_f
     integer, dimension(4) :: neut_types=[1,2,3,4]
     real(Float64), dimension(nlevs) :: prob
     real(Float64), dimension(nlevs) :: states
-    real(Float64) :: flux, phi, dphi, eb, ptch
+    real(Float64) :: flux, theta, dtheta, eb, ptch
 
     integer :: inpa,pcnt,ichan,nrange,ir
     real(Float64) :: papprox_tot, maxcnt, cnt, inv_maxcnt
@@ -7383,7 +7357,7 @@ subroutine npa_f
         k = pcell(3,ip)
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
-        !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,phi,gs,ir,dphi)
+        !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k))
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
@@ -7395,9 +7369,9 @@ subroutine npa_f
                 call npa_gyro_range(ichan, gs, gyrange, nrange)
                 if(nrange.eq.0) cycle detector_loop
                 gyro_range_loop: do ir=1,nrange
-                    dphi = gyrange(2,ir)
-                    phi = gyrange(1,ir) + 0.5*dphi
-                    call gyro_trajectory(gs, phi, ri, vi)
+                    dtheta = gyrange(2,ir)
+                    theta = gyrange(1,ir) + 0.5*dtheta
+                    call gyro_trajectory(gs, theta, ri, vi)
 
                     !! Check if particle hits a NPA detector
                     call hit_npa_detector(ri, vi ,det, rf, ichan)
@@ -7417,7 +7391,7 @@ subroutine npa_f
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
-                    flux = (dphi/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
+                    flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
                     call store_npa(det,ri,rf,vi,flux)
                 enddo gyro_range_loop
             enddo detector_loop
@@ -7436,9 +7410,9 @@ end subroutine npa_f
 
 subroutine npa_mc
     !+ Calculate NPA flux using a Monte Carlo fast-ion distribution
-    integer :: iion,iloop
+    integer :: iion,iphi,nphi
     type(FastIon) :: fast_ion
-    real(Float64) :: phi,dphi
+    real(Float64) :: phi,theta,dtheta
     real(Float64), dimension(3) :: ri, rf, rg, vi
     integer :: det,j,ichan,ir,nrange
     type(LocalEMFields) :: fields
@@ -7452,22 +7426,24 @@ subroutine npa_mc
     real(Float64), dimension(2,4) :: gyrange
     real(Float64) :: s,c
     real(Float64) :: maxcnt, inv_maxcnt, cnt
-    real(Float64), dimension(2) :: randomu
+    real(Float64), dimension(1) :: randomu
 
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
+    nphi = ceiling(dble(inputs%n_npa)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') particles%nparticle
+        write(*,'(T6,"# of markers: ",i9)') particles%nparticle*nphi
     endif
 
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,iloop,ind,fast_ion,vi,ri,rf,phi,s,c,ir, &
-    !$OMP& rg,fields,randomu,uvw,uvw_vi,prob,states,flux,det,ichan,gs,nrange,gyrange,dphi)
+    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,ind,fast_ion,vi,ri,rf,phi,s,c,ir, &
+    !$OMP& randomu,rg,fields,uvw,uvw_vi,prob,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0)cycle loop_over_fast_ions
-        if(fast_ion%cross_grid) then
+        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        phi_loop: do iphi=1,nphi
             !! Pick random torodial angle
             call randu(randomu)
             phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
@@ -7493,9 +7469,9 @@ subroutine npa_mc
                     if(nrange.eq.0) cycle detector_loop
 
                     gyro_range_loop: do ir=1,nrange
-                        dphi = gyrange(2,ir)
-                        phi = gyrange(1,ir) + 0.5*dphi
-                        call gyro_trajectory(gs, phi, ri, vi)
+                        dtheta = gyrange(2,ir)
+                        theta = gyrange(1,ir) + 0.5*dtheta
+                        call gyro_trajectory(gs, theta, ri, vi)
 
                         !! Check if particle hits a NPA detector
                         call hit_npa_detector(ri, vi ,det, rf, det=ichan)
@@ -7514,11 +7490,11 @@ subroutine npa_mc
                         if(sum(prob).le.0.) cycle gyro_range_loop
 
                         !! Attenuate states as the particle move through plasma
-                        states=prob*fast_ion%weight
+                        states=prob*fast_ion%weight/nphi
                         call attenuate(ri,rf,vi,states)
 
                         !! Store NPA Flux
-                        flux = (dphi/(2*pi))*sum(states)*beam_grid%dv
+                        flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
                         call store_npa(det,ri,rf,vi,flux)
                     enddo gyro_range_loop
                 enddo detector_loop
@@ -7534,24 +7510,24 @@ subroutine npa_mc
 
                 !! Check if particle hits a NPA detector
                 call hit_npa_detector(ri, vi ,det, rf)
-                if(det.eq.0) cycle loop_over_fast_ions
+                if(det.eq.0) cycle phi_loop
 
                 !! Get beam grid indices
                 call get_indices(ri,ind)
 
                 !! Calculate CX probability with beam and halo neutrals
                 call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
-                if(sum(prob).le.0.) cycle loop_over_fast_ions
+                if(sum(prob).le.0.) cycle phi_loop
 
                 !! Attenuate states as the particle moves though plasma
-                states=prob*fast_ion%weight
+                states=prob*fast_ion%weight/nphi
                 call attenuate(ri,rf,vi,states)
 
                 !! Store NPA Flux
                 flux = sum(states)*beam_grid%dv
                 call store_npa(det,ri,rf,vi,flux)
             endif
-        endif
+        enddo phi_loop
         if (inputs%verbose.ge.2)then
           WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif

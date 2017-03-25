@@ -4248,9 +4248,9 @@ subroutine gyro_surface(fields, energy, pitch, gs)
     gs%axes(3) = pitch*alpha
 
     s = 0.d0
-    s(1,1) = gs%axes(1)**-2
-    s(2,2) = gs%axes(2)**-2
-    s(3,3) = -gs%axes(3)**-2
+    s(1,1) = gs%axes(1)**(-2)
+    s(2,2) = gs%axes(2)**(-2)
+    s(3,3) = -gs%axes(3)**(-2)
 
     gs%center = fields%pos
 

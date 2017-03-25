@@ -7620,16 +7620,16 @@ end subroutine neutron_f
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
-    integer :: iion
+    integer :: iion, nphi, iphi
     type(FastIon) :: fast_ion
     type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
     real(Float64) :: eb, rate
-    real(Float64), dimension(3) :: ri      !! start position
-    real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64), dimension(3) :: ri, rg
+    real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
-    real(Float64), dimension(1) :: randomu
 
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
@@ -7639,8 +7639,9 @@ subroutine neutron_mc
 
     cnt=0.0
     rate=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri, &
-    !$OMP& plasma,randomu,uvw,uvw_vi,vnet_square,rate,eb)
+    nphi = 20
+    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg, &
+    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,iphi)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
@@ -7650,28 +7651,54 @@ subroutine neutron_mc
         uvw(1) = fast_ion%r
         uvw(2) = 0.0
         uvw(3) = fast_ion%z
-        call uvw_to_xyz(uvw, ri)
 
-        !! Get plasma parameters
-        call get_plasma(plasma,pos=ri)
+        if(inputs%dist_type.eq.2) then
+            call uvw_to_xyz(uvw, rg)
 
-        !! Calculate effective beam energy
-        uvw_vi(1) = fast_ion%vr
-        uvw_vi(2) = fast_ion%vt
-        uvw_vi(3) = fast_ion%vz
-        vi = matmul(beam_grid%inv_basis,uvw_vi)
-        vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
-        eb = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
+            !! Get electomagnetic fields
+            call get_fields(fields, pos=rg)
 
-        !! Get neutron production rate
-        call get_neutron_rate(plasma, eb, rate)
-        rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv
+            gyro_loop: do iphi=1,nphi
+                !! Correct for Gyro-motion
+                call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, ri, vi)
 
-        !! Store neutrons
-        call store_neutrons(rate, fast_ion%class)
+                !! Get plasma parameters
+                call get_plasma(plasma,pos=ri)
 
+                !! Calculate effective beam energy
+                vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                eb = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
+
+                !! Get neutron production rate
+                call get_neutron_rate(plasma, eb, rate)
+                rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv/nphi
+
+                !! Store neutrons
+                call store_neutrons(rate, fast_ion%class)
+            enddo gyro_loop
+        else
+            call uvw_to_xyz(uvw, ri)
+
+            !! Get plasma parameters
+            call get_plasma(plasma,pos=ri)
+
+            !! Calculate effective beam energy
+            uvw_vi(1) = fast_ion%vr
+            uvw_vi(2) = fast_ion%vt
+            uvw_vi(3) = fast_ion%vz
+            vi = matmul(beam_grid%inv_basis,uvw_vi)
+            vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+            eb = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
+
+            !! Get neutron production rate
+            call get_neutron_rate(plasma, eb, rate)
+            rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv
+
+            !! Store neutrons
+            call store_neutrons(rate, fast_ion%class)
+        endif
         if (inputs%verbose.ge.2)then
-          WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
+            WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO

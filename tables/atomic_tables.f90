@@ -3973,7 +3973,7 @@ function d_d_fusion_t(eb) result(sigma)
     !+$$ D + D \rightarrow T(1.01 MeV) + p(3.02 MeV) (50%)$$
     !+
     !+###References
-    !+* Equations 8-9 
+    !+* Equations 8-9
     !+* Table IV in Ref. 7 [[atomic_tables(module)]]
     real(Float64), intent(in) :: eb
         !+ Deuterium energy [keV]
@@ -3992,7 +3992,7 @@ function d_d_fusion_t(eb) result(sigma)
     S = (A(1) + E*(A(2) + E*(A(3) + E*(A(4) + E*A(5))))) / &
         (1    + E*(B(1) + E*(B(2) + E*(B(3) + E*B(4)))))
 
-    sigma = (1.0d-27)*(S/(eb*exp(Bg/sqrt(eb))))
+    sigma = (1.0d-27)*(S/(E*exp(Bg/sqrt(E))))
 
 end function d_d_fusion_t
 
@@ -4004,7 +4004,7 @@ function d_d_fusion_he(eb) result(sigma)
     !+$$ D + D \rightarrow He^3(0.82 MeV) + n(2.45 MeV) (50%)$$
     !+
     !+###References
-    !+* Equations 8-9 
+    !+* Equations 8-9
     !+* Table IV in Ref. 7 [[atomic_tables(module)]]
     real(Float64), intent(in) :: eb
         !+ Deuterium energy [keV]
@@ -4023,7 +4023,7 @@ function d_d_fusion_he(eb) result(sigma)
     S = (A(1) + E*(A(2) + E*(A(3) + E*(A(4) + E*A(5))))) / &
         (1    + E*(B(1) + E*(B(2) + E*(B(3) + E*B(4)))))
 
-    sigma = (1.0d-27)*(S/(eb*exp(Bg/sqrt(eb))))
+    sigma = (1.0d-27)*(S/(E*exp(Bg/sqrt(E))))
 
 end function d_d_fusion_he
 
@@ -4035,7 +4035,7 @@ function d_t_fusion(eb) result(sigma)
     !+$$ D + T \rightarrow He^4(3.5 MeV) + n(14.1 MeV)$$
     !+
     !+###References
-    !+* Equations 8-9 
+    !+* Equations 8-9
     !+* Table IV, VI in Ref. 7 [[atomic_tables(module)]]
     real(Float64), intent(in) :: eb
         !+ Deuterium energy [keV]
@@ -4068,10 +4068,10 @@ function d_t_fusion(eb) result(sigma)
         B = B2
     endif
 
-    S = (A(1) + eb*(A(2) + eb*(A(3) + eb*(A(4) + eb*A(5))))) / &
-        (1    + eb*(B(1) + eb*(B(2) + eb*(B(3) + eb*B(4)))))
+    S = (A(1) + E*(A(2) + E*(A(3) + E*(A(4) + E*A(5))))) / &
+        (1    + E*(B(1) + E*(B(2) + E*(B(3) + E*B(4)))))
 
-    sigma = (1.0d-27)*(S/(eb*exp(Bg/sqrt(eb))))
+    sigma = (1.0d-27)*(S/(E*exp(Bg/sqrt(E))))
 
 end function d_t_fusion
 

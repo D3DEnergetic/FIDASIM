@@ -7574,7 +7574,7 @@ subroutine neutron_f
             call get_fields(fields,pos=rg)
             if(.not.fields%in_plasma) cycle r_loop
 
-            factor = 1.0!2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/nphi
+            factor = 2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/nphi
             !! Loop over energy/pitch/phi
             pitch_loop: do ip = 1, fbm%npitch
                 pitch = fbm%pitch(ip)

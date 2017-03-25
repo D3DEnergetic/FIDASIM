@@ -753,17 +753,17 @@ type SimulationInputs
         !+ Used when [[SimulationInputs:load_neutrals]] is set.
 
     !! Monte Carlo settings
-    integer(Int32) :: n_fida
+    integer(Int64) :: n_fida
         !+ Number of FIDA mc markers
-    integer(Int32) :: n_npa
+    integer(Int64) :: n_npa
         !+ Number of NPA mc markers
-    integer(Int32) :: n_nbi
+    integer(Int64) :: n_nbi
         !+ Number of neutral beam mc markers
-    integer(Int32) :: n_dcx
+    integer(Int64) :: n_dcx
         !+ Number of direct charge exchange (DCX) mc markers
-    integer(Int32) :: n_halo
+    integer(Int64) :: n_halo
         !+ Number of halo mc markers
-    integer(Int32) :: n_birth
+    integer(Int64) :: n_birth
         !+ Number of birth particles per [[SimulationInputs:n_nbi]]
 
     !! Simulation switches
@@ -1508,7 +1508,7 @@ subroutine read_inputs
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,dump_dcx,no_flr
-    integer(Int32)     :: n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
+    integer(Int64)     :: n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
@@ -6342,7 +6342,7 @@ end subroutine store_fw_photons
 !=============================================================================
 subroutine get_nlaunch(nr_markers,papprox,papprox_tot,nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell
-    integer(Int32), intent(in)                   :: nr_markers
+    integer(Int64), intent(in)                   :: nr_markers
         !+ Approximate total number of markers to launch
     real(Float64), dimension(:,:,:), intent(in)  :: papprox
         !+ [[libfida:beam_grid]] cell weights
@@ -6696,10 +6696,10 @@ subroutine ndmc
     real(Float64), dimension(3) :: vnbi !! velocities(full..)
     real(Float64), dimension(3) :: rnbi !! initial position
 
-    integer :: jj, ii, kk, cnt
+    integer(Int64) :: jj, ii, kk, cnt
     integer :: ncell
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
-    integer, dimension(3) :: nl_birth
+    integer(Int64), dimension(3) :: nl_birth
     type(LocalProfiles) :: plasma
     real(Float64), dimension(nlevs) :: states, dens
     real(Float64) :: photons, iflux
@@ -6876,7 +6876,7 @@ end subroutine bremsstrahlung
 subroutine dcx
     !+ Calculates Direct Charge Exchange (DCX) neutral density and spectra
     integer :: i,j,k !indices of cells
-    integer :: idcx !! counter
+    integer(Int64) :: idcx !! counter
     real(Float64), dimension(3) :: ri    !! start position
     real(Float64), dimension(3) :: vihalo
     integer,dimension(3) :: ind    !! actual cell
@@ -6915,7 +6915,7 @@ subroutine dcx
     call get_nlaunch(inputs%n_dcx,papprox,papprox_tot,nlaunch)
 
     if(inputs%verbose.ge.1) then
-       write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
+       write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
     endif
 
     ccnt=0.d0
@@ -6926,7 +6926,7 @@ subroutine dcx
                 !! Loop over the markers
                 !$OMP PARALLEL DO schedule(guided) private(idcx,ind,vihalo, &
                 !$OMP& ri,tracks,ncell,prob,denn,states,jj,photons,plasma)
-                loop_over_dcx: do idcx=1,int(nlaunch(i,j,k))
+                loop_over_dcx: do idcx=1,int(nlaunch(i,j,k),Int64)
                     !! Calculate ri,vhalo and track
                     ind = [i, j, k]
                     call mc_halo(ind,vihalo,ri)
@@ -6968,7 +6968,7 @@ end subroutine dcx
 subroutine halo
     !+ Calculates halo neutral density and spectra
     integer :: i,j,k !indices of cells
-    integer :: ihalo !! counter
+    integer(Int64) :: ihalo !! counter
     real(Float64), dimension(3) :: ri    !! start position
     real(Float64), dimension(3) :: vihalo!! velocity bulk plasma ion
     integer,dimension(3) :: ind    !! actual cell
@@ -7023,7 +7023,7 @@ subroutine halo
         call get_nlaunch(inputs%n_halo,papprox,papprox_tot,nlaunch)
 
         if(inputs%verbose.ge.1) then
-            write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
+            write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
         endif
         ccnt=0.d0
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
@@ -7032,7 +7032,7 @@ subroutine halo
             loop_along_y: do j = 1, beam_grid%ny
                 loop_along_x: do i = 1, beam_grid%nx
                     !! Loop over the markers
-                    loop_over_halos: do ihalo=1,int(nlaunch(i,j,k))
+                    loop_over_halos: do ihalo=1,int(nlaunch(i,j,k),Int64)
                         !! Calculate ri,vhalo and track
                         ind = [i, j, k]
                         call mc_halo(ind,vihalo,ri)
@@ -7083,7 +7083,7 @@ subroutine halo
             exit iterations
         endif
 
-        inputs%n_halo=int(inputs%n_dcx*halo_iteration_dens/dcx_dens)
+        inputs%n_halo=int(inputs%n_dcx*halo_iteration_dens/dcx_dens,Int64)
 
         if(inputs%n_halo.lt.inputs%n_dcx*0.01)exit iterations
     enddo iterations
@@ -7095,8 +7095,8 @@ end subroutine halo
 
 subroutine fida_f
     !+ Calculate FIDA emission using a Fast-ion distribution function F(E,p,r,z)
-    integer :: i,j,k  !! indices  x,y,z of cells
-    integer(kind=8) :: iion,ip
+    integer :: i,j,k,ip  !! indices  x,y,z of cells
+    integer(Int64) :: iion
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
     real(Float64) :: denf !! fast-ion density
@@ -7149,7 +7149,7 @@ subroutine fida_f
     inv_maxcnt=100.0/real(pcnt)
     call get_nlaunch(inputs%n_fida,papprox,papprox_tot,nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
+        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
     endif
 
     !! Loop over all cells that have neutrals
@@ -7161,7 +7161,7 @@ subroutine fida_f
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields, &
         !$OMP tracks,ncell,jj,plasma,prob,denn,states,photons,denf,eb,ptch)
-        loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
+        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
@@ -7229,7 +7229,7 @@ subroutine fida_mc
     inv_maxcnt = 100.d0/maxcnt
     nphi = ceiling(dble(inputs%n_fida)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') particles%nparticle*nphi
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
     cnt=0.0
@@ -7297,8 +7297,8 @@ end subroutine fida_mc
 
 subroutine npa_f
     !+ Calculate NPA flux using a fast-ion distribution function F(E,p,r,z)
-    integer :: i,j,k
-    integer :: iion, det, ip
+    integer :: i,j,k,det,ip
+    integer(Int64) :: iion
     real(Float64), dimension(3) :: rg,ri,rf,vi
     integer, dimension(3) :: ind
     real(Float64) :: denf
@@ -7346,7 +7346,7 @@ subroutine npa_f
 
     call get_nlaunch(inputs%n_npa,papprox,papprox_tot,nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i12)') int(sum(nlaunch))
+        write(*,'(T6,"# of markers: ",i12)') int(sum(nlaunch),Int64)
     endif
 
     !! Loop over all cells that can contribute to NPA signal
@@ -7358,7 +7358,7 @@ subroutine npa_f
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
         !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
-        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k))
+        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
@@ -7432,7 +7432,7 @@ subroutine npa_mc
     inv_maxcnt = 100.d0/maxcnt
     nphi = ceiling(dble(inputs%n_npa)/particles%nparticle)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') particles%nparticle*nphi
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
     cnt=0.0
@@ -7574,7 +7574,7 @@ subroutine neutron_f
             call get_fields(fields,pos=rg)
             if(.not.fields%in_plasma) cycle r_loop
 
-            factor = 2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/nphi
+            factor = 1.0!2*pi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/nphi
             !! Loop over energy/pitch/phi
             pitch_loop: do ip = 1, fbm%npitch
                 pitch = fbm%pitch(ip)
@@ -7688,7 +7688,7 @@ end subroutine neutron_mc
 subroutine fida_weights_mc
     !+ Calculates FIDA weights
     integer :: i,j,k !! indices  x,y,z of cells
-    integer(kind=8) :: iion,ip
+    integer(Int64) :: iion,ip
     real(Float64), dimension(3) :: ri,rg      !! start position
     real(Float64), dimension(3) :: vi     !! velocity of fast ions
     integer,dimension(3) :: ind      !! new actual cell
@@ -7784,7 +7784,7 @@ subroutine fida_weights_mc
     inv_maxcnt=100.0/real(pcnt)
     call get_nlaunch(10*inputs%n_fida,papprox,papprox_tot,nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch))
+        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
     endif
 
     !! Loop over all cells that have neutrals
@@ -7797,7 +7797,7 @@ subroutine fida_weights_mc
         !$OMP PARALLEL DO schedule(guided) private(iion,vi,ri,rg,ienergy,ipitch, &
         !$OMP tracks,ncell,jj,plasma,fields,prob,denn,states,photons,energy,pitch, &
         !$OMP los_intersect,randomu3,fbm_denf)
-        loop_over_fast_ions: do iion=1,int8(nlaunch(i, j, k))
+        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution uniformally
             call randind(inputs%ne_wght, ienergy)
             call randind(inputs%np_wght, ipitch)

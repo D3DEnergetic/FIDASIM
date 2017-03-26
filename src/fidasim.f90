@@ -660,12 +660,12 @@ type NPAResults
         !+ Maximum allowed number of particles grows if necessary
     integer(Int32) :: nenergy = 100
         !+ Number of energy values
-    type(NPAParticle), dimension(:), allocatable  :: part
+    type(NPAParticle), dimension(:), allocatable :: part
         !+ Array of NPA particles
-    real(Float64), dimension(:), allocatable      :: energy
+    real(Float64), dimension(:), allocatable     :: energy
         !+ Energy array [keV]
-    real(Float64), dimension(:,:), allocatable    :: flux
-        !+ Neutral particle flux [neutrals/(s*dE)]
+    real(Float64), dimension(:,:,:), allocatable :: flux
+        !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
 type BirthProfile
@@ -3281,6 +3281,7 @@ end subroutine write_neutrals
 subroutine write_npa
     !+ Writes [[libfida:npa]] to a HDF5 file
     integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(3) :: dim3
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
@@ -3303,16 +3304,28 @@ subroutine write_npa
     !Create file overwriting any existing file
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    !Write variables
+    !Write Flux
     d(1) = 1
     dim2 = [npa%nenergy, npa%nchan]
+    dim3 = [npa%nenergy, npa%nchan, particles%nclass]
+    if(particles%nclass.gt.1) then
+        call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/flux",3,dim3,npa%flux, error)
+        call h5ltset_attribute_string_f(fid,"/flux", "description", &
+             "Neutral flux: flux(energy,chan,class)", error)
+    else
+        call h5ltmake_compressed_dataset_double_f(fid,"/flux",2,dim3(1:2),npa%flux(:,:,1), error)
+        call h5ltset_attribute_string_f(fid,"/flux", "description", &
+             "Neutral flux: flux(energy,chan)", error)
+    endif
+    call h5ltset_attribute_string_f(fid,"/flux", "units","neutrals/(s*dE)", error)
+
     call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [npa%nenergy], error)
     call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [npa%nchan], error)
     call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim2(1:1),&
          npa%energy, error)
     call h5ltmake_compressed_dataset_double_f(fid,"/radius",1,dim2(2:2),&
          npa_chords%radius, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/flux",2,dim2,npa%flux, error)
     call h5ltmake_compressed_dataset_int_f(fid,"/count",1,dim2(2:2), dcount, error)
 
     !Add attributes
@@ -3329,9 +3342,6 @@ subroutine write_npa
     call h5ltset_attribute_string_f(fid,"/radius","description", &
          "Detector line of sight radius at midplane or tangency point", error)
     call h5ltset_attribute_string_f(fid,"/radius","units","cm",error)
-    call h5ltset_attribute_string_f(fid,"/flux", "description", &
-         "Neutral flux: flux(energy,chan)", error)
-    call h5ltset_attribute_string_f(fid,"/flux", "units","neutrals/(s*dE)", error)
     call h5ltset_attribute_string_f(fid,"/count","description", &
          "Number of particles that hit the detector: count(chan)", error)
 
@@ -3550,6 +3560,8 @@ subroutine write_neutrons
 
     !Write variables
     if(particles%nclass.gt.1) then
+        dim1(1) = 1
+        call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
         dim1(1) = particles%nclass
         call h5ltmake_compressed_dataset_double_f(fid, "/rate", 1, dim1, neutron%rate, error)
         call h5ltset_attribute_string_f(fid,"/rate","description", &
@@ -5559,7 +5571,7 @@ subroutine store_births(ind, neut_type, dflux)
     !$OMP END CRITICAL(store_births_1)
 end subroutine store_births
 
-subroutine store_npa(det, ri, rf, vn, flux)
+subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
     !+ Store NPA particles in [[libfida:npa]]
     integer, intent(in)                     :: det
         !+ Detector/Channel Number
@@ -5571,12 +5583,21 @@ subroutine store_npa(det, ri, rf, vn, flux)
         !+ Particle velocity [cm/s]
     real(Float64), intent(in)               :: flux
         !+ Neutral flux [neutrals/s]
+    integer, intent(in), optional           :: orbit_class
+        !+ Orbit class ID
 
+    integer :: iclass
     type(LocalEMFields) :: fields
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
     real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
     type(NPAParticle), dimension(:), allocatable :: parts
+
+    if(present(orbit_class)) then
+        iclass = orbit_class
+    else
+        iclass = 1
+    endif
 
     ! Convert to machine coordinates
     call xyz_to_uvw(ri,uvw_ri)
@@ -5615,7 +5636,8 @@ subroutine store_npa(det, ri, rf, vn, flux)
     npa%part(npa%npart)%pitch = pitch
     npa%part(npa%npart)%weight = flux
     ienergy = minloc(abs(npa%energy - energy))
-    npa%flux(ienergy(1),det) = npa%flux(ienergy(1),det) + flux/dE
+    npa%flux(ienergy(1),det,iclass) = &
+        npa%flux(ienergy(1),det,iclass) + flux/dE
     !$OMP END CRITICAL(store_npa_1)
 
 end subroutine store_npa
@@ -7495,7 +7517,7 @@ subroutine npa_mc
 
                         !! Store NPA Flux
                         flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
-                        call store_npa(det,ri,rf,vi,flux)
+                        call store_npa(det,ri,rf,vi,flux,fast_ion%class)
                     enddo gyro_range_loop
                 enddo detector_loop
             else !! Full Orbit
@@ -7525,7 +7547,7 @@ subroutine npa_mc
 
                 !! Store NPA Flux
                 flux = sum(states)*beam_grid%dv
-                call store_npa(det,ri,rf,vi,flux)
+                call store_npa(det,ri,rf,vi,flux,fast_ion%class)
             endif
         enddo phi_loop
         if (inputs%verbose.ge.2)then
@@ -8379,7 +8401,7 @@ program fidasim
                 npa%energy(i)=real(i-0.5)
             enddo
         endif
-        allocate(npa%flux(npa%nenergy,npa%nchan))
+        allocate(npa%flux(npa%nenergy,npa%nchan,particles%nclass))
         npa%flux = 0.0
     endif
 

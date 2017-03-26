@@ -7679,6 +7679,7 @@ subroutine neutron_mc
 
             !! Get electomagnetic fields
             call get_fields(fields, pos=rg)
+            if(.not.fields%in_plasma) cycle loop_over_fast_ions
 
             gyro_loop: do iphi=1,nphi
                 !! Correct for Gyro-motion
@@ -7686,6 +7687,7 @@ subroutine neutron_mc
 
                 !! Get plasma parameters
                 call get_plasma(plasma,pos=ri)
+                if(.not.plasma%in_plasma) cycle gyro_loop
 
                 !! Calculate effective beam energy
                 vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
@@ -7703,6 +7705,7 @@ subroutine neutron_mc
 
             !! Get plasma parameters
             call get_plasma(plasma,pos=ri)
+            if(.not.plasma%in_plasma) cycle loop_over_fast_ions
 
             !! Calculate effective beam energy
             uvw_vi(1) = fast_ion%vr

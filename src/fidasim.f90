@@ -354,7 +354,7 @@ type FastIon
         !+ Vertical position of fast-ion [cm]
     real(Float64)  :: phi_enter = 0.d0
         !+ Torodial/phi position where fast-ion enters the [[libfida:beam_grid]] [radians]
-    real(Float64)  :: delta_phi = 0.d0
+    real(Float64)  :: delta_phi = 2*pi
         !+ Angle subtended by the [[libfida:beam_grid]] at (r,z)
     real(Float64)  :: energy = 0.d0
         !+ Energy [keV]
@@ -7667,7 +7667,7 @@ subroutine neutron_mc
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
-        if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
+        if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions
 
         !! Calculate position
         uvw(1) = fast_ion%r

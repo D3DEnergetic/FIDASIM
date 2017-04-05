@@ -7322,7 +7322,7 @@ subroutine npa_f
     integer :: i,j,k,det,ip
     integer(Int64) :: iion
     real(Float64), dimension(3) :: rg,ri,rf,vi
-    integer, dimension(3) :: ind
+    integer, dimension(3) :: ind,pind
     real(Float64) :: denf
     integer, dimension(3,beam_grid%ngrid) :: pcell
     type(LocalProfiles) :: plasma
@@ -7379,7 +7379,7 @@ subroutine npa_f
         k = pcell(3,ip)
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
-        !$OMP& vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
+        !$OMP& pind,vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
@@ -7404,8 +7404,11 @@ subroutine npa_f
                         cycle gyro_range_loop
                     endif
 
+                    !! Get beam grid indices at ri
+                    call get_indices(ri,pind)
+
                     !! Calculate CX probability with beam and halo neutrals
-                    call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
+                    call get_beam_cx_prob(pind,ri,vi,neut_types,prob)
                     if(sum(prob).le.0.) cycle gyro_range_loop
 
                     !! Attenuate states as the particle move through plasma
@@ -7504,7 +7507,7 @@ subroutine npa_mc
                             cycle gyro_range_loop
                         endif
 
-                        !! Get beam grid indices
+                        !! Get beam grid indices at ri
                         call get_indices(ri,ind)
 
                         !! Calculate CX probability with beam and halo neutrals
@@ -7534,7 +7537,7 @@ subroutine npa_mc
                 call hit_npa_detector(ri, vi ,det, rf)
                 if(det.eq.0) cycle phi_loop
 
-                !! Get beam grid indices
+                !! Get beam grid indices at ri
                 call get_indices(ri,ind)
 
                 !! Calculate CX probability with beam and halo neutrals

@@ -137,6 +137,9 @@ def main():
     parser.add_argument('-c','--clobber',
                         action = 'store_true',
                         help = 'Overwrite existing runs')
+    parser.add_argument('--last-output',
+                        default = 'spectra',
+                        help=argparse.SUPPRESS)
     parser.add_argument('-v','--verbose',
                         action = 'store_true',
                         help = 'Verbose')
@@ -196,7 +199,7 @@ def main():
              files=[fileordir+'/'+ f for f in allfiles if re.search('.*_inputs\.dat',f)]
 
         if not args.clobber:
-            sfiles=[fileordir+'/'+ f for f in allfiles if re.search('.*_spectra\.(cdf|h5)',f)]
+            sfiles=[fileordir+'/'+ f for f in allfiles if re.search('.*_'+args.last_output+'\.(cdf|h5)',f)]
             frids = [extract_runid(f) for f in files]
             srids = [extract_runid(f) for f in sfiles]
             files = [fileordir+'/'+f+'_inputs.dat' for f in set(frids).difference(srids)]

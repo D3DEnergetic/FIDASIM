@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.1% of total for procedures.">6 statements</a>
+	  title=" 0.2% of total for procedures.">22 statements</a>
      </li> 
      
      
@@ -287,6 +287,8 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -417,7 +419,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +479,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -502,6 +516,10 @@
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -540,6 +558,8 @@
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -670,8 +690,6 @@
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
@@ -833,12 +851,13 @@ public function d_t_fusion(eb) result(sigma)
 
     
     <p>Calculates total cross section at a given deuterium energy, <code>eb</code>,
-for Deuterium-Tritium nuclear reactions</p>
+for Deuterium-Tritium nuclear reactions in the range [0.5-550 keV]</p>
 <h3 id="equation">Equation</h3>
 <p>$$ D + T \rightarrow He^4(3.5 MeV) + n(14.1 MeV)$$</p>
 <h3 id="references">References</h3>
 <ul>
-<li>Pages 44-45 in Ref. 7 <a href="../module/atomic_tables.html">atomic_tables</a></li>
+<li>Equations 8-9</li>
+<li>Table IV, VI in Ref. 7 <a href="../module/atomic_tables.html">atomic_tables</a></li>
 </ul>
     
 
@@ -860,7 +879,7 @@ for Deuterium-Tritium nuclear reactions</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E94"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E95"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -1043,24 +1062,49 @@ for Deuterium-Tritium nuclear reactions</p>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">d_t_fusion</span><span class="p">(</span><span class="n">eb</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
     <span class="c">!+Calculates total cross section at a given deuterium energy, `eb`,</span>
-    <span class="c">!+for Deuterium-Tritium nuclear reactions</span>
+    <span class="c">!+for Deuterium-Tritium nuclear reactions in the range [0.5-550 keV]</span>
     <span class="c">!+</span>
     <span class="c">!+###Equation</span>
     <span class="c">!+$$ D + T \rightarrow He^4(3.5 MeV) + n(14.1 MeV)$$</span>
     <span class="c">!+</span>
     <span class="c">!+###References</span>
-    <span class="c">!+* Pages 44-45 in Ref. 7 [[atomic_tables(module)]]</span>
+    <span class="c">!+* Equations 8-9</span>
+    <span class="c">!+* Table IV, VI in Ref. 7 [[atomic_tables(module)]]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span>
         <span class="c">!+ Deuterium energy [keV]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="mf">5.95d0</span><span class="p">,</span> <span class="mf">5.02d4</span><span class="p">,</span>   <span class="p">&amp;</span>
-                                                   <span class="mf">1.368d-2</span><span class="p">,</span> <span class="mf">1.076d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                   <span class="mi">40</span><span class="mf">9.d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A1</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">6.927d4</span><span class="p">,</span>  <span class="mf">7.454d8</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="mf">2.050d6</span><span class="p">,</span> <span class="mf">5.2002d4</span><span class="p">,</span>  <span class="p">&amp;</span>
+                                                    <span class="mf">0.d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">B1</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">6.38d1</span><span class="p">,</span>  <span class="o">-</span><span class="mf">9.95d-1</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="mf">6.981d-5</span><span class="p">,</span> <span class="mf">1.728d-4</span>  <span class="p">]</span>
 
-    <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0d-24</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)))</span> <span class="o">/</span> <span class="p">&amp;</span>
-            <span class="p">(</span><span class="n">eb</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">eb</span><span class="p">))</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.4714d6</span><span class="p">,</span> <span class="mf">0.d0</span><span class="p">,</span>  <span class="p">&amp;</span>
+                                                     <span class="mf">0.d0</span><span class="p">,</span> <span class="mf">0.d0</span><span class="p">,</span> <span class="mf">0.d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">B2</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">8.4127d-3</span><span class="p">,</span> <span class="mf">4.7983d-6</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="o">-</span><span class="mf">1.0748d-9</span><span class="p">,</span> <span class="mf">8.5184d-14</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Bg</span> <span class="o">=</span> <span class="mi">3</span><span class="mf">4.3827</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">B</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">S</span><span class="p">,</span> <span class="n">E</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">eb</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span><span class="mi">470</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">E</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mi">53</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">A</span> <span class="o">=</span> <span class="n">A1</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">B1</span>
+    <span class="k">else</span>
+<span class="k">        </span><span class="n">A</span> <span class="o">=</span> <span class="n">A2</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">B2</span>
+    <span class="n">endif</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)))))</span> <span class="o">/</span> <span class="p">&amp;</span>
+        <span class="p">(</span><span class="mi">1</span>    <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="n">B</span><span class="p">(</span><span class="mi">4</span><span class="p">)))))</span>
+
+    <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0d-27</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">S</span><span class="o">/</span><span class="p">(</span><span class="n">E</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="n">Bg</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">E</span><span class="p">))))</span>
 
 <span class="k">end function </span><span class="n">d_t_fusion</span>
 </pre></div>
@@ -1168,6 +1212,8 @@ for Deuterium-Tritium nuclear reactions</p>
       <a class="list-group-item" href="../proc/balance.html">balance</a>
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
@@ -1299,7 +1345,17 @@ for Deuterium-Tritium nuclear reactions</p>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1349,6 +1405,8 @@ for Deuterium-Tritium nuclear reactions</p>
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1384,6 +1442,10 @@ for Deuterium-Tritium nuclear reactions</p>
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -1422,6 +1484,8 @@ for Deuterium-Tritium nuclear reactions</p>
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1552,8 +1616,6 @@ for Deuterium-Tritium nuclear reactions</p>
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       

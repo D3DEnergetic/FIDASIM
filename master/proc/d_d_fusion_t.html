@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.1% of total for procedures.">6 statements</a>
+	  title=" 0.1% of total for procedures.">11 statements</a>
      </li> 
      
      
@@ -287,6 +287,8 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -417,7 +419,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +479,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -502,6 +516,10 @@
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -540,6 +558,8 @@
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -670,8 +690,6 @@
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
@@ -838,7 +856,8 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
 <p>$$ D + D \rightarrow T(1.01 MeV) + p(3.02 MeV) (50%)$$</p>
 <h3 id="references">References</h3>
 <ul>
-<li>Pages 44-45 in Ref. 7 <a href="../module/atomic_tables.html">atomic_tables</a></li>
+<li>Equations 8-9</li>
+<li>Table IV in Ref. 7 <a href="../module/atomic_tables.html">atomic_tables</a></li>
 </ul>
     
 
@@ -860,7 +879,7 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E92"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E93"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -1061,18 +1080,26 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
     <span class="c">!+$$ D + D \rightarrow T(1.01 MeV) + p(3.02 MeV) (50%)$$</span>
     <span class="c">!+</span>
     <span class="c">!+###References</span>
-    <span class="c">!+* Pages 44-45 in Ref. 7 [[atomic_tables(module)]]</span>
+    <span class="c">!+* Equations 8-9</span>
+    <span class="c">!+* Table IV in Ref. 7 [[atomic_tables(module)]]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span>
         <span class="c">!+ Deuterium energy [keV]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">sigma</span>
         <span class="c">!+ Cross Section [\(cm^2\)]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="mf">6.097d0</span><span class="p">,</span> <span class="mi">37</span><span class="mf">2.0d0</span><span class="p">,</span> <span class="p">&amp;</span>
-                                                   <span class="mf">4.36d-4</span><span class="p">,</span> <span class="mf">1.22d0</span><span class="p">,</span>   <span class="p">&amp;</span>
-                                                   <span class="mf">0.d0</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">A</span> <span class="o">=</span> <span class="p">[</span> <span class="mf">5.5576d4</span><span class="p">,</span>  <span class="mf">2.1054d2</span><span class="p">,</span>  <span class="p">&amp;</span>
+                                                   <span class="o">-</span><span class="mf">3.2638d-2</span><span class="p">,</span> <span class="mf">1.4987d-6</span><span class="p">,</span> <span class="p">&amp;</span>
+                                                    <span class="mf">1.8181d-10</span> <span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">B</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.d0</span><span class="p">,</span><span class="mf">0.d0</span><span class="p">,</span><span class="mf">0.d0</span><span class="p">,</span><span class="mf">0.d0</span><span class="p">]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Bg</span> <span class="o">=</span> <span class="mi">3</span><span class="mf">1.3970</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">S</span><span class="p">,</span> <span class="n">E</span>
 
-    <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0d-24</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">eb</span><span class="p">)</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)))</span> <span class="o">/</span> <span class="p">&amp;</span>
-            <span class="p">(</span><span class="n">eb</span><span class="o">*</span><span class="p">(</span><span class="nb">exp</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">eb</span><span class="p">))</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">eb</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span><span class="mi">500</span><span class="mf">0.0</span><span class="p">)</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="n">A</span><span class="p">(</span><span class="mi">5</span><span class="p">)))))</span> <span class="o">/</span> <span class="p">&amp;</span>
+        <span class="p">(</span><span class="mi">1</span>    <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="p">(</span><span class="n">B</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">E</span><span class="o">*</span><span class="n">B</span><span class="p">(</span><span class="mi">4</span><span class="p">)))))</span>
+
+    <span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0d-27</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">S</span><span class="o">/</span><span class="p">(</span><span class="n">E</span><span class="o">*</span><span class="nb">exp</span><span class="p">(</span><span class="n">Bg</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">E</span><span class="p">))))</span>
 
 <span class="k">end function </span><span class="n">d_d_fusion_t</span>
 </pre></div>
@@ -1180,6 +1207,8 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       <a class="list-group-item" href="../proc/balance.html">balance</a>
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
@@ -1311,7 +1340,17 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1361,6 +1400,8 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1396,6 +1437,10 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -1434,6 +1479,8 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1564,8 +1611,6 @@ for the Tritium branch of Deuterium-Deutrium nuclear reactions</p>
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       

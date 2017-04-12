@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 1.7% of total for procedures.">158 statements</a>
+	  title=" 1.6% of total for procedures.">158 statements</a>
      </li> 
      
      
@@ -287,6 +287,8 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -417,7 +419,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +479,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -502,6 +516,10 @@
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -540,6 +558,8 @@
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -670,8 +690,6 @@
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
@@ -1010,8 +1028,8 @@ public subroutine read_inputs()
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_brems</span><span class="p">,</span><span class="n">calc_bes</span><span class="p">,</span><span class="n">calc_fida</span><span class="p">,</span><span class="n">calc_npa</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_birth</span><span class="p">,</span><span class="n">calc_fida_wght</span><span class="p">,</span><span class="n">calc_npa_wght</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">load_neutrals</span><span class="p">,</span><span class="n">verbose</span><span class="p">,</span><span class="n">dump_dcx</span><span class="p">,</span><span class="n">no_flr</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">shot</span><span class="p">,</span><span class="n">n_fida</span><span class="p">,</span><span class="n">n_npa</span><span class="p">,</span><span class="n">n_nbi</span><span class="p">,</span><span class="n">n_halo</span><span class="p">,</span><span class="n">n_dcx</span><span class="p">,</span><span class="n">n_birth</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">nlambda</span><span class="p">,</span><span class="n">ne_wght</span><span class="p">,</span><span class="n">np_wght</span><span class="p">,</span><span class="n">nphi_wght</span><span class="p">,</span><span class="n">nlambda_wght</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">n_fida</span><span class="p">,</span><span class="n">n_npa</span><span class="p">,</span><span class="n">n_nbi</span><span class="p">,</span><span class="n">n_halo</span><span class="p">,</span><span class="n">n_dcx</span><span class="p">,</span><span class="n">n_birth</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">shot</span><span class="p">,</span><span class="n">nlambda</span><span class="p">,</span><span class="n">ne_wght</span><span class="p">,</span><span class="n">np_wght</span><span class="p">,</span><span class="n">nphi_wght</span><span class="p">,</span><span class="n">nlambda_wght</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>      <span class="kd">::</span> <span class="nb">time</span><span class="p">,</span><span class="n">lambdamin</span><span class="p">,</span><span class="n">lambdamax</span><span class="p">,</span><span class="n">emax_wght</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">lambdamin_wght</span><span class="p">,</span><span class="n">lambdamax_wght</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">ai</span><span class="p">,</span><span class="n">ab</span><span class="p">,</span><span class="n">pinj</span><span class="p">,</span><span class="n">einj</span><span class="p">,</span><span class="n">current_fractions</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -1315,6 +1333,8 @@ public subroutine read_inputs()
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -1445,7 +1465,17 @@ public subroutine read_inputs()
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1495,6 +1525,8 @@ public subroutine read_inputs()
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1530,6 +1562,10 @@ public subroutine read_inputs()
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -1568,6 +1604,8 @@ public subroutine read_inputs()
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1698,8 +1736,6 @@ public subroutine read_inputs()
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       

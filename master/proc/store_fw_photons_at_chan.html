@@ -287,6 +287,8 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -417,7 +419,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +479,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -502,6 +516,10 @@
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -540,6 +558,8 @@
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -670,8 +690,6 @@
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
@@ -853,7 +871,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
   
 <tr>
   
-  <td><span class="anchor" id="variable-ichan"></span>integer,</td>
+  <td><span class="anchor" id="variable-ichan%7E2"></span>integer,</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -913,7 +931,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
   
 <tr>
   
-  <td><span class="anchor" id="variable-vi%7E7"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-vi%7E8"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -928,7 +946,7 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
   
 <tr>
   
-  <td><span class="anchor" id="variable-fields%7E4"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td><span class="anchor" id="variable-fields%7E6"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -1123,58 +1141,58 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
 <polygon fill="none" stroke="black" points="494,-48 352,-48 352,-22 494,-22 494,-48"/>
 <text text-anchor="middle" x="423" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50">store_fw_photons_at_chan</text>
 </g>
-<!-- proc~store_fw_photons -->
-<g id="node2" class="node"><title>proc~store_fw_photons</title>
-<a xlink:href="../proc/store_fw_photons.html" xlink:title="store_fw_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="315,-26 219,-26 219,-1.24345e-14 315,-3.55271e-15 315,-26"/>
-<text text-anchor="middle" x="267" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons</text>
-</a>
-</g>
-<!-- proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan -->
-<g id="edge8" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan</title>
-<path fill="none" stroke="#000000" d="M315.504,-19.8403C323.887,-21.0226 332.803,-22.28 341.777,-23.5454"/>
-<polygon fill="#000000" stroke="#000000" points="341.516,-27.0432 351.906,-24.974 342.493,-20.1117 341.516,-27.0432"/>
-</g>
 <!-- proc~fida_weights_los -->
-<g id="node3" class="node"><title>proc~fida_weights_los</title>
+<g id="node2" class="node"><title>proc~fida_weights_los</title>
 <a xlink:href="../proc/fida_weights_los.html" xlink:title="fida_weights_los">
 <polygon fill="#d9534f" stroke="#d9534f" points="312,-70 222,-70 222,-44 312,-44 312,-70"/>
 <text text-anchor="middle" x="267" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
 </a>
 </g>
 <!-- proc~fida_weights_los&#45;&gt;proc~store_fw_photons_at_chan -->
-<g id="edge10" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~store_fw_photons_at_chan</title>
+<g id="edge8" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~store_fw_photons_at_chan</title>
 <path fill="none" stroke="#000000" d="M312.541,-50.5775C321.782,-49.2744 331.762,-47.8669 341.813,-46.4495"/>
 <polygon fill="#000000" stroke="#000000" points="342.45,-49.8944 351.863,-45.0322 341.472,-42.963 342.45,-49.8944"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node4" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-27 90,-27 90,-1 182,-1 182,-27"/>
-<text text-anchor="middle" x="136" y="-11.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+<!-- proc~store_fw_photons -->
+<g id="node3" class="node"><title>proc~store_fw_photons</title>
+<a xlink:href="../proc/store_fw_photons.html" xlink:title="store_fw_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="315,-26 219,-26 219,-1.24345e-14 315,-3.55271e-15 315,-26"/>
+<text text-anchor="middle" x="267" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons</text>
 </a>
 </g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~store_fw_photons -->
-<g id="edge4" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~store_fw_photons</title>
-<path fill="none" stroke="#000000" d="M182.186,-13.6474C190.551,-13.5836 199.378,-13.5162 208.05,-13.45"/>
-<polygon fill="#000000" stroke="#000000" points="208.15,-16.9494 218.123,-13.3731 208.096,-9.94964 208.15,-16.9494"/>
+<!-- proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan -->
+<g id="edge10" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan</title>
+<path fill="none" stroke="#000000" d="M315.504,-19.8403C323.887,-21.0226 332.803,-22.28 341.777,-23.5454"/>
+<polygon fill="#000000" stroke="#000000" points="341.516,-27.0432 351.906,-24.974 342.493,-20.1117 341.516,-27.0432"/>
 </g>
 <!-- program~fidasim -->
-<g id="node5" class="node"><title>program~fidasim</title>
+<g id="node4" class="node"><title>program~fidasim</title>
 <a xlink:href="../program/fidasim.html" xlink:title="fidasim">
 <polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-48 2.13163e-14,-48 0,-22 54,-22 54,-48"/>
 <text text-anchor="middle" x="27" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_los -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
 <path fill="none" stroke="#000000" d="M54.0645,-37.4809C91.9472,-40.9535 161.669,-47.3447 210.997,-51.8664"/>
 <polygon fill="#000000" stroke="#000000" points="210.917,-55.3736 221.194,-52.8012 211.556,-48.4028 210.917,-55.3736"/>
 </g>
+<!-- proc~fida_weights_mc -->
+<g id="node6" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-27 90,-27 90,-1 182,-1 182,-27"/>
+<text text-anchor="middle" x="136" y="-11.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
 <path fill="none" stroke="#000000" d="M54.2241,-29.755C62.0126,-28.2544 70.8024,-26.561 79.6572,-24.855"/>
 <polygon fill="#000000" stroke="#000000" points="80.4749,-28.2619 89.6322,-22.9332 79.1506,-21.3883 80.4749,-28.2619"/>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~store_fw_photons -->
+<g id="edge6" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~store_fw_photons</title>
+<path fill="none" stroke="#000000" d="M182.186,-13.6474C190.551,-13.5836 199.378,-13.5162 208.05,-13.45"/>
+<polygon fill="#000000" stroke="#000000" points="208.15,-16.9494 218.123,-13.3731 208.096,-9.94964 208.15,-16.9494"/>
 </g>
 </g>
 </svg>
@@ -1458,6 +1476,8 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -1588,7 +1608,17 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1638,6 +1668,8 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1673,6 +1705,10 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -1711,6 +1747,8 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1841,8 +1879,6 @@ public subroutine store_fw_photons_at_chan(ichan, eind, pind, vp, vi, fields, dl
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       

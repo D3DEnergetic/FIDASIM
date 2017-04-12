@@ -287,6 +287,8 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -417,7 +419,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +479,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -502,6 +516,10 @@
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -540,6 +558,8 @@
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -670,8 +690,6 @@
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
@@ -958,27 +976,27 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
 <path fill="none" stroke="#000000" d="M76.8951,-70.0823C90.6534,-75.3925 106.574,-81.5372 120.579,-86.9428"/>
 <polygon fill="#000000" stroke="#000000" points="119.33,-90.2122 129.919,-90.5478 121.85,-83.6817 119.33,-90.2122"/>
 </g>
-<!-- proc~xyz_to_uvw -->
-<g id="node3" class="node"><title>proc~xyz_to_uvw</title>
-<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="191,-70 123,-70 123,-44 191,-44 191,-70"/>
-<text text-anchor="middle" x="157" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
-</a>
-</g>
-<!-- proc~get_distribution&#45;&gt;proc~xyz_to_uvw -->
-<g id="edge28" class="edge"><title>proc~get_distribution&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M85.7737,-57C94.5833,-57 103.877,-57 112.738,-57"/>
-<polygon fill="#000000" stroke="#000000" points="112.887,-60.5001 122.887,-57 112.887,-53.5001 112.887,-60.5001"/>
-</g>
 <!-- proc~get_position -->
-<g id="node4" class="node"><title>proc~get_position</title>
+<g id="node3" class="node"><title>proc~get_position</title>
 <a xlink:href="../proc/get_position.html" xlink:title="get_position">
-<polygon fill="#d9534f" stroke="#d9534f" points="192,-26 122,-26 122,-1.24345e-14 192,-3.55271e-15 192,-26"/>
-<text text-anchor="middle" x="157" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="192,-70 122,-70 122,-44 192,-44 192,-70"/>
+<text text-anchor="middle" x="157" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
 </a>
 </g>
 <!-- proc~get_distribution&#45;&gt;proc~get_position -->
-<g id="edge30" class="edge"><title>proc~get_distribution&#45;&gt;proc~get_position</title>
+<g id="edge28" class="edge"><title>proc~get_distribution&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="#000000" d="M85.7737,-57C94.2181,-57 103.107,-57 111.634,-57"/>
+<polygon fill="#000000" stroke="#000000" points="111.8,-60.5001 121.8,-57 111.8,-53.5001 111.8,-60.5001"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="node4" class="node"><title>proc~xyz_to_uvw</title>
+<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="191,-26 123,-26 123,-1.24345e-14 191,-3.55271e-15 191,-26"/>
+<text text-anchor="middle" x="157" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+<!-- proc~get_distribution&#45;&gt;proc~xyz_to_uvw -->
+<g id="edge30" class="edge"><title>proc~get_distribution&#45;&gt;proc~xyz_to_uvw</title>
 <path fill="none" stroke="#000000" d="M76.8951,-43.9177C88.3922,-39.4802 101.399,-34.4601 113.536,-29.7754"/>
 <polygon fill="#000000" stroke="#000000" points="114.97,-32.9739 123.039,-26.1079 112.449,-26.4435 114.97,-32.9739"/>
 </g>
@@ -1206,27 +1224,27 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
 <path fill="none" stroke="#000000" d="M244.106,-35C252.205,-35 261.119,-35 269.949,-35"/>
 <polygon fill="#000000" stroke="#000000" points="270.223,-38.5001 280.223,-35 270.223,-31.5001 270.223,-38.5001"/>
 </g>
-<!-- proc~fida_f -->
-<g id="node3" class="node"><title>proc~fida_f</title>
-<a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-70 90,-70 90,-44 144,-44 144,-70"/>
-<text text-anchor="middle" x="117" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
-</a>
-</g>
-<!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
-<g id="edge6" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
-<path fill="none" stroke="#000000" d="M144.223,-50.6957C152.184,-48.8522 161.079,-46.7921 169.74,-44.7865"/>
-<polygon fill="#000000" stroke="#000000" points="170.776,-48.1393 179.729,-42.4734 169.197,-41.3198 170.776,-48.1393"/>
-</g>
 <!-- proc~npa_f -->
-<g id="node4" class="node"><title>proc~npa_f</title>
+<g id="node3" class="node"><title>proc~npa_f</title>
 <a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
-<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-70 90,-70 90,-44 144,-44 144,-70"/>
+<text text-anchor="middle" x="117" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
 </a>
 </g>
 <!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
-<g id="edge8" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
+<g id="edge6" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
+<path fill="none" stroke="#000000" d="M144.223,-50.6957C152.184,-48.8522 161.079,-46.7921 169.74,-44.7865"/>
+<polygon fill="#000000" stroke="#000000" points="170.776,-48.1393 179.729,-42.4734 169.197,-41.3198 170.776,-48.1393"/>
+</g>
+<!-- proc~fida_f -->
+<g id="node4" class="node"><title>proc~fida_f</title>
+<a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
+<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+</a>
+</g>
+<!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
+<g id="edge8" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
 <path fill="none" stroke="#000000" d="M144.223,-19.3043C152.184,-21.1478 161.079,-23.2079 169.74,-25.2135"/>
 <polygon fill="#000000" stroke="#000000" points="169.197,-28.6802 179.729,-27.5266 170.776,-21.8607 169.197,-28.6802"/>
 </g>
@@ -1237,13 +1255,13 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
 <text text-anchor="middle" x="27" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
 <path fill="none" stroke="#000000" d="M54.003,-41.6007C62.1158,-43.5839 71.1631,-45.7954 79.8131,-47.9099"/>
 <polygon fill="#000000" stroke="#000000" points="79.1599,-51.3532 89.705,-50.3279 80.8221,-44.5534 79.1599,-51.3532"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<!-- program~fidasim&#45;&gt;proc~fida_f -->
+<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
 <path fill="none" stroke="#000000" d="M54.003,-28.3993C62.1158,-26.4161 71.1631,-24.2046 79.8131,-22.0901"/>
 <polygon fill="#000000" stroke="#000000" points="80.8221,-25.4466 89.705,-19.6721 79.1599,-18.6468 80.8221,-25.4466"/>
 </g>
@@ -1513,6 +1531,8 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
@@ -1643,7 +1663,17 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1693,6 +1723,8 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1728,6 +1760,10 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -1766,6 +1802,8 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1896,8 +1934,6 @@ public subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       

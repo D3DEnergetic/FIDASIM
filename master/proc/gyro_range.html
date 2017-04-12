@@ -10,7 +10,7 @@
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
-    <title>plane_intercept &ndash; FIDASIM</title>
+    <title>gyro_range &ndash; FIDASIM</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -114,7 +114,7 @@
     
   
   <div class="row">
-    <h1>plane_intercept
+    <h1>gyro_range
       <small>Subroutine</small>
     
     </h1>
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.1% of total for procedures.">10 statements</a>
+	  title=" 0.7% of total for procedures.">63 statements</a>
      </li> 
      
      
@@ -145,7 +145,7 @@
   
      <li><a href='../module/libfida.html'>libfida</a></li>
   
-     <li class="active">plane_intercept</li>
+     <li class="active">gyro_range</li>
   </ol>
 </div>
 </div>
@@ -186,7 +186,7 @@
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
-    <a class="list-group-item" href="../proc/plane_intercept.html#src">plane_intercept</a>
+    <a class="list-group-item" href="../proc/gyro_range.html#src">gyro_range</a>
   </div>
 </div>
 
@@ -286,6 +286,8 @@
       <a class="list-group-item" href="../proc/balance.html">balance</a>
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
@@ -417,7 +419,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +479,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -502,6 +516,10 @@
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -540,6 +558,8 @@
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -670,8 +690,6 @@
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
@@ -822,7 +840,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine plane_intercept(l0, l, p0, n, p, t)
+public subroutine gyro_range(b, gs, gyrange, nrange)
     
     
 	 
@@ -832,7 +850,7 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
 
 
     
-    <p>Calculates the intersection of a line and a plane</p>
+    <p>Calculates the range(s) of gyro-angles that would land within a bounded plane</p>
     
 
     <h3>Arguments</h3>
@@ -853,12 +871,12 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
   
 <tr>
   
-  <td><span class="anchor" id="variable-l0"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
+  <td><span class="anchor" id="variable-b%7E6"></span>type(<a href='../type/boundedplane.html'>BoundedPlane</a>),</td>
+  <td>intent(in)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>l0</strong></td><td><p>Point on line</p></td>
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td><p>Bounded Plane</p></td>
   
 </tr>
 
@@ -868,12 +886,12 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
   
 <tr>
   
-  <td><span class="anchor" id="variable-l"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
+  <td><span class="anchor" id="variable-gs%7E6"></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>l</strong></td><td><p>Ray of line</p></td>
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td><p>Gyro-surface</p></td>
   
 </tr>
 
@@ -883,42 +901,12 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
   
 <tr>
   
-  <td><span class="anchor" id="variable-p0"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>p0</strong></td><td><p>Point on plane</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-n%7E8"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>n</strong></td><td><p>Normal vector of plane</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-p%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-gyrange"></span>real(kind=Float64),</td>
   <td>intent(out),</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>p</strong></td><td><p>Line-plane intercept point</p></td>
+  <td>dimension(2,4)</td><td>::</td>
+  <td><strong>gyrange</strong></td><td><p>(theta, dtheta) values</p></td>
   
 </tr>
 
@@ -928,12 +916,12 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
   
 <tr>
   
-  <td><span class="anchor" id="variable-t"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-nrange"></span>integer,</td>
   <td>intent(out)</td>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>t</strong></td><td><p>"time" to intercept</p></td>
+  <td><strong>nrange</strong></td><td><p>Number of ranges. <code>1 &lt;= nrange &lt;= 4</code></p></td>
   
 </tr>
 
@@ -943,6 +931,167 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
     
     
     
+     <h3>Calls</h3>
+     
+                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+ -->
+<!-- Title: proc~~gyro_range~~CallsGraph Pages: 1 -->
+<svg id="procgyro_rangeCallsGraph" width="256pt" height="254pt"
+ viewBox="0.00 0.00 256.00 254.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~gyro_range~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 250)">
+<title>proc~~gyro_range~~CallsGraph</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-250 253,-250 253,5 -4,5"/>
+<!-- proc~gyro_range -->
+<g id="node1" class="node"><title>proc~gyro_range</title>
+<polygon fill="none" stroke="black" points="67,-136 1,-136 1,-110 67,-110 67,-136"/>
+<text text-anchor="middle" x="34" y="-120.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_range</text>
+</g>
+<!-- proc~line_plane_intersect -->
+<g id="node2" class="node"><title>proc~line_plane_intersect</title>
+<a xlink:href="../proc/line_plane_intersect.html" xlink:title="line_plane_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="230,-246 122,-246 122,-220 230,-220 230,-246"/>
+<text text-anchor="middle" x="176" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_plane_intersect</text>
+</a>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~line_plane_intersect -->
+<g id="edge2" class="edge"><title>proc~gyro_range&#45;&gt;proc~line_plane_intersect</title>
+<path fill="none" stroke="#000000" d="M40.983,-136.114C51.8929,-155.359 74.7912,-191.116 104,-211 106.701,-212.839 109.561,-214.528 112.524,-216.08"/>
+<polygon fill="#000000" stroke="#000000" points="111.118,-219.286 121.661,-220.334 114.073,-212.94 111.118,-219.286"/>
+</g>
+<!-- proc~gyro_surface_coordinates -->
+<g id="node3" class="node"><title>proc~gyro_surface_coordinates</title>
+<a xlink:href="../proc/gyro_surface_coordinates.html" xlink:title="gyro_surface_coordinates">
+<polygon fill="#d9534f" stroke="#d9534f" points="244,-202 108,-202 108,-176 244,-176 244,-202"/>
+<text text-anchor="middle" x="176" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_surface_coordinates</text>
+</a>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~gyro_surface_coordinates -->
+<g id="edge4" class="edge"><title>proc~gyro_range&#45;&gt;proc~gyro_surface_coordinates</title>
+<path fill="none" stroke="#000000" d="M51.9642,-136.161C65.6781,-145.736 85.3323,-158.464 104,-167 108.305,-168.969 112.834,-170.82 117.435,-172.549"/>
+<polygon fill="#000000" stroke="#000000" points="116.343,-175.875 126.937,-175.923 118.685,-169.279 116.343,-175.875"/>
+</g>
+<!-- proc~in_boundary -->
+<g id="node4" class="node"><title>proc~in_boundary</title>
+<a xlink:href="../proc/in_boundary.html" xlink:title="in_boundary">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="212,-158 140,-158 140,-132 212,-132 212,-158"/>
+<text text-anchor="middle" x="176" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_boundary</text>
+</a>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~in_boundary -->
+<g id="edge6" class="edge"><title>proc~gyro_range&#45;&gt;proc~in_boundary</title>
+<path fill="none" stroke="#000000" d="M67.652,-128.214C86.2446,-131.094 109.614,-134.715 129.885,-137.855"/>
+<polygon fill="#000000" stroke="#000000" points="129.438,-141.328 139.856,-139.4 130.51,-134.41 129.438,-141.328"/>
+</g>
+<!-- proc~in_gyro_surface -->
+<g id="node5" class="node"><title>proc~in_gyro_surface</title>
+<a xlink:href="../proc/in_gyro_surface.html" xlink:title="in_gyro_surface">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="220,-114 132,-114 132,-88 220,-88 220,-114"/>
+<text text-anchor="middle" x="176" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_gyro_surface</text>
+</a>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~in_gyro_surface -->
+<g id="edge8" class="edge"><title>proc~gyro_range&#45;&gt;proc~in_gyro_surface</title>
+<path fill="none" stroke="#000000" d="M67.652,-117.786C83.632,-115.311 103.141,-112.288 121.178,-109.494"/>
+<polygon fill="#000000" stroke="#000000" points="121.956,-112.915 131.302,-107.925 120.884,-105.997 121.956,-112.915"/>
+</g>
+<!-- proc~line_gyro_surface_intersect -->
+<g id="node6" class="node"><title>proc~line_gyro_surface_intersect</title>
+<a xlink:href="../proc/line_gyro_surface_intersect.html" xlink:title="line_gyro_surface_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="248,-70 104,-70 104,-44 248,-44 248,-70"/>
+<text text-anchor="middle" x="176" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_gyro_surface_intersect</text>
+</a>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~line_gyro_surface_intersect -->
+<g id="edge10" class="edge"><title>proc~gyro_range&#45;&gt;proc~line_gyro_surface_intersect</title>
+<path fill="none" stroke="#000000" d="M51.9642,-109.839C65.6781,-100.264 85.3323,-87.5355 104,-79 108.305,-77.0315 112.834,-75.1796 117.435,-73.4508"/>
+<polygon fill="#000000" stroke="#000000" points="118.685,-76.7213 126.937,-70.077 116.343,-70.1248 118.685,-76.7213"/>
+</g>
+<!-- proc~boundary_edge -->
+<g id="node7" class="node"><title>proc~boundary_edge</title>
+<a xlink:href="../proc/boundary_edge.html" xlink:title="boundary_edge">
+<polygon fill="#d9534f" stroke="#d9534f" points="220,-26 132,-26 132,-1.24345e-14 220,-3.55271e-15 220,-26"/>
+<text text-anchor="middle" x="176" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_edge</text>
+</a>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~boundary_edge -->
+<g id="edge12" class="edge"><title>proc~gyro_range&#45;&gt;proc~boundary_edge</title>
+<path fill="none" stroke="#000000" d="M40.983,-109.886C51.8929,-90.6413 74.7912,-54.8839 104,-35 109.59,-31.1948 115.861,-28.0291 122.309,-25.3999"/>
+<polygon fill="#000000" stroke="#000000" points="123.636,-28.6414 131.825,-21.9195 121.232,-22.0673 123.636,-28.6414"/>
+</g>
+</g>
+</svg>
+</div>
+                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
+                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="556pt" height="34pt"
+ viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
+<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
+<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
+<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
+<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
+<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
+<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+     
      
      <h3>Called By</h3>
      
@@ -951,103 +1100,69 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
-<!-- Title: proc~~plane_intercept~~CalledByGraph Pages: 1 -->
-<svg id="procplane_interceptCalledByGraph" width="424pt" height="166pt"
- viewBox="0.00 0.00 424.00 166.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~plane_intercept~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 162)">
-<title>proc~~plane_intercept~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-162 421,-162 421,5 -4,5"/>
-<!-- proc~plane_intercept -->
-<g id="node1" class="node"><title>proc~plane_intercept</title>
-<polygon fill="none" stroke="black" points="416,-92 330,-92 330,-66 416,-66 416,-92"/>
-<text text-anchor="middle" x="373" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50">plane_intercept</text>
+<!-- Title: proc~~gyro_range~~CalledByGraph Pages: 1 -->
+<svg id="procgyro_rangeCalledByGraph" width="384pt" height="78pt"
+ viewBox="0.00 0.00 384.00 78.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~gyro_range~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 74)">
+<title>proc~~gyro_range~~CalledByGraph</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-74 381,-74 381,5 -4,5"/>
+<!-- proc~gyro_range -->
+<g id="node1" class="node"><title>proc~gyro_range</title>
+<polygon fill="none" stroke="black" points="375,-48 309,-48 309,-22 375,-22 375,-48"/>
+<text text-anchor="middle" x="342" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_range</text>
 </g>
-<!-- proc~hit_npa_detector -->
-<g id="node2" class="node"><title>proc~hit_npa_detector</title>
-<a xlink:href="../proc/hit_npa_detector.html" xlink:title="hit_npa_detector">
-<polygon fill="#d9534f" stroke="#d9534f" points="293,-92 201,-92 201,-66 293,-66 293,-92"/>
-<text text-anchor="middle" x="247" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hit_npa_detector</text>
+<!-- proc~npa_gyro_range -->
+<g id="node2" class="node"><title>proc~npa_gyro_range</title>
+<a xlink:href="../proc/npa_gyro_range.html" xlink:title="npa_gyro_range">
+<polygon fill="#d9534f" stroke="#d9534f" points="271,-48 181,-48 181,-22 271,-22 271,-48"/>
+<text text-anchor="middle" x="226" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_gyro_range</text>
 </a>
 </g>
-<!-- proc~hit_npa_detector&#45;&gt;proc~plane_intercept -->
-<g id="edge18" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~plane_intercept</title>
-<path fill="none" stroke="#000000" d="M293.56,-79C302.125,-79 311.127,-79 319.869,-79"/>
-<polygon fill="#000000" stroke="#000000" points="319.97,-82.5001 329.97,-79 319.97,-75.5001 319.97,-82.5001"/>
-</g>
-<!-- proc~npa_weights -->
-<g id="node3" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-158 91,-158 91,-132 163,-132 163,-158"/>
-<text text-anchor="middle" x="127" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
-</a>
-</g>
-<!-- proc~npa_weights&#45;&gt;proc~hit_npa_detector -->
-<g id="edge10" class="edge"><title>proc~npa_weights&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M150.708,-131.961C168.952,-121.927 194.366,-107.949 214.504,-96.8727"/>
-<polygon fill="#000000" stroke="#000000" points="216.266,-99.8984 223.341,-92.0124 212.892,-93.7649 216.266,-99.8984"/>
+<!-- proc~npa_gyro_range&#45;&gt;proc~gyro_range -->
+<g id="edge10" class="edge"><title>proc~npa_gyro_range&#45;&gt;proc~gyro_range</title>
+<path fill="none" stroke="#000000" d="M271.513,-35C280.364,-35 289.622,-35 298.408,-35"/>
+<polygon fill="#000000" stroke="#000000" points="298.454,-38.5001 308.454,-35 298.454,-31.5001 298.454,-38.5001"/>
 </g>
 <!-- proc~npa_f -->
-<g id="node4" class="node"><title>proc~npa_f</title>
+<g id="node3" class="node"><title>proc~npa_f</title>
 <a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-114 100,-114 100,-88 154,-88 154,-114"/>
-<text text-anchor="middle" x="127" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-70 90,-70 90,-44 144,-44 144,-70"/>
+<text text-anchor="middle" x="117" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
 </a>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~hit_npa_detector -->
-<g id="edge12" class="edge"><title>proc~npa_f&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M154.23,-96.0079C164.924,-94.0472 177.623,-91.7192 190.138,-89.4246"/>
-<polygon fill="#000000" stroke="#000000" points="190.89,-92.8453 200.095,-87.5993 189.627,-85.96 190.89,-92.8453"/>
-</g>
-<!-- proc~read_npa -->
-<g id="node5" class="node"><title>proc~read_npa</title>
-<a xlink:href="../proc/read_npa.html" xlink:title="read_npa">
-<polygon fill="#d9534f" stroke="#d9534f" points="156,-70 98,-70 98,-44 156,-44 156,-70"/>
-<text text-anchor="middle" x="127" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
-</a>
-</g>
-<!-- proc~read_npa&#45;&gt;proc~hit_npa_detector -->
-<g id="edge14" class="edge"><title>proc~read_npa&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M156.049,-62.3256C166.453,-64.2331 178.568,-66.4541 190.497,-68.6412"/>
-<polygon fill="#000000" stroke="#000000" points="189.966,-72.102 200.433,-70.4627 191.228,-65.2168 189.966,-72.102"/>
+<!-- proc~npa_f&#45;&gt;proc~npa_gyro_range -->
+<g id="edge6" class="edge"><title>proc~npa_f&#45;&gt;proc~npa_gyro_range</title>
+<path fill="none" stroke="#000000" d="M144.224,-51.5052C152.282,-49.8789 161.411,-48.0364 170.575,-46.1867"/>
+<polygon fill="#000000" stroke="#000000" points="171.374,-49.5962 180.483,-44.1868 169.989,-42.7346 171.374,-49.5962"/>
 </g>
 <!-- proc~npa_mc -->
-<g id="node6" class="node"><title>proc~npa_mc</title>
+<g id="node4" class="node"><title>proc~npa_mc</title>
 <a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-26 100,-26 100,-1.24345e-14 154,-3.55271e-15 154,-26"/>
-<text text-anchor="middle" x="127" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
+<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
 </g>
-<!-- proc~npa_mc&#45;&gt;proc~hit_npa_detector -->
-<g id="edge16" class="edge"><title>proc~npa_mc&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M150.708,-26.0395C168.952,-36.0734 194.366,-50.0511 214.504,-61.1273"/>
-<polygon fill="#000000" stroke="#000000" points="212.892,-64.2351 223.341,-65.9876 216.266,-58.1016 212.892,-64.2351"/>
+<!-- proc~npa_mc&#45;&gt;proc~npa_gyro_range -->
+<g id="edge8" class="edge"><title>proc~npa_mc&#45;&gt;proc~npa_gyro_range</title>
+<path fill="none" stroke="#000000" d="M144.224,-18.4948C152.282,-20.1211 161.411,-21.9636 170.575,-23.8133"/>
+<polygon fill="#000000" stroke="#000000" points="169.989,-27.2654 180.483,-25.8132 171.374,-20.4038 169.989,-27.2654"/>
 </g>
 <!-- program~fidasim -->
-<g id="node7" class="node"><title>program~fidasim</title>
+<g id="node5" class="node"><title>program~fidasim</title>
 <a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-92 2.13163e-14,-92 0,-66 54,-66 54,-92"/>
-<text text-anchor="middle" x="27" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-48 2.13163e-14,-48 0,-22 54,-22 54,-48"/>
+<text text-anchor="middle" x="27" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M44.956,-92.0646C57.432,-101.012 74.5305,-113.018 90,-123 91.8878,-124.218 93.8424,-125.454 95.8222,-126.685"/>
-<polygon fill="#000000" stroke="#000000" points="94.1736,-129.78 104.533,-131.999 97.8186,-123.803 94.1736,-129.78"/>
-</g>
 <!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M54.0614,-84.9535C65.0669,-87.3747 77.9653,-90.2124 89.83,-92.8226"/>
-<polygon fill="#000000" stroke="#000000" points="89.3984,-96.3113 99.9169,-95.0417 90.9025,-89.4748 89.3984,-96.3113"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~read_npa -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
-<path fill="none" stroke="#000000" d="M54.0614,-73.0465C64.4243,-70.7667 76.4656,-68.1176 87.7418,-65.6368"/>
-<polygon fill="#000000" stroke="#000000" points="88.7979,-68.9882 97.8123,-63.4213 87.2938,-62.1517 88.7979,-68.9882"/>
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M54.003,-41.6007C62.1158,-43.5839 71.1631,-45.7954 79.8131,-47.9099"/>
+<polygon fill="#000000" stroke="#000000" points="79.1599,-51.3532 89.705,-50.3279 80.8221,-44.5534 79.1599,-51.3532"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M44.956,-65.9354C57.432,-56.9881 74.5305,-44.9821 90,-35 91.8878,-33.7819 93.8424,-32.5464 95.8222,-31.3146"/>
-<polygon fill="#000000" stroke="#000000" points="97.8186,-34.1966 104.533,-26.0014 94.1736,-28.2205 97.8186,-34.1966"/>
+<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<path fill="none" stroke="#000000" d="M54.003,-28.3993C62.1158,-26.4161 71.1631,-24.2046 79.8131,-22.0901"/>
+<polygon fill="#000000" stroke="#000000" points="80.8221,-25.4466 89.705,-19.6721 79.1599,-18.6468 80.8221,-25.4466"/>
 </g>
 </g>
 </svg>
@@ -1147,7 +1262,7 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
-    <a class="list-group-item" href="../proc/plane_intercept.html#src">plane_intercept</a>
+    <a class="list-group-item" href="../proc/gyro_range.html#src">gyro_range</a>
   </div>
 </div>
 
@@ -1175,26 +1290,81 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">plane_intercept</span><span class="p">(</span><span class="n">l0</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-    <span class="c">!+ Calculates the intersection of a line and a plane</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">l0</span>
-        <span class="c">!+ Point on line</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">l</span>
-        <span class="c">!+ Ray of line</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">p0</span>
-        <span class="c">!+ Point on plane</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">n</span>
-        <span class="c">!+ Normal vector of plane</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p</span>
-        <span class="c">!+ Line-plane intercept point</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">t</span>
-        <span class="c">!+ &quot;time&quot; to intercept</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_range</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">gyrange</span><span class="p">,</span> <span class="n">nrange</span><span class="p">)</span>
+    <span class="c">!+ Calculates the range(s) of gyro-angles that would land within a bounded plane</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">BoundedPlane</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">b</span>
+        <span class="c">!+ Bounded Plane</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">GyroSurface</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">gs</span>
+        <span class="c">!+ Gyro-surface</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gyrange</span>
+        <span class="c">!+ (theta, dtheta) values</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nrange</span>
+        <span class="c">!+ Number of ranges. `1 &lt;= nrange &lt;= 4`</span>
 
-    <span class="n">t</span> <span class="o">=</span> <span class="nb">dot_product</span><span class="p">(</span><span class="n">p0</span> <span class="o">-</span> <span class="n">l0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">/</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nb</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ninter</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">in_gs</span><span class="p">,</span> <span class="n">bin_gs</span>
+    <span class="kt">logical</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cross</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">t_p</span><span class="p">,</span> <span class="n">th1</span><span class="p">,</span> <span class="n">th2</span><span class="p">,</span> <span class="n">dth</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">u_cur</span><span class="p">,</span> <span class="n">t_i</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rc</span><span class="p">,</span> <span class="n">p_pre</span><span class="p">,</span> <span class="n">p_cur</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">ri</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span> <span class="kd">::</span> <span class="n">u</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span> <span class="kd">::</span> <span class="n">bedge</span>
 
-    <span class="n">p</span> <span class="o">=</span> <span class="n">l0</span> <span class="o">+</span> <span class="n">t</span><span class="o">*</span><span class="n">l</span>
+    <span class="n">nrange</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">call </span><span class="n">line_plane_intersect</span><span class="p">(</span><span class="n">gs</span><span class="p">%</span><span class="n">center</span><span class="p">,</span> <span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span> <span class="n">b</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="n">b</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span> <span class="n">rc</span><span class="p">,</span> <span class="n">t_p</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">t_p</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">return</span>
 
-<span class="k">end subroutine </span><span class="n">plane_intercept</span>
+<span class="k">    call </span><span class="n">boundary_edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">bedge</span><span class="p">,</span> <span class="n">nb</span><span class="p">)</span>
+    <span class="n">p_pre</span> <span class="o">=</span> <span class="n">bedge</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">in_gs</span> <span class="o">=</span> <span class="n">in_gyro_surface</span><span class="p">(</span><span class="n">gs</span><span class="p">,</span> <span class="n">p_pre</span><span class="p">)</span>
+    <span class="n">bin_gs</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+
+    <span class="n">ninter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="n">boundary_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nb</span>
+        <span class="n">p_cur</span> <span class="o">=</span> <span class="n">bedge</span><span class="p">(:,</span><span class="nb">modulo</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">nb</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="n">p_cur</span> <span class="o">-</span> <span class="n">p_pre</span>
+        <span class="k">call </span><span class="n">line_gyro_surface_intersect</span><span class="p">(</span><span class="n">p_pre</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">t_i</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">t_i</span><span class="p">(</span><span class="n">j</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">t_i</span><span class="p">(</span><span class="n">j</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="mf">1.0</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">ri</span> <span class="o">=</span> <span class="n">p_pre</span> <span class="o">+</span> <span class="n">t_i</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="o">*</span><span class="n">v0</span>
+                <span class="k">call </span><span class="n">gyro_surface_coordinates</span><span class="p">(</span><span class="n">gs</span><span class="p">,</span> <span class="n">ri</span><span class="p">,</span> <span class="n">u_cur</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">u_cur</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    </span><span class="n">in_gs</span> <span class="o">=</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span><span class="n">in_gs</span>
+                    <span class="n">ninter</span> <span class="o">=</span> <span class="n">ninter</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">cross</span><span class="p">(</span><span class="n">ninter</span><span class="p">)</span> <span class="o">=</span> <span class="n">in_gs</span>
+                    <span class="n">u</span><span class="p">(:,</span><span class="n">ninter</span><span class="p">)</span> <span class="o">=</span> <span class="n">u_cur</span>
+                <span class="n">endif</span>
+            <span class="n">endif</span>
+        <span class="n">enddo</span>
+        <span class="n">p_pre</span> <span class="o">=</span> <span class="n">p_cur</span>
+    <span class="n">enddo</span> <span class="n">boundary_loop</span>
+
+    <span class="n">gyrange</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">ninter</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(.</span><span class="nb">not</span><span class="p">.</span><span class="n">bin_gs</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">in_boundary</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">rc</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">nrange</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">gyrange</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.d0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">]</span>
+        <span class="n">endif</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
+
+    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ninter</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">cross</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">th1</span> <span class="o">=</span> <span class="n">u</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">ninter</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">th2</span> <span class="o">=</span> <span class="n">u</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
+            <span class="n">dth</span> <span class="o">=</span> <span class="n">th2</span><span class="o">-</span><span class="n">th1</span>
+            <span class="n">nrange</span> <span class="o">=</span> <span class="n">nrange</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">dth</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">gyrange</span><span class="p">(:,</span><span class="n">nrange</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">th1</span><span class="p">,</span> <span class="n">dth</span><span class="p">]</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">gyrange</span><span class="p">(:,</span><span class="n">nrange</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">th2</span><span class="p">,</span> <span class="o">-</span><span class="n">dth</span><span class="p">]</span>
+            <span class="n">endif</span>
+        <span class="n">endif</span>
+    <span class="n">enddo</span>
+
+<span class="k">end subroutine </span><span class="n">gyro_range</span>
 </pre></div>
 
     </section>
@@ -1300,6 +1470,8 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
       <a class="list-group-item" href="../proc/balance.html">balance</a>
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
       
@@ -1431,7 +1603,17 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1481,6 +1663,8 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1516,6 +1700,10 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
       <a class="list-group-item" href="../proc/lfs_multiply.html">lfs_multiply</a>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
+      
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
       
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
@@ -1554,6 +1742,8 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1684,8 +1874,6 @@ public subroutine plane_intercept(l0, l, p0, n, p, t)
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
-      
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       

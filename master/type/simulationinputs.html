@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p>12.0% of total for derived types.</p>Including implementation: 45 statements, 12.0% of total for derived types.">45 statements</a>
+	  title="<p>11.7% of total for derived types.</p>Including implementation: 45 statements, 11.7% of total for derived types.">45 statements</a>
      </li> 
      
      
@@ -317,6 +317,8 @@
       <a class="list-group-item" href="../type/fastionparticles.html">FastIonParticles</a>
       
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
+      
+      <a class="list-group-item" href="../type/gyrosurface.html">GyroSurface</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
       
@@ -658,7 +660,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_fida"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_fida"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -672,7 +674,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_npa"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_npa"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -686,7 +688,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_nbi"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_nbi"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -700,7 +702,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_dcx"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_dcx"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -714,7 +716,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_halo"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_halo"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -728,7 +730,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_birth"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_birth"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1167,17 +1169,17 @@
         <span class="c">!+ Used when [[SimulationInputs:load_neutrals]] is set.</span>
 
     <span class="c">!! Monte Carlo settings</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_fida</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_fida</span>
         <span class="c">!+ Number of FIDA mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_npa</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_npa</span>
         <span class="c">!+ Number of NPA mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_nbi</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_nbi</span>
         <span class="c">!+ Number of neutral beam mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_dcx</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_dcx</span>
         <span class="c">!+ Number of direct charge exchange (DCX) mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_halo</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_halo</span>
         <span class="c">!+ Number of halo mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_birth</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_birth</span>
         <span class="c">!+ Number of birth particles per [[SimulationInputs:n_nbi]]</span>
 
     <span class="c">!! Simulation switches</span>
@@ -1288,6 +1290,8 @@
       <a class="list-group-item" href="../type/fastionparticles.html">FastIonParticles</a>
       
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
+      
+      <a class="list-group-item" href="../type/gyrosurface.html">GyroSurface</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
       

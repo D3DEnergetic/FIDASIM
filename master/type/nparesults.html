@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 2.7% of total for derived types.</p>Including implementation: 10 statements,  2.7% of total for derived types.">10 statements</a>
+	  title="<p> 2.3% of total for derived types.</p>Including implementation: 9 statements,  2.3% of total for derived types.">9 statements</a>
      </li> 
      
      
@@ -175,8 +175,6 @@
       <a class="list-group-item" href="../type/nparesults.html#variable-npart">npart</a>
       
       <a class="list-group-item" href="../type/nparesults.html#variable-nmax">nmax</a>
-      
-      <a class="list-group-item" href="../type/nparesults.html#variable-nloop">nloop</a>
       
       <a class="list-group-item" href="../type/nparesults.html#variable-nenergy%7E5">nenergy</a>
       
@@ -247,6 +245,8 @@
       <a class="list-group-item" href="../type/fastionparticles.html">FastIonParticles</a>
       
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
+      
+      <a class="list-group-item" href="../type/gyrosurface.html">GyroSurface</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
       
@@ -411,8 +411,6 @@
       
       <a class="list-group-item" href="../type/nparesults.html#variable-nmax">nmax</a>
       
-      <a class="list-group-item" href="../type/nparesults.html#variable-nloop">nloop</a>
-      
       <a class="list-group-item" href="../type/nparesults.html#variable-nenergy%7E5">nenergy</a>
       
       <a class="list-group-item" href="../type/nparesults.html#variable-part">part</a>
@@ -515,20 +513,6 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-nloop"></span>integer(kind=Int32),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>nloop</strong></td><td> =</td><td>1000</td><td><p>Increases number of MC markers by factor of <code>nloop</code></p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" id="variable-nenergy%7E5"></span>integer(kind=Int32),</td>
   
   <td>public</td>
@@ -574,8 +558,8 @@
   <td><span class="anchor" id="variable-flux"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>flux</strong></td><td></td><td></td><td><p>Neutral particle flux [neutrals/(s*dE)]</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>flux</strong></td><td></td><td></td><td><p>Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]</p></td>
   
 </tr>
 
@@ -603,16 +587,14 @@
         <span class="c">!+ Number of particles that hit a detector</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nmax</span> <span class="o">=</span> <span class="mi">1000000</span>
         <span class="c">!+ Maximum allowed number of particles grows if necessary</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nloop</span> <span class="o">=</span> <span class="mi">1000</span>
-        <span class="c">!+ Increases number of MC markers by factor of `nloop`</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nenergy</span> <span class="o">=</span> <span class="mi">100</span>
         <span class="c">!+ Number of energy values</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">NPAParticle</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">part</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">NPAParticle</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">part</span>
         <span class="c">!+ Array of NPA particles</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">energy</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">energy</span>
         <span class="c">!+ Energy array [keV]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>    <span class="kd">::</span> <span class="n">flux</span>
-        <span class="c">!+ Neutral particle flux [neutrals/(s*dE)]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">flux</span>
+        <span class="c">!+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]</span>
 <span class="k">end type </span><span class="n">NPAResults</span>
 </pre></div>
 
@@ -654,6 +636,8 @@
       <a class="list-group-item" href="../type/fastionparticles.html">FastIonParticles</a>
       
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
+      
+      <a class="list-group-item" href="../type/gyrosurface.html">GyroSurface</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
       

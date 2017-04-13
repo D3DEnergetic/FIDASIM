@@ -87,7 +87,7 @@ PRO check_npa, inp, npa
         ;; Check if NPA detector is pointing in the right direction
         d_enter = sqrt(total((r_enter - xyz_aper)^2))
         d_exit = sqrt(total((r_exit - xyz_aper)^2))
-        if d_exit < d_enter then begin
+        if d_exit lt d_enter then begin
             err_arr[i] = 1
         endif
 

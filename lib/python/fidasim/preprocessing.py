@@ -1203,6 +1203,12 @@ def check_npa(inp, npa):
         if length <= 0.:
             err_arr[i] = 1
 
+        # Check if NPA detector is pointing in the right direction
+        d_enter = np.sqrt(np.sum((r_enter - xyz_aper)**2))
+        d_exit = np.sqrt(np.sum((r_exit - xyz_aper)**2))
+        if d_exit < d_enter:
+            err_arr[i] = 1
+
         # Check that the detector and aperture point in the same direction
         d_e3 = np.cross(d_e1, d_e2)
         a_e3 = np.cross(a_e1, a_e2)

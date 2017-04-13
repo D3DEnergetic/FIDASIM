@@ -433,36 +433,43 @@
 <a name="ln-84"></a>            <span class="s s-Atom">err_arr</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-85"></a>        <span class="s s-Atom">endif</span>
 <a name="ln-86"></a>
-<a name="ln-87"></a>        <span class="p">;;</span> <span class="nv">Check</span> <span class="s s-Atom">that</span> <span class="s s-Atom">the</span> <span class="s s-Atom">detector</span> <span class="s s-Atom">and</span> <span class="s s-Atom">aperture</span> <span class="s s-Atom">point</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">same</span> <span class="s s-Atom">direction</span>
-<a name="ln-88"></a>        <span class="s s-Atom">d_e3</span> <span class="o">=</span> <span class="nf">crossp</span><span class="p">(</span><span class="s s-Atom">d_e1</span><span class="p">,</span><span class="s s-Atom">d_e2</span><span class="p">)</span>
-<a name="ln-89"></a>        <span class="s s-Atom">a_e3</span> <span class="o">=</span> <span class="nf">crossp</span><span class="p">(</span><span class="s s-Atom">a_e1</span><span class="p">,</span><span class="s s-Atom">a_e2</span><span class="p">)</span>
-<a name="ln-90"></a>        <span class="s s-Atom">dp</span> <span class="o">=</span> <span class="nf">total</span><span class="p">(</span><span class="s s-Atom">d_e3</span><span class="o">*</span><span class="s s-Atom">a_e3</span><span class="p">)</span>
-<a name="ln-91"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">dp</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-92"></a>           <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;The dot product of the detector and aperture plane normal vectors is negative. The NPA definition may be incorrect.&#39;</span>
-<a name="ln-93"></a>        <span class="s s-Atom">endif</span>
-<a name="ln-94"></a>    <span class="s s-Atom">endfor</span>
-<a name="ln-95"></a>
-<a name="ln-96"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s s-Atom">err_arr</span> <span class="s s-Atom">eq</span> <span class="mf">0.0</span><span class="p">,</span><span class="s s-Atom">nw</span><span class="p">,</span><span class="s s-Atom">complement</span><span class="o">=</span><span class="s s-Atom">ww</span><span class="p">,</span><span class="s s-Atom">ncomplement</span><span class="o">=</span><span class="s s-Atom">nww</span><span class="p">)</span>
-<a name="ln-97"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">f=&#39;(i3,&quot; out of &quot;,i3,&quot; channels crossed the beam grid&quot;)&#39;</span><span class="p">,</span><span class="s s-Atom">nw</span><span class="p">,</span><span class="s s-Atom">nchan</span>
-<a name="ln-98"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-99"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;No channels intersect the beam grid&#39;</span>
-<a name="ln-100"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-101"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-87"></a>        <span class="p">;;</span> <span class="nv">Check</span> <span class="s s-Atom">if</span> <span class="nv">NPA</span> <span class="s s-Atom">detector</span> <span class="o">is</span> <span class="s s-Atom">pointing</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">right</span> <span class="s s-Atom">direction</span>
+<a name="ln-88"></a>        <span class="s s-Atom">d_enter</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">total</span><span class="p">((</span><span class="s s-Atom">r_enter</span> <span class="o">-</span> <span class="s s-Atom">xyz_aper</span><span class="p">)</span><span class="s s-Atom">^</span><span class="mi">2</span><span class="p">))</span>
+<a name="ln-89"></a>        <span class="s s-Atom">d_exit</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="nf">total</span><span class="p">((</span><span class="s s-Atom">r_exit</span> <span class="o">-</span> <span class="s s-Atom">xyz_aper</span><span class="p">)</span><span class="s s-Atom">^</span><span class="mi">2</span><span class="p">))</span>
+<a name="ln-90"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">d_exit</span> <span class="s s-Atom">lt</span> <span class="s s-Atom">d_enter</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-91"></a>            <span class="s s-Atom">err_arr</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-92"></a>        <span class="s s-Atom">endif</span>
+<a name="ln-93"></a>
+<a name="ln-94"></a>        <span class="p">;;</span> <span class="nv">Check</span> <span class="s s-Atom">that</span> <span class="s s-Atom">the</span> <span class="s s-Atom">detector</span> <span class="s s-Atom">and</span> <span class="s s-Atom">aperture</span> <span class="s s-Atom">point</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">same</span> <span class="s s-Atom">direction</span>
+<a name="ln-95"></a>        <span class="s s-Atom">d_e3</span> <span class="o">=</span> <span class="nf">crossp</span><span class="p">(</span><span class="s s-Atom">d_e1</span><span class="p">,</span><span class="s s-Atom">d_e2</span><span class="p">)</span>
+<a name="ln-96"></a>        <span class="s s-Atom">a_e3</span> <span class="o">=</span> <span class="nf">crossp</span><span class="p">(</span><span class="s s-Atom">a_e1</span><span class="p">,</span><span class="s s-Atom">a_e2</span><span class="p">)</span>
+<a name="ln-97"></a>        <span class="s s-Atom">dp</span> <span class="o">=</span> <span class="nf">total</span><span class="p">(</span><span class="s s-Atom">d_e3</span><span class="o">*</span><span class="s s-Atom">a_e3</span><span class="p">)</span>
+<a name="ln-98"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">dp</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-99"></a>           <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;The dot product of the detector and aperture plane normal vectors is negative. The NPA definition may be incorrect.&#39;</span>
+<a name="ln-100"></a>        <span class="s s-Atom">endif</span>
+<a name="ln-101"></a>    <span class="s s-Atom">endfor</span>
 <a name="ln-102"></a>
-<a name="ln-103"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nww</span> <span class="s s-Atom">gt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-104"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Some channels did not intersect the beam grid&#39;</span>
-<a name="ln-105"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number missed: &#39;</span><span class="p">,</span><span class="s s-Atom">nww</span>
-<a name="ln-106"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Missed channels:&#39;</span>
-<a name="ln-107"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;    &#39;</span><span class="p">,</span><span class="s s-Atom">npa</span><span class="p">.</span><span class="s s-Atom">id</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">]</span>
+<a name="ln-103"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s s-Atom">err_arr</span> <span class="s s-Atom">eq</span> <span class="mf">0.0</span><span class="p">,</span><span class="s s-Atom">nw</span><span class="p">,</span><span class="s s-Atom">complement</span><span class="o">=</span><span class="s s-Atom">ww</span><span class="p">,</span><span class="s s-Atom">ncomplement</span><span class="o">=</span><span class="s s-Atom">nww</span><span class="p">)</span>
+<a name="ln-104"></a>    <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">f=&#39;(i3,&quot; out of &quot;,i3,&quot; channels crossed the beam grid&quot;)&#39;</span><span class="p">,</span><span class="s s-Atom">nw</span><span class="p">,</span><span class="s s-Atom">nchan</span>
+<a name="ln-105"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-106"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;No channels intersect the beam grid&#39;</span>
+<a name="ln-107"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-108"></a>    <span class="s s-Atom">endif</span>
 <a name="ln-109"></a>
-<a name="ln-110"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-111"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-112"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid NPA geometry. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-113"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-114"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;NPA geometry is valid&#39;</span>
-<a name="ln-115"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-116"></a><span class="nv">END</span>
+<a name="ln-110"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nww</span> <span class="s s-Atom">gt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-111"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Some channels did not intersect the beam grid&#39;</span>
+<a name="ln-112"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number missed: &#39;</span><span class="p">,</span><span class="s s-Atom">nww</span>
+<a name="ln-113"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Missed channels:&#39;</span>
+<a name="ln-114"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;    &#39;</span><span class="p">,</span><span class="s s-Atom">npa</span><span class="p">.</span><span class="s s-Atom">id</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">]</span>
+<a name="ln-115"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-116"></a>
+<a name="ln-117"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
+<a name="ln-118"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-119"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid NPA geometry. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
+<a name="ln-120"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-121"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;NPA geometry is valid&#39;</span>
+<a name="ln-122"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-123"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

@@ -2153,9 +2153,6 @@ subroutine read_npa
         endif
 
         if(inputs%calc_npa_wght.ge.1) then
-            if(inputs%verbose.ge.1) then
-                write(*,'(T2,a)') "Calculating hit probabilities for NPA channels"
-            endif
             hw = npa_chords%det(ichan)%detector%hw
             hh = npa_chords%det(ichan)%detector%hh
             nd = size(xd)

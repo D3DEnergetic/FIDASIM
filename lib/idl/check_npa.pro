@@ -72,6 +72,8 @@ PRO check_npa, inp, npa
         a_e1 = npa.a_redge[*,i] - uvw_aper
         a_e2 = npa.a_tedge[*,i] - uvw_aper
 
+        uvw_dir = uvw_aper - uvw_det
+
         ;;Rotate chords into beam grid coordinates
         xyz_aper = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_aper,origin=inp.origin)
         xyz_det  = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_det,origin=inp.origin)
@@ -91,12 +93,15 @@ PRO check_npa, inp, npa
             err_arr[i] = 1
         endif
 
-        ;; Check that the detector and aperture point in the same direction
+        ;; Check that the detector and aperture point in the right direction
         d_e3 = crossp(d_e1,d_e2)
         a_e3 = crossp(a_e1,a_e2)
+        d_dp = total(uvw_dir*d_e3)
+        a_dp = total(uvw_dir*a_e3)
         dp = total(d_e3*a_e3)
-        if dp le 0.0 then begin
-           warn,'The dot product of the detector and aperture plane normal vectors is negative. The NPA definition may be incorrect.'
+        if (a_dp le 0.0) or (d_dp le 0.0) or (dp le 0.0) then begin
+            error,'The detector and/or aperture plane normal vectors are pointing in the wrong direction. The NPA definition is incorrect.'
+            err_arr[i] = 1
         endif
     endfor
 

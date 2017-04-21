@@ -6216,19 +6216,19 @@ subroutine gyro_step(vi, fields, r_gyro)
         cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
         cuvrxb(3) = fields%dbt_dr/fields%b_abs
         term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
-        grad_B(1) = (fields%br*fields%dbr_dr + fields%dbt_dr + fields%bz*fields%dbz_dr)/&
+        grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
                     fields%b_abs
         grad_B(2) = 0.0
-        grad_B(3) = (fields%br*fields%dbz_dr + fields%dbt_dz + fields%bz*fields%dbz_dz)/&
+        grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
                     fields%b_abs
         rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
         rg_rtz(2) = 0.0
         rg_rtz(3) = rg_uvw(3)
-        term2 = -1.0/(2.0*fields%b_abs)*dot_product(rg_rtz,grad_B)
-        r_gyro = r_gyro*(1.0 - term1 - term2)
-        if(1.0 - term1 - term2 .le. 0.0) then
-            write(*,'(a)') 'GYRO_STEP: Gyro correction results in negative distances: ', &
-                           (1 - term1 - term2)
+        term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
+        r_gyro = r_gyro * (1.0 - term1 - term2)
+        if (1.0 - term1 - term2 .le. 0.0) then
+            write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
+                          1.0-term1-term2
             stop
         endif
     else

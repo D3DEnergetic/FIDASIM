@@ -517,7 +517,7 @@ subroutine deriv_1d(x,y,yp)
         !+ X Values
     real(Float64), dimension(:),intent(in)  :: y
         !+ Y Values
-    real(FLoat64), dimension(:),intent(out) :: yp
+    real(Float64), dimension(:),intent(out) :: yp
         !+ Derivative of Y w.r.t. X
 
     integer :: i,n
@@ -530,7 +530,7 @@ subroutine deriv_1d(x,y,yp)
         p1 = x(i-1)
         p2 = x(i)
         p3 = x(i+1)
-        yp(i) = (y(i-1)*(p2-p1)/((p1-p2)*(p1-p3))) + &
+        yp(i) = (y(i-1)*(p2-p3)/((p1-p2)*(p1-p3))) + &
                 (y(i)*((1/(p2-p3))-(1/(p1-p2)))) -   &
                 (y(i+1)*(p1-p2)/((p1-p3)*(p2-p3)))
     enddo
@@ -538,8 +538,8 @@ subroutine deriv_1d(x,y,yp)
     yp(1) = (y(1)*((x(1)-x(2))+(x(1)-x(3)))/((x(1)-x(2))*(x(1)-x(3)))) - &
             (y(2)*(x(1)-x(3))/((x(1)-x(2))*(x(2)-x(3)))) +               &
             (y(3)*(x(1)-x(2))/((x(1)-x(3))*(x(2)-x(3))))
-    yp(n+1) = (y(n-1)*(x(n)-x(n+1))/((x(n-1)-x(n))*(x(n-1)-x(n+1)))) +   &
-              (y(n)*(x(n-1)-x(n+1))/((x(n-1)-x(n))*(x(n)-x(n+1)))) +     &
+    yp(n+1) = -(y(n-1)*(x(n)-x(n+1))/((x(n-1)-x(n))*(x(n-1)-x(n+1)))) +   &
+              (y(n)*(x(n-1)-x(n+1))/((x(n-1)-x(n))*(x(n)-x(n+1)))) -     &
               (y(n+1)*((x(n-1)-x(n+1))+(x(n)-x(n+1)))/((x(n-1)-x(n+1)) * &
               (x(n)-x(n+1))))
 
@@ -554,7 +554,7 @@ subroutine deriv_2d(x,y,z,zxp,zyp)
         !+ Y Values
     real(Float64), dimension(:,:), intent(in)  :: z
         !+ Z Values
-    real(FLoat64), dimension(:,:), intent(out) :: zxp
+    real(Float64), dimension(:,:), intent(out) :: zxp
         !+ Derivative of Z w.r.t. X
     real(Float64), dimension(:,:), intent(out) :: zyp
         !+ Derivative of Z w.r.t. Y

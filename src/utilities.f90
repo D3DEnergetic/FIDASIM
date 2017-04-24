@@ -564,12 +564,12 @@ subroutine deriv_2d(x,y,z,zxp,zyp)
 
     n = size(x)
     do i = 1,n
-        call deriv_1d(x,z(:,i),zxp(i,:))
+        call deriv_1d(x,z(:,i),zxp(:,i))
     enddo
 
     n = size(y)
     do i = 1,n
-        call deriv_1d(y,z(i,:),zyp(:,i))
+        call deriv_1d(y,z(i,:),zyp(i,:))
     enddo
 
 end subroutine deriv_2d

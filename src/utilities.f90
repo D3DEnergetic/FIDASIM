@@ -562,12 +562,12 @@ subroutine deriv_2d(x,y,z,zxp,zyp)
     integer :: i,n
         !! temporary values for loops
 
-    n = size(x)
+    n = size(y)
     do i = 1,n
         call deriv_1d(x,z(:,i),zxp(:,i))
     enddo
 
-    n = size(y)
+    n = size(x)
     do i = 1,n
         call deriv_1d(y,z(i,:),zyp(i,:))
     enddo

@@ -92,8 +92,6 @@ integer, parameter, dimension(n_stark) :: stark_sigma=1 - stark_pi
 !!Numerical Settings
 integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
-real(Float64), parameter :: n_halo_neutrate=20.
-    !+ Number of times to average halo H_H_cx
 real(Float64) :: colrad_threshold=1.d6
     !+ colrad threshold
 real(Float64), dimension(ntypes) :: halo_iter_dens = 0.d0
@@ -471,6 +469,36 @@ type AtomicCrossSection
 end type AtomicCrossSection
 
 type AtomicRates
+    !+ Defines a n/m-resolved atomic cross section table
+    integer       :: nenergy = 1
+        !+ Number of beam energies
+    real(Float64) :: logemin = 0.d0
+        !+ Log-10 minimum energy
+    real(Float64) :: logemax = 0.d0
+        !+ Log-10 maximum energy
+    integer       :: ntemp = 1
+        !+ Number of target temperatures
+    real(Float64) :: logtmin = 0.d0
+        !+ Log-10 minimum temperature
+    real(Float64) :: logtmax = 0.d0
+        !+ Log-10 maximum temperature
+    integer       :: n_max = nlevs
+        !+ Number of initial atomic energy levels
+    integer       :: m_max = nlevs
+        !+ Number of final atomic energy levels
+    real(Float64) :: dlogE = 0.d0
+        !+ Log-10 energy spacing
+    real(Float64) :: dlogT = 0.d0
+        !+ Log-10 temperature spacing
+    real(Float64) :: minlog_rate = 0.d0
+        !+ Log-10 minimum reaction rate
+    real(Float64), dimension(2) :: ab = 0.d0
+        !+ Atomic mass of beam and thermal ions respectively [amu]
+    real(Float64), dimension(:,:,:,:,:), allocatable :: log_rate
+        !+ Log-10 beam-target rates
+end type AtomicRates
+
+type AtomicTransitions
     !+ Defines an atomic table for populating and de-populating reaction rates
     integer       :: nenergy = 1
         !+ Number of beam energies
@@ -502,7 +530,7 @@ type AtomicRates
         !+ Log-10 reaction rates for populating transistions
     real(Float64), dimension(:,:,:,:), allocatable   :: log_depop
         !+ Log-10 reaction rates for de-populating transistions
-end type AtomicRates
+end type AtomicTransitions
 
 type NuclearRates
     !+ Nuclear reaction rates
@@ -534,14 +562,16 @@ end type NuclearRates
 
 type AtomicTables
     !+ Atomic tables for various types of interactions
-    type(AtomicCrossSection) :: H_H_cx
+    type(AtomicCrossSection) :: H_H_cx_cross
         !+ Hydrogen-Hydrogen charge exchange n/m-resolved cross sections
-    type(AtomicRates)        :: H_H
-        !+ Hydrogen-Hydrogen reaction rates
-    type(AtomicRates)        :: H_e
-        !+ Hydrogen-Electron reaction rates
-    type(AtomicRates)        :: H_Aq
-        !+ Hydrogen-Impurity reaction rates
+    type(AtomicRates)        :: H_H_cx_rate
+        !+ Hydrogen-Hydrogen charge exchange n/m-resolved beam-target rates
+    type(AtomicTransitions)  :: H_H
+        !+ Hydrogen-Hydrogen atomic transitions
+    type(AtomicTransitions)  :: H_e
+        !+ Hydrogen-Electron atomic transitions
+    type(AtomicTransitions)  :: H_Aq
+        !+ Hydrogen-Impurity atomic transitions
     real(Float64), dimension(nlevs,nlevs) :: einstein
         !+ Einstein coefficients for spontaneous emission
     type(NuclearRates)       :: D_D
@@ -2322,8 +2352,6 @@ subroutine read_equilibrium
 
     integer, dimension(:,:), allocatable :: p_mask, f_mask
 
-    integer :: iz, ir
-
     !!Initialize HDF5 interface
     call h5open_f(error)
 
@@ -2688,7 +2716,7 @@ subroutine read_atomic_cross(fid, grp, cross)
 
     allocate(cross%log_cross(cross%m_max,cross%n_max, cross%nenergy))
 
-    dim3 = [n_max, m_max, tables%H_H_cx%nenergy]
+    dim3 = [n_max, m_max, cross%nenergy]
     call h5ltread_dataset_double_f(fid,grp//"/cx", dummy3, dim3, error)
     rmin = minval(dummy3,dummy3.gt.0.d0)
     where (dummy3.le.0.0)
@@ -2702,8 +2730,8 @@ subroutine read_atomic_cross(fid, grp, cross)
 
 end subroutine read_atomic_cross
 
-subroutine read_atomic_rates(fid, grp, b_amu, t_amu, rates)
-    !+ Reads in a atomic reaction rates table from file
+subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
+    !+ Reads in a atomic rate table from file
     !+ and puts it into a [[AtomicRates]] type
     integer(HID_T), intent(in)              :: fid
         !+ HDF5 file ID
@@ -2732,7 +2760,127 @@ subroutine read_atomic_rates(fid, grp, b_amu, t_amu, rates)
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a,a)') 'READ_ATOMIC_RATES: Unknown atomic interaction: ', trim(grp)
+            write(*,'(a,a)') 'READ_ATOMIC_RATE: Unknown atomic interaction: ', trim(grp)
+        endif
+        stop
+    endif
+
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
+    allocate(dummy2(2, n_bt_amu))
+    dim2 = [2, n_bt_amu]
+    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", dummy2, dim2, error)
+
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/n_max", n_max, error)
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/m_max", m_max, error)
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", rates%nenergy, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/emin", emin, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/emax", emax, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/dlogE", rates%dlogE, error)
+    call h5ltread_dataset_int_scalar_f(fid, grp//"/ntemp", rates%ntemp, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/tmin", tmin, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/tmax", tmax, error)
+    call h5ltread_dataset_double_scalar_f(fid, grp//"/dlogT", rates%dlogT, error)
+    rates%logemin = log10(emin)
+    rates%logemax = log10(emax)
+    rates%logtmin = log10(tmin)
+    rates%logtmax = log10(tmax)
+
+    bt_ind = 1
+    tt_ind = 1
+    bt_amu = [b_amu(1), t_amu]
+    tt_amu = [b_amu(2), t_amu]
+    bt_min = norm2(bt_amu - dummy2(:,1))
+    tt_min = norm2(tt_amu - dummy2(:,1))
+    do i=2, n_bt_amu
+        bt_dum = norm2(bt_amu - dummy2(:,i))
+        tt_dum = norm2(tt_amu - dummy2(:,i))
+        if(bt_dum.lt.bt_min) then
+            bt_min = bt_dum
+            bt_ind = i
+        endif
+        if(tt_dum.lt.tt_min) then
+            tt_min = tt_dum
+            tt_ind = i
+        endif
+    enddo
+    rates%ab(1) = dummy2(1,bt_ind)
+    rates%ab(2) = dummy2(1,tt_ind)
+
+    deallocate(dummy2)
+
+    allocate(rates%log_rate(&
+                    rates%m_max, &
+                    rates%n_max, &
+                    rates%nenergy, &
+                    rates%ntemp, 2))
+    rates%log_rate = 0.d0
+
+    !!Read CX
+    call h5ltpath_valid_f(fid, grp//"/cx", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltget_dataset_ndims_f(fid, grp//"/cx", drank, error)
+        if(drank.eq.5) then
+            allocate(dummy5(n_max, m_max, &
+                           rates%nenergy, &
+                           rates%ntemp, n_bt_amu))
+            dim5 = [n_max, m_max, rates%nenergy, rates%ntemp,n_bt_amu]
+            call h5ltread_dataset_double_f(fid, grp//"/cx", dummy5, dim5, error)
+
+            do j=1,rates%ntemp
+                do i=1,rates%nenergy
+                        rates%log_rate(:,:,i,j,1) = transpose(dummy5(:,:,i,j,bt_ind))
+                        rates%log_rate(:,:,i,j,2) = transpose(dummy5(:,:,i,j,tt_ind))
+                enddo
+            enddo
+            deallocate(dummy5)
+        else
+            if(inputs%verbose.ge.0) then
+                write(*,'(a,a)') 'READ_ATOMIC_RATE: Unsupported atomic interaction: ', trim(grp)
+            endif
+            stop
+        endif
+    endif
+
+    rmin = minval(rates%log_rate, rates%log_rate.gt.0.d0)
+    where (rates%log_rate.le.0.d0)
+        rates%log_rate = 0.9*rmin
+    end where
+    rates%minlog_rate = log10(rmin)
+    rates%log_rate = log10(rates%log_rate)
+
+end subroutine read_atomic_rate
+
+subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
+    !+ Reads in a atomic transitions table from file
+    !+ and puts it into a [[AtomicTransitions]] type
+    integer(HID_T), intent(in)              :: fid
+        !+ HDF5 file ID
+    character(len=*), intent(in)            :: grp
+        !+ HDF5 group to read from
+    real(Float64), dimension(2), intent(in) :: b_amu
+        !+ Atomic masses of "beam" species (beam ion and thermal ion)
+    real(Float64), intent(in)               :: t_amu
+        !+ Atomic mass of "target" species (thermal ion)
+    type(AtomicTransitions), intent(inout)  :: rates
+        !+ Atomic transitions
+
+    integer(HSIZE_T), dimension(2) :: dim2
+    integer(HSIZE_T), dimension(4) :: dim4
+    integer(HSIZE_T), dimension(5) :: dim5
+    logical :: path_valid
+    integer :: i, j, n, n_max, m_max, error
+    integer :: n_bt_amu, tt_ind, bt_ind, drank
+    real(Float64) :: emin,emax,tmin,tmax,rmin
+    real(Float64) :: bt_min, tt_min, tt_dum, bt_dum
+    real(Float64), dimension(2) :: bt_amu, tt_amu
+    real(Float64), dimension(:,:), allocatable :: dummy2
+    real(Float64), dimension(:,:,:,:), allocatable :: dummy4
+    real(Float64), dimension(:,:,:,:,:), allocatable :: dummy5
+
+    call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
+    if(.not.path_valid) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,a)') 'READ_ATOMIC_TRANSITIONS: Unknown atomic interaction: ', trim(grp)
         endif
         stop
     endif
@@ -2888,7 +3036,7 @@ subroutine read_atomic_rates(fid, grp, b_amu, t_amu, rates)
     rates%minlog_pop = log10(rmin)
     rates%log_pop = log10(rates%log_pop)
 
-end subroutine read_atomic_rates
+end subroutine read_atomic_transitions
 
 subroutine read_nuclear_rates(fid, grp, rates)
     !+ Reads in a nuclear reaction rates table from file
@@ -2986,18 +3134,21 @@ subroutine read_tables
     call h5fopen_f(inputs%tables_file, H5F_ACC_RDONLY_F, fid, error)
 
     !!Read Hydrogen-Hydrogen CX Cross Sections
-    call read_atomic_cross(fid,"/cross/H_H",tables%H_H_cx)
+    call read_atomic_cross(fid,"/cross/H_H",tables%H_H_cx_cross)
 
-    !!Read Hydrogen-Hydrogen Rates
+    !!Read Hydrogen-Hydrogen CX Rates
     b_amu = [inputs%ab, inputs%ai]
-    call read_atomic_rates(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
+    call read_atomic_rate(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H_cx_rate)
+
+    !!Read Hydrogen-Hydrogen Transitions
+    call read_atomic_transitions(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
     inputs%ab = tables%H_H%ab(1)
     inputs%ai = tables%H_H%ab(2)
 
-    !!Read Hydrogen-Electron Rates
-    call read_atomic_rates(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
+    !!Read Hydrogen-Electron Transitions
+    call read_atomic_transitions(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
 
-    !!Read Hydrogen-Impurity rates
+    !!Read Hydrogen-Impurity Transitions
     impname = ''
     select case (inputs%impurity_charge)
         case (5)
@@ -3011,7 +3162,7 @@ subroutine read_tables
             imp_amu = 2.d0*inputs%impurity_charge
     end select
 
-    call read_atomic_rates(fid,"/rates/H_"//trim(adjustl(impname)), b_amu, imp_amu, tables%H_Aq)
+    call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), b_amu, imp_amu, tables%H_Aq)
 
     !!Read Einstein coefficients
     call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/n_max", n_max, error)
@@ -5754,8 +5905,8 @@ end subroutine store_npa
 !=============================================================================
 !--------------------------Atomic Physics Routines----------------------------
 !=============================================================================
-subroutine neut_rates(denn, vi, vn, rates)
-    !+ Get neutralization/cx rates
+subroutine bb_cx_rates(denn, vi, vn, rates)
+    !+ Get beam-beam neutralization/cx rates
     real(Float64), dimension(nlevs), intent(in)  :: denn
         !+ Neutral density [cm^-3]
     real(Float64), dimension(3),     intent(in)  :: vi
@@ -5776,14 +5927,14 @@ subroutine neut_rates(denn, vi, vn, rates)
     vrel=norm2(vi-vn)
     eb=v2_to_E_per_amu*vrel**2  ! [kev/amu]
     logeb = log10(eb)
-    logEmin = tables%H_H_cx%logemin
-    dlogE = tables%H_H_cx%dlogE
-    neb = tables%H_H_cx%nenergy
+    logEmin = tables%H_H_cx_cross%logemin
+    dlogE = tables%H_H_cx_cross%dlogE
+    neb = tables%H_H_cx_cross%nenergy
     call interpol_coeff(logEmin,dlogE,neb,logeb,c,err)
     ebi = c%i
     if(err.eq.1) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') "NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
+            write(*,'(a)') "BB_CX_RATES: Eb out of range of H_H_cx table. Using nearest energy value."
             write(*,'("eb = ",ES10.3," [keV]")') eb
         endif
         if(ebi.lt.1) then
@@ -5795,10 +5946,10 @@ subroutine neut_rates(denn, vi, vn, rates)
         endif
     endif
 
-    neut(:,:) = (c%b1*tables%H_H_cx%log_cross(:,:,ebi) + &
-                 c%b2*tables%H_H_cx%log_cross(:,:,ebi+1))
+    neut(:,:) = (c%b1*tables%H_H_cx_cross%log_cross(:,:,ebi) + &
+                 c%b2*tables%H_H_cx_cross%log_cross(:,:,ebi+1))
 
-    where (neut.lt.tables%H_H_cx%minlog_cross)
+    where (neut.lt.tables%H_H_cx_cross%minlog_cross)
         neut = 0.d0
     elsewhere
         neut = 10.d0**neut
@@ -5806,7 +5957,82 @@ subroutine neut_rates(denn, vi, vn, rates)
 
     rates=matmul(neut,denn)*vrel
 
-end subroutine neut_rates
+end subroutine bb_cx_rates
+
+subroutine bt_cx_rates(plasma, denn, vi, i_type, rates)
+    !+ Get beam-target neutralization/cx rates
+    type(LocalProfiles), intent(in)              :: plasma
+        !+ Plasma parameters
+    real(Float64), dimension(nlevs), intent(in)  :: denn
+        !+ Neutral density [cm^-3]
+    real(Float64), dimension(3),     intent(in)  :: vi
+        !+ Ion velocity [cm/s]
+    integer, intent(in)                          :: i_type
+        !+ Ion type
+    real(Float64), dimension(nlevs), intent(out) :: rates
+        !+ Reaction rates [1/s]
+
+    real(Float64) :: logEmin, dlogE, logeb, eb
+    real(Float64) :: logTmin, dlogT, logti, vrel
+    integer :: neb, nt
+    type(InterpolCoeffs2D) :: c
+    real(Float64) :: b11, b12, b21, b22, b_amu
+    real(Float64), dimension(nlevs,nlevs) :: H_H_rate
+    integer :: ebi, tii, n, err_status
+
+    H_H_rate = 0.d0
+
+    if(i_type.eq.beam_ion) then
+        b_amu = inputs%ab
+    else
+        b_amu = inputs%ai
+    endif
+    vrel=norm2(vi-plasma%vrot)
+    eb=b_amu*v2_to_E_per_amu*vrel**2  ! [kev/amu]
+
+    logeb = log10(eb)
+    logti = log10(plasma%ti)
+
+    !!H_H
+    err_status = 1
+    logEmin = tables%H_H_cx_rate%logemin
+    logTmin = tables%H_H_cx_rate%logtmin
+    dlogE = tables%H_H_cx_rate%dlogE
+    dlogT = tables%H_H_cx_rate%dlogT
+    neb = tables%H_H_cx_rate%nenergy
+    nt = tables%H_H_cx_rate%ntemp
+    call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
+                        logeb, logti, c, err_status)
+    ebi = c%i
+    tii = c%j
+    b11 = c%b11
+    b12 = c%b12
+    b21 = c%b21
+    b22 = c%b22
+    if(err_status.eq.1) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "BT_CX_RATES: Eb or Ti out of range of H_H_CX table. Setting H_H_CX rates to zero"
+            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+        endif
+        rates = 0.0
+        return
+    endif
+
+    H_H_rate = (b11*tables%H_H_cx_rate%log_rate(:,:,ebi,tii,i_type)   + &
+                b12*tables%H_H_cx_rate%log_rate(:,:,ebi,tii+1,i_type) + &
+                b21*tables%H_H_cx_rate%log_rate(:,:,ebi+1,tii,i_type) + &
+                b22*tables%H_H_cx_rate%log_rate(:,:,ebi+1,tii+1,i_type))
+
+    where (H_H_rate.lt.tables%H_H_cx_rate%minlog_rate)
+        H_H_rate = 0.d0
+    elsewhere
+        H_H_rate = 10.d0**H_H_rate !cm^3/s
+    end where
+
+    rates=matmul(H_H_rate,denn) !1/s
+
+end subroutine bt_cx_rates
 
 subroutine get_neutron_rate(plasma, eb, rate)
     !+ Gets neutron rate for a beam with energy `eb` interacting with a target plasma
@@ -5865,7 +6091,7 @@ subroutine get_neutron_rate(plasma, eb, rate)
 
 end subroutine get_neutron_rate
 
-subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
+subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
     !+ Get probability of a thermal ion charge exchanging with `types` neutrals
     integer(Int32), dimension(3), intent(in)     :: ind
         !+ [[libfida:beam_grid]] indices
@@ -5873,12 +6099,16 @@ subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
         !+ Interaction position in beam grid coordinates
     real(Float64), dimension(3), intent(in)      :: v_ion
         !+ Ion velocity [cm/s]
+    integer, intent(in)                          :: i_type
+        !+ Ion type
     integer(Int32), dimension(:), intent(in)     :: types
         !+ Neutral types
     real(Float64), dimension(nlevs), intent(out) :: prob
         !+ Charge exchange rate/probability [1/s]
 
     integer :: ntypes, i, ii
+    type(LocalProfiles) :: plasma
+    real(Float64) :: vabs
     real(Float64), dimension(nlevs) :: rates, denn
     real(Float64), dimension(3) :: vhalo,vn
 
@@ -5888,21 +6118,25 @@ subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     do i=1,ntypes
         if((types(i).le.3).and.(types(i).ne.0)) then
             ! CX with full type'th energy NBI neutrals
-            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3))
+            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3)) 
             vn = neut%v(:,types(i),ind(1),ind(2),ind(3))
-            call neut_rates(denn,v_ion,vn,rates)
+            vabs = norm2(vn)
+            if(vabs.le.0.d0) then
+                vn = pos - nbi%src
+                vabs = norm2(vn)
+            endif
+            vn = (nbi%vinj/sqrt(real(types(i))))*vn/vabs
+            call bb_cx_rates(denn,v_ion,vn,rates)
             prob = prob+rates
         else
+            call get_plasma(plasma,pos=pos)
             denn = neut%dens(:,types(i),ind(1),ind(2),ind(3))
-            do ii=1,int(n_halo_neutrate)
-                call mc_halo(ind, vhalo)
-                call neut_rates(denn,v_ion,vhalo,rates)
-                prob=prob+rates/n_halo_neutrate
-            enddo
+            call bt_cx_rates(plasma, denn, v_ion, i_type, rates)
+            prob = prob + rates
         endif
     enddo
 
-end subroutine get_beam_cx_prob
+end subroutine get_beam_cx_rate
 
 subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     !+ Gets rate matrix for use in [[libfida:colrad]]
@@ -7035,7 +7269,7 @@ subroutine dcx
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
-    real(Float64), dimension(nlevs) :: prob    !!  Prob. for CX
+    real(Float64), dimension(nlevs) :: rates    !!  CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     integer :: ncell
@@ -7076,7 +7310,7 @@ subroutine dcx
             loop_along_x: do i = 1, beam_grid%nx
                 !! Loop over the markers
                 !$OMP PARALLEL DO schedule(guided) private(idcx,ind,vihalo, &
-                !$OMP& ri,tracks,ncell,prob,denn,states,jj,photons,plasma)
+                !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
                 loop_over_dcx: do idcx=1,int(nlaunch(i,j,k),Int64)
                     !! Calculate ri,vhalo and track
                     ind = [i, j, k]
@@ -7085,13 +7319,14 @@ subroutine dcx
                     if(ncell.eq.0) cycle loop_over_dcx
 
                     !! Calculate CX probability
-                    call get_beam_cx_prob(tracks(1)%ind,ri,vihalo,neut_types,prob)
-                    if(sum(prob).le.0.) cycle loop_over_dcx
+                    call get_beam_cx_rate(tracks(1)%ind,ri,vihalo,thermal_ion,neut_types,rates)
+                    if(sum(rates).le.0.) cycle loop_over_dcx
 
                     !! Solve collisional radiative model along track
                     call get_plasma(plasma,pos=tracks(1)%pos)
 
-                    states = prob*(plasma%denp - plasma%denf)
+                    !! Weight CX rates by ion source density
+                    states = rates*(plasma%denp - plasma%denf)
 
                     loop_along_track: do jj=1,ncell
                         call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -7126,7 +7361,7 @@ subroutine halo
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
-    real(Float64), dimension(nlevs) :: prob    !!  Prob. for CX
+    real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     integer :: ncell
@@ -7178,7 +7413,7 @@ subroutine halo
         endif
         ccnt=0.d0
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ncell,prob,denn,states,jj,photons,plasma)
+        !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
         loop_along_z: do k = 1, beam_grid%nz
             loop_along_y: do j = 1, beam_grid%ny
                 loop_along_x: do i = 1, beam_grid%nx
@@ -7191,13 +7426,14 @@ subroutine halo
                         if(ncell.eq.0)cycle loop_over_halos
 
                         !! Calculate CX probability
-                        call get_beam_cx_prob(tracks(1)%ind,ri,vihalo,[s1type],prob)
-                        if(sum(prob).le.0.)cycle loop_over_halos
+                        call get_beam_cx_rate(tracks(1)%ind,ri,vihalo,thermal_ion,[s1type],rates)
+                        if(sum(rates).le.0.)cycle loop_over_halos
 
                         !! Solve collisional radiative model along track
                         call get_plasma(plasma,pos=tracks(1)%pos)
 
-                        states = prob*plasma%denp
+                        !! Weight CX rates by ion source density
+                        states = rates*plasma%denp
 
                         loop_along_track: do jj=1,ncell
                             call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -7257,7 +7493,7 @@ subroutine fida_f
     !! Determination of the CX probability
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
-    real(Float64), dimension(nlevs) :: prob !! Prob. for CX
+    real(Float64), dimension(nlevs) :: rates !! CX rates
 
     !! Collisiional radiative model along track
     integer :: ncell
@@ -7311,7 +7547,7 @@ subroutine fida_f
         k = pcell(3,ip)
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields, &
-        !$OMP tracks,ncell,jj,plasma,prob,denn,states,photons,denf,eb,ptch)
+        !$OMP tracks,ncell,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, fields, eb, ptch, denf)
@@ -7326,11 +7562,11 @@ subroutine fida_f
             if(ncell.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_beam_cx_prob(tracks(1)%ind, ri, vi, neut_types, prob)
-            if(sum(prob).le.0.) cycle loop_over_fast_ions
+            call get_beam_cx_rate(tracks(1)%ind, ri, vi, beam_ion, neut_types, rates)
+            if(sum(rates).le.0.) cycle loop_over_fast_ions
 
-            !! Calculate initial states of particle
-            states=prob*denf
+            !! Weight CX rates by ion source density
+            states=rates*denf
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ncell
@@ -7362,7 +7598,7 @@ subroutine fida_mc
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
     !! Determination of the CX probability
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
-    real(Float64), dimension(nlevs) :: prob    !! Prob. for CX
+    real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     integer :: ncell
@@ -7385,7 +7621,7 @@ subroutine fida_mc
 
     cnt=0.0
     !$OMP PARALLEL DO schedule(guided) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ncell,jj,prob,denn,los_intersect,states,photons)
+    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ncell,jj,rates,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=1,particles%nparticle
         fast_ion = particles%fast_ion(iion)
         cnt=cnt+1
@@ -7425,11 +7661,13 @@ subroutine fida_mc
             if(ncell.eq.0)cycle phi_loop
 
             !! Calculate CX probability
-            call get_beam_cx_prob(tracks(1)%ind,ri,vi,neut_types,prob)
-            if(sum(prob).le.0.)cycle phi_loop
+            call get_beam_cx_rate(tracks(1)%ind,ri,vi,beam_ion,neut_types,rates)
+            if(sum(rates).le.0.)cycle phi_loop
+
+            !! Weight CX rates by ion source density
+            states=rates*fast_ion%weight/nphi
 
             !! Calculate the spectra produced in each cell along the path
-            states=prob*fast_ion%weight/nphi
             loop_along_track: do jj=1,ncell
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
@@ -7459,7 +7697,7 @@ subroutine npa_f
     type(GyroSurface) :: gs
     real(Float64), dimension(2,4) :: gyrange
     integer, dimension(4) :: neut_types=[1,2,3,4]
-    real(Float64), dimension(nlevs) :: prob
+    real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux, theta, dtheta, eb, ptch
 
@@ -7508,7 +7746,7 @@ subroutine npa_f
         k = pcell(3,ip)
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
-        !$OMP& pind,vi,ri,rf,det,plasma,prob,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
+        !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
@@ -7537,11 +7775,13 @@ subroutine npa_f
                     call get_indices(ri,pind)
 
                     !! Calculate CX probability with beam and halo neutrals
-                    call get_beam_cx_prob(pind,ri,vi,neut_types,prob)
-                    if(sum(prob).le.0.) cycle gyro_range_loop
+                    call get_beam_cx_rate(pind,ri,vi,beam_ion,neut_types,rates)
+                    if(sum(rates).le.0.) cycle gyro_range_loop
+
+                    !! Weight CX rates by ion source density
+                    states=rates*denf
 
                     !! Attenuate states as the particle move through plasma
-                    states=prob*denf
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
@@ -7571,7 +7811,7 @@ subroutine npa_mc
     integer :: det,j,ichan,ir,nrange
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
-    real(Float64), dimension(nlevs) :: prob
+    real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux
     integer, dimension(4) :: neut_types=[1,2,3,4]
@@ -7591,7 +7831,7 @@ subroutine npa_mc
 
     cnt=0.0
     !$OMP PARALLEL DO schedule(guided) private(iion,iphi,ind,fast_ion,vi,ri,rf,phi,s,c,ir, &
-    !$OMP& randomu,rg,fields,uvw,uvw_vi,prob,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
+    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
@@ -7640,11 +7880,13 @@ subroutine npa_mc
                         call get_indices(ri,ind)
 
                         !! Calculate CX probability with beam and halo neutrals
-                        call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
-                        if(sum(prob).le.0.) cycle gyro_range_loop
+                        call get_beam_cx_rate(ind,ri,vi,beam_ion,neut_types,rates)
+                        if(sum(rates).le.0.) cycle gyro_range_loop
+
+                        !! Weight CX rates by ion source density
+                        states=rates*fast_ion%weight/nphi
 
                         !! Attenuate states as the particle move through plasma
-                        states=prob*fast_ion%weight/nphi
                         call attenuate(ri,rf,vi,states)
 
                         !! Store NPA Flux
@@ -7670,11 +7912,13 @@ subroutine npa_mc
                 call get_indices(ri,ind)
 
                 !! Calculate CX probability with beam and halo neutrals
-                call get_beam_cx_prob(ind,ri,vi,neut_types,prob)
-                if(sum(prob).le.0.) cycle phi_loop
+                call get_beam_cx_rate(ind,ri,vi,beam_ion,neut_types,rates)
+                if(sum(rates).le.0.) cycle phi_loop
+
+                !! Weight CX rates by ion source density
+                states=rates*fast_ion%weight/nphi
 
                 !! Attenuate states as the particle moves though plasma
-                states=prob*fast_ion%weight/nphi
                 call attenuate(ri,rf,vi,states)
 
                 !! Store NPA Flux
@@ -7879,10 +8123,10 @@ subroutine fida_weights_mc
     integer,dimension(4) :: neut_types=[1,2,3,4]
     logical :: los_intersect
 
-    !! Determination of the CX probability
+    !! Determination of the CX rates
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64), dimension(nlevs) :: prob !! Prob. for CX
+    real(Float64), dimension(nlevs) :: rates !! CX rates
 
     !! Collisiional radiative model along track
     integer :: ncell
@@ -7979,7 +8223,7 @@ subroutine fida_weights_mc
         k = pcell(3,ip)
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,vi,ri,rg,ienergy,ipitch, &
-        !$OMP tracks,ncell,jj,plasma,fields,prob,denn,states,photons,energy,pitch, &
+        !$OMP tracks,ncell,jj,plasma,fields,rates,denn,states,photons,energy,pitch, &
         !$OMP los_intersect,randomu3,fbm_denf)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution uniformally
@@ -8009,9 +8253,9 @@ subroutine fida_weights_mc
             if(ncell.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_beam_cx_prob(tracks(1)%ind, ri, vi, neut_types, prob)
-            if(sum(prob).le.0.) cycle loop_over_fast_ions
-            states=prob*1.d20
+            call get_beam_cx_rate(tracks(1)%ind, ri, vi, beam_ion, neut_types, rates)
+            if(sum(rates).le.0.) cycle loop_over_fast_ions
+            states=rates*1.d20
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ncell
@@ -8217,17 +8461,14 @@ subroutine fida_weights_los
                     enddo
 
                     states=0.d0
-                    call neut_rates(fdens,vi,vnbi_f,rates)
+                    call bb_cx_rates(fdens,vi,vnbi_f,rates)
                     states = states + rates
-                    call neut_rates(hdens,vi,vnbi_h,rates)
+                    call bb_cx_rates(hdens,vi,vnbi_h,rates)
                     states = states + rates
-                    call neut_rates(tdens,vi,vnbi_t,rates)
+                    call bb_cx_rates(tdens,vi,vnbi_t,rates)
                     states = states + rates
-                    do i=1,int(n_halo_neutrate)
-                        call mc_halo(ind,vhalo,plasma_in=plasma)
-                        call neut_rates(halodens,vi,vhalo,rates)
-                        states = states + rates/real(n_halo_neutrate)
-                    enddo
+                    call bt_cx_rates(plasma, halodens, vi, beam_ion, rates)
+                    states = states + rates
 
                     call colrad(plasma,beam_ion,vi,dt,states,denn,photons)
                     denf = mean_f(ienergy,ipitch)*dEdP
@@ -8362,7 +8603,7 @@ subroutine npa_weights
                             if (fbm_denf.ne.fbm_denf) cycle loop_over_energy
 
                             !! -------------- calculate CX probability -------!!
-                            call get_beam_cx_prob([ii,jj,kk],pos,vi,neut_types,pcx)
+                            call get_beam_cx_rate([ii,jj,kk],pos,vi,beam_ion,neut_types,pcx)
                             if(sum(pcx).le.0) cycle loop_over_energy
 
                             !!Calculate attenuation

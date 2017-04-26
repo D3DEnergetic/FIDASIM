@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 2.1% of total for derived types.</p>Including implementation: 8 statements,  2.1% of total for derived types.">8 statements</a>
+	  title="<p> 3.6% of total for derived types.</p>Including implementation: 14 statements,  3.6% of total for derived types.">14 statements</a>
      </li> 
      
      
@@ -181,6 +181,18 @@
       <a class="list-group-item" href="../type/emfields.html#variable-et">et</a>
       
       <a class="list-group-item" href="../type/emfields.html#variable-ez">ez</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbr_dr">dbr_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbr_dz">dbr_dz</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbt_dr">dbt_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbt_dz">dbt_dz</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbz_dr">dbz_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbz_dz">dbz_dz</a>
       
     </div>
   </div>
@@ -427,6 +439,18 @@
       
       <a class="list-group-item" href="../type/emfields.html#variable-ez">ez</a>
       
+      <a class="list-group-item" href="../type/emfields.html#variable-dbr_dr">dbr_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbr_dz">dbr_dz</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbt_dr">dbt_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbt_dz">dbt_dz</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbz_dr">dbz_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbz_dz">dbz_dz</a>
+      
     </div>
   </div>
 </div>
@@ -557,6 +581,90 @@
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbr_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbr_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbt_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbt_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the vertical magnetic field [T/m]</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -587,6 +695,18 @@
         <span class="c">!+ Torodial electric field [V/m]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ez</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Vertical electric field [V/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbr_dr</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Radial derivative of the radial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbr_dz</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Vertical derivative of the radial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbt_dr</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Radial derivative of the torodial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbt_dz</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Vertical derivative of the torodial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbz_dr</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Radial derivative of the radial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbz_dz</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Vertical derivative of the vertical magnetic field [T/m]</span>
 <span class="k">end type </span><span class="n">EMFields</span>
 </pre></div>
 

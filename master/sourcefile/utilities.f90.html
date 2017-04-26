@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 3.0% of total for source files.">316 statements</a>
+	  title=" 3.3% of total for source files.">353 statements</a>
      </li> 
      
      
@@ -461,496 +461,570 @@ sparse array implementation</p>
 <a name="ln-11"></a><span class="k">public</span> <span class="kd">::</span> <span class="n">ind2sub</span><span class="p">,</span> <span class="n">sub2ind</span>
 <a name="ln-12"></a><span class="k">public</span> <span class="kd">::</span> <span class="n">rng_type</span><span class="p">,</span> <span class="n">rng_init</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span> <span class="n">rng_uniform</span><span class="p">,</span> <span class="n">rng_normal</span><span class="p">,</span> <span class="n">randu</span><span class="p">,</span> <span class="n">randn</span><span class="p">,</span> <span class="n">randind</span>
 <a name="ln-13"></a><span class="k">public</span> <span class="kd">::</span> <span class="n">SparseArray</span><span class="p">,</span> <span class="n">get_value</span><span class="p">,</span> <span class="n">sparse</span>
-<a name="ln-14"></a>
-<a name="ln-15"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Int32</span> <span class="o">=</span> <span class="mi">4</span>
-<a name="ln-16"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Int64</span> <span class="o">=</span> <span class="nb">kind</span><span class="p">(</span><span class="n">int8</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-<a name="ln-17"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Float32</span> <span class="o">=</span> <span class="nb">kind</span><span class="p">(</span><span class="mf">1.e0</span><span class="p">)</span>
-<a name="ln-18"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Float64</span> <span class="o">=</span> <span class="nb">kind</span><span class="p">(</span><span class="mf">1.d0</span><span class="p">)</span>
-<a name="ln-19"></a>
-<a name="ln-20"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IA</span> <span class="o">=</span> <span class="mi">16807</span>
-<a name="ln-21"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IM</span> <span class="o">=</span> <span class="mi">2147483647</span>
-<a name="ln-22"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IQ</span> <span class="o">=</span> <span class="mi">127773</span>
-<a name="ln-23"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IR</span> <span class="o">=</span> <span class="mi">2836</span>
-<a name="ln-24"></a><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">protected</span> <span class="kd">::</span> <span class="n">AM</span> <span class="o">=</span> <span class="nb">nearest</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="n">IM</span>
-<a name="ln-25"></a>
-<a name="ln-26"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">ns</span> <span class="o">=</span> <span class="mi">2</span>
-<a name="ln-27"></a>
-<a name="ln-28"></a><span class="k">type</span> <span class="kd">::</span> <span class="n">rng_type</span>
-<a name="ln-29"></a>    <span class="c">!+ Random Number Generator Derived Type</span>
-<a name="ln-30"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span> <span class="kd">::</span> <span class="n">state</span>
-<a name="ln-31"></a><span class="k">end type </span><span class="n">rng_type</span>
-<a name="ln-32"></a>
-<a name="ln-33"></a><span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">rng</span>
-<a name="ln-34"></a>
-<a name="ln-35"></a><span class="k">type </span><span class="n">SparseArray</span>
-<a name="ln-36"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nnz</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-37"></a>        <span class="c">!+ Number of non-zero elements</span>
-<a name="ln-38"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nd</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-39"></a>        <span class="c">!+ Number of dimensions</span>
-<a name="ln-40"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dims</span>
-<a name="ln-41"></a>        <span class="c">!+ Dimensions of array</span>
-<a name="ln-42"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">inds</span>
-<a name="ln-43"></a>        <span class="c">!+ Linear index of non-zero elements</span>
-<a name="ln-44"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">vals</span>
-<a name="ln-45"></a>        <span class="c">!+ Array values</span>
-<a name="ln-46"></a><span class="k">end type </span><span class="n">SparseArray</span>
-<a name="ln-47"></a>
-<a name="ln-48"></a><span class="k">interface </span><span class="n">randind</span>
-<a name="ln-49"></a>    <span class="c">!+ Procedure for generating a random array index/subscripts</span>
-<a name="ln-50"></a>    <span class="k">module procedure </span><span class="n">randind_n</span>
-<a name="ln-51"></a>    <span class="k">module procedure </span><span class="n">randind_w_1</span>
-<a name="ln-52"></a>    <span class="k">module procedure </span><span class="n">randind_w_2</span>
-<a name="ln-53"></a><span class="k">end interface</span>
-<a name="ln-54"></a>
-<a name="ln-55"></a><span class="k">interface </span><span class="n">search_sorted_first</span>
-<a name="ln-56"></a>    <span class="c">!+ Function for searching a sorted array</span>
-<a name="ln-57"></a>    <span class="k">module procedure </span><span class="n">search_sorted_first_integer</span>
-<a name="ln-58"></a>    <span class="k">module procedure </span><span class="n">search_sorted_first_float64</span>
-<a name="ln-59"></a><span class="k">end interface</span>
-<a name="ln-60"></a>
-<a name="ln-61"></a><span class="k">interface </span><span class="n">sparse</span>
-<a name="ln-62"></a>    <span class="c">!+ Creates a sparse array from a dense array</span>
-<a name="ln-63"></a>    <span class="k">module procedure </span><span class="n">sparse_1</span>
-<a name="ln-64"></a>    <span class="k">module procedure </span><span class="n">sparse_2</span>
-<a name="ln-65"></a>    <span class="k">module procedure </span><span class="n">sparse_3</span>
-<a name="ln-66"></a>    <span class="k">module procedure </span><span class="n">sparse_4</span>
-<a name="ln-67"></a><span class="k">end interface</span>
-<a name="ln-68"></a>
-<a name="ln-69"></a><span class="k">contains</span>
-<a name="ln-70"></a>
-<a name="ln-71"></a><span class="c">!============================================================================</span>
-<a name="ln-72"></a><span class="c">!---------------------------Array Indexing Routines--------------------------</span>
-<a name="ln-73"></a><span class="c">!============================================================================</span>
-<a name="ln-74"></a><span class="k">subroutine </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">ind</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
-<a name="ln-75"></a>    <span class="c">!+ Calculate the subscripts `subs` into an array with dimensions `dims`</span>
-<a name="ln-76"></a>    <span class="c">!+ given the corresponding linear index `ind`</span>
-<a name="ln-77"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dims</span>
-<a name="ln-78"></a>        <span class="c">!+ Dimensions of array</span>
-<a name="ln-79"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">ind</span>
-<a name="ln-80"></a>        <span class="c">!+ Linear index</span>
-<a name="ln-81"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
-<a name="ln-82"></a>        <span class="c">!+ Subscripts corresponding to the linear index</span>
-<a name="ln-83"></a>
-<a name="ln-84"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span>
-<a name="ln-85"></a>  
-<a name="ln-86"></a>    <span class="n">ind1</span><span class="o">=</span><span class="n">ind</span>
-<a name="ln-87"></a>    <span class="n">ndims</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<a name="ln-88"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ndims</span><span class="o">-</span><span class="mi">1</span>
-<a name="ln-89"></a>        <span class="n">ind2</span> <span class="o">=</span> <span class="p">(</span><span class="n">ind1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-90"></a>        <span class="n">subs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span> <span class="o">-</span> <span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">ind2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-91"></a>        <span class="n">ind1</span> <span class="o">=</span> <span class="n">ind2</span>
-<a name="ln-92"></a>    <span class="n">enddo</span>
-<a name="ln-93"></a>    <span class="n">subs</span><span class="p">(</span><span class="n">ndims</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span>
-<a name="ln-94"></a>
-<a name="ln-95"></a><span class="k">end subroutine </span><span class="n">ind2sub</span>
-<a name="ln-96"></a>
-<a name="ln-97"></a><span class="k">function </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">subs</span><span class="p">)</span> <span class="k">result</span> <span class="p">(</span><span class="n">ind</span><span class="p">)</span>
-<a name="ln-98"></a>    <span class="c">!+ Calculates the linear index of an array with dimensions `dims` and</span>
-<a name="ln-99"></a>    <span class="c">!+ subcripts `subs`</span>
-<a name="ln-100"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
-<a name="ln-101"></a>        <span class="c">!+ Dimension of Array</span>
-<a name="ln-102"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
-<a name="ln-103"></a>        <span class="c">!+ Subscripts to convert</span>
-<a name="ln-104"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ind</span>
-<a name="ln-105"></a>        <span class="c">!+ Linear index</span>
-<a name="ln-106"></a>
-<a name="ln-107"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span>
-<a name="ln-108"></a>
-<a name="ln-109"></a>    <span class="n">ind</span> <span class="o">=</span> <span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-110"></a>    <span class="k">do </span><span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<a name="ln-111"></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-112"></a>        <span class="k">do </span><span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span>
-<a name="ln-113"></a>            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">*</span><span class="n">dims</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
-<a name="ln-114"></a>        <span class="n">enddo</span>
-<a name="ln-115"></a>        <span class="n">ind</span> <span class="o">=</span> <span class="n">ind</span> <span class="o">+</span> <span class="n">p</span><span class="o">*</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-116"></a>    <span class="n">enddo</span>
-<a name="ln-117"></a>
-<a name="ln-118"></a><span class="k">end function </span><span class="n">sub2ind</span>
-<a name="ln-119"></a>
-<a name="ln-120"></a><span class="c">!============================================================================</span>
-<a name="ln-121"></a><span class="c">!-------------------------------Search Routines------------------------------</span>
-<a name="ln-122"></a><span class="c">!============================================================================</span>
-<a name="ln-123"></a><span class="k">function </span><span class="n">search_sorted_first_integer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span>
-<a name="ln-124"></a>    <span class="c">!+ Returns the index of the first value in `x` greater or equal to `v`.</span>
-<a name="ln-125"></a>    <span class="c">!+ Returns `length(x)+1` if `v` is greater then all values in `x`.</span>
-<a name="ln-126"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
-<a name="ln-127"></a>        <span class="c">!+ Monotonically increasing array</span>
-<a name="ln-128"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">v</span>
-<a name="ln-129"></a>        <span class="c">!+ Value to search</span>
-<a name="ln-130"></a>
-<a name="ln-131"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">hi</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">m</span>
-<a name="ln-132"></a>
-<a name="ln-133"></a>    <span class="n">lo</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-134"></a>    <span class="n">hi</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
-<a name="ln-135"></a>
-<a name="ln-136"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">lo</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">hi</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-<a name="ln-137"></a>        <span class="n">m</span> <span class="o">=</span> <span class="nb">rshift</span><span class="p">(</span><span class="n">lo</span><span class="o">+</span><span class="n">hi</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-138"></a>        <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">m</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="n">v</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-139"></a><span class="k">            </span><span class="n">lo</span> <span class="o">=</span> <span class="n">m</span>
-<a name="ln-140"></a>        <span class="k">else</span>
-<a name="ln-141"></a><span class="k">            </span><span class="n">hi</span> <span class="o">=</span> <span class="n">m</span>
-<a name="ln-142"></a>        <span class="n">endif</span>
-<a name="ln-143"></a>    <span class="n">enddo</span>
-<a name="ln-144"></a>
-<a name="ln-145"></a><span class="k">end function </span><span class="n">search_sorted_first_integer</span>
-<a name="ln-146"></a>
-<a name="ln-147"></a><span class="k">function </span><span class="n">search_sorted_first_float64</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span>
-<a name="ln-148"></a>    <span class="c">!+ Returns the index of the first value in `x` greater or equal to `v`.</span>
-<a name="ln-149"></a>    <span class="c">!+ Returns `length(x)+1` if `v` is greater then all values in `x`.</span>
-<a name="ln-150"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
-<a name="ln-151"></a>        <span class="c">!+ Monotonically increasing array</span>
-<a name="ln-152"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">v</span>
-<a name="ln-153"></a>        <span class="c">!+ Value to search</span>
-<a name="ln-154"></a>
-<a name="ln-155"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">hi</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">m</span>
-<a name="ln-156"></a>
-<a name="ln-157"></a>    <span class="n">lo</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-158"></a>    <span class="n">hi</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
-<a name="ln-159"></a>
-<a name="ln-160"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">lo</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">hi</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-<a name="ln-161"></a>        <span class="n">m</span> <span class="o">=</span> <span class="nb">rshift</span><span class="p">(</span><span class="n">lo</span><span class="o">+</span><span class="n">hi</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-162"></a>        <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">m</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="n">v</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-163"></a><span class="k">            </span><span class="n">lo</span> <span class="o">=</span> <span class="n">m</span>
-<a name="ln-164"></a>        <span class="k">else</span>
-<a name="ln-165"></a><span class="k">            </span><span class="n">hi</span> <span class="o">=</span> <span class="n">m</span>
-<a name="ln-166"></a>        <span class="n">endif</span>
-<a name="ln-167"></a>    <span class="n">enddo</span>
-<a name="ln-168"></a>
-<a name="ln-169"></a><span class="k">end function </span><span class="n">search_sorted_first_float64</span>
-<a name="ln-170"></a>
-<a name="ln-171"></a><span class="c">!============================================================================</span>
-<a name="ln-172"></a><span class="c">!-----------------------Parallel Random Number Routines----------------------</span>
-<a name="ln-173"></a><span class="c">!============================================================================</span>
-<a name="ln-174"></a><span class="k">subroutine </span><span class="n">rng_init</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
-<a name="ln-175"></a>    <span class="c">!+ Procedure to initialize a random number generator with a seed</span>
-<a name="ln-176"></a>    <span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>
-<a name="ln-177"></a>        <span class="c">!+ Random Number Generator</span>
-<a name="ln-178"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">seed</span>
-<a name="ln-179"></a>        <span class="c">!+ Initial Seed Value</span>
-<a name="ln-180"></a>
-<a name="ln-181"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="mi">777755555</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
-<a name="ln-182"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ior</span><span class="p">(</span><span class="nb">ieor</span><span class="p">(</span><span class="mi">888889999</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">seed</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-183"></a>  
-<a name="ln-184"></a><span class="k">end subroutine </span><span class="n">rng_init</span>
-<a name="ln-185"></a>
-<a name="ln-186"></a><span class="k">function </span><span class="n">rng_uniform</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
-<a name="ln-187"></a>    <span class="c">!+ Generate a uniformally-distributed random number in the range [0,1)</span>
-<a name="ln-188"></a>    <span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>
-<a name="ln-189"></a>        <span class="c">!+ Random Number Generator</span>
-<a name="ln-190"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">u</span>
-<a name="ln-191"></a>        <span class="c">!+ Uniform random deviate</span>
+<a name="ln-14"></a><span class="k">public</span> <span class="kd">::</span> <span class="n">deriv</span>
+<a name="ln-15"></a>
+<a name="ln-16"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Int32</span> <span class="o">=</span> <span class="mi">4</span>
+<a name="ln-17"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Int64</span> <span class="o">=</span> <span class="nb">kind</span><span class="p">(</span><span class="n">int8</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<a name="ln-18"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Float32</span> <span class="o">=</span> <span class="nb">kind</span><span class="p">(</span><span class="mf">1.e0</span><span class="p">)</span>
+<a name="ln-19"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">Float64</span> <span class="o">=</span> <span class="nb">kind</span><span class="p">(</span><span class="mf">1.d0</span><span class="p">)</span>
+<a name="ln-20"></a>
+<a name="ln-21"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IA</span> <span class="o">=</span> <span class="mi">16807</span>
+<a name="ln-22"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IM</span> <span class="o">=</span> <span class="mi">2147483647</span>
+<a name="ln-23"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IQ</span> <span class="o">=</span> <span class="mi">127773</span>
+<a name="ln-24"></a><span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">IR</span> <span class="o">=</span> <span class="mi">2836</span>
+<a name="ln-25"></a><span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">protected</span> <span class="kd">::</span> <span class="n">AM</span> <span class="o">=</span> <span class="nb">nearest</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="n">IM</span>
+<a name="ln-26"></a>
+<a name="ln-27"></a><span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">ns</span> <span class="o">=</span> <span class="mi">2</span>
+<a name="ln-28"></a>
+<a name="ln-29"></a><span class="k">type</span> <span class="kd">::</span> <span class="n">rng_type</span>
+<a name="ln-30"></a>    <span class="c">!+ Random Number Generator Derived Type</span>
+<a name="ln-31"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span> <span class="kd">::</span> <span class="n">state</span>
+<a name="ln-32"></a><span class="k">end type </span><span class="n">rng_type</span>
+<a name="ln-33"></a>
+<a name="ln-34"></a><span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">rng</span>
+<a name="ln-35"></a>
+<a name="ln-36"></a><span class="k">type </span><span class="n">SparseArray</span>
+<a name="ln-37"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nnz</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-38"></a>        <span class="c">!+ Number of non-zero elements</span>
+<a name="ln-39"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nd</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-40"></a>        <span class="c">!+ Number of dimensions</span>
+<a name="ln-41"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dims</span>
+<a name="ln-42"></a>        <span class="c">!+ Dimensions of array</span>
+<a name="ln-43"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">inds</span>
+<a name="ln-44"></a>        <span class="c">!+ Linear index of non-zero elements</span>
+<a name="ln-45"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">vals</span>
+<a name="ln-46"></a>        <span class="c">!+ Array values</span>
+<a name="ln-47"></a><span class="k">end type </span><span class="n">SparseArray</span>
+<a name="ln-48"></a>
+<a name="ln-49"></a><span class="k">interface </span><span class="n">randind</span>
+<a name="ln-50"></a>    <span class="c">!+ Procedure for generating a random array index/subscripts</span>
+<a name="ln-51"></a>    <span class="k">module procedure </span><span class="n">randind_n</span>
+<a name="ln-52"></a>    <span class="k">module procedure </span><span class="n">randind_w_1</span>
+<a name="ln-53"></a>    <span class="k">module procedure </span><span class="n">randind_w_2</span>
+<a name="ln-54"></a><span class="k">end interface</span>
+<a name="ln-55"></a>
+<a name="ln-56"></a><span class="k">interface </span><span class="n">search_sorted_first</span>
+<a name="ln-57"></a>    <span class="c">!+ Function for searching a sorted array</span>
+<a name="ln-58"></a>    <span class="k">module procedure </span><span class="n">search_sorted_first_integer</span>
+<a name="ln-59"></a>    <span class="k">module procedure </span><span class="n">search_sorted_first_float64</span>
+<a name="ln-60"></a><span class="k">end interface</span>
+<a name="ln-61"></a>
+<a name="ln-62"></a><span class="k">interface </span><span class="n">sparse</span>
+<a name="ln-63"></a>    <span class="c">!+ Creates a sparse array from a dense array</span>
+<a name="ln-64"></a>    <span class="k">module procedure </span><span class="n">sparse_1</span>
+<a name="ln-65"></a>    <span class="k">module procedure </span><span class="n">sparse_2</span>
+<a name="ln-66"></a>    <span class="k">module procedure </span><span class="n">sparse_3</span>
+<a name="ln-67"></a>    <span class="k">module procedure </span><span class="n">sparse_4</span>
+<a name="ln-68"></a><span class="k">end interface</span>
+<a name="ln-69"></a>
+<a name="ln-70"></a><span class="k">interface </span><span class="n">deriv</span>
+<a name="ln-71"></a>    <span class="c">!+ Procedure for finding derivatives from an array</span>
+<a name="ln-72"></a>    <span class="k">module procedure </span><span class="n">deriv_1d</span>
+<a name="ln-73"></a>    <span class="k">module procedure </span><span class="n">deriv_2d</span>
+<a name="ln-74"></a><span class="k">end interface</span>
+<a name="ln-75"></a>
+<a name="ln-76"></a><span class="k">contains</span>
+<a name="ln-77"></a>
+<a name="ln-78"></a><span class="c">!============================================================================</span>
+<a name="ln-79"></a><span class="c">!---------------------------Array Indexing Routines--------------------------</span>
+<a name="ln-80"></a><span class="c">!============================================================================</span>
+<a name="ln-81"></a><span class="k">subroutine </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">ind</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
+<a name="ln-82"></a>    <span class="c">!+ Calculate the subscripts `subs` into an array with dimensions `dims`</span>
+<a name="ln-83"></a>    <span class="c">!+ given the corresponding linear index `ind`</span>
+<a name="ln-84"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dims</span>
+<a name="ln-85"></a>        <span class="c">!+ Dimensions of array</span>
+<a name="ln-86"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">ind</span>
+<a name="ln-87"></a>        <span class="c">!+ Linear index</span>
+<a name="ln-88"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
+<a name="ln-89"></a>        <span class="c">!+ Subscripts corresponding to the linear index</span>
+<a name="ln-90"></a>
+<a name="ln-91"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span>
+<a name="ln-92"></a>
+<a name="ln-93"></a>    <span class="n">ind1</span><span class="o">=</span><span class="n">ind</span>
+<a name="ln-94"></a>    <span class="n">ndims</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+<a name="ln-95"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ndims</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-96"></a>        <span class="n">ind2</span> <span class="o">=</span> <span class="p">(</span><span class="n">ind1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-97"></a>        <span class="n">subs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span> <span class="o">-</span> <span class="n">dims</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">ind2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-98"></a>        <span class="n">ind1</span> <span class="o">=</span> <span class="n">ind2</span>
+<a name="ln-99"></a>    <span class="n">enddo</span>
+<a name="ln-100"></a>    <span class="n">subs</span><span class="p">(</span><span class="n">ndims</span><span class="p">)</span> <span class="o">=</span> <span class="n">ind1</span>
+<a name="ln-101"></a>
+<a name="ln-102"></a><span class="k">end subroutine </span><span class="n">ind2sub</span>
+<a name="ln-103"></a>
+<a name="ln-104"></a><span class="k">function </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">subs</span><span class="p">)</span> <span class="k">result</span> <span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+<a name="ln-105"></a>    <span class="c">!+ Calculates the linear index of an array with dimensions `dims` and</span>
+<a name="ln-106"></a>    <span class="c">!+ subcripts `subs`</span>
+<a name="ln-107"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
+<a name="ln-108"></a>        <span class="c">!+ Dimension of Array</span>
+<a name="ln-109"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
+<a name="ln-110"></a>        <span class="c">!+ Subscripts to convert</span>
+<a name="ln-111"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ind</span>
+<a name="ln-112"></a>        <span class="c">!+ Linear index</span>
+<a name="ln-113"></a>
+<a name="ln-114"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span>
+<a name="ln-115"></a>
+<a name="ln-116"></a>    <span class="n">ind</span> <span class="o">=</span> <span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-117"></a>    <span class="k">do </span><span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+<a name="ln-118"></a>        <span class="n">p</span> <span class="o">=</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-119"></a>        <span class="k">do </span><span class="n">l</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-120"></a>            <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">*</span><span class="n">dims</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<a name="ln-121"></a>        <span class="n">enddo</span>
+<a name="ln-122"></a>        <span class="n">ind</span> <span class="o">=</span> <span class="n">ind</span> <span class="o">+</span> <span class="n">p</span><span class="o">*</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-123"></a>    <span class="n">enddo</span>
+<a name="ln-124"></a>
+<a name="ln-125"></a><span class="k">end function </span><span class="n">sub2ind</span>
+<a name="ln-126"></a>
+<a name="ln-127"></a><span class="c">!============================================================================</span>
+<a name="ln-128"></a><span class="c">!-------------------------------Search Routines------------------------------</span>
+<a name="ln-129"></a><span class="c">!============================================================================</span>
+<a name="ln-130"></a><span class="k">function </span><span class="n">search_sorted_first_integer</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span>
+<a name="ln-131"></a>    <span class="c">!+ Returns the index of the first value in `x` greater or equal to `v`.</span>
+<a name="ln-132"></a>    <span class="c">!+ Returns `length(x)+1` if `v` is greater then all values in `x`.</span>
+<a name="ln-133"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<a name="ln-134"></a>        <span class="c">!+ Monotonically increasing array</span>
+<a name="ln-135"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">v</span>
+<a name="ln-136"></a>        <span class="c">!+ Value to search</span>
+<a name="ln-137"></a>
+<a name="ln-138"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">hi</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">m</span>
+<a name="ln-139"></a>
+<a name="ln-140"></a>    <span class="n">lo</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-141"></a>    <span class="n">hi</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<a name="ln-142"></a>
+<a name="ln-143"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">lo</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">hi</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<a name="ln-144"></a>        <span class="n">m</span> <span class="o">=</span> <span class="nb">rshift</span><span class="p">(</span><span class="n">lo</span><span class="o">+</span><span class="n">hi</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-145"></a>        <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">m</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="n">v</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-146"></a><span class="k">            </span><span class="n">lo</span> <span class="o">=</span> <span class="n">m</span>
+<a name="ln-147"></a>        <span class="k">else</span>
+<a name="ln-148"></a><span class="k">            </span><span class="n">hi</span> <span class="o">=</span> <span class="n">m</span>
+<a name="ln-149"></a>        <span class="n">endif</span>
+<a name="ln-150"></a>    <span class="n">enddo</span>
+<a name="ln-151"></a>
+<a name="ln-152"></a><span class="k">end function </span><span class="n">search_sorted_first_integer</span>
+<a name="ln-153"></a>
+<a name="ln-154"></a><span class="k">function </span><span class="n">search_sorted_first_float64</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">hi</span><span class="p">)</span>
+<a name="ln-155"></a>    <span class="c">!+ Returns the index of the first value in `x` greater or equal to `v`.</span>
+<a name="ln-156"></a>    <span class="c">!+ Returns `length(x)+1` if `v` is greater then all values in `x`.</span>
+<a name="ln-157"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">x</span>
+<a name="ln-158"></a>        <span class="c">!+ Monotonically increasing array</span>
+<a name="ln-159"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">v</span>
+<a name="ln-160"></a>        <span class="c">!+ Value to search</span>
+<a name="ln-161"></a>
+<a name="ln-162"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">hi</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">m</span>
+<a name="ln-163"></a>
+<a name="ln-164"></a>    <span class="n">lo</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-165"></a>    <span class="n">hi</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<a name="ln-166"></a>
+<a name="ln-167"></a>    <span class="k">do while</span> <span class="p">(</span><span class="n">lo</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">hi</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<a name="ln-168"></a>        <span class="n">m</span> <span class="o">=</span> <span class="nb">rshift</span><span class="p">(</span><span class="n">lo</span><span class="o">+</span><span class="n">hi</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-169"></a>        <span class="k">if</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">m</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="n">v</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-170"></a><span class="k">            </span><span class="n">lo</span> <span class="o">=</span> <span class="n">m</span>
+<a name="ln-171"></a>        <span class="k">else</span>
+<a name="ln-172"></a><span class="k">            </span><span class="n">hi</span> <span class="o">=</span> <span class="n">m</span>
+<a name="ln-173"></a>        <span class="n">endif</span>
+<a name="ln-174"></a>    <span class="n">enddo</span>
+<a name="ln-175"></a>
+<a name="ln-176"></a><span class="k">end function </span><span class="n">search_sorted_first_float64</span>
+<a name="ln-177"></a>
+<a name="ln-178"></a><span class="c">!============================================================================</span>
+<a name="ln-179"></a><span class="c">!-----------------------Parallel Random Number Routines----------------------</span>
+<a name="ln-180"></a><span class="c">!============================================================================</span>
+<a name="ln-181"></a><span class="k">subroutine </span><span class="n">rng_init</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+<a name="ln-182"></a>    <span class="c">!+ Procedure to initialize a random number generator with a seed</span>
+<a name="ln-183"></a>    <span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>
+<a name="ln-184"></a>        <span class="c">!+ Random Number Generator</span>
+<a name="ln-185"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">seed</span>
+<a name="ln-186"></a>        <span class="c">!+ Initial Seed Value</span>
+<a name="ln-187"></a>
+<a name="ln-188"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="mi">777755555</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
+<a name="ln-189"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ior</span><span class="p">(</span><span class="nb">ieor</span><span class="p">(</span><span class="mi">888889999</span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">seed</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-190"></a>
+<a name="ln-191"></a><span class="k">end subroutine </span><span class="n">rng_init</span>
 <a name="ln-192"></a>
-<a name="ln-193"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">,</span><span class="n">k</span>
-<a name="ln-194"></a>  
-<a name="ln-195"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-196"></a>    <span class="n">iy</span> <span class="o">=</span> <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<a name="ln-197"></a>  
-<a name="ln-198"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="nb">ishft</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="mi">13</span><span class="p">))</span>
-<a name="ln-199"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="nb">ishft</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="o">-</span><span class="mi">17</span><span class="p">))</span>
-<a name="ln-200"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="nb">ishft</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
-<a name="ln-201"></a>    <span class="n">k</span><span class="o">=</span><span class="n">iy</span><span class="o">/</span><span class="n">IQ</span>
-<a name="ln-202"></a>    <span class="n">iy</span><span class="o">=</span><span class="n">IA</span><span class="o">*</span><span class="p">(</span><span class="n">iy</span> <span class="o">-</span> <span class="n">k</span><span class="o">*</span><span class="n">IQ</span><span class="p">)</span> <span class="o">-</span> <span class="n">IR</span><span class="o">*</span><span class="n">k</span>
-<a name="ln-203"></a>    <span class="k">if</span><span class="p">(</span><span class="n">iy</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="n">iy</span> <span class="o">=</span> <span class="n">iy</span> <span class="o">+</span> <span class="n">IM</span>
-<a name="ln-204"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ix</span>
-<a name="ln-205"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">iy</span>
-<a name="ln-206"></a>  
-<a name="ln-207"></a>    <span class="n">u</span> <span class="o">=</span> <span class="n">am</span><span class="o">*</span><span class="nb">ior</span><span class="p">(</span><span class="nb">iand</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span><span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
-<a name="ln-208"></a>
-<a name="ln-209"></a><span class="k">end function </span><span class="n">rng_uniform</span>
-<a name="ln-210"></a>
-<a name="ln-211"></a><span class="k">function </span><span class="n">rng_normal</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-<a name="ln-212"></a>    <span class="c">!+ Generate a normally-distributed random number with mean 0 and standard deviation 1</span>
-<a name="ln-213"></a>    <span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>
-<a name="ln-214"></a>        <span class="c">!+ Random Number Generator</span>
-<a name="ln-215"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">n</span>
-<a name="ln-216"></a>        <span class="c">!+ Normal random deviate</span>
+<a name="ln-193"></a><span class="k">function </span><span class="n">rng_uniform</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<a name="ln-194"></a>    <span class="c">!+ Generate a uniformally-distributed random number in the range [0,1)</span>
+<a name="ln-195"></a>    <span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>
+<a name="ln-196"></a>        <span class="c">!+ Random Number Generator</span>
+<a name="ln-197"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">u</span>
+<a name="ln-198"></a>        <span class="c">!+ Uniform random deviate</span>
+<a name="ln-199"></a>
+<a name="ln-200"></a>    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">,</span><span class="n">k</span>
+<a name="ln-201"></a>
+<a name="ln-202"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-203"></a>    <span class="n">iy</span> <span class="o">=</span> <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-204"></a>
+<a name="ln-205"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="nb">ishft</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="mi">13</span><span class="p">))</span>
+<a name="ln-206"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="nb">ishft</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="o">-</span><span class="mi">17</span><span class="p">))</span>
+<a name="ln-207"></a>    <span class="n">ix</span> <span class="o">=</span> <span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="nb">ishft</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<a name="ln-208"></a>    <span class="n">k</span><span class="o">=</span><span class="n">iy</span><span class="o">/</span><span class="n">IQ</span>
+<a name="ln-209"></a>    <span class="n">iy</span><span class="o">=</span><span class="n">IA</span><span class="o">*</span><span class="p">(</span><span class="n">iy</span> <span class="o">-</span> <span class="n">k</span><span class="o">*</span><span class="n">IQ</span><span class="p">)</span> <span class="o">-</span> <span class="n">IR</span><span class="o">*</span><span class="n">k</span>
+<a name="ln-210"></a>    <span class="k">if</span><span class="p">(</span><span class="n">iy</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="n">iy</span> <span class="o">=</span> <span class="n">iy</span> <span class="o">+</span> <span class="n">IM</span>
+<a name="ln-211"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ix</span>
+<a name="ln-212"></a>    <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">iy</span>
+<a name="ln-213"></a>
+<a name="ln-214"></a>    <span class="n">u</span> <span class="o">=</span> <span class="n">am</span><span class="o">*</span><span class="nb">ior</span><span class="p">(</span><span class="nb">iand</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span><span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-215"></a>
+<a name="ln-216"></a><span class="k">end function </span><span class="n">rng_uniform</span>
 <a name="ln-217"></a>
-<a name="ln-218"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.449871d0</span>
-<a name="ln-219"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">t</span> <span class="o">=</span> <span class="mf">0.386595d0</span>
-<a name="ln-220"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">0.196000d0</span>
-<a name="ln-221"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">0.254720d0</span>
-<a name="ln-222"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">r1</span> <span class="o">=</span> <span class="mf">0.27597d0</span>
-<a name="ln-223"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">r2</span> <span class="o">=</span> <span class="mf">0.27846d0</span>
-<a name="ln-224"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">q</span>
-<a name="ln-225"></a>  
-<a name="ln-226"></a>    <span class="k">do</span>
-<a name="ln-227"></a><span class="k">        </span><span class="n">u</span> <span class="o">=</span> <span class="n">rng_uniform</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
-<a name="ln-228"></a>        <span class="n">v</span> <span class="o">=</span> <span class="n">rng_uniform</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
-<a name="ln-229"></a>        <span class="n">v</span> <span class="o">=</span> <span class="mf">1.7156d0</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="mf">0.5d0</span><span class="p">)</span>
-<a name="ln-230"></a>  
-<a name="ln-231"></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">s</span>
-<a name="ln-232"></a>        <span class="n">y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">t</span>
-<a name="ln-233"></a>        <span class="n">q</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
-<a name="ln-234"></a>  
-<a name="ln-235"></a>        <span class="k">if</span> <span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">r1</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-236"></a><span class="k">        if</span> <span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">r2</span><span class="p">)</span> <span class="k">cycle</span>
-<a name="ln-237"></a><span class="k">        if</span><span class="p">((</span><span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">).</span><span class="n">lt</span><span class="p">.(</span><span class="o">-</span><span class="mf">4.0</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="k">exit</span>
-<a name="ln-238"></a><span class="k">    </span><span class="n">enddo</span>
-<a name="ln-239"></a>  
-<a name="ln-240"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">/</span><span class="n">u</span>
+<a name="ln-218"></a><span class="k">function </span><span class="n">rng_normal</span><span class="p">(</span><span class="n">self</span><span class="p">)</span> <span class="k">result</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<a name="ln-219"></a>    <span class="c">!+ Generate a normally-distributed random number with mean 0 and standard deviation 1</span>
+<a name="ln-220"></a>    <span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">self</span>
+<a name="ln-221"></a>        <span class="c">!+ Random Number Generator</span>
+<a name="ln-222"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">n</span>
+<a name="ln-223"></a>        <span class="c">!+ Normal random deviate</span>
+<a name="ln-224"></a>
+<a name="ln-225"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">s</span> <span class="o">=</span> <span class="mf">0.449871d0</span>
+<a name="ln-226"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">t</span> <span class="o">=</span> <span class="mf">0.386595d0</span>
+<a name="ln-227"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">a</span> <span class="o">=</span> <span class="mf">0.196000d0</span>
+<a name="ln-228"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">b</span> <span class="o">=</span> <span class="mf">0.254720d0</span>
+<a name="ln-229"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">r1</span> <span class="o">=</span> <span class="mf">0.27597d0</span>
+<a name="ln-230"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">r2</span> <span class="o">=</span> <span class="mf">0.27846d0</span>
+<a name="ln-231"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">q</span>
+<a name="ln-232"></a>
+<a name="ln-233"></a>    <span class="k">do</span>
+<a name="ln-234"></a><span class="k">        </span><span class="n">u</span> <span class="o">=</span> <span class="n">rng_uniform</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a name="ln-235"></a>        <span class="n">v</span> <span class="o">=</span> <span class="n">rng_uniform</span><span class="p">(</span><span class="n">self</span><span class="p">)</span>
+<a name="ln-236"></a>        <span class="n">v</span> <span class="o">=</span> <span class="mf">1.7156d0</span> <span class="o">*</span> <span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="mf">0.5d0</span><span class="p">)</span>
+<a name="ln-237"></a>
+<a name="ln-238"></a>        <span class="n">x</span> <span class="o">=</span> <span class="n">u</span> <span class="o">-</span> <span class="n">s</span>
+<a name="ln-239"></a>        <span class="n">y</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">t</span>
+<a name="ln-240"></a>        <span class="n">q</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">*</span><span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">y</span> <span class="o">-</span> <span class="n">b</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
 <a name="ln-241"></a>
-<a name="ln-242"></a><span class="k">end function </span><span class="n">rng_normal</span>
-<a name="ln-243"></a>
-<a name="ln-244"></a><span class="k">subroutine </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-<a name="ln-245"></a>    <span class="c">!+ Generate an array of uniformally-distributed random deviates</span>
-<a name="ln-246"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
-<a name="ln-247"></a>        <span class="c">!+ Array of uniform random deviates</span>
+<a name="ln-242"></a>        <span class="k">if</span> <span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">r1</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-243"></a><span class="k">        if</span> <span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">r2</span><span class="p">)</span> <span class="k">cycle</span>
+<a name="ln-244"></a><span class="k">        if</span><span class="p">((</span><span class="n">v</span><span class="o">**</span><span class="mi">2</span><span class="p">).</span><span class="n">lt</span><span class="p">.(</span><span class="o">-</span><span class="mf">4.0</span><span class="o">*</span><span class="nb">log</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span> <span class="k">exit</span>
+<a name="ln-245"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-246"></a>
+<a name="ln-247"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">v</span><span class="o">/</span><span class="n">u</span>
 <a name="ln-248"></a>
-<a name="ln-249"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">thread_id</span>
+<a name="ln-249"></a><span class="k">end function </span><span class="n">rng_normal</span>
 <a name="ln-250"></a>
-<a name="ln-251"></a><span class="cp">#ifdef _OMP</span>
-<a name="ln-252"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="n">OMP_get_thread_num</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-253"></a><span class="cp">#else</span>
-<a name="ln-254"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-255"></a><span class="cp">#endif</span>
-<a name="ln-256"></a>
-<a name="ln-257"></a>    <span class="n">randomu</span> <span class="o">=</span> <span class="mf">0.d0</span>
-<a name="ln-258"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-<a name="ln-259"></a>        <span class="n">randomu</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">rng_uniform</span><span class="p">(</span><span class="n">rng</span><span class="p">(</span><span class="n">thread_id</span><span class="p">))</span>
-<a name="ln-260"></a>    <span class="n">enddo</span>
-<a name="ln-261"></a>
-<a name="ln-262"></a><span class="k">end subroutine </span><span class="n">randu</span>
+<a name="ln-251"></a><span class="k">subroutine </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+<a name="ln-252"></a>    <span class="c">!+ Generate an array of uniformally-distributed random deviates</span>
+<a name="ln-253"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+<a name="ln-254"></a>        <span class="c">!+ Array of uniform random deviates</span>
+<a name="ln-255"></a>
+<a name="ln-256"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">thread_id</span>
+<a name="ln-257"></a>
+<a name="ln-258"></a><span class="cp">#ifdef _OMP</span>
+<a name="ln-259"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="n">OMP_get_thread_num</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-260"></a><span class="cp">#else</span>
+<a name="ln-261"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-262"></a><span class="cp">#endif</span>
 <a name="ln-263"></a>
-<a name="ln-264"></a><span class="k">subroutine </span><span class="n">randn</span><span class="p">(</span><span class="n">randomn</span><span class="p">)</span>
-<a name="ln-265"></a>    <span class="c">!+ Generate an array of normally-distributed random deviates</span>
-<a name="ln-266"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomn</span>
-<a name="ln-267"></a>        <span class="c">!+ Array of normal random deviates</span>
+<a name="ln-264"></a>    <span class="n">randomu</span> <span class="o">=</span> <span class="mf">0.d0</span>
+<a name="ln-265"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+<a name="ln-266"></a>        <span class="n">randomu</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">rng_uniform</span><span class="p">(</span><span class="n">rng</span><span class="p">(</span><span class="n">thread_id</span><span class="p">))</span>
+<a name="ln-267"></a>    <span class="n">enddo</span>
 <a name="ln-268"></a>
-<a name="ln-269"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">thread_id</span>
-<a name="ln-270"></a>  
-<a name="ln-271"></a><span class="cp">#ifdef _OMP</span>
-<a name="ln-272"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="n">OMP_get_thread_num</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-273"></a><span class="cp">#else</span>
-<a name="ln-274"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-275"></a><span class="cp">#endif</span>
-<a name="ln-276"></a>
-<a name="ln-277"></a>    <span class="n">randomn</span> <span class="o">=</span> <span class="mf">0.d0</span>
-<a name="ln-278"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomn</span><span class="p">)</span>
-<a name="ln-279"></a>        <span class="n">randomn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">rng_normal</span><span class="p">(</span><span class="n">rng</span><span class="p">(</span><span class="n">thread_id</span><span class="p">))</span>
-<a name="ln-280"></a>    <span class="n">enddo</span>
-<a name="ln-281"></a>
-<a name="ln-282"></a><span class="k">end subroutine </span><span class="n">randn</span>
+<a name="ln-269"></a><span class="k">end subroutine </span><span class="n">randu</span>
+<a name="ln-270"></a>
+<a name="ln-271"></a><span class="k">subroutine </span><span class="n">randn</span><span class="p">(</span><span class="n">randomn</span><span class="p">)</span>
+<a name="ln-272"></a>    <span class="c">!+ Generate an array of normally-distributed random deviates</span>
+<a name="ln-273"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomn</span>
+<a name="ln-274"></a>        <span class="c">!+ Array of normal random deviates</span>
+<a name="ln-275"></a>
+<a name="ln-276"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">thread_id</span>
+<a name="ln-277"></a>
+<a name="ln-278"></a><span class="cp">#ifdef _OMP</span>
+<a name="ln-279"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="n">OMP_get_thread_num</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-280"></a><span class="cp">#else</span>
+<a name="ln-281"></a>    <span class="n">thread_id</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-282"></a><span class="cp">#endif</span>
 <a name="ln-283"></a>
-<a name="ln-284"></a><span class="k">subroutine </span><span class="n">randind_n</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-285"></a>    <span class="c">!+ Generate a array of uniformally-distributed random integers in the range [1, n]</span>
-<a name="ln-286"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">n</span>
-<a name="ln-287"></a>        <span class="c">!+ Largest possible value</span>
-<a name="ln-288"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomi</span>
-<a name="ln-289"></a>        <span class="c">!+ Array of uniform deviates</span>
+<a name="ln-284"></a>    <span class="n">randomn</span> <span class="o">=</span> <span class="mf">0.d0</span>
+<a name="ln-285"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomn</span><span class="p">)</span>
+<a name="ln-286"></a>        <span class="n">randomn</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">rng_normal</span><span class="p">(</span><span class="n">rng</span><span class="p">(</span><span class="n">thread_id</span><span class="p">))</span>
+<a name="ln-287"></a>    <span class="n">enddo</span>
+<a name="ln-288"></a>
+<a name="ln-289"></a><span class="k">end subroutine </span><span class="n">randn</span>
 <a name="ln-290"></a>
-<a name="ln-291"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
-<a name="ln-292"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
-<a name="ln-293"></a>  
-<a name="ln-294"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span> 
-<a name="ln-295"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-296"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-<a name="ln-297"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
-<a name="ln-298"></a>    <span class="n">enddo</span>
-<a name="ln-299"></a>
-<a name="ln-300"></a><span class="k">end subroutine </span><span class="n">randind_n</span>
-<a name="ln-301"></a>
-<a name="ln-302"></a><span class="k">subroutine </span><span class="n">randind_w_1</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-303"></a>    <span class="c">!+ Generate an array of random indices of an 1D array distributed according to `w`</span>
-<a name="ln-304"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
-<a name="ln-305"></a>        <span class="c">!+ 1D array of index weights</span>
-<a name="ln-306"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
-<a name="ln-307"></a>        <span class="c">!+ Random indices</span>
+<a name="ln-291"></a><span class="k">subroutine </span><span class="n">randind_n</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-292"></a>    <span class="c">!+ Generate a array of uniformally-distributed random integers in the range [1, n]</span>
+<a name="ln-293"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">n</span>
+<a name="ln-294"></a>        <span class="c">!+ Largest possible value</span>
+<a name="ln-295"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomi</span>
+<a name="ln-296"></a>        <span class="c">!+ Array of uniform deviates</span>
+<a name="ln-297"></a>
+<a name="ln-298"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span>
+<a name="ln-299"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+<a name="ln-300"></a>
+<a name="ln-301"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-302"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-303"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+<a name="ln-304"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+<a name="ln-305"></a>    <span class="n">enddo</span>
+<a name="ln-306"></a>
+<a name="ln-307"></a><span class="k">end subroutine </span><span class="n">randind_n</span>
 <a name="ln-308"></a>
-<a name="ln-309"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">nw</span>
-<a name="ln-310"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cdf_val</span><span class="p">,</span> <span class="n">t</span>
-<a name="ln-311"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">))</span> <span class="kd">::</span> <span class="n">cdf</span>
-<a name="ln-312"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
-<a name="ln-313"></a>  
-<a name="ln-314"></a>    <span class="n">nw</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-<a name="ln-315"></a>    <span class="n">t</span> <span class="o">=</span> <span class="mf">0.d0</span>
-<a name="ln-316"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nw</span>
-<a name="ln-317"></a>        <span class="n">cdf</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">w</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<a name="ln-318"></a>        <span class="n">t</span> <span class="o">=</span> <span class="n">cdf</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<a name="ln-319"></a>    <span class="n">enddo</span>
+<a name="ln-309"></a><span class="k">subroutine </span><span class="n">randind_w_1</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-310"></a>    <span class="c">!+ Generate an array of random indices of an 1D array distributed according to `w`</span>
+<a name="ln-311"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
+<a name="ln-312"></a>        <span class="c">!+ 1D array of index weights</span>
+<a name="ln-313"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
+<a name="ln-314"></a>        <span class="c">!+ Random indices</span>
+<a name="ln-315"></a>
+<a name="ln-316"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">nw</span>
+<a name="ln-317"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cdf_val</span><span class="p">,</span> <span class="n">t</span>
+<a name="ln-318"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">))</span> <span class="kd">::</span> <span class="n">cdf</span>
+<a name="ln-319"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
 <a name="ln-320"></a>
-<a name="ln-321"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-322"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-323"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-<a name="ln-324"></a>        <span class="n">cdf_val</span> <span class="o">=</span> <span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">cdf</span><span class="p">(</span><span class="n">nw</span><span class="p">)</span>
-<a name="ln-325"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">search_sorted_first</span><span class="p">(</span><span class="n">cdf</span><span class="p">,</span><span class="n">cdf_val</span><span class="p">),</span><span class="n">nw</span><span class="p">)</span>
+<a name="ln-321"></a>    <span class="n">nw</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<a name="ln-322"></a>    <span class="n">t</span> <span class="o">=</span> <span class="mf">0.d0</span>
+<a name="ln-323"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nw</span>
+<a name="ln-324"></a>        <span class="n">cdf</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">t</span> <span class="o">+</span> <span class="n">w</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<a name="ln-325"></a>        <span class="n">t</span> <span class="o">=</span> <span class="n">cdf</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 <a name="ln-326"></a>    <span class="n">enddo</span>
 <a name="ln-327"></a>
-<a name="ln-328"></a><span class="k">end subroutine </span><span class="n">randind_w_1</span>
-<a name="ln-329"></a>
-<a name="ln-330"></a><span class="k">subroutine </span><span class="n">randind_w_2</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
-<a name="ln-331"></a>    <span class="c">!+ Generate an array of random subscripts of an 2D array distributed according to `w`</span>
-<a name="ln-332"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
-<a name="ln-333"></a>        <span class="c">!+ 2D array of subscript weights</span>
-<a name="ln-334"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
-<a name="ln-335"></a>        <span class="c">!+ A 2D (ndim, :) array of random subscripts</span>
-<a name="ln-336"></a>  
-<a name="ln-337"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">nw</span>
-<a name="ln-338"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
-<a name="ln-339"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span> <span class="kd">::</span> <span class="n">randi</span>
-<a name="ln-340"></a>
-<a name="ln-341"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
-<a name="ln-342"></a>    <span class="n">nw</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<a name="ln-328"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-329"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-330"></a>        <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+<a name="ln-331"></a>        <span class="n">cdf_val</span> <span class="o">=</span> <span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">cdf</span><span class="p">(</span><span class="n">nw</span><span class="p">)</span>
+<a name="ln-332"></a>        <span class="n">randomi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">search_sorted_first</span><span class="p">(</span><span class="n">cdf</span><span class="p">,</span><span class="n">cdf_val</span><span class="p">),</span><span class="n">nw</span><span class="p">)</span>
+<a name="ln-333"></a>    <span class="n">enddo</span>
+<a name="ln-334"></a>
+<a name="ln-335"></a><span class="k">end subroutine </span><span class="n">randind_w_1</span>
+<a name="ln-336"></a>
+<a name="ln-337"></a><span class="k">subroutine </span><span class="n">randind_w_2</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">randomi</span><span class="p">)</span>
+<a name="ln-338"></a>    <span class="c">!+ Generate an array of random subscripts of an 2D array distributed according to `w`</span>
+<a name="ln-339"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">w</span>
+<a name="ln-340"></a>        <span class="c">!+ 2D array of subscript weights</span>
+<a name="ln-341"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">randomi</span>
+<a name="ln-342"></a>        <span class="c">!+ A 2D (ndim, :) array of random subscripts</span>
 <a name="ln-343"></a>
-<a name="ln-344"></a>    <span class="k">call </span><span class="n">randind_w_1</span><span class="p">(</span><span class="nb">reshape</span><span class="p">(</span><span class="n">w</span><span class="p">,[</span><span class="n">nw</span><span class="p">]),</span><span class="n">randi</span><span class="p">)</span>
-<a name="ln-345"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
-<a name="ln-346"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">randi</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">subs</span><span class="p">)</span>
-<a name="ln-347"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
-<a name="ln-348"></a>    <span class="n">enddo</span>
-<a name="ln-349"></a>
-<a name="ln-350"></a><span class="k">end subroutine </span><span class="n">randind_w_2</span>
-<a name="ln-351"></a>
-<a name="ln-352"></a><span class="c">!============================================================================</span>
-<a name="ln-353"></a><span class="c">!------------------------------Sparse Routines-------------------------------</span>
-<a name="ln-354"></a><span class="c">!============================================================================</span>
-<a name="ln-355"></a><span class="k">subroutine </span><span class="n">sparse_1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
-<a name="ln-356"></a>    <span class="c">!+ Routine to create a 1D sparse array from a 1D dense array</span>
-<a name="ln-357"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
-<a name="ln-358"></a>        <span class="c">!+ Dense Array</span>
-<a name="ln-359"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
-<a name="ln-360"></a>        <span class="c">!+ Sparse Array</span>
-<a name="ln-361"></a>
-<a name="ln-362"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
-<a name="ln-363"></a>
-<a name="ln-364"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-365"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
-<a name="ln-366"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<a name="ln-367"></a>
-<a name="ln-368"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
-<a name="ln-369"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
-<a name="ln-370"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
-<a name="ln-371"></a>
-<a name="ln-372"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<a name="ln-373"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-374"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
-<a name="ln-375"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-376"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
-<a name="ln-377"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-<a name="ln-378"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-379"></a>        <span class="n">endif</span>
-<a name="ln-380"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-381"></a><span class="k">    </span><span class="n">enddo</span>
-<a name="ln-382"></a>            
-<a name="ln-383"></a><span class="k">end subroutine </span><span class="n">sparse_1</span>
-<a name="ln-384"></a>    
-<a name="ln-385"></a><span class="k">subroutine </span><span class="n">sparse_2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
-<a name="ln-386"></a>    <span class="c">!+ Routine to create a 2D sparse array from a 2D dense array</span>
-<a name="ln-387"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
-<a name="ln-388"></a>        <span class="c">!+ Dense Array</span>
-<a name="ln-389"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
-<a name="ln-390"></a>        <span class="c">!+ Sparse Array</span>
+<a name="ln-344"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">nw</span>
+<a name="ln-345"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
+<a name="ln-346"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span> <span class="kd">::</span> <span class="n">randi</span>
+<a name="ln-347"></a>
+<a name="ln-348"></a>    <span class="n">randomi</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-349"></a>    <span class="n">nw</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<a name="ln-350"></a>
+<a name="ln-351"></a>    <span class="k">call </span><span class="n">randind_w_1</span><span class="p">(</span><span class="nb">reshape</span><span class="p">(</span><span class="n">w</span><span class="p">,[</span><span class="n">nw</span><span class="p">]),</span><span class="n">randi</span><span class="p">)</span>
+<a name="ln-352"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="p">(</span><span class="n">randomi</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-353"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="nb">shape</span><span class="p">(</span><span class="n">w</span><span class="p">),</span><span class="n">randi</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">subs</span><span class="p">)</span>
+<a name="ln-354"></a>        <span class="n">randomi</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">subs</span>
+<a name="ln-355"></a>    <span class="n">enddo</span>
+<a name="ln-356"></a>
+<a name="ln-357"></a><span class="k">end subroutine </span><span class="n">randind_w_2</span>
+<a name="ln-358"></a>
+<a name="ln-359"></a><span class="c">!============================================================================</span>
+<a name="ln-360"></a><span class="c">!------------------------------Sparse Routines-------------------------------</span>
+<a name="ln-361"></a><span class="c">!============================================================================</span>
+<a name="ln-362"></a><span class="k">subroutine </span><span class="n">sparse_1</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
+<a name="ln-363"></a>    <span class="c">!+ Routine to create a 1D sparse array from a 1D dense array</span>
+<a name="ln-364"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
+<a name="ln-365"></a>        <span class="c">!+ Dense Array</span>
+<a name="ln-366"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
+<a name="ln-367"></a>        <span class="c">!+ Sparse Array</span>
+<a name="ln-368"></a>
+<a name="ln-369"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
+<a name="ln-370"></a>
+<a name="ln-371"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-372"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
+<a name="ln-373"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-374"></a>
+<a name="ln-375"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
+<a name="ln-376"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
+<a name="ln-377"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
+<a name="ln-378"></a>
+<a name="ln-379"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-380"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-381"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-382"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-383"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
+<a name="ln-384"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<a name="ln-385"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-386"></a>        <span class="n">endif</span>
+<a name="ln-387"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-388"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-389"></a>
+<a name="ln-390"></a><span class="k">end subroutine </span><span class="n">sparse_1</span>
 <a name="ln-391"></a>
-<a name="ln-392"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<a name="ln-393"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
-<a name="ln-394"></a>
-<a name="ln-395"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">2</span>
-<a name="ln-396"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
-<a name="ln-397"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-392"></a><span class="k">subroutine </span><span class="n">sparse_2</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
+<a name="ln-393"></a>    <span class="c">!+ Routine to create a 2D sparse array from a 2D dense array</span>
+<a name="ln-394"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
+<a name="ln-395"></a>        <span class="c">!+ Dense Array</span>
+<a name="ln-396"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
+<a name="ln-397"></a>        <span class="c">!+ Sparse Array</span>
 <a name="ln-398"></a>
-<a name="ln-399"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
-<a name="ln-400"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
-<a name="ln-401"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
-<a name="ln-402"></a>
-<a name="ln-403"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<a name="ln-404"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-405"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
-<a name="ln-406"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
-<a name="ln-407"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">)).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-408"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
-<a name="ln-409"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
-<a name="ln-410"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-411"></a>        <span class="n">endif</span>
-<a name="ln-412"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-413"></a><span class="k">    </span><span class="n">enddo</span>
-<a name="ln-414"></a>            
-<a name="ln-415"></a><span class="k">end subroutine </span><span class="n">sparse_2</span>
-<a name="ln-416"></a>
-<a name="ln-417"></a><span class="k">subroutine </span><span class="n">sparse_3</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
-<a name="ln-418"></a>    <span class="c">!+ Routine to create a 3D sparse array from a 3D dense array</span>
-<a name="ln-419"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
-<a name="ln-420"></a>        <span class="c">!+ Dense Array</span>
-<a name="ln-421"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
-<a name="ln-422"></a>        <span class="c">!+ Sparse Array</span>
+<a name="ln-399"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<a name="ln-400"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
+<a name="ln-401"></a>
+<a name="ln-402"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">2</span>
+<a name="ln-403"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
+<a name="ln-404"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-405"></a>
+<a name="ln-406"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
+<a name="ln-407"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
+<a name="ln-408"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
+<a name="ln-409"></a>
+<a name="ln-410"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-411"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-412"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-413"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
+<a name="ln-414"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">)).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-415"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
+<a name="ln-416"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+<a name="ln-417"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-418"></a>        <span class="n">endif</span>
+<a name="ln-419"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-420"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-421"></a>
+<a name="ln-422"></a><span class="k">end subroutine </span><span class="n">sparse_2</span>
 <a name="ln-423"></a>
-<a name="ln-424"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<a name="ln-425"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
-<a name="ln-426"></a>
-<a name="ln-427"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">3</span>
-<a name="ln-428"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
-<a name="ln-429"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-424"></a><span class="k">subroutine </span><span class="n">sparse_3</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
+<a name="ln-425"></a>    <span class="c">!+ Routine to create a 3D sparse array from a 3D dense array</span>
+<a name="ln-426"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
+<a name="ln-427"></a>        <span class="c">!+ Dense Array</span>
+<a name="ln-428"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
+<a name="ln-429"></a>        <span class="c">!+ Sparse Array</span>
 <a name="ln-430"></a>
-<a name="ln-431"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
-<a name="ln-432"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
-<a name="ln-433"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
-<a name="ln-434"></a>
-<a name="ln-435"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<a name="ln-436"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-437"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
-<a name="ln-438"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
-<a name="ln-439"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">)).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-440"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
-<a name="ln-441"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-<a name="ln-442"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-443"></a>        <span class="n">endif</span>
-<a name="ln-444"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-445"></a><span class="k">    </span><span class="n">enddo</span>
-<a name="ln-446"></a>            
-<a name="ln-447"></a><span class="k">end subroutine </span><span class="n">sparse_3</span>
-<a name="ln-448"></a>
-<a name="ln-449"></a><span class="k">subroutine </span><span class="n">sparse_4</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
-<a name="ln-450"></a>    <span class="c">!+ Routine to create a 4D sparse array from a 4D dense array</span>
-<a name="ln-451"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
-<a name="ln-452"></a>        <span class="c">!+ Dense Array</span>
-<a name="ln-453"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
-<a name="ln-454"></a>        <span class="c">!+ Sparse Array</span>
+<a name="ln-431"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<a name="ln-432"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
+<a name="ln-433"></a>
+<a name="ln-434"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">3</span>
+<a name="ln-435"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
+<a name="ln-436"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-437"></a>
+<a name="ln-438"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
+<a name="ln-439"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
+<a name="ln-440"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
+<a name="ln-441"></a>
+<a name="ln-442"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-443"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-444"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-445"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
+<a name="ln-446"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">)).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-447"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
+<a name="ln-448"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<a name="ln-449"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-450"></a>        <span class="n">endif</span>
+<a name="ln-451"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-452"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-453"></a>
+<a name="ln-454"></a><span class="k">end subroutine </span><span class="n">sparse_3</span>
 <a name="ln-455"></a>
-<a name="ln-456"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">subs</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-<a name="ln-457"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
-<a name="ln-458"></a>
-<a name="ln-459"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">4</span>
-<a name="ln-460"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
-<a name="ln-461"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-456"></a><span class="k">subroutine </span><span class="n">sparse_4</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">SA</span><span class="p">)</span>
+<a name="ln-457"></a>    <span class="c">!+ Routine to create a 4D sparse array from a 4D dense array</span>
+<a name="ln-458"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">A</span>
+<a name="ln-459"></a>        <span class="c">!+ Dense Array</span>
+<a name="ln-460"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">SA</span>
+<a name="ln-461"></a>        <span class="c">!+ Sparse Array</span>
 <a name="ln-462"></a>
-<a name="ln-463"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
-<a name="ln-464"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
-<a name="ln-465"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
-<a name="ln-466"></a>
-<a name="ln-467"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
-<a name="ln-468"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-469"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
-<a name="ln-470"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
-<a name="ln-471"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">4</span><span class="p">)).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-472"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
-<a name="ln-473"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
-<a name="ln-474"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
-<a name="ln-475"></a>        <span class="n">endif</span>
-<a name="ln-476"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
-<a name="ln-477"></a><span class="k">    </span><span class="n">enddo</span>
-<a name="ln-478"></a>            
-<a name="ln-479"></a><span class="k">end subroutine </span><span class="n">sparse_4</span>
-<a name="ln-480"></a>
-<a name="ln-481"></a><span class="k">function </span><span class="n">get_value</span><span class="p">(</span><span class="n">SA</span><span class="p">,</span> <span class="n">subs</span><span class="p">)</span> <span class="k">result</span> <span class="p">(</span><span class="n">val</span><span class="p">)</span>
-<a name="ln-482"></a>    <span class="c">!+ Gets value of sparse array `SA` at the subscripts `subs`</span>
-<a name="ln-483"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">SA</span>
-<a name="ln-484"></a>        <span class="c">!+ Sparse Array</span>
-<a name="ln-485"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
-<a name="ln-486"></a>        <span class="c">!+ Subscripts of Sparse Array</span>
-<a name="ln-487"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">val</span>
-<a name="ln-488"></a>        <span class="c">!+ Value of `SA` at `subs`</span>
-<a name="ln-489"></a>
-<a name="ln-490"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ind</span><span class="p">,</span> <span class="n">cind</span>
-<a name="ln-491"></a>
-<a name="ln-492"></a>    <span class="n">val</span> <span class="o">=</span> <span class="mf">0.d0</span>
-<a name="ln-493"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
-<a name="ln-494"></a><span class="k">        </span>
-<a name="ln-495"></a><span class="k">    </span><span class="n">ind</span> <span class="o">=</span> <span class="n">sub2ind</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span> <span class="n">subs</span><span class="p">)</span>
-<a name="ln-496"></a>    <span class="n">cind</span> <span class="o">=</span> <span class="n">search_sorted_first</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
-<a name="ln-497"></a>    <span class="k">if</span><span class="p">(</span><span class="n">ind</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">cind</span><span class="p">))</span><span class="k">then</span>
-<a name="ln-498"></a><span class="k">        </span><span class="n">val</span> <span class="o">=</span> <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">cind</span><span class="p">)</span>
-<a name="ln-499"></a>    <span class="n">endif</span>
-<a name="ln-500"></a>
-<a name="ln-501"></a><span class="k">end function </span><span class="n">get_value</span>
-<a name="ln-502"></a>
-<a name="ln-503"></a><span class="k">end module </span><span class="n">utilities</span>
+<a name="ln-463"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">subs</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<a name="ln-464"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">c</span>
+<a name="ln-465"></a>
+<a name="ln-466"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nd</span> <span class="o">=</span> <span class="mi">4</span>
+<a name="ln-467"></a>    <span class="k">allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nd</span><span class="p">))</span>
+<a name="ln-468"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="nb">shape</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-469"></a>
+<a name="ln-470"></a>    <span class="n">SA</span><span class="p">%</span><span class="n">nnz</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">A</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
+<a name="ln-471"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
+<a name="ln-472"></a><span class="k">    allocate</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">),</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">))</span>
+<a name="ln-473"></a>
+<a name="ln-474"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<a name="ln-475"></a>    <span class="n">c</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-476"></a>    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-477"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">subs</span><span class="p">)</span>
+<a name="ln-478"></a>        <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">4</span><span class="p">)).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-479"></a><span class="k">            </span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">i</span>
+<a name="ln-480"></a>            <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">=</span> <span class="n">A</span><span class="p">(</span><span class="n">subs</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">subs</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+<a name="ln-481"></a>            <span class="n">c</span> <span class="o">=</span> <span class="n">c</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-482"></a>        <span class="n">endif</span>
+<a name="ln-483"></a>        <span class="k">if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">)</span> <span class="k">exit</span>
+<a name="ln-484"></a><span class="k">    </span><span class="n">enddo</span>
+<a name="ln-485"></a>
+<a name="ln-486"></a><span class="k">end subroutine </span><span class="n">sparse_4</span>
+<a name="ln-487"></a>
+<a name="ln-488"></a><span class="k">function </span><span class="n">get_value</span><span class="p">(</span><span class="n">SA</span><span class="p">,</span> <span class="n">subs</span><span class="p">)</span> <span class="k">result</span> <span class="p">(</span><span class="n">val</span><span class="p">)</span>
+<a name="ln-489"></a>    <span class="c">!+ Gets value of sparse array `SA` at the subscripts `subs`</span>
+<a name="ln-490"></a>    <span class="k">type</span><span class="p">(</span><span class="n">SparseArray</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">SA</span>
+<a name="ln-491"></a>        <span class="c">!+ Sparse Array</span>
+<a name="ln-492"></a>    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">subs</span>
+<a name="ln-493"></a>        <span class="c">!+ Subscripts of Sparse Array</span>
+<a name="ln-494"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">val</span>
+<a name="ln-495"></a>        <span class="c">!+ Value of `SA` at `subs`</span>
+<a name="ln-496"></a>
+<a name="ln-497"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ind</span><span class="p">,</span> <span class="n">cind</span>
+<a name="ln-498"></a>
+<a name="ln-499"></a>    <span class="n">val</span> <span class="o">=</span> <span class="mf">0.d0</span>
+<a name="ln-500"></a>    <span class="k">if</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">nnz</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
+<a name="ln-501"></a>
+<a name="ln-502"></a><span class="k">    </span><span class="n">ind</span> <span class="o">=</span> <span class="n">sub2ind</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span> <span class="n">subs</span><span class="p">)</span>
+<a name="ln-503"></a>    <span class="n">cind</span> <span class="o">=</span> <span class="n">search_sorted_first</span><span class="p">(</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
+<a name="ln-504"></a>    <span class="k">if</span><span class="p">(</span><span class="n">ind</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="n">SA</span><span class="p">%</span><span class="n">inds</span><span class="p">(</span><span class="n">cind</span><span class="p">))</span><span class="k">then</span>
+<a name="ln-505"></a><span class="k">        </span><span class="n">val</span> <span class="o">=</span> <span class="n">SA</span><span class="p">%</span><span class="n">vals</span><span class="p">(</span><span class="n">cind</span><span class="p">)</span>
+<a name="ln-506"></a>    <span class="n">endif</span>
+<a name="ln-507"></a>
+<a name="ln-508"></a><span class="k">end function </span><span class="n">get_value</span>
+<a name="ln-509"></a>
+<a name="ln-510"></a><span class="c">!============================================================================</span>
+<a name="ln-511"></a><span class="c">!--------------------------------Deriv Routines------------------------------</span>
+<a name="ln-512"></a><span class="c">!============================================================================</span>
+<a name="ln-513"></a>
+<a name="ln-514"></a><span class="k">subroutine </span><span class="n">deriv_1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">yp</span><span class="p">)</span>
+<a name="ln-515"></a>    <span class="c">!+ Uses 3 point lagrangian method to calculate the derivative of an array</span>
+<a name="ln-516"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">x</span>
+<a name="ln-517"></a>        <span class="c">!+ X Values</span>
+<a name="ln-518"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">y</span>
+<a name="ln-519"></a>        <span class="c">!+ Y Values</span>
+<a name="ln-520"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span><span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">yp</span>
+<a name="ln-521"></a>        <span class="c">!+ Derivative of Y w.r.t. X</span>
+<a name="ln-522"></a>
+<a name="ln-523"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-524"></a>        <span class="c">!! temporary values for loops</span>
+<a name="ln-525"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">p3</span>
+<a name="ln-526"></a>        <span class="c">!! intermeadiate values for 3 point lagrangian</span>
+<a name="ln-527"></a>
+<a name="ln-528"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+<a name="ln-529"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-530"></a>        <span class="n">p1</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-531"></a>        <span class="n">p2</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<a name="ln-532"></a>        <span class="n">p3</span> <span class="o">=</span> <span class="n">x</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-533"></a>        <span class="n">yp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p3</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p3</span><span class="p">)))</span> <span class="o">+</span> <span class="p">&amp;</span>
+<a name="ln-534"></a>                <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p3</span><span class="p">))</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">))))</span> <span class="o">-</span>   <span class="p">&amp;</span>
+<a name="ln-535"></a>                <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="o">-</span><span class="n">p2</span><span class="p">)</span><span class="o">/</span><span class="p">((</span><span class="n">p1</span><span class="o">-</span><span class="n">p3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p2</span><span class="o">-</span><span class="n">p3</span><span class="p">)))</span>
+<a name="ln-536"></a>    <span class="n">enddo</span>
+<a name="ln-537"></a>
+<a name="ln-538"></a>    <span class="n">yp</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">+</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">)))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))))</span> <span class="o">-</span> <span class="p">&amp;</span>
+<a name="ln-539"></a>            <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))))</span> <span class="o">+</span>               <span class="p">&amp;</span>
+<a name="ln-540"></a>            <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="mi">3</span><span class="p">))))</span>
+<a name="ln-541"></a>    <span class="n">yp</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span> <span class="o">+</span>   <span class="p">&amp;</span>
+<a name="ln-542"></a>              <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span> <span class="o">-</span>     <span class="p">&amp;</span>
+<a name="ln-543"></a>              <span class="p">(</span><span class="n">y</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">+</span><span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span><span class="o">/</span><span class="p">((</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">&amp;</span>
+<a name="ln-544"></a>              <span class="p">(</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">x</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span>
+<a name="ln-545"></a>
+<a name="ln-546"></a><span class="k">end subroutine </span><span class="n">deriv_1d</span>
+<a name="ln-547"></a>
+<a name="ln-548"></a><span class="k">subroutine </span><span class="n">deriv_2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">zxp</span><span class="p">,</span><span class="n">zyp</span><span class="p">)</span>
+<a name="ln-549"></a>    <span class="c">!+ Uses 3 point lagrangian method to calculate the partial derivative</span>
+<a name="ln-550"></a>    <span class="c">!+ of an array Z w.r.t X and Y</span>
+<a name="ln-551"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">x</span>
+<a name="ln-552"></a>        <span class="c">!+ X Values</span>
+<a name="ln-553"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">y</span>
+<a name="ln-554"></a>        <span class="c">!+ Y Values</span>
+<a name="ln-555"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">z</span>
+<a name="ln-556"></a>        <span class="c">!+ Z Values</span>
+<a name="ln-557"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zxp</span>
+<a name="ln-558"></a>        <span class="c">!+ Derivative of Z w.r.t. X</span>
+<a name="ln-559"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zyp</span>
+<a name="ln-560"></a>        <span class="c">!+ Derivative of Z w.r.t. Y</span>
+<a name="ln-561"></a>
+<a name="ln-562"></a>    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-563"></a>        <span class="c">!! temporary values for loops</span>
+<a name="ln-564"></a>
+<a name="ln-565"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<a name="ln-566"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-567"></a>        <span class="k">call </span><span class="n">deriv_1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">z</span><span class="p">(:,</span><span class="n">i</span><span class="p">),</span><span class="n">zxp</span><span class="p">(:,</span><span class="n">i</span><span class="p">))</span>
+<a name="ln-568"></a>    <span class="n">enddo</span>
+<a name="ln-569"></a>
+<a name="ln-570"></a>    <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a name="ln-571"></a>    <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="n">n</span>
+<a name="ln-572"></a>        <span class="k">call </span><span class="n">deriv_1d</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">,:),</span><span class="n">zyp</span><span class="p">(</span><span class="n">i</span><span class="p">,:))</span>
+<a name="ln-573"></a>    <span class="n">enddo</span>
+<a name="ln-574"></a>
+<a name="ln-575"></a><span class="k">end subroutine </span><span class="n">deriv_2d</span>
+<a name="ln-576"></a>
+<a name="ln-577"></a><span class="k">end module </span><span class="n">utilities</span>
 </pre></div>
 
     </section>

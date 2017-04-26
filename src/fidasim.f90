@@ -716,6 +716,8 @@ end type NeutronRate
 
 type NeutralDensity
     !+ Neutral density structure
+    real(Float64), dimension(:,:,:,:,:), allocatable :: v
+        !+ Mean neutral particle velocity: v(:,neutral_type,x,y,z)
     real(Float64), dimension(:,:,:,:,:), allocatable :: dens
         !+ Neutral density: dens(lev,neutral_type,x,y,z)
 end type NeutralDensity
@@ -5626,7 +5628,7 @@ end subroutine get_ep_denf
 !=============================================================================
 !--------------------------Result Storage Routines----------------------------
 !=============================================================================
-subroutine store_neutrals(ind, neut_type, dens, store_iter)
+subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
     !Store neutrals in [[libfida:neut]] at indices `ind`
     integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
@@ -5634,9 +5636,13 @@ subroutine store_neutrals(ind, neut_type, dens, store_iter)
         !+ Neutral type
     real(Float64), dimension(:), intent(in)  :: dens
         !+ Neutral density [neutrals/cm^3]
+    real(Float64), dimension(3), intent(in)  :: vn
+        !+ Neutral particle velocity [cm/s]
     logical, intent(in), optional            :: store_iter
         !+ Store DCX/Halo iteration density in [[libfida:halo_iter_dens]]
     logical :: iter
+    real(Float64) :: totdens
+    real(Float64), dimension(3) :: vn_old
 
     if(present(store_iter)) then
         iter = store_iter
@@ -5646,10 +5652,17 @@ subroutine store_neutrals(ind, neut_type, dens, store_iter)
 
     !$OMP CRITICAL(store_neutrals_1)
     if(iter) halo_iter_dens(neut_type) = halo_iter_dens(neut_type) + sum(dens)
-
+    
     neut%dens(:,neut_type,ind(1),ind(2),ind(3)) = &
-      neut%dens(:,neut_type,ind(1),ind(2),ind(3))+dens ![neutrals/cm^3]
+        neut%dens(:,neut_type,ind(1),ind(2),ind(3))+dens ![neutrals/cm^3]
+    
+    !! Update mean velocity
+    vn_old = neut%v(:,neut_type,ind(1),ind(2),ind(3))
+    totdens = sum(neut%dens(:,neut_type,ind(1),ind(2),ind(3)))
+    neut%v(:,neut_type,ind(1),ind(2),ind(3)) = &
+        vn_old + (sum(dens)/totdens)*(vn-vn_old)
     !$OMP END CRITICAL(store_neutrals_1)
+
 end subroutine store_neutrals
 
 subroutine store_births(ind, neut_type, dflux)
@@ -5867,10 +5880,7 @@ subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
 
     integer :: ntypes, i, ii
     real(Float64), dimension(nlevs) :: rates, denn
-    real(Float64), dimension(3) :: vhalo, vnbi ,vn
-
-    vnbi = pos - nbi%src
-    vnbi = vnbi/norm2(vnbi)*nbi%vinj
+    real(Float64), dimension(3) :: vhalo,vn
 
     ntypes = size(types)
     prob = 0
@@ -5879,7 +5889,7 @@ subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
         if((types(i).le.3).and.(types(i).ne.0)) then
             ! CX with full type'th energy NBI neutrals
             denn = neut%dens(:,types(i),ind(1),ind(2),ind(3))
-            vn = vnbi/sqrt(real(types(i)))
+            vn = neut%v(:,types(i),ind(1),ind(2),ind(3))
             call neut_rates(denn,v_ion,vn,rates)
             prob = prob+rates
         else
@@ -6890,7 +6900,7 @@ subroutine ndmc
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,beam_ion,vnbi,tracks(jj)%time,states,dens,photons)
-                call store_neutrals(ind,neut_type,dens/nlaunch)
+                call store_neutrals(ind,neut_type,dens/nlaunch,vnbi)
                 tracks(jj)%flux = (iflux - sum(states))*beam_grid%dv/nlaunch
 
                 if(inputs%calc_birth.ge.1) then
@@ -7087,7 +7097,7 @@ subroutine dcx
                         call get_plasma(plasma,pos=tracks(jj)%pos)
 
                         call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
-                        call store_neutrals(tracks(jj)%ind,halo_type,denn/nlaunch(i,j,k),plasma%in_plasma)
+                        call store_neutrals(tracks(jj)%ind,halo_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
                         if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                           call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
@@ -7194,7 +7204,7 @@ subroutine halo
 
                             call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
                             call store_neutrals(tracks(jj)%ind,s2type, &
-                                 denn/nlaunch(i,j,k),plasma%in_plasma)
+                                 denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
                             if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                               call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
@@ -8484,7 +8494,9 @@ program fidasim
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
     !! ----------------------------------------------------------
     !! neutral density array!
+    allocate(neut%v(3,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
     allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    neut%v = 0.d0
     neut%dens = 0.d0
 
     !! birth profile

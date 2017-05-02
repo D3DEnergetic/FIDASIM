@@ -136,7 +136,8 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     ;+    **grid**: Interpolation grid
     ;+
     ;+##Keyword Arguments
-    ;+    **flux**: Set this keyword to a named variable to recieve the torodial flux mapped onto the interpolation grid
+    ;+    **flux**: Set this keyword to a named variable to receive the normalized
+    ;+              sqrt(torodial flux) (rho) mapped onto the interpolation grid
     ;+
     ;+    **g**: Set this keyword to a named variable to recieve the geqdsk structure
     ;+
@@ -152,7 +153,7 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     ;; Get eqdsk
     g=readg(filename)
     time = double(g.time)
-    fluxgrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear))
+    fluxgrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))
 
     calculate_bfield,bp,br,bphi,bz1,g
 

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.1% of total for procedures.">14 statements</a>
+	  title=" 0.2% of total for procedures.">15 statements</a>
      </li> 
      
      
@@ -287,9 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
       <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -395,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -552,8 +556,6 @@
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
-      
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
       
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
@@ -717,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -842,7 +846,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine store_neutrals(ind, neut_type, dens, store_iter)
+public subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
     
     
 	 
@@ -916,6 +920,21 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
   
 <tr>
   
+  <td><span class="anchor" id="variable-vn"></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vn</strong></td><td><p>Neutral particle velocity [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-store_iter"></span>logical,</td>
   <td>intent(in),</td>
   <td>optional</td>
@@ -950,39 +969,39 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
 <polygon fill="none" stroke="black" points="261,-70 181,-70 181,-44 261,-44 261,-70"/>
 <text text-anchor="middle" x="221" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">store_neutrals</text>
 </g>
-<!-- proc~dcx -->
-<g id="node2" class="node"><title>proc~dcx</title>
-<a xlink:href="../proc/dcx.html" xlink:title="dcx">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-114 90,-114 90,-88 144,-88 144,-114"/>
-<text text-anchor="middle" x="117" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
-</a>
-</g>
-<!-- proc~dcx&#45;&gt;proc~store_neutrals -->
-<g id="edge8" class="edge"><title>proc~dcx&#45;&gt;proc~store_neutrals</title>
-<path fill="none" stroke="#000000" d="M144.053,-89.5544C155.166,-84.8529 168.271,-79.3086 180.485,-74.1409"/>
-<polygon fill="#000000" stroke="#000000" points="182.189,-77.2203 190.035,-70.1005 179.462,-70.7735 182.189,-77.2203"/>
-</g>
 <!-- proc~ndmc -->
-<g id="node3" class="node"><title>proc~ndmc</title>
+<g id="node2" class="node"><title>proc~ndmc</title>
 <a xlink:href="../proc/ndmc.html" xlink:title="ndmc">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-70 90,-70 90,-44 144,-44 144,-70"/>
-<text text-anchor="middle" x="117" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-114 90,-114 90,-88 144,-88 144,-114"/>
+<text text-anchor="middle" x="117" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
 </a>
 </g>
 <!-- proc~ndmc&#45;&gt;proc~store_neutrals -->
-<g id="edge10" class="edge"><title>proc~ndmc&#45;&gt;proc~store_neutrals</title>
-<path fill="none" stroke="#000000" d="M144.053,-57C152.099,-57 161.19,-57 170.23,-57"/>
-<polygon fill="#000000" stroke="#000000" points="170.358,-60.5001 180.358,-57 170.358,-53.5001 170.358,-60.5001"/>
+<g id="edge8" class="edge"><title>proc~ndmc&#45;&gt;proc~store_neutrals</title>
+<path fill="none" stroke="#000000" d="M144.053,-89.5544C155.166,-84.8529 168.271,-79.3086 180.485,-74.1409"/>
+<polygon fill="#000000" stroke="#000000" points="182.189,-77.2203 190.035,-70.1005 179.462,-70.7735 182.189,-77.2203"/>
 </g>
 <!-- proc~halo -->
-<g id="node4" class="node"><title>proc~halo</title>
+<g id="node3" class="node"><title>proc~halo</title>
 <a xlink:href="../proc/halo.html" xlink:title="halo">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
-<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-70 90,-70 90,-44 144,-44 144,-70"/>
+<text text-anchor="middle" x="117" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
 </a>
 </g>
 <!-- proc~halo&#45;&gt;proc~store_neutrals -->
-<g id="edge12" class="edge"><title>proc~halo&#45;&gt;proc~store_neutrals</title>
+<g id="edge10" class="edge"><title>proc~halo&#45;&gt;proc~store_neutrals</title>
+<path fill="none" stroke="#000000" d="M144.053,-57C152.099,-57 161.19,-57 170.23,-57"/>
+<polygon fill="#000000" stroke="#000000" points="170.358,-60.5001 180.358,-57 170.358,-53.5001 170.358,-60.5001"/>
+</g>
+<!-- proc~dcx -->
+<g id="node4" class="node"><title>proc~dcx</title>
+<a xlink:href="../proc/dcx.html" xlink:title="dcx">
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
+<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+</a>
+</g>
+<!-- proc~dcx&#45;&gt;proc~store_neutrals -->
+<g id="edge12" class="edge"><title>proc~dcx&#45;&gt;proc~store_neutrals</title>
 <path fill="none" stroke="#000000" d="M144.053,-24.4456C155.166,-29.1471 168.271,-34.6914 180.485,-39.8591"/>
 <polygon fill="#000000" stroke="#000000" points="179.462,-43.2265 190.035,-43.8995 182.189,-36.7797 179.462,-43.2265"/>
 </g>
@@ -993,18 +1012,18 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
 <text text-anchor="middle" x="27" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~dcx -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<!-- program~fidasim&#45;&gt;proc~ndmc -->
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
 <path fill="none" stroke="#000000" d="M54.003,-70.2015C62.5341,-74.3722 72.0985,-79.0481 81.1476,-83.4721"/>
 <polygon fill="#000000" stroke="#000000" points="79.8051,-86.7117 90.3262,-87.9595 82.8796,-80.423 79.8051,-86.7117"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~ndmc -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
+<!-- program~fidasim&#45;&gt;proc~halo -->
+<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
 <path fill="none" stroke="#000000" d="M54.003,-57C62.0277,-57 70.9665,-57 79.5309,-57"/>
 <polygon fill="#000000" stroke="#000000" points="79.7051,-60.5001 89.705,-57 79.705,-53.5001 79.7051,-60.5001"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~halo -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
+<!-- program~fidasim&#45;&gt;proc~dcx -->
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
 <path fill="none" stroke="#000000" d="M54.003,-43.7985C62.5341,-39.6278 72.0985,-34.9519 81.1476,-30.5279"/>
 <polygon fill="#000000" stroke="#000000" points="82.8796,-33.577 90.3262,-26.0405 79.8051,-27.2883 82.8796,-33.577"/>
 </g>
@@ -1134,7 +1153,7 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_neutrals</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">neut_type</span><span class="p">,</span> <span class="n">dens</span><span class="p">,</span> <span class="n">store_iter</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_neutrals</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">neut_type</span><span class="p">,</span> <span class="n">dens</span><span class="p">,</span> <span class="n">vn</span><span class="p">,</span> <span class="n">store_iter</span><span class="p">)</span>
     <span class="c">!Store neutrals in [[libfida:neut]] at indices `ind`</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
         <span class="c">!+ [[libfida:beam_grid]] indices</span>
@@ -1142,6 +1161,8 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
         <span class="c">!+ Neutral type</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dens</span>
         <span class="c">!+ Neutral density [neutrals/cm^3]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vn</span>
+        <span class="c">!+ Neutral particle velocity [cm/s]</span>
     <span class="kt">logical</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>            <span class="kd">::</span> <span class="n">store_iter</span>
         <span class="c">!+ Store DCX/Halo iteration density in [[libfida:halo_iter_dens]]</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">iter</span>
@@ -1154,10 +1175,10 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
 
     <span class="c">!$OMP CRITICAL(store_neutrals_1)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">iter</span><span class="p">)</span> <span class="n">halo_iter_dens</span><span class="p">(</span><span class="n">neut_type</span><span class="p">)</span> <span class="o">=</span> <span class="n">halo_iter_dens</span><span class="p">(</span><span class="n">neut_type</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dens</span><span class="p">)</span>
-
     <span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">neut_type</span><span class="p">,</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">=</span> <span class="p">&amp;</span>
-      <span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">neut_type</span><span class="p">,</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">+</span><span class="n">dens</span> <span class="c">![neutrals/cm^3]</span>
+        <span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">neut_type</span><span class="p">,</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">+</span><span class="n">dens</span> <span class="c">![neutrals/cm^3]</span>
     <span class="c">!$OMP END CRITICAL(store_neutrals_1)</span>
+
 <span class="k">end subroutine </span><span class="n">store_neutrals</span>
 </pre></div>
 
@@ -1265,9 +1286,13 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
       <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1373,7 +1398,7 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1530,8 +1555,6 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
-      
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
       
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
@@ -1695,7 +1718,9 @@ public subroutine store_neutrals(ind, neut_type, dens, store_iter)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

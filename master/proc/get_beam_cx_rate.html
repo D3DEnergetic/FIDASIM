@@ -10,7 +10,7 @@
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
-    <title>neut_rates &ndash; FIDASIM</title>
+    <title>get_beam_cx_rate &ndash; FIDASIM</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -114,7 +114,7 @@
     
   
   <div class="row">
-    <h1>neut_rates
+    <h1>get_beam_cx_rate
       <small>Subroutine</small>
     
     </h1>
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.4% of total for procedures.">42 statements</a>
+	  title=" 0.3% of total for procedures.">29 statements</a>
      </li> 
      
      
@@ -145,7 +145,7 @@
   
      <li><a href='../module/libfida.html'>libfida</a></li>
   
-     <li class="active">neut_rates</li>
+     <li class="active">get_beam_cx_rate</li>
   </ol>
 </div>
 </div>
@@ -186,7 +186,7 @@
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
-    <a class="list-group-item" href="../proc/neut_rates.html#src">neut_rates</a>
+    <a class="list-group-item" href="../proc/get_beam_cx_rate.html#src">get_beam_cx_rate</a>
   </div>
 </div>
 
@@ -287,9 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
       <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -395,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -552,8 +556,6 @@
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
-      
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
       
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
@@ -717,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -842,7 +846,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine neut_rates(denn, vi, vn, rates)
+public subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
     
     
 	 
@@ -852,7 +856,7 @@ public subroutine neut_rates(denn, vi, vn, rates)
 
 
     
-    <p>Get neutralization/cx rates</p>
+    <p>Get probability of a thermal ion charge exchanging with <code>types</code> neutrals</p>
     
 
     <h3>Arguments</h3>
@@ -873,27 +877,12 @@ public subroutine neut_rates(denn, vi, vn, rates)
   
 <tr>
   
-  <td><span class="anchor" id="variable-denn"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(nlevs)</td><td>::</td>
-  <td><strong>denn</strong></td><td><p>Neutral density [cm^-3]</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-vi%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-ind%7E11"></span>integer(kind=Int32),</td>
   <td>intent(in),</td>
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
+  <td><strong>ind</strong></td><td><p><a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices</p></td>
   
 </tr>
 
@@ -903,12 +892,12 @@ public subroutine neut_rates(denn, vi, vn, rates)
   
 <tr>
   
-  <td><span class="anchor" id="variable-vn%7E2"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-pos%7E10"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>vn</strong></td><td><p>Neutral velocity [cm/s]</p></td>
+  <td><strong>pos</strong></td><td><p>Interaction position in beam grid coordinates</p></td>
   
 </tr>
 
@@ -918,12 +907,57 @@ public subroutine neut_rates(denn, vi, vn, rates)
   
 <tr>
   
-  <td><span class="anchor" id="variable-rates%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-v_ion"></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>v_ion</strong></td><td><p>Ion velocity [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-i_type%7E2"></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_type</strong></td><td><p>Ion type</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-types"></span>integer(kind=Int32),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>types</strong></td><td><p>Neutral types</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-prob"></span>real(kind=Float64),</td>
   <td>intent(out),</td>
   <td></td>
   
   <td>dimension(nlevs)</td><td>::</td>
-  <td><strong>rates</strong></td><td><p>Reaction rates [1/s]</p></td>
+  <td><strong>prob</strong></td><td><p>Charge exchange rate/probability [1/s]</p></td>
   
 </tr>
 
@@ -940,90 +974,178 @@ public subroutine neut_rates(denn, vi, vn, rates)
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
-<!-- Title: proc~~neut_rates~~CallsGraph Pages: 1 -->
-<svg id="procneut_ratesCallsGraph" width="460pt" height="133pt"
- viewBox="0.00 0.00 460.00 132.53" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~neut_rates~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 128.527)">
-<title>proc~~neut_rates~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-128.527 457,-128.527 457,5 -4,5"/>
-<!-- proc~neut_rates -->
-<g id="node1" class="node"><title>proc~neut_rates</title>
-<polygon fill="none" stroke="black" points="64,-62.5274 3.19744e-14,-62.5274 0,-36.5274 64,-36.5274 64,-62.5274"/>
-<text text-anchor="middle" x="32" y="-47.0774" font-family="Helvetica,sans-Serif" font-size="10.50">neut_rates</text>
+<!-- Title: proc~~get_beam_cx_rate~~CallsGraph Pages: 1 -->
+<svg id="procget_beam_cx_rateCallsGraph" width="641pt" height="164pt"
+ viewBox="0.00 0.00 641.00 164.31" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_beam_cx_rate~~CallsGraph" class="graph" transform="scale(0.902817 0.902817) rotate(0) translate(4 178)">
+<title>proc~~get_beam_cx_rate~~CallsGraph</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-178 707,-178 707,5 -4,5"/>
+<!-- proc~get_beam_cx_rate -->
+<g id="node1" class="node"><title>proc~get_beam_cx_rate</title>
+<polygon fill="none" stroke="black" points="102,-86 4.9738e-14,-86 0,-60 102,-60 102,-86"/>
+<text text-anchor="middle" x="51" y="-70.55" font-family="Helvetica,sans-Serif" font-size="10.50">get_beam_cx_rate</text>
+</g>
+<!-- proc~get_plasma -->
+<g id="node2" class="node"><title>proc~get_plasma</title>
+<a xlink:href="../proc/get_plasma.html" xlink:title="get_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="206,-130 138,-130 138,-104 206,-104 206,-130"/>
+<text text-anchor="middle" x="172" y="-114.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_plasma</text>
+</a>
+</g>
+<!-- proc~get_beam_cx_rate&#45;&gt;proc~get_plasma -->
+<g id="edge26" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~get_plasma</title>
+<path fill="none" stroke="#000000" d="M86.9764,-86.0823C99.8695,-90.7707 114.551,-96.1096 128.044,-101.016"/>
+<polygon fill="#000000" stroke="#000000" points="127.022,-104.368 137.616,-104.497 129.414,-97.7899 127.022,-104.368"/>
+</g>
+<!-- proc~bb_cx_rates -->
+<g id="node3" class="node"><title>proc~bb_cx_rates</title>
+<a xlink:href="../proc/bb_cx_rates.html" xlink:title="bb_cx_rates">
+<polygon fill="#d9534f" stroke="#d9534f" points="313,-86 243,-86 243,-60 313,-60 313,-86"/>
+<text text-anchor="middle" x="278" y="-70.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bb_cx_rates</text>
+</a>
+</g>
+<!-- proc~get_beam_cx_rate&#45;&gt;proc~bb_cx_rates -->
+<g id="edge28" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~bb_cx_rates</title>
+<path fill="none" stroke="#000000" d="M102.226,-73C141.312,-73 194.667,-73 232.31,-73"/>
+<polygon fill="#000000" stroke="#000000" points="232.486,-76.5001 242.486,-73 232.486,-69.5001 232.486,-76.5001"/>
+</g>
+<!-- proc~bt_cx_rates -->
+<g id="node4" class="node"><title>proc~bt_cx_rates</title>
+<a xlink:href="../proc/bt_cx_rates.html" xlink:title="bt_cx_rates">
+<polygon fill="#d9534f" stroke="#d9534f" points="206,-45 138,-45 138,-19 206,-19 206,-45"/>
+<text text-anchor="middle" x="172" y="-29.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_cx_rates</text>
+</a>
+</g>
+<!-- proc~get_beam_cx_rate&#45;&gt;proc~bt_cx_rates -->
+<g id="edge30" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~bt_cx_rates</title>
+<path fill="none" stroke="#000000" d="M89.6178,-59.9146C101.842,-55.7724 115.445,-51.1634 128.016,-46.9036"/>
+<polygon fill="#000000" stroke="#000000" points="129.484,-50.1019 137.832,-43.5777 127.237,-43.4721 129.484,-50.1019"/>
+</g>
+<!-- proc~get_position -->
+<g id="node5" class="node"><title>proc~get_position</title>
+<a xlink:href="../proc/get_position.html" xlink:title="get_position">
+<polygon fill="#d9534f" stroke="#d9534f" points="313,-174 243,-174 243,-148 313,-148 313,-174"/>
+<text text-anchor="middle" x="278" y="-158.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+</a>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~get_position -->
+<g id="edge18" class="edge"><title>proc~get_plasma&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="#000000" d="M203.517,-130.082C213.995,-134.432 225.822,-139.341 236.915,-143.946"/>
+<polygon fill="#000000" stroke="#000000" points="235.844,-147.291 246.422,-147.892 238.528,-140.826 235.844,-147.291"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="node6" class="node"><title>proc~in_plasma</title>
+<a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="308,-130 248,-130 248,-104 308,-104 308,-130"/>
+<text text-anchor="middle" x="278" y="-114.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~in_plasma -->
+<g id="edge20" class="edge"><title>proc~get_plasma&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M206.123,-117C215.915,-117 226.696,-117 236.863,-117"/>
+<polygon fill="#000000" stroke="#000000" points="237.169,-120.5 247.169,-117 237.169,-113.5 237.169,-120.5"/>
 </g>
 <!-- interface~interpol_coeff -->
-<g id="node2" class="node"><title>interface~interpol_coeff</title>
+<g id="node8" class="node"><title>interface~interpol_coeff</title>
 <a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="177,-62.5274 101,-62.5274 101,-36.5274 177,-36.5274 177,-62.5274"/>
-<text text-anchor="middle" x="139" y="-47.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="427,-86 351,-86 351,-60 427,-60 427,-86"/>
+<text text-anchor="middle" x="389" y="-70.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
 </a>
 </g>
-<!-- proc~neut_rates&#45;&gt;interface~interpol_coeff -->
-<g id="edge14" class="edge"><title>proc~neut_rates&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M64.1035,-49.5274C72.2445,-49.5274 81.1769,-49.5274 89.9487,-49.5274"/>
-<polygon fill="#000000" stroke="#000000" points="90.1152,-53.0275 100.115,-49.5274 90.1152,-46.0275 90.1152,-53.0275"/>
+<!-- proc~bb_cx_rates&#45;&gt;interface~interpol_coeff -->
+<g id="edge22" class="edge"><title>proc~bb_cx_rates&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M313.732,-73C322.114,-73 331.187,-73 340.036,-73"/>
+<polygon fill="#000000" stroke="#000000" points="340.265,-76.5001 350.265,-73 340.265,-69.5001 340.265,-76.5001"/>
 </g>
-<!-- proc~interpol1d_coeff_arr -->
-<g id="node3" class="node"><title>proc~interpol1d_coeff_arr</title>
-<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="324,-124.527 214,-124.527 214,-98.5274 324,-98.5274 324,-124.527"/>
-<text text-anchor="middle" x="269" y="-109.077" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+<!-- proc~bt_cx_rates&#45;&gt;interface~interpol_coeff -->
+<g id="edge24" class="edge"><title>proc~bt_cx_rates&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M206.104,-35.0902C235.025,-38.0613 277.504,-43.2529 314,-51 322.68,-52.8425 331.819,-55.1791 340.616,-57.6373"/>
+<polygon fill="#000000" stroke="#000000" points="339.783,-61.0394 350.361,-60.4443 341.72,-54.3129 339.783,-61.0394"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="node7" class="node"><title>proc~xyz_to_uvw</title>
+<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="423,-130 355,-130 355,-104 423,-104 423,-130"/>
+<text text-anchor="middle" x="389" y="-114.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M166.57,-62.676C185.701,-71.8002 211.395,-84.0542 232.263,-94.0065"/>
-<polygon fill="#000000" stroke="#000000" points="230.937,-97.252 241.47,-98.3977 233.951,-90.9338 230.937,-97.252"/>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="edge14" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M308.625,-117C319.743,-117 332.539,-117 344.606,-117"/>
+<polygon fill="#000000" stroke="#000000" points="344.961,-120.5 354.961,-117 344.961,-113.5 344.961,-120.5"/>
+</g>
+<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="edge16" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M308.625,-104.86C320.386,-100.198 334.027,-94.7912 346.694,-89.77"/>
+<polygon fill="#000000" stroke="#000000" points="348.137,-92.963 356.143,-86.0243 345.557,-86.4556 348.137,-92.963"/>
 </g>
 <!-- proc~interpol2d_coeff_arr -->
-<g id="node4" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="node9" class="node"><title>proc~interpol2d_coeff_arr</title>
 <a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="324,-42.5274 214,-42.5274 214,-16.5274 324,-16.5274 324,-42.5274"/>
-<text text-anchor="middle" x="269" y="-27.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="574,-146 464,-146 464,-120 574,-120 574,-146"/>
+<text text-anchor="middle" x="519" y="-130.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M177.652,-43.5809C185.918,-42.3092 194.868,-40.9323 203.822,-39.5547"/>
-<polygon fill="#000000" stroke="#000000" points="204.546,-42.9846 213.898,-38.0046 203.482,-36.066 204.546,-42.9846"/>
+<g id="edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M417.208,-86.0191C435.903,-94.6477 460.653,-106.071 481.067,-115.492"/>
+<polygon fill="#000000" stroke="#000000" points="479.852,-118.786 490.398,-119.799 482.785,-112.431 479.852,-118.786"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="node10" class="node"><title>proc~interpol2d_coeff</title>
+<a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="701,-116 611,-116 611,-90 701,-90 701,-116"/>
+<text text-anchor="middle" x="656" y="-100.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M427.539,-77.3302C472.894,-82.4263 548.569,-90.9291 600.301,-96.7417"/>
+<polygon fill="#000000" stroke="#000000" points="599.984,-100.228 610.313,-97.8666 600.766,-93.2718 599.984,-100.228"/>
 </g>
 <!-- proc~interpol1d_coeff -->
-<g id="node5" class="node"><title>proc~interpol1d_coeff</title>
+<g id="node11" class="node"><title>proc~interpol1d_coeff</title>
 <a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="451,-94.5274 361,-94.5274 361,-68.5274 451,-68.5274 451,-94.5274"/>
-<text text-anchor="middle" x="406" y="-79.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="701,-55 611,-55 611,-29 701,-29 701,-55"/>
+<text text-anchor="middle" x="656" y="-39.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
 <g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M177.539,-54.1463C222.894,-59.5821 298.569,-68.6517 350.301,-74.8519"/>
-<polygon fill="#000000" stroke="#000000" points="349.967,-78.3368 360.313,-76.0517 350.8,-71.3865 349.967,-78.3368"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M427.539,-68.5254C472.894,-63.2595 548.569,-54.4733 600.301,-48.4669"/>
+<polygon fill="#000000" stroke="#000000" points="600.783,-51.9346 610.313,-47.3045 599.976,-44.9813 600.783,-51.9346"/>
 </g>
-<!-- proc~interpol2d_coeff -->
-<g id="node6" class="node"><title>proc~interpol2d_coeff</title>
-<a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="451,-31.5274 361,-31.5274 361,-5.52737 451,-5.52737 451,-31.5274"/>
-<text text-anchor="middle" x="406" y="-16.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="node12" class="node"><title>proc~interpol1d_coeff_arr</title>
+<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="574,-26 464,-26 464,-1.24345e-14 574,-3.55271e-15 574,-26"/>
+<text text-anchor="middle" x="519" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M156.372,-36.3867C170.901,-26.2701 192.629,-13.1039 214,-7.52737 258.781,4.15753 311.358,-0.0362804 350.159,-6.33923"/>
-<polygon fill="#000000" stroke="#000000" points="349.768,-9.82315 360.216,-8.06966 350.955,-2.92453 349.768,-9.82315"/>
-</g>
-<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M324.328,-99.4117C332.868,-97.5416 341.693,-95.6093 350.242,-93.7371"/>
-<polygon fill="#000000" stroke="#000000" points="351.099,-97.1325 360.119,-91.5743 349.602,-90.2945 351.099,-97.1325"/>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M417.208,-59.9809C435.903,-51.3523 460.653,-39.9293 481.067,-30.5076"/>
+<polygon fill="#000000" stroke="#000000" points="482.785,-33.5694 490.398,-26.2009 479.852,-27.2137 482.785,-33.5694"/>
 </g>
 <!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge4" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M324.328,-25.085C332.776,-24.4067 341.501,-23.7061 349.963,-23.0267"/>
-<polygon fill="#000000" stroke="#000000" points="350.431,-26.5004 360.119,-22.2112 349.871,-19.5229 350.431,-26.5004"/>
+<g id="edge2" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M574.328,-120.884C582.868,-119.014 591.693,-117.082 600.242,-115.21"/>
+<polygon fill="#000000" stroke="#000000" points="601.099,-118.605 610.119,-113.047 599.602,-111.767 601.099,-118.605"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="edge4" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M574.328,-24.7118C582.868,-26.5196 591.693,-28.3875 600.242,-30.1972"/>
+<polygon fill="#000000" stroke="#000000" points="599.611,-33.6411 610.119,-32.288 601.061,-26.7929 599.611,-33.6411"/>
 </g>
 </g>
 </svg>
 </div>
+                <script>var panprocget_beam_cx_rateCallsGraph = svgPanZoom('#procget_beam_cx_rateCallsGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
                 <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
                 <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
                   <div class="modal-dialog modal-lg" role="document">
@@ -1100,188 +1222,159 @@ public subroutine neut_rates(denn, vi, vn, rates)
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.26.3 (20100126.1600)
  -->
-<!-- Title: proc~~neut_rates~~CalledByGraph Pages: 1 -->
-<svg id="procneut_ratesCalledByGraph" width="432pt" height="364pt"
- viewBox="0.00 0.00 432.00 364.22" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~neut_rates~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 360.223)">
-<title>proc~~neut_rates~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-360.223 429,-360.223 429,5 -4,5"/>
-<!-- proc~neut_rates -->
-<g id="node1" class="node"><title>proc~neut_rates</title>
-<polygon fill="none" stroke="black" points="424,-256 360,-256 360,-230 424,-230 424,-256"/>
-<text text-anchor="middle" x="392" y="-240.55" font-family="Helvetica,sans-Serif" font-size="10.50">neut_rates</text>
+<!-- Title: proc~~get_beam_cx_rate~~CalledByGraph Pages: 1 -->
+<svg id="procget_beam_cx_rateCalledByGraph" width="328pt" height="342pt"
+ viewBox="0.00 0.00 328.00 342.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_beam_cx_rate~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 338)">
+<title>proc~~get_beam_cx_rate~~CalledByGraph</title>
+<polygon fill="white" stroke="white" points="-4,5 -4,-338 325,-338 325,5 -4,5"/>
+<!-- proc~get_beam_cx_rate -->
+<g id="node1" class="node"><title>proc~get_beam_cx_rate</title>
+<polygon fill="none" stroke="black" points="320,-180 218,-180 218,-154 320,-154 320,-180"/>
+<text text-anchor="middle" x="269" y="-164.55" font-family="Helvetica,sans-Serif" font-size="10.50">get_beam_cx_rate</text>
 </g>
-<!-- proc~fida_weights_los -->
-<g id="node2" class="node"><title>proc~fida_weights_los</title>
-<a xlink:href="../proc/fida_weights_los.html" xlink:title="fida_weights_los">
-<polygon fill="#d9534f" stroke="#d9534f" points="316,-310 226,-310 226,-284 316,-284 316,-310"/>
-<text text-anchor="middle" x="271" y="-294.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
+<!-- proc~npa_weights -->
+<g id="node2" class="node"><title>proc~npa_weights</title>
+<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
+<polygon fill="#d9534f" stroke="#d9534f" points="172,-334 100,-334 100,-308 172,-308 172,-334"/>
+<text text-anchor="middle" x="136" y="-318.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
 </a>
 </g>
-<!-- proc~fida_weights_los&#45;&gt;proc~neut_rates -->
-<g id="edge36" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~neut_rates</title>
-<path fill="none" stroke="#000000" d="M300.291,-283.928C316.224,-276.817 336.135,-267.931 353.329,-260.258"/>
-<polygon fill="#000000" stroke="#000000" points="354.854,-263.41 362.56,-256.139 352.001,-257.018 354.854,-263.41"/>
+<!-- proc~npa_weights&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge18" class="edge"><title>proc~npa_weights&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M169.041,-307.932C173.652,-305.349 178.13,-302.374 182,-299 217.9,-267.698 245.107,-218.176 258.91,-189.521"/>
+<polygon fill="#000000" stroke="#000000" points="262.148,-190.86 263.225,-180.32 255.81,-187.887 262.148,-190.86"/>
 </g>
-<!-- proc~get_beam_cx_prob -->
-<g id="node3" class="node"><title>proc~get_beam_cx_prob</title>
-<a xlink:href="../proc/get_beam_cx_prob.html" xlink:title="get_beam_cx_prob">
-<polygon fill="#d9534f" stroke="#d9534f" points="323,-202 219,-202 219,-176 323,-176 323,-202"/>
-<text text-anchor="middle" x="271" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_beam_cx_prob</text>
-</a>
-</g>
-<!-- proc~get_beam_cx_prob&#45;&gt;proc~neut_rates -->
-<g id="edge38" class="edge"><title>proc~get_beam_cx_prob&#45;&gt;proc~neut_rates</title>
-<path fill="none" stroke="#000000" d="M300.291,-202.072C316.224,-209.183 336.135,-218.069 353.329,-225.742"/>
-<polygon fill="#000000" stroke="#000000" points="352.001,-228.982 362.56,-229.861 354.854,-222.59 352.001,-228.982"/>
-</g>
-<!-- program~fidasim -->
-<g id="node4" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-202 2.13163e-14,-202 0,-176 54,-176 54,-202"/>
-<text text-anchor="middle" x="27" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
-</a>
-</g>
-<!-- program~fidasim&#45;&gt;proc~fida_weights_los -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
-<path fill="none" stroke="#000000" d="M27.7601,-202.324C30.3367,-233.395 41.5537,-310.476 90,-343 138.222,-375.374 207.586,-339.915 244.89,-315.705"/>
-<polygon fill="#000000" stroke="#000000" points="246.847,-318.606 253.217,-310.14 242.958,-312.787 246.847,-318.606"/>
-</g>
-<!-- proc~fida_f -->
-<g id="node6" class="node"><title>proc~fida_f</title>
-<a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-334 109,-334 109,-308 163,-308 163,-334"/>
-<text text-anchor="middle" x="136" y="-318.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
-</a>
-</g>
-<!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M31.5563,-202.201C39.917,-224.72 59.6815,-270.847 90,-299 92.9799,-301.767 96.3716,-304.25 99.9313,-306.46"/>
-<polygon fill="#000000" stroke="#000000" points="98.5327,-309.684 108.987,-311.404 101.887,-303.54 98.5327,-309.684"/>
-</g>
-<!-- proc~fida_mc -->
-<g id="node7" class="node"><title>proc~fida_mc</title>
-<a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
+<!-- proc~npa_mc -->
+<g id="node3" class="node"><title>proc~npa_mc</title>
+<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
 <polygon fill="#d9534f" stroke="#d9534f" points="163,-290 109,-290 109,-264 163,-264 163,-290"/>
-<text text-anchor="middle" x="136" y="-274.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
+<text text-anchor="middle" x="136" y="-274.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_mc -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
-<path fill="none" stroke="#000000" d="M36.9915,-202.013C48.5423,-216.395 68.7121,-239.564 90,-255 93.0458,-257.209 96.3482,-259.29 99.7379,-261.226"/>
-<polygon fill="#000000" stroke="#000000" points="98.3197,-264.435 108.799,-265.997 101.581,-258.241 98.3197,-264.435"/>
+<!-- proc~npa_mc&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge20" class="edge"><title>proc~npa_mc&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.15,-265.926C169.575,-262.795 176.23,-259.107 182,-255 209.291,-235.574 235.612,-207.166 252.021,-187.924"/>
+<polygon fill="#000000" stroke="#000000" points="254.885,-189.955 258.625,-180.042 249.52,-185.459 254.885,-189.955"/>
 </g>
-<!-- proc~dcx -->
-<g id="node8" class="node"><title>proc~dcx</title>
-<a xlink:href="../proc/dcx.html" xlink:title="dcx">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-246 109,-246 109,-220 163,-220 163,-246"/>
-<text text-anchor="middle" x="136" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+<!-- proc~fida_weights_mc -->
+<g id="node4" class="node"><title>proc~fida_weights_mc</title>
+<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-246 90,-246 90,-220 182,-220 182,-246"/>
+<text text-anchor="middle" x="136" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~dcx -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
-<path fill="none" stroke="#000000" d="M54.2241,-199.99C67.8798,-205.502 84.6138,-212.257 99.3789,-218.217"/>
-<polygon fill="#000000" stroke="#000000" points="98.162,-221.5 108.745,-221.998 100.782,-215.009 98.162,-221.5"/>
+<!-- proc~fida_weights_mc&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge22" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.778,-219.837C169.798,-216.95 176.122,-213.892 182,-211 199.394,-202.444 218.636,-192.737 234.592,-184.622"/>
+<polygon fill="#000000" stroke="#000000" points="236.247,-187.707 243.568,-180.048 233.069,-181.47 236.247,-187.707"/>
 </g>
 <!-- proc~halo -->
-<g id="node9" class="node"><title>proc~halo</title>
+<g id="node5" class="node"><title>proc~halo</title>
 <a xlink:href="../proc/halo.html" xlink:title="halo">
 <polygon fill="#d9534f" stroke="#d9534f" points="163,-202 109,-202 109,-176 163,-176 163,-202"/>
 <text text-anchor="middle" x="136" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~halo -->
-<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
-<path fill="none" stroke="#000000" d="M54.2241,-189C67.6197,-189 83.9774,-189 98.533,-189"/>
-<polygon fill="#000000" stroke="#000000" points="98.7452,-192.5 108.745,-189 98.7451,-185.5 98.7452,-192.5"/>
+<!-- proc~halo&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge24" class="edge"><title>proc~halo&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.235,-184.495C176.14,-182.36 192.119,-179.717 207.712,-177.138"/>
+<polygon fill="#000000" stroke="#000000" points="208.573,-180.543 217.868,-175.458 207.431,-173.637 208.573,-180.543"/>
 </g>
-<!-- proc~npa_mc -->
-<g id="node10" class="node"><title>proc~npa_mc</title>
-<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
+<!-- proc~fida_f -->
+<g id="node6" class="node"><title>proc~fida_f</title>
+<a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
 <polygon fill="#d9534f" stroke="#d9534f" points="163,-158 109,-158 109,-132 163,-132 163,-158"/>
-<text text-anchor="middle" x="136" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<text text-anchor="middle" x="136" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M54.2241,-178.01C67.8798,-172.498 84.6138,-165.743 99.3789,-159.783"/>
-<polygon fill="#000000" stroke="#000000" points="100.782,-162.991 108.745,-156.002 98.162,-156.5 100.782,-162.991"/>
+<!-- proc~fida_f&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge26" class="edge"><title>proc~fida_f&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.235,-149.505C176.14,-151.64 192.119,-154.283 207.712,-156.862"/>
+<polygon fill="#000000" stroke="#000000" points="207.431,-160.363 217.868,-158.542 208.573,-153.457 207.431,-160.363"/>
 </g>
-<!-- proc~npa_weights -->
-<g id="node11" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="172,-114 100,-114 100,-88 172,-88 172,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+<!-- proc~npa_f -->
+<g id="node7" class="node"><title>proc~npa_f</title>
+<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-114 109,-114 109,-88 163,-88 163,-114"/>
+<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+</a>
+</g>
+<!-- proc~npa_f&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge28" class="edge"><title>proc~npa_f&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.291,-113.93C169.456,-116.885 175.963,-120.03 182,-123 199.394,-131.556 218.636,-141.263 234.592,-149.378"/>
+<polygon fill="#000000" stroke="#000000" points="233.069,-152.53 243.568,-153.952 236.247,-146.293 233.069,-152.53"/>
+</g>
+<!-- proc~dcx -->
+<g id="node8" class="node"><title>proc~dcx</title>
+<a xlink:href="../proc/dcx.html" xlink:title="dcx">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
+<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+</a>
+</g>
+<!-- proc~dcx&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge30" class="edge"><title>proc~dcx&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.15,-68.0741C169.575,-71.2046 176.23,-74.8931 182,-79 209.291,-98.4259 235.612,-126.834 252.021,-146.076"/>
+<polygon fill="#000000" stroke="#000000" points="249.52,-148.541 258.625,-153.958 254.885,-144.045 249.52,-148.541"/>
+</g>
+<!-- proc~fida_mc -->
+<g id="node9" class="node"><title>proc~fida_mc</title>
+<a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
+<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
+</a>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~get_beam_cx_rate -->
+<g id="edge32" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M163.282,-23.0628C169.843,-26.2578 176.529,-30.2295 182,-35 217.9,-66.3021 245.107,-115.824 258.91,-144.479"/>
+<polygon fill="#000000" stroke="#000000" points="255.81,-146.113 263.225,-153.68 262.148,-143.14 255.81,-146.113"/>
+</g>
+<!-- program~fidasim -->
+<g id="node10" class="node"><title>program~fidasim</title>
+<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-180 2.13163e-14,-180 0,-154 54,-154 54,-180"/>
+<text text-anchor="middle" x="27" y="-164.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M36.9915,-175.987C48.5423,-161.605 68.7121,-138.436 90,-123 91.8051,-121.691 93.7003,-120.427 95.6504,-119.211"/>
-<polygon fill="#000000" stroke="#000000" points="97.4856,-122.194 104.443,-114.203 94.021,-116.111 97.4856,-122.194"/>
+<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<path fill="none" stroke="#000000" d="M30.1688,-180.345C36.9546,-206.316 55.1803,-264.152 90,-299 91.0559,-300.057 92.1725,-301.07 93.3371,-302.04"/>
+<polygon fill="#000000" stroke="#000000" points="91.3942,-304.953 101.588,-307.84 95.4197,-299.226 91.3942,-304.953"/>
 </g>
-<!-- proc~npa_f -->
-<g id="node12" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
-<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
-</a>
-</g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge16" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M31.5563,-175.799C39.917,-153.28 59.6815,-107.153 90,-79 92.9799,-76.2328 96.3716,-73.7504 99.9313,-71.5396"/>
-<polygon fill="#000000" stroke="#000000" points="101.887,-74.4597 108.987,-66.5961 98.5327,-68.3155 101.887,-74.4597"/>
-</g>
-<!-- proc~fida_weights_mc -->
-<g id="node13" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-26 90,-26 90,-1.24345e-14 182,-3.55271e-15 182,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
+<!-- program~fidasim&#45;&gt;proc~npa_mc -->
+<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<path fill="none" stroke="#000000" d="M33.6754,-180.23C43.6956,-198.976 64.2283,-233.39 90,-255 93.0419,-257.551 96.4296,-259.883 99.9486,-261.995"/>
+<polygon fill="#000000" stroke="#000000" points="98.3809,-265.126 108.844,-266.79 101.702,-258.964 98.3809,-265.126"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge18" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M29.1107,-175.713C34.3609,-146.673 50.5434,-76.8052 90,-35 90.8886,-34.0585 91.8259,-33.1527 92.8033,-32.2817"/>
-<polygon fill="#000000" stroke="#000000" points="94.9792,-35.0258 100.942,-26.2682 90.8193,-29.3959 94.9792,-35.0258"/>
+<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M44.1447,-180.12C56.5362,-189.315 73.8651,-201.592 90,-211 92.5093,-212.463 95.1311,-213.913 97.7953,-215.328"/>
+<polygon fill="#000000" stroke="#000000" points="96.4163,-218.553 106.915,-219.978 99.5963,-212.317 96.4163,-218.553"/>
 </g>
-<!-- proc~fida_f&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge20" class="edge"><title>proc~fida_f&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.449,-310.325C169.865,-307.183 176.442,-303.388 182,-299 214.141,-273.624 242.162,-234.652 257.8,-210.552"/>
-<polygon fill="#000000" stroke="#000000" points="260.76,-212.42 263.17,-202.103 254.852,-208.665 260.76,-212.42"/>
+<!-- program~fidasim&#45;&gt;proc~halo -->
+<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
+<path fill="none" stroke="#000000" d="M54.2241,-172.495C67.6197,-175.198 83.9774,-178.5 98.533,-181.438"/>
+<polygon fill="#000000" stroke="#000000" points="98.2503,-184.951 108.745,-183.499 99.6353,-178.09 98.2503,-184.951"/>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge22" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.212,-265.049C169.504,-261.996 176.085,-258.562 182,-255 205.224,-241.012 229.852,-222.422 247.299,-208.537"/>
-<polygon fill="#000000" stroke="#000000" points="249.653,-211.135 255.249,-202.139 245.264,-205.682 249.653,-211.135"/>
+<!-- program~fidasim&#45;&gt;proc~fida_f -->
+<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<path fill="none" stroke="#000000" d="M54.2241,-161.505C67.6197,-158.802 83.9774,-155.5 98.533,-152.562"/>
+<polygon fill="#000000" stroke="#000000" points="99.6353,-155.91 108.745,-150.501 98.2503,-149.049 99.6353,-155.91"/>
 </g>
-<!-- proc~dcx&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge24" class="edge"><title>proc~dcx&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.319,-224.096C179.929,-218.683 201.641,-211.606 221.215,-205.226"/>
-<polygon fill="#000000" stroke="#000000" points="222.495,-208.49 230.918,-202.064 220.326,-201.835 222.495,-208.49"/>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M44.1447,-153.88C56.5362,-144.685 73.8651,-132.408 90,-123 93.1689,-121.152 96.5172,-119.326 99.9037,-117.563"/>
+<polygon fill="#000000" stroke="#000000" points="101.49,-120.684 108.86,-113.073 98.3523,-114.426 101.49,-120.684"/>
 </g>
-<!-- proc~halo&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge26" class="edge"><title>proc~halo&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.319,-189C176.276,-189 192.337,-189 208.067,-189"/>
-<polygon fill="#000000" stroke="#000000" points="208.319,-192.5 218.319,-189 208.319,-185.5 208.319,-192.5"/>
+<!-- program~fidasim&#45;&gt;proc~dcx -->
+<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<path fill="none" stroke="#000000" d="M33.6754,-153.77C43.6956,-135.024 64.2283,-100.61 90,-79 93.0419,-76.4493 96.4296,-74.1172 99.9486,-72.0053"/>
+<polygon fill="#000000" stroke="#000000" points="101.702,-75.0361 108.844,-67.2103 98.3809,-68.8743 101.702,-75.0361"/>
 </g>
-<!-- proc~npa_mc&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge28" class="edge"><title>proc~npa_mc&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.319,-153.904C179.929,-159.317 201.641,-166.394 221.215,-172.774"/>
-<polygon fill="#000000" stroke="#000000" points="220.326,-176.165 230.918,-175.936 222.495,-169.51 220.326,-176.165"/>
-</g>
-<!-- proc~npa_weights&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge30" class="edge"><title>proc~npa_weights&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M165.644,-114.143C171.181,-116.886 176.843,-119.894 182,-123 205.224,-136.988 229.852,-155.578 247.299,-169.463"/>
-<polygon fill="#000000" stroke="#000000" points="245.264,-172.318 255.249,-175.861 249.653,-166.865 245.264,-172.318"/>
-</g>
-<!-- proc~npa_f&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge32" class="edge"><title>proc~npa_f&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.449,-67.6747C169.865,-70.8174 176.442,-74.6115 182,-79 214.141,-104.376 242.162,-143.348 257.8,-167.448"/>
-<polygon fill="#000000" stroke="#000000" points="254.852,-169.335 263.17,-175.897 260.76,-165.58 254.852,-169.335"/>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge34" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M169.696,-26.1387C174.112,-28.6876 178.361,-31.6338 182,-35 222.706,-72.652 250.096,-133.252 262.822,-166.083"/>
-<polygon fill="#000000" stroke="#000000" points="259.643,-167.572 266.437,-175.702 266.196,-165.11 259.643,-167.572"/>
+<!-- program~fidasim&#45;&gt;proc~fida_mc -->
+<g id="edge16" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
+<path fill="none" stroke="#000000" d="M30.1688,-153.655C36.9546,-127.684 55.1803,-69.8477 90,-35 92.8744,-32.1233 96.1984,-29.5706 99.718,-27.3183"/>
+<polygon fill="#000000" stroke="#000000" points="101.677,-30.2345 108.726,-22.3248 98.2827,-24.1123 101.677,-30.2345"/>
 </g>
 </g>
 </svg>
@@ -1381,7 +1474,7 @@ public subroutine neut_rates(denn, vi, vn, rates)
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
-    <a class="list-group-item" href="../proc/neut_rates.html#src">neut_rates</a>
+    <a class="list-group-item" href="../proc/get_beam_cx_rate.html#src">get_beam_cx_rate</a>
   </div>
 </div>
 
@@ -1409,59 +1502,48 @@ public subroutine neut_rates(denn, vi, vn, rates)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">neut_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">vn</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
-    <span class="c">!+ Get neutralization/cx rates</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">denn</span>
-        <span class="c">!+ Neutral density [cm^-3]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vi</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">get_beam_cx_rate</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">v_ion</span><span class="p">,</span> <span class="n">i_type</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span>
+    <span class="c">!+ Get probability of a thermal ion charge exchanging with `types` neutrals</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">ind</span>
+        <span class="c">!+ [[libfida:beam_grid]] indices</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">pos</span>
+        <span class="c">!+ Interaction position in beam grid coordinates</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">v_ion</span>
         <span class="c">!+ Ion velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vn</span>
-        <span class="c">!+ Neutral velocity [cm/s]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span>
-        <span class="c">!+ Reaction rates [1/s]</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                          <span class="kd">::</span> <span class="n">i_type</span>
+        <span class="c">!+ Ion type</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">types</span>
+        <span class="c">!+ Neutral types</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">prob</span>
+        <span class="c">!+ Charge exchange rate/probability [1/s]</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">,</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">neut</span>  <span class="c">!!rate coeff</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eb</span> <span class="c">!! relative Energy</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">InterpolCoeffs1D</span><span class="p">)</span> <span class="kd">::</span> <span class="n">c</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dlogE</span><span class="p">,</span> <span class="n">logEmin</span><span class="p">,</span> <span class="n">logeb</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vrel</span> <span class="c">!! relative velocity</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ebi</span><span class="p">,</span> <span class="n">neb</span><span class="p">,</span> <span class="n">err</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">ii</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LocalProfiles</span><span class="p">)</span> <span class="kd">::</span> <span class="n">plasma</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span><span class="p">,</span> <span class="n">denn</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vhalo</span><span class="p">,</span><span class="n">vn</span><span class="p">,</span><span class="n">vnbi</span>
 
-    <span class="c">!Eeff</span>
-    <span class="n">vrel</span><span class="o">=</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vi</span><span class="o">-</span><span class="n">vn</span><span class="p">)</span>
-    <span class="n">eb</span><span class="o">=</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">vrel</span><span class="o">**</span><span class="mi">2</span>  <span class="c">! [kev/amu]</span>
-    <span class="n">logeb</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">eb</span><span class="p">)</span>
-    <span class="n">logEmin</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">%</span><span class="n">logemin</span>
-    <span class="n">dlogE</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">%</span><span class="n">dlogE</span>
-    <span class="n">neb</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">%</span><span class="n">nenergy</span>
-    <span class="k">call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">logEmin</span><span class="p">,</span><span class="n">dlogE</span><span class="p">,</span><span class="n">neb</span><span class="p">,</span><span class="n">logeb</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">err</span><span class="p">)</span>
-    <span class="n">ebi</span> <span class="o">=</span> <span class="n">c</span><span class="p">%</span><span class="n">i</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;NEUT_RATES: Eb out of range of H_H_cx table. Using nearest energy value.&quot;</span>
-            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;eb = &quot;,ES10.3,&quot; [keV]&quot;)&#39;</span><span class="p">)</span> <span class="n">eb</span>
-        <span class="n">endif</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">ebi</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            </span><span class="n">ebi</span><span class="o">=</span><span class="mi">1</span>
-            <span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">=</span><span class="mf">1.0</span> <span class="p">;</span> <span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">=</span><span class="mf">0.0</span>
+    <span class="n">vnbi</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">src</span>
+    <span class="n">vnbi</span> <span class="o">=</span> <span class="n">vnbi</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vnbi</span><span class="p">)</span>
+
+    <span class="n">ntypes</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">types</span><span class="p">)</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ntypes</span>
+        <span class="k">if</span><span class="p">((</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mi">3</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="n">ne</span><span class="p">.</span><span class="mi">0</span><span class="p">))</span> <span class="k">then</span>
+            <span class="c">! CX with full type&#39;th energy NBI neutrals</span>
+            <span class="n">denn</span> <span class="o">=</span> <span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> 
+            <span class="n">vn</span> <span class="o">=</span> <span class="n">vnbi</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="kt">real</span><span class="p">(</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
+            <span class="k">call </span><span class="n">bb_cx_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span><span class="n">v_ion</span><span class="p">,</span><span class="n">vn</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span><span class="o">+</span><span class="n">rates</span>
         <span class="k">else</span>
-<span class="k">            </span><span class="n">ebi</span><span class="o">=</span><span class="n">neb</span>
-            <span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">;</span> <span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="k">            call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">)</span>
+            <span class="n">denn</span> <span class="o">=</span> <span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">denn</span><span class="p">,</span> <span class="n">v_ion</span><span class="p">,</span> <span class="n">i_type</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span> <span class="o">+</span> <span class="n">rates</span>
         <span class="n">endif</span>
-    <span class="n">endif</span>
+    <span class="n">enddo</span>
 
-    <span class="n">neut</span><span class="p">(:,:)</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span><span class="p">%</span><span class="n">b1</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">%</span><span class="n">log_cross</span><span class="p">(:,:,</span><span class="n">ebi</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
-                 <span class="n">c</span><span class="p">%</span><span class="n">b2</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">%</span><span class="n">log_cross</span><span class="p">(:,:,</span><span class="n">ebi</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-
-    <span class="k">where</span> <span class="p">(</span><span class="n">neut</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">%</span><span class="n">minlog_cross</span><span class="p">)</span>
-        <span class="n">neut</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="n">elsewhere</span>
-        <span class="n">neut</span> <span class="o">=</span> <span class="mi">1</span><span class="mf">0.d0</span><span class="o">**</span><span class="n">neut</span>
-    <span class="k">end where</span>
-
-<span class="k">    </span><span class="n">rates</span><span class="o">=</span><span class="nb">matmul</span><span class="p">(</span><span class="n">neut</span><span class="p">,</span><span class="n">denn</span><span class="p">)</span><span class="o">*</span><span class="n">vrel</span>
-
-<span class="k">end subroutine </span><span class="n">neut_rates</span>
+<span class="k">end subroutine </span><span class="n">get_beam_cx_rate</span>
 </pre></div>
 
     </section>
@@ -1568,9 +1650,13 @@ public subroutine neut_rates(denn, vi, vn, rates)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
       <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
       
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1676,7 +1762,7 @@ public subroutine neut_rates(denn, vi, vn, rates)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1833,8 +1919,6 @@ public subroutine neut_rates(denn, vi, vn, rates)
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
-      
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
       
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
@@ -1998,7 +2082,9 @@ public subroutine neut_rates(denn, vi, vn, rates)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

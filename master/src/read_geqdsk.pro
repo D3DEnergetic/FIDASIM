@@ -126,7 +126,7 @@ PRO calculate_bfield,bp,br,bt,bz,g
     return
 end
 
-FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
+FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign
     ;+#read_geqdsk
     ;+Reads an EFIT GEQDSK file
     ;+***
@@ -141,6 +141,8 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     ;+
     ;+    **g**: Set this keyword to a named variable to recieve the geqdsk structure
     ;+
+    ;+    **btipsign**: Set this keyword to a named variable to recieve the bt-ip sign
+    ;+
     ;+##Return Value
     ;+Electronmagnetic fields structure
     ;+
@@ -152,6 +154,7 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g
     equil={err:1}
     ;; Get eqdsk
     g=readg(filename)
+    btipsign = signum(g.bcentr*g.cpasma)
     time = double(g.time)
     fluxgrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))
 

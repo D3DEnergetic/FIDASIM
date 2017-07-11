@@ -122,7 +122,9 @@ FUNCTION hdf5_read_group,id,shallow=shallow
         ENDCASE
     endfor
 
-    atts = hdf5_read_attributes(id)
+    if not keyword_set(shallow) then begin
+        atts = hdf5_read_attributes(id)
+    endif
 
     if n_elements(atts) ne 0 then begin 
         return, create_struct(d, atts)

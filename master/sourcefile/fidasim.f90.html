@@ -6596,7 +6596,7 @@
 <a name="ln-6101"></a>    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vhalo</span><span class="p">,</span><span class="n">vn</span><span class="p">,</span><span class="n">vnbi</span>
 <a name="ln-6102"></a>
 <a name="ln-6103"></a>    <span class="n">vnbi</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">src</span>
-<a name="ln-6104"></a>    <span class="n">vnbi</span> <span class="o">=</span> <span class="n">vnbi</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vnbi</span><span class="p">)</span>
+<a name="ln-6104"></a>    <span class="n">vnbi</span> <span class="o">=</span> <span class="n">nbi</span><span class="p">%</span><span class="n">vinj</span><span class="o">*</span><span class="n">vnbi</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vnbi</span><span class="p">)</span>
 <a name="ln-6105"></a>
 <a name="ln-6106"></a>    <span class="n">ntypes</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">types</span><span class="p">)</span>
 <a name="ln-6107"></a>    <span class="n">prob</span> <span class="o">=</span> <span class="mi">0</span>

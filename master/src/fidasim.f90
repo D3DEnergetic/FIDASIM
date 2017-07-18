@@ -6101,7 +6101,7 @@ subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
     real(Float64), dimension(3) :: vhalo,vn,vnbi
 
     vnbi = pos - nbi%src
-    vnbi = vnbi/norm2(vnbi)
+    vnbi = nbi%vinj*vnbi/norm2(vnbi)
 
     ntypes = size(types)
     prob = 0

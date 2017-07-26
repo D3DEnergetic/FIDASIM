@@ -18,6 +18,10 @@ contains
 
 subroutine settables
 
+    print*, inputs%tables_file
+    print*, inputs%ai
+    print*, inputs%ab
+    print*, inputs%impurity_charge
     call read_tables()
 end subroutine settables
 
@@ -37,16 +41,15 @@ subroutine setplasma(dene, denp, denimp, te, ti)
     Plasma%in_plasma = .True.
 end subroutine setplasma
 
-subroutine setinputs(ai, ab, impq, tables_file)
+subroutine setinputs(ai, ab, impq)
     real(8), intent(in)                    :: ai
     real(8), intent(in)                    :: ab
     integer, intent(in)                    :: impq
-    character(150), intent(in)             :: tables_file
 
     inputs%ai = ai
     inputs%ab = ab
     inputs%impurity_charge = impq
-    inputs%tables_file = tables_file
+    inputs%tables_file = '/home/kenny/Documents/FidaSim/FIDASIM-master/src/atomic_tables.h5'
     inputs%calc_npa = 0
     inputs%verbose = 1
 end subroutine setinputs
@@ -103,6 +106,7 @@ end subroutine testcol
 
 
 end module fidanet
+
 
 
 

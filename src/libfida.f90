@@ -2926,17 +2926,22 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
 
     deallocate(dummy2)
 
+    print*, 'post-deallocation'
+
     allocate(rates%log_pop(&
                     rates%m_max, &
                     rates%n_max, &
                     rates%nenergy, &
                     rates%ntemp, 2))
+    print*, '%%%%%%%%%% between 2 allocations %%%%%%%%%%'
     allocate(rates%log_depop(&
                     rates%n_max, &
                     rates%nenergy, &
                     rates%ntemp, 2))
     rates%log_pop = 0.d0
     rates%log_depop = 0.d0
+
+    print*, 'allocate / deallocate?'
 
     !!Read CX
     call h5ltpath_valid_f(fid, grp//"/cx", .True., path_valid, error)
@@ -2976,14 +2981,18 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         endif
     endif
 
+    print*, 'read cx'
+
     !!Read ionization
     call h5ltpath_valid_f(fid, grp//"/ionization", .True., path_valid, error)
     if(path_valid) then
         allocate(dummy4(n_max, &
                        rates%nenergy, &
                        rates%ntemp, n_bt_amu))
+        print*, '%%%%%%%%%% another allocate %%%%%%%%%%'
         dim4 = [n_max, rates%nenergy, rates%ntemp,n_bt_amu]
         call h5ltread_dataset_double_f(fid, grp//"/ionization", dummy4, dim4, error)
+        print*, '%%%%%%%%%% another call %%%%%%%%%%'
         do j=1,rates%ntemp
             do i=1,rates%nenergy
                 do n=1,rates%n_max
@@ -2994,8 +3003,12 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
                 enddo
             enddo
         enddo
+        print*, '%%%%%%%%%% do loops %%%%%%%%%%'
         deallocate(dummy4)
+        print*, '%%%%%%%%%% deallocate %%%%%%%%%%'
     endif
+
+    print*, 'read ionization'
 
     !!Read excitation
     call h5ltpath_valid_f(fid, grp//"/excitation", .True., path_valid, error)
@@ -3019,6 +3032,8 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         enddo
         deallocate(dummy5)
     endif
+
+    print*, 'read excitation'
 
     rmin = minval(rates%log_depop, rates%log_depop.gt.0.d0)
     where (rates%log_depop.le.0.d0)
@@ -3134,17 +3149,27 @@ subroutine read_tables
     !!Read Hydrogen-Hydrogen CX Cross Sections
     call read_atomic_cross(fid,"/cross/H_H",tables%H_H_cx_cross)
 
+!    !!Read Hydrogen-Hydrogen CX Rates
+!    b_amu = [inputs%ab, inputs%ai]
+!    call read_atomic_rate(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H_cx_rate)
+
+    !!Read Hydrogen-Hydrogen Transitions
+    call read_atomic_transitions(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
+
+    print*, 'H_H transitions'
+    inputs%ab = tables%H_H%ab(1)
+    inputs%ai = tables%H_H%ab(2)
+
+!!!!!!!!!!! moved from above
+
     !!Read Hydrogen-Hydrogen CX Rates
     b_amu = [inputs%ab, inputs%ai]
     call read_atomic_rate(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H_cx_rate)
 
-    !!Read Hydrogen-Hydrogen Transitions
-    call read_atomic_transitions(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
-    inputs%ab = tables%H_H%ab(1)
-    inputs%ai = tables%H_H%ab(2)
+    print*, 'H_H done'
 
-    !!Read Hydrogen-Electron Transitions
-    call read_atomic_transitions(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
+!    !!Read Hydrogen-Electron Transitions
+!    call read_atomic_transitions(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
 
     !!Read Hydrogen-Impurity Transitions
     impname = ''
@@ -3162,6 +3187,14 @@ subroutine read_tables
 
     call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), b_amu, imp_amu, tables%H_Aq)
 
+    print*, 'impurities done'
+
+!!!!!!!!! moved from above
+    !!Read Hydrogen-Electron Transitions
+    call read_atomic_transitions(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
+
+    print*, 'H_e done'
+
     !!Read Einstein coefficients
     call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/n_max", n_max, error)
     call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/m_max", m_max, error)
@@ -3171,8 +3204,13 @@ subroutine read_tables
     tables%einstein(:,:) = transpose(dummy2(1:nlevs,1:nlevs))
     deallocate(dummy2)
 
+    print*, 'Einstein'
+
     !!Read nuclear Deuterium-Deuterium rates
     call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
+
+
+    print*, 'Nuclear'
 
     !!Close file
     call h5fclose_f(fid, error)

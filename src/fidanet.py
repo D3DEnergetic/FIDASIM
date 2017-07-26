@@ -8,7 +8,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
     Module fidanet
     
     
-    Defined at fidanet.f90 lines 2-108
+    Defined at fidanet.f90 lines 2-112
     
     """
     @staticmethod
@@ -17,7 +17,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         settables()
         
         
-        Defined at fidanet.f90 lines 19-23
+        Defined at fidanet.f90 lines 19-27
         
         
         """
@@ -29,7 +29,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         setplasma(dene, denp, denimp, te, ti)
         
         
-        Defined at fidanet.f90 lines 25-38
+        Defined at fidanet.f90 lines 29-42
         
         Parameters
         ----------
@@ -43,22 +43,21 @@ class Fidanet(f90wrap.runtime.FortranModule):
         _fidanet.f90wrap_setplasma(dene=dene, denp=denp, denimp=denimp, te=te, ti=ti)
     
     @staticmethod
-    def setinputs(ai, ab, impq, tables_file):
+    def setinputs(ai, ab, impq):
         """
-        setinputs(ai, ab, impq, tables_file)
+        setinputs(ai, ab, impq)
         
         
-        Defined at fidanet.f90 lines 40-52
+        Defined at fidanet.f90 lines 44-55
         
         Parameters
         ----------
         ai : float
         ab : float
         impq : int
-        tables_file : str
         
         """
-        _fidanet.f90wrap_setinputs(ai=ai, ab=ab, impq=impq, tables_file=tables_file)
+        _fidanet.f90wrap_setinputs(ai=ai, ab=ab, impq=impq)
     
     @staticmethod
     def calcvn(i_type, eb, vn):
@@ -66,7 +65,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         calcvn(i_type, eb, vn)
         
         
-        Defined at fidanet.f90 lines 54-70
+        Defined at fidanet.f90 lines 57-73
         
         Parameters
         ----------
@@ -83,7 +82,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         setstates(newstates, states)
         
         
-        Defined at fidanet.f90 lines 72-77
+        Defined at fidanet.f90 lines 75-80
         
         Parameters
         ----------
@@ -99,7 +98,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         photons = testcol(i_type, eb, dt, states, dens)
         
         
-        Defined at fidanet.f90 lines 79-103
+        Defined at fidanet.f90 lines 82-106
         
         Parameters
         ----------

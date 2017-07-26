@@ -26,10 +26,16 @@ hdf5_extra.mod hdf5_extra.o: hdf5_extra.f90
 
 _fidanet.so:
 	f90wrap -m fidanet -k kind_map fidanet.f90
-	f2py --fcompiler=$(FC) --f77flags="-fopenmp -fPIC" $(IFLAGS) -L../deps/hdf5/lib/ -lhdf5 -lhdf5_fortran -lhdf5hl_fortran -lz -ldl -c -m _fidanet f90wrap*.f90 *.o
+	f2py-f90wrap --fcompiler=$(FC) --f90flags="$(CFLAGS)" $(IFLAGS) -L../deps/hdf5/lib/ -lhdf5 -lhdf5_fortran -lhdf5hl_fortran -lz -ldl -c -m _fidanet f90wrap*.f90 *.o
+
+./fidatest: fidatest.o fidanet.o eigensystem.o utilities.o hdf5_extra.o libfida.o
+	$(FC) $(CFLAGS) $^ -o $@ $(LFLAGS)
+
+fidatest.o: fidatest.f90 eigensystem.mod utilities.mod hdf5_extra.mod libfida.mod fidanet.mod
+	$(FC) $(CFLAGS) -c $(IFLAGS)  $<
 
 .PHONY: fidanet
-fidanet: fidanet.o _fidanet.so
+fidanet: fidanet.o _fidanet.so ./fidatest
 
 clean:
-	-rm -f *.mod *.o
+	-rm -f *.mod *.o fidanet.py _fidanet.so

@@ -19,15 +19,14 @@ subroutine f90wrap_setplasma(dene, denp, denimp, te, ti)
     call setplasma(dene=dene, denp=denp, denimp=denimp, te=te, ti=ti)
 end subroutine f90wrap_setplasma
 
-subroutine f90wrap_setinputs(ai, ab, impq, tables_file)
+subroutine f90wrap_setinputs(ai, ab, impq)
     use fidanet, only: setinputs
     implicit none
     
     real(8), intent(in) :: ai
     real(8), intent(in) :: ab
     integer, intent(in) :: impq
-    character(150), intent(in) :: tables_file
-    call setinputs(ai=ai, ab=ab, impq=impq, tables_file=tables_file)
+    call setinputs(ai=ai, ab=ab, impq=impq)
 end subroutine f90wrap_setinputs
 
 subroutine f90wrap_calcvn(i_type, eb, vn)

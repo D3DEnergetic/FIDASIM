@@ -18,6 +18,9 @@ SUPPORTED_FC = gfortran ifort
 SUPPORTED_CC = gcc icc
 SUPPORTED_CXX = g++ icpc
 
+FC = gfortran
+CC = gcc
+
 HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
 ifeq ($(HAS_FC),)
     $(error Fortran compiler $(FC) is not supported. Set FC to gfortran or ifort)
@@ -55,7 +58,7 @@ HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz 
 
 ifneq ($(findstring gfortran, $(FC)),)
 	LFLAGS = -lm
-	CFLAGS = -Ofast -g -fbacktrace -cpp
+	CFLAGS = -Ofast -g -fbacktrace -cpp -fPIC
 	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
 	OPENMP_FLAGS = -fopenmp -D_OMP
 	PROF_FLAGS = -pg -D_PROF
@@ -63,7 +66,7 @@ endif
 
 ifneq ($(findstring ifort, $(FC)),)
 	LFLAGS = -limf -lm
-	CFLAGS = -O2 -g -traceback -fpp
+	CFLAGS = -O2 -g -traceback -fpp -fPIC
 	DEBUG_CFLAGS = -O0 -g -fpp -traceback -debug all -check all -check bounds -fpe0 -warn -D_DEBUG
 	OPENMP_FLAGS = -openmp -D_OMP
 	PROF_FLAGS = -p -D_PROF
@@ -107,6 +110,10 @@ fidasim: deps src tables
 .PHONY: deps
 deps:
 	@cd $(DEPS_DIR); make
+
+.Phony: fidanet
+fidanet:
+	@cd $(SRC_DIR); make fidanet
 
 .PHONY: src
 src:

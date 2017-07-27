@@ -2826,8 +2826,8 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
 
             do j=1,rates%ntemp
                 do i=1,rates%nenergy
-                        rates%log_rate(:,:,i,j,1) = transpose(dummy5(:,:,i,j,bt_ind))
-                        rates%log_rate(:,:,i,j,2) = transpose(dummy5(:,:,i,j,tt_ind))
+                        rates%log_rate(:,:,i,j,1) = transpose(dummy5(1:nlevs,1:nlevs,i,j,bt_ind))
+                        rates%log_rate(:,:,i,j,2) = transpose(dummy5(1:nlevs,1:nlevs,i,j,tt_ind))
                 enddo
             enddo
             deallocate(dummy5)

@@ -55,16 +55,16 @@ HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz 
 
 ifneq ($(findstring gfortran, $(FC)),)
 	LFLAGS = -lm
-	CFLAGS = -Ofast -g -fbacktrace -cpp
-	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
+	CFLAGS = -Ofast -g -fbacktrace -cpp -fPIC
+	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fPIC -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
 	OPENMP_FLAGS = -fopenmp -D_OMP
 	PROF_FLAGS = -pg -D_PROF
 endif
 
 ifneq ($(findstring ifort, $(FC)),)
 	LFLAGS = -limf -lm
-	CFLAGS = -O2 -g -traceback -fpp
-	DEBUG_CFLAGS = -O0 -g -fpp -traceback -debug all -check all -check bounds -fpe0 -warn -D_DEBUG
+	CFLAGS = -O2 -g -traceback -fpp -fPIC
+	DEBUG_CFLAGS = -O0 -g -fpp -traceback -fPIC -debug all -check all -check bounds -fpe0 -warn -D_DEBUG
 	OPENMP_FLAGS = -openmp -D_OMP
 	PROF_FLAGS = -p -D_PROF
 endif

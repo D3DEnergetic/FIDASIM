@@ -17,7 +17,7 @@ hdf5_extra.mod hdf5_extra.o: hdf5_extra.f90
 
 _libfida.so:
 	f90wrap -m libfida -k kind_map fidasim.f90
-	f2py $(IFLAGS) -L../deps/hdf5/lib/ -lhdf5 -lhdf5_fortran -lhdf5hl_fortran -lz -ldl -c -m _libfida f90wrap*.f90 *.o
+	f2py-f90wrap -m _libfida --fcompiler=$(FC) --f90flags="$(CFLAGS)" $(IFLAGS) -lgomp -L../deps/hdf5/lib/ -lhdf5 -lhdf5_fortran -lhdf5hl_fortran -lz -ldl -c f90wrap*.f90 *.o
 
 clean:
-	-rm -f *.mod *.o
+	-rm -f *.mod *.o f90wrap*.f90 libfida.py *.so

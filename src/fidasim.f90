@@ -380,7 +380,7 @@ type FastIon
         !+ Z velocity [cm/s]
     real(Float64)  :: weight = 0.d0
         !+ Particle weight: How many fast-ions does particle represent.
-    integer(Int32) :: class = 0
+    integer(Int32) :: orbit_type = 0
         !+ Orbit class id
 end type FastIon
 
@@ -1053,7 +1053,7 @@ subroutine fast_ion_assign(p1, p2)
     p1%vt         = p2%vt
     p1%vz         = p2%vz
     p1%weight     = p2%weight
-    p1%class      = p2%class
+    p1%orbit_type = p2%orbit_type
 
 end subroutine fast_ion_assign
 
@@ -2564,9 +2564,9 @@ subroutine read_mc(fid, error)
     dims(1) = particles%nparticle
     call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
-    call h5ltread_dataset_int_f(fid, "/class", particles%fast_ion%class, dims, error)
+    call h5ltread_dataset_int_f(fid, "/class", particles%fast_ion%orbit_type, dims, error)
 
-    if(any(particles%fast_ion%class.gt.particles%nclass)) then
+    if(any(particles%fast_ion%orbit_type.gt.particles%nclass)) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
         endif
@@ -7658,7 +7658,7 @@ subroutine fida_mc
 
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class)
+                call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%orbit_type)
             enddo loop_along_track
         enddo phi_loop
         if (inputs%verbose.ge.2)then
@@ -7876,7 +7876,7 @@ subroutine npa_mc
 
                         !! Store NPA Flux
                         flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
-                        call store_npa(det,ri,rf,vi,flux,fast_ion%class)
+                        call store_npa(det,ri,rf,vi,flux,fast_ion%orbit_type)
                     enddo gyro_range_loop
                 enddo detector_loop
             else !! Full Orbit
@@ -7908,7 +7908,7 @@ subroutine npa_mc
 
                 !! Store NPA Flux
                 flux = sum(states)*beam_grid%dv
-                call store_npa(det,ri,rf,vi,flux,fast_ion%class)
+                call store_npa(det,ri,rf,vi,flux,fast_ion%orbit_type)
             endif
         enddo phi_loop
         if (inputs%verbose.ge.2)then
@@ -8059,7 +8059,7 @@ subroutine neutron_mc
                 rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv/nphi
 
                 !! Store neutrons
-                call store_neutrons(rate, fast_ion%class)
+                call store_neutrons(rate, fast_ion%orbit_type)
             enddo gyro_loop
         else
             call uvw_to_xyz(uvw, ri)
@@ -8081,7 +8081,7 @@ subroutine neutron_mc
             rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv
 
             !! Store neutrons
-            call store_neutrons(rate, fast_ion%class)
+            call store_neutrons(rate, fast_ion%orbit_type)
         endif
         if (inputs%verbose.ge.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)

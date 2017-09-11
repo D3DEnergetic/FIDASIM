@@ -38,6 +38,7 @@ PRO write_namelist, filename, inputs
     printf,55,f='("calc_brems = ",i2 , "    !! Calculate Bremsstrahlung")',inputs.calc_brems
     printf,55,f='("calc_fida = ",i2 , "    !! Calculate FIDA Spectra")',inputs.calc_fida
     printf,55,f='("calc_npa = ",i2 , "   !! Calculate NPA")',inputs.calc_npa
+    printf,55,f='("calc_neutron = ",i2 , "   !! Calculate B-T Neutron Rate")',inputs.calc_neutron
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
     printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght

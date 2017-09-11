@@ -43,6 +43,7 @@ A value of two will turn on additional functionality.
 | `calc_brems`        | Int16   | 0    | NA         | NA    | Calculate Bremsstrahlung                 |
 | `calc_fida`         | Int16   | 0    | NA         | NA    | Calculate FIDA spectra                   |
 | `calc_npa`          | Int16   | 0    | NA         | NA    | Calculate NPA flux                       |
+| `calc_neutron`      | Int16   | 0    | NA         | NA    | Calculate B-T Neutron rate               |
 | `calc_birth`        | Int16   | 0    | NA         | NA    | Calculate Birth profile                  |
 | `calc_fida_wght`    | Int16   | 0    | NA         | NA    | Calculate FIDA weight functions          | 
 | `calc_npa_wght`     | Int16   | 0    | NA         | NA    | Calculate NPA weight functions           |

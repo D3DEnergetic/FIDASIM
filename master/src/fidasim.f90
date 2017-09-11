@@ -1649,10 +1649,6 @@ subroutine read_inputs
         stop
     endif
 
-    !!Set Defaults TODO: remove at next major release
-    no_flr = 0
-    calc_neutron = 0
-
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)

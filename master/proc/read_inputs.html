@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.0.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>2.0.0-dev</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 1.6% of total for procedures.">158 statements</a>
+	  title=" 1.6% of total for procedures.">156 statements</a>
      </li> 
      
      
@@ -1063,10 +1063,6 @@ public subroutine read_inputs()
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Input file does not exist: &#39;</span><span class="p">,</span> <span class="nb">trim</span><span class="p">(</span><span class="n">namelist_file</span><span class="p">)</span>
         <span class="k">stop</span>
 <span class="k">    </span><span class="n">endif</span>
-
-    <span class="c">!!Set Defaults TODO: remove at next major release</span>
-    <span class="n">no_flr</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">calc_neutron</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">)</span>
     <span class="k">read</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="n">NML</span><span class="o">=</span><span class="n">fidasim_inputs</span><span class="p">)</span>

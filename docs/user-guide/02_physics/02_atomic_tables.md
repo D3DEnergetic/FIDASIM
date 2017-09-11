@@ -141,7 +141,7 @@ After editing the namelist file run
 ```
 and wait for a couple of hours depending on the number of threads used. 
 
-#Atomic Data References
+#Atomic & Nuclear Data References
 The atomic data is taken from a variety of sources [1-5]
 
 1. [W.L. Wiese, M.W. Smith, and B.M. Glennon. *Atomic Transition Probabilities. Volume 1. Hydrogen through Neon*. National Bureau of Standards Washington DC Institute for Basic Standards, 1966.](http://www.dtic.mil/dtic/tr/fulltext/u2/634145.pdf)
@@ -150,6 +150,7 @@ The atomic data is taken from a variety of sources [1-5]
 4. [ADAS: Atomic Data and Analysis Structure](http://www.adas.ac.uk/)
 5. [R.K. Janev and J.J. Smith. *Cross sections for collision processes of hydrogen atoms with electrons, protons and multiply charged ions.* Atomic and Plasma-Material Interaction Data for Fusion: Volume 4, 1993.](http://www-pub.iaea.org/books/IAEABooks/1839/Atomic-and-Plasma-Material-Interaction-Data-for-Fusion) 
 6. [Reinhold, C. O., R. E. Olson, and W. Fritsch. *Excitation of atomic hydrogen by fully stripped ions.* Physical Review A 41.9 1990.](http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837)
+7. [Bosch, H-S., and G. M. Hale. *Improved formulas for fusion cross-sections and thermal reactivities.* !+ Nuclear fusion 32.4 1992.](http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta)
 
 A more precice references can be found in the Fortran function documentation. For example, [[p_cx_janev]]
 
@@ -160,10 +161,14 @@ A more precice references can be found in the Fortran function documentation. Fo
 * [[atomic_tables(module)]]: Module containing routines to calculate atomic tables and reaction rates
 * [[generate_tables(program)]]: Program to create atomic tables file
 * [[AtomicCrossSection]]: Defines a n/m-resolved atomic cross section table
-* [[AtomicRates]]: Defines an atomic table for populating and de-populating reaction rates
+* [[AtomicRates]]: Defines a n/m-resolved atomic cross section table
+* [[AtomicTransitions]]: Defines an atomic table for populating and de-populating reaction rates
 * [[AtomicTables]]: Atomic tables for various types of interactions need by FIDASIM
+* [[NuclearRates]]: Defines nuclear fusion reaction rate table
 * [[read_atomic_cross]]: Reads atomic cross section from file
-* [[read_atomic_rates]]: Reads atomic rates from file
+* [[read_atomic_rate]]: Reads atomic rates from file
+* [[read_atomic_transitions]]: Reads in a atomic transitions table from file
+* [[read_nuclear_rates]]: Reads in nuclear reaction rates from file
 * [[read_tables]]: Reads all cross sections and rates needed by FIDASIM
 * [[m_spread]]: Spreads total n cross section amoung m states
 

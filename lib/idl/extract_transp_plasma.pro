@@ -11,7 +11,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+
     ;+    **grid**: Interpolation grid
     ;+
-    ;+    **flux**: Torodial Flux mapped onto the interpolation grid 
+    ;+    **flux**: Normalized square root of torodial flux("rho") mapped onto the interpolation grid 
     ;+
     ;+##Keyword Arguments
     ;+    **doplot**: Plot profiles

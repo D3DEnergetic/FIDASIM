@@ -51,11 +51,17 @@ PRO hdf5_write_struct, id, struct, compress=compress
             ndim = size(data,/n_dim)
             dims = size(data,/dim)
 
-            datatype_id = h5t_idl_create(data)
             if ndim eq 0L then begin
+                datatype_id = h5t_idl_create(data)
                 dataspace_id = h5s_create_scalar()
                 dataset_id = h5d_create(id, tags[i], datatype_id, dataspace_id)
             endif else begin
+                if size(data,/tname) eq "STRING" then begin
+                    strmax = max(strlen(data),nw)
+                    datatype_id = h5t_idl_create(data[nw])
+                endif else begin
+                    datatype_id = h5t_idl_create(data)
+                endelse
                 dataspace_id = h5s_create_simple(dims)
                 dataset_id = h5d_create(id, tags[i], datatype_id, dataspace_id, $
                                         chunk_dimensions=dims, gzip=compress,/shuffle)

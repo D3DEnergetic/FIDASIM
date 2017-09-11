@@ -26,7 +26,7 @@ text-align: center;
 
 An NPA detector is defined by an aperture for which neutral particles must pass through and an detector.
 The aperture/detectors are defined by three points and a shape as shown in the figures above.
-It is assumed that between the aperture and the detector that particles travel in straight lines i.e. there is no stripping foil.
+It is assumed that between the aperture and the detector that particles travel in straight lines i.e. there is no stripping foil at the aperture.
 
 The full definition of the NPA detector is given below (right and left as implied by looking through the aperture at the detector)
 
@@ -46,31 +46,27 @@ The full definition of the NPA detector is given below (right and left as implie
 | `d_redge`           | Float64 | 2    | [3,`nchan`]  | cm    | Position of the detectors right edge |
 | `d_tedge`           | Float64 | 2    | [3,`nchan`]  | cm    | Position of the detectors top edge |
 
-# Monte Carlo NPA calculation 
+# Monte Carlo NPA calculation
 The Monte Carlo method of calculating the NPA flux (MC-NPA) is as follows
 
-1. Sample Fast-ion distribution function and get initial position and velocity
-2. Determine if particle would go through the NPA aperture and hit the detecting region. If not increase counter and goto 1 else goto 3
-3. Charge exchange the ion (set initial state) and solve the collisional radiative model along particle track.
-4. Sum the final state of the neutral and bin the particle by its energy.
+1. Sample Fast-ion distribution function and get initial position, energy, and pitch
+2. Determine the range of gyro-angles (\(d\gamma\) ) that would allow a neutral particle to go through the NPA aperture and hit the detecting region. If the range is zero increase counter and goto 1 else goto 3
+3. Choose the gyro-angle to be in the middle of the range calculated in step 2. Charge exchange the ion (set initial state) and solve the collisional radiative model along particle track. Scale by the gyro-range \(d\gamma\).
+4. Sum the final state of the neutral and bin the particle by its energy. Increase counter.
 5. Repeat N times
 
-This process works but is not very efficient. The main issue is that more often or not a particle would not hit the detector.
-This causes very bad Monte Carlo noise in the calculated NPA flux.
-The only way to get around this is to use a lot of particles which can be prohibitively expensive.
+@note The Monte Carlo NPA calculation assumes that the second order gyro-correction is small and the gyro-ring is circular. This assumption is often safe to make in conventional tokamaks but it may cause problems in spherical tokamaks or at the plasma edge where the torodial magnetic field is small. In these cases the alternative approach (detailed below) is suggested.
 
-It would be much faster to just fire the particles directly at the NPA detector and then scale the resultant flux by the probability of that trajectory occuring.
-This is approach taken in the weight function method (WF-NPA) detailed [here](./07_weights.html#npa).
+An alternative approach is to fire the particles directly at the NPA detector and then scale the resultant flux by the probability of that trajectory occuring.
+This approach is taken in the weight function method (WF-NPA) detailed [here](./07_weights.html#npa).
 
 An example of the calculated NPA flux for the two different methods are shown below.
 
 ![NPA Flux](|media|/npa.png)
 {: style="text-align: center"}
 
-As you can see the WF-NPA method produces superior results at a fraction of the runtime.
-
 # Relevant Namelist Settings
-* `n_npa`: Number of Monte Carlo particles used in MC-NPA calculation 
+* `n_npa`: Number of Monte Carlo particles used in MC-NPA calculation
 * `calc_npa`: Calculate NPA flux using the Monte Carlo Method
 * `calc_npa_wght`: Calculate NPA weight function and flux using the weight function method
 * `ne_wght`: Number of energies in weight function calculation

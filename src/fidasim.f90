@@ -6757,6 +6757,9 @@ end subroutine pitch_to_vec
 
 subroutine gyro_step(vi, fields, r_gyro)
     !+ Calculates gyro-step
+    !+
+    !+###References
+    !+* Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. "Self-consistent equilibrium model of low aspect-ratio toroidal plasma with energetic beam ions." Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251. Appendix A: Last equation
     real(Float64), dimension(3), intent(in)  :: vi
         !+ Ion velocity
     type(LocalEMFields), intent(in)          :: fields

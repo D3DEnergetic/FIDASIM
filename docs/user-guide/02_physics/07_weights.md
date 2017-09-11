@@ -96,6 +96,5 @@ flux(E) = \sum_{cells} \left (\sum_{p} W_i(E,p) \times F_i(E,p) \, \Delta p \rig
 $$
 
 The NPA weight functions are calculated using the same assumptions as the FIDA weight functions (`calc_fida_wght=2`).
-However, since the `calc_npa` calculation is very slow and inefficient the NPA flux calculated here is exact.
 
 If `calc_npa_wght = 2` is set then the individual compenents of the npa weight function are also outputed. 

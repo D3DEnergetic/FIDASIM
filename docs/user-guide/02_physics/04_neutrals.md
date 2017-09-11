@@ -81,7 +81,7 @@ where \(y_s\) and \(z_s\) are random positions on the source plate in the horizo
 Not shown above are the beam aperture(s) which collimates the neutral beam.
 Apertures are represented in FIDASIM by their shape (circular or rectangular), size (half width and
 height), offsets relative to the +x aligned beam centerline, and their distance from the source grid.
-It is assumed that the plane of the aperture(s) is parallel to the plane of the source grid.
+It is assumed that the plane of the aperture(s) is parallel to the plane of the source grid. The routine `nubeam_geometry.pro`([IDL](|url|/sourcefile/nubeam_geometry.pro.html)) can be used to easily generate the NBI geometry from the TRANSP/NUBEAM beam definition.
 
 FIDASIM reads in the neutral beam geometry from a HDF5 file (`[runid]_geometry.h5`) that has the group `nbi` with the following datasets
 

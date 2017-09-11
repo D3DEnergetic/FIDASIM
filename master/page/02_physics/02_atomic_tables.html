@@ -144,7 +144,7 @@
 <li><a href="#atomic-cross-sections">Atomic Cross Sections</a></li>
 <li><a href="#approximate-hydrogen-charge-exchange-cross-sections">Approximate Hydrogen Charge Exchange Cross Sections</a></li>
 <li><a href="#generating-tables">Generating Tables</a></li>
-<li><a href="#atomic-data-references">Atomic Data References</a></li>
+<li><a href="#atomic-nuclear-data-references">Atomic &amp; Nuclear Data References</a></li>
 <li><a href="#relevent-namelist-settings">Relevent Namelist Settings</a></li>
 <li><a href="#fortran-references">Fortran References</a></li>
 <li><a href="#hydrogen-hydrogen-interactions">Hydrogen-Hydrogen Interactions</a><ul>
@@ -293,7 +293,7 @@ To generate custom tables from the tables directory run </p>
 
 
 <p>and wait for a couple of hours depending on the number of threads used. </p>
-<h1 id="atomic-data-references">Atomic Data References</h1>
+<h1 id="atomic-nuclear-data-references">Atomic &amp; Nuclear Data References</h1>
 <p>The atomic data is taken from a variety of sources [1-5]</p>
 <ol>
 <li><a href="http://www.dtic.mil/dtic/tr/fulltext/u2/634145.pdf">W.L. Wiese, M.W. Smith, and B.M. Glennon. <em>Atomic Transition Probabilities. Volume 1. Hydrogen through Neon</em>. National Bureau of Standards Washington DC Institute for Basic Standards, 1966.</a></li>
@@ -302,6 +302,7 @@ To generate custom tables from the tables directory run </p>
 <li><a href="http://www.adas.ac.uk/">ADAS: Atomic Data and Analysis Structure</a></li>
 <li><a href="http://www-pub.iaea.org/books/IAEABooks/1839/Atomic-and-Plasma-Material-Interaction-Data-for-Fusion">R.K. Janev and J.J. Smith. <em>Cross sections for collision processes of hydrogen atoms with electrons, protons and multiply charged ions.</em> Atomic and Plasma-Material Interaction Data for Fusion: Volume 4, 1993.</a> </li>
 <li><a href="http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837">Reinhold, C. O., R. E. Olson, and W. Fritsch. <em>Excitation of atomic hydrogen by fully stripped ions.</em> Physical Review A 41.9 1990.</a></li>
+<li><a href="http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta">Bosch, H-S., and G. M. Hale. <em>Improved formulas for fusion cross-sections and thermal reactivities.</em> !+ Nuclear fusion 32.4 1992.</a></li>
 </ol>
 <p>A more precice references can be found in the Fortran function documentation. For example, <a href="../../proc/p_cx_janev.html">p_cx_janev</a></p>
 <h1 id="relevent-namelist-settings">Relevent Namelist Settings</h1>
@@ -313,10 +314,14 @@ To generate custom tables from the tables directory run </p>
 <li><a href="../../module/atomic_tables.html">atomic_tables</a>: Module containing routines to calculate atomic tables and reaction rates</li>
 <li><a href="../../program/generate_tables.html">generate_tables</a>: Program to create atomic tables file</li>
 <li><a href="../../type/atomiccrosssection.html">AtomicCrossSection</a>: Defines a n/m-resolved atomic cross section table</li>
-<li><a href="../../type/atomicrates.html">AtomicRates</a>: Defines an atomic table for populating and de-populating reaction rates</li>
+<li><a href="../../type/atomicrates.html">AtomicRates</a>: Defines a n/m-resolved atomic cross section table</li>
+<li><a href="../../type/atomictransitions.html">AtomicTransitions</a>: Defines an atomic table for populating and de-populating reaction rates</li>
 <li><a href="../../type/atomictables.html">AtomicTables</a>: Atomic tables for various types of interactions need by FIDASIM</li>
+<li><a href="../../type/nuclearrates.html">NuclearRates</a>: Defines nuclear fusion reaction rate table</li>
 <li><a href="../../proc/read_atomic_cross.html">read_atomic_cross</a>: Reads atomic cross section from file</li>
-<li>[[read_atomic_rates]]: Reads atomic rates from file</li>
+<li><a href="../../proc/read_atomic_rate.html">read_atomic_rate</a>: Reads atomic rates from file</li>
+<li><a href="../../proc/read_atomic_transitions.html">read_atomic_transitions</a>: Reads in a atomic transitions table from file</li>
+<li><a href="../../proc/read_nuclear_rates.html">read_nuclear_rates</a>: Reads in nuclear reaction rates from file</li>
 <li><a href="../../proc/read_tables.html">read_tables</a>: Reads all cross sections and rates needed by FIDASIM</li>
 <li><a href="../../proc/m_spread.html">m_spread</a>: Spreads total n cross section amoung m states</li>
 </ul>

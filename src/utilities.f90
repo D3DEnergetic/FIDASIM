@@ -12,6 +12,7 @@ public :: ind2sub, sub2ind
 public :: rng_type, rng_init, rng, rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
 public :: deriv
+public :: InterpolCoeffs1D, InterpolCoeffs2D, interpol_coeff, interpol
 
 integer, parameter :: Int32 = 4
 integer, parameter :: Int64 = kind(int8(1))
@@ -46,6 +47,35 @@ type SparseArray
         !+ Array values
 end type SparseArray
 
+type InterpolCoeffs1D
+    !+ Linear Interpolation Coefficients and indices
+    integer :: i = 0
+        !+ Index of position right before `xout`
+    real(Float64) :: b1 = 0.d0
+        !+ Coefficient for y(i) term
+    real(Float64) :: b2 = 0.d0
+        !+ Coefficient for y(i+1) term
+end type InterpolCoeffs1D
+
+type InterpolCoeffs2D
+    !+ 2D Linear Interpolation Coefficients and indices
+    integer :: i = 0
+        !+ Index of abscissa before `xout`
+    integer :: j = 0
+        !+ Index of ordinate before `yout`
+    real(Float64) :: b11 = 0.d0
+        !+ Coefficient for z(i,j) term
+    real(Float64) :: b12 = 0.d0
+        !+ Coefficient for z(i,j+1) term
+    real(Float64) :: b21 = 0.d0
+        !+ Coefficient for z(i+1,j) term
+    real(Float64) :: b22 = 0.d0
+        !+ Coefficient for z(i+1,j+1) term
+end type InterpolCoeffs2D
+
+!============================================================================
+!-------------------------------- Interfaces --------------------------------
+!============================================================================
 interface randind
     !+ Procedure for generating a random array index/subscripts
     module procedure randind_n
@@ -71,6 +101,18 @@ interface deriv
     !+ Procedure for finding derivatives from an array
     module procedure deriv_1d
     module procedure deriv_2d
+end interface
+
+interface interpol_coeff
+    !+ Calculates linear interpolation coefficients
+    module procedure interpol1D_coeff, interpol1D_coeff_arr
+    module procedure interpol2D_coeff, interpol2D_coeff_arr
+end interface
+
+interface interpol
+    !+ Performs linear/bilinear interpolation
+    module procedure interpol1D_arr
+    module procedure interpol2D_arr, interpol2D_2D_arr
 end interface
 
 contains
@@ -573,5 +615,275 @@ subroutine deriv_2d(x,y,z,zxp,zyp)
     enddo
 
 end subroutine deriv_2d
+
+!============================================================================
+!---------------------------Interpolation Routines---------------------------
+!============================================================================
+subroutine interpol1D_coeff(xmin,dx,nx,xout,c,err)
+    !+ Linear interpolation coefficients and index for a 1D grid y(x)
+    real(Float64), intent(in)           :: xmin
+        !+ Minimum abscissa value
+    real(Float64), intent(in)           :: dx
+        !+ Absissa spacing
+    integer, intent(in)                 :: nx
+        !+ Number of abscissa
+    real(Float64), intent(in)           :: xout
+        !+ Abscissa value to interpolate
+    type(InterpolCoeffs1D), intent(out) :: c
+        !+ Interpolation Coefficients
+    integer, intent(out), optional      :: err
+        !+ Error code
+
+    real(Float64) :: x1, xp, b1, b2
+    integer :: i, err_status
+
+    err_status = 1
+    xp = max(xout,xmin)
+    i = floor((xp - xmin)/dx)+1
+
+    if ((i.gt.0).and.(i.le.(nx-1))) then
+        x1 = xmin + (i-1)*dx
+
+        b2 = (xp - x1)/dx
+        b1 = (1.0 - b2)
+
+        c%i = i
+        c%b1 = b1
+        c%b2 = b2
+        err_status = 0
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine interpol1D_coeff
+
+subroutine interpol1D_coeff_arr(x,xout,c,err)
+    !+ Linear interpolation coefficients and index for a 1D grid y(x)
+    real(Float64), dimension(:), intent(in) :: x
+        !+ Abscissa values
+    real(Float64), intent(in)               :: xout
+        !+ Abscissa value to interpolate
+    type(InterpolCoeffs1D), intent(out)     :: c
+        !+ Interpolation Coefficients
+    integer, intent(out), optional          :: err
+        !+ Error code
+
+    real(Float64) :: xmin, dx
+    integer :: sx,err_status
+
+    err_status = 1
+    sx = size(x)
+    xmin = x(1)
+    dx = abs(x(2)-x(1))
+
+    call interpol1D_coeff(xmin, dx, sx, xout, c, err_status)
+
+    if(present(err)) err = err_status
+
+end subroutine interpol1D_coeff_arr
+
+subroutine interpol2D_coeff(xmin,dx,nx,ymin,dy,ny,xout,yout,c,err)
+    !+ Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
+    real(Float64), intent(in)           :: xmin
+        !+ Minimum abscissa
+    real(Float64), intent(in)           :: dx
+        !+ Abscissa spacing
+    integer, intent(in)                 :: nx
+        !+ Number of abscissa
+    real(Float64), intent(in)           :: ymin
+        !+ Minimum ordinate
+    real(Float64), intent(in)           :: dy
+        !+ Ordinate spacing
+    integer, intent(in)                 :: ny
+        !+ Number of ordinates points
+    real(Float64), intent(in)           :: xout
+        !+ Abscissa value to interpolate
+    real(Float64), intent(in)           :: yout
+        !+ Ordinate value to interpolate
+    type(InterpolCoeffs2D), intent(out) :: c
+        !+ Interpolation Coefficients
+    integer, intent(out), optional      :: err
+        !+ Error code
+
+    real(Float64) :: x1, x2, y1, y2, xp, yp
+    integer :: i, j, err_status
+
+    err_status = 1
+    xp = max(xout,xmin)
+    yp = max(yout,ymin)
+    i = floor((xp-xmin)/dx)+1
+    j = floor((yp-ymin)/dy)+1
+
+    if (((i.gt.0).and.(i.le.(nx-1))).and.((j.gt.0).and.(j.le.(ny-1)))) then
+        x1 = xmin + (i-1)*dx
+        x2 = x1 + dx
+        y1 = ymin + (j-1)*dy
+        y2 = y1 + dy
+
+        c%b11 = ((x2 - xp) * (y2 - yp))/(dx*dy)
+        c%b21 = ((xp - x1) * (y2 - yp))/(dx*dy)
+        c%b12 = ((x2 - xp) * (yp - y1))/(dx*dy)
+        c%b22 = ((xp - x1) * (yp - y1))/(dx*dy)
+        c%i = i
+        c%j = j
+        err_status = 0
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine interpol2D_coeff
+
+subroutine interpol2D_coeff_arr(x,y,xout,yout,c,err)
+    !!Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
+    real(Float64), dimension(:), intent(in) :: x
+        !+ Abscissa values
+    real(Float64), dimension(:), intent(in) :: y
+        !+ Ordinate values
+    real(Float64), intent(in)               :: xout
+        !+ Abscissa value to interpolate
+    real(Float64), intent(in)               :: yout
+        !+ Ordinate value to interpolate
+    type(InterpolCoeffs2D), intent(out)     :: c
+        !+ Interpolation Coefficients
+    integer, intent(out), optional          :: err
+        !+ Error code
+
+    real(Float64) :: xmin, ymin, dx, dy
+    integer :: sx, sy, err_status
+
+    err_status = 1
+    sx = size(x)
+    sy = size(y)
+    xmin = x(1)
+    ymin = y(1)
+    dx = abs(x(2)-x(1))
+    dy = abs(y(2)-y(1))
+
+    call interpol2D_coeff(xmin, dx, sx, ymin, dy, sy, xout, yout, c, err_status)
+
+    if(present(err)) err = err_status
+
+end subroutine interpol2D_coeff_arr
+
+subroutine interpol1D_arr(x, y, xout, yout, err, coeffs)
+    !+ Performs linear interpolation on a uniform 1D grid y(x)
+    real(Float64), dimension(:), intent(in)      :: x
+        !+ The abscissa values of `y`
+    real(Float64), dimension(:), intent(in)      :: y
+        !+ Values at abscissa values `x`: y(x)
+    real(Float64), intent(in)                    :: xout
+        !+ Abscissa value to interpolate
+    real(Float64), intent(out)                   :: yout
+        !+ Interpolant: y(xout)
+    integer, intent(out), optional               :: err
+        !+ Error code
+    type(InterpolCoeffs1D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
+
+    type(InterpolCoeffs1D) :: c
+    integer :: i, err_status
+
+    err_status = 1
+    if(present(coeffs)) then
+        c = coeffs
+        err_status = 0
+    else
+        call interpol_coeff(x,xout,c,err_status)
+    endif
+
+    if(err_status.eq.0) then
+        i = c%i
+        yout = c%b1*y(i) + c%b2*y(i+1)
+    else
+        yout = 0.d0
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine interpol1D_arr
+
+subroutine interpol2D_arr(x, y, z, xout, yout, zout, err, coeffs)
+    !+ Performs bilinear interpolation on a 2D grid z(x,y)
+    real(Float64), dimension(:), intent(in)   :: x
+        !+ The abscissa values of `z`
+    real(Float64), dimension(:), intent(in)   :: y
+        !+ The ordinate values of `z`
+    real(Float64), dimension(:,:), intent(in) :: z
+        !+ Values at the abscissa/ordinates: z(x,y)
+    real(Float64), intent(in)                 :: xout
+        !+ The abscissa value to interpolate
+    real(Float64), intent(in)                 :: yout
+        !+ The ordinate value to interpolate
+    real(Float64), intent(out)                :: zout
+        !+ Interpolant: z(xout,yout)
+    integer, intent(out), optional            :: err
+        !+ Error code
+    type(InterpolCoeffs2D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
+
+    type(InterpolCoeffs2D) :: c
+    integer :: i, j, err_status
+
+    err_status = 1
+    if(present(coeffs)) then
+        c = coeffs
+        err_status = 0
+    else
+        call interpol_coeff(x,y,xout,yout,c,err_status)
+    endif
+
+    if(err_status.eq.0) then
+        i = c%i
+        j = c%j
+        zout = c%b11*z(i,j) + c%b12*z(i,j+1) + c%b21*z(i+1,j) + c%b22*z(i+1,j+1)
+    else
+        zout = 0.d0
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine interpol2D_arr
+
+subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err, coeffs)
+    !+ Performs bilinear interpolation on a 2D grid of 2D arrays z(:,:,x,y)
+    real(Float64), dimension(:), intent(in)       :: x
+        !+ The abscissa values of `z`
+    real(Float64), dimension(:), intent(in)       :: y
+        !+ The ordinate values of `z`
+    real(Float64), dimension(:,:,:,:), intent(in) :: z
+        !+ Values at the abscissa/ordinates: z(:,:,x,y)
+    real(Float64), intent(in)                     :: xout
+        !+ The abscissa value to interpolate
+    real(Float64), intent(in)                     :: yout
+        !+ The ordinate value to interpolate
+    real(Float64), dimension(:,:), intent(out)    :: zout
+        !+ Interpolant: z(:,:,xout,yout)
+    integer, intent(out), optional                :: err
+        !+ Error code
+    type(InterpolCoeffs2D), intent(in), optional :: coeffs
+        !+ Precomputed Linear Interpolation Coefficients
+
+    type(InterpolCoeffs2D) :: c
+    integer :: i, j, err_status
+
+    err_status = 1
+    if(present(coeffs)) then
+        c = coeffs
+        err_status = 0
+    else
+        call interpol_coeff(x,y,xout,yout,c,err_status)
+    endif
+
+    if(err_status.eq.0) then
+        i = c%i
+        j = c%j
+        zout = c%b11*z(:,:,i,j) + c%b12*z(:,:,i,j+1) + c%b21*z(:,:,i+1,j) + c%b22*z(:,:,i+1,j+1)
+    else
+        zout = 0.0
+    endif
+
+    if(present(err)) err = err_status
+
+end subroutine interpol2D_2D_arr
 
 end module utilities

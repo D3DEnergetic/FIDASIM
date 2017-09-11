@@ -21,6 +21,8 @@ integer, parameter, private   :: Float64 = 8
     !+ Defines a 64 bit floating point real
 integer, parameter :: charlim = 150
     !+ Defines character limit for files and directories
+integer :: max_threads = 1
+    !+ Number of OpenMP threads
 
 character(charlim) :: namelist_file
     !+ Input namelist file
@@ -92,38 +94,10 @@ integer, parameter, dimension(n_stark) :: stark_sigma=1 - stark_pi
 !!Numerical Settings
 integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
-real(Float64) :: colrad_threshold=1.d6
-    !+ colrad threshold
 real(Float64), dimension(ntypes) :: halo_iter_dens = 0.d0
     !+ Keeps track of how of each generations halo density
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
-
-type InterpolCoeffs1D
-    !+ Linear Interpolation Coefficients and indices
-    integer :: i = 0
-        !+ Index of position right before `xout`
-    real(Float64) :: b1 = 0.d0
-        !+ Coefficient for y(i) term
-    real(Float64) :: b2 = 0.d0
-        !+ Coefficient for y(i+1) term
-end type InterpolCoeffs1D
-
-type InterpolCoeffs2D
-    !+ 2D Linear Interpolation Coefficients and indices
-    integer :: i = 0
-        !+ Index of abscissa before `xout`
-    integer :: j = 0
-        !+ Index of ordinate before `yout`
-    real(Float64) :: b11 = 0.d0
-        !+ Coefficient for z(i,j) term
-    real(Float64) :: b12 = 0.d0
-        !+ Coefficient for z(i,j+1) term
-    real(Float64) :: b21 = 0.d0
-        !+ Coefficient for z(i+1,j) term
-    real(Float64) :: b22 = 0.d0
-        !+ Coefficient for z(i+1,j+1) term
-end type InterpolCoeffs2D
 
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
@@ -944,52 +918,40 @@ interface operator(/)
     module procedure ps_divide, lps_divide, fs_divide, lfs_divide
 end interface
 
-interface interpol_coeff
-    !+ Calculates linear interpolation coefficients
-    module procedure interpol1D_coeff, interpol1D_coeff_arr
-    module procedure interpol2D_coeff, interpol2D_coeff_arr
-end interface
-
-interface interpol
-    !+ Performs linear/bilinear interpolation
-    module procedure interpol1D_arr
-    module procedure interpol2D_arr, interpol2D_2D_arr
-end interface
-
-!! definition of the structures:
-type(BeamGrid), save            :: beam_grid
+!! definition of the structures: (target attribute for python wrapper)
+type(BeamGrid), save, target            :: beam_grid
     !+ Variable containing beam grid definition
-type(InterpolationGrid), save   :: inter_grid
+type(InterpolationGrid), save, target   :: inter_grid
     !+ Variable containing interpolation grid definition
-type(FastIonDistribution), save :: fbm
+type(FastIonDistribution), save, target :: fbm
     !+ Variable containing the fast-ion distribution function
-type(FastIonParticles), save    :: particles
+type(FastIonParticles), save, target    :: particles
     !+ Variable containing a MC fast-ion distribution
-type(Equilibrium), save         :: equil
+type(Equilibrium), save, target         :: equil
     !+ Variable containing the plasma parameters and fields
-type(NeutralBeam), save         :: nbi
+type(NeutralBeam), save, target         :: nbi
     !+ Variable containing the neutral beam geometry and settings
-type(AtomicTables), save        :: tables
+type(AtomicTables), save, target        :: tables
     !+ Variable containing the atomic tables
-type(NPAResults), save          :: npa
+type(NPAResults), save, target          :: npa
     !+ Variable for storing the calculated NPA results
-type(SpectralChords), save      :: spec_chords
+type(SpectralChords), save, target      :: spec_chords
     !+ Variable containing the spectral system definition
-type(NPAChords), save           :: npa_chords
+type(NPAChords), save, target           :: npa_chords
     !+ Variable containing the NPA system definition
-type(SimulationInputs), save    :: inputs
+type(SimulationInputs), save, target    :: inputs
     !+ Variable containing the simulation inputs
-type(BirthProfile), save        :: birth
+type(BirthProfile), save, target        :: birth
     !+ Variable for storing the calculated birth profile
-type(NeutralDensity), save      :: neut
+type(NeutralDensity), save, target      :: neut
     !+ Variable for storing the calculated beam density
-type(Spectra), save             :: spec
+type(Spectra), save, target             :: spec
     !+ Variable for storing the calculated spectra
-type(NeutronRate), save         :: neutron
+type(NeutronRate), save, target         :: neutron
     !+ Variable for storing the neutron rate
-type(FIDAWeights), save         :: fweight
+type(FIDAWeights), save, target         :: fweight
     !+ Variable for storing the calculated FIDA weights
-type(NPAWeights), save          :: nweight
+type(NPAWeights), save, target          :: nweight
     !+ Variable for storing the calculated NPA weights
 
 contains
@@ -1032,6 +994,73 @@ subroutine print_banner()
 #endif
 
 end subroutine print_banner
+
+subroutine initialize()
+    !+ Initializes RNG and result arrays
+    integer :: i
+
+    !! Initialize Random Number Generator
+    allocate(rng(max_threads))
+    do i=1, max_threads
+        call rng_init(rng(i),932117 + i)
+    enddo
+
+    !! Allocate neutral density array
+    allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    neut%dens = 0.d0
+
+    !! Allocate birth profile arrays
+    if(inputs%calc_birth.ge.1) then
+        allocate(birth%dens(3, &
+                            beam_grid%nx, &
+                            beam_grid%ny, &
+                            beam_grid%nz))
+        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi)))
+        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
+        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
+        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
+        birth%neut_type = 0
+        birth%dens = 0.d0
+        birth%ind = 0
+        birth%ri = 0.d0
+        birth%vi = 0.d0
+    endif
+
+    !! Allocate spectrum arrays
+    if(inputs%calc_spec.ge.1) then
+        allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
+        allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4))
+        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
+        spec%brems = 0.d0
+        spec%bes = 0.d0
+        spec%fida = 0.d0
+    endif
+
+    !! Allocate NPA arrays
+    if(inputs%calc_npa.ge.1)then
+        npa%nchan = npa_chords%nchan
+        allocate(npa%part(npa%nmax))
+        if(inputs%dist_type.eq.1) then
+            npa%nenergy = fbm%nenergy
+            allocate(npa%energy(npa%nenergy))
+            npa%energy = fbm%energy
+        else
+            allocate(npa%energy(npa%nenergy))
+            do i=1,npa%nenergy
+                npa%energy(i)=real(i-0.5)
+            enddo
+        endif
+        allocate(npa%flux(npa%nenergy,npa%nchan,particles%nclass))
+        npa%flux = 0.0
+    endif
+
+    !! Allocate neutron arrays
+    if(inputs%calc_neutron.ge.1)then
+        allocate(neutron%rate(particles%nclass))
+        neutron%rate = 0.d0
+    endif
+
+end subroutine initialize
 
 !============================================================================
 !---------------------------Operator Overloading-----------------------------
@@ -5215,276 +5244,6 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
 
 end subroutine track
 
-!============================================================================
-!---------------------------Interpolation Routines---------------------------
-!============================================================================
-subroutine interpol1D_coeff(xmin,dx,nx,xout,c,err)
-    !+ Linear interpolation coefficients and index for a 1D grid y(x)
-    real(Float64), intent(in)           :: xmin
-        !+ Minimum abscissa value
-    real(Float64), intent(in)           :: dx
-        !+ Absissa spacing
-    integer, intent(in)                 :: nx
-        !+ Number of abscissa
-    real(Float64), intent(in)           :: xout
-        !+ Abscissa value to interpolate
-    type(InterpolCoeffs1D), intent(out) :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional      :: err
-        !+ Error code
-
-    real(Float64) :: x1, xp, b1, b2
-    integer :: i, err_status
-
-    err_status = 1
-    xp = max(xout,xmin)
-    i = floor((xp - xmin)/dx)+1
-
-    if ((i.gt.0).and.(i.le.(nx-1))) then
-        x1 = xmin + (i-1)*dx
-
-        b2 = (xp - x1)/dx
-        b1 = (1.0 - b2)
-
-        c%i = i
-        c%b1 = b1
-        c%b2 = b2
-        err_status = 0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol1D_coeff
-
-subroutine interpol1D_coeff_arr(x,xout,c,err)
-    !+ Linear interpolation coefficients and index for a 1D grid y(x)
-    real(Float64), dimension(:), intent(in) :: x
-        !+ Abscissa values
-    real(Float64), intent(in)               :: xout
-        !+ Abscissa value to interpolate
-    type(InterpolCoeffs1D), intent(out)     :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional          :: err
-        !+ Error code
-
-    real(Float64) :: xmin, dx
-    integer :: sx,err_status
-
-    err_status = 1
-    sx = size(x)
-    xmin = x(1)
-    dx = abs(x(2)-x(1))
-
-    call interpol1D_coeff(xmin, dx, sx, xout, c, err_status)
-
-    if(present(err)) err = err_status
-
-end subroutine interpol1D_coeff_arr
-
-subroutine interpol2D_coeff(xmin,dx,nx,ymin,dy,ny,xout,yout,c,err)
-    !+ Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
-    real(Float64), intent(in)           :: xmin
-        !+ Minimum abscissa
-    real(Float64), intent(in)           :: dx
-        !+ Abscissa spacing
-    integer, intent(in)                 :: nx
-        !+ Number of abscissa
-    real(Float64), intent(in)           :: ymin
-        !+ Minimum ordinate
-    real(Float64), intent(in)           :: dy
-        !+ Ordinate spacing
-    integer, intent(in)                 :: ny
-        !+ Number of ordinates points
-    real(Float64), intent(in)           :: xout
-        !+ Abscissa value to interpolate
-    real(Float64), intent(in)           :: yout
-        !+ Ordinate value to interpolate
-    type(InterpolCoeffs2D), intent(out) :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional      :: err
-        !+ Error code
-
-    real(Float64) :: x1, x2, y1, y2, xp, yp
-    integer :: i, j, err_status
-
-    err_status = 1
-    xp = max(xout,xmin)
-    yp = max(yout,ymin)
-    i = floor((xp-xmin)/dx)+1
-    j = floor((yp-ymin)/dy)+1
-
-    if (((i.gt.0).and.(i.le.(nx-1))).and.((j.gt.0).and.(j.le.(ny-1)))) then
-        x1 = xmin + (i-1)*dx
-        x2 = x1 + dx
-        y1 = ymin + (j-1)*dy
-        y2 = y1 + dy
-
-        c%b11 = ((x2 - xp) * (y2 - yp))/(dx*dy)
-        c%b21 = ((xp - x1) * (y2 - yp))/(dx*dy)
-        c%b12 = ((x2 - xp) * (yp - y1))/(dx*dy)
-        c%b22 = ((xp - x1) * (yp - y1))/(dx*dy)
-        c%i = i
-        c%j = j
-        err_status = 0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_coeff
-
-subroutine interpol2D_coeff_arr(x,y,xout,yout,c,err)
-    !!Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
-    real(Float64), dimension(:), intent(in) :: x
-        !+ Abscissa values
-    real(Float64), dimension(:), intent(in) :: y
-        !+ Ordinate values
-    real(Float64), intent(in)               :: xout
-        !+ Abscissa value to interpolate
-    real(Float64), intent(in)               :: yout
-        !+ Ordinate value to interpolate
-    type(InterpolCoeffs2D), intent(out)     :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional          :: err
-        !+ Error code
-
-    real(Float64) :: xmin, ymin, dx, dy
-    integer :: sx, sy, err_status
-
-    err_status = 1
-    sx = size(x)
-    sy = size(y)
-    xmin = x(1)
-    ymin = y(1)
-    dx = abs(x(2)-x(1))
-    dy = abs(y(2)-y(1))
-
-    call interpol2D_coeff(xmin, dx, sx, ymin, dy, sy, xout, yout, c, err_status)
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_coeff_arr
-
-subroutine interpol1D_arr(x, y, xout, yout, err, coeffs)
-    !+ Performs linear interpolation on a uniform 1D grid y(x)
-    real(Float64), dimension(:), intent(in)      :: x
-        !+ The abscissa values of `y`
-    real(Float64), dimension(:), intent(in)      :: y
-        !+ Values at abscissa values `x`: y(x)
-    real(Float64), intent(in)                    :: xout
-        !+ Abscissa value to interpolate
-    real(Float64), intent(out)                   :: yout
-        !+ Interpolant: y(xout)
-    integer, intent(out), optional               :: err
-        !+ Error code
-    type(InterpolCoeffs1D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
-
-    type(InterpolCoeffs1D) :: c
-    integer :: i, err_status
-
-    err_status = 1
-    if(present(coeffs)) then
-        c = coeffs
-        err_status = 0
-    else
-        call interpol_coeff(x,xout,c,err_status)
-    endif
-
-    if(err_status.eq.0) then
-        i = c%i
-        yout = c%b1*y(i) + c%b2*y(i+1)
-    else
-        yout = 0.d0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol1D_arr
-
-subroutine interpol2D_arr(x, y, z, xout, yout, zout, err, coeffs)
-    !+ Performs bilinear interpolation on a 2D grid z(x,y)
-    real(Float64), dimension(:), intent(in)   :: x
-        !+ The abscissa values of `z`
-    real(Float64), dimension(:), intent(in)   :: y
-        !+ The ordinate values of `z`
-    real(Float64), dimension(:,:), intent(in) :: z
-        !+ Values at the abscissa/ordinates: z(x,y)
-    real(Float64), intent(in)                 :: xout
-        !+ The abscissa value to interpolate
-    real(Float64), intent(in)                 :: yout
-        !+ The ordinate value to interpolate
-    real(Float64), intent(out)                :: zout
-        !+ Interpolant: z(xout,yout)
-    integer, intent(out), optional            :: err
-        !+ Error code
-    type(InterpolCoeffs2D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
-
-    type(InterpolCoeffs2D) :: c
-    integer :: i, j, err_status
-
-    err_status = 1
-    if(present(coeffs)) then
-        c = coeffs
-        err_status = 0
-    else
-        call interpol_coeff(x,y,xout,yout,c,err_status)
-    endif
-
-    if(err_status.eq.0) then
-        i = c%i
-        j = c%j
-        zout = c%b11*z(i,j) + c%b12*z(i,j+1) + c%b21*z(i+1,j) + c%b22*z(i+1,j+1)
-    else
-        zout = 0.d0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_arr
-
-subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err, coeffs)
-    !+ Performs bilinear interpolation on a 2D grid of 2D arrays z(:,:,x,y)
-    real(Float64), dimension(:), intent(in)       :: x
-        !+ The abscissa values of `z`
-    real(Float64), dimension(:), intent(in)       :: y
-        !+ The ordinate values of `z`
-    real(Float64), dimension(:,:,:,:), intent(in) :: z
-        !+ Values at the abscissa/ordinates: z(:,:,x,y)
-    real(Float64), intent(in)                     :: xout
-        !+ The abscissa value to interpolate
-    real(Float64), intent(in)                     :: yout
-        !+ The ordinate value to interpolate
-    real(Float64), dimension(:,:), intent(out)    :: zout
-        !+ Interpolant: z(:,:,xout,yout)
-    integer, intent(out), optional                :: err
-        !+ Error code
-    type(InterpolCoeffs2D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
-
-    type(InterpolCoeffs2D) :: c
-    integer :: i, j, err_status
-
-    err_status = 1
-    if(present(coeffs)) then
-        c = coeffs
-        err_status = 0
-    else
-        call interpol_coeff(x,y,xout,yout,c,err_status)
-    endif
-
-    if(err_status.eq.0) then
-        i = c%i
-        j = c%j
-        zout = c%b11*z(:,:,i,j) + c%b12*z(:,:,i,j+1) + c%b21*z(:,:,i+1,j) + c%b22*z(:,:,i+1,j+1)
-    else
-        zout = 0.0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_2D_arr
-
 !=============================================================================
 !-------------------------Profiles and Fields Routines------------------------
 !=============================================================================
@@ -6330,9 +6089,6 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     dens=0.d0
 
     iflux=sum(states)
-    if(iflux.lt.colrad_threshold .and. inputs%calc_npa.eq.0)then
-        return
-    endif
 
     if(.not.plasma%in_plasma) then
         dens = states*dt
@@ -8646,7 +8402,7 @@ program fidasim
     implicit none
     character(3)          :: arg = ''
     integer, dimension(8) :: time_arr,time_start,time_end !Time array
-    integer               :: i,narg,nthreads,max_threads
+    integer               :: i,narg,nthreads
     integer               :: hour,minu,sec
 
 #ifdef _VERSION
@@ -8686,17 +8442,7 @@ program fidasim
         write(*,*) ''
     endif
     call OMP_set_num_threads(max_threads)
-#else
-    max_threads = 1
 #endif
-
-    !! ----------------------------------------------------------
-    !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
-    !! ----------------------------------------------------------
-    allocate(rng(max_threads))
-    do i=1,max_threads
-        call rng_init(rng(i),932117 + i)
-    enddo
 
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------
@@ -8717,59 +8463,10 @@ program fidasim
     endif
 
     !! ----------------------------------------------------------
-    !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
+    !! ------------ INITIALIZE RNG & RESULT ARRAYS --------------
     !! ----------------------------------------------------------
-    !! neutral density array!
-    allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    neut%dens = 0.d0
+    call initialize()
 
-    !! birth profile
-    if(inputs%calc_birth.ge.1) then
-        allocate(birth%dens(3, &
-                            beam_grid%nx, &
-                            beam_grid%ny, &
-                            beam_grid%nz))
-        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
-        birth%neut_type = 0
-        birth%dens = 0.d0
-        birth%ind = 0
-        birth%ri = 0.d0
-        birth%vi = 0.d0
-    endif
-
-    if(inputs%calc_spec.ge.1) then
-        allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4))
-        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
-        spec%brems = 0.d0
-        spec%bes = 0.d0
-        spec%fida = 0.d0
-    endif
-
-    if(inputs%calc_npa.ge.1)then
-        npa%nchan = npa_chords%nchan
-        allocate(npa%part(npa%nmax))
-        if(inputs%dist_type.eq.1) then
-            npa%nenergy = fbm%nenergy
-            allocate(npa%energy(npa%nenergy))
-            npa%energy = fbm%energy
-        else
-            allocate(npa%energy(npa%nenergy))
-            do i=1,npa%nenergy
-                npa%energy(i)=real(i-0.5)
-            enddo
-        endif
-        allocate(npa%flux(npa%nenergy,npa%nchan,particles%nclass))
-        npa%flux = 0.0
-    endif
-
-    if(inputs%calc_neutron.ge.1)then
-        allocate(neutron%rate(particles%nclass))
-        neutron%rate = 0.d0
-    endif
 
     !! -----------------------------------------------------------------------
     !! --------------- CALCULATE/LOAD the BEAM and HALO DENSITY---------------
@@ -8889,7 +8586,6 @@ program fidasim
     !! ----------- Calculation of weight functions -----------------------
     !! -------------------------------------------------------------------
     if(inputs%calc_fida_wght.ge.1) then
-        colrad_threshold=0. !! to speed up simulation!
         call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
             write(*,'(A,I2,":",I2.2,":",I2.2)') 'fida weight function:    ',  &

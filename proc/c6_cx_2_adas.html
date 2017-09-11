@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -860,7 +884,7 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E53"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E54"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -890,78 +914,83 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~c6_cx_2_adas~~CalledByGraph Pages: 1 -->
-<svg id="procc6_cx_2_adasCalledByGraph" width="640pt" height="34pt"
- viewBox="0.00 0.00 640.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~c6_cx_2_adas~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="procc6_cx_2_adasCalledByGraph" width="640pt" height="32pt"
+ viewBox="0.00 0.00 640.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~c6_cx_2_adas~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>proc~~c6_cx_2_adas~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 637,-30 637,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 636,-28 636,4 -4,4"/>
 <!-- proc~c6_cx_2_adas -->
-<g id="node1" class="node"><title>proc~c6_cx_2_adas</title>
-<polygon fill="none" stroke="black" points="632,-26 548,-26 548,-1.24345e-14 632,-3.55271e-15 632,-26"/>
-<text text-anchor="middle" x="590" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">C6_cx_2_adas</text>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_node1" class="node"><title>proc~c6_cx_2_adas</title>
+<polygon fill="none" stroke="black" points="632,-24 548,-24 548,-0 632,-0 632,-24"/>
+<text text-anchor="middle" x="590" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">C6_cx_2_adas</text>
 </g>
 <!-- proc~aq_cx_n_adas -->
-<g id="node2" class="node"><title>proc~aq_cx_n_adas</title>
-<a xlink:href="../proc/aq_cx_n_adas.html" xlink:title="Aq_cx_n_adas">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="511,-26 429,-26 429,-1.24345e-14 511,-3.55271e-15 511,-26"/>
-<text text-anchor="middle" x="470" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_cx_n_adas</text>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_node2" class="node"><title>proc~aq_cx_n_adas</title>
+<g id="a_proc~~c6_cx_2_adas~~CalledByGraph_node2"><a xlink:href="../proc/aq_cx_n_adas.html" xlink:title="Aq_cx_n_adas">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="511.5,-24 428.5,-24 428.5,-0 511.5,-0 511.5,-24"/>
+<text text-anchor="middle" x="470" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_cx_n_adas</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_2_adas -->
-<g id="edge10" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_2_adas</title>
-<path fill="none" stroke="#000000" d="M511.633,-13C520.002,-13 528.898,-13 537.579,-13"/>
-<polygon fill="#000000" stroke="#000000" points="537.627,-16.5001 547.627,-13 537.627,-9.5001 537.627,-16.5001"/>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_edge5" class="edge"><title>proc~aq_cx_n_adas&#45;&gt;proc~c6_cx_2_adas</title>
+<path fill="none" stroke="#000000" d="M511.609,-12C520.042,-12 529.033,-12 537.79,-12"/>
+<polygon fill="#000000" stroke="#000000" points="537.916,-15.5001 547.916,-12 537.916,-8.5001 537.916,-15.5001"/>
 </g>
 <!-- proc~aq_cx_n -->
-<g id="node3" class="node"><title>proc~aq_cx_n</title>
-<a xlink:href="../proc/aq_cx_n.html" xlink:title="Aq_cx_n">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="392,-26 338,-26 338,-1.24345e-14 392,-3.55271e-15 392,-26"/>
-<text text-anchor="middle" x="365" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_cx_n</text>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_node3" class="node"><title>proc~aq_cx_n</title>
+<g id="a_proc~~c6_cx_2_adas~~CalledByGraph_node3"><a xlink:href="../proc/aq_cx_n.html" xlink:title="Aq_cx_n">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="392,-24 338,-24 338,-0 392,-0 392,-24"/>
+<text text-anchor="middle" x="365" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_cx_n</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_cx_n&#45;&gt;proc~aq_cx_n_adas -->
-<g id="edge8" class="edge"><title>proc~aq_cx_n&#45;&gt;proc~aq_cx_n_adas</title>
-<path fill="none" stroke="#000000" d="M392.04,-13C400.075,-13 409.16,-13 418.216,-13"/>
-<polygon fill="#000000" stroke="#000000" points="418.372,-16.5001 428.372,-13 418.372,-9.5001 418.372,-16.5001"/>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_edge4" class="edge"><title>proc~aq_cx_n&#45;&gt;proc~aq_cx_n_adas</title>
+<path fill="none" stroke="#000000" d="M392.258,-12C400.226,-12 409.265,-12 418.273,-12"/>
+<polygon fill="#000000" stroke="#000000" points="418.37,-15.5001 428.37,-12 418.37,-8.5001 418.37,-15.5001"/>
 </g>
 <!-- proc~aq_cx -->
-<g id="node4" class="node"><title>proc~aq_cx</title>
-<a xlink:href="../proc/aq_cx.html" xlink:title="Aq_cx">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="302,-26 248,-26 248,-1.24345e-14 302,-3.55271e-15 302,-26"/>
-<text text-anchor="middle" x="275" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_cx</text>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_node4" class="node"><title>proc~aq_cx</title>
+<g id="a_proc~~c6_cx_2_adas~~CalledByGraph_node4"><a xlink:href="../proc/aq_cx.html" xlink:title="Aq_cx">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="302,-24 248,-24 248,-0 302,-0 302,-24"/>
+<text text-anchor="middle" x="275" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_cx</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_cx&#45;&gt;proc~aq_cx_n -->
-<g id="edge6" class="edge"><title>proc~aq_cx&#45;&gt;proc~aq_cx_n</title>
-<path fill="none" stroke="#000000" d="M302.003,-13C310.028,-13 318.967,-13 327.531,-13"/>
-<polygon fill="#000000" stroke="#000000" points="327.705,-16.5001 337.705,-13 327.705,-9.5001 327.705,-16.5001"/>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_edge3" class="edge"><title>proc~aq_cx&#45;&gt;proc~aq_cx_n</title>
+<path fill="none" stroke="#000000" d="M302.403,-12C310.393,-12 319.311,-12 327.824,-12"/>
+<polygon fill="#000000" stroke="#000000" points="327.919,-15.5001 337.919,-12 327.919,-8.5001 327.919,-15.5001"/>
 </g>
 <!-- proc~write_bb_h_aq -->
-<g id="node5" class="node"><title>proc~write_bb_h_aq</title>
-<a xlink:href="../proc/write_bb_h_aq.html" xlink:title="write_bb_H_Aq">
-<polygon fill="#d9534f" stroke="#d9534f" points="211,-26 127,-26 127,-1.24345e-14 211,-3.55271e-15 211,-26"/>
-<text text-anchor="middle" x="169" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_Aq</text>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_node5" class="node"><title>proc~write_bb_h_aq</title>
+<g id="a_proc~~c6_cx_2_adas~~CalledByGraph_node5"><a xlink:href="../proc/write_bb_h_aq.html" xlink:title="write_bb_H_Aq">
+<polygon fill="#d9534f" stroke="#d9534f" points="211.5,-24 126.5,-24 126.5,-0 211.5,-0 211.5,-24"/>
+<text text-anchor="middle" x="169" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_Aq</text>
 </a>
+</g>
 </g>
 <!-- proc~write_bb_h_aq&#45;&gt;proc~aq_cx -->
-<g id="edge4" class="edge"><title>proc~write_bb_h_aq&#45;&gt;proc~aq_cx</title>
-<path fill="none" stroke="#000000" d="M211.503,-13C220.089,-13 229.058,-13 237.458,-13"/>
-<polygon fill="#000000" stroke="#000000" points="237.724,-16.5001 247.724,-13 237.724,-9.5001 237.724,-16.5001"/>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_edge2" class="edge"><title>proc~write_bb_h_aq&#45;&gt;proc~aq_cx</title>
+<path fill="none" stroke="#000000" d="M211.702,-12C220.284,-12 229.257,-12 237.633,-12"/>
+<polygon fill="#000000" stroke="#000000" points="237.849,-15.5001 247.849,-12 237.849,-8.5001 237.849,-15.5001"/>
 </g>
 <!-- program~generate_tables -->
-<g id="node6" class="node"><title>program~generate_tables</title>
-<a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-26 4.26326e-14,-26 0,-1.24345e-14 90,-3.55271e-15 90,-26"/>
-<text text-anchor="middle" x="45" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_node6" class="node"><title>program~generate_tables</title>
+<g id="a_proc~~c6_cx_2_adas~~CalledByGraph_node6"><a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-24 0,-24 0,-0 90,-0 90,-24"/>
+<text text-anchor="middle" x="45" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
 </a>
 </g>
+</g>
 <!-- program~generate_tables&#45;&gt;proc~write_bb_h_aq -->
-<g id="edge2" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_aq</title>
-<path fill="none" stroke="#000000" d="M90.1176,-13C98.5788,-13 107.494,-13 116.165,-13"/>
-<polygon fill="#000000" stroke="#000000" points="116.189,-16.5001 126.189,-13 116.189,-9.5001 116.189,-16.5001"/>
+<g id="proc~~c6_cx_2_adas~~CalledByGraph_edge1" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_aq</title>
+<path fill="none" stroke="#000000" d="M90.0448,-12C98.5807,-12 107.598,-12 116.352,-12"/>
+<polygon fill="#000000" stroke="#000000" points="116.462,-15.5001 126.462,-12 116.462,-8.5001 116.462,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -980,43 +1009,43 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1226,7 +1255,13 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1271,6 +1306,8 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1330,7 +1367,7 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1356,7 +1393,17 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1406,6 +1453,8 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1442,6 +1491,10 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1472,13 +1525,13 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1610,8 +1663,6 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1636,7 +1687,9 @@ in the \(n=2\) state colliding with a fully stripped Carbon ion at energy <code>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

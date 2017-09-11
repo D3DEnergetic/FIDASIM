@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p>12.0% of total for derived types.</p>Including implementation: 45 statements, 12.0% of total for derived types.">45 statements</a>
+	  title="<p>11.1% of total for derived types.</p>Including implementation: 45 statements, 11.1% of total for derived types.">45 statements</a>
      </li> 
      
      
@@ -226,7 +226,7 @@
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
       
-      <a class="list-group-item" href="../type/simulationinputs.html#variable-ab%7E2">ab</a>
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-ab%7E3">ab</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-impurity_charge">impurity_charge</a>
       
@@ -300,6 +300,8 @@
       
       <a class="list-group-item" href="../type/atomictables.html">AtomicTables</a>
       
+      <a class="list-group-item" href="../type/atomictransitions.html">AtomicTransitions</a>
+      
       <a class="list-group-item" href="../type/beamgrid.html">BeamGrid</a>
       
       <a class="list-group-item" href="../type/birthprofile.html">BirthProfile</a>
@@ -317,6 +319,8 @@
       <a class="list-group-item" href="../type/fastionparticles.html">FastIonParticles</a>
       
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
+      
+      <a class="list-group-item" href="../type/gyrosurface.html">GyroSurface</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
       
@@ -449,7 +453,7 @@
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
       
-      <a class="list-group-item" href="../type/simulationinputs.html#variable-ab%7E2">ab</a>
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-ab%7E3">ab</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-impurity_charge">impurity_charge</a>
       
@@ -658,7 +662,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_fida"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_fida"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -672,7 +676,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_npa"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_npa"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -686,7 +690,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_nbi"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_nbi"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -700,7 +704,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_dcx"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_dcx"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -714,7 +718,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_halo"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_halo"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -728,7 +732,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_birth"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_birth"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -924,7 +928,7 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-ab%7E2"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-ab%7E3"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -1167,17 +1171,17 @@
         <span class="c">!+ Used when [[SimulationInputs:load_neutrals]] is set.</span>
 
     <span class="c">!! Monte Carlo settings</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_fida</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_fida</span>
         <span class="c">!+ Number of FIDA mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_npa</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_npa</span>
         <span class="c">!+ Number of NPA mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_nbi</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_nbi</span>
         <span class="c">!+ Number of neutral beam mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_dcx</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_dcx</span>
         <span class="c">!+ Number of direct charge exchange (DCX) mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_halo</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_halo</span>
         <span class="c">!+ Number of halo mc markers</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_birth</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_birth</span>
         <span class="c">!+ Number of birth particles per [[SimulationInputs:n_nbi]]</span>
 
     <span class="c">!! Simulation switches</span>
@@ -1271,6 +1275,8 @@
       
       <a class="list-group-item" href="../type/atomictables.html">AtomicTables</a>
       
+      <a class="list-group-item" href="../type/atomictransitions.html">AtomicTransitions</a>
+      
       <a class="list-group-item" href="../type/beamgrid.html">BeamGrid</a>
       
       <a class="list-group-item" href="../type/birthprofile.html">BirthProfile</a>
@@ -1288,6 +1294,8 @@
       <a class="list-group-item" href="../type/fastionparticles.html">FastIonParticles</a>
       
       <a class="list-group-item" href="../type/fidaweights.html">FIDAWeights</a>
+      
+      <a class="list-group-item" href="../type/gyrosurface.html">GyroSurface</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html">InterpolationGrid</a>
       

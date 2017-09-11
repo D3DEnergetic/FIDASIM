@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -904,77 +928,79 @@ public subroutine read_atomic_cross(fid, grp, cross)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_atomic_cross~~CallsGraph Pages: 1 -->
-<svg id="procread_atomic_crossCallsGraph" width="500pt" height="160pt"
- viewBox="0.00 0.00 500.00 160.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_atomic_cross~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 156)">
+<svg id="procread_atomic_crossCallsGraph" width="500pt" height="154pt"
+ viewBox="0.00 0.00 500.00 154.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_atomic_cross~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 150)">
 <title>proc~~read_atomic_cross~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-156 497,-156 497,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-150 496,-150 496,4 -4,4"/>
 <!-- proc~read_atomic_cross -->
-<g id="node1" class="node"><title>proc~read_atomic_cross</title>
-<polygon fill="none" stroke="black" points="103,-87 1,-87 1,-61 103,-61 103,-87"/>
-<text text-anchor="middle" x="52" y="-71.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_atomic_cross</text>
+<g id="proc~~read_atomic_cross~~CallsGraph_node1" class="node"><title>proc~read_atomic_cross</title>
+<polygon fill="none" stroke="black" points="103.5,-86 0.5,-86 0.5,-62 103.5,-62 103.5,-86"/>
+<text text-anchor="middle" x="52" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_atomic_cross</text>
 </g>
 <!-- proc~h5ltread_dataset_double_scalar_f -->
-<g id="node2" class="node"><title>proc~h5ltread_dataset_double_scalar_f</title>
-<a xlink:href="../proc/h5ltread_dataset_double_scalar_f.html" xlink:title="h5ltread_dataset_double_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="315,-152 141,-152 141,-126 315,-126 315,-152"/>
-<text text-anchor="middle" x="228" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_scalar_f</text>
+<g id="proc~~read_atomic_cross~~CallsGraph_node2" class="node"><title>proc~h5ltread_dataset_double_scalar_f</title>
+<g id="a_proc~~read_atomic_cross~~CallsGraph_node2"><a xlink:href="../proc/h5ltread_dataset_double_scalar_f.html" xlink:title="h5ltread_dataset_double_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="315.5,-146 140.5,-146 140.5,-122 315.5,-122 315.5,-146"/>
+<text text-anchor="middle" x="228" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_scalar_f</text>
 </a>
+</g>
 </g>
 <!-- proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
-<g id="edge6" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
-<path fill="none" stroke="#000000" d="M75.3151,-87.0645C92.7213,-96.401 117.316,-108.726 140,-117 145.922,-119.16 152.144,-121.183 158.428,-123.058"/>
-<polygon fill="#000000" stroke="#000000" points="157.74,-126.501 168.317,-125.882 159.662,-119.77 157.74,-126.501"/>
-</g>
-<!-- h5ltpath_valid_f -->
-<g id="node3" class="node"><title>h5ltpath_valid_f</title>
-<polygon fill="#777777" stroke="#777777" points="272,-108 184,-108 184,-82 272,-82 272,-108"/>
-<text text-anchor="middle" x="228" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
-</g>
-<!-- proc~read_atomic_cross&#45;&gt;h5ltpath_valid_f -->
-<g id="edge8" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltpath_valid_f</title>
-<path fill="none" stroke="#000000" d="M103.854,-80.1871C125.925,-82.8205 151.667,-85.892 173.97,-88.5532"/>
-<polygon fill="#000000" stroke="#000000" points="173.605,-92.0345 183.95,-89.744 174.435,-85.0838 173.605,-92.0345"/>
+<g id="proc~~read_atomic_cross~~CallsGraph_edge3" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
+<path fill="none" stroke="#000000" d="M82.1752,-86.0935C98.9624,-92.8774 120.526,-101.298 140,-108 151.068,-111.809 163.034,-115.596 174.447,-119.053"/>
+<polygon fill="#000000" stroke="#000000" points="173.713,-122.487 184.297,-121.998 175.718,-115.78 173.713,-122.487"/>
 </g>
 <!-- h5ltread_dataset_double_f -->
-<g id="node4" class="node"><title>h5ltread_dataset_double_f</title>
-<polygon fill="#777777" stroke="#777777" points="492,-111 352,-111 352,-85 492,-85 492,-111"/>
-<text text-anchor="middle" x="422" y="-95.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
+<g id="proc~~read_atomic_cross~~CallsGraph_node3" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="492,-126 352,-126 352,-102 492,-102 492,-126"/>
+<text text-anchor="middle" x="422" y="-111.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
 </g>
 <!-- proc~read_atomic_cross&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge10" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M103.65,-73.315C115.587,-73.1839 128.236,-73.0668 140,-73 218.221,-72.5556 238.302,-63.9615 316,-73 332.797,-74.954 350.796,-78.5941 367.106,-82.5036"/>
-<polygon fill="#000000" stroke="#000000" points="366.469,-85.9516 377.017,-84.96 368.153,-79.1572 366.469,-85.9516"/>
+<g id="proc~~read_atomic_cross~~CallsGraph_edge4" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M103.782,-79.5198C165.361,-86.2132 269.846,-97.5702 341.98,-105.411"/>
+<polygon fill="#000000" stroke="#000000" points="341.617,-108.892 351.936,-106.493 342.373,-101.933 341.617,-108.892"/>
+</g>
+<!-- h5ltpath_valid_f -->
+<g id="proc~~read_atomic_cross~~CallsGraph_node4" class="node"><title>h5ltpath_valid_f</title>
+<polygon fill="#777777" stroke="#777777" points="272,-66 184,-66 184,-42 272,-42 272,-66"/>
+<text text-anchor="middle" x="228" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
+</g>
+<!-- proc~read_atomic_cross&#45;&gt;h5ltpath_valid_f -->
+<g id="proc~~read_atomic_cross~~CallsGraph_edge5" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M103.796,-68.1614C125.804,-65.6318 151.573,-62.6697 173.84,-60.1104"/>
+<polygon fill="#000000" stroke="#000000" points="174.263,-63.5849 183.798,-58.9658 173.463,-56.6307 174.263,-63.5849"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f -->
-<g id="node5" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
-<a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="305,-26 151,-26 151,-1.24345e-14 305,-3.55271e-15 305,-26"/>
-<text text-anchor="middle" x="228" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+<g id="proc~~read_atomic_cross~~CallsGraph_node5" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="a_proc~~read_atomic_cross~~CallsGraph_node5"><a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="305,-24 151,-24 151,-0 305,-0 305,-24"/>
+<text text-anchor="middle" x="228" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
 </a>
 </g>
+</g>
 <!-- proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="edge12" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M84.3941,-60.851C100.93,-54.3007 121.427,-46.4282 140,-40 150.746,-36.2808 162.317,-32.5432 173.424,-29.0847"/>
-<polygon fill="#000000" stroke="#000000" points="174.506,-32.4136 183.033,-26.1248 172.446,-25.7238 174.506,-32.4136"/>
+<g id="proc~~read_atomic_cross~~CallsGraph_edge6" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M75.3636,-61.9101C92.6287,-52.9615 117.321,-40.9872 140,-33 146.4,-30.7459 153.149,-28.6497 159.941,-26.7231"/>
+<polygon fill="#000000" stroke="#000000" points="161.153,-30.0208 169.886,-24.0233 159.319,-23.2653 161.153,-30.0208"/>
 </g>
 <!-- proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge2" class="edge"><title>proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M289.649,-125.971C308.917,-121.899 330.34,-117.371 350.24,-113.166"/>
-<polygon fill="#000000" stroke="#000000" points="351.118,-116.558 360.178,-111.065 349.671,-109.709 351.118,-116.558"/>
+<g id="proc~~read_atomic_cross~~CallsGraph_edge1" class="edge"><title>proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M315.732,-124.965C324.446,-124.058 333.263,-123.139 341.892,-122.24"/>
+<polygon fill="#000000" stroke="#000000" points="342.334,-125.713 351.918,-121.196 341.609,-118.751 342.334,-125.713"/>
 </g>
 <!-- h5ltread_dataset_int_f -->
-<g id="node7" class="node"><title>h5ltread_dataset_int_f</title>
-<polygon fill="#777777" stroke="#777777" points="481,-26 363,-26 363,-1.24345e-14 481,-3.55271e-15 481,-26"/>
-<text text-anchor="middle" x="422" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+<g id="proc~~read_atomic_cross~~CallsGraph_node6" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="481.5,-24 362.5,-24 362.5,-0 481.5,-0 481.5,-24"/>
+<text text-anchor="middle" x="422" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
-<g id="edge4" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M305.231,-13C320.685,-13 336.837,-13 352.029,-13"/>
-<polygon fill="#000000" stroke="#000000" points="352.372,-16.5001 362.372,-13 352.372,-9.5001 352.372,-16.5001"/>
+<g id="proc~~read_atomic_cross~~CallsGraph_edge2" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M305.159,-12C320.641,-12 336.843,-12 352.058,-12"/>
+<polygon fill="#000000" stroke="#000000" points="352.413,-15.5001 362.413,-12 352.413,-8.5001 352.413,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -993,43 +1019,43 @@ public subroutine read_atomic_cross(fid, grp, cross)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1053,42 +1079,44 @@ public subroutine read_atomic_cross(fid, grp, cross)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_atomic_cross~~CalledByGraph Pages: 1 -->
-<svg id="procread_atomic_crossCalledByGraph" width="308pt" height="34pt"
- viewBox="0.00 0.00 308.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_atomic_cross~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="procread_atomic_crossCalledByGraph" width="308pt" height="32pt"
+ viewBox="0.00 0.00 308.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_atomic_cross~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>proc~~read_atomic_cross~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 305,-30 305,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 304,-28 304,4 -4,4"/>
 <!-- proc~read_atomic_cross -->
-<g id="node1" class="node"><title>proc~read_atomic_cross</title>
-<polygon fill="none" stroke="black" points="299,-26 197,-26 197,-1.24345e-14 299,-3.55271e-15 299,-26"/>
-<text text-anchor="middle" x="248" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_atomic_cross</text>
+<g id="proc~~read_atomic_cross~~CalledByGraph_node1" class="node"><title>proc~read_atomic_cross</title>
+<polygon fill="none" stroke="black" points="299.5,-24 196.5,-24 196.5,-0 299.5,-0 299.5,-24"/>
+<text text-anchor="middle" x="248" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_atomic_cross</text>
 </g>
 <!-- proc~read_tables -->
-<g id="node2" class="node"><title>proc~read_tables</title>
-<a xlink:href="../proc/read_tables.html" xlink:title="read_tables">
-<polygon fill="#d9534f" stroke="#d9534f" points="159,-26 91,-26 91,-1.24345e-14 159,-3.55271e-15 159,-26"/>
-<text text-anchor="middle" x="125" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_tables</text>
+<g id="proc~~read_atomic_cross~~CalledByGraph_node2" class="node"><title>proc~read_tables</title>
+<g id="a_proc~~read_atomic_cross~~CalledByGraph_node2"><a xlink:href="../proc/read_tables.html" xlink:title="read_tables">
+<polygon fill="#d9534f" stroke="#d9534f" points="159.5,-24 90.5,-24 90.5,-0 159.5,-0 159.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_tables</text>
 </a>
+</g>
 </g>
 <!-- proc~read_tables&#45;&gt;proc~read_atomic_cross -->
-<g id="edge4" class="edge"><title>proc~read_tables&#45;&gt;proc~read_atomic_cross</title>
-<path fill="none" stroke="#000000" d="M159.59,-13C167.85,-13 176.917,-13 185.998,-13"/>
-<polygon fill="#000000" stroke="#000000" points="186.216,-16.5001 196.216,-13 186.216,-9.5001 186.216,-16.5001"/>
+<g id="proc~~read_atomic_cross~~CalledByGraph_edge2" class="edge"><title>proc~read_tables&#45;&gt;proc~read_atomic_cross</title>
+<path fill="none" stroke="#000000" d="M159.705,-12C167.936,-12 176.996,-12 186.069,-12"/>
+<polygon fill="#000000" stroke="#000000" points="186.274,-15.5001 196.274,-12 186.274,-8.5001 186.274,-15.5001"/>
 </g>
 <!-- program~fidasim -->
-<g id="node3" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
-<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~read_atomic_cross~~CalledByGraph_node3" class="node"><title>program~fidasim</title>
+<g id="a_proc~~read_atomic_cross~~CalledByGraph_node3"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
+</g>
 <!-- program~fidasim&#45;&gt;proc~read_tables -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_tables</title>
-<path fill="none" stroke="#000000" d="M54.0384,-13C62.1011,-13 71.1641,-13 80.0483,-13"/>
-<polygon fill="#000000" stroke="#000000" points="80.325,-16.5001 90.325,-13 80.3249,-9.5001 80.325,-16.5001"/>
+<g id="proc~~read_atomic_cross~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~read_tables</title>
+<path fill="none" stroke="#000000" d="M54.2324,-12C62.2127,-12 71.2115,-12 80.0278,-12"/>
+<polygon fill="#000000" stroke="#000000" points="80.2215,-15.5001 90.2215,-12 80.2215,-8.5001 80.2215,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -1107,43 +1135,43 @@ public subroutine read_atomic_cross(fid, grp, cross)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1253,7 +1281,7 @@ public subroutine read_atomic_cross(fid, grp, cross)
 
     <span class="k">allocate</span><span class="p">(</span><span class="n">cross</span><span class="p">%</span><span class="n">log_cross</span><span class="p">(</span><span class="n">cross</span><span class="p">%</span><span class="n">m_max</span><span class="p">,</span><span class="n">cross</span><span class="p">%</span><span class="n">n_max</span><span class="p">,</span> <span class="n">cross</span><span class="p">%</span><span class="n">nenergy</span><span class="p">))</span>
 
-    <span class="n">dim3</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">%</span><span class="n">nenergy</span><span class="p">]</span>
+    <span class="n">dim3</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">cross</span><span class="p">%</span><span class="n">nenergy</span><span class="p">]</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="n">dummy3</span><span class="p">,</span> <span class="n">dim3</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="n">rmin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">dummy3</span><span class="p">,</span><span class="n">dummy3</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>
     <span class="k">where</span> <span class="p">(</span><span class="n">dummy3</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span>
@@ -1372,7 +1400,13 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1417,6 +1451,8 @@ public subroutine read_atomic_cross(fid, grp, cross)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1476,7 +1512,7 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1502,7 +1538,17 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1552,6 +1598,8 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1588,6 +1636,10 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1618,13 +1670,13 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1756,8 +1808,6 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1782,7 +1832,9 @@ public subroutine read_atomic_cross(fid, grp, cross)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

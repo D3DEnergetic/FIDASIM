@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="52.1% of total for modules and submodules.">5205 statements</a>
+	  title="54.5% of total for modules and submodules.">5807 statements</a>
      </li> 
      
      
@@ -227,8 +227,6 @@
       <a class="list-group-item" href="../module/libfida.html#variable-stark_sigma">stark_sigma</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nlevs">nlevs</a>
-      
-      <a class="list-group-item" href="../module/libfida.html#variable-n_halo_neutrate">n_halo_neutrate</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-colrad_threshold">colrad_threshold</a>
       
@@ -341,6 +339,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-atomicrates">AtomicRates</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-atomictransitions">AtomicTransitions</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-nuclearrates">NuclearRates</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-atomictables">AtomicTables</a>
@@ -380,6 +380,8 @@
       <a class="list-group-item" href="../module/libfida.html#type-simulationinputs">SimulationInputs</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-particletrack">ParticleTrack</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#type-gyrosurface">GyroSurface</a>
       
     </div>
   </div>
@@ -441,7 +443,11 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-in_boundary">in_boundary</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-in_gyro_surface">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-in_grid">in_grid</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_radius">gyro_radius</a>
       
     </div>
   </div>
@@ -495,7 +501,9 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_cross">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_rates">read_atomic_rates</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_rate">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_transitions">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_nuclear_rates">read_nuclear_rates</a>
       
@@ -527,7 +535,21 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-plane_basis">plane_basis</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-plane_intercept">plane_intercept</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-line_plane_intersect">line_plane_intersect</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-boundary_edge">boundary_edge</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_surface">gyro_surface</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-line_gyro_surface_intersect">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_surface_coordinates">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_trajectory">gyro_trajectory</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_range">gyro_range</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-npa_gyro_range">npa_gyro_range</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-hit_npa_detector">hit_npa_detector</a>
       
@@ -577,11 +599,13 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_npa">store_npa</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-neut_rates">neut_rates</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-bb_cx_rates">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-bt_cx_rates">bt_cx_rates</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_neutron_rate">get_neutron_rate</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-get_beam_cx_prob">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-get_beam_cx_rate">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_rate_matrix">get_rate_matrix</a>
       
@@ -702,96 +726,100 @@
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: module~~libfida~~UsesGraph Pages: 1 -->
-<svg id="modulelibfidaUsesGraph" width="262pt" height="192pt"
- viewBox="0.00 0.00 262.00 192.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="module~~libfida~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 188)">
+<svg id="modulelibfidaUsesGraph" width="262pt" height="185pt"
+ viewBox="0.00 0.00 262.00 185.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~libfida~~UsesGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 181)">
 <title>module~~libfida~~UsesGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-188 259,-188 259,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-181 258,-181 258,4 -4,4"/>
 <!-- module~libfida -->
-<g id="node1" class="node"><title>module~libfida</title>
-<polygon fill="none" stroke="black" points="254,-111 200,-111 200,-85 254,-85 254,-111"/>
-<text text-anchor="middle" x="227" y="-95.55" font-family="Helvetica,sans-Serif" font-size="10.50">libfida</text>
-</g>
-<!-- H5LT -->
-<g id="node2" class="node"><title>H5LT</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="54,-184 2.13163e-14,-184 0,-158 54,-158 54,-184"/>
-<text text-anchor="middle" x="27" y="-168.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">H5LT</text>
-</g>
-<!-- H5LT&#45;&gt;module~libfida -->
-<g id="edge8" class="edge"><title>H5LT&#45;&gt;module~libfida</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.1097,-174.403C82.7765,-176.806 128.652,-177.174 164,-161 183.871,-151.908 200.996,-133.665 212.355,-119.14"/>
-<polygon fill="#000000" stroke="#000000" points="215.17,-121.22 218.353,-111.114 209.563,-117.029 215.17,-121.22"/>
-</g>
-<!-- module~hdf5_extra -->
-<g id="node3" class="node"><title>module~hdf5_extra</title>
-<a xlink:href="../module/hdf5_extra.html" xlink:title="hdf5_extra">
-<polygon fill="#337ab7" stroke="#337ab7" points="159,-152 95,-152 95,-126 159,-126 159,-152"/>
-<text text-anchor="middle" x="127" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_extra</text>
-</a>
-</g>
-<!-- H5LT&#45;&gt;module~hdf5_extra -->
-<g id="edge2" class="edge"><title>H5LT&#45;&gt;module~hdf5_extra</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0614,-162.34C63.7157,-159.251 74.8267,-155.695 85.4187,-152.306"/>
-<polygon fill="#000000" stroke="#000000" points="86.486,-155.639 94.9435,-149.258 84.3525,-148.972 86.486,-155.639"/>
-</g>
-<!-- module~hdf5_extra&#45;&gt;module~libfida -->
-<g id="edge10" class="edge"><title>module~hdf5_extra&#45;&gt;module~libfida</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M158.916,-125.915C168.878,-121.83 179.948,-117.291 190.217,-113.081"/>
-<polygon fill="#000000" stroke="#000000" points="191.829,-116.203 199.754,-109.171 189.174,-109.726 191.829,-116.203"/>
-</g>
-<!-- module~utilities -->
-<g id="node4" class="node"><title>module~utilities</title>
-<a xlink:href="../module/utilities.html" xlink:title="utilities">
-<polygon fill="#337ab7" stroke="#337ab7" points="154,-70 100,-70 100,-44 154,-44 154,-70"/>
-<text text-anchor="middle" x="127" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">utilities</text>
-</a>
-</g>
-<!-- module~utilities&#45;&gt;module~libfida -->
-<g id="edge12" class="edge"><title>module~utilities&#45;&gt;module~libfida</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M154.061,-68.0952C165.289,-72.6986 178.487,-78.1098 190.548,-83.0546"/>
-<polygon fill="#000000" stroke="#000000" points="189.337,-86.3407 199.917,-86.8959 191.992,-79.864 189.337,-86.3407"/>
-</g>
-<!-- module~eigensystem -->
-<g id="node5" class="node"><title>module~eigensystem</title>
-<a xlink:href="../module/eigensystem.html" xlink:title="eigensystem">
-<polygon fill="#337ab7" stroke="#337ab7" points="163,-26 91,-26 91,-1.24345e-14 163,-3.55271e-15 163,-26"/>
-<text text-anchor="middle" x="127" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem</text>
-</a>
-</g>
-<!-- module~eigensystem&#45;&gt;module~libfida -->
-<g id="edge14" class="edge"><title>module~eigensystem&#45;&gt;module~libfida</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M151.064,-26.1208C155.497,-28.866 159.988,-31.8805 164,-35 180.382,-47.738 196.895,-64.4268 208.904,-77.4274"/>
-<polygon fill="#000000" stroke="#000000" points="206.444,-79.9252 215.757,-84.9772 211.627,-75.2203 206.444,-79.9252"/>
+<g id="module~~libfida~~UsesGraph_node1" class="node"><title>module~libfida</title>
+<polygon fill="none" stroke="black" points="254,-106 200,-106 200,-82 254,-82 254,-106"/>
+<text text-anchor="middle" x="227" y="-91.6" font-family="Helvetica,sans-Serif" font-size="10.50">libfida</text>
 </g>
 <!-- HDF5 -->
-<g id="node6" class="node"><title>HDF5</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="54,-123 2.13163e-14,-123 0,-97 54,-97 54,-123"/>
-<text text-anchor="middle" x="27" y="-107.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HDF5</text>
+<g id="module~~libfida~~UsesGraph_node2" class="node"><title>HDF5</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-177 0,-177 0,-153 54,-153 54,-177"/>
+<text text-anchor="middle" x="27" y="-162.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">HDF5</text>
 </g>
 <!-- HDF5&#45;&gt;module~libfida -->
-<g id="edge16" class="edge"><title>HDF5&#45;&gt;module~libfida</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.3898,-108.357C89.4729,-106.252 150.425,-102.594 189.717,-100.237"/>
-<polygon fill="#000000" stroke="#000000" points="190.169,-103.716 199.941,-99.6235 189.749,-96.7288 190.169,-103.716"/>
+<g id="module~~libfida~~UsesGraph_edge4" class="edge"><title>HDF5&#45;&gt;module~libfida</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.1065,-168.239C82.4855,-170.616 128.525,-171.07 164,-155 183.478,-146.177 200.378,-128.45 211.593,-114.369"/>
+<polygon fill="#000000" stroke="#000000" points="214.548,-116.265 217.813,-106.185 208.975,-112.029 214.548,-116.265"/>
 </g>
-<!-- HDF5&#45;&gt;module~hdf5_extra -->
-<g id="edge4" class="edge"><title>HDF5&#45;&gt;module~hdf5_extra</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0614,-117.848C63.6172,-120.619 74.6001,-123.804 85.0943,-126.847"/>
-<polygon fill="#000000" stroke="#000000" points="84.3644,-130.28 94.9435,-129.704 86.3141,-123.557 84.3644,-130.28"/>
-</g>
-<!-- omp_lib -->
-<g id="node9" class="node"><title>omp_lib</title>
-<a xlink:href="https://gcc.gnu.org/onlinedocs/gcc-4.4.3/libgomp/Runtime-Library-Routines.html" xlink:title="omp_lib">
-<polygon fill="#337ab7" stroke="#337ab7" points="54,-70 2.13163e-14,-70 0,-44 54,-44 54,-70"/>
-<text text-anchor="middle" x="27" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_lib</text>
+<!-- module~hdf5_extra -->
+<g id="module~~libfida~~UsesGraph_node6" class="node"><title>module~hdf5_extra</title>
+<g id="a_module~~libfida~~UsesGraph_node6"><a xlink:href="../module/hdf5_extra.html" xlink:title="hdf5_extra">
+<polygon fill="#337ab7" stroke="#337ab7" points="159,-146 95,-146 95,-122 159,-122 159,-146"/>
+<text text-anchor="middle" x="127" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hdf5_extra</text>
 </a>
 </g>
+</g>
+<!-- HDF5&#45;&gt;module~hdf5_extra -->
+<g id="module~~libfida~~UsesGraph_edge2" class="edge"><title>HDF5&#45;&gt;module~hdf5_extra</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0049,-156.774C63.643,-153.725 74.8161,-150.191 85.443,-146.829"/>
+<polygon fill="#000000" stroke="#000000" points="86.5103,-150.163 94.989,-143.81 84.3991,-143.489 86.5103,-150.163"/>
+</g>
+<!-- module~utilities -->
+<g id="module~~libfida~~UsesGraph_node3" class="node"><title>module~utilities</title>
+<g id="a_module~~libfida~~UsesGraph_node3"><a xlink:href="../module/utilities.html" xlink:title="utilities">
+<polygon fill="#337ab7" stroke="#337ab7" points="154,-66 100,-66 100,-42 154,-42 154,-66"/>
+<text text-anchor="middle" x="127" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">utilities</text>
+</a>
+</g>
+</g>
+<!-- module~utilities&#45;&gt;module~libfida -->
+<g id="module~~libfida~~UsesGraph_edge5" class="edge"><title>module~utilities&#45;&gt;module~libfida</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M154.005,-64.6142C165.191,-69.1799 178.445,-74.5896 190.512,-79.5151"/>
+<polygon fill="#000000" stroke="#000000" points="189.292,-82.7976 199.874,-83.3362 191.938,-76.3166 189.292,-82.7976"/>
+</g>
+<!-- H5LT -->
+<g id="module~~libfida~~UsesGraph_node4" class="node"><title>H5LT</title>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-117 0,-117 0,-93 54,-93 54,-117"/>
+<text text-anchor="middle" x="27" y="-102.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">H5LT</text>
+</g>
+<!-- H5LT&#45;&gt;module~libfida -->
+<g id="module~~libfida~~UsesGraph_edge6" class="edge"><title>H5LT&#45;&gt;module~libfida</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.2929,-103.539C89.079,-101.607 150.557,-98.1913 189.737,-96.0146"/>
+<polygon fill="#000000" stroke="#000000" points="190.123,-99.4986 199.914,-95.4492 189.735,-92.5094 190.123,-99.4986"/>
+</g>
+<!-- H5LT&#45;&gt;module~hdf5_extra -->
+<g id="module~~libfida~~UsesGraph_edge3" class="edge"><title>H5LT&#45;&gt;module~hdf5_extra</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0049,-112.695C63.5446,-115.518 74.5883,-118.786 85.1175,-121.902"/>
+<polygon fill="#000000" stroke="#000000" points="84.4069,-125.342 94.989,-124.823 86.3932,-118.63 84.4069,-125.342"/>
+</g>
+<!-- module~eigensystem -->
+<g id="module~~libfida~~UsesGraph_node5" class="node"><title>module~eigensystem</title>
+<g id="a_module~~libfida~~UsesGraph_node5"><a xlink:href="../module/eigensystem.html" xlink:title="eigensystem">
+<polygon fill="#337ab7" stroke="#337ab7" points="163.5,-24 90.5,-24 90.5,-0 163.5,-0 163.5,-24"/>
+<text text-anchor="middle" x="127" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigensystem</text>
+</a>
+</g>
+</g>
+<!-- module~eigensystem&#45;&gt;module~libfida -->
+<g id="module~~libfida~~UsesGraph_edge7" class="edge"><title>module~eigensystem&#45;&gt;module~libfida</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M150.644,-24.0476C155.203,-26.7908 159.861,-29.8361 164,-33 180.139,-45.3372 196.438,-61.5537 208.271,-74.1651"/>
+<polygon fill="#000000" stroke="#000000" points="206.006,-76.8721 215.356,-81.855 211.154,-72.129 206.006,-76.8721"/>
+</g>
+<!-- module~hdf5_extra&#45;&gt;module~libfida -->
+<g id="module~~libfida~~UsesGraph_edge8" class="edge"><title>module~hdf5_extra&#45;&gt;module~libfida</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M157.403,-121.999C167.869,-117.727 179.762,-112.873 190.673,-108.419"/>
+<polygon fill="#000000" stroke="#000000" points="192.011,-111.653 199.947,-104.634 189.366,-105.172 192.011,-111.653"/>
+</g>
+<!-- omp_lib -->
+<g id="module~~libfida~~UsesGraph_node7" class="node"><title>omp_lib</title>
+<g id="a_module~~libfida~~UsesGraph_node7"><a xlink:href="https://gcc.gnu.org/onlinedocs/gcc-4.4.3/libgomp/Runtime-Library-Routines.html" xlink:title="omp_lib">
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-66 0,-66 0,-42 54,-42 54,-66"/>
+<text text-anchor="middle" x="27" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_lib</text>
+</a>
+</g>
+</g>
 <!-- omp_lib&#45;&gt;module~utilities -->
-<g id="edge6" class="edge"><title>omp_lib&#45;&gt;module~utilities</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0614,-57C65.0669,-57 77.9653,-57 89.83,-57"/>
-<polygon fill="#000000" stroke="#000000" points="89.917,-60.5001 99.9169,-57 89.9169,-53.5001 89.917,-60.5001"/>
+<g id="module~~libfida~~UsesGraph_edge1" class="edge"><title>omp_lib&#45;&gt;module~utilities</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.0049,-54C64.9694,-54 77.9204,-54 89.7938,-54"/>
+<polygon fill="#000000" stroke="#000000" points="89.8736,-57.5001 99.8736,-54 89.8735,-50.5001 89.8736,-57.5001"/>
 </g>
 </g>
 </svg>
@@ -810,43 +838,43 @@
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="486pt" height="34pt"
- viewBox="0.00 0.00 486.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 483,-30 483,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
 <!-- Module -->
 <g id="node1" class="node"><title>Module</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
-<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
 </g>
 <!-- Submodule -->
 <g id="node2" class="node"><title>Submodule</title>
-<polygon fill="#5bc0de" stroke="#5bc0de" points="138,-26 72,-26 72,-1.24345e-14 138,-3.55271e-15 138,-26"/>
-<text text-anchor="middle" x="105" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
 </g>
 <!-- Subroutine -->
 <g id="node3" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="220,-26 156,-26 156,-1.24345e-14 220,-3.55271e-15 220,-26"/>
-<text text-anchor="middle" x="188" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node4" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="292,-26 238,-26 238,-1.24345e-14 292,-3.55271e-15 292,-26"/>
-<text text-anchor="middle" x="265" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="364,-26 310,-26 310,-1.24345e-14 364,-3.55271e-15 364,-26"/>
-<text text-anchor="middle" x="337" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="478,-26 382,-26 382,-1.24345e-14 478,-3.55271e-15 478,-26"/>
-<text text-anchor="middle" x="430" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -873,30 +901,31 @@
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: module~~libfida~~UsedByGraph Pages: 1 -->
-<svg id="modulelibfidaUsedByGraph" width="152pt" height="34pt"
- viewBox="0.00 0.00 152.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="module~~libfida~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="modulelibfidaUsedByGraph" width="152pt" height="32pt"
+ viewBox="0.00 0.00 152.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="module~~libfida~~UsedByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>module~~libfida~~UsedByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 149,-30 149,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 148,-28 148,4 -4,4"/>
 <!-- module~libfida -->
-<g id="node1" class="node"><title>module~libfida</title>
-<polygon fill="none" stroke="black" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
-<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">libfida</text>
+<g id="module~~libfida~~UsedByGraph_node1" class="node"><title>module~libfida</title>
+<polygon fill="none" stroke="black" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">libfida</text>
 </g>
 <!-- program~fidasim -->
-<g id="node2" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="144,-26 90,-26 90,-1.24345e-14 144,-3.55271e-15 144,-26"/>
-<text text-anchor="middle" x="117" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="module~~libfida~~UsedByGraph_node2" class="node"><title>program~fidasim</title>
+<g id="a_module~~libfida~~UsedByGraph_node2"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="144,-24 90,-24 90,-0 144,-0 144,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
+</g>
 <!-- module~libfida&#45;&gt;program~fidasim -->
-<g id="edge2" class="edge"><title>module~libfida&#45;&gt;program~fidasim</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.003,-13C62.0277,-13 70.9665,-13 79.5309,-13"/>
-<polygon fill="#000000" stroke="#000000" points="79.7051,-16.5001 89.705,-13 79.705,-9.5001 79.7051,-16.5001"/>
+<g id="module~~libfida~~UsedByGraph_edge1" class="edge"><title>module~libfida&#45;&gt;program~fidasim</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.4029,-12C62.3932,-12 71.3106,-12 79.8241,-12"/>
+<polygon fill="#000000" stroke="#000000" points="79.919,-15.5001 89.919,-12 79.919,-8.5001 79.919,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -915,43 +944,43 @@
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="486pt" height="34pt"
- viewBox="0.00 0.00 486.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="489pt" height="32pt"
+ viewBox="0.00 0.00 489.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 483,-30 483,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 485,-28 485,4 -4,4"/>
 <!-- Module -->
 <g id="node1" class="node"><title>Module</title>
-<polygon fill="#337ab7" stroke="#337ab7" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
-<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
+<polygon fill="#337ab7" stroke="#337ab7" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Module</text>
 </g>
 <!-- Submodule -->
 <g id="node2" class="node"><title>Submodule</title>
-<polygon fill="#5bc0de" stroke="#5bc0de" points="138,-26 72,-26 72,-1.24345e-14 138,-3.55271e-15 138,-26"/>
-<text text-anchor="middle" x="105" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
+<polygon fill="#5bc0de" stroke="#5bc0de" points="139.25,-24 72.75,-24 72.75,-0 139.25,-0 139.25,-24"/>
+<text text-anchor="middle" x="106" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Submodule</text>
 </g>
 <!-- Subroutine -->
 <g id="node3" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="220,-26 156,-26 156,-1.24345e-14 220,-3.55271e-15 220,-26"/>
-<text text-anchor="middle" x="188" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-24 158,-24 158,-0 222,-0 222,-24"/>
+<text text-anchor="middle" x="190" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node4" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="292,-26 238,-26 238,-1.24345e-14 292,-3.55271e-15 292,-26"/>
-<text text-anchor="middle" x="265" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="294,-24 240,-24 240,-0 294,-0 294,-24"/>
+<text text-anchor="middle" x="267" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="364,-26 310,-26 310,-1.24345e-14 364,-3.55271e-15 364,-26"/>
-<text text-anchor="middle" x="337" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="366,-24 312,-24 312,-0 366,-0 366,-24"/>
+<text text-anchor="middle" x="339" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="478,-26 382,-26 382,-1.24345e-14 478,-3.55271e-15 478,-26"/>
-<text text-anchor="middle" x="430" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="481.25,-24 384.75,-24 384.75,-0 481.25,-0 481.25,-24"/>
+<text text-anchor="middle" x="433" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1038,8 +1067,6 @@
       <a class="list-group-item" href="../module/libfida.html#variable-stark_sigma">stark_sigma</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-nlevs">nlevs</a>
-      
-      <a class="list-group-item" href="../module/libfida.html#variable-n_halo_neutrate">n_halo_neutrate</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-colrad_threshold">colrad_threshold</a>
       
@@ -1152,6 +1179,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-atomicrates">AtomicRates</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-atomictransitions">AtomicTransitions</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-nuclearrates">NuclearRates</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-atomictables">AtomicTables</a>
@@ -1191,6 +1220,8 @@
       <a class="list-group-item" href="../module/libfida.html#type-simulationinputs">SimulationInputs</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-particletrack">ParticleTrack</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#type-gyrosurface">GyroSurface</a>
       
     </div>
   </div>
@@ -1252,7 +1283,11 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-in_boundary">in_boundary</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-in_gyro_surface">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-in_grid">in_grid</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_radius">gyro_radius</a>
       
     </div>
   </div>
@@ -1306,7 +1341,9 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_cross">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_rates">read_atomic_rates</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_rate">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-read_atomic_transitions">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-read_nuclear_rates">read_nuclear_rates</a>
       
@@ -1338,7 +1375,21 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-plane_basis">plane_basis</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-plane_intercept">plane_intercept</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-line_plane_intersect">line_plane_intersect</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-boundary_edge">boundary_edge</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_surface">gyro_surface</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-line_gyro_surface_intersect">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_surface_coordinates">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_trajectory">gyro_trajectory</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-gyro_range">gyro_range</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-npa_gyro_range">npa_gyro_range</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-hit_npa_detector">hit_npa_detector</a>
       
@@ -1388,11 +1439,13 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-store_npa">store_npa</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-neut_rates">neut_rates</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-bb_cx_rates">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-bt_cx_rates">bt_cx_rates</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_neutron_rate">get_neutron_rate</a>
       
-      <a class="list-group-item" href="../module/libfida.html#proc-get_beam_cx_prob">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../module/libfida.html#proc-get_beam_cx_rate">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_rate_matrix">get_rate_matrix</a>
       
@@ -1899,20 +1952,6 @@
   <td>public,</td>
   <td>parameter</td><td>::</td>
   <td><strong>nlevs</strong></td><td> =</td><td>6</td><td><p>Number of atomic energy levels</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-n_halo_neutrate"></span>real(kind=Float64),</td>
-  
-  <td>public,</td>
-  <td>parameter</td><td>::</td>
-  <td><strong>n_halo_neutrate</strong></td><td> =</td><td>20.</td><td><p>Number of times to average halo H_H_cx</p></td>
   
 </tr>
 
@@ -6958,6 +6997,90 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbr_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbr_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbt_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbt_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the vertical magnetic field [T/m]</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -7072,6 +7195,90 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>ez</strong></td><td> =</td><td>0.d0</td><td><p>Vertical electric field [V/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbr_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbr_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbt_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbt_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dr"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dz"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dz</strong></td><td> =</td><td>0.d0</td><td><p>Vertical derivative of the vertical magnetic field [T/m]</p></td>
   
 </tr>
 
@@ -7730,7 +7937,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>delta_phi</strong></td><td> =</td><td>0.d0</td><td><p>Angle subtended by the <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> at (r,z)</p></td>
+  <td><strong>delta_phi</strong></td><td> =</td><td>2*pi</td><td><p>Angle subtended by the <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> at (r,z)</p></td>
   
 </tr>
 
@@ -8468,7 +8675,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <div class="panel-body">
     
     
-    <p>Defines an atomic table for populating and de-populating reaction rates</p>
+    <p>Defines a n/m-resolved atomic cross section table</p>
     
      
      <h4>Components</h4>
@@ -8628,25 +8835,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-minlog_pop"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-minlog_rate"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>minlog_pop</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum reaction rates for populating transistions</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-minlog_depop"></span>real(kind=Float64),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>minlog_depop</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum reaction rates for de-populating transistions</p></td>
+  <td><strong>minlog_rate</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum reaction rate</p></td>
   
 </tr>
 
@@ -8670,25 +8863,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-log_pop"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-log_rate"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
-  <td><strong>log_pop</strong></td><td></td><td></td><td><p>Log-10 reaction rates for populating transistions</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-log_depop"></span>real(kind=Float64),</td>
-  
-  <td>public,</td>
-  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
-  <td><strong>log_depop</strong></td><td></td><td></td><td><p>Log-10 reaction rates for de-populating transistions</p></td>
+  <td><strong>log_rate</strong></td><td></td><td></td><td><p>Log-10 beam-target rates</p></td>
   
 </tr>
 
@@ -8705,13 +8884,13 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
      
 	   
 <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="type-nuclearrates"></span><h3>type, public :: <a href='../type/nuclearrates.html'>NuclearRates</a>
+  <div class="panel-heading codesum"><span class="anchor" id="type-atomictransitions"></span><h3>type, public :: <a href='../type/atomictransitions.html'>AtomicTransitions</a>
     
   </h3></div>
   <div class="panel-body">
     
     
-    <p>Nuclear reaction rates</p>
+    <p>Defines an atomic table for populating and de-populating reaction rates</p>
     
      
      <h4>Components</h4>
@@ -8724,20 +8903,6 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
 
 
 <tbody>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-nbranch"></span>integer,</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>nbranch</strong></td><td> =</td><td>1</td><td><p>Number of reaction branches</p></td>
-  
-</tr>
 
   
   
@@ -8829,6 +8994,34 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-n_max%7E3"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>n_max</strong></td><td> =</td><td>nlevs</td><td><p>Number of initial atomic energy levels</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-m_max%7E3"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>m_max</strong></td><td> =</td><td>nlevs</td><td><p>Number of final atomic energy levels</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dloge%7E3"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -8857,7 +9050,236 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-minlog_rate"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-minlog_pop"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>minlog_pop</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum reaction rates for populating transistions</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-minlog_depop"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>minlog_depop</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum reaction rates for de-populating transistions</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ab%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(2)</td><td>::</td>
+  <td><strong>ab</strong></td><td> =</td><td>0.d0</td><td><p>Atomic mass of beam and thermal ions respectively [amu]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-log_pop"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>log_pop</strong></td><td></td><td></td><td><p>Log-10 reaction rates for populating transistions</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-log_depop"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>log_depop</strong></td><td></td><td></td><td><p>Log-10 reaction rates for de-populating transistions</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-nuclearrates"></span><h3>type, public :: <a href='../type/nuclearrates.html'>NuclearRates</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Nuclear reaction rates</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nbranch"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nbranch</strong></td><td> =</td><td>1</td><td><p>Number of reaction branches</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nenergy%7E5"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nenergy</strong></td><td> =</td><td>1</td><td><p>Number of beam energies</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logemin%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logemin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum energy</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logemax%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logemax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum energy</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ntemp%7E3"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ntemp</strong></td><td> =</td><td>1</td><td><p>Number of target temperatures</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logtmin%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logtmin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum temperature</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-logtmax%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>logtmax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum temperature</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dloge%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dlogE</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 energy spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dlogt%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dlogT</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 temperature spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-minlog_rate%7E2"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -8885,7 +9307,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-log_rate"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-log_rate%7E2"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:), allocatable</td><td>::</td>
@@ -8932,11 +9354,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-h_h_cx"></span>type(<a href='../type/atomiccrosssection.html'>AtomicCrossSection</a>),</td>
+  <td><span class="anchor" id="variable-h_h_cx_cross"></span>type(<a href='../type/atomiccrosssection.html'>AtomicCrossSection</a>),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>H_H_cx</strong></td><td></td><td></td><td><p>Hydrogen-Hydrogen charge exchange n/m-resolved cross sections</p></td>
+  <td><strong>H_H_cx_cross</strong></td><td></td><td></td><td><p>Hydrogen-Hydrogen charge exchange n/m-resolved cross sections</p></td>
   
 </tr>
 
@@ -8946,11 +9368,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-h_h"></span>type(<a href='../type/atomicrates.html'>AtomicRates</a>),</td>
+  <td><span class="anchor" id="variable-h_h_cx_rate"></span>type(<a href='../type/atomicrates.html'>AtomicRates</a>),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>H_H</strong></td><td></td><td></td><td><p>Hydrogen-Hydrogen reaction rates</p></td>
+  <td><strong>H_H_cx_rate</strong></td><td></td><td></td><td><p>Hydrogen-Hydrogen charge exchange n/m-resolved beam-target rates</p></td>
   
 </tr>
 
@@ -8960,11 +9382,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-h_e"></span>type(<a href='../type/atomicrates.html'>AtomicRates</a>),</td>
+  <td><span class="anchor" id="variable-h_h"></span>type(<a href='../type/atomictransitions.html'>AtomicTransitions</a>),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>H_e</strong></td><td></td><td></td><td><p>Hydrogen-Electron reaction rates</p></td>
+  <td><strong>H_H</strong></td><td></td><td></td><td><p>Hydrogen-Hydrogen atomic transitions</p></td>
   
 </tr>
 
@@ -8974,11 +9396,25 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-h_aq"></span>type(<a href='../type/atomicrates.html'>AtomicRates</a>),</td>
+  <td><span class="anchor" id="variable-h_e"></span>type(<a href='../type/atomictransitions.html'>AtomicTransitions</a>),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>H_Aq</strong></td><td></td><td></td><td><p>Hydrogen-Impurity reaction rates</p></td>
+  <td><strong>H_e</strong></td><td></td><td></td><td><p>Hydrogen-Electron atomic transitions</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-h_aq"></span>type(<a href='../type/atomictransitions.html'>AtomicTransitions</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>H_Aq</strong></td><td></td><td></td><td><p>Hydrogen-Impurity atomic transitions</p></td>
   
 </tr>
 
@@ -9934,21 +10370,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-nloop"></span>integer(kind=Int32),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>nloop</strong></td><td> =</td><td>1000</td><td><p>Increases number of MC markers by factor of <code>nloop</code></p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-nenergy%7E5"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-nenergy%7E6"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -9993,8 +10415,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-flux"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>flux</strong></td><td></td><td></td><td><p>Neutral particle flux [neutrals/(s*dE)]</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>flux</strong></td><td></td><td></td><td><p>Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]</p></td>
   
 </tr>
 
@@ -10628,7 +11050,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_fida"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_fida"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -10642,7 +11064,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_npa"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_npa"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -10656,7 +11078,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_nbi"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_nbi"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -10670,7 +11092,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_dcx"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_dcx"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -10684,7 +11106,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_halo"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_halo"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -10698,7 +11120,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_birth"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-n_birth"></span>integer(kind=Int64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -10894,7 +11316,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-ab%7E2"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-ab%7E3"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
@@ -11184,6 +11606,129 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public,</td>
   <td>dimension(3)</td><td>::</td>
   <td><strong>pos</strong></td><td> =</td><td>0.d0</td><td><p>Midpoint of track in cell [cm]</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-gyrosurface"></span><h3>type, public :: <a href='../type/gyrosurface.html'>GyroSurface</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Surface containing the fast-ion velocity vectors for all values of the
+ gyro-angle. It takes the form of a hyperboloid 
+ \((x(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(cos(\gamma + \pi/2) - \omega_i t sin(\gamma + \pi/2)) \)
+ \((y(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(sin(\gamma + \pi/2) + \omega_i t cos(\gamma + \pi/2)) \)
+ \((z(\gamma,t) = \alpha \omega_i \rm{pitch} t\)
+ where \(\gamma\) is the gyro-angle, \(\omega_i\) is the ion
+ gyro-frequency and \(\alpha = V/\omega_i \)</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-v"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>v</strong></td><td> =</td><td>0.d0</td><td><p>Particle speed</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-omega"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>omega</strong></td><td> =</td><td>0.d0</td><td><p>Ion gyro-frequency</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-axes"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>axes</strong></td><td></td><td></td><td><p>Semi-axes of the hyperboloid, i.e. a, b, c coefficients</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-center%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>center</strong></td><td> =</td><td>0.d0</td><td><p>Center of the gyrosurface</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-a"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3,3)</td><td>::</td>
+  <td><strong>A</strong></td><td> =</td><td>0.d0</td><td><p>Coefficients of quartic surface i.e. <code>basis*diagm(1/a^2,1/b^2,1/c^2)*basis'</code></p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-basis%7E4"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3,3)</td><td>::</td>
+  <td><strong>basis</strong></td><td> =</td><td>0.d0</td><td><p>Basis of coordinate system of gyrosurface</p></td>
   
 </tr>
 
@@ -13328,6 +13873,89 @@ public function <a href='../proc/in_boundary.html'>in_boundary</a>(bplane, p) re
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-in_gyro_surface"></span><h3>
+public function <a href='../proc/in_gyro_surface.html'>in_gyro_surface</a>(gs, p) result(in_gs)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Indicator function for determining if a point is inside the gyro_surface</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td><p>Gyro-surface</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>p</strong></td><td><p>Point</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-in_grid"></span><h3>
 public function <a href='../proc/in_grid.html'>in_grid</a>(xyz) result(ing)
     
@@ -13388,6 +14016,104 @@ public function <a href='../proc/in_grid.html'>in_grid</a>(xyz) result(ing)
      <h4>Return Value <small>logical
   </small></h4>
   <p>Indicates whether the position is in the beam grid</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_radius"></span><h3>
+public function <a href='../proc/gyro_radius.html'>gyro_radius</a>(fields, energy, pitch) result(gyro_rad)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates mean gyro-radius</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fields</strong></td><td><p>Electromagnetic fields at guiding center</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>energy</strong></td><td><p>Energy of particle</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=Float64)
+  </small></h4>
+  <p>Mean gyro-radius</p>
     
 
   </div>
@@ -14625,8 +15351,8 @@ public subroutine <a href='../proc/read_atomic_cross.html'>read_atomic_cross</a>
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-read_atomic_rates"></span><h3>
-public subroutine <a href='../proc/read_atomic_rates.html'>read_atomic_rates</a>(fid, grp, b_amu, t_amu, rates)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-read_atomic_rate"></span><h3>
+public subroutine <a href='../proc/read_atomic_rate.html'>read_atomic_rate</a>(fid, grp, b_amu, t_amu, rates)
     
     
 	 
@@ -14641,7 +15367,7 @@ public subroutine <a href='../proc/read_atomic_rates.html'>read_atomic_rates</a>
 
 
 
-<p>Reads in a atomic reaction rates table from file
+<p>Reads in a atomic rate table from file
  and puts it into a <a href="../type/atomicrates.html">AtomicRates</a> type</p>
     
     <h4>Arguments</h4>
@@ -14729,6 +15455,126 @@ public subroutine <a href='../proc/read_atomic_rates.html'>read_atomic_rates</a>
   
   <td></td><td>::</td>
   <td><strong>rates</strong></td><td><p>Atomic reaction rates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-read_atomic_transitions"></span><h3>
+public subroutine <a href='../proc/read_atomic_transitions.html'>read_atomic_transitions</a>(fid, grp, b_amu, t_amu, rates)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Reads in a atomic transitions table from file
+ and puts it into a <a href="../type/atomictransitions.html">AtomicTransitions</a> type</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=HID_T),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fid</strong></td><td><p>HDF5 file ID</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grp</strong></td><td><p>HDF5 group to read from</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(2)</td><td>::</td>
+  <td><strong>b_amu</strong></td><td><p>Atomic masses of "beam" species (beam ion and thermal ion)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>t_amu</strong></td><td><p>Atomic mass of "target" species (thermal ion)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/atomictransitions.html'>AtomicTransitions</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rates</strong></td><td><p>Atomic transitions</p></td>
   
 </tr>
 
@@ -15551,8 +16397,8 @@ public subroutine <a href='../proc/plane_basis.html'>plane_basis</a>(center, red
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-plane_intercept"></span><h3>
-public subroutine <a href='../proc/plane_intercept.html'>plane_intercept</a>(l0, l, p0, n, p, t)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-line_plane_intersect"></span><h3>
+public subroutine <a href='../proc/line_plane_intersect.html'>line_plane_intersect</a>(l0, l, p0, n, p, t)
     
     
 	 
@@ -15653,7 +16499,7 @@ public subroutine <a href='../proc/plane_intercept.html'>plane_intercept</a>(l0,
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>p</strong></td><td><p>Line-plane intercept point</p></td>
+  <td><strong>p</strong></td><td><p>Line-plane intersect point</p></td>
   
 </tr>
 
@@ -15668,7 +16514,705 @@ public subroutine <a href='../proc/plane_intercept.html'>plane_intercept</a>(l0,
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>t</strong></td><td><p>"time" to intercept</p></td>
+  <td><strong>t</strong></td><td><p>"time" to intersect</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-boundary_edge"></span><h3>
+public subroutine <a href='../proc/boundary_edge.html'>boundary_edge</a>(bplane, bedge, nb)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Returns 3 x <code>nb</code> array containing points along the BoundedPlane's boundary edge</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/boundedplane.html'>BoundedPlane</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>bplane</strong></td><td><p>Bounded plane</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>bedge</strong></td><td><p>Boundary edge points of bounded plane</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nb</strong></td><td><p>Number of points in boundary edge</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_surface"></span><h3>
+public subroutine <a href='../proc/gyro_surface.html'>gyro_surface</a>(fields, energy, pitch, gs)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates the surface of all possible trajectories</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fields</strong></td><td><p>Electromagnetic fields at guiding center</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>energy</strong></td><td><p>Energy of particle</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>pitch</strong></td><td><p>Particle pitch w.r.t the magnetic field</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td><p>Gyro-surface</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-line_gyro_surface_intersect"></span><h3>
+public subroutine <a href='../proc/line_gyro_surface_intersect.html'>line_gyro_surface_intersect</a>(r0, v0, gs, t)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates the times of intersection of a line and a gyro-surface</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>r0</strong></td><td><p>Point on line</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>v0</strong></td><td><p>Direction of line</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td><p>Gyro-surface</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(2)</td><td>::</td>
+  <td><strong>t</strong></td><td><p>"time" to intersect</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_surface_coordinates"></span><h3>
+public subroutine <a href='../proc/gyro_surface_coordinates.html'>gyro_surface_coordinates</a>(gs, p, u)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates the parametric coordinates, <code>u</code>, of point <code>p</code> on the gyro_surface</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td><p>Gyro_surface</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>p</strong></td><td><p>Point on gyro_surface</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(2)</td><td>::</td>
+  <td><strong>u</strong></td><td><p>Parametric coordinates (gyro-angle, t)</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_trajectory"></span><h3>
+public subroutine <a href='../proc/gyro_trajectory.html'>gyro_trajectory</a>(gs, theta, ri, vi)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculate particle trajectory for a given gyro-angle and gyro-surface</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td><p>Gyro-Surface</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>theta</strong></td><td><p>Gyro-angle</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ri</strong></td><td><p>Particle position</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vi</strong></td><td><p>Particle Velocity</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_range"></span><h3>
+public subroutine <a href='../proc/gyro_range.html'>gyro_range</a>(b, gs, gyrange, nrange)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates the range(s) of gyro-angles that would land within a bounded plane</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/boundedplane.html'>BoundedPlane</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>b</strong></td><td><p>Bounded Plane</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td><p>Gyro-surface</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(2,4)</td><td>::</td>
+  <td><strong>gyrange</strong></td><td><p>(theta, dtheta) values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nrange</strong></td><td><p>Number of ranges. <code>1 &lt;= nrange &lt;= 4</code></p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-npa_gyro_range"></span><h3>
+public subroutine <a href='../proc/npa_gyro_range.html'>npa_gyro_range</a>(ichan, gs, gyrange, nrange)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates range of gyro-angles that would hit the NPA detector</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ichan</strong></td><td><p>Index of NPA detector</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(2,4)</td><td>::</td>
+  <td><strong>gyrange</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nrange</strong></td><td></td>
   
 </tr>
 
@@ -18180,7 +19724,7 @@ public subroutine <a href='../proc/get_ep_denf.html'>get_ep_denf</a>(energy, pit
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-store_neutrals"></span><h3>
-public subroutine <a href='../proc/store_neutrals.html'>store_neutrals</a>(ind, neut_type, dens, store_iter)
+public subroutine <a href='../proc/store_neutrals.html'>store_neutrals</a>(ind, neut_type, dens, vn, store_iter)
     
     
 	 
@@ -18244,6 +19788,21 @@ public subroutine <a href='../proc/store_neutrals.html'>store_neutrals</a>(ind, 
   
   <td>dimension(:)</td><td>::</td>
   <td><strong>dens</strong></td><td><p>Neutral density [neutrals/cm^3]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vn</strong></td><td><p>Neutral particle velocity [cm/s]</p></td>
   
 </tr>
 
@@ -18365,7 +19924,7 @@ public subroutine <a href='../proc/store_births.html'>store_births</a>(ind, neut
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-store_npa"></span><h3>
-public subroutine <a href='../proc/store_npa.html'>store_npa</a>(det, ri, rf, vn, flux)
+public subroutine <a href='../proc/store_npa.html'>store_npa</a>(det, ri, rf, vn, flux, orbit_class)
     
     
 	 
@@ -18470,6 +20029,21 @@ public subroutine <a href='../proc/store_npa.html'>store_npa</a>(det, ri, rf, vn
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>orbit_class</strong></td><td><p>Orbit class ID</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -18483,8 +20057,8 @@ public subroutine <a href='../proc/store_npa.html'>store_npa</a>(det, ri, rf, vn
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-neut_rates"></span><h3>
-public subroutine <a href='../proc/neut_rates.html'>neut_rates</a>(denn, vi, vn, rates)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-bb_cx_rates"></span><h3>
+public subroutine <a href='../proc/bb_cx_rates.html'>bb_cx_rates</a>(denn, vi, vn, rates)
     
     
 	 
@@ -18499,7 +20073,7 @@ public subroutine <a href='../proc/neut_rates.html'>neut_rates</a>(denn, vi, vn,
 
 
 
-<p>Get neutralization/cx rates</p>
+<p>Get beam-beam neutralization/cx rates</p>
     
     <h4>Arguments</h4>
     
@@ -18556,6 +20130,125 @@ public subroutine <a href='../proc/neut_rates.html'>neut_rates</a>(denn, vi, vn,
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>vn</strong></td><td><p>Neutral velocity [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(nlevs)</td><td>::</td>
+  <td><strong>rates</strong></td><td><p>Reaction rates [1/s]</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-bt_cx_rates"></span><h3>
+public subroutine <a href='../proc/bt_cx_rates.html'>bt_cx_rates</a>(plasma, denn, vi, i_type, rates)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Get beam-target neutralization/cx rates</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>plasma</strong></td><td><p>Plasma parameters</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(nlevs)</td><td>::</td>
+  <td><strong>denn</strong></td><td><p>Neutral density [cm^-3]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_type</strong></td><td><p>Ion type</p></td>
   
 </tr>
 
@@ -18676,8 +20369,8 @@ public subroutine <a href='../proc/get_neutron_rate.html'>get_neutron_rate</a>(p
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-get_beam_cx_prob"></span><h3>
-public subroutine <a href='../proc/get_beam_cx_prob.html'>get_beam_cx_prob</a>(ind, pos, v_ion, types, prob)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_beam_cx_rate"></span><h3>
+public subroutine <a href='../proc/get_beam_cx_rate.html'>get_beam_cx_rate</a>(ind, pos, v_ion, i_type, types, prob)
     
     
 	 
@@ -18749,6 +20442,21 @@ public subroutine <a href='../proc/get_beam_cx_prob.html'>get_beam_cx_prob</a>(i
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>v_ion</strong></td><td><p>Ion velocity [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>i_type</strong></td><td><p>Ion type</p></td>
   
 </tr>
 
@@ -19978,7 +21686,7 @@ public subroutine <a href='../proc/get_nlaunch.html'>get_nlaunch</a>(nr_markers,
   
 <tr>
   
-  <td><span class="anchor" ></span>integer(kind=Int32),</td>
+  <td><span class="anchor" ></span>integer(kind=Int64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -20221,7 +21929,8 @@ public subroutine <a href='../proc/gyro_step.html'>gyro_step</a>(vi, fields, r_g
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>r_gyro</strong></td><td><p>Gyro-step</p></td>
+  <td><strong>r_gyro</strong></td><td><p>Gyro-step
+ Gyro-radius vector from particle position to guiding center</p></td>
   
 </tr>
 
@@ -20239,7 +21948,7 @@ public subroutine <a href='../proc/gyro_step.html'>gyro_step</a>(vi, fields, r_g
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-gyro_correction"></span><h3>
-public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fields, rg, energy, pitch, rp, vp)
+public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fields, energy, pitch, rp, vp, phi_in)
     
     
 	 
@@ -20281,21 +21990,6 @@ public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fie
   
   <td></td><td>::</td>
   <td><strong>fields</strong></td><td><p>Electromagnetic fields at guiding center</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>rg</strong></td><td><p>Gyro-center position</p></td>
   
 </tr>
 
@@ -20359,6 +22053,21 @@ public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fie
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>phi_in</strong></td><td><p>Gyro-angle</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -20373,7 +22082,7 @@ public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fie
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-mc_fastion"></span><h3>
-public subroutine <a href='../proc/mc_fastion.html'>mc_fastion</a>(ind, rp, vi, denf)
+public subroutine <a href='../proc/mc_fastion.html'>mc_fastion</a>(ind, fields, eb, ptch, denf)
     
     
 	 
@@ -20424,12 +22133,12 @@ public subroutine <a href='../proc/mc_fastion.html'>mc_fastion</a>(ind, rp, vi, 
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
+  <td><span class="anchor" ></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td>intent(out)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>rp</strong></td><td><p>Fast-ion particle position [cm]</p></td>
+  <td></td><td>::</td>
+  <td><strong>fields</strong></td><td><p>Electromagnetic fields at the guiding center</p></td>
   
 </tr>
 
@@ -20440,11 +22149,26 @@ public subroutine <a href='../proc/mc_fastion.html'>mc_fastion</a>(ind, rp, vi, 
 <tr>
   
   <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
+  <td>intent(out)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>vi</strong></td><td><p>Fast-ion particle velocity [cm/s]</p></td>
+  <td></td><td>::</td>
+  <td><strong>eb</strong></td><td><p>Energy of the fast ion</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ptch</strong></td><td><p>Pitch of the fast ion</p></td>
   
 </tr>
 

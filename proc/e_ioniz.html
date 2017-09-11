@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -861,7 +885,7 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E40"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E41"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -876,7 +900,7 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
   
 <tr>
   
-  <td><span class="anchor" id="variable-n_max%7E6"></span>integer,</td>
+  <td><span class="anchor" id="variable-n_max%7E7"></span>integer,</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -905,66 +929,70 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~e_ioniz~~CallsGraph Pages: 1 -->
-<svg id="proce_ionizCallsGraph" width="282pt" height="122pt"
- viewBox="0.00 0.00 282.00 122.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~e_ioniz~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 118)">
+<svg id="proce_ionizCallsGraph" width="282pt" height="116pt"
+ viewBox="0.00 0.00 282.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~e_ioniz~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
 <title>proc~~e_ioniz~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-118 279,-118 279,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-112 278,-112 278,4 -4,4"/>
 <!-- proc~e_ioniz -->
-<g id="node1" class="node"><title>proc~e_ioniz</title>
-<polygon fill="none" stroke="black" points="54,-70 2.13163e-14,-70 0,-44 54,-44 54,-70"/>
-<text text-anchor="middle" x="27" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">e_ioniz</text>
+<g id="proc~~e_ioniz~~CallsGraph_node1" class="node"><title>proc~e_ioniz</title>
+<polygon fill="none" stroke="black" points="54,-66 0,-66 0,-42 54,-42 54,-66"/>
+<text text-anchor="middle" x="27" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">e_ioniz</text>
 </g>
 <!-- proc~e_ioniz_n -->
-<g id="node2" class="node"><title>proc~e_ioniz_n</title>
-<a xlink:href="../proc/e_ioniz_n.html" xlink:title="e_ioniz_n">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="148,-70 90,-70 90,-44 148,-44 148,-70"/>
-<text text-anchor="middle" x="119" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_n</text>
+<g id="proc~~e_ioniz~~CallsGraph_node2" class="node"><title>proc~e_ioniz_n</title>
+<g id="a_proc~~e_ioniz~~CallsGraph_node2"><a xlink:href="../proc/e_ioniz_n.html" xlink:title="e_ioniz_n">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="148,-66 90,-66 90,-42 148,-42 148,-66"/>
+<text text-anchor="middle" x="119" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_n</text>
 </a>
+</g>
 </g>
 <!-- proc~e_ioniz&#45;&gt;proc~e_ioniz_n -->
-<g id="edge8" class="edge"><title>proc~e_ioniz&#45;&gt;proc~e_ioniz_n</title>
-<path fill="none" stroke="#000000" d="M54.1054,-57C62.094,-57 71.0028,-57 79.5978,-57"/>
-<polygon fill="#000000" stroke="#000000" points="79.8433,-60.5001 89.8432,-57 79.8432,-53.5001 79.8433,-60.5001"/>
+<g id="proc~~e_ioniz~~CallsGraph_edge4" class="edge"><title>proc~e_ioniz&#45;&gt;proc~e_ioniz_n</title>
+<path fill="none" stroke="#000000" d="M54.0317,-54C62.0039,-54 70.9483,-54 79.5645,-54"/>
+<polygon fill="#000000" stroke="#000000" points="79.8244,-57.5001 89.8243,-54 79.8243,-50.5001 79.8244,-57.5001"/>
 </g>
 <!-- proc~e_ioniz_1_janev -->
-<g id="node3" class="node"><title>proc~e_ioniz_1_janev</title>
-<a xlink:href="../proc/e_ioniz_1_janev.html" xlink:title="e_ioniz_1_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="274,-114 184,-114 184,-88 274,-88 274,-114"/>
-<text text-anchor="middle" x="229" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_1_janev</text>
+<g id="proc~~e_ioniz~~CallsGraph_node3" class="node"><title>proc~e_ioniz_1_janev</title>
+<g id="a_proc~~e_ioniz~~CallsGraph_node3"><a xlink:href="../proc/e_ioniz_1_janev.html" xlink:title="e_ioniz_1_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="274,-108 184,-108 184,-84 274,-84 274,-108"/>
+<text text-anchor="middle" x="229" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_1_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~e_ioniz_n&#45;&gt;proc~e_ioniz_1_janev -->
-<g id="edge2" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_1_janev</title>
-<path fill="none" stroke="#000000" d="M148.189,-68.6757C159.956,-73.3825 173.762,-78.9047 186.599,-84.0397"/>
-<polygon fill="#000000" stroke="#000000" points="185.593,-87.4069 196.178,-87.8712 188.193,-80.9075 185.593,-87.4069"/>
+<g id="proc~~e_ioniz~~CallsGraph_edge1" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_1_janev</title>
+<path fill="none" stroke="#000000" d="M148.094,-64.9254C160.164,-69.6194 174.497,-75.1935 187.669,-80.3159"/>
+<polygon fill="#000000" stroke="#000000" points="186.418,-83.5844 197.006,-83.9469 188.955,-77.0604 186.418,-83.5844"/>
 </g>
 <!-- proc~e_ioniz_2_janev -->
-<g id="node4" class="node"><title>proc~e_ioniz_2_janev</title>
-<a xlink:href="../proc/e_ioniz_2_janev.html" xlink:title="e_ioniz_2_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="274,-70 184,-70 184,-44 274,-44 274,-70"/>
-<text text-anchor="middle" x="229" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_2_janev</text>
+<g id="proc~~e_ioniz~~CallsGraph_node4" class="node"><title>proc~e_ioniz_2_janev</title>
+<g id="a_proc~~e_ioniz~~CallsGraph_node4"><a xlink:href="../proc/e_ioniz_2_janev.html" xlink:title="e_ioniz_2_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="274,-66 184,-66 184,-42 274,-42 274,-66"/>
+<text text-anchor="middle" x="229" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_2_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~e_ioniz_n&#45;&gt;proc~e_ioniz_2_janev -->
-<g id="edge4" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_2_janev</title>
-<path fill="none" stroke="#000000" d="M148.189,-57C156.058,-57 164.838,-57 173.63,-57"/>
-<polygon fill="#000000" stroke="#000000" points="173.904,-60.5001 183.904,-57 173.904,-53.5001 173.904,-60.5001"/>
+<g id="proc~~e_ioniz~~CallsGraph_edge2" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_2_janev</title>
+<path fill="none" stroke="#000000" d="M148.094,-54C155.91,-54 164.676,-54 173.46,-54"/>
+<polygon fill="#000000" stroke="#000000" points="173.725,-57.5001 183.725,-54 173.725,-50.5001 173.725,-57.5001"/>
 </g>
 <!-- proc~e_ioniz_3_janev -->
-<g id="node5" class="node"><title>proc~e_ioniz_3_janev</title>
-<a xlink:href="../proc/e_ioniz_3_janev.html" xlink:title="e_ioniz_3_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="274,-26 184,-26 184,-1.24345e-14 274,-3.55271e-15 274,-26"/>
-<text text-anchor="middle" x="229" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_3_janev</text>
+<g id="proc~~e_ioniz~~CallsGraph_node5" class="node"><title>proc~e_ioniz_3_janev</title>
+<g id="a_proc~~e_ioniz~~CallsGraph_node5"><a xlink:href="../proc/e_ioniz_3_janev.html" xlink:title="e_ioniz_3_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="274,-24 184,-24 184,-0 274,-0 274,-24"/>
+<text text-anchor="middle" x="229" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">e_ioniz_3_janev</text>
 </a>
 </g>
+</g>
 <!-- proc~e_ioniz_n&#45;&gt;proc~e_ioniz_3_janev -->
-<g id="edge6" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_3_janev</title>
-<path fill="none" stroke="#000000" d="M148.189,-45.3243C159.956,-40.6175 173.762,-35.0953 186.599,-29.9603"/>
-<polygon fill="#000000" stroke="#000000" points="188.193,-33.0925 196.178,-26.1288 185.593,-26.5931 188.193,-33.0925"/>
+<g id="proc~~e_ioniz~~CallsGraph_edge3" class="edge"><title>proc~e_ioniz_n&#45;&gt;proc~e_ioniz_3_janev</title>
+<path fill="none" stroke="#000000" d="M148.094,-43.0746C160.164,-38.3806 174.497,-32.8065 187.669,-27.6841"/>
+<polygon fill="#000000" stroke="#000000" points="188.955,-30.9396 197.006,-24.0531 186.418,-24.4156 188.955,-30.9396"/>
 </g>
 </g>
 </svg>
@@ -983,43 +1011,43 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1043,42 +1071,44 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~e_ioniz~~CalledByGraph Pages: 1 -->
-<svg id="proce_ionizCalledByGraph" width="304pt" height="34pt"
- viewBox="0.00 0.00 304.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~e_ioniz~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="proce_ionizCalledByGraph" width="304pt" height="32pt"
+ viewBox="0.00 0.00 304.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~e_ioniz~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>proc~~e_ioniz~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 301,-30 301,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 300,-28 300,4 -4,4"/>
 <!-- proc~e_ioniz -->
-<g id="node1" class="node"><title>proc~e_ioniz</title>
-<polygon fill="none" stroke="black" points="296,-26 242,-26 242,-1.24345e-14 296,-3.55271e-15 296,-26"/>
-<text text-anchor="middle" x="269" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">e_ioniz</text>
+<g id="proc~~e_ioniz~~CalledByGraph_node1" class="node"><title>proc~e_ioniz</title>
+<polygon fill="none" stroke="black" points="296,-24 242,-24 242,-0 296,-0 296,-24"/>
+<text text-anchor="middle" x="269" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">e_ioniz</text>
 </g>
 <!-- proc~write_bb_h_e -->
-<g id="node2" class="node"><title>proc~write_bb_h_e</title>
-<a xlink:href="../proc/write_bb_h_e.html" xlink:title="write_bb_H_e">
-<polygon fill="#d9534f" stroke="#d9534f" points="205,-26 127,-26 127,-1.24345e-14 205,-3.55271e-15 205,-26"/>
-<text text-anchor="middle" x="166" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_e</text>
+<g id="proc~~e_ioniz~~CalledByGraph_node2" class="node"><title>proc~write_bb_h_e</title>
+<g id="a_proc~~e_ioniz~~CalledByGraph_node2"><a xlink:href="../proc/write_bb_h_e.html" xlink:title="write_bb_H_e">
+<polygon fill="#d9534f" stroke="#d9534f" points="205.5,-24 126.5,-24 126.5,-0 205.5,-0 205.5,-24"/>
+<text text-anchor="middle" x="166" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_e</text>
 </a>
+</g>
 </g>
 <!-- proc~write_bb_h_e&#45;&gt;proc~e_ioniz -->
-<g id="edge4" class="edge"><title>proc~write_bb_h_e&#45;&gt;proc~e_ioniz</title>
-<path fill="none" stroke="#000000" d="M205.528,-13C214.159,-13 223.265,-13 231.802,-13"/>
-<polygon fill="#000000" stroke="#000000" points="231.862,-16.5001 241.862,-13 231.862,-9.5001 231.862,-16.5001"/>
+<g id="proc~~e_ioniz~~CalledByGraph_edge2" class="edge"><title>proc~write_bb_h_e&#45;&gt;proc~e_ioniz</title>
+<path fill="none" stroke="#000000" d="M205.76,-12C214.382,-12 223.487,-12 231.993,-12"/>
+<polygon fill="#000000" stroke="#000000" points="231.998,-15.5001 241.998,-12 231.998,-8.5001 231.998,-15.5001"/>
 </g>
 <!-- program~generate_tables -->
-<g id="node3" class="node"><title>program~generate_tables</title>
-<a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-26 4.26326e-14,-26 0,-1.24345e-14 90,-3.55271e-15 90,-26"/>
-<text text-anchor="middle" x="45" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+<g id="proc~~e_ioniz~~CalledByGraph_node3" class="node"><title>program~generate_tables</title>
+<g id="a_proc~~e_ioniz~~CalledByGraph_node3"><a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-24 0,-24 0,-0 90,-0 90,-24"/>
+<text text-anchor="middle" x="45" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
 </a>
 </g>
+</g>
 <!-- program~generate_tables&#45;&gt;proc~write_bb_h_e -->
-<g id="edge2" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_e</title>
-<path fill="none" stroke="#000000" d="M90.0559,-13C98.6522,-13 107.694,-13 116.423,-13"/>
-<polygon fill="#000000" stroke="#000000" points="116.48,-16.5001 126.48,-13 116.479,-9.5001 116.48,-16.5001"/>
+<g id="proc~~e_ioniz~~CalledByGraph_edge1" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_e</title>
+<path fill="none" stroke="#000000" d="M90.3112,-12C98.6735,-12 107.465,-12 115.962,-12"/>
+<polygon fill="#000000" stroke="#000000" points="116.133,-15.5001 126.133,-12 116.133,-8.5001 116.133,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -1097,43 +1127,43 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1337,7 +1367,13 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1382,6 +1418,8 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1441,7 +1479,7 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1467,7 +1505,17 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1517,6 +1565,8 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1553,6 +1603,10 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1583,13 +1637,13 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1721,8 +1775,6 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1747,7 +1799,9 @@ the \(n=1..n_{max}\) states at energy <code>eb</code></p>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

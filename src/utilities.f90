@@ -11,6 +11,7 @@ private
 public :: ind2sub, sub2ind
 public :: rng_type, rng_init, rng, rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
+public :: deriv
 
 integer, parameter :: Int32 = 4
 integer, parameter :: Int64 = kind(int8(1))
@@ -66,6 +67,12 @@ interface sparse
     module procedure sparse_4
 end interface
 
+interface deriv
+    !+ Procedure for finding derivatives from an array
+    module procedure deriv_1d
+    module procedure deriv_2d
+end interface
+
 contains
 
 !============================================================================
@@ -82,7 +89,7 @@ subroutine ind2sub(dims,ind,subs)
         !+ Subscripts corresponding to the linear index
 
     integer :: i, ndims, ind1, ind2
-  
+
     ind1=ind
     ndims = size(dims)
     do i=1,ndims-1
@@ -180,7 +187,7 @@ subroutine rng_init(self, seed)
 
     self%state(1) = ieor(777755555,abs(seed))
     self%state(2) = ior(ieor(888889999,abs(seed)),1)
-  
+
 end subroutine rng_init
 
 function rng_uniform(self) result(u)
@@ -191,10 +198,10 @@ function rng_uniform(self) result(u)
         !+ Uniform random deviate
 
     integer(Int32) :: ix,iy,k
-  
+
     ix = self%state(1)
     iy = self%state(2)
-  
+
     ix = ieor(ix,ishft(ix,13))
     ix = ieor(ix,ishft(ix,-17))
     ix = ieor(ix,ishft(ix,5))
@@ -203,7 +210,7 @@ function rng_uniform(self) result(u)
     if(iy.lt.0) iy = iy + IM
     self%state(1) = ix
     self%state(2) = iy
-  
+
     u = am*ior(iand(IM,ieor(ix,iy)),1)
 
 end function rng_uniform
@@ -222,21 +229,21 @@ function rng_normal(self) result(n)
     real(Float64), parameter :: r1 = 0.27597d0
     real(Float64), parameter :: r2 = 0.27846d0
     real(Float64) :: u, v, x, y, q
-  
+
     do
         u = rng_uniform(self)
         v = rng_uniform(self)
         v = 1.7156d0 * (v - 0.5d0)
-  
+
         x = u - s
         y = abs(v) + t
         q = x**2 + y*(a*y - b*x)
-  
+
         if (q.lt.r1) exit
         if (q.gt.r2) cycle
         if((v**2).lt.(-4.0*log(u)*u**2)) exit
     enddo
-  
+
     n = v/u
 
 end function rng_normal
@@ -267,7 +274,7 @@ subroutine randn(randomn)
         !+ Array of normal random deviates
 
     integer :: i, thread_id
-  
+
 #ifdef _OMP
     thread_id = OMP_get_thread_num() + 1
 #else
@@ -290,8 +297,8 @@ subroutine randind_n(n,randomi)
 
     integer :: i
     real(Float64), dimension(1) :: randomu
-  
-    randomi = 0 
+
+    randomi = 0
     do i=1,size(randomi)
         call randu(randomu)
         randomi(i) = ceiling(randomu(1)*n)
@@ -310,7 +317,7 @@ subroutine randind_w_1(w,randomi)
     real(Float64) :: cdf_val, t
     real(Float64), dimension(size(w)) :: cdf
     real(Float64), dimension(1) :: randomu
-  
+
     nw = size(w)
     t = 0.d0
     do i=1, nw
@@ -333,7 +340,7 @@ subroutine randind_w_2(w,randomi)
         !+ 2D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts
-  
+
     integer :: i,nw
     integer, dimension(2) :: subs
     integer, dimension(size(randomi,2)) :: randi
@@ -379,9 +386,9 @@ subroutine sparse_1(A,SA)
         endif
         if(c.gt.SA%nnz) exit
     enddo
-            
+
 end subroutine sparse_1
-    
+
 subroutine sparse_2(A,SA)
     !+ Routine to create a 2D sparse array from a 2D dense array
     real(Float64), dimension(:,:), intent(in) :: A
@@ -411,7 +418,7 @@ subroutine sparse_2(A,SA)
         endif
         if(c.gt.SA%nnz) exit
     enddo
-            
+
 end subroutine sparse_2
 
 subroutine sparse_3(A,SA)
@@ -443,7 +450,7 @@ subroutine sparse_3(A,SA)
         endif
         if(c.gt.SA%nnz) exit
     enddo
-            
+
 end subroutine sparse_3
 
 subroutine sparse_4(A,SA)
@@ -475,7 +482,7 @@ subroutine sparse_4(A,SA)
         endif
         if(c.gt.SA%nnz) exit
     enddo
-            
+
 end subroutine sparse_4
 
 function get_value(SA, subs) result (val)
@@ -491,7 +498,7 @@ function get_value(SA, subs) result (val)
 
     val = 0.d0
     if(SA%nnz.eq.0) return
-        
+
     ind = sub2ind(SA%dims, subs)
     cind = search_sorted_first(SA%inds, ind)
     if(ind.eq.SA%inds(cind))then
@@ -499,5 +506,72 @@ function get_value(SA, subs) result (val)
     endif
 
 end function get_value
+
+!============================================================================
+!--------------------------------Deriv Routines------------------------------
+!============================================================================
+
+subroutine deriv_1d(x,y,yp)
+    !+ Uses 3 point lagrangian method to calculate the derivative of an array
+    real(Float64), dimension(:),intent(in)  :: x
+        !+ X Values
+    real(Float64), dimension(:),intent(in)  :: y
+        !+ Y Values
+    real(Float64), dimension(:),intent(out) :: yp
+        !+ Derivative of Y w.r.t. X
+
+    integer :: i,n
+        !! temporary values for loops
+    real(Float64) :: p1,p2,p3
+        !! intermeadiate values for 3 point lagrangian
+
+    n = size(x)-1
+    do i = 2,n
+        p1 = x(i-1)
+        p2 = x(i)
+        p3 = x(i+1)
+        yp(i) = (y(i-1)*(p2-p3)/((p1-p2)*(p1-p3))) + &
+                (y(i)*((1/(p2-p3))-(1/(p1-p2)))) -   &
+                (y(i+1)*(p1-p2)/((p1-p3)*(p2-p3)))
+    enddo
+
+    yp(1) = (y(1)*((x(1)-x(2))+(x(1)-x(3)))/((x(1)-x(2))*(x(1)-x(3)))) - &
+            (y(2)*(x(1)-x(3))/((x(1)-x(2))*(x(2)-x(3)))) +               &
+            (y(3)*(x(1)-x(2))/((x(1)-x(3))*(x(2)-x(3))))
+    yp(n+1) = -(y(n-1)*(x(n)-x(n+1))/((x(n-1)-x(n))*(x(n-1)-x(n+1)))) +   &
+              (y(n)*(x(n-1)-x(n+1))/((x(n-1)-x(n))*(x(n)-x(n+1)))) -     &
+              (y(n+1)*((x(n-1)-x(n+1))+(x(n)-x(n+1)))/((x(n-1)-x(n+1)) * &
+              (x(n)-x(n+1))))
+
+end subroutine deriv_1d
+
+subroutine deriv_2d(x,y,z,zxp,zyp)
+    !+ Uses 3 point lagrangian method to calculate the partial derivative
+    !+ of an array Z w.r.t X and Y
+    real(Float64), dimension(:), intent(in)  :: x
+        !+ X Values
+    real(Float64), dimension(:), intent(in)  :: y
+        !+ Y Values
+    real(Float64), dimension(:,:), intent(in)  :: z
+        !+ Z Values
+    real(Float64), dimension(:,:), intent(out) :: zxp
+        !+ Derivative of Z w.r.t. X
+    real(Float64), dimension(:,:), intent(out) :: zyp
+        !+ Derivative of Z w.r.t. Y
+
+    integer :: i,n
+        !! temporary values for loops
+
+    n = size(y)
+    do i = 1,n
+        call deriv_1d(x,z(:,i),zxp(:,i))
+    enddo
+
+    n = size(x)
+    do i = 1,n
+        call deriv_1d(y,z(i,:),zyp(i,:))
+    enddo
+
+end subroutine deriv_2d
 
 end module utilities

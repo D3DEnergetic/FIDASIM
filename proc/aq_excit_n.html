@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -869,7 +893,7 @@ the <code>n</code> state to the m=1..<code>m_max</code> states due to a collisio
   
 <tr>
   
-  <td><span class="anchor" id="variable-eb%7E89"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-eb%7E90"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -914,7 +938,7 @@ the <code>n</code> state to the m=1..<code>m_max</code> states due to a collisio
   
 <tr>
   
-  <td><span class="anchor" id="variable-m_max%7E20"></span>integer,</td>
+  <td><span class="anchor" id="variable-m_max%7E21"></span>integer,</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -944,339 +968,362 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~aq_excit_n~~CallsGraph Pages: 1 -->
-<svg id="procaq_excit_nCallsGraph" width="506pt" height="814pt"
- viewBox="0.00 0.00 506.00 814.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~aq_excit_n~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 810)">
+<svg id="procaq_excit_nCallsGraph" width="506pt" height="780pt"
+ viewBox="0.00 0.00 506.00 780.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~aq_excit_n~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 776)">
 <title>proc~~aq_excit_n~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-810 503,-810 503,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-776 502,-776 502,4 -4,4"/>
 <!-- proc~aq_excit_n -->
-<g id="node1" class="node"><title>proc~aq_excit_n</title>
-<polygon fill="none" stroke="black" points="65,-520 1,-520 1,-494 65,-494 65,-520"/>
-<text text-anchor="middle" x="33" y="-504.55" font-family="Helvetica,sans-Serif" font-size="10.50">Aq_excit_n</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node1" class="node"><title>proc~aq_excit_n</title>
+<polygon fill="none" stroke="black" points="65.5,-457 0.5,-457 0.5,-433 65.5,-433 65.5,-457"/>
+<text text-anchor="middle" x="33" y="-442.6" font-family="Helvetica,sans-Serif" font-size="10.50">Aq_excit_n</text>
 </g>
 <!-- proc~aq_excit_1_janev -->
-<g id="node2" class="node"><title>proc~aq_excit_1_janev</title>
-<a xlink:href="../proc/aq_excit_1_janev.html" xlink:title="Aq_excit_1_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="199,-718 103,-718 103,-692 199,-692 199,-718"/>
-<text text-anchor="middle" x="151" y="-702.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node2" class="node"><title>proc~aq_excit_1_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node2"><a xlink:href="../proc/aq_excit_1_janev.html" xlink:title="Aq_excit_1_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="199.5,-688 102.5,-688 102.5,-664 199.5,-664 199.5,-688"/>
+<text text-anchor="middle" x="151" y="-673.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_n&#45;&gt;proc~aq_excit_1_janev -->
-<g id="edge58" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_1_janev</title>
-<path fill="none" stroke="#000000" d="M40.9255,-520.299C60.8685,-553.762 113.289,-641.723 137.894,-683.009"/>
-<polygon fill="#000000" stroke="#000000" points="134.983,-684.961 143.109,-691.759 140.996,-681.377 134.983,-684.961"/>
-</g>
-<!-- proc~aq_excit_n_janev -->
-<g id="node3" class="node"><title>proc~aq_excit_n_janev</title>
-<a xlink:href="../proc/aq_excit_n_janev.html" xlink:title="Aq_excit_n_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="199,-542 103,-542 103,-516 199,-516 199,-542"/>
-<text text-anchor="middle" x="151" y="-526.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_n_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_n&#45;&gt;proc~aq_excit_n_janev -->
-<g id="edge60" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_n_janev</title>
-<path fill="none" stroke="#000000" d="M65.5564,-513.07C73.8725,-514.62 83.0724,-516.336 92.2637,-518.049"/>
-<polygon fill="#000000" stroke="#000000" points="91.7196,-521.508 102.192,-519.9 93.0027,-514.627 91.7196,-521.508"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge29" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_1_janev</title>
+<path fill="none" stroke="#000000" d="M40.0733,-457.094C58.744,-494.275 115.47,-607.238 139.289,-654.671"/>
+<polygon fill="#000000" stroke="#000000" points="136.231,-656.381 143.847,-663.747 142.487,-653.239 136.231,-656.381"/>
 </g>
 <!-- proc~aq_excit_3_janev -->
-<g id="node4" class="node"><title>proc~aq_excit_3_janev</title>
-<a xlink:href="../proc/aq_excit_3_janev.html" xlink:title="Aq_excit_3_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="199,-498 103,-498 103,-472 199,-472 199,-498"/>
-<text text-anchor="middle" x="151" y="-482.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node3" class="node"><title>proc~aq_excit_3_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node3"><a xlink:href="../proc/aq_excit_3_janev.html" xlink:title="Aq_excit_3_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="199.5,-478 102.5,-478 102.5,-454 199.5,-454 199.5,-478"/>
+<text text-anchor="middle" x="151" y="-463.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_n&#45;&gt;proc~aq_excit_3_janev -->
-<g id="edge62" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_3_janev</title>
-<path fill="none" stroke="#000000" d="M65.5564,-500.93C73.8725,-499.38 83.0724,-497.664 92.2637,-495.951"/>
-<polygon fill="#000000" stroke="#000000" points="93.0027,-499.373 102.192,-494.1 91.7196,-492.492 93.0027,-499.373"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge30" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_3_janev</title>
+<path fill="none" stroke="#000000" d="M65.6975,-450.738C73.9736,-452.237 83.1562,-453.899 92.3279,-455.559"/>
+<polygon fill="#000000" stroke="#000000" points="91.7689,-459.015 102.232,-457.352 93.0159,-452.127 91.7689,-459.015"/>
+</g>
+<!-- proc~aq_excit_n_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node4" class="node"><title>proc~aq_excit_n_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node4"><a xlink:href="../proc/aq_excit_n_janev.html" xlink:title="Aq_excit_n_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="199.5,-436 102.5,-436 102.5,-412 199.5,-412 199.5,-436"/>
+<text text-anchor="middle" x="151" y="-421.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_n_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_n&#45;&gt;proc~aq_excit_n_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge31" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_n_janev</title>
+<path fill="none" stroke="#000000" d="M65.6975,-439.262C73.9736,-437.763 83.1562,-436.101 92.3279,-434.441"/>
+<polygon fill="#000000" stroke="#000000" points="93.0159,-437.873 102.232,-432.648 91.7689,-430.985 93.0159,-437.873"/>
 </g>
 <!-- proc~aq_excit_2_janev -->
-<g id="node5" class="node"><title>proc~aq_excit_2_janev</title>
-<a xlink:href="../proc/aq_excit_2_janev.html" xlink:title="Aq_excit_2_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="199,-196 103,-196 103,-170 199,-170 199,-196"/>
-<text text-anchor="middle" x="151" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node5" class="node"><title>proc~aq_excit_2_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node5"><a xlink:href="../proc/aq_excit_2_janev.html" xlink:title="Aq_excit_2_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="199.5,-188 102.5,-188 102.5,-164 199.5,-164 199.5,-188"/>
+<text text-anchor="middle" x="151" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_n&#45;&gt;proc~aq_excit_2_janev -->
-<g id="edge64" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_2_janev</title>
-<path fill="none" stroke="#000000" d="M37.7719,-493.898C55.7838,-444.441 119.78,-268.723 142.732,-205.702"/>
-<polygon fill="#000000" stroke="#000000" points="146.035,-206.86 146.169,-196.266 139.458,-204.464 146.035,-206.86"/>
-</g>
-<!-- proc~aq_excit_1_5_janev -->
-<g id="node6" class="node"><title>proc~aq_excit_1_5_janev</title>
-<a xlink:href="../proc/aq_excit_1_5_janev.html" xlink:title="Aq_excit_1_5_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-806 240,-806 240,-780 348,-780 348,-806"/>
-<text text-anchor="middle" x="294" y="-790.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_5_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_5_janev -->
-<g id="edge2" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_5_janev</title>
-<path fill="none" stroke="#000000" d="M165.102,-718.109C181.243,-732.577 208.954,-755.822 236,-771 239.002,-772.685 242.159,-774.292 245.386,-775.815"/>
-<polygon fill="#000000" stroke="#000000" points="244.028,-779.041 254.59,-779.876 246.854,-772.637 244.028,-779.041"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge32" class="edge"><title>proc~aq_excit_n&#45;&gt;proc~aq_excit_2_janev</title>
+<path fill="none" stroke="#000000" d="M39.2857,-432.743C57.4818,-390.546 117.68,-250.948 140.824,-197.279"/>
+<polygon fill="#000000" stroke="#000000" points="144.07,-198.591 144.816,-188.022 137.642,-195.819 144.07,-198.591"/>
 </g>
 <!-- proc~aq_excit_1_4_janev -->
-<g id="node7" class="node"><title>proc~aq_excit_1_4_janev</title>
-<a xlink:href="../proc/aq_excit_1_4_janev.html" xlink:title="Aq_excit_1_4_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-762 240,-762 240,-736 348,-736 348,-762"/>
-<text text-anchor="middle" x="294" y="-746.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_4_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node6" class="node"><title>proc~aq_excit_1_4_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node6"><a xlink:href="../proc/aq_excit_1_4_janev.html" xlink:title="Aq_excit_1_4_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-772 239.5,-772 239.5,-748 348.5,-748 348.5,-772"/>
+<text text-anchor="middle" x="294" y="-757.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_4_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_4_janev -->
-<g id="edge4" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_4_janev</title>
-<path fill="none" stroke="#000000" d="M193.518,-718.082C208.653,-722.739 225.875,-728.038 241.733,-732.918"/>
-<polygon fill="#000000" stroke="#000000" points="240.812,-736.296 251.399,-735.892 242.871,-729.606 240.812,-736.296"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge1" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_4_janev</title>
+<path fill="none" stroke="#000000" d="M165.417,-688.027C181.329,-701.806 209.098,-724.365 236,-739 239.248,-740.767 242.676,-742.444 246.173,-744.022"/>
+<polygon fill="#000000" stroke="#000000" points="244.942,-747.302 255.516,-747.964 247.663,-740.852 244.942,-747.302"/>
+</g>
+<!-- proc~aq_excit_1_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node7" class="node"><title>proc~aq_excit_1_5_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node7"><a xlink:href="../proc/aq_excit_1_5_janev.html" xlink:title="Aq_excit_1_5_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-730 239.5,-730 239.5,-706 348.5,-706 348.5,-730"/>
+<text text-anchor="middle" x="294" y="-715.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_5_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge2" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_5_janev</title>
+<path fill="none" stroke="#000000" d="M192.405,-688.036C208.04,-692.693 226.105,-698.074 242.576,-702.98"/>
+<polygon fill="#000000" stroke="#000000" points="242.006,-706.462 252.589,-705.963 244.004,-699.754 242.006,-706.462"/>
 </g>
 <!-- proc~aq_excit_1_2_janev -->
-<g id="node8" class="node"><title>proc~aq_excit_1_2_janev</title>
-<a xlink:href="../proc/aq_excit_1_2_janev.html" xlink:title="Aq_excit_1_2_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-718 240,-718 240,-692 348,-692 348,-718"/>
-<text text-anchor="middle" x="294" y="-702.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_2_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node8" class="node"><title>proc~aq_excit_1_2_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node8"><a xlink:href="../proc/aq_excit_1_2_janev.html" xlink:title="Aq_excit_1_2_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-688 239.5,-688 239.5,-664 348.5,-664 348.5,-688"/>
+<text text-anchor="middle" x="294" y="-673.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_2_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_2_janev -->
-<g id="edge6" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_2_janev</title>
-<path fill="none" stroke="#000000" d="M199.813,-705C209.18,-705 219.128,-705 228.914,-705"/>
-<polygon fill="#000000" stroke="#000000" points="229.022,-708.5 239.022,-705 229.022,-701.5 229.022,-708.5"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge3" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_2_janev</title>
+<path fill="none" stroke="#000000" d="M199.736,-676C209.223,-676 219.327,-676 229.25,-676"/>
+<polygon fill="#000000" stroke="#000000" points="229.493,-679.5 239.493,-676 229.493,-672.5 229.493,-679.5"/>
 </g>
 <!-- proc~aq_excit_1_3_janev -->
-<g id="node9" class="node"><title>proc~aq_excit_1_3_janev</title>
-<a xlink:href="../proc/aq_excit_1_3_janev.html" xlink:title="Aq_excit_1_3_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-674 240,-674 240,-648 348,-648 348,-674"/>
-<text text-anchor="middle" x="294" y="-658.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_3_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node9" class="node"><title>proc~aq_excit_1_3_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node9"><a xlink:href="../proc/aq_excit_1_3_janev.html" xlink:title="Aq_excit_1_3_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-646 239.5,-646 239.5,-622 348.5,-622 348.5,-646"/>
+<text text-anchor="middle" x="294" y="-631.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_1_3_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_3_janev -->
-<g id="edge8" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_3_janev</title>
-<path fill="none" stroke="#000000" d="M193.518,-691.918C208.653,-687.261 225.875,-681.962 241.733,-677.082"/>
-<polygon fill="#000000" stroke="#000000" points="242.871,-680.394 251.399,-674.108 240.812,-673.704 242.871,-680.394"/>
-</g>
-<!-- proc~aq_excit_3_4_janev -->
-<g id="node14" class="node"><title>proc~aq_excit_3_4_janev</title>
-<a xlink:href="../proc/aq_excit_3_4_janev.html" xlink:title="Aq_excit_3_4_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-630 240,-630 240,-604 348,-604 348,-630"/>
-<text text-anchor="middle" x="294" y="-614.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_4_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_4_janev -->
-<g id="edge18" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_4_janev</title>
-<path fill="none" stroke="#000000" d="M188.335,-498.005C192.606,-500.536 196.629,-503.514 200,-507 229.373,-537.379 205.737,-565.507 236,-595 237.109,-596.08 238.276,-597.109 239.491,-598.088"/>
-<polygon fill="#000000" stroke="#000000" points="237.85,-601.201 248.107,-603.856 241.744,-595.384 237.85,-601.201"/>
-</g>
-<!-- proc~aq_excit_3_10_janev -->
-<g id="node15" class="node"><title>proc~aq_excit_3_10_janev</title>
-<a xlink:href="../proc/aq_excit_3_10_janev.html" xlink:title="Aq_excit_3_10_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="351,-586 237,-586 237,-560 351,-560 351,-586"/>
-<text text-anchor="middle" x="294" y="-570.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_10_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev -->
-<g id="edge20" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev</title>
-<path fill="none" stroke="#000000" d="M185.632,-498.09C190.675,-500.683 195.632,-503.655 200,-507 220.06,-522.362 215.492,-536.241 236,-551 238.065,-552.486 240.243,-553.885 242.495,-555.201"/>
-<polygon fill="#000000" stroke="#000000" points="240.983,-558.36 251.47,-559.869 244.213,-552.149 240.983,-558.36"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge4" class="edge"><title>proc~aq_excit_1_janev&#45;&gt;proc~aq_excit_1_3_janev</title>
+<path fill="none" stroke="#000000" d="M192.405,-663.964C208.04,-659.307 226.105,-653.926 242.576,-649.02"/>
+<polygon fill="#000000" stroke="#000000" points="244.004,-652.246 252.589,-646.037 242.006,-645.538 244.004,-652.246"/>
 </g>
 <!-- proc~aq_excit_3_9_janev -->
-<g id="node16" class="node"><title>proc~aq_excit_3_9_janev</title>
-<a xlink:href="../proc/aq_excit_3_9_janev.html" xlink:title="Aq_excit_3_9_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-542 240,-542 240,-516 348,-516 348,-542"/>
-<text text-anchor="middle" x="294" y="-526.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_9_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node10" class="node"><title>proc~aq_excit_3_9_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node10"><a xlink:href="../proc/aq_excit_3_9_janev.html" xlink:title="Aq_excit_3_9_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-604 239.5,-604 239.5,-580 348.5,-580 348.5,-604"/>
+<text text-anchor="middle" x="294" y="-589.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_9_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_9_janev -->
-<g id="edge22" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_9_janev</title>
-<path fill="none" stroke="#000000" d="M193.518,-498.082C208.653,-502.739 225.875,-508.038 241.733,-512.918"/>
-<polygon fill="#000000" stroke="#000000" points="240.812,-516.296 251.399,-515.892 242.871,-509.606 240.812,-516.296"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge9" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_9_janev</title>
+<path fill="none" stroke="#000000" d="M158.696,-478.167C171.176,-499.789 200.017,-545.065 236,-571 238.096,-572.511 240.313,-573.925 242.608,-575.247"/>
+<polygon fill="#000000" stroke="#000000" points="241.261,-578.488 251.762,-579.898 244.433,-572.247 241.261,-578.488"/>
 </g>
-<!-- proc~aq_excit_3_5_janev -->
-<g id="node17" class="node"><title>proc~aq_excit_3_5_janev</title>
-<a xlink:href="../proc/aq_excit_3_5_janev.html" xlink:title="Aq_excit_3_5_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-498 240,-498 240,-472 348,-472 348,-498"/>
-<text text-anchor="middle" x="294" y="-482.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_5_janev</text>
+<!-- proc~aq_excit_3_10_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node11" class="node"><title>proc~aq_excit_3_10_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node11"><a xlink:href="../proc/aq_excit_3_10_janev.html" xlink:title="Aq_excit_3_10_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="351.5,-562 236.5,-562 236.5,-538 351.5,-538 351.5,-562"/>
+<text text-anchor="middle" x="294" y="-547.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_10_janev</text>
 </a>
 </g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev -->
-<g id="edge24" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev</title>
-<path fill="none" stroke="#000000" d="M199.813,-485C209.18,-485 219.128,-485 228.914,-485"/>
-<polygon fill="#000000" stroke="#000000" points="229.022,-488.5 239.022,-485 229.022,-481.5 229.022,-488.5"/>
 </g>
-<!-- proc~aq_excit_3_6_janev -->
-<g id="node18" class="node"><title>proc~aq_excit_3_6_janev</title>
-<a xlink:href="../proc/aq_excit_3_6_janev.html" xlink:title="Aq_excit_3_6_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="497,-457 389,-457 389,-431 497,-431 497,-457"/>
-<text text-anchor="middle" x="443" y="-441.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_6_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge26" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M195.699,-471.985C208.611,-468.62 222.785,-465.301 236,-463 283.197,-454.782 337.108,-449.978 378.078,-447.257"/>
-<polygon fill="#000000" stroke="#000000" points="378.447,-450.74 388.204,-446.609 378,-443.755 378.447,-450.74"/>
-</g>
-<!-- proc~aq_excit_3_7_janev -->
-<g id="node19" class="node"><title>proc~aq_excit_3_7_janev</title>
-<a xlink:href="../proc/aq_excit_3_7_janev.html" xlink:title="Aq_excit_3_7_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-416 240,-416 240,-390 348,-390 348,-416"/>
-<text text-anchor="middle" x="294" y="-400.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_7_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_7_janev -->
-<g id="edge28" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_7_janev</title>
-<path fill="none" stroke="#000000" d="M169.777,-471.773C186.7,-460.115 212.464,-443.011 236,-430 241.943,-426.715 248.356,-423.458 254.675,-420.405"/>
-<polygon fill="#000000" stroke="#000000" points="256.252,-423.531 263.8,-416.096 253.263,-417.201 256.252,-423.531"/>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge10" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_10_janev</title>
+<path fill="none" stroke="#000000" d="M165.417,-478.027C181.329,-491.806 209.098,-514.365 236,-529 239.248,-530.767 242.676,-532.444 246.173,-534.022"/>
+<polygon fill="#000000" stroke="#000000" points="244.942,-537.302 255.516,-537.964 247.663,-530.852 244.942,-537.302"/>
 </g>
 <!-- proc~aq_excit_3_8_janev -->
-<g id="node20" class="node"><title>proc~aq_excit_3_8_janev</title>
-<a xlink:href="../proc/aq_excit_3_8_janev.html" xlink:title="Aq_excit_3_8_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-372 240,-372 240,-346 348,-346 348,-372"/>
-<text text-anchor="middle" x="294" y="-356.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_8_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node12" class="node"><title>proc~aq_excit_3_8_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node12"><a xlink:href="../proc/aq_excit_3_8_janev.html" xlink:title="Aq_excit_3_8_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-520 239.5,-520 239.5,-496 348.5,-496 348.5,-520"/>
+<text text-anchor="middle" x="294" y="-505.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_8_janev</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_8_janev -->
-<g id="edge30" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_8_janev</title>
-<path fill="none" stroke="#000000" d="M158.484,-471.96C171.57,-450.229 200.613,-406.481 236,-381 238.065,-379.513 240.242,-378.114 242.494,-376.798"/>
-<polygon fill="#000000" stroke="#000000" points="244.212,-379.849 251.468,-372.129 240.982,-373.639 244.212,-379.849"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge11" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_8_janev</title>
+<path fill="none" stroke="#000000" d="M192.405,-478.036C208.04,-482.693 226.105,-488.074 242.576,-492.98"/>
+<polygon fill="#000000" stroke="#000000" points="242.006,-496.462 252.589,-495.963 244.004,-489.754 242.006,-496.462"/>
 </g>
-<!-- proc~aq_excit_2_7_janev -->
-<g id="node32" class="node"><title>proc~aq_excit_2_7_janev</title>
-<a xlink:href="../proc/aq_excit_2_7_janev.html" xlink:title="Aq_excit_2_7_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-328 240,-328 240,-302 348,-302 348,-328"/>
-<text text-anchor="middle" x="294" y="-312.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_7_janev</text>
+<!-- proc~aq_excit_3_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node13" class="node"><title>proc~aq_excit_3_5_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node13"><a xlink:href="../proc/aq_excit_3_5_janev.html" xlink:title="Aq_excit_3_5_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-478 239.5,-478 239.5,-454 348.5,-454 348.5,-478"/>
+<text text-anchor="middle" x="294" y="-463.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_5_janev</text>
 </a>
 </g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_7_janev -->
-<g id="edge42" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_7_janev</title>
-<path fill="none" stroke="#000000" d="M157.888,-196.079C170.487,-218.828 199.351,-265.843 236,-293 238.044,-294.515 240.205,-295.937 242.444,-297.272"/>
-<polygon fill="#000000" stroke="#000000" points="240.904,-300.417 251.381,-301.991 244.172,-294.227 240.904,-300.417"/>
 </g>
-<!-- proc~aq_excit_2_3_janev -->
-<g id="node33" class="node"><title>proc~aq_excit_2_3_janev</title>
-<a xlink:href="../proc/aq_excit_2_3_janev.html" xlink:title="Aq_excit_2_3_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-284 240,-284 240,-258 348,-258 348,-284"/>
-<text text-anchor="middle" x="294" y="-268.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_3_janev</text>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge12" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_5_janev</title>
+<path fill="none" stroke="#000000" d="M199.736,-466C209.223,-466 219.327,-466 229.25,-466"/>
+<polygon fill="#000000" stroke="#000000" points="229.493,-469.5 239.493,-466 229.493,-462.5 229.493,-469.5"/>
+</g>
+<!-- proc~aq_excit_3_6_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node14" class="node"><title>proc~aq_excit_3_6_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node14"><a xlink:href="../proc/aq_excit_3_6_janev.html" xlink:title="Aq_excit_3_6_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="497.5,-520 388.5,-520 388.5,-496 497.5,-496 497.5,-520"/>
+<text text-anchor="middle" x="443" y="-505.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_6_janev</text>
 </a>
 </g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_3_janev -->
-<g id="edge44" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_3_janev</title>
-<path fill="none" stroke="#000000" d="M165.102,-196.109C181.243,-210.577 208.954,-233.822 236,-249 239.002,-250.685 242.159,-252.292 245.386,-253.815"/>
-<polygon fill="#000000" stroke="#000000" points="244.028,-257.041 254.59,-257.876 246.854,-250.637 244.028,-257.041"/>
 </g>
-<!-- proc~aq_excit_2_8_janev -->
-<g id="node34" class="node"><title>proc~aq_excit_2_8_janev</title>
-<a xlink:href="../proc/aq_excit_2_8_janev.html" xlink:title="Aq_excit_2_8_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-240 240,-240 240,-214 348,-214 348,-240"/>
-<text text-anchor="middle" x="294" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_8_janev</text>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge13" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M187.184,-453.903C227.817,-441.834 296.226,-427.419 352,-445 379.2,-453.574 405.331,-473.626 422.362,-488.822"/>
+<polygon fill="#000000" stroke="#000000" points="420.23,-491.618 429.956,-495.82 424.974,-486.47 420.23,-491.618"/>
+</g>
+<!-- proc~aq_excit_3_7_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node15" class="node"><title>proc~aq_excit_3_7_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node15"><a xlink:href="../proc/aq_excit_3_7_janev.html" xlink:title="Aq_excit_3_7_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-398 239.5,-398 239.5,-374 348.5,-374 348.5,-398"/>
+<text text-anchor="middle" x="294" y="-383.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_7_janev</text>
 </a>
 </g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_8_janev -->
-<g id="edge46" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_8_janev</title>
-<path fill="none" stroke="#000000" d="M193.518,-196.082C208.653,-200.739 225.875,-206.038 241.733,-210.918"/>
-<polygon fill="#000000" stroke="#000000" points="240.812,-214.296 251.399,-213.892 242.871,-207.606 240.812,-214.296"/>
 </g>
-<!-- proc~aq_excit_2_4_janev -->
-<g id="node35" class="node"><title>proc~aq_excit_2_4_janev</title>
-<a xlink:href="../proc/aq_excit_2_4_janev.html" xlink:title="Aq_excit_2_4_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-196 240,-196 240,-170 348,-170 348,-196"/>
-<text text-anchor="middle" x="294" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_4_janev</text>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_7_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge14" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_7_janev</title>
+<path fill="none" stroke="#000000" d="M183.76,-453.881C189.342,-451.258 194.969,-448.276 200,-445 218.189,-433.156 217.904,-423.985 236,-412 241.237,-408.532 247.012,-405.305 252.815,-402.388"/>
+<polygon fill="#000000" stroke="#000000" points="254.363,-405.527 261.886,-398.067 251.353,-399.208 254.363,-405.527"/>
+</g>
+<!-- proc~aq_excit_3_4_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node16" class="node"><title>proc~aq_excit_3_4_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node16"><a xlink:href="../proc/aq_excit_3_4_janev.html" xlink:title="Aq_excit_3_4_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-356 239.5,-356 239.5,-332 348.5,-332 348.5,-356"/>
+<text text-anchor="middle" x="294" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_3_4_janev</text>
 </a>
 </g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_4_janev -->
-<g id="edge48" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_4_janev</title>
-<path fill="none" stroke="#000000" d="M199.813,-183C209.18,-183 219.128,-183 228.914,-183"/>
-<polygon fill="#000000" stroke="#000000" points="229.022,-186.5 239.022,-183 229.022,-179.5 229.022,-186.5"/>
 </g>
-<!-- proc~aq_excit_2_10_janev -->
-<g id="node36" class="node"><title>proc~aq_excit_2_10_janev</title>
-<a xlink:href="../proc/aq_excit_2_10_janev.html" xlink:title="Aq_excit_2_10_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="351,-152 237,-152 237,-126 351,-126 351,-152"/>
-<text text-anchor="middle" x="294" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_10_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_10_janev -->
-<g id="edge50" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_10_janev</title>
-<path fill="none" stroke="#000000" d="M193.518,-169.918C208.653,-165.261 225.875,-159.962 241.733,-155.082"/>
-<polygon fill="#000000" stroke="#000000" points="242.871,-158.394 251.399,-152.108 240.812,-151.704 242.871,-158.394"/>
-</g>
-<!-- proc~aq_excit_2_9_janev -->
-<g id="node37" class="node"><title>proc~aq_excit_2_9_janev</title>
-<a xlink:href="../proc/aq_excit_2_9_janev.html" xlink:title="Aq_excit_2_9_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-108 240,-108 240,-82 348,-82 348,-108"/>
-<text text-anchor="middle" x="294" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_9_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_9_janev -->
-<g id="edge52" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_9_janev</title>
-<path fill="none" stroke="#000000" d="M165.102,-169.891C181.243,-155.423 208.954,-132.178 236,-117 239.002,-115.315 242.159,-113.708 245.386,-112.185"/>
-<polygon fill="#000000" stroke="#000000" points="246.854,-115.363 254.59,-108.124 244.028,-108.959 246.854,-115.363"/>
-</g>
-<!-- proc~aq_excit_2_5_janev -->
-<g id="node38" class="node"><title>proc~aq_excit_2_5_janev</title>
-<a xlink:href="../proc/aq_excit_2_5_janev.html" xlink:title="Aq_excit_2_5_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="497,-130 389,-130 389,-104 497,-104 497,-130"/>
-<text text-anchor="middle" x="443" y="-114.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_5_janev</text>
-</a>
-</g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_5_janev -->
-<g id="edge54" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
-<path fill="none" stroke="#000000" d="M156.482,-169.642C167.39,-145.087 194.406,-93.4244 236,-73 294.561,-44.2443 371.476,-76.5501 413.107,-99.0439"/>
-<polygon fill="#000000" stroke="#000000" points="411.484,-102.146 421.924,-103.949 414.887,-96.0287 411.484,-102.146"/>
+<!-- proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_4_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge15" class="edge"><title>proc~aq_excit_3_janev&#45;&gt;proc~aq_excit_3_4_janev</title>
+<path fill="none" stroke="#000000" d="M187.973,-453.862C192.355,-451.387 196.509,-448.455 200,-445 227.713,-417.574 207.484,-391.59 236,-365 237.299,-363.789 238.674,-362.646 240.109,-361.567"/>
+<polygon fill="#000000" stroke="#000000" points="242.262,-364.349 248.879,-356.074 238.546,-358.417 242.262,-364.349"/>
 </g>
 <!-- proc~aq_excit_2_6_janev -->
-<g id="node39" class="node"><title>proc~aq_excit_2_6_janev</title>
-<a xlink:href="../proc/aq_excit_2_6_janev.html" xlink:title="Aq_excit_2_6_janev">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="348,-26 240,-26 240,-1.24345e-14 348,-3.55271e-15 348,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_6_janev</text>
+<g id="proc~~aq_excit_n~~CallsGraph_node17" class="node"><title>proc~aq_excit_2_6_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node17"><a xlink:href="../proc/aq_excit_2_6_janev.html" xlink:title="Aq_excit_2_6_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-314 239.5,-314 239.5,-290 348.5,-290 348.5,-314"/>
+<text text-anchor="middle" x="294" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_6_janev</text>
 </a>
 </g>
-<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_6_janev -->
-<g id="edge56" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_6_janev</title>
-<path fill="none" stroke="#000000" d="M155.738,-169.795C166.212,-142.27 193.796,-78.1574 236,-40 239.765,-36.5956 244.035,-33.5462 248.509,-30.8335"/>
-<polygon fill="#000000" stroke="#000000" points="250.195,-33.9006 257.284,-26.0273 246.832,-27.7611 250.195,-33.9006"/>
 </g>
-<!-- proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge10" class="edge"><title>proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M336.167,-559.924C341.722,-557.377 347.16,-554.414 352,-551 385.074,-527.672 413.512,-489.618 429.423,-465.738"/>
-<polygon fill="#000000" stroke="#000000" points="432.559,-467.336 435.079,-457.045 426.692,-463.518 432.559,-467.336"/>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_6_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge21" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_6_janev</title>
+<path fill="none" stroke="#000000" d="M158.696,-188.167C171.176,-209.789 200.017,-255.065 236,-281 238.096,-282.511 240.313,-283.925 242.608,-285.247"/>
+<polygon fill="#000000" stroke="#000000" points="241.261,-288.488 251.762,-289.898 244.433,-282.247 241.261,-288.488"/>
+</g>
+<!-- proc~aq_excit_2_7_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node18" class="node"><title>proc~aq_excit_2_7_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node18"><a xlink:href="../proc/aq_excit_2_7_janev.html" xlink:title="Aq_excit_2_7_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-272 239.5,-272 239.5,-248 348.5,-248 348.5,-272"/>
+<text text-anchor="middle" x="294" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_7_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_7_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge22" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_7_janev</title>
+<path fill="none" stroke="#000000" d="M165.417,-188.027C181.329,-201.806 209.098,-224.365 236,-239 239.248,-240.767 242.676,-242.444 246.173,-244.022"/>
+<polygon fill="#000000" stroke="#000000" points="244.942,-247.302 255.516,-247.964 247.663,-240.852 244.942,-247.302"/>
+</g>
+<!-- proc~aq_excit_2_3_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node19" class="node"><title>proc~aq_excit_2_3_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node19"><a xlink:href="../proc/aq_excit_2_3_janev.html" xlink:title="Aq_excit_2_3_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-230 239.5,-230 239.5,-206 348.5,-206 348.5,-230"/>
+<text text-anchor="middle" x="294" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_3_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_3_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge23" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_3_janev</title>
+<path fill="none" stroke="#000000" d="M192.405,-188.036C208.04,-192.693 226.105,-198.074 242.576,-202.98"/>
+<polygon fill="#000000" stroke="#000000" points="242.006,-206.462 252.589,-205.963 244.004,-199.754 242.006,-206.462"/>
+</g>
+<!-- proc~aq_excit_2_8_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node20" class="node"><title>proc~aq_excit_2_8_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node20"><a xlink:href="../proc/aq_excit_2_8_janev.html" xlink:title="Aq_excit_2_8_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-188 239.5,-188 239.5,-164 348.5,-164 348.5,-188"/>
+<text text-anchor="middle" x="294" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_8_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_8_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge24" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_8_janev</title>
+<path fill="none" stroke="#000000" d="M199.736,-176C209.223,-176 219.327,-176 229.25,-176"/>
+<polygon fill="#000000" stroke="#000000" points="229.493,-179.5 239.493,-176 229.493,-172.5 229.493,-179.5"/>
+</g>
+<!-- proc~aq_excit_2_10_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node21" class="node"><title>proc~aq_excit_2_10_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node21"><a xlink:href="../proc/aq_excit_2_10_janev.html" xlink:title="Aq_excit_2_10_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="351.5,-146 236.5,-146 236.5,-122 351.5,-122 351.5,-146"/>
+<text text-anchor="middle" x="294" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_10_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_10_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge25" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_10_janev</title>
+<path fill="none" stroke="#000000" d="M192.405,-163.964C208.04,-159.307 226.105,-153.926 242.576,-149.02"/>
+<polygon fill="#000000" stroke="#000000" points="244.004,-152.246 252.589,-146.037 242.006,-145.538 244.004,-152.246"/>
+</g>
+<!-- proc~aq_excit_2_9_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node22" class="node"><title>proc~aq_excit_2_9_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node22"><a xlink:href="../proc/aq_excit_2_9_janev.html" xlink:title="Aq_excit_2_9_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-104 239.5,-104 239.5,-80 348.5,-80 348.5,-104"/>
+<text text-anchor="middle" x="294" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_9_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_9_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge26" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_9_janev</title>
+<path fill="none" stroke="#000000" d="M165.417,-163.973C181.329,-150.194 209.098,-127.635 236,-113 239.248,-111.233 242.676,-109.556 246.173,-107.978"/>
+<polygon fill="#000000" stroke="#000000" points="247.663,-111.148 255.516,-104.036 244.942,-104.698 247.663,-111.148"/>
+</g>
+<!-- proc~aq_excit_2_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node23" class="node"><title>proc~aq_excit_2_5_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node23"><a xlink:href="../proc/aq_excit_2_5_janev.html" xlink:title="Aq_excit_2_5_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="497.5,-167 388.5,-167 388.5,-143 497.5,-143 497.5,-167"/>
+<text text-anchor="middle" x="443" y="-152.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_5_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge27" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
+<path fill="none" stroke="#000000" d="M157.212,-163.959C167.989,-140.802 195.181,-90.6186 236,-71 282.467,-48.6667 304.036,-52.0943 352,-71 384.362,-83.7558 411.951,-114.243 427.757,-134.761"/>
+<polygon fill="#000000" stroke="#000000" points="425.009,-136.932 433.788,-142.863 430.624,-132.752 425.009,-136.932"/>
+</g>
+<!-- proc~aq_excit_2_4_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_node24" class="node"><title>proc~aq_excit_2_4_janev</title>
+<g id="a_proc~~aq_excit_n~~CallsGraph_node24"><a xlink:href="../proc/aq_excit_2_4_janev.html" xlink:title="Aq_excit_2_4_janev">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-24 239.5,-24 239.5,-0 348.5,-0 348.5,-24"/>
+<text text-anchor="middle" x="294" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_2_4_janev</text>
+</a>
+</g>
+</g>
+<!-- proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_4_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge28" class="edge"><title>proc~aq_excit_2_janev&#45;&gt;proc~aq_excit_2_4_janev</title>
+<path fill="none" stroke="#000000" d="M156.586,-163.636C166.932,-137.258 194.468,-74.8675 236,-38 239.866,-34.5679 244.262,-31.514 248.857,-28.8161"/>
+<polygon fill="#000000" stroke="#000000" points="250.647,-31.8287 257.852,-24.061 247.376,-25.6401 250.647,-31.8287"/>
 </g>
 <!-- proc~aq_excit_3_9_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge12" class="edge"><title>proc~aq_excit_3_9_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M332.334,-515.975C339.015,-513.279 345.804,-510.258 352,-507 375.824,-494.474 400.822,-476.793 418.576,-463.35"/>
-<polygon fill="#000000" stroke="#000000" points="420.874,-465.998 426.673,-457.131 416.61,-460.446 420.874,-465.998"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge5" class="edge"><title>proc~aq_excit_3_9_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M332.092,-579.917C338.85,-577.273 345.739,-574.275 352,-571 376.256,-558.315 401.601,-540.053 419.191,-526.453"/>
+<polygon fill="#000000" stroke="#000000" points="421.458,-529.124 427.164,-520.197 417.136,-523.617 421.458,-529.124"/>
 </g>
-<!-- proc~aq_excit_3_7_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge14" class="edge"><title>proc~aq_excit_3_7_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M341.554,-416.085C355.602,-419.951 371.126,-424.223 385.718,-428.238"/>
-<polygon fill="#000000" stroke="#000000" points="385.072,-431.69 395.642,-430.969 386.929,-424.941 385.072,-431.69"/>
+<!-- proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge6" class="edge"><title>proc~aq_excit_3_10_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M337.124,-537.964C353.578,-533.263 372.614,-527.825 389.916,-522.881"/>
+<polygon fill="#000000" stroke="#000000" points="391.216,-526.15 399.87,-520.037 389.293,-519.419 391.216,-526.15"/>
 </g>
 <!-- proc~aq_excit_3_8_janev&#45;&gt;proc~aq_excit_3_6_janev -->
-<g id="edge16" class="edge"><title>proc~aq_excit_3_8_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
-<path fill="none" stroke="#000000" d="M332.334,-372.025C339.015,-374.721 345.804,-377.742 352,-381 375.824,-393.526 400.822,-411.207 418.576,-424.65"/>
-<polygon fill="#000000" stroke="#000000" points="416.61,-427.554 426.673,-430.869 420.874,-422.002 416.61,-427.554"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge7" class="edge"><title>proc~aq_excit_3_8_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M348.903,-508C358.39,-508 368.347,-508 378.076,-508"/>
+<polygon fill="#000000" stroke="#000000" points="378.104,-511.5 388.104,-508 378.104,-504.5 378.104,-511.5"/>
 </g>
-<!-- proc~aq_excit_2_7_janev&#45;&gt;proc~aq_excit_2_5_janev -->
-<g id="edge32" class="edge"><title>proc~aq_excit_2_7_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
-<path fill="none" stroke="#000000" d="M338.712,-301.997C343.505,-299.485 348.061,-296.512 352,-293 399.675,-250.5 426.063,-177.067 436.964,-139.928"/>
-<polygon fill="#000000" stroke="#000000" points="440.403,-140.63 439.745,-130.055 433.665,-138.732 440.403,-140.63"/>
-</g>
-<!-- proc~aq_excit_2_8_janev&#45;&gt;proc~aq_excit_2_5_janev -->
-<g id="edge34" class="edge"><title>proc~aq_excit_2_8_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
-<path fill="none" stroke="#000000" d="M334.953,-213.884C340.865,-211.307 346.726,-208.347 352,-205 381.224,-186.45 408.933,-157.416 425.93,-137.82"/>
-<polygon fill="#000000" stroke="#000000" points="428.72,-139.942 432.532,-130.057 423.387,-135.407 428.72,-139.942"/>
-</g>
-<!-- proc~aq_excit_2_10_janev&#45;&gt;proc~aq_excit_2_5_janev -->
-<g id="edge36" class="edge"><title>proc~aq_excit_2_10_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
-<path fill="none" stroke="#000000" d="M351.607,-130.494C360.413,-129.194 369.552,-127.845 378.494,-126.524"/>
-<polygon fill="#000000" stroke="#000000" points="379.098,-129.973 388.479,-125.05 378.075,-123.048 379.098,-129.973"/>
-</g>
-<!-- proc~aq_excit_2_9_janev&#45;&gt;proc~aq_excit_2_5_janev -->
-<g id="edge38" class="edge"><title>proc~aq_excit_2_9_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
-<path fill="none" stroke="#000000" d="M348.636,-103.067C358.252,-104.487 368.345,-105.977 378.207,-107.433"/>
-<polygon fill="#000000" stroke="#000000" points="377.967,-110.936 388.371,-108.934 378.989,-104.011 377.967,-110.936"/>
+<!-- proc~aq_excit_3_7_janev&#45;&gt;proc~aq_excit_3_6_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge8" class="edge"><title>proc~aq_excit_3_7_janev&#45;&gt;proc~aq_excit_3_6_janev</title>
+<path fill="none" stroke="#000000" d="M327.269,-398.086C335.684,-401.929 344.491,-406.607 352,-412 382.335,-433.785 410.628,-466.894 427.117,-487.981"/>
+<polygon fill="#000000" stroke="#000000" points="424.369,-490.15 433.234,-495.952 429.922,-485.888 424.369,-490.15"/>
 </g>
 <!-- proc~aq_excit_2_6_janev&#45;&gt;proc~aq_excit_2_5_janev -->
-<g id="edge40" class="edge"><title>proc~aq_excit_2_6_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
-<path fill="none" stroke="#000000" d="M326.115,-26.0978C334.767,-30.118 343.953,-34.8537 352,-40 378.005,-56.6309 404.599,-80.0214 422.267,-96.6489"/>
-<polygon fill="#000000" stroke="#000000" points="420.072,-99.3921 429.723,-103.764 424.905,-94.3281 420.072,-99.3921"/>
+<g id="proc~~aq_excit_n~~CallsGraph_edge16" class="edge"><title>proc~aq_excit_2_6_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
+<path fill="none" stroke="#000000" d="M336.709,-289.998C342.128,-287.494 347.389,-284.518 352,-281 389.307,-252.535 417.583,-204.304 431.797,-176.498"/>
+<polygon fill="#000000" stroke="#000000" points="435.076,-177.766 436.389,-167.253 428.806,-174.652 435.076,-177.766"/>
+</g>
+<!-- proc~aq_excit_2_7_janev&#45;&gt;proc~aq_excit_2_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge17" class="edge"><title>proc~aq_excit_2_7_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
+<path fill="none" stroke="#000000" d="M334.298,-247.88C340.419,-245.331 346.522,-242.373 352,-239 380.694,-221.33 408.182,-193.562 425.066,-174.838"/>
+<polygon fill="#000000" stroke="#000000" points="427.833,-176.992 431.834,-167.182 422.589,-172.356 427.833,-176.992"/>
+</g>
+<!-- proc~aq_excit_2_8_janev&#45;&gt;proc~aq_excit_2_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge18" class="edge"><title>proc~aq_excit_2_8_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
+<path fill="none" stroke="#000000" d="M348.903,-168.3C358.39,-166.944 368.347,-165.522 378.076,-164.132"/>
+<polygon fill="#000000" stroke="#000000" points="378.699,-167.579 388.104,-162.699 377.709,-160.649 378.699,-167.579"/>
+</g>
+<!-- proc~aq_excit_2_10_janev&#45;&gt;proc~aq_excit_2_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge19" class="edge"><title>proc~aq_excit_2_10_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
+<path fill="none" stroke="#000000" d="M351.834,-142.119C360.428,-143.347 369.344,-144.621 378.075,-145.868"/>
+<polygon fill="#000000" stroke="#000000" points="377.817,-149.366 388.211,-147.316 378.807,-142.437 377.817,-149.366"/>
+</g>
+<!-- proc~aq_excit_2_9_janev&#45;&gt;proc~aq_excit_2_5_janev -->
+<g id="proc~~aq_excit_n~~CallsGraph_edge20" class="edge"><title>proc~aq_excit_2_9_janev&#45;&gt;proc~aq_excit_2_5_janev</title>
+<path fill="none" stroke="#000000" d="M329.24,-104.086C336.783,-106.896 344.699,-109.958 352,-113 370.76,-120.817 391.324,-130.339 408.053,-138.339"/>
+<polygon fill="#000000" stroke="#000000" points="406.89,-141.664 417.418,-142.849 409.927,-135.357 406.89,-141.664"/>
 </g>
 </g>
 </svg>
@@ -1295,43 +1342,43 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1355,66 +1402,70 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~aq_excit_n~~CalledByGraph Pages: 1 -->
-<svg id="procaq_excit_nCalledByGraph" width="438pt" height="78pt"
- viewBox="0.00 0.00 438.00 78.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~aq_excit_n~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 74)">
+<svg id="procaq_excit_nCalledByGraph" width="438pt" height="74pt"
+ viewBox="0.00 0.00 438.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~aq_excit_n~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
 <title>proc~~aq_excit_n~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-74 435,-74 435,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-70 434,-70 434,4 -4,4"/>
 <!-- proc~aq_excit_n -->
-<g id="node1" class="node"><title>proc~aq_excit_n</title>
-<polygon fill="none" stroke="black" points="429,-48 365,-48 365,-22 429,-22 429,-48"/>
-<text text-anchor="middle" x="397" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50">Aq_excit_n</text>
+<g id="proc~~aq_excit_n~~CalledByGraph_node1" class="node"><title>proc~aq_excit_n</title>
+<polygon fill="none" stroke="black" points="429.5,-45 364.5,-45 364.5,-21 429.5,-21 429.5,-45"/>
+<text text-anchor="middle" x="397" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">Aq_excit_n</text>
 </g>
 <!-- proc~aq_excit_n_m -->
-<g id="node2" class="node"><title>proc~aq_excit_n_m</title>
-<a xlink:href="../proc/aq_excit_n_m.html" xlink:title="Aq_excit_n_m">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="328,-70 248,-70 248,-44 328,-44 328,-70"/>
-<text text-anchor="middle" x="288" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_n_m</text>
+<g id="proc~~aq_excit_n~~CalledByGraph_node2" class="node"><title>proc~aq_excit_n_m</title>
+<g id="a_proc~~aq_excit_n~~CalledByGraph_node2"><a xlink:href="../proc/aq_excit_n_m.html" xlink:title="Aq_excit_n_m">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="328,-66 248,-66 248,-42 328,-42 328,-66"/>
+<text text-anchor="middle" x="288" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit_n_m</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit_n_m&#45;&gt;proc~aq_excit_n -->
-<g id="edge6" class="edge"><title>proc~aq_excit_n_m&#45;&gt;proc~aq_excit_n</title>
-<path fill="none" stroke="#000000" d="M328.278,-48.8705C336.821,-47.1462 345.866,-45.3207 354.489,-43.5802"/>
-<polygon fill="#000000" stroke="#000000" points="355.253,-46.9966 364.363,-41.5872 353.869,-40.1349 355.253,-46.9966"/>
+<g id="proc~~aq_excit_n~~CalledByGraph_edge3" class="edge"><title>proc~aq_excit_n_m&#45;&gt;proc~aq_excit_n</title>
+<path fill="none" stroke="#000000" d="M328.235,-46.2996C336.809,-44.6169 345.91,-42.8307 354.567,-41.1318"/>
+<polygon fill="#000000" stroke="#000000" points="355.327,-44.5493 364.466,-39.1889 353.979,-37.6804 355.327,-44.5493"/>
 </g>
 <!-- proc~aq_excit -->
-<g id="node3" class="node"><title>proc~aq_excit</title>
-<a xlink:href="../proc/aq_excit.html" xlink:title="Aq_excit">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="315,-26 261,-26 261,-1.24345e-14 315,-3.55271e-15 315,-26"/>
-<text text-anchor="middle" x="288" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit</text>
+<g id="proc~~aq_excit_n~~CalledByGraph_node3" class="node"><title>proc~aq_excit</title>
+<g id="a_proc~~aq_excit_n~~CalledByGraph_node3"><a xlink:href="../proc/aq_excit.html" xlink:title="Aq_excit">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="315,-24 261,-24 261,-0 315,-0 315,-24"/>
+<text text-anchor="middle" x="288" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Aq_excit</text>
 </a>
+</g>
 </g>
 <!-- proc~aq_excit&#45;&gt;proc~aq_excit_n -->
-<g id="edge8" class="edge"><title>proc~aq_excit&#45;&gt;proc~aq_excit_n</title>
-<path fill="none" stroke="#000000" d="M315.224,-18.4948C327.083,-20.8883 341.263,-23.7503 354.459,-26.4137"/>
-<polygon fill="#000000" stroke="#000000" points="353.809,-29.853 364.303,-28.4007 355.193,-22.9913 353.809,-29.853"/>
+<g id="proc~~aq_excit_n~~CalledByGraph_edge4" class="edge"><title>proc~aq_excit&#45;&gt;proc~aq_excit_n</title>
+<path fill="none" stroke="#000000" d="M315.175,-17.1372C327.008,-19.4595 341.278,-22.2601 354.514,-24.8578"/>
+<polygon fill="#000000" stroke="#000000" points="353.889,-28.3019 364.376,-26.7934 355.237,-21.433 353.889,-28.3019"/>
 </g>
 <!-- proc~write_bb_h_aq -->
-<g id="node4" class="node"><title>proc~write_bb_h_aq</title>
-<a xlink:href="../proc/write_bb_h_aq.html" xlink:title="write_bb_H_Aq">
-<polygon fill="#d9534f" stroke="#d9534f" points="211,-26 127,-26 127,-1.24345e-14 211,-3.55271e-15 211,-26"/>
-<text text-anchor="middle" x="169" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_Aq</text>
+<g id="proc~~aq_excit_n~~CalledByGraph_node4" class="node"><title>proc~write_bb_h_aq</title>
+<g id="a_proc~~aq_excit_n~~CalledByGraph_node4"><a xlink:href="../proc/write_bb_h_aq.html" xlink:title="write_bb_H_Aq">
+<polygon fill="#d9534f" stroke="#d9534f" points="211.5,-24 126.5,-24 126.5,-0 211.5,-0 211.5,-24"/>
+<text text-anchor="middle" x="169" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_Aq</text>
 </a>
+</g>
 </g>
 <!-- proc~write_bb_h_aq&#45;&gt;proc~aq_excit -->
-<g id="edge4" class="edge"><title>proc~write_bb_h_aq&#45;&gt;proc~aq_excit</title>
-<path fill="none" stroke="#000000" d="M211.626,-13C224.443,-13 238.399,-13 250.833,-13"/>
-<polygon fill="#000000" stroke="#000000" points="250.861,-16.5001 260.861,-13 250.861,-9.5001 250.861,-16.5001"/>
+<g id="proc~~aq_excit_n~~CalledByGraph_edge2" class="edge"><title>proc~write_bb_h_aq&#45;&gt;proc~aq_excit</title>
+<path fill="none" stroke="#000000" d="M211.579,-12C224.408,-12 238.424,-12 250.855,-12"/>
+<polygon fill="#000000" stroke="#000000" points="250.864,-15.5001 260.864,-12 250.863,-8.5001 250.864,-15.5001"/>
 </g>
 <!-- program~generate_tables -->
-<g id="node5" class="node"><title>program~generate_tables</title>
-<a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-26 4.26326e-14,-26 0,-1.24345e-14 90,-3.55271e-15 90,-26"/>
-<text text-anchor="middle" x="45" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+<g id="proc~~aq_excit_n~~CalledByGraph_node5" class="node"><title>program~generate_tables</title>
+<g id="a_proc~~aq_excit_n~~CalledByGraph_node5"><a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-24 0,-24 0,-0 90,-0 90,-24"/>
+<text text-anchor="middle" x="45" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
 </a>
 </g>
+</g>
 <!-- program~generate_tables&#45;&gt;proc~write_bb_h_aq -->
-<g id="edge2" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_aq</title>
-<path fill="none" stroke="#000000" d="M90.1176,-13C98.5788,-13 107.494,-13 116.165,-13"/>
-<polygon fill="#000000" stroke="#000000" points="116.189,-16.5001 126.189,-13 116.189,-9.5001 116.189,-16.5001"/>
+<g id="proc~~aq_excit_n~~CalledByGraph_edge1" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_aq</title>
+<path fill="none" stroke="#000000" d="M90.0448,-12C98.5807,-12 107.598,-12 116.352,-12"/>
+<polygon fill="#000000" stroke="#000000" points="116.462,-15.5001 126.462,-12 116.462,-8.5001 116.462,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -1433,43 +1484,43 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1694,7 +1745,13 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1739,6 +1796,8 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1798,7 +1857,7 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1824,7 +1883,17 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1874,6 +1943,8 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1910,6 +1981,10 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1940,13 +2015,13 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -2078,8 +2153,6 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -2104,7 +2177,9 @@ an excitation from the <code>n</code> state to the m'th state [\(cm^2\)]</p>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -869,7 +893,7 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
   
 <tr>
   
-  <td><span class="anchor" id="variable-m_max%7E22"></span>integer,</td>
+  <td><span class="anchor" id="variable-m_max%7E23"></span>integer,</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -920,112 +944,119 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~m_spread~~CalledByGraph Pages: 1 -->
-<svg id="procm_spreadCalledByGraph" width="590pt" height="100pt"
- viewBox="0.00 0.00 590.00 100.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~m_spread~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 96)">
+<svg id="procm_spreadCalledByGraph" width="590pt" height="95pt"
+ viewBox="0.00 0.00 590.00 95.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~m_spread~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 91)">
 <title>proc~~m_spread~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-96 587,-96 587,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-91 586,-91 586,4 -4,4"/>
 <!-- proc~m_spread -->
-<g id="node1" class="node"><title>proc~m_spread</title>
-<polygon fill="none" stroke="black" points="581,-70 521,-70 521,-44 581,-44 581,-70"/>
-<text text-anchor="middle" x="551" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">m_spread</text>
+<g id="proc~~m_spread~~CalledByGraph_node1" class="node"><title>proc~m_spread</title>
+<polygon fill="none" stroke="black" points="581.5,-66 520.5,-66 520.5,-42 581.5,-42 581.5,-66"/>
+<text text-anchor="middle" x="551" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">m_spread</text>
 </g>
 <!-- proc~p_cx_n -->
-<g id="node2" class="node"><title>proc~p_cx_n</title>
-<a xlink:href="../proc/p_cx_n.html" xlink:title="p_cx_n">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="394,-70 340,-70 340,-44 394,-44 394,-70"/>
-<text text-anchor="middle" x="367" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_n</text>
+<g id="proc~~m_spread~~CalledByGraph_node2" class="node"><title>proc~p_cx_n</title>
+<g id="a_proc~~m_spread~~CalledByGraph_node2"><a xlink:href="../proc/p_cx_n.html" xlink:title="p_cx_n">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="394,-66 340,-66 340,-42 394,-42 394,-66"/>
+<text text-anchor="middle" x="367" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_n</text>
 </a>
+</g>
 </g>
 <!-- proc~p_cx_n&#45;&gt;proc~m_spread -->
-<g id="edge14" class="edge"><title>proc~p_cx_n&#45;&gt;proc~m_spread</title>
-<path fill="none" stroke="#000000" d="M394.071,-68.6933C405.01,-72.822 417.893,-76.9468 430,-79 453.662,-83.0127 460.301,-82.7912 484,-79 492.871,-77.5808 502.162,-75.1675 510.903,-72.4466"/>
-<polygon fill="#000000" stroke="#000000" points="512.089,-75.741 520.486,-69.2806 509.893,-69.0943 512.089,-75.741"/>
+<g id="proc~~m_spread~~CalledByGraph_edge7" class="edge"><title>proc~p_cx_n&#45;&gt;proc~m_spread</title>
+<path fill="none" stroke="#000000" d="M394.064,-64.9403C404.963,-68.9554 417.89,-73.0047 430,-75 453.681,-78.9016 460.284,-78.682 484,-75 492.711,-73.6476 501.846,-71.3475 510.447,-68.7535"/>
+<polygon fill="#000000" stroke="#000000" points="511.788,-71.9991 520.241,-65.6124 509.65,-65.3334 511.788,-71.9991"/>
 </g>
 <!-- proc~p_cx_2 -->
-<g id="node3" class="node"><title>proc~p_cx_2</title>
-<a xlink:href="../proc/p_cx_2.html" xlink:title="p_cx_2">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="484,-70 430,-70 430,-44 484,-44 484,-70"/>
-<text text-anchor="middle" x="457" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_2</text>
+<g id="proc~~m_spread~~CalledByGraph_node3" class="node"><title>proc~p_cx_2</title>
+<g id="a_proc~~m_spread~~CalledByGraph_node3"><a xlink:href="../proc/p_cx_2.html" xlink:title="p_cx_2">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="484,-66 430,-66 430,-42 484,-42 484,-66"/>
+<text text-anchor="middle" x="457" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_2</text>
 </a>
+</g>
 </g>
 <!-- proc~p_cx_n&#45;&gt;proc~p_cx_2 -->
-<g id="edge10" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_2</title>
-<path fill="none" stroke="#000000" d="M394.003,-57C402.028,-57 410.967,-57 419.531,-57"/>
-<polygon fill="#000000" stroke="#000000" points="419.705,-60.5001 429.705,-57 419.705,-53.5001 419.705,-60.5001"/>
+<g id="proc~~m_spread~~CalledByGraph_edge5" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_2</title>
+<path fill="none" stroke="#000000" d="M394.403,-54C402.393,-54 411.311,-54 419.824,-54"/>
+<polygon fill="#000000" stroke="#000000" points="419.919,-57.5001 429.919,-54 419.919,-50.5001 419.919,-57.5001"/>
 </g>
 <!-- proc~p_cx_3 -->
-<g id="node4" class="node"><title>proc~p_cx_3</title>
-<a xlink:href="../proc/p_cx_3.html" xlink:title="p_cx_3">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="484,-26 430,-26 430,-1.24345e-14 484,-3.55271e-15 484,-26"/>
-<text text-anchor="middle" x="457" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3</text>
+<g id="proc~~m_spread~~CalledByGraph_node4" class="node"><title>proc~p_cx_3</title>
+<g id="a_proc~~m_spread~~CalledByGraph_node4"><a xlink:href="../proc/p_cx_3.html" xlink:title="p_cx_3">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="484,-24 430,-24 430,-0 484,-0 484,-24"/>
+<text text-anchor="middle" x="457" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_3</text>
 </a>
+</g>
 </g>
 <!-- proc~p_cx_n&#45;&gt;proc~p_cx_3 -->
-<g id="edge12" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_3</title>
-<path fill="none" stroke="#000000" d="M394.003,-43.7985C402.534,-39.6278 412.098,-34.9519 421.148,-30.5279"/>
-<polygon fill="#000000" stroke="#000000" points="422.88,-33.577 430.326,-26.0405 419.805,-27.2883 422.88,-33.577"/>
+<g id="proc~~m_spread~~CalledByGraph_edge6" class="edge"><title>proc~p_cx_n&#45;&gt;proc~p_cx_3</title>
+<path fill="none" stroke="#000000" d="M393.453,-41.8519C402.21,-37.6727 412.165,-32.9211 421.518,-28.4571"/>
+<polygon fill="#000000" stroke="#000000" points="423.087,-31.5869 430.604,-24.1208 420.072,-25.2695 423.087,-31.5869"/>
 </g>
 <!-- proc~p_cx_2&#45;&gt;proc~m_spread -->
-<g id="edge16" class="edge"><title>proc~p_cx_2&#45;&gt;proc~m_spread</title>
-<path fill="none" stroke="#000000" d="M484.189,-57C492.295,-57 501.364,-57 510.141,-57"/>
-<polygon fill="#000000" stroke="#000000" points="510.237,-60.5001 520.237,-57 510.237,-53.5001 510.237,-60.5001"/>
+<g id="proc~~m_spread~~CalledByGraph_edge8" class="edge"><title>proc~p_cx_2&#45;&gt;proc~m_spread</title>
+<path fill="none" stroke="#000000" d="M484.117,-54C492.212,-54 501.324,-54 510.131,-54"/>
+<polygon fill="#000000" stroke="#000000" points="510.249,-57.5001 520.249,-54 510.249,-50.5001 510.249,-57.5001"/>
 </g>
 <!-- proc~p_cx_3&#45;&gt;proc~m_spread -->
-<g id="edge18" class="edge"><title>proc~p_cx_3&#45;&gt;proc~m_spread</title>
-<path fill="none" stroke="#000000" d="M484.189,-25.7266C493.475,-30.0734 504.025,-35.0115 513.953,-39.6588"/>
-<polygon fill="#000000" stroke="#000000" points="512.679,-42.9271 523.22,-43.9966 515.647,-36.5873 512.679,-42.9271"/>
-</g>
-<!-- proc~p_cx -->
-<g id="node5" class="node"><title>proc~p_cx</title>
-<a xlink:href="../proc/p_cx.html" xlink:title="p_cx">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="300,-92 246,-92 246,-66 300,-66 300,-92"/>
-<text text-anchor="middle" x="273" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx</text>
-</a>
-</g>
-<!-- proc~p_cx&#45;&gt;proc~p_cx_n -->
-<g id="edge6" class="edge"><title>proc~p_cx&#45;&gt;proc~p_cx_n</title>
-<path fill="none" stroke="#000000" d="M300.189,-72.6367C309.445,-70.4704 319.955,-68.0105 329.855,-65.6935"/>
-<polygon fill="#000000" stroke="#000000" points="330.933,-69.0358 339.872,-63.349 329.338,-62.22 330.933,-69.0358"/>
+<g id="proc~~m_spread~~CalledByGraph_edge9" class="edge"><title>proc~p_cx_3&#45;&gt;proc~m_spread</title>
+<path fill="none" stroke="#000000" d="M484.117,-23.9232C493.457,-28.187 504.151,-33.069 514.168,-37.6419"/>
+<polygon fill="#000000" stroke="#000000" points="512.947,-40.9321 523.498,-41.9012 515.854,-34.5643 512.947,-40.9321"/>
 </g>
 <!-- proc~p_cx_n_m -->
-<g id="node6" class="node"><title>proc~p_cx_n_m</title>
-<a xlink:href="../proc/p_cx_n_m.html" xlink:title="p_cx_n_m">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="304,-48 242,-48 242,-22 304,-22 304,-48"/>
-<text text-anchor="middle" x="273" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_n_m</text>
+<g id="proc~~m_spread~~CalledByGraph_node5" class="node"><title>proc~p_cx_n_m</title>
+<g id="a_proc~~m_spread~~CalledByGraph_node5"><a xlink:href="../proc/p_cx_n_m.html" xlink:title="p_cx_n_m">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="304,-87 242,-87 242,-63 304,-63 304,-87"/>
+<text text-anchor="middle" x="273" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx_n_m</text>
 </a>
+</g>
 </g>
 <!-- proc~p_cx_n_m&#45;&gt;proc~p_cx_n -->
-<g id="edge8" class="edge"><title>proc~p_cx_n_m&#45;&gt;proc~p_cx_n</title>
-<path fill="none" stroke="#000000" d="M304.04,-42.2646C312.342,-44.2077 321.398,-46.3272 329.988,-48.3376"/>
-<polygon fill="#000000" stroke="#000000" points="329.249,-51.7592 339.784,-50.6302 330.844,-44.9434 329.249,-51.7592"/>
+<g id="proc~~m_spread~~CalledByGraph_edge3" class="edge"><title>proc~p_cx_n_m&#45;&gt;proc~p_cx_n</title>
+<path fill="none" stroke="#000000" d="M304.124,-68.1238C312.411,-66.2323 321.481,-64.162 330.06,-62.2038"/>
+<polygon fill="#000000" stroke="#000000" points="330.858,-65.6115 339.829,-59.9739 329.301,-58.7871 330.858,-65.6115"/>
+</g>
+<!-- proc~p_cx -->
+<g id="proc~~m_spread~~CalledByGraph_node6" class="node"><title>proc~p_cx</title>
+<g id="a_proc~~m_spread~~CalledByGraph_node6"><a xlink:href="../proc/p_cx.html" xlink:title="p_cx">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="300,-45 246,-45 246,-21 300,-21 300,-45"/>
+<text text-anchor="middle" x="273" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">p_cx</text>
+</a>
+</g>
+</g>
+<!-- proc~p_cx&#45;&gt;proc~p_cx_n -->
+<g id="proc~~m_spread~~CalledByGraph_edge4" class="edge"><title>proc~p_cx&#45;&gt;proc~p_cx_n</title>
+<path fill="none" stroke="#000000" d="M300.117,-38.9616C309.343,-41.0675 319.891,-43.4751 329.802,-45.7373"/>
+<polygon fill="#000000" stroke="#000000" points="329.289,-49.2103 339.817,-48.0235 330.847,-42.3858 329.289,-49.2103"/>
 </g>
 <!-- proc~write_bb_h_h -->
-<g id="node7" class="node"><title>proc~write_bb_h_h</title>
-<a xlink:href="../proc/write_bb_h_h.html" xlink:title="write_bb_H_H">
-<polygon fill="#d9534f" stroke="#d9534f" points="206,-92 126,-92 126,-66 206,-66 206,-92"/>
-<text text-anchor="middle" x="166" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_H</text>
+<g id="proc~~m_spread~~CalledByGraph_node7" class="node"><title>proc~write_bb_h_h</title>
+<g id="a_proc~~m_spread~~CalledByGraph_node7"><a xlink:href="../proc/write_bb_h_h.html" xlink:title="write_bb_H_H">
+<polygon fill="#d9534f" stroke="#d9534f" points="206,-45 126,-45 126,-21 206,-21 206,-45"/>
+<text text-anchor="middle" x="166" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">write_bb_H_H</text>
 </a>
+</g>
 </g>
 <!-- proc~write_bb_h_h&#45;&gt;proc~p_cx -->
-<g id="edge4" class="edge"><title>proc~write_bb_h_h&#45;&gt;proc~p_cx</title>
-<path fill="none" stroke="#000000" d="M206.147,-79C215.902,-79 226.29,-79 235.897,-79"/>
-<polygon fill="#000000" stroke="#000000" points="235.948,-82.5001 245.948,-79 235.948,-75.5001 235.948,-82.5001"/>
+<g id="proc~~m_spread~~CalledByGraph_edge2" class="edge"><title>proc~write_bb_h_h&#45;&gt;proc~p_cx</title>
+<path fill="none" stroke="#000000" d="M206.098,-33C215.861,-33 226.286,-33 235.897,-33"/>
+<polygon fill="#000000" stroke="#000000" points="235.935,-36.5001 245.935,-33 235.935,-29.5001 235.935,-36.5001"/>
 </g>
 <!-- program~generate_tables -->
-<g id="node8" class="node"><title>program~generate_tables</title>
-<a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-92 4.26326e-14,-92 0,-66 90,-66 90,-92"/>
-<text text-anchor="middle" x="45" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+<g id="proc~~m_spread~~CalledByGraph_node8" class="node"><title>program~generate_tables</title>
+<g id="a_proc~~m_spread~~CalledByGraph_node8"><a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="90,-45 0,-45 0,-21 90,-21 90,-45"/>
+<text text-anchor="middle" x="45" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
 </a>
 </g>
+</g>
 <!-- program~generate_tables&#45;&gt;proc~write_bb_h_h -->
-<g id="edge2" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_h</title>
-<path fill="none" stroke="#000000" d="M90.0559,-79C98.3677,-79 107.096,-79 115.555,-79"/>
-<polygon fill="#000000" stroke="#000000" points="115.693,-82.5001 125.693,-79 115.693,-75.5001 115.693,-82.5001"/>
+<g id="proc~~m_spread~~CalledByGraph_edge1" class="edge"><title>program~generate_tables&#45;&gt;proc~write_bb_h_h</title>
+<path fill="none" stroke="#000000" d="M90.3112,-33C98.5796,-33 107.267,-33 115.676,-33"/>
+<polygon fill="#000000" stroke="#000000" points="115.746,-36.5001 125.746,-33 115.746,-29.5001 115.746,-36.5001"/>
 </g>
 </g>
 </svg>
@@ -1044,43 +1075,43 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1291,7 +1322,13 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1336,6 +1373,8 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1395,7 +1434,7 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1421,7 +1460,17 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1471,6 +1520,8 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1507,6 +1558,10 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1537,13 +1592,13 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1675,8 +1730,6 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1701,7 +1754,9 @@ public subroutine m_spread(n, m_max, sigma_tot, sigma)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

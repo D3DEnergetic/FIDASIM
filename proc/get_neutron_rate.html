@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -853,7 +877,7 @@ public subroutine get_neutron_rate(plasma, eb, rate)
   
 <tr>
   
-  <td><span class="anchor" id="variable-plasma%7E3"></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
+  <td><span class="anchor" id="variable-plasma%7E4"></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -903,88 +927,93 @@ public subroutine get_neutron_rate(plasma, eb, rate)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~get_neutron_rate~~CallsGraph Pages: 1 -->
-<svg id="procget_neutron_rateCallsGraph" width="492pt" height="133pt"
- viewBox="0.00 0.00 492.00 132.53" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~get_neutron_rate~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 128.527)">
+<svg id="procget_neutron_rateCallsGraph" width="492pt" height="150pt"
+ viewBox="0.00 0.00 492.00 150.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_neutron_rate~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 146)">
 <title>proc~~get_neutron_rate~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-128.527 489,-128.527 489,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-146 488,-146 488,4 -4,4"/>
 <!-- proc~get_neutron_rate -->
-<g id="node1" class="node"><title>proc~get_neutron_rate</title>
-<polygon fill="none" stroke="black" points="95,-62.5274 1,-62.5274 1,-36.5274 95,-36.5274 95,-62.5274"/>
-<text text-anchor="middle" x="48" y="-47.0774" font-family="Helvetica,sans-Serif" font-size="10.50">get_neutron_rate</text>
+<g id="proc~~get_neutron_rate~~CallsGraph_node1" class="node"><title>proc~get_neutron_rate</title>
+<polygon fill="none" stroke="black" points="95.5,-83 0.5,-83 0.5,-59 95.5,-59 95.5,-83"/>
+<text text-anchor="middle" x="48" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_neutron_rate</text>
 </g>
 <!-- interface~interpol_coeff -->
-<g id="node2" class="node"><title>interface~interpol_coeff</title>
-<a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="209,-62.5274 133,-62.5274 133,-36.5274 209,-36.5274 209,-62.5274"/>
-<text text-anchor="middle" x="171" y="-47.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+<g id="proc~~get_neutron_rate~~CallsGraph_node2" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~get_neutron_rate~~CallsGraph_node2"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="209.5,-83 132.5,-83 132.5,-59 209.5,-59 209.5,-83"/>
+<text text-anchor="middle" x="171" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
 </a>
+</g>
 </g>
 <!-- proc~get_neutron_rate&#45;&gt;interface~interpol_coeff -->
-<g id="edge14" class="edge"><title>proc~get_neutron_rate&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M95.555,-49.5274C104.301,-49.5274 113.444,-49.5274 122.225,-49.5274"/>
-<polygon fill="#000000" stroke="#000000" points="122.322,-53.0275 132.322,-49.5274 122.322,-46.0275 122.322,-53.0275"/>
-</g>
-<!-- proc~interpol1d_coeff_arr -->
-<g id="node3" class="node"><title>proc~interpol1d_coeff_arr</title>
-<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="356,-124.527 246,-124.527 246,-98.5274 356,-98.5274 356,-124.527"/>
-<text text-anchor="middle" x="301" y="-109.077" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M198.57,-62.676C217.701,-71.8002 243.395,-84.0542 264.263,-94.0065"/>
-<polygon fill="#000000" stroke="#000000" points="262.937,-97.252 273.47,-98.3977 265.951,-90.9338 262.937,-97.252"/>
+<g id="proc~~get_neutron_rate~~CallsGraph_edge7" class="edge"><title>proc~get_neutron_rate&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M95.7818,-71C104.481,-71 113.58,-71 122.306,-71"/>
+<polygon fill="#000000" stroke="#000000" points="122.333,-74.5001 132.333,-71 122.333,-67.5001 122.333,-74.5001"/>
 </g>
 <!-- proc~interpol2d_coeff_arr -->
-<g id="node4" class="node"><title>proc~interpol2d_coeff_arr</title>
-<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="356,-42.5274 246,-42.5274 246,-16.5274 356,-16.5274 356,-42.5274"/>
-<text text-anchor="middle" x="301" y="-27.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+<g id="proc~~get_neutron_rate~~CallsGraph_node3" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~get_neutron_rate~~CallsGraph_node3"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="356,-142 246,-142 246,-118 356,-118 356,-142"/>
+<text text-anchor="middle" x="301" y="-127.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
 </a>
+</g>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M209.652,-43.5809C217.918,-42.3092 226.868,-40.9323 235.822,-39.5547"/>
-<polygon fill="#000000" stroke="#000000" points="236.546,-42.9846 245.898,-38.0046 235.482,-36.066 236.546,-42.9846"/>
+<g id="proc~~get_neutron_rate~~CallsGraph_edge3" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M198.212,-83.0819C217.366,-91.9111 243.557,-103.983 264.575,-113.671"/>
+<polygon fill="#000000" stroke="#000000" points="263.277,-116.927 273.823,-117.934 266.207,-110.57 263.277,-116.927"/>
 </g>
 <!-- proc~interpol1d_coeff -->
-<g id="node5" class="node"><title>proc~interpol1d_coeff</title>
-<a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="483,-94.5274 393,-94.5274 393,-68.5274 483,-68.5274 483,-94.5274"/>
-<text text-anchor="middle" x="438" y="-79.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+<g id="proc~~get_neutron_rate~~CallsGraph_node4" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~get_neutron_rate~~CallsGraph_node4"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="483.5,-53 392.5,-53 392.5,-29 483.5,-29 483.5,-53"/>
+<text text-anchor="middle" x="438" y="-38.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
+</g>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M209.539,-54.1463C254.894,-59.5821 330.569,-68.6517 382.301,-74.8519"/>
-<polygon fill="#000000" stroke="#000000" points="381.967,-78.3368 392.313,-76.0517 382.8,-71.3865 381.967,-78.3368"/>
+<g id="proc~~get_neutron_rate~~CallsGraph_edge4" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M209.687,-66.7336C254.832,-61.6228 330.816,-53.0208 382.39,-47.1823"/>
+<polygon fill="#000000" stroke="#000000" points="382.82,-50.656 392.363,-46.0532 382.033,-43.7004 382.82,-50.656"/>
 </g>
 <!-- proc~interpol2d_coeff -->
-<g id="node6" class="node"><title>proc~interpol2d_coeff</title>
-<a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="483,-31.5274 393,-31.5274 393,-5.52737 483,-5.52737 483,-31.5274"/>
-<text text-anchor="middle" x="438" y="-16.0774" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+<g id="proc~~get_neutron_rate~~CallsGraph_node5" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~get_neutron_rate~~CallsGraph_node5"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="483.5,-113 392.5,-113 392.5,-89 483.5,-89 483.5,-113"/>
+<text text-anchor="middle" x="438" y="-98.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M188.372,-36.3867C202.901,-26.2701 224.629,-13.1039 246,-7.52737 290.781,4.15753 343.358,-0.0362804 382.159,-6.33923"/>
-<polygon fill="#000000" stroke="#000000" points="381.768,-9.82315 392.216,-8.06966 382.955,-2.92453 381.768,-9.82315"/>
 </g>
-<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M356.328,-99.4117C364.868,-97.5416 373.693,-95.6093 382.242,-93.7371"/>
-<polygon fill="#000000" stroke="#000000" points="383.099,-97.1325 392.119,-91.5743 381.602,-90.2945 383.099,-97.1325"/>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~get_neutron_rate~~CallsGraph_edge5" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M209.687,-75.2664C254.832,-80.3772 330.816,-88.9792 382.39,-94.8177"/>
+<polygon fill="#000000" stroke="#000000" points="382.033,-98.2996 392.363,-95.9468 382.82,-91.344 382.033,-98.2996"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~get_neutron_rate~~CallsGraph_node6" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~get_neutron_rate~~CallsGraph_node6"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="356,-24 246,-24 246,-0 356,-0 356,-24"/>
+<text text-anchor="middle" x="301" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~get_neutron_rate~~CallsGraph_edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M198.212,-58.9181C217.366,-50.0889 243.557,-38.0165 264.575,-28.3288"/>
+<polygon fill="#000000" stroke="#000000" points="266.207,-31.4305 273.823,-24.0657 263.277,-25.0733 266.207,-31.4305"/>
 </g>
 <!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge4" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M356.328,-25.085C364.776,-24.4067 373.501,-23.7061 381.963,-23.0267"/>
-<polygon fill="#000000" stroke="#000000" points="382.431,-26.5004 392.119,-22.2112 381.871,-19.5229 382.431,-26.5004"/>
+<g id="proc~~get_neutron_rate~~CallsGraph_edge1" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M356.132,-118.372C364.779,-116.514 373.73,-114.591 382.388,-112.731"/>
+<polygon fill="#000000" stroke="#000000" points="383.339,-116.107 392.381,-110.585 381.869,-109.263 383.339,-116.107"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~get_neutron_rate~~CallsGraph_edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M356.132,-23.6283C364.779,-25.4858 373.73,-27.4087 382.388,-29.2686"/>
+<polygon fill="#000000" stroke="#000000" points="381.869,-32.7368 392.381,-31.4151 383.339,-25.8929 381.869,-32.7368"/>
 </g>
 </g>
 </svg>
@@ -1003,43 +1032,43 @@ public subroutine get_neutron_rate(plasma, eb, rate)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1063,59 +1092,62 @@ public subroutine get_neutron_rate(plasma, eb, rate)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~get_neutron_rate~~CalledByGraph Pages: 1 -->
-<svg id="procget_neutron_rateCalledByGraph" width="300pt" height="78pt"
- viewBox="0.00 0.00 300.00 78.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~get_neutron_rate~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 74)">
+<svg id="procget_neutron_rateCalledByGraph" width="300pt" height="74pt"
+ viewBox="0.00 0.00 300.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_neutron_rate~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
 <title>proc~~get_neutron_rate~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-74 297,-74 297,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-70 296,-70 296,4 -4,4"/>
 <!-- proc~get_neutron_rate -->
-<g id="node1" class="node"><title>proc~get_neutron_rate</title>
-<polygon fill="none" stroke="black" points="291,-48 197,-48 197,-22 291,-22 291,-48"/>
-<text text-anchor="middle" x="244" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50">get_neutron_rate</text>
-</g>
-<!-- proc~neutron_mc -->
-<g id="node2" class="node"><title>proc~neutron_mc</title>
-<a xlink:href="../proc/neutron_mc.html" xlink:title="neutron_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="160,-70 90,-70 90,-44 160,-44 160,-70"/>
-<text text-anchor="middle" x="125" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_mc</text>
-</a>
-</g>
-<!-- proc~neutron_mc&#45;&gt;proc~get_neutron_rate -->
-<g id="edge6" class="edge"><title>proc~neutron_mc&#45;&gt;proc~get_neutron_rate</title>
-<path fill="none" stroke="#000000" d="M160.06,-50.5183C168.329,-48.9896 177.36,-47.32 186.335,-45.6607"/>
-<polygon fill="#000000" stroke="#000000" points="187.204,-49.0594 196.402,-43.7997 185.932,-42.1761 187.204,-49.0594"/>
+<g id="proc~~get_neutron_rate~~CalledByGraph_node1" class="node"><title>proc~get_neutron_rate</title>
+<polygon fill="none" stroke="black" points="291.5,-45 196.5,-45 196.5,-21 291.5,-21 291.5,-45"/>
+<text text-anchor="middle" x="244" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_neutron_rate</text>
 </g>
 <!-- proc~neutron_f -->
-<g id="node3" class="node"><title>proc~neutron_f</title>
-<a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-26 96,-26 96,-1.24345e-14 154,-3.55271e-15 154,-26"/>
-<text text-anchor="middle" x="125" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
+<g id="proc~~get_neutron_rate~~CalledByGraph_node2" class="node"><title>proc~neutron_f</title>
+<g id="a_proc~~get_neutron_rate~~CalledByGraph_node2"><a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="154,-66 96,-66 96,-42 154,-42 154,-66"/>
+<text text-anchor="middle" x="125" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
 </a>
+</g>
 </g>
 <!-- proc~neutron_f&#45;&gt;proc~get_neutron_rate -->
-<g id="edge8" class="edge"><title>proc~neutron_f&#45;&gt;proc~get_neutron_rate</title>
-<path fill="none" stroke="#000000" d="M154.111,-18.3818C163.804,-20.1739 174.968,-22.2378 186.06,-24.2885"/>
-<polygon fill="#000000" stroke="#000000" points="185.712,-27.7834 196.182,-26.1597 186.985,-20.9 185.712,-27.7834"/>
+<g id="proc~~get_neutron_rate~~CalledByGraph_edge3" class="edge"><title>proc~neutron_f&#45;&gt;proc~get_neutron_rate</title>
+<path fill="none" stroke="#000000" d="M154.024,-48.97C163.855,-47.2056 175.277,-45.1553 186.596,-43.1239"/>
+<polygon fill="#000000" stroke="#000000" points="187.248,-46.5628 196.472,-41.3511 186.011,-39.6729 187.248,-46.5628"/>
 </g>
-<!-- program~fidasim -->
-<g id="node4" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-48 2.13163e-14,-48 0,-22 54,-22 54,-48"/>
-<text text-anchor="middle" x="27" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<!-- proc~neutron_mc -->
+<g id="proc~~get_neutron_rate~~CalledByGraph_node3" class="node"><title>proc~neutron_mc</title>
+<g id="a_proc~~get_neutron_rate~~CalledByGraph_node3"><a xlink:href="../proc/neutron_mc.html" xlink:title="neutron_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="160,-24 90,-24 90,-0 160,-0 160,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_mc</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~neutron_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_mc</title>
-<path fill="none" stroke="#000000" d="M54.0384,-41.0698C62.1064,-42.881 71.176,-44.9171 80.0659,-46.9128"/>
-<polygon fill="#000000" stroke="#000000" points="79.4397,-50.3592 89.9635,-49.1347 80.973,-43.5292 79.4397,-50.3592"/>
+</g>
+<!-- proc~neutron_mc&#45;&gt;proc~get_neutron_rate -->
+<g id="proc~~get_neutron_rate~~CalledByGraph_edge4" class="edge"><title>proc~neutron_mc&#45;&gt;proc~get_neutron_rate</title>
+<path fill="none" stroke="#000000" d="M160.156,-18.1305C168.389,-19.6083 177.405,-21.2265 186.363,-22.8343"/>
+<polygon fill="#000000" stroke="#000000" points="185.945,-26.3153 196.407,-24.6371 187.182,-19.4254 185.945,-26.3153"/>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~get_neutron_rate~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
+<g id="a_proc~~get_neutron_rate~~CalledByGraph_node4"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-45 0,-45 0,-21 54,-21 54,-45"/>
+<text text-anchor="middle" x="27" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~neutron_f -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
-<path fill="none" stroke="#000000" d="M54.0384,-28.9302C63.9132,-26.7134 75.2884,-24.1598 85.998,-21.7555"/>
-<polygon fill="#000000" stroke="#000000" points="87.0009,-25.1176 95.9914,-19.5121 85.4676,-18.2876 87.0009,-25.1176"/>
+<g id="proc~~get_neutron_rate~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<path fill="none" stroke="#000000" d="M54.2324,-38.7383C63.9927,-40.8734 75.2764,-43.3417 85.8864,-45.6627"/>
+<polygon fill="#000000" stroke="#000000" points="85.2638,-49.1092 95.7808,-47.827 86.7598,-42.2709 85.2638,-49.1092"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_mc -->
+<g id="proc~~get_neutron_rate~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_mc</title>
+<path fill="none" stroke="#000000" d="M54.2324,-27.2617C62.2188,-25.5146 71.2252,-23.5445 80.0479,-21.6145"/>
+<polygon fill="#000000" stroke="#000000" points="80.8457,-25.0228 89.8668,-19.4666 79.3498,-18.1845 80.8457,-25.0228"/>
 </g>
 </g>
 </svg>
@@ -1134,43 +1166,43 @@ public subroutine get_neutron_rate(plasma, eb, rate)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1405,7 +1437,13 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1450,6 +1488,8 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1509,7 +1549,7 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1535,7 +1575,17 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1585,6 +1635,8 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1621,6 +1673,10 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1651,13 +1707,13 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1789,8 +1845,6 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1815,7 +1869,9 @@ public subroutine get_neutron_rate(plasma, eb, rate)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

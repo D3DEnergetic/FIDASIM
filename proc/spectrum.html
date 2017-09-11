@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.4% of total for procedures.">34 statements</a>
+	  title=" 0.3% of total for procedures.">34 statements</a>
      </li> 
      
      
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -868,7 +892,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
   
 <tr>
   
-  <td><span class="anchor" id="variable-vi%7E4"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-vi%7E6"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -883,7 +907,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
   
 <tr>
   
-  <td><span class="anchor" id="variable-fields%7E3"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td><span class="anchor" id="variable-fields%7E5"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -979,192 +1003,204 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~spectrum~~CalledByGraph Pages: 1 -->
-<svg id="procspectrumCalledByGraph" width="602pt" height="292pt"
- viewBox="0.00 0.00 602.00 292.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~spectrum~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 288)">
+<svg id="procspectrumCalledByGraph" width="602pt" height="280pt"
+ viewBox="0.00 0.00 602.00 280.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~spectrum~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 276)">
 <title>proc~~spectrum~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-288 599,-288 599,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-276 598,-276 598,4 -4,4"/>
 <!-- proc~spectrum -->
-<g id="node1" class="node"><title>proc~spectrum</title>
-<polygon fill="none" stroke="black" points="593,-152 537,-152 537,-126 593,-126 593,-152"/>
-<text text-anchor="middle" x="565" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50">spectrum</text>
+<g id="proc~~spectrum~~CalledByGraph_node1" class="node"><title>proc~spectrum</title>
+<polygon fill="none" stroke="black" points="593.5,-146 536.5,-146 536.5,-122 593.5,-122 593.5,-146"/>
+<text text-anchor="middle" x="565" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50">spectrum</text>
 </g>
 <!-- proc~store_fida_photons -->
-<g id="node2" class="node"><title>proc~store_fida_photons</title>
-<a xlink:href="../proc/store_fida_photons.html" xlink:title="store_fida_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="322,-240 218,-240 218,-214 322,-214 322,-240"/>
-<text text-anchor="middle" x="270" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
+<g id="proc~~spectrum~~CalledByGraph_node2" class="node"><title>proc~store_fida_photons</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node2"><a xlink:href="../proc/store_fida_photons.html" xlink:title="store_fida_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="322,-230 218,-230 218,-206 322,-206 322,-230"/>
+<text text-anchor="middle" x="270" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
 </a>
+</g>
 </g>
 <!-- proc~store_fida_photons&#45;&gt;proc~spectrum -->
-<g id="edge32" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~spectrum</title>
-<path fill="none" stroke="#000000" d="M313.846,-213.921C371.415,-196.747 471.58,-166.868 526.409,-150.512"/>
-<polygon fill="#000000" stroke="#000000" points="527.516,-153.834 536.099,-147.621 525.515,-147.126 527.516,-153.834"/>
+<g id="proc~~spectrum~~CalledByGraph_edge16" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~spectrum</title>
+<path fill="none" stroke="#000000" d="M312.98,-205.965C370.182,-189.565 471.745,-160.448 526.511,-144.748"/>
+<polygon fill="#000000" stroke="#000000" points="527.523,-148.099 536.171,-141.978 525.594,-141.37 527.523,-148.099"/>
 </g>
 <!-- proc~store_bes_photons -->
-<g id="node3" class="node"><title>proc~store_bes_photons</title>
-<a xlink:href="../proc/store_bes_photons.html" xlink:title="store_bes_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="322,-152 218,-152 218,-126 322,-126 322,-152"/>
-<text text-anchor="middle" x="270" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_bes_photons</text>
+<g id="proc~~spectrum~~CalledByGraph_node3" class="node"><title>proc~store_bes_photons</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node3"><a xlink:href="../proc/store_bes_photons.html" xlink:title="store_bes_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="322,-146 218,-146 218,-122 322,-122 322,-146"/>
+<text text-anchor="middle" x="270" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_bes_photons</text>
 </a>
+</g>
 </g>
 <!-- proc~store_bes_photons&#45;&gt;proc~spectrum -->
-<g id="edge34" class="edge"><title>proc~store_bes_photons&#45;&gt;proc~spectrum</title>
-<path fill="none" stroke="#000000" d="M322.061,-139C380.4,-139 473.648,-139 526.025,-139"/>
-<polygon fill="#000000" stroke="#000000" points="526.243,-142.5 536.243,-139 526.243,-135.5 526.243,-142.5"/>
+<g id="proc~~spectrum~~CalledByGraph_edge17" class="edge"><title>proc~store_bes_photons&#45;&gt;proc~spectrum</title>
+<path fill="none" stroke="#000000" d="M322.037,-134C380.325,-134 474.324,-134 526.341,-134"/>
+<polygon fill="#000000" stroke="#000000" points="526.468,-137.5 536.468,-134 526.468,-130.5 526.468,-137.5"/>
 </g>
 <!-- proc~store_fw_photons_at_chan -->
-<g id="node4" class="node"><title>proc~store_fw_photons_at_chan</title>
-<a xlink:href="../proc/store_fw_photons_at_chan.html" xlink:title="store_fw_photons_at_chan">
-<polygon fill="#d9534f" stroke="#d9534f" points="500,-70 358,-70 358,-44 500,-44 500,-70"/>
-<text text-anchor="middle" x="429" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons_at_chan</text>
+<g id="proc~~spectrum~~CalledByGraph_node4" class="node"><title>proc~store_fw_photons_at_chan</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node4"><a xlink:href="../proc/store_fw_photons_at_chan.html" xlink:title="store_fw_photons_at_chan">
+<polygon fill="#d9534f" stroke="#d9534f" points="500,-66 358,-66 358,-42 500,-42 500,-66"/>
+<text text-anchor="middle" x="429" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons_at_chan</text>
 </a>
+</g>
 </g>
 <!-- proc~store_fw_photons_at_chan&#45;&gt;proc~spectrum -->
-<g id="edge36" class="edge"><title>proc~store_fw_photons_at_chan&#45;&gt;proc~spectrum</title>
-<path fill="none" stroke="#000000" d="M450.851,-70.1747C473.454,-83.8031 508.938,-105.198 534.342,-120.515"/>
-<polygon fill="#000000" stroke="#000000" points="532.832,-123.692 543.203,-125.858 536.447,-117.697 532.832,-123.692"/>
+<g id="proc~~spectrum~~CalledByGraph_edge18" class="edge"><title>proc~store_fw_photons_at_chan&#45;&gt;proc~spectrum</title>
+<path fill="none" stroke="#000000" d="M450.352,-66.1503C472.913,-79.6199 509.485,-101.454 535.03,-116.704"/>
+<polygon fill="#000000" stroke="#000000" points="533.515,-119.877 543.896,-121.998 537.104,-113.866 533.515,-119.877"/>
 </g>
 <!-- proc~fida_f -->
-<g id="node5" class="node"><title>proc~fida_f</title>
-<a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-284 109,-284 109,-258 163,-258 163,-284"/>
-<text text-anchor="middle" x="136" y="-268.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+<g id="proc~~spectrum~~CalledByGraph_node5" class="node"><title>proc~fida_f</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node5"><a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-272 109,-272 109,-248 163,-248 163,-272"/>
+<text text-anchor="middle" x="136" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
 </a>
+</g>
 </g>
 <!-- proc~fida_f&#45;&gt;proc~store_fida_photons -->
-<g id="edge6" class="edge"><title>proc~fida_f&#45;&gt;proc~store_fida_photons</title>
-<path fill="none" stroke="#000000" d="M163.117,-262.096C179.603,-256.683 201.155,-249.606 220.584,-243.226"/>
-<polygon fill="#000000" stroke="#000000" points="221.806,-246.509 230.215,-240.064 219.622,-239.858 221.806,-246.509"/>
+<g id="proc~~spectrum~~CalledByGraph_edge3" class="edge"><title>proc~fida_f&#45;&gt;proc~store_fida_photons</title>
+<path fill="none" stroke="#000000" d="M163.079,-251.702C179.726,-246.405 201.801,-239.381 221.489,-233.117"/>
+<polygon fill="#000000" stroke="#000000" points="222.757,-236.387 231.225,-230.019 220.635,-229.716 222.757,-236.387"/>
 </g>
 <!-- proc~fida_mc -->
-<g id="node6" class="node"><title>proc~fida_mc</title>
-<a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-240 109,-240 109,-214 163,-214 163,-240"/>
-<text text-anchor="middle" x="136" y="-224.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
+<g id="proc~~spectrum~~CalledByGraph_node6" class="node"><title>proc~fida_mc</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node6"><a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-230 109,-230 109,-206 163,-206 163,-230"/>
+<text text-anchor="middle" x="136" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
 </a>
+</g>
 </g>
 <!-- proc~fida_mc&#45;&gt;proc~store_fida_photons -->
-<g id="edge8" class="edge"><title>proc~fida_mc&#45;&gt;proc~store_fida_photons</title>
-<path fill="none" stroke="#000000" d="M163.117,-227C176.04,-227 192.076,-227 207.761,-227"/>
-<polygon fill="#000000" stroke="#000000" points="207.982,-230.5 217.982,-227 207.982,-223.5 207.982,-230.5"/>
+<g id="proc~~spectrum~~CalledByGraph_edge4" class="edge"><title>proc~fida_mc&#45;&gt;proc~store_fida_photons</title>
+<path fill="none" stroke="#000000" d="M163.079,-218C175.899,-218 191.937,-218 207.626,-218"/>
+<polygon fill="#000000" stroke="#000000" points="207.847,-221.5 217.847,-218 207.847,-214.5 207.847,-221.5"/>
 </g>
 <!-- program~fidasim -->
-<g id="node7" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-152 2.13163e-14,-152 0,-126 54,-126 54,-152"/>
-<text text-anchor="middle" x="27" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~spectrum~~CalledByGraph_node7" class="node"><title>program~fidasim</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node7"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-146 0,-146 0,-122 54,-122 54,-146"/>
+<text text-anchor="middle" x="27" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M31.5563,-152.201C39.917,-174.72 59.6815,-220.847 90,-249 92.9799,-251.767 96.3716,-254.25 99.9313,-256.46"/>
-<polygon fill="#000000" stroke="#000000" points="98.5327,-259.684 108.987,-261.404 101.887,-253.54 98.5327,-259.684"/>
+<g id="proc~~spectrum~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<path fill="none" stroke="#000000" d="M32.4294,-146.286C40.6983,-167.693 60.3728,-212.109 90,-239 92.9326,-241.662 96.2617,-244.044 99.7506,-246.162"/>
+<polygon fill="#000000" stroke="#000000" points="98.1468,-249.274 108.618,-250.891 101.44,-243.097 98.1468,-249.274"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_mc -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
-<path fill="none" stroke="#000000" d="M36.9915,-152.013C48.5423,-166.395 68.7121,-189.564 90,-205 93.0458,-207.209 96.3482,-209.29 99.7379,-211.226"/>
-<polygon fill="#000000" stroke="#000000" points="98.3197,-214.435 108.799,-215.997 101.581,-208.241 98.3197,-214.435"/>
+<g id="proc~~spectrum~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
+<path fill="none" stroke="#000000" d="M37.6808,-146.188C49.0618,-159.909 69.0685,-182.214 90,-197 93.0675,-199.167 96.3941,-201.204 99.8027,-203.094"/>
+<polygon fill="#000000" stroke="#000000" points="98.3979,-206.306 108.896,-207.737 101.581,-200.072 98.3979,-206.306"/>
 </g>
 <!-- proc~ndmc -->
-<g id="node12" class="node"><title>proc~ndmc</title>
-<a xlink:href="../proc/ndmc.html" xlink:title="ndmc">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-196 109,-196 109,-170 163,-170 163,-196"/>
-<text text-anchor="middle" x="136" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
+<g id="proc~~spectrum~~CalledByGraph_node8" class="node"><title>proc~ndmc</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node8"><a xlink:href="../proc/ndmc.html" xlink:title="ndmc">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-188 109,-188 109,-164 163,-164 163,-188"/>
+<text text-anchor="middle" x="136" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ndmc</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~ndmc -->
-<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
-<path fill="none" stroke="#000000" d="M54.2241,-149.99C67.8798,-155.502 84.6138,-162.257 99.3789,-168.217"/>
-<polygon fill="#000000" stroke="#000000" points="98.162,-171.5 108.745,-171.998 100.782,-165.009 98.162,-171.5"/>
+<g id="proc~~spectrum~~CalledByGraph_edge5" class="edge"><title>program~fidasim&#45;&gt;proc~ndmc</title>
+<path fill="none" stroke="#000000" d="M54.1751,-144.274C67.7768,-149.613 84.5994,-156.217 99.3693,-162.014"/>
+<polygon fill="#000000" stroke="#000000" points="98.1368,-165.29 108.724,-165.686 100.695,-158.774 98.1368,-165.29"/>
 </g>
 <!-- proc~dcx -->
-<g id="node13" class="node"><title>proc~dcx</title>
-<a xlink:href="../proc/dcx.html" xlink:title="dcx">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-152 109,-152 109,-126 163,-126 163,-152"/>
-<text text-anchor="middle" x="136" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
+<g id="proc~~spectrum~~CalledByGraph_node9" class="node"><title>proc~dcx</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node9"><a xlink:href="../proc/dcx.html" xlink:title="dcx">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-146 109,-146 109,-122 163,-122 163,-146"/>
+<text text-anchor="middle" x="136" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~dcx -->
-<g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
-<path fill="none" stroke="#000000" d="M54.2241,-139C67.6197,-139 83.9774,-139 98.533,-139"/>
-<polygon fill="#000000" stroke="#000000" points="98.7452,-142.5 108.745,-139 98.7451,-135.5 98.7452,-142.5"/>
+<g id="proc~~spectrum~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
+<path fill="none" stroke="#000000" d="M54.1751,-134C67.5177,-134 83.9597,-134 98.5231,-134"/>
+<polygon fill="#000000" stroke="#000000" points="98.7243,-137.5 108.724,-134 98.7242,-130.5 98.7243,-137.5"/>
 </g>
 <!-- proc~halo -->
-<g id="node14" class="node"><title>proc~halo</title>
-<a xlink:href="../proc/halo.html" xlink:title="halo">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-108 109,-108 109,-82 163,-82 163,-108"/>
-<text text-anchor="middle" x="136" y="-92.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
+<g id="proc~~spectrum~~CalledByGraph_node10" class="node"><title>proc~halo</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node10"><a xlink:href="../proc/halo.html" xlink:title="halo">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-104 109,-104 109,-80 163,-80 163,-104"/>
+<text text-anchor="middle" x="136" y="-89.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~halo -->
-<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
-<path fill="none" stroke="#000000" d="M54.2241,-128.01C67.8798,-122.498 84.6138,-115.743 99.3789,-109.783"/>
-<polygon fill="#000000" stroke="#000000" points="100.782,-112.991 108.745,-106.002 98.162,-106.5 100.782,-112.991"/>
+<g id="proc~~spectrum~~CalledByGraph_edge7" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
+<path fill="none" stroke="#000000" d="M54.1751,-123.726C67.7768,-118.387 84.5994,-111.783 99.3693,-105.986"/>
+<polygon fill="#000000" stroke="#000000" points="100.695,-109.226 108.724,-102.314 98.1368,-102.71 100.695,-109.226"/>
 </g>
 <!-- proc~fida_weights_los -->
-<g id="node22" class="node"><title>proc~fida_weights_los</title>
-<a xlink:href="../proc/fida_weights_los.html" xlink:title="fida_weights_los">
-<polygon fill="#d9534f" stroke="#d9534f" points="315,-70 225,-70 225,-44 315,-44 315,-70"/>
-<text text-anchor="middle" x="270" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
+<g id="proc~~spectrum~~CalledByGraph_node11" class="node"><title>proc~fida_weights_los</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node11"><a xlink:href="../proc/fida_weights_los.html" xlink:title="fida_weights_los">
+<polygon fill="#d9534f" stroke="#d9534f" points="315.5,-66 224.5,-66 224.5,-42 315.5,-42 315.5,-66"/>
+<text text-anchor="middle" x="270" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_los -->
-<g id="edge26" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
-<path fill="none" stroke="#000000" d="M35.152,-125.889C45.6831,-110.25 65.5935,-84.7492 90,-73 128.629,-54.4041 177.307,-51.102 214.299,-52.0649"/>
-<polygon fill="#000000" stroke="#000000" points="214.282,-55.5666 224.405,-52.4405 214.542,-48.5714 214.282,-55.5666"/>
+<g id="proc~~spectrum~~CalledByGraph_edge11" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
+<path fill="none" stroke="#000000" d="M35.9466,-121.765C46.3706,-106.88 66.1651,-82.339 90,-71 128.779,-52.5519 177.569,-49.0217 214.414,-49.7037"/>
+<polygon fill="#000000" stroke="#000000" points="214.372,-53.2039 224.471,-49.9988 214.578,-46.2069 214.372,-53.2039"/>
 </g>
 <!-- proc~fida_weights_mc -->
-<g id="node23" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-26 90,-26 90,-1.24345e-14 182,-3.55271e-15 182,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+<g id="proc~~spectrum~~CalledByGraph_node13" class="node"><title>proc~fida_weights_mc</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node13"><a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-24 90,-24 90,-0 182,-0 182,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge22" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M32.9014,-125.755C42.5044,-105.351 63.1682,-65.884 90,-40 93.074,-37.0346 96.5337,-34.2612 100.14,-31.707"/>
-<polygon fill="#000000" stroke="#000000" points="102.218,-34.5311 108.709,-26.1576 98.4132,-28.6555 102.218,-34.5311"/>
+<g id="proc~~spectrum~~CalledByGraph_edge12" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M33.5262,-121.782C42.8732,-102.17 63.4113,-63.3036 90,-38 93.2496,-34.9074 96.9344,-32.0354 100.763,-29.4149"/>
+<polygon fill="#000000" stroke="#000000" points="102.643,-32.367 109.259,-24.092 98.9269,-26.4349 102.643,-32.367"/>
 </g>
 <!-- proc~ndmc&#45;&gt;proc~store_bes_photons -->
-<g id="edge16" class="edge"><title>proc~ndmc&#45;&gt;proc~store_bes_photons</title>
-<path fill="none" stroke="#000000" d="M163.117,-174.096C179.603,-168.683 201.155,-161.606 220.584,-155.226"/>
-<polygon fill="#000000" stroke="#000000" points="221.806,-158.509 230.215,-152.064 219.622,-151.858 221.806,-158.509"/>
+<g id="proc~~spectrum~~CalledByGraph_edge8" class="edge"><title>proc~ndmc&#45;&gt;proc~store_bes_photons</title>
+<path fill="none" stroke="#000000" d="M163.079,-167.702C179.726,-162.405 201.801,-155.381 221.489,-149.117"/>
+<polygon fill="#000000" stroke="#000000" points="222.757,-152.387 231.225,-146.019 220.635,-145.716 222.757,-152.387"/>
 </g>
 <!-- proc~dcx&#45;&gt;proc~store_bes_photons -->
-<g id="edge18" class="edge"><title>proc~dcx&#45;&gt;proc~store_bes_photons</title>
-<path fill="none" stroke="#000000" d="M163.117,-139C176.04,-139 192.076,-139 207.761,-139"/>
-<polygon fill="#000000" stroke="#000000" points="207.982,-142.5 217.982,-139 207.982,-135.5 207.982,-142.5"/>
+<g id="proc~~spectrum~~CalledByGraph_edge9" class="edge"><title>proc~dcx&#45;&gt;proc~store_bes_photons</title>
+<path fill="none" stroke="#000000" d="M163.079,-134C175.899,-134 191.937,-134 207.626,-134"/>
+<polygon fill="#000000" stroke="#000000" points="207.847,-137.5 217.847,-134 207.847,-130.5 207.847,-137.5"/>
 </g>
 <!-- proc~halo&#45;&gt;proc~store_bes_photons -->
-<g id="edge20" class="edge"><title>proc~halo&#45;&gt;proc~store_bes_photons</title>
-<path fill="none" stroke="#000000" d="M163.117,-103.904C179.603,-109.317 201.155,-116.394 220.584,-122.774"/>
-<polygon fill="#000000" stroke="#000000" points="219.622,-126.142 230.215,-125.936 221.806,-119.491 219.622,-126.142"/>
-</g>
-<!-- proc~store_fw_photons -->
-<g id="node21" class="node"><title>proc~store_fw_photons</title>
-<a xlink:href="../proc/store_fw_photons.html" xlink:title="store_fw_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="318,-26 222,-26 222,-1.24345e-14 318,-3.55271e-15 318,-26"/>
-<text text-anchor="middle" x="270" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons</text>
-</a>
-</g>
-<!-- proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan -->
-<g id="edge28" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan</title>
-<path fill="none" stroke="#000000" d="M317.275,-26.0823C334.499,-30.8487 354.152,-36.2873 372.123,-41.2604"/>
-<polygon fill="#000000" stroke="#000000" points="371.336,-44.6742 381.907,-43.9681 373.203,-37.9277 371.336,-44.6742"/>
+<g id="proc~~spectrum~~CalledByGraph_edge10" class="edge"><title>proc~halo&#45;&gt;proc~store_bes_photons</title>
+<path fill="none" stroke="#000000" d="M163.079,-100.298C179.726,-105.595 201.801,-112.619 221.489,-118.883"/>
+<polygon fill="#000000" stroke="#000000" points="220.635,-122.284 231.225,-121.981 222.757,-115.613 220.635,-122.284"/>
 </g>
 <!-- proc~fida_weights_los&#45;&gt;proc~store_fw_photons_at_chan -->
-<g id="edge30" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~store_fw_photons_at_chan</title>
-<path fill="none" stroke="#000000" d="M315.563,-57C325.68,-57 336.7,-57 347.765,-57"/>
-<polygon fill="#000000" stroke="#000000" points="347.914,-60.5001 357.914,-57 347.914,-53.5001 347.914,-60.5001"/>
+<g id="proc~~spectrum~~CalledByGraph_edge14" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~store_fw_photons_at_chan</title>
+<path fill="none" stroke="#000000" d="M315.57,-54C325.634,-54 336.62,-54 347.654,-54"/>
+<polygon fill="#000000" stroke="#000000" points="347.776,-57.5001 357.776,-54 347.776,-50.5001 347.776,-57.5001"/>
+</g>
+<!-- proc~store_fw_photons -->
+<g id="proc~~spectrum~~CalledByGraph_node12" class="node"><title>proc~store_fw_photons</title>
+<g id="a_proc~~spectrum~~CalledByGraph_node12"><a xlink:href="../proc/store_fw_photons.html" xlink:title="store_fw_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="318.5,-24 221.5,-24 221.5,-0 318.5,-0 318.5,-24"/>
+<text text-anchor="middle" x="270" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fw_photons</text>
+</a>
+</g>
+</g>
+<!-- proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan -->
+<g id="proc~~spectrum~~CalledByGraph_edge15" class="edge"><title>proc~store_fw_photons&#45;&gt;proc~store_fw_photons_at_chan</title>
+<path fill="none" stroke="#000000" d="M315.99,-24.0355C333.809,-28.8025 354.465,-34.3281 373.149,-39.3264"/>
+<polygon fill="#000000" stroke="#000000" points="372.439,-42.7595 383.004,-41.9627 374.248,-35.9973 372.439,-42.7595"/>
 </g>
 <!-- proc~fida_weights_mc&#45;&gt;proc~store_fw_photons -->
-<g id="edge24" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~store_fw_photons</title>
-<path fill="none" stroke="#000000" d="M182.115,-13C191.344,-13 201.161,-13 210.762,-13"/>
-<polygon fill="#000000" stroke="#000000" points="211.057,-16.5001 221.057,-13 211.057,-9.5001 211.057,-16.5001"/>
+<g id="proc~~spectrum~~CalledByGraph_edge13" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~store_fw_photons</title>
+<path fill="none" stroke="#000000" d="M182.058,-12C191.481,-12 201.54,-12 211.348,-12"/>
+<polygon fill="#000000" stroke="#000000" points="211.443,-15.5001 221.443,-12 211.443,-8.5001 211.443,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -1183,43 +1219,43 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1458,7 +1494,13 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1503,6 +1545,8 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1562,7 +1606,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1588,7 +1632,17 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1638,6 +1692,8 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1674,6 +1730,10 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1704,13 +1764,13 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1842,8 +1902,6 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1868,7 +1926,9 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

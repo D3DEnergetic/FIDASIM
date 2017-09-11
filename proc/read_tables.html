@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.5% of total for procedures.">51 statements</a>
+	  title=" 0.5% of total for procedures.">52 statements</a>
      </li> 
      
      
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -846,213 +870,256 @@ public subroutine read_tables()
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_tables~~CallsGraph Pages: 1 -->
-<svg id="procread_tablesCallsGraph" width="608pt" height="464pt"
- viewBox="0.00 0.00 608.00 464.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_tables~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 460)">
+<svg id="procread_tablesCallsGraph" width="630pt" height="474pt"
+ viewBox="0.00 0.00 630.00 474.06" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_tables~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 470.059)">
 <title>proc~~read_tables~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-460 605,-460 605,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-470.059 626,-470.059 626,4 -4,4"/>
 <!-- proc~read_tables -->
-<g id="node1" class="node"><title>proc~read_tables</title>
-<polygon fill="none" stroke="black" points="69,-199 1,-199 1,-173 69,-173 69,-199"/>
-<text text-anchor="middle" x="35" y="-183.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_tables</text>
-</g>
-<!-- proc~read_atomic_rates -->
-<g id="node2" class="node"><title>proc~read_atomic_rates</title>
-<a xlink:href="../proc/read_atomic_rates.html" xlink:title="read_atomic_rates">
-<polygon fill="#d9534f" stroke="#d9534f" points="210,-269 108,-269 108,-243 210,-243 210,-269"/>
-<text text-anchor="middle" x="159" y="-253.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_atomic_rates</text>
-</a>
-</g>
-<!-- proc~read_tables&#45;&gt;proc~read_atomic_rates -->
-<g id="edge32" class="edge"><title>proc~read_tables&#45;&gt;proc~read_atomic_rates</title>
-<path fill="none" stroke="#000000" d="M58.0328,-199.002C77.3986,-209.935 105.294,-225.682 126.859,-237.856"/>
-<polygon fill="#000000" stroke="#000000" points="125.241,-240.962 135.67,-242.83 128.682,-234.866 125.241,-240.962"/>
-</g>
-<!-- h5fclose_f -->
-<g id="node3" class="node"><title>h5fclose_f</title>
-<polygon fill="#777777" stroke="#777777" points="189,-158 129,-158 129,-132 189,-132 189,-158"/>
-<text text-anchor="middle" x="159" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
-</g>
-<!-- proc~read_tables&#45;&gt;h5fclose_f -->
-<g id="edge34" class="edge"><title>proc~read_tables&#45;&gt;h5fclose_f</title>
-<path fill="none" stroke="#000000" d="M69.5409,-174.579C84.8518,-169.517 102.962,-163.529 118.87,-158.269"/>
-<polygon fill="#000000" stroke="#000000" points="120.05,-161.565 128.445,-155.103 117.852,-154.919 120.05,-161.565"/>
-</g>
-<!-- proc~read_nuclear_rates -->
-<g id="node4" class="node"><title>proc~read_nuclear_rates</title>
-<a xlink:href="../proc/read_nuclear_rates.html" xlink:title="read_nuclear_rates">
-<polygon fill="#d9534f" stroke="#d9534f" points="212,-330 106,-330 106,-304 212,-304 212,-330"/>
-<text text-anchor="middle" x="159" y="-314.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_nuclear_rates</text>
-</a>
-</g>
-<!-- proc~read_tables&#45;&gt;proc~read_nuclear_rates -->
-<g id="edge36" class="edge"><title>proc~read_tables&#45;&gt;proc~read_nuclear_rates</title>
-<path fill="none" stroke="#000000" d="M43.3962,-199.112C55.751,-217.836 80.1729,-252.757 106,-278 113.337,-285.171 122.049,-292.11 130.267,-298.098"/>
-<polygon fill="#000000" stroke="#000000" points="128.388,-301.055 138.576,-303.963 132.425,-295.336 128.388,-301.055"/>
+<g id="proc~~read_tables~~CallsGraph_node1" class="node"><title>proc~read_tables</title>
+<polygon fill="none" stroke="black" points="69.5,-206 0.5,-206 0.5,-182 69.5,-182 69.5,-206"/>
+<text text-anchor="middle" x="35" y="-191.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_tables</text>
 </g>
 <!-- h5close_f -->
-<g id="node5" class="node"><title>h5close_f</title>
-<polygon fill="#777777" stroke="#777777" points="188,-114 130,-114 130,-88 188,-88 188,-114"/>
-<text text-anchor="middle" x="159" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
+<g id="proc~~read_tables~~CallsGraph_node2" class="node"><title>h5close_f</title>
+<polygon fill="#777777" stroke="#777777" points="199,-394 141,-394 141,-370 199,-370 199,-394"/>
+<text text-anchor="middle" x="170" y="-379.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
 </g>
 <!-- proc~read_tables&#45;&gt;h5close_f -->
-<g id="edge38" class="edge"><title>proc~read_tables&#45;&gt;h5close_f</title>
-<path fill="none" stroke="#000000" d="M47.0443,-172.997C60.3996,-159.167 83.0964,-137.347 106,-123 110.476,-120.196 115.371,-117.61 120.32,-115.272"/>
-<polygon fill="#000000" stroke="#000000" points="122.069,-118.326 129.806,-111.089 119.244,-111.921 122.069,-118.326"/>
+<g id="proc~~read_tables~~CallsGraph_edge21" class="edge"><title>proc~read_tables&#45;&gt;h5close_f</title>
+<path fill="none" stroke="#000000" d="M37.6018,-206.025C42.2862,-236.449 58.7498,-317.174 106,-361 113.015,-367.506 122.101,-372.001 131.18,-375.105"/>
+<polygon fill="#000000" stroke="#000000" points="130.349,-378.508 140.929,-377.956 132.314,-371.79 130.349,-378.508"/>
 </g>
-<!-- h5open_f -->
-<g id="node6" class="node"><title>h5open_f</title>
-<polygon fill="#777777" stroke="#777777" points="188,-70 130,-70 130,-44 188,-44 188,-70"/>
-<text text-anchor="middle" x="159" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
-</g>
-<!-- proc~read_tables&#45;&gt;h5open_f -->
-<g id="edge40" class="edge"><title>proc~read_tables&#45;&gt;h5open_f</title>
-<path fill="none" stroke="#000000" d="M40.6813,-172.648C50.7716,-150.385 73.8258,-105.511 106,-79 110.325,-75.4363 115.308,-72.3765 120.451,-69.7713"/>
-<polygon fill="#000000" stroke="#000000" points="122.101,-72.8669 129.775,-65.5621 119.22,-66.487 122.101,-72.8669"/>
-</g>
-<!-- proc~h5ltread_dataset_int_scalar_f -->
-<g id="node7" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
-<a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="413,-456 259,-456 259,-430 413,-430 413,-456"/>
-<text text-anchor="middle" x="336" y="-440.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+<!-- proc~read_atomic_transitions -->
+<g id="proc~~read_tables~~CallsGraph_node3" class="node"><title>proc~read_atomic_transitions</title>
+<g id="a_proc~~read_tables~~CallsGraph_node3"><a xlink:href="../proc/read_atomic_transitions.html" xlink:title="read_atomic_transitions">
+<polygon fill="#d9534f" stroke="#d9534f" points="233.5,-352 106.5,-352 106.5,-328 233.5,-328 233.5,-352"/>
+<text text-anchor="middle" x="170" y="-337.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_atomic_transitions</text>
 </a>
 </g>
-<!-- proc~read_tables&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="edge42" class="edge"><title>proc~read_tables&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M35.6813,-199.056C38.2467,-234.3 50.2943,-332.132 106,-383 144.621,-418.266 201.372,-433.32 248.836,-439.53"/>
-<polygon fill="#000000" stroke="#000000" points="248.469,-443.011 258.814,-440.726 249.301,-436.061 248.469,-443.011"/>
+</g>
+<!-- proc~read_tables&#45;&gt;proc~read_atomic_transitions -->
+<g id="proc~~read_tables~~CallsGraph_edge22" class="edge"><title>proc~read_tables&#45;&gt;proc~read_atomic_transitions</title>
+<path fill="none" stroke="#000000" d="M39.5425,-206.261C47.3581,-231.163 68.4337,-287.93 106,-319 107.732,-320.433 109.566,-321.769 111.477,-323.016"/>
+<polygon fill="#000000" stroke="#000000" points="109.823,-326.101 120.26,-327.923 113.237,-319.99 109.823,-326.101"/>
 </g>
 <!-- h5ltread_dataset_double_f -->
-<g id="node8" class="node"><title>h5ltread_dataset_double_f</title>
-<polygon fill="#777777" stroke="#777777" points="600,-289 460,-289 460,-263 600,-263 600,-289"/>
-<text text-anchor="middle" x="530" y="-273.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
+<g id="proc~~read_tables~~CallsGraph_node4" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="622,-308 482,-308 482,-284 622,-284 622,-308"/>
+<text text-anchor="middle" x="552" y="-293.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
 </g>
 <!-- proc~read_tables&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge44" class="edge"><title>proc~read_tables&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M69.6229,-181.542C152.524,-171.422 360.254,-149.493 424,-175 463.935,-190.98 497.391,-229.964 515.483,-254.559"/>
-<polygon fill="#000000" stroke="#000000" points="512.779,-256.794 521.437,-262.9 518.476,-252.727 512.779,-256.794"/>
+<g id="proc~~read_tables~~CallsGraph_edge23" class="edge"><title>proc~read_tables&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M65.643,-181.957C136.919,-155.069 321.227,-98.0268 446,-171 474.171,-187.476 461.488,-209.616 482,-235 494.816,-250.86 511.987,-266.057 525.993,-277.315"/>
+<polygon fill="#000000" stroke="#000000" points="524.21,-280.365 534.238,-283.787 528.532,-274.859 524.21,-280.365"/>
 </g>
-<!-- h5fopen_f -->
-<g id="node9" class="node"><title>h5fopen_f</title>
-<polygon fill="#777777" stroke="#777777" points="189,-26 129,-26 129,-1.24345e-14 189,-3.55271e-15 189,-26"/>
-<text text-anchor="middle" x="159" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+<!-- h5open_f -->
+<g id="proc~~read_tables~~CallsGraph_node5" class="node"><title>h5open_f</title>
+<polygon fill="#777777" stroke="#777777" points="199,-108 141,-108 141,-84 199,-84 199,-108"/>
+<text text-anchor="middle" x="170" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
 </g>
-<!-- proc~read_tables&#45;&gt;h5fopen_f -->
-<g id="edge46" class="edge"><title>proc~read_tables&#45;&gt;h5fopen_f</title>
-<path fill="none" stroke="#000000" d="M37.7916,-172.797C44.5317,-143.973 64.3089,-74.8132 106,-35 109.82,-31.3523 114.331,-28.2718 119.082,-25.6802"/>
-<polygon fill="#000000" stroke="#000000" points="120.852,-28.7149 128.398,-21.2782 117.862,-22.3859 120.852,-28.7149"/>
+<!-- proc~read_tables&#45;&gt;h5open_f -->
+<g id="proc~~read_tables~~CallsGraph_edge24" class="edge"><title>proc~read_tables&#45;&gt;h5open_f</title>
+<path fill="none" stroke="#000000" d="M45.2149,-181.808C57.5729,-166.162 80.8857,-139.014 106,-122 113.687,-116.792 122.58,-112.335 131.219,-108.656"/>
+<polygon fill="#000000" stroke="#000000" points="132.797,-111.795 140.785,-104.835 130.2,-105.294 132.797,-111.795"/>
 </g>
 <!-- proc~read_atomic_cross -->
-<g id="node10" class="node"><title>proc~read_atomic_cross</title>
-<a xlink:href="../proc/read_atomic_cross.html" xlink:title="read_atomic_cross">
-<polygon fill="#d9534f" stroke="#d9534f" points="210,-374 108,-374 108,-348 210,-348 210,-374"/>
-<text text-anchor="middle" x="159" y="-358.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_atomic_cross</text>
+<g id="proc~~read_tables~~CallsGraph_node6" class="node"><title>proc~read_atomic_cross</title>
+<g id="a_proc~~read_tables~~CallsGraph_node6"><a xlink:href="../proc/read_atomic_cross.html" xlink:title="read_atomic_cross">
+<polygon fill="#d9534f" stroke="#d9534f" points="221.5,-268 118.5,-268 118.5,-244 221.5,-244 221.5,-268"/>
+<text text-anchor="middle" x="170" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_atomic_cross</text>
 </a>
+</g>
 </g>
 <!-- proc~read_tables&#45;&gt;proc~read_atomic_cross -->
-<g id="edge48" class="edge"><title>proc~read_tables&#45;&gt;proc~read_atomic_cross</title>
-<path fill="none" stroke="#000000" d="M37.7394,-199.376C44.3754,-228.579 63.9578,-298.648 106,-339 107.235,-340.186 108.544,-341.311 109.91,-342.38"/>
-<polygon fill="#000000" stroke="#000000" points="107.983,-345.302 118.257,-347.89 111.84,-339.46 107.983,-345.302"/>
+<g id="proc~~read_tables~~CallsGraph_edge25" class="edge"><title>proc~read_tables&#45;&gt;proc~read_atomic_cross</title>
+<path fill="none" stroke="#000000" d="M54.1548,-206.05C67.9659,-214.863 87.6583,-226.681 106,-235 110.128,-236.872 114.473,-238.664 118.873,-240.357"/>
+<polygon fill="#000000" stroke="#000000" points="117.932,-243.74 128.525,-243.897 120.342,-237.168 117.932,-243.74"/>
 </g>
-<!-- proc~read_atomic_rates&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="edge12" class="edge"><title>proc~read_atomic_rates&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M182.17,-269.032C192.405,-275.718 203.921,-284.64 212,-295 237.988,-328.322 221.417,-350.151 248,-383 261.967,-400.259 282.19,-414.527 299.73,-424.814"/>
-<polygon fill="#000000" stroke="#000000" points="298.18,-427.958 308.609,-429.824 301.62,-421.862 298.18,-427.958"/>
-</g>
-<!-- proc~read_atomic_rates&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge4" class="edge"><title>proc~read_atomic_rates&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M210.379,-255.513C263.828,-255.393 349.9,-256.285 424,-262 432.38,-262.646 441.113,-263.502 449.81,-264.473"/>
-<polygon fill="#000000" stroke="#000000" points="449.642,-267.977 459.981,-265.66 450.454,-261.024 449.642,-267.977"/>
-</g>
-<!-- h5ltget_dataset_ndims_f -->
-<g id="node11" class="node"><title>h5ltget_dataset_ndims_f</title>
-<polygon fill="#777777" stroke="#777777" points="401,-210 271,-210 271,-184 401,-184 401,-210"/>
-<text text-anchor="middle" x="336" y="-194.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltget_dataset_ndims_f</text>
-</g>
-<!-- proc~read_atomic_rates&#45;&gt;h5ltget_dataset_ndims_f -->
-<g id="edge6" class="edge"><title>proc~read_atomic_rates&#45;&gt;h5ltget_dataset_ndims_f</title>
-<path fill="none" stroke="#000000" d="M193.951,-243C210.305,-237.029 230.084,-229.965 248,-224 259.023,-220.329 270.883,-216.566 282.215,-213.059"/>
-<polygon fill="#000000" stroke="#000000" points="283.473,-216.334 292.003,-210.051 281.416,-209.643 283.473,-216.334"/>
-</g>
-<!-- proc~h5ltread_dataset_double_scalar_f -->
-<g id="node12" class="node"><title>proc~h5ltread_dataset_double_scalar_f</title>
-<a xlink:href="../proc/h5ltread_dataset_double_scalar_f.html" xlink:title="h5ltread_dataset_double_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="423,-374 249,-374 249,-348 423,-348 423,-374"/>
-<text text-anchor="middle" x="336" y="-358.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_scalar_f</text>
+<!-- proc~read_nuclear_rates -->
+<g id="proc~~read_tables~~CallsGraph_node7" class="node"><title>proc~read_nuclear_rates</title>
+<g id="a_proc~~read_tables~~CallsGraph_node7"><a xlink:href="../proc/read_nuclear_rates.html" xlink:title="read_nuclear_rates">
+<polygon fill="#d9534f" stroke="#d9534f" points="223,-226 117,-226 117,-202 223,-202 223,-226"/>
+<text text-anchor="middle" x="170" y="-211.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_nuclear_rates</text>
 </a>
 </g>
-<!-- proc~read_atomic_rates&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
-<g id="edge8" class="edge"><title>proc~read_atomic_rates&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
-<path fill="none" stroke="#000000" d="M179.31,-269.155C189.589,-276.246 201.978,-285.48 212,-295 230.319,-312.402 226.66,-325.471 248,-339 250.641,-340.675 253.403,-342.222 256.249,-343.651"/>
-<polygon fill="#000000" stroke="#000000" points="255.03,-346.94 265.588,-347.827 257.888,-340.55 255.03,-346.94"/>
+</g>
+<!-- proc~read_tables&#45;&gt;proc~read_nuclear_rates -->
+<g id="proc~~read_tables~~CallsGraph_edge26" class="edge"><title>proc~read_tables&#45;&gt;proc~read_nuclear_rates</title>
+<path fill="none" stroke="#000000" d="M69.5615,-199.047C80.8556,-200.745 93.8456,-202.699 106.631,-204.621"/>
+<polygon fill="#000000" stroke="#000000" points="106.395,-208.125 116.805,-206.151 107.436,-201.203 106.395,-208.125"/>
+</g>
+<!-- h5fopen_f -->
+<g id="proc~~read_tables~~CallsGraph_node8" class="node"><title>h5fopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="200.5,-66 139.5,-66 139.5,-42 200.5,-42 200.5,-66"/>
+<text text-anchor="middle" x="170" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+</g>
+<!-- proc~read_tables&#45;&gt;h5fopen_f -->
+<g id="proc~~read_tables~~CallsGraph_edge27" class="edge"><title>proc~read_tables&#45;&gt;h5fopen_f</title>
+<path fill="none" stroke="#000000" d="M39.8408,-181.959C48.0708,-158.059 69.6687,-104.404 106,-75 112.828,-69.474 121.171,-65.3772 129.524,-62.3484"/>
+<polygon fill="#000000" stroke="#000000" points="130.772,-65.6245 139.243,-59.2617 128.653,-58.9529 130.772,-65.6245"/>
+</g>
+<!-- proc~read_atomic_rate -->
+<g id="proc~~read_tables~~CallsGraph_node9" class="node"><title>proc~read_atomic_rate</title>
+<g id="a_proc~~read_tables~~CallsGraph_node9"><a xlink:href="../proc/read_atomic_rate.html" xlink:title="read_atomic_rate">
+<polygon fill="#d9534f" stroke="#d9534f" points="218.5,-310 121.5,-310 121.5,-286 218.5,-286 218.5,-310"/>
+<text text-anchor="middle" x="170" y="-295.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_atomic_rate</text>
+</a>
+</g>
+</g>
+<!-- proc~read_tables&#45;&gt;proc~read_atomic_rate -->
+<g id="proc~~read_tables~~CallsGraph_edge28" class="edge"><title>proc~read_tables&#45;&gt;proc~read_atomic_rate</title>
+<path fill="none" stroke="#000000" d="M43.2332,-206.266C54.4622,-224.288 77.7628,-257.849 106,-277 108.415,-278.638 110.969,-280.157 113.61,-281.566"/>
+<polygon fill="#000000" stroke="#000000" points="112.315,-284.825 122.851,-285.936 115.307,-278.497 112.315,-284.825"/>
+</g>
+<!-- proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_node10" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="a_proc~~read_tables~~CallsGraph_node10"><a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-226 281,-226 281,-202 435,-202 435,-226"/>
+<text text-anchor="middle" x="358" y="-211.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+</a>
+</g>
+</g>
+<!-- proc~read_tables&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge29" class="edge"><title>proc~read_tables&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M69.8231,-193.419C81.3058,-193.248 94.2109,-193.084 106,-193 162.887,-192.594 177.314,-188.196 234,-193 251.774,-194.506 270.839,-197.216 288.525,-200.2"/>
+<polygon fill="#000000" stroke="#000000" points="288.307,-203.714 298.76,-201.981 289.508,-196.818 288.307,-203.714"/>
+</g>
+<!-- h5fclose_f -->
+<g id="proc~~read_tables~~CallsGraph_node11" class="node"><title>h5fclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="200.5,-24 139.5,-24 139.5,-0 200.5,-0 200.5,-24"/>
+<text text-anchor="middle" x="170" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
+</g>
+<!-- proc~read_tables&#45;&gt;h5fclose_f -->
+<g id="proc~~read_tables~~CallsGraph_edge30" class="edge"><title>proc~read_tables&#45;&gt;h5fclose_f</title>
+<path fill="none" stroke="#000000" d="M37.8141,-181.967C42.9166,-152.291 60.1349,-74.9808 106,-33 112.673,-26.8918 121.175,-22.5551 129.757,-19.4778"/>
+<polygon fill="#000000" stroke="#000000" points="130.86,-22.8002 139.387,-16.5113 128.8,-16.1104 130.86,-22.8002"/>
+</g>
+<!-- proc~read_atomic_transitions&#45;&gt;h5ltread_dataset_double_f -->
+<g id="proc~~read_tables~~CallsGraph_edge4" class="edge"><title>proc~read_atomic_transitions&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M220.616,-352.109C225.454,-354.552 230.031,-357.483 234,-361 261.974,-385.788 238.417,-417.013 270,-437 336.099,-478.829 376.096,-472.101 446,-437 495.962,-411.912 528.184,-350.537 542.473,-317.648"/>
+<polygon fill="#000000" stroke="#000000" points="545.856,-318.629 546.482,-308.053 539.397,-315.931 545.856,-318.629"/>
+</g>
+<!-- proc~read_atomic_transitions&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge6" class="edge"><title>proc~read_atomic_transitions&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M217.597,-327.971C223.38,-325.485 229.007,-322.522 234,-319 255.216,-304.037 251.028,-290.721 270,-273 287.149,-256.981 309.02,-242.169 326.543,-231.393"/>
+<polygon fill="#000000" stroke="#000000" points="328.502,-234.299 335.262,-226.141 324.89,-228.303 328.502,-234.299"/>
+</g>
+<!-- h5ltget_dataset_ndims_f -->
+<g id="proc~~read_tables~~CallsGraph_node12" class="node"><title>h5ltget_dataset_ndims_f</title>
+<polygon fill="#777777" stroke="#777777" points="423,-428 293,-428 293,-404 423,-404 423,-428"/>
+<text text-anchor="middle" x="358" y="-413.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltget_dataset_ndims_f</text>
+</g>
+<!-- proc~read_atomic_transitions&#45;&gt;h5ltget_dataset_ndims_f -->
+<g id="proc~~read_tables~~CallsGraph_edge2" class="edge"><title>proc~read_atomic_transitions&#45;&gt;h5ltget_dataset_ndims_f</title>
+<path fill="none" stroke="#000000" d="M214.23,-352.123C221.02,-354.672 227.828,-357.629 234,-361 252.031,-370.849 251.817,-380.435 270,-390 277.805,-394.106 286.354,-397.659 294.949,-400.705"/>
+<polygon fill="#000000" stroke="#000000" points="294.041,-404.091 304.634,-403.93 296.253,-397.45 294.041,-404.091"/>
+</g>
+<!-- proc~h5ltread_dataset_double_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_node13" class="node"><title>proc~h5ltread_dataset_double_scalar_f</title>
+<g id="a_proc~~read_tables~~CallsGraph_node13"><a xlink:href="../proc/h5ltread_dataset_double_scalar_f.html" xlink:title="h5ltread_dataset_double_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="445.5,-348 270.5,-348 270.5,-324 445.5,-324 445.5,-348"/>
+<text text-anchor="middle" x="358" y="-333.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_scalar_f</text>
+</a>
+</g>
+</g>
+<!-- proc~read_atomic_transitions&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge3" class="edge"><title>proc~read_atomic_transitions&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
+<path fill="none" stroke="#000000" d="M233.712,-338.651C242.294,-338.467 251.262,-338.274 260.278,-338.08"/>
+<polygon fill="#000000" stroke="#000000" points="260.535,-341.575 270.458,-337.861 260.385,-334.577 260.535,-341.575"/>
 </g>
 <!-- h5ltpath_valid_f -->
-<g id="node13" class="node"><title>h5ltpath_valid_f</title>
-<polygon fill="#777777" stroke="#777777" points="380,-330 292,-330 292,-304 380,-304 380,-330"/>
-<text text-anchor="middle" x="336" y="-314.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
+<g id="proc~~read_tables~~CallsGraph_node14" class="node"><title>h5ltpath_valid_f</title>
+<polygon fill="#777777" stroke="#777777" points="402,-306 314,-306 314,-282 402,-282 402,-306"/>
+<text text-anchor="middle" x="358" y="-291.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
 </g>
-<!-- proc~read_atomic_rates&#45;&gt;h5ltpath_valid_f -->
-<g id="edge10" class="edge"><title>proc~read_atomic_rates&#45;&gt;h5ltpath_valid_f</title>
-<path fill="none" stroke="#000000" d="M196.971,-269.086C223.685,-278.293 259.638,-290.683 288.289,-300.557"/>
-<polygon fill="#000000" stroke="#000000" points="287.497,-303.986 298.092,-303.936 289.778,-297.368 287.497,-303.986"/>
-</g>
-<!-- proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="edge20" class="edge"><title>proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M197.026,-330.072C202.287,-332.642 207.443,-335.612 212,-339 232.278,-354.074 229.371,-365.93 248,-383 265.182,-398.744 286.775,-413.528 304.271,-424.482"/>
-<polygon fill="#000000" stroke="#000000" points="302.649,-427.593 313.002,-429.846 306.313,-421.629 302.649,-427.593"/>
-</g>
-<!-- proc~read_nuclear_rates&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge18" class="edge"><title>proc~read_nuclear_rates&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M205.34,-303.917C218.982,-300.509 234.004,-297.184 248,-295 315.436,-284.477 392.84,-279.78 449.474,-277.684"/>
-<polygon fill="#000000" stroke="#000000" points="449.928,-281.171 459.799,-277.322 449.683,-274.175 449.928,-281.171"/>
-</g>
-<!-- proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
-<g id="edge14" class="edge"><title>proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
-<path fill="none" stroke="#000000" d="M211.627,-330.082C231.156,-334.937 253.49,-340.489 273.793,-345.536"/>
-<polygon fill="#000000" stroke="#000000" points="273.027,-348.952 283.576,-347.968 274.716,-342.159 273.027,-348.952"/>
-</g>
-<!-- proc~read_nuclear_rates&#45;&gt;h5ltpath_valid_f -->
-<g id="edge16" class="edge"><title>proc~read_nuclear_rates&#45;&gt;h5ltpath_valid_f</title>
-<path fill="none" stroke="#000000" d="M212.106,-317C234.083,-317 259.546,-317 281.651,-317"/>
-<polygon fill="#000000" stroke="#000000" points="281.874,-320.5 291.874,-317 281.874,-313.5 281.874,-320.5"/>
-</g>
-<!-- h5ltread_dataset_int_f -->
-<g id="node24" class="node"><title>h5ltread_dataset_int_f</title>
-<polygon fill="#777777" stroke="#777777" points="589,-456 471,-456 471,-430 589,-430 589,-456"/>
-<text text-anchor="middle" x="530" y="-440.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
-</g>
-<!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
-<g id="edge22" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M413.231,-443C428.685,-443 444.837,-443 460.029,-443"/>
-<polygon fill="#000000" stroke="#000000" points="460.372,-446.5 470.372,-443 460.372,-439.5 460.372,-446.5"/>
-</g>
-<!-- proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="edge30" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M176.983,-374.032C194.437,-386.207 222.027,-404.226 248,-416 256.75,-419.967 266.243,-423.559 275.648,-426.735"/>
-<polygon fill="#000000" stroke="#000000" points="274.791,-430.136 285.383,-429.891 276.95,-423.477 274.791,-430.136"/>
+<!-- proc~read_atomic_transitions&#45;&gt;h5ltpath_valid_f -->
+<g id="proc~~read_tables~~CallsGraph_edge5" class="edge"><title>proc~read_atomic_transitions&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M218.31,-327.945C234.673,-323.805 253.134,-319.165 270,-315 280.856,-312.319 292.485,-309.486 303.593,-306.798"/>
+<polygon fill="#000000" stroke="#000000" points="304.712,-310.128 313.61,-304.379 303.068,-303.324 304.712,-310.128"/>
 </g>
 <!-- proc~read_atomic_cross&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge28" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M194.921,-374.121C247.449,-391.112 347.303,-414.98 424,-383 465.451,-365.716 498.994,-323.463 516.583,-297.523"/>
-<polygon fill="#000000" stroke="#000000" points="519.555,-299.374 522.126,-289.096 513.706,-295.527 519.555,-299.374"/>
+<g id="proc~~read_tables~~CallsGraph_edge8" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M221.666,-256.8C277.019,-258.216 368.187,-262.138 446,-273 461.54,-275.169 478.199,-278.395 493.566,-281.748"/>
+<polygon fill="#000000" stroke="#000000" points="492.929,-285.193 503.452,-283.961 494.458,-278.362 492.929,-285.193"/>
+</g>
+<!-- proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge10" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M221.825,-244.523C244.037,-239.508 270.32,-233.573 293.777,-228.276"/>
+<polygon fill="#000000" stroke="#000000" points="294.654,-231.666 303.638,-226.05 293.112,-224.838 294.654,-231.666"/>
 </g>
 <!-- proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
-<g id="edge24" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
-<path fill="none" stroke="#000000" d="M210.672,-361C219.364,-361 228.633,-361 238.047,-361"/>
-<polygon fill="#000000" stroke="#000000" points="238.298,-364.5 248.298,-361 238.298,-357.5 238.298,-364.5"/>
+<g id="proc~~read_tables~~CallsGraph_edge7" class="edge"><title>proc~read_atomic_cross&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
+<path fill="none" stroke="#000000" d="M216.304,-268.075C222.476,-270.576 228.554,-273.532 234,-277 253.623,-289.497 249.864,-303.347 270,-315 273.215,-316.861 276.588,-318.557 280.062,-320.103"/>
+<polygon fill="#000000" stroke="#000000" points="278.868,-323.395 289.453,-323.856 281.466,-316.895 278.868,-323.395"/>
 </g>
 <!-- proc~read_atomic_cross&#45;&gt;h5ltpath_valid_f -->
-<g id="edge26" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltpath_valid_f</title>
-<path fill="none" stroke="#000000" d="M210.672,-348.155C233.071,-342.587 259.301,-336.066 281.959,-330.434"/>
-<polygon fill="#000000" stroke="#000000" points="282.9,-333.807 291.76,-327.998 281.211,-327.013 282.9,-333.807"/>
+<g id="proc~~read_tables~~CallsGraph_edge9" class="edge"><title>proc~read_atomic_cross&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M221.825,-266.384C247.274,-271.583 278.067,-277.874 303.832,-283.138"/>
+<polygon fill="#000000" stroke="#000000" points="303.304,-286.602 313.802,-285.175 304.705,-279.744 303.304,-286.602"/>
+</g>
+<!-- proc~read_nuclear_rates&#45;&gt;h5ltread_dataset_double_f -->
+<g id="proc~~read_tables~~CallsGraph_edge12" class="edge"><title>proc~read_nuclear_rates&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M202.862,-201.946C255.997,-183.885 364.87,-155.685 446,-193 468.336,-203.273 464.749,-217.483 482,-235 496.68,-249.906 514.378,-265.51 528.175,-277.205"/>
+<polygon fill="#000000" stroke="#000000" points="526.29,-280.192 536.2,-283.94 530.79,-274.83 526.29,-280.192"/>
+</g>
+<!-- proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge14" class="edge"><title>proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M223.306,-214C238.077,-214 254.554,-214 270.756,-214"/>
+<polygon fill="#000000" stroke="#000000" points="270.791,-217.5 280.791,-214 270.791,-210.5 270.791,-217.5"/>
+</g>
+<!-- proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge11" class="edge"><title>proc~read_nuclear_rates&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
+<path fill="none" stroke="#000000" d="M220.685,-226.031C225.51,-228.488 230.065,-231.444 234,-235 262.928,-261.142 239.989,-290.11 270,-315 271.57,-316.302 273.207,-317.525 274.901,-318.675"/>
+<polygon fill="#000000" stroke="#000000" points="273.386,-321.843 283.793,-323.832 276.898,-315.787 273.386,-321.843"/>
+</g>
+<!-- proc~read_nuclear_rates&#45;&gt;h5ltpath_valid_f -->
+<g id="proc~~read_tables~~CallsGraph_edge13" class="edge"><title>proc~read_nuclear_rates&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M209.593,-226.011C217.723,-228.779 226.198,-231.843 234,-235 265.398,-247.705 300.103,-264.628 324.62,-277.091"/>
+<polygon fill="#000000" stroke="#000000" points="323.317,-280.356 333.813,-281.799 326.507,-274.126 323.317,-280.356"/>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;h5ltread_dataset_double_f -->
+<g id="proc~~read_tables~~CallsGraph_edge17" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M216.304,-310.075C222.476,-312.576 228.554,-315.532 234,-319 253.623,-331.497 248.629,-347.808 270,-357 341.857,-387.908 370.471,-377.347 446,-357 476.677,-348.736 507.623,-329.063 527.89,-314.277"/>
+<polygon fill="#000000" stroke="#000000" points="530.247,-316.884 536.151,-308.087 526.049,-311.283 530.247,-316.884"/>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge19" class="edge"><title>proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M210.326,-285.915C218.246,-283.196 226.453,-280.169 234,-277 266.561,-263.327 302.343,-244.55 326.876,-231.058"/>
+<polygon fill="#000000" stroke="#000000" points="328.649,-234.077 335.698,-226.167 325.255,-227.955 328.649,-234.077"/>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;h5ltget_dataset_ndims_f -->
+<g id="proc~~read_tables~~CallsGraph_edge15" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltget_dataset_ndims_f</title>
+<path fill="none" stroke="#000000" d="M218.609,-309.294C224.165,-311.894 229.46,-315.085 234,-319 260.793,-342.106 242.848,-367.317 270,-390 274.495,-393.755 279.518,-396.968 284.821,-399.717"/>
+<polygon fill="#000000" stroke="#000000" points="283.418,-402.924 293.966,-403.919 286.341,-396.564 283.418,-402.924"/>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_double_scalar_f -->
+<g id="proc~~read_tables~~CallsGraph_edge16" class="edge"><title>proc~read_atomic_rate&#45;&gt;proc~h5ltread_dataset_double_scalar_f</title>
+<path fill="none" stroke="#000000" d="M218.9,-307.786C239.902,-312.077 264.954,-317.195 287.919,-321.887"/>
+<polygon fill="#000000" stroke="#000000" points="287.459,-325.365 297.957,-323.937 288.86,-318.506 287.459,-325.365"/>
+</g>
+<!-- proc~read_atomic_rate&#45;&gt;h5ltpath_valid_f -->
+<g id="proc~~read_tables~~CallsGraph_edge18" class="edge"><title>proc~read_atomic_rate&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M218.9,-296.97C244.746,-296.414 276.725,-295.726 303.399,-295.153"/>
+<polygon fill="#000000" stroke="#000000" points="303.792,-298.645 313.714,-294.931 303.641,-291.647 303.792,-298.645"/>
+</g>
+<!-- h5ltread_dataset_int_f -->
+<g id="proc~~read_tables~~CallsGraph_node15" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="611.5,-226 492.5,-226 492.5,-202 611.5,-202 611.5,-226"/>
+<text text-anchor="middle" x="552" y="-211.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+</g>
+<!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
+<g id="proc~~read_tables~~CallsGraph_edge20" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M435.159,-214C450.641,-214 466.843,-214 482.058,-214"/>
+<polygon fill="#000000" stroke="#000000" points="482.413,-217.5 492.413,-214 482.413,-210.5 482.413,-217.5"/>
 </g>
 <!-- proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge2" class="edge"><title>proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M397.808,-347.982C406.733,-345.404 415.7,-342.418 424,-339 452.579,-327.232 482.637,-308.7 503.416,-294.776"/>
-<polygon fill="#000000" stroke="#000000" points="505.423,-297.643 511.722,-289.124 501.485,-291.856 505.423,-297.643"/>
+<g id="proc~~read_tables~~CallsGraph_edge1" class="edge"><title>proc~h5ltread_dataset_double_scalar_f&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M416.606,-323.999C437.584,-319.628 461.49,-314.648 483.266,-310.111"/>
+<polygon fill="#000000" stroke="#000000" points="484.027,-313.528 493.103,-308.062 482.599,-306.675 484.027,-313.528"/>
 </g>
 </g>
 </svg>
@@ -1071,43 +1138,43 @@ public subroutine read_tables()
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1131,30 +1198,31 @@ public subroutine read_tables()
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_tables~~CalledByGraph Pages: 1 -->
-<svg id="procread_tablesCalledByGraph" width="168pt" height="34pt"
- viewBox="0.00 0.00 168.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_tables~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="procread_tablesCalledByGraph" width="168pt" height="32pt"
+ viewBox="0.00 0.00 168.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_tables~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>proc~~read_tables~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 165,-30 165,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 164,-28 164,4 -4,4"/>
 <!-- proc~read_tables -->
-<g id="node1" class="node"><title>proc~read_tables</title>
-<polygon fill="none" stroke="black" points="159,-26 91,-26 91,-1.24345e-14 159,-3.55271e-15 159,-26"/>
-<text text-anchor="middle" x="125" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_tables</text>
+<g id="proc~~read_tables~~CalledByGraph_node1" class="node"><title>proc~read_tables</title>
+<polygon fill="none" stroke="black" points="159.5,-24 90.5,-24 90.5,-0 159.5,-0 159.5,-24"/>
+<text text-anchor="middle" x="125" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_tables</text>
 </g>
 <!-- program~fidasim -->
-<g id="node2" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
-<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~read_tables~~CalledByGraph_node2" class="node"><title>program~fidasim</title>
+<g id="a_proc~~read_tables~~CalledByGraph_node2"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
+</g>
 <!-- program~fidasim&#45;&gt;proc~read_tables -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_tables</title>
-<path fill="none" stroke="#000000" d="M54.0384,-13C62.1011,-13 71.1641,-13 80.0483,-13"/>
-<polygon fill="#000000" stroke="#000000" points="80.325,-16.5001 90.325,-13 80.3249,-9.5001 80.325,-16.5001"/>
+<g id="proc~~read_tables~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~read_tables</title>
+<path fill="none" stroke="#000000" d="M54.2324,-12C62.2127,-12 71.2115,-12 80.0278,-12"/>
+<polygon fill="#000000" stroke="#000000" points="80.2215,-15.5001 90.2215,-12 80.2215,-8.5001 80.2215,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -1173,43 +1241,43 @@ public subroutine read_tables()
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1305,18 +1373,21 @@ public subroutine read_tables()
     <span class="k">call </span><span class="n">h5fopen_f</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">tables_file</span><span class="p">,</span> <span class="n">H5F_ACC_RDONLY_F</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
     <span class="c">!!Read Hydrogen-Hydrogen CX Cross Sections</span>
-    <span class="k">call </span><span class="n">read_atomic_cross</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/cross/H_H&quot;</span><span class="p">,</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">read_atomic_cross</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/cross/H_H&quot;</span><span class="p">,</span><span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_cross</span><span class="p">)</span>
 
-    <span class="c">!!Read Hydrogen-Hydrogen Rates</span>
+    <span class="c">!!Read Hydrogen-Hydrogen CX Rates</span>
     <span class="n">b_amu</span> <span class="o">=</span> <span class="p">[</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="p">,</span> <span class="n">inputs</span><span class="p">%</span><span class="n">ai</span><span class="p">]</span>
-    <span class="k">call </span><span class="n">read_atomic_rates</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_H&quot;</span><span class="p">,</span><span class="n">b_amu</span><span class="p">,</span> <span class="n">inputs</span><span class="p">%</span><span class="n">ai</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">read_atomic_rate</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_H&quot;</span><span class="p">,</span><span class="n">b_amu</span><span class="p">,</span> <span class="n">inputs</span><span class="p">%</span><span class="n">ai</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H_cx_rate</span><span class="p">)</span>
+
+    <span class="c">!!Read Hydrogen-Hydrogen Transitions</span>
+    <span class="k">call </span><span class="n">read_atomic_transitions</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_H&quot;</span><span class="p">,</span><span class="n">b_amu</span><span class="p">,</span> <span class="n">inputs</span><span class="p">%</span><span class="n">ai</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H</span><span class="p">)</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">ab</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H</span><span class="p">%</span><span class="n">ab</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">ai</span> <span class="o">=</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_H</span><span class="p">%</span><span class="n">ab</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
-    <span class="c">!!Read Hydrogen-Electron Rates</span>
-    <span class="k">call </span><span class="n">read_atomic_rates</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_e&quot;</span><span class="p">,</span><span class="n">b_amu</span><span class="p">,</span> <span class="n">e_amu</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_e</span><span class="p">)</span>
+    <span class="c">!!Read Hydrogen-Electron Transitions</span>
+    <span class="k">call </span><span class="n">read_atomic_transitions</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_e&quot;</span><span class="p">,</span><span class="n">b_amu</span><span class="p">,</span> <span class="n">e_amu</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_e</span><span class="p">)</span>
 
-    <span class="c">!!Read Hydrogen-Impurity rates</span>
+    <span class="c">!!Read Hydrogen-Impurity Transitions</span>
     <span class="n">impname</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">select case</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">impurity_charge</span><span class="p">)</span>
         <span class="k">case</span> <span class="p">(</span><span class="mi">5</span><span class="p">)</span>
@@ -1330,7 +1401,7 @@ public subroutine read_tables()
             <span class="n">imp_amu</span> <span class="o">=</span> <span class="mf">2.d0</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">impurity_charge</span>
     <span class="k">end select</span>
 
-<span class="k">    call </span><span class="n">read_atomic_rates</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_&quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">impname</span><span class="p">)),</span> <span class="n">b_amu</span><span class="p">,</span> <span class="n">imp_amu</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_Aq</span><span class="p">)</span>
+<span class="k">    call </span><span class="n">read_atomic_transitions</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/H_&quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">impname</span><span class="p">)),</span> <span class="n">b_amu</span><span class="p">,</span> <span class="n">imp_amu</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">H_Aq</span><span class="p">)</span>
 
     <span class="c">!!Read Einstein coefficients</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/rates/spontaneous/n_max&quot;</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -1465,7 +1536,13 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1510,6 +1587,8 @@ public subroutine read_tables()
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1569,7 +1648,7 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1595,7 +1674,17 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1645,6 +1734,8 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1681,6 +1772,10 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1711,13 +1806,13 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1849,8 +1944,6 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1875,7 +1968,9 @@ public subroutine read_tables()
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

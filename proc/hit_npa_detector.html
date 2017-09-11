@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -853,7 +877,7 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
   
 <tr>
   
-  <td><span class="anchor" id="variable-r0%7E2"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-r0%7E3"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -868,7 +892,7 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
   
 <tr>
   
-  <td><span class="anchor" id="variable-v0%7E2"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-v0%7E3"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -933,42 +957,44 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~hit_npa_detector~~CallsGraph Pages: 1 -->
-<svg id="prochit_npa_detectorCallsGraph" width="224pt" height="78pt"
- viewBox="0.00 0.00 224.00 78.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~hit_npa_detector~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 74)">
+<svg id="prochit_npa_detectorCallsGraph" width="246pt" height="74pt"
+ viewBox="0.00 0.00 246.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~hit_npa_detector~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
 <title>proc~~hit_npa_detector~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-74 221,-74 221,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-70 242,-70 242,4 -4,4"/>
 <!-- proc~hit_npa_detector -->
-<g id="node1" class="node"><title>proc~hit_npa_detector</title>
-<polygon fill="none" stroke="black" points="93,-48 1,-48 1,-22 93,-22 93,-48"/>
-<text text-anchor="middle" x="47" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50">hit_npa_detector</text>
+<g id="proc~~hit_npa_detector~~CallsGraph_node1" class="node"><title>proc~hit_npa_detector</title>
+<polygon fill="none" stroke="black" points="93.5,-45 0.5,-45 0.5,-21 93.5,-21 93.5,-45"/>
+<text text-anchor="middle" x="47" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">hit_npa_detector</text>
 </g>
-<!-- proc~plane_intercept -->
-<g id="node2" class="node"><title>proc~plane_intercept</title>
-<a xlink:href="../proc/plane_intercept.html" xlink:title="plane_intercept">
-<polygon fill="#d9534f" stroke="#d9534f" points="216,-70 130,-70 130,-44 216,-44 216,-70"/>
-<text text-anchor="middle" x="173" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">plane_intercept</text>
+<!-- proc~line_plane_intersect -->
+<g id="proc~~hit_npa_detector~~CallsGraph_node2" class="node"><title>proc~line_plane_intersect</title>
+<g id="a_proc~~hit_npa_detector~~CallsGraph_node2"><a xlink:href="../proc/line_plane_intersect.html" xlink:title="line_plane_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="238,-66 130,-66 130,-42 238,-42 238,-66"/>
+<text text-anchor="middle" x="184" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_plane_intersect</text>
 </a>
 </g>
-<!-- proc~hit_npa_detector&#45;&gt;proc~plane_intercept -->
-<g id="edge2" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~plane_intercept</title>
-<path fill="none" stroke="#000000" d="M93.5598,-43.1295C102.125,-44.6251 111.127,-46.1968 119.869,-47.7231"/>
-<polygon fill="#000000" stroke="#000000" points="119.517,-51.2145 129.97,-49.4868 120.721,-44.3188 119.517,-51.2145"/>
+</g>
+<!-- proc~hit_npa_detector&#45;&gt;proc~line_plane_intersect -->
+<g id="proc~~hit_npa_detector~~CallsGraph_edge1" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~line_plane_intersect</title>
+<path fill="none" stroke="#000000" d="M93.7048,-40.1096C102.153,-41.4237 111.11,-42.8172 119.965,-44.1946"/>
+<polygon fill="#000000" stroke="#000000" points="119.467,-47.6592 129.887,-45.7379 120.543,-40.7424 119.467,-47.6592"/>
 </g>
 <!-- proc~in_boundary -->
-<g id="node3" class="node"><title>proc~in_boundary</title>
-<a xlink:href="../proc/in_boundary.html" xlink:title="in_boundary">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="209,-26 137,-26 137,-1.24345e-14 209,-3.55271e-15 209,-26"/>
-<text text-anchor="middle" x="173" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_boundary</text>
+<g id="proc~~hit_npa_detector~~CallsGraph_node3" class="node"><title>proc~in_boundary</title>
+<g id="a_proc~~hit_npa_detector~~CallsGraph_node3"><a xlink:href="../proc/in_boundary.html" xlink:title="in_boundary">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="220,-24 148,-24 148,-0 220,-0 220,-24"/>
+<text text-anchor="middle" x="184" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_boundary</text>
 </a>
 </g>
+</g>
 <!-- proc~hit_npa_detector&#45;&gt;proc~in_boundary -->
-<g id="edge4" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~in_boundary</title>
-<path fill="none" stroke="#000000" d="M93.5598,-26.8705C104.397,-24.9783 115.933,-22.9642 126.756,-21.0743"/>
-<polygon fill="#000000" stroke="#000000" points="127.621,-24.4764 136.87,-19.3085 126.417,-17.5807 127.621,-24.4764"/>
+<g id="proc~~hit_npa_detector~~CallsGraph_edge2" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~in_boundary</title>
+<path fill="none" stroke="#000000" d="M93.7048,-25.8904C107.862,-23.6881 123.452,-21.263 137.589,-19.0639"/>
+<polygon fill="#000000" stroke="#000000" points="138.242,-22.5045 147.585,-17.5089 137.166,-15.5877 138.242,-22.5045"/>
 </g>
 </g>
 </svg>
@@ -987,43 +1013,43 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1047,93 +1073,98 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~hit_npa_detector~~CalledByGraph Pages: 1 -->
-<svg id="prochit_npa_detectorCalledByGraph" width="302pt" height="166pt"
- viewBox="0.00 0.00 302.00 166.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~hit_npa_detector~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 162)">
+<svg id="prochit_npa_detectorCalledByGraph" width="302pt" height="158pt"
+ viewBox="0.00 0.00 302.00 158.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~hit_npa_detector~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 154)">
 <title>proc~~hit_npa_detector~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-162 299,-162 299,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-154 298,-154 298,4 -4,4"/>
 <!-- proc~hit_npa_detector -->
-<g id="node1" class="node"><title>proc~hit_npa_detector</title>
-<polygon fill="none" stroke="black" points="293,-92 201,-92 201,-66 293,-66 293,-92"/>
-<text text-anchor="middle" x="247" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50">hit_npa_detector</text>
-</g>
-<!-- proc~npa_f -->
-<g id="node2" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-158 100,-158 100,-132 154,-132 154,-158"/>
-<text text-anchor="middle" x="127" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
-</a>
-</g>
-<!-- proc~npa_f&#45;&gt;proc~hit_npa_detector -->
-<g id="edge10" class="edge"><title>proc~npa_f&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M150.708,-131.961C168.952,-121.927 194.366,-107.949 214.504,-96.8727"/>
-<polygon fill="#000000" stroke="#000000" points="216.266,-99.8984 223.341,-92.0124 212.892,-93.7649 216.266,-99.8984"/>
+<g id="proc~~hit_npa_detector~~CalledByGraph_node1" class="node"><title>proc~hit_npa_detector</title>
+<polygon fill="none" stroke="black" points="293.5,-87 200.5,-87 200.5,-63 293.5,-63 293.5,-87"/>
+<text text-anchor="middle" x="247" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">hit_npa_detector</text>
 </g>
 <!-- proc~read_npa -->
-<g id="node3" class="node"><title>proc~read_npa</title>
-<a xlink:href="../proc/read_npa.html" xlink:title="read_npa">
-<polygon fill="#d9534f" stroke="#d9534f" points="156,-114 98,-114 98,-88 156,-88 156,-114"/>
-<text text-anchor="middle" x="127" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
+<g id="proc~~hit_npa_detector~~CalledByGraph_node2" class="node"><title>proc~read_npa</title>
+<g id="a_proc~~hit_npa_detector~~CalledByGraph_node2"><a xlink:href="../proc/read_npa.html" xlink:title="read_npa">
+<polygon fill="#d9534f" stroke="#d9534f" points="156,-150 98,-150 98,-126 156,-126 156,-150"/>
+<text text-anchor="middle" x="127" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_npa</text>
 </a>
+</g>
 </g>
 <!-- proc~read_npa&#45;&gt;proc~hit_npa_detector -->
-<g id="edge12" class="edge"><title>proc~read_npa&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M156.049,-95.6744C166.453,-93.7669 178.568,-91.5459 190.497,-89.3588"/>
-<polygon fill="#000000" stroke="#000000" points="191.228,-92.7832 200.433,-87.5373 189.966,-85.898 191.228,-92.7832"/>
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge5" class="edge"><title>proc~read_npa&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M150.752,-125.853C168.79,-116.222 194.209,-102.651 214.251,-91.9507"/>
+<polygon fill="#000000" stroke="#000000" points="216.145,-94.9071 223.318,-87.1097 212.848,-88.732 216.145,-94.9071"/>
 </g>
 <!-- proc~npa_weights -->
-<g id="node4" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 91,-70 91,-44 163,-44 163,-70"/>
-<text text-anchor="middle" x="127" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+<g id="proc~~hit_npa_detector~~CalledByGraph_node3" class="node"><title>proc~npa_weights</title>
+<g id="a_proc~~hit_npa_detector~~CalledByGraph_node3"><a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
+<polygon fill="#d9534f" stroke="#d9534f" points="163.5,-108 90.5,-108 90.5,-84 163.5,-84 163.5,-108"/>
+<text text-anchor="middle" x="127" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
 </a>
+</g>
 </g>
 <!-- proc~npa_weights&#45;&gt;proc~hit_npa_detector -->
-<g id="edge14" class="edge"><title>proc~npa_weights&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M163.656,-63.7203C172.069,-65.2627 181.208,-66.9381 190.248,-68.5955"/>
-<polygon fill="#000000" stroke="#000000" points="189.901,-72.0902 200.369,-70.4509 191.164,-65.2049 189.901,-72.0902"/>
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge6" class="edge"><title>proc~npa_weights&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M163.724,-89.6423C172.103,-88.1512 181.227,-86.5274 190.249,-84.9217"/>
+<polygon fill="#000000" stroke="#000000" points="191.116,-88.3226 200.348,-83.1245 189.889,-81.4309 191.116,-88.3226"/>
+</g>
+<!-- proc~npa_f -->
+<g id="proc~~hit_npa_detector~~CalledByGraph_node4" class="node"><title>proc~npa_f</title>
+<g id="a_proc~~hit_npa_detector~~CalledByGraph_node4"><a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="154,-66 100,-66 100,-42 154,-42 154,-66"/>
+<text text-anchor="middle" x="127" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+</a>
+</g>
+</g>
+<!-- proc~npa_f&#45;&gt;proc~hit_npa_detector -->
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge7" class="edge"><title>proc~npa_f&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M154.188,-58.6606C164.903,-60.5675 177.735,-62.8512 190.362,-65.0983"/>
+<polygon fill="#000000" stroke="#000000" points="189.941,-68.5783 200.399,-66.8846 191.167,-61.6865 189.941,-68.5783"/>
 </g>
 <!-- proc~npa_mc -->
-<g id="node5" class="node"><title>proc~npa_mc</title>
-<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="154,-26 100,-26 100,-1.24345e-14 154,-3.55271e-15 154,-26"/>
-<text text-anchor="middle" x="127" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<g id="proc~~hit_npa_detector~~CalledByGraph_node5" class="node"><title>proc~npa_mc</title>
+<g id="a_proc~~hit_npa_detector~~CalledByGraph_node5"><a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="154,-24 100,-24 100,-0 154,-0 154,-24"/>
+<text text-anchor="middle" x="127" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
+</g>
 </g>
 <!-- proc~npa_mc&#45;&gt;proc~hit_npa_detector -->
-<g id="edge16" class="edge"><title>proc~npa_mc&#45;&gt;proc~hit_npa_detector</title>
-<path fill="none" stroke="#000000" d="M150.708,-26.0395C168.952,-36.0734 194.366,-50.0511 214.504,-61.1273"/>
-<polygon fill="#000000" stroke="#000000" points="212.892,-64.2351 223.341,-65.9876 216.266,-58.1016 212.892,-64.2351"/>
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge8" class="edge"><title>proc~npa_mc&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M150.752,-24.147C168.79,-33.7777 194.209,-47.3488 214.251,-58.0493"/>
+<polygon fill="#000000" stroke="#000000" points="212.848,-61.268 223.318,-62.8903 216.145,-55.0929 212.848,-61.268"/>
 </g>
 <!-- program~fidasim -->
-<g id="node6" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-92 2.13163e-14,-92 0,-66 54,-66 54,-92"/>
-<text text-anchor="middle" x="27" y="-76.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~hit_npa_detector~~CalledByGraph_node6" class="node"><title>program~fidasim</title>
+<g id="a_proc~~hit_npa_detector~~CalledByGraph_node6"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-87 0,-87 0,-63 54,-63 54,-87"/>
+<text text-anchor="middle" x="27" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M44.956,-92.0646C57.432,-101.012 74.5305,-113.018 90,-123 91.8878,-124.218 93.8424,-125.454 95.8222,-126.685"/>
-<polygon fill="#000000" stroke="#000000" points="94.1736,-129.78 104.533,-131.999 97.8186,-123.803 94.1736,-129.78"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~read_npa -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
-<path fill="none" stroke="#000000" d="M54.0614,-84.9535C64.4243,-87.2333 76.4656,-89.8824 87.7418,-92.3632"/>
-<polygon fill="#000000" stroke="#000000" points="87.2938,-95.8483 97.8123,-94.5787 88.7979,-89.0118 87.2938,-95.8483"/>
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~read_npa</title>
+<path fill="none" stroke="#000000" d="M45.1647,-87.0835C57.4972,-95.6526 74.5955,-107.305 90,-117 91.8907,-118.19 93.849,-119.398 95.8311,-120.603"/>
+<polygon fill="#000000" stroke="#000000" points="94.1564,-123.68 104.537,-125.798 97.743,-117.668 94.1564,-123.68"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M54.0614,-73.0465C62.1305,-71.2713 71.2171,-69.2722 80.1678,-67.3031"/>
-<polygon fill="#000000" stroke="#000000" points="81.1398,-70.673 90.1542,-65.1061 79.6358,-63.8365 81.1398,-70.673"/>
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<path fill="none" stroke="#000000" d="M54.0049,-80.5725C62.0801,-82.3029 71.2328,-84.2642 80.2389,-86.1941"/>
+<polygon fill="#000000" stroke="#000000" points="79.7683,-89.6726 90.2797,-88.3456 81.235,-82.828 79.7683,-89.6726"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~npa_f -->
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M54.0049,-69.4275C64.9694,-67.078 77.9204,-64.3028 89.7938,-61.7585"/>
+<polygon fill="#000000" stroke="#000000" points="90.8289,-65.1162 99.8736,-59.5985 89.3622,-58.2716 90.8289,-65.1162"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M44.956,-65.9354C57.432,-56.9881 74.5305,-44.9821 90,-35 91.8878,-33.7819 93.8424,-32.5464 95.8222,-31.3146"/>
-<polygon fill="#000000" stroke="#000000" points="97.8186,-34.1966 104.533,-26.0014 94.1736,-28.2205 97.8186,-34.1966"/>
+<g id="proc~~hit_npa_detector~~CalledByGraph_edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<path fill="none" stroke="#000000" d="M45.1647,-62.9165C57.4972,-54.3474 74.5955,-42.6953 90,-33 91.8907,-31.81 93.849,-30.6016 95.8311,-29.3966"/>
+<polygon fill="#000000" stroke="#000000" points="97.743,-32.3315 104.537,-24.2021 94.1564,-26.3202 97.743,-32.3315"/>
 </g>
 </g>
 </svg>
@@ -1152,43 +1183,43 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1289,11 +1320,11 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
     <span class="n">d_index</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">detector_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="n">ndet</span>
         <span class="c">!! Find where trajectory crosses detector plane</span>
-        <span class="k">call </span><span class="n">plane_intercept</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="k">call </span><span class="n">line_plane_intersect</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="p">&amp;</span>
              <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span><span class="n">d</span><span class="p">,</span><span class="n">t_d</span><span class="p">)</span>
 
         <span class="c">!! Find where trajectory crosses aperture plane</span>
-        <span class="k">call </span><span class="n">plane_intercept</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="k">call </span><span class="n">line_plane_intersect</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="p">&amp;</span>
              <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span><span class="n">a</span><span class="p">,</span><span class="n">t_a</span><span class="p">)</span>
 
         <span class="c">!! If both points are in plane boundaries and the</span>
@@ -1302,10 +1333,10 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
            <span class="n">in_boundary</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">detector</span><span class="p">,</span><span class="n">d</span><span class="p">)</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="p">&amp;</span>
            <span class="p">(</span><span class="n">t_d</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
 <span class="k">            </span><span class="n">d_index</span> <span class="o">=</span> <span class="n">i</span>
-            <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">rd</span><span class="p">))</span> <span class="n">rd</span> <span class="o">=</span> <span class="n">d</span>
             <span class="k">exit </span><span class="n">detector_loop</span>
         <span class="n">endif</span>
     <span class="n">enddo</span> <span class="n">detector_loop</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">rd</span><span class="p">))</span> <span class="n">rd</span> <span class="o">=</span> <span class="n">d</span>
 
 <span class="k">end subroutine </span><span class="n">hit_npa_detector</span>
 </pre></div>
@@ -1414,7 +1445,13 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1459,6 +1496,8 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1518,7 +1557,7 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1544,7 +1583,17 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1594,6 +1643,8 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1630,6 +1681,10 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1660,13 +1715,13 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1798,8 +1853,6 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1824,7 +1877,9 @@ public subroutine hit_npa_detector(r0, v0, d_index, rd, det)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

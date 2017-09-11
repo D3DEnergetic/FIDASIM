@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -280,7 +280,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -325,6 +331,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -384,7 +392,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -410,7 +418,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -460,6 +478,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -496,6 +516,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -526,13 +550,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -664,8 +688,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -690,7 +712,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -875,59 +899,62 @@ public function in_grid(xyz) result(ing)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~in_grid~~CallsGraph Pages: 1 -->
-<svg id="procin_gridCallsGraph" width="262pt" height="78pt"
- viewBox="0.00 0.00 262.00 78.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~in_grid~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 74)">
+<svg id="procin_gridCallsGraph" width="262pt" height="74pt"
+ viewBox="0.00 0.00 262.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~in_grid~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
 <title>proc~~in_grid~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-74 259,-74 259,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-70 258,-70 258,4 -4,4"/>
 <!-- proc~in_grid -->
-<g id="node1" class="node"><title>proc~in_grid</title>
-<polygon fill="none" stroke="black" points="54,-48 2.13163e-14,-48 0,-22 54,-22 54,-48"/>
-<text text-anchor="middle" x="27" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50">in_grid</text>
+<g id="proc~~in_grid~~CallsGraph_node1" class="node"><title>proc~in_grid</title>
+<polygon fill="none" stroke="black" points="54,-45 0,-45 0,-21 54,-21 54,-45"/>
+<text text-anchor="middle" x="27" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">in_grid</text>
 </g>
 <!-- proc~approx_ge -->
-<g id="node2" class="node"><title>proc~approx_ge</title>
-<a xlink:href="../proc/approx_ge.html" xlink:title="approx_ge">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="154,-70 90,-70 90,-44 154,-44 154,-70"/>
-<text text-anchor="middle" x="122" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_ge</text>
+<g id="proc~~in_grid~~CallsGraph_node2" class="node"><title>proc~approx_ge</title>
+<g id="a_proc~~in_grid~~CallsGraph_node2"><a xlink:href="../proc/approx_ge.html" xlink:title="approx_ge">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="154,-66 90,-66 90,-42 154,-42 154,-66"/>
+<text text-anchor="middle" x="122" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_ge</text>
 </a>
+</g>
 </g>
 <!-- proc~in_grid&#45;&gt;proc~approx_ge -->
-<g id="edge6" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_ge</title>
-<path fill="none" stroke="#000000" d="M54.2232,-41.3043C62.1836,-43.1478 71.0794,-45.2079 79.74,-47.2135"/>
-<polygon fill="#000000" stroke="#000000" points="79.1968,-50.6802 89.7286,-49.5266 80.7761,-43.8607 79.1968,-50.6802"/>
+<g id="proc~~in_grid~~CallsGraph_edge3" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_ge</title>
+<path fill="none" stroke="#000000" d="M54.4013,-38.9616C62.3524,-40.757 71.2743,-42.7716 79.9406,-44.7285"/>
+<polygon fill="#000000" stroke="#000000" points="79.3979,-48.194 89.9233,-46.9827 80.9398,-41.3659 79.3979,-48.194"/>
 </g>
 <!-- proc~approx_le -->
-<g id="node3" class="node"><title>proc~approx_le</title>
-<a xlink:href="../proc/approx_le.html" xlink:title="approx_le">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="152,-26 92,-26 92,-1.24345e-14 152,-3.55271e-15 152,-26"/>
-<text text-anchor="middle" x="122" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_le</text>
+<g id="proc~~in_grid~~CallsGraph_node3" class="node"><title>proc~approx_le</title>
+<g id="a_proc~~in_grid~~CallsGraph_node3"><a xlink:href="../proc/approx_le.html" xlink:title="approx_le">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="152,-24 92,-24 92,-0 152,-0 152,-24"/>
+<text text-anchor="middle" x="122" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_le</text>
 </a>
+</g>
 </g>
 <!-- proc~in_grid&#45;&gt;proc~approx_le -->
-<g id="edge8" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_le</title>
-<path fill="none" stroke="#000000" d="M54.2232,-28.6957C62.8399,-26.7002 72.5525,-24.451 81.8764,-22.2918"/>
-<polygon fill="#000000" stroke="#000000" points="82.8186,-25.6663 91.7711,-20.0004 81.2392,-18.8468 82.8186,-25.6663"/>
+<g id="proc~~in_grid~~CallsGraph_edge4" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_le</title>
+<path fill="none" stroke="#000000" d="M54.4013,-27.0384C62.9985,-25.0971 72.7307,-22.8995 82.0475,-20.7957"/>
+<polygon fill="#000000" stroke="#000000" points="82.9375,-24.183 91.921,-18.5662 81.3956,-17.3549 82.9375,-24.183"/>
 </g>
 <!-- proc~approx_eq -->
-<g id="node4" class="node"><title>proc~approx_eq</title>
-<a xlink:href="../proc/approx_eq.html" xlink:title="approx_eq">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="254,-48 190,-48 190,-22 254,-22 254,-48"/>
-<text text-anchor="middle" x="222" y="-32.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_eq</text>
+<g id="proc~~in_grid~~CallsGraph_node4" class="node"><title>proc~approx_eq</title>
+<g id="a_proc~~in_grid~~CallsGraph_node4"><a xlink:href="../proc/approx_eq.html" xlink:title="approx_eq">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="254,-45 190,-45 190,-21 254,-21 254,-45"/>
+<text text-anchor="middle" x="222" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_eq</text>
 </a>
 </g>
+</g>
 <!-- proc~approx_ge&#45;&gt;proc~approx_eq -->
-<g id="edge2" class="edge"><title>proc~approx_ge&#45;&gt;proc~approx_eq</title>
-<path fill="none" stroke="#000000" d="M154.191,-49.918C162.399,-48.1123 171.343,-46.1446 179.963,-44.2482"/>
-<polygon fill="#000000" stroke="#000000" points="180.855,-47.6357 189.869,-42.0688 179.351,-40.7992 180.855,-47.6357"/>
+<g id="proc~~in_grid~~CallsGraph_edge1" class="edge"><title>proc~approx_ge&#45;&gt;proc~approx_eq</title>
+<path fill="none" stroke="#000000" d="M154.008,-47.3555C162.23,-45.5936 171.237,-43.6635 179.905,-41.8061"/>
+<polygon fill="#000000" stroke="#000000" points="180.813,-45.1911 189.858,-39.6734 179.346,-38.3464 180.813,-45.1911"/>
 </g>
 <!-- proc~approx_le&#45;&gt;proc~approx_eq -->
-<g id="edge4" class="edge"><title>proc~approx_le&#45;&gt;proc~approx_eq</title>
-<path fill="none" stroke="#000000" d="M152.003,-19.6007C160.791,-21.534 170.566,-23.6844 179.956,-25.7503"/>
-<polygon fill="#000000" stroke="#000000" points="179.411,-29.2141 189.93,-27.9445 180.915,-22.3775 179.411,-29.2141"/>
+<g id="proc~~in_grid~~CallsGraph_edge2" class="edge"><title>proc~approx_le&#45;&gt;proc~approx_eq</title>
+<path fill="none" stroke="#000000" d="M152.138,-18.2438C160.839,-20.1084 170.546,-22.1885 179.864,-24.1851"/>
+<polygon fill="#000000" stroke="#000000" points="179.244,-27.6317 189.755,-26.3047 180.711,-20.7871 179.244,-27.6317"/>
 </g>
 </g>
 </svg>
@@ -946,43 +973,43 @@ public function in_grid(xyz) result(ing)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1006,66 +1033,70 @@ public function in_grid(xyz) result(ing)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~in_grid~~CalledByGraph Pages: 1 -->
-<svg id="procin_gridCalledByGraph" width="516pt" height="34pt"
- viewBox="0.00 0.00 516.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~in_grid~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="procin_gridCalledByGraph" width="516pt" height="32pt"
+ viewBox="0.00 0.00 516.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~in_grid~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>proc~~in_grid~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 513,-30 513,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 512,-28 512,4 -4,4"/>
 <!-- proc~in_grid -->
-<g id="node1" class="node"><title>proc~in_grid</title>
-<polygon fill="none" stroke="black" points="508,-26 454,-26 454,-1.24345e-14 508,-3.55271e-15 508,-26"/>
-<text text-anchor="middle" x="481" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">in_grid</text>
+<g id="proc~~in_grid~~CalledByGraph_node1" class="node"><title>proc~in_grid</title>
+<polygon fill="none" stroke="black" points="508,-24 454,-24 454,-0 508,-0 508,-24"/>
+<text text-anchor="middle" x="481" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">in_grid</text>
 </g>
 <!-- proc~circle_grid_intersect -->
-<g id="node2" class="node"><title>proc~circle_grid_intersect</title>
-<a xlink:href="../proc/circle_grid_intersect.html" xlink:title="circle_grid_intersect">
-<polygon fill="#d9534f" stroke="#d9534f" points="418,-26 310,-26 310,-1.24345e-14 418,-3.55271e-15 418,-26"/>
-<text text-anchor="middle" x="364" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">circle_grid_intersect</text>
+<g id="proc~~in_grid~~CalledByGraph_node2" class="node"><title>proc~circle_grid_intersect</title>
+<g id="a_proc~~in_grid~~CalledByGraph_node2"><a xlink:href="../proc/circle_grid_intersect.html" xlink:title="circle_grid_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="418,-24 310,-24 310,-0 418,-0 418,-24"/>
+<text text-anchor="middle" x="364" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">circle_grid_intersect</text>
 </a>
+</g>
 </g>
 <!-- proc~circle_grid_intersect&#45;&gt;proc~in_grid -->
-<g id="edge8" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~in_grid</title>
-<path fill="none" stroke="#000000" d="M418.048,-13C426.805,-13 435.695,-13 443.929,-13"/>
-<polygon fill="#000000" stroke="#000000" points="443.947,-16.5001 453.947,-13 443.947,-9.5001 443.947,-16.5001"/>
+<g id="proc~~in_grid~~CalledByGraph_edge4" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~in_grid</title>
+<path fill="none" stroke="#000000" d="M418.124,-12C426.717,-12 435.442,-12 443.523,-12"/>
+<polygon fill="#000000" stroke="#000000" points="443.712,-15.5001 453.712,-12 443.712,-8.5001 443.712,-15.5001"/>
 </g>
 <!-- proc~read_mc -->
-<g id="node3" class="node"><title>proc~read_mc</title>
-<a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="273,-26 219,-26 219,-1.24345e-14 273,-3.55271e-15 273,-26"/>
-<text text-anchor="middle" x="246" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
+<g id="proc~~in_grid~~CalledByGraph_node3" class="node"><title>proc~read_mc</title>
+<g id="a_proc~~in_grid~~CalledByGraph_node3"><a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="273.5,-24 218.5,-24 218.5,-0 273.5,-0 273.5,-24"/>
+<text text-anchor="middle" x="246" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
 </a>
+</g>
 </g>
 <!-- proc~read_mc&#45;&gt;proc~circle_grid_intersect -->
-<g id="edge6" class="edge"><title>proc~read_mc&#45;&gt;proc~circle_grid_intersect</title>
-<path fill="none" stroke="#000000" d="M273.666,-13C281.486,-13 290.34,-13 299.372,-13"/>
-<polygon fill="#000000" stroke="#000000" points="299.599,-16.5001 309.599,-13 299.599,-9.5001 299.599,-16.5001"/>
+<g id="proc~~in_grid~~CalledByGraph_edge3" class="edge"><title>proc~read_mc&#45;&gt;proc~circle_grid_intersect</title>
+<path fill="none" stroke="#000000" d="M273.613,-12C281.57,-12 290.656,-12 299.916,-12"/>
+<polygon fill="#000000" stroke="#000000" points="299.987,-15.5001 309.987,-12 299.987,-8.5001 299.987,-15.5001"/>
 </g>
 <!-- proc~read_distribution -->
-<g id="node4" class="node"><title>proc~read_distribution</title>
-<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-26 90,-26 90,-1.24345e-14 182,-3.55271e-15 182,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
+<g id="proc~~in_grid~~CalledByGraph_node4" class="node"><title>proc~read_distribution</title>
+<g id="a_proc~~in_grid~~CalledByGraph_node4"><a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-24 90,-24 90,-0 182,-0 182,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
 </a>
+</g>
 </g>
 <!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.013,-13C190.705,-13 199.706,-13 208.114,-13"/>
-<polygon fill="#000000" stroke="#000000" points="208.38,-16.5001 218.38,-13 208.38,-9.5001 208.38,-16.5001"/>
+<g id="proc~~in_grid~~CalledByGraph_edge2" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.176,-12C190.873,-12 199.885,-12 208.274,-12"/>
+<polygon fill="#000000" stroke="#000000" points="208.498,-15.5001 218.498,-12 208.498,-8.5001 208.498,-15.5001"/>
 </g>
 <!-- program~fidasim -->
-<g id="node5" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
-<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~in_grid~~CalledByGraph_node5" class="node"><title>program~fidasim</title>
+<g id="a_proc~~in_grid~~CalledByGraph_node5"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
+</g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
-<path fill="none" stroke="#000000" d="M54.2241,-13C61.9289,-13 70.6135,-13 79.3716,-13"/>
-<polygon fill="#000000" stroke="#000000" points="79.6322,-16.5001 89.6322,-13 79.6322,-9.5001 79.6322,-16.5001"/>
+<g id="proc~~in_grid~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<path fill="none" stroke="#000000" d="M54.1751,-12C61.9968,-12 70.8836,-12 79.8327,-12"/>
+<polygon fill="#000000" stroke="#000000" points="79.9095,-15.5001 89.9095,-12 79.9094,-8.5001 79.9095,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -1084,43 +1115,43 @@ public function in_grid(xyz) result(ing)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1285,7 +1316,13 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1330,6 +1367,8 @@ public function in_grid(xyz) result(ing)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1389,7 +1428,7 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1415,7 +1454,17 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1465,6 +1514,8 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1501,6 +1552,10 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1531,13 +1586,13 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1669,8 +1724,6 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1695,7 +1748,9 @@ public function in_grid(xyz) result(ing)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

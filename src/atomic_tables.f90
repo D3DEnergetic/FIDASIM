@@ -16,7 +16,8 @@ module atomic_tables
 !+Volume 4, 1993.](http://www-pub.iaea.org/books/IAEABooks/1839/Atomic-and-Plasma-Material-Interaction-Data-for-Fusion)
 !+6. [Reinhold, C. O., R. E. Olson, and W. Fritsch. *Excitation of atomic hydrogen by fully stripped ions.*
 !+Physical Review A 41.9 1990.](http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837)
-!+7. [NRL Plasma Formulary (2016)](https://www.nrl.navy.mil/ppd/content/nrl-plasma-formulary)
+!+7. [Bosch, H-S., and G. M. Hale. *Improved formulas for fusion cross-sections and thermal reactivities.*
+!+ Nuclear fusion 32.4 1992.](http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta)
 use H5LT
 use HDF5
 use hdf5_extra
@@ -3972,18 +3973,26 @@ function d_d_fusion_t(eb) result(sigma)
     !+$$ D + D \rightarrow T(1.01 MeV) + p(3.02 MeV) (50%)$$
     !+
     !+###References
-    !+* Pages 44-45 in Ref. 7 [[atomic_tables(module)]]
+    !+* Equations 8-9
+    !+* Table IV in Ref. 7 [[atomic_tables(module)]]
     real(Float64), intent(in) :: eb
         !+ Deuterium energy [keV]
     real(Float64)             :: sigma
         !+ Cross Section [\(cm^2\)]
 
-    real(Float64), dimension(5), parameter :: A = [46.097d0, 372.0d0, &
-                                                   4.36d-4, 1.22d0,   &
-                                                   0.d0 ]
+    real(Float64), dimension(5), parameter :: A = [ 5.5576d4,  2.1054d2,  &
+                                                   -3.2638d-2, 1.4987d-6, &
+                                                    1.8181d-10 ]
+    real(Float64), dimension(4), parameter :: B = [0.d0,0.d0,0.d0,0.d0]
+    real(Float64), parameter :: Bg = 31.3970
+    real(Float64) :: S, E
 
-    sigma = (1.0d-24)*(A(5) + (A(2)/((A(4) - A(3)*eb)**2.0 + 1.0))) / &
-            (eb*(exp(A(1)/sqrt(eb)) - 1.0))
+    E = min(max(eb,0.5),5000.0)
+
+    S = (A(1) + E*(A(2) + E*(A(3) + E*(A(4) + E*A(5))))) / &
+        (1    + E*(B(1) + E*(B(2) + E*(B(3) + E*B(4)))))
+
+    sigma = (1.0d-27)*(S/(E*exp(Bg/sqrt(E))))
 
 end function d_d_fusion_t
 
@@ -3995,41 +4004,74 @@ function d_d_fusion_he(eb) result(sigma)
     !+$$ D + D \rightarrow He^3(0.82 MeV) + n(2.45 MeV) (50%)$$
     !+
     !+###References
-    !+* Pages 44-45 in Ref. 7 [[atomic_tables(module)]]
+    !+* Equations 8-9
+    !+* Table IV in Ref. 7 [[atomic_tables(module)]]
     real(Float64), intent(in) :: eb
         !+ Deuterium energy [keV]
     real(Float64)             :: sigma
         !+ Cross Section [\(cm^2\)]
 
-    real(Float64), dimension(5), parameter :: A = [47.88d0, 482.0d0, &
-                                                   3.08d-4, 1.177d0, &
-                                                   0.d0 ]
+    real(Float64), dimension(5), parameter :: A = [ 5.3701d4,  3.3027d2,  &
+                                                   -1.2706d-1, 2.9327d-5, &
+                                                   -2.5151d-9 ]
+    real(Float64), dimension(4), parameter :: B = [0.d0,0.d0,0.d0,0.d0]
+    real(Float64), parameter :: Bg = 31.3970
+    real(Float64) :: S, E
 
-    sigma = (1.0d-24)*(A(5) + (A(2)/((A(4) - A(3)*eb)**2.0 + 1.0))) / &
-            (eb*(exp(A(1)/sqrt(eb)) - 1.0))
+    E = min(max(eb,0.5),4900.0)
+
+    S = (A(1) + E*(A(2) + E*(A(3) + E*(A(4) + E*A(5))))) / &
+        (1    + E*(B(1) + E*(B(2) + E*(B(3) + E*B(4)))))
+
+    sigma = (1.0d-27)*(S/(E*exp(Bg/sqrt(E))))
 
 end function d_d_fusion_he
 
 function d_t_fusion(eb) result(sigma)
     !+Calculates total cross section at a given deuterium energy, `eb`,
-    !+for Deuterium-Tritium nuclear reactions
+    !+for Deuterium-Tritium nuclear reactions in the range [0.5-550 keV]
     !+
     !+###Equation
     !+$$ D + T \rightarrow He^4(3.5 MeV) + n(14.1 MeV)$$
     !+
     !+###References
-    !+* Pages 44-45 in Ref. 7 [[atomic_tables(module)]]
+    !+* Equations 8-9
+    !+* Table IV, VI in Ref. 7 [[atomic_tables(module)]]
     real(Float64), intent(in) :: eb
         !+ Deuterium energy [keV]
     real(Float64)             :: sigma
         !+ Cross Section [\(cm^2\)]
 
-    real(Float64), dimension(5), parameter :: A = [45.95d0, 5.02d4,   &
-                                                   1.368d-2, 1.076d0, &
-                                                   409.d0 ]
+    real(Float64), dimension(5), parameter :: A1 = [ 6.927d4,  7.454d8, &
+                                                    2.050d6, 5.2002d4,  &
+                                                    0.d0 ]
+    real(Float64), dimension(4), parameter :: B1 = [ 6.38d1,  -9.95d-1, &
+                                                    6.981d-5, 1.728d-4  ]
 
-    sigma = (1.0d-24)*(A(5) + (A(2)/((A(4) - A(3)*eb)**2.0 + 1.0))) / &
-            (eb*(exp(A(1)/sqrt(eb)) - 1.0))
+    real(Float64), dimension(5), parameter :: A2 = [-1.4714d6, 0.d0,  &
+                                                     0.d0, 0.d0, 0.d0 ]
+    real(Float64), dimension(4), parameter :: B2 = [-8.4127d-3, 4.7983d-6, &
+                                                    -1.0748d-9, 8.5184d-14 ]
+    real(Float64), parameter :: Bg = 34.3827
+
+    real(Float64), dimension(5) :: A
+    real(Float64), dimension(4) :: B
+    real(Float64) :: S, E
+
+    E = min(max(eb,0.5),4700.0)
+
+    if(E.le.530.0) then
+        A = A1
+        B = B1
+    else
+        A = A2
+        B = B2
+    endif
+
+    S = (A(1) + E*(A(2) + E*(A(3) + E*(A(4) + E*A(5))))) / &
+        (1    + E*(B(1) + E*(B(2) + E*(B(3) + E*B(4)))))
+
+    sigma = (1.0d-27)*(S/(E*exp(Bg/sqrt(E))))
 
 end function d_t_fusion
 

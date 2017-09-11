@@ -10,7 +10,7 @@
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
 
-    <title>get_beam_cx_prob &ndash; FIDASIM</title>
+    <title>npa_gyro_range &ndash; FIDASIM</title>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/pygments.css" rel="stylesheet">
@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -114,7 +114,7 @@
     
   
   <div class="row">
-    <h1>get_beam_cx_prob
+    <h1>npa_gyro_range
       <small>Subroutine</small>
     
     </h1>
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.3% of total for procedures.">29 statements</a>
+	  title=" 0.6% of total for procedures.">55 statements</a>
      </li> 
      
      
@@ -145,7 +145,7 @@
   
      <li><a href='../module/libfida.html'>libfida</a></li>
   
-     <li class="active">get_beam_cx_prob</li>
+     <li class="active">npa_gyro_range</li>
   </ol>
 </div>
 </div>
@@ -186,7 +186,7 @@
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
-    <a class="list-group-item" href="../proc/get_beam_cx_prob.html#src">get_beam_cx_prob</a>
+    <a class="list-group-item" href="../proc/npa_gyro_range.html#src">npa_gyro_range</a>
   </div>
 </div>
 
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -822,7 +846,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
+public subroutine npa_gyro_range(ichan, gs, gyrange, nrange)
     
     
 	 
@@ -832,7 +856,7 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
 
 
     
-    <p>Get probability of a thermal ion charge exchanging with <code>types</code> neutrals</p>
+    <p>Calculates range of gyro-angles that would hit the NPA detector</p>
     
 
     <h3>Arguments</h3>
@@ -853,12 +877,12 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
   
 <tr>
   
-  <td><span class="anchor" id="variable-ind%7E11"></span>integer(kind=Int32),</td>
-  <td>intent(in),</td>
+  <td><span class="anchor" id="variable-ichan"></span>integer,</td>
+  <td>intent(in)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>ind</strong></td><td><p><a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices</p></td>
+  <td></td><td>::</td>
+  <td><strong>ichan</strong></td><td><p>Index of NPA detector</p></td>
   
 </tr>
 
@@ -868,12 +892,12 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
   
 <tr>
   
-  <td><span class="anchor" id="variable-pos%7E10"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
+  <td><span class="anchor" id="variable-gs%7E7"></span>type(<a href='../type/gyrosurface.html'>GyroSurface</a>),</td>
+  <td>intent(in)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>pos</strong></td><td><p>Interaction position in beam grid coordinates</p></td>
+  <td></td><td>::</td>
+  <td><strong>gs</strong></td><td></td>
   
 </tr>
 
@@ -883,42 +907,27 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
   
 <tr>
   
-  <td><span class="anchor" id="variable-v_ion"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>v_ion</strong></td><td><p>Ion velocity [cm/s]</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-types"></span>integer(kind=Int32),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(:)</td><td>::</td>
-  <td><strong>types</strong></td><td><p>Neutral types</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-prob"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-gyrange%7E2"></span>real(kind=Float64),</td>
   <td>intent(out),</td>
   <td></td>
   
-  <td>dimension(nlevs)</td><td>::</td>
-  <td><strong>prob</strong></td><td><p>Charge exchange rate/probability [1/s]</p></td>
+  <td>dimension(2,4)</td><td>::</td>
+  <td><strong>gyrange</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nrange%7E2"></span>integer,</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nrange</strong></td><td></td>
   
 </tr>
 
@@ -933,243 +942,126 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
-<!-- Title: proc~~get_beam_cx_prob~~CallsGraph Pages: 1 -->
-<svg id="procget_beam_cx_probCallsGraph" width="641pt" height="212pt"
- viewBox="0.00 0.00 641.00 212.42" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~get_beam_cx_prob~~CallsGraph" class="graph" transform="scale(0.745349 0.745349) rotate(0) translate(4 281)">
-<title>proc~~get_beam_cx_prob~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-281 857,-281 857,5 -4,5"/>
-<!-- proc~get_beam_cx_prob -->
-<g id="node1" class="node"><title>proc~get_beam_cx_prob</title>
-<polygon fill="none" stroke="black" points="105,-173 1,-173 1,-147 105,-147 105,-173"/>
-<text text-anchor="middle" x="53" y="-157.55" font-family="Helvetica,sans-Serif" font-size="10.50">get_beam_cx_prob</text>
+<!-- Title: proc~~npa_gyro_range~~CallsGraph Pages: 1 -->
+<svg id="procnpa_gyro_rangeCallsGraph" width="384pt" height="242pt"
+ viewBox="0.00 0.00 384.00 242.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~npa_gyro_range~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 238)">
+<title>proc~~npa_gyro_range~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-238 380,-238 380,4 -4,4"/>
+<!-- proc~npa_gyro_range -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node1" class="node"><title>proc~npa_gyro_range</title>
+<polygon fill="none" stroke="black" points="91.5,-108 0.5,-108 0.5,-84 91.5,-84 91.5,-108"/>
+<text text-anchor="middle" x="46" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50">npa_gyro_range</text>
 </g>
-<!-- proc~neut_rates -->
-<g id="node2" class="node"><title>proc~neut_rates</title>
-<a xlink:href="../proc/neut_rates.html" xlink:title="neut_rates">
-<polygon fill="#d9534f" stroke="#d9534f" points="206,-216 142,-216 142,-190 206,-190 206,-216"/>
-<text text-anchor="middle" x="174" y="-200.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neut_rates</text>
+<!-- proc~gyro_range -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node2" class="node"><title>proc~gyro_range</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node2"><a xlink:href="../proc/gyro_range.html" xlink:title="gyro_range">
+<polygon fill="#d9534f" stroke="#d9534f" points="195.5,-129 128.5,-129 128.5,-105 195.5,-105 195.5,-129"/>
+<text text-anchor="middle" x="162" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_range</text>
 </a>
 </g>
-<!-- proc~get_beam_cx_prob&#45;&gt;proc~neut_rates -->
-<g id="edge40" class="edge"><title>proc~get_beam_cx_prob&#45;&gt;proc~neut_rates</title>
-<path fill="none" stroke="#000000" d="M89.6324,-173.018C102.954,-177.752 118.114,-183.14 131.873,-188.029"/>
-<polygon fill="#000000" stroke="#000000" points="131.003,-191.434 141.598,-191.485 133.347,-184.839 131.003,-191.434"/>
 </g>
-<!-- proc~mc_halo -->
-<g id="node3" class="node"><title>proc~mc_halo</title>
-<a xlink:href="../proc/mc_halo.html" xlink:title="mc_halo">
-<polygon fill="#d9534f" stroke="#d9534f" points="201,-131 147,-131 147,-105 201,-105 201,-131"/>
-<text text-anchor="middle" x="174" y="-115.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_halo</text>
+<!-- proc~npa_gyro_range&#45;&gt;proc~gyro_range -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge7" class="edge"><title>proc~npa_gyro_range&#45;&gt;proc~gyro_range</title>
+<path fill="none" stroke="#000000" d="M91.7286,-104.239C100.516,-105.858 109.712,-107.552 118.427,-109.158"/>
+<polygon fill="#000000" stroke="#000000" points="117.914,-112.622 128.382,-110.991 119.182,-105.738 117.914,-112.622"/>
+</g>
+<!-- proc~approx_eq -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node3" class="node"><title>proc~approx_eq</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node3"><a xlink:href="../proc/approx_eq.html" xlink:title="approx_eq">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="194,-87 130,-87 130,-63 194,-63 194,-87"/>
+<text text-anchor="middle" x="162" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_eq</text>
 </a>
 </g>
-<!-- proc~get_beam_cx_prob&#45;&gt;proc~mc_halo -->
-<g id="edge42" class="edge"><title>proc~get_beam_cx_prob&#45;&gt;proc~mc_halo</title>
-<path fill="none" stroke="#000000" d="M90.6219,-146.941C105.39,-141.815 122.291,-135.949 136.998,-130.844"/>
-<polygon fill="#000000" stroke="#000000" points="138.478,-134.035 146.777,-127.449 136.182,-127.422 138.478,-134.035"/>
 </g>
-<!-- interface~interpol_coeff -->
-<g id="node4" class="node"><title>interface~interpol_coeff</title>
-<a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="577,-216 501,-216 501,-190 577,-190 577,-216"/>
-<text text-anchor="middle" x="539" y="-200.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+<!-- proc~npa_gyro_range&#45;&gt;proc~approx_eq -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge8" class="edge"><title>proc~npa_gyro_range&#45;&gt;proc~approx_eq</title>
+<path fill="none" stroke="#000000" d="M91.7286,-87.7605C100.974,-86.0574 110.672,-84.2709 119.786,-82.5921"/>
+<polygon fill="#000000" stroke="#000000" points="120.571,-86.0065 129.771,-80.7527 119.303,-79.1223 120.571,-86.0065"/>
+</g>
+<!-- proc~line_plane_intersect -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node4" class="node"><title>proc~line_plane_intersect</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node4"><a xlink:href="../proc/line_plane_intersect.html" xlink:title="line_plane_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="358,-234 250,-234 250,-210 358,-210 358,-234"/>
+<text text-anchor="middle" x="304" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_plane_intersect</text>
 </a>
 </g>
-<!-- proc~neut_rates&#45;&gt;interface~interpol_coeff -->
-<g id="edge14" class="edge"><title>proc~neut_rates&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M206.187,-203.647C259.702,-204.627 370.36,-206.248 464,-205 472.519,-204.886 481.58,-204.7 490.351,-204.486"/>
-<polygon fill="#000000" stroke="#000000" points="490.558,-207.982 500.464,-204.225 490.377,-200.984 490.558,-207.982"/>
 </g>
-<!-- proc~get_plasma -->
-<g id="node16" class="node"><title>proc~get_plasma</title>
-<a xlink:href="../proc/get_plasma.html" xlink:title="get_plasma">
-<polygon fill="#d9534f" stroke="#d9534f" points="310,-155 242,-155 242,-129 310,-129 310,-155"/>
-<text text-anchor="middle" x="276" y="-139.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_plasma</text>
+<!-- proc~gyro_range&#45;&gt;proc~line_plane_intersect -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge1" class="edge"><title>proc~gyro_range&#45;&gt;proc~line_plane_intersect</title>
+<path fill="none" stroke="#000000" d="M169.787,-129.242C180.574,-147.573 203.37,-182.023 232,-201 234.732,-202.811 237.624,-204.47 240.618,-205.988"/>
+<polygon fill="#000000" stroke="#000000" points="239.287,-209.227 249.843,-210.136 242.158,-202.843 239.287,-209.227"/>
+</g>
+<!-- proc~line_gyro_surface_intersect -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node5" class="node"><title>proc~line_gyro_surface_intersect</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node5"><a xlink:href="../proc/line_gyro_surface_intersect.html" xlink:title="line_gyro_surface_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="376,-192 232,-192 232,-168 376,-168 376,-192"/>
+<text text-anchor="middle" x="304" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_gyro_surface_intersect</text>
 </a>
 </g>
-<!-- proc~mc_halo&#45;&gt;proc~get_plasma -->
-<g id="edge34" class="edge"><title>proc~mc_halo&#45;&gt;proc~get_plasma</title>
-<path fill="none" stroke="#000000" d="M201.066,-124.369C210.548,-126.6 221.457,-129.166 231.965,-131.639"/>
-<polygon fill="#000000" stroke="#000000" points="231.32,-135.083 241.856,-133.966 232.923,-128.269 231.32,-135.083"/>
 </g>
-<!-- proc~randu -->
-<g id="node17" class="node"><title>proc~randu</title>
-<a xlink:href="../proc/randu.html" xlink:title="randu">
-<polygon fill="#d9534f" stroke="#d9534f" points="303,-111 249,-111 249,-85 303,-85 303,-111"/>
-<text text-anchor="middle" x="276" y="-95.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+<!-- proc~gyro_range&#45;&gt;proc~line_gyro_surface_intersect -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge2" class="edge"><title>proc~gyro_range&#45;&gt;proc~line_gyro_surface_intersect</title>
+<path fill="none" stroke="#000000" d="M179.902,-129.004C193.471,-138.21 213.281,-150.704 232,-159 236.466,-160.979 241.17,-162.833 245.944,-164.556"/>
+<polygon fill="#000000" stroke="#000000" points="245.191,-167.997 255.786,-167.906 247.447,-161.371 245.191,-167.997"/>
+</g>
+<!-- proc~in_gyro_surface -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node6" class="node"><title>proc~in_gyro_surface</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node6"><a xlink:href="../proc/in_gyro_surface.html" xlink:title="in_gyro_surface">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="348.5,-150 259.5,-150 259.5,-126 348.5,-126 348.5,-150"/>
+<text text-anchor="middle" x="304" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_gyro_surface</text>
 </a>
 </g>
-<!-- proc~mc_halo&#45;&gt;proc~randu -->
-<g id="edge36" class="edge"><title>proc~mc_halo&#45;&gt;proc~randu</title>
-<path fill="none" stroke="#000000" d="M201.066,-112.693C212.594,-110.433 226.231,-107.759 238.69,-105.316"/>
-<polygon fill="#000000" stroke="#000000" points="239.668,-108.691 248.807,-103.332 238.321,-101.822 239.668,-108.691"/>
 </g>
-<!-- proc~randn -->
-<g id="node18" class="node"><title>proc~randn</title>
-<a xlink:href="../proc/randn.html" xlink:title="randn">
-<polygon fill="#d9534f" stroke="#d9534f" points="303,-67 249,-67 249,-41 303,-41 303,-67"/>
-<text text-anchor="middle" x="276" y="-51.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randn</text>
+<!-- proc~gyro_range&#45;&gt;proc~in_gyro_surface -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge3" class="edge"><title>proc~gyro_range&#45;&gt;proc~in_gyro_surface</title>
+<path fill="none" stroke="#000000" d="M195.824,-121.924C211.707,-124.306 231.187,-127.228 249.163,-129.924"/>
+<polygon fill="#000000" stroke="#000000" points="248.839,-133.415 259.248,-131.437 249.877,-126.492 248.839,-133.415"/>
+</g>
+<!-- proc~gyro_surface_coordinates -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node7" class="node"><title>proc~gyro_surface_coordinates</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node7"><a xlink:href="../proc/gyro_surface_coordinates.html" xlink:title="gyro_surface_coordinates">
+<polygon fill="#d9534f" stroke="#d9534f" points="372,-108 236,-108 236,-84 372,-84 372,-108"/>
+<text text-anchor="middle" x="304" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_surface_coordinates</text>
 </a>
 </g>
-<!-- proc~mc_halo&#45;&gt;proc~randn -->
-<g id="edge38" class="edge"><title>proc~mc_halo&#45;&gt;proc~randn</title>
-<path fill="none" stroke="#000000" d="M195.134,-104.739C210.003,-95.4096 230.102,-82.799 246.541,-72.4839"/>
-<polygon fill="#000000" stroke="#000000" points="248.631,-75.3046 255.242,-67.0249 244.911,-69.3751 248.631,-75.3046"/>
 </g>
-<!-- proc~interpol1d_coeff_arr -->
-<g id="node5" class="node"><title>proc~interpol1d_coeff_arr</title>
-<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="724,-277 614,-277 614,-251 724,-251 724,-277"/>
-<text text-anchor="middle" x="669" y="-261.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+<!-- proc~gyro_range&#45;&gt;proc~gyro_surface_coordinates -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge4" class="edge"><title>proc~gyro_range&#45;&gt;proc~gyro_surface_coordinates</title>
+<path fill="none" stroke="#000000" d="M195.824,-112.076C204.949,-110.708 215.263,-109.161 225.796,-107.581"/>
+<polygon fill="#000000" stroke="#000000" points="226.56,-111.005 235.93,-106.06 225.522,-104.083 226.56,-111.005"/>
+</g>
+<!-- proc~boundary_edge -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node8" class="node"><title>proc~boundary_edge</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node8"><a xlink:href="../proc/boundary_edge.html" xlink:title="boundary_edge">
+<polygon fill="#d9534f" stroke="#d9534f" points="348,-66 260,-66 260,-42 348,-42 348,-66"/>
+<text text-anchor="middle" x="304" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_edge</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M566.888,-216.086C585.909,-225.011 611.307,-236.929 632.014,-246.645"/>
-<polygon fill="#000000" stroke="#000000" points="630.618,-249.856 641.158,-250.936 633.592,-243.519 630.618,-249.856"/>
 </g>
-<!-- proc~interpol2d_coeff_arr -->
-<g id="node6" class="node"><title>proc~interpol2d_coeff_arr</title>
-<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="724,-195 614,-195 614,-169 724,-169 724,-195"/>
-<text text-anchor="middle" x="669" y="-179.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+<!-- proc~gyro_range&#45;&gt;proc~boundary_edge -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge5" class="edge"><title>proc~gyro_range&#45;&gt;proc~boundary_edge</title>
+<path fill="none" stroke="#000000" d="M182.322,-104.886C200.879,-93.3094 226.84,-77.2871 232,-75 237.784,-72.4365 243.969,-70.0825 250.186,-67.9521"/>
+<polygon fill="#000000" stroke="#000000" points="251.498,-71.2061 259.929,-64.7906 249.337,-64.5479 251.498,-71.2061"/>
+</g>
+<!-- proc~in_boundary -->
+<g id="proc~~npa_gyro_range~~CallsGraph_node9" class="node"><title>proc~in_boundary</title>
+<g id="a_proc~~npa_gyro_range~~CallsGraph_node9"><a xlink:href="../proc/in_boundary.html" xlink:title="in_boundary">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="340,-24 268,-24 268,-0 340,-0 340,-24"/>
+<text text-anchor="middle" x="304" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_boundary</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M577.652,-196.756C585.918,-195.421 594.868,-193.975 603.822,-192.529"/>
-<polygon fill="#000000" stroke="#000000" points="604.584,-195.951 613.898,-190.901 603.468,-189.041 604.584,-195.951"/>
 </g>
-<!-- proc~interpol1d_coeff -->
-<g id="node7" class="node"><title>proc~interpol1d_coeff</title>
-<a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="851,-247 761,-247 761,-221 851,-221 851,-247"/>
-<text text-anchor="middle" x="806" y="-231.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M577.539,-207.475C622.894,-212.741 698.569,-221.527 750.301,-227.533"/>
-<polygon fill="#000000" stroke="#000000" points="749.976,-231.019 760.313,-228.695 750.783,-224.065 749.976,-231.019"/>
-</g>
-<!-- proc~interpol2d_coeff -->
-<g id="node8" class="node"><title>proc~interpol2d_coeff</title>
-<a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="851,-184 761,-184 761,-158 851,-158 851,-184"/>
-<text text-anchor="middle" x="806" y="-168.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M555.738,-189.969C570.235,-179.561 592.245,-165.794 614,-160 658.721,-148.089 711.303,-152.302 750.122,-158.669"/>
-<polygon fill="#000000" stroke="#000000" points="749.732,-162.154 760.184,-160.418 750.931,-155.257 749.732,-162.154"/>
-</g>
-<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M724.328,-251.884C732.868,-250.014 741.693,-248.082 750.242,-246.21"/>
-<polygon fill="#000000" stroke="#000000" points="751.099,-249.605 760.119,-244.047 749.602,-242.767 751.099,-249.605"/>
-</g>
-<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge4" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M724.328,-177.558C732.776,-176.879 741.501,-176.179 749.963,-175.499"/>
-<polygon fill="#000000" stroke="#000000" points="750.431,-178.973 760.119,-174.684 749.871,-171.996 750.431,-178.973"/>
-</g>
-<!-- proc~get_position -->
-<g id="node19" class="node"><title>proc~get_position</title>
-<a xlink:href="../proc/get_position.html" xlink:title="get_position">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-196 370,-196 370,-170 440,-170 440,-196"/>
-<text text-anchor="middle" x="405" y="-180.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
-</a>
-</g>
-<!-- proc~get_plasma&#45;&gt;proc~get_position -->
-<g id="edge20" class="edge"><title>proc~get_plasma&#45;&gt;proc~get_position</title>
-<path fill="none" stroke="#000000" d="M310.231,-152.88C325.437,-157.713 343.546,-163.468 359.84,-168.647"/>
-<polygon fill="#000000" stroke="#000000" points="359.118,-172.09 369.709,-171.783 361.239,-165.419 359.118,-172.09"/>
-</g>
-<!-- proc~in_plasma -->
-<g id="node20" class="node"><title>proc~in_plasma</title>
-<a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
-<polygon fill="#d9534f" stroke="#d9534f" points="435,-152 375,-152 375,-126 435,-126 435,-152"/>
-<text text-anchor="middle" x="405" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
-</a>
-</g>
-<!-- proc~get_plasma&#45;&gt;proc~in_plasma -->
-<g id="edge22" class="edge"><title>proc~get_plasma&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M310.231,-141.204C326.673,-140.822 346.51,-140.36 363.776,-139.959"/>
-<polygon fill="#000000" stroke="#000000" points="364.225,-143.449 374.141,-139.718 364.062,-136.451 364.225,-143.449"/>
-</g>
-<!-- omp_get_thread_num -->
-<g id="node26" class="node"><title>omp_get_thread_num</title>
-<polygon fill="#777777" stroke="#777777" points="464,-70 346,-70 346,-44 464,-44 464,-70"/>
-<text text-anchor="middle" x="405" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
-</g>
-<!-- proc~randu&#45;&gt;omp_get_thread_num -->
-<g id="edge24" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="#000000" d="M303.043,-89.4051C317.941,-84.6699 336.92,-78.6378 354.454,-73.065"/>
-<polygon fill="#000000" stroke="#000000" points="355.541,-76.3921 364.011,-70.0274 353.421,-69.7209 355.541,-76.3921"/>
-</g>
-<!-- proc~rng_uniform -->
-<g id="node27" class="node"><title>proc~rng_uniform</title>
-<a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="574,-67 504,-67 504,-41 574,-41 574,-67"/>
-<text text-anchor="middle" x="539" y="-51.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
-</a>
-</g>
-<!-- proc~randu&#45;&gt;proc~rng_uniform -->
-<g id="edge26" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="#000000" d="M303.064,-97.1398C339.857,-95.5465 407.546,-91.1057 464,-79 474.373,-76.7756 485.32,-73.6153 495.548,-70.287"/>
-<polygon fill="#000000" stroke="#000000" points="496.734,-73.5808 505.092,-67.0696 494.498,-66.9475 496.734,-73.5808"/>
-</g>
-<!-- proc~randn&#45;&gt;omp_get_thread_num -->
-<g id="edge32" class="edge"><title>proc~randn&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="#000000" d="M303.043,-54.6289C312.7,-54.8535 324.071,-55.1179 335.652,-55.3873"/>
-<polygon fill="#000000" stroke="#000000" points="335.767,-58.8908 345.845,-55.6243 335.929,-51.8927 335.767,-58.8908"/>
-</g>
-<!-- proc~rng_normal -->
-<g id="node30" class="node"><title>proc~rng_normal</title>
-<a xlink:href="../proc/rng_normal.html" xlink:title="rng_normal">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="438,-26 372,-26 372,-1.24345e-14 438,-3.55271e-15 438,-26"/>
-<text text-anchor="middle" x="405" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_normal</text>
-</a>
-</g>
-<!-- proc~randn&#45;&gt;proc~rng_normal -->
-<g id="edge30" class="edge"><title>proc~randn&#45;&gt;proc~rng_normal</title>
-<path fill="none" stroke="#000000" d="M303.043,-45.4051C319.981,-40.0216 342.193,-32.9618 361.56,-26.8064"/>
-<polygon fill="#000000" stroke="#000000" points="362.624,-30.1411 371.094,-23.7765 360.503,-23.4699 362.624,-30.1411"/>
-</g>
-<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
-<g id="edge18" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M435.685,-149.427C444.908,-152.831 454.973,-156.819 464,-161 479.184,-168.032 495.454,-176.961 508.947,-184.776"/>
-<polygon fill="#000000" stroke="#000000" points="507.401,-187.927 517.797,-189.972 510.945,-181.891 507.401,-187.927"/>
-</g>
-<!-- proc~xyz_to_uvw -->
-<g id="node21" class="node"><title>proc~xyz_to_uvw</title>
-<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="573,-152 505,-152 505,-126 573,-126 573,-152"/>
-<text text-anchor="middle" x="539" y="-136.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
-</a>
-</g>
-<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
-<g id="edge16" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M435.742,-139C453.165,-139 475.267,-139 494.55,-139"/>
-<polygon fill="#000000" stroke="#000000" points="494.629,-142.5 504.629,-139 494.629,-135.5 494.629,-142.5"/>
-</g>
-<!-- proc~rng_normal&#45;&gt;proc~rng_uniform -->
-<g id="edge28" class="edge"><title>proc~rng_normal&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="#000000" d="M438.814,-23.346C455.561,-28.4701 476.008,-34.7265 494.054,-40.2478"/>
-<polygon fill="#000000" stroke="#000000" points="493.207,-43.6487 503.793,-43.2277 495.255,-36.955 493.207,-43.6487"/>
+<!-- proc~gyro_range&#45;&gt;proc~in_boundary -->
+<g id="proc~~npa_gyro_range~~CallsGraph_edge6" class="edge"><title>proc~gyro_range&#45;&gt;proc~in_boundary</title>
+<path fill="none" stroke="#000000" d="M185.44,-104.828C189.216,-102.211 192.907,-99.2437 196,-96 218.255,-72.6605 206.715,-53.0164 232,-33 239.63,-26.9601 248.956,-22.656 258.308,-19.5892"/>
+<polygon fill="#000000" stroke="#000000" points="259.34,-22.9344 267.993,-16.8204 257.416,-16.204 259.34,-22.9344"/>
 </g>
 </g>
 </svg>
 </div>
-                <script>var panprocget_beam_cx_probCallsGraph = svgPanZoom('#procget_beam_cx_probCallsGraph', {
-                    zoomEnabled: true,
-                    controlIconsEnabled: true,
-                    fit: true,
-                    center: true,});
-                    </script>
                 <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
                 <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
                   <div class="modal-dialog modal-lg" role="document">
@@ -1184,43 +1076,43 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1244,161 +1136,62 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
-<!-- Title: proc~~get_beam_cx_prob~~CalledByGraph Pages: 1 -->
-<svg id="procget_beam_cx_probCalledByGraph" width="332pt" height="342pt"
- viewBox="0.00 0.00 332.00 342.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~get_beam_cx_prob~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 338)">
-<title>proc~~get_beam_cx_prob~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-338 329,-338 329,5 -4,5"/>
-<!-- proc~get_beam_cx_prob -->
-<g id="node1" class="node"><title>proc~get_beam_cx_prob</title>
-<polygon fill="none" stroke="black" points="323,-180 219,-180 219,-154 323,-154 323,-180"/>
-<text text-anchor="middle" x="271" y="-164.55" font-family="Helvetica,sans-Serif" font-size="10.50">get_beam_cx_prob</text>
-</g>
-<!-- proc~fida_mc -->
-<g id="node2" class="node"><title>proc~fida_mc</title>
-<a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-334 109,-334 109,-308 163,-308 163,-334"/>
-<text text-anchor="middle" x="136" y="-318.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
-</a>
-</g>
-<!-- proc~fida_mc&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge18" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.247,-310.897C169.809,-307.703 176.504,-303.742 182,-299 218.317,-267.668 246.295,-218.157 260.55,-189.512"/>
-<polygon fill="#000000" stroke="#000000" points="263.797,-190.839 265.012,-180.314 257.498,-187.784 263.797,-190.839"/>
+<!-- Title: proc~~npa_gyro_range~~CalledByGraph Pages: 1 -->
+<svg id="procnpa_gyro_rangeCalledByGraph" width="280pt" height="74pt"
+ viewBox="0.00 0.00 280.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~npa_gyro_range~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~npa_gyro_range~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-70 276,-70 276,4 -4,4"/>
+<!-- proc~npa_gyro_range -->
+<g id="proc~~npa_gyro_range~~CalledByGraph_node1" class="node"><title>proc~npa_gyro_range</title>
+<polygon fill="none" stroke="black" points="271.5,-45 180.5,-45 180.5,-21 271.5,-21 271.5,-45"/>
+<text text-anchor="middle" x="226" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">npa_gyro_range</text>
 </g>
 <!-- proc~npa_mc -->
-<g id="node3" class="node"><title>proc~npa_mc</title>
-<a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-290 109,-290 109,-264 163,-264 163,-290"/>
-<text text-anchor="middle" x="136" y="-274.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<g id="proc~~npa_gyro_range~~CalledByGraph_node2" class="node"><title>proc~npa_mc</title>
+<g id="a_proc~~npa_gyro_range~~CalledByGraph_node2"><a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-66 90,-66 90,-42 144,-42 144,-66"/>
+<text text-anchor="middle" x="117" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
 </g>
-<!-- proc~npa_mc&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge20" class="edge"><title>proc~npa_mc&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.117,-265.879C169.543,-262.75 176.207,-259.074 182,-255 209.838,-235.422 236.927,-206.86 253.763,-187.636"/>
-<polygon fill="#000000" stroke="#000000" points="256.447,-189.882 260.323,-180.022 251.144,-185.313 256.447,-189.882"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node4" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-246 90,-246 90,-220 182,-220 182,-246"/>
-<text text-anchor="middle" x="136" y="-230.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
-</a>
-</g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge22" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.758,-219.796C169.78,-216.912 176.109,-213.865 182,-211 199.623,-202.43 219.145,-192.794 235.405,-184.73"/>
-<polygon fill="#000000" stroke="#000000" points="237.163,-187.765 244.563,-180.182 234.049,-181.495 237.163,-187.765"/>
-</g>
-<!-- proc~fida_f -->
-<g id="node5" class="node"><title>proc~fida_f</title>
-<a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-202 109,-202 109,-176 163,-176 163,-202"/>
-<text text-anchor="middle" x="136" y="-186.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
-</a>
-</g>
-<!-- proc~fida_f&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge24" class="edge"><title>proc~fida_f&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.319,-184.548C176.276,-182.437 192.337,-179.819 208.067,-177.256"/>
-<polygon fill="#000000" stroke="#000000" points="209.012,-180.648 218.319,-175.585 207.886,-173.739 209.012,-180.648"/>
-</g>
-<!-- proc~halo -->
-<g id="node6" class="node"><title>proc~halo</title>
-<a xlink:href="../proc/halo.html" xlink:title="halo">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-158 109,-158 109,-132 163,-132 163,-158"/>
-<text text-anchor="middle" x="136" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">halo</text>
-</a>
-</g>
-<!-- proc~halo&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge26" class="edge"><title>proc~halo&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.319,-149.452C176.276,-151.563 192.337,-154.181 208.067,-156.744"/>
-<polygon fill="#000000" stroke="#000000" points="207.886,-160.261 218.319,-158.415 209.012,-153.352 207.886,-160.261"/>
+<!-- proc~npa_mc&#45;&gt;proc~npa_gyro_range -->
+<g id="proc~~npa_gyro_range~~CalledByGraph_edge3" class="edge"><title>proc~npa_mc&#45;&gt;proc~npa_gyro_range</title>
+<path fill="none" stroke="#000000" d="M144.175,-48.8628C152.172,-47.2934 161.282,-45.5055 170.433,-43.7093"/>
+<polygon fill="#000000" stroke="#000000" points="171.191,-47.1276 180.329,-41.7671 169.843,-40.2586 171.191,-47.1276"/>
 </g>
 <!-- proc~npa_f -->
-<g id="node7" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-114 109,-114 109,-88 163,-88 163,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<g id="proc~~npa_gyro_range~~CalledByGraph_node3" class="node"><title>proc~npa_f</title>
+<g id="a_proc~~npa_gyro_range~~CalledByGraph_node3"><a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-24 90,-24 90,-0 144,-0 144,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
 </a>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge28" class="edge"><title>proc~npa_f&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.271,-113.971C169.437,-116.923 175.95,-120.058 182,-123 199.623,-131.57 219.145,-141.206 235.405,-149.27"/>
-<polygon fill="#000000" stroke="#000000" points="234.049,-152.505 244.563,-153.818 237.163,-146.235 234.049,-152.505"/>
 </g>
-<!-- proc~dcx -->
-<g id="node8" class="node"><title>proc~dcx</title>
-<a xlink:href="../proc/dcx.html" xlink:title="dcx">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
-<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dcx</text>
-</a>
-</g>
-<!-- proc~dcx&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge30" class="edge"><title>proc~dcx&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M163.117,-68.1207C169.543,-71.2498 176.207,-74.926 182,-79 209.838,-98.5781 236.927,-127.14 253.763,-146.364"/>
-<polygon fill="#000000" stroke="#000000" points="251.144,-148.687 260.323,-153.978 256.447,-144.118 251.144,-148.687"/>
-</g>
-<!-- proc~npa_weights -->
-<g id="node9" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="172,-26 100,-26 100,-1.24345e-14 172,-3.55271e-15 172,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
-</a>
-</g>
-<!-- proc~npa_weights&#45;&gt;proc~get_beam_cx_prob -->
-<g id="edge32" class="edge"><title>proc~npa_weights&#45;&gt;proc~get_beam_cx_prob</title>
-<path fill="none" stroke="#000000" d="M169.01,-26.1048C173.625,-28.6826 178.112,-31.6461 182,-35 218.317,-66.3317 246.295,-115.843 260.55,-144.488"/>
-<polygon fill="#000000" stroke="#000000" points="257.498,-146.216 265.012,-153.686 263.797,-143.161 257.498,-146.216"/>
+<!-- proc~npa_f&#45;&gt;proc~npa_gyro_range -->
+<g id="proc~~npa_gyro_range~~CalledByGraph_edge4" class="edge"><title>proc~npa_f&#45;&gt;proc~npa_gyro_range</title>
+<path fill="none" stroke="#000000" d="M144.175,-17.1372C152.172,-18.7066 161.282,-20.4945 170.433,-22.2907"/>
+<polygon fill="#000000" stroke="#000000" points="169.843,-25.7414 180.329,-24.2329 171.191,-18.8724 169.843,-25.7414"/>
 </g>
 <!-- program~fidasim -->
-<g id="node10" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-180 2.13163e-14,-180 0,-154 54,-154 54,-180"/>
-<text text-anchor="middle" x="27" y="-164.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~npa_gyro_range~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
+<g id="a_proc~~npa_gyro_range~~CalledByGraph_node4"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-45 0,-45 0,-21 54,-21 54,-45"/>
+<text text-anchor="middle" x="27" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
-<path fill="none" stroke="#000000" d="M30.1688,-180.345C36.9546,-206.316 55.1803,-264.152 90,-299 92.8744,-301.877 96.1984,-304.429 99.718,-306.682"/>
-<polygon fill="#000000" stroke="#000000" points="98.2827,-309.888 108.726,-311.675 101.677,-303.766 98.2827,-309.888"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M33.6754,-180.23C43.6956,-198.976 64.2283,-233.39 90,-255 93.0419,-257.551 96.4296,-259.883 99.9486,-261.995"/>
-<polygon fill="#000000" stroke="#000000" points="98.3809,-265.126 108.844,-266.79 101.702,-258.964 98.3809,-265.126"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M44.1447,-180.12C56.5362,-189.315 73.8651,-201.592 90,-211 92.5093,-212.463 95.1311,-213.913 97.7953,-215.328"/>
-<polygon fill="#000000" stroke="#000000" points="96.4163,-218.553 106.915,-219.978 99.5963,-212.317 96.4163,-218.553"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M54.2241,-172.495C67.6197,-175.198 83.9774,-178.5 98.533,-181.438"/>
-<polygon fill="#000000" stroke="#000000" points="98.2503,-184.951 108.745,-183.499 99.6353,-178.09 98.2503,-184.951"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~halo -->
-<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~halo</title>
-<path fill="none" stroke="#000000" d="M54.2241,-161.505C67.6197,-158.802 83.9774,-155.5 98.533,-152.562"/>
-<polygon fill="#000000" stroke="#000000" points="99.6353,-155.91 108.745,-150.501 98.2503,-149.049 99.6353,-155.91"/>
+<g id="proc~~npa_gyro_range~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<path fill="none" stroke="#000000" d="M54.4029,-39.3007C62.481,-41.2284 71.5067,-43.3823 80.1046,-45.4341"/>
+<polygon fill="#000000" stroke="#000000" points="79.3797,-48.8593 89.919,-47.7761 81.0046,-42.0505 79.3797,-48.8593"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M44.1447,-153.88C56.5362,-144.685 73.8651,-132.408 90,-123 93.1689,-121.152 96.5172,-119.326 99.9037,-117.563"/>
-<polygon fill="#000000" stroke="#000000" points="101.49,-120.684 108.86,-113.073 98.3523,-114.426 101.49,-120.684"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~dcx -->
-<g id="edge14" class="edge"><title>program~fidasim&#45;&gt;proc~dcx</title>
-<path fill="none" stroke="#000000" d="M33.6754,-153.77C43.6956,-135.024 64.2283,-100.61 90,-79 93.0419,-76.4493 96.4296,-74.1172 99.9486,-72.0053"/>
-<polygon fill="#000000" stroke="#000000" points="101.702,-75.0361 108.844,-67.2103 98.3809,-68.8743 101.702,-75.0361"/>
-</g>
-<!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge16" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M30.1688,-153.655C36.9546,-127.684 55.1803,-69.8477 90,-35 91.0559,-33.9433 92.1725,-32.9302 93.3371,-31.9598"/>
-<polygon fill="#000000" stroke="#000000" points="95.4197,-34.7741 101.588,-26.16 91.3942,-29.0474 95.4197,-34.7741"/>
+<g id="proc~~npa_gyro_range~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
+<path fill="none" stroke="#000000" d="M54.4029,-26.6993C62.481,-24.7716 71.5067,-22.6177 80.1046,-20.5659"/>
+<polygon fill="#000000" stroke="#000000" points="81.0046,-23.9495 89.919,-18.2239 79.3797,-17.1407 81.0046,-23.9495"/>
 </g>
 </g>
 </svg>
@@ -1417,43 +1210,43 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1498,7 +1291,7 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
   <div class="list-group">
-    <a class="list-group-item" href="../proc/get_beam_cx_prob.html#src">get_beam_cx_prob</a>
+    <a class="list-group-item" href="../proc/npa_gyro_range.html#src">npa_gyro_range</a>
   </div>
 </div>
 
@@ -1526,47 +1319,71 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">get_beam_cx_prob</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">v_ion</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span>
-    <span class="c">!+ Get probability of a thermal ion charge exchanging with `types` neutrals</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">ind</span>
-        <span class="c">!+ [[libfida:beam_grid]] indices</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">pos</span>
-        <span class="c">!+ Interaction position in beam grid coordinates</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">v_ion</span>
-        <span class="c">!+ Ion velocity [cm/s]</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">types</span>
-        <span class="c">!+ Neutral types</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">prob</span>
-        <span class="c">!+ Charge exchange rate/probability [1/s]</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">npa_gyro_range</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">gyrange</span><span class="p">,</span> <span class="n">nrange</span><span class="p">)</span>
+    <span class="c">!+ Calculates range of gyro-angles that would hit the NPA detector</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ichan</span>
+        <span class="c">!+ Index of NPA detector</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">GyroSurface</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gs</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gyrange</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nrange</span>
 
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ntypes</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">ii</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span><span class="p">,</span> <span class="n">denn</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vhalo</span><span class="p">,</span> <span class="n">vnbi</span> <span class="p">,</span><span class="n">vn</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">a_nrange</span><span class="p">,</span> <span class="n">d_nrange</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a_gyrange</span><span class="p">,</span> <span class="n">d_gyrange</span>
 
-    <span class="n">vnbi</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">-</span> <span class="n">nbi</span><span class="p">%</span><span class="n">src</span>
-    <span class="n">vnbi</span> <span class="o">=</span> <span class="n">vnbi</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">vnbi</span><span class="p">)</span><span class="o">*</span><span class="n">nbi</span><span class="p">%</span><span class="n">vinj</span>
+    <span class="n">nrange</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">gyrange</span> <span class="o">=</span> <span class="mf">0.d0</span>
 
-    <span class="n">ntypes</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">types</span><span class="p">)</span>
-    <span class="n">prob</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">call </span><span class="n">gyro_range</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">aperture</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">a_gyrange</span><span class="p">,</span> <span class="n">a_nrange</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">a_nrange</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
 
-    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ntypes</span>
-        <span class="k">if</span><span class="p">((</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mi">3</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">).</span><span class="n">ne</span><span class="p">.</span><span class="mi">0</span><span class="p">))</span> <span class="k">then</span>
-            <span class="c">! CX with full type&#39;th energy NBI neutrals</span>
-            <span class="n">denn</span> <span class="o">=</span> <span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-            <span class="n">vn</span> <span class="o">=</span> <span class="n">vnbi</span><span class="o">/</span><span class="nb">sqrt</span><span class="p">(</span><span class="kt">real</span><span class="p">(</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">)))</span>
-            <span class="k">call </span><span class="n">neut_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span><span class="n">v_ion</span><span class="p">,</span><span class="n">vn</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
-            <span class="n">prob</span> <span class="o">=</span> <span class="n">prob</span><span class="o">+</span><span class="n">rates</span>
-        <span class="k">else</span>
-<span class="k">            </span><span class="n">denn</span> <span class="o">=</span> <span class="n">neut</span><span class="p">%</span><span class="n">dens</span><span class="p">(:,</span><span class="n">types</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
-            <span class="k">do </span><span class="n">ii</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">n_halo_neutrate</span><span class="p">)</span>
-                <span class="k">call </span><span class="n">mc_halo</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">vhalo</span><span class="p">)</span>
-                <span class="k">call </span><span class="n">neut_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span><span class="n">v_ion</span><span class="p">,</span><span class="n">vhalo</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
-                <span class="n">prob</span><span class="o">=</span><span class="n">prob</span><span class="o">+</span><span class="n">rates</span><span class="o">/</span><span class="n">n_halo_neutrate</span>
-            <span class="n">enddo</span>
-        <span class="n">endif</span>
+<span class="k">    call </span><span class="n">gyro_range</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">d_gyrange</span><span class="p">,</span> <span class="n">d_nrange</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">d_nrange</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">return</span>
+
+<span class="k">    if</span><span class="p">((</span><span class="n">a_nrange</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">).</span><span class="nb">and</span><span class="p">.</span><span class="n">approx_eq</span><span class="p">(</span><span class="n">a_gyrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">,</span><span class="mi">1</span><span class="n">d</span><span class="o">-</span><span class="mi">6</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">gyrange</span> <span class="o">=</span> <span class="n">d_gyrange</span>
+        <span class="n">nrange</span> <span class="o">=</span> <span class="n">d_nrange</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">((</span><span class="n">d_nrange</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">).</span><span class="nb">and</span><span class="p">.</span><span class="n">approx_eq</span><span class="p">(</span><span class="n">d_gyrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">,</span><span class="mi">1</span><span class="n">d</span><span class="o">-</span><span class="mi">6</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">gyrange</span> <span class="o">=</span> <span class="n">a_gyrange</span>
+        <span class="n">nrange</span> <span class="o">=</span> <span class="n">a_nrange</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
+
+    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">a_nrange</span>
+        <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">d_nrange</span>
+            <span class="n">a0</span> <span class="o">=</span> <span class="mf">0.d0</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">d_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="n">a_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">a0</span> <span class="o">=</span> <span class="n">a_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="mf">0.d0</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">a_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">a_gyrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="n">a0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">d_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">a0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">d_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">d_gyrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">a0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">a0</span> <span class="o">=</span> <span class="n">d_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="mf">0.d0</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">d_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="n">d_gyrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">-</span> <span class="n">a0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">a_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="n">a0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">a_gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="n">a_gyrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">)</span> <span class="o">-</span> <span class="n">a0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
+            <span class="n">endif</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">c</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">b</span><span class="p">).</span><span class="nb">or</span><span class="p">.(</span><span class="n">d</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">c</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">                if</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">d</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    </span><span class="n">nrange</span> <span class="o">=</span> <span class="n">nrange</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">gyrange</span><span class="p">(:,</span><span class="n">nrange</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">a0</span> <span class="o">+</span> <span class="n">c</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="n">c</span><span class="p">,</span><span class="n">b</span><span class="o">-</span><span class="n">c</span><span class="p">)]</span>
+                <span class="k">else</span>
+<span class="k">                    </span><span class="n">nrange</span> <span class="o">=</span> <span class="n">nrange</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">gyrange</span><span class="p">(:,</span><span class="n">nrange</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">a0</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span>
+                    <span class="n">nrange</span> <span class="o">=</span> <span class="n">nrange</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="n">gyrange</span><span class="p">(:,</span><span class="n">nrange</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">a0</span><span class="o">+</span><span class="n">c</span><span class="p">,</span> <span class="n">b</span><span class="o">-</span><span class="n">c</span><span class="p">]</span>
+                <span class="n">endif</span>
+            <span class="n">endif</span>
+        <span class="n">enddo</span>
     <span class="n">enddo</span>
 
-<span class="k">end subroutine </span><span class="n">get_beam_cx_prob</span>
+<span class="k">end subroutine </span><span class="n">npa_gyro_range</span>
 </pre></div>
 
     </section>
@@ -1673,7 +1490,13 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1718,6 +1541,8 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1777,7 +1602,7 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1803,7 +1628,17 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1853,6 +1688,8 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1889,6 +1726,10 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1919,13 +1760,13 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -2057,8 +1898,6 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -2083,7 +1922,9 @@ public subroutine get_beam_cx_prob(ind, pos, v_ion, types, prob)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

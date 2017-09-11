@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 1.4% of total for procedures.">126 statements</a>
+	  title=" 0.9% of total for procedures.">90 statements</a>
      </li> 
      
      
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -888,366 +912,258 @@ public subroutine read_mc(fid, error)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_mc~~CallsGraph Pages: 1 -->
-<svg id="procread_mcCallsGraph" width="641pt" height="363pt"
- viewBox="0.00 0.00 641.00 362.57" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_mc~~CallsGraph" class="graph" transform="scale(0.764916 0.764916) rotate(0) translate(4 470)">
+<svg id="procread_mcCallsGraph" width="641pt" height="346pt"
+ viewBox="0.00 0.00 641.00 345.80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_mc~~CallsGraph" class="graph" transform="scale(0.937135 0.937135) rotate(0) translate(4 365)">
 <title>proc~~read_mc~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-470 835,-470 835,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-365 680,-365 680,4 -4,4"/>
 <!-- proc~read_mc -->
-<g id="node1" class="node"><title>proc~read_mc</title>
-<polygon fill="none" stroke="black" points="55,-206 1,-206 1,-180 55,-180 55,-206"/>
-<text text-anchor="middle" x="28" y="-190.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_mc</text>
-</g>
-<!-- proc~uvw_to_xyz -->
-<g id="node2" class="node"><title>proc~uvw_to_xyz</title>
-<a xlink:href="../proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
-<polygon fill="#d9534f" stroke="#d9534f" points="203,-400 135,-400 135,-374 203,-374 203,-400"/>
-<text text-anchor="middle" x="169" y="-384.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
-</a>
-</g>
-<!-- proc~read_mc&#45;&gt;proc~uvw_to_xyz -->
-<g id="edge52" class="edge"><title>proc~read_mc&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M28.9882,-206.417C32.0966,-238.661 44.5188,-321.082 92,-365 101.09,-373.408 113.175,-378.628 125.071,-381.862"/>
-<polygon fill="#000000" stroke="#000000" points="124.418,-385.303 134.949,-384.136 125.989,-378.481 124.418,-385.303"/>
-</g>
-<!-- proc~in_plasma -->
-<g id="node3" class="node"><title>proc~in_plasma</title>
-<a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
-<polygon fill="#d9534f" stroke="#d9534f" points="372,-123 312,-123 312,-97 372,-97 372,-123"/>
-<text text-anchor="middle" x="342" y="-107.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
-</a>
-</g>
-<!-- proc~read_mc&#45;&gt;proc~in_plasma -->
-<g id="edge54" class="edge"><title>proc~read_mc&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M43.7923,-179.908C56.1478,-170.37 74.1689,-157.95 92,-151 162.204,-123.637 250.404,-114.535 301.075,-111.508"/>
-<polygon fill="#000000" stroke="#000000" points="301.503,-114.99 311.298,-110.95 301.122,-108.001 301.503,-114.99"/>
-</g>
-<!-- h5ltread_dataset_int_f -->
-<g id="node4" class="node"><title>h5ltread_dataset_int_f</title>
-<polygon fill="#777777" stroke="#777777" points="401,-186 283,-186 283,-160 401,-160 401,-186"/>
-<text text-anchor="middle" x="342" y="-170.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
-</g>
-<!-- proc~read_mc&#45;&gt;h5ltread_dataset_int_f -->
-<g id="edge56" class="edge"><title>proc~read_mc&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M55.7175,-194.055C66.9749,-194.434 80.1068,-194.814 92,-195 160.436,-196.069 177.989,-202.693 246,-195 258.602,-193.574 271.96,-191.128 284.579,-188.372"/>
-<polygon fill="#000000" stroke="#000000" points="285.539,-191.743 294.512,-186.109 283.984,-184.918 285.539,-191.743"/>
-</g>
-<!-- proc~gyro_correction -->
-<g id="node5" class="node"><title>proc~gyro_correction</title>
-<a xlink:href="../proc/gyro_correction.html" xlink:title="gyro_correction">
-<polygon fill="#d9534f" stroke="#d9534f" points="212,-356 126,-356 126,-330 212,-330 212,-356"/>
-<text text-anchor="middle" x="169" y="-340.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
-</a>
-</g>
-<!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge58" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M36.7521,-206.194C48.4045,-223.334 70.101,-253.803 92,-277 107.909,-293.852 127.814,-310.822 143.4,-323.335"/>
-<polygon fill="#000000" stroke="#000000" points="141.55,-326.334 151.562,-329.798 145.896,-320.846 141.55,-326.334"/>
+<g id="proc~~read_mc~~CallsGraph_node1" class="node"><title>proc~read_mc</title>
+<polygon fill="none" stroke="black" points="55.5,-175 0.5,-175 0.5,-151 55.5,-151 55.5,-175"/>
+<text text-anchor="middle" x="28" y="-160.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_mc</text>
 </g>
 <!-- proc~circle_grid_intersect -->
-<g id="node6" class="node"><title>proc~circle_grid_intersect</title>
-<a xlink:href="../proc/circle_grid_intersect.html" xlink:title="circle_grid_intersect">
-<polygon fill="#d9534f" stroke="#d9534f" points="223,-268 115,-268 115,-242 223,-242 223,-268"/>
-<text text-anchor="middle" x="169" y="-252.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">circle_grid_intersect</text>
+<g id="proc~~read_mc~~CallsGraph_node2" class="node"><title>proc~circle_grid_intersect</title>
+<g id="a_proc~~read_mc~~CallsGraph_node2"><a xlink:href="../proc/circle_grid_intersect.html" xlink:title="circle_grid_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="223,-279 115,-279 115,-255 223,-255 223,-279"/>
+<text text-anchor="middle" x="169" y="-264.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">circle_grid_intersect</text>
 </a>
+</g>
 </g>
 <!-- proc~read_mc&#45;&gt;proc~circle_grid_intersect -->
-<g id="edge60" class="edge"><title>proc~read_mc&#45;&gt;proc~circle_grid_intersect</title>
-<path fill="none" stroke="#000000" d="M49.7641,-206.057C61.9405,-213.066 77.5383,-221.562 92,-228 100.363,-231.723 109.411,-235.287 118.265,-238.535"/>
-<polygon fill="#000000" stroke="#000000" points="117.16,-241.857 127.755,-241.928 119.517,-235.266 117.16,-241.857"/>
+<g id="proc~~read_mc~~CallsGraph_edge17" class="edge"><title>proc~read_mc&#45;&gt;proc~circle_grid_intersect</title>
+<path fill="none" stroke="#000000" d="M34.9166,-175.166C44.4002,-193.371 64.7437,-227.53 92,-246 96.2124,-248.854 100.804,-251.323 105.575,-253.457"/>
+<polygon fill="#000000" stroke="#000000" points="104.335,-256.73 114.921,-257.162 106.915,-250.223 104.335,-256.73"/>
 </g>
-<!-- proc~get_fields -->
-<g id="node7" class="node"><title>proc~get_fields</title>
-<a xlink:href="../proc/get_fields.html" xlink:title="get_fields">
-<polygon fill="#d9534f" stroke="#d9534f" points="198,-60 140,-60 140,-34 198,-34 198,-60"/>
-<text text-anchor="middle" x="169" y="-44.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+<!-- proc~uvw_to_xyz -->
+<g id="proc~~read_mc~~CallsGraph_node3" class="node"><title>proc~uvw_to_xyz</title>
+<g id="a_proc~~read_mc~~CallsGraph_node3"><a xlink:href="../proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="203,-237 135,-237 135,-213 203,-213 203,-237"/>
+<text text-anchor="middle" x="169" y="-222.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
 </a>
 </g>
-<!-- proc~read_mc&#45;&gt;proc~get_fields -->
-<g id="edge62" class="edge"><title>proc~read_mc&#45;&gt;proc~get_fields</title>
-<path fill="none" stroke="#000000" d="M31.0458,-179.944C37.6354,-154.637 55.6425,-98.7825 92,-69 102.713,-60.2242 116.747,-54.947 129.895,-51.7744"/>
-<polygon fill="#000000" stroke="#000000" points="130.629,-55.1968 139.708,-49.7354 129.205,-48.3432 130.629,-55.1968"/>
 </g>
-<!-- h5ltread_dataset_double_f -->
-<g id="node8" class="node"><title>h5ltread_dataset_double_f</title>
-<polygon fill="#777777" stroke="#777777" points="239,-104 99,-104 99,-78 239,-78 239,-104"/>
-<text text-anchor="middle" x="169" y="-88.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
-</g>
-<!-- proc~read_mc&#45;&gt;h5ltread_dataset_double_f -->
-<g id="edge64" class="edge"><title>proc~read_mc&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M36.1171,-179.74C46.9331,-163.106 67.5731,-134.74 92,-118 97.5742,-114.18 103.745,-110.846 110.096,-107.949"/>
-<polygon fill="#000000" stroke="#000000" points="111.613,-111.109 119.481,-104.013 108.906,-104.653 111.613,-111.109"/>
+<!-- proc~read_mc&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~read_mc~~CallsGraph_edge18" class="edge"><title>proc~read_mc&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M44.531,-175.057C56.8276,-184.107 74.7477,-196.228 92,-204 102.32,-208.649 113.902,-212.486 124.855,-215.55"/>
+<polygon fill="#000000" stroke="#000000" points="124.119,-218.976 134.682,-218.148 125.908,-212.208 124.119,-218.976"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f -->
-<g id="node9" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
-<a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="246,-186 92,-186 92,-160 246,-160 246,-186"/>
-<text text-anchor="middle" x="169" y="-170.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+<g id="proc~~read_mc~~CallsGraph_node4" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="a_proc~~read_mc~~CallsGraph_node4"><a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="246,-195 92,-195 92,-171 246,-171 246,-195"/>
+<text text-anchor="middle" x="169" y="-180.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
 </a>
+</g>
 </g>
 <!-- proc~read_mc&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="edge66" class="edge"><title>proc~read_mc&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M55.5209,-189.096C63.3725,-187.983 72.3742,-186.706 81.7983,-185.369"/>
-<polygon fill="#000000" stroke="#000000" points="82.3324,-188.828 91.7417,-183.959 81.3493,-181.898 82.3324,-188.828"/>
+<g id="proc~~read_mc~~CallsGraph_edge19" class="edge"><title>proc~read_mc&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M55.8006,-166.856C63.5879,-167.977 72.543,-169.265 81.926,-170.615"/>
+<polygon fill="#000000" stroke="#000000" points="81.4315,-174.08 91.8281,-172.04 82.4285,-167.151 81.4315,-174.08"/>
 </g>
-<!-- proc~xyz_to_uvw -->
-<g id="node10" class="node"><title>proc~xyz_to_uvw</title>
-<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="531,-145 463,-145 463,-119 531,-119 531,-145"/>
-<text text-anchor="middle" x="497" y="-129.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+<!-- proc~in_plasma -->
+<g id="proc~~read_mc~~CallsGraph_node5" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~read_mc~~CallsGraph_node5"><a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="199.5,-115 138.5,-115 138.5,-91 199.5,-91 199.5,-115"/>
+<text text-anchor="middle" x="169" y="-100.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
 </a>
 </g>
-<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
-<g id="edge14" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M372.623,-114.346C395.498,-117.593 427.101,-122.079 452.725,-125.716"/>
-<polygon fill="#000000" stroke="#000000" points="452.546,-129.225 462.938,-127.165 453.529,-122.295 452.546,-129.225"/>
 </g>
-<!-- interface~interpol_coeff -->
-<g id="node11" class="node"><title>interface~interpol_coeff</title>
-<a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="535,-101 459,-101 459,-75 535,-75 535,-101"/>
-<text text-anchor="middle" x="497" y="-85.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
-</a>
+<!-- proc~read_mc&#45;&gt;proc~in_plasma -->
+<g id="proc~~read_mc~~CallsGraph_edge20" class="edge"><title>proc~read_mc&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M49.285,-150.942C61.428,-144.007 77.3103,-135.424 92,-129 103.679,-123.893 116.707,-119.118 128.632,-115.089"/>
+<polygon fill="#000000" stroke="#000000" points="129.934,-118.345 138.335,-111.89 127.742,-111.697 129.934,-118.345"/>
 </g>
-<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
-<g id="edge16" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M372.623,-105.654C394.257,-102.583 423.698,-98.4041 448.506,-94.8831"/>
-<polygon fill="#000000" stroke="#000000" points="449.054,-98.3404 458.463,-93.4698 448.07,-91.4099 449.054,-98.3404"/>
+<!-- h5ltread_dataset_int_f -->
+<g id="proc~~read_mc~~CallsGraph_node6" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="401.5,-186 282.5,-186 282.5,-162 401.5,-162 401.5,-186"/>
+<text text-anchor="middle" x="342" y="-171.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
 </g>
-<!-- proc~gyro_step -->
-<g id="node24" class="node"><title>proc~gyro_step</title>
-<a xlink:href="../proc/gyro_step.html" xlink:title="gyro_step">
-<polygon fill="#d9534f" stroke="#d9534f" points="372,-356 312,-356 312,-330 372,-330 372,-356"/>
-<text text-anchor="middle" x="342" y="-340.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
-</a>
+<!-- proc~read_mc&#45;&gt;h5ltread_dataset_int_f -->
+<g id="proc~~read_mc~~CallsGraph_edge21" class="edge"><title>proc~read_mc&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M55.6681,-162.483C66.8859,-162.29 80.077,-162.095 92,-162 160.442,-161.457 177.691,-157.703 246,-162 254.467,-162.533 263.333,-163.33 272.103,-164.265"/>
+<polygon fill="#000000" stroke="#000000" points="271.995,-167.775 282.324,-165.418 272.78,-160.819 271.995,-167.775"/>
 </g>
-<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
-<g id="edge24" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M212.655,-343C240.049,-343 275.113,-343 301.82,-343"/>
-<polygon fill="#000000" stroke="#000000" points="301.977,-346.5 311.977,-343 301.977,-339.5 301.977,-346.5"/>
+<!-- h5ltread_dataset_double_f -->
+<g id="proc~~read_mc~~CallsGraph_node7" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="239,-73 99,-73 99,-49 239,-49 239,-73"/>
+<text text-anchor="middle" x="169" y="-58.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
 </g>
-<!-- proc~randu -->
-<g id="node25" class="node"><title>proc~randu</title>
-<a xlink:href="../proc/randu.html" xlink:title="randu">
-<polygon fill="#d9534f" stroke="#d9534f" points="369,-444 315,-444 315,-418 369,-418 369,-444"/>
-<text text-anchor="middle" x="342" y="-428.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
-</a>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~randu -->
-<g id="edge26" class="edge"><title>proc~gyro_correction&#45;&gt;proc~randu</title>
-<path fill="none" stroke="#000000" d="M212.553,-350.529C224.042,-353.792 236.01,-358.431 246,-365 267.112,-378.882 261.41,-394.355 282,-409 288.942,-413.938 297.117,-417.892 305.161,-421.01"/>
-<polygon fill="#000000" stroke="#000000" points="304.222,-424.389 314.817,-424.407 306.545,-417.786 304.222,-424.389"/>
-</g>
-<!-- proc~pitch_to_vec -->
-<g id="node26" class="node"><title>proc~pitch_to_vec</title>
-<a xlink:href="../proc/pitch_to_vec.html" xlink:title="pitch_to_vec">
-<polygon fill="#d9534f" stroke="#d9534f" points="378,-400 306,-400 306,-374 378,-374 378,-400"/>
-<text text-anchor="middle" x="342" y="-384.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pitch_to_vec</text>
-</a>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~pitch_to_vec -->
-<g id="edge28" class="edge"><title>proc~gyro_correction&#45;&gt;proc~pitch_to_vec</title>
-<path fill="none" stroke="#000000" d="M212.655,-354.103C237.928,-360.531 269.729,-368.619 295.474,-375.167"/>
-<polygon fill="#000000" stroke="#000000" points="294.823,-378.613 305.377,-377.686 296.549,-371.829 294.823,-378.613"/>
-</g>
-<!-- proc~grid_intersect -->
-<g id="node36" class="node"><title>proc~grid_intersect</title>
-<a xlink:href="../proc/grid_intersect.html" xlink:title="grid_intersect">
-<polygon fill="#d9534f" stroke="#d9534f" points="380,-268 304,-268 304,-242 380,-242 380,-268"/>
-<text text-anchor="middle" x="342" y="-252.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
-</a>
-</g>
-<!-- proc~circle_grid_intersect&#45;&gt;proc~grid_intersect -->
-<g id="edge38" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~grid_intersect</title>
-<path fill="none" stroke="#000000" d="M223.264,-255C245.676,-255 271.458,-255 293.259,-255"/>
-<polygon fill="#000000" stroke="#000000" points="293.288,-258.5 303.288,-255 293.288,-251.5 293.288,-258.5"/>
+<!-- proc~read_mc&#45;&gt;h5ltread_dataset_double_f -->
+<g id="proc~~read_mc~~CallsGraph_edge22" class="edge"><title>proc~read_mc&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M35.1528,-150.834C44.8036,-132.998 65.1999,-99.9314 92,-82 94.4532,-80.3586 97.0323,-78.8448 99.6987,-77.4486"/>
+<polygon fill="#000000" stroke="#000000" points="101.428,-80.5054 109.045,-73.1407 98.4979,-74.1482 101.428,-80.5054"/>
 </g>
 <!-- proc~in_grid -->
-<g id="node37" class="node"><title>proc~in_grid</title>
-<a xlink:href="../proc/in_grid.html" xlink:title="in_grid">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="369,-312 315,-312 315,-286 369,-286 369,-312"/>
-<text text-anchor="middle" x="342" y="-296.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_grid</text>
+<g id="proc~~read_mc~~CallsGraph_node8" class="node"><title>proc~in_grid</title>
+<g id="a_proc~~read_mc~~CallsGraph_node8"><a xlink:href="../proc/in_grid.html" xlink:title="in_grid">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="369,-319 315,-319 315,-295 369,-295 369,-319"/>
+<text text-anchor="middle" x="342" y="-304.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_grid</text>
 </a>
+</g>
 </g>
 <!-- proc~circle_grid_intersect&#45;&gt;proc~in_grid -->
-<g id="edge40" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~in_grid</title>
-<path fill="none" stroke="#000000" d="M220.437,-268.082C247.454,-274.954 279.964,-283.222 304.564,-289.479"/>
-<polygon fill="#000000" stroke="#000000" points="304.029,-292.954 314.583,-292.027 305.754,-286.17 304.029,-292.954"/>
+<g id="proc~~read_mc~~CallsGraph_edge5" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~in_grid</title>
+<path fill="none" stroke="#000000" d="M221.306,-279.001C248.163,-285.284 280.409,-292.827 304.662,-298.5"/>
+<polygon fill="#000000" stroke="#000000" points="303.993,-301.938 314.527,-300.808 305.587,-295.122 303.993,-301.938"/>
 </g>
 <!-- proc~approx_eq -->
-<g id="node38" class="node"><title>proc~approx_eq</title>
-<a xlink:href="../proc/approx_eq.html" xlink:title="approx_eq">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="679,-268 615,-268 615,-242 679,-242 679,-268"/>
-<text text-anchor="middle" x="647" y="-252.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_eq</text>
+<g id="proc~~read_mc~~CallsGraph_node9" class="node"><title>proc~approx_eq</title>
+<g id="a_proc~~read_mc~~CallsGraph_node9"><a xlink:href="../proc/approx_eq.html" xlink:title="approx_eq">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="662,-319 598,-319 598,-295 662,-295 662,-319"/>
+<text text-anchor="middle" x="630" y="-304.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_eq</text>
 </a>
+</g>
 </g>
 <!-- proc~circle_grid_intersect&#45;&gt;proc~approx_eq -->
-<g id="edge42" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~approx_eq</title>
-<path fill="none" stroke="#000000" d="M223.006,-242.294C241.59,-238.508 262.603,-234.871 282,-233 403.215,-221.31 435.078,-218.591 556,-233 572.285,-234.941 589.869,-238.769 605.198,-242.696"/>
-<polygon fill="#000000" stroke="#000000" points="604.347,-246.091 614.91,-245.271 606.141,-239.325 604.347,-246.091"/>
+<g id="proc~~read_mc~~CallsGraph_edge6" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~approx_eq</title>
+<path fill="none" stroke="#000000" d="M223.242,-266.281C296.732,-266.059 433.2,-268.421 548,-286 561.144,-288.013 575.244,-291.271 587.935,-294.626"/>
+<polygon fill="#000000" stroke="#000000" points="587.198,-298.053 597.767,-297.316 589.045,-291.301 587.198,-298.053"/>
 </g>
-<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
-<g id="edge46" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M198.157,-54.4049C212.673,-58.3248 230.408,-63.4675 246,-69 265.599,-75.9542 286.916,-84.9118 304.473,-92.6796"/>
-<polygon fill="#000000" stroke="#000000" points="303.248,-95.9657 313.806,-96.8523 306.105,-89.5753 303.248,-95.9657"/>
-</g>
-<!-- proc~get_position -->
-<g id="node48" class="node"><title>proc~get_position</title>
-<a xlink:href="../proc/get_position.html" xlink:title="get_position">
-<polygon fill="#d9534f" stroke="#d9534f" points="377,-70 307,-70 307,-44 377,-44 377,-70"/>
-<text text-anchor="middle" x="342" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+<!-- proc~grid_intersect -->
+<g id="proc~~read_mc~~CallsGraph_node10" class="node"><title>proc~grid_intersect</title>
+<g id="a_proc~~read_mc~~CallsGraph_node10"><a xlink:href="../proc/grid_intersect.html" xlink:title="grid_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="380.5,-239 303.5,-239 303.5,-215 380.5,-215 380.5,-239"/>
+<text text-anchor="middle" x="342" y="-224.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
 </a>
 </g>
-<!-- proc~get_fields&#45;&gt;proc~get_position -->
-<g id="edge44" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
-<path fill="none" stroke="#000000" d="M198.347,-48.6964C225.283,-50.2534 265.602,-52.584 296.676,-54.3801"/>
-<polygon fill="#000000" stroke="#000000" points="296.641,-57.8838 306.826,-54.9668 297.045,-50.8955 296.641,-57.8838"/>
 </g>
-<!-- proc~calc_perp_vectors -->
-<g id="node49" class="node"><title>proc~calc_perp_vectors</title>
-<a xlink:href="../proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
-<polygon fill="#d9534f" stroke="#d9534f" points="392,-26 292,-26 292,-1.24345e-14 392,-3.55271e-15 392,-26"/>
-<text text-anchor="middle" x="342" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
-</a>
-</g>
-<!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
-<g id="edge48" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
-<path fill="none" stroke="#000000" d="M198.347,-41.2324C221.199,-36.7412 253.684,-30.3569 281.983,-24.7952"/>
-<polygon fill="#000000" stroke="#000000" points="282.659,-28.2295 291.796,-22.8667 281.309,-21.3609 282.659,-28.2295"/>
+<!-- proc~circle_grid_intersect&#45;&gt;proc~grid_intersect -->
+<g id="proc~~read_mc~~CallsGraph_edge7" class="edge"><title>proc~circle_grid_intersect&#45;&gt;proc~grid_intersect</title>
+<path fill="none" stroke="#000000" d="M221.306,-254.999C244.169,-249.651 270.938,-243.389 293.357,-238.145"/>
+<polygon fill="#000000" stroke="#000000" points="294.381,-241.5 303.321,-235.814 292.787,-234.684 294.381,-241.5"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
-<g id="edge50" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M246.14,-173C254.883,-173 263.755,-173 272.393,-173"/>
-<polygon fill="#000000" stroke="#000000" points="272.404,-176.5 282.404,-173 272.404,-169.5 272.404,-176.5"/>
+<g id="proc~~read_mc~~CallsGraph_edge8" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M246.497,-178.974C255.032,-178.525 263.688,-178.069 272.119,-177.625"/>
+<polygon fill="#000000" stroke="#000000" points="272.467,-181.112 282.269,-177.091 272.099,-174.122 272.467,-181.112"/>
 </g>
-<!-- proc~interpol1d_coeff_arr -->
-<g id="node12" class="node"><title>proc~interpol1d_coeff_arr</title>
-<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="702,-123 592,-123 592,-97 702,-97 702,-123"/>
-<text text-anchor="middle" x="647" y="-107.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~read_mc~~CallsGraph_node13" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~read_mc~~CallsGraph_node13"><a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="376,-125 308,-125 308,-101 376,-101 376,-125"/>
+<text text-anchor="middle" x="342" y="-110.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M535.629,-93.6655C549.656,-95.723 565.924,-98.1089 581.62,-100.411"/>
-<polygon fill="#000000" stroke="#000000" points="581.421,-103.919 591.823,-101.907 582.437,-96.9932 581.421,-103.919"/>
 </g>
-<!-- proc~interpol2d_coeff_arr -->
-<g id="node13" class="node"><title>proc~interpol2d_coeff_arr</title>
-<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="702,-79 592,-79 592,-53 702,-53 702,-79"/>
-<text text-anchor="middle" x="647" y="-63.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~read_mc~~CallsGraph_edge15" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M199.786,-104.742C226.749,-106.319 266.805,-108.661 297.376,-110.449"/>
+<polygon fill="#000000" stroke="#000000" points="297.57,-113.966 307.757,-111.056 297.978,-106.978 297.57,-113.966"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~read_mc~~CallsGraph_node14" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~read_mc~~CallsGraph_node14"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="380.5,-83 303.5,-83 303.5,-59 380.5,-59 380.5,-83"/>
+<text text-anchor="middle" x="342" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M535.629,-82.3345C549.656,-80.277 565.924,-77.8911 581.62,-75.5891"/>
-<polygon fill="#000000" stroke="#000000" points="582.437,-79.0068 591.823,-74.0927 581.421,-72.0809 582.437,-79.0068"/>
 </g>
-<!-- proc~interpol1d_coeff -->
-<g id="node14" class="node"><title>proc~interpol1d_coeff</title>
-<a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="829,-133 739,-133 739,-107 829,-107 829,-133"/>
-<text text-anchor="middle" x="784" y="-117.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M535.221,-101.029C542.233,-103.762 549.413,-106.796 556,-110 572.862,-118.202 573.95,-126.921 592,-132 636.712,-144.58 689.507,-139.951 728.408,-133.097"/>
-<polygon fill="#000000" stroke="#000000" points="729.3,-136.491 738.489,-131.217 728.016,-129.61 729.3,-136.491"/>
-</g>
-<!-- proc~interpol2d_coeff -->
-<g id="node15" class="node"><title>proc~interpol2d_coeff</title>
-<a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="829,-69 739,-69 739,-43 829,-43 829,-69"/>
-<text text-anchor="middle" x="784" y="-53.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
-</a>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M518.308,-74.8464C536.961,-64.1528 565.197,-49.9057 592,-44 637.21,-34.0386 689.751,-38.3827 728.43,-44.461"/>
-<polygon fill="#000000" stroke="#000000" points="728.014,-47.9398 738.452,-46.1231 729.16,-41.0341 728.014,-47.9398"/>
-</g>
-<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M702.328,-114.039C710.776,-114.655 719.501,-115.292 727.963,-115.91"/>
-<polygon fill="#000000" stroke="#000000" points="727.891,-119.414 738.119,-116.651 728.4,-112.432 727.891,-119.414"/>
-</g>
-<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge4" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M702.328,-61.9614C710.776,-61.3448 719.501,-60.708 727.963,-60.0903"/>
-<polygon fill="#000000" stroke="#000000" points="728.4,-63.5678 738.119,-59.349 727.891,-56.5863 728.4,-63.5678"/>
-</g>
-<!-- proc~cross_product -->
-<g id="node27" class="node"><title>proc~cross_product</title>
-<a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="537,-356 457,-356 457,-330 537,-330 537,-356"/>
-<text text-anchor="middle" x="497" y="-340.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
-</a>
-</g>
-<!-- proc~gyro_step&#45;&gt;proc~cross_product -->
-<g id="edge18" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M372.254,-343C393.376,-343 422.07,-343 446.613,-343"/>
-<polygon fill="#000000" stroke="#000000" points="446.843,-346.5 456.843,-343 446.843,-339.5 446.843,-346.5"/>
-</g>
-<!-- omp_get_thread_num -->
-<g id="node29" class="node"><title>omp_get_thread_num</title>
-<polygon fill="#777777" stroke="#777777" points="556,-466 438,-466 438,-440 556,-440 556,-466"/>
-<text text-anchor="middle" x="497" y="-450.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
-</g>
-<!-- proc~randu&#45;&gt;omp_get_thread_num -->
-<g id="edge20" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="#000000" d="M369.354,-434.883C385.636,-437.193 407.093,-440.239 427.757,-443.172"/>
-<polygon fill="#000000" stroke="#000000" points="427.419,-446.659 437.812,-444.599 428.403,-439.729 427.419,-446.659"/>
-</g>
-<!-- proc~rng_uniform -->
-<g id="node30" class="node"><title>proc~rng_uniform</title>
-<a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="532,-422 462,-422 462,-396 532,-396 532,-422"/>
-<text text-anchor="middle" x="497" y="-406.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
-</a>
-</g>
-<!-- proc~randu&#45;&gt;proc~rng_uniform -->
-<g id="edge22" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="#000000" d="M369.354,-427.117C392.065,-423.894 424.843,-419.242 451.497,-415.459"/>
-<polygon fill="#000000" stroke="#000000" points="452.34,-418.874 461.749,-414.003 451.357,-411.943 452.34,-418.874"/>
+<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~read_mc~~CallsGraph_edge16" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M199.786,-97.426C225.663,-92.5835 263.6,-85.4842 293.638,-79.8631"/>
+<polygon fill="#000000" stroke="#000000" points="294.308,-83.2986 303.493,-78.0188 293.02,-76.418 294.308,-83.2986"/>
 </g>
 <!-- proc~approx_ge -->
-<g id="node39" class="node"><title>proc~approx_ge</title>
-<a xlink:href="../proc/approx_ge.html" xlink:title="approx_ge">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="529,-268 465,-268 465,-242 529,-242 529,-268"/>
-<text text-anchor="middle" x="497" y="-252.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_ge</text>
+<g id="proc~~read_mc~~CallsGraph_node11" class="node"><title>proc~approx_ge</title>
+<g id="a_proc~~read_mc~~CallsGraph_node11"><a xlink:href="../proc/approx_ge.html" xlink:title="approx_ge">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="525,-361 461,-361 461,-337 525,-337 525,-361"/>
+<text text-anchor="middle" x="493" y="-346.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_ge</text>
 </a>
+</g>
 </g>
 <!-- proc~in_grid&#45;&gt;proc~approx_ge -->
-<g id="edge34" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_ge</title>
-<path fill="none" stroke="#000000" d="M369.354,-291.235C393.117,-284.489 427.902,-274.615 455.161,-266.877"/>
-<polygon fill="#000000" stroke="#000000" points="456.165,-270.23 464.829,-264.132 454.253,-263.496 456.165,-270.23"/>
+<g id="proc~~read_mc~~CallsGraph_edge3" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_ge</title>
+<path fill="none" stroke="#000000" d="M369.295,-314.412C391.964,-320.802 425.068,-330.133 451.18,-337.494"/>
+<polygon fill="#000000" stroke="#000000" points="450.234,-340.863 460.809,-340.208 452.133,-334.126 450.234,-340.863"/>
 </g>
 <!-- proc~approx_le -->
-<g id="node40" class="node"><title>proc~approx_le</title>
-<a xlink:href="../proc/approx_le.html" xlink:title="approx_le">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="527,-312 467,-312 467,-286 527,-286 527,-312"/>
-<text text-anchor="middle" x="497" y="-296.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_le</text>
+<g id="proc~~read_mc~~CallsGraph_node12" class="node"><title>proc~approx_le</title>
+<g id="a_proc~~read_mc~~CallsGraph_node12"><a xlink:href="../proc/approx_le.html" xlink:title="approx_le">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="523,-319 463,-319 463,-295 523,-295 523,-319"/>
+<text text-anchor="middle" x="493" y="-304.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_le</text>
 </a>
 </g>
+</g>
 <!-- proc~in_grid&#45;&gt;proc~approx_le -->
-<g id="edge36" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_le</title>
-<path fill="none" stroke="#000000" d="M369.354,-299C393.552,-299 429.18,-299 456.651,-299"/>
-<polygon fill="#000000" stroke="#000000" points="456.739,-302.5 466.739,-299 456.739,-295.5 456.739,-302.5"/>
+<g id="proc~~read_mc~~CallsGraph_edge4" class="edge"><title>proc~in_grid&#45;&gt;proc~approx_le</title>
+<path fill="none" stroke="#000000" d="M369.295,-307C392.454,-307 426.504,-307 452.864,-307"/>
+<polygon fill="#000000" stroke="#000000" points="452.911,-310.5 462.911,-307 452.911,-303.5 452.911,-310.5"/>
 </g>
 <!-- proc~approx_ge&#45;&gt;proc~approx_eq -->
-<g id="edge30" class="edge"><title>proc~approx_ge&#45;&gt;proc~approx_eq</title>
-<path fill="none" stroke="#000000" d="M529.179,-255C551.225,-255 580.695,-255 604.646,-255"/>
-<polygon fill="#000000" stroke="#000000" points="604.874,-258.5 614.874,-255 604.874,-251.5 604.874,-258.5"/>
+<g id="proc~~read_mc~~CallsGraph_edge1" class="edge"><title>proc~approx_ge&#45;&gt;proc~approx_eq</title>
+<path fill="none" stroke="#000000" d="M525.311,-339.259C544.054,-333.428 568.081,-325.952 588.287,-319.666"/>
+<polygon fill="#000000" stroke="#000000" points="589.35,-323.001 597.859,-316.688 587.27,-316.317 589.35,-323.001"/>
 </g>
 <!-- proc~approx_le&#45;&gt;proc~approx_eq -->
-<g id="edge32" class="edge"><title>proc~approx_le&#45;&gt;proc~approx_eq</title>
-<path fill="none" stroke="#000000" d="M527.355,-290.096C549.701,-283.541 580.361,-274.547 605.049,-267.306"/>
-<polygon fill="#000000" stroke="#000000" points="606.265,-270.596 614.876,-264.423 604.295,-263.879 606.265,-270.596"/>
+<g id="proc~~read_mc~~CallsGraph_edge2" class="edge"><title>proc~approx_le&#45;&gt;proc~approx_eq</title>
+<path fill="none" stroke="#000000" d="M523.293,-307C542.134,-307 566.895,-307 587.717,-307"/>
+<polygon fill="#000000" stroke="#000000" points="587.885,-310.5 597.885,-307 587.885,-303.5 587.885,-310.5"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~read_mc~~CallsGraph_node15" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~read_mc~~CallsGraph_node15"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="548,-142 438,-142 438,-118 548,-118 548,-142"/>
+<text text-anchor="middle" x="493" y="-127.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~read_mc~~CallsGraph_edge11" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M378.065,-83.1063C385.969,-85.9392 394.298,-89.0063 402,-92 419.542,-98.8188 438.787,-106.866 454.963,-113.796"/>
+<polygon fill="#000000" stroke="#000000" points="454.026,-117.203 464.595,-117.945 456.795,-110.774 454.026,-117.203"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~read_mc~~CallsGraph_node16" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~read_mc~~CallsGraph_node16"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="675.5,-53 584.5,-53 584.5,-29 675.5,-29 675.5,-53"/>
+<text text-anchor="middle" x="630" y="-38.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~read_mc~~CallsGraph_edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M380.684,-67.0472C430.091,-61.8646 517.135,-52.7341 573.932,-46.7764"/>
+<polygon fill="#000000" stroke="#000000" points="574.589,-50.2268 584.169,-45.7026 573.858,-43.265 574.589,-50.2268"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~read_mc~~CallsGraph_node17" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~read_mc~~CallsGraph_node17"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="675.5,-113 584.5,-113 584.5,-89 675.5,-89 675.5,-113"/>
+<text text-anchor="middle" x="630" y="-98.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~read_mc~~CallsGraph_edge13" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M380.684,-74.9528C430.091,-80.1354 517.135,-89.2659 573.932,-95.2236"/>
+<polygon fill="#000000" stroke="#000000" points="573.858,-98.735 584.169,-96.2974 574.589,-91.7732 573.858,-98.735"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~read_mc~~CallsGraph_node18" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~read_mc~~CallsGraph_node18"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="548,-24 438,-24 438,-0 548,-0 548,-24"/>
+<text text-anchor="middle" x="493" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~read_mc~~CallsGraph_edge14" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M373.512,-58.9181C396.211,-49.9298 427.399,-37.5804 452.079,-27.8075"/>
+<polygon fill="#000000" stroke="#000000" points="453.52,-31.0016 461.529,-24.0657 450.943,-24.4932 453.52,-31.0016"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~read_mc~~CallsGraph_edge9" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M548.132,-118.372C556.779,-116.514 565.73,-114.591 574.388,-112.731"/>
+<polygon fill="#000000" stroke="#000000" points="575.339,-116.107 584.381,-110.585 573.869,-109.263 575.339,-116.107"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~read_mc~~CallsGraph_edge10" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M548.132,-23.6283C556.779,-25.4858 565.73,-27.4087 574.388,-29.2686"/>
+<polygon fill="#000000" stroke="#000000" points="573.869,-32.7368 584.381,-31.4151 575.339,-25.8929 573.869,-32.7368"/>
 </g>
 </g>
 </svg>
@@ -1272,43 +1188,43 @@ public subroutine read_mc(fid, error)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1332,42 +1248,44 @@ public subroutine read_mc(fid, error)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_mc~~CalledByGraph Pages: 1 -->
-<svg id="procread_mcCalledByGraph" width="282pt" height="34pt"
- viewBox="0.00 0.00 282.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_mc~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="procread_mcCalledByGraph" width="282pt" height="32pt"
+ viewBox="0.00 0.00 282.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_mc~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>proc~~read_mc~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 279,-30 279,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 278,-28 278,4 -4,4"/>
 <!-- proc~read_mc -->
-<g id="node1" class="node"><title>proc~read_mc</title>
-<polygon fill="none" stroke="black" points="273,-26 219,-26 219,-1.24345e-14 273,-3.55271e-15 273,-26"/>
-<text text-anchor="middle" x="246" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">read_mc</text>
+<g id="proc~~read_mc~~CalledByGraph_node1" class="node"><title>proc~read_mc</title>
+<polygon fill="none" stroke="black" points="273.5,-24 218.5,-24 218.5,-0 273.5,-0 273.5,-24"/>
+<text text-anchor="middle" x="246" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_mc</text>
 </g>
 <!-- proc~read_distribution -->
-<g id="node2" class="node"><title>proc~read_distribution</title>
-<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-26 90,-26 90,-1.24345e-14 182,-3.55271e-15 182,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
+<g id="proc~~read_mc~~CalledByGraph_node2" class="node"><title>proc~read_distribution</title>
+<g id="a_proc~~read_mc~~CalledByGraph_node2"><a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-24 90,-24 90,-0 182,-0 182,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
 </a>
+</g>
 </g>
 <!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.013,-13C190.705,-13 199.706,-13 208.114,-13"/>
-<polygon fill="#000000" stroke="#000000" points="208.38,-16.5001 218.38,-13 208.38,-9.5001 208.38,-16.5001"/>
+<g id="proc~~read_mc~~CalledByGraph_edge2" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
+<path fill="none" stroke="#000000" d="M182.176,-12C190.873,-12 199.885,-12 208.274,-12"/>
+<polygon fill="#000000" stroke="#000000" points="208.498,-15.5001 218.498,-12 208.498,-8.5001 208.498,-15.5001"/>
 </g>
 <!-- program~fidasim -->
-<g id="node3" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-26 2.13163e-14,-26 0,-1.24345e-14 54,-3.55271e-15 54,-26"/>
-<text text-anchor="middle" x="27" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~read_mc~~CalledByGraph_node3" class="node"><title>program~fidasim</title>
+<g id="a_proc~~read_mc~~CalledByGraph_node3"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
+</g>
 <!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
-<path fill="none" stroke="#000000" d="M54.2241,-13C61.9289,-13 70.6135,-13 79.3716,-13"/>
-<polygon fill="#000000" stroke="#000000" points="79.6322,-16.5001 89.6322,-13 79.6322,-9.5001 79.6322,-16.5001"/>
+<g id="proc~~read_mc~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
+<path fill="none" stroke="#000000" d="M54.1751,-12C61.9968,-12 70.8836,-12 79.8327,-12"/>
+<polygon fill="#000000" stroke="#000000" points="79.9095,-15.5001 89.9095,-12 79.9094,-8.5001 79.9095,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -1386,43 +1304,43 @@ public subroutine read_mc(fid, error)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1504,46 +1422,32 @@ public subroutine read_mc(fid, error)
 
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">ii</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi</span><span class="p">,</span><span class="n">phi_enter</span><span class="p">,</span><span class="n">phi_exit</span><span class="p">,</span><span class="n">delta_phi</span><span class="p">,</span><span class="n">r_ratio</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi</span><span class="p">,</span><span class="n">phi_enter</span><span class="p">,</span><span class="n">phi_exit</span><span class="p">,</span><span class="n">delta_phi</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">uvw</span><span class="p">,</span><span class="n">ri</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">e1_xyz</span><span class="p">,</span><span class="n">e2_xyz</span><span class="p">,</span><span class="n">C_xyz</span><span class="p">,</span><span class="n">dum</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">minpos</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">weight</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">r</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="n">vt</span><span class="p">,</span> <span class="n">vz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">orbit_class</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">cnt</span><span class="p">,</span><span class="n">num</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">inp</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">npart</span><span class="p">,</span><span class="n">nrep</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dist_type_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;---- Fast-ion distribution settings ----&#39;</span>
     <span class="n">endif</span>
 
-    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/nparticle&quot;</span><span class="p">,</span> <span class="n">npart</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/nparticle&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/nclass&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">nclass</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-
-    <span class="n">nrep</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="nb">dble</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">n_fida</span><span class="p">)</span><span class="o">/</span><span class="n">npart</span><span class="p">)</span>
-    <span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nrep</span><span class="o">*</span><span class="n">npart</span><span class="p">)</span>
 
     <span class="c">!!ALLOCATE SPACE</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">))</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">r</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">z</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">vr</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">vt</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">vz</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">weight</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">orbit_class</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">weight</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">))</span>
 
-    <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">npart</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/r&quot;</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/z&quot;</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/weight&quot;</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_int_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/class&quot;</span><span class="p">,</span> <span class="n">orbit_class</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/r&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/z&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_int_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/class&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="k">class</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
-    <span class="k">if</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">orbit_class</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">particles</span><span class="p">%</span><span class="n">nclass</span><span class="p">))</span> <span class="k">then</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="k">class</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">particles</span><span class="p">%</span><span class="n">nclass</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_MC: Orbit class ID greater then the number of classes&#39;</span>
         <span class="n">endif</span>
@@ -1552,85 +1456,59 @@ public subroutine read_mc(fid, error)
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Guiding Center Monte Carlo&quot;</span>
-        <span class="k">allocate</span><span class="p">(</span><span class="n">energy</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-        <span class="k">allocate</span><span class="p">(</span><span class="n">pitch</span><span class="p">(</span><span class="n">npart</span><span class="p">))</span>
-        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/energy&quot;</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/pitch&quot;</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/energy&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/pitch&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="p">))</span>
     <span class="k">else</span>
 <span class="k">        </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Full Orbit Monte Carlo&quot;</span>
-        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vr&quot;</span><span class="p">,</span> <span class="n">vr</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vt&quot;</span><span class="p">,</span> <span class="n">vt</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vz&quot;</span><span class="p">,</span> <span class="n">vz</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vr&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vr</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vt&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vt</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vz&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vz</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vr</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">&amp;</span>
+                                       <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vt</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">&amp;</span>
+                                       <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vz</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span> <span class="o">=</span> <span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">*</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span><span class="o">**</span><span class="mi">2</span>
     <span class="n">endif</span>
+
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/weight&quot;</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
     <span class="n">cnt</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">e1_xyz</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">inv_basis</span><span class="p">,[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span>
     <span class="n">e2_xyz</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">inv_basis</span><span class="p">,[</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">])</span>
     <span class="c">!$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &amp;</span>
-    <span class="c">!$OMP&amp; delta_phi,phi_enter,phi_exit,r_ratio,C_xyz)</span>
-    <span class="n">particle_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">npart</span>
+    <span class="c">!$OMP&amp; delta_phi,phi_enter,phi_exit,C_xyz)</span>
+    <span class="n">particle_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span>
         <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(f7.2,&quot;% completed&quot;,a,$)&#39;</span><span class="p">)</span> <span class="n">cnt</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">npart</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="nb">char</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+<span class="k">            WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(f7.2,&quot;% completed&quot;,a,$)&#39;</span><span class="p">)</span> <span class="n">cnt</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="nb">char</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
         <span class="n">endif</span>
-        <span class="n">uvw</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="mf">0.d0</span><span class="p">,</span> <span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span>
+        <span class="n">uvw</span> <span class="o">=</span> <span class="p">[</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">r</span><span class="p">,</span> <span class="mf">0.d0</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">z</span><span class="p">]</span>
         <span class="k">call </span><span class="n">in_plasma</span><span class="p">(</span><span class="n">uvw</span><span class="p">,</span><span class="n">inp</span><span class="p">,</span><span class="n">machine_coords</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
         <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">inp</span><span class="p">)</span> <span class="k">cycle </span><span class="n">particle_loop</span>
-        <span class="k">do </span><span class="n">ii</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nrep</span>
-            <span class="n">j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nrep</span> <span class="o">+</span> <span class="n">ii</span><span class="p">)</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
-                <span class="c">!! Transform to full orbit</span>
-                <span class="k">call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="n">pos</span> <span class="o">=</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">machine_coords</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
-                <span class="k">call </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">energy</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">pitch</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vi</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">r</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">ri</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">ri</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">z</span> <span class="o">=</span> <span class="n">ri</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-                <span class="c">!r_ratio = particles%fast_ion(j)%r/r(i)</span>
-                <span class="n">r_ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
-                <span class="n">phi</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">ri</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ri</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vr</span> <span class="o">=</span>  <span class="n">vi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">vi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vt</span> <span class="o">=</span> <span class="o">-</span><span class="n">vi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">vi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vz</span> <span class="o">=</span>  <span class="n">vi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">pitch</span> <span class="o">=</span>  <span class="n">pitch</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="k">else</span>
-<span class="k">                </span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vr</span> <span class="o">=</span> <span class="n">vr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vt</span> <span class="o">=</span> <span class="n">vt</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vz</span> <span class="o">=</span> <span class="n">vz</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-                <span class="n">r_ratio</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="n">endif</span>
-            <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vabs</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vr</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                              <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vt</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                              <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vz</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-            <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">energy</span> <span class="o">=</span> <span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">*</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">vabs</span><span class="o">**</span><span class="mi">2</span>
-            <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="k">class</span> <span class="o">=</span> <span class="n">orbit_class</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-            <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.0</span>
-            <span class="n">phi_exit</span> <span class="o">=</span> <span class="mf">0.0</span>
-            <span class="n">dum</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.d0</span><span class="p">,</span> <span class="mf">0.d0</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">z</span><span class="p">]</span>
-            <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">dum</span><span class="p">,</span> <span class="n">C_xyz</span><span class="p">)</span>
-            <span class="k">call </span><span class="n">circle_grid_intersect</span><span class="p">(</span><span class="n">C_xyz</span><span class="p">,</span><span class="n">e1_xyz</span><span class="p">,</span><span class="n">e2_xyz</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">r</span><span class="p">,</span><span class="n">phi_enter</span><span class="p">,</span><span class="n">phi_exit</span><span class="p">)</span>
-            <span class="n">delta_phi</span> <span class="o">=</span> <span class="n">phi_exit</span><span class="o">-</span><span class="n">phi_enter</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">delta_phi</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">                </span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
-            <span class="k">else</span>
-<span class="k">                </span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
-                <span class="n">delta_phi</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span>
-            <span class="n">endif</span>
-            <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">phi_enter</span> <span class="o">=</span> <span class="n">phi_enter</span>
-            <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">delta_phi</span> <span class="o">=</span> <span class="n">delta_phi</span>
-            <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">weight</span> <span class="o">=</span> <span class="p">(</span><span class="n">r_ratio</span><span class="o">*</span><span class="n">weight</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">/</span><span class="n">nrep</span><span class="p">)</span> <span class="o">*</span> <span class="p">&amp;</span>
-                                           <span class="p">(</span><span class="n">delta_phi</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">/</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dv</span>
+        <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">phi_exit</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">dum</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.d0</span><span class="p">,</span> <span class="mf">0.d0</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">z</span><span class="p">]</span>
+        <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">dum</span><span class="p">,</span> <span class="n">C_xyz</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">circle_grid_intersect</span><span class="p">(</span><span class="n">C_xyz</span><span class="p">,</span><span class="n">e1_xyz</span><span class="p">,</span><span class="n">e2_xyz</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">r</span><span class="p">,</span><span class="n">phi_enter</span><span class="p">,</span><span class="n">phi_exit</span><span class="p">)</span>
+        <span class="n">delta_phi</span> <span class="o">=</span> <span class="n">phi_exit</span><span class="o">-</span><span class="n">phi_enter</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">delta_phi</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+            <span class="n">delta_phi</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span>
+        <span class="n">endif</span>
+        <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">phi_enter</span> <span class="o">=</span> <span class="n">phi_enter</span>
+        <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">delta_phi</span> <span class="o">=</span> <span class="n">delta_phi</span>
+        <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">delta_phi</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">/</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dv</span>
 
-            <span class="n">minpos</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span> <span class="o">-</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">r</span><span class="p">))</span>
-            <span class="n">ir</span> <span class="o">=</span> <span class="n">minpos</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="n">minpos</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span> <span class="o">-</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">z</span><span class="p">))</span>
-            <span class="n">iz</span> <span class="o">=</span> <span class="n">minpos</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-            <span class="c">!$OMP CRITICAL(mc_denf)</span>
-            <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">)%</span><span class="n">denf</span> <span class="o">=</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">)%</span><span class="n">denf</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                       <span class="p">(</span><span class="n">r_ratio</span><span class="o">*</span><span class="n">weight</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">/</span><span class="n">nrep</span><span class="p">)</span> <span class="o">/</span> <span class="p">&amp;</span>
-                                       <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">r</span><span class="o">*</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">da</span><span class="p">)</span>
-            <span class="c">!$OMP END CRITICAL(mc_denf)</span>
-        <span class="n">enddo</span>
+        <span class="n">minpos</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span> <span class="o">-</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">r</span><span class="p">))</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="n">minpos</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">minpos</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span> <span class="o">-</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">z</span><span class="p">))</span>
+        <span class="n">iz</span> <span class="o">=</span> <span class="n">minpos</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c">!$OMP CRITICAL(mc_denf)</span>
+        <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">)%</span><span class="n">denf</span> <span class="o">=</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">)%</span><span class="n">denf</span> <span class="o">+</span> <span class="n">weight</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">/</span> <span class="p">&amp;</span>
+                                   <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">r</span><span class="o">*</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">da</span><span class="p">)</span>
+        <span class="c">!$OMP END CRITICAL(mc_denf)</span>
         <span class="n">cnt</span><span class="o">=</span><span class="n">cnt</span><span class="o">+</span><span class="mi">1</span>
     <span class="n">enddo</span> <span class="n">particle_loop</span>
     <span class="c">!$OMP END PARALLEL DO</span>
@@ -1645,7 +1523,7 @@ public subroutine read_mc(fid, error)
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Distribution type: &quot;,a)&#39;</span><span class="p">)</span> <span class="n">dist_type_name</span>
-        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Number of mc particles: &quot;,i9)&#39;</span><span class="p">)</span> <span class="n">npart</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Number of mc particles: &quot;,i9)&#39;</span><span class="p">)</span> <span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Number of orbit classes: &quot;,i6)&#39;</span><span class="p">)</span> <span class="n">particles</span><span class="p">%</span><span class="n">nclass</span>
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
     <span class="n">endif</span>
@@ -1757,7 +1635,13 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1802,6 +1686,8 @@ public subroutine read_mc(fid, error)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1861,7 +1747,7 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1887,7 +1773,17 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1937,6 +1833,8 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1973,6 +1871,10 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -2003,13 +1905,13 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -2141,8 +2043,6 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -2167,7 +2067,9 @@ public subroutine read_mc(fid, error)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

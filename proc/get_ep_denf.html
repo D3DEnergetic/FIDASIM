@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -854,7 +878,7 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
   
 <tr>
   
-  <td><span class="anchor" id="variable-energy%7E5"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-energy%7E7"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -869,7 +893,7 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
   
 <tr>
   
-  <td><span class="anchor" id="variable-pitch%7E5"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-pitch%7E7"></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -949,170 +973,181 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~get_ep_denf~~CallsGraph Pages: 1 -->
-<svg id="procget_ep_denfCallsGraph" width="641pt" height="166pt"
- viewBox="0.00 0.00 641.00 165.65" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~get_ep_denf~~CallsGraph" class="graph" transform="scale(0.900281 0.900281) rotate(0) translate(4 180)">
+<svg id="procget_ep_denfCallsGraph" width="641pt" height="135pt"
+ viewBox="0.00 0.00 641.00 135.04" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_ep_denf~~CallsGraph" class="graph" transform="scale(0.900281 0.900281) rotate(0) translate(4 146)">
 <title>proc~~get_ep_denf~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-180 709,-180 709,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-146 708,-146 708,4 -4,4"/>
 <!-- proc~get_ep_denf -->
-<g id="node1" class="node"><title>proc~get_ep_denf</title>
-<polygon fill="none" stroke="black" points="73,-70 1,-70 1,-44 73,-44 73,-70"/>
-<text text-anchor="middle" x="37" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">get_ep_denf</text>
-</g>
-<!-- interface~interpol -->
-<g id="node2" class="node"><title>interface~interpol</title>
-<a xlink:href="../interface/interpol.html" xlink:title="interpol">
-<polygon fill="#a7506f" stroke="#a7506f" points="172,-114 118,-114 118,-88 172,-88 172,-114"/>
-<text text-anchor="middle" x="145" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol</text>
-</a>
-</g>
-<!-- proc~get_ep_denf&#45;&gt;interface~interpol -->
-<g id="edge26" class="edge"><title>proc~get_ep_denf&#45;&gt;interface~interpol</title>
-<path fill="none" stroke="#000000" d="M69.1112,-70.0823C81.4983,-75.1289 95.7352,-80.9292 108.507,-86.1325"/>
-<polygon fill="#000000" stroke="#000000" points="107.352,-89.4411 117.933,-89.9728 109.993,-82.9584 107.352,-89.4411"/>
-</g>
-<!-- proc~xyz_to_uvw -->
-<g id="node3" class="node"><title>proc~xyz_to_uvw</title>
-<a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="179,-70 111,-70 111,-44 179,-44 179,-70"/>
-<text text-anchor="middle" x="145" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
-</a>
-</g>
-<!-- proc~get_ep_denf&#45;&gt;proc~xyz_to_uvw -->
-<g id="edge28" class="edge"><title>proc~get_ep_denf&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M73.5639,-57C82.1847,-57 91.4696,-57 100.401,-57"/>
-<polygon fill="#000000" stroke="#000000" points="100.661,-60.5001 110.661,-57 100.661,-53.5001 100.661,-60.5001"/>
+<g id="proc~~get_ep_denf~~CallsGraph_node1" class="node"><title>proc~get_ep_denf</title>
+<polygon fill="none" stroke="black" points="73.5,-83 0.5,-83 0.5,-59 73.5,-59 73.5,-83"/>
+<text text-anchor="middle" x="37" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_ep_denf</text>
 </g>
 <!-- proc~get_position -->
-<g id="node4" class="node"><title>proc~get_position</title>
-<a xlink:href="../proc/get_position.html" xlink:title="get_position">
-<polygon fill="#d9534f" stroke="#d9534f" points="180,-26 110,-26 110,-1.24345e-14 180,-3.55271e-15 180,-26"/>
-<text text-anchor="middle" x="145" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+<g id="proc~~get_ep_denf~~CallsGraph_node2" class="node"><title>proc~get_position</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node2"><a xlink:href="../proc/get_position.html" xlink:title="get_position">
+<polygon fill="#d9534f" stroke="#d9534f" points="180,-125 110,-125 110,-101 180,-101 180,-125"/>
+<text text-anchor="middle" x="145" y="-110.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
 </a>
+</g>
 </g>
 <!-- proc~get_ep_denf&#45;&gt;proc~get_position -->
-<g id="edge30" class="edge"><title>proc~get_ep_denf&#45;&gt;proc~get_position</title>
-<path fill="none" stroke="#000000" d="M69.1112,-43.9177C79.8953,-39.5242 92.0813,-34.5595 103.482,-29.9147"/>
-<polygon fill="#000000" stroke="#000000" points="104.886,-33.1222 112.826,-26.1079 102.245,-26.6396 104.886,-33.1222"/>
+<g id="proc~~get_ep_denf~~CallsGraph_edge13" class="edge"><title>proc~get_ep_denf&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="#000000" d="M68.3753,-83.0355C79.4637,-87.429 92.1787,-92.467 103.979,-97.1426"/>
+<polygon fill="#000000" stroke="#000000" points="103.034,-100.533 113.62,-100.963 105.613,-94.0251 103.034,-100.533"/>
 </g>
-<!-- proc~interpol1d_arr -->
-<g id="node5" class="node"><title>proc~interpol1d_arr</title>
-<a xlink:href="../proc/interpol1d_arr.html" xlink:title="interpol1D_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="306,-158 226,-158 226,-132 306,-132 306,-158"/>
-<text text-anchor="middle" x="266" y="-142.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_arr</text>
+<!-- interface~interpol -->
+<g id="proc~~get_ep_denf~~CallsGraph_node3" class="node"><title>interface~interpol</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node3"><a xlink:href="../interface/interpol.html" xlink:title="interpol">
+<polygon fill="#a7506f" stroke="#a7506f" points="172,-83 118,-83 118,-59 172,-59 172,-83"/>
+<text text-anchor="middle" x="145" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol</text>
 </a>
 </g>
-<!-- interface~interpol&#45;&gt;proc~interpol1d_arr -->
-<g id="edge20" class="edge"><title>interface~interpol&#45;&gt;proc~interpol1d_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M172.155,-110.874C186.483,-116.085 204.441,-122.615 220.801,-128.564"/>
-<polygon fill="#000000" stroke="#000000" points="219.615,-131.857 230.209,-131.985 222.007,-125.278 219.615,-131.857"/>
 </g>
-<!-- proc~interpol2d_arr -->
-<g id="node6" class="node"><title>proc~interpol2d_arr</title>
-<a xlink:href="../proc/interpol2d_arr.html" xlink:title="interpol2D_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="306,-114 226,-114 226,-88 306,-88 306,-114"/>
-<text text-anchor="middle" x="266" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_arr</text>
+<!-- proc~get_ep_denf&#45;&gt;interface~interpol -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge14" class="edge"><title>proc~get_ep_denf&#45;&gt;interface~interpol</title>
+<path fill="none" stroke="#000000" d="M73.5913,-71C84.5302,-71 96.582,-71 107.576,-71"/>
+<polygon fill="#000000" stroke="#000000" points="107.721,-74.5001 117.721,-71 107.721,-67.5001 107.721,-74.5001"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~get_ep_denf~~CallsGraph_node4" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node4"><a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="179,-41 111,-41 111,-17 179,-17 179,-41"/>
+<text text-anchor="middle" x="145" y="-26.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
 </a>
 </g>
-<!-- interface~interpol&#45;&gt;proc~interpol2d_arr -->
-<g id="edge22" class="edge"><title>interface~interpol&#45;&gt;proc~interpol2d_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M172.155,-101C184.836,-101 200.36,-101 215.103,-101"/>
-<polygon fill="#000000" stroke="#000000" points="215.14,-104.5 225.14,-101 215.14,-97.5001 215.14,-104.5"/>
+</g>
+<!-- proc~get_ep_denf&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge15" class="edge"><title>proc~get_ep_denf&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M68.3753,-58.9645C79.4637,-54.571 92.1787,-49.533 103.979,-44.8574"/>
+<polygon fill="#000000" stroke="#000000" points="105.613,-47.9749 113.62,-41.0373 103.034,-41.4671 105.613,-47.9749"/>
 </g>
 <!-- proc~interpol2d_2d_arr -->
-<g id="node7" class="node"><title>proc~interpol2d_2d_arr</title>
-<a xlink:href="../proc/interpol2d_2d_arr.html" xlink:title="interpol2D_2D_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="316,-70 216,-70 216,-44 316,-44 316,-70"/>
-<text text-anchor="middle" x="266" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_2D_arr</text>
+<g id="proc~~get_ep_denf~~CallsGraph_node5" class="node"><title>proc~interpol2d_2d_arr</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node5"><a xlink:href="../proc/interpol2d_2d_arr.html" xlink:title="interpol2D_2D_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="316,-125 216,-125 216,-101 316,-101 316,-125"/>
+<text text-anchor="middle" x="266" y="-110.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_2D_arr</text>
 </a>
+</g>
 </g>
 <!-- interface~interpol&#45;&gt;proc~interpol2d_2d_arr -->
-<g id="edge24" class="edge"><title>interface~interpol&#45;&gt;proc~interpol2d_2d_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M172.155,-91.1255C186.483,-85.9152 204.441,-79.3852 220.801,-73.4362"/>
-<polygon fill="#000000" stroke="#000000" points="222.007,-76.7217 230.209,-70.015 219.615,-70.1432 222.007,-76.7217"/>
+<g id="proc~~get_ep_denf~~CallsGraph_edge10" class="edge"><title>interface~interpol&#45;&gt;proc~interpol2d_2d_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M172.115,-80.2171C186.528,-85.3038 204.804,-91.7544 221.325,-97.5853"/>
+<polygon fill="#000000" stroke="#000000" points="220.212,-100.904 230.807,-100.932 222.542,-94.3032 220.212,-100.904"/>
+</g>
+<!-- proc~interpol1d_arr -->
+<g id="proc~~get_ep_denf~~CallsGraph_node6" class="node"><title>proc~interpol1d_arr</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node6"><a xlink:href="../proc/interpol1d_arr.html" xlink:title="interpol1D_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="306.5,-83 225.5,-83 225.5,-59 306.5,-59 306.5,-83"/>
+<text text-anchor="middle" x="266" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol&#45;&gt;proc~interpol1d_arr -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge11" class="edge"><title>interface~interpol&#45;&gt;proc~interpol1d_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M172.115,-71C184.789,-71 200.452,-71 215.281,-71"/>
+<polygon fill="#000000" stroke="#000000" points="215.367,-74.5001 225.367,-71 215.367,-67.5001 215.367,-74.5001"/>
+</g>
+<!-- proc~interpol2d_arr -->
+<g id="proc~~get_ep_denf~~CallsGraph_node7" class="node"><title>proc~interpol2d_arr</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node7"><a xlink:href="../proc/interpol2d_arr.html" xlink:title="interpol2D_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="306.5,-41 225.5,-41 225.5,-17 306.5,-17 306.5,-41"/>
+<text text-anchor="middle" x="266" y="-26.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol&#45;&gt;proc~interpol2d_arr -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge12" class="edge"><title>interface~interpol&#45;&gt;proc~interpol2d_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M172.115,-61.7829C186.528,-56.6962 204.804,-50.2456 221.325,-44.4147"/>
+<polygon fill="#000000" stroke="#000000" points="222.542,-47.6968 230.807,-41.068 220.212,-41.0958 222.542,-47.6968"/>
 </g>
 <!-- interface~interpol_coeff -->
-<g id="node8" class="node"><title>interface~interpol_coeff</title>
-<a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="429,-114 353,-114 353,-88 429,-88 429,-114"/>
-<text text-anchor="middle" x="391" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+<g id="proc~~get_ep_denf~~CallsGraph_node8" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node8"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="429.5,-83 352.5,-83 352.5,-59 429.5,-59 429.5,-83"/>
+<text text-anchor="middle" x="391" y="-68.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
 </a>
 </g>
-<!-- proc~interpol1d_arr&#45;&gt;interface~interpol_coeff -->
-<g id="edge14" class="edge"><title>proc~interpol1d_arr&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M303.166,-131.918C316.022,-127.392 330.599,-122.261 344.132,-117.498"/>
-<polygon fill="#000000" stroke="#000000" points="345.491,-120.73 353.762,-114.108 343.167,-114.127 345.491,-120.73"/>
-</g>
-<!-- proc~interpol2d_arr&#45;&gt;interface~interpol_coeff -->
-<g id="edge16" class="edge"><title>proc~interpol2d_arr&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M306.584,-101C317.942,-101 330.406,-101 342.187,-101"/>
-<polygon fill="#000000" stroke="#000000" points="342.32,-104.5 352.32,-101 342.32,-97.5001 342.32,-104.5"/>
 </g>
 <!-- proc~interpol2d_2d_arr&#45;&gt;interface~interpol_coeff -->
-<g id="edge18" class="edge"><title>proc~interpol2d_2d_arr&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M303.166,-70.0823C316.022,-74.6077 330.599,-79.7389 344.132,-84.5025"/>
-<polygon fill="#000000" stroke="#000000" points="343.167,-87.8732 353.762,-87.8921 345.491,-81.2703 343.167,-87.8732"/>
+<g id="proc~~get_ep_denf~~CallsGraph_edge7" class="edge"><title>proc~interpol2d_2d_arr&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M302.247,-100.964C315.628,-96.3952 331.051,-91.1289 345.198,-86.2981"/>
+<polygon fill="#000000" stroke="#000000" points="346.416,-89.581 354.748,-83.0373 344.153,-82.9566 346.416,-89.581"/>
 </g>
-<!-- proc~interpol1d_coeff_arr -->
-<g id="node9" class="node"><title>proc~interpol1d_coeff_arr</title>
-<a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="576,-176 466,-176 466,-150 576,-150 576,-176"/>
-<text text-anchor="middle" x="521" y="-160.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
-</a>
+<!-- proc~interpol1d_arr&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge8" class="edge"><title>proc~interpol1d_arr&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M306.595,-71C317.893,-71 330.325,-71 342.064,-71"/>
+<polygon fill="#000000" stroke="#000000" points="342.155,-74.5001 352.155,-71 342.155,-67.5001 342.155,-74.5001"/>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M418.57,-114.149C437.701,-123.273 463.395,-135.527 484.263,-145.479"/>
-<polygon fill="#000000" stroke="#000000" points="482.937,-148.725 493.47,-149.87 485.951,-142.406 482.937,-148.725"/>
+<!-- proc~interpol2d_arr&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge9" class="edge"><title>proc~interpol2d_arr&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M302.247,-41.0355C315.628,-45.6048 331.051,-50.8711 345.198,-55.7019"/>
+<polygon fill="#000000" stroke="#000000" points="344.153,-59.0434 354.748,-58.9627 346.416,-52.419 344.153,-59.0434"/>
 </g>
 <!-- proc~interpol2d_coeff_arr -->
-<g id="node10" class="node"><title>proc~interpol2d_coeff_arr</title>
-<a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="576,-94 466,-94 466,-68 576,-68 576,-94"/>
-<text text-anchor="middle" x="521" y="-78.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+<g id="proc~~get_ep_denf~~CallsGraph_node9" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node9"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="576,-142 466,-142 466,-118 576,-118 576,-142"/>
+<text text-anchor="middle" x="521" y="-127.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
 </a>
+</g>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M429.652,-95.0535C437.918,-93.7819 446.868,-92.4049 455.822,-91.0273"/>
-<polygon fill="#000000" stroke="#000000" points="456.546,-94.4572 465.898,-89.4773 455.482,-87.5386 456.546,-94.4572"/>
+<g id="proc~~get_ep_denf~~CallsGraph_edge3" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M418.212,-83.0819C437.366,-91.9111 463.557,-103.983 484.575,-113.671"/>
+<polygon fill="#000000" stroke="#000000" points="483.277,-116.927 493.823,-117.934 486.207,-110.57 483.277,-116.927"/>
 </g>
 <!-- proc~interpol1d_coeff -->
-<g id="node11" class="node"><title>proc~interpol1d_coeff</title>
-<a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="703,-146 613,-146 613,-120 703,-120 703,-146"/>
-<text text-anchor="middle" x="658" y="-130.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+<g id="proc~~get_ep_denf~~CallsGraph_node10" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node10"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="703.5,-53 612.5,-53 612.5,-29 703.5,-29 703.5,-53"/>
+<text text-anchor="middle" x="658" y="-38.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
+</g>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge10" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M429.539,-105.619C474.894,-111.055 550.569,-120.124 602.301,-126.325"/>
-<polygon fill="#000000" stroke="#000000" points="601.967,-129.809 612.313,-127.524 602.8,-122.859 601.967,-129.809"/>
+<g id="proc~~get_ep_denf~~CallsGraph_edge4" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M429.687,-66.7336C474.832,-61.6228 550.816,-53.0208 602.39,-47.1823"/>
+<polygon fill="#000000" stroke="#000000" points="602.82,-50.656 612.363,-46.0532 602.033,-43.7004 602.82,-50.656"/>
 </g>
 <!-- proc~interpol2d_coeff -->
-<g id="node12" class="node"><title>proc~interpol2d_coeff</title>
-<a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="703,-83 613,-83 613,-57 703,-57 703,-83"/>
-<text text-anchor="middle" x="658" y="-67.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+<g id="proc~~get_ep_denf~~CallsGraph_node11" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node11"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="703.5,-113 612.5,-113 612.5,-89 703.5,-89 703.5,-113"/>
+<text text-anchor="middle" x="658" y="-98.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
 </a>
 </g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge12" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M408.372,-87.8593C422.901,-77.7428 444.629,-64.5765 466,-59 510.781,-47.3151 563.358,-51.5089 602.159,-57.8119"/>
-<polygon fill="#000000" stroke="#000000" points="601.768,-61.2958 612.216,-59.5423 602.955,-54.3972 601.768,-61.2958"/>
 </g>
-<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M576.328,-150.884C584.868,-149.014 593.693,-147.082 602.242,-145.21"/>
-<polygon fill="#000000" stroke="#000000" points="603.099,-148.605 612.119,-143.047 601.602,-141.767 603.099,-148.605"/>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge5" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M429.687,-75.2664C474.832,-80.3772 550.816,-88.9792 602.39,-94.8177"/>
+<polygon fill="#000000" stroke="#000000" points="602.033,-98.2996 612.363,-95.9468 602.82,-91.344 602.033,-98.2996"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~get_ep_denf~~CallsGraph_node12" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~get_ep_denf~~CallsGraph_node12"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="576,-24 466,-24 466,-0 576,-0 576,-24"/>
+<text text-anchor="middle" x="521" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M418.212,-58.9181C437.366,-50.0889 463.557,-38.0165 484.575,-28.3288"/>
+<polygon fill="#000000" stroke="#000000" points="486.207,-31.4305 493.823,-24.0657 483.277,-25.0733 486.207,-31.4305"/>
 </g>
 <!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="edge4" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M576.328,-76.5576C584.776,-75.8793 593.501,-75.1788 601.963,-74.4993"/>
-<polygon fill="#000000" stroke="#000000" points="602.431,-77.9731 612.119,-73.6839 601.871,-70.9955 602.431,-77.9731"/>
+<g id="proc~~get_ep_denf~~CallsGraph_edge1" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M576.132,-118.372C584.779,-116.514 593.73,-114.591 602.388,-112.731"/>
+<polygon fill="#000000" stroke="#000000" points="603.339,-116.107 612.381,-110.585 601.869,-109.263 603.339,-116.107"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~get_ep_denf~~CallsGraph_edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M576.132,-23.6283C584.779,-25.4858 593.73,-27.4087 602.388,-29.2686"/>
+<polygon fill="#000000" stroke="#000000" points="601.869,-32.7368 612.381,-31.4151 603.339,-25.8929 601.869,-32.7368"/>
 </g>
 </g>
 </svg>
@@ -1137,43 +1172,43 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1197,76 +1232,80 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~get_ep_denf~~CalledByGraph Pages: 1 -->
-<svg id="procget_ep_denfCalledByGraph" width="300pt" height="122pt"
- viewBox="0.00 0.00 300.00 122.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~get_ep_denf~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 118)">
+<svg id="procget_ep_denfCalledByGraph" width="300pt" height="116pt"
+ viewBox="0.00 0.00 300.00 116.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_ep_denf~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 112)">
 <title>proc~~get_ep_denf~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-118 297,-118 297,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-112 296,-112 296,4 -4,4"/>
 <!-- proc~get_ep_denf -->
-<g id="node1" class="node"><title>proc~get_ep_denf</title>
-<polygon fill="none" stroke="black" points="291,-70 219,-70 219,-44 291,-44 291,-70"/>
-<text text-anchor="middle" x="255" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50">get_ep_denf</text>
+<g id="proc~~get_ep_denf~~CalledByGraph_node1" class="node"><title>proc~get_ep_denf</title>
+<polygon fill="none" stroke="black" points="291.5,-66 218.5,-66 218.5,-42 291.5,-42 291.5,-66"/>
+<text text-anchor="middle" x="255" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_ep_denf</text>
 </g>
 <!-- proc~fida_weights_mc -->
-<g id="node2" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+<g id="proc~~get_ep_denf~~CalledByGraph_node2" class="node"><title>proc~fida_weights_mc</title>
+<g id="a_proc~~get_ep_denf~~CalledByGraph_node2"><a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-108 90,-108 90,-84 182,-84 182,-108"/>
+<text text-anchor="middle" x="136" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
 </a>
+</g>
 </g>
 <!-- proc~fida_weights_mc&#45;&gt;proc~get_ep_denf -->
-<g id="edge8" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~get_ep_denf</title>
-<path fill="none" stroke="#000000" d="M171.382,-87.9177C183.502,-83.4363 197.229,-78.3606 210.006,-73.6364"/>
-<polygon fill="#000000" stroke="#000000" points="211.384,-76.8588 219.549,-70.1079 208.956,-70.2932 211.384,-76.8588"/>
-</g>
-<!-- proc~fida_weights_los -->
-<g id="node3" class="node"><title>proc~fida_weights_los</title>
-<a xlink:href="../proc/fida_weights_los.html" xlink:title="fida_weights_los">
-<polygon fill="#d9534f" stroke="#d9534f" points="181,-70 91,-70 91,-44 181,-44 181,-70"/>
-<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
-</a>
-</g>
-<!-- proc~fida_weights_los&#45;&gt;proc~get_ep_denf -->
-<g id="edge10" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~get_ep_denf</title>
-<path fill="none" stroke="#000000" d="M181.668,-57C190.431,-57 199.617,-57 208.408,-57"/>
-<polygon fill="#000000" stroke="#000000" points="208.498,-60.5001 218.497,-57 208.497,-53.5001 208.498,-60.5001"/>
+<g id="proc~~get_ep_denf~~CalledByGraph_edge4" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~get_ep_denf</title>
+<path fill="none" stroke="#000000" d="M170.528,-83.9645C183.134,-79.4392 197.645,-74.2301 210.995,-69.4376"/>
+<polygon fill="#000000" stroke="#000000" points="212.238,-72.7102 220.468,-66.0373 209.873,-66.1218 212.238,-72.7102"/>
 </g>
 <!-- proc~npa_weights -->
-<g id="node4" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="172,-26 100,-26 100,-1.24345e-14 172,-3.55271e-15 172,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+<g id="proc~~get_ep_denf~~CalledByGraph_node3" class="node"><title>proc~npa_weights</title>
+<g id="a_proc~~get_ep_denf~~CalledByGraph_node3"><a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
+<polygon fill="#d9534f" stroke="#d9534f" points="172.5,-66 99.5,-66 99.5,-42 172.5,-42 172.5,-66"/>
+<text text-anchor="middle" x="136" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
 </a>
+</g>
 </g>
 <!-- proc~npa_weights&#45;&gt;proc~get_ep_denf -->
-<g id="edge12" class="edge"><title>proc~npa_weights&#45;&gt;proc~get_ep_denf</title>
-<path fill="none" stroke="#000000" d="M171.382,-26.0823C183.502,-30.5637 197.229,-35.6394 210.006,-40.3636"/>
-<polygon fill="#000000" stroke="#000000" points="208.956,-43.7068 219.549,-43.8921 211.384,-37.1412 208.956,-43.7068"/>
+<g id="proc~~get_ep_denf~~CalledByGraph_edge5" class="edge"><title>proc~npa_weights&#45;&gt;proc~get_ep_denf</title>
+<path fill="none" stroke="#000000" d="M172.74,-54C183.967,-54 196.519,-54 208.336,-54"/>
+<polygon fill="#000000" stroke="#000000" points="208.479,-57.5001 218.479,-54 208.479,-50.5001 208.479,-57.5001"/>
 </g>
-<!-- program~fidasim -->
-<g id="node5" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-70 2.13163e-14,-70 0,-44 54,-44 54,-70"/>
-<text text-anchor="middle" x="27" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<!-- proc~fida_weights_los -->
+<g id="proc~~get_ep_denf~~CalledByGraph_node4" class="node"><title>proc~fida_weights_los</title>
+<g id="a_proc~~get_ep_denf~~CalledByGraph_node4"><a xlink:href="../proc/fida_weights_los.html" xlink:title="fida_weights_los">
+<polygon fill="#d9534f" stroke="#d9534f" points="181.5,-24 90.5,-24 90.5,-0 181.5,-0 181.5,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_los</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M54.2241,-67.9896C66.3005,-72.8644 80.7842,-78.7111 94.1846,-84.1204"/>
-<polygon fill="#000000" stroke="#000000" points="93.1177,-87.4641 103.701,-87.9618 95.738,-80.973 93.1177,-87.4641"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_weights_los -->
-<g id="edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
-<path fill="none" stroke="#000000" d="M54.2241,-57C62.1959,-57 71.2166,-57 80.2823,-57"/>
-<polygon fill="#000000" stroke="#000000" points="80.4834,-60.5001 90.4834,-57 80.4834,-53.5001 80.4834,-60.5001"/>
+<!-- proc~fida_weights_los&#45;&gt;proc~get_ep_denf -->
+<g id="proc~~get_ep_denf~~CalledByGraph_edge6" class="edge"><title>proc~fida_weights_los&#45;&gt;proc~get_ep_denf</title>
+<path fill="none" stroke="#000000" d="M170.528,-24.0355C183.134,-28.5608 197.645,-33.7699 210.995,-38.5624"/>
+<polygon fill="#000000" stroke="#000000" points="209.873,-41.8782 220.468,-41.9627 212.238,-35.2898 209.873,-41.8782"/>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~get_ep_denf~~CalledByGraph_node5" class="node"><title>program~fidasim</title>
+<g id="a_proc~~get_ep_denf~~CalledByGraph_node5"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-66 0,-66 0,-42 54,-42 54,-66"/>
+<text text-anchor="middle" x="27" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
+<g id="proc~~get_ep_denf~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M54.1751,-64.2744C66.3228,-69.0426 81.0397,-74.8193 94.5689,-80.1299"/>
+<polygon fill="#000000" stroke="#000000" points="93.5692,-83.4974 104.157,-83.8932 96.1269,-76.9814 93.5692,-83.4974"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M54.2241,-46.0104C66.3005,-41.1356 80.7842,-35.2889 94.1846,-29.8796"/>
-<polygon fill="#000000" stroke="#000000" points="95.738,-33.027 103.701,-26.0382 93.1177,-26.5359 95.738,-33.027"/>
+<g id="proc~~get_ep_denf~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<path fill="none" stroke="#000000" d="M54.1751,-54C64.7026,-54 77.1597,-54 89.101,-54"/>
+<polygon fill="#000000" stroke="#000000" points="89.4008,-57.5001 99.4007,-54 89.4007,-50.5001 89.4008,-57.5001"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_weights_los -->
+<g id="proc~~get_ep_denf~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_los</title>
+<path fill="none" stroke="#000000" d="M54.1751,-43.7256C66.3228,-38.9574 81.0397,-33.1807 94.5689,-27.8701"/>
+<polygon fill="#000000" stroke="#000000" points="96.1269,-31.0186 104.157,-24.1068 93.5692,-24.5026 96.1269,-31.0186"/>
 </g>
 </g>
 </svg>
@@ -1285,43 +1324,43 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1551,7 +1590,13 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1596,6 +1641,8 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1655,7 +1702,7 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1681,7 +1728,17 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1731,6 +1788,8 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1767,6 +1826,10 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1797,13 +1860,13 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1935,8 +1998,6 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1961,7 +2022,9 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

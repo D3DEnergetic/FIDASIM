@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.1.1</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.3% of total for procedures.">24 statements</a>
+	  title=" 0.4% of total for procedures.">43 statements</a>
      </li> 
      
      
@@ -287,7 +287,13 @@
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -332,6 +338,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -391,7 +399,7 @@
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -417,7 +425,17 @@
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -467,6 +485,8 @@
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -503,6 +523,10 @@
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -533,13 +557,13 @@
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -671,8 +695,6 @@
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -697,7 +719,9 @@
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       
@@ -833,6 +857,10 @@ public subroutine gyro_step(vi, fields, r_gyro)
 
     
     <p>Calculates gyro-step</p>
+<h3 id="references">References</h3>
+<ul>
+<li>Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. "Self-consistent equilibrium model of low aspect-ratio toroidal plasma with energetic beam ions." Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251. Appendix A: Last equation</li>
+</ul>
     
 
     <h3>Arguments</h3>
@@ -853,7 +881,7 @@ public subroutine gyro_step(vi, fields, r_gyro)
   
 <tr>
   
-  <td><span class="anchor" id="variable-vi%7E9"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-vi%7E11"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -868,7 +896,7 @@ public subroutine gyro_step(vi, fields, r_gyro)
   
 <tr>
   
-  <td><span class="anchor" id="variable-fields%7E6"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td><span class="anchor" id="variable-fields%7E8"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -888,7 +916,8 @@ public subroutine gyro_step(vi, fields, r_gyro)
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>r_gyro</strong></td><td><p>Gyro-step</p></td>
+  <td><strong>r_gyro</strong></td><td><p>Gyro-step
+ Gyro-radius vector from particle position to guiding center</p></td>
   
 </tr>
 
@@ -903,30 +932,31 @@ public subroutine gyro_step(vi, fields, r_gyro)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~gyro_step~~CallsGraph Pages: 1 -->
-<svg id="procgyro_stepCallsGraph" width="184pt" height="34pt"
- viewBox="0.00 0.00 184.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~gyro_step~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg id="procgyro_stepCallsGraph" width="184pt" height="32pt"
+ viewBox="0.00 0.00 184.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~gyro_step~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>proc~~gyro_step~~CallsGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 181,-30 181,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 180,-28 180,4 -4,4"/>
 <!-- proc~gyro_step -->
-<g id="node1" class="node"><title>proc~gyro_step</title>
-<polygon fill="none" stroke="black" points="60,-26 2.4869e-14,-26 0,-1.24345e-14 60,-3.55271e-15 60,-26"/>
-<text text-anchor="middle" x="30" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_step</text>
+<g id="proc~~gyro_step~~CallsGraph_node1" class="node"><title>proc~gyro_step</title>
+<polygon fill="none" stroke="black" points="60,-24 3.55271e-15,-24 3.55271e-15,-0 60,-0 60,-24"/>
+<text text-anchor="middle" x="30" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_step</text>
 </g>
 <!-- proc~cross_product -->
-<g id="node2" class="node"><title>proc~cross_product</title>
-<a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="176,-26 96,-26 96,-1.24345e-14 176,-3.55271e-15 176,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+<g id="proc~~gyro_step~~CallsGraph_node2" class="node"><title>proc~cross_product</title>
+<g id="a_proc~~gyro_step~~CallsGraph_node2"><a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="176,-24 96,-24 96,-0 176,-0 176,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
 </a>
 </g>
+</g>
 <!-- proc~gyro_step&#45;&gt;proc~cross_product -->
-<g id="edge2" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M60.0918,-13C68.0985,-13 76.9689,-13 85.7391,-13"/>
-<polygon fill="#000000" stroke="#000000" points="85.9307,-16.5001 95.9307,-13 85.9306,-9.5001 85.9307,-16.5001"/>
+<g id="proc~~gyro_step~~CallsGraph_edge1" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M60.2466,-12C68.1921,-12 77.0204,-12 85.7454,-12"/>
+<polygon fill="#000000" stroke="#000000" points="85.8812,-15.5001 95.8812,-12 85.8811,-8.5001 85.8812,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -945,43 +975,43 @@ public subroutine gyro_step(vi, fields, r_gyro)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1005,163 +1035,160 @@ public subroutine gyro_step(vi, fields, r_gyro)
                 <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~gyro_step~~CalledByGraph Pages: 1 -->
-<svg id="procgyro_stepCalledByGraph" width="538pt" height="225pt"
- viewBox="0.00 0.00 538.00 225.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~gyro_step~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 221)">
+<svg id="procgyro_stepCalledByGraph" width="410pt" height="224pt"
+ viewBox="0.00 0.00 410.00 223.96" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~gyro_step~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 219.964)">
 <title>proc~~gyro_step~~CalledByGraph</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-221 535,-221 535,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-219.964 406,-219.964 406,4 -4,4"/>
 <!-- proc~gyro_step -->
-<g id="node1" class="node"><title>proc~gyro_step</title>
-<polygon fill="none" stroke="black" points="530,-185 470,-185 470,-159 530,-159 530,-185"/>
-<text text-anchor="middle" x="500" y="-169.55" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_step</text>
-</g>
-<!-- proc~gyro_correction -->
-<g id="node2" class="node"><title>proc~gyro_correction</title>
-<a xlink:href="../proc/gyro_correction.html" xlink:title="gyro_correction">
-<polygon fill="#d9534f" stroke="#d9534f" points="433,-153 347,-153 347,-127 433,-127 433,-153"/>
-<text text-anchor="middle" x="390" y="-137.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
-</a>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
-<g id="edge28" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M433.791,-152.739C442.49,-155.27 451.579,-157.914 460.138,-160.404"/>
-<polygon fill="#000000" stroke="#000000" points="459.307,-163.807 469.886,-163.24 461.262,-157.086 459.307,-163.807"/>
+<g id="proc~~gyro_step~~CalledByGraph_node1" class="node"><title>proc~gyro_step</title>
+<polygon fill="none" stroke="black" points="402,-128 342,-128 342,-104 402,-104 402,-128"/>
+<text text-anchor="middle" x="372" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_step</text>
 </g>
 <!-- proc~npa_weights -->
-<g id="node3" class="node"><title>proc~npa_weights</title>
-<a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
-<polygon fill="#d9534f" stroke="#d9534f" points="426,-217 354,-217 354,-191 426,-191 426,-217"/>
-<text text-anchor="middle" x="390" y="-201.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
+<g id="proc~~gyro_step~~CalledByGraph_node2" class="node"><title>proc~npa_weights</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node2"><a xlink:href="../proc/npa_weights.html" xlink:title="npa_weights">
+<polygon fill="#d9534f" stroke="#d9534f" points="298.5,-211 225.5,-211 225.5,-187 298.5,-187 298.5,-211"/>
+<text text-anchor="middle" x="262" y="-196.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_weights</text>
 </a>
+</g>
 </g>
 <!-- proc~npa_weights&#45;&gt;proc~gyro_step -->
-<g id="edge30" class="edge"><title>proc~npa_weights&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M426.628,-193.344C437.347,-190.226 449.117,-186.802 460.032,-183.627"/>
-<polygon fill="#000000" stroke="#000000" points="461.136,-186.951 469.76,-180.797 459.18,-180.23 461.136,-186.951"/>
+<g id="proc~~gyro_step~~CalledByGraph_edge12" class="edge"><title>proc~npa_weights&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M278.936,-186.753C296.985,-172.882 326.579,-150.138 347.33,-134.191"/>
+<polygon fill="#000000" stroke="#000000" points="349.554,-136.896 355.35,-128.027 345.288,-131.346 349.554,-136.896"/>
 </g>
-<!-- proc~read_mc -->
-<g id="node4" class="node"><title>proc~read_mc</title>
-<a xlink:href="../proc/read_mc.html" xlink:title="read_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="291,-109 237,-109 237,-83 291,-83 291,-109"/>
-<text text-anchor="middle" x="264" y="-93.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_mc</text>
+<!-- proc~gyro_radius -->
+<g id="proc~~gyro_step~~CalledByGraph_node3" class="node"><title>proc~gyro_radius</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node3"><a xlink:href="../proc/gyro_radius.html" xlink:title="gyro_radius">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="296.5,-86 227.5,-86 227.5,-62 296.5,-62 296.5,-86"/>
+<text text-anchor="middle" x="262" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_radius</text>
 </a>
 </g>
-<!-- proc~read_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge18" class="edge"><title>proc~read_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M291.651,-105.656C306.548,-110.858 325.344,-117.422 342.503,-123.414"/>
-<polygon fill="#000000" stroke="#000000" points="341.781,-126.869 352.376,-126.861 344.089,-120.26 341.781,-126.869"/>
 </g>
-<!-- proc~fida_weights_mc -->
-<g id="node5" class="node"><title>proc~fida_weights_mc</title>
-<a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="310,-197 218,-197 218,-171 310,-171 310,-197"/>
-<text text-anchor="middle" x="264" y="-181.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+<!-- proc~gyro_radius&#45;&gt;proc~gyro_step -->
+<g id="proc~~gyro_step~~CalledByGraph_edge13" class="edge"><title>proc~gyro_radius&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M293.948,-86.0355C305.969,-90.7101 319.865,-96.1142 332.519,-101.035"/>
+<polygon fill="#000000" stroke="#000000" points="331.313,-104.321 341.901,-104.684 333.85,-97.7974 331.313,-104.321"/>
+</g>
+<!-- proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_node4" class="node"><title>proc~gyro_correction</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node4"><a xlink:href="../proc/gyro_correction.html" xlink:title="gyro_correction">
+<polygon fill="#d9534f" stroke="#d9534f" points="305.5,-128 218.5,-128 218.5,-104 305.5,-104 305.5,-128"/>
+<text text-anchor="middle" x="262" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
 </a>
 </g>
-<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
-<g id="edge20" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M301.463,-170.918C314.422,-166.392 329.116,-161.261 342.757,-156.498"/>
-<polygon fill="#000000" stroke="#000000" points="344.177,-159.709 352.464,-153.108 341.869,-153.1 344.177,-159.709"/>
 </g>
-<!-- proc~neutron_f -->
-<g id="node6" class="node"><title>proc~neutron_f</title>
-<a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="293,-153 235,-153 235,-127 293,-127 293,-153"/>
-<text text-anchor="middle" x="264" y="-137.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
-</a>
-</g>
-<!-- proc~neutron_f&#45;&gt;proc~gyro_correction -->
-<g id="edge22" class="edge"><title>proc~neutron_f&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M293.224,-140C305.982,-140 321.365,-140 336.073,-140"/>
-<polygon fill="#000000" stroke="#000000" points="336.108,-143.5 346.108,-140 336.108,-136.5 336.108,-143.5"/>
-</g>
-<!-- proc~mc_fastion -->
-<g id="node7" class="node"><title>proc~mc_fastion</title>
-<a xlink:href="../proc/mc_fastion.html" xlink:title="mc_fastion">
-<polygon fill="#d9534f" stroke="#d9534f" points="296,-65 232,-65 232,-39 296,-39 296,-65"/>
-<text text-anchor="middle" x="264" y="-49.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_fastion</text>
-</a>
-</g>
-<!-- proc~mc_fastion&#45;&gt;proc~gyro_correction -->
-<g id="edge24" class="edge"><title>proc~mc_fastion&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M294.265,-65.1736C299.631,-67.8726 305.075,-70.8572 310,-74 331.327,-87.6085 353.343,-106.161 368.866,-120.131"/>
-<polygon fill="#000000" stroke="#000000" points="366.61,-122.81 376.354,-126.968 371.33,-117.64 366.61,-122.81"/>
-</g>
-<!-- proc~read_distribution -->
-<g id="node8" class="node"><title>proc~read_distribution</title>
-<a xlink:href="../proc/read_distribution.html" xlink:title="read_distribution">
-<polygon fill="#d9534f" stroke="#d9534f" points="182,-114 90,-114 90,-88 182,-88 182,-114"/>
-<text text-anchor="middle" x="136" y="-98.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">read_distribution</text>
-</a>
-</g>
-<!-- proc~read_distribution&#45;&gt;proc~read_mc -->
-<g id="edge4" class="edge"><title>proc~read_distribution&#45;&gt;proc~read_mc</title>
-<path fill="none" stroke="#000000" d="M182.211,-99.1949C196.705,-98.6287 212.522,-98.0109 226.35,-97.4707"/>
-<polygon fill="#000000" stroke="#000000" points="226.626,-100.963 236.482,-97.0749 226.353,-93.968 226.626,-100.963"/>
+<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
+<g id="proc~~gyro_step~~CalledByGraph_edge14" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M305.684,-116C314.319,-116 323.359,-116 331.864,-116"/>
+<polygon fill="#000000" stroke="#000000" points="331.912,-119.5 341.911,-116 331.911,-112.5 331.912,-119.5"/>
 </g>
 <!-- program~fidasim -->
-<g id="node9" class="node"><title>program~fidasim</title>
-<a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-134 2.13163e-14,-134 0,-108 54,-108 54,-134"/>
-<text text-anchor="middle" x="27" y="-118.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~gyro_step~~CalledByGraph_node5" class="node"><title>program~fidasim</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node5"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-129 0,-129 0,-105 54,-105 54,-129"/>
+<text text-anchor="middle" x="27" y="-114.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_weights -->
-<g id="edge26" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
-<path fill="none" stroke="#000000" d="M41.5378,-134.204C53.7109,-144.653 71.9464,-158.948 90,-168 178.7,-212.475 210.782,-207.24 310,-206 320.738,-205.866 332.285,-205.63 343.174,-205.367"/>
-<polygon fill="#000000" stroke="#000000" points="343.456,-208.861 353.364,-205.108 343.278,-201.863 343.456,-208.861"/>
+<g id="proc~~gyro_step~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~npa_weights</title>
+<path fill="none" stroke="#000000" d="M32.7541,-129.313C41.0173,-148.751 60.0655,-185.889 90,-201 128.838,-220.605 179.241,-217.111 215.245,-210.538"/>
+<polygon fill="#000000" stroke="#000000" points="216.328,-213.892 225.461,-208.521 214.972,-207.024 216.328,-213.892"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
-<g id="edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
-<path fill="none" stroke="#000000" d="M54.088,-131.157C65.1409,-135.118 78.0993,-139.53 90,-143 129.05,-154.385 173.722,-164.859 208.025,-172.371"/>
-<polygon fill="#000000" stroke="#000000" points="207.349,-175.806 217.864,-174.507 208.834,-168.965 207.349,-175.806"/>
+<!-- proc~neutron_f -->
+<g id="proc~~gyro_step~~CalledByGraph_node6" class="node"><title>proc~neutron_f</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node6"><a xlink:href="../proc/neutron_f.html" xlink:title="neutron_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="165,-192 107,-192 107,-168 165,-168 165,-192"/>
+<text text-anchor="middle" x="136" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_f</text>
+</a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~neutron_f -->
-<g id="edge8" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
-<path fill="none" stroke="#000000" d="M54.1869,-123.18C96.0986,-126.54 176.678,-133 224.862,-136.862"/>
-<polygon fill="#000000" stroke="#000000" points="224.669,-140.358 234.917,-137.668 225.229,-133.38 224.669,-140.358"/>
+<g id="proc~~gyro_step~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_f</title>
+<path fill="none" stroke="#000000" d="M44.3814,-129.149C56.6225,-137.964 73.9423,-149.891 90,-159 92.5308,-160.436 95.1765,-161.858 97.8627,-163.245"/>
+<polygon fill="#000000" stroke="#000000" points="96.5298,-166.491 107.044,-167.796 99.6386,-160.219 96.5298,-166.491"/>
 </g>
-<!-- program~fidasim&#45;&gt;proc~read_distribution -->
-<g id="edge2" class="edge"><title>program~fidasim&#45;&gt;proc~read_distribution</title>
-<path fill="none" stroke="#000000" d="M54.2241,-116.005C62.0126,-114.576 70.8024,-112.963 79.6572,-111.338"/>
-<polygon fill="#000000" stroke="#000000" points="80.4281,-114.755 89.6322,-109.508 79.1647,-107.87 80.4281,-114.755"/>
+<!-- proc~neutron_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_node7" class="node"><title>proc~neutron_mc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node7"><a xlink:href="../proc/neutron_mc.html" xlink:title="neutron_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="171,-150 101,-150 101,-126 171,-126 171,-150"/>
+<text text-anchor="middle" x="136" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">neutron_mc</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~neutron_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~neutron_mc</title>
+<path fill="none" stroke="#000000" d="M54.1751,-122.137C65.099,-124.281 78.1004,-126.833 90.4475,-129.256"/>
+<polygon fill="#000000" stroke="#000000" points="90.1182,-132.758 100.605,-131.25 91.4664,-125.889 90.1182,-132.758"/>
+</g>
+<!-- proc~fida_weights_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_node8" class="node"><title>proc~fida_weights_mc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node8"><a xlink:href="../proc/fida_weights_mc.html" xlink:title="fida_weights_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-108 90,-108 90,-84 182,-84 182,-108"/>
+<text text-anchor="middle" x="136" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_weights_mc</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~fida_weights_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_edge4" class="edge"><title>program~fidasim&#45;&gt;proc~fida_weights_mc</title>
+<path fill="none" stroke="#000000" d="M54.1751,-111.863C61.9968,-110.328 70.8836,-108.584 79.8327,-106.827"/>
+<polygon fill="#000000" stroke="#000000" points="80.7708,-110.21 89.9095,-104.85 79.4226,-103.341 80.7708,-110.21"/>
 </g>
 <!-- proc~fida_f -->
-<g id="node14" class="node"><title>proc~fida_f</title>
-<a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-70 109,-70 109,-44 163,-44 163,-70"/>
-<text text-anchor="middle" x="136" y="-54.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
+<g id="proc~~gyro_step~~CalledByGraph_node9" class="node"><title>proc~fida_f</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node9"><a xlink:href="../proc/fida_f.html" xlink:title="fida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-66 109,-66 109,-42 163,-42 163,-66"/>
+<text text-anchor="middle" x="136" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_f</text>
 </a>
+</g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~fida_f -->
-<g id="edge10" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
-<path fill="none" stroke="#000000" d="M45.0351,-107.982C57.4032,-99.3048 74.3452,-87.9022 90,-79 93.1887,-77.1867 96.5504,-75.384 99.9454,-73.636"/>
-<polygon fill="#000000" stroke="#000000" points="101.525,-76.7595 108.915,-69.167 98.4031,-70.4941 101.525,-76.7595"/>
+<g id="proc~~gyro_step~~CalledByGraph_edge5" class="edge"><title>program~fidasim&#45;&gt;proc~fida_f</title>
+<path fill="none" stroke="#000000" d="M44.3814,-104.851C56.6225,-96.0355 73.9423,-84.1094 90,-75 93.0932,-73.2452 96.358,-71.5108 99.6587,-69.8355"/>
+<polygon fill="#000000" stroke="#000000" points="101.492,-72.8355 108.943,-65.3038 98.4215,-66.5448 101.492,-72.8355"/>
 </g>
-<!-- proc~npa_f -->
-<g id="node15" class="node"><title>proc~npa_f</title>
-<a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="163,-26 109,-26 109,-1.24345e-14 163,-3.55271e-15 163,-26"/>
-<text text-anchor="middle" x="136" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<!-- proc~fida_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_node10" class="node"><title>proc~fida_mc</title>
+<g id="a_proc~~gyro_step~~CalledByGraph_node10"><a xlink:href="../proc/fida_mc.html" xlink:title="fida_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="163,-24 109,-24 109,-0 163,-0 163,-24"/>
+<text text-anchor="middle" x="136" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fida_mc</text>
 </a>
 </g>
-<!-- program~fidasim&#45;&gt;proc~npa_f -->
-<g id="edge12" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M33.9191,-107.771C44.0887,-89.3924 64.6406,-56.0295 90,-35 93.0558,-32.466 96.4525,-30.1446 99.9769,-28.0393"/>
-<polygon fill="#000000" stroke="#000000" points="101.729,-31.0709 108.879,-23.2525 98.4144,-24.9056 101.729,-31.0709"/>
 </g>
-<!-- proc~fida_f&#45;&gt;proc~mc_fastion -->
-<g id="edge14" class="edge"><title>proc~fida_f&#45;&gt;proc~mc_fastion</title>
-<path fill="none" stroke="#000000" d="M163.146,-55.9396C180.19,-55.2738 202.524,-54.4014 221.842,-53.6468"/>
-<polygon fill="#000000" stroke="#000000" points="222.061,-57.141 231.917,-53.2532 221.788,-50.1463 222.061,-57.141"/>
+<!-- program~fidasim&#45;&gt;proc~fida_mc -->
+<g id="proc~~gyro_step~~CalledByGraph_edge6" class="edge"><title>program~fidasim&#45;&gt;proc~fida_mc</title>
+<path fill="none" stroke="#000000" d="M34.3087,-104.945C44.1296,-87.1647 64.6099,-53.7764 90,-33 93.065,-30.4919 96.4791,-28.2078 100.018,-26.1479"/>
+<polygon fill="#000000" stroke="#000000" points="101.699,-29.2189 108.945,-21.49 98.4606,-23.0128 101.699,-29.2189"/>
 </g>
-<!-- proc~npa_f&#45;&gt;proc~mc_fastion -->
-<g id="edge16" class="edge"><title>proc~npa_f&#45;&gt;proc~mc_fastion</title>
-<path fill="none" stroke="#000000" d="M163.146,-21.2709C180.268,-26.488 202.73,-33.3319 222.109,-39.2363"/>
-<polygon fill="#000000" stroke="#000000" points="221.331,-42.6581 231.917,-42.2247 223.371,-35.962 221.331,-42.6581"/>
+<!-- proc~neutron_f&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge7" class="edge"><title>proc~neutron_f&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M163.782,-167.833C169.809,-165.004 176.151,-161.953 182,-159 198.237,-150.802 216.054,-141.162 230.652,-133.089"/>
+<polygon fill="#000000" stroke="#000000" points="232.691,-135.96 239.73,-128.041 229.29,-129.842 232.691,-135.96"/>
+</g>
+<!-- proc~neutron_mc&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge8" class="edge"><title>proc~neutron_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M171.212,-131.93C182.751,-129.883 195.909,-127.548 208.528,-125.309"/>
+<polygon fill="#000000" stroke="#000000" points="209.257,-128.735 218.492,-123.542 208.034,-121.843 209.257,-128.735"/>
+</g>
+<!-- proc~fida_weights_mc&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge9" class="edge"><title>proc~fida_weights_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M182.118,-103.277C190.579,-104.642 199.494,-106.08 208.165,-107.478"/>
+<polygon fill="#000000" stroke="#000000" points="207.759,-110.958 218.189,-109.095 208.874,-104.047 207.759,-110.958"/>
+</g>
+<!-- proc~fida_f&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge10" class="edge"><title>proc~fida_f&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M163.326,-65.9061C169.493,-68.7998 176.01,-71.9433 182,-75 198.303,-83.3197 201.771,-86.5365 218,-95 220.712,-96.4142 223.533,-97.8559 226.376,-99.288"/>
+<polygon fill="#000000" stroke="#000000" points="224.91,-102.468 235.423,-103.784 228.025,-96.1992 224.91,-102.468"/>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~gyro_correction -->
+<g id="proc~~gyro_step~~CalledByGraph_edge11" class="edge"><title>proc~fida_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M163.407,-21.0829C169.973,-24.1724 176.655,-28.1132 182,-33 205.516,-54.5014 194.675,-73.2916 218,-95 219.254,-96.1674 220.586,-97.283 221.973,-98.3476"/>
+<polygon fill="#000000" stroke="#000000" points="220.119,-101.317 230.396,-103.892 223.968,-95.4701 220.119,-101.317"/>
 </g>
 </g>
 </svg>
@@ -1180,43 +1207,43 @@ public subroutine gyro_step(vi, fields, r_gyro)
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Generated by graphviz version 2.26.3 (20100126.1600)
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: Graph Key Pages: 1 -->
-<svg width="556pt" height="34pt"
- viewBox="0.00 0.00 556.00 34.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 30)">
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
 <title>Graph Key</title>
-<polygon fill="white" stroke="white" points="-4,5 -4,-30 553,-30 553,5 -4,5"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
 <!-- Subroutine -->
 <g id="node1" class="node"><title>Subroutine</title>
-<polygon fill="#d9534f" stroke="#d9534f" points="64,-26 3.19744e-14,-26 0,-1.24345e-14 64,-3.55271e-15 64,-26"/>
-<text text-anchor="middle" x="32" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
 </g>
 <!-- Function -->
 <g id="node2" class="node"><title>Function</title>
-<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-26 82,-26 82,-1.24345e-14 136,-3.55271e-15 136,-26"/>
-<text text-anchor="middle" x="109" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
 </g>
 <!-- Interface -->
 <g id="node3" class="node"><title>Interface</title>
-<polygon fill="#a7506f" stroke="#a7506f" points="208,-26 154,-26 154,-1.24345e-14 208,-3.55271e-15 208,-26"/>
-<text text-anchor="middle" x="181" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
 </g>
 <!-- Unknown Procedure Type -->
 <g id="node4" class="node"><title>Unknown Procedure Type</title>
-<polygon fill="#777777" stroke="#777777" points="362,-26 226,-26 226,-1.24345e-14 362,-3.55271e-15 362,-26"/>
-<text text-anchor="middle" x="294" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
 </g>
 <!-- Program -->
 <g id="node5" class="node"><title>Program</title>
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="434,-26 380,-26 380,-1.24345e-14 434,-3.55271e-15 434,-26"/>
-<text text-anchor="middle" x="407" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
 </g>
 <!-- This Page&#39;s Entity -->
 <g id="node6" class="node"><title>This Page&#39;s Entity</title>
-<polygon fill="none" stroke="black" points="548,-26 452,-26 452,-1.24345e-14 548,-3.55271e-15 548,-26"/>
-<text text-anchor="middle" x="500" y="-10.55" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
 </g>
 </g>
 </svg>
@@ -1291,19 +1318,24 @@ public subroutine gyro_step(vi, fields, r_gyro)
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_step</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">r_gyro</span><span class="p">)</span>
     <span class="c">!+ Calculates gyro-step</span>
+    <span class="c">!+</span>
+    <span class="c">!+###References</span>
+    <span class="c">!+* Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. &quot;Self-consistent equilibrium model of low aspect-ratio toroidal plasma with energetic beam ions.&quot; Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251. Appendix A: Last equation</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vi</span>
         <span class="c">!+ Ion velocity</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electro-magnetic fields</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r_gyro</span>
         <span class="c">!+ Gyro-step</span>
+        <span class="c">!+ Gyro-radius vector from particle position to guiding center</span>
 
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vxB</span><span class="p">,</span><span class="n">rg_uvw</span><span class="p">,</span><span class="n">uvw</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">one_over_omega</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">rg_r</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vxB</span><span class="p">,</span> <span class="n">rg_uvw</span><span class="p">,</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">cuvrxb</span><span class="p">,</span> <span class="n">b_rtz</span><span class="p">,</span> <span class="n">grad_B</span><span class="p">,</span> <span class="n">rg_rtz</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">one_over_omega</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">rg_r</span><span class="p">,</span> <span class="n">vpar</span><span class="p">,</span> <span class="n">term1</span><span class="p">,</span> <span class="n">term2</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">no_flr</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">one_over_omega</span><span class="o">=</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">*</span><span class="n">mass_u</span><span class="o">/</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="o">*</span><span class="n">e0</span><span class="p">)</span>
         <span class="n">vxB</span> <span class="o">=</span> <span class="n">cross_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span>
+        <span class="n">vpar</span> <span class="o">=</span>  <span class="nb">dot_product</span><span class="p">(</span><span class="n">vi</span><span class="p">,</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">)</span>
         <span class="n">r_gyro</span> <span class="o">=</span> <span class="n">vxB</span><span class="o">*</span><span class="n">one_over_omega</span> <span class="c">!points towards gyrocenter</span>
 
         <span class="c">!! Second order correction approximation derived from</span>
@@ -1321,7 +1353,28 @@ public subroutine gyro_step(vi, fields, r_gyro)
 <span class="k">            </span><span class="n">rg_uvw</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">basis</span><span class="p">,</span><span class="n">r_gyro</span><span class="p">)</span>
         <span class="n">endif</span>
         <span class="n">rg_r</span> <span class="o">=</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
-        <span class="n">r_gyro</span> <span class="o">=</span> <span class="n">r_gyro</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">rg_r</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">R</span><span class="p">))</span>
+        <span class="n">b_rtz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">b_rtz</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">bt</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">b_rtz</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">cuvrxb</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">fields</span><span class="p">%</span><span class="n">dbt_dz</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">cuvrxb</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dz</span> <span class="o">-</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbz_dr</span><span class="p">)</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">cuvrxb</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbt_dr</span><span class="o">/</span><span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">term1</span> <span class="o">=</span> <span class="n">vpar</span><span class="o">*</span><span class="n">one_over_omega</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">b_rtz</span><span class="p">,</span><span class="n">cuvrxb</span><span class="p">)</span>
+        <span class="n">grad_B</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dr</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bt</span> <span class="o">*</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbt_dr</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dr</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span>
+                    <span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">grad_B</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">grad_B</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">br</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbr_dz</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bt</span> <span class="o">*</span> <span class="n">fields</span><span class="p">%</span><span class="n">dbt_dz</span> <span class="o">+</span> <span class="n">fields</span><span class="p">%</span><span class="n">bz</span><span class="o">*</span><span class="n">fields</span><span class="p">%</span><span class="n">dbz_dz</span><span class="p">)</span><span class="o">/</span><span class="p">&amp;</span>
+                    <span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span>
+        <span class="n">rg_rtz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">+</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+        <span class="n">rg_rtz</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">rg_rtz</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">rg_uvw</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">term2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">fields</span><span class="p">%</span><span class="n">b_abs</span><span class="p">)</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">rg_rtz</span><span class="p">,</span><span class="n">grad_B</span><span class="p">)</span>
+        <span class="n">r_gyro</span> <span class="o">=</span> <span class="n">r_gyro</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">term1</span> <span class="o">-</span> <span class="n">term2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">term1</span> <span class="o">-</span> <span class="n">term2</span> <span class="p">.</span><span class="n">le</span><span class="p">.</span> <span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;GYRO_STEP: Gyro correction results in negative distances: &#39;</span><span class="p">,</span> <span class="p">&amp;</span>
+                          <span class="mf">1.0</span><span class="o">-</span><span class="n">term1</span><span class="o">-</span><span class="n">term2</span>
+            <span class="k">stop</span>
+<span class="k">        </span><span class="n">endif</span>
     <span class="k">else</span>
 <span class="k">        </span><span class="n">r_gyro</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">endif</span>
@@ -1433,7 +1486,13 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/balback.html">balback</a>
       
+      <a class="list-group-item" href="../proc/bb_cx_rates.html">bb_cx_rates</a>
+      
+      <a class="list-group-item" href="../proc/boundary_edge.html">boundary_edge</a>
+      
       <a class="list-group-item" href="../proc/bremsstrahlung.html">bremsstrahlung</a>
+      
+      <a class="list-group-item" href="../proc/bt_cx_rates.html">bt_cx_rates</a>
       
       <a class="list-group-item" href="../interface/bt_maxwellian.html">bt_maxwellian</a>
       
@@ -1478,6 +1537,8 @@ public subroutine gyro_step(vi, fields, r_gyro)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
       <a class="list-group-item" href="../proc/e_excit.html">e_excit</a>
       
@@ -1537,7 +1598,7 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/fs_multiply.html">fs_multiply</a>
       
-      <a class="list-group-item" href="../proc/get_beam_cx_prob.html">get_beam_cx_prob</a>
+      <a class="list-group-item" href="../proc/get_beam_cx_rate.html">get_beam_cx_rate</a>
       
       <a class="list-group-item" href="../proc/get_distribution.html">get_distribution</a>
       
@@ -1563,7 +1624,17 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/gyro_correction.html">gyro_correction</a>
       
+      <a class="list-group-item" href="../proc/gyro_radius.html">gyro_radius</a>
+      
+      <a class="list-group-item" href="../proc/gyro_range.html">gyro_range</a>
+      
       <a class="list-group-item" href="../proc/gyro_step.html">gyro_step</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface.html">gyro_surface</a>
+      
+      <a class="list-group-item" href="../proc/gyro_surface_coordinates.html">gyro_surface_coordinates</a>
+      
+      <a class="list-group-item" href="../proc/gyro_trajectory.html">gyro_trajectory</a>
       
       <a class="list-group-item" href="../interface/h5ltmake_compressed_dataset_double_f.html">h5ltmake_compressed_dataset_double_f</a>
       
@@ -1613,6 +1684,8 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/in_grid.html">in_grid</a>
       
+      <a class="list-group-item" href="../proc/in_gyro_surface.html">in_gyro_surface</a>
+      
       <a class="list-group-item" href="../proc/in_plasma.html">in_plasma</a>
       
       <a class="list-group-item" href="../proc/ind2sub.html">ind2sub</a>
@@ -1649,6 +1722,10 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/line_basis.html">line_basis</a>
       
+      <a class="list-group-item" href="../proc/line_gyro_surface_intersect.html">line_gyro_surface_intersect</a>
+      
+      <a class="list-group-item" href="../proc/line_plane_intersect.html">line_plane_intersect</a>
+      
       <a class="list-group-item" href="../proc/lplp_add.html">lplp_add</a>
       
       <a class="list-group-item" href="../proc/lplp_assign.html">lplp_assign</a>
@@ -1679,13 +1756,13 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
-      <a class="list-group-item" href="../proc/neut_rates.html">neut_rates</a>
-      
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
+      
+      <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
       
       <a class="list-group-item" href="../proc/npa_mc.html">npa_mc</a>
       
@@ -1817,8 +1894,6 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
-      <a class="list-group-item" href="../proc/plane_intercept.html">plane_intercept</a>
-      
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
@@ -1843,7 +1918,9 @@ public subroutine gyro_step(vi, fields, r_gyro)
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
-      <a class="list-group-item" href="../proc/read_atomic_rates.html">read_atomic_rates</a>
+      <a class="list-group-item" href="../proc/read_atomic_rate.html">read_atomic_rate</a>
+      
+      <a class="list-group-item" href="../proc/read_atomic_transitions.html">read_atomic_transitions</a>
       
       <a class="list-group-item" href="../proc/read_beam.html">read_beam</a>
       

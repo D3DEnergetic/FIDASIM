@@ -9,6 +9,8 @@ type(LocalProfiles)       :: Plasma
 
 real(8)                   :: ai = H_2_amu
 real(8)                   :: ab = H_2_amu
+integer                   :: impq = 6
+real(8)                   :: eqt = 10 * (4.41d7**(-1))
 
 real(8), dimension(6)     :: states
 real(8), dimension(6)     :: dens
@@ -17,14 +19,20 @@ real(8)                   :: photons
 contains
 
 subroutine settables
-
-    print*, inputs%tables_file
-    print*, inputs%ai
-    print*, inputs%ab
-    print*, inputs%impurity_charge
+    colrad_threshold = 0.0
     call read_tables()
 end subroutine settables
 
+subroutine getdens(dene,impq,Zeff,denp,denimp)
+    real(8), intent(in)                    :: dene
+    integer, intent(in)                    :: impq
+    real(8), intent(in)                    :: Zeff
+    real(8), intent(out)                   :: denp
+    real(8), intent(out)                   :: denimp
+
+    denimp = ((Zeff-1.d0)/(impq*(impq-1.d0)))*dene
+    denp = dene - impq*denimp
+end subroutine getdens
 
 subroutine setplasma(dene, denp, denimp, te, ti)
     real(8), intent(in)                    :: dene
@@ -32,10 +40,10 @@ subroutine setplasma(dene, denp, denimp, te, ti)
     real(8), intent(in)                    :: denimp
     real(8), intent(in)                    :: te
     real(8), intent(in)                    :: ti
-
+    
     Plasma%dene = dene
-    Plasma%denp = denp
     Plasma%denimp = denimp
+    Plasma%denp = denp
     Plasma%te = te
     Plasma%ti = ti
     Plasma%in_plasma = .True.
@@ -101,14 +109,19 @@ subroutine testcol(i_type,eb,dt,states,dens,photons)
 end subroutine testcol
 
 
-
-
-
-
 end module fidanet
 
 
 
+! eb [1eV,100keV]
+!Te / Ti [1eV,20keV]
+!ne [0,2e14]
+!Zeff [1,6]    <-- make thing to determine denp,denimp from Zeff and dene
+
+! Start w/ ground state, dt big ~ Einstein inverted * 10
+! Einstein inverted not always big enough for some choices of parameters that are inside the
+!   (admittedly massive) ranges given.
+! In these instances, 1 should still work
 
 
 !+important plasma parameters:

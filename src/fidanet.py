@@ -8,7 +8,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
     Module fidanet
     
     
-    Defined at fidanet.f90 lines 2-112
+    Defined at fidanet.f90 lines 2-114
     
     """
     @staticmethod
@@ -17,11 +17,34 @@ class Fidanet(f90wrap.runtime.FortranModule):
         settables()
         
         
-        Defined at fidanet.f90 lines 19-27
+        Defined at fidanet.f90 lines 21-24
         
         
         """
         _fidanet.f90wrap_settables()
+    
+    @staticmethod
+    def getdens(dene, impq, zeff):
+        """
+        denp, denimp = getdens(dene, impq, zeff)
+        
+        
+        Defined at fidanet.f90 lines 26-35
+        
+        Parameters
+        ----------
+        dene : float
+        impq : int
+        zeff : float
+        
+        Returns
+        -------
+        denp : float
+        denimp : float
+        
+        """
+        denp, denimp = _fidanet.f90wrap_getdens(dene=dene, impq=impq, zeff=zeff)
+        return denp, denimp
     
     @staticmethod
     def setplasma(dene, denp, denimp, te, ti):
@@ -29,7 +52,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         setplasma(dene, denp, denimp, te, ti)
         
         
-        Defined at fidanet.f90 lines 29-42
+        Defined at fidanet.f90 lines 37-50
         
         Parameters
         ----------
@@ -48,7 +71,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         setinputs(ai, ab, impq)
         
         
-        Defined at fidanet.f90 lines 44-55
+        Defined at fidanet.f90 lines 52-63
         
         Parameters
         ----------
@@ -65,7 +88,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         calcvn(i_type, eb, vn)
         
         
-        Defined at fidanet.f90 lines 57-73
+        Defined at fidanet.f90 lines 65-81
         
         Parameters
         ----------
@@ -82,7 +105,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         setstates(newstates, states)
         
         
-        Defined at fidanet.f90 lines 75-80
+        Defined at fidanet.f90 lines 83-88
         
         Parameters
         ----------
@@ -98,7 +121,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         photons = testcol(i_type, eb, dt, states, dens)
         
         
-        Defined at fidanet.f90 lines 82-106
+        Defined at fidanet.f90 lines 90-110
         
         Parameters
         ----------
@@ -148,12 +171,42 @@ class Fidanet(f90wrap.runtime.FortranModule):
         _fidanet.f90wrap_fidanet__set__ab(ab)
     
     @property
+    def impq(self):
+        """
+        Element impq ftype=integer                    pytype=int
+        
+        
+        Defined at fidanet.f90 line 12
+        
+        """
+        return _fidanet.f90wrap_fidanet__get__impq()
+    
+    @impq.setter
+    def impq(self, impq):
+        _fidanet.f90wrap_fidanet__set__impq(impq)
+    
+    @property
+    def eqt(self):
+        """
+        Element eqt ftype=real(8) pytype=float
+        
+        
+        Defined at fidanet.f90 line 13
+        
+        """
+        return _fidanet.f90wrap_fidanet__get__eqt()
+    
+    @eqt.setter
+    def eqt(self, eqt):
+        _fidanet.f90wrap_fidanet__set__eqt(eqt)
+    
+    @property
     def states(self):
         """
         Element states ftype=real(8) pytype=float
         
         
-        Defined at fidanet.f90 line 13
+        Defined at fidanet.f90 line 15
         
         """
         array_ndim, array_type, array_shape, array_handle = \
@@ -177,7 +230,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         Element dens ftype=real(8) pytype=float
         
         
-        Defined at fidanet.f90 line 14
+        Defined at fidanet.f90 line 16
         
         """
         array_ndim, array_type, array_shape, array_handle = \
@@ -201,7 +254,7 @@ class Fidanet(f90wrap.runtime.FortranModule):
         Element photons ftype=real(8) pytype=float
         
         
-        Defined at fidanet.f90 line 15
+        Defined at fidanet.f90 line 17
         
         """
         return _fidanet.f90wrap_fidanet__get__photons()
@@ -216,6 +269,10 @@ class Fidanet(f90wrap.runtime.FortranModule):
         ret.append(repr(self.ai))
         ret.append(',\n    ab : ')
         ret.append(repr(self.ab))
+        ret.append(',\n    impq : ')
+        ret.append(repr(self.impq))
+        ret.append(',\n    eqt : ')
+        ret.append(repr(self.eqt))
         ret.append(',\n    states : ')
         ret.append(repr(self.states))
         ret.append(',\n    dens : ')

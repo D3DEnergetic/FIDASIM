@@ -7,6 +7,18 @@ subroutine f90wrap_settables
     call settables()
 end subroutine f90wrap_settables
 
+subroutine f90wrap_getdens(dene, impq, zeff, denp, denimp)
+    use fidanet, only: getdens
+    implicit none
+    
+    real(8), intent(in) :: dene
+    integer, intent(in) :: impq
+    real(8), intent(in) :: zeff
+    real(8), intent(out) :: denp
+    real(8), intent(out) :: denimp
+    call getdens(dene=dene, impq=impq, Zeff=zeff, denp=denp, denimp=denimp)
+end subroutine f90wrap_getdens
+
 subroutine f90wrap_setplasma(dene, denp, denimp, te, ti)
     use fidanet, only: setplasma
     implicit none
@@ -93,6 +105,38 @@ subroutine f90wrap_fidanet__set__ab(f90wrap_ab)
     
     fidanet_ab = f90wrap_ab
 end subroutine f90wrap_fidanet__set__ab
+
+subroutine f90wrap_fidanet__get__impq(f90wrap_impq)
+    use fidanet, only: fidanet_impq => impq
+    implicit none
+    integer, intent(out) :: f90wrap_impq
+    
+    f90wrap_impq = fidanet_impq
+end subroutine f90wrap_fidanet__get__impq
+
+subroutine f90wrap_fidanet__set__impq(f90wrap_impq)
+    use fidanet, only: fidanet_impq => impq
+    implicit none
+    integer, intent(in) :: f90wrap_impq
+    
+    fidanet_impq = f90wrap_impq
+end subroutine f90wrap_fidanet__set__impq
+
+subroutine f90wrap_fidanet__get__eqt(f90wrap_eqt)
+    use fidanet, only: fidanet_eqt => eqt
+    implicit none
+    real(8), intent(out) :: f90wrap_eqt
+    
+    f90wrap_eqt = fidanet_eqt
+end subroutine f90wrap_fidanet__get__eqt
+
+subroutine f90wrap_fidanet__set__eqt(f90wrap_eqt)
+    use fidanet, only: fidanet_eqt => eqt
+    implicit none
+    real(8), intent(in) :: f90wrap_eqt
+    
+    fidanet_eqt = f90wrap_eqt
+end subroutine f90wrap_fidanet__set__eqt
 
 subroutine f90wrap_fidanet__array__states(dummy_this, nd, dtype, dshape, dloc)
     use libfida

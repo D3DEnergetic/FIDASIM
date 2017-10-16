@@ -94,7 +94,7 @@ integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
 real(Float64), dimension(ntypes) :: halo_iter_dens = 0.d0
     !+ Keeps track of how of each generations halo density
-integer :: nbi_outside = 0
+integer :: nbi_outside[*] = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
 
 type InterpolCoeffs1D
@@ -710,17 +710,17 @@ end type NPAResults
 
 type BirthProfile
     !+ Birth profile structure
-    integer :: cnt = 1
+    integer :: cnt[*] = 1
         !+ Particle counter
-    integer, dimension(:), allocatable             :: neut_type
+    integer, dimension(:), allocatable             :: neut_type[*]
         !+ Particle birth type (1=Full, 2=Half, 3=Third)
-    real(Float64), dimension(:,:), allocatable     :: ri
+    real(Float64), dimension(:,:), allocatable     :: ri[*]
         !+ Particle birth position [cm]
-    real(Float64), dimension(:,:), allocatable     :: vi
+    real(Float64), dimension(:,:), allocatable     :: vi[*]
         !+ Particle birth velocity [cm/s]
-    integer, dimension(:,:), allocatable           :: ind
+    integer, dimension(:,:), allocatable           :: ind[*]
         !+ Particle [[libfida:beam_grid]] indices
-    real(Float64), dimension(:,:,:,:), allocatable :: dens
+    real(Float64), dimension(:,:,:,:), allocatable :: dens[*]
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
 
@@ -889,7 +889,7 @@ end type ParticleTrack
 
 type GyroSurface
     !+ Surface containing the fast-ion velocity vectors for all values of the
-    !+ gyro-angle. It takes the form of a hyperboloid 
+    !+ gyro-angle. It takes the form of a hyperboloid
     !+ \((x(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(cos(\gamma + \pi/2) - \omega_i t sin(\gamma + \pi/2)) \)
     !+ \((y(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(sin(\gamma + \pi/2) + \omega_i t cos(\gamma + \pi/2)) \)
     !+ \((z(\gamma,t) = \alpha \omega_i \rm{pitch} t\)
@@ -977,17 +977,17 @@ type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
-type(BirthProfile), save        :: birth
+type(BirthProfile), save        :: birth[*]
     !+ Variable for storing the calculated birth profile
-type(NeutralDensity), save      :: neut
+type(NeutralDensity), save      :: neut[*]
     !+ Variable for storing the calculated beam density
-type(Spectra), save             :: spec
+type(Spectra), save             :: spec[*]
     !+ Variable for storing the calculated spectra
-type(NeutronRate), save         :: neutron
+type(NeutronRate), save         :: neutron[*]
     !+ Variable for storing the neutron rate
-type(FIDAWeights), save         :: fweight
+type(FIDAWeights), save         :: fweight[*]
     !+ Variable for storing the calculated FIDA weights
-type(NPAWeights), save          :: nweight
+type(NPAWeights), save          :: nweight[*]
     !+ Variable for storing the calculated NPA weights
 
 contains
@@ -1606,7 +1606,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron
+    integer            :: pathlen, calc_neutron, nimages
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,dump_dcx,no_flr
@@ -1676,12 +1676,13 @@ subroutine read_inputs
     inputs%no_flr = no_flr
 
     !!Monte Carlo Settings
-    inputs%n_fida=max(10,n_fida)
-    inputs%n_npa=max(10,n_npa)
-    inputs%n_nbi=max(10,n_nbi)
-    inputs%n_halo=max(10,n_halo)
-    inputs%n_dcx=max(10,n_dcx)
-    inputs%n_birth= max(1,nint(n_birth/real(n_nbi)))
+    nimages = num_images()
+    inputs%n_fida=max(10,n_fida/nimages)
+    inputs%n_npa=max(10,n_npa/nimages)
+    inputs%n_nbi=max(10,n_nbi/nimages)
+    inputs%n_halo=max(10,n_halo/nimages)
+    inputs%n_dcx=max(10,n_dcx/nimages)
+    inputs%n_birth= max(1,nint(n_birth/real(n_nbi*nimages)))
 
     !!Plasma Settings
     inputs%ai=ai
@@ -1722,6 +1723,9 @@ subroutine read_inputs
     beam_grid%beta=beta
     beam_grid%gamma=gamma
     beam_grid%origin=origin
+
+    !! Only output on master
+    if(this_image().ne.1) inputs%verbose=0
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Shot settings ----"
@@ -4545,7 +4549,7 @@ subroutine line_gyro_surface_intersect(r0, v0, gs, t)
 
     t(1) = (-b - sqrt(d))/(2*a)
     t(2) = (-b + sqrt(d))/(2*a)
-    
+
 end subroutine line_gyro_surface_intersect
 
 subroutine gyro_surface_coordinates(gs, p, u)
@@ -4605,7 +4609,7 @@ subroutine gyro_trajectory(gs, theta, ri, vi)
     vi = gs%omega*matmul(gs%basis, [-a*sin(th), b*cos(th), c])
 
 end subroutine gyro_trajectory
-    
+
 function in_gyro_surface(gs, p) result(in_gs)
     !+ Indicator function for determining if a point is inside the gyro_surface
     type(GyroSurface), intent(in)           :: gs
@@ -6100,7 +6104,7 @@ subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
     do i=1,ntypes
         if((types(i).le.3).and.(types(i).ne.0)) then
             ! CX with full type'th energy NBI neutrals
-            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3)) 
+            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3))
             vn = vnbi/sqrt(real(types(i)))
             call bb_cx_rates(denn,v_ion,vn,rates)
             prob = prob+rates
@@ -7062,7 +7066,7 @@ subroutine ndmc
     logical :: err
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi
+        write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi*num_images()
     endif
 
     !! # of injected neutrals = NBI power/energy_per_particle
@@ -7130,12 +7134,27 @@ subroutine ndmc
         endif
     enddo loop_over_markers
 
+    !! Combine results from different processes
+    nimages = num_images()
+    call co_sum(neut%dens(:,1:3,:,:,:))
+    neut%dens = neut%dens/nimages
+
+    call co_sum(spec%bes(:,:,1:3))
+    spec%bes(:,:,1:3) = spec%bes(:,:,1:3)/nimages
+
+    call co_sum(birth%dens)
+    birth%dens = birth%dens/nimages
+
+    call co_sum(nbi_outside)
     if(nbi_outside.gt.0)then
         if(inputs%verbose.ge.0) then
             write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                                   100.*nbi_outside/(3.*inputs%n_nbi)
         endif
-        if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
+        if(sum(neut%dens).eq.0) then
+            write(*,'(a)') 'Beam does not intersect the grid!'
+            stop all
+        endif
     endif
 
 end subroutine ndmc
@@ -8599,7 +8618,9 @@ program fidasim
     version = _VERSION
 #endif
 
-    call print_banner()
+    if(this_image() == 1) then
+        call print_banner()
+    endif
 
     narg = command_argument_count()
     if(narg.eq.0) then

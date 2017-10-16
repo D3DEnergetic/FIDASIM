@@ -1021,14 +1021,6 @@ subroutine print_banner()
     write(*,'(a)') ""
 #endif
 
-#ifdef _OMP
-#else
-    write(*,'(a)') "########################### ATTENTION ###########################"
-    write(*,'(a)') "#              OpenMP threading has been disabled               #"
-    write(*,'(a)') "#################################################################"
-    write(*,'(a)') ""
-#endif
-
 end subroutine print_banner
 
 !============================================================================
@@ -2087,8 +2079,6 @@ subroutine read_chords
         endif
 
         dlength = 0.d0
-        !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-        !$OMP& length, r_enter, r_exit, j, tracks, ncell, ind)
         do ic=1,nc
             ! Uniformally sample within spot size
             call randu(randomu)
@@ -2104,13 +2094,10 @@ subroutine read_chords
             track_loop: do j=1, ncell
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
-                !$OMP CRITICAL(read_chords_1)
                 dlength(ind(1),ind(2),ind(3)) = &
                 dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                !$OMP END CRITICAL(read_chords_1)
             enddo track_loop
         enddo
-        !$OMP END PARALLEL DO
         do kk=1,beam_grid%nz
             do jj=1,beam_grid%ny
                 xloop: do ii=1, beam_grid%nx
@@ -2292,8 +2279,6 @@ subroutine read_npa
             inv_basis = npa_chords%det(ichan)%detector%inv_basis
             cnt = 0
             ! For each grid point find the probability of hitting the detector given an isotropic source
-            !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields)
             do k=1,beam_grid%nz
                 do j=1,beam_grid%ny
                     do i=1,beam_grid%nx
@@ -2334,7 +2319,6 @@ subroutine read_npa
                     enddo !x loop
                 enddo !y loop
             enddo !z loop
-            !$OMP END PARALLEL DO
 
             total_prob = sum(npa_chords%phit(:,:,:,ichan)%p)
             if(total_prob.le.0.d0) then
@@ -2612,8 +2596,6 @@ subroutine read_mc(fid, error)
     cnt=0
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
-    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,minpos,fields,uvw,phi,ri,vi, &
-    !$OMP& delta_phi,phi_enter,phi_exit,C_xyz)
     particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
@@ -2642,13 +2624,10 @@ subroutine read_mc(fid, error)
         ir = minpos(1)
         minpos = minloc(abs(inter_grid%z - particles%fast_ion(i)%z))
         iz = minpos(1)
-        !$OMP CRITICAL(mc_denf)
         equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + weight(i) / &
                                    (2*pi*particles%fast_ion(i)%r*inter_grid%da)
-        !$OMP END CRITICAL(mc_denf)
         cnt=cnt+1
     enddo particle_loop
-    !$OMP END PARALLEL DO
 
     num = count(particles%fast_ion%cross_grid)
     if(num.le.0) then
@@ -5815,11 +5794,9 @@ subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
         iter = .False.
     endif
 
-    !$OMP CRITICAL(store_neutrals_1)
     if(iter) halo_iter_dens(neut_type) = halo_iter_dens(neut_type) + sum(dens)
     neut%dens(:,neut_type,ind(1),ind(2),ind(3)) = &
         neut%dens(:,neut_type,ind(1),ind(2),ind(3))+dens ![neutrals/cm^3]
-    !$OMP END CRITICAL(store_neutrals_1)
 
 end subroutine store_neutrals
 
@@ -5832,10 +5809,8 @@ subroutine store_births(ind, neut_type, dflux)
     real(Float64), intent(in)                :: dflux
         !+ Deposited flux
 
-    !$OMP CRITICAL(store_births_1)
     birth%dens( neut_type,ind(1),ind(2),ind(3))= &
      birth%dens(neut_type,ind(1),ind(2),ind(3)) + dflux
-    !$OMP END CRITICAL(store_births_1)
 end subroutine store_births
 
 subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
@@ -5883,7 +5858,6 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
         pitch = 0.d0
     endif
 
-    !$OMP CRITICAL(store_npa_1)
     npa%npart = npa%npart + 1
     if(npa%npart.gt.npa%nmax) then
         npa%nmax = int(npa%nmax*2)
@@ -5905,7 +5879,6 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
     ienergy = minloc(abs(npa%energy - energy))
     npa%flux(ienergy(1),det,iclass) = &
         npa%flux(ienergy(1),det,iclass) + flux/dE
-    !$OMP END CRITICAL(store_npa_1)
 
 end subroutine store_npa
 
@@ -6525,10 +6498,8 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            !$OMP CRITICAL(bes_spectrum)
             spec%bes(bin,ichan,neut_type)= &
               spec%bes(bin,ichan,neut_type) + intensity(i)
-            !$OMP END CRITICAL(bes_spectrum)
         enddo loop_over_stark
     enddo loop_over_channels
 
@@ -6578,10 +6549,8 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            !$OMP CRITICAL(fida_spectrum)
             spec%fida(bin,ichan,iclass)= &
               spec%fida(bin,ichan,iclass) + intensity(i)
-            !$OMP END CRITICAL(fida_spectrum)
         enddo loop_over_stark
     enddo loop_over_channels
 
@@ -6602,9 +6571,7 @@ subroutine store_neutrons(rate, orbit_class)
         iclass = 1
     endif
 
-    !$OMP CRITICAL(neutron_rate)
     neutron%rate(iclass)= neutron%rate(iclass) + rate
-    !$OMP END CRITICAL(neutron_rate)
 
 end subroutine store_neutrons
 
@@ -6641,7 +6608,6 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
     call spectrum(vp,vi,fields,sigma_pi,photons, &
                   dlength,lambda,intensity)
 
-    !$OMP CRITICAL(fida_wght)
     loop_over_stark: do i=1,n_stark
         bin=floor((lambda(i) - inputs%lambdamin_wght)/dlambda) + 1
         if (bin.lt.1)                   cycle loop_over_stark
@@ -6655,7 +6621,6 @@ subroutine store_fw_photons_at_chan(ichan,eind,pind,vp,vi,fields,dlength,sigma_p
         fweight%mean_f(eind,pind,ichan) = fweight%mean_f(eind,pind,ichan) + &
                                           (denf*intens_fac)*sum(intensity)
     endif
-    !$OMP END CRITICAL(fida_wght)
 
 end subroutine store_fw_photons_at_chan
 
@@ -7108,9 +7073,6 @@ subroutine ndmc
 
     nlaunch=real(inputs%n_nbi)
     cnt = 0
-    !$OMP PARALLEL DO schedule(guided) &
-    !$OMP& private(vnbi,rnbi,tracks,ncell,plasma,nl_birth,randi, &
-    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
     loop_over_markers: do ii=1,inputs%n_nbi
         if(inputs%calc_birth.ge.1) then
             !! Determine the type of birth particle (1, 2, or 3)
@@ -7150,7 +7112,6 @@ subroutine ndmc
             enddo loop_along_track
             if(inputs%calc_birth.ge.1) then
                 !! Sample according to deposited flux along neutral trajectory
-                !$OMP CRITICAL(ndmc_birth)
                 do kk=1,nl_birth(neut_type)
                     call randind(tracks(1:ncell)%flux,randi)
                     call randu(randomu)
@@ -7161,7 +7122,6 @@ subroutine ndmc
                                             vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
                     birth%cnt = birth%cnt+1
                 enddo
-                !$OMP END CRITICAL(ndmc_birth)
             endif
         enddo energy_fractions
         if (inputs%verbose.ge.2)then
@@ -7169,7 +7129,6 @@ subroutine ndmc
             WRITE(*,'(f7.2,"% completed",a,$)') 100*cnt/nlaunch,char(13)
         endif
     enddo loop_over_markers
-    !$OMP END PARALLEL DO
 
     if(nbi_outside.gt.0)then
         if(inputs%verbose.ge.0) then
@@ -7201,8 +7160,6 @@ subroutine bremsstrahlung
     dlambda = 10*inputs%dlambda ![A]
 
     dlength = 0.3 !cm
-    !! $OMP PARALLEL DO schedule(guided) private(ichan,xyz,vi,basis,spot_size, &
-    !! $OMP& ic, nc,randomu,sqrt_rho,theta,r0,plasma,gaunt,brems)
     loop_over_channels: do ichan=1,spec_chords%nchan
         xyz = spec_chords%los(ichan)%lens
         vi = spec_chords%los(ichan)%axis
@@ -7255,7 +7212,6 @@ subroutine bremsstrahlung
             WRITE(*,'(f7.2,"% completed",a,$)') 100*ichan/real(spec_chords%nchan),char(13)
         endif
     enddo loop_over_channels
-    !! $OMP END PARALLEL DO
 
     deallocate(lambda_arr,brems)
 
@@ -7312,8 +7268,6 @@ subroutine dcx
         loop_along_y: do j = 1, beam_grid%ny
             loop_along_x: do i = 1, beam_grid%nx
                 !! Loop over the markers
-                !$OMP PARALLEL DO schedule(guided) private(idcx,ind,vihalo, &
-                !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
                 loop_over_dcx: do idcx=1,int(nlaunch(i,j,k),Int64)
                     !! Calculate ri,vhalo and track
                     ind = [i, j, k]
@@ -7343,7 +7297,6 @@ subroutine dcx
 
                     enddo loop_along_track
                 enddo loop_over_dcx
-                !$OMP END PARALLEL DO
                 ccnt=ccnt+1
                 if (inputs%verbose.ge.2)then
                     WRITE(*,'(f7.2,"% completed",a,$)') ccnt*inv_ng,char(13)
@@ -7415,8 +7368,6 @@ subroutine halo
             write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
         endif
         ccnt=0.d0
-        !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
         loop_along_z: do k = 1, beam_grid%nz
             loop_along_y: do j = 1, beam_grid%ny
                 loop_along_x: do i = 1, beam_grid%nx
@@ -7458,7 +7409,6 @@ subroutine halo
                 enddo loop_along_x
             enddo loop_along_y
         enddo loop_along_z
-        !$OMP END PARALLEL DO
 
         halo_iteration_dens = halo_iter_dens(s2type)
         neut%dens(:,halo_type,:,:,:)= neut%dens(:,halo_type,:,:,:) &
@@ -7549,8 +7499,6 @@ subroutine fida_f
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields, &
-        !$OMP tracks,ncell,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, fields, eb, ptch, denf)
@@ -7580,7 +7528,6 @@ subroutine fida_f
                 call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
-        !$OMP END PARALLEL DO
         cnt=cnt+1
 
         if (inputs%verbose.ge.2)then
@@ -7623,8 +7570,6 @@ subroutine fida_mc
     endif
 
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ncell,jj,rates,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=1,particles%nparticle
         fast_ion = particles%fast_ion(iion)
         cnt=cnt+1
@@ -7683,7 +7628,6 @@ subroutine fida_mc
           WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_fast_ions
-    !$OMP END PARALLEL DO
 
 end subroutine fida_mc
 
@@ -7748,8 +7692,6 @@ subroutine npa_f
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
-        !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
@@ -7793,7 +7735,6 @@ subroutine npa_f
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
-        !$OMP END PARALLEL DO
         cnt=cnt+1
         if (inputs%verbose.ge.2)then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
@@ -7833,8 +7774,6 @@ subroutine npa_mc
     endif
 
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it, &
-    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
@@ -7944,7 +7883,6 @@ subroutine npa_mc
           WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_fast_ions
-    !$OMP END PARALLEL DO
     if(inputs%verbose.ge.1) then
         write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
     endif
@@ -7971,8 +7909,6 @@ subroutine neutron_f
     maxcnt=fbm%nr*fbm%nz
     inv_maxcnt = 100.d0/maxcnt
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
-    !$OMP& ir,iz,ie,ip,iphi,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel)
     z_loop: do iz = 1, fbm%nz
         r_loop: do ir=1, fbm%nr
             cnt = cnt+1
@@ -8019,7 +7955,6 @@ subroutine neutron_f
             endif
         enddo r_loop
     enddo z_loop
-    !$OMP END PARALLEL DO
 
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
@@ -8052,8 +7987,6 @@ subroutine neutron_mc
     cnt=0.0
     rate=0.0
     nphi = 20
-    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg, &
-    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,iphi)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
@@ -8116,7 +8049,6 @@ subroutine neutron_mc
             WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
         endif
     enddo loop_over_fast_ions
-    !$OMP END PARALLEL DO
 
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
@@ -8236,9 +8168,6 @@ subroutine fida_weights_mc
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        !$OMP PARALLEL DO schedule(guided) private(iion,vi,ri,rg,ienergy,ipitch, &
-        !$OMP tracks,ncell,jj,plasma,fields,rates,denn,states,photons,energy,pitch, &
-        !$OMP los_intersect,randomu3,fbm_denf)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution uniformally
             call randind(inputs%ne_wght, ienergy)
@@ -8281,7 +8210,6 @@ subroutine fida_weights_mc
                      tracks(jj)%pos, vi, fbm_denf, photons/nlaunch(i,j,k))
             enddo loop_along_track
         enddo loop_over_fast_ions
-        !$OMP END PARALLEL DO
         cnt=cnt+1
 
         if(inputs%verbose.ge.2) then
@@ -8446,9 +8374,6 @@ subroutine fida_weights_los
         sigma_pi = spec_chords%los(ichan)%sigma_pi
         dlength = 1.d0
 
-        !$OMP PARALLEL DO schedule(guided) collapse(3) private(eb,vabs,ptch,phi,vi,vi_norm, &
-        !$OMP& r_enter,r_exit,length,max_dens,ind,tracks,ncell,dt,icell,states,rates, &
-        !$OMP& vhalo,denn,denf,photons,ienergy,ipitch,igyro)
         do ienergy=1,inputs%ne_wght
             do ipitch=1,inputs%np_wght
                 do igyro=1,inputs%nphi_wght
@@ -8493,7 +8418,6 @@ subroutine fida_weights_los
                 enddo
             enddo
         enddo
-        !$OMP END PARALLEL DO
     enddo chan_loop
 
     fweight%mean_f = fweight%mean_f/(dEdP)
@@ -8578,8 +8502,6 @@ subroutine npa_weights
         endif
 
         ccnt=0.d0
-        !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,fields,phit,&
-        !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf)
         loop_along_z: do kk=1,beam_grid%nz
             loop_along_y: do jj=1,beam_grid%ny
                 loop_along_x: do ii=1,beam_grid%nx
@@ -8626,7 +8548,6 @@ subroutine npa_weights
                             call attenuate(pos,dpos,vi,states)
                             pcxa=sum(states)/sum(states_i)
 
-                            !$OMP CRITICAL(npa_wght)
                             nweight%attenuation(ic,ii,jj,kk,ichan) = pcxa
                             nweight%cx(ic,ii,jj,kk,ichan) = sum(pcx)
                             nweight%weight(ic,ipitch(1),ichan) = nweight%weight(ic,ipitch(1),ichan) + &
@@ -8637,7 +8558,6 @@ subroutine npa_weights
                                       !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
                             nweight%emissivity(ii,jj,kk,ichan)=nweight%emissivity(ii,jj,kk,ichan)+ &
                                       2*fbm_denf*sum(pcx)*pcxa*phit%p*dE
-                            !$OMP END CRITICAL(npa_wght)
                         enddo loop_over_energy
                     endif
                     ccnt=ccnt+1
@@ -8647,7 +8567,6 @@ subroutine npa_weights
                 enddo loop_along_x
             enddo loop_along_y
         enddo loop_along_z
-        !$OMP END PARALLEL DO
 
        if(inputs%verbose.ge.1) then
            write(*,'(T4,A,ES14.5)') 'Flux:   ',sum(nweight%flux(:,ichan))*dE
@@ -8669,9 +8588,7 @@ program fidasim
     !+ FIDASIM {!../VERSION!}
     use libfida
     use hdf5_extra
-#ifdef _OMP
-    use omp_lib
-#endif
+
     implicit none
     character(3)          :: arg = ''
     integer, dimension(8) :: time_arr,time_start,time_end !Time array
@@ -8700,28 +8617,10 @@ program fidasim
 
     call read_inputs()
 
-#ifdef _OMP
-    max_threads = OMP_get_num_procs()
-    if(narg.ge.2) then
-        call get_command_argument(2,arg)
-        read(arg,'(i3)') nthreads
-    else
-        nthreads = max_threads
-    endif
-    max_threads = min(nthreads,max_threads)
-    if(inputs%verbose.ge.1) then
-        write(*,'(a)') "---- OpenMP settings ----"
-        write(*,'(T2,"Number of threads: ",i2)') max_threads
-        write(*,*) ''
-    endif
-    call OMP_set_num_threads(max_threads)
-#else
-    max_threads = 1
-#endif
-
     !! ----------------------------------------------------------
     !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
     !! ----------------------------------------------------------
+    max_threads = 1
     allocate(rng(max_threads))
     do i=1,max_threads
         call rng_init(rng(i),932117 + i)

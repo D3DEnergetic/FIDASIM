@@ -92,7 +92,7 @@ integer, parameter, dimension(n_stark) :: stark_sigma=1 - stark_pi
 !!Numerical Settings
 integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
-real(Float64), dimension(ntypes) :: halo_iter_dens = 0.d0
+real(Float64), dimension(ntypes) :: halo_iter_dens[*] = 0.d0
     !+ Keeps track of how of each generations halo density
 integer :: nbi_outside[*] = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
@@ -728,9 +728,9 @@ type Spectra
     !+ Spectra storage structure
     real(Float64), dimension(:,:), allocatable   :: brems
         !+ Bremsstruhlung: brems(lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable :: bes
+    real(Float64), dimension(:,:,:), allocatable :: bes[*]
         !+ Beam emission: bes(lambda,chan,neutral_type)
-    real(Float64), dimension(:,:,:), allocatable :: fida
+    real(Float64), dimension(:,:,:), allocatable :: fida[*]
         !+ FIDA emission: fida(lambda,chan,orbit_type)
 end type Spectra
 
@@ -1636,7 +1636,7 @@ subroutine read_inputs
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
         write(*,'(a,a)') 'READ_INPUTS: Input file does not exist: ', trim(namelist_file)
-        stop
+        stop all
     endif
 
     open(13,file=namelist_file)
@@ -1805,7 +1805,7 @@ subroutine read_inputs
     endif
 
     if(error) then
-        stop
+        stop all
     endif
 
 end subroutine read_inputs
@@ -2490,7 +2490,7 @@ subroutine read_f(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
         endif
-        stop
+        stop all
     endif
 
     allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz))
@@ -2576,7 +2576,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
         endif
-        stop
+        stop all
     endif
 
     if(inputs%dist_type.eq.2) then
@@ -2638,7 +2638,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: No mc particles in beam grid'
         endif
-        stop
+        stop all
     endif
 
     if(inputs%verbose.ge.1) then
@@ -2699,7 +2699,7 @@ subroutine read_atomic_cross(fid, grp, cross)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
         endif
-        stop
+        stop all
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", cross%nenergy, error)
@@ -2761,7 +2761,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_RATE: Unknown atomic interaction: ', trim(grp)
         endif
-        stop
+        stop all
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -2836,7 +2836,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
             if(inputs%verbose.ge.0) then
                 write(*,'(a,a)') 'READ_ATOMIC_RATE: Unsupported atomic interaction: ', trim(grp)
             endif
-            stop
+            stop all
         endif
     endif
 
@@ -2881,7 +2881,7 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_TRANSITIONS: Unknown atomic interaction: ', trim(grp)
         endif
-        stop
+        stop all
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -4187,7 +4187,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
         endif
-        stop
+        stop all
     endif
 
     !Open HDF5 interface
@@ -4208,7 +4208,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
         endif
-        stop
+        stop all
     endif
 
     dims = [nlevs, nx, ny, nz]
@@ -4426,7 +4426,7 @@ function in_boundary(bplane, p) result(in_b)
             if(inputs%verbose.ge.0) then
                 write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            stop
+            stop all
     END SELECT
 
 end function in_boundary
@@ -4451,7 +4451,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                stop
+                stop all
             endif
             xx = [-bplane%hw,-bplane%hw,bplane%hw,bplane%hw]
             yy = [-bplane%hh,bplane%hh,bplane%hh,-bplane%hh]
@@ -4464,7 +4464,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                stop
+                stop all
             endif
             dth = 2*pi/nb
             do i=1,nb
@@ -4477,7 +4477,7 @@ subroutine boundary_edge(bplane, bedge, nb)
             if(inputs%verbose.ge.0) then
                 write(*,'("BOUNDARY_EDGE: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            stop
+            stop all
     end select
 
 end subroutine boundary_edge
@@ -6796,7 +6796,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         if (1.0 - term1 - term2 .le. 0.0) then
             write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
                           1.0-term1-term2
-            stop
+            stop all
         endif
     else
         r_gyro = 0.d0
@@ -7035,7 +7035,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
             write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
             write(*,'(a)') "Move the beam grid closer to the source to fix"
         endif
-        stop
+        stop all
     endif
 
     !! Determine velocity of neutrals corrected by efrac
@@ -7137,7 +7137,7 @@ subroutine ndmc
     !! Combine results from different processes
     nimages = num_images()
     call co_sum(neut%dens(:,1:3,:,:,:))
-    neut%dens = neut%dens/nimages
+    neut%dens(:,1:3,:,:,:) = neut%dens(:,1:3,:,:,:)/nimages
 
     call co_sum(spec%bes(:,:,1:3))
     spec%bes(:,:,1:3) = spec%bes(:,:,1:3)/nimages
@@ -7250,7 +7250,7 @@ subroutine dcx
     real(Float64), dimension(nlevs) :: rates    !!  CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ncell
+    integer :: ncell, nimages
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
     integer :: jj       !! counter along track
     real(Float64):: tot_denn, photons  !! photon flux
@@ -7266,9 +7266,7 @@ subroutine dcx
             do i=1,beam_grid%nx
                 ind = [i,j,k]
                 call get_plasma(plasma,ind=ind)
-                tot_denn = sum(neut%dens(:,nbif_type,i,j,k)) + &
-                           sum(neut%dens(:,nbih_type,i,j,k)) + &
-                           sum(neut%dens(:,nbit_type,i,j,k))
+                tot_denn = sum(neut%dens(:,1:3,i,j,k))
                 papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
                 if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
             enddo
@@ -7324,6 +7322,13 @@ subroutine dcx
         enddo loop_along_y
     enddo loop_along_z
 
+    !! Combine results from different processes
+    nimages = num_images()
+    call co_sum(neut%dens(:,halo_type,:,:,:))
+    neut%dens(:,halo_type,:,:,:) = neut%dens(:,halo_type,:,:,:)/nimages
+
+    call co_sum(spec%bes(:,:,1:3))
+    spec%bes(:,:,1:3) = spec%bes(:,:,1:3)/nimages
 end subroutine dcx
 
 subroutine halo
@@ -7346,11 +7351,12 @@ subroutine halo
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
     real(Float64) :: papprox_tot, ccnt, inv_ng
     !! Halo iteration
-    integer :: hh !! counters
+    integer :: nimages,hh !! counters
     real(Float64) :: dcx_dens, halo_iteration_dens
     integer :: s1type  ! halo iteration
     integer :: s2type  ! halo iteration
 
+    nimages = num_images()
     s1type = fida_type
     s2type = brems_type
 
@@ -7359,7 +7365,7 @@ subroutine halo
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
         endif
-        stop
+        stop all
     endif
     inv_ng = 100.0/real(beam_grid%ngrid)
     neut%dens(:,s1type,:,:,:) = neut%dens(:,halo_type,:,:,:)
@@ -7429,6 +7435,16 @@ subroutine halo
             enddo loop_along_y
         enddo loop_along_z
 
+        !! Combine contributions across processes
+        call co_sum(halo_iter_dens(s2type))
+        halo_iter_dens(s2type) = halo_iter_dens(s2type)/nimages
+
+        call co_sum(neut%dens(:,s2type,:,:,:))
+        neut%dens(:,s2type,:,:,:) = neut%dens(:,s2type,:,:,:)/nimages
+
+        call co_sum(spec%bes(:,:,halo_type))
+        spec%bes(:,:,halo_type) = spec%bes(:,:,halo_type)/nimages
+
         halo_iteration_dens = halo_iter_dens(s2type)
         neut%dens(:,halo_type,:,:,:)= neut%dens(:,halo_type,:,:,:) &
                                            + neut%dens(:,s2type,:,:,:)
@@ -7481,6 +7497,7 @@ subroutine fida_f
     real(Float64) :: papprox_tot, inv_maxcnt, cnt, eb, ptch
     integer, dimension(3,beam_grid%ngrid) :: pcell
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
+    integer :: nimages
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -7491,11 +7508,8 @@ subroutine fida_f
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
-                papprox(i,j,k) = (sum(neut%dens(:,nbif_type,i,j,k)) + &
-                                  sum(neut%dens(:,nbih_type,i,j,k)) + &
-                                  sum(neut%dens(:,nbit_type,i,j,k)) + &
-                                  sum(neut%dens(:,halo_type,i,j,k)))* &
-                                  plasma%denf
+                papprox(i,j,k) = sum(neut%dens(:,1:4,i,j,k))* &
+                                 plasma%denf
                 if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
                     pcnt=pcnt+1
@@ -7554,6 +7568,10 @@ subroutine fida_f
         endif
     enddo loop_over_cells
 
+    !! Combine contributions across processes
+    nimages = num_images()
+    call co_sum(spec%fida)
+    spec%fida = spec%fida/nimages
 end subroutine fida_f
 
 subroutine fida_mc
@@ -7580,6 +7598,7 @@ subroutine fida_mc
     real(Float64)  :: s, c
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(1) :: randomu
+    integer :: nimages
 
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
@@ -7648,6 +7667,10 @@ subroutine fida_mc
         endif
     enddo loop_over_fast_ions
 
+    !! Combine contributions across processes
+    nimages = num_images()
+    call co_sum(spec%fida)
+    spec%fida = spec%fida/nimages
 end subroutine fida_mc
 
 subroutine npa_f
@@ -8625,7 +8648,7 @@ program fidasim
     narg = command_argument_count()
     if(narg.eq.0) then
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
-        stop
+        stop all
     else
         call get_command_argument(1,namelist_file)
     endif

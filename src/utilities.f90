@@ -8,7 +8,7 @@ module utilities
 
 implicit none
 private
-public :: ind2sub, sub2ind
+public :: ind2sub, sub2ind, split_indices
 public :: rng_type, rng_init, rng, rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
 public :: deriv
@@ -124,6 +124,21 @@ function sub2ind(dims, subs) result (ind)
 
 end function sub2ind
 
+subroutine split_indices(i1,i2,ngroup,group,istart,iend)
+    integer, intent(in)  :: i1
+    integer, intent(in)  :: i2
+    integer, intent(in)  :: ngroup
+    integer, intent(in)  :: group
+    integer, intent(out) :: istart
+    integer, intent(out) :: iend
+
+    integer :: n_per_group
+
+    n_per_group = ceiling(real((i2-i1)+1)/ngroup)
+    istart = int(i1 + (group - 1)*n_per_group)
+    iend = min(int(group*n_per_group),i2)
+
+end subroutine split_indices
 !============================================================================
 !-------------------------------Search Routines------------------------------
 !============================================================================

@@ -738,13 +738,13 @@ type NeutronRate
     !+ Neutron storage structure
     real(Float64), dimension(:), allocatable :: rate
         !+ Neutron rate: rate(orbit_type) [neutrons/sec]
-    real(Float64), dimension(:,:,:,:), allocatable :: weight
+    real(Float64), dimension(:,:,:,:), allocatable :: weight[*]
         !+ Neutron rate weight: weight(E,p,R,Z)
 end type NeutronRate
 
 type NeutralDensity
     !+ Neutral density structure
-    real(Float64), dimension(:,:,:,:,:), allocatable :: dens
+    real(Float64), dimension(:,:,:,:,:), allocatable :: dens[*]
         !+ Neutral density: dens(lev,neutral_type,x,y,z)
 end type NeutralDensity
 
@@ -969,7 +969,7 @@ type(NeutralBeam), save         :: nbi
     !+ Variable containing the neutral beam geometry and settings
 type(AtomicTables), save        :: tables
     !+ Variable containing the atomic tables
-type(NPAResults), save          :: npa
+type(NPAResults), save          :: npa[*]
     !+ Variable for storing the calculated NPA results
 type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
@@ -977,17 +977,17 @@ type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
-type(BirthProfile), save        :: birth[*]
+type(BirthProfile), save        :: birth
     !+ Variable for storing the calculated birth profile
-type(NeutralDensity), save      :: neut[*]
+type(NeutralDensity), save      :: neut
     !+ Variable for storing the calculated beam density
-type(Spectra), save             :: spec[*]
+type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
-type(NeutronRate), save         :: neutron[*]
+type(NeutronRate), save         :: neutron
     !+ Variable for storing the neutron rate
-type(FIDAWeights), save         :: fweight[*]
+type(FIDAWeights), save         :: fweight
     !+ Variable for storing the calculated FIDA weights
-type(NPAWeights), save          :: nweight[*]
+type(NPAWeights), save          :: nweight
     !+ Variable for storing the calculated NPA weights
 
 contains
@@ -3668,7 +3668,7 @@ subroutine write_spectra
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(3) :: dims
     integer(HSIZE_T), dimension(1) :: d
-    integer :: error
+    integer :: error, nimages
 
     character(charlim) :: filename
     integer :: i
@@ -3678,6 +3678,11 @@ subroutine write_spectra
     do i=1,inputs%nlambda
         lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin
     enddo
+
+    !! Combine spectra contributions across processes
+    nimages = num_images()
+    call co_sum(spec%bes/nimages)
+    call co_sum(spec%fida/nimages)
 
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
     spec%brems=spec%brems/(inputs%dlambda)/(4.d0*pi)*1.d4
@@ -7134,16 +7139,10 @@ subroutine ndmc
         endif
     enddo loop_over_markers
 
-    !! Combine results from different processes
+    !! Combine neutral density contributions across processes
     nimages = num_images()
-    call co_sum(neut%dens(:,1:3,:,:,:))
-    neut%dens(:,1:3,:,:,:) = neut%dens(:,1:3,:,:,:)/nimages
-
-    call co_sum(spec%bes(:,:,1:3))
-    spec%bes(:,:,1:3) = spec%bes(:,:,1:3)/nimages
-
-    call co_sum(birth%dens)
-    birth%dens = birth%dens/nimages
+    call co_sum(neut%dens(:,1:3,:,:,:)/nimages)
+    call co_sum(birth%dens/nimages)
 
     call co_sum(nbi_outside)
     if(nbi_outside.gt.0)then
@@ -7322,13 +7321,10 @@ subroutine dcx
         enddo loop_along_y
     enddo loop_along_z
 
-    !! Combine results from different processes
+    !! Combine dcx density contributions across processes
     nimages = num_images()
-    call co_sum(neut%dens(:,halo_type,:,:,:))
-    neut%dens(:,halo_type,:,:,:) = neut%dens(:,halo_type,:,:,:)/nimages
+    call co_sum(neut%dens(:,halo_type,:,:,:)/nimages)
 
-    call co_sum(spec%bes(:,:,1:3))
-    spec%bes(:,:,1:3) = spec%bes(:,:,1:3)/nimages
 end subroutine dcx
 
 subroutine halo
@@ -7435,15 +7431,9 @@ subroutine halo
             enddo loop_along_y
         enddo loop_along_z
 
-        !! Combine contributions across processes
-        call co_sum(halo_iter_dens(s2type))
-        halo_iter_dens(s2type) = halo_iter_dens(s2type)/nimages
-
-        call co_sum(neut%dens(:,s2type,:,:,:))
-        neut%dens(:,s2type,:,:,:) = neut%dens(:,s2type,:,:,:)/nimages
-
-        call co_sum(spec%bes(:,:,halo_type))
-        spec%bes(:,:,halo_type) = spec%bes(:,:,halo_type)/nimages
+        !! Combine halo contributions across processes
+        call co_sum(halo_iter_dens(s2type)/nimages)
+        call co_sum(neut%dens(:,s2type,:,:,:)/nimages)
 
         halo_iteration_dens = halo_iter_dens(s2type)
         neut%dens(:,halo_type,:,:,:)= neut%dens(:,halo_type,:,:,:) &
@@ -7568,15 +7558,11 @@ subroutine fida_f
         endif
     enddo loop_over_cells
 
-    !! Combine contributions across processes
-    nimages = num_images()
-    call co_sum(spec%fida)
-    spec%fida = spec%fida/nimages
 end subroutine fida_f
 
 subroutine fida_mc
     !+ Calculate FIDA emission using a Monte Carlo Fast-ion distribution
-    integer :: iion,iphi,nphi
+    integer :: iion,iphi,nphi,istart,iend
     type(FastIon) :: fast_ion
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
@@ -7598,7 +7584,6 @@ subroutine fida_mc
     real(Float64)  :: s, c
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
     real(Float64), dimension(1) :: randomu
-    integer :: nimages
 
     maxcnt=particles%nparticle
     inv_maxcnt = 100.d0/maxcnt
@@ -7607,8 +7592,9 @@ subroutine fida_mc
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
+    call split_indices(1,particles%nparticles,num_images(),this_image(),istart,iend)
     cnt=0.0
-    loop_over_fast_ions: do iion=1,particles%nparticle
+    loop_over_fast_ions: do iion=istart,iend
         fast_ion = particles%fast_ion(iion)
         cnt=cnt+1
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -7667,10 +7653,6 @@ subroutine fida_mc
         endif
     enddo loop_over_fast_ions
 
-    !! Combine contributions across processes
-    nimages = num_images()
-    call co_sum(spec%fida)
-    spec%fida = spec%fida/nimages
 end subroutine fida_mc
 
 subroutine npa_f
@@ -7790,7 +7772,7 @@ end subroutine npa_f
 
 subroutine npa_mc
     !+ Calculate NPA flux using a Monte Carlo fast-ion distribution
-    integer :: iion,iphi,nphi
+    integer :: iion,iphi,nphi,istart,iend
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
     real(Float64), dimension(3) :: ri, rf, rg, vi
@@ -7815,8 +7797,10 @@ subroutine npa_mc
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
+    call split_indices(1,particles%nparticles,num_images(),this_image(),istart,iend)
+
     cnt=0.0
-    loop_over_fast_ions: do iion=1,particles%nparticle
+    loop_over_fast_ions: do iion=istart,iend
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0)cycle loop_over_fast_ions
@@ -8003,13 +7987,13 @@ subroutine neutron_f
         write(*,'(30X,a)') ''
     endif
 
-    call write_neutrons()
+    if(this_image().eq.1) call write_neutrons()
 
 end subroutine neutron_f
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
-    integer :: iion, nphi, iphi
+    integer :: iion, nphi, iphi, istart, iend
     type(FastIon) :: fast_ion
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
@@ -8029,7 +8013,10 @@ subroutine neutron_mc
     cnt=0.0
     rate=0.0
     nphi = 20
-    loop_over_fast_ions: do iion=1,particles%nparticle
+
+    call split_indices(1,particles%nparticles,num_images(),this_image(),istart,iend)
+
+    loop_over_fast_ions: do iion=istart,iend
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions

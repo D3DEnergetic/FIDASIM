@@ -4951,7 +4951,7 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
     end select
 
     write(*,'(a)') "---- H-"//trim(adjustl(aname))//" cross sections settings ----"
-    write(*,'(T2,"q = ", i2)'), q
+    write(*,'(T2,"q = ", i2)') q
     write(*,'(T2,"Emin = ",e9.2, " keV")') emin
     write(*,'(T2,"Emax = ",e9.2, " keV")') emax
     write(*,'(T2,"Nenergy = ", i4)') nenergy
@@ -5778,7 +5778,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
         tarr(it) = 10.d0**(log10(tmin) + (it-1)*dlogT)
     enddo
     write(*,'(a)') "---- H-"//trim(adjustl(aname))//" reaction rates settings ----"
-    write(*,'(T2,"q = ", i2)'), q
+    write(*,'(T2,"q = ", i2)') q
     write(*,'(T2,"mass = ",f7.2, " amu")') mass
     write(*,'(T2,"Emin = ",e9.2, " keV")') emin
     write(*,'(T2,"Emax = ",e9.2, " keV")') emax

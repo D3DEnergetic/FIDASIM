@@ -357,6 +357,7 @@ def check_inputs(inputs):
               'calc_birth': zero_int,
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
+              'calc_neutron': zero_int,
               'dump_dcx': zero_int}
 
     err = check_dict_schema(schema, inputs, desc="simulation settings")

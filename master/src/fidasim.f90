@@ -92,8 +92,6 @@ integer, parameter, dimension(n_stark) :: stark_sigma=1 - stark_pi
 !!Numerical Settings
 integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
-real(Float64) :: colrad_threshold=1.d6
-    !+ colrad threshold
 real(Float64), dimension(ntypes) :: halo_iter_dens = 0.d0
     !+ Keeps track of how of each generations halo density
 integer :: nbi_outside = 0
@@ -6350,9 +6348,6 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     dens=0.d0
 
     iflux=sum(states)
-    if(iflux.lt.colrad_threshold .and. inputs%calc_npa.eq.0)then
-        return
-    endif
 
     if(.not.plasma%in_plasma) then
         dens = states*dt
@@ -8912,7 +8907,6 @@ program fidasim
     !! ----------- Calculation of weight functions -----------------------
     !! -------------------------------------------------------------------
     if(inputs%calc_fida_wght.ge.1) then
-        colrad_threshold=0. !! to speed up simulation!
         call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
             write(*,'(A,I2,":",I2.2,":",I2.2)') 'fida weight function:    ',  &

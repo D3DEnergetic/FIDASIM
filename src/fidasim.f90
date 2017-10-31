@@ -1822,8 +1822,9 @@ end subroutine read_inputs
 
 subroutine make_beam_grid
     !+ Makes [[libfida:beam_grid] from user defined inputs
-    integer(Int32) :: i
-    real(Float64) :: dx, dy, dz
+    integer(Int32) :: i, j, k, n
+    real(Float64) :: dx, dy, dz, ri(3)
+    logical :: inp
 
     allocate(beam_grid%xc(beam_grid%nx),  &
              beam_grid%yc(beam_grid%ny),  &
@@ -1865,6 +1866,18 @@ subroutine make_beam_grid
     call tb_zyx(beam_grid%alpha,beam_grid%beta,beam_grid%gamma, &
                 beam_grid%basis, beam_grid%inv_basis)
 
+    !! Check if beam grid is in the plasma
+    n = 0
+    do k=1,beam_grid%nz
+        do j=1,beam_grid%ny
+            do i=1,beam_grid%nx
+                ri = [beam_grid%xc(i),beam_grid%yc(j), beam_grid%zc(k)]
+                call in_plasma(ri, inp)
+                if(inp) n = n + 1
+            enddo
+        enddo
+    enddo
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Beam grid settings ----"
         write(*,'(T2,"Nx: ", i3)') beam_grid%nx
@@ -1875,7 +1888,14 @@ subroutine make_beam_grid
         write(*,'(T2,"beta:  ",f5.2," [rad]")') beam_grid%beta
         write(*,'(T2,"gamma: ",f5.2," [rad]")') beam_grid%gamma
         write(*,'(T2,"origin: [",f7.2,",",f7.2,",",f7.2,"] [cm]")') beam_grid%origin
+        write(*,'(T2,"Number of cells in plasma: ",i8)') n
         write(*,*) ''
+    endif
+
+    if(n.le.(0.5*beam_grid%ngrid)) then
+        write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
+                        &Less than 50% of the beam grid cells fall within the plasma."
+        stop
     endif
 
 end subroutine make_beam_grid
@@ -2461,6 +2481,7 @@ subroutine read_equilibrium
         write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
         stop
     endif
+
 end subroutine read_equilibrium
 
 subroutine read_f(fid, error)
@@ -8707,8 +8728,8 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------
     !! ----------------------------------------------------------
-    call make_beam_grid()
     call read_equilibrium()
+    call make_beam_grid()
     call read_beam()
     call read_tables()
     call read_distribution()

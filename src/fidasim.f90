@@ -7811,7 +7811,7 @@ subroutine npa_mc
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
     real(Float64), dimension(3) :: ri, rf, rg, vi
-    integer :: det,j,ichan,ir,nrange
+    integer :: det,j,ichan,ir,nrange,it
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
     real(Float64), dimension(nlevs) :: rates
@@ -7894,7 +7894,11 @@ subroutine npa_mc
 
                         !! Store NPA Flux
                         flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
-                        call store_npa(det,ri,rf,vi,flux,fast_ion%class)
+                        spread_loop: do it=1,25
+                            theta = gyrange(1,ir) + (it-0.5)*dtheta/25
+                            call gyro_trajectory(gs, theta, ri, vi)
+                            call store_npa(det,ri,rf,vi,flux/25,fast_ion%class)
+                        enddo spread_loop
                     enddo gyro_range_loop
                 enddo detector_loop
             else !! Full Orbit

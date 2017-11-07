@@ -7833,7 +7833,7 @@ subroutine npa_mc
     endif
 
     cnt=0.0
-    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,ind,fast_ion,vi,ri,rf,phi,s,c,ir, &
+    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it, &
     !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
@@ -7897,6 +7897,13 @@ subroutine npa_mc
                         spread_loop: do it=1,25
                             theta = gyrange(1,ir) + (it-0.5)*dtheta/25
                             call gyro_trajectory(gs, theta, ri, vi)
+                            call hit_npa_detector(ri, vi ,det, rf, det=ichan)
+                            if(det.ne.ichan) then
+                                if (inputs%verbose.ge.0)then
+                                    write(*,*) "NPA_MC: Missed Detector ",ichan
+                                endif
+                                cycle spread_loop
+                            endif
                             call store_npa(det,ri,rf,vi,flux/25,fast_ion%class)
                         enddo spread_loop
                     enddo gyro_range_loop

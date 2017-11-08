@@ -17,18 +17,26 @@ To figure out what shell you currently have run `echo $SHELL` to find out.
 FIDASIM has the following dependencies:
 
 * Linux because all other operating systems are inferior
-* [Make](https://www.gnu.org/software/make/) for building FIDASIM.
-* Fortran, C, and C++ compilers.
+* [Make](https://www.gnu.org/software/make/) for building FIDASIM. (Required)
+* Fortran, C, and C++ compilers. (Required)
   [GNU(>v4.6)](https://gcc.gnu.org/) and [Intel(>13)](https://software.intel.com/en-us/intel-compilers) compilers are supported.
   Note you cannot mix and match different compilers.
-* [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts and pre-processing.
+* [zlib](http://zlib.net/) for file compression. (Required)
+* [Anaconda Python](https://www.continuum.io/why-anaconda) for python scripts and pre-processing. (Optional)
 * [IDL](http://www.harrisgeospatial.com/ProductsandSolutions/GeospatialProducts/IDL.aspx) for pre-processing (Optional)
-* [zlib](http://zlib.net/) for file compression.
 * [HDF5 1.8.16](https://www.hdfgroup.org/HDF5/) for reading and writing data files (Included)
 * [EFIT](https://fusion.gat.com/theory/Efit) for electro-magnetic fields (Partially Included)
 * [git](https://git-scm.com/) for version control (Optional)
 * [Ford](https://github.com/cmacmackin/ford) for creating HTML documentation (Optional)
 * [LinkChecker](http://wummel.github.io/linkchecker/) for validating HTML documentation (Optional)
+
+The following commands will install the required dependencies (Tested on Ubuntu 16.04)
+```bash
+sudo apt-get update
+sudo apt-get install build-essential
+sudo apt-get install gfortran
+sudo apt-get install zlib1g-dev
+```
 
 ##Getting FIDASIM source
 It's rather difficult to run software you haven't downloaded. There are two ways of getting the source code.

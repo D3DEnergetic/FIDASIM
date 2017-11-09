@@ -48,7 +48,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.2.0</small></a>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.2.1</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -167,35 +167,43 @@ To figure out what shell you currently have run <code>echo $SHELL</code> to find
 <p>FIDASIM has the following dependencies:</p>
 <ul>
 <li>Linux because all other operating systems are inferior</li>
-<li><a href="https://www.gnu.org/software/make/">Make</a> for building FIDASIM.</li>
-<li>Fortran, C, and C++ compilers.
+<li><a href="https://www.gnu.org/software/make/">Make</a> for building FIDASIM. (Required)</li>
+<li>Fortran, C, and C++ compilers. (Required)
   <a href="https://gcc.gnu.org/">GNU(&gt;v4.6)</a> and <a href="https://software.intel.com/en-us/intel-compilers">Intel(&gt;13)</a> compilers are supported.
   Note you cannot mix and match different compilers.</li>
-<li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> for python scripts and pre-processing.</li>
+<li><a href="http://zlib.net/">zlib</a> for file compression. (Required)</li>
+<li><a href="https://www.continuum.io/why-anaconda">Anaconda Python</a> for python scripts and pre-processing. (Optional)</li>
 <li><a href="http://www.harrisgeospatial.com/ProductsandSolutions/GeospatialProducts/IDL.aspx">IDL</a> for pre-processing (Optional)</li>
-<li><a href="http://zlib.net/">zlib</a> for file compression.</li>
 <li><a href="https://www.hdfgroup.org/HDF5/">HDF5 1.8.16</a> for reading and writing data files (Included)</li>
 <li><a href="https://fusion.gat.com/theory/Efit">EFIT</a> for electro-magnetic fields (Partially Included)</li>
 <li><a href="https://git-scm.com/">git</a> for version control (Optional)</li>
 <li><a href="https://github.com/cmacmackin/ford">Ford</a> for creating HTML documentation (Optional)</li>
 <li><a href="http://wummel.github.io/linkchecker/">LinkChecker</a> for validating HTML documentation (Optional)</li>
 </ul>
+<p>The following commands will install the required dependencies (Tested on Ubuntu 16.04)</p>
+<div class="codehilite"><pre><span></span>sudo apt-get update
+sudo apt-get install build-essential
+sudo apt-get install gfortran
+sudo apt-get install zlib1g-dev
+</pre></div>
+
+
 <h2 id="getting-fidasim-source">Getting FIDASIM source</h2>
 <p>It's rather difficult to run software you haven't downloaded. There are two ways of getting the source code.</p>
 <h3 id="downloading-source-directly">Downloading source directly</h3>
-<p>The most recent version of FIDASIM (1.2.0) can be downloaded from <a href="https://github.com/D3DEnergetic/FIDASIM/releases">here</a>
+<p>The most recent version of FIDASIM (1.2.1) can be downloaded from <a href="https://github.com/D3DEnergetic/FIDASIM/releases">here</a>
 Once you have downloaded the <code>.tar.gz</code> or <code>.zip</code> file unpack it using the following commands.</p>
-<div class="codehilite"><pre><span></span>tar -zxf FIDASIM-1.2.0.tar.gz
+<div class="codehilite"><pre><span></span>tar -zxf FIDASIM-1.2.1.tar.gz
 </pre></div>
 
 
 <p>or if you downloaded the <code>.zip</code> file</p>
-<div class="codehilite"><pre><span></span>unzip FIDASIM-1.2.0.zip
+<div class="codehilite"><pre><span></span>unzip FIDASIM-1.2.1.zip
 </pre></div>
 
 
-<p>There should now be a directory named <code>FIDASIM-1.2.0</code> in your current directory. Enter the directory using</p>
-<div class="codehilite"><pre><span></span><span class="nb">cd</span> FIDASIM-1.2.0
+<p>There should now be a directory named <code>FIDASIM-1.2.1</code> in your current directory. Enter the directory using</p>
+<div class="codehilite"><pre><span></span><span class="nb">cd</span> FIDASIM-1.2.1
 </pre></div>
 
 
@@ -208,7 +216,7 @@ Once you have downloaded the <code>.tar.gz</code> or <code>.zip</code> file unpa
 
 <p>By default you will be on the master branch which may or may not be in a usable state.
 To use the release version run the command</p>
-<div class="codehilite"><pre><span></span>git checkout v1.2.0
+<div class="codehilite"><pre><span></span>git checkout v1.2.1
 </pre></div>
 
 
@@ -241,7 +249,7 @@ To use the release version run the command</p>
 
 <p>Once running, go get a coffee since it will take a while because HDF5 is being built as well.</p>
 <p>Once make has completed check if FIDASIM compiled correctly.</p>
-<div class="codehilite"><pre><span></span>user@computer:~/FIDASIM-1.2.0$ ./fidasim
+<div class="codehilite"><pre><span></span>user@computer:~/FIDASIM-1.2.1$ ./fidasim
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ <span class="se">\ </span>/ _ <span class="p">|</span>  / __//  _//  <span class="p">|</span>/  /
  / _/ _/ / / // // __ <span class="p">|</span> _<span class="se">\ \ </span>_/ / / /<span class="p">|</span>_/ /

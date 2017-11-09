@@ -614,30 +614,38 @@ def check_beam(inputs, nbi):
     origin = inputs['origin']
     uvw_src = nbi['src']
     uvw_axis = nbi['axis']
-    uvw_pos = uvw_src + nbi['adist'][0] * uvw_axis
-    uvw_arbitrary = uvw_src + 100. * uvw_axis
+    if nbi['naperture'] == 0:
+        uvw_pos = uvw_src + 100 * uvw_axis
+    else:
+        uvw_pos = uvw_src + nbi['adist'][0]
 
     # Convert to beam coordinates
     xyz_src = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_src, origin=origin)
     xyz_axis = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_axis)
     xyz_pos = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_pos, origin=origin)
     xyz_center = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], [0., 0., 0.], origin=origin)
-    xyz_arbitrary = uvw_to_xyz(inputs['alpha'], inputs['beta'], inputs['gamma'], uvw_arbitrary, origin=origin)
 
-    dis = np.sqrt(np.sum((xyz_src - xyz_arbitrary) ** 2.))  # now dis can never be zero
+    dis = np.sqrt(np.sum((xyz_src - xyz_pos) ** 2.))
     alpha = np.arctan2((xyz_pos[1] - xyz_src[1]), (xyz_pos[0] - xyz_src[0]))
     beta = np.arcsin((xyz_src[2] - xyz_pos[2]) / dis)
 
-    print('Beam injection start point in machine coordinates')
-    print(uvw_src)
-    print('First aperture position in machine coordinates')
-    print(uvw_pos)
     print('Machine center in beam grid coordinates')
     print(xyz_center)
+    print('Beam injection start point in machine coordinates')
+    print(uvw_src)
     print('Beam injection start point in beam grid coordinates')
     print(xyz_src)
-    print('First aperture position in beam grid coordinates')
-    print(xyz_pos)
+
+    if nbi['naperture'] != 0:
+        print('First aperture position in machine coordinates')
+        print(uvw_pos)
+        print('First aperture position in beam grid coordinates')
+        print(xyz_pos)
+    else:
+        print('Position of point 100cm along beam centerline in machine coordinates')
+        print(uvw_pos)
+        print('Position of point 100cm along beam centerline in beam grid coordinates')
+        print(xyz_pos)
 
     print('Beam grid rotation angles that would align it with the beam centerline')
     print('alpha = {} deg.'.format(alpha / np.pi * 180.))

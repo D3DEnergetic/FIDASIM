@@ -88,7 +88,11 @@ PRO check_beam, inp, nbi
     origin = inp.origin
     uvw_src = nbi.src
     uvw_axis = nbi.axis
-    uvw_pos = uvw_src + nbi.adist[0]*uvw_axis
+    if nbi.naperture eq 0 then begin
+        uvw_pos = uvw_src + 100*uvw_axis
+    endif else begin
+        uvw_pos = uvw_src + nbi.adist[0]*uvw_axis
+    endelse
 
     xyz_src = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_src, origin=origin)
     xyz_axis = uvw_to_xyz(inp.alpha,inp.beta,inp.gamma,uvw_axis)
@@ -99,16 +103,25 @@ PRO check_beam, inp, nbi
     BETA=double(asin((xyz_src[2]-xyz_pos[2])/dis))
     ALPHA=double(atan((xyz_pos[1]-xyz_src[1]),(xyz_pos[0]-xyz_src[0])))
 
-    print,'Beam injection start point in machine coordinates'
-    print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_src
-    print,'First aperture position in machine coordinates'
-    print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_pos
     print,'Machine center in beam grid coordinates'
     print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_center
+    print,'Beam injection start point in machine coordinates'
+    print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_src
     print,'Beam injection start point in beam grid coordinates'
     print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_src
-    print,'First aperture position in beam grid coordinates'
-    print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_pos
+
+    if nbi.naperture ne 0 then begin
+        print,'First aperture position in machine coordinates'
+        print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_pos
+        print,'First aperture position in beam grid coordinates'
+        print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_pos
+    endif else begin
+        print,'Position of point 100cm along beam centerline in machine coordinates'
+        print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', uvw_pos
+        print,'Position of point 100cm along beam centerline in beam grid coordinates'
+        print, f='("    [",F9.3,",",F9.3,",",F9.3,"]")', xyz_pos
+    endelse
+
     print,'Beam grid rotation angles that would align it with the beam centerline'
     print, ALPHA/!DPI*180,FORMAT='("    alpha = ",F14.10,"°")'
     print, BETA/!DPI*180,FORMAT='("    beta = ",F14.10,"°")'

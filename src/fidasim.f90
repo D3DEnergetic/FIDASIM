@@ -1822,8 +1822,9 @@ end subroutine read_inputs
 
 subroutine make_beam_grid
     !+ Makes [[libfida:beam_grid] from user defined inputs
-    integer(Int32) :: i
-    real(Float64) :: dx, dy, dz
+    integer(Int32) :: i, j, k, n
+    real(Float64) :: dx, dy, dz, ri(3)
+    logical :: inp
 
     allocate(beam_grid%xc(beam_grid%nx),  &
              beam_grid%yc(beam_grid%ny),  &
@@ -1865,6 +1866,18 @@ subroutine make_beam_grid
     call tb_zyx(beam_grid%alpha,beam_grid%beta,beam_grid%gamma, &
                 beam_grid%basis, beam_grid%inv_basis)
 
+    !! Check if beam grid is in the plasma
+    n = 0
+    do k=1,beam_grid%nz
+        do j=1,beam_grid%ny
+            do i=1,beam_grid%nx
+                ri = [beam_grid%xc(i),beam_grid%yc(j), beam_grid%zc(k)]
+                call in_plasma(ri, inp)
+                if(inp) n = n + 1
+            enddo
+        enddo
+    enddo
+
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Beam grid settings ----"
         write(*,'(T2,"Nx: ", i3)') beam_grid%nx
@@ -1875,7 +1888,14 @@ subroutine make_beam_grid
         write(*,'(T2,"beta:  ",f5.2," [rad]")') beam_grid%beta
         write(*,'(T2,"gamma: ",f5.2," [rad]")') beam_grid%gamma
         write(*,'(T2,"origin: [",f7.2,",",f7.2,",",f7.2,"] [cm]")') beam_grid%origin
+        write(*,'(T2,"Number of cells in plasma: ",i8)') n
         write(*,*) ''
+    endif
+
+    if(n.le.(0.5*beam_grid%ngrid)) then
+        write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
+                        &Less than 50% of the beam grid cells fall within the plasma."
+        stop
     endif
 
 end subroutine make_beam_grid
@@ -2061,7 +2081,7 @@ subroutine read_chords
         call grid_intersect(r0,v0,length,r_enter,r_exit)
         if(length.le.0.d0) then
             if(inputs%verbose.ge.0) then
-                WRITE(*,'("Channel ",i5," missed the beam grid")'),i
+                WRITE(*,'("Channel ",i5," missed the beam grid")') i
             endif
             cycle chan_loop
         endif
@@ -2260,7 +2280,7 @@ subroutine read_npa
         call grid_intersect(xyz_d_cent,v0,length,r0,r0_d)
         if(length.le.0.0) then
             if(inputs%verbose.ge.0) then
-                WRITE(*,'("Channel ",i3," centerline missed the beam grid")'),ichan
+                WRITE(*,'("Channel ",i3," centerline missed the beam grid")') ichan
             endif
         endif
 
@@ -2325,7 +2345,7 @@ subroutine read_npa
             total_prob = sum(npa_chords%phit(:,:,:,ichan)%p)
             if(total_prob.le.0.d0) then
                 if(inputs%verbose.ge.0) then
-                    WRITE(*,'("Channel ",i3," missed the beam grid")'),ichan
+                    WRITE(*,'("Channel ",i3," missed the beam grid")') ichan
                 endif
                 cycle chan_loop
             endif
@@ -2457,6 +2477,10 @@ subroutine read_equilibrium
     allocate(equil%mask(inter_grid%nr,inter_grid%nz))
     equil%mask = 0.d0
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
+    if (sum(equil%mask).le.0.d0) then
+        write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
+        stop
+    endif
 
 end subroutine read_equilibrium
 
@@ -2522,10 +2546,10 @@ subroutine read_f(fid, error)
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z)"
-        write(*,'(T2,"Nenergy = ",i3)'),fbm%nenergy
-        write(*,'(T2,"Npitch  = ",i3)'),fbm%npitch
-        write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")'),fbm%emin,fbm%emax
-        write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")'),fbm%pmin,fbm%pmax
+        write(*,'(T2,"Nenergy = ",i3)') fbm%nenergy
+        write(*,'(T2,"Npitch  = ",i3)') fbm%npitch
+        write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")') fbm%emin,fbm%emax
+        write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")') fbm%pmin,fbm%pmax
         write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
     endif
@@ -4423,7 +4447,7 @@ function in_boundary(bplane, p) result(in_b)
             endif
         CASE DEFAULT
             if(inputs%verbose.ge.0) then
-                write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)'),bplane%shape
+                write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)') bplane%shape
             endif
             stop
     END SELECT
@@ -4474,7 +4498,7 @@ subroutine boundary_edge(bplane, bedge, nb)
             enddo
         case default
             if(inputs%verbose.ge.0) then
-                write(*,'("BOUNDARY_EDGE: Unknown boundary shape: ",i2)'),bplane%shape
+                write(*,'("BOUNDARY_EDGE: Unknown boundary shape: ",i2)') bplane%shape
             endif
             stop
     end select
@@ -7996,7 +8020,7 @@ subroutine neutron_f
     !$OMP END PARALLEL DO
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,A,ES14.5," [neutrons/s]")'),'Rate:   ',sum(neutron%rate)
+        write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
     endif
 
@@ -8093,7 +8117,7 @@ subroutine neutron_mc
     !$OMP END PARALLEL DO
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,A,ES14.5," [neutrons/s]")'),'Rate:   ',sum(neutron%rate)
+        write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
     endif
 
@@ -8624,8 +8648,8 @@ subroutine npa_weights
         !$OMP END PARALLEL DO
 
        if(inputs%verbose.ge.1) then
-           write(*,'(T4,A,ES14.5)'),'Flux:   ',sum(nweight%flux(:,ichan))*dE
-           write(*,'(T4,A,ES14.5)'),'Weight: ',sum(nweight%weight(:,:,ichan))*dE*dP
+           write(*,'(T4,A,ES14.5)') 'Flux:   ',sum(nweight%flux(:,ichan))*dE
+           write(*,'(T4,A,ES14.5)') 'Weight: ',sum(nweight%weight(:,:,ichan))*dE*dP
            write(*,*) ''
        endif
     enddo loop_over_channels
@@ -8704,8 +8728,8 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------
     !! ----------------------------------------------------------
-    call make_beam_grid()
     call read_equilibrium()
+    call make_beam_grid()
     call read_beam()
     call read_tables()
     call read_distribution()

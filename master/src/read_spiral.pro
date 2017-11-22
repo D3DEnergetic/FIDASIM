@@ -45,8 +45,8 @@ FUNCTION finite_struct, s
         if finite(s.(i)) ne 1 then return, 0
     endfor
     return, 1
-END 
-        
+END
+
 ;+ This file contains the procedure to read SPIRAL fast-ion distribution file
 FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, p_range=p_range, $
                            particle_weight=particle_weight, btipsign=btipsign
@@ -74,7 +74,7 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, p_range=p_
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> dist = read_mc_nubeam("./mc_159243H06_9",ntotal=1e19)
+    ;+IDL> dist = read_spiral("./mc_159243H06_9",ntotal=1e19,btipsign=-1)
     ;+```
 
     if not keyword_set(btipsign) then begin
@@ -84,7 +84,7 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, p_range=p_
     if not file_test(file) then begin
         error, 'Nonexistent file: '+file,/halt
     endif
-    
+
     if not keyword_set(ntotal) and not keyword_set(particle_weight) then begin
         print, 'WARNING: ntotal is not set. Setting arbitrarily to 1e19'
         ntotal = 1.d19
@@ -165,6 +165,6 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, p_range=p_
                    nparticle:long(nw),nclass:1,r:r[ww],z:z[ww],phi:phi[ww],$
                    energy:energy[ww],pitch:pitch[ww],class:orbit_class[ww],$
                    weight:weight[ww]}
-   
-    return, dist_struct 
+
+    return, dist_struct
 END

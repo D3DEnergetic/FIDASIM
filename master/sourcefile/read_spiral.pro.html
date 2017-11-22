@@ -315,7 +315,7 @@
 <h2 id="return-value">Return Value</h2>
 <p>Distribution structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> <span class="nb">dist</span> <span class="o">=</span> read_mc_nubeam(<span class="s2">&quot;./mc_159243H06_9&quot;</span>,ntotal<span class="o">=</span>1e19)
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> <span class="nb">dist</span> <span class="o">=</span> read_spiral(<span class="s2">&quot;./mc_159243H06_9&quot;</span>,ntotal<span class="o">=</span>1e19,btipsign<span class="o">=-</span><span class="mi">1</span>)
 </pre></div>
     
       
@@ -403,8 +403,8 @@
 <a name="ln-45"></a>        <span class="s s-Atom">if</span> <span class="nf">finite</span><span class="p">(</span><span class="s s-Atom">s</span><span class="p">.(</span><span class="s s-Atom">i</span><span class="p">))</span> <span class="s s-Atom">ne</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">return</span><span class="p">,</span> <span class="mi">0</span>
 <a name="ln-46"></a>    <span class="s s-Atom">endfor</span>
 <a name="ln-47"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="mi">1</span>
-<a name="ln-48"></a><span class="nv">END</span> 
-<a name="ln-49"></a>        
+<a name="ln-48"></a><span class="nv">END</span>
+<a name="ln-49"></a>
 <a name="ln-50"></a><span class="p">;</span><span class="o">+</span> <span class="nv">This</span> <span class="s s-Atom">file</span> <span class="s s-Atom">contains</span> <span class="s s-Atom">the</span> <span class="s s-Atom">procedure</span> <span class="s s-Atom">to</span> <span class="s s-Atom">read</span> <span class="nv">SPIRAL</span> <span class="s s-Atom">fast</span><span class="o">-</span><span class="s s-Atom">ion</span> <span class="s s-Atom">distribution</span> <span class="s s-Atom">file</span>
 <a name="ln-51"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">read_spiral</span><span class="p">,</span><span class="s s-Atom">file</span><span class="p">,</span> <span class="s s-Atom">time</span><span class="o">=</span><span class="s s-Atom">time</span><span class="p">,</span> <span class="s s-Atom">ntotal</span><span class="o">=</span><span class="s s-Atom">ntotal</span><span class="p">,</span> <span class="s s-Atom">e_range</span><span class="o">=</span><span class="s s-Atom">e_range</span><span class="p">,</span> <span class="s s-Atom">p_range</span><span class="o">=</span><span class="s s-Atom">p_range</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-52"></a>                           <span class="s s-Atom">particle_weight</span><span class="o">=</span><span class="s s-Atom">particle_weight</span><span class="p">,</span> <span class="s s-Atom">btipsign</span><span class="o">=</span><span class="s s-Atom">btipsign</span>
@@ -432,7 +432,7 @@
 <a name="ln-74"></a>    <span class="p">;</span><span class="o">+</span>
 <a name="ln-75"></a>    <span class="p">;</span><span class="s s-Atom">+##</span><span class="nv">Example</span> <span class="nv">Usage</span>
 <a name="ln-76"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span><span class="s s-Atom">idl</span>
-<a name="ln-77"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">dist</span> <span class="o">=</span> <span class="nf">read_mc_nubeam</span><span class="p">(</span><span class="s2">&quot;./mc_159243H06_9&quot;</span><span class="p">,</span><span class="s s-Atom">ntotal</span><span class="o">=</span><span class="mi">1</span><span class="s s-Atom">e19</span><span class="p">)</span>
+<a name="ln-77"></a>    <span class="p">;</span><span class="o">+</span><span class="nv">IDL</span><span class="o">&gt;</span> <span class="s s-Atom">dist</span> <span class="o">=</span> <span class="nf">read_spiral</span><span class="p">(</span><span class="s2">&quot;./mc_159243H06_9&quot;</span><span class="p">,</span><span class="s s-Atom">ntotal</span><span class="o">=</span><span class="mi">1</span><span class="s s-Atom">e19</span><span class="p">,</span><span class="s s-Atom">btipsign=-</span><span class="mi">1</span><span class="p">)</span>
 <a name="ln-78"></a>    <span class="p">;</span><span class="s s-Atom">+</span><span class="err">```</span>
 <a name="ln-79"></a>
 <a name="ln-80"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">btipsign</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
@@ -442,7 +442,7 @@
 <a name="ln-84"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">file</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
 <a name="ln-85"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Nonexistent file: &#39;</span><span class="o">+</span><span class="s s-Atom">file</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
 <a name="ln-86"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-87"></a>    
+<a name="ln-87"></a>
 <a name="ln-88"></a>    <span class="s s-Atom">if</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">ntotal</span><span class="p">)</span> <span class="s s-Atom">and</span> <span class="o">not</span> <span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">particle_weight</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
 <a name="ln-89"></a>        <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;WARNING: ntotal is not set. Setting arbitrarily to 1e19&#39;</span>
 <a name="ln-90"></a>        <span class="s s-Atom">ntotal</span> <span class="o">=</span> <span class="mf">1.</span><span class="s s-Atom">d19</span>
@@ -523,8 +523,8 @@
 <a name="ln-165"></a>                   <span class="nn">nparticle</span><span class="p">:</span><span class="nf">long</span><span class="p">(</span><span class="s s-Atom">nw</span><span class="p">),</span><span class="nn">nclass</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nn">r</span><span class="p">:</span><span class="s s-Atom">r</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="nn">z</span><span class="p">:</span><span class="s s-Atom">z</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="nn">phi</span><span class="p">:</span><span class="s s-Atom">phi</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="err">$</span>
 <a name="ln-166"></a>                   <span class="nn">energy</span><span class="p">:</span><span class="s s-Atom">energy</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="nn">pitch</span><span class="p">:</span><span class="s s-Atom">pitch</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="nn">class</span><span class="p">:</span><span class="s s-Atom">orbit_class</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">],</span><span class="err">$</span>
 <a name="ln-167"></a>                   <span class="nn">weight</span><span class="p">:</span><span class="s s-Atom">weight</span><span class="p">[</span><span class="s s-Atom">ww</span><span class="p">]}</span>
-<a name="ln-168"></a>   
-<a name="ln-169"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">dist_struct</span> 
+<a name="ln-168"></a>
+<a name="ln-169"></a>    <span class="s s-Atom">return</span><span class="p">,</span> <span class="s s-Atom">dist_struct</span>
 <a name="ln-170"></a><span class="nv">END</span>
 </pre></div>
 

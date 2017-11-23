@@ -702,11 +702,11 @@ type NPAResults
         !+ Number of particles that hit a detector
     integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
-    type(NPAParticle), dimension(:), allocatable :: part[:]
+    type(NPAParticle), dimension(:), allocatable :: part
         !+ Array of NPA particles
     real(Float64), dimension(:), allocatable     :: energy
         !+ Energy array [keV]
-    real(Float64), dimension(:,:,:), allocatable :: flux[:]
+    real(Float64), dimension(:,:,:), allocatable :: flux
         !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
@@ -714,15 +714,15 @@ type BirthProfile
     !+ Birth profile structure
     integer :: cnt = 1
         !+ Particle counter
-    integer, dimension(:), allocatable             :: neut_type[:]
+    integer, dimension(:), allocatable             :: neut_type
         !+ Particle birth type (1=Full, 2=Half, 3=Third)
-    real(Float64), dimension(:,:), allocatable     :: ri[:]
+    real(Float64), dimension(:,:), allocatable     :: ri
         !+ Particle birth position [cm]
-    real(Float64), dimension(:,:), allocatable     :: vi[:]
+    real(Float64), dimension(:,:), allocatable     :: vi
         !+ Particle birth velocity [cm/s]
-    integer, dimension(:,:), allocatable           :: ind[:]
+    integer, dimension(:,:), allocatable           :: ind
         !+ Particle [[libfida:beam_grid]] indices
-    real(Float64), dimension(:,:,:,:), allocatable :: dens[:]
+    real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
 
@@ -730,31 +730,31 @@ type Spectra
     !+ Spectra storage structure
     real(Float64), dimension(:,:), allocatable   :: brems
         !+ Bremsstruhlung: brems(lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable :: bes[:]
+    real(Float64), dimension(:,:,:), allocatable :: bes
         !+ Beam emission: bes(lambda,chan,neutral_type)
-    real(Float64), dimension(:,:,:), allocatable :: fida[:]
+    real(Float64), dimension(:,:,:), allocatable :: fida
         !+ FIDA emission: fida(lambda,chan,orbit_type)
 end type Spectra
 
 type NeutronRate
     !+ Neutron storage structure
-    real(Float64), dimension(:), allocatable :: rate[:]
+    real(Float64), dimension(:), allocatable :: rate
         !+ Neutron rate: rate(orbit_type) [neutrons/sec]
-    real(Float64), dimension(:,:,:,:), allocatable :: weight[:]
+    real(Float64), dimension(:,:,:,:), allocatable :: weight
         !+ Neutron rate weight: weight(E,p,R,Z)
 end type NeutronRate
 
 type NeutralDensity
     !+ Neutral density structure
-    real(Float64), dimension(:,:,:,:,:), allocatable :: dens[:]
+    real(Float64), dimension(:,:,:,:,:), allocatable :: dens
         !+ Neutral density: dens(lev,neutral_type,x,y,z)
 end type NeutralDensity
 
 type FIDAWeights
     !+ FIDA weights structure
-    real(Float64), dimension(:,:,:), allocatable   :: mean_f[:]
+    real(Float64), dimension(:,:,:), allocatable   :: mean_f
         !+ Estimate of mean fast-ion distribution function "seen" by LOS: mean_f(E,p,chan)
-    real(Float64), dimension(:,:,:,:), allocatable :: weight[:]
+    real(Float64), dimension(:,:,:,:), allocatable :: weight
         !+ FIDA weight function: weight(lambda,E,p,chan)
 end type FIDAWeights
 
@@ -3548,6 +3548,7 @@ subroutine write_npa
     do i=1,npa_chords%nchan
         dcount(i) = count(npa%part%detector.eq.i)
     enddo
+    call co_sum(dcount)
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.h5"
 
@@ -5848,7 +5849,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
     real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
-    type(NPAParticle), dimension(:), allocatable :: parts[:]
+    type(NPAParticle), dimension(:), allocatable :: parts
 
     if(present(orbit_class)) then
         iclass = orbit_class
@@ -5876,7 +5877,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
     npa%npart = npa%npart + 1
     if(npa%npart.gt.npa%nmax) then
         npa%nmax = int(npa%nmax*2)
-        allocate(parts(npa%nmax)[*])
+        allocate(parts(npa%nmax))
         parts(1:(npa%npart-1)) = npa%part
         deallocate(npa%part)
         call move_alloc(parts, npa%part)
@@ -8673,7 +8674,7 @@ program fidasim
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
     !! ----------------------------------------------------------
     !! neutral density array!
-    allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz)[*])
+    allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
     neut%dens = 0.d0
 
     !! birth profile
@@ -8681,11 +8682,11 @@ program fidasim
         allocate(birth%dens(3, &
                             beam_grid%nx, &
                             beam_grid%ny, &
-                            beam_grid%nz)[*])
-        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi))[*])
-        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi))[*])
-        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi))[*])
-        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi))[*])
+                            beam_grid%nz))
+        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi)))
+        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
+        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
+        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
         birth%neut_type = 0
         birth%dens = 0.d0
         birth%ind = 0
@@ -8695,8 +8696,8 @@ program fidasim
 
     if(inputs%calc_spec.ge.1) then
         allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4)[*])
-        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass)[*])
+        allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4))
+        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
         spec%brems = 0.d0
         spec%bes = 0.d0
         spec%fida = 0.d0
@@ -8704,7 +8705,7 @@ program fidasim
 
     if(inputs%calc_npa.ge.1)then
         npa%nchan = npa_chords%nchan
-        allocate(npa%part(npa%nmax)[*])
+        allocate(npa%part(npa%nmax))
         if(inputs%dist_type.eq.1) then
             npa%nenergy = fbm%nenergy
             allocate(npa%energy(npa%nenergy))
@@ -8715,20 +8716,20 @@ program fidasim
                 npa%energy(i)=real(i-0.5)
             enddo
         endif
-        allocate(npa%flux(npa%nenergy,npa%nchan,particles%nclass)[*])
+        allocate(npa%flux(npa%nenergy,npa%nchan,particles%nclass))
         npa%flux = 0.0
     endif
 
     if(inputs%calc_neutron.ge.1)then
-        allocate(neutron%rate(particles%nclass)[*])
-        allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz)[*])
+        allocate(neutron%rate(particles%nclass))
+        allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz))
         neutron%rate = 0.d0
         neutron%weight = 0.d0
     endif
 
     if(inputs%calc_fida_wght.ge.1)then
-        allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan)[*])
-        allocate(fweight%weight(inputs%nlambda_wght,inputs%ne_wght,inputs%np_wght,spec_chords%nchan)[*])
+        allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
+        allocate(fweight%weight(inputs%nlambda_wght,inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
         fweight%mean_f = 0.d0
         fweight%weight = 0.d0
     endif

@@ -20,28 +20,16 @@ SUPPORTED_CXX = g++
 HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
 ifeq ($(HAS_FC),)
     $(error Fortran compiler $(FC) is not supported. Set FC to gfortran)
-else
-ifneq ($(shell $(FC) -dumpversion | head -c 1), 7)
-    $(error Incompatible gfortran version. Use gfortran > 7.0.0)
-endif
 endif
 
 HAS_CC := $(strip $(foreach SC, $(SUPPORTED_CC), $(findstring $(SC), $(CC))))
 ifeq ($(HAS_CC),)
     $(error C compiler $(CC) is not supported. Set CC to gcc)
-else
-ifneq ($(shell $(CC) -dumpversion | head -c 1), 7)
-    $(error Incompatible gcc version. Use gcc > 7.0.0)
-endif
 endif
 
 HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
 ifeq ($(HAS_CXX),)
     $(error C++ compiler $(CXX) is not supported. Set CXX to g++)
-else
-ifneq ($(shell $(CXX) -dumpversion | head -c 1), 7)
-    $(error Incompatible g++ version. Use g++ > 7.0.0)
-endif
 endif
 
 # Compiler Flags

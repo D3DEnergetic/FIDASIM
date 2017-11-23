@@ -8615,7 +8615,7 @@ program fidasim
     implicit none
     character(3)          :: arg = ''
     integer, dimension(8) :: time_arr,time_start,time_end !Time array
-    integer               :: i,narg,nthreads,max_threads
+    integer               :: i,narg
     integer               :: hour,minu,sec
 
 #ifdef _VERSION
@@ -8646,11 +8646,8 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
     !! ----------------------------------------------------------
-    max_threads = 1
-    allocate(rng(max_threads))
-    do i=1,max_threads
-        call rng_init(rng(i),932117 + i)
-    enddo
+    allocate(rng(1))
+    call rng_init(rng(i),932117 + this_image())
 
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------

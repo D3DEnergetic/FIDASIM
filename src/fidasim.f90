@@ -9,6 +9,8 @@ USE utilities
 
 implicit none
 
+integer :: nimages
+    !+ Number of coarray images
 character(30) :: version = ''
     !+ FIDASIM version number
 integer, parameter, private   :: Int32   = 4
@@ -694,33 +696,33 @@ type NPAResults
     !+ MC NPA result structure
     integer(Int32) :: nchan = 0
         !+ Number of NPA channels
-    integer(Int32) :: npart[*] = 0
-        !+ Number of particles that hit a detector
-    integer(Int32) :: nmax[*] = 1000000
-        !+ Maximum allowed number of particles grows if necessary
     integer(Int32) :: nenergy = 100
         !+ Number of energy values
-    type(NPAParticle), dimension(:), allocatable :: part[*]
+    integer(Int32) :: npart = 0
+        !+ Number of particles that hit a detector
+    integer(Int32) :: nmax = 1000000
+        !+ Maximum allowed number of particles grows if necessary
+    type(NPAParticle), dimension(:), allocatable :: part[:]
         !+ Array of NPA particles
     real(Float64), dimension(:), allocatable     :: energy
         !+ Energy array [keV]
-    real(Float64), dimension(:,:,:), allocatable :: flux[*]
+    real(Float64), dimension(:,:,:), allocatable :: flux[:]
         !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
 type BirthProfile
     !+ Birth profile structure
-    integer :: cnt[*] = 1
+    integer :: cnt = 1
         !+ Particle counter
-    integer, dimension(:), allocatable             :: neut_type[*]
+    integer, dimension(:), allocatable             :: neut_type[:]
         !+ Particle birth type (1=Full, 2=Half, 3=Third)
-    real(Float64), dimension(:,:), allocatable     :: ri[*]
+    real(Float64), dimension(:,:), allocatable     :: ri[:]
         !+ Particle birth position [cm]
-    real(Float64), dimension(:,:), allocatable     :: vi[*]
+    real(Float64), dimension(:,:), allocatable     :: vi[:]
         !+ Particle birth velocity [cm/s]
-    integer, dimension(:,:), allocatable           :: ind[*]
+    integer, dimension(:,:), allocatable           :: ind[:]
         !+ Particle [[libfida:beam_grid]] indices
-    real(Float64), dimension(:,:,:,:), allocatable :: dens[*]
+    real(Float64), dimension(:,:,:,:), allocatable :: dens[:]
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
 
@@ -728,31 +730,31 @@ type Spectra
     !+ Spectra storage structure
     real(Float64), dimension(:,:), allocatable   :: brems
         !+ Bremsstruhlung: brems(lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable :: bes[*]
+    real(Float64), dimension(:,:,:), allocatable :: bes[:]
         !+ Beam emission: bes(lambda,chan,neutral_type)
-    real(Float64), dimension(:,:,:), allocatable :: fida[*]
+    real(Float64), dimension(:,:,:), allocatable :: fida[:]
         !+ FIDA emission: fida(lambda,chan,orbit_type)
 end type Spectra
 
 type NeutronRate
     !+ Neutron storage structure
-    real(Float64), dimension(:), allocatable :: rate
+    real(Float64), dimension(:), allocatable :: rate[:]
         !+ Neutron rate: rate(orbit_type) [neutrons/sec]
-    real(Float64), dimension(:,:,:,:), allocatable :: weight[*]
+    real(Float64), dimension(:,:,:,:), allocatable :: weight[:]
         !+ Neutron rate weight: weight(E,p,R,Z)
 end type NeutronRate
 
 type NeutralDensity
     !+ Neutral density structure
-    real(Float64), dimension(:,:,:,:,:), allocatable :: dens[*]
+    real(Float64), dimension(:,:,:,:,:), allocatable :: dens[:]
         !+ Neutral density: dens(lev,neutral_type,x,y,z)
 end type NeutralDensity
 
 type FIDAWeights
     !+ FIDA weights structure
-    real(Float64), dimension(:,:,:), allocatable   :: mean_f
+    real(Float64), dimension(:,:,:), allocatable   :: mean_f[:]
         !+ Estimate of mean fast-ion distribution function "seen" by LOS: mean_f(E,p,chan)
-    real(Float64), dimension(:,:,:,:), allocatable :: weight
+    real(Float64), dimension(:,:,:,:), allocatable :: weight[:]
         !+ FIDA weight function: weight(lambda,E,p,chan)
 end type FIDAWeights
 
@@ -1606,7 +1608,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron, nimages
+    integer            :: pathlen, calc_neutron
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,dump_dcx,no_flr
@@ -1636,7 +1638,7 @@ subroutine read_inputs
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
         write(*,'(a,a)') 'READ_INPUTS: Input file does not exist: ', trim(namelist_file)
-        stop all
+        error stop
     endif
 
     open(13,file=namelist_file)
@@ -1676,7 +1678,6 @@ subroutine read_inputs
     inputs%no_flr = no_flr
 
     !!Monte Carlo Settings
-    nimages = num_images()
     inputs%n_fida=max(10,n_fida/nimages)
     inputs%n_npa=max(10,n_npa/nimages)
     inputs%n_nbi=max(10,n_nbi/nimages)
@@ -1805,7 +1806,7 @@ subroutine read_inputs
     endif
 
     if(error) then
-        stop all
+        error stop
     endif
 
 end subroutine read_inputs
@@ -1885,7 +1886,7 @@ subroutine make_beam_grid
     if(n.le.(0.5*beam_grid%ngrid)) then
         write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
                         &Less than 50% of the beam grid cells fall within the plasma."
-        stop
+        error stop
     endif
 
 end subroutine make_beam_grid
@@ -2461,7 +2462,7 @@ subroutine read_equilibrium
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
     if (sum(equil%mask).le.0.d0) then
         write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
-        stop
+        error stop
     endif
 
 end subroutine read_equilibrium
@@ -2490,7 +2491,7 @@ subroutine read_f(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
         endif
-        stop all
+        error stop
     endif
 
     allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz))
@@ -2576,7 +2577,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
         endif
-        stop all
+        error stop
     endif
 
     if(inputs%dist_type.eq.2) then
@@ -2638,7 +2639,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: No mc particles in beam grid'
         endif
-        stop all
+        error stop
     endif
 
     if(inputs%verbose.ge.1) then
@@ -2699,7 +2700,7 @@ subroutine read_atomic_cross(fid, grp, cross)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
         endif
-        stop all
+        error stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", cross%nenergy, error)
@@ -2761,7 +2762,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_RATE: Unknown atomic interaction: ', trim(grp)
         endif
-        stop all
+        error stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -2836,7 +2837,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
             if(inputs%verbose.ge.0) then
                 write(*,'(a,a)') 'READ_ATOMIC_RATE: Unsupported atomic interaction: ', trim(grp)
             endif
-            stop all
+            error stop
         endif
     endif
 
@@ -2881,7 +2882,7 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_TRANSITIONS: Unknown atomic interaction: ', trim(grp)
         endif
-        stop all
+        error stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -3536,12 +3537,12 @@ subroutine write_npa
 
     integer, dimension(:), allocatable :: dcount
     real(Float64), dimension(:,:), allocatable :: ri, rf
-    integer :: i, n, nimages
+    integer :: i, n
     character(charlim) :: filename = ''
 
-    !! Combine flux contributions across processes
-    nimages = num_images()
-    call co_sum(npa%flux/nimages)
+    !! Combine contributions from across processes
+    npa%flux = npa%flux/nimages
+    call co_sum(npa%flux)
 
     allocate(dcount(npa_chords%nchan))
     do i=1,npa_chords%nchan
@@ -3672,7 +3673,7 @@ subroutine write_spectra
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(3) :: dims
     integer(HSIZE_T), dimension(1) :: d
-    integer :: error, nimages
+    integer :: error
 
     character(charlim) :: filename
     integer :: i
@@ -3683,10 +3684,11 @@ subroutine write_spectra
         lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin
     enddo
 
-    !! Combine spectra contributions across processes
-    nimages = num_images()
-    call co_sum(spec%bes/nimages)
-    call co_sum(spec%fida/nimages)
+    !! Combine contributions across processes
+    spec%bes = spec%bes/nimages
+    call co_sum(spec%bes)
+    spec%fida = spec%fida/nimages
+    call co_sum(spec%fida)
 
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
     spec%brems=spec%brems/(inputs%dlambda)/(4.d0*pi)*1.d4
@@ -4196,7 +4198,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
         endif
-        stop all
+        error stop
     endif
 
     !Open HDF5 interface
@@ -4217,7 +4219,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
         endif
-        stop all
+        error stop
     endif
 
     dims = [nlevs, nx, ny, nz]
@@ -4435,7 +4437,7 @@ function in_boundary(bplane, p) result(in_b)
             if(inputs%verbose.ge.0) then
                 write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            stop all
+            error stop
     END SELECT
 
 end function in_boundary
@@ -4460,7 +4462,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                stop all
+                error stop
             endif
             xx = [-bplane%hw,-bplane%hw,bplane%hw,bplane%hw]
             yy = [-bplane%hh,bplane%hh,bplane%hh,-bplane%hh]
@@ -4473,7 +4475,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                stop all
+                error stop
             endif
             dth = 2*pi/nb
             do i=1,nb
@@ -4486,7 +4488,7 @@ subroutine boundary_edge(bplane, bedge, nb)
             if(inputs%verbose.ge.0) then
                 write(*,'("BOUNDARY_EDGE: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            stop all
+            error stop
     end select
 
 end subroutine boundary_edge
@@ -5846,7 +5848,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
     real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
-    type(NPAParticle), dimension(:), allocatable :: parts
+    type(NPAParticle), dimension(:), allocatable :: parts[:]
 
     if(present(orbit_class)) then
         iclass = orbit_class
@@ -5874,7 +5876,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
     npa%npart = npa%npart + 1
     if(npa%npart.gt.npa%nmax) then
         npa%nmax = int(npa%nmax*2)
-        allocate(parts(npa%nmax))
+        allocate(parts(npa%nmax)[*])
         parts(1:(npa%npart-1)) = npa%part
         deallocate(npa%part)
         call move_alloc(parts, npa%part)
@@ -6805,7 +6807,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         if (1.0 - term1 - term2 .le. 0.0) then
             write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
                           1.0-term1-term2
-            stop all
+            error stop
         endif
     else
         r_gyro = 0.d0
@@ -7044,7 +7046,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
             write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
             write(*,'(a)') "Move the beam grid closer to the source to fix"
         endif
-        stop all
+        error stop
     endif
 
     !! Determine velocity of neutrals corrected by efrac
@@ -7144,9 +7146,10 @@ subroutine ndmc
     enddo loop_over_markers
 
     !! Combine neutral density contributions across processes
-    nimages = num_images()
-    call co_sum(neut%dens(:,1:3,:,:,:)/nimages)
-    call co_sum(birth%dens/nimages)
+    neut%dens(:,1:3,:,:,:) = neut%dens(:,1:3,:,:,:)/nimages
+    call co_sum(neut%dens(:,1:3,:,:,:))
+    birth%dens = birth%dens/nimages
+    call co_sum(birth%dens)
 
     call co_sum(nbi_outside)
     if(nbi_outside.gt.0)then
@@ -7156,7 +7159,7 @@ subroutine ndmc
         endif
         if(sum(neut%dens).eq.0) then
             write(*,'(a)') 'Beam does not intersect the grid!'
-            stop all
+            error stop
         endif
     endif
 
@@ -7253,7 +7256,7 @@ subroutine dcx
     real(Float64), dimension(nlevs) :: rates    !!  CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ncell, nimages
+    integer :: ncell
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
     integer :: jj       !! counter along track
     real(Float64):: tot_denn, photons  !! photon flux
@@ -7326,8 +7329,8 @@ subroutine dcx
     enddo loop_along_z
 
     !! Combine dcx density contributions across processes
-    nimages = num_images()
-    call co_sum(neut%dens(:,halo_type,:,:,:)/nimages)
+    neut%dens(:,halo_type,:,:,:) = neut%dens(:,halo_type,:,:,:)/nimages
+    call co_sum(neut%dens(:,halo_type,:,:,:))
 
 end subroutine dcx
 
@@ -7351,12 +7354,11 @@ subroutine halo
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
     real(Float64) :: papprox_tot, ccnt, inv_ng
     !! Halo iteration
-    integer :: nimages,hh !! counters
+    integer :: hh !! counters
     real(Float64) :: dcx_dens, halo_iteration_dens
     integer :: s1type  ! halo iteration
     integer :: s2type  ! halo iteration
 
-    nimages = num_images()
     s1type = fida_type
     s2type = brems_type
 
@@ -7365,7 +7367,7 @@ subroutine halo
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
         endif
-        stop all
+        error stop
     endif
     inv_ng = 100.0/real(beam_grid%ngrid)
     neut%dens(:,s1type,:,:,:) = neut%dens(:,halo_type,:,:,:)
@@ -7436,8 +7438,10 @@ subroutine halo
         enddo loop_along_z
 
         !! Combine halo contributions across processes
-        call co_sum(halo_iter_dens(s2type)/nimages)
-        call co_sum(neut%dens(:,s2type,:,:,:)/nimages)
+        halo_iter_dens(s2type) = halo_iter_dens(s2type)/nimages
+        call co_sum(halo_iter_dens(s2type))
+        neut%dens(:,s2type,:,:,:) = neut%dens(:,s2type,:,:,:)/nimages
+        call co_sum(neut%dens(:,s2type,:,:,:))
 
         halo_iteration_dens = halo_iter_dens(s2type)
         neut%dens(:,halo_type,:,:,:)= neut%dens(:,halo_type,:,:,:) &
@@ -7491,7 +7495,6 @@ subroutine fida_f
     real(Float64) :: papprox_tot, inv_maxcnt, cnt, eb, ptch
     integer, dimension(3,beam_grid%ngrid) :: pcell
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
-    integer :: nimages
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
@@ -7596,9 +7599,8 @@ subroutine fida_mc
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
-    call split_indices(1,particles%nparticles,num_images(),this_image(),istart,iend)
     cnt=0.0
-    loop_over_fast_ions: do iion=istart,iend
+    loop_over_fast_ions: do iion=1,particles%nparticle
         fast_ion = particles%fast_ion(iion)
         cnt=cnt+1
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -7801,10 +7803,8 @@ subroutine npa_mc
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
-    call split_indices(1,particles%nparticles,num_images(),this_image(),istart,iend)
-
     cnt=0.0
-    loop_over_fast_ions: do iion=istart,iend
+    loop_over_fast_ions: do iion=1,particles%nparticle
         cnt=cnt+1
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0)cycle loop_over_fast_ions
@@ -7932,9 +7932,6 @@ subroutine neutron_f
     real(Float64)  :: vnet_square, factor
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
 
-    allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz))
-    neutron%weight = 0.d0
-
     nphi = 20
     maxcnt=fbm%nr*fbm%nz
     inv_maxcnt = 100.d0/maxcnt
@@ -8018,7 +8015,7 @@ subroutine neutron_mc
     rate=0.0
     nphi = 20
 
-    call split_indices(1,particles%nparticles,num_images(),this_image(),istart,iend)
+    call split_indices(1,particles%nparticle,num_images(),this_image(),istart,iend)
 
     loop_over_fast_ions: do iion=istart,iend
         cnt=cnt+1
@@ -8083,12 +8080,14 @@ subroutine neutron_mc
         endif
     enddo loop_over_fast_ions
 
+    call co_sum(neutron%rate)
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
     endif
 
-    call write_neutrons()
+    if(this_image().eq.1) call write_neutrons()
 
 end subroutine neutron_mc
 
@@ -8148,10 +8147,6 @@ subroutine fida_weights_mc
     dEdP = dE*dP
     phase_area = dEdP*real(inputs%np_wght)*real(inputs%ne_wght)
 
-    !! allocate storage arrays
-    allocate(fweight%weight(nwav,inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
-    allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
-
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Number of Channels: ",i5)') spec_chords%nchan
         write(*,'(T2,"Nlambda: ",i4)') nwav
@@ -8159,10 +8154,6 @@ subroutine fida_weights_mc
         write(*,'(T2,"Maximum Energy: ",f7.2)') inputs%emax_wght
         write(*,'(T2,"LOS averaged: ",a)') "False"
     endif
-
-    !! zero out arrays
-    fweight%weight = 0.d0
-    fweight%mean_f = 0.d0
 
     etov2 = 1.d0/(v2_to_E_per_amu*inputs%ab)
 
@@ -8250,9 +8241,14 @@ subroutine fida_weights_mc
         endif
     enddo loop_over_cells
 
-    fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight
-    fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
-    call write_fida_weights()
+    fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight/nimages
+    fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f/nimages
+
+    !! Combine contributions across processes
+    call co_sum(fweight%weight)
+    call co_sum(fweight%mean_f)
+
+    if(this_image().eq.1) call write_fida_weights()
 
 end subroutine fida_weights_mc
 
@@ -8313,14 +8309,7 @@ subroutine fida_weights_los
         phiarr(i)=real(i-0.5)*2.d0*pi/real(inputs%nphi_wght)
     enddo
 
-    !! allocate storage arrays
-    allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
-    allocate(fweight%weight(nwav,inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
-
     allocate(mean_f(inputs%ne_wght,inputs%np_wght))
-    !! zero out arrays
-    fweight%weight = 0.d0
-    fweight%mean_f = 0.d0
     mean_f = 0.d0
 
     if(inputs%verbose.ge.1) then
@@ -8454,7 +8443,7 @@ subroutine fida_weights_los
     enddo chan_loop
 
     fweight%mean_f = fweight%mean_f/(dEdP)
-    call write_fida_weights()
+    if(this_image().eq.1) call write_fida_weights()
 
 end subroutine fida_weights_los
 
@@ -8608,7 +8597,7 @@ subroutine npa_weights
        endif
     enddo loop_over_channels
 
-    call write_npa_weights()
+    if(this_image().eq.1) call write_npa_weights()
 
 end subroutine npa_weights
 
@@ -8632,14 +8621,15 @@ program fidasim
     version = _VERSION
 #endif
 
+    nimages = num_images()
     if(this_image() == 1) then
         call print_banner()
     endif
 
     narg = command_argument_count()
     if(narg.eq.0) then
-        write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
-        stop all
+        if(this_image() == 1) write(*,'(a)') "usage: ./fidasim namelist_file"
+        return
     else
         call get_command_argument(1,namelist_file)
     endif
@@ -8683,7 +8673,7 @@ program fidasim
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
     !! ----------------------------------------------------------
     !! neutral density array!
-    allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz)[*])
     neut%dens = 0.d0
 
     !! birth profile
@@ -8691,11 +8681,11 @@ program fidasim
         allocate(birth%dens(3, &
                             beam_grid%nx, &
                             beam_grid%ny, &
-                            beam_grid%nz))
-        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
+                            beam_grid%nz)[*])
+        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi))[*])
+        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi))[*])
+        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi))[*])
+        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi))[*])
         birth%neut_type = 0
         birth%dens = 0.d0
         birth%ind = 0
@@ -8705,8 +8695,8 @@ program fidasim
 
     if(inputs%calc_spec.ge.1) then
         allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4))
-        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
+        allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4)[*])
+        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass)[*])
         spec%brems = 0.d0
         spec%bes = 0.d0
         spec%fida = 0.d0
@@ -8714,7 +8704,7 @@ program fidasim
 
     if(inputs%calc_npa.ge.1)then
         npa%nchan = npa_chords%nchan
-        allocate(npa%part(npa%nmax))
+        allocate(npa%part(npa%nmax)[*])
         if(inputs%dist_type.eq.1) then
             npa%nenergy = fbm%nenergy
             allocate(npa%energy(npa%nenergy))
@@ -8725,15 +8715,23 @@ program fidasim
                 npa%energy(i)=real(i-0.5)
             enddo
         endif
-        allocate(npa%flux(npa%nenergy,npa%nchan,particles%nclass))
+        allocate(npa%flux(npa%nenergy,npa%nchan,particles%nclass)[*])
         npa%flux = 0.0
     endif
 
     if(inputs%calc_neutron.ge.1)then
-        allocate(neutron%rate(particles%nclass))
+        allocate(neutron%rate(particles%nclass)[*])
+        allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz)[*])
         neutron%rate = 0.d0
+        neutron%weight = 0.d0
     endif
 
+    if(inputs%calc_fida_wght.ge.1)then
+        allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan)[*])
+        allocate(fweight%weight(inputs%nlambda_wght,inputs%ne_wght,inputs%np_wght,spec_chords%nchan)[*])
+        fweight%mean_f = 0.d0
+        fweight%weight = 0.d0
+    endif
     !! -----------------------------------------------------------------------
     !! --------------- CALCULATE/LOAD the BEAM and HALO DENSITY---------------
     !! -----------------------------------------------------------------------
@@ -8747,7 +8745,7 @@ program fidasim
                   time_arr(5),time_arr(6),time_arr(7)
         endif
         call ndmc
-        if(inputs%calc_birth.eq.1)then
+        if((inputs%calc_birth.eq.1).and.(this_image().eq.1))then
             call write_birth_profile()
         endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -8770,7 +8768,7 @@ program fidasim
         endif
         call halo()
         !! ---------- WRITE NEUTRALS ---------- !!
-        call write_neutrals()
+        if(this_image().eq.1) call write_neutrals()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
@@ -8804,7 +8802,7 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
-    if(inputs%calc_spec.ge.1) then
+    if((inputs%calc_spec.ge.1).and.(this_image().eq.1)) then
         call write_spectra()
         write(*,'(30X,a)') ''
     endif
@@ -8826,7 +8824,7 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
-    if(inputs%calc_npa.ge.1) then
+    if((inputs%calc_npa.ge.1).and.(this_image().eq.1)) then
         call write_npa()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif

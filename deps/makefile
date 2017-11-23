@@ -2,8 +2,14 @@ SHELL = /bin/bash
 
 DEPS_DIR = $(FIDASIM_DIR)/deps
 HDF5_LOG = $(DEPS_DIR)/hdf5_build.log
+OPENCOARRAYS_LOG = $(DEPS_DIR)/opencoarrays_build.log
+export OMPI_FC = $(FC)
+export OMPI_CC = $(CC)
+export OMPI_CXX = $(CXX)
 
-hdf5: 
+all: hdf5 opencoarrays
+
+hdf5:
 	@printf "\nBuilding HDF5...\n"
 	tar -zxvf $(DEPS_DIR)/hdf5-1.8.16.tar.gz >> $(HDF5_LOG) 2>&1
 	cd $(DEPS_DIR)/hdf5-1.8.16; ./configure --prefix=$(DEPS_DIR)/hdf5 --enable-fortran --enable-cxx >> $(HDF5_LOG) 2>&1
@@ -13,5 +19,20 @@ hdf5:
 	-rm -rf hdf5-1.8.16
 	@printf "HDF5 build complete\n\n"
 
-clean:
-	-rm -rf hdf5 hdf5-1.8.16 $(HDF5_LOG) 
+opencoarrays:
+	@printf "\nBuilding OpenCoarrays...\n"
+	tar -zvxf $(DEPS_DIR)/OpenCoarrays-1.9.2.tar.gz >> $(OPENCOARRAYS_LOG) 2>&1
+	cd $(DEPS_DIR)/OpenCoarrays-1.9.2; ./install.sh --install-prefix=$(DEPS_DIR)/opencoarrays \
+	    -y --with-fortran $(FC) --with-c $(CC) --with-cxx $(CXX) >> $(OPENCOARRAYS_LOG) 2>&1
+	cp $(DEPS_DIR)/OpenCoarrays-1.9.2/LICENSE $(DEPS_DIR)/opencoarrays
+	cp $(DEPS_DIR)/OpenCoarrays-1.9.2/GETTING_STARTED.md $(DEPS_DIR)/opencoarrays
+	-rm -rf OpenCoarrays-1.9.2
+	@printf "OpenCoarrays build is complete\n\n"
+
+clean: clean_hdf5 clean_opencoarrays
+
+clean_hdf5:
+	-rm -rf hdf5 hdf5-1.8.16 $(HDF5_LOG)
+
+clean_opencoarrays:
+	-rm -rf opencoarrays OpenCoarrays-1.9.2 $(OPENCOARRAYS_LOG)

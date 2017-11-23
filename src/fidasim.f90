@@ -694,17 +694,17 @@ type NPAResults
     !+ MC NPA result structure
     integer(Int32) :: nchan = 0
         !+ Number of NPA channels
-    integer(Int32) :: npart = 0
+    integer(Int32) :: npart[*] = 0
         !+ Number of particles that hit a detector
-    integer(Int32) :: nmax = 1000000
+    integer(Int32) :: nmax[*] = 1000000
         !+ Maximum allowed number of particles grows if necessary
     integer(Int32) :: nenergy = 100
         !+ Number of energy values
-    type(NPAParticle), dimension(:), allocatable :: part
+    type(NPAParticle), dimension(:), allocatable :: part[*]
         !+ Array of NPA particles
     real(Float64), dimension(:), allocatable     :: energy
         !+ Energy array [keV]
-    real(Float64), dimension(:,:,:), allocatable :: flux
+    real(Float64), dimension(:,:,:), allocatable :: flux[*]
         !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
@@ -969,7 +969,7 @@ type(NeutralBeam), save         :: nbi
     !+ Variable containing the neutral beam geometry and settings
 type(AtomicTables), save        :: tables
     !+ Variable containing the atomic tables
-type(NPAResults), save          :: npa[*]
+type(NPAResults), save          :: npa
     !+ Variable for storing the calculated NPA results
 type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
@@ -3536,8 +3536,12 @@ subroutine write_npa
 
     integer, dimension(:), allocatable :: dcount
     real(Float64), dimension(:,:), allocatable :: ri, rf
-    integer :: i, n
+    integer :: i, n, nimages
     character(charlim) :: filename = ''
+
+    !! Combine flux contributions across processes
+    nimages = num_images()
+    call co_sum(npa%flux/nimages)
 
     allocate(dcount(npa_chords%nchan))
     do i=1,npa_chords%nchan

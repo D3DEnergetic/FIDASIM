@@ -1,6 +1,7 @@
 SHELL = /bin/bash
 
 #Default compiling options
+USE_OPENMP = y
 PROFILE = n
 DEBUG = n
 
@@ -61,7 +62,11 @@ ifneq ($(findstring gfortran, $(FC)),)
 endif
 
 ifeq ($(PROFILE),n)
+ifeq ($(USE_OPENMP),y)
+	CFLAGS := $(CFLAGS) $(UFLAGS) $(OPENMP_FLAGS)
+else
 	CFLAGS := $(CFLAGS) $(UFLAGS)
+endif
 else
 	CFLAGS := $(CFLAGS) $(UFLAGS) $(PROF_FLAGS)
 endif

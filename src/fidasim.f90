@@ -710,18 +710,24 @@ type NPAResults
         !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
+type BirthParticle
+    !+ Birth particle structure
+    integer :: neut_type = 0
+        !+ Birth type (1=Full, 2=Half, 3=Third)
+    real(Float64), dimension(3) :: ri = [0.d0,0.d0,0.d0]
+        !+ Birth position [cm]
+    real(Float64), dimension(3) :: vi = [0.d0,0.d0,0.d0]
+        !+ Birth velocity [cm/s]
+    integer, dimension(3) :: ind = [0,0,0]
+        !+ Birth [[libfida:beam_grid]] indices
+end type BirthParticle
+
 type BirthProfile
     !+ Birth profile structure
     integer :: cnt = 1
         !+ Particle counter
-    integer, dimension(:), allocatable             :: neut_type
-        !+ Particle birth type (1=Full, 2=Half, 3=Third)
-    real(Float64), dimension(:,:), allocatable     :: ri
-        !+ Particle birth position [cm]
-    real(Float64), dimension(:,:), allocatable     :: vi
-        !+ Particle birth velocity [cm/s]
-    integer, dimension(:,:), allocatable           :: ind
-        !+ Particle [[libfida:beam_grid]] indices
+    type(BirthParticle), dimension(:), allocatable :: part
+        !+ Birth Particles
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
@@ -971,7 +977,7 @@ type(NeutralBeam), save         :: nbi
     !+ Variable containing the neutral beam geometry and settings
 type(AtomicTables), save        :: tables
     !+ Variable containing the atomic tables
-type(NPAResults), save          :: npa
+type(NPAResults), save          :: npa[*]
     !+ Variable for storing the calculated NPA results
 type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
@@ -979,7 +985,7 @@ type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
-type(BirthProfile), save        :: birth
+type(BirthProfile), save        :: birth[*]
     !+ Variable for storing the calculated birth profile
 type(NeutralDensity), save      :: neut
     !+ Variable for storing the calculated beam density
@@ -3279,87 +3285,115 @@ subroutine write_birth_profile
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
-    integer :: error, i, npart
+    integer :: error, i, npart, istart, iend
 
     character(charlim) :: filename
+    integer, dimension(nimages) :: nparts
+    type(BirthParticle), dimension(:), allocatable :: parts
     real(Float64), dimension(:,:), allocatable :: ri
     real(Float64), dimension(:,:), allocatable :: vi
+    integer, dimension(:,:), allocatable :: ind
     real(Float64), dimension(3) :: xyz,uvw,v_uvw
 
-
-    npart = birth%cnt-1
-    allocate(ri(3,npart))
-    allocate(vi(3,npart))
-
-    do i=1,npart
-        ! Convert position to rzphi
-        xyz = birth%ri(:,i)
-        call xyz_to_uvw(xyz,uvw)
-        ri(1,i) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-        ri(2,i) = uvw(3)
-        ri(3,i) = atan2(uvw(2),uvw(1))
-
-        ! Convert velocity to rzphi
-        v_uvw = matmul(beam_grid%basis, birth%vi(:,i))
-        vi(1,i) = v_uvw(1)*cos(ri(3,i)) + v_uvw(2)*sin(ri(3,i))
-        vi(2,i) = v_uvw(3)
-        vi(3,i) = -v_uvw(1)*sin(ri(3,i)) + v_uvw(2)*cos(ri(3,i))
+    !! Combine particles from each process
+    do i=1,nimages
+        nparts(i) = birth[i]%cnt-1
     enddo
+    sync all
 
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.h5"
+    npart = sum(nparts)
+    allocate(parts(npart))
+    istart=1
+    do i=1,nimages
+        if(this_image().eq.i) then
+            iend = nparts(i) + istart - 1
+            parts(istart:iend) = birth%part
+            istart = iend + 1
+        endif
+        call co_broadcast(parts, source_image=i)
+        call co_broadcast(istart, source_image=i)
+    enddo
+    deallocate(birth%part)
+    call move_alloc(parts, birth%part)
 
-    !Open HDF5 interface
-    call h5open_f(error)
+    if(this_image().eq.1) then
+        allocate(ri(3,npart))
+        allocate(vi(3,npart))
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        do i=1,npart
+            ! Convert position to rzphi
+            xyz = birth%part(i)%ri
+            call xyz_to_uvw(xyz,uvw)
+            ri(1,i) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
+            ri(2,i) = uvw(3)
+            ri(3,i) = atan2(uvw(2),uvw(1))
 
-    !Write variables
-    call write_beam_grid(fid, error)
-    d(1) = 1
-    call h5ltmake_dataset_int_f(fid, "/n_birth", 0, d, [npart], error)
-    dim4 = shape(birth%dens)
-    call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, birth%dens, error)
-    dim2 = [3, npart]
-    call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
-    call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, birth%ind, error)
-    call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), birth%neut_type, error)
+            ! Convert velocity to rzphi
+            v_uvw = matmul(beam_grid%basis, birth%part(i)%vi)
+            vi(1,i) = v_uvw(1)*cos(ri(3,i)) + v_uvw(2)*sin(ri(3,i))
+            vi(2,i) = v_uvw(3)
+            vi(3,i) = -v_uvw(1)*sin(ri(3,i)) + v_uvw(2)*cos(ri(3,i))
 
-    !Add attributes
-    call h5ltset_attribute_string_f(fid, "/n_birth","description", &
-         "Number of birth mc particles deposited", error)
-    call h5ltset_attribute_string_f(fid, "/dens", "description", &
-         "Birth density: dens(beam_component,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid, "/dens", "units", &
-         "fast-ions/(s*cm^3)", error)
-    call h5ltset_attribute_string_f(fid, "/ri", "description", &
-         "Fast-ion birth position in R-Z-Phi: ri([r,z,phi],particle)", error)
-    call h5ltset_attribute_string_f(fid, "/ri", "units", "cm, radians", error)
-    call h5ltset_attribute_string_f(fid, "/vi", "description", &
-         "Fast-ion birth velocity in R-Z-Phi: vi([r,z,phi],particle)", error)
-    call h5ltset_attribute_string_f(fid, "/vi", "units", "cm/s", error)
-    call h5ltset_attribute_string_f(fid, "/ind", "description", &
-         "Fast-ion birth beam grid indices: ind([i,j,k],particle)", error)
-    call h5ltset_attribute_string_f(fid, "/type", "description", &
-         "Fast-ion birth type (1=Full, 2=Half, 3=Third)", error)
+            ind(:,i) = birth%part(i)%ind
+        enddo
 
-    call h5ltset_attribute_string_f(fid, "/", "coordinate_system", &
-         "Cylindrical (R,Z,Phi)",error)
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid, "/", "description", &
-         "Birth density and particles calculated by FIDASIM", error)
+        filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_birth.h5"
 
-    !!Close file
-    call h5fclose_f(fid, error)
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    !!Close HDF5 interface
-    call h5close_f(error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    deallocate(ri,vi)
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'birth profile written to: ',trim(filename)
+        !Write variables
+        call write_beam_grid(fid, error)
+        d(1) = 1
+        call h5ltmake_dataset_int_f(fid, "/n_birth", 0, d, [npart], error)
+        dim4 = shape(birth%dens)
+        call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, birth%dens, error)
+        dim2 = [3, npart]
+        call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
+        call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, ind, error)
+        call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), birth%part%neut_type, error)
+
+        !Add attributes
+        call h5ltset_attribute_string_f(fid, "/n_birth","description", &
+             "Number of birth mc particles deposited", error)
+        call h5ltset_attribute_string_f(fid, "/dens", "description", &
+             "Birth density: dens(beam_component,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid, "/dens", "units", &
+             "fast-ions/(s*cm^3)", error)
+        call h5ltset_attribute_string_f(fid, "/ri", "description", &
+             "Fast-ion birth position in R-Z-Phi: ri([r,z,phi],particle)", error)
+        call h5ltset_attribute_string_f(fid, "/ri", "units", "cm, radians", error)
+        call h5ltset_attribute_string_f(fid, "/vi", "description", &
+             "Fast-ion birth velocity in R-Z-Phi: vi([r,z,phi],particle)", error)
+        call h5ltset_attribute_string_f(fid, "/vi", "units", "cm/s", error)
+        call h5ltset_attribute_string_f(fid, "/ind", "description", &
+             "Fast-ion birth beam grid indices: ind([i,j,k],particle)", error)
+        call h5ltset_attribute_string_f(fid, "/type", "description", &
+             "Fast-ion birth type (1=Full, 2=Half, 3=Third)", error)
+
+        call h5ltset_attribute_string_f(fid, "/", "coordinate_system", &
+             "Cylindrical (R,Z,Phi)",error)
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        call h5ltset_attribute_string_f(fid, "/", "description", &
+             "Birth density and particles calculated by FIDASIM", error)
+
+        !!Close file
+        call h5fclose_f(fid, error)
+
+        !!Close HDF5 interface
+        call h5close_f(error)
+
+        deallocate(ri,vi)
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'birth profile written to: ',trim(filename)
+        endif
     endif
+    sync all
 
 end subroutine write_birth_profile
 
@@ -3390,74 +3424,77 @@ subroutine write_dcx
         dcx_spec = spec%bes(:,:,halo_type)/(inputs%dlambda)/(4.d0*pi)*1.d4
     endif
 
-    !Open HDF5 interface
-    call h5open_f(error)
+    if(this_image().eq.1) then
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    !Write variables
-    call write_beam_grid(fid, error)
+        !Write variables
+        call write_beam_grid(fid, error)
 
-    d(1) =1
-    call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
-    dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz ]
-    call h5ltmake_compressed_dataset_double_f(fid, "/dens", 4, dims, &
-         neut%dens(:,halo_type,:,:,:), error)
+        d(1) =1
+        call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
+        dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz ]
+        call h5ltmake_compressed_dataset_double_f(fid, "/dens", 4, dims, &
+             neut%dens(:,halo_type,:,:,:), error)
 
-    if(inputs%calc_spec.ge.1) then
-        call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
-        call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
-        dims(1) = inputs%nlambda
-        dims(2) = spec_chords%nchan
-        call h5ltmake_compressed_dataset_double_f(fid, "/spec", 2, dims(1:2), &
-             dcx_spec, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
-             lambda_arr, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
-             spec_chords%radius, error)
+        if(inputs%calc_spec.ge.1) then
+            call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
+            call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
+            dims(1) = inputs%nlambda
+            dims(2) = spec_chords%nchan
+            call h5ltmake_compressed_dataset_double_f(fid, "/spec", 2, dims(1:2), &
+                 dcx_spec, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
+                 lambda_arr, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
+                 spec_chords%radius, error)
+        endif
+
+        !Add attributes
+        call h5ltset_attribute_string_f(fid,"/nlevel","description", &
+             "Number of atomic energy levels", error)
+        call h5ltset_attribute_string_f(fid,"/dens", "description", &
+             "Direct Charge Exchange (DCX) neutral density: dcx(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/dens","units","neutrals*cm^-3", error)
+
+        if(inputs%calc_spec.ge.1) then
+            call h5ltset_attribute_string_f(fid,"/nchan", "description", &
+                 "Number of channels", error)
+            call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
+                 "Number of wavelengths", error)
+            call h5ltset_attribute_string_f(fid,"/spec","description", &
+                 "Direct Charge Exchange (DCX) beam emission: spec(lambda, chan)", error)
+            call h5ltset_attribute_string_f(fid,"/spec","units","Ph/(s*nm*sr*m^2)",error)
+            call h5ltset_attribute_string_f(fid,"/lambda","description", &
+                 "Wavelength array", error)
+            call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
+            call h5ltset_attribute_string_f(fid,"/radius", "description", &
+                 "Line of sight radius at midplane or tangency point", error)
+            call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
+        endif
+
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        call h5ltset_attribute_string_f(fid,"/","description", &
+             "Direct Charge Exchange (DCX)"//trim(spec_str)//" neutral density calculated by FIDASIM", error)
+
+        !Close file
+        call h5fclose_f(fid, error)
+
+        !Close HDF5 interface
+        call h5close_f(error)
+
+        if(inputs%calc_spec.ge.1) then
+            deallocate(dcx_spec,lambda_arr)
+        endif
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'dcx written to: ',trim(filename)
+        endif
     endif
-
-    !Add attributes
-    call h5ltset_attribute_string_f(fid,"/nlevel","description", &
-         "Number of atomic energy levels", error)
-    call h5ltset_attribute_string_f(fid,"/dens", "description", &
-         "Direct Charge Exchange (DCX) neutral density: dcx(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/dens","units","neutrals*cm^-3", error)
-
-    if(inputs%calc_spec.ge.1) then
-        call h5ltset_attribute_string_f(fid,"/nchan", "description", &
-             "Number of channels", error)
-        call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
-             "Number of wavelengths", error)
-        call h5ltset_attribute_string_f(fid,"/spec","description", &
-             "Direct Charge Exchange (DCX) beam emission: spec(lambda, chan)", error)
-        call h5ltset_attribute_string_f(fid,"/spec","units","Ph/(s*nm*sr*m^2)",error)
-        call h5ltset_attribute_string_f(fid,"/lambda","description", &
-             "Wavelength array", error)
-        call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
-        call h5ltset_attribute_string_f(fid,"/radius", "description", &
-             "Line of sight radius at midplane or tangency point", error)
-        call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
-    endif
-
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid,"/","description", &
-         "Direct Charge Exchange (DCX)"//trim(spec_str)//" neutral density calculated by FIDASIM", error)
-
-    !Close file
-    call h5fclose_f(fid, error)
-
-    !Close HDF5 interface
-    call h5close_f(error)
-
-    if(inputs%calc_spec.ge.1) then
-        deallocate(dcx_spec,lambda_arr)
-    endif
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'dcx written to: ',trim(filename)
-    endif
+    sync all
 
 end subroutine write_dcx
 
@@ -3472,58 +3509,61 @@ subroutine write_neutrals
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.h5"
 
-    !Open HDF5 interface
-    call h5open_f(error)
+    if(this_image().eq.1) then
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    !Write variables
-    call write_beam_grid(fid, error)
-    dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz]
-    d(1) =1
-    call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
-         neut%dens(:,nbif_type,:,:,:), error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/hdens", 4, dims, &
-         neut%dens(:,nbih_type,:,:,:), error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/tdens", 4, dims, &
-         neut%dens(:,nbit_type,:,:,:), error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
-         neut%dens(:,halo_type,:,:,:), error)
+        !Write variables
+        call write_beam_grid(fid, error)
+        dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz]
+        d(1) =1
+        call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
+             neut%dens(:,nbif_type,:,:,:), error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/hdens", 4, dims, &
+             neut%dens(:,nbih_type,:,:,:), error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/tdens", 4, dims, &
+             neut%dens(:,nbit_type,:,:,:), error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
+             neut%dens(:,halo_type,:,:,:), error)
 
-    !Write attributes
-    call h5ltset_attribute_string_f(fid,"/nlevel","description", &
-         "Number of atomic energy levels", error)
-    call h5ltset_attribute_string_f(fid,"/fdens","description", &
-         "Neutral density for the full energy component of the beam: fdens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
+        !Write attributes
+        call h5ltset_attribute_string_f(fid,"/nlevel","description", &
+             "Number of atomic energy levels", error)
+        call h5ltset_attribute_string_f(fid,"/fdens","description", &
+             "Neutral density for the full energy component of the beam: fdens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
 
-    call h5ltset_attribute_string_f(fid,"/hdens","description", &
-         "Neutral density for the half energy component of the beam: hdens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/hdens","units","neutrals*cm^-3",error)
+        call h5ltset_attribute_string_f(fid,"/hdens","description", &
+             "Neutral density for the half energy component of the beam: hdens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/hdens","units","neutrals*cm^-3",error)
 
-    call h5ltset_attribute_string_f(fid,"/tdens","description", &
-         "Neutral density for the third energy component of the beam: tdens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
+        call h5ltset_attribute_string_f(fid,"/tdens","description", &
+             "Neutral density for the third energy component of the beam: tdens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
 
-    call h5ltset_attribute_string_f(fid,"/halodens","description", &
-         "Neutral density of the beam halo(including dcx): halodens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
+        call h5ltset_attribute_string_f(fid,"/halodens","description", &
+             "Neutral density of the beam halo(including dcx): halodens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
 
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid,"/","description", &
-         "Beam neutral density calculated by FIDASIM", error)
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        call h5ltset_attribute_string_f(fid,"/","description", &
+             "Beam neutral density calculated by FIDASIM", error)
 
-    !Close file
-    call h5fclose_f(fid, error)
+        !Close file
+        call h5fclose_f(fid, error)
 
-    !Close HDF5 interface
-    call h5close_f(error)
+        !Close HDF5 interface
+        call h5close_f(error)
 
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'neutral density written to: ',trim(filename)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'neutral density written to: ',trim(filename)
+        endif
     endif
+    sync all
 
 end subroutine write_neutrals
 
@@ -3536,136 +3576,160 @@ subroutine write_npa
     integer :: error
 
     integer, dimension(:), allocatable :: dcount
+    integer, dimension(nimages) :: nparts
     real(Float64), dimension(:,:), allocatable :: ri, rf
-    integer :: i, n
+    type(NPAParticle), dimension(:), allocatable :: parts
+    integer :: i, n, istart,iend
     character(charlim) :: filename = ''
 
     !! Combine contributions from across processes
     npa%flux = npa%flux/nimages
     call co_sum(npa%flux)
 
-    allocate(dcount(npa_chords%nchan))
-    do i=1,npa_chords%nchan
-        dcount(i) = count(npa%part%detector.eq.i)
+    do i=1,nimages
+        nparts(i) = npa[i]%npart
     enddo
-    call co_sum(dcount)
+    sync all
 
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.h5"
+    npa%npart = sum(nparts)
+    allocate(parts(npa%npart))
+    istart=1
+    do i=1,nimages
+        if(this_image().eq.i) then
+            iend = nparts(i) + istart - 1
+            parts(istart:iend) = npa%part
+            istart = iend + 1
+        endif
+        call co_broadcast(parts, source_image=i)
+        call co_broadcast(istart, source_image=i)
+    enddo
+    deallocate(npa%part)
+    call move_alloc(parts, npa%part)
 
-    !Open HDF5 interface
-    call h5open_f(error)
+    if(this_image().eq.1) then
+        allocate(dcount(npa_chords%nchan))
+        do i=1,npa_chords%nchan
+            dcount(i) = count(npa%part%detector.eq.i)
+        enddo
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.h5"
 
-    !Write Flux
-    d(1) = 1
-    dim2 = [npa%nenergy, npa%nchan]
-    dim3 = [npa%nenergy, npa%nchan, particles%nclass]
-    if(particles%nclass.gt.1) then
-        call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/flux",3,dim3,npa%flux, error)
-        call h5ltset_attribute_string_f(fid,"/flux", "description", &
-             "Neutral flux: flux(energy,chan,class)", error)
-    else
-        call h5ltmake_compressed_dataset_double_f(fid,"/flux",2,dim3(1:2),npa%flux(:,:,1), error)
-        call h5ltset_attribute_string_f(fid,"/flux", "description", &
-             "Neutral flux: flux(energy,chan)", error)
-    endif
-    call h5ltset_attribute_string_f(fid,"/flux", "units","neutrals/(s*dE)", error)
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [npa%nenergy], error)
-    call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [npa%nchan], error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim2(1:1),&
-         npa%energy, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/radius",1,dim2(2:2),&
-         npa_chords%radius, error)
-    call h5ltmake_compressed_dataset_int_f(fid,"/count",1,dim2(2:2), dcount, error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    !Add attributes
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid,"/","description", &
-         "NPA flux calculated by FIDASIM",error)
-    call h5ltset_attribute_string_f(fid,"/nenergy","description",&
-         "Number of energy values",error)
-    call h5ltset_attribute_string_f(fid,"/nchan","description",&
-         "Number of channels",error)
-    call h5ltset_attribute_string_f(fid,"/energy","description", &
-         "Energy array", error)
-    call h5ltset_attribute_string_f(fid,"/energy","units","keV", error)
-    call h5ltset_attribute_string_f(fid,"/radius","description", &
-         "Detector line of sight radius at midplane or tangency point", error)
-    call h5ltset_attribute_string_f(fid,"/radius","units","cm",error)
-    call h5ltset_attribute_string_f(fid,"/count","description", &
-         "Number of particles that hit the detector: count(chan)", error)
+        !Write Flux
+        d(1) = 1
+        dim2 = [npa%nenergy, npa%nchan]
+        dim3 = [npa%nenergy, npa%nchan, particles%nclass]
+        if(particles%nclass.gt.1) then
+            call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
+            call h5ltmake_compressed_dataset_double_f(fid,"/flux",3,dim3,npa%flux, error)
+            call h5ltset_attribute_string_f(fid,"/flux", "description", &
+                 "Neutral flux: flux(energy,chan,class)", error)
+        else
+            call h5ltmake_compressed_dataset_double_f(fid,"/flux",2,dim3(1:2),npa%flux(:,:,1), error)
+            call h5ltset_attribute_string_f(fid,"/flux", "description", &
+                 "Neutral flux: flux(energy,chan)", error)
+        endif
+        call h5ltset_attribute_string_f(fid,"/flux", "units","neutrals/(s*dE)", error)
 
-    deallocate(dcount)
-
-    if((npa%npart.ne.0).and.(inputs%calc_npa.ge.2)) then
-        n = npa%npart
-        allocate(ri(3,n),rf(3,n))
-        ri(1,:) = npa%part(1:n)%xi
-        ri(2,:) = npa%part(1:n)%yi
-        ri(3,:) = npa%part(1:n)%zi
-        rf(1,:) = npa%part(1:n)%xf
-        rf(2,:) = npa%part(1:n)%yf
-        rf(3,:) = npa%part(1:n)%zf
-
-        !Create Group
-        call h5gcreate_f(fid,"/particles",gid, error)
-        call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npa%npart], error)
-        d(1) = npa%npart
-        dim2 = [3, n]
-        call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, &
-             npa%part(1:n)%pitch, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d,&
-             npa%part(1:n)%energy, error)
-        call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d,&
-             npa%part(1:n)%weight, error)
-        call h5ltmake_compressed_dataset_int_f(gid,"detector",1,d,&
-             npa%part(1:n)%detector, error)
+        call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [npa%nenergy], error)
+        call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [npa%nchan], error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim2(1:1),&
+             npa%energy, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/radius",1,dim2(2:2),&
+             npa_chords%radius, error)
+        call h5ltmake_compressed_dataset_int_f(fid,"/count",1,dim2(2:2), dcount, error)
 
         !Add attributes
-        call h5ltset_attribute_string_f(gid,"nparticle","description", &
-             "Number of particles that hit a detector", error)
-        call h5ltset_attribute_string_f(gid,"ri","description", &
-             "Neutral particle's birth position in machine coordinates: ri([x,y,z],particle)", error)
-        call h5ltset_attribute_string_f(gid,"ri","units", "cm", error)
-        call h5ltset_attribute_string_f(gid,"rf","description", &
-             "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
-        call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
-        call h5ltset_attribute_string_f(gid,"pitch","description", &
-             "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
-        call h5ltset_attribute_string_f(gid,"energy","description", &
-             "Energy value of the neutral particle", error)
-        call h5ltset_attribute_string_f(gid,"energy","units","keV",error)
-        call h5ltset_attribute_string_f(gid,"weight","description", &
-             "Neutral particle's contribution to the flux", error)
-        call h5ltset_attribute_string_f(gid,"weight","units","neutrals/s",error)
-        call h5ltset_attribute_string_f(gid,"detector","description", &
-             "Detector that the neutral particle hit", error)
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        call h5ltset_attribute_string_f(fid,"/","description", &
+             "NPA flux calculated by FIDASIM",error)
+        call h5ltset_attribute_string_f(fid,"/nenergy","description",&
+             "Number of energy values",error)
+        call h5ltset_attribute_string_f(fid,"/nchan","description",&
+             "Number of channels",error)
+        call h5ltset_attribute_string_f(fid,"/energy","description", &
+             "Energy array", error)
+        call h5ltset_attribute_string_f(fid,"/energy","units","keV", error)
+        call h5ltset_attribute_string_f(fid,"/radius","description", &
+             "Detector line of sight radius at midplane or tangency point", error)
+        call h5ltset_attribute_string_f(fid,"/radius","units","cm",error)
+        call h5ltset_attribute_string_f(fid,"/count","description", &
+             "Number of particles that hit the detector: count(chan)", error)
 
-        call h5ltset_attribute_string_f(fid,"/particles","coordinate_system", &
-             "Right-handed cartesian",error)
-        call h5ltset_attribute_string_f(fid,"/particles","description", &
-             "Monte Carlo particles",error)
+        deallocate(dcount)
 
-        !Close group
-        call h5gclose_f(gid, error)
-        deallocate(ri,rf)
+        if((npa%npart.ne.0).and.(inputs%calc_npa.ge.2)) then
+            n = npa%npart
+            allocate(ri(3,n),rf(3,n))
+            ri(1,:) = npa%part(1:n)%xi
+            ri(2,:) = npa%part(1:n)%yi
+            ri(3,:) = npa%part(1:n)%zi
+            rf(1,:) = npa%part(1:n)%xf
+            rf(2,:) = npa%part(1:n)%yf
+            rf(3,:) = npa%part(1:n)%zf
+
+            !Create Group
+            call h5gcreate_f(fid,"/particles",gid, error)
+            call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npa%npart], error)
+            d(1) = npa%npart
+            dim2 = [3, n]
+            call h5ltmake_compressed_dataset_double_f(gid,"ri",2,dim2, ri, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"rf",2,dim2, rf, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"pitch",1,d, &
+                 npa%part(1:n)%pitch, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d,&
+                 npa%part(1:n)%energy, error)
+            call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d,&
+                 npa%part(1:n)%weight, error)
+            call h5ltmake_compressed_dataset_int_f(gid,"detector",1,d,&
+                 npa%part(1:n)%detector, error)
+
+            !Add attributes
+            call h5ltset_attribute_string_f(gid,"nparticle","description", &
+                 "Number of particles that hit a detector", error)
+            call h5ltset_attribute_string_f(gid,"ri","description", &
+                 "Neutral particle's birth position in machine coordinates: ri([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"ri","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"rf","description", &
+                 "Neutral particle's hit position in machine coordinates: rf([x,y,z],particle)", error)
+            call h5ltset_attribute_string_f(gid,"rf","units", "cm", error)
+            call h5ltset_attribute_string_f(gid,"pitch","description", &
+                 "Pitch value of the neutral particle: p = v_parallel/v  w.r.t. the magnetic field", error)
+            call h5ltset_attribute_string_f(gid,"energy","description", &
+                 "Energy value of the neutral particle", error)
+            call h5ltset_attribute_string_f(gid,"energy","units","keV",error)
+            call h5ltset_attribute_string_f(gid,"weight","description", &
+                 "Neutral particle's contribution to the flux", error)
+            call h5ltset_attribute_string_f(gid,"weight","units","neutrals/s",error)
+            call h5ltset_attribute_string_f(gid,"detector","description", &
+                 "Detector that the neutral particle hit", error)
+
+            call h5ltset_attribute_string_f(fid,"/particles","coordinate_system", &
+                 "Right-handed cartesian",error)
+            call h5ltset_attribute_string_f(fid,"/particles","description", &
+                 "Monte Carlo particles",error)
+
+            !Close group
+            call h5gclose_f(gid, error)
+            deallocate(ri,rf)
+        endif
+
+        !Close file
+        call h5fclose_f(fid, error)
+
+        !Close HDF5 interface
+        call h5close_f(error)
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'NPA data written to: ',trim(filename)
+        endif
     endif
-
-    !Close file
-    call h5fclose_f(fid, error)
-
-    !Close HDF5 interface
-    call h5close_f(error)
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'NPA data written to: ',trim(filename)
-    endif
+    sync all
 
 end subroutine write_npa
 
@@ -3696,107 +3760,110 @@ subroutine write_spectra
     spec%bes=spec%bes/(inputs%dlambda)/(4.d0*pi)*1.d4
     spec%fida=spec%fida/(inputs%dlambda)/(4.d0*pi)*1.d4
 
-    !! write to file
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.h5"
+    if(this_image().eq.1) then
+        !! write to file
+        filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.h5"
 
-    !Open HDF5 interface
-    call h5open_f(error)
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    !Write variables
-    d(1) = 1
-    call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
-    call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
-    dims(1) = inputs%nlambda
-    dims(2) = spec_chords%nchan
-    dims(3) = particles%nclass
-    call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
-         lambda_arr, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
-         spec_chords%radius, error)
-
-    !Add attributes
-    call h5ltset_attribute_string_f(fid,"/nchan", "description", &
-         "Number of channels", error)
-    call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
-         "Number of wavelengths", error)
-    call h5ltset_attribute_string_f(fid,"/lambda","description", &
-         "Wavelength array", error)
-    call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
-    call h5ltset_attribute_string_f(fid,"/radius", "description", &
-         "Line of sight radius at midplane or tangency point", error)
-    call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
-
-    if(inputs%calc_brems.ge.1) then
         !Write variables
-        call h5ltmake_compressed_dataset_double_f(fid, "/brems", 2, &
-             dims(1:2), spec%brems, error)
+        d(1) = 1
+        call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
+        call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
+        dims(1) = inputs%nlambda
+        dims(2) = spec_chords%nchan
+        dims(3) = particles%nclass
+        call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
+             lambda_arr, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
+             spec_chords%radius, error)
+
         !Add attributes
-        call h5ltset_attribute_string_f(fid,"/brems","description", &
-             "Visible Bremsstrahlung: brems(lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/brems","units",&
-             "Ph/(s*nm*sr*m^2)",error )
-    endif
+        call h5ltset_attribute_string_f(fid,"/nchan", "description", &
+             "Number of channels", error)
+        call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
+             "Number of wavelengths", error)
+        call h5ltset_attribute_string_f(fid,"/lambda","description", &
+             "Wavelength array", error)
+        call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
+        call h5ltset_attribute_string_f(fid,"/radius", "description", &
+             "Line of sight radius at midplane or tangency point", error)
+        call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
 
-    if(inputs%calc_bes.ge.1) then
-        !Write variables
-        call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
-             spec%bes(:,:,nbif_type), error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/half", 2, dims(1:2), &
-             spec%bes(:,:,nbih_type), error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(1:2),&
-             spec%bes(:,:,nbit_type), error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
-             spec%bes(:,:,halo_type), error)
-        !Add attributes
-        call h5ltset_attribute_string_f(fid,"/full","description", &
-             "Full energy component of the beam emmision: full(lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/full","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltset_attribute_string_f(fid,"/half","description", &
-             "Half energy component of the beam emmision: half(lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/half","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltset_attribute_string_f(fid,"/third","description", &
-             "Third energy component of the beam emmision: third(lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/third","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltset_attribute_string_f(fid,"/halo","description", &
-             "Halo component of the beam emmision (includes dcx): halo(lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
-    endif
-
-    if(inputs%calc_fida.ge.1) then
-        !Write variables
-        if(particles%nclass.le.1) then
-            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
-                 dims(1:2), spec%fida(:,:,1), error)
+        if(inputs%calc_brems.ge.1) then
+            !Write variables
+            call h5ltmake_compressed_dataset_double_f(fid, "/brems", 2, &
+                 dims(1:2), spec%brems, error)
             !Add attributes
-            call h5ltset_attribute_string_f(fid,"/fida","description", &
-                 "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
-        else
-            call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
-                 dims, spec%fida, error)
+            call h5ltset_attribute_string_f(fid,"/brems","description", &
+                 "Visible Bremsstrahlung: brems(lambda,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/brems","units",&
+                 "Ph/(s*nm*sr*m^2)",error )
+        endif
+
+        if(inputs%calc_bes.ge.1) then
+            !Write variables
+            call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
+                 spec%bes(:,:,nbif_type), error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/half", 2, dims(1:2), &
+                 spec%bes(:,:,nbih_type), error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(1:2),&
+                 spec%bes(:,:,nbit_type), error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
+                 spec%bes(:,:,halo_type), error)
             !Add attributes
-            call h5ltset_attribute_string_f(fid,"/fida","description", &
-                 "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
-       endif
-        call h5ltset_attribute_string_f(fid,"/fida","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltset_attribute_string_f(fid,"/full","description", &
+                 "Full energy component of the beam emmision: full(lambda,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/full","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltset_attribute_string_f(fid,"/half","description", &
+                 "Half energy component of the beam emmision: half(lambda,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/half","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltset_attribute_string_f(fid,"/third","description", &
+                 "Third energy component of the beam emmision: third(lambda,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/third","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltset_attribute_string_f(fid,"/halo","description", &
+                 "Halo component of the beam emmision (includes dcx): halo(lambda,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
+        endif
+
+        if(inputs%calc_fida.ge.1) then
+            !Write variables
+            if(particles%nclass.le.1) then
+                call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
+                     dims(1:2), spec%fida(:,:,1), error)
+                !Add attributes
+                call h5ltset_attribute_string_f(fid,"/fida","description", &
+                     "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
+            else
+                call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
+                call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
+                     dims, spec%fida, error)
+                !Add attributes
+                call h5ltset_attribute_string_f(fid,"/fida","description", &
+                     "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
+           endif
+            call h5ltset_attribute_string_f(fid,"/fida","units","Ph/(s*nm*sr*m^2)",error )
+        endif
+
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        call h5ltset_attribute_string_f(fid,"/","description",&
+             "Spectra calculated by FIDASIM", error)
+
+        !Close file
+        call h5fclose_f(fid, error)
+
+        !Close HDF5 interface
+        call h5close_f(error)
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'Spectra written to: ', trim(filename)
+        endif
     endif
-
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid,"/","description",&
-         "Spectra calculated by FIDASIM", error)
-
-    !Close file
-    call h5fclose_f(fid, error)
-
-    !Close HDF5 interface
-    call h5close_f(error)
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'Spectra written to: ', trim(filename)
-    endif
+    sync all
 
 end subroutine write_spectra
 
@@ -3809,82 +3876,85 @@ subroutine write_neutrons
 
     character(charlim) :: filename
 
-    !! write to file
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrons.h5"
+    if(this_image().eq.1) then
+        !! write to file
+        filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrons.h5"
 
-    !Open HDF5 interface
-    call h5open_f(error)
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    !Write variables
-    if(particles%nclass.gt.1) then
-        dim1(1) = 1
-        call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
-        dim1(1) = particles%nclass
-        call h5ltmake_compressed_dataset_double_f(fid, "/rate", 1, dim1, neutron%rate, error)
-        call h5ltset_attribute_string_f(fid,"/rate","description", &
-             "Neutron rate: rate(orbit_class)", error)
-    else
-        dim1(1) = 1
-        call h5ltmake_dataset_double_f(fid, "/rate", 0, dim1, neutron%rate, error)
-        call h5ltset_attribute_string_f(fid,"/rate","description", &
-             "Neutron rate", error)
+        !Write variables
+        if(particles%nclass.gt.1) then
+            dim1(1) = 1
+            call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
+            dim1(1) = particles%nclass
+            call h5ltmake_compressed_dataset_double_f(fid, "/rate", 1, dim1, neutron%rate, error)
+            call h5ltset_attribute_string_f(fid,"/rate","description", &
+                 "Neutron rate: rate(orbit_class)", error)
+        else
+            dim1(1) = 1
+            call h5ltmake_dataset_double_f(fid, "/rate", 0, dim1, neutron%rate, error)
+            call h5ltset_attribute_string_f(fid,"/rate","description", &
+                 "Neutron rate", error)
+        endif
+        call h5ltset_attribute_string_f(fid,"/rate","units","neutrons/s",error )
+
+        if(inputs%dist_type.eq.1) then
+            dim1(1) = 1
+            call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
+            call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
+            call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
+            call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
+            dim4 = shape(neutron%weight)
+            call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, neutron%weight, error)
+            call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(1:1), fbm%energy, error)
+            call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(2:2), fbm%pitch, error)
+            call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim4(3:3), fbm%r, error)
+            call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim4(4:4), fbm%z, error)
+
+            call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
+                 "Number of energy values", error)
+            call h5ltset_attribute_string_f(fid,"/npitch", "description", &
+                 "Number of pitch values", error)
+            call h5ltset_attribute_string_f(fid,"/nr", "description", &
+                 "Number of R values", error)
+            call h5ltset_attribute_string_f(fid,"/nz", "description", &
+                 "Number of Z values", error)
+            call h5ltset_attribute_string_f(fid,"/weight", "description", &
+                 "Neutron Weight Function: weight(E,p,R,Z), rate = sum(f*weight)", error)
+            call h5ltset_attribute_string_f(fid,"/weight", "units","neutrons*cm^3*dE*dp/fast-ion*s", error)
+
+            call h5ltset_attribute_string_f(fid,"/energy","description", &
+                 "Energy array", error)
+            call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
+            call h5ltset_attribute_string_f(fid,"/pitch", "description", &
+                 "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
+            call h5ltset_attribute_string_f(fid,"/r","description", &
+                 "Radius array", error)
+            call h5ltset_attribute_string_f(fid,"/r", "units","cm", error)
+            call h5ltset_attribute_string_f(fid,"/z","description", &
+                 "Z array", error)
+            call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
+        endif
+
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        call h5ltset_attribute_string_f(fid,"/","description",&
+             "Neutron rate calculated by FIDASIM", error)
+
+        !Close file
+        call h5fclose_f(fid, error)
+
+        !Close HDF5 interface
+        call h5close_f(error)
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'Neutrons written to: ', trim(filename)
+        endif
     endif
-    call h5ltset_attribute_string_f(fid,"/rate","units","neutrons/s",error )
-
-    if(inputs%dist_type.eq.1) then
-        dim1(1) = 1
-        call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
-        call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
-        call h5ltmake_dataset_int_f(fid,"/nr",0,dim1,[fbm%nr], error)
-        call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
-        dim4 = shape(neutron%weight)
-        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 4, dim4, neutron%weight, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim4(1:1), fbm%energy, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim4(2:2), fbm%pitch, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim4(3:3), fbm%r, error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/z", 1, dim4(4:4), fbm%z, error)
-
-        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
-             "Number of energy values", error)
-        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
-             "Number of pitch values", error)
-        call h5ltset_attribute_string_f(fid,"/nr", "description", &
-             "Number of R values", error)
-        call h5ltset_attribute_string_f(fid,"/nz", "description", &
-             "Number of Z values", error)
-        call h5ltset_attribute_string_f(fid,"/weight", "description", &
-             "Neutron Weight Function: weight(E,p,R,Z), rate = sum(f*weight)", error)
-        call h5ltset_attribute_string_f(fid,"/weight", "units","neutrons*cm^3*dE*dp/fast-ion*s", error)
-
-        call h5ltset_attribute_string_f(fid,"/energy","description", &
-             "Energy array", error)
-        call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
-        call h5ltset_attribute_string_f(fid,"/pitch", "description", &
-             "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
-        call h5ltset_attribute_string_f(fid,"/r","description", &
-             "Radius array", error)
-        call h5ltset_attribute_string_f(fid,"/r", "units","cm", error)
-        call h5ltset_attribute_string_f(fid,"/z","description", &
-             "Z array", error)
-        call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
-    endif
-
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid,"/","description",&
-         "Neutron rate calculated by FIDASIM", error)
-
-    !Close file
-    call h5fclose_f(fid, error)
-
-    !Close HDF5 interface
-    call h5close_f(error)
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'Neutrons written to: ', trim(filename)
-    endif
+    sync all
 
 end subroutine write_neutrons
 
@@ -3905,161 +3975,164 @@ subroutine write_fida_weights
     real(Float64), dimension(:,:), allocatable :: vpa_grid,vpe_grid,fida
     real(Float64) :: dlambda, wtot, dE, dP
 
-    dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
-    allocate(lambda_arr(inputs%nlambda_wght))
-    do i=1,inputs%nlambda_wght
-        lambda_arr(i)=(i-0.5)*dlambda + inputs%lambdamin_wght
-    enddo
+    if(this_image().eq.1) then
+        dlambda=(inputs%lambdamax_wght-inputs%lambdamin_wght)/inputs%nlambda_wght
+        allocate(lambda_arr(inputs%nlambda_wght))
+        do i=1,inputs%nlambda_wght
+            lambda_arr(i)=(i-0.5)*dlambda + inputs%lambdamin_wght
+        enddo
 
-    !! define arrays
-    !! define energy - array
-    allocate(ebarr(inputs%ne_wght))
-    do i=1,inputs%ne_wght
-        ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
-    enddo
-    dE = abs(ebarr(2)-ebarr(1))
+        !! define arrays
+        !! define energy - array
+        allocate(ebarr(inputs%ne_wght))
+        do i=1,inputs%ne_wght
+            ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
+        enddo
+        dE = abs(ebarr(2)-ebarr(1))
 
-    !! define pitch - array
-    allocate(ptcharr(inputs%np_wght))
-    do i=1,inputs%np_wght
-        ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
-    enddo
-    dP = abs(ptcharr(2)-ptcharr(1))
+        !! define pitch - array
+        allocate(ptcharr(inputs%np_wght))
+        do i=1,inputs%np_wght
+            ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
+        enddo
+        dP = abs(ptcharr(2)-ptcharr(1))
 
-    !! define 2d grids
-    !! define energy grid
-    allocate(e_grid(inputs%ne_wght,inputs%np_wght))
-    do i=1,inputs%ne_wght
-        e_grid(i,:) = ebarr(i)
-    enddo
+        !! define 2d grids
+        !! define energy grid
+        allocate(e_grid(inputs%ne_wght,inputs%np_wght))
+        do i=1,inputs%ne_wght
+            e_grid(i,:) = ebarr(i)
+        enddo
 
-    !! define pitch grid
-    allocate(p_grid(inputs%ne_wght,inputs%np_wght))
-    do i=1,inputs%np_wght
-        p_grid(:,i) = ptcharr(i)
-    enddo
+        !! define pitch grid
+        allocate(p_grid(inputs%ne_wght,inputs%np_wght))
+        do i=1,inputs%np_wght
+            p_grid(:,i) = ptcharr(i)
+        enddo
 
-    !! define velocity space grid
-    allocate(vpe_grid(inputs%ne_wght,inputs%np_wght)) !! V perpendicular
-    allocate(vpa_grid(inputs%ne_wght,inputs%np_wght)) !! V parallel
-    vpa_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid)*p_grid ! [cm/s]
-    vpe_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid*(1.0-p_grid**2)) ![cm/s]
+        !! define velocity space grid
+        allocate(vpe_grid(inputs%ne_wght,inputs%np_wght)) !! V perpendicular
+        allocate(vpa_grid(inputs%ne_wght,inputs%np_wght)) !! V parallel
+        vpa_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid)*p_grid ! [cm/s]
+        vpe_grid = 100*sqrt((((2.0d3)*e0)/(mass_u*inputs%ab))*e_grid*(1.0-p_grid**2)) ![cm/s]
 
-    !! define jacobian to convert between E-p to velocity
-    allocate(jacobian(inputs%ne_wght,inputs%np_wght))
-    jacobian = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2 + vpe_grid**2)
+        !! define jacobian to convert between E-p to velocity
+        allocate(jacobian(inputs%ne_wght,inputs%np_wght))
+        jacobian = ((inputs%ab*mass_u)/(e0*1.0d3)) *vpe_grid/sqrt(vpa_grid**2 + vpe_grid**2)
 
-    !! normalize mean_f
-    do ic=1,spec_chords%nchan
-        do ip=1,inputs%np_wght
-            do ie=1,inputs%ne_wght
-                wtot = sum(fweight%weight(:,ie,ip,ic))
-                if((wtot.gt.0.d0)) then
-                    fweight%mean_f(ie,ip,ic) = fweight%mean_f(ie,ip,ic)/wtot
-                endif
+        !! normalize mean_f
+        do ic=1,spec_chords%nchan
+            do ip=1,inputs%np_wght
+                do ie=1,inputs%ne_wght
+                    wtot = sum(fweight%weight(:,ie,ip,ic))
+                    if((wtot.gt.0.d0)) then
+                        fweight%mean_f(ie,ip,ic) = fweight%mean_f(ie,ip,ic)/wtot
+                    endif
+                enddo
             enddo
         enddo
-    enddo
 
-    !! Calculate FIDA estimate
-    allocate(fida(inputs%nlambda_wght,spec_chords%nchan))
-    do iwav=1,size(fida,1)
-        fida(iwav,:) = (dE*dP*1d4)*sum(sum(fweight%mean_f(:,:,:)*fweight%weight(iwav,:,:,:),1),1)
-    enddo
+        !! Calculate FIDA estimate
+        allocate(fida(inputs%nlambda_wght,spec_chords%nchan))
+        do iwav=1,size(fida,1)
+            fida(iwav,:) = (dE*dP*1d4)*sum(sum(fweight%mean_f(:,:,:)*fweight%weight(iwav,:,:,:),1),1)
+        enddo
 
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.h5"
+        filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_fida_weights.h5"
 
-    !Open HDF5 interface
-    call h5open_f(error)
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    dim1(1) = 1
-    dim2 = [inputs%nlambda_wght, spec_chords%nchan]
-    dim4 = [inputs%nlambda_wght, inputs%ne_wght, inputs%np_wght, spec_chords%nchan]
-    call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[inputs%ne_wght], error)
-    call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[inputs%np_wght], error)
-    call h5ltmake_dataset_int_f(fid,"/nchan",0,dim1,[spec_chords%nchan], error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/weight",4,dim4,fweight%weight,error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/fida",2,dim2,fida,error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/mean_f",3,dim4(2:4),fweight%mean_f,error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/lambda",1,dim4(1:1),lambda_arr,error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim4(2:2),ebarr, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/pitch",1,dim4(3:3),ptcharr, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/radius",1,dim4(4:4),spec_chords%radius, error)
-    dim2 = [inputs%ne_wght, inputs%np_wght]
-    call h5ltmake_compressed_dataset_double_f(fid,"/jacobian",2,dim2, jacobian, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/vpe_grid",2,dim2,vpe_grid, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/vpa_grid",2,dim2,vpa_grid, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/e_grid",2,dim2,e_grid, error)
-    call h5ltmake_compressed_dataset_double_f(fid,"/p_grid",2,dim2,p_grid, error)
+        dim1(1) = 1
+        dim2 = [inputs%nlambda_wght, spec_chords%nchan]
+        dim4 = [inputs%nlambda_wght, inputs%ne_wght, inputs%np_wght, spec_chords%nchan]
+        call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[inputs%ne_wght], error)
+        call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[inputs%np_wght], error)
+        call h5ltmake_dataset_int_f(fid,"/nchan",0,dim1,[spec_chords%nchan], error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/weight",4,dim4,fweight%weight,error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/fida",2,dim2,fida,error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/mean_f",3,dim4(2:4),fweight%mean_f,error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/lambda",1,dim4(1:1),lambda_arr,error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim4(2:2),ebarr, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/pitch",1,dim4(3:3),ptcharr, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/radius",1,dim4(4:4),spec_chords%radius, error)
+        dim2 = [inputs%ne_wght, inputs%np_wght]
+        call h5ltmake_compressed_dataset_double_f(fid,"/jacobian",2,dim2, jacobian, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/vpe_grid",2,dim2,vpe_grid, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/vpa_grid",2,dim2,vpa_grid, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/e_grid",2,dim2,e_grid, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/p_grid",2,dim2,p_grid, error)
 
-    !Add attributes
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    if(inputs%calc_fida_wght.eq.1) then
-        call h5ltset_attribute_string_f(fid,"/", "description", &
-             "Line of Sight averaged FIDA E-p space sensitivity/weights " // &
-             "and spectra calculated by FIDASIM", error)
-    else
-        call h5ltset_attribute_string_f(fid,"/", "description", &
-             "Full FIDA E-p space sensitivity/weights and spectra calculated " // &
-             "by FIDASIM via Monte Carlo method", error)
+        !Add attributes
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        if(inputs%calc_fida_wght.eq.1) then
+            call h5ltset_attribute_string_f(fid,"/", "description", &
+                 "Line of Sight averaged FIDA E-p space sensitivity/weights " // &
+                 "and spectra calculated by FIDASIM", error)
+        else
+            call h5ltset_attribute_string_f(fid,"/", "description", &
+                 "Full FIDA E-p space sensitivity/weights and spectra calculated " // &
+                 "by FIDASIM via Monte Carlo method", error)
+        endif
+        call h5ltset_attribute_string_f(fid,"/weight","description", &
+             "E-p space sensivity/weight of FIDA diagnostic: weight(lambda,energy,pitch,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/weight","units", &
+             "(Ph*cm)/(s*nm*sr*fast-ion*dE*dP)",error)
+        call h5ltset_attribute_string_f(fid,"/fida","units", &
+             "Ph/(s*nm*sr*m^2)",error )
+        call h5ltset_attribute_string_f(fid,"/fida","description", &
+             "Estimate of Fast-ion D-alpha (FIDA) emmision calculated by 1e4*weight*mean_f*dEdP: fida(lambda,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/mean_f","description", &
+             "Estimated mean fast-ion distribution function seen by los: mean_f(energy,pitch,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/mean_f","units", &
+             "fast-ion/(dE*dP*cm^3)", error)
+        call h5ltset_attribute_string_f(fid,"/lambda","description", &
+             "Wavelength array", error)
+        call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
+        call h5ltset_attribute_string_f(fid,"/nchan", "description", &
+             "Number of channels", error)
+        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
+             "Number of energy values", error)
+        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
+             "Number of pitch value", error)
+        call h5ltset_attribute_string_f(fid,"/energy","description", &
+             "Energy array", error)
+        call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
+        call h5ltset_attribute_string_f(fid,"/pitch", "description", &
+             "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
+        call h5ltset_attribute_string_f(fid,"/radius", "description", &
+             "Line of sight radius at midplane or tangency point", error)
+        call h5ltset_attribute_string_f(fid,"/radius", "units","cm", error)
+        call h5ltset_attribute_string_f(fid,"/jacobian","description", &
+             "Jacobian used to convert from E-p space to velocity space", error)
+        call h5ltset_attribute_string_f(fid,"/jacobian","units", &
+             "(dE*dP)/(dvpa*dvpe)", error)
+        call h5ltset_attribute_string_f(fid,"/e_grid","description", &
+             "2D energy grid", error)
+        call h5ltset_attribute_string_f(fid,"/e_grid","units","keV", error)
+        call h5ltset_attribute_string_f(fid,"/p_grid","description", &
+             "2D pitch grid", error)
+        call h5ltset_attribute_string_f(fid,"/vpe_grid","description", &
+             "2D perpendicular velocity grid", error)
+        call h5ltset_attribute_string_f(fid,"/vpe_grid","units","cm/s", error)
+        call h5ltset_attribute_string_f(fid,"/vpa_grid","description", &
+             "2D parallel velocity grid", error)
+        call h5ltset_attribute_string_f(fid,"/vpa_grid","units","cm/s", error)
+
+        !Close file
+        call h5fclose_f(fid, error)
+
+        !Close HDF5 interface
+        call h5close_f(error)
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'FIDA weights written to: ', trim(filename)
+        endif
     endif
-    call h5ltset_attribute_string_f(fid,"/weight","description", &
-         "E-p space sensivity/weight of FIDA diagnostic: weight(lambda,energy,pitch,chan)", error)
-    call h5ltset_attribute_string_f(fid,"/weight","units", &
-         "(Ph*cm)/(s*nm*sr*fast-ion*dE*dP)",error)
-    call h5ltset_attribute_string_f(fid,"/fida","units", &
-         "Ph/(s*nm*sr*m^2)",error )
-    call h5ltset_attribute_string_f(fid,"/fida","description", &
-         "Estimate of Fast-ion D-alpha (FIDA) emmision calculated by 1e4*weight*mean_f*dEdP: fida(lambda,chan)", error)
-    call h5ltset_attribute_string_f(fid,"/mean_f","description", &
-         "Estimated mean fast-ion distribution function seen by los: mean_f(energy,pitch,chan)", error)
-    call h5ltset_attribute_string_f(fid,"/mean_f","units", &
-         "fast-ion/(dE*dP*cm^3)", error)
-    call h5ltset_attribute_string_f(fid,"/lambda","description", &
-         "Wavelength array", error)
-    call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
-    call h5ltset_attribute_string_f(fid,"/nchan", "description", &
-         "Number of channels", error)
-    call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
-         "Number of energy values", error)
-    call h5ltset_attribute_string_f(fid,"/npitch", "description", &
-         "Number of pitch value", error)
-    call h5ltset_attribute_string_f(fid,"/energy","description", &
-         "Energy array", error)
-    call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
-    call h5ltset_attribute_string_f(fid,"/pitch", "description", &
-         "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
-    call h5ltset_attribute_string_f(fid,"/radius", "description", &
-         "Line of sight radius at midplane or tangency point", error)
-    call h5ltset_attribute_string_f(fid,"/radius", "units","cm", error)
-    call h5ltset_attribute_string_f(fid,"/jacobian","description", &
-         "Jacobian used to convert from E-p space to velocity space", error)
-    call h5ltset_attribute_string_f(fid,"/jacobian","units", &
-         "(dE*dP)/(dvpa*dvpe)", error)
-    call h5ltset_attribute_string_f(fid,"/e_grid","description", &
-         "2D energy grid", error)
-    call h5ltset_attribute_string_f(fid,"/e_grid","units","keV", error)
-    call h5ltset_attribute_string_f(fid,"/p_grid","description", &
-         "2D pitch grid", error)
-    call h5ltset_attribute_string_f(fid,"/vpe_grid","description", &
-         "2D perpendicular velocity grid", error)
-    call h5ltset_attribute_string_f(fid,"/vpe_grid","units","cm/s", error)
-    call h5ltset_attribute_string_f(fid,"/vpa_grid","description", &
-         "2D parallel velocity grid", error)
-    call h5ltset_attribute_string_f(fid,"/vpa_grid","units","cm/s", error)
-
-    !Close file
-    call h5fclose_f(fid, error)
-
-    !Close HDF5 interface
-    call h5close_f(error)
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'FIDA weights written to: ', trim(filename)
-    endif
+    sync all
 
 end subroutine write_fida_weights
 
@@ -4077,104 +4150,107 @@ subroutine write_npa_weights
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
 
-    !! define energy - array
-    allocate(ebarr(inputs%ne_wght))
-    do i=1,inputs%ne_wght
-        ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
-    enddo
+    if(this_image().eq.1) then
+        !! define energy - array
+        allocate(ebarr(inputs%ne_wght))
+        do i=1,inputs%ne_wght
+            ebarr(i)=real(i-0.5)*inputs%emax_wght/real(inputs%ne_wght)
+        enddo
 
-    !! define pitch - array
-    allocate(ptcharr(inputs%np_wght))
-    do i=1,inputs%np_wght
-        ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
-    enddo
+        !! define pitch - array
+        allocate(ptcharr(inputs%np_wght))
+        do i=1,inputs%np_wght
+            ptcharr(i)=real(i-0.5)*2./real(inputs%np_wght)-1.
+        enddo
 
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.h5"
+        filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa_weights.h5"
 
-    !Open HDF5 interface
-    call h5open_f(error)
+        !Open HDF5 interface
+        call h5open_f(error)
 
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
+        !Create file overwriting any existing file
+        call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
-    !Write variables
-    d(1) = 1
-    dim2 = [inputs%ne_wght, npa_chords%nchan]
-    dim3 = [inputs%ne_wght, inputs%np_wght, npa_chords%nchan]
-    dim5 = [inputs%ne_wght, beam_grid%nx, beam_grid%ny, beam_grid%nz, npa_chords%nchan]
-    call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [npa_chords%nchan], error)
-    call h5ltmake_dataset_int_f(fid, "/nenergy", 0, d, [inputs%ne_wght], error)
-    call h5ltmake_dataset_int_f(fid, "/npitch", 0, d, [inputs%np_wght], error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, &
-         dim2(2:2), npa_chords%radius, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/energy", 1, &
-         dim2(1:1), ebarr, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/pitch", 1, &
-         dim3(2:2), ptcharr, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, &
-         dim2, nweight%flux, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/weight", 3, &
-         dim3, nweight%weight, error)
+        !Write variables
+        d(1) = 1
+        dim2 = [inputs%ne_wght, npa_chords%nchan]
+        dim3 = [inputs%ne_wght, inputs%np_wght, npa_chords%nchan]
+        dim5 = [inputs%ne_wght, beam_grid%nx, beam_grid%ny, beam_grid%nz, npa_chords%nchan]
+        call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [npa_chords%nchan], error)
+        call h5ltmake_dataset_int_f(fid, "/nenergy", 0, d, [inputs%ne_wght], error)
+        call h5ltmake_dataset_int_f(fid, "/npitch", 0, d, [inputs%np_wght], error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, &
+             dim2(2:2), npa_chords%radius, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/energy", 1, &
+             dim2(1:1), ebarr, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/pitch", 1, &
+             dim3(2:2), ptcharr, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/flux", 2, &
+             dim2, nweight%flux, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/weight", 3, &
+             dim3, nweight%weight, error)
 
-    !Add attributes
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid,"/", "description", &
-         "NPA E-p space sensitivity/weights and Flux calculated by FIDASIM", error)
-    call h5ltset_attribute_string_f(fid,"/nchan", "description", &
-         "Number of channels", error)
-    call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
-         "Number of energy values", error)
-    call h5ltset_attribute_string_f(fid,"/npitch", "description", &
-         "Number of pitch value", error)
-    call h5ltset_attribute_string_f(fid,"/energy","description", &
-         "Energy array", error)
-    call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
-    call h5ltset_attribute_string_f(fid,"/pitch", "description", &
-         "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
-    call h5ltset_attribute_string_f(fid,"/radius", "description", &
-         "Line of sight radius at midplane or tangency point", error)
-    call h5ltset_attribute_string_f(fid,"/radius", "units","cm", error)
-    call h5ltset_attribute_string_f(fid,"/flux", "description", &
-         "Neutral flux: flux(energy,chan)", error)
-    call h5ltset_attribute_string_f(fid,"/flux", "units", &
-         "neutrals/(s*dE)", error)
-    call h5ltset_attribute_string_f(fid,"/weight", "description", &
-         "E-p space sensivity/weight of NPA diagnostics: weight(energy,pitch,chan)", error)
-    call h5ltset_attribute_string_f(fid,"/weight","units", &
-         "neutrals/(s*fast-ion*dE*dP)",error)
+        !Add attributes
+        call h5ltset_attribute_string_f(fid, "/", "version", version, error)
+        call h5ltset_attribute_string_f(fid,"/", "description", &
+             "NPA E-p space sensitivity/weights and Flux calculated by FIDASIM", error)
+        call h5ltset_attribute_string_f(fid,"/nchan", "description", &
+             "Number of channels", error)
+        call h5ltset_attribute_string_f(fid,"/nenergy", "description", &
+             "Number of energy values", error)
+        call h5ltset_attribute_string_f(fid,"/npitch", "description", &
+             "Number of pitch value", error)
+        call h5ltset_attribute_string_f(fid,"/energy","description", &
+             "Energy array", error)
+        call h5ltset_attribute_string_f(fid,"/energy", "units","keV", error)
+        call h5ltset_attribute_string_f(fid,"/pitch", "description", &
+             "Pitch array: p = v_parallel/v  w.r.t. the magnetic field", error)
+        call h5ltset_attribute_string_f(fid,"/radius", "description", &
+             "Line of sight radius at midplane or tangency point", error)
+        call h5ltset_attribute_string_f(fid,"/radius", "units","cm", error)
+        call h5ltset_attribute_string_f(fid,"/flux", "description", &
+             "Neutral flux: flux(energy,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/flux", "units", &
+             "neutrals/(s*dE)", error)
+        call h5ltset_attribute_string_f(fid,"/weight", "description", &
+             "E-p space sensivity/weight of NPA diagnostics: weight(energy,pitch,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/weight","units", &
+             "neutrals/(s*fast-ion*dE*dP)",error)
 
-    if(inputs%calc_npa_wght.ge.2) then !Write diagnostic variables
-        call write_beam_grid(fid, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/emissivity", 4, &
-             dim5(2:5), nweight%emissivity, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/attenuation", 5, &
-             dim5, nweight%attenuation, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/cx", 5, &
-             dim5, nweight%cx, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/phit", 4, &
-             dim5(2:5), npa_chords%phit%p, error)
+        if(inputs%calc_npa_wght.ge.2) then !Write diagnostic variables
+            call write_beam_grid(fid, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/emissivity", 4, &
+                 dim5(2:5), nweight%emissivity, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/attenuation", 5, &
+                 dim5, nweight%attenuation, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/cx", 5, &
+                 dim5, nweight%cx, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/phit", 4, &
+                 dim5(2:5), npa_chords%phit%p, error)
 
-        call h5ltset_attribute_string_f(fid,"/emissivity", "description", &
-             "Neutral emissivity: emissivity(x,y,z,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/emissivity", "units", &
-             "neutrals/(s*dV)", error)
-        call h5ltset_attribute_string_f(fid,"/cx", "description", &
-             "Charge-exchange rate: cx(energy,x,y,z,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/cx", "units", "s^(-1)", error)
-        call h5ltset_attribute_string_f(fid,"/attenuation","description", &
-             "Attenuation factor i.e. survival probability: attenuation(energy,x,y,z,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/phit","description", &
-             "Probability of hitting the detector given an isotropic source: phit(x,y,z,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/emissivity", "description", &
+                 "Neutral emissivity: emissivity(x,y,z,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/emissivity", "units", &
+                 "neutrals/(s*dV)", error)
+            call h5ltset_attribute_string_f(fid,"/cx", "description", &
+                 "Charge-exchange rate: cx(energy,x,y,z,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/cx", "units", "s^(-1)", error)
+            call h5ltset_attribute_string_f(fid,"/attenuation","description", &
+                 "Attenuation factor i.e. survival probability: attenuation(energy,x,y,z,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/phit","description", &
+                 "Probability of hitting the detector given an isotropic source: phit(x,y,z,chan)", error)
+        endif
+
+        !Close file
+        call h5fclose_f(fid, error)
+
+        !Close HDF5 interface
+        call h5close_f(error)
+        if(inputs%verbose.ge.1) then
+            write(*,'(T4,a,a)') 'NPA weights written to: ',trim(filename)
+        endif
     endif
-
-    !Close file
-    call h5fclose_f(fid, error)
-
-    !Close HDF5 interface
-    call h5close_f(error)
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'NPA weights written to: ',trim(filename)
-    endif
+    sync all
 
 end subroutine write_npa_weights
 
@@ -7131,11 +7207,11 @@ subroutine ndmc
                 do kk=1,nl_birth(neut_type)
                     call randind(tracks(1:ncell)%flux,randi)
                     call randu(randomu)
-                    birth%neut_type(birth%cnt) = neut_type
-                    birth%ind(:,birth%cnt) = tracks(randi(1))%ind
-                    birth%vi(:,birth%cnt) = vnbi
-                    birth%ri(:,birth%cnt) = tracks(randi(1))%pos + &
-                                            vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
+                    birth%part(birth%cnt)%neut_type = neut_type
+                    birth%part(birth%cnt)%ind = tracks(randi(1))%ind
+                    birth%part(birth%cnt)%vi = vnbi
+                    birth%part(birth%cnt)%ri = tracks(randi(1))%pos + &
+                                               vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
                     birth%cnt = birth%cnt+1
                 enddo
             endif
@@ -7989,7 +8065,7 @@ subroutine neutron_f
         write(*,'(30X,a)') ''
     endif
 
-    if(this_image().eq.1) call write_neutrons()
+    call write_neutrons()
 
 end subroutine neutron_f
 
@@ -8088,7 +8164,7 @@ subroutine neutron_mc
         write(*,'(30X,a)') ''
     endif
 
-    if(this_image().eq.1) call write_neutrons()
+    call write_neutrons()
 
 end subroutine neutron_mc
 
@@ -8249,7 +8325,7 @@ subroutine fida_weights_mc
     call co_sum(fweight%weight)
     call co_sum(fweight%mean_f)
 
-    if(this_image().eq.1) call write_fida_weights()
+    call write_fida_weights()
 
 end subroutine fida_weights_mc
 
@@ -8444,7 +8520,7 @@ subroutine fida_weights_los
     enddo chan_loop
 
     fweight%mean_f = fweight%mean_f/(dEdP)
-    if(this_image().eq.1) call write_fida_weights()
+    call write_fida_weights()
 
 end subroutine fida_weights_los
 
@@ -8598,7 +8674,7 @@ subroutine npa_weights
        endif
     enddo loop_over_channels
 
-    if(this_image().eq.1) call write_npa_weights()
+    call write_npa_weights()
 
 end subroutine npa_weights
 
@@ -8680,15 +8756,8 @@ program fidasim
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
-        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
-        birth%neut_type = 0
+        allocate(birth%part(int(inputs%n_birth*inputs%n_nbi)))
         birth%dens = 0.d0
-        birth%ind = 0
-        birth%ri = 0.d0
-        birth%vi = 0.d0
     endif
 
     if(inputs%calc_spec.ge.1) then
@@ -8743,7 +8812,7 @@ program fidasim
                   time_arr(5),time_arr(6),time_arr(7)
         endif
         call ndmc
-        if((inputs%calc_birth.eq.1).and.(this_image().eq.1))then
+        if(inputs%calc_birth.eq.1)then
             call write_birth_profile()
         endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -8766,7 +8835,7 @@ program fidasim
         endif
         call halo()
         !! ---------- WRITE NEUTRALS ---------- !!
-        if(this_image().eq.1) call write_neutrals()
+        call write_neutrals()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
@@ -8800,7 +8869,7 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
-    if((inputs%calc_spec.ge.1).and.(this_image().eq.1)) then
+    if(inputs%calc_spec.ge.1) then
         call write_spectra()
         write(*,'(30X,a)') ''
     endif
@@ -8822,7 +8891,7 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
-    if((inputs%calc_npa.ge.1).and.(this_image().eq.1)) then
+    if(inputs%calc_npa.ge.1) then
         call write_npa()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif

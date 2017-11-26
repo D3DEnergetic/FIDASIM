@@ -21,12 +21,12 @@ hdf5:
 
 opencoarrays:
 	@printf "\nBuilding OpenCoarrays...\n"
-	tar -zvxf $(DEPS_DIR)/OpenCoarrays-1.9.2.tar.gz >> $(OPENCOARRAYS_LOG) 2>&1
-	cd $(DEPS_DIR)/OpenCoarrays-1.9.2; ./install.sh --install-prefix=$(DEPS_DIR)/opencoarrays \
+	tar -zvxf $(DEPS_DIR)/OpenCoarrays-1.9.3.tar.gz >> $(OPENCOARRAYS_LOG) 2>&1
+	cd $(DEPS_DIR)/OpenCoarrays-1.9.3; ./install.sh --install-prefix=$(DEPS_DIR)/opencoarrays \
 	    -y --with-fortran $(FC) --with-c $(CC) --with-cxx $(CXX) >> $(OPENCOARRAYS_LOG) 2>&1
-	cp $(DEPS_DIR)/OpenCoarrays-1.9.2/LICENSE $(DEPS_DIR)/opencoarrays
-	cp $(DEPS_DIR)/OpenCoarrays-1.9.2/GETTING_STARTED.md $(DEPS_DIR)/opencoarrays
-	-rm -rf OpenCoarrays-1.9.2
+	cp $(DEPS_DIR)/OpenCoarrays-1.9.3/LICENSE $(DEPS_DIR)/opencoarrays
+	cp $(DEPS_DIR)/OpenCoarrays-1.9.3/GETTING_STARTED.md $(DEPS_DIR)/opencoarrays
+	-rm -rf OpenCoarrays-1.9.3
 	@printf "OpenCoarrays build is complete\n\n"
 
 clean: clean_hdf5 clean_opencoarrays
@@ -35,4 +35,4 @@ clean_hdf5:
 	-rm -rf hdf5 hdf5-1.8.16 $(HDF5_LOG)
 
 clean_opencoarrays:
-	-rm -rf opencoarrays OpenCoarrays-1.9.2 $(OPENCOARRAYS_LOG)
+	-rm -rf opencoarrays OpenCoarrays-1.9.3 $(OPENCOARRAYS_LOG)

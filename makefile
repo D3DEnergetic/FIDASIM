@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 
 #Default compiling options
-USE_OPENMP = y
+USE_OPENMP = n
 PROFILE = n
 DEBUG = n
 

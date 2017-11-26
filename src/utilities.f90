@@ -9,7 +9,8 @@ module utilities
 implicit none
 private
 public :: ind2sub, sub2ind, split_indices
-public :: rng_type, rng_init, rng, rng_uniform, rng_normal, randu, randn, randind
+public :: rng_type, rng_init, get_rng, rng
+public :: rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
 public :: deriv
 
@@ -46,11 +47,26 @@ type SparseArray
         !+ Array values
 end type SparseArray
 
+interface randu
+    module procedure randu_arr
+    module procedure randu_r_arr
+end interface
+
+interface randn
+    module procedure randn_arr
+    module procedure randn_r_arr
+end interface
+
 interface randind
     !+ Procedure for generating a random array index/subscripts
     module procedure randind_n
     module procedure randind_w_1
     module procedure randind_w_2
+    module procedure randind_w_3
+    module procedure randind_r_n
+    module procedure randind_r_w_1
+    module procedure randind_r_w_2
+    module procedure randind_r_w_3
 end interface
 
 interface search_sorted_first
@@ -205,6 +221,34 @@ subroutine rng_init(self, seed)
 
 end subroutine rng_init
 
+function get_rng() result(r)
+    type(rng_type) :: r
+    integer :: thread_id
+
+#ifdef _OMP
+    thread_id = OMP_get_thread_num() + 1
+#else
+    thread_id = 1
+#endif
+
+    r = rng(thread_id)
+
+end function get_rng
+
+subroutine update_rng(r)
+    type(rng_type), intent(in) :: r
+    integer :: thread_id
+
+#ifdef _OMP
+    thread_id = OMP_get_thread_num() + 1
+#else
+    thread_id = 1
+#endif
+
+    rng(thread_id) = r
+
+end subroutine update_rng
+
 function rng_uniform(self) result(u)
     !+ Generate a uniformally-distributed random number in the range [0,1)
     type(rng_type), intent(inout) :: self
@@ -263,48 +307,68 @@ function rng_normal(self) result(n)
 
 end function rng_normal
 
-subroutine randu(randomu)
+subroutine randu_r_arr(r, randomu)
+    !+ Generate an array of uniformally-distributed random deviates
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
+    real(Float64), dimension(:), intent(out) :: randomu
+        !+ Array of uniform random deviates
+
+    integer :: i
+
+    randomu = 0.d0
+    do i=1,size(randomu)
+        randomu(i) = rng_uniform(r)
+    enddo
+
+end subroutine randu_r_arr
+
+subroutine randu_arr(randomu)
     !+ Generate an array of uniformally-distributed random deviates
     real(Float64), dimension(:), intent(out) :: randomu
         !+ Array of uniform random deviates
 
-    integer :: i, thread_id
+    type(rng_type) ::r
 
-#ifdef _OMP
-    thread_id = OMP_get_thread_num() + 1
-#else
-    thread_id = 1
-#endif
+    r = get_rng()
+    call randu_r_arr(r, randomu)
+    call update_rng(r)
 
-    randomu = 0.d0
-    do i=1,size(randomu)
-        randomu(i) = rng_uniform(rng(thread_id))
+end subroutine randu_arr
+
+subroutine randn_r_arr(r, randomn)
+    !+ Generate an array of normally-distributed random deviates
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
+    real(Float64), dimension(:), intent(out) :: randomn
+        !+ Array of normal random deviates
+
+    integer :: i
+
+    randomn = 0.d0
+    do i=1,size(randomn)
+        randomn(i) = rng_normal(r)
     enddo
 
-end subroutine randu
+end subroutine randn_r_arr
 
-subroutine randn(randomn)
+subroutine randn_arr(randomn)
     !+ Generate an array of normally-distributed random deviates
     real(Float64), dimension(:), intent(out) :: randomn
         !+ Array of normal random deviates
 
-    integer :: i, thread_id
+    type(rng_type) :: r
 
-#ifdef _OMP
-    thread_id = OMP_get_thread_num() + 1
-#else
-    thread_id = 1
-#endif
+    r = get_rng()
+    call randn_r_arr(r,randomn)
+    call update_rng(r)
 
-    randomn = 0.d0
-    do i=1,size(randomn)
-        randomn(i) = rng_normal(rng(thread_id))
-    enddo
+end subroutine randn_arr
 
-end subroutine randn
-
-subroutine randind_n(n,randomi)
+subroutine randind_r_n(r, n, randomi)
     !+ Generate a array of uniformally-distributed random integers in the range [1, n]
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
     integer, intent(in)                :: n
         !+ Largest possible value
     integer, dimension(:), intent(out) :: randomi
@@ -315,14 +379,31 @@ subroutine randind_n(n,randomi)
 
     randomi = 0
     do i=1,size(randomi)
-        call randu(randomu)
+        call randu_r_arr(r, randomu)
         randomi(i) = ceiling(randomu(1)*n)
     enddo
 
+end subroutine randind_r_n
+
+subroutine randind_n(n, randomi)
+    !+ Generate a array of uniformally-distributed random integers in the range [1, n]
+    integer, intent(in)                :: n
+        !+ Largest possible value
+    integer, dimension(:), intent(out) :: randomi
+        !+ Array of uniform deviates
+
+    type(rng_type) :: r
+
+    r = get_rng()
+    call randind_r_n(r, n, randomi)
+    call update_rng(r)
+
 end subroutine randind_n
 
-subroutine randind_w_1(w,randomi)
+subroutine randind_r_w_1(r, w, randomi)
     !+ Generate an array of random indices of an 1D array distributed according to `w`
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
     real(Float64), dimension(:), intent(in) :: w
         !+ 1D array of index weights
     integer, dimension(:), intent(out)      :: randomi
@@ -342,15 +423,32 @@ subroutine randind_w_1(w,randomi)
 
     randomi = 0
     do i=1,size(randomi)
-        call randu(randomu)
+        call randu_r_arr(r,randomu)
         cdf_val = randomu(1)*cdf(nw)
         randomi(i) = min(search_sorted_first(cdf,cdf_val),nw)
     enddo
 
+end subroutine randind_r_w_1
+
+subroutine randind_w_1(w, randomi)
+    !+ Generate an array of random indices of an 1D array distributed according to `w`
+    real(Float64), dimension(:), intent(in) :: w
+        !+ 1D array of index weights
+    integer, dimension(:), intent(out)      :: randomi
+        !+ Random indices
+
+    type(rng_type) :: r
+
+    r = get_rng()
+    call randind_r_w_1(r, w, randomi)
+    call update_rng(r)
+
 end subroutine randind_w_1
 
-subroutine randind_w_2(w,randomi)
+subroutine randind_r_w_2(r, w, randomi)
     !+ Generate an array of random subscripts of an 2D array distributed according to `w`
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
     real(Float64), dimension(:,:), intent(in) :: w
         !+ 2D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
@@ -363,13 +461,67 @@ subroutine randind_w_2(w,randomi)
     randomi = 0
     nw = size(w)
 
-    call randind_w_1(reshape(w,[nw]),randi)
+    call randind_r_w_1(r, reshape(w,[nw]),randi)
     do i=1,size(randomi,2)
         call ind2sub(shape(w),randi(i),subs)
         randomi(:,i) = subs
     enddo
 
+end subroutine randind_r_w_2
+
+subroutine randind_w_2(w, randomi)
+    !+ Generate an array of random subscripts of an 2D array distributed according to `w`
+    real(Float64), dimension(:,:), intent(in) :: w
+        !+ 2D array of subscript weights
+    integer, dimension(:,:), intent(out)      :: randomi
+        !+ A 2D (ndim, :) array of random subscripts
+
+    type(rng_type) :: r
+
+    r = get_rng()
+    call randind_r_w_2(r, w, randomi)
+    call update_rng(r)
+
 end subroutine randind_w_2
+
+subroutine randind_r_w_3(r, w, randomi)
+    !+ Generate an array of random subscripts of an 3D array distributed according to `w`
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
+    real(Float64), dimension(:,:,:), intent(in) :: w
+        !+ 3D array of subscript weights
+    integer, dimension(:,:), intent(out)      :: randomi
+        !+ A 2D (ndim, :) array of random subscripts
+
+    integer :: i,nw
+    integer, dimension(3) :: subs
+    integer, dimension(size(randomi,2)) :: randi
+
+    randomi = 0
+    nw = size(w)
+
+    call randind_r_w_1(r,reshape(w,[nw]),randi)
+    do i=1,size(randomi,2)
+        call ind2sub(shape(w),randi(i),subs)
+        randomi(:,i) = subs
+    enddo
+
+end subroutine randind_r_w_3
+
+subroutine randind_w_3(w, randomi)
+    !+ Generate an array of random subscripts of an 3D array distributed according to `w`
+    real(Float64), dimension(:,:,:), intent(in) :: w
+        !+ 3D array of subscript weights
+    integer, dimension(:,:), intent(out)      :: randomi
+        !+ A 2D (ndim, :) array of random subscripts
+
+    type(rng_type) :: r
+
+    r = get_rng()
+    call randind_r_w_3(r, w, randomi)
+    call update_rng(r)
+
+end subroutine randind_w_3
 
 !============================================================================
 !------------------------------Sparse Routines-------------------------------

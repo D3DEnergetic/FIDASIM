@@ -1747,7 +1747,7 @@ subroutine read_inputs
     beam_grid%origin=origin
 
     !! Only output on master
-    if(this_image().ne.1) inputs%verbose=0
+    !if(this_image().ne.1) inputs%verbose=0
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Shot settings ----"
@@ -3767,7 +3767,7 @@ subroutine write_spectra
                  "Direct Charge Exchange (DCX) beam emission: spec(lambda, chan)", error)
             call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error)
             call h5ltset_attribute_string_f(fid,"/halo","description", &
-                 "Halo component of the beam emmision (includes dcx): halo(lambda,chan)", error)
+                 "Halo component of the beam emmision: halo(lambda,chan)", error)
             call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
         endif
 
@@ -7189,7 +7189,10 @@ subroutine ndmc
     call co_sum(neut%third)
     neut%third = neut%third/nimages
 
-    if(inputs%calc_birth.ge.1) call co_sum(birth%dens)
+    if(inputs%calc_birth.ge.1) then
+        call co_sum(birth%dens)
+        birth%dens = birth%dens/nimages
+    endif
 
     call co_sum(nbi_outside)
     if(nbi_outside.gt.0)then

@@ -3463,7 +3463,7 @@ subroutine write_neutrals
         call h5ltset_attribute_string_f(fid,"/dcxdens","units","neutrals*cm^-3", error)
 
         call h5ltset_attribute_string_f(fid,"/halodens","description", &
-             "Neutral density of the beam halo(including dcx): halodens(level,x,y,z)", error)
+             "Neutral density of the beam halo: halodens(level,x,y,z)", error)
         call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
 
         call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -5589,18 +5589,6 @@ subroutine get_plasma(plasma, pos, ind)
     real(Float64) :: phi, s, c
     integer :: i, j
 
-    plasma%denp = 0.d0
-    plasma%dene = 0.d0
-    plasma%denimp = 0.d0
-    plasma%denf = 0.d0
-    plasma%ti = 0.d0
-    plasma%te = 0.d0
-    plasma%zeff = 0.d0
-    plasma%vr = 0.d0
-    plasma%vz = 0.d0
-    plasma%vt = 0.d0
-    plasma%vrot = 0.d0
-    plasma%pos = 0.d0
     plasma%in_plasma = .False.
 
     if(present(ind)) call get_position(ind,xyz)

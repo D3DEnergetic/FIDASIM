@@ -1747,7 +1747,7 @@ subroutine read_inputs
     beam_grid%origin=origin
 
     !! Only output on master
-    !if(this_image().ne.1) inputs%verbose=0
+    if(this_image().ne.1) inputs%verbose=0
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- Shot settings ----"

@@ -181,19 +181,27 @@ type BeamGrid
 end type BeamGrid
 
 type InterpolationGrid
-    !+ Defines a 2D R-Z grid for interpolating plasma parameters and fields
+    !+ Defines a 3D R-Z-phi grid for interpolating plasma parameters and fields
     integer(Int32) :: nr
         !+ Number of Radii
+    integer(Int32) :: nphi
+        !+ Number of phi values
     integer(Int32) :: nz
         !+ Number of Z values
     real(Float64)  :: dr
         !+ Radial spacing [cm]
+    real(Float64)  :: dphi
+        !+ Angular spacing [rad]
     real(Float64)  :: dz
         !+ Vertical spacing [cm]
     real(Float64)  :: da
         !+ Grid element area [\(cm^2\)]
+    real(Float64), dimension(:,:,:),   allocatable :: dv
+        !+ Cell volumes [\(cm^3\)]
     real(Float64), dimension(:),   allocatable :: r
         !+ Radii values [cm]
+    real(Float64), dimension(:),   allocatable :: phi
+        !+ Angular values [rad]
     real(Float64), dimension(:),   allocatable :: z
         !+ Z values [cm]
     real(Float64), dimension(:,:), allocatable :: r2d
@@ -322,6 +330,8 @@ type FastIonDistribution
         !+ Pitch spacing
     real(Float64)  :: dr
         !+ Radial spacing [cm]
+    real(Float64)  :: dphi
+        !+ Angular spacing [rad]
     real(Float64)  :: dz
         !+ Z spacing [cm]
     real(Float64)  :: emin
@@ -344,6 +354,8 @@ type FastIonDistribution
         !+ Pitch w.r.t. the magnetic field
     real(Float64), dimension(:), allocatable       :: r
         !+ Radius [cm]
+    real(Float64), dimension(:), allocatable       :: phi
+        !+ Angles [rad]
     real(Float64), dimension(:), allocatable       :: z
         !+ Z [cm]
     real(Float64), dimension(:,:), allocatable     :: denf

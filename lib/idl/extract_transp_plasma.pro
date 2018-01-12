@@ -25,7 +25,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, flux)
     ;+```
 
-    var_list = ["TRFLX","TFLUX","TIME","NE","TE","TI","ZEFFI","OMEGA"]
+    var_list = ["TRFLX","TFLUX","TIME","NE","TE","TI","ZEFFI","OMEGA","dn0wd","dn0out"]
 
     zz = read_ncdf(filename,vars = var_list)
 
@@ -36,6 +36,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     transp_ne = zz.ne_[*,idx] ;cm^-3
     transp_te = zz.te[*,idx]*1.d-3  ; kev
     transp_ti = zz.ti[*,idx]*1.d-3   ; kev
+    transp_dn0wd = zz.dn0wd[*,idx] ;cm^-3
     transp_zeff = zz.zeffi[*,idx]
     rho_cb = sqrt(zz.trflx[*,idx]/zz.tflux[idx])
     ; center each rho b/c toroidal flux is at cell boundary
@@ -50,6 +51,13 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
       transp_omega=replicate(0.,n_elements(rho),n_elements(t))
     endif else begin
       transp_omega = zz.omega  ; rad/s
+    endelse
+
+    if total(strmatch(tag_names(zz),'dn0out',/fold_case)) eq 0 then begin
+      warn,'dn0out not found in TRANSP file. Assuming no neutral density outside LCFS'
+      transp_dn0out=replicate(0.,n_elements(rho),n_elements(t))
+    endif else begin 
+      transp_dn0out = zz.dn0out  ; cm^-3
     endelse
 
     print, ' * Selecting profiles at :', time, ' s' ;pick the closest timeslice to TOI
@@ -101,10 +109,14 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     	plot, x, transp_te,                  ytitle=' keV',        title='Te'
     	plot, x, transp_ti,    xtitle='rho', ytitle=' keV',        title='Ti'
     	plot, x, transp_omega, xtitle='rho', ytitle='rad/s',       title='Omega'
+        plot, x, transp_dn0wd,               ytitle='cm-3',	   title='Dn0WD'
+	plot, x, transp_dn0out,              ytitle='cm-3',	   title='Dn0Out'
     endif
 
     profiles = {rho:rho, $
                 dene:transp_ne > 0.0, $
+		dennw:transp_dn0wd > 0.0, $
+		denno:transp_dn0out > 0.0, $
                 te:transp_te > 0.0, $
                 ti:transp_ti > 0.0, $
                 zeff:transp_zeff > 1.0, $
@@ -112,6 +124,8 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
 
     ;; Interpolate onto r-z grid
     dene=interpol(transp_ne,rho,flux) > 0.0
+    dennw=interpol(transp_dn0wd,rho,flux) > 0.0
+    denno=interpol(transp_dn0out,tho,flux) > 0.0
     te=interpol(transp_te,rho,flux) > 0.0
     ti=interpol(transp_ti,rho,flux) > 0.0
     zeff=interpol(transp_zeff,rho,flux) > 1.0
@@ -128,7 +142,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
 
     ;;SAVE IN PROFILES STRUCTURE
     plasma={data_source:file_expand_path(filename),time:time,mask:mask, $
-            dene:dene,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff}
+            dene:dene,dennw:dennw,denno:denno,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff}
 
     return,plasma
 

@@ -27,8 +27,7 @@ PRO check_plasma, inp, grid, plasma
               vt:nrnz_double, $
               vz:nrnz_double, $
               dene:nrnz_double, $
-              dennw:nrnz_double, $
-	      denno:nrnz_double, $
+              denn:nrnz_double, $
 	      ti:nrnz_double, $
               te:nrnz_double, $
               zeff:nrnz_double, $
@@ -48,11 +47,8 @@ PRO check_plasma, inp, grid, plasma
     ;;Electron density
     plasma.dene = plasma.dene > 0. ;[1/cm^3]
 
-    ;;Wall neutral density
-    plasma.denww = plasma.dennw > 0. ;[1/cm^3]
-
-    ;;Outside LCFS neutral density
-    plasma.denno = plasma.denno > 0. ;[1/cm^3]
+    ;;Neutral density
+    plasma.denn = plasma.denn > 0. ;[1/cm^3]
 
     ;;Zeff
     plasma.zeff = plasma.zeff > 1.0

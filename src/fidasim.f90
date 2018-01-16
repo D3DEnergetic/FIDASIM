@@ -2417,6 +2417,7 @@ subroutine read_equilibrium
     allocate(equil%plasma(inter_grid%nr,inter_grid%nz))
 
     call h5ltread_dataset_double_f(gid, "/plasma/dene", equil%plasma%dene, dims, error)
+    call h5ltread_dataset_double_f(gid, "/plasma/denn", equil%plasma%denn, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/te", equil%plasma%te, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/ti", equil%plasma%ti, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/zeff", equil%plasma%zeff, dims, error)

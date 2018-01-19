@@ -214,6 +214,8 @@ type Profiles
     !+ Torodial symmetric plasma parameters at a given R-Z
     real(Float64) :: dene = 0.d0
         !+ Electron density [\(cm^{-3}\)]
+    real(Float64) :: denn = 0.d0
+        !+ Neutral density [\(cm^{-3}\)]
     real(Float64) :: denp = 0.d0
         !+ Ion density [\(cm^{-3}\)]
     real(Float64) :: denimp = 0.d0

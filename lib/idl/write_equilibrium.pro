@@ -24,7 +24,7 @@ PRO write_equilibrium, filename, plasma, fields
     plasma_desc = {attribute,obj:'/plasma', $
                    name:'description', $
                    data:'Plasma Parameters'}
-    
+
     plasma_cs = {attribute,obj:'/plasma', $
                  name:'coordinate_system', $
                  data:'Cylindrical'}
@@ -44,6 +44,13 @@ PRO write_equilibrium, filename, plasma, fields
                         name:'description', $
                         data:'Electron Number Density: Dene(r,z)'}
     plasma_dene_unit = {attribute,obj:'/plasma/dene', $
+                        name:'units', $
+                        data:'cm^-3'}
+
+    plasma_denn_desc = {attribute,obj:'/plasma/denn', $
+                        name:'description', $
+                        data:'Cold Neutral Number Density: Denn(r,z)'}
+    plasma_denn_unit = {attribute,obj:'/plasma/denn', $
                         name:'units', $
                         data:'cm^-3'}
 
@@ -89,7 +96,7 @@ PRO write_equilibrium, filename, plasma, fields
     plasma_nr_desc = {attribute,obj:'/plasma/nr', $
                       name:'description', $
                       data:'Number of R values'}
-   
+
     plasma_nz_desc = {attribute,obj:'/plasma/nz', $
                       name:'description', $
                       data:'Number of Z values'}
@@ -131,6 +138,7 @@ PRO write_equilibrium, filename, plasma, fields
                    plasma_time_desc, plasma_time_unit, $
                    plasma_mask_desc, $
                    plasma_dene_desc, plasma_dene_unit, $
+                   plasma_denn_desc, plasma_denn_unit, $
                    plasma_te_desc, plasma_te_unit, $
                    plasma_ti_desc, plasma_ti_unit, $
                    plasma_zeff_desc, $

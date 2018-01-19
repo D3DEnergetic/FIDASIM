@@ -33,6 +33,7 @@ PRO check_inputs, inputs
               emax_wght:zero_double, nlambda_wght:zero_int, $
               lambdamin_wght:zero_double, lambdamax_wght:zero_double, $
               calc_npa:zero_int, calc_fida:zero_int, calc_bes:zero_int, $
+	      calc_pnpa:zero_int, calc_pfida:zero_int, $
               calc_brems:zero_int, calc_birth:zero_int, calc_neutron:zero_int,$
               calc_fida_wght:zero_int, calc_npa_wght:zero_int, $
               dump_dcx:zero_int}

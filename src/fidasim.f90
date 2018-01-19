@@ -2439,6 +2439,10 @@ subroutine read_equilibrium
         equil%plasma%dene = 0.0
     endwhere
 
+    where(equil%plasma%denn.lt.0.0)
+        equil%plasma%denn = 0.0
+    endwhere
+
     where(equil%plasma%te.lt.0.0)
         equil%plasma%te = 0.0
     endwhere

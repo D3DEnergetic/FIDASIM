@@ -746,6 +746,8 @@ type Spectra
         !+ Beam emission: bes(lambda,chan,neutral_type)
     real(Float64), dimension(:,:,:), allocatable :: fida
         !+ FIDA emission: fida(lambda,chan,orbit_type)
+    real(Float64), dimension(:,:,:), allocatable :: pfida
+        !+ Passive FIDA emission: fida(lambda,chan,orbit_type)
 end type Spectra
 
 type NeutronRate

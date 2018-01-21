@@ -1,6 +1,6 @@
 FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
             doplot=doplot, profiles=profiles, $
-            sne=sne, ste=ste, sti=sti, simp=simp, srot=srot
+            sne=sne, ste=ste, sti=sti, simp=simp, srot=srot, snn=snn
     ;+#extract_transp_plasma
     ;+Extracts `plasma` structure from a TRANSP run
     ;+***
@@ -18,14 +18,14 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+
     ;+    **profiles**: Set this keyword to a named variable to recieve the plasma profiles as a function of rho
     ;+
-    ;+    **s(ne|te|ti|imp|rot)**: Smooth profiles
+    ;+    **s(ne|te|ti|imp|rot|nn)**: Smooth profiles
     ;+
     ;+##Example Usage
     ;+```idl
     ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, flux)
     ;+```
 
-    var_list = ["TRFLX","TFLUX","TIME","NE","TE","TI","ZEFFI","OMEGA","dn0wd","dn0out"]
+    var_list = ["X","TRFLX","TFLUX","TIME","NE","TE","TI","ZEFFI","OMEGA","DN0WD"]
 
     zz = read_ncdf(filename,vars = var_list)
 
@@ -42,15 +42,15 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ; center each rho b/c toroidal flux is at cell boundary
     rho = 0.d0*rho_cb
     rho[0] = 0.5*rho_cb[0]
-    for i=1,n_elements(rho_cb) do begin
+    for i=1,n_elements(rho_cb)-1 do begin
         rho[i] = rho_cb[i] - 0.5*(rho_cb[i] - rho_cb[i-1])
     endfor
 
     if total(strmatch(tag_names(zz),'OMEGA',/fold_case)) eq 0 then begin
       warn,'OMEGA not found in TRANSP file. Assuming no plasma rotation'
-      transp_omega=replicate(0.,n_elements(rho),n_elements(t))
+      transp_omega=0.0*transp_te
     endif else begin
-      transp_omega = zz.omega  ; rad/s
+      transp_omega = zz.omega[*,idx]  ; rad/s
     endelse
 
     print, ' * Selecting profiles at :', time, ' s' ;pick the closest timeslice to TOI
@@ -94,6 +94,13 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
            oplot, x, z, psym=0, color=100
            transp_omega = z
         end
+
+        if keyword_set(snn) then begin
+           z = smooth(transp_nn, snn)
+           plot,  x, transp_nn, title='Omega'
+           oplot, x, z, psym=0, color=100
+           transp_nn = z
+        end
     	!p.color=220  & !p.multi=[0,2,3]  &  !p.psym=0  & !p.thick=2
     	window, 1, retain=2, xs=600, ys=800
 
@@ -107,7 +114,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
 
     profiles = {rho:rho, $
                 dene:transp_ne > 0.0, $
-		dennw:transp_nn > 0.0, $
+		denn:transp_nn > 0.0, $
                 te:transp_te > 0.0, $
                 ti:transp_ti > 0.0, $
                 zeff:transp_zeff > 1.0, $

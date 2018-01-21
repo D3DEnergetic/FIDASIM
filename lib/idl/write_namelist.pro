@@ -54,6 +54,7 @@ PRO write_namelist, filename, inputs
     printf,55,''
     printf,55,'!! Monte Carlo Settings'
     printf,55,f='("n_fida = ",i9,"    !! Number of FIDA mc particles")',inputs.n_fida
+    printf,55,f='("n_pfida = ",i9,"    !! Number of passive FIDA mc particles")',inputs.n_pfida
     printf,55,f='("n_npa = ",i9,"    !! Number of NPA mc particles")',inputs.n_npa
     printf,55,f='("n_nbi = ",i9,"    !! Number of NBI mc particles")',inputs.n_nbi
     printf,55,f='("n_halo = ",i9,"    !! Number of HALO mc particles")',inputs.n_halo

@@ -42,15 +42,15 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ; center each rho b/c toroidal flux is at cell boundary
     rho = 0.d0*rho_cb
     rho[0] = 0.5*rho_cb[0]
-    for i=1,n_elements(rho_cb) do begin
+    for i=1,n_elements(rho_cb)-1 do begin
         rho[i] = rho_cb[i] - 0.5*(rho_cb[i] - rho_cb[i-1])
     endfor
 
     if total(strmatch(tag_names(zz),'OMEGA',/fold_case)) eq 0 then begin
       warn,'OMEGA not found in TRANSP file. Assuming no plasma rotation'
-      transp_omega=replicate(0.,n_elements(rho),n_elements(t))
+      transp_omega=0.0*rho
     endif else begin
-      transp_omega = zz.omega  ; rad/s
+      transp_omega = zz.omega[*,idx]  ; rad/s
     endelse
 
     print, ' * Selecting profiles at :', time, ' s' ;pick the closest timeslice to TOI

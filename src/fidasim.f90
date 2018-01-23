@@ -1904,9 +1904,9 @@ subroutine make_beam_grid
         write(*,*) ''
     endif
 
-    if(n.le.(0.5*beam_grid%ngrid)) then
+    if(n.le.(0.1*beam_grid%ngrid)) then
         write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
-                        &Less than 50% of the beam grid cells fall within the plasma."
+                        &Less than 10% of the beam grid cells fall within the plasma."
         error stop
     endif
 
@@ -8878,7 +8878,7 @@ program fidasim
 
     if(inputs%calc_spec.ge.1) then
         call write_spectra()
-        write(*,'(30X,a)') ''
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
     !! -----------------------------------------------------------------------

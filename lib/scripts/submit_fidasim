@@ -27,7 +27,7 @@ def pbs_jobscript(args):
     job_script = """
                  #!/bin/bash
                  #PBS -N %(job_name)s
-                 #PBS -l nodes=%(nodes)s:ppn=%(ppn)s
+                 #PBS -l nodes=%(ntasks)s
                  #PBS -l mem=%(mem)s
                  #PBS -l walltime=%(walltime)s
                  #PBS -r n
@@ -41,7 +41,7 @@ def pbs_jobscript(args):
 
                  ulimit -s unlimited
 
-                 %(commands)s
+                 cafrun -np %(ntasks) %(commands)s
 
                  %(postcall)s
 
@@ -63,9 +63,8 @@ def slurm_jobscript(args):
     job_script = """
                  #!/bin/bash
                  #SBATCH -J %(job_name)s
-                 #SBATCH -N %(nodes)s
-                 #SBATCH -n %(ppn)s
-                 #SBATCH --mem=%(mem)s
+                 #SBATCH --ntasks=%(ntasks)s
+                 #SBATCH --mem-per-cpu=%(mem)s
                  #SBATCH -t %(walltime)s
                  %(partition)s
                  #SBATCH -o /dev/null -e /dev/null
@@ -75,7 +74,7 @@ def slurm_jobscript(args):
 
                  ulimit -s unlimited
 
-                 %(commands)s
+                 cafrun -np %(ntasks)s %(commands)s
 
                  %(postcall)s
 
@@ -93,18 +92,15 @@ def main():
     parser.add_argument('-w','--walltime',
                         default = '2:00:00',
                         help = 'Set walltime. Defaults to 2:00:00')
-    parser.add_argument('-n','--nodes',
-                        type=int,default = 1,
-                        help = 'Set number of nodes. Defaults to 1')
-    parser.add_argument('-ppn',
-                        type=int,default = 16,dest='ppn',
-                        help = 'Set processors per node. Defaults to 16')
+    parser.add_argument('-n','--ntasks',
+                        type=int, default = 1,
+                        help = 'Set number of tasks. Defaults to 1')
     parser.add_argument('-p','--partition',
                         default = '',
                         help = 'Set partition/queue')
-    parser.add_argument('-mem','--memory',
+    parser.add_argument('-m','--memory',
                         default = '2G',
-                        help = 'Set required memory in G or M. Defaults to 2G')
+                        help = 'Set required memory per cpu in G or M. Defaults to 2G')
     executable = dirname(dirname(dirname(os.path.abspath(__file__))))+'/fidasim'
     parser.add_argument('-ex','--executable',
                         default = executable,
@@ -175,8 +171,7 @@ def main():
 
     if args.verbose:
         print('Walltime: '+args.walltime)
-        print('Nodes:    '+str(args.nodes))
-        print('PPN:      '+str(args.ppn))
+        print('NTasks:    '+str(args.ntasks))
         print('Memory:   '+args.memory)
 
     fileordir = os.path.abspath(args.path)
@@ -221,10 +216,10 @@ def main():
 
         output_files = [extract_runid(file)+".out" for file in job]
 
-        args_dict =  {'commands':"\n".join([args.executable+" "+z[0]+" "+str(args.ppn) +
+        args_dict =  {'commands':"\n".join([args.executable+" "+ z[0] +
                                  " >& "+log_dir+"/"+z[1] for z in zip(job,output_files)]),
-                      'nodes':str(args.nodes),
-                      'ppn':str(args.ppn),'mem':args.memory,
+                      'ntasks':str(args.ntasks),
+                      'mem':args.memory,
                       'walltime':args.walltime,'partition':args.partition,
                       'directive':"\n".join(item for item in args.directive),
                       'precall':"\n".join(item for item in args.precall),

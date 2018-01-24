@@ -831,10 +831,14 @@ type SimulationInputs
         !+ Calculate BES: 0 = off, 1=on
     integer(Int32) :: calc_fida
         !+ Calculate FIDA: 0 = off, 1=on
+    integer(Int32) :: calc_pfida
+        !+ Calculate passive FIDA: 0 = off, 1=on
     integer(Int32) :: load_neutrals
         !+ Load neutrals from file: 0 = off, 1=on
     integer(Int32) :: calc_npa
         !+ Calculate NPA: 0 = off, 1=on, 2=on++
+    integer(Int32) :: calc_pnpa
+        !+ Calculate passive NPA: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_fida_wght
         !+ Calculate FIDA weight: 0 = off, 1=on, 2=on++
     integer(Int32) :: calc_npa_wght

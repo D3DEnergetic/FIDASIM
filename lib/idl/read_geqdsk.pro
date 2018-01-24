@@ -77,9 +77,6 @@ PRO calculate_bfield,bp,br,bt,bz,g
 
     compile_opt defint32,strictarr,strictarrsubs
     
-    if n_elements(g.time) eq 0 then return
-    ;if a.ishot le 0 or g.time le 0 then return
-    if g.time le 0 then return
     mw=g.mw & mh=g.mh
     bp=fltarr(mw,mh) & bt=fltarr(mw,mh) & br=fltarr(mw,mh) & bz=fltarr(mw,mh)
     dpsidx = fltarr(mw,mh)

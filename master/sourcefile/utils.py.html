@@ -847,25 +847,23 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-372"></a>    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dic</span><span class="p">:</span>
 <a name="ln-373"></a>        <span class="c1"># Transpose data to match expected by Fortran and historically provided by IDL</span>
 <a name="ln-374"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-<a name="ln-375"></a>            <span class="k">if</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+<a name="ln-375"></a>            <span class="k">if</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
 <a name="ln-376"></a>                <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
-<a name="ln-377"></a>            <span class="k">elif</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-<a name="ln-378"></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Dict {}, key {}, has shape {}, need fix.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
-<a name="ln-379"></a>
-<a name="ln-380"></a>        <span class="c1"># Make strings of fixed length as required by Fortran.</span>
-<a name="ln-381"></a>        <span class="c1"># See http://docs.h5py.org/en/latest/strings.html#fixed-length-ascii</span>
-<a name="ln-382"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-<a name="ln-383"></a>            <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
-<a name="ln-384"></a>
-<a name="ln-385"></a>        <span class="c1"># Create dataset</span>
-<a name="ln-386"></a>        <span class="n">ds</span> <span class="o">=</span> <span class="n">h5_obj</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
-<a name="ln-387"></a>
-<a name="ln-388"></a>        <span class="c1"># Add descrption attribute</span>
-<a name="ln-389"></a>        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-<a name="ln-390"></a>
-<a name="ln-391"></a>        <span class="c1"># Add units attribute (if present)</span>
-<a name="ln-392"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">units</span><span class="p">:</span>
-<a name="ln-393"></a>            <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a name="ln-377"></a>
+<a name="ln-378"></a>        <span class="c1"># Make strings of fixed length as required by Fortran.</span>
+<a name="ln-379"></a>        <span class="c1"># See http://docs.h5py.org/en/latest/strings.html#fixed-length-ascii</span>
+<a name="ln-380"></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+<a name="ln-381"></a>            <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">(</span><span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+<a name="ln-382"></a>
+<a name="ln-383"></a>        <span class="c1"># Create dataset</span>
+<a name="ln-384"></a>        <span class="n">ds</span> <span class="o">=</span> <span class="n">h5_obj</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">dic</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+<a name="ln-385"></a>
+<a name="ln-386"></a>        <span class="c1"># Add descrption attribute</span>
+<a name="ln-387"></a>        <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+<a name="ln-388"></a>
+<a name="ln-389"></a>        <span class="c1"># Add units attribute (if present)</span>
+<a name="ln-390"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">units</span><span class="p">:</span>
+<a name="ln-391"></a>            <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 </pre></div>
 
     </section>

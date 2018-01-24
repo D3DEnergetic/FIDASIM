@@ -372,10 +372,8 @@ def write_data(h5_obj, dic, desc, units, name=''):
     for key in dic:
         # Transpose data to match expected by Fortran and historically provided by IDL
         if isinstance(dic[key], np.ndarray):
-            if dic[key].ndim == 2:
+            if dic[key].ndim >= 2:
                 dic[key] = dic[key].T
-            elif dic[key].ndim != 1:
-                raise ValueError('Dict {}, key {}, has shape {}, need fix.'.format(name, key, dic[key].shape))
 
         # Make strings of fixed length as required by Fortran.
         # See http://docs.h5py.org/en/latest/strings.html#fixed-length-ascii

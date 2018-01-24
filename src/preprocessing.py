@@ -750,8 +750,7 @@ def check_plasma(inputs, grid, plasma):
         print('Plasma time: ', plasma['time'])
 
     # Add grid elements to plasma dict
-    for key in grid:
-        plasma[key] = grid[key]
+    plasma.update(grid.copy())
 
     if err:
         error('Invalid plasma parameters. Exiting...', halt=True)
@@ -822,8 +821,7 @@ def check_fields(inputs, grid, fields):
         print('Electromagnetic fields time: {}'.format(fields['time']))
 
     # Add grid elements to fields dict
-    for key in grid:
-        fields[key] = grid[key]
+    fields.update(grid.copy())
 
     if err:
         error('Invalid electromagnetic fields. Exiting...', halt=True)
@@ -907,7 +905,9 @@ def check_distribution(inputs, grid, dist):
         if err:
             error('Invalid fast-ion distribution. Exiting...', halt=True)
 
-        dist['grid'] = grid
+        # Add grid elements to plasma dict
+        dist.update(grid.copy())
+
     elif dist_type == 2:
         print('Using Guiding Center Monte Carlo fast-ion distribution')
         if 'nparticle' not in dist_keys:
@@ -951,6 +951,7 @@ def check_distribution(inputs, grid, dist):
             error('Invalid fast-ion distribution. Exiting...', halt=True)
 
         print('Number of MC particles: {}'.format(npart))
+
     elif dist_type == 3:
         print('Using Full Orbit Monte Carlo fast-ion distribution')
         if 'nparticle' not in dist_keys:

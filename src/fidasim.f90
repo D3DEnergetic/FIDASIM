@@ -1636,6 +1636,7 @@ subroutine read_inputs
     character(charlim) :: geometry_file, neutrals_file
     integer            :: pathlen, calc_neutron
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
+    integer            :: calc_pfida,calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,dump_dcx,no_flr
     integer(Int64)     :: n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
@@ -1652,6 +1653,7 @@ subroutine read_inputs
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_bes, calc_fida, calc_npa, calc_birth, no_flr, &
+        calc_pfida, calc_pnpa, &
         calc_fida_wght, calc_npa_wght, load_neutrals, dump_dcx, verbose, &
         calc_neutron, n_fida,n_npa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
@@ -1694,6 +1696,8 @@ subroutine read_inputs
     inputs%calc_bes=calc_bes
     inputs%calc_fida=calc_fida
     inputs%calc_npa=calc_npa
+    inputs%calc_pfida=calc_pfida
+    inputs%calc_pnpa=calc_pnpa
     inputs%calc_birth=calc_birth
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght

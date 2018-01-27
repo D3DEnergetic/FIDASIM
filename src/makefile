@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-
+FC = caf
 $(FIDASIM_DIR)/fidasim: fidasim.o eigensystem.o utilities.o hdf5_extra.o
 	$(FC) $(CFLAGS) $^ -o $@ $(LFLAGS)
 

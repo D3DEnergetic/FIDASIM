@@ -1179,14 +1179,14 @@ def check_npa(inp, npa):
         error('Invalid NPA geometry. Exiting...', halt=True)
 
     # Check detector/aperture shape
-    w = (npa['d_shape'] > 2) or (npa['d_shape'] == 0)
+    w = np.logical_or(npa['d_shape'] > 2, npa['d_shape'] == 0)
     nw = len(npa['d_shape'][w])
     if nw != 0:
         error('Invalid detector shape. Expected 1 (rectagular) or 2 (circular)')
         print('Invalid indices: {}'.format(np.arange(len(npa['d_shape']))[w]))
         err = True
 
-    w = (npa['a_shape'] > 2) or (npa['a_shape'] == 0)
+    w = np.logical_or(npa['a_shape'] > 2, npa['a_shape'] == 0)
     nw = len(npa['a_shape'])
     if nw != 0:
         error('Invalid aperture shape. Expected 1 (rectagular) or 2 (circular)')

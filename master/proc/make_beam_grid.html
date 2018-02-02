@@ -1298,9 +1298,9 @@ public subroutine make_beam_grid()
         <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
     <span class="n">endif</span>
 
-    <span class="k">if</span><span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">le</span><span class="p">.(</span><span class="mf">0.5</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">))</span> <span class="k">then</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">le</span><span class="p">.(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;MAKE_BEAM_GRID: Beam grid definition is poorly defined. &amp;</span>
-<span class="s2">                        &amp;Less than 50% of the beam grid cells fall within the plasma.&quot;</span>
+<span class="s2">                        &amp;Less than 10% of the beam grid cells fall within the plasma.&quot;</span>
         <span class="k">stop</span>
 <span class="k">    </span><span class="n">endif</span>
 

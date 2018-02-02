@@ -1155,11 +1155,16 @@ def check_npa(inp, npa):
     nchan_int = {'dims': [nchan],
                  'type': [int, np.int32, np.int64]}
 
+    nchan_float = {'dims': [nchan],
+                    'type': [float, np.float64]}
+
+    nchan_string = {'dims': [nchan],
+                    'type': [str, np.str_, np.bytes_]}
+
     schema = {'data_source': zero_string,
               'nchan': zero_long,
               'system': zero_string,
-              'id': {'dims': [nchan],
-                     'type': [str]},
+              'id': nchan_string,
               'a_shape': nchan_int,
               'd_shape': nchan_int,
               'a_tedge': three_float,
@@ -1168,7 +1173,7 @@ def check_npa(inp, npa):
               'd_tedge': three_float,
               'd_redge': three_float,
               'd_cent': three_float,
-              'radius': three_float}
+              'radius': nchan_float}
 
     err = check_dict_schema(schema, npa, desc="NPA geometry")
     if err:

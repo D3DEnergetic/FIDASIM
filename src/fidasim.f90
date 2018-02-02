@@ -214,8 +214,8 @@ type Profiles
     !+ Torodial symmetric plasma parameters at a given R-Z
     real(Float64) :: dene = 0.d0
         !+ Electron density [\(cm^{-3}\)]
-    real(Float64) :: denn = 0.d0
-        !+ Neutral density [\(cm^{-3}\)]
+    real(Float64) :: denn(nlevs) = 0.d0
+        !+ Cold neutral density [\(cm^{-3}\)]
     real(Float64) :: denp = 0.d0
         !+ Ion density [\(cm^{-3}\)]
     real(Float64) :: denimp = 0.d0
@@ -288,6 +288,7 @@ type, extends( EMFields ) :: LocalEMFields
         !+ Indicates whether vectors are in machine coordinates
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
+
     real(Float64) :: e_abs = 0.d0
         !+ Magnitude of electrin field
     real(Float64), dimension(3) :: pos = 0.d0
@@ -1099,6 +1100,7 @@ subroutine pp_assign(p1, p2)
     type(Profiles), intent(inout) :: p1
 
     p1%dene   = p2%dene
+    p1%denn   = p2%denn
     p1%ti     = p2%ti
     p1%te     = p2%te
     p1%denp   = p2%denp
@@ -1117,6 +1119,7 @@ subroutine lpp_assign(p1, p2)
     type(LocalProfiles), intent(inout) :: p1
 
     p1%dene   = p2%dene
+    p1%denn   = p2%denn
     p1%ti     = p2%ti
     p1%te     = p2%te
     p1%denp   = p2%denp
@@ -1135,6 +1138,7 @@ subroutine plp_assign(p1, p2)
     type(Profiles), intent(inout)   :: p1
 
     p1%dene   = p2%dene
+    p1%denn   = p2%denn
     p1%ti     = p2%ti
     p1%te     = p2%te
     p1%denp   = p2%denp
@@ -1155,6 +1159,7 @@ subroutine lplp_assign(p1, p2)
     p1%pos    = p2%pos
     p1%uvw    = p2%uvw
     p1%dene   = p2%dene
+    p1%denn   = p2%denn
     p1%ti     = p2%ti
     p1%te     = p2%te
     p1%denp   = p2%denp
@@ -1266,6 +1271,7 @@ function pp_add(p1, p2) result (p3)
     type(Profiles)             :: p3
 
     p3%dene   = p1%dene   + p2%dene
+    p3%denn   = p1%denn   + p2%denn
     p3%ti     = p1%ti     + p2%ti
     p3%te     = p1%te     + p2%te
     p3%denp   = p1%denp   + p2%denp
@@ -1284,6 +1290,7 @@ function pp_subtract(p1, p2) result (p3)
     type(Profiles)             :: p3
 
     p3%dene   = p1%dene   - p2%dene
+    p3%denn   = p1%denn   - p2%denn
     p3%ti     = p1%ti     - p2%ti
     p3%te     = p1%te     - p2%te
     p3%denp   = p1%denp   - p2%denp
@@ -1304,6 +1311,7 @@ function lplp_add(p1, p2) result (p3)
     p3%pos    = p1%pos    + p2%pos
     p3%uvw    = p1%uvw    + p2%uvw
     p3%dene   = p1%dene   + p2%dene
+    p3%denn   = p1%denn   + p2%denn
     p3%ti     = p1%ti     + p2%ti
     p3%te     = p1%te     + p2%te
     p3%denp   = p1%denp   + p2%denp
@@ -1325,6 +1333,7 @@ function lplp_subtract(p1, p2) result (p3)
     p3%pos    = p1%pos    - p2%pos
     p3%uvw    = p1%uvw    - p2%uvw
     p3%dene   = p1%dene   - p2%dene
+    p3%denn   = p1%denn   - p2%denn
     p3%ti     = p1%ti     - p2%ti
     p3%te     = p1%te     - p2%te
     p3%denp   = p1%denp   - p2%denp
@@ -1345,6 +1354,7 @@ function ps_multiply(p1, real_scalar) result (p3)
     type(Profiles)             :: p3
 
     p3%dene   = p1%dene   * real_scalar
+    p3%denn   = p1%denn   * real_scalar
     p3%ti     = p1%ti     * real_scalar
     p3%te     = p1%te     * real_scalar
     p3%denp   = p1%denp   * real_scalar
@@ -1386,6 +1396,7 @@ function lps_multiply(p1, real_scalar) result (p3)
     p3%pos    = p1%pos    * real_scalar
     p3%uvw    = p1%uvw    * real_scalar
     p3%dene   = p1%dene   * real_scalar
+    p3%denn   = p1%denn   * real_scalar
     p3%ti     = p1%ti     * real_scalar
     p3%te     = p1%te     * real_scalar
     p3%denp   = p1%denp   * real_scalar
@@ -2383,10 +2394,23 @@ subroutine read_equilibrium
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(2) :: dims
 
-    integer :: impc
+    integer :: impc, i, k, it
     integer :: error
 
     integer, dimension(:,:), allocatable :: p_mask, f_mask
+
+    real(Float64), dimension(:,:), allocatable :: denn2d
+        !+ 2 dimensional array of constant neutral density
+    type(LocalProfiles)                          :: plasma
+        !+ Plasma profiles
+    real(Float64), dimension(nlevs)              :: states, states_avg
+    real(Float64), dimension(3)                  :: vn
+        !+ Neutral velocitiy [cm/s]
+    real(Float64), dimension(nlevs)              :: dens
+        !+ Density of neutrals
+    real(Float64)                                :: photons
+    real(Float64), dimension(3)                  :: randomu
+        !+ Array of uniform random deviates
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -2427,9 +2451,10 @@ subroutine read_equilibrium
 
     !!Read in plasma parameters
     allocate(equil%plasma(inter_grid%nr,inter_grid%nz))
+    allocate(denn2d(inter_grid%nr,inter_grid%nz))
 
     call h5ltread_dataset_double_f(gid, "/plasma/dene", equil%plasma%dene, dims, error)
-    call h5ltread_dataset_double_f(gid, "/plasma/denn", equil%plasma%denn, dims, error)
+    call h5ltread_dataset_double_f(gid, "/plasma/denn", denn2d, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/te", equil%plasma%te, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/ti", equil%plasma%ti, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/zeff", equil%plasma%zeff, dims, error)
@@ -2451,8 +2476,8 @@ subroutine read_equilibrium
         equil%plasma%dene = 0.0
     endwhere
 
-    where(equil%plasma%denn.lt.0.0)
-        equil%plasma%denn = 0.0
+    where(denn2d.lt.0.0)
+        denn2d = 0.0
     endwhere
 
     where(equil%plasma%te.lt.0.0)
@@ -2466,6 +2491,29 @@ subroutine read_equilibrium
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
 
+    
+    loop_over_z: do k=1,inter_grid%nz
+        loop_over_r: do i=1,inter_grid%nr
+            if(p_mask(i,k).LT.0.5) cycle loop_over_r
+            plasma = equil%plasma(i,k)
+            plasma%vrot = [plasma%vr, plasma%vt, plasma%vz]
+            plasma%in_plasma = .True.            
+            states_avg = 0.d0
+            
+            do it=1,50
+                states=0.d0
+                states(1) = 1.d19
+                call randu(randomu)
+                vn = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*randomu
+                call colrad(plasma,thermal_ion,vn,1.d0,states,dens,photons)
+                states_avg = states_avg + states/50
+            enddo
+    
+            if(sum(states_avg).le.0.0) cycle loop_over_r
+            equil%plasma(i,k)%denn = denn2d(i,k)*states_avg/sum(states_avg) 
+        enddo loop_over_r
+    enddo loop_over_z
+    !+ print*,'Sum=',sum(equil%plasma(50,50)%denn),denn2d(50,50)     
     !!Close PLASMA group
     call h5gclose_f(gid, error)
 
@@ -8759,10 +8807,10 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------
     !! ----------------------------------------------------------
+    call read_tables()
     call read_equilibrium()
     call make_beam_grid()
     call read_beam()
-    call read_tables()
     call read_distribution()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))

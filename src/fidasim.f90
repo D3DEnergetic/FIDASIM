@@ -6611,7 +6611,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
 
 end subroutine store_bes_photons
 
-subroutine store_fida_photons(pos, vi, photons, orbit_class)
+subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     !+ Store fida photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
@@ -6621,6 +6621,8 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     integer, intent(in), optional           :: orbit_class
         !+ Orbit class ID
+    logical, intent(in), optional           :: passive
+        !+ Used to store pfida emission
 
     real(Float64), dimension(n_stark) :: lambda, intensity
     real(Float64) :: dlength, sigma_pi
@@ -6629,6 +6631,10 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
     real(Float64), dimension(3) :: vp
     type(LOSInters) :: inter
     integer :: ichan, i, j, bin, iclass, nchan
+    logical :: storepassive
+
+    storepassive = .False.
+    if(present(passive)) storepassive = .True.
 
     if(present(orbit_class)) then
         iclass = orbit_class
@@ -6656,8 +6662,13 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class)
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
             !$OMP CRITICAL(fida_spectrum)
-            spec%fida(bin,ichan,iclass)= &
-              spec%fida(bin,ichan,iclass) + intensity(i)
+            if (storepassive) then
+                spec%pfida(bin,ichan,iclass)= &
+                  spec%pfida(bin,ichan,iclass) + intensity(i)
+            else
+                spec%fida(bin,ichan,iclass)= &
+                  spec%fida(bin,ichan,iclass) + intensity(i)
+            endif
             !$OMP END CRITICAL(fida_spectrum)
         enddo loop_over_stark
     enddo loop_over_channels
@@ -7666,6 +7677,113 @@ subroutine fida_f
     enddo loop_over_cells
 
 end subroutine fida_f
+
+subroutine pfida_f
+    !+ Calculate FIDA emission using a Fast-ion distribution function F(E,p,r,z)
+    integer :: i,j,k,ip  !! indices  x,y,z of cells
+    integer(Int64) :: iion
+    real(Float64), dimension(3) :: ri      !! start position
+    real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64) :: denf !! fast-ion density
+    integer, dimension(3) :: ind      !! new actual cell
+    integer, dimension(4) :: neut_types=[1,2,3,4]
+    logical :: los_intersect
+    !! Determination of the CX probability
+    type(LocalEMFields) :: fields
+    type(LocalProfiles) :: plasma
+    real(Float64), dimension(nlevs) :: rates !! CX rates
+
+    !! Collisiional radiative model along track
+    integer :: ncell
+    integer :: jj      !! counter along track
+    type(ParticleTrack),dimension(beam_grid%ntrack) :: tracks
+
+    real(Float64) :: photons !! photon flux
+    real(Float64), dimension(nlevs) :: states  !! Density of n-states
+    real(Float64), dimension(nlevs) :: denn
+
+    !! Number of particles to launch
+    integer(kind=8) :: pcnt
+    real(Float64) :: papprox_tot, inv_maxcnt, cnt, eb, ptch
+    integer, dimension(3,beam_grid%ngrid) :: pcell
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
+
+    !! Estimate how many particles to launch in each cell
+    papprox=0.d0
+    papprox_tot=0.d0
+    pcnt=1
+    do k=1,beam_grid%nz
+        do j=1,beam_grid%ny
+            do i=1,beam_grid%nx
+                ind =[i,j,k]
+                call get_plasma(plasma,ind=ind)
+                papprox(i,j,k) = (sum(neut%dens(:,nbif_type,i,j,k)) + &
+                                  sum(neut%dens(:,nbih_type,i,j,k)) + &
+                                  sum(neut%dens(:,nbit_type,i,j,k)) + &
+                                  sum(neut%dens(:,halo_type,i,j,k)))* &
+                                  plasma%denf
+                if(papprox(i,j,k).gt.0) then
+                    pcell(:,pcnt)= ind
+                    pcnt=pcnt+1
+                endif
+                if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
+            enddo
+        enddo
+    enddo
+    pcnt=pcnt-1
+    inv_maxcnt=100.0/real(pcnt)
+    call get_nlaunch(inputs%n_fida,papprox,papprox_tot,nlaunch)
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
+    endif
+
+    !! Loop over all cells that have neutrals
+    cnt=0.d0
+    loop_over_cells: do ip = 1, int(pcnt)
+        i = pcell(1,ip)
+        j = pcell(2,ip)
+        k = pcell(3,ip)
+        ind = [i, j, k]
+        !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields, &
+        !$OMP tracks,ncell,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
+        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
+            !! Sample fast ion distribution for velocity and position
+            call mc_fastion(ind, fields, eb, ptch, denf)
+            if(denf.eq.0.0) cycle loop_over_fast_ions
+
+            !! Correct for gyro motion and get particle position and velocity
+            call gyro_correction(fields, eb, ptch, ri, vi)
+
+            !! Find the particles path through the beam grid
+            call track(ri, vi, tracks, ncell,los_intersect)
+            if(.not.los_intersect) cycle loop_over_fast_ions
+            if(ncell.eq.0) cycle loop_over_fast_ions
+
+            !! Calculate CX probability with beam and halo neutrals
+            call get_plasma(plasma, pos =  ri)
+            call bt_cx_rates(plasma,plasma%denn,vi,beam_ion,rates)
+            if(sum(rates).le.0.) cycle loop_over_fast_ions
+
+            !! Weight CX rates by ion source density
+            states=rates*denf
+
+            !! Calculate the spectra produced in each cell along the path
+            loop_along_track: do jj=1,ncell
+                call get_plasma(plasma,pos=tracks(jj)%pos)
+
+                call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
+                call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k),passive = .True.)
+            enddo loop_along_track
+        enddo loop_over_fast_ions
+        !$OMP END PARALLEL DO
+        cnt=cnt+1
+
+        if (inputs%verbose.ge.2)then
+            WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
+        endif
+    enddo loop_over_cells
+
+end subroutine pfida_f
 
 subroutine fida_mc
     !+ Calculate FIDA emission using a Monte Carlo Fast-ion distribution

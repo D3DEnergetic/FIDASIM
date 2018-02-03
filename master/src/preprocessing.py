@@ -1195,8 +1195,8 @@ def check_npa(inp, npa):
         err = True
 
     # Calculate grid center rc and sides length dr
-    dr = [inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']]
-    rc = [inp['xmin'], inp['ymin'], inp['zmin']] + 0.5 * dr
+    dr = np.array([inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']])
+    rc = np.array([inp['xmin'], inp['ymin'], inp['zmin']]) + 0.5 * dr
     err_arr = np.zeros(nchan, dtype=int)
     for i in range(nchan):
         uvw_det = npa['d_cent'][:, i]

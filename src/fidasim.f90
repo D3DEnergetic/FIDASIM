@@ -2400,7 +2400,7 @@ subroutine read_equilibrium
     type(LocalProfiles) :: plasma
     integer :: impc, ir, iz, it
     real(Float64) :: photons
-    real(Float64), dimension(nlevs) :: rates, denn
+    real(Float64), dimension(nlevs) :: rates, rates_av, denn
     real(Float64), dimension(3) :: vi, random3
     integer :: error
 
@@ -2479,6 +2479,10 @@ subroutine read_equilibrium
         equil%plasma%ti = 0.0
     endwhere
 
+    where(denn2d.lt.0.0)
+        denn2d = 0.0
+    endwhere
+
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
 
@@ -2489,17 +2493,17 @@ subroutine read_equilibrium
             plasma = equil%plasma(ir,iz)
             plasma%vrot = [plasma%vr,plasma%vt,plasma%vz]
             plasma%in_plasma = .True.
-
+            rates_av = 0.d0
             do it=1,50
                 rates = 0.0
                 rates(1) = 1.d19
                 call randn(random3)
                 vi = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
                 call colrad(plasma, thermal_ion, vi, 1.d0, rates, denn, photons)
-                plasma%denn = plasma%denn + denn/50
+                rates_av = rates_av + rates/50
             enddo
-            if(sum(plasma%denn).le.0.d0) cycle z_loop
-            equil%plasma(ir,iz)%denn = denn2d(ir,iz)*plasma%denn/sum(plasma%denn)
+            if(sum(rates_av).le.0.d0) cycle z_loop
+            equil%plasma(ir,iz)%denn = denn2d(ir,iz)*rates_av/sum(rates_av)
         enddo z_loop
     enddo r_loop
     !$OMP END PARALLEL DO

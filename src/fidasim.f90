@@ -6678,51 +6678,44 @@ end subroutine store_fw_photons
 !=============================================================================
 !---------------------------Monte Carlo Routines------------------------------
 !=============================================================================
-subroutine get_nlaunch(nr_markers,papprox,papprox_tot,nlaunch)
+subroutine get_nlaunch(nr_markers,papprox, nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell
-    integer(Int64), intent(in)                   :: nr_markers
+    integer(Int64), intent(in)                    :: nr_markers
         !+ Approximate total number of markers to launch
-    real(Float64), dimension(:,:,:), intent(in)  :: papprox
+    real(Float64), dimension(:,:,:), intent(in)   :: papprox
         !+ [[libfida:beam_grid]] cell weights
-    real(Float64), intent(in)                    :: papprox_tot
-        !+ Total cell weights
-    real(Float64), dimension(:,:,:), intent(out) :: nlaunch
+    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
 
-    integer  :: i, j, k, cc
-    real(Float64), dimension(:), allocatable :: randomu
+    logical, dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: mask
+    integer  :: c, i, j, k, nc, nm
+    integer  :: nmin = 5
+    integer, dimension(:,:), allocatable :: randomi
+    type(rng_type) :: r
 
-    do i=1,1000
-       nlaunch(:,:,:)=papprox(:,:,:)/papprox_tot*nr_markers*(1.+i*0.01)
-       if(sum(nlaunch).gt.nr_markers) then
-          exit
-       endif
-    enddo
+    !! Fill in minimum number of markers per cell
+    nlaunch = 0
+    mask = papprox.gt.0.0
+    where(mask)
+        nlaunch = nmin
+    endwhere
 
-    allocate(randomu(count(nlaunch.gt.0)))
-    call randu(randomu)
-    cc=1
-    do k = 1, beam_grid%nz
-        do j = 1, beam_grid%ny
-            do i = 1, beam_grid%nx
-                if(nlaunch(i,j,k).gt.0.)then
-                    if(mod(nlaunch(i,j,k),1.).gt.randomu(cc))then
-                        nlaunch(i,j,k)=nlaunch(i,j,k)+1.
-                    endif
-                    cc=cc+1
-                endif
-            enddo
+    !! If there are any left over distribute according to papprox
+    nc = count(mask)
+    if(nr_markers.gt.(nmin*nc)) then
+        nm = nr_markers - nmin*nc
+        allocate(randomi(3,nm))
+
+        !! use the same seed for all processes
+        call rng_init(r,932117)
+        call randind(r, papprox, randomi)
+
+        do c=1, nm
+            i = randomi(1,c) ; j = randomi(2,c) ; k = randomi(3,c)
+            nlaunch(i,j,k) = nlaunch(i,j,k) + 1
         enddo
-    enddo
-
-    do k = 1, beam_grid%nz
-        do j = 1, beam_grid%ny
-            do i = 1, beam_grid%nx
-                nlaunch(i,j,k)=floor(nlaunch(i,j,k))
-            enddo
-        enddo
-    enddo
-    deallocate(randomu)
+        deallocate(randomi)
+    endif
 
 end subroutine get_nlaunch
 
@@ -7257,30 +7250,29 @@ subroutine dcx
     real(Float64):: tot_denn, photons  !! photon flux
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-    real(Float64) :: papprox_tot, ccnt, inv_ng
+    real(Float64) :: ccnt, inv_ng
 
     halo_iter_dens(dcx_type) = 0.d0
     papprox=0.d0
-    papprox_tot=0.d0
     tot_denn=0.d0
     do k=1,beam_grid%nz
         do j=1,beam_grid%ny
             do i=1,beam_grid%nx
                 ind = [i,j,k]
                 call get_plasma(plasma,ind=ind)
+                if(.not.plasma%in_plasma) cycle
                 tot_denn = sum(neut%full(:,i,j,k)) + &
                            sum(neut%half(:,i,j,k)) + &
                            sum(neut%third(:,i,j,k))
                 papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
-                if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
             enddo
         enddo
     enddo
 
-    call get_nlaunch(inputs%n_dcx,papprox,papprox_tot,nlaunch)
+    call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
 
     if(inputs%verbose.ge.1) then
-       write(*,'(T6,"# of markers: ",i9)') inputs%n_dcx
+       write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
 
     ccnt=0.d0
@@ -7348,9 +7340,10 @@ subroutine halo
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle Tracks
     integer :: jj       !! counter along track
     real(Float64) :: tot_denn, photons  !! photon flux
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev,dens_cur
-    real(Float64) :: papprox_tot, ccnt, inv_ng
+    real(Float64) :: ccnt, inv_ng
     !! Halo iteration
     integer(Int64) :: hh, n_halo !! counters
     real(Float64) :: dcx_dens, halo_iteration_dens
@@ -7374,7 +7367,6 @@ subroutine halo
     n_halo = inputs%n_halo
     iterations: do hh=1,200
         papprox=0.d0
-        papprox_tot=0.d0
         tot_denn=0.d0
         halo_iter_dens(cur_type) = 0.d0
         do k=1,beam_grid%nz
@@ -7382,18 +7374,17 @@ subroutine halo
                 do i=1,beam_grid%nx
                     ind = [i,j,k]
                     call get_plasma(plasma,ind=ind)
+                    if(.not.plasma%in_plasma) cycle
                     tot_denn = sum(dens_prev(:,i,j,k))
                     papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
-
-                    if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
                 enddo
             enddo
         enddo
 
-        call get_nlaunch(n_halo,papprox,papprox_tot,nlaunch)
+        call get_nlaunch(n_halo, papprox, nlaunch)
 
         if(inputs%verbose.ge.1) then
-            write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
+            write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
         endif
         ccnt=0.d0
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
@@ -7402,7 +7393,7 @@ subroutine halo
             loop_along_y: do j = 1, beam_grid%ny
                 loop_along_x: do i = 1, beam_grid%nx
                     !! Loop over the markers
-                    loop_over_halos: do ihalo=1,int(nlaunch(i,j,k),Int64)
+                    loop_over_halos: do ihalo=1, nlaunch(i,j,k)
                         !! Calculate ri,vhalo and track
                         ind = [i, j, k]
                         call mc_halo(ind,vihalo,ri)
@@ -7498,19 +7489,20 @@ subroutine fida_f
 
     !! Number of particles to launch
     integer(kind=8) :: pcnt
-    real(Float64) :: papprox_tot, inv_maxcnt, cnt, eb, ptch
+    real(Float64) :: inv_maxcnt, cnt, eb, ptch
     integer, dimension(3,beam_grid%ngrid) :: pcell
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
-    papprox_tot=0.d0
     pcnt=1
     do k=1,beam_grid%nz
         do j=1,beam_grid%ny
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
+                if(.not.plasma%in_plasma) cycle
                 papprox(i,j,k) = (sum(neut%full(:,i,j,k)) + &
                                   sum(neut%half(:,i,j,k)) + &
                                   sum(neut%third(:,i,j,k)) + &
@@ -7521,15 +7513,14 @@ subroutine fida_f
                     pcell(:,pcnt)= ind
                     pcnt=pcnt+1
                 endif
-                if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
             enddo
         enddo
     enddo
     pcnt=pcnt-1
     inv_maxcnt=100.0/real(pcnt)
-    call get_nlaunch(inputs%n_fida,papprox,papprox_tot,nlaunch)
+    call get_nlaunch(inputs%n_fida, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
+        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -7541,7 +7532,7 @@ subroutine fida_f
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields, &
         !$OMP tracks,ncell,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
-        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
+        loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
@@ -7695,18 +7686,18 @@ subroutine npa_f
     real(Float64) :: flux, theta, dtheta, eb, ptch
 
     integer :: inpa,pcnt,ichan,nrange,ir
-    real(Float64) :: papprox_tot, maxcnt, cnt, inv_maxcnt
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch
+    real(Float64) :: maxcnt, cnt, inv_maxcnt
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     papprox=0.d0
-    papprox_tot=0.d0
-
     pcnt=1
     do k=1,beam_grid%nz
         do j=1,beam_grid%ny
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
+                if(.not.plasma%in_plasma) cycle
                 papprox(i,j,k)=(sum(neut%full(:,i,j,k)) + &
                                 sum(neut%half(:,i,j,k)) + &
                                 sum(neut%third(:,i,j,k)) + &
@@ -7718,8 +7709,6 @@ subroutine npa_f
                     pcell(:,pcnt)= ind
                     pcnt = pcnt + 1
                 endif
-
-                if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
             enddo
         enddo
     enddo
@@ -7727,9 +7716,9 @@ subroutine npa_f
     maxcnt=real(pcnt)
     inv_maxcnt = 100.0/maxcnt
 
-    call get_nlaunch(inputs%n_npa,papprox,papprox_tot,nlaunch)
+    call get_nlaunch(inputs%n_npa, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i12)') int(sum(nlaunch),Int64)
+        write(*,'(T6,"# of markers: ",i12)') sum(nlaunch)
     endif
 
     !! Loop over all cells that can contribute to NPA signal
@@ -7741,7 +7730,7 @@ subroutine npa_f
         ind = [i, j, k]
         !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
         !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
-        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
+        loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
@@ -8151,9 +8140,10 @@ subroutine fida_weights_mc
 
     !! Number of particles to launch
     integer(kind=8) :: pcnt
-    real(Float64) :: papprox_tot,inv_maxcnt,cnt,fbm_denf,phase_area
+    real(Float64) :: inv_maxcnt,cnt,fbm_denf,phase_area
     integer,dimension(3,beam_grid%ngrid) :: pcell
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox,nlaunch !! approx. density
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     nwav = inputs%nlambda_wght
 
@@ -8194,13 +8184,13 @@ subroutine fida_weights_mc
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
-    papprox_tot=0.d0
     pcnt=1
     do k=1,beam_grid%nz
         do j=1,beam_grid%ny
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
+                if(.not.plasma%in_plasma) cycle
                 papprox(i,j,k)=(sum(neut%full(:,i,j,k)) + &
                                 sum(neut%half(:,i,j,k)) + &
                                 sum(neut%third(:,i,j,k)) + &
@@ -8210,15 +8200,14 @@ subroutine fida_weights_mc
                     pcell(:,pcnt)= ind
                     pcnt=pcnt+1
                 endif
-                if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
             enddo
         enddo
     enddo
     pcnt=pcnt-1
     inv_maxcnt=100.0/real(pcnt)
-    call get_nlaunch(10*inputs%n_fida,papprox,papprox_tot,nlaunch)
+    call get_nlaunch(10*inputs%n_fida,papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
+        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -8231,7 +8220,7 @@ subroutine fida_weights_mc
         !$OMP PARALLEL DO schedule(guided) private(iion,vi,ri,rg,ienergy,ipitch, &
         !$OMP tracks,ncell,jj,plasma,fields,rates,denn,states,photons,energy,pitch, &
         !$OMP los_intersect,randomu3,fbm_denf)
-        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
+        loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution uniformally
             call randind(inputs%ne_wght, ienergy)
             call randind(inputs%np_wght, ipitch)

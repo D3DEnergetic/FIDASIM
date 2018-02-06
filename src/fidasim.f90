@@ -1698,7 +1698,7 @@ subroutine read_inputs
     inputs%neutrals_file=neutrals_file
 
     !!Simulation Switches
-    if((calc_brems+calc_bes+calc_fida).gt.0) then
+    if((calc_brems+calc_bes+calc_fida+calc_pfida).gt.0) then
         inputs%calc_spec=1
     else
         inputs%calc_spec=0
@@ -2054,6 +2054,7 @@ subroutine read_chords
         endif
         inputs%calc_spec = 0
         inputs%calc_fida = 0
+        inputs%calc_pfida = 0
         inputs%calc_bes = 0
         inputs%calc_brems = 0
         inputs%calc_fida_wght = 0
@@ -3777,6 +3778,7 @@ subroutine write_spectra
     spec%brems=spec%brems/(inputs%dlambda)/(4.d0*pi)*1.d4
     spec%bes=spec%bes/(inputs%dlambda)/(4.d0*pi)*1.d4
     spec%fida=spec%fida/(inputs%dlambda)/(4.d0*pi)*1.d4
+    spec%pfida=spec%pfida/(inputs%dlambda)/(4.d0*pi)*1.d4
 
     !! write to file
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.h5"
@@ -3864,6 +3866,25 @@ subroutine write_spectra
                  "Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
        endif
         call h5ltset_attribute_string_f(fid,"/fida","units","Ph/(s*nm*sr*m^2)",error )
+    endif
+
+    if(inputs%calc_pfida.ge.1) then
+        !Write variables
+        if(particles%nclass.le.1) then
+            call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 2, &
+                 dims(1:2), spec%pfida(:,:,1), error)
+            !Add attributes
+            call h5ltset_attribute_string_f(fid,"/pfida","description", &
+                 "Passive Fast-ion D-alpha (FIDA) emmision: pfida(lambda,chan)", error)
+        else
+            call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 3, &
+                 dims, spec%pfida, error)
+            !Add attributes
+            call h5ltset_attribute_string_f(fid,"/pfida","description", &
+                 "Fast-ion D-alpha (FIDA) emmision: pfida(lambda,chan,class)", error)
+       endif
+        call h5ltset_attribute_string_f(fid,"/pfida","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -8968,6 +8989,7 @@ program fidasim
         allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
         allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4))
         allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
+        allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))
         spec%brems = 0.d0
         spec%bes = 0.d0
         spec%fida = 0.d0
@@ -9062,6 +9084,20 @@ program fidasim
         else
             call fida_mc()
         endif
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+
+    if(inputs%calc_pfida.ge.1)then
+        call date_and_time (values=time_arr)
+        if(inputs%verbose.ge.1) then
+            write(*,'(A,I2,":",I2.2,":",I2.2)') 'fida:    ' , &
+                  time_arr(5),time_arr(6),time_arr(7)
+        endif
+    !    if(inputs%dist_type.eq.1) then
+            call pfida_f()
+    !    else
+    !        call fida_mc()
+    !    endif
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

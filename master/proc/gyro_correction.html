@@ -817,8 +817,6 @@
       
       <a class="list-group-item" href="../proc/write_bt_h_h.html">write_bt_H_H</a>
       
-      <a class="list-group-item" href="../proc/write_dcx.html">write_dcx</a>
-      
       <a class="list-group-item" href="../proc/write_einstein.html">write_einstein</a>
       
       <a class="list-group-item" href="../proc/write_fida_weights.html">write_fida_weights</a>
@@ -985,18 +983,18 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
 <polygon fill="none" stroke="black" points="87.5,-66 0.5,-66 0.5,-42 87.5,-42 87.5,-66"/>
 <text text-anchor="middle" x="44" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_correction</text>
 </g>
-<!-- proc~gyro_step -->
-<g id="proc~~gyro_correction~~CallsGraph_node2" class="node"><title>proc~gyro_step</title>
-<g id="a_proc~~gyro_correction~~CallsGraph_node2"><a xlink:href="../proc/gyro_step.html" xlink:title="gyro_step">
-<polygon fill="#d9534f" stroke="#d9534f" points="191,-108 131,-108 131,-84 191,-84 191,-108"/>
-<text text-anchor="middle" x="161" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
+<!-- proc~pitch_to_vec -->
+<g id="proc~~gyro_correction~~CallsGraph_node2" class="node"><title>proc~pitch_to_vec</title>
+<g id="a_proc~~gyro_correction~~CallsGraph_node2"><a xlink:href="../proc/pitch_to_vec.html" xlink:title="pitch_to_vec">
+<polygon fill="#d9534f" stroke="#d9534f" points="197.5,-108 124.5,-108 124.5,-84 197.5,-84 197.5,-108"/>
+<text text-anchor="middle" x="161" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pitch_to_vec</text>
 </a>
 </g>
 </g>
-<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
-<g id="proc~~gyro_correction~~CallsGraph_edge4" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M77.9544,-66.0355C91.544,-70.9987 107.385,-76.7842 121.504,-81.9408"/>
-<polygon fill="#000000" stroke="#000000" points="120.361,-85.2493 130.955,-85.3923 122.763,-78.6741 120.361,-85.2493"/>
+<!-- proc~gyro_correction&#45;&gt;proc~pitch_to_vec -->
+<g id="proc~~gyro_correction~~CallsGraph_edge4" class="edge"><title>proc~gyro_correction&#45;&gt;proc~pitch_to_vec</title>
+<path fill="none" stroke="#000000" d="M77.9544,-66.0355C90.2248,-70.5169 104.331,-75.6688 117.348,-80.4227"/>
+<polygon fill="#000000" stroke="#000000" points="116.447,-83.8197 127.041,-83.9627 118.848,-77.2445 116.447,-83.8197"/>
 </g>
 <!-- proc~randu -->
 <g id="proc~~gyro_correction~~CallsGraph_node3" class="node"><title>proc~randu</title>
@@ -1011,54 +1009,54 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
 <path fill="none" stroke="#000000" d="M87.8218,-54C99.6537,-54 112.374,-54 123.791,-54"/>
 <polygon fill="#000000" stroke="#000000" points="123.846,-57.5001 133.846,-54 123.846,-50.5001 123.846,-57.5001"/>
 </g>
-<!-- proc~pitch_to_vec -->
-<g id="proc~~gyro_correction~~CallsGraph_node4" class="node"><title>proc~pitch_to_vec</title>
-<g id="a_proc~~gyro_correction~~CallsGraph_node4"><a xlink:href="../proc/pitch_to_vec.html" xlink:title="pitch_to_vec">
-<polygon fill="#d9534f" stroke="#d9534f" points="197.5,-24 124.5,-24 124.5,-0 197.5,-0 197.5,-24"/>
-<text text-anchor="middle" x="161" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pitch_to_vec</text>
+<!-- proc~gyro_step -->
+<g id="proc~~gyro_correction~~CallsGraph_node4" class="node"><title>proc~gyro_step</title>
+<g id="a_proc~~gyro_correction~~CallsGraph_node4"><a xlink:href="../proc/gyro_step.html" xlink:title="gyro_step">
+<polygon fill="#d9534f" stroke="#d9534f" points="191,-24 131,-24 131,-0 191,-0 191,-24"/>
+<text text-anchor="middle" x="161" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
 </a>
 </g>
 </g>
-<!-- proc~gyro_correction&#45;&gt;proc~pitch_to_vec -->
-<g id="proc~~gyro_correction~~CallsGraph_edge6" class="edge"><title>proc~gyro_correction&#45;&gt;proc~pitch_to_vec</title>
-<path fill="none" stroke="#000000" d="M77.9544,-41.9645C90.2248,-37.4831 104.331,-32.3312 117.348,-27.5773"/>
-<polygon fill="#000000" stroke="#000000" points="118.848,-30.7555 127.041,-24.0373 116.447,-24.1803 118.848,-30.7555"/>
-</g>
-<!-- proc~cross_product -->
-<g id="proc~~gyro_correction~~CallsGraph_node5" class="node"><title>proc~cross_product</title>
-<g id="a_proc~~gyro_correction~~CallsGraph_node5"><a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="333,-108 253,-108 253,-84 333,-84 333,-108"/>
-<text text-anchor="middle" x="293" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
-</a>
-</g>
-</g>
-<!-- proc~gyro_step&#45;&gt;proc~cross_product -->
-<g id="proc~~gyro_correction~~CallsGraph_edge1" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M191.175,-96C206.177,-96 224.882,-96 242.093,-96"/>
-<polygon fill="#000000" stroke="#000000" points="242.57,-99.5001 252.57,-96 242.57,-92.5001 242.57,-99.5001"/>
+<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
+<g id="proc~~gyro_correction~~CallsGraph_edge6" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M77.9544,-41.9645C91.544,-37.0013 107.385,-31.2158 121.504,-26.0592"/>
+<polygon fill="#000000" stroke="#000000" points="122.763,-29.3259 130.955,-22.6077 120.361,-22.7507 122.763,-29.3259"/>
 </g>
 <!-- omp_get_thread_num -->
-<g id="proc~~gyro_correction~~CallsGraph_node6" class="node"><title>omp_get_thread_num</title>
-<polygon fill="#777777" stroke="#777777" points="352,-66 234,-66 234,-42 352,-42 352,-66"/>
-<text text-anchor="middle" x="293" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
+<g id="proc~~gyro_correction~~CallsGraph_node5" class="node"><title>omp_get_thread_num</title>
+<polygon fill="#777777" stroke="#777777" points="352,-108 234,-108 234,-84 352,-84 352,-108"/>
+<text text-anchor="middle" x="293" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
 </g>
 <!-- proc~randu&#45;&gt;omp_get_thread_num -->
-<g id="proc~~gyro_correction~~CallsGraph_edge2" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="#000000" d="M188.307,-54C198.669,-54 211.094,-54 223.685,-54"/>
-<polygon fill="#000000" stroke="#000000" points="223.782,-57.5001 233.782,-54 223.782,-50.5001 223.782,-57.5001"/>
+<g id="proc~~gyro_correction~~CallsGraph_edge1" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
+<path fill="none" stroke="#000000" d="M188.307,-62.4993C204.481,-67.7247 225.681,-74.5737 244.694,-80.7164"/>
+<polygon fill="#000000" stroke="#000000" points="243.807,-84.108 254.399,-83.8519 245.959,-77.447 243.807,-84.108"/>
 </g>
 <!-- proc~rng_uniform -->
-<g id="proc~~gyro_correction~~CallsGraph_node7" class="node"><title>proc~rng_uniform</title>
-<g id="a_proc~~gyro_correction~~CallsGraph_node7"><a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="328,-24 258,-24 258,-0 328,-0 328,-24"/>
-<text text-anchor="middle" x="293" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
+<g id="proc~~gyro_correction~~CallsGraph_node6" class="node"><title>proc~rng_uniform</title>
+<g id="a_proc~~gyro_correction~~CallsGraph_node6"><a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="328,-66 258,-66 258,-42 328,-42 328,-66"/>
+<text text-anchor="middle" x="293" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
 </a>
 </g>
 </g>
 <!-- proc~randu&#45;&gt;proc~rng_uniform -->
-<g id="proc~~gyro_correction~~CallsGraph_edge3" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="#000000" d="M188.307,-45.5007C205.444,-39.9642 228.222,-32.6052 248.064,-26.1947"/>
-<polygon fill="#000000" stroke="#000000" points="249.388,-29.445 257.828,-23.0402 247.236,-22.784 249.388,-29.445"/>
+<g id="proc~~gyro_correction~~CallsGraph_edge2" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
+<path fill="none" stroke="#000000" d="M188.307,-54C205.366,-54 228.014,-54 247.792,-54"/>
+<polygon fill="#000000" stroke="#000000" points="247.828,-57.5001 257.828,-54 247.828,-50.5001 247.828,-57.5001"/>
+</g>
+<!-- proc~cross_product -->
+<g id="proc~~gyro_correction~~CallsGraph_node7" class="node"><title>proc~cross_product</title>
+<g id="a_proc~~gyro_correction~~CallsGraph_node7"><a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="333,-24 253,-24 253,-0 333,-0 333,-24"/>
+<text text-anchor="middle" x="293" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+</a>
+</g>
+</g>
+<!-- proc~gyro_step&#45;&gt;proc~cross_product -->
+<g id="proc~~gyro_correction~~CallsGraph_edge3" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M191.175,-12C206.177,-12 224.882,-12 242.093,-12"/>
+<polygon fill="#000000" stroke="#000000" points="242.57,-15.5001 252.57,-12 242.57,-8.5001 242.57,-15.5001"/>
 </g>
 </g>
 </svg>
@@ -2046,8 +2044,6 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
       <a class="list-group-item" href="../proc/write_bt_h_e.html">write_bt_H_e</a>
       
       <a class="list-group-item" href="../proc/write_bt_h_h.html">write_bt_H_H</a>
-      
-      <a class="list-group-item" href="../proc/write_dcx.html">write_dcx</a>
       
       <a class="list-group-item" href="../proc/write_einstein.html">write_einstein</a>
       

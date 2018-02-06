@@ -384,91 +384,90 @@
 <a name="ln-34"></a>              <span class="s s-Atom">lambdamin_wght:zero_double</span><span class="p">,</span> <span class="s s-Atom">lambdamax_wght:zero_double</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-35"></a>              <span class="s s-Atom">calc_npa:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_fida:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_bes:zero_int</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-36"></a>              <span class="s s-Atom">calc_brems:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_birth:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_neutron:zero_int</span><span class="p">,</span><span class="err">$</span>
-<a name="ln-37"></a>              <span class="s s-Atom">calc_fida_wght:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_npa_wght:zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-38"></a>              <span class="s s-Atom">dump_dcx:zero_int</span><span class="p">}</span>
-<a name="ln-39"></a>
-<a name="ln-40"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span> <span class="s s-Atom">schema</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;simulation settings&quot;</span>
-<a name="ln-41"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-42"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-43"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-44"></a>
-<a name="ln-45"></a>    <span class="p">;</span><span class="nv">Normalize</span> <span class="nv">File</span> <span class="nv">Paths</span>
-<a name="ln-46"></a>    <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span> <span class="o">=</span> <span class="nf">expand_path</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="p">)</span>
-<a name="ln-47"></a>
-<a name="ln-48"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">alpha</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">or</span> <span class="err">$</span>
-<a name="ln-49"></a>       <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">beta</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">or</span> <span class="err">$</span>
-<a name="ln-50"></a>       <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">gamma</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-51"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Angles must be in radians&#39;</span>
-<a name="ln-52"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-53"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-54"></a>
-<a name="ln-55"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-56"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid wavelength range. Expected lambdamin &lt; lamdbdamax&#39;</span>
-<a name="ln-57"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-58"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-59"></a>
-<a name="ln-60"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamin_wght</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamax_wght</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-61"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid wavelength range. Expected lambdamin_wght &lt; lamdbdamax_wght&#39;</span>
-<a name="ln-62"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-63"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-64"></a>
-<a name="ln-65"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">xmin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">xmax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-66"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid x range. Expected xmin &lt; xmax&#39;</span>
-<a name="ln-67"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-68"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-69"></a>
-<a name="ln-70"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">ymin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">ymax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-71"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid y range. Expected ymin &lt; ymax&#39;</span>
-<a name="ln-72"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-73"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-74"></a>
-<a name="ln-75"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">zmin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">zmax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-76"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid z range. Expected zmin &lt; zmax&#39;</span>
-<a name="ln-77"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-78"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-79"></a>
-<a name="ln-80"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">pinj</span> <span class="s s-Atom">le</span> <span class="mf">0.</span> <span class="s s-Atom">or</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">einj</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-81"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;The selected source is not on&#39;</span>
-<a name="ln-82"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;einj = &#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">einj</span>
-<a name="ln-83"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;pinj = &#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">pinj</span>
-<a name="ln-84"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-85"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-86"></a>
-<a name="ln-87"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">current_fractions</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">1.</span><span class="s s-Atom">d</span><span class="o">-</span><span class="mi">3</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-88"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;current_fractions do not sum to 1.0&#39;</span>
-<a name="ln-89"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;sum(current_fractions) = &#39;</span><span class="p">,</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">current_fractions</span><span class="p">)</span>
-<a name="ln-90"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-91"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-92"></a>
-<a name="ln-93"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">impurity_charge</span> <span class="s s-Atom">le</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-94"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid impurity charge. Expected impurity charge &gt; 1&#39;</span>
-<a name="ln-95"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-96"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-97"></a>
-<a name="ln-98"></a>    <span class="s s-Atom">ps</span> <span class="o">=</span> <span class="nf">path_sep</span><span class="p">()</span>
-<a name="ln-99"></a>    <span class="s s-Atom">input_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_inputs.dat&#39;</span>
-<a name="ln-100"></a>    <span class="s s-Atom">equilibrium_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_equilibrium.h5&#39;</span>
-<a name="ln-101"></a>    <span class="s s-Atom">geometry_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_geometry.h5&#39;</span>
-<a name="ln-102"></a>    <span class="s s-Atom">distribution_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_distribution.h5&#39;</span>
-<a name="ln-103"></a>    <span class="s s-Atom">neutrals_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_neutrals.h5&#39;</span>
-<a name="ln-104"></a>
-<a name="ln-105"></a>    <span class="s s-Atom">inputs</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span><span class="s s-Atom">&#39;input_file&#39;</span><span class="p">,</span><span class="s s-Atom">input_file</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-106"></a>                                  <span class="s s-Atom">&#39;equilibrium_file&#39;</span><span class="p">,</span><span class="s s-Atom">equilibrium_file</span><span class="p">,</span><span class="err">$</span> 
-<a name="ln-107"></a>                                  <span class="s s-Atom">&#39;geometry_file&#39;</span><span class="p">,</span><span class="s s-Atom">geometry_file</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-108"></a>                                  <span class="s s-Atom">&#39;distribution_file&#39;</span><span class="p">,</span><span class="s s-Atom">distribution_file</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-109"></a>                                  <span class="s s-Atom">&#39;load_neutrals&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-110"></a>                                  <span class="s s-Atom">&#39;no_flr&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-111"></a>                                  <span class="s s-Atom">&#39;verbose&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-112"></a>                                  <span class="s s-Atom">&#39;neutrals_file&#39;</span><span class="p">,</span><span class="s s-Atom">neutrals_file</span><span class="p">)</span>
-<a name="ln-113"></a>
-<a name="ln-114"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-115"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-116"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid simulation settings. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-117"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-118"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Simulation settings are valid&#39;</span>
-<a name="ln-119"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-120"></a>
-<a name="ln-121"></a><span class="nv">END</span>
+<a name="ln-37"></a>              <span class="s s-Atom">calc_fida_wght:zero_int</span><span class="p">,</span> <span class="s s-Atom">calc_npa_wght:zero_int</span> <span class="p">}</span>
+<a name="ln-38"></a>
+<a name="ln-39"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span> <span class="s s-Atom">schema</span><span class="p">,</span> <span class="s s-Atom">inputs</span><span class="p">,</span> <span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;simulation settings&quot;</span>
+<a name="ln-40"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-41"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-42"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-43"></a>
+<a name="ln-44"></a>    <span class="p">;</span><span class="nv">Normalize</span> <span class="nv">File</span> <span class="nv">Paths</span>
+<a name="ln-45"></a>    <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span> <span class="o">=</span> <span class="nf">expand_path</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="p">)</span>
+<a name="ln-46"></a>
+<a name="ln-47"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">alpha</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">or</span> <span class="err">$</span>
+<a name="ln-48"></a>       <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">beta</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">or</span> <span class="err">$</span>
+<a name="ln-49"></a>       <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">gamma</span> <span class="s s-Atom">gt</span> <span class="mi">2</span><span class="s s-Atom">*</span><span class="p">!</span><span class="nv">DPI</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-50"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Angles must be in radians&#39;</span>
+<a name="ln-51"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-52"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-55"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid wavelength range. Expected lambdamin &lt; lamdbdamax&#39;</span>
+<a name="ln-56"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-57"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-58"></a>
+<a name="ln-59"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamin_wght</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">lambdamax_wght</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-60"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid wavelength range. Expected lambdamin_wght &lt; lamdbdamax_wght&#39;</span>
+<a name="ln-61"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-62"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-63"></a>
+<a name="ln-64"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">xmin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">xmax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-65"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid x range. Expected xmin &lt; xmax&#39;</span>
+<a name="ln-66"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-67"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-68"></a>
+<a name="ln-69"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">ymin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">ymax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-70"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid y range. Expected ymin &lt; ymax&#39;</span>
+<a name="ln-71"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-72"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-73"></a>
+<a name="ln-74"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">zmin</span> <span class="s s-Atom">ge</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">zmax</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-75"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid z range. Expected zmin &lt; zmax&#39;</span>
+<a name="ln-76"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-77"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-78"></a>
+<a name="ln-79"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">pinj</span> <span class="s s-Atom">le</span> <span class="mf">0.</span> <span class="s s-Atom">or</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">einj</span> <span class="s s-Atom">le</span> <span class="mf">0.0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-80"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;The selected source is not on&#39;</span>
+<a name="ln-81"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;einj = &#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">einj</span>
+<a name="ln-82"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;pinj = &#39;</span><span class="p">,</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">pinj</span>
+<a name="ln-83"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-84"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-85"></a>
+<a name="ln-86"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">current_fractions</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">1.</span><span class="s s-Atom">d</span><span class="o">-</span><span class="mi">3</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-87"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;current_fractions do not sum to 1.0&#39;</span>
+<a name="ln-88"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;sum(current_fractions) = &#39;</span><span class="p">,</span><span class="nf">total</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">current_fractions</span><span class="p">)</span>
+<a name="ln-89"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-90"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-91"></a>
+<a name="ln-92"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">impurity_charge</span> <span class="s s-Atom">le</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-93"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid impurity charge. Expected impurity charge &gt; 1&#39;</span>
+<a name="ln-94"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-95"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-96"></a>
+<a name="ln-97"></a>    <span class="s s-Atom">ps</span> <span class="o">=</span> <span class="nf">path_sep</span><span class="p">()</span>
+<a name="ln-98"></a>    <span class="s s-Atom">input_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_inputs.dat&#39;</span>
+<a name="ln-99"></a>    <span class="s s-Atom">equilibrium_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_equilibrium.h5&#39;</span>
+<a name="ln-100"></a>    <span class="s s-Atom">geometry_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_geometry.h5&#39;</span>
+<a name="ln-101"></a>    <span class="s s-Atom">distribution_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_distribution.h5&#39;</span>
+<a name="ln-102"></a>    <span class="s s-Atom">neutrals_file</span> <span class="o">=</span> <span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">result_dir</span><span class="o">+</span><span class="s s-Atom">ps</span><span class="o">+</span><span class="s s-Atom">inputs</span><span class="p">.</span><span class="s s-Atom">runid+&#39;_neutrals.h5&#39;</span>
+<a name="ln-103"></a>
+<a name="ln-104"></a>    <span class="s s-Atom">inputs</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">inputs</span><span class="p">,</span><span class="s s-Atom">&#39;input_file&#39;</span><span class="p">,</span><span class="s s-Atom">input_file</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-105"></a>                                  <span class="s s-Atom">&#39;equilibrium_file&#39;</span><span class="p">,</span><span class="s s-Atom">equilibrium_file</span><span class="p">,</span><span class="err">$</span> 
+<a name="ln-106"></a>                                  <span class="s s-Atom">&#39;geometry_file&#39;</span><span class="p">,</span><span class="s s-Atom">geometry_file</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-107"></a>                                  <span class="s s-Atom">&#39;distribution_file&#39;</span><span class="p">,</span><span class="s s-Atom">distribution_file</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-108"></a>                                  <span class="s s-Atom">&#39;load_neutrals&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-109"></a>                                  <span class="s s-Atom">&#39;no_flr&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-110"></a>                                  <span class="s s-Atom">&#39;verbose&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-111"></a>                                  <span class="s s-Atom">&#39;neutrals_file&#39;</span><span class="p">,</span><span class="s s-Atom">neutrals_file</span><span class="p">)</span>
+<a name="ln-112"></a>
+<a name="ln-113"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
+<a name="ln-114"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-115"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid simulation settings. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
+<a name="ln-116"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-117"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Simulation settings are valid&#39;</span>
+<a name="ln-118"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-119"></a>
+<a name="ln-120"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

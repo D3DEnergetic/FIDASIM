@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 0.7% of total for derived types.</p>Including implementation: 3 statements,  0.7% of total for derived types.">3 statements</a>
+	  title="<p> 1.7% of total for derived types.</p>Including implementation: 7 statements,  1.7% of total for derived types.">7 statements</a>
      </li> 
      
      
@@ -170,7 +170,15 @@
   <div id="vars-0" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../type/neutraldensity.html#variable-dens%7E2">dens</a>
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-full%7E2">full</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-half%7E2">half</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-third%7E2">third</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-dcx%7E2">dcx</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-halo%7E2">halo</a>
       
     </div>
   </div>
@@ -313,7 +321,15 @@
   <div id="vars-1" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../type/neutraldensity.html#variable-dens%7E2">dens</a>
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-full%7E2">full</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-half%7E2">half</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-third%7E2">third</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-dcx%7E2">dcx</a>
+      
+      <a class="list-group-item" href="../type/neutraldensity.html#variable-halo%7E2">halo</a>
       
     </div>
   </div>
@@ -367,11 +383,67 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-dens%7E2"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-full%7E2"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
-  <td><strong>dens</strong></td><td></td><td></td><td><p>Neutral density: dens(lev,neutral_type,x,y,z)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>full</strong></td><td></td><td></td><td><p>Full energy neutral density: full(lev,x,y,z)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-half%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>half</strong></td><td></td><td></td><td><p>Half energy neutral density: half(lev,x,y,z)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-third%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>third</strong></td><td></td><td></td><td><p>Third energy neutral density: third(lev,x,y,z)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dcx%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX neutral density: dcx(lev,x,y,z)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-halo%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo neutral density: dens(lev,x,y,z)</p></td>
   
 </tr>
 
@@ -393,8 +465,16 @@
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">NeutralDensity</span>
     <span class="c">!+ Neutral density structure</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dens</span>
-        <span class="c">!+ Neutral density: dens(lev,neutral_type,x,y,z)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">full</span>
+        <span class="c">!+ Full energy neutral density: full(lev,x,y,z)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">half</span>
+        <span class="c">!+ Half energy neutral density: half(lev,x,y,z)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">third</span>
+        <span class="c">!+ Third energy neutral density: third(lev,x,y,z)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dcx</span>
+        <span class="c">!+ Direct CX neutral density: dcx(lev,x,y,z)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">halo</span>
+        <span class="c">!+ Thermal halo neutral density: dens(lev,x,y,z)</span>
 <span class="k">end type </span><span class="n">NeutralDensity</span>
 </pre></div>
 

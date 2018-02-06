@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 1.2% of total for derived types.</p>Including implementation: 5 statements,  1.2% of total for derived types.">5 statements</a>
+	  title="<p> 2.2% of total for derived types.</p>Including implementation: 9 statements,  2.2% of total for derived types.">9 statements</a>
      </li> 
      
      
@@ -172,7 +172,15 @@
       
       <a class="list-group-item" href="../type/spectra.html#variable-brems">brems</a>
       
-      <a class="list-group-item" href="../type/spectra.html#variable-bes">bes</a>
+      <a class="list-group-item" href="../type/spectra.html#variable-full">full</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-half">half</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-third">third</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-dcx">dcx</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-halo">halo</a>
       
       <a class="list-group-item" href="../type/spectra.html#variable-fida">fida</a>
       
@@ -319,7 +327,15 @@
       
       <a class="list-group-item" href="../type/spectra.html#variable-brems">brems</a>
       
-      <a class="list-group-item" href="../type/spectra.html#variable-bes">bes</a>
+      <a class="list-group-item" href="../type/spectra.html#variable-full">full</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-half">half</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-third">third</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-dcx">dcx</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-halo">halo</a>
       
       <a class="list-group-item" href="../type/spectra.html#variable-fida">fida</a>
       
@@ -389,11 +405,67 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-bes"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-full"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>bes</strong></td><td></td><td></td><td><p>Beam emission: bes(lambda,chan,neutral_type)</p></td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>full</strong></td><td></td><td></td><td><p>Full energy beam emission: full(lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-half"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>half</strong></td><td></td><td></td><td><p>Half energy beam emission: half(lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-third"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>third</strong></td><td></td><td></td><td><p>Third energy beam emission: third(lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dcx"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX emission: dcx(lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-halo"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission: halo(lambda,chan)</p></td>
   
 </tr>
 
@@ -431,8 +503,16 @@
     <span class="c">!+ Spectra storage structure</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">brems</span>
         <span class="c">!+ Bremsstruhlung: brems(lambda,chan)</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">bes</span>
-        <span class="c">!+ Beam emission: bes(lambda,chan,neutral_type)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">full</span>
+        <span class="c">!+ Full energy beam emission: full(lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">half</span>
+        <span class="c">!+ Half energy beam emission: half(lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">third</span>
+        <span class="c">!+ Third energy beam emission: third(lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">dcx</span>
+        <span class="c">!+ Direct CX emission: dcx(lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">halo</span>
+        <span class="c">!+ Thermal halo emission: halo(lambda,chan)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fida</span>
         <span class="c">!+ FIDA emission: fida(lambda,chan,orbit_type)</span>
 <span class="k">end type </span><span class="n">Spectra</span>

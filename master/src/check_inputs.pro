@@ -34,8 +34,7 @@ PRO check_inputs, inputs
               lambdamin_wght:zero_double, lambdamax_wght:zero_double, $
               calc_npa:zero_int, calc_fida:zero_int, calc_bes:zero_int, $
               calc_brems:zero_int, calc_birth:zero_int, calc_neutron:zero_int,$
-              calc_fida_wght:zero_int, calc_npa_wght:zero_int, $
-              dump_dcx:zero_int}
+              calc_fida_wght:zero_int, calc_npa_wght:zero_int }
 
     check_struct_schema, schema, inputs, err_status, desc="simulation settings"
     if err_status eq 1 then begin

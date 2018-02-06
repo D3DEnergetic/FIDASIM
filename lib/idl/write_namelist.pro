@@ -42,7 +42,6 @@ PRO write_namelist, filename, inputs
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
     printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght
-    printf,55,f='("dump_dcx = ",i2,"    !! Dump DCX neutrals and spectra")',inputs.dump_dcx
     printf,55,''
     printf,55,'!! Debugging Switches'
     printf,55,f='("no_flr = ",i2,"    !! Turn off Finite Larmor Radius effects")',inputs.no_flr

@@ -30,13 +30,15 @@ integer, parameter :: nbih_type  = 2
     !+ Identifier for half energy NBI neutral interaction
 integer, parameter :: nbit_type  = 3
     !+ Identifier for third energy NBI neutral interaction
-integer, parameter :: halo_type  = 4
+integer, parameter :: dcx_type   = 4
+    !+ Identifier for dcx neutral interaction
+integer, parameter :: halo_type  = 5
     !+ Identifier for halo neutral interaction
-integer, parameter :: fida_type  = 5
+integer, parameter :: fida_type  = 6
     !+ Identifier for fida neutral interaction
-integer, parameter :: brems_type = 6
+integer, parameter :: brems_type = 7
     !+ Identifier for bremsstrahlung interaction. Acts as dummy type
-integer, parameter :: ntypes     = 6
+integer, parameter :: ntypes     = 7
     !+ Number of different types of neutrals
 
 integer, parameter :: beam_ion = 1
@@ -728,8 +730,16 @@ type Spectra
     !+ Spectra storage structure
     real(Float64), dimension(:,:), allocatable   :: brems
         !+ Bremsstruhlung: brems(lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable :: bes
-        !+ Beam emission: bes(lambda,chan,neutral_type)
+    real(Float64), dimension(:,:), allocatable   :: full
+        !+ Full energy beam emission: full(lambda,chan)
+    real(Float64), dimension(:,:), allocatable   :: half
+        !+ Half energy beam emission: half(lambda,chan)
+    real(Float64), dimension(:,:), allocatable   :: third
+        !+ Third energy beam emission: third(lambda,chan)
+    real(Float64), dimension(:,:), allocatable   :: dcx
+        !+ Direct CX emission: dcx(lambda,chan)
+    real(Float64), dimension(:,:), allocatable   :: halo
+        !+ Thermal halo emission: halo(lambda,chan)
     real(Float64), dimension(:,:,:), allocatable :: fida
         !+ FIDA emission: fida(lambda,chan,orbit_type)
 end type Spectra
@@ -744,8 +754,16 @@ end type NeutronRate
 
 type NeutralDensity
     !+ Neutral density structure
-    real(Float64), dimension(:,:,:,:,:), allocatable :: dens
-        !+ Neutral density: dens(lev,neutral_type,x,y,z)
+    real(Float64), dimension(:,:,:,:), allocatable :: full
+        !+ Full energy neutral density: full(lev,x,y,z)
+    real(Float64), dimension(:,:,:,:), allocatable :: half
+        !+ Half energy neutral density: half(lev,x,y,z)
+    real(Float64), dimension(:,:,:,:), allocatable :: third
+        !+ Third energy neutral density: third(lev,x,y,z)
+    real(Float64), dimension(:,:,:,:), allocatable :: dcx
+        !+ Direct CX neutral density: dcx(lev,x,y,z)
+    real(Float64), dimension(:,:,:,:), allocatable :: halo
+        !+ Thermal halo neutral density: dens(lev,x,y,z)
 end type NeutralDensity
 
 type FIDAWeights
@@ -829,8 +847,6 @@ type SimulationInputs
         !+ Calculate neutron flux: 0 = off, 1=on
     integer(Int32) :: no_flr
         !+ Turns off Finite Larmor Radius effects: 0=off, 1=on
-    integer(Int32) :: dump_dcx
-        !+ Output DCX density and spectra: 0 = off, 1=on
     integer(Int32) :: verbose
         !+ Verbosity: <0 = off++, 0 = off, 1=on, 2=on++
 
@@ -889,7 +905,7 @@ end type ParticleTrack
 
 type GyroSurface
     !+ Surface containing the fast-ion velocity vectors for all values of the
-    !+ gyro-angle. It takes the form of a hyperboloid 
+    !+ gyro-angle. It takes the form of a hyperboloid
     !+ \((x(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(cos(\gamma + \pi/2) - \omega_i t sin(\gamma + \pi/2)) \)
     !+ \((y(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(sin(\gamma + \pi/2) + \omega_i t cos(\gamma + \pi/2)) \)
     !+ \((z(\gamma,t) = \alpha \omega_i \rm{pitch} t\)
@@ -1617,7 +1633,7 @@ subroutine read_inputs
     integer            :: pathlen, calc_neutron
     integer            :: calc_brems,calc_bes,calc_fida,calc_npa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer            :: load_neutrals,verbose,dump_dcx,no_flr
+    integer            :: load_neutrals,verbose,no_flr
     integer(Int64)     :: n_fida,n_npa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1632,7 +1648,7 @@ subroutine read_inputs
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_bes, calc_fida, calc_npa, calc_birth, no_flr, &
-        calc_fida_wght, calc_npa_wght, load_neutrals, dump_dcx, verbose, &
+        calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida,n_npa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
@@ -1679,7 +1695,6 @@ subroutine read_inputs
     inputs%calc_npa_wght=calc_npa_wght
     inputs%calc_neutron=calc_neutron
     inputs%load_neutrals=load_neutrals
-    inputs%dump_dcx=dump_dcx
     inputs%verbose=verbose
     inputs%no_flr = no_flr
 
@@ -3379,104 +3394,6 @@ subroutine write_birth_profile
 
 end subroutine write_birth_profile
 
-subroutine write_dcx
-    !+ Writes the direct charge exchange (DCX) neutrals and spectra to a HDF5 file
-    integer(HID_T) :: fid
-    integer(HSIZE_T), dimension(4) :: dims
-    integer(HSIZE_T), dimension(1) :: d
-    integer :: error
-
-    character(charlim) :: filename
-    character(15) :: spec_str
-    integer :: i
-    real(Float64), dimension(:),   allocatable :: lambda_arr
-    real(Float64), dimension(:,:), allocatable :: dcx_spec
-
-    filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_dcx.h5"
-    spec_str = ""
-    if(inputs%calc_spec.ge.1) then
-        spec_str = " spectra and"
-        allocate(lambda_arr(inputs%nlambda))
-        do i=1,inputs%nlambda
-            lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin ! [nm]
-        enddo
-
-        allocate(dcx_spec(inputs%nlambda,spec_chords%nchan))
-        !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
-        dcx_spec = spec%bes(:,:,halo_type)/(inputs%dlambda)/(4.d0*pi)*1.d4
-    endif
-
-    !Open HDF5 interface
-    call h5open_f(error)
-
-    !Create file overwriting any existing file
-    call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
-
-    !Write variables
-    call write_beam_grid(fid, error)
-
-    d(1) =1
-    call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
-    dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz ]
-    call h5ltmake_compressed_dataset_double_f(fid, "/dens", 4, dims, &
-         neut%dens(:,halo_type,:,:,:), error)
-
-    if(inputs%calc_spec.ge.1) then
-        call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
-        call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
-        dims(1) = inputs%nlambda
-        dims(2) = spec_chords%nchan
-        call h5ltmake_compressed_dataset_double_f(fid, "/spec", 2, dims(1:2), &
-             dcx_spec, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
-             lambda_arr, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
-             spec_chords%radius, error)
-    endif
-
-    !Add attributes
-    call h5ltset_attribute_string_f(fid,"/nlevel","description", &
-         "Number of atomic energy levels", error)
-    call h5ltset_attribute_string_f(fid,"/dens", "description", &
-         "Direct Charge Exchange (DCX) neutral density: dcx(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/dens","units","neutrals*cm^-3", error)
-
-    if(inputs%calc_spec.ge.1) then
-        call h5ltset_attribute_string_f(fid,"/nchan", "description", &
-             "Number of channels", error)
-        call h5ltset_attribute_string_f(fid,"/nlambda", "description", &
-             "Number of wavelengths", error)
-        call h5ltset_attribute_string_f(fid,"/spec","description", &
-             "Direct Charge Exchange (DCX) beam emission: spec(lambda, chan)", error)
-        call h5ltset_attribute_string_f(fid,"/spec","units","Ph/(s*nm*sr*m^2)",error)
-        call h5ltset_attribute_string_f(fid,"/lambda","description", &
-             "Wavelength array", error)
-        call h5ltset_attribute_string_f(fid,"/lambda","units","nm", error)
-        call h5ltset_attribute_string_f(fid,"/radius", "description", &
-             "Line of sight radius at midplane or tangency point", error)
-        call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
-    endif
-
-    call h5ltset_attribute_string_f(fid, "/", "version", version, error)
-    call h5ltset_attribute_string_f(fid,"/","description", &
-         "Direct Charge Exchange (DCX)"//trim(spec_str)//" neutral density calculated by FIDASIM", error)
-
-    !Close file
-    call h5fclose_f(fid, error)
-
-    !Close HDF5 interface
-    call h5close_f(error)
-
-    if(inputs%calc_spec.ge.1) then
-        deallocate(dcx_spec,lambda_arr)
-    endif
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'dcx written to: ',trim(filename)
-    endif
-
-end subroutine write_dcx
-
 subroutine write_neutrals
     !+ Writes [[libfida:neut]] to a HDF5 file
     integer(HID_T) :: fid
@@ -3500,13 +3417,15 @@ subroutine write_neutrals
     d(1) =1
     call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
     call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
-         neut%dens(:,nbif_type,:,:,:), error)
+         neut%full, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/hdens", 4, dims, &
-         neut%dens(:,nbih_type,:,:,:), error)
+         neut%half, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/tdens", 4, dims, &
-         neut%dens(:,nbit_type,:,:,:), error)
+         neut%third, error)
+    call h5ltmake_compressed_dataset_double_f(fid, "/dcxdens", 4, dims, &
+         neut%dcx, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
-         neut%dens(:,halo_type,:,:,:), error)
+         neut%halo, error)
 
     !Write attributes
     call h5ltset_attribute_string_f(fid,"/nlevel","description", &
@@ -3523,8 +3442,12 @@ subroutine write_neutrals
          "Neutral density for the third energy component of the beam: tdens(level,x,y,z)", error)
     call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
 
+    call h5ltset_attribute_string_f(fid,"/dcxdens","description", &
+         "Direct Charge Exchange (DCX) neutral density: dcxdens(level,x,y,z)", error)
+    call h5ltset_attribute_string_f(fid,"/dcxdens","units","neutrals*cm^-3",error)
+
     call h5ltset_attribute_string_f(fid,"/halodens","description", &
-         "Neutral density of the beam halo(including dcx): halodens(level,x,y,z)", error)
+         "Neutral density of the beam halo: halodens(level,x,y,z)", error)
     call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -3689,6 +3612,7 @@ subroutine write_spectra
 
     character(charlim) :: filename
     integer :: i
+    real(Float64) :: factor
     real(Float64), dimension(:), allocatable :: lambda_arr
 
     allocate(lambda_arr(inputs%nlambda))
@@ -3696,10 +3620,15 @@ subroutine write_spectra
         lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin
     enddo
 
+    factor = 1.d0/(inputs%dlambda)/(4.d0*pi)*1.d4
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
-    spec%brems=spec%brems/(inputs%dlambda)/(4.d0*pi)*1.d4
-    spec%bes=spec%bes/(inputs%dlambda)/(4.d0*pi)*1.d4
-    spec%fida=spec%fida/(inputs%dlambda)/(4.d0*pi)*1.d4
+    spec%brems = factor*spec%brems
+    spec%full  = factor*spec%full
+    spec%half  = factor*spec%half
+    spec%third = factor*spec%third
+    spec%dcx   = factor*spec%dcx
+    spec%halo  = factor*spec%halo
+    spec%fida  = factor*spec%fida
 
     !! write to file
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.h5"
@@ -3748,13 +3677,15 @@ subroutine write_spectra
     if(inputs%calc_bes.ge.1) then
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
-             spec%bes(:,:,nbif_type), error)
+             spec%full, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/half", 2, dims(1:2), &
-             spec%bes(:,:,nbih_type), error)
+             spec%half, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(1:2),&
-             spec%bes(:,:,nbit_type), error)
+             spec%third, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 2, dims(1:2), &
+             spec%dcx, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
-             spec%bes(:,:,halo_type), error)
+             spec%halo, error)
         !Add attributes
         call h5ltset_attribute_string_f(fid,"/full","description", &
              "Full energy component of the beam emmision: full(lambda,chan)", error)
@@ -3765,8 +3696,11 @@ subroutine write_spectra
         call h5ltset_attribute_string_f(fid,"/third","description", &
              "Third energy component of the beam emmision: third(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/third","units","Ph/(s*nm*sr*m^2)",error )
+        call h5ltset_attribute_string_f(fid,"/dcx","description", &
+             "Direct Charge Exchange (DCX) emission: dcx(lambda,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
         call h5ltset_attribute_string_f(fid,"/halo","description", &
-             "Halo component of the beam emmision (includes dcx): halo(lambda,chan)", error)
+             "Halo component of the beam emmision: halo(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
@@ -4230,13 +4164,15 @@ subroutine read_neutrals
 
     dims = [nlevs, nx, ny, nz]
     call h5ltread_dataset_double_f(fid,"/fdens", &
-         neut%dens(:,nbif_type,:,:,:), dims, error)
+         neut%full, dims, error)
     call h5ltread_dataset_double_f(fid,"/hdens", &
-         neut%dens(:,nbih_type,:,:,:), dims, error)
+         neut%half, dims, error)
     call h5ltread_dataset_double_f(fid,"/tdens", &
-         neut%dens(:,nbit_type,:,:,:), dims, error)
+         neut%third, dims, error)
+    call h5ltread_dataset_double_f(fid,"/dcxdens", &
+         neut%dcx, dims, error)
     call h5ltread_dataset_double_f(fid,"/halodens", &
-         neut%dens(:,halo_type,:,:,:), dims, error)
+         neut%halo, dims, error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -4566,7 +4502,7 @@ subroutine line_gyro_surface_intersect(r0, v0, gs, t)
 
     t(1) = (-b - sqrt(d))/(2*a)
     t(2) = (-b + sqrt(d))/(2*a)
-    
+
 end subroutine line_gyro_surface_intersect
 
 subroutine gyro_surface_coordinates(gs, p, u)
@@ -4626,7 +4562,7 @@ subroutine gyro_trajectory(gs, theta, ri, vi)
     vi = gs%omega*matmul(gs%basis, [-a*sin(th), b*cos(th), c])
 
 end subroutine gyro_trajectory
-    
+
 function in_gyro_surface(gs, p) result(in_gs)
     !+ Indicator function for determining if a point is inside the gyro_surface
     type(GyroSurface), intent(in)           :: gs
@@ -5809,16 +5745,34 @@ subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
         !+ Store DCX/Halo iteration density in [[libfida:halo_iter_dens]]
     logical :: iter
 
+    integer :: i, j, k
     if(present(store_iter)) then
         iter = store_iter
     else
         iter = .False.
     endif
 
+    i = ind(1) ; j = ind(2) ; k = ind(3)
+
     !$OMP CRITICAL(store_neutrals_1)
     if(iter) halo_iter_dens(neut_type) = halo_iter_dens(neut_type) + sum(dens)
-    neut%dens(:,neut_type,ind(1),ind(2),ind(3)) = &
-        neut%dens(:,neut_type,ind(1),ind(2),ind(3))+dens ![neutrals/cm^3]
+    select case (neut_type)
+        case (nbif_type)
+            neut%full(:,i,j,k) = neut%full(:,i,j,k) + dens
+        case (nbih_type)
+            neut%half(:,i,j,k) = neut%half(:,i,j,k) + dens
+        case (nbit_type)
+            neut%third(:,i,j,k) = neut%third(:,i,j,k) + dens
+        case (dcx_type)
+            neut%dcx(:,i,j,k) = neut%dcx(:,i,j,k) + dens
+        case (halo_type)
+            neut%halo(:,i,j,k) = neut%halo(:,i,j,k) + dens
+        case default
+            if(inputs%verbose.ge.0) then
+                write(*,'("STORE_NEUTRALS: Unknown neutral type: ",i2)') neut_type
+            endif
+            stop
+    end select
     !$OMP END CRITICAL(store_neutrals_1)
 
 end subroutine store_neutrals
@@ -6098,7 +6052,7 @@ subroutine get_neutron_rate(plasma, eb, rate)
 
 end subroutine get_neutron_rate
 
-subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
+subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, rate_tot)
     !+ Get probability of a thermal ion charge exchanging with `types` neutrals
     integer(Int32), dimension(3), intent(in)     :: ind
         !+ [[libfida:beam_grid]] indices
@@ -6110,10 +6064,10 @@ subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
         !+ Ion type
     integer(Int32), dimension(:), intent(in)     :: types
         !+ Neutral types
-    real(Float64), dimension(nlevs), intent(out) :: prob
-        !+ Charge exchange rate/probability [1/s]
+    real(Float64), dimension(nlevs), intent(out) :: rate_tot
+        !+ Total charge exchange rate [1/s]
 
-    integer :: ntypes, i, ii
+    integer :: n, i, j, k, ii
     type(LocalProfiles) :: plasma
     real(Float64), dimension(nlevs) :: rates, denn
     real(Float64), dimension(3) :: vhalo,vn,vnbi
@@ -6121,22 +6075,29 @@ subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
     vnbi = pos - nbi%src
     vnbi = nbi%vinj*vnbi/norm2(vnbi)
 
-    ntypes = size(types)
-    prob = 0
+    n = size(types)
+    rate_tot = 0
 
-    do i=1,ntypes
-        if((types(i).le.3).and.(types(i).ne.0)) then
-            ! CX with full type'th energy NBI neutrals
-            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3)) 
-            vn = vnbi/sqrt(real(types(i)))
-            call bb_cx_rates(denn,v_ion,vn,rates)
-            prob = prob+rates
-        else
-            call get_plasma(plasma,pos=pos)
-            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3))
-            call bt_cx_rates(plasma, denn, v_ion, i_type, rates)
-            prob = prob + rates
-        endif
+    i = ind(1) ; j = ind(2) ; k = ind(3)
+    do ii=1,n
+        select case (types(ii))
+            case (nbif_type)
+                vn = vnbi
+                call bb_cx_rates(neut%full(:,i,j,k),v_ion,vn,rates)
+            case (nbih_type)
+                vn = vnbi/sqrt(2.0)
+                call bb_cx_rates(neut%half(:,i,j,k),v_ion,vn,rates)
+            case (nbit_type)
+                vn = vnbi/sqrt(3.0)
+                call bb_cx_rates(neut%third(:,i,j,k),v_ion,vn,rates)
+            case (dcx_type)
+                call get_plasma(plasma, pos=pos)
+                call bt_cx_rates(plasma,neut%dcx(:,i,j,k),v_ion,i_type,rates)
+            case (halo_type)
+                call get_plasma(plasma, pos=pos)
+                call bt_cx_rates(plasma,neut%halo(:,i,j,k),v_ion,i_type,rates)
+        end select
+        rate_tot = rate_tot + rates
     enddo
 
 end subroutine get_beam_cx_rate
@@ -6526,8 +6487,23 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
             !$OMP CRITICAL(bes_spectrum)
-            spec%bes(bin,ichan,neut_type)= &
-              spec%bes(bin,ichan,neut_type) + intensity(i)
+            select case (neut_type)
+                case (nbif_type)
+                    spec%full(bin,ichan) = spec%full(bin,ichan) + intensity(i)
+                case (nbih_type)
+                    spec%half(bin,ichan) = spec%half(bin,ichan) + intensity(i)
+                case (nbit_type)
+                    spec%third(bin,ichan) = spec%third(bin,ichan) + intensity(i)
+                case (dcx_type)
+                    spec%dcx(bin,ichan) = spec%dcx(bin,ichan) + intensity(i)
+                case (halo_type)
+                    spec%halo(bin,ichan) = spec%halo(bin,ichan) + intensity(i)
+                case default
+                    if(inputs%verbose.ge.0) then
+                        write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
+                    endif
+                    stop
+            end select
             !$OMP END CRITICAL(bes_spectrum)
         enddo loop_over_stark
     enddo loop_over_channels
@@ -7176,7 +7152,7 @@ subroutine ndmc
             write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                                   100.*nbi_outside/(3.*inputs%n_nbi)
         endif
-        if(sum(neut%dens).eq.0) stop 'Beam does not intersect the grid!'
+        if(sum(neut%full).eq.0) stop 'Beam does not intersect the grid!'
     endif
 
 end subroutine ndmc
@@ -7282,7 +7258,7 @@ subroutine dcx
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
     real(Float64) :: papprox_tot, ccnt, inv_ng
 
-    halo_iter_dens(halo_type) = 0.d0
+    halo_iter_dens(dcx_type) = 0.d0
     papprox=0.d0
     papprox_tot=0.d0
     tot_denn=0.d0
@@ -7291,9 +7267,9 @@ subroutine dcx
             do i=1,beam_grid%nx
                 ind = [i,j,k]
                 call get_plasma(plasma,ind=ind)
-                tot_denn = sum(neut%dens(:,nbif_type,i,j,k)) + &
-                           sum(neut%dens(:,nbih_type,i,j,k)) + &
-                           sum(neut%dens(:,nbit_type,i,j,k))
+                tot_denn = sum(neut%full(:,i,j,k)) + &
+                           sum(neut%half(:,i,j,k)) + &
+                           sum(neut%third(:,i,j,k))
                 papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
                 if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
             enddo
@@ -7335,10 +7311,10 @@ subroutine dcx
                         call get_plasma(plasma,pos=tracks(jj)%pos)
 
                         call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
-                        call store_neutrals(tracks(jj)%ind,halo_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
+                        call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
                         if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
-                          call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
+                          call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
                         endif
 
                     enddo loop_along_track
@@ -7372,17 +7348,20 @@ subroutine halo
     integer :: jj       !! counter along track
     real(Float64) :: tot_denn, photons  !! photon flux
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
+    real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev,dens_cur
     real(Float64) :: papprox_tot, ccnt, inv_ng
     !! Halo iteration
-    integer :: hh !! counters
+    integer(Int64) :: hh, n_halo !! counters
     real(Float64) :: dcx_dens, halo_iteration_dens
-    integer :: s1type  ! halo iteration
-    integer :: s2type  ! halo iteration
+    integer :: prev_type  ! previous iteration
+    integer :: cur_type  ! current iteration
 
-    s1type = fida_type
-    s2type = brems_type
+    prev_type = fida_type
+    cur_type = brems_type
 
-    dcx_dens = halo_iter_dens(halo_type)
+    dens_prev = 0.d0
+    dens_cur = 0.d0
+    dcx_dens = halo_iter_dens(dcx_type)
     if(dcx_dens.eq.0) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
@@ -7390,18 +7369,19 @@ subroutine halo
         stop
     endif
     inv_ng = 100.0/real(beam_grid%ngrid)
-    neut%dens(:,s1type,:,:,:) = neut%dens(:,halo_type,:,:,:)
+    dens_prev = neut%dcx
+    n_halo = inputs%n_halo
     iterations: do hh=1,200
         papprox=0.d0
         papprox_tot=0.d0
         tot_denn=0.d0
-        halo_iter_dens(s2type) = 0.d0
+        halo_iter_dens(cur_type) = 0.d0
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
                 do i=1,beam_grid%nx
                     ind = [i,j,k]
                     call get_plasma(plasma,ind=ind)
-                    tot_denn = sum(neut%dens(:,s1type,i,j,k))
+                    tot_denn = sum(dens_prev(:,i,j,k))
                     papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
 
                     if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
@@ -7409,7 +7389,7 @@ subroutine halo
             enddo
         enddo
 
-        call get_nlaunch(inputs%n_halo,papprox,papprox_tot,nlaunch)
+        call get_nlaunch(n_halo,papprox,papprox_tot,nlaunch)
 
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
@@ -7428,11 +7408,15 @@ subroutine halo
                         call track(ri,vihalo,tracks,ncell)
                         if(ncell.eq.0)cycle loop_over_halos
 
+                        !! Get plasma parameters at particle location
+                        call get_plasma(plasma, pos=ri)
+
                         !! Calculate CX probability
-                        call get_beam_cx_rate(tracks(1)%ind,ri,vihalo,thermal_ion,[s1type],rates)
+                        ind = tracks(1)%ind
+                        call bt_cx_rates(plasma, dens_prev(:,ind(1),ind(2),ind(3)), vihalo, thermal_ion, rates)
                         if(sum(rates).le.0.)cycle loop_over_halos
 
-                        !! Solve collisional radiative model along track
+                        !! Get plasma parameters at mean point in cell
                         call get_plasma(plasma,pos=tracks(1)%pos)
 
                         !! Weight CX rates by ion source density
@@ -7442,9 +7426,17 @@ subroutine halo
                             call get_plasma(plasma,pos=tracks(jj)%pos)
 
                             call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
-                            call store_neutrals(tracks(jj)%ind,s2type, &
-                                 denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
+                            !! Store Neutrals
+                            ind = tracks(jj)%ind
+                            !$OMP CRITICAL(halo1)
+                            dens_cur(:,ind(1),ind(2),ind(3)) = &
+                                dens_cur(:,ind(1),ind(2),ind(3)) + denn/nlaunch(i,j,k)
+                            if(plasma%in_plasma) then
+                                halo_iter_dens(cur_type) = &
+                                    halo_iter_dens(cur_type) + sum(denn)/nlaunch(i,j,k)
+                            endif
+                            !$OMP END CRITICAL(halo1)
                             if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                               call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                             endif
@@ -7460,11 +7452,10 @@ subroutine halo
         enddo loop_along_z
         !$OMP END PARALLEL DO
 
-        halo_iteration_dens = halo_iter_dens(s2type)
-        neut%dens(:,halo_type,:,:,:)= neut%dens(:,halo_type,:,:,:) &
-                                           + neut%dens(:,s2type,:,:,:)
-        neut%dens(:,s1type,:,:,:)= neut%dens(:,s2type,:,:,:)
-        neut%dens(:,s2type,:,:,:)= 0.
+        halo_iteration_dens = halo_iter_dens(cur_type)
+        neut%halo = neut%halo + dens_cur
+        dens_prev = dens_cur
+        dens_cur = 0.d0
 
         if(halo_iteration_dens/dcx_dens.gt.1)then
             if(inputs%verbose.ge.0) then
@@ -7473,13 +7464,10 @@ subroutine halo
             exit iterations
         endif
 
-        inputs%n_halo=int(inputs%n_dcx*halo_iteration_dens/dcx_dens,Int64)
+        n_halo=int(inputs%n_halo*halo_iteration_dens/dcx_dens,Int64)
 
-        if(inputs%n_halo.lt.inputs%n_dcx*0.01)exit iterations
+        if(n_halo.lt.inputs%n_halo*0.01)exit iterations
     enddo iterations
-    !! set the neutral density in s1type(fida_type) and s2type (brems) to 0!
-    neut%dens(:,s1type,:,:,:) = 0.d0
-    neut%dens(:,s2type,:,:,:) = 0.d0
 
 end subroutine halo
 
@@ -7491,7 +7479,7 @@ subroutine fida_f
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
     real(Float64) :: denf !! fast-ion density
     integer, dimension(3) :: ind      !! new actual cell
-    integer, dimension(4) :: neut_types=[1,2,3,4]
+    integer, dimension(5) :: neut_types=[1,2,3,4,5]
     logical :: los_intersect
     !! Determination of the CX probability
     type(LocalEMFields) :: fields
@@ -7522,10 +7510,11 @@ subroutine fida_f
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
-                papprox(i,j,k) = (sum(neut%dens(:,nbif_type,i,j,k)) + &
-                                  sum(neut%dens(:,nbih_type,i,j,k)) + &
-                                  sum(neut%dens(:,nbit_type,i,j,k)) + &
-                                  sum(neut%dens(:,halo_type,i,j,k)))* &
+                papprox(i,j,k) = (sum(neut%full(:,i,j,k)) + &
+                                  sum(neut%half(:,i,j,k)) + &
+                                  sum(neut%third(:,i,j,k)) + &
+                                  sum(neut%dcx(:,i,j,k)) + &
+                                  sum(neut%halo(:,i,j,k)))* &
                                   plasma%denf
                 if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
@@ -7609,7 +7598,7 @@ subroutine fida_mc
     logical :: los_intersect
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux
-    integer, dimension(4) :: neut_types=[1,2,3,4]
+    integer, dimension(5) :: neut_types=[1,2,3,4,5]
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: s, c
     real(Float64)  :: maxcnt, inv_maxcnt, cnt
@@ -7699,7 +7688,7 @@ subroutine npa_f
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
     real(Float64), dimension(2,4) :: gyrange
-    integer, dimension(4) :: neut_types=[1,2,3,4]
+    integer, dimension(5) :: neut_types=[1,2,3,4,5]
     real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux, theta, dtheta, eb, ptch
@@ -7717,10 +7706,11 @@ subroutine npa_f
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
-                papprox(i,j,k)=(sum(neut%dens(:,nbif_type,i,j,k)) + &
-                                sum(neut%dens(:,nbih_type,i,j,k)) + &
-                                sum(neut%dens(:,nbit_type,i,j,k)) + &
-                                sum(neut%dens(:,halo_type,i,j,k)))* &
+                papprox(i,j,k)=(sum(neut%full(:,i,j,k)) + &
+                                sum(neut%half(:,i,j,k)) + &
+                                sum(neut%third(:,i,j,k)) + &
+                                sum(neut%dcx(:,i,j,k)) + &
+                                sum(neut%halo(:,i,j,k)))* &
                                 plasma%denf
 
                 if(papprox(i,j,k).gt.0) then
@@ -7817,7 +7807,7 @@ subroutine npa_mc
     real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux
-    integer, dimension(4) :: neut_types=[1,2,3,4]
+    integer, dimension(5) :: neut_types=[1,2,3,4,5]
     integer, dimension(3) :: ind
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64), dimension(2,4) :: gyrange
@@ -8134,7 +8124,7 @@ subroutine fida_weights_mc
     real(Float64), dimension(3) :: ri,rg      !! start position
     real(Float64), dimension(3) :: vi     !! velocity of fast ions
     integer,dimension(3) :: ind      !! new actual cell
-    integer,dimension(4) :: neut_types=[1,2,3,4]
+    integer,dimension(5) :: neut_types=[1,2,3,4,5]
     logical :: los_intersect
 
     !! Determination of the CX rates
@@ -8210,10 +8200,11 @@ subroutine fida_weights_mc
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
-                papprox(i,j,k)=(sum(neut%dens(:,nbif_type,i,j,k)) + &
-                                sum(neut%dens(:,nbih_type,i,j,k)) + &
-                                sum(neut%dens(:,nbit_type,i,j,k)) + &
-                                sum(neut%dens(:,halo_type,i,j,k)))
+                papprox(i,j,k)=(sum(neut%full(:,i,j,k)) + &
+                                sum(neut%half(:,i,j,k)) + &
+                                sum(neut%third(:,i,j,k)) + &
+                                sum(neut%dcx(:,i,j,k)) + &
+                                sum(neut%halo(:,i,j,k)))
                 if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
                     pcnt=pcnt+1
@@ -8314,7 +8305,7 @@ subroutine fida_weights_los
     real(Float64), dimension(3) :: r_enter, r_exit
     real(Float64) :: vabs, dE, dP
     !! Determination of the CX probability
-    real(Float64), dimension(nlevs) :: fdens,hdens,tdens,halodens
+    real(Float64), dimension(nlevs) :: fdens,hdens,tdens,dcxdens,halodens
     real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states ! Density of n-states
     real(Float64), dimension(nlevs) :: denn  ! Density of n-states
@@ -8376,7 +8367,8 @@ subroutine fida_weights_los
     etov2 = 1.0/(v2_to_E_per_amu*inputs%ab)
 
     chan_loop: do ichan=1,spec_chords%nchan
-        fdens = 0.d0 ; hdens = 0.d0 ; tdens = 0.d0 ; halodens = 0.d0
+        fdens = 0.d0 ; hdens = 0.d0 ; tdens = 0.d0
+        halodens = 0.d0 ; dcxdens = 0.d0
         plasma = plasma*0.d0
         fields = fields*0.d0
         wght_tot = 0.d0
@@ -8394,11 +8386,14 @@ subroutine fida_weights_los
                     if(cid.eq.ichan) then
                         ind = [i,j,k]
                         dlength = inter%los_elem(cind)%length
-                        fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
-                        hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength
-                        tdens = tdens + neut%dens(:,nbit_type,i,j,k)*dlength
-                        halodens = halodens + neut%dens(:,halo_type,i,j,k)*dlength
-                        wght = sum(neut%dens(3,1:4,i,j,k))*dlength
+                        fdens = fdens + neut%full(:,i,j,k)*dlength
+                        hdens = hdens + neut%half(:,i,j,k)*dlength
+                        tdens = tdens + neut%third(:,i,j,k)*dlength
+                        dcxdens = dcxdens + neut%dcx(:,i,j,k)*dlength
+                        halodens = halodens + neut%halo(:,i,j,k)*dlength
+                        wght = (neut%full(3,i,j,k) + neut%half(3,i,j,k) + &
+                                neut%third(3,i,j,k) + neut%dcx(3,i,j,k) + &
+                                neut%halo(3,i,j,k))*dlength
 
                         call get_plasma(plasma_cell,ind=ind)
                         call get_fields(fields_cell,ind=ind)
@@ -8464,7 +8459,11 @@ subroutine fida_weights_los
                     max_dens = 0.d0
                     do icell=1,ncell
                         ind = tracks(icell)%ind
-                        tracks(icell)%flux = sum(neut%dens(3,1:4,ind(1),ind(2),ind(3)))
+                        tracks(icell)%flux = neut%full(3,ind(1),ind(2),ind(3))  + &
+                                             neut%half(3,ind(1),ind(2),ind(3))  + &
+                                             neut%third(3,ind(1),ind(2),ind(3)) + &
+                                             neut%dcx(3,ind(1),ind(2),ind(3))   + &
+                                             neut%halo(3,ind(1),ind(2),ind(3))
                         if(tracks(icell)%flux.gt.max_dens) max_dens=tracks(icell)%flux
                     enddo
                     dt = 0.d0
@@ -8481,7 +8480,7 @@ subroutine fida_weights_los
                     states = states + rates
                     call bb_cx_rates(tdens,vi,vnbi_t,rates)
                     states = states + rates
-                    call bt_cx_rates(plasma, halodens, vi, beam_ion, rates)
+                    call bt_cx_rates(plasma, dcxdens + halodens, vi, beam_ion, rates)
                     states = states + rates
 
                     call colrad(plasma,beam_ion,vi,dt,states,denn,photons)
@@ -8514,7 +8513,7 @@ subroutine npa_weights
     real(Float64) :: vabs, fbm_denf, dE, dP, ccnt
     real(Float64), dimension(nlevs) :: pcx   !! Rate coefficiants for CX
     real(Float64), dimension(nlevs) :: states, states_i  ! Density of n-states
-    integer, dimension(4) :: neut_types=[1,2,3,4]
+    integer, dimension(5) :: neut_types=[1,2,3,4,5]
     real(Float64), dimension(3) :: pos,dpos,r_gyro
     integer(Int32) :: ichan
     real(Float64), dimension(:), allocatable :: ebarr, ptcharr
@@ -8749,8 +8748,16 @@ program fidasim
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
     !! ----------------------------------------------------------
     !! neutral density array!
-    allocate(neut%dens(nlevs,ntypes,beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    neut%dens = 0.d0
+    allocate(neut%full(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(neut%half(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(neut%third(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(neut%dcx(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(neut%halo(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    neut%full = 0.d0
+    neut%half = 0.d0
+    neut%third = 0.d0
+    neut%dcx = 0.d0
+    neut%halo = 0.d0
 
     !! birth profile
     if(inputs%calc_birth.ge.1) then
@@ -8771,10 +8778,18 @@ program fidasim
 
     if(inputs%calc_spec.ge.1) then
         allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%bes(inputs%nlambda,spec_chords%nchan,4))
+        allocate(spec%full(inputs%nlambda,spec_chords%nchan))
+        allocate(spec%half(inputs%nlambda,spec_chords%nchan))
+        allocate(spec%third(inputs%nlambda,spec_chords%nchan))
+        allocate(spec%dcx(inputs%nlambda,spec_chords%nchan))
+        allocate(spec%halo(inputs%nlambda,spec_chords%nchan))
         allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
         spec%brems = 0.d0
-        spec%bes = 0.d0
+        spec%full = 0.d0
+        spec%half = 0.d0
+        spec%third = 0.d0
+        spec%dcx = 0.d0
+        spec%halo = 0.d0
         spec%fida = 0.d0
     endif
 
@@ -8825,7 +8840,6 @@ program fidasim
                   time_arr(5),time_arr(6),time_arr(7)
         endif
         call dcx()
-        if(inputs%dump_dcx.eq.1) call write_dcx()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
         !! ---------- HALO ---------- !!

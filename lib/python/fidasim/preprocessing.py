@@ -357,8 +357,7 @@ def check_inputs(inputs):
               'calc_birth': zero_int,
               'calc_fida_wght': zero_int,
               'calc_npa_wght': zero_int,
-              'calc_neutron': zero_int,
-              'dump_dcx': zero_int}
+              'calc_neutron': zero_int}
 
     err = check_dict_schema(schema, inputs, desc="simulation settings")
     if err:
@@ -1302,7 +1301,6 @@ def write_namelist(filename, inputs):
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
-        f.write("dump_dcx = {:d}    !! Dump DCX neutrals and spectra\n\n".format(inputs['dump_dcx']))
 
         f.write("!! Debugging Switches\n")
         f.write("no_flr = {:d}    !! Turn off Finite Larmor Radius effects\n".format(inputs['no_flr']))

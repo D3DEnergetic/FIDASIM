@@ -7255,7 +7255,8 @@ subroutine dcx
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
     integer :: jj       !! counter along track
     real(Float64):: tot_denn, photons  !! photon flux
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch !! approx. density
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64) :: papprox_tot, ccnt, inv_ng
 
     halo_iter_dens(dcx_type) = 0.d0
@@ -7279,7 +7280,7 @@ subroutine dcx
     call get_nlaunch(inputs%n_dcx,papprox,papprox_tot,nlaunch)
 
     if(inputs%verbose.ge.1) then
-       write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
+       write(*,'(T6,"# of markers: ",i9)') inputs%n_dcx
     endif
 
     ccnt=0.d0
@@ -7290,7 +7291,7 @@ subroutine dcx
                 !! Loop over the markers
                 !$OMP PARALLEL DO schedule(guided) private(idcx,ind,vihalo, &
                 !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
-                loop_over_dcx: do idcx=1,int(nlaunch(i,j,k),Int64)
+                loop_over_dcx: do idcx=1, nlaunch(i,j,k)
                     !! Calculate ri,vhalo and track
                     ind = [i, j, k]
                     call mc_halo(ind,vihalo,ri)

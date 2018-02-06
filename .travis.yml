@@ -30,10 +30,9 @@ install:
   - export CXX=g++
   - pip install --upgrade graphviz
   - (pip install --upgrade ford && ford --version)
-  - pip install -Iv markdown==2.6.9
 
 script:
-  - travis_wait 30 make
+  - travis_wait 60 make
   - ./fidasim
   - make docs CHECK_LINKS=n
 

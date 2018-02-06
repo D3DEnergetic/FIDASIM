@@ -14,30 +14,30 @@ LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
 
 #Compilers
-SUPPORTED_FC = gfortran ifort
-SUPPORTED_CC = gcc icc
-SUPPORTED_CXX = g++ icpc
+SUPPORTED_FC = gfortran
+SUPPORTED_CC = gcc
+SUPPORTED_CXX = g++
 
 HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
 ifeq ($(HAS_FC),)
-    $(error Fortran compiler $(FC) is not supported. Set FC to gfortran or ifort)
+    $(error Fortran compiler $(FC) is not supported. Set FC to gfortran)
 endif
 
 HAS_CC := $(strip $(foreach SC, $(SUPPORTED_CC), $(findstring $(SC), $(CC))))
 ifeq ($(HAS_CC),)
-    $(error C compiler $(CC) is not supported. Set CC to gcc or icc)
+    $(error C compiler $(CC) is not supported. Set CC to gcc)
 endif
 
 HAS_CXX := $(strip $(foreach SC, $(SUPPORTED_CXX), $(findstring $(SC), $(CXX))))
 ifeq ($(HAS_CXX),)
-    $(error C++ compiler $(CXX) is not supported. Set CXX to g++ or icpc)
+    $(error C++ compiler $(CXX) is not supported. Set CXX to g++)
 endif
 
 # Compiler Flags
 # User defined Flags
 VERSION := $(shell [ -e $(FIDASIM_DIR)/VERSION ] && cat $(FIDASIM_DIR)/VERSION)
 ifneq ($(VERSION),)
-	UFLAGS := -D_VERSION=\"$(VERSION)\" 
+	UFLAGS := -D_VERSION=\"$(VERSION)\"
 endif
 
 BUILD := $(shell command -v git >/dev/null 2>&1 && \
@@ -61,14 +61,6 @@ ifneq ($(findstring gfortran, $(FC)),)
 	PROF_FLAGS = -pg -D_PROF
 endif
 
-ifneq ($(findstring ifort, $(FC)),)
-	LFLAGS = -limf -lm
-	CFLAGS = -O2 -g -traceback -fpp
-	DEBUG_CFLAGS = -O0 -g -fpp -traceback -debug all -check all -check bounds -fpe0 -warn -D_DEBUG
-	OPENMP_FLAGS = -openmp -D_OMP
-	PROF_FLAGS = -p -D_PROF
-endif
-
 ifeq ($(PROFILE),n)
 ifeq ($(USE_OPENMP),y)
 	CFLAGS := $(CFLAGS) $(UFLAGS) $(OPENMP_FLAGS)
@@ -87,7 +79,7 @@ LFLAGS := $(LFLAGS) $(HDF5_FLAGS) -L$(SRC_DIR)
 IFLAGS := -I$(HDF5_INCLUDE) -I$(SRC_DIR)
 
 # atomic table variables
-NTHREADS = 1000 
+NTHREADS = 1000
 
 # FORD documentation variables
 FORD_FLAGS = -d $(SRC_DIR) -d $(TABLES_DIR) -d $(LIB_DIR)/idl -d $(LIB_DIR)/python/fidasim -p $(DOCS_DIR)/user-guide -o $(DOCS_DIR)/html

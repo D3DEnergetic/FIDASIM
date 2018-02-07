@@ -2,6 +2,7 @@ SHELL = /bin/bash
 
 #Default compiling options
 USE_OPENMP = y
+USE_MPI = n
 PROFILE = n
 DEBUG = n
 
@@ -55,24 +56,40 @@ HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz 
 
 ifneq ($(findstring gfortran, $(FC)),)
 	LFLAGS = -lm
-	CFLAGS = -Ofast -g -fbacktrace -cpp
+	COMMON_CFLAGS = -Ofast -g -fbacktrace -cpp
 	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
 	OPENMP_FLAGS = -fopenmp -D_OMP
+	MPI_FLAGS = -D_MPI
 	PROF_FLAGS = -pg -D_PROF
 endif
 
-ifeq ($(PROFILE),n)
-ifeq ($(USE_OPENMP),y)
-	CFLAGS := $(CFLAGS) $(UFLAGS) $(OPENMP_FLAGS)
-else
-	CFLAGS := $(CFLAGS) $(UFLAGS)
-endif
-else
-	CFLAGS := $(CFLAGS) $(UFLAGS) $(PROF_FLAGS)
-endif
+
+CFLAGS = $(COMMON_CFLAGS) $(UFLAGS)
 
 ifeq ($(DEBUG),y)
-	CFLAGS := $(DEBUG_CFLAGS) $(UFLAGS)
+	USE_OPENMP = n
+	USE_MPI = n
+	PROFILE = n
+	MPI_FC = $(FC)
+	CFLAGS = $(DEBUG_CFLAGS) $(UFLAGS)
+endif
+
+ifeq ($(PROFILE),y)
+	USE_OPENMP = n
+	USE_MPI = n
+	MPI_FC = $(FC)
+	CFLAGS = $(COMMON_CFLAGS) $(UFLAGS) $(PROF_FLAGS)
+endif
+
+ifeq ($(USE_MPI),y)
+	USE_OPENMP = n
+	MPI_FC = caf
+	CFLAGS = $(COMMON_CFLAGS) $(UFLAGS) $(MPI_FLAGS)
+endif
+
+ifeq ($(USE_OPENMP),y)
+	MPI_FC = $(FC)
+	CFLAGS = $(COMMON_CFLAGS) $(UFLAGS) $(OPENMP_FLAGS)
 endif
 
 LFLAGS := $(LFLAGS) $(HDF5_FLAGS) -L$(SRC_DIR)
@@ -89,6 +106,7 @@ export FIDASIM_DIR
 export SRC_DIR
 export DEPS_DIR
 export TABLES_DIR
+export MPI_FC
 export CFLAGS
 export LFLAGS
 export IFLAGS

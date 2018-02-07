@@ -3,6 +3,8 @@ SHELL = /bin/bash
 DEPS_DIR = $(FIDASIM_DIR)/deps
 HDF5_LOG = $(DEPS_DIR)/hdf5_build.log
 OPENCOARRAYS_LOG = $(DEPS_DIR)/opencoarrays_build.log
+
+# Needed for OpenMPI/MPICH
 export OMPI_FC = $(FC)
 export OMPI_CC = $(CC)
 export OMPI_CXX = $(CXX)

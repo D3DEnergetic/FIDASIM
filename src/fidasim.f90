@@ -910,7 +910,7 @@ end type ParticleTrack
 
 type GyroSurface
     !+ Surface containing the fast-ion velocity vectors for all values of the
-    !+ gyro-angle. It takes the form of a hyperboloid 
+    !+ gyro-angle. It takes the form of a hyperboloid
     !+ \((x(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(cos(\gamma + \pi/2) - \omega_i t sin(\gamma + \pi/2)) \)
     !+ \((y(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(sin(\gamma + \pi/2) + \omega_i t cos(\gamma + \pi/2)) \)
     !+ \((z(\gamma,t) = \alpha \omega_i \rm{pitch} t\)
@@ -2492,29 +2492,28 @@ subroutine read_equilibrium
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
 
-    
+
     loop_over_z: do k=1,inter_grid%nz
         loop_over_r: do i=1,inter_grid%nr
             if(p_mask(i,k).LT.0.5) cycle loop_over_r
             plasma = equil%plasma(i,k)
             plasma%vrot = [plasma%vr, plasma%vt, plasma%vz]
-            plasma%in_plasma = .True.            
+            plasma%in_plasma = .True.
             states_avg = 0.d0
-            
+
             do it=1,50
                 states=0.d0
                 states(1) = 1.d19
                 call randu(randomu)
                 vn = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*randomu
-                call colrad(plasma,thermal_ion,vn,1.d0,states,dens,photons)
+                call colrad(plasma,thermal_ion,vn,1.d-7,states,dens,photons)
                 states_avg = states_avg + states/50
             enddo
-    
+
             if(sum(states_avg).le.0.0) cycle loop_over_r
-            equil%plasma(i,k)%denn = denn2d(i,k)*states_avg/sum(states_avg) 
+            equil%plasma(i,k)%denn = denn2d(i,k)*states_avg/sum(states_avg)
         enddo loop_over_r
     enddo loop_over_z
-    !+ print*,'Sum=',sum(equil%plasma(50,50)%denn),denn2d(50,50)     
     !!Close PLASMA group
     call h5gclose_f(gid, error)
 
@@ -4664,7 +4663,7 @@ subroutine line_gyro_surface_intersect(r0, v0, gs, t)
 
     t(1) = (-b - sqrt(d))/(2*a)
     t(2) = (-b + sqrt(d))/(2*a)
-    
+
 end subroutine line_gyro_surface_intersect
 
 subroutine gyro_surface_coordinates(gs, p, u)
@@ -4724,7 +4723,7 @@ subroutine gyro_trajectory(gs, theta, ri, vi)
     vi = gs%omega*matmul(gs%basis, [-a*sin(th), b*cos(th), c])
 
 end subroutine gyro_trajectory
-    
+
 function in_gyro_surface(gs, p) result(in_gs)
     !+ Indicator function for determining if a point is inside the gyro_surface
     type(GyroSurface), intent(in)           :: gs
@@ -6225,7 +6224,7 @@ subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, prob)
     do i=1,ntypes
         if((types(i).le.3).and.(types(i).ne.0)) then
             ! CX with full type'th energy NBI neutrals
-            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3)) 
+            denn = neut%dens(:,types(i),ind(1),ind(2),ind(3))
             vn = vnbi/sqrt(real(types(i)))
             call bb_cx_rates(denn,v_ion,vn,rates)
             prob = prob+rates
@@ -6471,7 +6470,6 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
 
     states = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
     dens   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
-
     if ((minval(states).lt.0).or.(minval(dens).lt.0)) then
         do n=1,nlevs
             if(states(n).lt.0) states(n)=0.d0
@@ -7738,11 +7736,7 @@ subroutine pfida_f
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
-                papprox(i,j,k) = (sum(neut%dens(:,nbif_type,i,j,k)) + &
-                                  sum(neut%dens(:,nbih_type,i,j,k)) + &
-                                  sum(neut%dens(:,nbit_type,i,j,k)) + &
-                                  sum(neut%dens(:,halo_type,i,j,k)))* &
-                                  plasma%denf
+                papprox(i,j,k) = sum(plasma%denn)*plasma%denf
                 if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
                     pcnt=pcnt+1
@@ -7757,7 +7751,6 @@ subroutine pfida_f
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
     endif
-
     !! Loop over all cells that have neutrals
     cnt=0.d0
     loop_over_cells: do ip = 1, int(pcnt)
@@ -9090,7 +9083,7 @@ program fidasim
     if(inputs%calc_pfida.ge.1)then
         call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'fida:    ' , &
+            write(*,'(A,I2,":",I2.2,":",I2.2)') 'pfida:    ' , &
                   time_arr(5),time_arr(6),time_arr(7)
         endif
     !    if(inputs%dist_type.eq.1) then

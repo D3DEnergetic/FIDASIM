@@ -11,6 +11,7 @@ FUNCTION test_profiles,filename,grid,flux
     ;;   TI              DOUBLE    Array[nr,nz] [keV]
     ;;   TE              DOUBLE    Array[nr,nz] [keV]
     ;;   DENE            DOUBLE    Array[nr,nz] [cm^-3]
+    ;;   DENN            DOUBLE    Array[nr,nz] [cm^-3]
     ;;   ZEFF            DOUBLE    Array[nr,nz]
 
 
@@ -18,6 +19,7 @@ FUNCTION test_profiles,filename,grid,flux
 
     rho = double(prof.rho)
     dene = interpol(prof.dene*1.0d-6,rho,flux) ;;cm^-3
+    denn = 0*dene+9.0d7 ;;cm^-3
     ti = interpol(prof.ti*1.0d-3,rho,flux) ;;keV
     te = interpol(prof.te*1.0d-3,rho,flux) ;;keV
     zeff = interpol(prof.zeff*1.0d0,rho,flux)
@@ -33,7 +35,7 @@ FUNCTION test_profiles,filename,grid,flux
 
     ;;SAVE IN PROFILE STRUCTURE
 	profiles={time:1.d0,data_source:filename,mask:mask, $ 
-              te:te,ti:ti,vr:vr,vt:vt,vz:vz,dene:dene,zeff:zeff}
+              te:te,ti:ti,vr:vr,vt:vt,vz:vz,dene:dene,denn:denn,zeff:zeff}
 
 	return,profiles
 END

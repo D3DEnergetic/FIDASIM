@@ -8014,6 +8014,124 @@ subroutine npa_f
 
 end subroutine npa_f
 
+subroutine pnpa_f
+    !+ Calculate NPA flux using a fast-ion distribution function F(E,p,r,z)
+    integer :: i,j,k,det,ip
+    integer(Int64) :: iion
+    real(Float64), dimension(3) :: rg,ri,rf,vi
+    integer, dimension(3) :: ind,pind
+    real(Float64) :: denf
+    integer, dimension(3,beam_grid%ngrid) :: pcell
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    type(GyroSurface) :: gs
+    real(Float64), dimension(2,4) :: gyrange
+    integer, dimension(4) :: neut_types=[1,2,3,4]
+    real(Float64), dimension(nlevs) :: rates
+    real(Float64), dimension(nlevs) :: states
+    real(Float64) :: flux, theta, dtheta, eb, ptch
+
+    integer :: inpa,pcnt,ichan,nrange,ir
+    real(Float64) :: papprox_tot, maxcnt, cnt, inv_maxcnt
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox, nlaunch
+
+    papprox=0.d0
+    papprox_tot=0.d0
+
+    pcnt=1
+    do k=1,beam_grid%nz
+        do j=1,beam_grid%ny
+            do i=1,beam_grid%nx
+                ind =[i,j,k]
+                call get_plasma(plasma,ind=ind)
+                papprox(i,j,k)=(sum(neut%dens(:,nbif_type,i,j,k)) + &
+                                sum(neut%dens(:,nbih_type,i,j,k)) + &
+                                sum(neut%dens(:,nbit_type,i,j,k)) + &
+                                sum(neut%dens(:,halo_type,i,j,k)))* &
+                                plasma%denf
+
+                if(papprox(i,j,k).gt.0) then
+                    pcell(:,pcnt)= ind
+                    pcnt = pcnt + 1
+                endif
+
+                if(plasma%in_plasma) papprox_tot=papprox_tot+papprox(i,j,k)
+            enddo
+        enddo
+    enddo
+    pcnt = pcnt - 1
+    maxcnt=real(pcnt)
+    inv_maxcnt = 100.0/maxcnt
+
+    call get_nlaunch(inputs%n_npa,papprox,papprox_tot,nlaunch)
+    if(inputs%verbose.ge.1) then
+        write(*,'(T6,"# of markers: ",i12)') int(sum(nlaunch),Int64)
+    endif
+
+    !! Loop over all cells that can contribute to NPA signal
+    cnt=0.d0
+    loop_over_cells: do ip = 1, int(pcnt)
+        i = pcell(1,ip)
+        j = pcell(2,ip)
+        k = pcell(3,ip)
+        ind = [i, j, k]
+        !$OMP PARALLEL DO schedule(guided) private(iion,ichan,fields,nrange,gyrange, &
+        !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
+        loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
+            !! Sample fast ion distribution for energy and pitch
+            call mc_fastion(ind, fields, eb, ptch, denf)
+            if(denf.eq.0.0) cycle loop_over_fast_ions
+
+            call gyro_surface(fields, eb, ptch, gs)
+
+            detector_loop: do ichan=1,npa_chords%nchan
+                call npa_gyro_range(ichan, gs, gyrange, nrange)
+                if(nrange.eq.0) cycle detector_loop
+                gyro_range_loop: do ir=1,nrange
+                    dtheta = gyrange(2,ir)
+                    theta = gyrange(1,ir) + 0.5*dtheta
+                    call gyro_trajectory(gs, theta, ri, vi)
+
+                    !! Check if particle hits a NPA detector
+                    call hit_npa_detector(ri, vi ,det, rf, ichan)
+                    if(det.ne.ichan) then
+                        if (inputs%verbose.ge.0)then
+                            write(*,*) "NPA_F: Missed Detector ",ichan
+                        endif
+                        cycle gyro_range_loop
+                    endif
+
+                    !! Get beam grid indices at ri
+                    call get_indices(ri,pind)
+
+                    !! Calculate CX probability with beam and halo neutrals
+                    call get_beam_cx_rate(pind,ri,vi,beam_ion,neut_types,rates)
+                    if(sum(rates).le.0.) cycle gyro_range_loop
+
+                    !! Weight CX rates by ion source density
+                    states=rates*denf
+
+                    !! Attenuate states as the particle move through plasma
+                    call attenuate(ri,rf,vi,states)
+
+                    !! Store NPA Flux
+                    flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
+                    call store_npa(det,ri,rf,vi,flux)
+                enddo gyro_range_loop
+            enddo detector_loop
+        enddo loop_over_fast_ions
+        !$OMP END PARALLEL DO
+        cnt=cnt+1
+        if (inputs%verbose.ge.2)then
+            WRITE(*,'(f7.2,"% completed",a,$)') cnt*inv_maxcnt,char(13)
+        endif
+    enddo loop_over_cells
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,"Number of NPA particles that hit a detector: ",i8)') npa%npart
+    endif
+
+end subroutine pnpa_f
+
 subroutine npa_mc
     !+ Calculate NPA flux using a Monte Carlo fast-ion distribution
     integer :: iion,iphi,nphi

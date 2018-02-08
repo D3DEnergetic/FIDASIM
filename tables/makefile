@@ -12,7 +12,7 @@ atomic_tables.o: atomic_tables.f90 $(SRC_DIR)/hdf5_extra.mod
 table_settings: table_settings.dat generate_tables
 
 table_settings.dat:
-	cafrun $(TABLES_DIR)/generate_tables > table_settings.dat
+	cafrun -np 1 $(TABLES_DIR)/generate_tables > table_settings.dat
 
 .PHONY: atomic_tables
 atomic_tables:

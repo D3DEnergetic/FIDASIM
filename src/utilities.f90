@@ -9,7 +9,7 @@ module utilities
 implicit none
 private
 public :: ind2sub, sub2ind
-public :: rng_type, rng_init, get_rng, rng
+public :: rng_type, rng_init, get_rng, rng, randind_cdf, cumsum
 public :: rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
 public :: deriv
@@ -55,6 +55,12 @@ end interface
 interface randn
     module procedure randn_arr
     module procedure randn_r_arr
+end interface
+
+interface randind_cdf
+    !+ Procedure for generating a random array index/subscripts
+    module procedure randind_r_cdf_1
+    module procedure randind_cdf_1
 end interface
 
 interface randind
@@ -385,6 +391,64 @@ subroutine randind_n(n, randomi)
 
 end subroutine randind_n
 
+subroutine randind_r_cdf_1(r, cdf, randomi)
+    !+ Generate an array of random indices of an 1D array distributed according to `cdf`
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
+    real(Float64), dimension(:), intent(in) :: cdf
+        !+ 1D array of index weights
+    integer, dimension(:), intent(out)      :: randomi
+        !+ Random indices
+
+    integer :: i, n
+    real(Float64) :: cdf_val
+    real(Float64), dimension(1) :: randomu
+
+    n = size(cdf)
+
+    randomi = 0
+    do i=1,size(randomi)
+        call randu_r_arr(r,randomu)
+        cdf_val = randomu(1)*cdf(n)
+        randomi(i) = min(search_sorted_first(cdf,cdf_val),n)
+    enddo
+
+end subroutine randind_r_cdf_1
+
+subroutine randind_cdf_1(cdf, randomi)
+    !+ Generate an array of random indices of an 1D array distributed according to `cdf`
+    real(Float64), dimension(:), intent(in) :: cdf
+        !+ 1D array of index weights
+    integer, dimension(:), intent(out)      :: randomi
+        !+ Random indices
+
+    type(rng_type) :: r
+
+    r = get_rng()
+    call randind_r_cdf_1(r, cdf, randomi)
+    call update_rng(r)
+
+end subroutine randind_cdf_1
+
+subroutine cumsum(x, cs)
+    !+ Calculate cumulative sum
+    real(Float64), dimension(:), intent(in)  :: x
+        !+ Array to sum
+    real(Float64), dimension(:), intent(out) :: cs
+        !+ Cumulative sum of `x`
+
+    integer :: i, n
+    real(Float64) :: cdf_val, t
+
+    n = size(x)
+    t = 0.d0
+    do i=1, n
+        cs(i) = t + x(i)
+        t = cs(i)
+    enddo
+
+end subroutine cumsum
+
 subroutine randind_r_w_1(r, w, randomi)
     !+ Generate an array of random indices of an 1D array distributed according to `w`
     type(rng_type), intent(inout) :: r
@@ -394,24 +458,10 @@ subroutine randind_r_w_1(r, w, randomi)
     integer, dimension(:), intent(out)      :: randomi
         !+ Random indices
 
-    integer :: i, nw
-    real(Float64) :: cdf_val, t
     real(Float64), dimension(size(w)) :: cdf
-    real(Float64), dimension(1) :: randomu
 
-    nw = size(w)
-    t = 0.d0
-    do i=1, nw
-        cdf(i) = t + w(i)
-        t = cdf(i)
-    enddo
-
-    randomi = 0
-    do i=1,size(randomi)
-        call randu_r_arr(r,randomu)
-        cdf_val = randomu(1)*cdf(nw)
-        randomi(i) = min(search_sorted_first(cdf,cdf_val),nw)
-    enddo
+    call cumsum(w, cdf)
+    call randind_r_cdf_1(r, cdf, randomi)
 
 end subroutine randind_r_w_1
 

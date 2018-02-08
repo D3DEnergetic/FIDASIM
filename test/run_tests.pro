@@ -119,10 +119,8 @@ PRO run_tests,result_dir,test_case=test_case
        grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100) 
        equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux,g=g)
        equil = create_struct(equil,"geqdsk",g)
-       fbm = read_nubeam(test_dir+'test_fi_1.cdf',grid,$
-                         btipsign=-1.0,$
-                         e_range=[67.0,77.0], $
-                         p_range=[-0.1,0.1])
+       fbm = read_nubeam(test_dir+'test_fi_2.cdf',grid,$
+                         btipsign=-1.0)
        spec = test_chords()
        npa = test_npa()
 

@@ -8786,10 +8786,15 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
     !! ----------------------------------------------------------
+#ifdef _MPI
+    allocate(rng(1))
+    call rng_init(rng(1),932117 + this_image())
+#else
     allocate(rng(max_threads))
     do i=1,max_threads
         call rng_init(rng(i),932117 + i)
     enddo
+#endif
 
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------

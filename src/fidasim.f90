@@ -8622,7 +8622,7 @@ subroutine npa_weights
     loop_over_channels: do ichan=1,npa_chords%nchan
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(ii,jj,kk,fields,phit,&
         !$OMP& ic,det,pos,dpos,r_gyro,pitch,ipitch,vabs,vi,pcx,pcxa,states,states_i,vi_norm,fbm_denf)
-        loop_along_z: do kk=istart,beam_grid%nz,istep
+        loop_along_z: do kk=1,beam_grid%nz
             loop_along_y: do jj=1,beam_grid%ny
                 loop_along_x: do ii=1,beam_grid%nx
                     phit = npa_chords%phit(ii,jj,kk,ichan)
@@ -8645,7 +8645,7 @@ subroutine npa_weights
                         !! Determine the angle between the B-field and the Line of Sight
                         pitch = phit%pitch
                         ipitch=minloc(abs(ptcharr - pitch))
-                        loop_over_energy: do ic = 1, inputs%ne_wght !! energy loop
+                        loop_over_energy: do ic = istart, inputs%ne_wght,istep !! energy loop
                             vabs = sqrt(ebarr(ic)/(v2_to_E_per_amu*inputs%ab))
                             vi = vi_norm*vabs
                             !!Correct for gyro orbit
@@ -8695,6 +8695,7 @@ subroutine npa_weights
     call co_sum(nweight%attenuation)
     call co_sum(nweight%emissivity)
 #endif
+
     do ichan=1,npa_chords%nchan
         if(inputs%verbose.ge.1) then
             write(*,'(T4,"Channel: ",i3)') ichan

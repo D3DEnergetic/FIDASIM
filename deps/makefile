@@ -9,7 +9,12 @@ export OMPI_FC = $(FC)
 export OMPI_CC = $(CC)
 export OMPI_CXX = $(CXX)
 
-all: hdf5 opencoarrays
+TARGETS = hdf5
+ifeq ($(USE_MPI),y)
+    TARGETS := $(TARGETS) opencoarrays
+endif
+
+all: $(TARGETS)
 
 hdf5:
 	@printf "\nBuilding HDF5...\n"

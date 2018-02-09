@@ -107,6 +107,7 @@ export SRC_DIR
 export DEPS_DIR
 export TABLES_DIR
 export MPI_FC
+export USE_MPI
 export CFLAGS
 export LFLAGS
 export IFLAGS

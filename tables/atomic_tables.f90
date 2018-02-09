@@ -5666,7 +5666,7 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     enddo
     !$OMP END PARALLEL DO
 
-#ifdef _mpi
+#ifdef _MPI
     call co_sum(ebarr)
     call co_sum(tarr)
     call co_sum(excit)
@@ -5908,7 +5908,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
     enddo
     !$OMP END PARALLEL DO
 
-#ifdef _mpi
+#ifdef _MPI
     call co_sum(ebarr)
     call co_sum(tarr)
     call co_sum(cx)
@@ -6107,7 +6107,7 @@ subroutine write_bt_D_D(id, namelist_file)
     enddo
     !$OMP END PARALLEL DO
 
-#ifdef _mpi
+#ifdef _MPI
     call co_sum(ebarr)
     call co_sum(tarr)
     call co_sum(fusion)
@@ -6281,7 +6281,7 @@ subroutine write_bt_D_T(id, namelist_file)
     enddo
     !$OMP END PARALLEL DO
 
-#ifdef _mpi
+#ifdef _MPI
     call co_sum(ebarr)
     call co_sum(tarr)
     call co_sum(fusion)

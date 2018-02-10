@@ -2039,7 +2039,7 @@ subroutine read_chords
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
 
-    integer :: i, j, ic, nc, ncell, ind(3), ii, jj, kk
+    integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
     if(inputs%verbose.ge.1) then
@@ -2129,7 +2129,7 @@ subroutine read_chords
 
         dlength = 0.d0
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-        !$OMP& length, r_enter, r_exit, j, tracks, ncell, ind)
+        !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
         do ic=1,nc
             ! Uniformally sample within spot size
             call randu(randomu)
@@ -2141,8 +2141,8 @@ subroutine read_chords
             r0 = matmul(basis,r0) + xyz_lens
 
             call grid_intersect(r0, v0, length, r_enter, r_exit)
-            call track(r_enter, v0, tracks, ncell)
-            track_loop: do j=1, ncell
+            call track(r_enter, v0, tracks, ntrack)
+            track_loop: do j=1, ntrack
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
@@ -5162,7 +5162,7 @@ subroutine get_position(ind, pos)
 
 end subroutine get_position
 
-subroutine track(rin, vin, tracks, ncell, los_intersect)
+subroutine track(rin, vin, tracks, ntrack, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:beam_grid]]
     real(Float64), dimension(3), intent(in)          :: rin
         !+ Initial position of particle
@@ -5170,7 +5170,7 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
         !+ Initial velocity of particle
     type(ParticleTrack), dimension(:), intent(inout) :: tracks
         !+ Array of [[ParticleTrack]] type
-    integer(Int32), intent(out)                      :: ncell
+    integer(Int32), intent(out)                      :: ntrack
         !+ Number of cells that a particle crosses
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
@@ -5186,7 +5186,7 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
     integer, dimension(3) :: gdims
     integer, dimension(1) :: minpos
 
-    vn = vin ;  ri = rin ; sgn = 0 ; ncell = 0
+    vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
 
     if(dot_product(vin,vin).eq.0.0) then
         return
@@ -5259,7 +5259,7 @@ subroutine track(rin, vin, tracks, ncell, los_intersect)
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
     enddo track_loop
-    ncell = cc-1
+    ntrack = cc-1
     if(present(los_intersect)) then
         los_intersect = los_inter
     endif
@@ -7152,7 +7152,7 @@ subroutine ndmc
     real(Float64), dimension(3) :: rnbi !! initial position
 
     integer(Int64) :: jj, ii, kk, cnt
-    integer :: ncell
+    integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer(Int64), dimension(3) :: nl_birth
     type(LocalProfiles) :: plasma
@@ -7175,7 +7175,7 @@ subroutine ndmc
 
     nlaunch=real(inputs%n_nbi)
     !$OMP PARALLEL DO schedule(guided) &
-    !$OMP& private(vnbi,rnbi,tracks,ncell,plasma,nl_birth,randi, &
+    !$OMP& private(vnbi,rnbi,tracks,ntrack,plasma,nl_birth,randi, &
     !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
     loop_over_markers: do ii=istart,inputs%n_nbi,istep
         if(inputs%calc_birth.ge.1) then
@@ -7191,13 +7191,13 @@ subroutine ndmc
             call mc_nbi(vnbi,neut_type,rnbi,err)
             if(err) cycle energy_fractions
 
-            call track(rnbi,vnbi,tracks,ncell)
-            if(ncell.eq.0) cycle energy_fractions
+            call track(rnbi,vnbi,tracks,ntrack)
+            if(ntrack.eq.0) cycle energy_fractions
 
             !! Solve collisional radiative model along track
             states=0.d0
             states(1)=nneutrals*nbi%current_fractions(neut_type)/beam_grid%dv
-            loop_along_track: do jj=1,ncell
+            loop_along_track: do jj=1,ntrack
                 iflux = sum(states)
                 ind = tracks(jj)%ind
                 call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -7218,7 +7218,7 @@ subroutine ndmc
                 !! Sample according to deposited flux along neutral trajectory
                 !$OMP CRITICAL(ndmc_birth)
                 do kk=1,nl_birth(neut_type)
-                    call randind(tracks(1:ncell)%flux,randi)
+                    call randind(tracks(1:ntrack)%flux,randi)
                     call randu(randomu)
                     birth%neut_type(birth%cnt) = neut_type
                     birth%ind(:,birth%cnt) = tracks(randi(1))%ind
@@ -7341,7 +7341,7 @@ end subroutine bremsstrahlung
 
 subroutine dcx
     !+ Calculates Direct Charge Exchange (DCX) neutral density and spectra
-    integer :: ic,i,j,k
+    integer :: ic,i,j,k,ncell
     integer(Int64) :: idcx !! counter
     real(Float64), dimension(3) :: ri    !! start position
     real(Float64), dimension(3) :: vihalo
@@ -7353,14 +7353,16 @@ subroutine dcx
     real(Float64), dimension(nlevs) :: rates    !!  CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ncell
+    integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
     integer :: jj       !! counter along track
     real(Float64):: tot_denn, photons  !! photon flux
+    integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     halo_iter_dens(dcx_type) = 0.d0
+    ncell = 0
     papprox=0.d0
     tot_denn=0.d0
     do ic=1,beam_grid%ngrid
@@ -7372,6 +7374,10 @@ subroutine dcx
                    sum(neut%half(:,i,j,k)) + &
                    sum(neut%third(:,i,j,k))
         papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+        if(papprox(i,j,k).gt.0.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic
+        endif
     enddo
 
     call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
@@ -7380,16 +7386,16 @@ subroutine dcx
        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
     !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
-    loop_over_cells: do ic = istart, beam_grid%ngrid, istep
-        call ind2sub(beam_grid%dims,ic,ind)
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma)
+    loop_over_cells: do ic = istart, ncell, istep
+        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         !! Loop over the markers
         loop_over_dcx: do idcx=1, nlaunch(i,j,k)
             !! Calculate ri,vhalo and track
             call mc_halo(ind,vihalo,ri)
-            call track(ri,vihalo,tracks,ncell)
-            if(ncell.eq.0) cycle loop_over_dcx
+            call track(ri,vihalo,tracks,ntrack)
+            if(ntrack.eq.0) cycle loop_over_dcx
 
             !! Calculate CX probability
             call get_beam_cx_rate(tracks(1)%ind,ri,vihalo,thermal_ion,neut_types,rates)
@@ -7401,7 +7407,7 @@ subroutine dcx
             !! Weight CX rates by ion source density
             states = rates*(plasma%denp - plasma%denf)
 
-            loop_along_track: do jj=1,ncell
+            loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
@@ -7427,7 +7433,7 @@ end subroutine dcx
 
 subroutine halo
     !+ Calculates halo neutral density and spectra
-    integer :: ic,i,j,k
+    integer :: ic,i,j,k,ncell
     integer(Int64) :: ihalo !! counter
     real(Float64), dimension(3) :: ri    !! start position
     real(Float64), dimension(3) :: vihalo!! velocity bulk plasma ion
@@ -7438,10 +7444,11 @@ subroutine halo
     real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ncell
+    integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle Tracks
     integer :: jj       !! counter along track
     real(Float64) :: tot_denn, photons  !! photon flux
+    integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
     real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev,dens_cur
@@ -7471,6 +7478,8 @@ subroutine halo
         papprox=0.d0
         tot_denn=0.d0
         halo_iter_dens(cur_type) = 0.d0
+        cell_ind = 0
+        ncell = 0
         do ic=1,beam_grid%ngrid
             call ind2sub(beam_grid%dims,ic,ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -7478,6 +7487,10 @@ subroutine halo
             if(.not.plasma%in_plasma) cycle
             tot_denn = sum(dens_prev(:,i,j,k))
             papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+            if(papprox(i,j,k).gt.0.0) then
+                ncell = ncell + 1
+                cell_ind(ncell) = ic
+            endif
         enddo
 
         call get_nlaunch(n_halo, papprox, nlaunch)
@@ -7486,16 +7499,16 @@ subroutine halo
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
         !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma,tind)
-        loop_over_cells: do ic=istart,beam_grid%ngrid,istep
-            call ind2sub(beam_grid%dims,ic,ind)
+        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind)
+        loop_over_cells: do ic=istart,ncell,istep
+            call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
             !! Loop over the markers
             loop_over_halos: do ihalo=1, nlaunch(i,j,k)
                 !! Calculate ri,vhalo and track
                 call mc_halo(ind,vihalo,ri)
-                call track(ri,vihalo,tracks,ncell)
-                if(ncell.eq.0)cycle loop_over_halos
+                call track(ri,vihalo,tracks,ntrack)
+                if(ntrack.eq.0)cycle loop_over_halos
 
                 !! Get plasma parameters at particle location
                 call get_plasma(plasma, pos=ri)
@@ -7511,7 +7524,7 @@ subroutine halo
                 !! Weight CX rates by ion source density
                 states = rates*plasma%denp
 
-                loop_along_track: do jj=1,ncell
+                loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
 
                     call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
@@ -7563,7 +7576,7 @@ end subroutine halo
 
 subroutine fida_f
     !+ Calculate FIDA emission using a Fast-ion distribution function F(E,p,r,z)
-    integer :: i,j,k,ic
+    integer :: i,j,k,ic,ncell
     integer(Int64) :: iion
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
@@ -7577,7 +7590,7 @@ subroutine fida_f
     real(Float64), dimension(nlevs) :: rates !! CX rates
 
     !! Collisiional radiative model along track
-    integer :: ncell
+    integer :: ntrack
     integer :: jj      !! counter along track
     type(ParticleTrack),dimension(beam_grid%ntrack) :: tracks
 
@@ -7587,10 +7600,12 @@ subroutine fida_f
 
     !! Number of particles to launch
     real(Float64) :: eb, ptch
+    integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
+    ncell = 0
     papprox=0.d0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -7603,6 +7618,10 @@ subroutine fida_f
                           sum(neut%dcx(:,i,j,k)) + &
                           sum(neut%halo(:,i,j,k)))* &
                           plasma%denf
+        if(papprox(i,j,k).gt.0.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic
+        endif
     enddo
 
     call get_nlaunch(inputs%n_fida, papprox, nlaunch)
@@ -7612,9 +7631,9 @@ subroutine fida_f
 
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ind,iion,vi,ri,fields, &
-    !$OMP tracks,ncell,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
-    loop_over_cells: do ic = istart, beam_grid%ngrid, istep
-        call ind2sub(beam_grid%dims,ic,ind)
+    !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
+    loop_over_cells: do ic = istart, ncell, istep
+        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
@@ -7625,9 +7644,9 @@ subroutine fida_f
             call gyro_correction(fields, eb, ptch, ri, vi)
 
             !! Find the particles path through the beam grid
-            call track(ri, vi, tracks, ncell,los_intersect)
+            call track(ri, vi, tracks, ntrack,los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
-            if(ncell.eq.0) cycle loop_over_fast_ions
+            if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_rate(tracks(1)%ind, ri, vi, beam_ion, neut_types, rates)
@@ -7637,7 +7656,7 @@ subroutine fida_f
             states=rates*denf
 
             !! Calculate the spectra produced in each cell along the path
-            loop_along_track: do jj=1,ncell
+            loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
@@ -7668,7 +7687,7 @@ subroutine fida_mc
     real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ncell
+    integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     logical :: los_intersect
     integer :: jj      !! counter along track
@@ -7684,7 +7703,7 @@ subroutine fida_mc
     endif
 
     !$OMP PARALLEL DO schedule(guided) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ncell,jj,rates,denn,los_intersect,states,photons)
+    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -7718,9 +7737,9 @@ subroutine fida_mc
             endif
 
             !! Track particle through grid
-            call track(ri, vi, tracks, ncell, los_intersect)
+            call track(ri, vi, tracks, ntrack, los_intersect)
             if(.not.los_intersect) cycle phi_loop
-            if(ncell.eq.0)cycle phi_loop
+            if(ntrack.eq.0)cycle phi_loop
 
             !! Calculate CX probability
             call get_beam_cx_rate(tracks(1)%ind,ri,vi,beam_ion,neut_types,rates)
@@ -7730,7 +7749,7 @@ subroutine fida_mc
             states=rates*fast_ion%weight/nphi
 
             !! Calculate the spectra produced in each cell along the path
-            loop_along_track: do jj=1,ncell
+            loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
@@ -7763,11 +7782,13 @@ subroutine npa_f
     real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux, theta, dtheta, eb, ptch
 
-    integer :: inpa,ichan,nrange,ir,npart
+    integer :: inpa,ichan,nrange,ir,npart,ncell
+    integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     papprox=0.d0
+    ncell = 0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -7779,6 +7800,10 @@ subroutine npa_f
                         sum(neut%dcx(:,i,j,k)) + &
                         sum(neut%halo(:,i,j,k)))* &
                         plasma%denf
+        if(papprox(i,j,k).gt.0.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic
+        endif
     enddo
 
     call get_nlaunch(inputs%n_npa, papprox, nlaunch)
@@ -7789,8 +7814,8 @@ subroutine npa_f
     !! Loop over all cells that can contribute to NPA signal
     !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
     !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
-    loop_over_cells: do ic = istart, beam_grid%ngrid, istep
-        call ind2sub(beam_grid%dims,ic,ind)
+    loop_over_cells: do ic = istart, ncell, istep
+        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
@@ -8170,7 +8195,7 @@ end subroutine neutron_mc
 
 subroutine fida_weights_mc
     !+ Calculates FIDA weights
-    integer :: i,j,k,ic !! indices  x,y,z of cells
+    integer :: i,j,k,ic,ncell
     integer(Int64) :: iion,ip
     real(Float64), dimension(3) :: ri,rg      !! start position
     real(Float64), dimension(3) :: vi     !! velocity of fast ions
@@ -8184,7 +8209,7 @@ subroutine fida_weights_mc
     real(Float64), dimension(nlevs) :: rates !! CX rates
 
     !! Collisiional radiative model along track
-    integer :: ncell
+    integer :: ntrack
     integer :: jj      !! counter along track
     type(ParticleTrack),dimension(beam_grid%ntrack) :: tracks
 
@@ -8201,6 +8226,7 @@ subroutine fida_weights_mc
 
     !! Number of particles to launch
     real(Float64) :: fbm_denf,phase_area
+    integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
@@ -8242,6 +8268,7 @@ subroutine fida_weights_mc
     etov2 = 1.d0/(v2_to_E_per_amu*inputs%ab)
 
     !! Estimate how many particles to launch in each cell
+    ncell = 0
     papprox=0.d0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -8253,6 +8280,10 @@ subroutine fida_weights_mc
                         sum(neut%third(:,i,j,k)) + &
                         sum(neut%dcx(:,i,j,k)) + &
                         sum(neut%halo(:,i,j,k)))
+        if(papprox(i,j,k).gt.0.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic
+        endif
     enddo
 
     call get_nlaunch(10*inputs%n_fida,papprox, nlaunch)
@@ -8262,10 +8293,10 @@ subroutine fida_weights_mc
 
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ind,iion,vi,ri,rg,ienergy,ipitch, &
-    !$OMP tracks,ncell,jj,plasma,fields,rates,denn,states,photons,energy,pitch, &
+    !$OMP tracks,ntrack,jj,plasma,fields,rates,denn,states,photons,energy,pitch, &
     !$OMP los_intersect,randomu3,fbm_denf)
-    loop_over_cells: do ic = istart, beam_grid%ngrid, istep
-        call ind2sub(beam_grid%dims,ic,ind)
+    loop_over_cells: do ic = istart, ncell, istep
+        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution uniformally
@@ -8290,9 +8321,9 @@ subroutine fida_weights_mc
             endif
 
             !! Find the particles path through the beam grid
-            call track(ri, vi, tracks, ncell, los_intersect)
+            call track(ri, vi, tracks, ntrack, los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
-            if(ncell.eq.0) cycle loop_over_fast_ions
+            if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
             call get_beam_cx_rate(tracks(1)%ind, ri, vi, beam_ion, neut_types, rates)
@@ -8300,7 +8331,7 @@ subroutine fida_weights_mc
             states=rates*1.d20
 
             !! Calculate the spectra produced in each cell along the path
-            loop_along_track: do jj=1,ncell
+            loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
@@ -8356,7 +8387,7 @@ subroutine fida_weights_los
     !! Solution of differential equation
     integer, dimension(3) :: ind  !!actual cell
     real(Float64), dimension(3) :: ri
-    integer(Int32) :: ncell
+    integer(Int32) :: ntrack
 
     real(Float64):: etov2, dEdP
 
@@ -8482,7 +8513,7 @@ subroutine fida_weights_los
         dlength = 1.d0
 
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(eb,vabs,ptch,phi,vi,vi_norm, &
-        !$OMP& r_enter,r_exit,length,max_dens,ind,tracks,ncell,dt,icell,states,rates, &
+        !$OMP& r_enter,r_exit,length,max_dens,ind,tracks,ntrack,dt,icell,states,rates, &
         !$OMP& vhalo,denn,denf,photons,ienergy,ipitch,igyro)
         do ienergy=istart,inputs%ne_wght,istep
             do ipitch=1,inputs%np_wght
@@ -8495,9 +8526,9 @@ subroutine fida_weights_los
                     vi = vabs*vi_norm
 
                     call grid_intersect(ri,vi,length,r_enter,r_exit)
-                    call track(r_enter, vi, tracks, ncell)
+                    call track(r_enter, vi, tracks, ntrack)
                     max_dens = 0.d0
-                    do icell=1,ncell
+                    do icell=1,ntrack
                         ind = tracks(icell)%ind
                         tracks(icell)%flux = neut%full(3,ind(1),ind(2),ind(3))  + &
                                              neut%half(3,ind(1),ind(2),ind(3))  + &
@@ -8507,7 +8538,7 @@ subroutine fida_weights_los
                         if(tracks(icell)%flux.gt.max_dens) max_dens=tracks(icell)%flux
                     enddo
                     dt = 0.d0
-                    do icell=1,ncell
+                    do icell=1,ntrack
                         if(tracks(icell)%flux.gt.(0.5*max_dens)) then
                             dt = dt + tracks(icell)%time
                         endif

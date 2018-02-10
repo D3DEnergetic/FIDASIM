@@ -20,9 +20,5 @@ table_settings: table_settings.dat generate_tables
 table_settings.dat:
 	$(EX) > table_settings.dat
 
-.PHONY: atomic_tables
-atomic_tables:
-	$(TABLES_DIR)/generate_tables $(TABLES_DIR)/table_settings.dat $(NTHREADS)
-
 clean:
 	-rm -f *.mod *.o *.dat generate_tables

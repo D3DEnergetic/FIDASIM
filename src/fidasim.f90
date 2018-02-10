@@ -8781,6 +8781,11 @@ program fidasim
 #ifdef _MPI
     istart = this_image()
     istep = num_images()
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- MPI settings ----"
+        write(*,'(T2,"Number of processes: ",i2)') istep
+        write(*,*) ''
+    endif
 #endif
 
     !! ----------------------------------------------------------

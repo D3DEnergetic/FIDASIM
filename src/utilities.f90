@@ -8,7 +8,7 @@ module utilities
 
 implicit none
 private
-public :: ind2sub, sub2ind
+public :: ind2sub, sub2ind, time
 public :: rng_type, rng_init, get_rng, rng, randind_cdf, cumsum
 public :: rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
@@ -775,5 +775,45 @@ subroutine deriv_2d(x,y,z,zxp,zyp)
     enddo
 
 end subroutine deriv_2d
+
+!============================================================================
+!------------------------------ Misc. Routines ------------------------------
+!============================================================================
+function time(time_start) result (time_str)
+    !+ Returns time string
+    integer, dimension(8), intent(in), optional :: time_start
+        !+ Optional start time
+    character(30) :: time_str
+        !+ Time string
+
+    integer :: ts(8), ta(8), hour, minu, sec
+
+    ts = 0
+    if(present(time_start)) then
+        ts = time_start
+    endif
+
+    call date_and_time(values=ta)
+    hour = ta(5) - ts(5)
+    minu = ta(6) - ts(6)
+    sec  = ta(7) - ts(7)
+    if (minu.lt.0.) then
+        minu = minu + 60
+        hour = hour - 1
+    endif
+    if (sec.lt.0.) then
+        sec  = sec + 60
+        minu = minu - 1
+    endif
+
+    if(present(time_start)) then
+        write(time_str,'(I2,":",I2.2,":",I2.2," --- elapsed:",I2,":",I2.2,":",I2.2)') &
+            ta(5),ta(6),ta(7), hour,minu,sec
+    else
+        write(time_str,'(I2,":",I2.2,":",I2.2)') &
+            ta(5),ta(6),ta(7)
+    endif
+
+end function time
 
 end module utilities

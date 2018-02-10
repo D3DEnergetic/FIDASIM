@@ -8760,9 +8760,8 @@ program fidasim
 #endif
     implicit none
     character(3)          :: arg = ''
-    integer, dimension(8) :: time_arr,time_start,time_end !Time array
+    integer, dimension(8) :: time_start
     integer               :: i,narg,nthreads,max_threads
-    integer               :: hour,minu,sec
 
 #ifdef _VERSION
     version = _VERSION
@@ -8928,10 +8927,8 @@ program fidasim
         call read_neutrals()
     else
         !! ----------- BEAM NEUTRALS ---------- !!
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'ndmc:    ' , &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'ndmc:    ' , time(time_start)
         endif
         call ndmc
         if(inputs%calc_birth.eq.1)then
@@ -8940,19 +8937,15 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
         !! ---------- DCX (Direct charge exchange) ---------- !!
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'dcx:     ' , &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'dcx:     ' , time(time_start)
         endif
         call dcx()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
         !! ---------- HALO ---------- !!
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'halo:    ' , &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'halo:    ' , time(time_start)
         endif
         call halo()
         !! ---------- WRITE NEUTRALS ---------- !!
@@ -8969,10 +8962,8 @@ program fidasim
     !!----------------------------- BREMSSTRAHLUNG ---------------------------
     !! -----------------------------------------------------------------------
     if(inputs%calc_brems.ge.1) then
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'bremsstrahlung:    ' , &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'bremsstrahlung:    ' ,time(time_start)
         endif
         call bremsstrahlung()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
@@ -8982,10 +8973,8 @@ program fidasim
     !! --------------------- CALCULATE the FIDA RADIATION --------------------
     !! -----------------------------------------------------------------------
     if(inputs%calc_fida.ge.1)then
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'fida:    ' , &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'fida:    ' ,time(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call fida_f()
@@ -9009,10 +8998,8 @@ program fidasim
     !! ----------------------- CALCULATE the NPA FLUX ------------------------
     !! -----------------------------------------------------------------------
     if(inputs%calc_npa.ge.1)then
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'npa:    ' , &
-            time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'npa:     ' ,time(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call npa_f()
@@ -9031,10 +9018,8 @@ program fidasim
     !! ------------------- Calculation of neutron flux -------------------
     !! -------------------------------------------------------------------
     if(inputs%calc_neutron.ge.1) then
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'neutron rate:    ',  &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'neutron rate:    ', time(time_start)
         endif
         if(inputs%dist_type.eq.1) then
             call neutron_f()
@@ -9048,10 +9033,8 @@ program fidasim
     !! ----------- Calculation of weight functions -----------------------
     !! -------------------------------------------------------------------
     if(inputs%calc_fida_wght.ge.1) then
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'fida weight function:    ',  &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'fida weight function:    ', time(time_start)
         endif
         if(inputs%calc_fida_wght.eq.1) then
             call fida_weights_los()
@@ -9062,36 +9045,15 @@ program fidasim
     endif
 
     if(inputs%calc_npa_wght.ge.1) then
-        call date_and_time (values=time_arr)
         if(inputs%verbose.ge.1) then
-            write(*,'(A,I2,":",I2.2,":",I2.2)') 'npa weight function:    ',  &
-                  time_arr(5),time_arr(6),time_arr(7)
+            write(*,*) 'npa weight function:    ', time(time_start)
         endif
         call npa_weights()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
-    call date_and_time (values=time_arr)
     if(inputs%verbose.ge.1) then
-        write(*,'(A,I2,":",I2.2,":",I2.2)') 'END: hour, minute, second: ',&
-              time_arr(5),time_arr(6),time_arr(7)
-    endif
-
-    call date_and_time (values=time_end)
-    hour = time_end(5) - time_start(5)
-    minu = time_end(6) - time_start(6)
-    sec  = time_end(7) - time_start(7)
-    if (minu.lt.0.) then
-        minu = minu +60
-        hour = hour -1
-    endif
-    if (sec.lt.0.) then
-        sec  = sec +60
-        minu = minu -1
-    endif
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(A,18X,I2,":",I2.2,":",I2.2)') 'duration:',hour,minu,sec
+        write(*,*) 'END: hour:minute:second ', time(time_start)
     endif
 
 end program fidasim

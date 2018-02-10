@@ -716,7 +716,7 @@ type NPAResults
     integer(Int32) :: nenergy = 100
         !+ Number of energy values
     type(NPAParticle), dimension(:), allocatable :: part
-        !+ Array of NPA particles
+        !+ Array of active NPA particles
     real(Float64), dimension(:), allocatable     :: energy
         !+ Energy array [keV]
     real(Float64), dimension(:,:,:), allocatable :: flux
@@ -992,6 +992,8 @@ type(AtomicTables), save        :: tables
     !+ Variable containing the atomic tables
 type(NPAResults), save          :: npa
     !+ Variable for storing the calculated NPA results
+type(NPAResults), save          :: pnpa
+    !+ Variable for storing the calculated passive NPA results
 type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
 type(NPAChords), save           :: npa_chords
@@ -3652,13 +3654,31 @@ subroutine write_npa
     dim3 = [npa%nenergy, npa%nchan, particles%nclass]
     if(particles%nclass.gt.1) then
         call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
-        call h5ltmake_compressed_dataset_double_f(fid,"/flux",3,dim3,npa%flux, error)
-        call h5ltset_attribute_string_f(fid,"/flux", "description", &
-             "Neutral flux: flux(energy,chan,class)", error)
-    else
-        call h5ltmake_compressed_dataset_double_f(fid,"/flux",2,dim3(1:2),npa%flux(:,:,1), error)
-        call h5ltset_attribute_string_f(fid,"/flux", "description", &
-             "Neutral flux: flux(energy,chan)", error)
+    endif
+
+    if(inputs%calc_pnpa.ge.1) then
+        if(particles%nclass.gt.1) then
+            call h5ltmake_compressed_dataset_double_f(fid,"/pflux",3,dim3,pnpa%flux, error)
+            call h5ltset_attribute_string_f(fid,"/pflux", "description", &
+                 "Neutral passive flux: pflux(energy,chan,class)", error)
+        else
+            call h5ltmake_compressed_dataset_double_f(fid,"/pflux",2,dim3(1:2),pnpa%flux(:,:,1), error)
+            call h5ltset_attribute_string_f(fid,"/pflux", "description", &
+                 "Neutral passive flux: pflux(energy,chan)", error)
+        endif
+    endif
+    call h5ltset_attribute_string_f(fid,"/pflux", "units","neutrals/(s*dE)", error)
+
+    if(inputs%calc_npa.ge.1) then
+        if(particles%nclass.gt.1) then
+            call h5ltmake_compressed_dataset_double_f(fid,"/flux",3,dim3,npa%flux, error)
+            call h5ltset_attribute_string_f(fid,"/flux", "description", &
+                 "Neutral flux: flux(energy,chan,class)", error)
+        else
+            call h5ltmake_compressed_dataset_double_f(fid,"/flux",2,dim3(1:2),npa%flux(:,:,1), error)
+            call h5ltset_attribute_string_f(fid,"/flux", "description", &
+                 "Neutral flux: flux(energy,chan)", error)
+        endif
     endif
     call h5ltset_attribute_string_f(fid,"/flux", "units","neutrals/(s*dE)", error)
 
@@ -3847,7 +3867,6 @@ subroutine write_spectra
              "Halo component of the beam emmision (includes dcx): halo(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
     endif
-
     if(inputs%calc_fida.ge.1) then
         !Write variables
         if(particles%nclass.le.1) then
@@ -5935,7 +5954,7 @@ subroutine store_births(ind, neut_type, dflux)
     !$OMP END CRITICAL(store_births_1)
 end subroutine store_births
 
-subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
+subroutine store_npa(det, ri, rf, vn, flux, orbit_class,passive)
     !+ Store NPA particles in [[libfida:npa]]
     integer, intent(in)                     :: det
         !+ Detector/Channel Number
@@ -5949,13 +5968,19 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
         !+ Neutral flux [neutrals/s]
     integer, intent(in), optional           :: orbit_class
         !+ Orbit class ID
+    logical, intent(in), optional           :: passive
+        !+ Used to store pnpa flux
 
     integer :: iclass
     type(LocalEMFields) :: fields
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
     real(Float64) :: energy, pitch, dE
     integer(Int32), dimension(1) :: ienergy
-    type(NPAParticle), dimension(:), allocatable :: parts
+    type(NPAParticle), dimension(:), allocatable :: parts,pparts
+    logical :: storepassive
+
+    storepassive = .False.
+    if(present(passive)) storepassive = .True.
 
     if(present(orbit_class)) then
         iclass = orbit_class
@@ -5981,27 +6006,53 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class)
     endif
 
     !$OMP CRITICAL(store_npa_1)
-    npa%npart = npa%npart + 1
-    if(npa%npart.gt.npa%nmax) then
-        npa%nmax = int(npa%nmax*2)
-        allocate(parts(npa%nmax))
-        parts(1:(npa%npart-1)) = npa%part
-        deallocate(npa%part)
-        call move_alloc(parts, npa%part)
+    !! Passive
+    if (storepassive) then
+        pnpa%npart = pnpa%npart + 1
+        if(pnpa%npart.gt.pnpa%nmax) then
+            pnpa%nmax = int(pnpa%nmax*2)
+            allocate(parts(pnpa%nmax))
+            parts(1:(pnpa%npart-1)) = pnpa%part
+            deallocate(pnpa%part)
+            call move_alloc(parts, pnpa%part)
+        endif
+        pnpa%part(pnpa%npart)%detector = det
+        pnpa%part(pnpa%npart)%xi = uvw_ri(1)
+        pnpa%part(pnpa%npart)%yi = uvw_ri(2)
+        pnpa%part(pnpa%npart)%zi = uvw_ri(3)
+        pnpa%part(pnpa%npart)%xf = uvw_rf(1)
+        pnpa%part(pnpa%npart)%yf = uvw_rf(2)
+        pnpa%part(pnpa%npart)%zf = uvw_rf(3)
+        pnpa%part(pnpa%npart)%energy = energy
+        pnpa%part(pnpa%npart)%pitch = pitch
+        pnpa%part(pnpa%npart)%weight = flux
+        ienergy = minloc(abs(pnpa%energy - energy))
+        pnpa%flux(ienergy(1),det,iclass) = &
+            pnpa%flux(ienergy(1),det,iclass) + flux/dE
+    else
+        !! Active
+        npa%npart = npa%npart + 1
+        if(npa%npart.gt.npa%nmax) then
+            npa%nmax = int(npa%nmax*2)
+            allocate(parts(npa%nmax))
+            parts(1:(npa%npart-1)) = npa%part
+            deallocate(npa%part)
+            call move_alloc(parts, npa%part)
+        endif
+        npa%part(npa%npart)%detector = det
+        npa%part(npa%npart)%xi = uvw_ri(1)
+        npa%part(npa%npart)%yi = uvw_ri(2)
+        npa%part(npa%npart)%zi = uvw_ri(3)
+        npa%part(npa%npart)%xf = uvw_rf(1)
+        npa%part(npa%npart)%yf = uvw_rf(2)
+        npa%part(npa%npart)%zf = uvw_rf(3)
+        npa%part(npa%npart)%energy = energy
+        npa%part(npa%npart)%pitch = pitch
+        npa%part(npa%npart)%weight = flux
+        ienergy = minloc(abs(npa%energy - energy))
+        npa%flux(ienergy(1),det,iclass) = &
+            npa%flux(ienergy(1),det,iclass) + flux/dE
     endif
-    npa%part(npa%npart)%detector = det
-    npa%part(npa%npart)%xi = uvw_ri(1)
-    npa%part(npa%npart)%yi = uvw_ri(2)
-    npa%part(npa%npart)%zi = uvw_ri(3)
-    npa%part(npa%npart)%xf = uvw_rf(1)
-    npa%part(npa%npart)%yf = uvw_rf(2)
-    npa%part(npa%npart)%zf = uvw_rf(3)
-    npa%part(npa%npart)%energy = energy
-    npa%part(npa%npart)%pitch = pitch
-    npa%part(npa%npart)%weight = flux
-    ienergy = minloc(abs(npa%energy - energy))
-    npa%flux(ienergy(1),det,iclass) = &
-        npa%flux(ienergy(1),det,iclass) + flux/dE
     !$OMP END CRITICAL(store_npa_1)
 
 end subroutine store_npa
@@ -7773,7 +7824,7 @@ subroutine pfida_f
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ncell.eq.0) cycle loop_over_fast_ions
 
-            !! Calculate CX probability with beam and halo neutrals
+            !! Calculate CX probability with passive neutrals
             call get_plasma(plasma, pos =  ri)
             call bt_cx_rates(plasma,plasma%denn,vi,beam_ion,rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
@@ -8044,11 +8095,7 @@ subroutine pnpa_f
             do i=1,beam_grid%nx
                 ind =[i,j,k]
                 call get_plasma(plasma,ind=ind)
-                papprox(i,j,k)=(sum(neut%dens(:,nbif_type,i,j,k)) + &
-                                sum(neut%dens(:,nbih_type,i,j,k)) + &
-                                sum(neut%dens(:,nbit_type,i,j,k)) + &
-                                sum(neut%dens(:,halo_type,i,j,k)))* &
-                                plasma%denf
+                papprox(i,j,k)=sum(plasma%denn)*plasma%denf
 
                 if(papprox(i,j,k).gt.0) then
                     pcell(:,pcnt)= ind
@@ -8105,7 +8152,8 @@ subroutine pnpa_f
                     call get_indices(ri,pind)
 
                     !! Calculate CX probability with beam and halo neutrals
-                    call get_beam_cx_rate(pind,ri,vi,beam_ion,neut_types,rates)
+                    call get_plasma(plasma, pos = ri)
+                    call bt_cx_rates(plasma,plasma%denn,vi,beam_ion,rates)
                     if(sum(rates).le.0.) cycle gyro_range_loop
 
                     !! Weight CX rates by ion source density
@@ -8116,7 +8164,7 @@ subroutine pnpa_f
 
                     !! Store NPA Flux
                     flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
-                    call store_npa(det,ri,rf,vi,flux)
+                    call store_npa(det,ri,rf,vi,flux,passive = .True.)
                 enddo gyro_range_loop
             enddo detector_loop
         enddo loop_over_fast_ions
@@ -9123,6 +9171,23 @@ program fidasim
         npa%flux = 0.0
     endif
 
+    if(inputs%calc_pnpa.ge.1)then
+        pnpa%nchan = npa_chords%nchan
+        allocate(pnpa%part(pnpa%nmax))
+        if(inputs%dist_type.eq.1) then
+            pnpa%nenergy = fbm%nenergy
+            allocate(pnpa%energy(pnpa%nenergy))
+            pnpa%energy = fbm%energy
+        else
+            allocate(pnpa%energy(pnpa%nenergy))
+            do i=1,pnpa%nenergy
+                pnpa%energy(i)=real(i-0.5)
+            enddo
+        endif
+        allocate(pnpa%flux(pnpa%nenergy,pnpa%nchan,particles%nclass))
+        pnpa%flux = 0.0
+    endif
+
     if(inputs%calc_neutron.ge.1)then
         allocate(neutron%rate(particles%nclass))
         neutron%rate = 0.d0
@@ -9234,11 +9299,26 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
-    if(inputs%calc_npa.ge.1) then
+    if(inputs%calc_pnpa.ge.1)then
+        call date_and_time (values=time_arr)
+        if(inputs%verbose.ge.1) then
+            write(*,'(A,I2,":",I2.2,":",I2.2)') 'pnpa:    ' , &
+            time_arr(5),time_arr(6),time_arr(7)
+        endif
+        if(inputs%dist_type.eq.1) then
+            print*, 'call pnpa on'
+            call pnpa_f()
+  !!      else
+  !!          call npa_mc()
+        endif
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+    if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then
+        print*,'write npa on'
         call write_npa()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
-
+    stop
     !! -------------------------------------------------------------------
     !! ------------------- Calculation of neutron flux -------------------
     !! -------------------------------------------------------------------

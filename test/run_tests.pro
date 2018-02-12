@@ -24,11 +24,12 @@ PRO run_tests,result_dir,test_case=test_case
                    ab:2.01410178d0,ai:2.0141078d0,impurity_charge:6,$
                    lambdamin:647.0d0,lambdamax:667.0d0,nlambda:2000,$
                    n_fida:5000000L,n_npa:5000000L,n_nbi:50000L, $
+                   n_pfida:50000000L,n_pnpa:50000000L, $
                    n_halo:500000L,n_dcx:500000L,n_birth:10000L,$
                    ne_wght:50,np_wght:50,nphi_wght:100,emax_wght:100.0d0,$
                    nlambda_wght:1000,lambdamin_wght:647.d0,lambdamax_wght:667.d0,$
-                   calc_npa:1,calc_brems:1,calc_bes:1,calc_fida:1,calc_neutron:1,$
-                   calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,$
+                   calc_npa:2,calc_brems:1,calc_bes:1,calc_fida:1,calc_neutron:1,$
+                   calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,calc_pfida:1,calc_pnpa:2,$
                    result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}
 
    basic_bgrid = {nx:50,ny:60,nz:70,$
@@ -39,7 +40,7 @@ PRO run_tests,result_dir,test_case=test_case
                   origin:[0.d0,0.d0,0.d0]}
 
    test_ids = ['1A','1B','2A','2B','3A','3B','4A','4B']
-   test_cases = 'TEST_' + test_ids 
+   test_cases = 'TEST_' + test_ids
    test_cases = [test_cases,'ALL']
    run = strmatch(test_cases,test_case,/fold_case)
    if total(run) eq 0 then begin
@@ -103,7 +104,7 @@ PRO run_tests,result_dir,test_case=test_case
                inputs = create_struct("runid",'test_4a',$
                         "comment",'Rotated, Tilted up grid; flat profiles',$
                         basic_inputs, bgrid)
-                          
+
            END
            "TEST_4B": BEGIN
                nbi = test_beam(-0.25)
@@ -113,10 +114,10 @@ PRO run_tests,result_dir,test_case=test_case
                         "comment",'Rotated, Tilted down grid; realistic profiles',$
                         basic_inputs, bgrid)
            END
-       ENDCASE 
+       ENDCASE
        PRINT, inputs.comment
 
-       grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100) 
+       grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100)
        equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux,g=g)
        equil = create_struct(equil,"geqdsk",g)
        fbm = read_nubeam(test_dir+'test_fi_2.cdf',grid,$
@@ -127,8 +128,8 @@ PRO run_tests,result_dir,test_case=test_case
        tcb = byte(strlowcase(test_cases[i]))
        pfile = test_dir+'test_profiles_'+string(tcb[-1])+'.cdf'
        plasma = test_profiles(pfile,grid,flux)
-       
+
        prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
    endfor
 
-end    
+end

@@ -27,12 +27,13 @@ PRO check_inputs, inputs
               ymin:zero_double, ymax:zero_double, zmin:zero_double, zmax:zero_double, $
               ab:zero_double, ai:zero_double, current_fractions:three_double, $
               pinj:zero_double, einj:zero_double, impurity_charge:zero_int, $
-              n_fida:zero_long, n_nbi:zero_long, n_dcx:zero_long, $
-              n_npa:zero_long, n_halo:zero_long, n_birth:zero_long, $
+              n_fida:zero_long, n_pfida:zero_long, n_nbi:zero_long, n_dcx:zero_long, $
+              n_npa:zero_long, n_pnpa:zero_long,n_halo:zero_long, n_birth:zero_long, $
               ne_wght:zero_int, np_wght:zero_int, nphi_wght:zero_int, $
               emax_wght:zero_double, nlambda_wght:zero_int, $
               lambdamin_wght:zero_double, lambdamax_wght:zero_double, $
               calc_npa:zero_int, calc_fida:zero_int, calc_bes:zero_int, $
+	      calc_pnpa:zero_int, calc_pfida:zero_int, $
               calc_brems:zero_int, calc_birth:zero_int, calc_neutron:zero_int,$
               calc_fida_wght:zero_int, calc_npa_wght:zero_int }
 

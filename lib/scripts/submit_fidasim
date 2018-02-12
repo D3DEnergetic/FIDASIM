@@ -65,7 +65,7 @@ def slurm_omp_jobscript(args):
                  #!/bin/bash
                  #SBATCH -J %(job_name)s
                  #SBATCH -N 1
-                 #SBATCH -n %(ppn)s
+                 #SBATCH -n %(ntasks)s
                  #SBATCH --mem=%(mem)s
                  #SBATCH -t %(walltime)s
                  %(partition)s

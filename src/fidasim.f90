@@ -1678,7 +1678,7 @@ subroutine read_inputs
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
         write(*,'(a,a)') 'READ_INPUTS: Input file does not exist: ', trim(namelist_file)
-        stop
+        error stop
     endif
 
     open(13,file=namelist_file)
@@ -1846,7 +1846,7 @@ subroutine read_inputs
     endif
 
     if(error) then
-        stop
+        error stop
     endif
 
 end subroutine read_inputs
@@ -1930,7 +1930,7 @@ subroutine make_beam_grid
     if(n.le.(0.1*beam_grid%ngrid)) then
         write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
                         &Less than 10% of the beam grid cells fall within the plasma."
-        stop
+        error stop
     endif
 
 end subroutine make_beam_grid
@@ -2192,6 +2192,8 @@ subroutine read_npa
 
     real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
     real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
+    real(Float64), dimension(beam_grid%ngrid) :: probs
+    real(Float64), dimension(3,beam_grid%ngrid) :: eff_rds
     integer, dimension(:), allocatable :: a_shape, d_shape
     character(len=20) :: system = ''
 
@@ -2203,7 +2205,7 @@ subroutine read_npa
     real(Float64), dimension(50) :: xd, yd
     type(LocalEMFields) :: fields
     real(Float64) :: length,total_prob, hh, hw, dprob, dx, dy, r, pitch
-    integer :: ichan,i,j,k,id,ix,iy,d_index,nd,ind_d(2)
+    integer :: ichan,ic,i,j,k,id,ix,iy,d_index,nd,ind_d(2),ind(3)
     integer :: error
 
     !!Initialize HDF5 interface
@@ -2331,52 +2333,53 @@ subroutine read_npa
             dy = abs(yd(2) - yd(1))
             basis = npa_chords%det(ichan)%detector%basis
             inv_basis = npa_chords%det(ichan)%detector%inv_basis
+            eff_rds = 0.d0
+            probs = 0.d0
             ! For each grid point find the probability of hitting the detector given an isotropic source
-            !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d)
-            do k=1,beam_grid%nz
-                do j=1,beam_grid%ny
-                    do i=1,beam_grid%nx
-                        total_prob = 0.d0
-                        eff_rd = eff_rd*0.d0
-                        r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
-                        r0_d = matmul(inv_basis,r0-xyz_d_cent)
-
-                        do id = istart, nd*nd, istep
-                            call ind2sub([nd,nd],id,ind_d)
-                            ix = ind_d(1) ; iy = ind_d(2)
-                            rd_d = [xd(ix),yd(iy),0.d0]
-                            rd = matmul(basis,rd_d) + xyz_d_cent
-                            v0 = rd - r0
-                            d_index = 0
-                            call hit_npa_detector(r0,v0,d_index,det=ichan)
-                            if(d_index.ne.0) then
-                                r = norm2(rd_d - r0_d)**2
-                                dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
-                                eff_rd = eff_rd + dprob*rd
-                                total_prob = total_prob + dprob
-                            endif
-                        enddo
-#ifdef _MPI
-                        call co_sum(total_prob)
-                        call co_sum(eff_rd)
-#endif
-                        if(total_prob.gt.0.0) then
-                            eff_rd = eff_rd/total_prob
-                            call get_fields(fields,pos=r0)
-                            v0 = (eff_rd - r0)/norm2(eff_rd - r0)
-                            npa_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
-                            npa_chords%phit(i,j,k,ichan)%p = total_prob
-                            npa_chords%phit(i,j,k,ichan)%dir = v0
-                            npa_chords%phit(i,j,k,ichan)%eff_rd = eff_rd
-                            npa_chords%hit(i,j,k) = .True.
-                        endif
-                    enddo !x loop
-                enddo !y loop
-            enddo !z loop
+            !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
+            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind)
+            do ic=istart,beam_grid%ngrid,istep
+                call ind2sub(beam_grid%dims,ic,ind)
+                i = ind(1) ; j = ind(2) ; k = ind(3)
+                r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
+                r0_d = matmul(inv_basis,r0-xyz_d_cent)
+                do id = 1, nd*nd
+                    call ind2sub([nd,nd],id,ind_d)
+                    ix = ind_d(1) ; iy = ind_d(2)
+                    rd_d = [xd(ix),yd(iy),0.d0]
+                    rd = matmul(basis,rd_d) + xyz_d_cent
+                    v0 = rd - r0
+                    d_index = 0
+                    call hit_npa_detector(r0,v0,d_index,det=ichan)
+                    if(d_index.ne.0) then
+                        r = norm2(rd_d - r0_d)**2
+                        dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
+                        eff_rds(:,ic) = eff_rds(:,ic) + dprob*rd
+                        probs(ic) = probs(ic) + dprob
+                    endif
+                enddo
+            enddo
             !$OMP END PARALLEL DO
-
-            total_prob = sum(npa_chords%phit(:,:,:,ichan)%p)
+#ifdef _MPI
+            call co_sum(eff_rds)
+            call co_sum(probs)
+#endif
+            do ic = 1, beam_grid%ngrid
+                if(probs(ic).gt.0.0) then
+                    call ind2sub(beam_grid%dims, ic, ind)
+                    i = ind(1) ; j = ind(2) ; k = ind(3)
+                    r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
+                    eff_rd = eff_rds(:,ic)/probs(ic)
+                    call get_fields(fields,pos=r0)
+                    v0 = (eff_rd - r0)/norm2(eff_rd - r0)
+                    npa_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
+                    npa_chords%phit(i,j,k,ichan)%p = probs(ic)
+                    npa_chords%phit(i,j,k,ichan)%dir = v0
+                    npa_chords%phit(i,j,k,ichan)%eff_rd = eff_rd
+                    npa_chords%hit(i,j,k) = .True.
+                endif
+            enddo
+            total_prob = sum(probs)
             if(total_prob.le.0.d0) then
                 if(inputs%verbose.ge.0) then
                     WRITE(*,'("Channel ",i3," missed the beam grid")') ichan
@@ -2513,7 +2516,7 @@ subroutine read_equilibrium
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
     if (sum(equil%mask).le.0.d0) then
         write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
-        stop
+        error stop
     endif
 
 end subroutine read_equilibrium
@@ -2542,7 +2545,7 @@ subroutine read_f(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
         endif
-        stop
+        error stop
     endif
 
     allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz))
@@ -2628,7 +2631,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
         endif
-        stop
+        error stop
     endif
 
     if(inputs%dist_type.eq.2) then
@@ -2695,7 +2698,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: No mc particles in beam grid'
         endif
-        stop
+        error stop
     endif
 
     if(inputs%verbose.ge.1) then
@@ -2756,7 +2759,7 @@ subroutine read_atomic_cross(fid, grp, cross)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
         endif
-        stop
+        error stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", cross%nenergy, error)
@@ -2818,7 +2821,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_RATE: Unknown atomic interaction: ', trim(grp)
         endif
-        stop
+        error stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -2893,7 +2896,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
             if(inputs%verbose.ge.0) then
                 write(*,'(a,a)') 'READ_ATOMIC_RATE: Unsupported atomic interaction: ', trim(grp)
             endif
-            stop
+            error stop
         endif
     endif
 
@@ -2938,7 +2941,7 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_TRANSITIONS: Unknown atomic interaction: ', trim(grp)
         endif
-        stop
+        error stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -4235,7 +4238,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
         endif
-        stop
+        error stop
     endif
 
     !Open HDF5 interface
@@ -4256,7 +4259,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
         endif
-        stop
+        error stop
     endif
 
     dims = [nlevs, nx, ny, nz]
@@ -4476,7 +4479,7 @@ function in_boundary(bplane, p) result(in_b)
             if(inputs%verbose.ge.0) then
                 write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            stop
+            error stop
     END SELECT
 
 end function in_boundary
@@ -4501,7 +4504,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                stop
+                error stop
             endif
             xx = [-bplane%hw,-bplane%hw,bplane%hw,bplane%hw]
             yy = [-bplane%hh,bplane%hh,bplane%hh,-bplane%hh]
@@ -4514,7 +4517,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                stop
+                error stop
             endif
             dth = 2*pi/nb
             do i=1,nb
@@ -4527,7 +4530,7 @@ subroutine boundary_edge(bplane, bedge, nb)
             if(inputs%verbose.ge.0) then
                 write(*,'("BOUNDARY_EDGE: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            stop
+            error stop
     end select
 
 end subroutine boundary_edge
@@ -5868,7 +5871,7 @@ subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
             if(inputs%verbose.ge.0) then
                 write(*,'("STORE_NEUTRALS: Unknown neutral type: ",i2)') neut_type
             endif
-            stop
+            error stop
     end select
     !$OMP END CRITICAL(store_neutrals_1)
 
@@ -6599,7 +6602,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
                     if(inputs%verbose.ge.0) then
                         write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
                     endif
-                    stop
+                    error stop
             end select
             !$OMP END CRITICAL(bes_spectrum)
         enddo loop_over_stark
@@ -6894,7 +6897,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         if (1.0 - term1 - term2 .le. 0.0) then
             write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
                           1.0-term1-term2
-            stop
+            error stop
         endif
     else
         r_gyro = 0.d0
@@ -7133,7 +7136,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
             write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
             write(*,'(a)') "Move the beam grid closer to the source to fix"
         endif
-        stop
+        error stop
     endif
 
     !! Determine velocity of neutrals corrected by efrac
@@ -7253,7 +7256,7 @@ subroutine ndmc
             write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                                   100.*nbi_outside/(3.*inputs%n_nbi)
         endif
-        if(sum(neut%full).eq.0) stop 'Beam does not intersect the grid!'
+        if(sum(neut%full).eq.0) error stop 'Beam does not intersect the grid!'
     endif
 
 end subroutine ndmc
@@ -7469,7 +7472,7 @@ subroutine halo
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
         endif
-        stop
+        error stop
     endif
     dens_prev = neut%dcx
     n_halo = inputs%n_halo
@@ -8776,7 +8779,7 @@ program fidasim
     narg = command_argument_count()
     if(narg.eq.0) then
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
-        stop
+        error stop
     else
         call get_command_argument(1,namelist_file)
     endif

@@ -5482,7 +5482,10 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
-        if (ncross.ge.2) exit track_loop
+        if (ncross.ge.2) then
+            cc = cc - 1 !dont include last segment
+            exit track_loop
+        endif
     enddo track_loop
     ntrack = cc-1
     if(present(los_intersect)) then
@@ -7683,14 +7686,13 @@ subroutine dcx
 
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
-
+                if(.not.plasma%in_plasma) exit loop_along_track
                 call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
                 call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
                 if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                   call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
                 endif
-
             enddo loop_along_track
         enddo loop_over_dcx
     enddo loop_over_cells
@@ -7809,7 +7811,7 @@ subroutine halo
 
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
-
+                    if(.not.plasma%in_plasma) exit loop_along_track
                     call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
 
                     !! Store Neutrals
@@ -7817,10 +7819,8 @@ subroutine halo
                     !$OMP CRITICAL(halo1)
                     dens_cur(:,tind(1),tind(2),tind(3)) = &
                         dens_cur(:,tind(1),tind(2),tind(3)) + denn/nlaunch(i,j,k)
-                    if(plasma%in_plasma) then
-                        halo_iter_dens(cur_type) = &
-                            halo_iter_dens(cur_type) + sum(denn)/nlaunch(i,j,k)
-                    endif
+                    halo_iter_dens(cur_type) = &
+                        halo_iter_dens(cur_type) + sum(denn)/nlaunch(i,j,k)
                     !$OMP END CRITICAL(halo1)
                     if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                       call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)

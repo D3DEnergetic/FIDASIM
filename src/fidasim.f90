@@ -7630,13 +7630,12 @@ subroutine dcx
     integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
     integer :: jj       !! counter along track
-    real(Float64):: tot_denn, photons  !! photon flux
+    real(Float64):: max_papprox,tot_denn, photons  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     halo_iter_dens(dcx_type) = 0.d0
-    ncell = 0
     papprox=0.d0
     tot_denn=0.d0
     do ic=1,beam_grid%ngrid
@@ -7648,6 +7647,16 @@ subroutine dcx
                    sum(neut%half(:,i,j,k)) + &
                    sum(neut%third(:,i,j,k))
         papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+    enddo
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox*1.d-3))
+        papprox = 0.0
+    endwhere
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
             cell_ind(ncell) = ic
@@ -7728,7 +7737,7 @@ subroutine halo
     real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev,dens_cur
     !! Halo iteration
     integer(Int64) :: hh, n_halo !! counters
-    real(Float64) :: dcx_dens, halo_iteration_dens,seed_dcx
+    real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
     integer :: prev_type  ! previous iteration
     integer :: cur_type  ! current iteration
 
@@ -7752,8 +7761,6 @@ subroutine halo
         papprox=0.d0
         tot_denn=0.d0
         halo_iter_dens(cur_type) = 0.d0
-        cell_ind = 0
-        ncell = 0
         do ic=1,beam_grid%ngrid
             call ind2sub(beam_grid%dims,ic,ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -7761,6 +7768,17 @@ subroutine halo
             if(.not.plasma%in_plasma) cycle
             tot_denn = sum(dens_prev(:,i,j,k))
             papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+        enddo
+        max_papprox = maxval(papprox)
+        where (papprox.lt.(max_papprox*1.d-3))
+            papprox = 0.0
+        endwhere
+
+        cell_ind = 0
+        ncell = 0
+        do ic=1,beam_grid%ngrid
+            call ind2sub(beam_grid%dims,ic,ind)
+            i = ind(1) ; j = ind(2) ; k = ind(3)
             if(papprox(i,j,k).gt.0.0) then
                 ncell = ncell + 1
                 cell_ind(ncell) = ic
@@ -7873,13 +7891,12 @@ subroutine fida_f
     real(Float64), dimension(nlevs) :: denn
 
     !! Number of particles to launch
-    real(Float64) :: eb, ptch
+    real(Float64) :: max_papprox, eb, ptch
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
-    ncell = 0
     papprox=0.d0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -7892,6 +7909,16 @@ subroutine fida_f
                           sum(neut%dcx(:,i,j,k)) + &
                           sum(neut%halo(:,i,j,k)))* &
                           plasma%denf
+    enddo
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox*1.d-3))
+        papprox = 0.0
+    endwhere
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
             cell_ind(ncell) = ic
@@ -7971,13 +7998,12 @@ subroutine pfida_f
     real(Float64), dimension(nlevs) :: denn
 
     !! Number of particles to launch
-    real(Float64) :: eb, ptch
+    real(Float64) :: max_papprox, eb, ptch
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
-    ncell = 0
     papprox=0.d0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -7985,6 +8011,16 @@ subroutine pfida_f
         call get_plasma(plasma,ind=ind)
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
+    enddo
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox*1.d-3))
+        papprox = 0.0
+    endwhere
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
             cell_ind(ncell) = ic
@@ -8241,7 +8277,7 @@ subroutine npa_f
     integer, dimension(5) :: neut_types=[1,2,3,4,5]
     real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states
-    real(Float64) :: flux, theta, dtheta, eb, ptch
+    real(Float64) :: flux, theta, dtheta, eb, ptch, max_papprox
 
     integer :: inpa,ichan,nrange,ir,npart,ncell
     integer, dimension(beam_grid%ngrid) :: cell_ind
@@ -8249,7 +8285,6 @@ subroutine npa_f
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     papprox=0.d0
-    ncell = 0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8261,6 +8296,16 @@ subroutine npa_f
                         sum(neut%dcx(:,i,j,k)) + &
                         sum(neut%halo(:,i,j,k)))* &
                         plasma%denf
+    enddo
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox*1.d-3))
+        papprox = 0.0
+    endwhere
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
             cell_ind(ncell) = ic
@@ -8349,7 +8394,7 @@ subroutine pnpa_f
     real(Float64), dimension(2,4) :: gyrange
     real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states
-    real(Float64) :: flux, theta, dtheta, eb, ptch
+    real(Float64) :: flux, theta, dtheta, eb, ptch,max_papprox
 
     integer :: inpa,ichan,nrange,ir,npart,ncell
     integer, dimension(beam_grid%ngrid) :: cell_ind
@@ -8357,13 +8402,22 @@ subroutine pnpa_f
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
 
     papprox=0.d0
-    ncell = 0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         call get_plasma(plasma,ind=ind)
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k)=sum(plasma%denn)*plasma%denf
+    enddo
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox*1.d-3))
+        papprox = 0.0
+    endwhere
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
             cell_ind(ncell) = ic
@@ -8937,7 +8991,7 @@ subroutine fida_weights_mc
     real(Float64), dimension(3) :: randomu3
 
     !! Number of particles to launch
-    real(Float64) :: fbm_denf,phase_area
+    real(Float64) :: fbm_denf,phase_area, max_papprox
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -8980,7 +9034,6 @@ subroutine fida_weights_mc
     etov2 = 1.d0/(v2_to_E_per_amu*inputs%ab)
 
     !! Estimate how many particles to launch in each cell
-    ncell = 0
     papprox=0.d0
     do ic=1,beam_grid%ngrid
         call ind2sub(beam_grid%dims,ic,ind)
@@ -8992,6 +9045,16 @@ subroutine fida_weights_mc
                         sum(neut%third(:,i,j,k)) + &
                         sum(neut%dcx(:,i,j,k)) + &
                         sum(neut%halo(:,i,j,k)))
+    enddo
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox*1.d-3))
+        papprox = 0.0
+    endwhere
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
             cell_ind(ncell) = ic

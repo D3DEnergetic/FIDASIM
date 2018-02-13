@@ -6722,40 +6722,15 @@ subroutine get_nlaunch(nr_markers,papprox,papprox_tot,nlaunch)
     real(Float64), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
 
-    integer  :: i, j, k, cc
-    real(Float64), dimension(:), allocatable :: randomu
+    integer  :: i, j, k
 
-    do i=1,1000
-       nlaunch(:,:,:)=papprox(:,:,:)/papprox_tot*nr_markers*(1.+i*0.01)
-       if(sum(nlaunch).gt.nr_markers) then
-          exit
-       endif
-    enddo
+    nlaunch = nr_markers*papprox/sum(papprox)
 
-    allocate(randomu(count(nlaunch.gt.0)))
-    call randu(randomu)
-    cc=1
-    do k = 1, beam_grid%nz
-        do j = 1, beam_grid%ny
-            do i = 1, beam_grid%nx
-                if(nlaunch(i,j,k).gt.0.)then
-                    if(mod(nlaunch(i,j,k),1.).gt.randomu(cc))then
-                        nlaunch(i,j,k)=nlaunch(i,j,k)+1.
-                    endif
-                    cc=cc+1
-                endif
-            enddo
-        enddo
-    enddo
+    where ((nlaunch.gt.0.0).and.(nlaunch.lt.5.0))
+        nlaunch = 5.0
+    endwhere
 
-    do k = 1, beam_grid%nz
-        do j = 1, beam_grid%ny
-            do i = 1, beam_grid%nx
-                nlaunch(i,j,k)=floor(nlaunch(i,j,k))
-            enddo
-        enddo
-    enddo
-    deallocate(randomu)
+    nlaunch = floor(nlaunch)
 
 end subroutine get_nlaunch
 
@@ -7366,7 +7341,7 @@ end subroutine dcx
 subroutine halo
     !+ Calculates halo neutral density and spectra
     integer :: i,j,k !indices of cells
-    integer(Int64) :: ihalo !! counter
+    integer(Int64) :: ihalo,n_halo !! counter
     real(Float64), dimension(3) :: ri    !! start position
     real(Float64), dimension(3) :: vihalo!! velocity bulk plasma ion
     integer,dimension(3) :: ind    !! actual cell
@@ -7384,7 +7359,7 @@ subroutine halo
     real(Float64) :: papprox_tot, ccnt, inv_ng
     !! Halo iteration
     integer :: hh !! counters
-    real(Float64) :: dcx_dens, halo_iteration_dens
+    real(Float64) :: dcx_dens, halo_iteration_dens, seed_dcx
     integer :: s1type  ! halo iteration
     integer :: s2type  ! halo iteration
 
@@ -7392,6 +7367,7 @@ subroutine halo
     s2type = brems_type
 
     dcx_dens = halo_iter_dens(halo_type)
+    halo_iter_dens(s1type) = dcx_dens
     if(dcx_dens.eq.0) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
@@ -7400,6 +7376,8 @@ subroutine halo
     endif
     inv_ng = 100.0/real(beam_grid%ngrid)
     neut%dens(:,s1type,:,:,:) = neut%dens(:,halo_type,:,:,:)
+    n_halo = inputs%n_halo
+    seed_dcx = 1.0
     iterations: do hh=1,200
         papprox=0.d0
         papprox_tot=0.d0
@@ -7418,10 +7396,10 @@ subroutine halo
             enddo
         enddo
 
-        call get_nlaunch(inputs%n_halo,papprox,papprox_tot,nlaunch)
+        call get_nlaunch(n_halo,papprox,papprox_tot,nlaunch)
 
         if(inputs%verbose.ge.1) then
-            write(*,'(T6,"# of markers: ",i9)') int(sum(nlaunch),Int64)
+            write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') int(sum(nlaunch),Int64), seed_dcx
         endif
         ccnt=0.d0
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
@@ -7469,22 +7447,25 @@ subroutine halo
         enddo loop_along_z
         !$OMP END PARALLEL DO
 
+        if(halo_iter_dens(s2type)/halo_iter_dens(s1type).gt.1.0) then
+            if(inputs%verbose.ge.0) then
+                write(*,'(a)') "HALO: Halo generation density exceeded seed density. This shouldn't happen."
+            endif
+            exit iterations
+        endif
+
         halo_iteration_dens = halo_iter_dens(s2type)
+        halo_iter_dens(s1type) = halo_iter_dens(s2type)
+
         neut%dens(:,halo_type,:,:,:)= neut%dens(:,halo_type,:,:,:) &
                                            + neut%dens(:,s2type,:,:,:)
         neut%dens(:,s1type,:,:,:)= neut%dens(:,s2type,:,:,:)
         neut%dens(:,s2type,:,:,:)= 0.
 
-        if(halo_iteration_dens/dcx_dens.gt.1)then
-            if(inputs%verbose.ge.0) then
-                write(*,'(a)') "HALO: Halo generation density exceeded DCX density. This shouldn't happen."
-            endif
-            exit iterations
-        endif
+        seed_dcx = halo_iteration_dens/dcx_dens
+        n_halo=int(inputs%n_halo*seed_dcx,Int64)
 
-        inputs%n_halo=int(inputs%n_dcx*halo_iteration_dens/dcx_dens,Int64)
-
-        if(inputs%n_halo.lt.inputs%n_dcx*0.01)exit iterations
+        if(seed_dcx.lt.0.01) exit iterations
     enddo iterations
     !! set the neutral density in s1type(fida_type) and s2type (brems) to 0!
     neut%dens(:,s1type,:,:,:) = 0.d0

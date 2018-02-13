@@ -1154,11 +1154,16 @@ def check_npa(inp, npa):
     nchan_int = {'dims': [nchan],
                  'type': [int, np.int32, np.int64]}
 
+    nchan_float = {'dims': [nchan],
+                    'type': [float, np.float64]}
+
+    nchan_string = {'dims': [nchan],
+                    'type': [str, np.str_, np.bytes_]}
+
     schema = {'data_source': zero_string,
               'nchan': zero_long,
               'system': zero_string,
-              'id': {'dims': [nchan],
-                     'type': [str]},
+              'id': nchan_string,
               'a_shape': nchan_int,
               'd_shape': nchan_int,
               'a_tedge': three_float,
@@ -1167,21 +1172,21 @@ def check_npa(inp, npa):
               'd_tedge': three_float,
               'd_redge': three_float,
               'd_cent': three_float,
-              'radius': three_float}
+              'radius': nchan_float}
 
     err = check_dict_schema(schema, npa, desc="NPA geometry")
     if err:
         error('Invalid NPA geometry. Exiting...', halt=True)
 
     # Check detector/aperture shape
-    w = (npa['d_shape'] > 2) or (npa['d_shape'] == 0)
+    w = np.logical_or(npa['d_shape'] > 2, npa['d_shape'] == 0)
     nw = len(npa['d_shape'][w])
     if nw != 0:
         error('Invalid detector shape. Expected 1 (rectagular) or 2 (circular)')
         print('Invalid indices: {}'.format(np.arange(len(npa['d_shape']))[w]))
         err = True
 
-    w = (npa['a_shape'] > 2) or (npa['a_shape'] == 0)
+    w = np.logical_or(npa['a_shape'] > 2, npa['a_shape'] == 0)
     nw = len(npa['a_shape'])
     if nw != 0:
         error('Invalid aperture shape. Expected 1 (rectagular) or 2 (circular)')
@@ -1189,8 +1194,8 @@ def check_npa(inp, npa):
         err = True
 
     # Calculate grid center rc and sides length dr
-    dr = [inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']]
-    rc = [inp['xmin'], inp['ymin'], inp['zmin']] + 0.5 * dr
+    dr = np.array([inp['xmax'] - inp['xmin'], inp['ymax'] - inp['ymin'], inp['zmax'] - inp['zmin']])
+    rc = np.array([inp['xmin'], inp['ymin'], inp['zmin']]) + 0.5 * dr
     err_arr = np.zeros(nchan, dtype=int)
     for i in range(nchan):
         uvw_det = npa['d_cent'][:, i]

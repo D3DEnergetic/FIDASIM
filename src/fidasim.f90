@@ -8839,19 +8839,23 @@ subroutine neutron_f
     enddo z_loop
     !$OMP END PARALLEL DO
 
+#ifdef _MPI
+    call co_sum(neutron%rate)
+    call co_sum(neutron%weight)
+#endif
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
     endif
 
 #ifdef _MPI
-    call co_sum(neutron%rate)
-    call co_sum(neutron%weight)
     if(this_image().eq.1) call write_neutrons()
     sync all
 #else
     call write_neutrons()
 #endif
+
 
 end subroutine neutron_f
 
@@ -8935,13 +8939,16 @@ subroutine neutron_mc
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
+#ifdef _MPI
+    call co_sum(neutron%rate)
+#endif
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
     endif
 
 #ifdef _MPI
-    call co_sum(neutron%rate)
     if(this_image().eq.1) call write_neutrons()
     sync all
 #else

@@ -2160,7 +2160,7 @@ subroutine read_chords
 
         dlength = 0.d0
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-        !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind,inp,inps)
+        !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
         do ic=1,nc
             ! Uniformally sample within spot size
             call randu(randomu)

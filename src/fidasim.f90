@@ -9541,7 +9541,11 @@ program fidasim
 
     narg = command_argument_count()
     if(narg.eq.0) then
+#ifdef _MPI
+        write(*,'(a)') "usage: cafrun -np [num_processes] ./fidasim namelist_file"
+#else
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
+#endif
         stop
     else
         call get_command_argument(1,namelist_file)
@@ -9579,7 +9583,7 @@ program fidasim
     istep = num_images()
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- MPI settings ----"
-        write(*,'(T2,"Number of processes: ",i2)') istep
+        write(*,'(T2,"Number of processes: ",i3)') istep
         write(*,*) ''
     endif
 #endif

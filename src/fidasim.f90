@@ -3507,10 +3507,6 @@ subroutine write_birth_profile
         call h5close_f(error)
     endif
 
-#ifdef _MPI
-    sync all
-#endif
-
     deallocate(ri,vi)
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'birth profile written to: ',trim(filename)
@@ -3895,10 +3891,6 @@ subroutine write_npa
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'NPA data written to: ',trim(filename)
     endif
-
-#ifdef _MPI
-    sync all
-#endif
 
 end subroutine write_npa
 
@@ -8851,7 +8843,6 @@ subroutine neutron_f
 
 #ifdef _MPI
     if(this_image().eq.1) call write_neutrons()
-    sync all
 #else
     call write_neutrons()
 #endif
@@ -8950,7 +8941,6 @@ subroutine neutron_mc
 
 #ifdef _MPI
     if(this_image().eq.1) call write_neutrons()
-    sync all
 #else
     call write_neutrons()
 #endif
@@ -9123,7 +9113,6 @@ subroutine fida_weights_mc
     call co_sum(fweight%weight)
     call co_sum(fweight%mean_f)
     if(this_image().eq.1) call write_fida_weights()
-    sync all
 #else
     call write_fida_weights()
 #endif
@@ -9346,7 +9335,6 @@ subroutine fida_weights_los
     call co_sum(fweight%weight)
     call co_sum(fweight%mean_f)
     if(this_image().eq.1) call write_fida_weights()
-    sync all
 #else
     call write_fida_weights()
 #endif
@@ -9512,7 +9500,6 @@ subroutine npa_weights
 
 #ifdef _MPI
     if(this_image().eq.1) call write_npa_weights()
-    sync all
 #else
     call write_npa_weights()
 #endif
@@ -9747,7 +9734,6 @@ program fidasim
         !! ---------- WRITE NEUTRALS ---------- !!
 #ifdef _MPI
         if(this_image().eq.1) call write_neutrals()
-        sync all
 #else
         call write_neutrals()
 #endif
@@ -9795,7 +9781,6 @@ program fidasim
     if(inputs%calc_spec.ge.1) then
 #ifdef _MPI
         if(this_image().eq.1) call write_spectra()
-        sync all
 #else
         call write_spectra()
 #endif

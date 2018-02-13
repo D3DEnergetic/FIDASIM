@@ -2071,7 +2071,6 @@ subroutine read_chords
     character(len=20) :: system = ''
 
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
-    logical :: inp, inps
     integer :: error
 
     if(inputs%verbose.ge.1) then
@@ -2174,18 +2173,7 @@ subroutine read_chords
 
             call grid_intersect(r0, v0, length, r_enter, r_exit)
             call track(r_enter, v0, tracks, ntrack)
-            call in_plasma(tracks(1)%pos, inps)
             track_loop: do j=1, ntrack
-                !light cant travel through walls so if the LOS crosses the
-                !boundary twice then stop
-                call in_plasma(tracks(j)%pos, inp)
-                if (inps.neqv.inp) then
-                    if(.not.inps) then
-                        inps = inp
-                    else
-                        exit track_loop
-                    endif
-                endif
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
@@ -5409,7 +5397,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
 
-    integer :: cc, i, ii, mind
+    integer :: cc, i, ii, mind,ncross
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     real(Float64) :: dT, dt1, inv_50
@@ -5449,6 +5437,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     los_inter = .False.
     tracks%time = 0.d0
     tracks%flux = 0.d0
+    ncross = 0
     call in_plasma(ri,in_plasma1)
     track_loop: do i=1,beam_grid%ntrack
         if(cc.gt.beam_grid%ntrack) exit track_loop
@@ -5478,6 +5467,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             tracks(cc)%ind = ind
             tracks(cc+1)%ind = ind
             cc = cc + 2
+            ncross = ncross + 1
         else
             tracks(cc)%pos = ri + 0.5*dT*vn
             tracks(cc)%time = dT
@@ -5492,6 +5482,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
+        if (ncross.ge.2) exit track_loop
     enddo track_loop
     ntrack = cc-1
     if(present(los_intersect)) then

@@ -112,7 +112,7 @@ def pbs_mpi_jobscript(args):
 
                  ulimit -s unlimited
 
-                 cafrun -np %(ntasks) %(commands)s
+                 %(commands)s
 
                  %(postcall)s
 
@@ -145,7 +145,7 @@ def slurm_mpi_jobscript(args):
 
                  ulimit -s unlimited
 
-                 cafrun -np %(ntasks)s %(commands)s
+                 %(commands)s
 
                  %(postcall)s
 
@@ -300,7 +300,16 @@ def main():
 
         output_files = [extract_runid(file)+".out" for file in job]
 
-        args_dict =  {'commands':"\n".join([args.executable+" "+ z[0] +
+        use_mpi = is_mpi_executable(args.executable)
+
+        if use_mpi:
+            pre_call = "cafrun -np {} ".format(args.ntasks)
+            post_call = ""
+        else:
+            pre_call = ""
+            post_call = " {}".format(args.ntasks)
+
+        args_dict =  {'commands':"\n".join([pre_call + args.executable + " " + z[0] + post_call +
                                  " >& "+log_dir+"/"+z[1] for z in zip(job,output_files)]),
                       'ntasks':str(args.ntasks),
                       'mem':args.memory,
@@ -309,8 +318,6 @@ def main():
                       'precall':"\n".join(item for item in args.precall),
                       'postcall':"\n".join(item for item in args.postcall),
                       'job_name':os.path.basename(args.executable)}
-
-        use_mpi = is_mpi_executable(args.executable)
 
         if 'slurm' in rm:
             if use_mpi:

@@ -8,8 +8,8 @@ module utilities
 
 implicit none
 private
-public :: ind2sub, sub2ind, time
-public :: rng_type, rng_init, get_rng, rng, randind_cdf, cumsum
+public :: ind2sub, sub2ind, time, cumsum
+public :: rng_type, rng_init, rng_seed, get_rng, rng, randind_cdf
 public :: rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
 public :: deriv
@@ -29,6 +29,7 @@ integer, parameter :: ns = 2
 
 type :: rng_type
     !+ Random Number Generator Derived Type
+    integer(Int32) :: seed
     integer(Int32), dimension(ns) :: state
 end type rng_type
 
@@ -200,15 +201,42 @@ end function search_sorted_first_float64
 !============================================================================
 !-----------------------Parallel Random Number Routines----------------------
 !============================================================================
+function rng_seed() result (seed)
+    !+ Generates random 32-bit integer seed from `/dev/urandom`
+    integer(Int32) :: seed
+        !+ Seed value
+
+    open(89, file='/dev/urandom', access='SEQUENTIAL', form='UNFORMATTED')
+    read(89) seed
+    close(89)
+    seed = abs(seed)
+
+end function rng_seed
+
 subroutine rng_init(self, seed)
-    !+ Procedure to initialize a random number generator with a seed
+    !+ Procedure to initialize a random number generator with a seed.
+    !+ If seed is negative then random seed is used
     type(rng_type), intent(inout) :: self
         !+ Random Number Generator
     integer(Int32), intent(in)    :: seed
         !+ Initial Seed Value
 
-    self%state(1) = ieor(777755555,abs(seed))
-    self%state(2) = ior(ieor(888889999,abs(seed)),1)
+    integer(Int32) :: s
+
+    if(seed.lt.0) then
+        s = rng_seed()
+    else
+#ifdef _MPI
+        s = seed + this_image() - 1
+#else
+        s = seed
+#endif
+    endif
+
+
+    self%seed = s
+    self%state(1) = ieor(777755555,abs(s))
+    self%state(2) = ior(ieor(888889999,abs(s)),1)
 
 end subroutine rng_init
 

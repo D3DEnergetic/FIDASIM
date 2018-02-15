@@ -9521,7 +9521,7 @@ program fidasim
     implicit none
     character(3)          :: arg = ''
     integer, dimension(8) :: time_start
-    integer               :: i,narg,nthreads,max_threads
+    integer               :: i,narg,nthreads,max_threads,seed
 
 #ifdef _VERSION
     version = _VERSION
@@ -9585,14 +9585,18 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
     !! ----------------------------------------------------------
-#ifdef _MPI
-    allocate(rng(1))
-    call rng_init(rng(1),932117 + this_image())
-#else
+    seed = -1  !!If negative than random seed is used
     allocate(rng(max_threads))
+#ifdef _OMP
     do i=1,max_threads
-        call rng_init(rng(i),932117 + i)
+        if(seed.lt.0) then
+            call rng_init(rng(i), seed)
+        else
+            call rng_init(rng(i), seed + i)
+        endif
     enddo
+#else
+    call rng_init(rng(1), seed)
 #endif
 
     !! ----------------------------------------------------------

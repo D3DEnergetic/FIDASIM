@@ -2091,6 +2091,7 @@ subroutine read_chords
         endif
         inputs%calc_spec = 0
         inputs%calc_fida = 0
+        inputs%calc_pfida = 0
         inputs%calc_bes = 0
         inputs%calc_brems = 0
         inputs%calc_fida_wght = 0
@@ -7400,6 +7401,91 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     vnbi = vnbi*nbi%vinj/sqrt(real(efrac))
 end subroutine mc_nbi
 
+subroutine mc_nbi_cell(ind, vnbi)
+    !+ Generates a neutral beam a normalized velocity vector
+    !+ that passes through cell at `ind`
+    integer, dimension(3), intent(in)        :: ind
+        !+ Cell index
+    real(Float64), dimension(3), intent(out) :: vnbi
+        !+ Normalized Velocity
+
+    real(Float64), dimension(3) :: rc         !! Center of cell in uvw coords
+    real(Float64), dimension(3) :: uvw_rf     !! End position in xyz coords
+    real(Float64), dimension(3) :: xyz_rf     !! End position in xyz coords
+    real(Float64), dimension(3) :: uvw_src    !! Start position on ion source
+    real(Float64), dimension(3) :: xyz_src    !! Start position on ion source
+    real(Float64), dimension(3) :: uvw_ray    !! NBI velocity in uvw coords
+    real(Float64), dimension(3) :: xyz_ray    !! NBI velocity in xyz coords
+    real(Float64), dimension(3) :: xyz_ape    !! Aperture plane intersection point
+    real(Float64), dimension(3) :: randomu    !! uniform random numbers
+    real(Float64), dimension(3) :: r_enter, r_exit
+    real(Float64) :: sqrt_rho, theta
+    integer :: i, j
+    logical :: valid_trajectory
+
+    rc = [beam_grid%xc(ind(1)), beam_grid%yc(ind(2)), beam_grid%zc(ind(3))]
+    valid_trajectory = .False.
+    rejection_loop: do i=1,1000
+        call randu(randomu)
+        select case (nbi%shape)
+            case (1)
+                ! Uniformally sample in rectangle
+                xyz_src(1) =  0.d0
+                xyz_src(2) =  nbi%widy * 2.d0*(randomu(1)-0.5d0)
+                xyz_src(3) =  nbi%widz * 2.d0*(randomu(2)-0.5d0)
+            case (2)
+                ! Uniformally sample in ellipse
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                xyz_src(1) = 0.d0
+                xyz_src(2) = nbi%widy*sqrt_rho*cos(theta)
+                xyz_src(3) = nbi%widz*sqrt_rho*sin(theta)
+        end select
+
+        !! Create random position in the cell
+        call randu(randomu)
+        uvw_rf = rc + (randomu - 0.5)*beam_grid%dr
+        xyz_rf = matmul(nbi%inv_basis, uvw_rf - nbi%src)
+
+        xyz_ray = xyz_rf - xyz_src
+        xyz_ray = xyz_ray/norm2(xyz_ray)
+
+        aperture_loop: do j=1,nbi%naperture
+            xyz_ape = xyz_ray*nbi%adist(j) + xyz_src
+            select case (nbi%ashape(j))
+                case (1)
+                    if ((abs(xyz_ape(2) - nbi%aoffy(j)).gt.nbi%awidy(j)).or.&
+                        (abs(xyz_ape(3) - nbi%aoffz(j)).gt.nbi%awidz(j))) then
+                        cycle rejection_loop
+                    endif
+                case (2)
+                    if ((((xyz_ape(2) - nbi%aoffy(j))*nbi%awidz(j))**2 + &
+                         ((xyz_ape(3) - nbi%aoffz(j))*nbi%awidy(j))**2).gt. &
+                         (nbi%awidy(j)*nbi%awidz(j))**2) then
+                        cycle rejection_loop
+                    endif
+            end select
+        enddo aperture_loop
+        valid_trajectory = .True.
+
+        !! Convert to beam centerline coordinates to beam grid coordinates
+        uvw_src = matmul(nbi%basis,xyz_src) + nbi%src
+        uvw_ray = matmul(nbi%basis,xyz_ray)
+        vnbi = uvw_ray/norm2(uvw_ray)
+
+        exit rejection_loop
+    enddo rejection_loop
+
+    !Set Default trajectory in case rejection sampling fails
+    if(.not.valid_trajectory)then
+        call randu(randomu)
+        uvw_rf = rc + (randomu - 0.5)*beam_grid%dr
+        uvw_ray = uvw_rf - nbi%src
+        vnbi = uvw_ray/norm2(uvw_ray)
+    endif
+
+end subroutine mc_nbi_cell
+
 !=============================================================================
 !------------------------Primary Simulation Routines--------------------------
 !=============================================================================
@@ -7826,7 +7912,6 @@ subroutine halo
 #ifdef _MPI
         !! Combine densities
         call co_sum(dens_cur)
-        call co_sum(spec%halo)
         call co_sum(halo_iter_dens(cur_type))
 #endif
 
@@ -7846,8 +7931,80 @@ subroutine halo
 
         if(seed_dcx.lt.0.01) exit iterations
     enddo iterations
+#ifdef _MPI
+        !! Combine Spectra
+        call co_sum(spec%halo)
+#endif
 
 end subroutine halo
+
+subroutine bes
+    !+ Calculates approximate beam emmission (full, half, third, dcx, halo)
+    !+ from user supplied neutrals file
+    integer :: ic, i, j, k, it, ncell
+    real(Float64), dimension(3) :: ri, vhalo, vnbi, random3
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64) :: nbif_photons, nbih_photons, nbit_photons
+    real(Float64) :: dcx_photons, halo_photons
+    integer, dimension(beam_grid%ngrid) :: cell_ind
+    integer :: n = 10000
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        if(spec_chords%inter(i,j,k)%nchan.gt.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic
+        endif
+    enddo
+
+    !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,it,ind,vhalo,random3,ri, &
+    !$OMP& nbif_photons,nbih_photons,nbit_photons,dcx_photons,halo_photons,plasma)
+    loop_over_cells: do ic = istart, ncell, istep
+        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        call get_plasma(plasma, pos=ri)
+        nbif_photons = neut%full(3,i,j,k)*tables%einstein(2,3)
+        nbih_photons = neut%half(3,i,j,k)*tables%einstein(2,3)
+        nbit_photons = neut%third(3,i,j,k)*tables%einstein(2,3)
+        dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
+        halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
+        do it=1, n
+            !! Get velocity vector that passes through the cell
+            call mc_nbi_cell(ind, vnbi)
+            vnbi = nbi%vinj*vnbi
+            call store_bes_photons(ri, vnbi, nbif_photons/n, nbif_type)
+            call store_bes_photons(ri, vnbi/sqrt(2.0), nbih_photons/n, nbih_type)
+            call store_bes_photons(ri, vnbi/sqrt(3.0), nbit_photons/n, nbit_type)
+
+            !! DCX Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_bes_photons(ri, vhalo, dcx_photons/n, dcx_type)
+
+            !! Halo Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_bes_photons(ri, vhalo, halo_photons/n, halo_type)
+        enddo
+    enddo loop_over_cells
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine Spectra
+    call co_sum(spec%full)
+    call co_sum(spec%half)
+    call co_sum(spec%third)
+    call co_sum(spec%dcx)
+    call co_sum(spec%halo)
+#endif
+
+end subroutine bes
 
 subroutine fida_f
     !+ Calculate Active FIDA emission using a Fast-ion distribution function F(E,p,r,z)
@@ -9712,6 +9869,14 @@ program fidasim
     !! -----------------------------------------------------------------------
     if(inputs%load_neutrals.eq.1) then
         call read_neutrals()
+
+        if(inputs%calc_bes.ge.1) then
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'bes:     ' , time(time_start)
+            endif
+            call bes()
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+        endif
     else
         !! ----------- BEAM NEUTRALS ---------- !!
         if(inputs%verbose.ge.1) then

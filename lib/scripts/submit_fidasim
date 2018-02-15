@@ -303,11 +303,11 @@ def main():
         use_mpi = is_mpi_executable(args.executable)
 
         if use_mpi:
-            pre_call = "cafrun -np {} ".format(args.ntasks)
+            pre_call = "cafrun -np {0} ".format(args.ntasks)
             post_call = ""
         else:
             pre_call = ""
-            post_call = " {}".format(args.ntasks)
+            post_call = " {0}".format(args.ntasks)
 
         args_dict =  {'commands':"\n".join([pre_call + args.executable + " " + z[0] + post_call +
                                  " >& "+log_dir+"/"+z[1] for z in zip(job,output_files)]),

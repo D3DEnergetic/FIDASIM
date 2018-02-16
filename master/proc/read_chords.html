@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 1.2% of total for procedures.">124 statements</a>
+	  title=" 1.3% of total for procedures.">141 statements</a>
      </li> 
      
      
@@ -323,6 +323,8 @@
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -331,6 +333,8 @@
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -338,6 +342,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -419,6 +425,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -474,6 +482,8 @@
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -554,6 +564,10 @@
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -691,11 +705,19 @@
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -713,9 +735,11 @@
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -748,6 +772,8 @@
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -783,11 +809,15 @@
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       
@@ -871,343 +901,333 @@ public subroutine read_chords()
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_chords~~CallsGraph Pages: 1 -->
-<svg id="procread_chordsCallsGraph" width="641pt" height="487pt"
- viewBox="0.00 0.00 641.00 487.03" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_chords~~CallsGraph" class="graph" transform="scale(0.785539 0.785539) rotate(0) translate(4 616)">
+<svg id="procread_chordsCallsGraph" width="641pt" height="550pt"
+ viewBox="0.00 0.00 641.00 549.55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_chords~~CallsGraph" class="graph" transform="scale(0.785539 0.785539) rotate(0) translate(4 695.587)">
 <title>proc~~read_chords~~CallsGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-616 812,-616 812,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-695.587 812,-695.587 812,4 -4,4"/>
 <!-- proc~read_chords -->
 <g id="proc~~read_chords~~CallsGraph_node1" class="node"><title>proc~read_chords</title>
-<polygon fill="none" stroke="black" points="73.5,-318 0.5,-318 0.5,-294 73.5,-294 73.5,-318"/>
-<text text-anchor="middle" x="37" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_chords</text>
+<polygon fill="none" stroke="black" points="73.5,-376.587 0.5,-376.587 0.5,-352.587 73.5,-352.587 73.5,-376.587"/>
+<text text-anchor="middle" x="37" y="-362.187" font-family="Helvetica,sans-Serif" font-size="10.50">read_chords</text>
 </g>
-<!-- h5fopen_f -->
-<g id="proc~~read_chords~~CallsGraph_node2" class="node"><title>h5fopen_f</title>
-<polygon fill="#777777" stroke="#777777" points="217.5,-612 156.5,-612 156.5,-588 217.5,-588 217.5,-612"/>
-<text text-anchor="middle" x="187" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+<!-- h5open_f -->
+<g id="proc~~read_chords~~CallsGraph_node2" class="node"><title>h5open_f</title>
+<polygon fill="#777777" stroke="#777777" points="216,-691.587 158,-691.587 158,-667.587 216,-667.587 216,-691.587"/>
+<text text-anchor="middle" x="187" y="-677.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
 </g>
-<!-- proc~read_chords&#45;&gt;h5fopen_f -->
-<g id="proc~~read_chords~~CallsGraph_edge15" class="edge"><title>proc~read_chords&#45;&gt;h5fopen_f</title>
-<path fill="none" stroke="#000000" d="M39.5782,-318.076C46.0485,-365.805 72.0121,-540.564 110,-579 119.662,-588.776 133.436,-594.113 146.61,-596.991"/>
-<polygon fill="#000000" stroke="#000000" points="146.031,-600.443 156.489,-598.744 147.255,-593.55 146.031,-600.443"/>
+<!-- proc~read_chords&#45;&gt;h5open_f -->
+<g id="proc~~read_chords~~CallsGraph_edge13" class="edge"><title>proc~read_chords&#45;&gt;h5open_f</title>
+<path fill="none" stroke="#000000" d="M39.3615,-376.892C45.1709,-427.236 69.4568,-616.833 110,-658.587 119.879,-668.761 134.208,-674.14 147.767,-676.938"/>
+<polygon fill="#000000" stroke="#000000" points="147.463,-680.435 157.9,-678.612 148.604,-673.529 147.463,-680.435"/>
 </g>
-<!-- proc~grid_intersect -->
-<g id="proc~~read_chords~~CallsGraph_node3" class="node"><title>proc~grid_intersect</title>
-<g id="a_proc~~read_chords~~CallsGraph_node3"><a xlink:href="../proc/grid_intersect.html" xlink:title="grid_intersect">
-<polygon fill="#d9534f" stroke="#d9534f" points="225.5,-570 148.5,-570 148.5,-546 225.5,-546 225.5,-570"/>
-<text text-anchor="middle" x="187" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
-</a>
+<!-- h5ltread_dataset_double_f -->
+<g id="proc~~read_chords~~CallsGraph_node3" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="257,-649.587 117,-649.587 117,-625.587 257,-625.587 257,-649.587"/>
+<text text-anchor="middle" x="187" y="-635.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
 </g>
-</g>
-<!-- proc~read_chords&#45;&gt;proc~grid_intersect -->
-<g id="proc~~read_chords~~CallsGraph_edge16" class="edge"><title>proc~read_chords&#45;&gt;proc~grid_intersect</title>
-<path fill="none" stroke="#000000" d="M37.9702,-318.095C38.5587,-356.179 45.7101,-474.77 110,-537 117.752,-544.503 127.934,-549.377 138.315,-552.529"/>
-<polygon fill="#000000" stroke="#000000" points="137.703,-555.985 148.256,-555.053 139.425,-549.2 137.703,-555.985"/>
-</g>
-<!-- proc~uvw_to_xyz -->
-<g id="proc~~read_chords~~CallsGraph_node4" class="node"><title>proc~uvw_to_xyz</title>
-<g id="a_proc~~read_chords~~CallsGraph_node4"><a xlink:href="../proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
-<polygon fill="#d9534f" stroke="#d9534f" points="221,-528 153,-528 153,-504 221,-504 221,-528"/>
-<text text-anchor="middle" x="187" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
-</a>
-</g>
-</g>
-<!-- proc~read_chords&#45;&gt;proc~uvw_to_xyz -->
-<g id="proc~~read_chords~~CallsGraph_edge17" class="edge"><title>proc~read_chords&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M38.9469,-318.258C42.2104,-351.799 55.9778,-445.851 110,-495 119.097,-503.276 131.17,-508.33 143.009,-511.404"/>
-<polygon fill="#000000" stroke="#000000" points="142.312,-514.834 152.828,-513.547 143.804,-507.995 142.312,-514.834"/>
-</g>
-<!-- proc~track -->
-<g id="proc~~read_chords~~CallsGraph_node5" class="node"><title>proc~track</title>
-<g id="a_proc~~read_chords~~CallsGraph_node5"><a xlink:href="../proc/track.html" xlink:title="track">
-<polygon fill="#d9534f" stroke="#d9534f" points="214,-486 160,-486 160,-462 214,-462 214,-486"/>
-<text text-anchor="middle" x="187" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track</text>
-</a>
-</g>
-</g>
-<!-- proc~read_chords&#45;&gt;proc~track -->
-<g id="proc~~read_chords~~CallsGraph_edge18" class="edge"><title>proc~read_chords&#45;&gt;proc~track</title>
-<path fill="none" stroke="#000000" d="M40.4543,-318.39C46.7236,-346.709 66.0367,-416.533 110,-453 121.166,-462.263 136.113,-467.455 149.796,-470.36"/>
-<polygon fill="#000000" stroke="#000000" points="149.471,-473.857 159.93,-472.165 150.699,-466.965 149.471,-473.857"/>
-</g>
-<!-- h5close_f -->
-<g id="proc~~read_chords~~CallsGraph_node6" class="node"><title>h5close_f</title>
-<polygon fill="#777777" stroke="#777777" points="216,-444 158,-444 158,-420 216,-420 216,-444"/>
-<text text-anchor="middle" x="187" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
-</g>
-<!-- proc~read_chords&#45;&gt;h5close_f -->
-<g id="proc~~read_chords~~CallsGraph_edge19" class="edge"><title>proc~read_chords&#45;&gt;h5close_f</title>
-<path fill="none" stroke="#000000" d="M42.9211,-318.128C52.4682,-340.101 75.6319,-386.482 110,-411 121.079,-418.904 135.016,-423.836 147.92,-426.912"/>
-<polygon fill="#000000" stroke="#000000" points="147.469,-430.394 157.972,-429.003 148.894,-423.54 147.469,-430.394"/>
+<!-- proc~read_chords&#45;&gt;h5ltread_dataset_double_f -->
+<g id="proc~~read_chords~~CallsGraph_edge14" class="edge"><title>proc~read_chords&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M37.6028,-376.609C36.9622,-416.782 40.5256,-547.715 110,-616.587 111.094,-617.671 112.238,-618.701 113.426,-619.678"/>
+<polygon fill="#000000" stroke="#000000" points="111.603,-622.671 121.84,-625.403 115.541,-616.884 111.603,-622.671"/>
 </g>
 <!-- h5ltread_dataset_string_f -->
-<g id="proc~~read_chords~~CallsGraph_node7" class="node"><title>h5ltread_dataset_string_f</title>
-<polygon fill="#777777" stroke="#777777" points="254,-402 120,-402 120,-378 254,-378 254,-402"/>
-<text text-anchor="middle" x="187" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_string_f</text>
+<g id="proc~~read_chords~~CallsGraph_node4" class="node"><title>h5ltread_dataset_string_f</title>
+<polygon fill="#777777" stroke="#777777" points="254,-607.587 120,-607.587 120,-583.587 254,-583.587 254,-607.587"/>
+<text text-anchor="middle" x="187" y="-593.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_string_f</text>
 </g>
 <!-- proc~read_chords&#45;&gt;h5ltread_dataset_string_f -->
-<g id="proc~~read_chords~~CallsGraph_edge20" class="edge"><title>proc~read_chords&#45;&gt;h5ltread_dataset_string_f</title>
-<path fill="none" stroke="#000000" d="M48.5013,-318.018C61.5483,-332.22 85.1423,-355.606 110,-369 113.66,-370.972 117.522,-372.772 121.486,-374.413"/>
-<polygon fill="#000000" stroke="#000000" points="120.282,-377.699 130.873,-377.958 122.755,-371.151 120.282,-377.699"/>
-</g>
-<!-- h5gopen_f -->
-<g id="proc~~read_chords~~CallsGraph_node8" class="node"><title>h5gopen_f</title>
-<polygon fill="#777777" stroke="#777777" points="219,-360 155,-360 155,-336 219,-336 219,-360"/>
-<text text-anchor="middle" x="187" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
-</g>
-<!-- proc~read_chords&#45;&gt;h5gopen_f -->
-<g id="proc~~read_chords~~CallsGraph_edge21" class="edge"><title>proc~read_chords&#45;&gt;h5gopen_f</title>
-<path fill="none" stroke="#000000" d="M73.8616,-316.568C85.391,-319.937 98.226,-323.656 110,-327 121.407,-330.239 133.796,-333.691 145.197,-336.84"/>
-<polygon fill="#000000" stroke="#000000" points="144.341,-340.235 154.912,-339.517 146.201,-333.486 144.341,-340.235"/>
-</g>
-<!-- proc~randu -->
-<g id="proc~~read_chords~~CallsGraph_node9" class="node"><title>proc~randu</title>
-<g id="a_proc~~read_chords~~CallsGraph_node9"><a xlink:href="../proc/randu.html" xlink:title="randu">
-<polygon fill="#d9534f" stroke="#d9534f" points="214,-318 160,-318 160,-294 214,-294 214,-318"/>
-<text text-anchor="middle" x="187" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
-</a>
-</g>
-</g>
-<!-- proc~read_chords&#45;&gt;proc~randu -->
-<g id="proc~~read_chords~~CallsGraph_edge22" class="edge"><title>proc~read_chords&#45;&gt;proc~randu</title>
-<path fill="none" stroke="#000000" d="M73.8267,-306C96.8246,-306 126.596,-306 149.689,-306"/>
-<polygon fill="#000000" stroke="#000000" points="149.78,-309.5 159.78,-306 149.78,-302.5 149.78,-309.5"/>
+<g id="proc~~read_chords~~CallsGraph_edge15" class="edge"><title>proc~read_chords&#45;&gt;h5ltread_dataset_string_f</title>
+<path fill="none" stroke="#000000" d="M38.4023,-376.606C40.2673,-412.333 50.7773,-518.855 110,-574.587 111.268,-575.78 112.597,-576.907 113.979,-577.97"/>
+<polygon fill="#000000" stroke="#000000" points="112.1,-580.923 122.402,-583.397 115.891,-575.039 112.1,-580.923"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f -->
-<g id="proc~~read_chords~~CallsGraph_node10" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
-<g id="a_proc~~read_chords~~CallsGraph_node10"><a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="264,-276 110,-276 110,-252 264,-252 264,-276"/>
-<text text-anchor="middle" x="187" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+<g id="proc~~read_chords~~CallsGraph_node5" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="a_proc~~read_chords~~CallsGraph_node5"><a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="264,-565.587 110,-565.587 110,-541.587 264,-541.587 264,-565.587"/>
+<text text-anchor="middle" x="187" y="-551.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
 </a>
 </g>
 </g>
 <!-- proc~read_chords&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="proc~~read_chords~~CallsGraph_edge23" class="edge"><title>proc~read_chords&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M73.8616,-295.432C85.391,-292.063 98.226,-288.344 110,-285 117.142,-282.972 124.668,-280.861 132.097,-278.792"/>
-<polygon fill="#000000" stroke="#000000" points="133.064,-282.156 141.764,-276.109 131.192,-275.411 133.064,-282.156"/>
+<g id="proc~~read_chords~~CallsGraph_edge16" class="edge"><title>proc~read_chords&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M39.5996,-376.839C44.3055,-407.811 60.9975,-489.804 110,-532.587 111.508,-533.904 113.092,-535.139 114.738,-536.297"/>
+<polygon fill="#000000" stroke="#000000" points="113.04,-539.359 123.423,-541.469 116.622,-533.345 113.04,-539.359"/>
+</g>
+<!-- proc~grid_intersect -->
+<g id="proc~~read_chords~~CallsGraph_node6" class="node"><title>proc~grid_intersect</title>
+<g id="a_proc~~read_chords~~CallsGraph_node6"><a xlink:href="../proc/grid_intersect.html" xlink:title="grid_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="225.5,-523.587 148.5,-523.587 148.5,-499.587 225.5,-499.587 225.5,-523.587"/>
+<text text-anchor="middle" x="187" y="-509.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
+</a>
+</g>
+</g>
+<!-- proc~read_chords&#45;&gt;proc~grid_intersect -->
+<g id="proc~~read_chords~~CallsGraph_edge17" class="edge"><title>proc~read_chords&#45;&gt;proc~grid_intersect</title>
+<path fill="none" stroke="#000000" d="M41.4652,-376.727C49.2985,-401.935 70.809,-460.132 110,-490.587 118.188,-496.95 128.184,-501.386 138.202,-504.478"/>
+<polygon fill="#000000" stroke="#000000" points="137.596,-507.939 148.161,-507.144 139.406,-501.177 137.596,-507.939"/>
+</g>
+<!-- h5fopen_f -->
+<g id="proc~~read_chords~~CallsGraph_node7" class="node"><title>h5fopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="217.5,-481.587 156.5,-481.587 156.5,-457.587 217.5,-457.587 217.5,-481.587"/>
+<text text-anchor="middle" x="187" y="-467.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+</g>
+<!-- proc~read_chords&#45;&gt;h5fopen_f -->
+<g id="proc~~read_chords~~CallsGraph_edge18" class="edge"><title>proc~read_chords&#45;&gt;h5fopen_f</title>
+<path fill="none" stroke="#000000" d="M45.1734,-376.888C56.5495,-395.295 80.4918,-429.845 110,-448.587 120.833,-455.468 133.924,-460.125 146.166,-463.265"/>
+<polygon fill="#000000" stroke="#000000" points="145.653,-466.738 156.182,-465.561 147.217,-459.915 145.653,-466.738"/>
+</g>
+<!-- interface~randu -->
+<g id="proc~~read_chords~~CallsGraph_node8" class="node"><title>interface~randu</title>
+<g id="a_proc~~read_chords~~CallsGraph_node8"><a xlink:href="../interface/randu.html" xlink:title="randu">
+<polygon fill="#a7506f" stroke="#a7506f" points="214,-439.587 160,-439.587 160,-415.587 214,-415.587 214,-439.587"/>
+<text text-anchor="middle" x="187" y="-425.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+</a>
+</g>
+</g>
+<!-- proc~read_chords&#45;&gt;interface~randu -->
+<g id="proc~~read_chords~~CallsGraph_edge19" class="edge"><title>proc~read_chords&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M55.6721,-376.642C69.8496,-385.875 90.5301,-398.382 110,-406.587 122.641,-411.914 137.031,-416.289 149.864,-419.64"/>
+<polygon fill="#000000" stroke="#000000" points="149.209,-423.084 159.758,-422.107 150.902,-416.292 149.209,-423.084"/>
+</g>
+<!-- h5fclose_f -->
+<g id="proc~~read_chords~~CallsGraph_node9" class="node"><title>h5fclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="217.5,-397.587 156.5,-397.587 156.5,-373.587 217.5,-373.587 217.5,-397.587"/>
+<text text-anchor="middle" x="187" y="-383.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
+</g>
+<!-- proc~read_chords&#45;&gt;h5fclose_f -->
+<g id="proc~~read_chords~~CallsGraph_edge20" class="edge"><title>proc~read_chords&#45;&gt;h5fclose_f</title>
+<path fill="none" stroke="#000000" d="M73.8267,-369.671C95.786,-372.787 123.921,-376.779 146.52,-379.985"/>
+<polygon fill="#000000" stroke="#000000" points="146.08,-383.458 156.472,-381.398 147.063,-376.527 146.08,-383.458"/>
+</g>
+<!-- h5gopen_f -->
+<g id="proc~~read_chords~~CallsGraph_node10" class="node"><title>h5gopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="219,-355.587 155,-355.587 155,-331.587 219,-331.587 219,-355.587"/>
+<text text-anchor="middle" x="187" y="-341.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
+</g>
+<!-- proc~read_chords&#45;&gt;h5gopen_f -->
+<g id="proc~~read_chords~~CallsGraph_edge21" class="edge"><title>proc~read_chords&#45;&gt;h5gopen_f</title>
+<path fill="none" stroke="#000000" d="M73.8267,-359.504C95.0963,-356.486 122.16,-352.646 144.375,-349.494"/>
+<polygon fill="#000000" stroke="#000000" points="145.113,-352.924 154.522,-348.054 144.13,-345.993 145.113,-352.924"/>
+</g>
+<!-- proc~ind2sub -->
+<g id="proc~~read_chords~~CallsGraph_node11" class="node"><title>proc~ind2sub</title>
+<g id="a_proc~~read_chords~~CallsGraph_node11"><a xlink:href="../proc/ind2sub.html" xlink:title="ind2sub">
+<polygon fill="#d9534f" stroke="#d9534f" points="214,-313.587 160,-313.587 160,-289.587 214,-289.587 214,-313.587"/>
+<text text-anchor="middle" x="187" y="-299.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ind2sub</text>
+</a>
+</g>
+</g>
+<!-- proc~read_chords&#45;&gt;proc~ind2sub -->
+<g id="proc~~read_chords~~CallsGraph_edge22" class="edge"><title>proc~read_chords&#45;&gt;proc~ind2sub</title>
+<path fill="none" stroke="#000000" d="M55.6721,-352.532C69.8496,-343.299 90.5301,-330.792 110,-322.587 122.641,-317.26 137.031,-312.886 149.864,-309.534"/>
+<polygon fill="#000000" stroke="#000000" points="150.902,-312.883 159.758,-307.067 149.209,-306.091 150.902,-312.883"/>
 </g>
 <!-- proc~line_basis -->
-<g id="proc~~read_chords~~CallsGraph_node11" class="node"><title>proc~line_basis</title>
-<g id="a_proc~~read_chords~~CallsGraph_node11"><a xlink:href="../proc/line_basis.html" xlink:title="line_basis">
-<polygon fill="#d9534f" stroke="#d9534f" points="217,-234 157,-234 157,-210 217,-210 217,-234"/>
-<text text-anchor="middle" x="187" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_basis</text>
+<g id="proc~~read_chords~~CallsGraph_node12" class="node"><title>proc~line_basis</title>
+<g id="a_proc~~read_chords~~CallsGraph_node12"><a xlink:href="../proc/line_basis.html" xlink:title="line_basis">
+<polygon fill="#d9534f" stroke="#d9534f" points="217,-271.587 157,-271.587 157,-247.587 217,-247.587 217,-271.587"/>
+<text text-anchor="middle" x="187" y="-257.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_basis</text>
 </a>
 </g>
 </g>
 <!-- proc~read_chords&#45;&gt;proc~line_basis -->
-<g id="proc~~read_chords~~CallsGraph_edge24" class="edge"><title>proc~read_chords&#45;&gt;proc~line_basis</title>
-<path fill="none" stroke="#000000" d="M48.5013,-293.982C61.5483,-279.78 85.1423,-256.394 110,-243 121.298,-236.913 134.513,-232.468 146.727,-229.278"/>
-<polygon fill="#000000" stroke="#000000" points="147.78,-232.625 156.686,-226.886 146.145,-225.818 147.78,-232.625"/>
-</g>
-<!-- h5fclose_f -->
-<g id="proc~~read_chords~~CallsGraph_node12" class="node"><title>h5fclose_f</title>
-<polygon fill="#777777" stroke="#777777" points="217.5,-192 156.5,-192 156.5,-168 217.5,-168 217.5,-192"/>
-<text text-anchor="middle" x="187" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
-</g>
-<!-- proc~read_chords&#45;&gt;h5fclose_f -->
-<g id="proc~~read_chords~~CallsGraph_edge25" class="edge"><title>proc~read_chords&#45;&gt;h5fclose_f</title>
-<path fill="none" stroke="#000000" d="M42.9211,-293.872C52.4682,-271.899 75.6319,-225.518 110,-201 120.534,-193.485 133.652,-188.656 146.008,-185.555"/>
-<polygon fill="#000000" stroke="#000000" points="147.117,-188.895 156.135,-183.335 145.618,-182.058 147.117,-188.895"/>
-</g>
-<!-- h5ltread_dataset_double_f -->
-<g id="proc~~read_chords~~CallsGraph_node13" class="node"><title>h5ltread_dataset_double_f</title>
-<polygon fill="#777777" stroke="#777777" points="257,-150 117,-150 117,-126 257,-126 257,-150"/>
-<text text-anchor="middle" x="187" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
-</g>
-<!-- proc~read_chords&#45;&gt;h5ltread_dataset_double_f -->
-<g id="proc~~read_chords~~CallsGraph_edge26" class="edge"><title>proc~read_chords&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M40.4543,-293.61C46.7236,-265.291 66.0367,-195.467 110,-159 111.58,-157.689 113.237,-156.46 114.954,-155.307"/>
-<polygon fill="#000000" stroke="#000000" points="117.034,-158.15 123.987,-150.156 113.567,-152.069 117.034,-158.15"/>
+<g id="proc~~read_chords~~CallsGraph_edge23" class="edge"><title>proc~read_chords&#45;&gt;proc~line_basis</title>
+<path fill="none" stroke="#000000" d="M45.1734,-352.287C56.5495,-333.879 80.4918,-299.33 110,-280.587 121.124,-273.522 134.628,-268.801 147.15,-265.66"/>
+<polygon fill="#000000" stroke="#000000" points="147.928,-269.072 156.917,-263.465 146.393,-262.243 147.928,-269.072"/>
 </g>
 <!-- h5ltpath_valid_f -->
-<g id="proc~~read_chords~~CallsGraph_node14" class="node"><title>h5ltpath_valid_f</title>
-<polygon fill="#777777" stroke="#777777" points="231,-108 143,-108 143,-84 231,-84 231,-108"/>
-<text text-anchor="middle" x="187" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
+<g id="proc~~read_chords~~CallsGraph_node13" class="node"><title>h5ltpath_valid_f</title>
+<polygon fill="#777777" stroke="#777777" points="231,-229.587 143,-229.587 143,-205.587 231,-205.587 231,-229.587"/>
+<text text-anchor="middle" x="187" y="-215.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
 </g>
 <!-- proc~read_chords&#45;&gt;h5ltpath_valid_f -->
-<g id="proc~~read_chords~~CallsGraph_edge27" class="edge"><title>proc~read_chords&#45;&gt;h5ltpath_valid_f</title>
-<path fill="none" stroke="#000000" d="M38.9469,-293.742C42.2104,-260.201 55.9778,-166.149 110,-117 116.547,-111.043 124.636,-106.756 133.07,-103.674"/>
-<polygon fill="#000000" stroke="#000000" points="134.168,-106.998 142.675,-100.683 132.087,-100.315 134.168,-106.998"/>
+<g id="proc~~read_chords~~CallsGraph_edge24" class="edge"><title>proc~read_chords&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M41.4652,-352.447C49.2985,-327.24 70.809,-269.043 110,-238.587 116.759,-233.335 124.75,-229.395 132.969,-226.441"/>
+<polygon fill="#000000" stroke="#000000" points="134.164,-229.734 142.661,-223.405 132.072,-223.054 134.164,-229.734"/>
+</g>
+<!-- proc~uvw_to_xyz -->
+<g id="proc~~read_chords~~CallsGraph_node14" class="node"><title>proc~uvw_to_xyz</title>
+<g id="a_proc~~read_chords~~CallsGraph_node14"><a xlink:href="../proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="221,-187.587 153,-187.587 153,-163.587 221,-163.587 221,-187.587"/>
+<text text-anchor="middle" x="187" y="-173.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
+</a>
+</g>
+</g>
+<!-- proc~read_chords&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~read_chords~~CallsGraph_edge25" class="edge"><title>proc~read_chords&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M39.5996,-352.335C44.3055,-321.364 60.9975,-239.371 110,-196.587 119.092,-188.649 130.937,-183.688 142.559,-180.595"/>
+<polygon fill="#000000" stroke="#000000" points="143.652,-183.937 152.641,-178.33 142.117,-177.107 143.652,-183.937"/>
+</g>
+<!-- h5close_f -->
+<g id="proc~~read_chords~~CallsGraph_node15" class="node"><title>h5close_f</title>
+<polygon fill="#777777" stroke="#777777" points="216,-145.587 158,-145.587 158,-121.587 216,-121.587 216,-145.587"/>
+<text text-anchor="middle" x="187" y="-131.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
+</g>
+<!-- proc~read_chords&#45;&gt;h5close_f -->
+<g id="proc~~read_chords~~CallsGraph_edge26" class="edge"><title>proc~read_chords&#45;&gt;h5close_f</title>
+<path fill="none" stroke="#000000" d="M38.4023,-352.568C40.2673,-316.841 50.7773,-210.32 110,-154.587 120.248,-144.944 134.52,-139.659 147.932,-136.787"/>
+<polygon fill="#000000" stroke="#000000" points="148.696,-140.206 157.94,-135.029 147.485,-133.312 148.696,-140.206"/>
+</g>
+<!-- proc~track -->
+<g id="proc~~read_chords~~CallsGraph_node16" class="node"><title>proc~track</title>
+<g id="a_proc~~read_chords~~CallsGraph_node16"><a xlink:href="../proc/track.html" xlink:title="track">
+<polygon fill="#d9534f" stroke="#d9534f" points="214,-103.587 160,-103.587 160,-79.5873 214,-79.5873 214,-103.587"/>
+<text text-anchor="middle" x="187" y="-89.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track</text>
+</a>
+</g>
+</g>
+<!-- proc~read_chords&#45;&gt;proc~track -->
+<g id="proc~~read_chords~~CallsGraph_edge27" class="edge"><title>proc~read_chords&#45;&gt;proc~track</title>
+<path fill="none" stroke="#000000" d="M37.6028,-352.566C36.9622,-312.393 40.5256,-181.459 110,-112.587 120.561,-102.118 135.844,-96.7525 149.94,-94.0444"/>
+<polygon fill="#000000" stroke="#000000" points="150.56,-97.4902 159.91,-92.5071 149.493,-90.572 150.56,-97.4902"/>
 </g>
 <!-- h5gclose_f -->
-<g id="proc~~read_chords~~CallsGraph_node15" class="node"><title>h5gclose_f</title>
-<polygon fill="#777777" stroke="#777777" points="219,-66 155,-66 155,-42 219,-42 219,-66"/>
-<text text-anchor="middle" x="187" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
+<g id="proc~~read_chords~~CallsGraph_node17" class="node"><title>h5gclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="219,-61.5873 155,-61.5873 155,-37.5873 219,-37.5873 219,-61.5873"/>
+<text text-anchor="middle" x="187" y="-47.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
 </g>
 <!-- proc~read_chords&#45;&gt;h5gclose_f -->
 <g id="proc~~read_chords~~CallsGraph_edge28" class="edge"><title>proc~read_chords&#45;&gt;h5gclose_f</title>
-<path fill="none" stroke="#000000" d="M37.9702,-293.905C38.5587,-255.821 45.7101,-137.23 110,-75 119.391,-65.91 132.348,-60.6793 144.906,-57.6936"/>
-<polygon fill="#000000" stroke="#000000" points="145.676,-61.1094 154.815,-55.7496 144.328,-54.2403 145.676,-61.1094"/>
-</g>
-<!-- h5open_f -->
-<g id="proc~~read_chords~~CallsGraph_node16" class="node"><title>h5open_f</title>
-<polygon fill="#777777" stroke="#777777" points="216,-24 158,-24 158,-0 216,-0 216,-24"/>
-<text text-anchor="middle" x="187" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
-</g>
-<!-- proc~read_chords&#45;&gt;h5open_f -->
-<g id="proc~~read_chords~~CallsGraph_edge29" class="edge"><title>proc~read_chords&#45;&gt;h5open_f</title>
-<path fill="none" stroke="#000000" d="M39.5782,-293.924C46.0485,-246.195 72.0121,-71.4359 110,-33 119.968,-22.914 134.314,-17.5521 147.862,-14.7425"/>
-<polygon fill="#000000" stroke="#000000" points="148.693,-18.1524 157.982,-13.0556 147.542,-11.2477 148.693,-18.1524"/>
-</g>
-<!-- proc~get_indices -->
-<g id="proc~~read_chords~~CallsGraph_node17" class="node"><title>proc~get_indices</title>
-<g id="a_proc~~read_chords~~CallsGraph_node17"><a xlink:href="../proc/get_indices.html" xlink:title="get_indices">
-<polygon fill="#d9534f" stroke="#d9534f" points="393.5,-507 326.5,-507 326.5,-483 393.5,-483 393.5,-507"/>
-<text text-anchor="middle" x="360" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
-</a>
-</g>
-</g>
-<!-- proc~track&#45;&gt;proc~get_indices -->
-<g id="proc~~read_chords~~CallsGraph_edge9" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
-<path fill="none" stroke="#000000" d="M214.344,-477.235C241.565,-480.578 284.476,-485.848 316.503,-489.781"/>
-<polygon fill="#000000" stroke="#000000" points="316.134,-493.262 326.486,-491.007 316.987,-486.314 316.134,-493.262"/>
-</g>
-<!-- proc~in_plasma -->
-<g id="proc~~read_chords~~CallsGraph_node18" class="node"><title>proc~in_plasma</title>
-<g id="a_proc~~read_chords~~CallsGraph_node18"><a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
-<polygon fill="#d9534f" stroke="#d9534f" points="390.5,-465 329.5,-465 329.5,-441 390.5,-441 390.5,-465"/>
-<text text-anchor="middle" x="360" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
-</a>
-</g>
-</g>
-<!-- proc~track&#45;&gt;proc~in_plasma -->
-<g id="proc~~read_chords~~CallsGraph_edge10" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M214.344,-470.765C242.41,-467.318 287.157,-461.823 319.455,-457.856"/>
-<polygon fill="#000000" stroke="#000000" points="319.968,-461.32 329.467,-456.627 319.115,-454.372 319.968,-461.32"/>
-</g>
-<!-- omp_get_thread_num -->
-<g id="proc~~read_chords~~CallsGraph_node25" class="node"><title>omp_get_thread_num</title>
-<polygon fill="#777777" stroke="#777777" points="419,-360 301,-360 301,-336 419,-336 419,-360"/>
-<text text-anchor="middle" x="360" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
-</g>
-<!-- proc~randu&#45;&gt;omp_get_thread_num -->
-<g id="proc~~read_chords~~CallsGraph_edge11" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="#000000" d="M214.344,-312.47C237.055,-318.049 270.688,-326.309 299.81,-333.462"/>
-<polygon fill="#000000" stroke="#000000" points="299.351,-336.953 309.897,-335.94 301.021,-330.155 299.351,-336.953"/>
-</g>
-<!-- proc~rng_uniform -->
-<g id="proc~~read_chords~~CallsGraph_node26" class="node"><title>proc~rng_uniform</title>
-<g id="a_proc~~read_chords~~CallsGraph_node26"><a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="395,-318 325,-318 325,-294 395,-294 395,-318"/>
-<text text-anchor="middle" x="360" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
-</a>
-</g>
-</g>
-<!-- proc~randu&#45;&gt;proc~rng_uniform -->
-<g id="proc~~read_chords~~CallsGraph_edge12" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="#000000" d="M214.344,-306C241.026,-306 282.784,-306 314.589,-306"/>
-<polygon fill="#000000" stroke="#000000" points="314.958,-309.5 324.958,-306 314.958,-302.5 314.958,-309.5"/>
+<path fill="none" stroke="#000000" d="M39.3615,-352.283C45.1709,-301.939 69.4568,-112.341 110,-70.5873 119.18,-61.1332 132.203,-55.8198 144.88,-52.8698"/>
+<polygon fill="#000000" stroke="#000000" points="145.717,-56.2736 154.893,-50.9768 144.417,-49.3955 145.717,-56.2736"/>
 </g>
 <!-- h5ltread_dataset_int_f -->
-<g id="proc~~read_chords~~CallsGraph_node27" class="node"><title>h5ltread_dataset_int_f</title>
-<polygon fill="#777777" stroke="#777777" points="419.5,-276 300.5,-276 300.5,-252 419.5,-252 419.5,-276"/>
-<text text-anchor="middle" x="360" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+<g id="proc~~read_chords~~CallsGraph_node18" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="419.5,-565.587 300.5,-565.587 300.5,-541.587 419.5,-541.587 419.5,-565.587"/>
+<text text-anchor="middle" x="360" y="-551.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
-<g id="proc~~read_chords~~CallsGraph_edge13" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M264.497,-264C273.032,-264 281.688,-264 290.119,-264"/>
-<polygon fill="#000000" stroke="#000000" points="290.269,-267.5 300.269,-264 290.269,-260.5 290.269,-267.5"/>
+<g id="proc~~read_chords~~CallsGraph_edge1" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M264.497,-553.587C273.032,-553.587 281.688,-553.587 290.119,-553.587"/>
+<polygon fill="#000000" stroke="#000000" points="290.269,-557.087 300.269,-553.587 290.269,-550.087 290.269,-557.087"/>
 </g>
 <!-- proc~tb_zyx -->
-<g id="proc~~read_chords~~CallsGraph_node28" class="node"><title>proc~tb_zyx</title>
-<g id="a_proc~~read_chords~~CallsGraph_node28"><a xlink:href="../proc/tb_zyx.html" xlink:title="tb_zyx">
-<polygon fill="#d9534f" stroke="#d9534f" points="387,-234 333,-234 333,-210 387,-210 387,-234"/>
-<text text-anchor="middle" x="360" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">tb_zyx</text>
+<g id="proc~~read_chords~~CallsGraph_node19" class="node"><title>proc~tb_zyx</title>
+<g id="a_proc~~read_chords~~CallsGraph_node19"><a xlink:href="../proc/tb_zyx.html" xlink:title="tb_zyx">
+<polygon fill="#d9534f" stroke="#d9534f" points="387,-271.587 333,-271.587 333,-247.587 387,-247.587 387,-271.587"/>
+<text text-anchor="middle" x="360" y="-257.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">tb_zyx</text>
 </a>
 </g>
 </g>
 <!-- proc~line_basis&#45;&gt;proc~tb_zyx -->
-<g id="proc~~read_chords~~CallsGraph_edge14" class="edge"><title>proc~line_basis&#45;&gt;proc~tb_zyx</title>
-<path fill="none" stroke="#000000" d="M217.008,-222C246.201,-222 291.297,-222 322.813,-222"/>
-<polygon fill="#000000" stroke="#000000" points="322.937,-225.5 332.937,-222 322.937,-218.5 322.937,-225.5"/>
+<g id="proc~~read_chords~~CallsGraph_edge2" class="edge"><title>proc~line_basis&#45;&gt;proc~tb_zyx</title>
+<path fill="none" stroke="#000000" d="M217.008,-259.587C246.201,-259.587 291.297,-259.587 322.813,-259.587"/>
+<polygon fill="#000000" stroke="#000000" points="322.937,-263.087 332.937,-259.587 322.937,-256.087 322.937,-263.087"/>
+</g>
+<!-- proc~get_indices -->
+<g id="proc~~read_chords~~CallsGraph_node20" class="node"><title>proc~get_indices</title>
+<g id="a_proc~~read_chords~~CallsGraph_node20"><a xlink:href="../proc/get_indices.html" xlink:title="get_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="393.5,-124.587 326.5,-124.587 326.5,-100.587 393.5,-100.587 393.5,-124.587"/>
+<text text-anchor="middle" x="360" y="-110.187" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~track&#45;&gt;proc~get_indices -->
+<g id="proc~~read_chords~~CallsGraph_edge11" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="#000000" d="M214.344,-94.8225C241.565,-98.1654 284.476,-103.435 316.503,-107.368"/>
+<polygon fill="#000000" stroke="#000000" points="316.134,-110.849 326.486,-108.594 316.987,-103.901 316.134,-110.849"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="proc~~read_chords~~CallsGraph_node21" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~read_chords~~CallsGraph_node21"><a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="390.5,-82.5873 329.5,-82.5873 329.5,-58.5873 390.5,-58.5873 390.5,-82.5873"/>
+<text text-anchor="middle" x="360" y="-68.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~track&#45;&gt;proc~in_plasma -->
+<g id="proc~~read_chords~~CallsGraph_edge12" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M214.344,-88.352C242.41,-84.9053 287.157,-79.4101 319.455,-75.4437"/>
+<polygon fill="#000000" stroke="#000000" points="319.968,-78.907 329.467,-74.2141 319.115,-71.9592 319.968,-78.907"/>
 </g>
 <!-- proc~xyz_to_uvw -->
-<g id="proc~~read_chords~~CallsGraph_node19" class="node"><title>proc~xyz_to_uvw</title>
-<g id="a_proc~~read_chords~~CallsGraph_node19"><a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="529,-486 461,-486 461,-462 529,-462 529,-486"/>
-<text text-anchor="middle" x="495" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+<g id="proc~~read_chords~~CallsGraph_node22" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~read_chords~~CallsGraph_node22"><a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="529,-103.587 461,-103.587 461,-79.5873 529,-79.5873 529,-103.587"/>
+<text text-anchor="middle" x="495" y="-89.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
 </a>
 </g>
 </g>
 <!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
-<g id="proc~~read_chords~~CallsGraph_edge7" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M390.517,-457.661C408.243,-460.459 431.11,-464.07 450.838,-467.185"/>
-<polygon fill="#000000" stroke="#000000" points="450.401,-470.659 460.824,-468.762 451.493,-463.745 450.401,-470.659"/>
+<g id="proc~~read_chords~~CallsGraph_edge9" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M390.517,-75.2478C408.243,-78.0467 431.11,-81.6572 450.838,-84.7722"/>
+<polygon fill="#000000" stroke="#000000" points="450.401,-88.2465 460.824,-86.349 451.493,-81.3321 450.401,-88.2465"/>
 </g>
 <!-- interface~interpol_coeff -->
-<g id="proc~~read_chords~~CallsGraph_node20" class="node"><title>interface~interpol_coeff</title>
-<g id="a_proc~~read_chords~~CallsGraph_node20"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="533.5,-444 456.5,-444 456.5,-420 533.5,-420 533.5,-444"/>
-<text text-anchor="middle" x="495" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+<g id="proc~~read_chords~~CallsGraph_node23" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~read_chords~~CallsGraph_node23"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="533.5,-61.5873 456.5,-61.5873 456.5,-37.5873 533.5,-37.5873 533.5,-61.5873"/>
+<text text-anchor="middle" x="495" y="-47.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
 </a>
 </g>
 </g>
 <!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
-<g id="proc~~read_chords~~CallsGraph_edge8" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M390.517,-448.339C406.918,-445.75 427.72,-442.465 446.365,-439.521"/>
-<polygon fill="#000000" stroke="#000000" points="447.128,-442.944 456.46,-437.927 446.036,-436.03 447.128,-442.944"/>
-</g>
-<!-- proc~interpol2d_coeff_arr -->
-<g id="proc~~read_chords~~CallsGraph_node21" class="node"><title>proc~interpol2d_coeff_arr</title>
-<g id="a_proc~~read_chords~~CallsGraph_node21"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="680,-503 570,-503 570,-479 680,-479 680,-503"/>
-<text text-anchor="middle" x="625" y="-488.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
-</a>
-</g>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="proc~~read_chords~~CallsGraph_edge3" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M522.212,-444.082C541.366,-452.911 567.557,-464.983 588.575,-474.671"/>
-<polygon fill="#000000" stroke="#000000" points="587.277,-477.927 597.823,-478.934 590.207,-471.57 587.277,-477.927"/>
-</g>
-<!-- proc~interpol2d_coeff -->
-<g id="proc~~read_chords~~CallsGraph_node22" class="node"><title>proc~interpol2d_coeff</title>
-<g id="a_proc~~read_chords~~CallsGraph_node22"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="807.5,-474 716.5,-474 716.5,-450 807.5,-450 807.5,-474"/>
-<text text-anchor="middle" x="762" y="-459.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
-</a>
-</g>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="proc~~read_chords~~CallsGraph_edge4" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.687,-436.266C578.832,-441.377 654.816,-449.979 706.39,-455.818"/>
-<polygon fill="#000000" stroke="#000000" points="706.033,-459.3 716.363,-456.947 706.82,-452.344 706.033,-459.3"/>
+<g id="proc~~read_chords~~CallsGraph_edge10" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M390.517,-65.9267C406.918,-63.337 427.72,-60.0525 446.365,-57.1086"/>
+<polygon fill="#000000" stroke="#000000" points="447.128,-60.5316 456.46,-55.5147 446.036,-53.6172 447.128,-60.5316"/>
 </g>
 <!-- proc~interpol1d_coeff -->
-<g id="proc~~read_chords~~CallsGraph_node23" class="node"><title>proc~interpol1d_coeff</title>
-<g id="a_proc~~read_chords~~CallsGraph_node23"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="807.5,-414 716.5,-414 716.5,-390 807.5,-390 807.5,-414"/>
-<text text-anchor="middle" x="762" y="-399.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+<g id="proc~~read_chords~~CallsGraph_node24" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~read_chords~~CallsGraph_node24"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="807.5,-92.5873 716.5,-92.5873 716.5,-68.5873 807.5,-68.5873 807.5,-92.5873"/>
+<text text-anchor="middle" x="762" y="-78.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
 </a>
 </g>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
 <g id="proc~~read_chords~~CallsGraph_edge5" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.687,-427.734C578.832,-422.623 654.816,-414.021 706.39,-408.182"/>
-<polygon fill="#000000" stroke="#000000" points="706.82,-411.656 716.363,-407.053 706.033,-404.7 706.82,-411.656"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M518.152,-61.7158C523.363,-64.6004 528.888,-67.684 534,-70.5873 550.107,-79.7343 552.119,-86.7531 570,-91.5873 614.739,-103.682 667.449,-99.3249 706.151,-92.8565"/>
+<polygon fill="#000000" stroke="#000000" points="706.938,-96.2717 716.175,-91.0821 705.718,-89.3788 706.938,-96.2717"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~read_chords~~CallsGraph_node25" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~read_chords~~CallsGraph_node25"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="680,-40.5873 570,-40.5873 570,-16.5873 680,-16.5873 680,-40.5873"/>
+<text text-anchor="middle" x="625" y="-26.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~read_chords~~CallsGraph_edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.712,-43.4001C541.963,-42.0464 550.92,-40.5769 559.88,-39.1069"/>
+<polygon fill="#000000" stroke="#000000" points="560.659,-42.5261 569.96,-37.4532 559.525,-35.6184 560.659,-42.5261"/>
 </g>
 <!-- proc~interpol1d_coeff_arr -->
-<g id="proc~~read_chords~~CallsGraph_node24" class="node"><title>proc~interpol1d_coeff_arr</title>
-<g id="a_proc~~read_chords~~CallsGraph_node24"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="680,-385 570,-385 570,-361 680,-361 680,-385"/>
-<text text-anchor="middle" x="625" y="-370.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+<g id="proc~~read_chords~~CallsGraph_node26" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~read_chords~~CallsGraph_node26"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="680,-82.5873 570,-82.5873 570,-58.5873 680,-58.5873 680,-82.5873"/>
+<text text-anchor="middle" x="625" y="-68.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
 </a>
 </g>
 </g>
 <!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="proc~~read_chords~~CallsGraph_edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M522.212,-419.918C541.366,-411.089 567.557,-399.017 588.575,-389.329"/>
-<polygon fill="#000000" stroke="#000000" points="590.207,-392.43 597.823,-385.066 587.277,-386.073 590.207,-392.43"/>
+<g id="proc~~read_chords~~CallsGraph_edge7" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M533.712,-55.7744C541.963,-57.1281 550.92,-58.5976 559.88,-60.0676"/>
+<polygon fill="#000000" stroke="#000000" points="559.525,-63.5561 569.96,-61.7213 560.659,-56.6484 559.525,-63.5561"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~read_chords~~CallsGraph_node27" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~read_chords~~CallsGraph_node27"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="807.5,-30.5873 716.5,-30.5873 716.5,-6.58726 807.5,-6.58726 807.5,-30.5873"/>
+<text text-anchor="middle" x="762" y="-16.1873" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~read_chords~~CallsGraph_edge8" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M511.685,-37.4632C525.983,-27.2318 548.147,-13.3565 570,-7.58726 614.81,4.24267 667.514,-0.0908634 706.195,-6.48262"/>
+<polygon fill="#000000" stroke="#000000" points="705.76,-9.95954 716.213,-8.23539 706.966,-3.06428 705.76,-9.95954"/>
 </g>
 <!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="proc~~read_chords~~CallsGraph_edge1" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M680.132,-479.372C688.779,-477.514 697.73,-475.591 706.388,-473.731"/>
-<polygon fill="#000000" stroke="#000000" points="707.339,-477.107 716.381,-471.585 705.869,-470.263 707.339,-477.107"/>
+<g id="proc~~read_chords~~CallsGraph_edge3" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M680.132,-24.5775C688.779,-23.937 697.73,-23.2739 706.388,-22.6326"/>
+<polygon fill="#000000" stroke="#000000" points="706.667,-26.1216 716.381,-21.8924 706.15,-19.1408 706.667,-26.1216"/>
 </g>
 <!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="proc~~read_chords~~CallsGraph_edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M680.132,-384.628C688.779,-386.486 697.73,-388.409 706.388,-390.269"/>
-<polygon fill="#000000" stroke="#000000" points="705.869,-393.737 716.381,-392.415 707.339,-386.893 705.869,-393.737"/>
+<g id="proc~~read_chords~~CallsGraph_edge4" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M680.132,-74.597C688.779,-75.2375 697.73,-75.9006 706.388,-76.5419"/>
+<polygon fill="#000000" stroke="#000000" points="706.15,-80.0338 716.381,-77.2821 706.667,-73.0529 706.15,-80.0338"/>
 </g>
 </g>
 </svg>
@@ -1463,7 +1483,7 @@ public subroutine read_chords()
     <span class="k">type</span><span class="p">(</span><span class="n">ParticleTrack</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ntrack</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tracks</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="kd">::</span> <span class="nb">system</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ic</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">ncell</span><span class="p">,</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="n">kk</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ic</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">ntrack</span><span class="p">,</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="n">kk</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">error</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
@@ -1484,7 +1504,11 @@ public subroutine read_chords()
         <span class="n">endif</span>
         <span class="n">inputs</span><span class="p">%</span><span class="n">calc_spec</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_cold</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">inputs</span><span class="p">%</span><span class="n">calc_brems</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida_wght</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -1553,7 +1577,7 @@ public subroutine read_chords()
 
         <span class="n">dlength</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &amp;</span>
-        <span class="c">!$OMP&amp; length, r_enter, r_exit, j, tracks, ncell, ind)</span>
+        <span class="c">!$OMP&amp; length, r_enter, r_exit, j, tracks, ntrack, ind)</span>
         <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nc</span>
             <span class="c">! Uniformally sample within spot size</span>
             <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
@@ -1565,8 +1589,8 @@ public subroutine read_chords()
             <span class="n">r0</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="n">r0</span><span class="p">)</span> <span class="o">+</span> <span class="n">xyz_lens</span>
 
             <span class="k">call </span><span class="n">grid_intersect</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">r_enter</span><span class="p">,</span> <span class="n">r_exit</span><span class="p">)</span>
-            <span class="k">call </span><span class="n">track</span><span class="p">(</span><span class="n">r_enter</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">tracks</span><span class="p">,</span> <span class="n">ncell</span><span class="p">)</span>
-            <span class="n">track_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncell</span>
+            <span class="k">call </span><span class="n">track</span><span class="p">(</span><span class="n">r_enter</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">tracks</span><span class="p">,</span> <span class="n">ntrack</span><span class="p">)</span>
+            <span class="n">track_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntrack</span>
                 <span class="n">ind</span> <span class="o">=</span> <span class="n">tracks</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">ind</span>
                 <span class="c">!inds can repeat so add rather than assign</span>
                 <span class="c">!$OMP CRITICAL(read_chords_1)</span>
@@ -1597,6 +1621,19 @@ public subroutine read_chords()
             <span class="n">enddo</span>
         <span class="n">enddo</span>
     <span class="n">enddo</span> <span class="n">chan_loop</span>
+
+    <span class="n">spec_chords</span><span class="p">%</span><span class="n">ncell</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">%</span><span class="n">nchan</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">ncell</span><span class="p">))</span>
+
+    <span class="n">nc</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span>
+        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">ic</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span>
+        <span class="n">ii</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">jj</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">kk</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">nchan</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">nc</span> <span class="o">=</span> <span class="n">nc</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">spec_chords</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="o">=</span> <span class="n">ic</span>
+        <span class="n">endif</span>
+    <span class="n">enddo</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;FIDA/BES System: &quot;,a)&#39;</span><span class="p">)</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="nb">system</span><span class="p">))</span>
@@ -1749,6 +1786,8 @@ public subroutine read_chords()
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1757,6 +1796,8 @@ public subroutine read_chords()
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -1764,6 +1805,8 @@ public subroutine read_chords()
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -1845,6 +1888,8 @@ public subroutine read_chords()
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -1900,6 +1945,8 @@ public subroutine read_chords()
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -1980,6 +2027,10 @@ public subroutine read_chords()
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -2117,11 +2168,19 @@ public subroutine read_chords()
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -2139,9 +2198,11 @@ public subroutine read_chords()
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -2174,6 +2235,8 @@ public subroutine read_chords()
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -2209,11 +2272,15 @@ public subroutine read_chords()
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       

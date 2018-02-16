@@ -352,7 +352,10 @@ def check_inputs(inputs):
               'lambdamax_wght': zero_double,
               'calc_npa': zero_int,
               'calc_fida': zero_int,
-              'calc_bes': zero_int,
+              'calc_nbi': zero_int,
+              'calc_dcx': zero_int,
+              'calc_halo': zero_int,
+              'calc_cold': zero_int,
               'calc_brems': zero_int,
               'calc_birth': zero_int,
               'calc_fida_wght': zero_int,
@@ -1187,7 +1190,7 @@ def check_npa(inp, npa):
         err = True
 
     w = np.logical_or(npa['a_shape'] > 2, npa['a_shape'] == 0)
-    nw = len(npa['a_shape'])
+    nw = len(npa['a_shape'][w])
     if nw != 0:
         error('Invalid aperture shape. Expected 1 (rectagular) or 2 (circular)')
         print('Invalid indices: {}'.format(np.arange(len(npa['a_shape']))[w]))
@@ -1293,7 +1296,10 @@ def write_namelist(filename, inputs):
         f.write("distribution_file = '" + inputs['distribution_file'] + "'    !! File containing fast-ion distribution\n\n")
 
         f.write("!! Simulation Switches\n")
-        f.write("calc_bes = {:d}    !! Calculate Beam Emission and Halo Spectra\n".format(inputs['calc_bes']))
+        f.write("calc_nbi = {:d}    !! Calculate NBI Spectra\n".format(inputs['calc_nbi']))
+        f.write("calc_dcx = {:d}    !! Calculate Direct CX Spectra\n".format(inputs['calc_dcx']))
+        f.write("calc_halo = {:d}    !! Calculate Halo Spectra\n".format(inputs['calc_halo']))
+        f.write("calc_cold = {:d}    !! Calculate Cold D-alpha Spectra\n".format(inputs['calc_cold']))
         f.write("calc_brems = {:d}    !! Calculate Bremsstrahlung\n".format(inputs['calc_brems']))
         f.write("calc_fida = {:d}    !! Calculate FIDA Spectra\n".format(inputs['calc_fida']))
         f.write("calc_npa = {:d}   !! Calculate NPA\n".format(inputs['calc_npa']))

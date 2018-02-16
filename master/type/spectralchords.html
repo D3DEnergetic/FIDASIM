@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 1.5% of total for derived types.</p>Including implementation: 6 statements,  1.5% of total for derived types.">6 statements</a>
+	  title="<p> 1.9% of total for derived types.</p>Including implementation: 8 statements,  1.9% of total for derived types.">8 statements</a>
      </li> 
      
      
@@ -172,11 +172,15 @@
       
       <a class="list-group-item" href="../type/spectralchords.html#variable-nchan%7E2">nchan</a>
       
+      <a class="list-group-item" href="../type/spectralchords.html#variable-ncell">ncell</a>
+      
       <a class="list-group-item" href="../type/spectralchords.html#variable-los">los</a>
       
       <a class="list-group-item" href="../type/spectralchords.html#variable-radius">radius</a>
       
       <a class="list-group-item" href="../type/spectralchords.html#variable-inter">inter</a>
+      
+      <a class="list-group-item" href="../type/spectralchords.html#variable-cell">cell</a>
       
     </div>
   </div>
@@ -432,11 +436,15 @@
       
       <a class="list-group-item" href="../type/spectralchords.html#variable-nchan%7E2">nchan</a>
       
+      <a class="list-group-item" href="../type/spectralchords.html#variable-ncell">ncell</a>
+      
       <a class="list-group-item" href="../type/spectralchords.html#variable-los">los</a>
       
       <a class="list-group-item" href="../type/spectralchords.html#variable-radius">radius</a>
       
       <a class="list-group-item" href="../type/spectralchords.html#variable-inter">inter</a>
+      
+      <a class="list-group-item" href="../type/spectralchords.html#variable-cell">cell</a>
       
     </div>
   </div>
@@ -504,6 +512,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-ncell"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>ncell</strong></td><td> =</td><td>0</td><td><p>Number of beam_grid cells with intersections</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-los"></span>type(<a href='../type/lineofsight.html'>LineOfSight</a>),</td>
   
   <td>public,</td>
@@ -540,6 +562,20 @@
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-cell"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>cell</strong></td><td></td><td></td><td><p>Linear indices of beam_grid that have intersections</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -560,12 +596,16 @@
     <span class="c">!+ Defines an spectral diagnostic system</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nchan</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Number of channels</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ncell</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c">!+ Number of beam_grid cells with intersections</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LineOfSight</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">los</span>
         <span class="c">!+ Line of sight array</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">radius</span>
         <span class="c">!+ Radius of each line of sight</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LOSInters</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">inter</span>
         <span class="c">!+ Array of LOS intersections with [[libfida:beam_grid]]</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">cell</span>
+        <span class="c">!+ Linear indices of beam_grid that have intersections</span>
 <span class="k">end type </span><span class="n">SpectralChords</span>
 </pre></div>
 

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.3% of total for procedures.">26 statements</a>
+	  title=" 0.2% of total for procedures.">26 statements</a>
      </li> 
      
      
@@ -323,6 +323,8 @@
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -331,6 +333,8 @@
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -338,6 +342,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -419,6 +425,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -474,6 +482,8 @@
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -554,6 +564,10 @@
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -691,11 +705,19 @@
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -713,9 +735,11 @@
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -748,6 +772,8 @@
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -783,11 +809,15 @@
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       
@@ -944,59 +974,95 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~gyro_surface~~CalledByGraph Pages: 1 -->
-<svg id="procgyro_surfaceCalledByGraph" width="264pt" height="74pt"
- viewBox="0.00 0.00 264.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~gyro_surface~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<svg id="procgyro_surfaceCalledByGraph" width="268pt" height="158pt"
+ viewBox="0.00 0.00 268.00 158.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~gyro_surface~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 154)">
 <title>proc~~gyro_surface~~CalledByGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-70 260,-70 260,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-154 264,-154 264,4 -4,4"/>
 <!-- proc~gyro_surface -->
 <g id="proc~~gyro_surface~~CalledByGraph_node1" class="node"><title>proc~gyro_surface</title>
-<polygon fill="none" stroke="black" points="255.5,-45 180.5,-45 180.5,-21 255.5,-21 255.5,-45"/>
-<text text-anchor="middle" x="218" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_surface</text>
+<polygon fill="none" stroke="black" points="259.5,-87 184.5,-87 184.5,-63 259.5,-63 259.5,-87"/>
+<text text-anchor="middle" x="222" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50">gyro_surface</text>
 </g>
 <!-- proc~npa_f -->
 <g id="proc~~gyro_surface~~CalledByGraph_node2" class="node"><title>proc~npa_f</title>
 <g id="a_proc~~gyro_surface~~CalledByGraph_node2"><a xlink:href="../proc/npa_f.html" xlink:title="npa_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-66 90,-66 90,-42 144,-42 144,-66"/>
-<text text-anchor="middle" x="117" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
+<polygon fill="#d9534f" stroke="#d9534f" points="146,-150 92,-150 92,-126 146,-126 146,-150"/>
+<text text-anchor="middle" x="119" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_f</text>
 </a>
 </g>
 </g>
 <!-- proc~npa_f&#45;&gt;proc~gyro_surface -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge3" class="edge"><title>proc~npa_f&#45;&gt;proc~gyro_surface</title>
-<path fill="none" stroke="#000000" d="M144.011,-48.4825C152.173,-46.7512 161.444,-44.7846 170.575,-42.8477"/>
-<polygon fill="#000000" stroke="#000000" points="171.313,-46.2692 180.369,-40.7702 169.86,-39.4215 171.313,-46.2692"/>
+<g id="proc~~gyro_surface~~CalledByGraph_edge5" class="edge"><title>proc~npa_f&#45;&gt;proc~gyro_surface</title>
+<path fill="none" stroke="#000000" d="M139.474,-125.853C154.564,-116.44 175.689,-103.263 192.654,-92.6813"/>
+<polygon fill="#000000" stroke="#000000" points="194.954,-95.3719 201.586,-87.1097 191.249,-89.4326 194.954,-95.3719"/>
+</g>
+<!-- proc~pnpa_f -->
+<g id="proc~~gyro_surface~~CalledByGraph_node3" class="node"><title>proc~pnpa_f</title>
+<g id="a_proc~~gyro_surface~~CalledByGraph_node3"><a xlink:href="../proc/pnpa_f.html" xlink:title="pnpa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="146,-108 92,-108 92,-84 146,-84 146,-108"/>
+<text text-anchor="middle" x="119" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pnpa_f</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_f&#45;&gt;proc~gyro_surface -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge6" class="edge"><title>proc~pnpa_f&#45;&gt;proc~gyro_surface</title>
+<path fill="none" stroke="#000000" d="M146.01,-90.592C154.686,-88.7881 164.634,-86.7196 174.388,-84.6916"/>
+<polygon fill="#000000" stroke="#000000" points="175.343,-88.0681 184.421,-82.6056 173.918,-81.2146 175.343,-88.0681"/>
+</g>
+<!-- proc~pnpa_mc -->
+<g id="proc~~gyro_surface~~CalledByGraph_node4" class="node"><title>proc~pnpa_mc</title>
+<g id="a_proc~~gyro_surface~~CalledByGraph_node4"><a xlink:href="../proc/pnpa_mc.html" xlink:title="pnpa_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="147.5,-66 90.5,-66 90.5,-42 147.5,-42 147.5,-66"/>
+<text text-anchor="middle" x="119" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pnpa_mc</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~gyro_surface -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge7" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~gyro_surface</title>
+<path fill="none" stroke="#000000" d="M147.599,-59.7383C155.92,-61.4685 165.293,-63.4174 174.489,-65.3295"/>
+<polygon fill="#000000" stroke="#000000" points="173.837,-68.7687 184.34,-67.3777 175.262,-61.9152 173.837,-68.7687"/>
 </g>
 <!-- proc~npa_mc -->
-<g id="proc~~gyro_surface~~CalledByGraph_node3" class="node"><title>proc~npa_mc</title>
-<g id="a_proc~~gyro_surface~~CalledByGraph_node3"><a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
-<polygon fill="#d9534f" stroke="#d9534f" points="144,-24 90,-24 90,-0 144,-0 144,-24"/>
-<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
+<g id="proc~~gyro_surface~~CalledByGraph_node5" class="node"><title>proc~npa_mc</title>
+<g id="a_proc~~gyro_surface~~CalledByGraph_node5"><a xlink:href="../proc/npa_mc.html" xlink:title="npa_mc">
+<polygon fill="#d9534f" stroke="#d9534f" points="146,-24 92,-24 92,-0 146,-0 146,-24"/>
+<text text-anchor="middle" x="119" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_mc</text>
 </a>
 </g>
 </g>
 <!-- proc~npa_mc&#45;&gt;proc~gyro_surface -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge4" class="edge"><title>proc~npa_mc&#45;&gt;proc~gyro_surface</title>
-<path fill="none" stroke="#000000" d="M144.011,-17.5175C152.173,-19.2488 161.444,-21.2154 170.575,-23.1523"/>
-<polygon fill="#000000" stroke="#000000" points="169.86,-26.5785 180.369,-25.2298 171.313,-19.7308 169.86,-26.5785"/>
+<g id="proc~~gyro_surface~~CalledByGraph_edge8" class="edge"><title>proc~npa_mc&#45;&gt;proc~gyro_surface</title>
+<path fill="none" stroke="#000000" d="M139.474,-24.147C154.564,-33.5598 175.689,-46.7368 192.654,-57.3187"/>
+<polygon fill="#000000" stroke="#000000" points="191.249,-60.5674 201.586,-62.8903 194.954,-54.6281 191.249,-60.5674"/>
 </g>
 <!-- program~fidasim -->
-<g id="proc~~gyro_surface~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
-<g id="a_proc~~gyro_surface~~CalledByGraph_node4"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-45 0,-45 0,-21 54,-21 54,-45"/>
-<text text-anchor="middle" x="27" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="proc~~gyro_surface~~CalledByGraph_node6" class="node"><title>program~fidasim</title>
+<g id="a_proc~~gyro_surface~~CalledByGraph_node6"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-87 0,-87 0,-63 54,-63 54,-87"/>
+<text text-anchor="middle" x="27" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_f -->
 <g id="proc~~gyro_surface~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~npa_f</title>
-<path fill="none" stroke="#000000" d="M54.4029,-39.3007C62.481,-41.2284 71.5067,-43.3823 80.1046,-45.4341"/>
-<polygon fill="#000000" stroke="#000000" points="79.3797,-48.8593 89.919,-47.7761 81.0046,-42.0505 79.3797,-48.8593"/>
+<path fill="none" stroke="#000000" d="M45.3529,-87.147C58.6752,-96.4726 77.2758,-109.493 92.3202,-120.024"/>
+<polygon fill="#000000" stroke="#000000" points="90.5009,-123.023 100.7,-125.89 94.5152,-117.288 90.5009,-123.023"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~pnpa_f -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~pnpa_f</title>
+<path fill="none" stroke="#000000" d="M54.0317,-81.0741C62.7242,-83.1023 72.5725,-85.4003 81.8911,-87.5746"/>
+<polygon fill="#000000" stroke="#000000" points="81.1812,-91.0029 91.715,-89.8668 82.7719,-84.186 81.1812,-91.0029"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~pnpa_mc -->
+<g id="proc~~gyro_surface~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~pnpa_mc</title>
+<path fill="none" stroke="#000000" d="M54.0317,-68.9259C62.33,-66.9897 71.6816,-64.8076 80.6201,-62.722"/>
+<polygon fill="#000000" stroke="#000000" points="81.5151,-66.1072 90.4582,-60.4264 79.9245,-59.2903 81.5151,-66.1072"/>
 </g>
 <!-- program~fidasim&#45;&gt;proc~npa_mc -->
-<g id="proc~~gyro_surface~~CalledByGraph_edge2" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
-<path fill="none" stroke="#000000" d="M54.4029,-26.6993C62.481,-24.7716 71.5067,-22.6177 80.1046,-20.5659"/>
-<polygon fill="#000000" stroke="#000000" points="81.0046,-23.9495 89.919,-18.2239 79.3797,-17.1407 81.0046,-23.9495"/>
+<g id="proc~~gyro_surface~~CalledByGraph_edge4" class="edge"><title>program~fidasim&#45;&gt;proc~npa_mc</title>
+<path fill="none" stroke="#000000" d="M45.3529,-62.853C58.6752,-53.5274 77.2758,-40.5069 92.3202,-29.9759"/>
+<polygon fill="#000000" stroke="#000000" points="94.5152,-32.7117 100.7,-24.1097 90.5009,-26.9771 94.5152,-32.7117"/>
 </g>
 </g>
 </svg>
@@ -1305,6 +1371,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1313,6 +1381,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -1320,6 +1390,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -1401,6 +1473,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -1456,6 +1530,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -1536,6 +1612,10 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -1673,11 +1753,19 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -1695,9 +1783,11 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -1730,6 +1820,8 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -1765,11 +1857,15 @@ public subroutine gyro_surface(fields, energy, pitch, gs)
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       

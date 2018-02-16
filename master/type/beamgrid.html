@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 6.8% of total for derived types.</p>Including implementation: 28 statements,  6.8% of total for derived types.">28 statements</a>
+	  title="<p> 6.8% of total for derived types.</p>Including implementation: 29 statements,  6.8% of total for derived types.">29 statements</a>
      </li> 
      
      
@@ -203,6 +203,8 @@
       <a class="list-group-item" href="../type/beamgrid.html#variable-ntrack">ntrack</a>
       
       <a class="list-group-item" href="../type/beamgrid.html#variable-ngrid">ngrid</a>
+      
+      <a class="list-group-item" href="../type/beamgrid.html#variable-dims">dims</a>
       
       <a class="list-group-item" href="../type/beamgrid.html#variable-origin">origin</a>
       
@@ -396,6 +398,8 @@
       <a class="list-group-item" href="../type/beamgrid.html#variable-ntrack">ntrack</a>
       
       <a class="list-group-item" href="../type/beamgrid.html#variable-ngrid">ngrid</a>
+      
+      <a class="list-group-item" href="../type/beamgrid.html#variable-dims">dims</a>
       
       <a class="list-group-item" href="../type/beamgrid.html#variable-origin">origin</a>
       
@@ -705,6 +709,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-dims"></span>integer(kind=Int32),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>dims</strong></td><td></td><td></td><td><p>Dimensions of beam grid</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-origin"></span>real(kind=Float64),</td>
   
   <td>public,</td>
@@ -878,6 +896,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
         <span class="c">!+ Maximum number of cell for particle tracking</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ngrid</span>
         <span class="c">!+ Number of cells</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dims</span>
+        <span class="c">!+ Dimensions of beam grid</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">origin</span>
         <span class="c">!+ Origin of beam grid in machine coordinates</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">center</span>

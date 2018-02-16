@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.8% of total for procedures.">82 statements</a>
+	  title=" 1.0% of total for procedures.">113 statements</a>
      </li> 
      
      
@@ -323,6 +323,8 @@
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -331,6 +333,8 @@
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -338,6 +342,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -419,6 +425,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -474,6 +482,8 @@
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -554,6 +564,10 @@
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -691,11 +705,19 @@
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -713,9 +735,11 @@
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -748,6 +772,8 @@
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -783,11 +809,15 @@
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       
@@ -872,130 +902,455 @@ public subroutine read_equilibrium()
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~read_equilibrium~~CallsGraph Pages: 1 -->
-<svg id="procread_equilibriumCallsGraph" width="446pt" height="406pt"
- viewBox="0.00 0.00 446.00 406.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~read_equilibrium~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 402)">
+<svg id="procread_equilibriumCallsGraph" width="641pt" height="477pt"
+ viewBox="0.00 0.00 641.00 477.29" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~read_equilibrium~~CallsGraph" class="graph" transform="scale(0.768585 0.768585) rotate(0) translate(4 617)">
 <title>proc~~read_equilibrium~~CallsGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-402 442,-402 442,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-617 830,-617 830,4 -4,4"/>
 <!-- proc~read_equilibrium -->
 <g id="proc~~read_equilibrium~~CallsGraph_node1" class="node"><title>proc~read_equilibrium</title>
-<polygon fill="none" stroke="black" points="92,-209 0,-209 0,-185 92,-185 92,-209"/>
-<text text-anchor="middle" x="46" y="-194.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_equilibrium</text>
+<polygon fill="none" stroke="black" points="92,-365 0,-365 0,-341 92,-341 92,-365"/>
+<text text-anchor="middle" x="46" y="-350.6" font-family="Helvetica,sans-Serif" font-size="10.50">read_equilibrium</text>
 </g>
-<!-- h5fopen_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node2" class="node"><title>h5fopen_f</title>
-<polygon fill="#777777" stroke="#777777" points="235.5,-398 174.5,-398 174.5,-374 235.5,-374 235.5,-398"/>
-<text text-anchor="middle" x="205" y="-383.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+<!-- h5open_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_node2" class="node"><title>h5open_f</title>
+<polygon fill="#777777" stroke="#777777" points="234,-613 176,-613 176,-589 234,-589 234,-613"/>
+<text text-anchor="middle" x="205" y="-598.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
 </g>
-<!-- proc~read_equilibrium&#45;&gt;h5fopen_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge2" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fopen_f</title>
-<path fill="none" stroke="#000000" d="M49.296,-209.282C55.755,-240.322 77.0417,-322.464 128,-365 138.199,-373.514 151.589,-378.59 164.283,-381.612"/>
-<polygon fill="#000000" stroke="#000000" points="163.746,-385.074 174.241,-383.622 165.131,-378.213 163.746,-385.074"/>
+<!-- proc~read_equilibrium&#45;&gt;h5open_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge26" class="edge"><title>proc~read_equilibrium&#45;&gt;h5open_f</title>
+<path fill="none" stroke="#000000" d="M47.5797,-365.192C50.0541,-403.019 62.8686,-519.467 128,-580 138.307,-589.58 152.591,-594.852 165.996,-597.732"/>
+<polygon fill="#000000" stroke="#000000" points="165.539,-601.205 175.995,-599.499 166.757,-594.312 165.539,-601.205"/>
 </g>
 <!-- h5ltread_dataset_double_f -->
 <g id="proc~~read_equilibrium~~CallsGraph_node3" class="node"><title>h5ltread_dataset_double_f</title>
-<polygon fill="#777777" stroke="#777777" points="275,-356 135,-356 135,-332 275,-332 275,-356"/>
-<text text-anchor="middle" x="205" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
+<polygon fill="#777777" stroke="#777777" points="275,-571 135,-571 135,-547 275,-547 275,-571"/>
+<text text-anchor="middle" x="205" y="-556.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;h5ltread_dataset_double_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge3" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_double_f</title>
-<path fill="none" stroke="#000000" d="M51.3496,-209.154C61.016,-234.387 86.7415,-292.631 128,-323 130.122,-324.562 132.355,-326.008 134.67,-327.346"/>
-<polygon fill="#000000" stroke="#000000" points="133.435,-330.642 143.943,-331.994 136.571,-324.384 133.435,-330.642"/>
+<g id="proc~~read_equilibrium~~CallsGraph_edge27" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M49.0028,-365.009C54.9649,-397.026 75.5583,-485.233 128,-533 131.895,-536.548 136.296,-539.615 140.968,-542.266"/>
+<polygon fill="#000000" stroke="#000000" points="139.714,-545.55 150.226,-546.867 142.829,-539.282 139.714,-545.55"/>
 </g>
-<!-- h5gopen_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node4" class="node"><title>h5gopen_f</title>
-<polygon fill="#777777" stroke="#777777" points="237,-314 173,-314 173,-290 237,-290 237,-314"/>
-<text text-anchor="middle" x="205" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
+<!-- h5ltread_dataset_int_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_node4" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="437.5,-511 318.5,-511 318.5,-487 437.5,-487 437.5,-511"/>
+<text text-anchor="middle" x="378" y="-496.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
 </g>
-<!-- proc~read_equilibrium&#45;&gt;h5gopen_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge4" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gopen_f</title>
-<path fill="none" stroke="#000000" d="M55.4479,-209.274C68.7395,-227.647 96.3105,-262.151 128,-281 138.662,-287.342 151.3,-291.825 163.178,-294.971"/>
-<polygon fill="#000000" stroke="#000000" points="162.376,-298.378 172.917,-297.311 164.011,-291.572 162.376,-298.378"/>
-</g>
-<!-- interface~deriv -->
-<g id="proc~~read_equilibrium~~CallsGraph_node5" class="node"><title>interface~deriv</title>
-<g id="a_proc~~read_equilibrium~~CallsGraph_node5"><a xlink:href="../interface/deriv.html" xlink:title="deriv">
-<polygon fill="#a7506f" stroke="#a7506f" points="232,-272 178,-272 178,-248 232,-248 232,-272"/>
-<text text-anchor="middle" x="205" y="-257.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deriv</text>
-</a>
-</g>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;interface~deriv -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge5" class="edge"><title>proc~read_equilibrium&#45;&gt;interface~deriv</title>
-<path fill="none" stroke="#000000" d="M67.4198,-209.108C83.4723,-218.249 106.619,-230.609 128,-239 140.77,-244.011 155.188,-248.317 168.007,-251.702"/>
-<polygon fill="#000000" stroke="#000000" points="167.328,-255.141 177.883,-254.215 169.054,-248.357 167.328,-255.141"/>
-</g>
-<!-- h5fclose_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node6" class="node"><title>h5fclose_f</title>
-<polygon fill="#777777" stroke="#777777" points="235.5,-230 174.5,-230 174.5,-206 235.5,-206 235.5,-230"/>
-<text text-anchor="middle" x="205" y="-215.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;h5fclose_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge6" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fclose_f</title>
-<path fill="none" stroke="#000000" d="M92.4109,-203.074C115.083,-206.107 142.263,-209.742 164.122,-212.666"/>
-<polygon fill="#000000" stroke="#000000" points="163.692,-216.14 174.068,-213.996 164.62,-209.201 163.692,-216.14"/>
+<!-- proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge28" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M49.4292,-365.425C55.9795,-395.109 77.0711,-469.914 128,-500 188.842,-535.942 273.508,-525.576 326.767,-513.386"/>
+<polygon fill="#000000" stroke="#000000" points="327.748,-516.75 336.658,-511.018 326.118,-509.942 327.748,-516.75"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node7" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
-<g id="a_proc~~read_equilibrium~~CallsGraph_node7"><a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
-<polygon fill="#d9534f" stroke="#d9534f" points="282,-188 128,-188 128,-164 282,-164 282,-188"/>
-<text text-anchor="middle" x="205" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+<g id="proc~~read_equilibrium~~CallsGraph_node5" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node5"><a xlink:href="../proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="282,-491 128,-491 128,-467 282,-467 282,-491"/>
+<text text-anchor="middle" x="205" y="-476.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
 </a>
 </g>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge7" class="edge"><title>proc~read_equilibrium&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
-<path fill="none" stroke="#000000" d="M92.4109,-190.926C100.504,-189.843 109.172,-188.684 117.967,-187.508"/>
-<polygon fill="#000000" stroke="#000000" points="118.479,-190.97 127.927,-186.175 117.551,-184.032 118.479,-190.97"/>
+<g id="proc~~read_equilibrium~~CallsGraph_edge29" class="edge"><title>proc~read_equilibrium&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M52.9549,-365.127C64.3762,-387.097 91.5009,-433.474 128,-458 130.45,-459.646 133.026,-461.164 135.691,-462.564"/>
+<polygon fill="#000000" stroke="#000000" points="134.485,-465.862 145.031,-466.88 137.422,-459.508 134.485,-465.862"/>
+</g>
+<!-- h5fopen_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_node6" class="node"><title>h5fopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="235.5,-449 174.5,-449 174.5,-425 235.5,-425 235.5,-449"/>
+<text text-anchor="middle" x="205" y="-434.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;h5fopen_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge30" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fopen_f</title>
+<path fill="none" stroke="#000000" d="M59.3838,-365.202C74.4115,-379.362 101.093,-402.49 128,-416 139.278,-421.662 152.289,-425.97 164.322,-429.164"/>
+<polygon fill="#000000" stroke="#000000" points="163.593,-432.589 174.14,-431.59 165.272,-425.793 163.593,-432.589"/>
 </g>
 <!-- h5close_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node8" class="node"><title>h5close_f</title>
-<polygon fill="#777777" stroke="#777777" points="234,-146 176,-146 176,-122 234,-122 234,-146"/>
-<text text-anchor="middle" x="205" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
+<g id="proc~~read_equilibrium~~CallsGraph_node7" class="node"><title>h5close_f</title>
+<polygon fill="#777777" stroke="#777777" points="234,-407 176,-407 176,-383 234,-383 234,-407"/>
+<text text-anchor="middle" x="205" y="-392.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;h5close_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge8" class="edge"><title>proc~read_equilibrium&#45;&gt;h5close_f</title>
-<path fill="none" stroke="#000000" d="M67.4198,-184.892C83.4723,-175.751 106.619,-163.391 128,-155 140.046,-150.273 153.559,-146.173 165.812,-142.882"/>
-<polygon fill="#000000" stroke="#000000" points="166.944,-146.205 175.749,-140.312 165.192,-139.428 166.944,-146.205"/>
+<g id="proc~~read_equilibrium~~CallsGraph_edge31" class="edge"><title>proc~read_equilibrium&#45;&gt;h5close_f</title>
+<path fill="none" stroke="#000000" d="M91.9899,-365.036C115.406,-371.3 143.719,-378.874 166.021,-384.84"/>
+<polygon fill="#000000" stroke="#000000" points="165.241,-388.254 175.806,-387.458 167.05,-381.492 165.241,-388.254"/>
 </g>
-<!-- h5ltread_dataset_int_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node9" class="node"><title>h5ltread_dataset_int_f</title>
-<polygon fill="#777777" stroke="#777777" points="437.5,-147 318.5,-147 318.5,-123 437.5,-123 437.5,-147"/>
-<text text-anchor="middle" x="378" y="-132.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+<!-- h5fclose_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_node8" class="node"><title>h5fclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="235.5,-365 174.5,-365 174.5,-341 235.5,-341 235.5,-365"/>
+<text text-anchor="middle" x="205" y="-350.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
 </g>
-<!-- proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge9" class="edge"><title>proc~read_equilibrium&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M54.0776,-184.898C66.2745,-165.402 93.3191,-127.736 128,-113 196.337,-83.9632 284.552,-103.566 335.549,-119.763"/>
-<polygon fill="#000000" stroke="#000000" points="334.643,-123.149 345.236,-122.941 336.826,-116.498 334.643,-123.149"/>
+<!-- proc~read_equilibrium&#45;&gt;h5fclose_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge32" class="edge"><title>proc~read_equilibrium&#45;&gt;h5fclose_f</title>
+<path fill="none" stroke="#000000" d="M92.4109,-353C114.981,-353 142.018,-353 163.825,-353"/>
+<polygon fill="#000000" stroke="#000000" points="164.068,-356.5 174.068,-353 164.068,-349.5 164.068,-356.5"/>
+</g>
+<!-- h5gopen_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_node9" class="node"><title>h5gopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="237,-323 173,-323 173,-299 237,-299 237,-323"/>
+<text text-anchor="middle" x="205" y="-308.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;h5gopen_f -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge33" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gopen_f</title>
+<path fill="none" stroke="#000000" d="M91.9899,-340.964C114.362,-334.98 141.204,-327.799 163.003,-321.967"/>
+<polygon fill="#000000" stroke="#000000" points="164.187,-325.274 172.942,-319.308 162.377,-318.512 164.187,-325.274"/>
+</g>
+<!-- interface~randn -->
+<g id="proc~~read_equilibrium~~CallsGraph_node10" class="node"><title>interface~randn</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node10"><a xlink:href="../interface/randn.html" xlink:title="randn">
+<polygon fill="#a7506f" stroke="#a7506f" points="232,-281 178,-281 178,-257 232,-257 232,-281"/>
+<text text-anchor="middle" x="205" y="-266.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randn</text>
+</a>
+</g>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;interface~randn -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge34" class="edge"><title>proc~read_equilibrium&#45;&gt;interface~randn</title>
+<path fill="none" stroke="#000000" d="M59.3838,-340.798C74.4115,-326.638 101.093,-303.51 128,-290 140.356,-283.796 154.792,-279.219 167.744,-275.95"/>
+<polygon fill="#000000" stroke="#000000" points="168.808,-279.296 177.744,-273.603 167.209,-272.481 168.808,-279.296"/>
+</g>
+<!-- proc~ind2sub -->
+<g id="proc~~read_equilibrium~~CallsGraph_node11" class="node"><title>proc~ind2sub</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node11"><a xlink:href="../proc/ind2sub.html" xlink:title="ind2sub">
+<polygon fill="#d9534f" stroke="#d9534f" points="232,-239 178,-239 178,-215 232,-215 232,-239"/>
+<text text-anchor="middle" x="205" y="-224.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ind2sub</text>
+</a>
+</g>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;proc~ind2sub -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge35" class="edge"><title>proc~read_equilibrium&#45;&gt;proc~ind2sub</title>
+<path fill="none" stroke="#000000" d="M52.9549,-340.873C64.3762,-318.903 91.5009,-272.526 128,-248 139.861,-240.03 154.686,-235.068 168.086,-231.986"/>
+<polygon fill="#000000" stroke="#000000" points="168.878,-235.397 177.982,-229.977 167.485,-228.537 168.878,-235.397"/>
+</g>
+<!-- interface~deriv -->
+<g id="proc~~read_equilibrium~~CallsGraph_node12" class="node"><title>interface~deriv</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node12"><a xlink:href="../interface/deriv.html" xlink:title="deriv">
+<polygon fill="#a7506f" stroke="#a7506f" points="232,-197 178,-197 178,-173 232,-173 232,-197"/>
+<text text-anchor="middle" x="205" y="-182.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">deriv</text>
+</a>
+</g>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;interface~deriv -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge36" class="edge"><title>proc~read_equilibrium&#45;&gt;interface~deriv</title>
+<path fill="none" stroke="#000000" d="M50.2447,-340.586C58.3147,-312.217 82.0336,-242.296 128,-206 139.301,-197.077 154.146,-191.941 167.715,-188.987"/>
+<polygon fill="#000000" stroke="#000000" points="168.567,-192.389 177.762,-187.126 167.292,-185.506 168.567,-192.389"/>
+</g>
+<!-- proc~colrad -->
+<g id="proc~~read_equilibrium~~CallsGraph_node13" class="node"><title>proc~colrad</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node13"><a xlink:href="../proc/colrad.html" xlink:title="colrad">
+<polygon fill="#d9534f" stroke="#d9534f" points="232,-155 178,-155 178,-131 232,-131 232,-155"/>
+<text text-anchor="middle" x="205" y="-140.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">colrad</text>
+</a>
+</g>
+</g>
+<!-- proc~read_equilibrium&#45;&gt;proc~colrad -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge37" class="edge"><title>proc~read_equilibrium&#45;&gt;proc~colrad</title>
+<path fill="none" stroke="#000000" d="M48.5757,-340.709C53.5519,-307.083 72.0654,-212.836 128,-164 138.929,-154.458 153.835,-149.218 167.551,-146.352"/>
+<polygon fill="#000000" stroke="#000000" points="168.467,-149.746 177.723,-144.592 167.273,-142.849 168.467,-149.746"/>
 </g>
 <!-- h5gclose_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node10" class="node"><title>h5gclose_f</title>
-<polygon fill="#777777" stroke="#777777" points="237,-66 173,-66 173,-42 237,-42 237,-66"/>
-<text text-anchor="middle" x="205" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
+<g id="proc~~read_equilibrium~~CallsGraph_node14" class="node"><title>h5gclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="237,-113 173,-113 173,-89 237,-89 237,-113"/>
+<text text-anchor="middle" x="205" y="-98.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
 </g>
 <!-- proc~read_equilibrium&#45;&gt;h5gclose_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge10" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gclose_f</title>
-<path fill="none" stroke="#000000" d="M52.2249,-184.823C62.9661,-161.193 89.7709,-108.908 128,-80 138.254,-72.2461 150.979,-66.7051 163.064,-62.7887"/>
-<polygon fill="#000000" stroke="#000000" points="164.391,-66.0468 172.998,-59.8681 162.417,-59.331 164.391,-66.0468"/>
-</g>
-<!-- h5open_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_node11" class="node"><title>h5open_f</title>
-<polygon fill="#777777" stroke="#777777" points="234,-24 176,-24 176,-0 234,-0 234,-24"/>
-<text text-anchor="middle" x="205" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
-</g>
-<!-- proc~read_equilibrium&#45;&gt;h5open_f -->
-<g id="proc~~read_equilibrium~~CallsGraph_edge11" class="edge"><title>proc~read_equilibrium&#45;&gt;h5open_f</title>
-<path fill="none" stroke="#000000" d="M49.4883,-184.558C56.2806,-153.91 78.0711,-74.2765 128,-33 138.573,-24.2595 152.514,-19.1441 165.566,-16.1549"/>
-<polygon fill="#000000" stroke="#000000" points="166.607,-19.5186 175.762,-14.185 165.279,-12.6457 166.607,-19.5186"/>
+<g id="proc~~read_equilibrium~~CallsGraph_edge38" class="edge"><title>proc~read_equilibrium&#45;&gt;h5gclose_f</title>
+<path fill="none" stroke="#000000" d="M47.4903,-340.869C49.7079,-302.679 61.8634,-183.806 128,-122 137.549,-113.076 150.547,-107.888 163.092,-104.89"/>
+<polygon fill="#000000" stroke="#000000" points="163.855,-108.307 172.982,-102.925 162.492,-101.441 163.855,-108.307"/>
 </g>
 <!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
 <g id="proc~~read_equilibrium~~CallsGraph_edge1" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
-<path fill="none" stroke="#000000" d="M256.381,-163.92C275.343,-159.374 297.096,-154.158 316.86,-149.42"/>
-<polygon fill="#000000" stroke="#000000" points="317.776,-152.799 326.684,-147.064 316.144,-145.992 317.776,-152.799"/>
+<path fill="none" stroke="#000000" d="M282.497,-487.947C291.032,-488.945 299.688,-489.958 308.119,-490.944"/>
+<polygon fill="#000000" stroke="#000000" points="307.93,-494.445 318.269,-492.131 308.744,-487.493 307.93,-494.445"/>
+</g>
+<!-- proc~eigen -->
+<g id="proc~~read_equilibrium~~CallsGraph_node15" class="node"><title>proc~eigen</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node15"><a xlink:href="../proc/eigen.html" xlink:title="eigen">
+<polygon fill="#d9534f" stroke="#d9534f" points="405,-279 351,-279 351,-255 405,-255 405,-279"/>
+<text text-anchor="middle" x="378" y="-264.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigen</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~eigen -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge23" class="edge"><title>proc~colrad&#45;&gt;proc~eigen</title>
+<path fill="none" stroke="#000000" d="M232.068,-146.52C247.446,-149.463 266.807,-154.734 282,-164 316.836,-185.247 346.806,-222.87 363.331,-246.288"/>
+<polygon fill="#000000" stroke="#000000" points="360.63,-248.536 369.181,-254.791 366.397,-244.568 360.63,-248.536"/>
+</g>
+<!-- proc~get_rate_matrix -->
+<g id="proc~~read_equilibrium~~CallsGraph_node16" class="node"><title>proc~get_rate_matrix</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node16"><a xlink:href="../proc/get_rate_matrix.html" xlink:title="get_rate_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="422,-155 334,-155 334,-131 422,-131 422,-155"/>
+<text text-anchor="middle" x="378" y="-140.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_rate_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~get_rate_matrix -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge24" class="edge"><title>proc~colrad&#45;&gt;proc~get_rate_matrix</title>
+<path fill="none" stroke="#000000" d="M232.344,-143C256.669,-143 293.525,-143 323.946,-143"/>
+<polygon fill="#000000" stroke="#000000" points="323.988,-146.5 333.988,-143 323.988,-139.5 323.988,-146.5"/>
+</g>
+<!-- proc~matinv -->
+<g id="proc~~read_equilibrium~~CallsGraph_node17" class="node"><title>proc~matinv</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node17"><a xlink:href="../proc/matinv.html" xlink:title="matinv">
+<polygon fill="#d9534f" stroke="#d9534f" points="405,-66 351,-66 351,-42 405,-42 405,-66"/>
+<text text-anchor="middle" x="378" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matinv</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~matinv -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge25" class="edge"><title>proc~colrad&#45;&gt;proc~matinv</title>
+<path fill="none" stroke="#000000" d="M232.141,-138.162C247.188,-134.799 266.188,-129.549 282,-122 309.46,-108.89 337.361,-87.7926 355.756,-72.5717"/>
+<polygon fill="#000000" stroke="#000000" points="358.112,-75.1628 363.503,-66.0416 353.601,-69.8105 358.112,-75.1628"/>
+</g>
+<!-- proc~hqr2 -->
+<g id="proc~~read_equilibrium~~CallsGraph_node18" class="node"><title>proc~hqr2</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node18"><a xlink:href="../proc/hqr2.html" xlink:title="hqr2">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-384 486,-384 486,-360 540,-360 540,-384"/>
+<text text-anchor="middle" x="513" y="-369.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqr2</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~hqr2 -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge7" class="edge"><title>proc~eigen&#45;&gt;proc~hqr2</title>
+<path fill="none" stroke="#000000" d="M390.874,-279.061C408.183,-296.265 441.8,-328.281 474,-351 475.801,-352.271 477.687,-353.526 479.615,-354.751"/>
+<polygon fill="#000000" stroke="#000000" points="477.823,-357.758 488.199,-359.898 481.422,-351.754 477.823,-357.758"/>
+</g>
+<!-- proc~balance -->
+<g id="proc~~read_equilibrium~~CallsGraph_node19" class="node"><title>proc~balance</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node19"><a xlink:href="../proc/balance.html" xlink:title="balance">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-342 486,-342 486,-318 540,-318 540,-342"/>
+<text text-anchor="middle" x="513" y="-327.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balance</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balance -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge8" class="edge"><title>proc~eigen&#45;&gt;proc~balance</title>
+<path fill="none" stroke="#000000" d="M404.644,-279.147C425.251,-288.908 454.405,-302.718 477.132,-313.484"/>
+<polygon fill="#000000" stroke="#000000" points="475.899,-316.772 486.435,-317.89 478.896,-310.446 475.899,-316.772"/>
+</g>
+<!-- proc~elmtrans -->
+<g id="proc~~read_equilibrium~~CallsGraph_node20" class="node"><title>proc~elmtrans</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node20"><a xlink:href="../proc/elmtrans.html" xlink:title="elmtrans">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-300 486,-300 486,-276 540,-276 540,-300"/>
+<text text-anchor="middle" x="513" y="-285.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmtrans</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmtrans -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge9" class="edge"><title>proc~eigen&#45;&gt;proc~elmtrans</title>
+<path fill="none" stroke="#000000" d="M405.277,-271.149C425.405,-274.327 453.41,-278.749 475.682,-282.266"/>
+<polygon fill="#000000" stroke="#000000" points="475.355,-285.757 485.778,-283.86 476.446,-278.843 475.355,-285.757"/>
+</g>
+<!-- proc~balback -->
+<g id="proc~~read_equilibrium~~CallsGraph_node21" class="node"><title>proc~balback</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node21"><a xlink:href="../proc/balback.html" xlink:title="balback">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-258 486,-258 486,-234 540,-234 540,-258"/>
+<text text-anchor="middle" x="513" y="-243.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balback</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balback -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge10" class="edge"><title>proc~eigen&#45;&gt;proc~balback</title>
+<path fill="none" stroke="#000000" d="M405.277,-262.851C425.405,-259.673 453.41,-255.251 475.682,-251.734"/>
+<polygon fill="#000000" stroke="#000000" points="476.446,-255.157 485.778,-250.14 475.355,-248.243 476.446,-255.157"/>
+</g>
+<!-- proc~elmhes -->
+<g id="proc~~read_equilibrium~~CallsGraph_node22" class="node"><title>proc~elmhes</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node22"><a xlink:href="../proc/elmhes.html" xlink:title="elmhes">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-216 486,-216 486,-192 540,-192 540,-216"/>
+<text text-anchor="middle" x="513" y="-201.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmhes</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmhes -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge11" class="edge"><title>proc~eigen&#45;&gt;proc~elmhes</title>
+<path fill="none" stroke="#000000" d="M404.644,-254.853C425.251,-245.092 454.405,-231.282 477.132,-220.516"/>
+<polygon fill="#000000" stroke="#000000" points="478.896,-223.554 486.435,-216.11 475.899,-217.228 478.896,-223.554"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_node26" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node26"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="551.5,-155 474.5,-155 474.5,-131 551.5,-131 551.5,-155"/>
+<text text-anchor="middle" x="513" y="-140.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+</a>
+</g>
+</g>
+<!-- proc~get_rate_matrix&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge18" class="edge"><title>proc~get_rate_matrix&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M422.181,-143C435.6,-143 450.468,-143 464.183,-143"/>
+<polygon fill="#000000" stroke="#000000" points="464.403,-146.5 474.403,-143 464.403,-139.5 464.403,-146.5"/>
+</g>
+<!-- proc~ludcmp -->
+<g id="proc~~read_equilibrium~~CallsGraph_node31" class="node"><title>proc~ludcmp</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node31"><a xlink:href="../proc/ludcmp.html" xlink:title="ludcmp">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-66 486,-66 486,-42 540,-42 540,-66"/>
+<text text-anchor="middle" x="513" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ludcmp</text>
+</a>
+</g>
+</g>
+<!-- proc~matinv&#45;&gt;proc~ludcmp -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge21" class="edge"><title>proc~matinv&#45;&gt;proc~ludcmp</title>
+<path fill="none" stroke="#000000" d="M405.277,-54C425.405,-54 453.41,-54 475.682,-54"/>
+<polygon fill="#000000" stroke="#000000" points="475.778,-57.5001 485.778,-54 475.778,-50.5001 475.778,-57.5001"/>
+</g>
+<!-- proc~lubksb -->
+<g id="proc~~read_equilibrium~~CallsGraph_node32" class="node"><title>proc~lubksb</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node32"><a xlink:href="../proc/lubksb.html" xlink:title="lubksb">
+<polygon fill="#d9534f" stroke="#d9534f" points="540,-24 486,-24 486,-0 540,-0 540,-24"/>
+<text text-anchor="middle" x="513" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">lubksb</text>
+</a>
+</g>
+</g>
+<!-- proc~matinv&#45;&gt;proc~lubksb -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge22" class="edge"><title>proc~matinv&#45;&gt;proc~lubksb</title>
+<path fill="none" stroke="#000000" d="M405.277,-45.7022C425.496,-39.3169 453.664,-30.422 475.984,-23.3735"/>
+<polygon fill="#000000" stroke="#000000" points="477.296,-26.6295 485.778,-20.2806 475.188,-19.9545 477.296,-26.6295"/>
+</g>
+<!-- proc~hqrvec -->
+<g id="proc~~read_equilibrium~~CallsGraph_node23" class="node"><title>proc~hqrvec</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node23"><a xlink:href="../proc/hqrvec.html" xlink:title="hqrvec">
+<polygon fill="#d9534f" stroke="#d9534f" points="670,-384 616,-384 616,-360 670,-360 670,-384"/>
+<text text-anchor="middle" x="643" y="-369.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqrvec</text>
+</a>
+</g>
+</g>
+<!-- proc~hqr2&#45;&gt;proc~hqrvec -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge3" class="edge"><title>proc~hqr2&#45;&gt;proc~hqrvec</title>
+<path fill="none" stroke="#000000" d="M540.212,-372C559.108,-372 584.851,-372 605.72,-372"/>
+<polygon fill="#000000" stroke="#000000" points="605.824,-375.5 615.823,-372 605.823,-368.5 605.824,-375.5"/>
+</g>
+<!-- proc~rswap -->
+<g id="proc~~read_equilibrium~~CallsGraph_node25" class="node"><title>proc~rswap</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node25"><a xlink:href="../proc/rswap.html" xlink:title="RSWAP">
+<polygon fill="#d9534f" stroke="#d9534f" points="670,-268 616,-268 616,-244 670,-244 670,-268"/>
+<text text-anchor="middle" x="643" y="-253.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RSWAP</text>
+</a>
+</g>
+</g>
+<!-- proc~balance&#45;&gt;proc~rswap -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge4" class="edge"><title>proc~balance&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="#000000" d="M536.16,-317.887C541.371,-315.002 546.894,-311.914 552,-309 572.52,-297.291 595.465,-283.772 613.051,-273.319"/>
+<polygon fill="#000000" stroke="#000000" points="614.917,-276.281 621.718,-268.158 611.335,-270.267 614.917,-276.281"/>
+</g>
+<!-- proc~balback&#45;&gt;proc~rswap -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge5" class="edge"><title>proc~balback&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="#000000" d="M540.212,-248.048C559.108,-249.524 584.851,-251.535 605.72,-253.166"/>
+<polygon fill="#000000" stroke="#000000" points="605.581,-256.665 615.823,-253.955 606.126,-249.687 605.581,-256.665"/>
+</g>
+<!-- proc~elmhes&#45;&gt;proc~rswap -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge6" class="edge"><title>proc~elmhes&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="#000000" d="M540.212,-214.648C559.28,-222.395 585.322,-232.974 606.29,-241.493"/>
+<polygon fill="#000000" stroke="#000000" points="605.241,-244.845 615.823,-245.366 607.876,-238.359 605.241,-244.845"/>
+</g>
+<!-- proc~comdiv -->
+<g id="proc~~read_equilibrium~~CallsGraph_node24" class="node"><title>proc~comdiv</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node24"><a xlink:href="../proc/comdiv.html" xlink:title="Comdiv">
+<polygon fill="#d9534f" stroke="#d9534f" points="807,-384 753,-384 753,-360 807,-360 807,-384"/>
+<text text-anchor="middle" x="780" y="-369.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Comdiv</text>
+</a>
+</g>
+</g>
+<!-- proc~hqrvec&#45;&gt;proc~comdiv -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge2" class="edge"><title>proc~hqrvec&#45;&gt;proc~comdiv</title>
+<path fill="none" stroke="#000000" d="M670.029,-372C690.627,-372 719.636,-372 742.545,-372"/>
+<polygon fill="#000000" stroke="#000000" points="742.59,-375.5 752.59,-372 742.59,-368.5 742.59,-375.5"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_node27" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node27"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="825.5,-198 734.5,-198 734.5,-174 825.5,-174 825.5,-198"/>
+<text text-anchor="middle" x="780" y="-183.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge14" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M525.701,-155.295C539.237,-168.54 562.9,-188.816 588,-197 632.207,-211.415 685.18,-206.775 724.114,-199.61"/>
+<polygon fill="#000000" stroke="#000000" points="725.055,-202.992 734.199,-197.64 723.713,-196.122 725.055,-202.992"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~read_equilibrium~~CallsGraph_node28" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node28"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-146 588,-146 588,-122 698,-122 698,-146"/>
+<text text-anchor="middle" x="643" y="-131.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge15" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M551.712,-140.348C559.963,-139.768 568.92,-139.138 577.88,-138.508"/>
+<polygon fill="#000000" stroke="#000000" points="578.23,-141.993 587.96,-137.8 577.739,-135.01 578.23,-141.993"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~read_equilibrium~~CallsGraph_node29" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node29"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="698,-188 588,-188 588,-164 698,-164 698,-188"/>
+<text text-anchor="middle" x="643" y="-173.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge16" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M551.712,-152.723C562.207,-155.428 573.843,-158.428 585.175,-161.35"/>
+<polygon fill="#000000" stroke="#000000" points="584.462,-164.78 595.019,-163.888 586.209,-158.002 584.462,-164.78"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_node30" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node30"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="825.5,-136 734.5,-136 734.5,-112 825.5,-112 825.5,-136"/>
+<text text-anchor="middle" x="780" y="-121.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge17" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M537.278,-130.858C551.505,-124.131 570.311,-116.449 588,-113 633.338,-104.159 685.785,-108.17 724.236,-113.679"/>
+<polygon fill="#000000" stroke="#000000" points="723.783,-117.15 734.194,-115.183 724.829,-110.229 723.783,-117.15"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge12" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M698.132,-129.99C706.779,-129.35 715.73,-128.687 724.388,-128.045"/>
+<polygon fill="#000000" stroke="#000000" points="724.667,-131.534 734.381,-127.305 724.15,-124.553 724.667,-131.534"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge13" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M698.132,-180.01C706.779,-180.65 715.73,-181.313 724.388,-181.955"/>
+<polygon fill="#000000" stroke="#000000" points="724.15,-185.447 734.381,-182.695 724.667,-178.466 724.15,-185.447"/>
+</g>
+<!-- proc~swap -->
+<g id="proc~~read_equilibrium~~CallsGraph_node33" class="node"><title>proc~swap</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node33"><a xlink:href="../proc/swap.html" xlink:title="swap">
+<polygon fill="#d9534f" stroke="#d9534f" points="670,-66 616,-66 616,-42 670,-42 670,-66"/>
+<text text-anchor="middle" x="643" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">swap</text>
+</a>
+</g>
+</g>
+<!-- proc~ludcmp&#45;&gt;proc~swap -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge19" class="edge"><title>proc~ludcmp&#45;&gt;proc~swap</title>
+<path fill="none" stroke="#000000" d="M540.212,-54C559.108,-54 584.851,-54 605.72,-54"/>
+<polygon fill="#000000" stroke="#000000" points="605.824,-57.5001 615.823,-54 605.823,-50.5001 605.824,-57.5001"/>
+</g>
+<!-- proc~outerprod -->
+<g id="proc~~read_equilibrium~~CallsGraph_node34" class="node"><title>proc~outerprod</title>
+<g id="a_proc~~read_equilibrium~~CallsGraph_node34"><a xlink:href="../proc/outerprod.html" xlink:title="outerprod">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="672.5,-24 613.5,-24 613.5,-0 672.5,-0 672.5,-24"/>
+<text text-anchor="middle" x="643" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">outerprod</text>
+</a>
+</g>
+</g>
+<!-- proc~ludcmp&#45;&gt;proc~outerprod -->
+<g id="proc~~read_equilibrium~~CallsGraph_edge20" class="edge"><title>proc~ludcmp&#45;&gt;proc~outerprod</title>
+<path fill="none" stroke="#000000" d="M540.212,-45.3993C558.44,-39.4182 583.039,-31.3465 603.489,-24.6364"/>
+<polygon fill="#000000" stroke="#000000" points="604.738,-27.9103 613.148,-21.4669 602.556,-21.2592 604.738,-27.9103"/>
 </g>
 </g>
 </svg>
 </div>
+                <script>var panprocread_equilibriumCallsGraph = svgPanZoom('#procread_equilibriumCallsGraph', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,});
+                    </script>
                 <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
                 <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
                   <div class="modal-dialog modal-lg" role="document">
@@ -1228,10 +1583,15 @@ public subroutine read_equilibrium()
     <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fid</span><span class="p">,</span> <span class="n">gid</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
 
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">impc</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">impc</span><span class="p">,</span> <span class="n">ic</span><span class="p">,</span> <span class="n">ir</span><span class="p">,</span> <span class="n">iz</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LocalProfiles</span><span class="p">)</span> <span class="kd">::</span> <span class="n">plasma</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">photons</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span><span class="p">,</span> <span class="n">denn</span><span class="p">,</span> <span class="n">rates_avg</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi</span><span class="p">,</span> <span class="n">random3</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">error</span>
 
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">p_mask</span><span class="p">,</span> <span class="n">f_mask</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">denn2d</span>
 
     <span class="c">!!Initialize HDF5 interface</span>
     <span class="k">call </span><span class="n">h5open_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
@@ -1245,12 +1605,14 @@ public subroutine read_equilibrium()
     <span class="c">!!Read in interpolation grid</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/nr&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/nz&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="n">inter_grid</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">]</span>
 
     <span class="k">allocate</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">),</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r2d</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">z2d</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">p_mask</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">f_mask</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">denn2d</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
 
     <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">]</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/r&quot;</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span><span class="p">),</span> <span class="n">error</span><span class="p">)</span>
@@ -1280,6 +1642,7 @@ public subroutine read_equilibrium()
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/vr&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">vr</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/vt&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">vt</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/vz&quot;</span><span class="p">,</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">vz</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/denn&quot;</span><span class="p">,</span> <span class="n">denn2d</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/plasma/mask&quot;</span><span class="p">,</span> <span class="n">p_mask</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span><span class="n">error</span><span class="p">)</span>
 
     <span class="n">impc</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">%</span><span class="n">impurity_charge</span>
@@ -1303,8 +1666,33 @@ public subroutine read_equilibrium()
         <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">ti</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">endwhere</span>
 
+    <span class="k">where</span><span class="p">(</span><span class="n">denn2d</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">denn2d</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">endwhere</span>
+
     <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">denimp</span> <span class="o">=</span> <span class="p">((</span><span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">zeff</span><span class="o">-</span><span class="mf">1.d0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">impc</span><span class="o">*</span><span class="p">(</span><span class="n">impc</span><span class="o">-</span><span class="mf">1.d0</span><span class="p">)))</span><span class="o">*</span><span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">dene</span>
     <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">denp</span> <span class="o">=</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">dene</span> <span class="o">-</span> <span class="n">impc</span><span class="o">*</span><span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">%</span><span class="n">denimp</span>
+
+    <span class="n">loop_over_cells</span><span class="p">:</span> <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span><span class="o">*</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="n">istep</span>
+        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">ic</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">iz</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">p_mask</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_cells</span>
+        <span class="n">plasma</span> <span class="o">=</span> <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">)</span>
+        <span class="n">plasma</span><span class="p">%</span><span class="n">vrot</span> <span class="o">=</span> <span class="p">[</span><span class="n">plasma</span><span class="p">%</span><span class="n">vr</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">vt</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">vz</span><span class="p">]</span>
+        <span class="n">plasma</span><span class="p">%</span><span class="n">in_plasma</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
+
+        <span class="n">rates_avg</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">do </span><span class="n">it</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="mi">50</span>
+            <span class="n">rates</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">rates</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.d19</span>
+            <span class="k">call </span><span class="n">randn</span><span class="p">(</span><span class="n">random3</span><span class="p">)</span>
+            <span class="n">vi</span> <span class="o">=</span> <span class="n">plasma</span><span class="p">%</span><span class="n">vrot</span> <span class="o">+</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">ti</span><span class="o">*</span><span class="mf">0.5</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ai</span><span class="p">))</span><span class="o">*</span><span class="n">random3</span>
+            <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">thermal_ion</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="mf">1.0d-7</span><span class="p">,</span> <span class="n">rates</span><span class="p">,</span> <span class="n">denn</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
+            <span class="n">rates_avg</span> <span class="o">=</span> <span class="n">rates_avg</span> <span class="o">+</span> <span class="n">rates</span><span class="o">/</span><span class="mi">50</span>
+        <span class="n">enddo</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">rates_avg</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_cells</span>
+        <span class="n">equil</span><span class="p">%</span><span class="n">plasma</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">)%</span><span class="n">denn</span> <span class="o">=</span> <span class="n">denn2d</span><span class="p">(</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">rates_avg</span><span class="p">)</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">rates_avg</span><span class="p">)</span>
+    <span class="n">enddo</span> <span class="n">loop_over_cells</span>
 
     <span class="c">!!Close PLASMA group</span>
     <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -1342,7 +1730,7 @@ public subroutine read_equilibrium()
     <span class="k">where</span> <span class="p">((</span><span class="n">p_mask</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">f_mask</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="n">equil</span><span class="p">%</span><span class="n">mask</span> <span class="o">=</span> <span class="mf">1.d0</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">equil</span><span class="p">%</span><span class="n">mask</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere&quot;</span>
-        <span class="k">stop</span>
+        <span class="n">error</span> <span class="k">stop</span>
 <span class="k">    </span><span class="n">endif</span>
 
 <span class="k">end subroutine </span><span class="n">read_equilibrium</span>
@@ -1488,6 +1876,8 @@ public subroutine read_equilibrium()
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1496,6 +1886,8 @@ public subroutine read_equilibrium()
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -1503,6 +1895,8 @@ public subroutine read_equilibrium()
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -1584,6 +1978,8 @@ public subroutine read_equilibrium()
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -1639,6 +2035,8 @@ public subroutine read_equilibrium()
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -1719,6 +2117,10 @@ public subroutine read_equilibrium()
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -1856,11 +2258,19 @@ public subroutine read_equilibrium()
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -1878,9 +2288,11 @@ public subroutine read_equilibrium()
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -1913,6 +2325,8 @@ public subroutine read_equilibrium()
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -1948,11 +2362,15 @@ public subroutine read_equilibrium()
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       

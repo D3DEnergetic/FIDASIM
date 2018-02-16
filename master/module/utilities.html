@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 3.3% of total for modules and submodules.">353 statements</a>
+	  title=" 4.3% of total for modules and submodules.">511 statements</a>
      </li> 
      
      
@@ -188,6 +188,12 @@
   <div id="inters-0" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../module/utilities.html#interface-randu">randu</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#interface-randn">randn</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#interface-randind_cdf">randind_cdf</a>
+      
       <a class="list-group-item" href="../module/utilities.html#interface-randind">randind</a>
       
       <a class="list-group-item" href="../module/utilities.html#interface-sparse">sparse</a>
@@ -221,11 +227,17 @@
       
       <a class="list-group-item" href="../module/utilities.html#proc-sub2ind">sub2ind</a>
       
+      <a class="list-group-item" href="../module/utilities.html#proc-rng_seed">rng_seed</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#proc-get_rng">get_rng</a>
+      
       <a class="list-group-item" href="../module/utilities.html#proc-rng_uniform">rng_uniform</a>
       
       <a class="list-group-item" href="../module/utilities.html#proc-rng_normal">rng_normal</a>
       
       <a class="list-group-item" href="../module/utilities.html#proc-get_value">get_value</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#proc-time">time</a>
       
     </div>
   </div>
@@ -241,9 +253,7 @@
       
       <a class="list-group-item" href="../module/utilities.html#proc-rng_init">rng_init</a>
       
-      <a class="list-group-item" href="../module/utilities.html#proc-randu">randu</a>
-      
-      <a class="list-group-item" href="../module/utilities.html#proc-randn">randn</a>
+      <a class="list-group-item" href="../module/utilities.html#proc-cumsum">cumsum</a>
       
     </div>
   </div>
@@ -544,6 +554,12 @@
   <div id="inters-1" class="panel-collapse collapse">
     <div class="list-group">
       
+      <a class="list-group-item" href="../module/utilities.html#interface-randu">randu</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#interface-randn">randn</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#interface-randind_cdf">randind_cdf</a>
+      
       <a class="list-group-item" href="../module/utilities.html#interface-randind">randind</a>
       
       <a class="list-group-item" href="../module/utilities.html#interface-sparse">sparse</a>
@@ -577,11 +593,17 @@
       
       <a class="list-group-item" href="../module/utilities.html#proc-sub2ind">sub2ind</a>
       
+      <a class="list-group-item" href="../module/utilities.html#proc-rng_seed">rng_seed</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#proc-get_rng">get_rng</a>
+      
       <a class="list-group-item" href="../module/utilities.html#proc-rng_uniform">rng_uniform</a>
       
       <a class="list-group-item" href="../module/utilities.html#proc-rng_normal">rng_normal</a>
       
       <a class="list-group-item" href="../module/utilities.html#proc-get_value">get_value</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#proc-time">time</a>
       
     </div>
   </div>
@@ -597,9 +619,7 @@
       
       <a class="list-group-item" href="../module/utilities.html#proc-rng_init">rng_init</a>
       
-      <a class="list-group-item" href="../module/utilities.html#proc-randu">randu</a>
-      
-      <a class="list-group-item" href="../module/utilities.html#proc-randn">randn</a>
+      <a class="list-group-item" href="../module/utilities.html#proc-cumsum">cumsum</a>
       
     </div>
   </div>
@@ -672,6 +692,443 @@
     <section>
 	 <h2>Interfaces</h2>
 	 
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="interface-randu"></span><h3>public interface <a href='../interface/randu.html'>randu</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randu_arr(randomu)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of uniformally-distributed random deviates</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomu</strong></td><td><p>Array of uniform random deviates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randu_r_arr(r, randomu)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of uniformally-distributed random deviates</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/rng_type.html'>rng_type</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>r</strong></td><td><p>Random Number Generator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomu</strong></td><td><p>Array of uniform random deviates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="interface-randn"></span><h3>public interface <a href='../interface/randn.html'>randn</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randn_arr(randomn)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of normally-distributed random deviates</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomn</strong></td><td><p>Array of normal random deviates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randn_r_arr(r, randomn)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of normally-distributed random deviates</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/rng_type.html'>rng_type</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>r</strong></td><td><p>Random Number Generator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomn</strong></td><td><p>Array of normal random deviates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+	   
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="interface-randind_cdf"></span><h3>public interface <a href='../interface/randind_cdf.html'>randind_cdf</a>
+    
+  </h3></div>
+  
+  <div class="panel-body">
+    
+    <p>Procedure for generating a random array index/subscripts</p>
+  </div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randind_r_cdf_1(r, cdf, randomi)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of random indices of an 1D array distributed according to <code>cdf</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/rng_type.html'>rng_type</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>r</strong></td><td><p>Random Number Generator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>cdf</strong></td><td><p>1D array of index weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomi</strong></td><td><p>Random indices</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randind_cdf_1(cdf, randomi)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of random indices of an 1D array distributed according to <code>cdf</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>cdf</strong></td><td><p>1D array of index weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomi</strong></td><td><p>Random indices</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
 	   
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="interface-randind"></span><h3>public interface <a href='../interface/randind.html'>randind</a>
@@ -861,6 +1318,401 @@ private subroutine randind_w_2(w, randomi)
   
   <td>dimension(:,:)</td><td>::</td>
   <td><strong>w</strong></td><td><p>2D array of subscript weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>randomi</strong></td><td><p>A 2D (ndim, :) array of random subscripts</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randind_w_3(w, randomi)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of random subscripts of an 3D array distributed according to <code>w</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>w</strong></td><td><p>3D array of subscript weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>randomi</strong></td><td><p>A 2D (ndim, :) array of random subscripts</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randind_r_n(r, n, randomi)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate a array of uniformally-distributed random integers in the range [1, n]</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/rng_type.html'>rng_type</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>r</strong></td><td><p>Random Number Generator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>n</strong></td><td><p>Largest possible value</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomi</strong></td><td><p>Array of uniform deviates</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randind_r_w_1(r, w, randomi)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of random indices of an 1D array distributed according to <code>w</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/rng_type.html'>rng_type</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>r</strong></td><td><p>Random Number Generator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>w</strong></td><td><p>1D array of index weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>randomi</strong></td><td><p>Random indices</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randind_r_w_2(r, w, randomi)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of random subscripts of an 2D array distributed according to <code>w</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/rng_type.html'>rng_type</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>r</strong></td><td><p>Random Number Generator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>w</strong></td><td><p>2D array of subscript weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>randomi</strong></td><td><p>A 2D (ndim, :) array of random subscripts</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+private subroutine randind_r_w_3(r, w, randomi)
+    
+    
+	 
+</h3>
+    
+
+
+
+<p>Generate an array of random subscripts of an 3D array distributed according to <code>w</code></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/rng_type.html'>rng_type</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>r</strong></td><td><p>Random Number Generator</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>w</strong></td><td><p>3D array of subscript weights</p></td>
   
 </tr>
 
@@ -1434,6 +2286,20 @@ private subroutine deriv_2d(x, y, z, zxp, zyp)
   
 <tr>
   
+  <td><span class="anchor" id="variable-seed"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>seed</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-state"></span>integer(kind=Int32),</td>
   
   <td>public,</td>
@@ -1506,7 +2372,7 @@ private subroutine deriv_2d(x, y, z, zxp, zyp)
   
 <tr>
   
-  <td><span class="anchor" id="variable-dims"></span>integer,</td>
+  <td><span class="anchor" id="variable-dims%7E3"></span>integer,</td>
   
   <td>public,</td>
   <td>dimension(:), allocatable</td><td>::</td>
@@ -1639,6 +2505,76 @@ public function <a href='../proc/sub2ind.html'>sub2ind</a>(dims, subs) result(in
      <h4>Return Value <small>integer
   </small></h4>
   <p>Linear index</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-rng_seed"></span><h3>
+public function <a href='../proc/rng_seed.html'>rng_seed</a>() result(seed)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Generates random 32-bit integer seed from <code>/dev/urandom</code></p>
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=Int32)
+  </small></h4>
+  <p>Seed value</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_rng"></span><h3>
+public function <a href='../proc/get_rng.html'>get_rng</a>() result(r)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+    
+    <h4>Arguments</h4>
+    
+      <em>None</em>
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/rng_type.html'>rng_type</a>)
+  </small></h4>
+  
     
 
   </div>
@@ -1864,6 +2800,74 @@ public function <a href='../proc/get_value.html'>get_value</a>(SA, subs) result(
   </div>
 
     
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-time"></span><h3>
+public function <a href='../proc/time.html'>time</a>(time_start) result(time_str)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Returns time string</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td>dimension(8)</td><td>::</td>
+  <td><strong>time_start</strong></td><td><p>Optional start time</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=30)
+  </small></h4>
+  <p>Time string</p>
+    
+
+  </div>
+  </div>
+
+    
     </section>
     <br>
     
@@ -1980,7 +2984,8 @@ public subroutine <a href='../proc/rng_init.html'>rng_init</a>(self, seed)
 
 
 
-<p>Procedure to initialize a random number generator with a seed</p>
+<p>Procedure to initialize a random number generator with a seed.
+ If seed is negative then random seed is used</p>
     
     <h4>Arguments</h4>
     
@@ -2038,8 +3043,8 @@ public subroutine <a href='../proc/rng_init.html'>rng_init</a>(self, seed)
     
     
   <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-randu"></span><h3>
-public subroutine <a href='../proc/randu.html'>randu</a>(randomu)
+  <div class="panel-heading codesum"><span class="anchor" id="proc-cumsum"></span><h3>
+public subroutine <a href='../proc/cumsum.html'>cumsum</a>(x, cs)
     
     
 	 
@@ -2054,7 +3059,7 @@ public subroutine <a href='../proc/randu.html'>randu</a>(randomu)
 
 
 
-<p>Generate an array of uniformally-distributed random deviates</p>
+<p>Calculate cumulative sum</p>
     
     <h4>Arguments</h4>
     
@@ -2076,58 +3081,14 @@ public subroutine <a href='../proc/randu.html'>randu</a>(randomu)
 <tr>
   
   <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
+  <td>intent(in),</td>
   <td></td>
   
   <td>dimension(:)</td><td>::</td>
-  <td><strong>randomu</strong></td><td><p>Array of uniform random deviates</p></td>
+  <td><strong>x</strong></td><td><p>Array to sum</p></td>
   
 </tr>
 
-</tbody>
-</table>
-
-      
-    
-    
-
-  </div>
-  </div>
-
-    
-    
-  <div class="panel panel-default">
-  <div class="panel-heading codesum"><span class="anchor" id="proc-randn"></span><h3>
-public subroutine <a href='../proc/randn.html'>randn</a>(randomn)
-    
-    
-	 
-</h3></div>
-  <div class="panel-body">
-       
-    
-
-
-
-
-
-
-
-<p>Generate an array of normally-distributed random deviates</p>
-    
-    <h4>Arguments</h4>
-    
-      
-      
-<table class="table table-striped varlist">
-<thead><tr><th>Type</th>
-<th>Intent</th><th>Optional</th>
-<th>Attributes</th><th></th><th>Name</th><th></th></thead>
-
-
-
-<tbody>
-
   
   
   
@@ -2139,7 +3100,7 @@ public subroutine <a href='../proc/randn.html'>randn</a>(randomn)
   <td></td>
   
   <td>dimension(:)</td><td>::</td>
-  <td><strong>randomn</strong></td><td><p>Array of normal random deviates</p></td>
+  <td><strong>cs</strong></td><td><p>Cumulative sum of <code>x</code></p></td>
   
 </tr>
 

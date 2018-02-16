@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.7% of total for procedures.">68 statements</a>
+	  title=" 0.6% of total for procedures.">61 statements</a>
      </li> 
      
      
@@ -323,6 +323,8 @@
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -331,6 +333,8 @@
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -338,6 +342,8 @@
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -419,6 +425,8 @@
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -474,6 +482,8 @@
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -554,6 +564,10 @@
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -691,11 +705,19 @@
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -713,9 +735,11 @@
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -748,6 +772,8 @@
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -783,11 +809,15 @@
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       
@@ -854,7 +884,7 @@ public subroutine fida_mc()
 
 
     
-    <p>Calculate FIDA emission using a Monte Carlo Fast-ion distribution</p>
+    <p>Calculate Active FIDA emission using a Monte Carlo Fast-ion distribution</p>
     
 
     <h3>Arguments</h3>
@@ -871,628 +901,618 @@ public subroutine fida_mc()
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: proc~~fida_mc~~CallsGraph Pages: 1 -->
-<svg id="procfida_mcCallsGraph" width="641pt" height="541pt"
- viewBox="0.00 0.00 641.00 540.57" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="proc~~fida_mc~~CallsGraph" class="graph" transform="scale(0.738479 0.738479) rotate(0) translate(4 728)">
+<svg id="procfida_mcCallsGraph" width="641pt" height="408pt"
+ viewBox="0.00 0.00 641.00 408.46" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~fida_mc~~CallsGraph" class="graph" transform="scale(0.654082 0.654082) rotate(0) translate(4 620.486)">
 <title>proc~~fida_mc~~CallsGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-728 864,-728 864,4 -4,4"/>
+<polygon fill="white" stroke="none" points="-4,4 -4,-620.486 976,-620.486 976,4 -4,4"/>
 <!-- proc~fida_mc -->
 <g id="proc~~fida_mc~~CallsGraph_node1" class="node"><title>proc~fida_mc</title>
-<polygon fill="none" stroke="black" points="54,-244 0,-244 0,-220 54,-220 54,-244"/>
-<text text-anchor="middle" x="27" y="-229.6" font-family="Helvetica,sans-Serif" font-size="10.50">fida_mc</text>
-</g>
-<!-- proc~uvw_to_xyz -->
-<g id="proc~~fida_mc~~CallsGraph_node2" class="node"><title>proc~uvw_to_xyz</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node2"><a xlink:href="../proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
-<polygon fill="#d9534f" stroke="#d9534f" points="176,-482 108,-482 108,-458 176,-458 176,-482"/>
-<text text-anchor="middle" x="142" y="-467.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
-</a>
-</g>
-</g>
-<!-- proc~fida_mc&#45;&gt;proc~uvw_to_xyz -->
-<g id="proc~~fida_mc~~CallsGraph_edge48" class="edge"><title>proc~fida_mc&#45;&gt;proc~uvw_to_xyz</title>
-<path fill="none" stroke="#000000" d="M27.9675,-244.044C28.5153,-279.911 34.915,-387.353 90,-449 92.5421,-451.845 95.5283,-454.313 98.7588,-456.453"/>
-<polygon fill="#000000" stroke="#000000" points="97.2927,-459.64 107.743,-461.382 100.66,-453.503 97.2927,-459.64"/>
-</g>
-<!-- proc~colrad -->
-<g id="proc~~fida_mc~~CallsGraph_node3" class="node"><title>proc~colrad</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node3"><a xlink:href="../proc/colrad.html" xlink:title="colrad">
-<polygon fill="#d9534f" stroke="#d9534f" points="169,-440 115,-440 115,-416 169,-416 169,-440"/>
-<text text-anchor="middle" x="142" y="-425.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">colrad</text>
-</a>
-</g>
-</g>
-<!-- proc~fida_mc&#45;&gt;proc~colrad -->
-<g id="proc~~fida_mc~~CallsGraph_edge49" class="edge"><title>proc~fida_mc&#45;&gt;proc~colrad</title>
-<path fill="none" stroke="#000000" d="M33.4731,-244.059C43.7027,-266.285 66.7933,-315.004 90,-354 101.101,-372.654 115.199,-392.888 125.758,-407.476"/>
-<polygon fill="#000000" stroke="#000000" points="123.089,-409.757 131.816,-415.764 128.74,-405.626 123.089,-409.757"/>
+<polygon fill="none" stroke="black" points="54,-435 0,-435 0,-411 54,-411 54,-435"/>
+<text text-anchor="middle" x="27" y="-420.6" font-family="Helvetica,sans-Serif" font-size="10.50">fida_mc</text>
 </g>
 <!-- proc~track -->
-<g id="proc~~fida_mc~~CallsGraph_node4" class="node"><title>proc~track</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node4"><a xlink:href="../proc/track.html" xlink:title="track">
-<polygon fill="#d9534f" stroke="#d9534f" points="169,-244 115,-244 115,-220 169,-220 169,-244"/>
-<text text-anchor="middle" x="142" y="-229.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track</text>
+<g id="proc~~fida_mc~~CallsGraph_node2" class="node"><title>proc~track</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node2"><a xlink:href="../proc/track.html" xlink:title="track">
+<polygon fill="#d9534f" stroke="#d9534f" points="308,-601 254,-601 254,-577 308,-577 308,-601"/>
+<text text-anchor="middle" x="281" y="-586.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track</text>
 </a>
 </g>
 </g>
 <!-- proc~fida_mc&#45;&gt;proc~track -->
-<g id="proc~~fida_mc~~CallsGraph_edge50" class="edge"><title>proc~fida_mc&#45;&gt;proc~track</title>
-<path fill="none" stroke="#000000" d="M54.2085,-232C69.1836,-232 88.1896,-232 104.596,-232"/>
-<polygon fill="#000000" stroke="#000000" points="104.934,-235.5 114.934,-232 104.934,-228.5 104.934,-235.5"/>
+<g id="proc~~fida_mc~~CallsGraph_edge47" class="edge"><title>proc~fida_mc&#45;&gt;proc~track</title>
+<path fill="none" stroke="#000000" d="M29.3609,-435.361C33.177,-463.542 46.7084,-532.607 90,-565 134.57,-598.35 202.11,-598.343 243.511,-594.346"/>
+<polygon fill="#000000" stroke="#000000" points="244.136,-597.799 253.696,-593.231 243.374,-590.84 244.136,-597.799"/>
 </g>
-<!-- proc~randu -->
-<g id="proc~~fida_mc~~CallsGraph_node5" class="node"><title>proc~randu</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node5"><a xlink:href="../proc/randu.html" xlink:title="randu">
-<polygon fill="#d9534f" stroke="#d9534f" points="301,-108 247,-108 247,-84 301,-84 301,-108"/>
-<text text-anchor="middle" x="274" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+<!-- proc~get_beam_cx_rate -->
+<g id="proc~~fida_mc~~CallsGraph_node3" class="node"><title>proc~get_beam_cx_rate</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node3"><a xlink:href="../proc/get_beam_cx_rate.html" xlink:title="get_beam_cx_rate">
+<polygon fill="#d9534f" stroke="#d9534f" points="332,-435 230,-435 230,-411 332,-411 332,-435"/>
+<text text-anchor="middle" x="281" y="-420.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_beam_cx_rate</text>
 </a>
 </g>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~randu -->
-<g id="proc~~fida_mc~~CallsGraph_edge51" class="edge"><title>proc~fida_mc&#45;&gt;proc~randu</title>
-<path fill="none" stroke="#000000" d="M32.5387,-219.737C40.7274,-199.392 59.9658,-158.843 90,-138 134.156,-107.358 197.346,-98.7642 236.735,-96.5289"/>
-<polygon fill="#000000" stroke="#000000" points="237.106,-100.016 246.936,-96.0623 236.786,-93.023 237.106,-100.016"/>
+<!-- proc~fida_mc&#45;&gt;proc~get_beam_cx_rate -->
+<g id="proc~~fida_mc~~CallsGraph_edge48" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_beam_cx_rate</title>
+<path fill="none" stroke="#000000" d="M54.0193,-423C92.8062,-423 166.871,-423 219.634,-423"/>
+<polygon fill="#000000" stroke="#000000" points="219.886,-426.5 229.886,-423 219.886,-419.5 219.886,-426.5"/>
+</g>
+<!-- proc~get_plasma -->
+<g id="proc~~fida_mc~~CallsGraph_node4" class="node"><title>proc~get_plasma</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node4"><a xlink:href="../proc/get_plasma.html" xlink:title="get_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="442,-475 374,-475 374,-451 442,-451 442,-475"/>
+<text text-anchor="middle" x="408" y="-460.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~get_plasma -->
+<g id="proc~~fida_mc~~CallsGraph_edge49" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_plasma</title>
+<path fill="none" stroke="#000000" d="M54.0908,-429.746C65.1058,-432.371 78.1106,-435.179 90,-437 187.263,-451.895 302.71,-458.651 363.904,-461.382"/>
+<polygon fill="#000000" stroke="#000000" points="363.824,-464.882 373.965,-461.817 364.126,-457.889 363.824,-464.882"/>
+</g>
+<!-- proc~get_fields -->
+<g id="proc~~fida_mc~~CallsGraph_node5" class="node"><title>proc~get_fields</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node5"><a xlink:href="../proc/get_fields.html" xlink:title="get_fields">
+<polygon fill="#d9534f" stroke="#d9534f" points="437,-517 379,-517 379,-493 437,-493 437,-517"/>
+<text text-anchor="middle" x="408" y="-502.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+</a>
+</g>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~get_fields -->
+<g id="proc~~fida_mc~~CallsGraph_edge50" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M45.9371,-435.05C57.9167,-442.528 74.2997,-451.693 90,-457 186.753,-489.702 307.659,-500.185 368.392,-503.5"/>
+<polygon fill="#000000" stroke="#000000" points="368.498,-507.009 378.663,-504.022 368.854,-500.018 368.498,-507.009"/>
+</g>
+<!-- proc~gyro_correction -->
+<g id="proc~~fida_mc~~CallsGraph_node6" class="node"><title>proc~gyro_correction</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node6"><a xlink:href="../proc/gyro_correction.html" xlink:title="gyro_correction">
+<polygon fill="#d9534f" stroke="#d9534f" points="185.5,-192 98.5,-192 98.5,-168 185.5,-168 185.5,-192"/>
+<text text-anchor="middle" x="142" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
+</a>
+</g>
+</g>
+<!-- proc~fida_mc&#45;&gt;proc~gyro_correction -->
+<g id="proc~~fida_mc~~CallsGraph_edge51" class="edge"><title>proc~fida_mc&#45;&gt;proc~gyro_correction</title>
+<path fill="none" stroke="#000000" d="M29.3747,-410.716C33.5452,-377.774 48.4189,-285.717 90,-223 96.2076,-213.637 105.033,-205.196 113.601,-198.322"/>
+<polygon fill="#000000" stroke="#000000" points="115.783,-201.06 121.644,-192.234 111.558,-195.479 115.783,-201.06"/>
 </g>
 <!-- proc~store_fida_photons -->
-<g id="proc~~fida_mc~~CallsGraph_node6" class="node"><title>proc~store_fida_photons</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node6"><a xlink:href="../proc/store_fida_photons.html" xlink:title="store_fida_photons">
-<polygon fill="#d9534f" stroke="#d9534f" points="194,-202 90,-202 90,-178 194,-178 194,-202"/>
-<text text-anchor="middle" x="142" y="-187.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
+<g id="proc~~fida_mc~~CallsGraph_node7" class="node"><title>proc~store_fida_photons</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node7"><a xlink:href="../proc/store_fida_photons.html" xlink:title="store_fida_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="194,-556 90,-556 90,-532 194,-532 194,-556"/>
+<text text-anchor="middle" x="142" y="-541.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_fida_photons</text>
 </a>
 </g>
 </g>
 <!-- proc~fida_mc&#45;&gt;proc~store_fida_photons -->
 <g id="proc~~fida_mc~~CallsGraph_edge52" class="edge"><title>proc~fida_mc&#45;&gt;proc~store_fida_photons</title>
-<path fill="none" stroke="#000000" d="M54.2085,-222.259C67.4722,-217.329 83.898,-211.224 98.879,-205.656"/>
-<polygon fill="#000000" stroke="#000000" points="100.313,-208.857 108.467,-202.092 97.8744,-202.295 100.313,-208.857"/>
+<path fill="none" stroke="#000000" d="M33.4835,-435.07C42.7707,-454.423 63.2265,-492.685 90,-517 93.9319,-520.571 98.4225,-523.821 103.072,-526.729"/>
+<polygon fill="#000000" stroke="#000000" points="101.685,-529.968 112.103,-531.897 105.162,-523.892 101.685,-529.968"/>
 </g>
-<!-- proc~gyro_correction -->
-<g id="proc~~fida_mc~~CallsGraph_node7" class="node"><title>proc~gyro_correction</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node7"><a xlink:href="../proc/gyro_correction.html" xlink:title="gyro_correction">
-<polygon fill="#d9534f" stroke="#d9534f" points="185.5,-77 98.5,-77 98.5,-53 185.5,-53 185.5,-77"/>
-<text text-anchor="middle" x="142" y="-62.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_correction</text>
+<!-- proc~uvw_to_xyz -->
+<g id="proc~~fida_mc~~CallsGraph_node8" class="node"><title>proc~uvw_to_xyz</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node8"><a xlink:href="../proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="176,-150 108,-150 108,-126 176,-126 176,-150"/>
+<text text-anchor="middle" x="142" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
 </a>
 </g>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~gyro_correction -->
-<g id="proc~~fida_mc~~CallsGraph_edge53" class="edge"><title>proc~fida_mc&#45;&gt;proc~gyro_correction</title>
-<path fill="none" stroke="#000000" d="M30.884,-219.619C37.4402,-193.762 55.6249,-133.255 90,-95 94.2804,-90.2364 99.5007,-86.0137 104.949,-82.3511"/>
-<polygon fill="#000000" stroke="#000000" points="106.894,-85.2643 113.597,-77.0592 103.24,-79.2936 106.894,-85.2643"/>
+<!-- proc~fida_mc&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~fida_mc~~CallsGraph_edge53" class="edge"><title>proc~fida_mc&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M29.3786,-410.829C34.8662,-364.303 56.4988,-198.339 90,-159 92.5803,-155.97 95.6671,-153.37 99.0279,-151.141"/>
+<polygon fill="#000000" stroke="#000000" points="100.724,-154.203 107.814,-146.329 97.3618,-148.063 100.724,-154.203"/>
 </g>
-<!-- proc~get_fields -->
-<g id="proc~~fida_mc~~CallsGraph_node8" class="node"><title>proc~get_fields</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node8"><a xlink:href="../proc/get_fields.html" xlink:title="get_fields">
-<polygon fill="#d9534f" stroke="#d9534f" points="303,-150 245,-150 245,-126 303,-126 303,-150"/>
-<text text-anchor="middle" x="274" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+<!-- proc~colrad -->
+<g id="proc~~fida_mc~~CallsGraph_node9" class="node"><title>proc~colrad</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node9"><a xlink:href="../proc/colrad.html" xlink:title="colrad">
+<polygon fill="#d9534f" stroke="#d9534f" points="169,-322 115,-322 115,-298 169,-298 169,-322"/>
+<text text-anchor="middle" x="142" y="-307.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">colrad</text>
 </a>
 </g>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~get_fields -->
-<g id="proc~~fida_mc~~CallsGraph_edge54" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_fields</title>
-<path fill="none" stroke="#000000" d="M36.2709,-219.788C46.885,-205.166 66.7315,-181.132 90,-169 135.836,-145.102 196.086,-138.982 234.687,-137.743"/>
-<polygon fill="#000000" stroke="#000000" points="235.051,-141.236 244.97,-137.512 234.894,-134.238 235.051,-141.236"/>
+<!-- proc~fida_mc&#45;&gt;proc~colrad -->
+<g id="proc~~fida_mc~~CallsGraph_edge54" class="edge"><title>proc~fida_mc&#45;&gt;proc~colrad</title>
+<path fill="none" stroke="#000000" d="M40.093,-410.907C59.6334,-391.367 98.3174,-352.683 121.7,-329.3"/>
+<polygon fill="#000000" stroke="#000000" points="124.398,-331.552 128.994,-322.006 119.448,-326.602 124.398,-331.552"/>
 </g>
-<!-- proc~get_beam_cx_rate -->
-<g id="proc~~fida_mc~~CallsGraph_node9" class="node"><title>proc~get_beam_cx_rate</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node9"><a xlink:href="../proc/get_beam_cx_rate.html" xlink:title="get_beam_cx_rate">
-<polygon fill="#d9534f" stroke="#d9534f" points="193,-345 91,-345 91,-321 193,-321 193,-345"/>
-<text text-anchor="middle" x="142" y="-330.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_beam_cx_rate</text>
+<!-- interface~randu -->
+<g id="proc~~fida_mc~~CallsGraph_node10" class="node"><title>interface~randu</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node10"><a xlink:href="../interface/randu.html" xlink:title="randu">
+<polygon fill="#a7506f" stroke="#a7506f" points="308,-192 254,-192 254,-168 308,-168 308,-192"/>
+<text text-anchor="middle" x="281" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
 </a>
 </g>
 </g>
-<!-- proc~fida_mc&#45;&gt;proc~get_beam_cx_rate -->
-<g id="proc~~fida_mc~~CallsGraph_edge55" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_beam_cx_rate</title>
-<path fill="none" stroke="#000000" d="M38.8407,-244.415C50.7794,-257.787 70.8336,-279.377 90,-296 97.5252,-302.527 106.15,-309.092 114.14,-314.842"/>
-<polygon fill="#000000" stroke="#000000" points="112.289,-317.819 122.478,-320.722 116.323,-312.099 112.289,-317.819"/>
-</g>
-<!-- proc~get_plasma -->
-<g id="proc~~fida_mc~~CallsGraph_node10" class="node"><title>proc~get_plasma</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node10"><a xlink:href="../proc/get_plasma.html" xlink:title="get_plasma">
-<polygon fill="#d9534f" stroke="#d9534f" points="308,-314 240,-314 240,-290 308,-290 308,-314"/>
-<text text-anchor="middle" x="274" y="-299.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_plasma</text>
-</a>
-</g>
-</g>
-<!-- proc~fida_mc&#45;&gt;proc~get_plasma -->
-<g id="proc~~fida_mc~~CallsGraph_edge56" class="edge"><title>proc~fida_mc&#45;&gt;proc~get_plasma</title>
-<path fill="none" stroke="#000000" d="M54.1244,-241.269C65.1447,-245.069 78.1445,-249.409 90,-253 137.475,-267.379 192.528,-281.823 229.752,-291.264"/>
-<polygon fill="#000000" stroke="#000000" points="229.205,-294.736 239.757,-293.791 230.918,-287.949 229.205,-294.736"/>
-</g>
-<!-- proc~get_rate_matrix -->
-<g id="proc~~fida_mc~~CallsGraph_node11" class="node"><title>proc~get_rate_matrix</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node11"><a xlink:href="../proc/get_rate_matrix.html" xlink:title="get_rate_matrix">
-<polygon fill="#d9534f" stroke="#d9534f" points="318,-440 230,-440 230,-416 318,-416 318,-440"/>
-<text text-anchor="middle" x="274" y="-425.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_rate_matrix</text>
-</a>
-</g>
-</g>
-<!-- proc~colrad&#45;&gt;proc~get_rate_matrix -->
-<g id="proc~~fida_mc~~CallsGraph_edge22" class="edge"><title>proc~colrad&#45;&gt;proc~get_rate_matrix</title>
-<path fill="none" stroke="#000000" d="M169.307,-428C183.82,-428 202.379,-428 219.774,-428"/>
-<polygon fill="#000000" stroke="#000000" points="219.842,-431.5 229.842,-428 219.842,-424.5 219.842,-431.5"/>
-</g>
-<!-- proc~eigen -->
-<g id="proc~~fida_mc~~CallsGraph_node12" class="node"><title>proc~eigen</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node12"><a xlink:href="../proc/eigen.html" xlink:title="eigen">
-<polygon fill="#d9534f" stroke="#d9534f" points="301,-619 247,-619 247,-595 301,-595 301,-619"/>
-<text text-anchor="middle" x="274" y="-604.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigen</text>
-</a>
-</g>
-</g>
-<!-- proc~colrad&#45;&gt;proc~eigen -->
-<g id="proc~~fida_mc~~CallsGraph_edge23" class="edge"><title>proc~colrad&#45;&gt;proc~eigen</title>
-<path fill="none" stroke="#000000" d="M169.183,-434.725C177.856,-437.943 187.057,-442.546 194,-449 235.147,-487.246 257.857,-551.653 267.448,-585.202"/>
-<polygon fill="#000000" stroke="#000000" points="264.096,-586.214 270.107,-594.938 270.848,-584.369 264.096,-586.214"/>
-</g>
-<!-- proc~matinv -->
-<g id="proc~~fida_mc~~CallsGraph_node13" class="node"><title>proc~matinv</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node13"><a xlink:href="../proc/matinv.html" xlink:title="matinv">
-<polygon fill="#d9534f" stroke="#d9534f" points="301,-482 247,-482 247,-458 301,-458 301,-482"/>
-<text text-anchor="middle" x="274" y="-467.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matinv</text>
-</a>
-</g>
-</g>
-<!-- proc~colrad&#45;&gt;proc~matinv -->
-<g id="proc~~fida_mc~~CallsGraph_edge24" class="edge"><title>proc~colrad&#45;&gt;proc~matinv</title>
-<path fill="none" stroke="#000000" d="M169.307,-436.499C188.778,-442.79 215.532,-451.433 236.987,-458.365"/>
-<polygon fill="#000000" stroke="#000000" points="236.14,-461.769 246.732,-461.513 238.292,-455.108 236.14,-461.769"/>
+<!-- proc~fida_mc&#45;&gt;interface~randu -->
+<g id="proc~~fida_mc~~CallsGraph_edge55" class="edge"><title>proc~fida_mc&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M31.0467,-410.97C37.9108,-385.828 56.6459,-326.915 90,-289 132.555,-240.626 201.998,-208.541 244.104,-192.371"/>
+<polygon fill="#000000" stroke="#000000" points="245.537,-195.572 253.675,-188.789 243.083,-189.016 245.537,-195.572"/>
 </g>
 <!-- proc~get_indices -->
-<g id="proc~~fida_mc~~CallsGraph_node31" class="node"><title>proc~get_indices</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node31"><a xlink:href="../proc/get_indices.html" xlink:title="get_indices">
-<polygon fill="#d9534f" stroke="#d9534f" points="307.5,-234 240.5,-234 240.5,-210 307.5,-210 307.5,-234"/>
-<text text-anchor="middle" x="274" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
+<g id="proc~~fida_mc~~CallsGraph_node11" class="node"><title>proc~get_indices</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node11"><a xlink:href="../proc/get_indices.html" xlink:title="get_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="441.5,-601 374.5,-601 374.5,-577 441.5,-577 441.5,-601"/>
+<text text-anchor="middle" x="408" y="-586.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
 </a>
 </g>
 </g>
 <!-- proc~track&#45;&gt;proc~get_indices -->
-<g id="proc~~fida_mc~~CallsGraph_edge27" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
-<path fill="none" stroke="#000000" d="M169.307,-229.976C186.745,-228.635 210.024,-226.844 230.106,-225.3"/>
-<polygon fill="#000000" stroke="#000000" points="230.567,-228.775 240.269,-224.518 230.03,-221.795 230.567,-228.775"/>
+<g id="proc~~fida_mc~~CallsGraph_edge9" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="#000000" d="M308.204,-589C324.392,-589 345.552,-589 364.135,-589"/>
+<polygon fill="#000000" stroke="#000000" points="364.145,-592.5 374.145,-589 364.145,-585.5 364.145,-592.5"/>
 </g>
 <!-- proc~in_plasma -->
-<g id="proc~~fida_mc~~CallsGraph_node32" class="node"><title>proc~in_plasma</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node32"><a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
-<polygon fill="#d9534f" stroke="#d9534f" points="443.5,-294 382.5,-294 382.5,-270 443.5,-270 443.5,-294"/>
-<text text-anchor="middle" x="413" y="-279.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+<g id="proc~~fida_mc~~CallsGraph_node12" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node12"><a xlink:href="../proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="564.5,-565 503.5,-565 503.5,-541 564.5,-541 564.5,-565"/>
+<text text-anchor="middle" x="534" y="-550.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
 </a>
 </g>
 </g>
 <!-- proc~track&#45;&gt;proc~in_plasma -->
-<g id="proc~~fida_mc~~CallsGraph_edge28" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M169.283,-236.885C216.7,-245.699 316.797,-264.304 372.495,-274.657"/>
-<polygon fill="#000000" stroke="#000000" points="371.884,-278.103 382.355,-276.49 373.163,-271.221 371.884,-278.103"/>
-</g>
-<!-- omp_get_thread_num -->
-<g id="proc~~fida_mc~~CallsGraph_node34" class="node"><title>omp_get_thread_num</title>
-<polygon fill="#777777" stroke="#777777" points="472,-128 354,-128 354,-104 472,-104 472,-128"/>
-<text text-anchor="middle" x="413" y="-113.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">omp_get_thread_num</text>
-</g>
-<!-- proc~randu&#45;&gt;omp_get_thread_num -->
-<g id="proc~~fida_mc~~CallsGraph_edge29" class="edge"><title>proc~randu&#45;&gt;omp_get_thread_num</title>
-<path fill="none" stroke="#000000" d="M301.091,-99.8089C313.382,-101.603 328.677,-103.836 343.942,-106.065"/>
-<polygon fill="#000000" stroke="#000000" points="343.537,-109.542 353.938,-107.524 344.548,-102.616 343.537,-109.542"/>
-</g>
-<!-- proc~rng_uniform -->
-<g id="proc~~fida_mc~~CallsGraph_node35" class="node"><title>proc~rng_uniform</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node35"><a xlink:href="../proc/rng_uniform.html" xlink:title="rng_uniform">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="448,-86 378,-86 378,-62 448,-62 448,-86"/>
-<text text-anchor="middle" x="413" y="-71.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_uniform</text>
-</a>
-</g>
-</g>
-<!-- proc~randu&#45;&gt;proc~rng_uniform -->
-<g id="proc~~fida_mc~~CallsGraph_edge30" class="edge"><title>proc~randu&#45;&gt;proc~rng_uniform</title>
-<path fill="none" stroke="#000000" d="M301.091,-91.8102C319.924,-88.7859 345.808,-84.6294 367.834,-81.0924"/>
-<polygon fill="#000000" stroke="#000000" points="368.646,-84.5068 377.965,-79.4655 367.537,-77.5954 368.646,-84.5068"/>
-</g>
-<!-- proc~store_fida_photons&#45;&gt;proc~get_fields -->
-<g id="proc~~fida_mc~~CallsGraph_edge32" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~get_fields</title>
-<path fill="none" stroke="#000000" d="M173.151,-177.939C191.715,-170.514 215.664,-160.934 235.453,-153.019"/>
-<polygon fill="#000000" stroke="#000000" points="236.807,-156.247 244.792,-149.283 234.207,-149.748 236.807,-156.247"/>
-</g>
-<!-- proc~store_fida_photons&#45;&gt;proc~get_indices -->
-<g id="proc~~fida_mc~~CallsGraph_edge31" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~get_indices</title>
-<path fill="none" stroke="#000000" d="M191.777,-202.007C204.385,-205.11 217.863,-208.428 230.144,-211.451"/>
-<polygon fill="#000000" stroke="#000000" points="229.586,-214.918 240.133,-213.91 231.259,-208.121 229.586,-214.918"/>
-</g>
-<!-- proc~spectrum -->
-<g id="proc~~fida_mc~~CallsGraph_node36" class="node"><title>proc~spectrum</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node36"><a xlink:href="../proc/spectrum.html" xlink:title="spectrum">
-<polygon fill="#d9534f" stroke="#d9534f" points="302.5,-192 245.5,-192 245.5,-168 302.5,-168 302.5,-192"/>
-<text text-anchor="middle" x="274" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spectrum</text>
-</a>
-</g>
-</g>
-<!-- proc~store_fida_photons&#45;&gt;proc~spectrum -->
-<g id="proc~~fida_mc~~CallsGraph_edge33" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~spectrum</title>
-<path fill="none" stroke="#000000" d="M194.006,-186.076C207.677,-185.025 222.215,-183.907 235.043,-182.92"/>
-<polygon fill="#000000" stroke="#000000" points="235.657,-186.383 245.36,-182.126 235.12,-179.404 235.657,-186.383"/>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~randu -->
-<g id="proc~~fida_mc~~CallsGraph_edge36" class="edge"><title>proc~gyro_correction&#45;&gt;proc~randu</title>
-<path fill="none" stroke="#000000" d="M185.567,-75.1506C202.089,-79.0905 220.816,-83.5561 236.688,-87.3409"/>
-<polygon fill="#000000" stroke="#000000" points="236.114,-90.8022 246.653,-89.7174 237.738,-83.9932 236.114,-90.8022"/>
-</g>
-<!-- proc~pitch_to_vec -->
-<g id="proc~~fida_mc~~CallsGraph_node37" class="node"><title>proc~pitch_to_vec</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node37"><a xlink:href="../proc/pitch_to_vec.html" xlink:title="pitch_to_vec">
-<polygon fill="#d9534f" stroke="#d9534f" points="310.5,-24 237.5,-24 237.5,-0 310.5,-0 310.5,-24"/>
-<text text-anchor="middle" x="274" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pitch_to_vec</text>
-</a>
-</g>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~pitch_to_vec -->
-<g id="proc~~fida_mc~~CallsGraph_edge35" class="edge"><title>proc~gyro_correction&#45;&gt;proc~pitch_to_vec</title>
-<path fill="none" stroke="#000000" d="M172.499,-52.9735C190.654,-45.572 214.138,-35.9975 233.84,-27.9653"/>
-<polygon fill="#000000" stroke="#000000" points="235.229,-31.1787 243.168,-24.1624 232.586,-24.6967 235.229,-31.1787"/>
-</g>
-<!-- proc~gyro_step -->
-<g id="proc~~fida_mc~~CallsGraph_node38" class="node"><title>proc~gyro_step</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node38"><a xlink:href="../proc/gyro_step.html" xlink:title="gyro_step">
-<polygon fill="#d9534f" stroke="#d9534f" points="304,-66 244,-66 244,-42 304,-42 304,-66"/>
-<text text-anchor="middle" x="274" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
-</a>
-</g>
-</g>
-<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
-<g id="proc~~fida_mc~~CallsGraph_edge37" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
-<path fill="none" stroke="#000000" d="M185.567,-61.3982C201.09,-60.0847 218.558,-58.6067 233.776,-57.3189"/>
-<polygon fill="#000000" stroke="#000000" points="234.232,-60.793 243.901,-56.4622 233.642,-53.8179 234.232,-60.793"/>
-</g>
-<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
-<g id="proc~~fida_mc~~CallsGraph_edge40" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M303.288,-148.264C308.643,-151.136 313.857,-154.685 318,-159 345.567,-187.71 328.832,-210.166 354,-241 361.403,-250.069 371.292,-258.051 380.805,-264.504"/>
-<polygon fill="#000000" stroke="#000000" points="379.046,-267.534 389.353,-269.988 382.826,-261.642 379.046,-267.534"/>
-</g>
-<!-- proc~get_position -->
-<g id="proc~~fida_mc~~CallsGraph_node40" class="node"><title>proc~get_position</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node40"><a xlink:href="../proc/get_position.html" xlink:title="get_position">
-<polygon fill="#d9534f" stroke="#d9534f" points="448,-232 378,-232 378,-208 448,-208 448,-232"/>
-<text text-anchor="middle" x="413" y="-217.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
-</a>
-</g>
-</g>
-<!-- proc~get_fields&#45;&gt;proc~get_position -->
-<g id="proc~~fida_mc~~CallsGraph_edge38" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
-<path fill="none" stroke="#000000" d="M301.185,-150.159C306.799,-152.94 312.649,-155.972 318,-159 341.717,-172.421 367.623,-189.419 386.222,-202.06"/>
-<polygon fill="#000000" stroke="#000000" points="384.495,-205.12 394.724,-207.881 388.45,-199.344 384.495,-205.12"/>
-</g>
-<!-- proc~calc_perp_vectors -->
-<g id="proc~~fida_mc~~CallsGraph_node41" class="node"><title>proc~calc_perp_vectors</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node41"><a xlink:href="../proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
-<polygon fill="#d9534f" stroke="#d9534f" points="463,-170 363,-170 363,-146 463,-146 463,-170"/>
-<text text-anchor="middle" x="413" y="-155.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
-</a>
-</g>
-</g>
-<!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
-<g id="proc~~fida_mc~~CallsGraph_edge39" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
-<path fill="none" stroke="#000000" d="M303.055,-142.096C317.451,-144.197 335.562,-146.841 352.861,-149.366"/>
-<polygon fill="#000000" stroke="#000000" points="352.517,-152.853 362.918,-150.835 353.528,-145.927 352.517,-152.853"/>
+<g id="proc~~fida_mc~~CallsGraph_edge10" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M308.16,-598.9C341.355,-609.98 400.06,-624.586 448,-610 472.463,-602.557 496.284,-585.469 512.454,-571.932"/>
+<polygon fill="#000000" stroke="#000000" points="514.906,-574.438 520.175,-565.247 510.324,-569.146 514.906,-574.438"/>
 </g>
 <!-- proc~get_beam_cx_rate&#45;&gt;proc~get_plasma -->
-<g id="proc~~fida_mc~~CallsGraph_edge44" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~get_plasma</title>
-<path fill="none" stroke="#000000" d="M193.261,-321.015C205.308,-318.142 218.068,-315.099 229.765,-312.31"/>
-<polygon fill="#000000" stroke="#000000" points="230.811,-315.659 239.726,-309.935 229.187,-308.85 230.811,-315.659"/>
+<g id="proc~~fida_mc~~CallsGraph_edge13" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~get_plasma</title>
+<path fill="none" stroke="#000000" d="M319.504,-435.001C333.527,-439.489 349.56,-444.619 364.038,-449.252"/>
+<polygon fill="#000000" stroke="#000000" points="363.178,-452.652 373.769,-452.366 365.312,-445.985 363.178,-452.652"/>
 </g>
 <!-- proc~bb_cx_rates -->
-<g id="proc~~fida_mc~~CallsGraph_node42" class="node"><title>proc~bb_cx_rates</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node42"><a xlink:href="../proc/bb_cx_rates.html" xlink:title="bb_cx_rates">
-<polygon fill="#d9534f" stroke="#d9534f" points="309.5,-356 238.5,-356 238.5,-332 309.5,-332 309.5,-356"/>
-<text text-anchor="middle" x="274" y="-341.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bb_cx_rates</text>
+<g id="proc~~fida_mc~~CallsGraph_node19" class="node"><title>proc~bb_cx_rates</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node19"><a xlink:href="../proc/bb_cx_rates.html" xlink:title="bb_cx_rates">
+<polygon fill="#d9534f" stroke="#d9534f" points="569.5,-439 498.5,-439 498.5,-415 569.5,-415 569.5,-439"/>
+<text text-anchor="middle" x="534" y="-424.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bb_cx_rates</text>
 </a>
 </g>
 </g>
 <!-- proc~get_beam_cx_rate&#45;&gt;proc~bb_cx_rates -->
-<g id="proc~~fida_mc~~CallsGraph_edge43" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~bb_cx_rates</title>
-<path fill="none" stroke="#000000" d="M193.261,-337.253C204.749,-338.225 216.885,-339.252 228.129,-340.203"/>
-<polygon fill="#000000" stroke="#000000" points="227.902,-343.696 238.161,-341.052 228.492,-336.721 227.902,-343.696"/>
+<g id="proc~~fida_mc~~CallsGraph_edge14" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~bb_cx_rates</title>
+<path fill="none" stroke="#000000" d="M332.19,-423.8C377.751,-424.526 444.326,-425.587 488.146,-426.285"/>
+<polygon fill="#000000" stroke="#000000" points="488.169,-429.786 498.223,-426.446 488.28,-422.787 488.169,-429.786"/>
 </g>
 <!-- proc~bt_cx_rates -->
-<g id="proc~~fida_mc~~CallsGraph_node43" class="node"><title>proc~bt_cx_rates</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node43"><a xlink:href="../proc/bt_cx_rates.html" xlink:title="bt_cx_rates">
-<polygon fill="#d9534f" stroke="#d9534f" points="308,-398 240,-398 240,-374 308,-374 308,-398"/>
-<text text-anchor="middle" x="274" y="-383.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_cx_rates</text>
+<g id="proc~~fida_mc~~CallsGraph_node20" class="node"><title>proc~bt_cx_rates</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node20"><a xlink:href="../proc/bt_cx_rates.html" xlink:title="bt_cx_rates">
+<polygon fill="#d9534f" stroke="#d9534f" points="568,-397 500,-397 500,-373 568,-373 568,-397"/>
+<text text-anchor="middle" x="534" y="-382.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_cx_rates</text>
 </a>
 </g>
 </g>
 <!-- proc~get_beam_cx_rate&#45;&gt;proc~bt_cx_rates -->
-<g id="proc~~fida_mc~~CallsGraph_edge45" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~bt_cx_rates</title>
-<path fill="none" stroke="#000000" d="M172.499,-345.027C190.654,-352.428 214.138,-362.003 233.84,-370.035"/>
-<polygon fill="#000000" stroke="#000000" points="232.586,-373.303 243.168,-373.838 235.229,-366.821 232.586,-373.303"/>
+<g id="proc~~fida_mc~~CallsGraph_edge15" class="edge"><title>proc~get_beam_cx_rate&#45;&gt;proc~bt_cx_rates</title>
+<path fill="none" stroke="#000000" d="M332.19,-415.401C378.281,-408.424 445.877,-398.19 489.665,-391.561"/>
+<polygon fill="#000000" stroke="#000000" points="490.35,-394.997 499.714,-390.039 489.302,-388.076 490.35,-394.997"/>
 </g>
 <!-- proc~get_plasma&#45;&gt;proc~in_plasma -->
-<g id="proc~~fida_mc~~CallsGraph_edge47" class="edge"><title>proc~get_plasma&#45;&gt;proc~in_plasma</title>
-<path fill="none" stroke="#000000" d="M308.164,-297.159C327.539,-294.33 352.108,-290.743 372.482,-287.769"/>
-<polygon fill="#000000" stroke="#000000" points="373.015,-291.228 382.405,-286.32 372.004,-284.302 373.015,-291.228"/>
+<g id="proc~~fida_mc~~CallsGraph_edge17" class="edge"><title>proc~get_plasma&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M435.203,-475.061C439.697,-477.69 444.153,-480.689 448,-484 468.212,-501.395 463.034,-515.522 484,-532 487.144,-534.471 490.622,-536.706 494.232,-538.714"/>
+<polygon fill="#000000" stroke="#000000" points="492.85,-541.935 503.363,-543.245 495.961,-535.665 492.85,-541.935"/>
+</g>
+<!-- proc~get_position -->
+<g id="proc~~fida_mc~~CallsGraph_node21" class="node"><title>proc~get_position</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node21"><a xlink:href="../proc/get_position.html" xlink:title="get_position">
+<polygon fill="#d9534f" stroke="#d9534f" points="569,-481 499,-481 499,-457 569,-457 569,-481"/>
+<text text-anchor="middle" x="534" y="-466.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+</a>
+</g>
 </g>
 <!-- proc~get_plasma&#45;&gt;proc~get_position -->
-<g id="proc~~fida_mc~~CallsGraph_edge46" class="edge"><title>proc~get_plasma&#45;&gt;proc~get_position</title>
-<path fill="none" stroke="#000000" d="M295.215,-289.901C318.385,-276.032 356.552,-253.188 382.914,-237.409"/>
-<polygon fill="#000000" stroke="#000000" points="384.919,-240.288 391.702,-232.149 381.324,-234.282 384.919,-240.288"/>
+<g id="proc~~fida_mc~~CallsGraph_edge16" class="edge"><title>proc~get_plasma&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="#000000" d="M442.23,-464.608C456.452,-465.296 473.269,-466.11 488.54,-466.849"/>
+<polygon fill="#000000" stroke="#000000" points="488.656,-470.358 498.814,-467.346 488.995,-463.367 488.656,-470.358"/>
 </g>
-<!-- interface~interpol_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_node14" class="node"><title>interface~interpol_coeff</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node14"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
-<polygon fill="#a7506f" stroke="#a7506f" points="585.5,-375 508.5,-375 508.5,-351 585.5,-351 585.5,-375"/>
-<text text-anchor="middle" x="547" y="-360.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
+<g id="proc~~fida_mc~~CallsGraph_edge20" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M437.138,-515.892C453.855,-522.363 475.31,-530.668 493.683,-537.78"/>
+<polygon fill="#000000" stroke="#000000" points="492.656,-541.136 503.245,-541.482 495.183,-534.608 492.656,-541.136"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~get_position -->
+<g id="proc~~fida_mc~~CallsGraph_edge18" class="edge"><title>proc~get_fields&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="#000000" d="M437.138,-496.831C452.429,-492.392 471.685,-486.801 488.919,-481.798"/>
+<polygon fill="#000000" stroke="#000000" points="490.161,-485.082 498.788,-478.932 488.209,-478.359 490.161,-485.082"/>
+</g>
+<!-- proc~calc_perp_vectors -->
+<g id="proc~~fida_mc~~CallsGraph_node22" class="node"><title>proc~calc_perp_vectors</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node22"><a xlink:href="../proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
+<polygon fill="#d9534f" stroke="#d9534f" points="584,-523 484,-523 484,-499 584,-499 584,-523"/>
+<text text-anchor="middle" x="534" y="-508.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
 </a>
 </g>
 </g>
-<!-- proc~get_rate_matrix&#45;&gt;interface~interpol_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge7" class="edge"><title>proc~get_rate_matrix&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M318.017,-420.871C358.171,-413.838 419.599,-402.112 472,-388 482.32,-385.221 493.299,-381.783 503.554,-378.356"/>
-<polygon fill="#000000" stroke="#000000" points="504.782,-381.635 513.118,-375.096 502.524,-375.01 504.782,-381.635"/>
+<!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
+<g id="proc~~fida_mc~~CallsGraph_edge19" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
+<path fill="none" stroke="#000000" d="M437.138,-506.361C447.963,-506.885 460.775,-507.505 473.451,-508.119"/>
+<polygon fill="#000000" stroke="#000000" points="473.389,-511.62 483.546,-508.607 473.727,-504.628 473.389,-511.62"/>
 </g>
-<!-- proc~elmhes -->
-<g id="proc~~fida_mc~~CallsGraph_node19" class="node"><title>proc~elmhes</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node19"><a xlink:href="../proc/elmhes.html" xlink:title="elmhes">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-640 386,-640 386,-616 440,-616 440,-640"/>
-<text text-anchor="middle" x="413" y="-625.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmhes</text>
+<!-- proc~gyro_correction&#45;&gt;interface~randu -->
+<g id="proc~~fida_mc~~CallsGraph_edge23" class="edge"><title>proc~gyro_correction&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M185.597,-180C204.245,-180 225.896,-180 243.756,-180"/>
+<polygon fill="#000000" stroke="#000000" points="243.783,-183.5 253.783,-180 243.783,-176.5 243.783,-183.5"/>
+</g>
+<!-- proc~gyro_step -->
+<g id="proc~~fida_mc~~CallsGraph_node23" class="node"><title>proc~gyro_step</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node23"><a xlink:href="../proc/gyro_step.html" xlink:title="gyro_step">
+<polygon fill="#d9534f" stroke="#d9534f" points="311,-66 251,-66 251,-42 311,-42 311,-66"/>
+<text text-anchor="middle" x="281" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_step</text>
 </a>
 </g>
 </g>
-<!-- proc~eigen&#45;&gt;proc~elmhes -->
-<g id="proc~~fida_mc~~CallsGraph_edge13" class="edge"><title>proc~eigen&#45;&gt;proc~elmhes</title>
-<path fill="none" stroke="#000000" d="M301.091,-610.999C322.191,-614.234 352.141,-618.825 375.601,-622.421"/>
-<polygon fill="#000000" stroke="#000000" points="375.124,-625.888 385.539,-623.944 376.185,-618.969 375.124,-625.888"/>
+<!-- proc~gyro_correction&#45;&gt;proc~gyro_step -->
+<g id="proc~~fida_mc~~CallsGraph_edge22" class="edge"><title>proc~gyro_correction&#45;&gt;proc~gyro_step</title>
+<path fill="none" stroke="#000000" d="M178.79,-167.934C184.129,-165.39 189.383,-162.42 194,-159 198.308,-155.809 239.972,-104.067 263.689,-74.4332"/>
+<polygon fill="#000000" stroke="#000000" points="266.623,-76.3678 270.134,-66.3717 261.156,-71.9964 266.623,-76.3678"/>
 </g>
-<!-- proc~balback -->
-<g id="proc~~fida_mc~~CallsGraph_node20" class="node"><title>proc~balback</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node20"><a xlink:href="../proc/balback.html" xlink:title="balback">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-724 386,-724 386,-700 440,-700 440,-724"/>
-<text text-anchor="middle" x="413" y="-709.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balback</text>
+<!-- proc~pitch_to_vec -->
+<g id="proc~~fida_mc~~CallsGraph_node24" class="node"><title>proc~pitch_to_vec</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node24"><a xlink:href="../proc/pitch_to_vec.html" xlink:title="pitch_to_vec">
+<polygon fill="#d9534f" stroke="#d9534f" points="317.5,-150 244.5,-150 244.5,-126 317.5,-126 317.5,-150"/>
+<text text-anchor="middle" x="281" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pitch_to_vec</text>
 </a>
 </g>
 </g>
-<!-- proc~eigen&#45;&gt;proc~balback -->
-<g id="proc~~fida_mc~~CallsGraph_edge14" class="edge"><title>proc~eigen&#45;&gt;proc~balback</title>
-<path fill="none" stroke="#000000" d="M283.573,-619.278C296.769,-637.343 323.725,-671.09 354,-691 360.795,-695.468 368.662,-699.134 376.367,-702.079"/>
-<polygon fill="#000000" stroke="#000000" points="375.353,-705.432 385.948,-705.431 377.665,-698.825 375.353,-705.432"/>
+<!-- proc~gyro_correction&#45;&gt;proc~pitch_to_vec -->
+<g id="proc~~fida_mc~~CallsGraph_edge24" class="edge"><title>proc~gyro_correction&#45;&gt;proc~pitch_to_vec</title>
+<path fill="none" stroke="#000000" d="M182.259,-167.964C198.651,-162.939 217.793,-157.071 234.771,-151.866"/>
+<polygon fill="#000000" stroke="#000000" points="235.945,-155.167 244.48,-148.889 233.893,-148.474 235.945,-155.167"/>
 </g>
-<!-- proc~hqr2 -->
-<g id="proc~~fida_mc~~CallsGraph_node21" class="node"><title>proc~hqr2</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node21"><a xlink:href="../proc/hqr2.html" xlink:title="hqr2">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-598 386,-598 386,-574 440,-574 440,-598"/>
-<text text-anchor="middle" x="413" y="-583.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqr2</text>
+<!-- proc~store_photons -->
+<g id="proc~~fida_mc~~CallsGraph_node26" class="node"><title>proc~store_photons</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node26"><a xlink:href="../proc/store_photons.html" xlink:title="store_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="321.5,-558 240.5,-558 240.5,-534 321.5,-534 321.5,-558"/>
+<text text-anchor="middle" x="281" y="-543.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_photons</text>
 </a>
 </g>
 </g>
-<!-- proc~eigen&#45;&gt;proc~hqr2 -->
-<g id="proc~~fida_mc~~CallsGraph_edge15" class="edge"><title>proc~eigen&#45;&gt;proc~hqr2</title>
-<path fill="none" stroke="#000000" d="M301.091,-603.001C322.191,-599.766 352.141,-595.175 375.601,-591.579"/>
-<polygon fill="#000000" stroke="#000000" points="376.185,-595.031 385.539,-590.056 375.124,-588.112 376.185,-595.031"/>
+<!-- proc~store_fida_photons&#45;&gt;proc~store_photons -->
+<g id="proc~~fida_mc~~CallsGraph_edge28" class="edge"><title>proc~store_fida_photons&#45;&gt;proc~store_photons</title>
+<path fill="none" stroke="#000000" d="M194.014,-544.745C205.782,-544.917 218.288,-545.099 230.012,-545.27"/>
+<polygon fill="#000000" stroke="#000000" points="230.025,-548.771 240.075,-545.417 230.127,-541.771 230.025,-548.771"/>
 </g>
-<!-- proc~balance -->
-<g id="proc~~fida_mc~~CallsGraph_node22" class="node"><title>proc~balance</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node22"><a xlink:href="../proc/balance.html" xlink:title="balance">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-682 386,-682 386,-658 440,-658 440,-682"/>
-<text text-anchor="middle" x="413" y="-667.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balance</text>
+<!-- proc~eigen -->
+<g id="proc~~fida_mc~~CallsGraph_node28" class="node"><title>proc~eigen</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node28"><a xlink:href="../proc/eigen.html" xlink:title="eigen">
+<polygon fill="#d9534f" stroke="#d9534f" points="308,-276 254,-276 254,-252 308,-252 308,-276"/>
+<text text-anchor="middle" x="281" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigen</text>
 </a>
 </g>
 </g>
-<!-- proc~eigen&#45;&gt;proc~balance -->
-<g id="proc~~fida_mc~~CallsGraph_edge16" class="edge"><title>proc~eigen&#45;&gt;proc~balance</title>
-<path fill="none" stroke="#000000" d="M295.723,-619.055C311.429,-627.935 333.7,-639.983 354,-649 361.145,-652.174 368.932,-655.245 376.414,-658.015"/>
-<polygon fill="#000000" stroke="#000000" points="375.399,-661.369 385.994,-661.465 377.771,-654.784 375.399,-661.369"/>
+<!-- proc~colrad&#45;&gt;proc~eigen -->
+<g id="proc~~fida_mc~~CallsGraph_edge44" class="edge"><title>proc~colrad&#45;&gt;proc~eigen</title>
+<path fill="none" stroke="#000000" d="M169.091,-301.239C190.286,-294.123 220.41,-284.008 243.916,-276.116"/>
+<polygon fill="#000000" stroke="#000000" points="245.174,-279.386 253.539,-272.885 242.945,-272.75 245.174,-279.386"/>
 </g>
-<!-- proc~elmtrans -->
-<g id="proc~~fida_mc~~CallsGraph_node23" class="node"><title>proc~elmtrans</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node23"><a xlink:href="../proc/elmtrans.html" xlink:title="elmtrans">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-556 386,-556 386,-532 440,-532 440,-556"/>
-<text text-anchor="middle" x="413" y="-541.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmtrans</text>
+<!-- proc~get_rate_matrix -->
+<g id="proc~~fida_mc~~CallsGraph_node29" class="node"><title>proc~get_rate_matrix</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node29"><a xlink:href="../proc/get_rate_matrix.html" xlink:title="get_rate_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="325,-338 237,-338 237,-314 325,-314 325,-338"/>
+<text text-anchor="middle" x="281" y="-323.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_rate_matrix</text>
 </a>
 </g>
 </g>
-<!-- proc~eigen&#45;&gt;proc~elmtrans -->
-<g id="proc~~fida_mc~~CallsGraph_edge17" class="edge"><title>proc~eigen&#45;&gt;proc~elmtrans</title>
-<path fill="none" stroke="#000000" d="M295.723,-594.945C311.429,-586.065 333.7,-574.017 354,-565 361.145,-561.826 368.932,-558.755 376.414,-555.985"/>
-<polygon fill="#000000" stroke="#000000" points="377.771,-559.216 385.994,-552.535 375.399,-552.631 377.771,-559.216"/>
+<!-- proc~colrad&#45;&gt;proc~get_rate_matrix -->
+<g id="proc~~fida_mc~~CallsGraph_edge45" class="edge"><title>proc~colrad&#45;&gt;proc~get_rate_matrix</title>
+<path fill="none" stroke="#000000" d="M169.091,-313.047C185.355,-314.947 206.876,-317.46 226.631,-319.767"/>
+<polygon fill="#000000" stroke="#000000" points="226.424,-323.267 236.763,-320.95 227.236,-316.314 226.424,-323.267"/>
 </g>
-<!-- proc~lubksb -->
-<g id="proc~~fida_mc~~CallsGraph_node27" class="node"><title>proc~lubksb</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node27"><a xlink:href="../proc/lubksb.html" xlink:title="lubksb">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-472 386,-472 386,-448 440,-448 440,-472"/>
-<text text-anchor="middle" x="413" y="-457.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">lubksb</text>
+<!-- proc~matinv -->
+<g id="proc~~fida_mc~~CallsGraph_node30" class="node"><title>proc~matinv</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node30"><a xlink:href="../proc/matinv.html" xlink:title="matinv">
+<polygon fill="#d9534f" stroke="#d9534f" points="308,-234 254,-234 254,-210 308,-210 308,-234"/>
+<text text-anchor="middle" x="281" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matinv</text>
 </a>
 </g>
 </g>
-<!-- proc~matinv&#45;&gt;proc~lubksb -->
-<g id="proc~~fida_mc~~CallsGraph_edge20" class="edge"><title>proc~matinv&#45;&gt;proc~lubksb</title>
-<path fill="none" stroke="#000000" d="M301.091,-468.096C322.096,-466.562 351.873,-464.389 375.285,-462.68"/>
-<polygon fill="#000000" stroke="#000000" points="375.821,-466.15 385.539,-461.931 375.311,-459.169 375.821,-466.15"/>
-</g>
-<!-- proc~ludcmp -->
-<g id="proc~~fida_mc~~CallsGraph_node28" class="node"><title>proc~ludcmp</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node28"><a xlink:href="../proc/ludcmp.html" xlink:title="ludcmp">
-<polygon fill="#d9534f" stroke="#d9534f" points="440,-514 386,-514 386,-490 440,-490 440,-514"/>
-<text text-anchor="middle" x="413" y="-499.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ludcmp</text>
-</a>
-</g>
-</g>
-<!-- proc~matinv&#45;&gt;proc~ludcmp -->
-<g id="proc~~fida_mc~~CallsGraph_edge21" class="edge"><title>proc~matinv&#45;&gt;proc~ludcmp</title>
-<path fill="none" stroke="#000000" d="M301.091,-476.094C322.191,-481.023 352.141,-488.018 375.601,-493.498"/>
-<polygon fill="#000000" stroke="#000000" points="375.005,-496.953 385.539,-495.819 376.598,-490.137 375.005,-496.953"/>
-</g>
-<!-- proc~interpol2d_coeff_arr -->
-<g id="proc~~fida_mc~~CallsGraph_node15" class="node"><title>proc~interpol2d_coeff_arr</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node15"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="732,-435 622,-435 622,-411 732,-411 732,-435"/>
-<text text-anchor="middle" x="677" y="-420.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
-</a>
-</g>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
-<g id="proc~~fida_mc~~CallsGraph_edge3" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M573.903,-375.142C593.161,-384.169 619.655,-396.588 640.827,-406.513"/>
-<polygon fill="#000000" stroke="#000000" points="639.596,-409.801 650.136,-410.876 642.567,-403.463 639.596,-409.801"/>
-</g>
-<!-- proc~interpol2d_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_node16" class="node"><title>proc~interpol2d_coeff</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node16"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="859.5,-405 768.5,-405 768.5,-381 859.5,-381 859.5,-405"/>
-<text text-anchor="middle" x="814" y="-390.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
-</a>
-</g>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge4" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M585.687,-367.266C630.832,-372.377 706.816,-380.979 758.39,-386.818"/>
-<polygon fill="#000000" stroke="#000000" points="758.033,-390.3 768.363,-387.947 758.82,-383.344 758.033,-390.3"/>
-</g>
-<!-- proc~interpol1d_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_node17" class="node"><title>proc~interpol1d_coeff</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node17"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
-<polygon fill="#d9534f" stroke="#d9534f" points="859.5,-344 768.5,-344 768.5,-320 859.5,-320 859.5,-344"/>
-<text text-anchor="middle" x="814" y="-329.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
-</a>
-</g>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge5" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M564.014,-350.965C578.351,-340.994 600.386,-327.588 622,-322 666.857,-310.404 719.557,-314.419 758.224,-320.473"/>
-<polygon fill="#000000" stroke="#000000" points="757.801,-323.951 768.239,-322.135 758.947,-317.045 757.801,-323.951"/>
-</g>
-<!-- proc~interpol1d_coeff_arr -->
-<g id="proc~~fida_mc~~CallsGraph_node18" class="node"><title>proc~interpol1d_coeff_arr</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node18"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
-<polygon fill="#d9534f" stroke="#d9534f" points="732,-355 622,-355 622,-331 732,-331 732,-355"/>
-<text text-anchor="middle" x="677" y="-340.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
-</a>
-</g>
-</g>
-<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
-<g id="proc~~fida_mc~~CallsGraph_edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M585.712,-357.108C593.963,-355.818 602.92,-354.419 611.88,-353.019"/>
-<polygon fill="#000000" stroke="#000000" points="612.62,-356.446 621.96,-351.444 611.539,-349.53 612.62,-356.446"/>
-</g>
-<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge1" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
-<path fill="none" stroke="#000000" d="M732.132,-410.971C740.779,-409.049 749.73,-407.06 758.388,-405.136"/>
-<polygon fill="#000000" stroke="#000000" points="759.378,-408.501 768.381,-402.915 757.86,-401.668 759.378,-408.501"/>
-</g>
-<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
-<path fill="none" stroke="#000000" d="M732.132,-338.589C740.779,-337.885 749.73,-337.155 758.388,-336.45"/>
-<polygon fill="#000000" stroke="#000000" points="758.698,-339.936 768.381,-335.636 758.13,-332.959 758.698,-339.936"/>
-</g>
-<!-- proc~rswap -->
-<g id="proc~~fida_mc~~CallsGraph_node24" class="node"><title>proc~rswap</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node24"><a xlink:href="../proc/rswap.html" xlink:title="RSWAP">
-<polygon fill="#d9534f" stroke="#d9534f" points="574,-682 520,-682 520,-658 574,-658 574,-682"/>
-<text text-anchor="middle" x="547" y="-667.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RSWAP</text>
-</a>
-</g>
-</g>
-<!-- proc~elmhes&#45;&gt;proc~rswap -->
-<g id="proc~~fida_mc~~CallsGraph_edge8" class="edge"><title>proc~elmhes&#45;&gt;proc~rswap</title>
-<path fill="none" stroke="#000000" d="M440.079,-636.298C460.147,-642.683 488.102,-651.578 510.255,-658.626"/>
-<polygon fill="#000000" stroke="#000000" points="509.385,-662.023 519.975,-661.719 511.507,-655.352 509.385,-662.023"/>
-</g>
-<!-- proc~balback&#45;&gt;proc~rswap -->
-<g id="proc~~fida_mc~~CallsGraph_edge9" class="edge"><title>proc~balback&#45;&gt;proc~rswap</title>
-<path fill="none" stroke="#000000" d="M440.079,-703.702C460.147,-697.317 488.102,-688.422 510.255,-681.374"/>
-<polygon fill="#000000" stroke="#000000" points="511.507,-684.648 519.975,-678.281 509.385,-677.977 511.507,-684.648"/>
-</g>
-<!-- proc~hqrvec -->
-<g id="proc~~fida_mc~~CallsGraph_node25" class="node"><title>proc~hqrvec</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node25"><a xlink:href="../proc/hqrvec.html" xlink:title="hqrvec">
-<polygon fill="#d9534f" stroke="#d9534f" points="574,-598 520,-598 520,-574 574,-574 574,-598"/>
-<text text-anchor="middle" x="547" y="-583.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqrvec</text>
-</a>
-</g>
-</g>
-<!-- proc~hqr2&#45;&gt;proc~hqrvec -->
-<g id="proc~~fida_mc~~CallsGraph_edge11" class="edge"><title>proc~hqr2&#45;&gt;proc~hqrvec</title>
-<path fill="none" stroke="#000000" d="M440.079,-586C460.056,-586 487.851,-586 509.955,-586"/>
-<polygon fill="#000000" stroke="#000000" points="509.975,-589.5 519.975,-586 509.975,-582.5 509.975,-589.5"/>
-</g>
-<!-- proc~balance&#45;&gt;proc~rswap -->
-<g id="proc~~fida_mc~~CallsGraph_edge12" class="edge"><title>proc~balance&#45;&gt;proc~rswap</title>
-<path fill="none" stroke="#000000" d="M440.079,-670C460.056,-670 487.851,-670 509.955,-670"/>
-<polygon fill="#000000" stroke="#000000" points="509.975,-673.5 519.975,-670 509.975,-666.5 509.975,-673.5"/>
-</g>
-<!-- proc~comdiv -->
-<g id="proc~~fida_mc~~CallsGraph_node26" class="node"><title>proc~comdiv</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node26"><a xlink:href="../proc/comdiv.html" xlink:title="Comdiv">
-<polygon fill="#d9534f" stroke="#d9534f" points="704,-598 650,-598 650,-574 704,-574 704,-598"/>
-<text text-anchor="middle" x="677" y="-583.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Comdiv</text>
-</a>
-</g>
-</g>
-<!-- proc~hqrvec&#45;&gt;proc~comdiv -->
-<g id="proc~~fida_mc~~CallsGraph_edge10" class="edge"><title>proc~hqrvec&#45;&gt;proc~comdiv</title>
-<path fill="none" stroke="#000000" d="M574.212,-586C593.108,-586 618.851,-586 639.72,-586"/>
-<polygon fill="#000000" stroke="#000000" points="639.824,-589.5 649.823,-586 639.823,-582.5 639.824,-589.5"/>
-</g>
-<!-- proc~swap -->
-<g id="proc~~fida_mc~~CallsGraph_node29" class="node"><title>proc~swap</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node29"><a xlink:href="../proc/swap.html" xlink:title="swap">
-<polygon fill="#d9534f" stroke="#d9534f" points="574,-535 520,-535 520,-511 574,-511 574,-535"/>
-<text text-anchor="middle" x="547" y="-520.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">swap</text>
-</a>
-</g>
-</g>
-<!-- proc~ludcmp&#45;&gt;proc~swap -->
-<g id="proc~~fida_mc~~CallsGraph_edge18" class="edge"><title>proc~ludcmp&#45;&gt;proc~swap</title>
-<path fill="none" stroke="#000000" d="M440.079,-506.149C460.056,-509.327 487.851,-513.749 509.955,-517.266"/>
-<polygon fill="#000000" stroke="#000000" points="509.549,-520.745 519.975,-518.86 510.649,-513.832 509.549,-520.745"/>
-</g>
-<!-- proc~outerprod -->
-<g id="proc~~fida_mc~~CallsGraph_node30" class="node"><title>proc~outerprod</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node30"><a xlink:href="../proc/outerprod.html" xlink:title="outerprod">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="576.5,-493 517.5,-493 517.5,-469 576.5,-469 576.5,-493"/>
-<text text-anchor="middle" x="547" y="-478.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">outerprod</text>
-</a>
-</g>
-</g>
-<!-- proc~ludcmp&#45;&gt;proc~outerprod -->
-<g id="proc~~fida_mc~~CallsGraph_edge19" class="edge"><title>proc~ludcmp&#45;&gt;proc~outerprod</title>
-<path fill="none" stroke="#000000" d="M440.079,-497.851C459.278,-494.797 485.697,-490.594 507.346,-487.149"/>
-<polygon fill="#000000" stroke="#000000" points="507.9,-490.605 517.226,-485.578 506.8,-483.692 507.9,-490.605"/>
-</g>
-<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge26" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M433.762,-294.127C455.925,-307.726 492.067,-329.905 517.333,-345.409"/>
-<polygon fill="#000000" stroke="#000000" points="515.749,-348.544 526.103,-350.791 519.411,-342.577 515.749,-348.544"/>
+<!-- proc~colrad&#45;&gt;proc~matinv -->
+<g id="proc~~fida_mc~~CallsGraph_edge46" class="edge"><title>proc~colrad&#45;&gt;proc~matinv</title>
+<path fill="none" stroke="#000000" d="M156.374,-297.914C172.814,-283.496 201.987,-259.298 230,-243 234.562,-240.346 239.524,-237.847 244.492,-235.562"/>
+<polygon fill="#000000" stroke="#000000" points="246.175,-238.647 253.949,-231.45 243.383,-232.228 246.175,-238.647"/>
 </g>
 <!-- proc~xyz_to_uvw -->
-<g id="proc~~fida_mc~~CallsGraph_node33" class="node"><title>proc~xyz_to_uvw</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node33"><a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
-<polygon fill="#d9534f" stroke="#d9534f" points="581,-294 513,-294 513,-270 581,-270 581,-294"/>
-<text text-anchor="middle" x="547" y="-279.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+<g id="proc~~fida_mc~~CallsGraph_node13" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node13"><a xlink:href="../proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="693,-565 625,-565 625,-541 693,-541 693,-565"/>
+<text text-anchor="middle" x="659" y="-550.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
 </a>
 </g>
 </g>
 <!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
-<g id="proc~~fida_mc~~CallsGraph_edge25" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
-<path fill="none" stroke="#000000" d="M443.623,-282C461.02,-282 483.32,-282 502.664,-282"/>
-<polygon fill="#000000" stroke="#000000" points="502.761,-285.5 512.761,-282 502.761,-278.5 502.761,-285.5"/>
+<g id="proc~~fida_mc~~CallsGraph_edge7" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M564.775,-553C579.589,-553 597.785,-553 614.156,-553"/>
+<polygon fill="#000000" stroke="#000000" points="614.598,-556.5 624.598,-553 614.598,-549.5 614.598,-556.5"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_node14" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node14"><a xlink:href="../interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="697.5,-418 620.5,-418 620.5,-394 697.5,-394 697.5,-418"/>
+<text text-anchor="middle" x="659" y="-403.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge8" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M564.503,-543.925C571.405,-540.879 578.375,-536.956 584,-532 617.079,-502.851 639.35,-455.207 650.242,-427.615"/>
+<polygon fill="#000000" stroke="#000000" points="653.577,-428.694 653.858,-418.102 647.033,-426.206 653.577,-428.694"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_node15" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node15"><a xlink:href="../proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="971.5,-448 880.5,-448 880.5,-424 971.5,-424 971.5,-448"/>
+<text text-anchor="middle" x="926" y="-433.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge3" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M676.014,-418.035C690.351,-428.006 712.386,-441.412 734,-447 778.87,-458.599 831.568,-454.287 870.232,-447.962"/>
+<polygon fill="#000000" stroke="#000000" points="870.99,-451.383 880.246,-446.228 869.795,-444.485 870.99,-451.383"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~fida_mc~~CallsGraph_node16" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node16"><a xlink:href="../proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="844,-358 734,-358 734,-334 844,-334 844,-358"/>
+<text text-anchor="middle" x="789" y="-343.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~fida_mc~~CallsGraph_edge4" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M685.903,-393.858C705.161,-384.831 731.655,-372.412 752.827,-362.487"/>
+<polygon fill="#000000" stroke="#000000" points="754.567,-365.537 762.136,-358.124 751.596,-359.199 754.567,-365.537"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~fida_mc~~CallsGraph_node17" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node17"><a xlink:href="../proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="844,-438 734,-438 734,-414 844,-414 844,-438"/>
+<text text-anchor="middle" x="789" y="-423.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~fida_mc~~CallsGraph_edge5" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M697.712,-411.892C705.963,-413.182 714.92,-414.581 723.88,-415.981"/>
+<polygon fill="#000000" stroke="#000000" points="723.539,-419.47 733.96,-417.556 724.62,-412.554 723.539,-419.47"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_node18" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node18"><a xlink:href="../proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="971.5,-387 880.5,-387 880.5,-363 971.5,-363 971.5,-387"/>
+<text text-anchor="middle" x="926" y="-372.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge6" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M697.687,-401.591C742.832,-396.31 818.816,-387.421 870.39,-381.388"/>
+<polygon fill="#000000" stroke="#000000" points="870.837,-384.86 880.363,-380.222 870.024,-377.907 870.837,-384.86"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge1" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M844.132,-357.628C852.779,-359.486 861.73,-361.409 870.388,-363.269"/>
+<polygon fill="#000000" stroke="#000000" points="869.869,-366.737 880.381,-365.415 871.339,-359.893 869.869,-366.737"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge2" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M844.132,-430.01C852.779,-430.65 861.73,-431.313 870.388,-431.955"/>
+<polygon fill="#000000" stroke="#000000" points="870.15,-435.447 880.381,-432.695 870.667,-428.466 870.15,-435.447"/>
+</g>
+<!-- proc~bb_cx_rates&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge11" class="edge"><title>proc~bb_cx_rates&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M569.59,-421.094C582.16,-418.948 596.598,-416.483 610.113,-414.176"/>
+<polygon fill="#000000" stroke="#000000" points="610.954,-417.583 620.222,-412.45 609.776,-410.683 610.954,-417.583"/>
+</g>
+<!-- proc~bt_cx_rates&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge12" class="edge"><title>proc~bt_cx_rates&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M568.286,-390.683C581.224,-392.892 596.29,-395.464 610.34,-397.863"/>
+<polygon fill="#000000" stroke="#000000" points="609.899,-401.338 620.345,-399.571 611.077,-394.438 609.899,-401.338"/>
 </g>
 <!-- proc~cross_product -->
-<g id="proc~~fida_mc~~CallsGraph_node39" class="node"><title>proc~cross_product</title>
-<g id="a_proc~~fida_mc~~CallsGraph_node39"><a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="453,-44 373,-44 373,-20 453,-20 453,-44"/>
-<text text-anchor="middle" x="413" y="-29.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+<g id="proc~~fida_mc~~CallsGraph_node25" class="node"><title>proc~cross_product</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node25"><a xlink:href="../proc/cross_product.html" xlink:title="cross_product">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="448,-24 368,-24 368,-0 448,-0 448,-24"/>
+<text text-anchor="middle" x="408" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
 </a>
 </g>
 </g>
 <!-- proc~gyro_step&#45;&gt;proc~cross_product -->
-<g id="proc~~fida_mc~~CallsGraph_edge34" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M304.054,-49.3344C321.11,-46.5955 343.115,-43.0617 362.804,-39.9001"/>
-<polygon fill="#000000" stroke="#000000" points="363.532,-43.3282 372.85,-38.2868 362.422,-36.4167 363.532,-43.3282"/>
+<g id="proc~~fida_mc~~CallsGraph_edge21" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M311.307,-44.1529C326.267,-39.1264 344.801,-32.8989 361.562,-27.2672"/>
+<polygon fill="#000000" stroke="#000000" points="362.821,-30.5366 371.185,-24.0338 360.591,-23.9011 362.821,-30.5366"/>
 </g>
-<!-- proc~bb_cx_rates&#45;&gt;interface~interpol_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge41" class="edge"><title>proc~bb_cx_rates&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M309.598,-346.426C357.454,-349.781 444.052,-355.852 498.101,-359.642"/>
-<polygon fill="#000000" stroke="#000000" points="497.906,-363.137 508.126,-360.345 498.396,-356.154 497.906,-363.137"/>
+<!-- proc~store_photons&#45;&gt;proc~get_fields -->
+<g id="proc~~fida_mc~~CallsGraph_edge26" class="edge"><title>proc~store_photons&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M318.828,-533.92C334.692,-528.717 353.226,-522.638 369.197,-517.4"/>
+<polygon fill="#000000" stroke="#000000" points="370.351,-520.704 378.762,-514.262 368.17,-514.053 370.351,-520.704"/>
 </g>
-<!-- proc~bt_cx_rates&#45;&gt;interface~interpol_coeff -->
-<g id="proc~~fida_mc~~CallsGraph_edge42" class="edge"><title>proc~bt_cx_rates&#45;&gt;interface~interpol_coeff</title>
-<path fill="none" stroke="#000000" d="M308.23,-383.18C355.765,-379.145 443.447,-371.704 498.021,-367.072"/>
-<polygon fill="#000000" stroke="#000000" points="498.472,-370.546 508.14,-366.213 497.88,-363.571 498.472,-370.546"/>
+<!-- proc~store_photons&#45;&gt;proc~get_indices -->
+<g id="proc~~fida_mc~~CallsGraph_edge25" class="edge"><title>proc~store_photons&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="#000000" d="M317.152,-558.092C331.842,-563.146 349.044,-569.063 364.441,-574.36"/>
+<polygon fill="#000000" stroke="#000000" points="363.66,-577.792 374.255,-577.736 365.937,-571.173 363.66,-577.792"/>
+</g>
+<!-- proc~spectrum -->
+<g id="proc~~fida_mc~~CallsGraph_node27" class="node"><title>proc~spectrum</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node27"><a xlink:href="../proc/spectrum.html" xlink:title="spectrum">
+<polygon fill="#d9534f" stroke="#d9534f" points="436.5,-559 379.5,-559 379.5,-535 436.5,-535 436.5,-559"/>
+<text text-anchor="middle" x="408" y="-544.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spectrum</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photons&#45;&gt;proc~spectrum -->
+<g id="proc~~fida_mc~~CallsGraph_edge27" class="edge"><title>proc~store_photons&#45;&gt;proc~spectrum</title>
+<path fill="none" stroke="#000000" d="M321.551,-546.316C336.777,-546.438 354.113,-546.577 369.173,-546.697"/>
+<polygon fill="#000000" stroke="#000000" points="369.153,-550.197 379.181,-546.777 369.209,-543.197 369.153,-550.197"/>
+</g>
+<!-- proc~hqr2 -->
+<g id="proc~~fida_mc~~CallsGraph_node31" class="node"><title>proc~hqr2</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node31"><a xlink:href="../proc/hqr2.html" xlink:title="hqr2">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-150 381,-150 381,-126 435,-126 435,-150"/>
+<text text-anchor="middle" x="408" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqr2</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~hqr2 -->
+<g id="proc~~fida_mc~~CallsGraph_edge34" class="edge"><title>proc~eigen&#45;&gt;proc~hqr2</title>
+<path fill="none" stroke="#000000" d="M308.145,-257.305C316.59,-254.102 325.452,-249.501 332,-243 360.825,-214.384 340.586,-188.971 368,-159 369.362,-157.51 370.856,-156.106 372.438,-154.784"/>
+<polygon fill="#000000" stroke="#000000" points="374.72,-157.459 380.907,-148.858 370.707,-151.723 374.72,-157.459"/>
+</g>
+<!-- proc~balance -->
+<g id="proc~~fida_mc~~CallsGraph_node32" class="node"><title>proc~balance</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node32"><a xlink:href="../proc/balance.html" xlink:title="balance">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-276 381,-276 381,-252 435,-252 435,-276"/>
+<text text-anchor="middle" x="408" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balance</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balance -->
+<g id="proc~~fida_mc~~CallsGraph_edge35" class="edge"><title>proc~eigen&#45;&gt;proc~balance</title>
+<path fill="none" stroke="#000000" d="M308.204,-264C326.371,-264 350.799,-264 370.82,-264"/>
+<polygon fill="#000000" stroke="#000000" points="370.83,-267.5 380.83,-264 370.83,-260.5 370.83,-267.5"/>
+</g>
+<!-- proc~elmtrans -->
+<g id="proc~~fida_mc~~CallsGraph_node33" class="node"><title>proc~elmtrans</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node33"><a xlink:href="../proc/elmtrans.html" xlink:title="elmtrans">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-318 381,-318 381,-294 435,-294 435,-318"/>
+<text text-anchor="middle" x="408" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmtrans</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmtrans -->
+<g id="proc~~fida_mc~~CallsGraph_edge36" class="edge"><title>proc~eigen&#45;&gt;proc~elmtrans</title>
+<path fill="none" stroke="#000000" d="M308.204,-272.805C326.454,-278.937 351.024,-287.192 371.095,-293.936"/>
+<polygon fill="#000000" stroke="#000000" points="370.236,-297.34 380.83,-297.207 372.466,-290.704 370.236,-297.34"/>
+</g>
+<!-- proc~balback -->
+<g id="proc~~fida_mc~~CallsGraph_node34" class="node"><title>proc~balback</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node34"><a xlink:href="../proc/balback.html" xlink:title="balback">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-234 381,-234 381,-210 435,-210 435,-234"/>
+<text text-anchor="middle" x="408" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balback</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balback -->
+<g id="proc~~fida_mc~~CallsGraph_edge37" class="edge"><title>proc~eigen&#45;&gt;proc~balback</title>
+<path fill="none" stroke="#000000" d="M308.204,-255.195C326.454,-249.063 351.024,-240.808 371.095,-234.064"/>
+<polygon fill="#000000" stroke="#000000" points="372.466,-237.296 380.83,-230.793 370.236,-230.66 372.466,-237.296"/>
+</g>
+<!-- proc~elmhes -->
+<g id="proc~~fida_mc~~CallsGraph_node35" class="node"><title>proc~elmhes</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node35"><a xlink:href="../proc/elmhes.html" xlink:title="elmhes">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-192 381,-192 381,-168 435,-168 435,-192"/>
+<text text-anchor="middle" x="408" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmhes</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmhes -->
+<g id="proc~~fida_mc~~CallsGraph_edge38" class="edge"><title>proc~eigen&#45;&gt;proc~elmhes</title>
+<path fill="none" stroke="#000000" d="M308.135,-255.678C316.207,-252.429 324.848,-248.213 332,-243 351.867,-228.518 348.853,-216.422 368,-201 369.527,-199.77 371.137,-198.577 372.798,-197.425"/>
+<polygon fill="#000000" stroke="#000000" points="374.774,-200.317 381.382,-192.035 371.052,-194.388 374.774,-200.317"/>
+</g>
+<!-- proc~get_rate_matrix&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~fida_mc~~CallsGraph_edge39" class="edge"><title>proc~get_rate_matrix&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M325.169,-326.199C384.846,-327.637 495.235,-334.515 584,-364 601.25,-369.73 619.014,-379.655 632.812,-388.418"/>
+<polygon fill="#000000" stroke="#000000" points="630.978,-391.401 641.261,-393.953 634.814,-385.546 630.978,-391.401"/>
+</g>
+<!-- proc~ludcmp -->
+<g id="proc~~fida_mc~~CallsGraph_node39" class="node"><title>proc~ludcmp</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node39"><a xlink:href="../proc/ludcmp.html" xlink:title="ludcmp">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-108 381,-108 381,-84 435,-84 435,-108"/>
+<text text-anchor="middle" x="408" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ludcmp</text>
+</a>
+</g>
+</g>
+<!-- proc~matinv&#45;&gt;proc~ludcmp -->
+<g id="proc~~fida_mc~~CallsGraph_edge42" class="edge"><title>proc~matinv&#45;&gt;proc~ludcmp</title>
+<path fill="none" stroke="#000000" d="M308.145,-215.305C316.59,-212.102 325.452,-207.501 332,-201 360.825,-172.384 340.586,-146.971 368,-117 369.362,-115.51 370.856,-114.106 372.438,-112.784"/>
+<polygon fill="#000000" stroke="#000000" points="374.72,-115.459 380.907,-106.858 370.707,-109.723 374.72,-115.459"/>
+</g>
+<!-- proc~lubksb -->
+<g id="proc~~fida_mc~~CallsGraph_node40" class="node"><title>proc~lubksb</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node40"><a xlink:href="../proc/lubksb.html" xlink:title="lubksb">
+<polygon fill="#d9534f" stroke="#d9534f" points="435,-66 381,-66 381,-42 435,-42 435,-66"/>
+<text text-anchor="middle" x="408" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">lubksb</text>
+</a>
+</g>
+</g>
+<!-- proc~matinv&#45;&gt;proc~lubksb -->
+<g id="proc~~fida_mc~~CallsGraph_edge43" class="edge"><title>proc~matinv&#45;&gt;proc~lubksb</title>
+<path fill="none" stroke="#000000" d="M308.111,-215.955C316.755,-212.788 325.751,-208.043 332,-201 370.654,-157.435 331.488,-120.375 368,-75 369.41,-73.2476 371.007,-71.6214 372.73,-70.1156"/>
+<polygon fill="#000000" stroke="#000000" points="374.807,-72.9335 380.899,-64.2656 370.731,-67.2423 374.807,-72.9335"/>
+</g>
+<!-- proc~hqrvec -->
+<g id="proc~~fida_mc~~CallsGraph_node36" class="node"><title>proc~hqrvec</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node36"><a xlink:href="../proc/hqrvec.html" xlink:title="hqrvec">
+<polygon fill="#d9534f" stroke="#d9534f" points="561,-150 507,-150 507,-126 561,-126 561,-150"/>
+<text text-anchor="middle" x="534" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqrvec</text>
+</a>
+</g>
+</g>
+<!-- proc~hqr2&#45;&gt;proc~hqrvec -->
+<g id="proc~~fida_mc~~CallsGraph_edge30" class="edge"><title>proc~hqr2&#45;&gt;proc~hqrvec</title>
+<path fill="none" stroke="#000000" d="M435.297,-138C453.135,-138 476.953,-138 496.607,-138"/>
+<polygon fill="#000000" stroke="#000000" points="496.741,-141.5 506.741,-138 496.741,-134.5 496.741,-141.5"/>
+</g>
+<!-- proc~rswap -->
+<g id="proc~~fida_mc~~CallsGraph_node38" class="node"><title>proc~rswap</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node38"><a xlink:href="../proc/rswap.html" xlink:title="RSWAP">
+<polygon fill="#d9534f" stroke="#d9534f" points="561,-234 507,-234 507,-210 561,-210 561,-234"/>
+<text text-anchor="middle" x="534" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">RSWAP</text>
+</a>
+</g>
+</g>
+<!-- proc~balance&#45;&gt;proc~rswap -->
+<g id="proc~~fida_mc~~CallsGraph_edge31" class="edge"><title>proc~balance&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="#000000" d="M435.297,-255.093C453.299,-248.995 477.392,-240.835 497.149,-234.143"/>
+<polygon fill="#000000" stroke="#000000" points="498.392,-237.417 506.741,-230.894 496.146,-230.787 498.392,-237.417"/>
+</g>
+<!-- proc~balback&#45;&gt;proc~rswap -->
+<g id="proc~~fida_mc~~CallsGraph_edge32" class="edge"><title>proc~balback&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="#000000" d="M435.297,-222C453.135,-222 476.953,-222 496.607,-222"/>
+<polygon fill="#000000" stroke="#000000" points="496.741,-225.5 506.741,-222 496.741,-218.5 496.741,-225.5"/>
+</g>
+<!-- proc~elmhes&#45;&gt;proc~rswap -->
+<g id="proc~~fida_mc~~CallsGraph_edge33" class="edge"><title>proc~elmhes&#45;&gt;proc~rswap</title>
+<path fill="none" stroke="#000000" d="M435.297,-188.907C453.299,-195.005 477.392,-203.165 497.149,-209.857"/>
+<polygon fill="#000000" stroke="#000000" points="496.146,-213.213 506.741,-213.106 498.392,-206.583 496.146,-213.213"/>
+</g>
+<!-- proc~comdiv -->
+<g id="proc~~fida_mc~~CallsGraph_node37" class="node"><title>proc~comdiv</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node37"><a xlink:href="../proc/comdiv.html" xlink:title="Comdiv">
+<polygon fill="#d9534f" stroke="#d9534f" points="686,-150 632,-150 632,-126 686,-126 686,-150"/>
+<text text-anchor="middle" x="659" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Comdiv</text>
+</a>
+</g>
+</g>
+<!-- proc~hqrvec&#45;&gt;proc~comdiv -->
+<g id="proc~~fida_mc~~CallsGraph_edge29" class="edge"><title>proc~hqrvec&#45;&gt;proc~comdiv</title>
+<path fill="none" stroke="#000000" d="M561.085,-138C578.779,-138 602.405,-138 621.9,-138"/>
+<polygon fill="#000000" stroke="#000000" points="621.952,-141.5 631.952,-138 621.952,-134.5 621.952,-141.5"/>
+</g>
+<!-- proc~swap -->
+<g id="proc~~fida_mc~~CallsGraph_node41" class="node"><title>proc~swap</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node41"><a xlink:href="../proc/swap.html" xlink:title="swap">
+<polygon fill="#d9534f" stroke="#d9534f" points="561,-108 507,-108 507,-84 561,-84 561,-108"/>
+<text text-anchor="middle" x="534" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">swap</text>
+</a>
+</g>
+</g>
+<!-- proc~ludcmp&#45;&gt;proc~swap -->
+<g id="proc~~fida_mc~~CallsGraph_edge40" class="edge"><title>proc~ludcmp&#45;&gt;proc~swap</title>
+<path fill="none" stroke="#000000" d="M435.297,-96C453.135,-96 476.953,-96 496.607,-96"/>
+<polygon fill="#000000" stroke="#000000" points="496.741,-99.5001 506.741,-96 496.741,-92.5001 496.741,-99.5001"/>
+</g>
+<!-- proc~outerprod -->
+<g id="proc~~fida_mc~~CallsGraph_node42" class="node"><title>proc~outerprod</title>
+<g id="a_proc~~fida_mc~~CallsGraph_node42"><a xlink:href="../proc/outerprod.html" xlink:title="outerprod">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="563.5,-66 504.5,-66 504.5,-42 563.5,-42 563.5,-66"/>
+<text text-anchor="middle" x="534" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">outerprod</text>
+</a>
+</g>
+</g>
+<!-- proc~ludcmp&#45;&gt;proc~outerprod -->
+<g id="proc~~fida_mc~~CallsGraph_edge41" class="edge"><title>proc~ludcmp&#45;&gt;proc~outerprod</title>
+<path fill="none" stroke="#000000" d="M435.297,-87.0929C452.49,-81.2694 475.24,-73.5638 494.461,-67.0535"/>
+<polygon fill="#000000" stroke="#000000" points="495.794,-70.2974 504.143,-63.7743 493.548,-63.6674 495.794,-70.2974"/>
 </g>
 </g>
 </svg>
@@ -1730,7 +1750,7 @@ public subroutine fida_mc()
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">fida_mc</span>
-    <span class="c">!+ Calculate FIDA emission using a Monte Carlo Fast-ion distribution</span>
+    <span class="c">!+ Calculate Active FIDA emission using a Monte Carlo Fast-ion distribution</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">iion</span><span class="p">,</span><span class="n">iphi</span><span class="p">,</span><span class="n">nphi</span>
     <span class="k">type</span><span class="p">(</span><span class="n">FastIon</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fast_ion</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
@@ -1743,7 +1763,7 @@ public subroutine fida_mc()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span>    <span class="c">!! CX rates</span>
     <span class="c">!! Collisiional radiative model along track</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">states</span>  <span class="c">! Density of n-states</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ncell</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ntrack</span>
     <span class="k">type</span><span class="p">(</span><span class="n">ParticleTrack</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ntrack</span><span class="p">)</span> <span class="kd">::</span> <span class="n">tracks</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">los_intersect</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">jj</span>      <span class="c">!! counter along track</span>
@@ -1751,22 +1771,17 @@ public subroutine fida_mc()
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="kd">::</span> <span class="n">neut_types</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">uvw_vi</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">s</span><span class="p">,</span> <span class="n">c</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">maxcnt</span><span class="p">,</span> <span class="n">inv_maxcnt</span><span class="p">,</span> <span class="n">cnt</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
 
-    <span class="n">maxcnt</span><span class="o">=</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span>
-    <span class="n">inv_maxcnt</span> <span class="o">=</span> <span class="mi">10</span><span class="mf">0.d0</span><span class="o">/</span><span class="n">maxcnt</span>
     <span class="n">nphi</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="nb">dble</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">n_fida</span><span class="p">)</span><span class="o">/</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i9)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="o">*</span><span class="n">nphi</span><span class="p">,</span><span class="n">Int64</span><span class="p">)</span>
     <span class="n">endif</span>
 
-    <span class="n">cnt</span><span class="o">=</span><span class="mf">0.0</span>
     <span class="c">!$OMP PARALLEL DO schedule(guided) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &amp;</span>
-    <span class="c">!$OMP&amp; randomu,plasma,fields,uvw,uvw_vi,ncell,jj,rates,denn,los_intersect,states,photons)</span>
-    <span class="n">loop_over_fast_ions</span><span class="p">:</span> <span class="k">do </span><span class="n">iion</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span>
+    <span class="c">!$OMP&amp; randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)</span>
+    <span class="n">loop_over_fast_ions</span><span class="p">:</span> <span class="k">do </span><span class="n">iion</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">,</span><span class="n">istep</span>
         <span class="n">fast_ion</span> <span class="o">=</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">iion</span><span class="p">)</span>
-        <span class="n">cnt</span><span class="o">=</span><span class="n">cnt</span><span class="o">+</span><span class="mi">1</span>
         <span class="k">if</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_fast_ions</span>
         <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">cross_grid</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_fast_ions</span>
         <span class="n">phi_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">iphi</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nphi</span>
@@ -1798,9 +1813,9 @@ public subroutine fida_mc()
             <span class="n">endif</span>
 
             <span class="c">!! Track particle through grid</span>
-            <span class="k">call </span><span class="n">track</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">tracks</span><span class="p">,</span> <span class="n">ncell</span><span class="p">,</span> <span class="n">los_intersect</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">track</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">tracks</span><span class="p">,</span> <span class="n">ntrack</span><span class="p">,</span> <span class="n">los_intersect</span><span class="p">)</span>
             <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">los_intersect</span><span class="p">)</span> <span class="k">cycle </span><span class="n">phi_loop</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">ncell</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="k">cycle </span><span class="n">phi_loop</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">ntrack</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="k">cycle </span><span class="n">phi_loop</span>
 
             <span class="c">!! Calculate CX probability</span>
             <span class="k">call </span><span class="n">get_beam_cx_rate</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="mi">1</span><span class="p">)%</span><span class="n">ind</span><span class="p">,</span><span class="n">ri</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">beam_ion</span><span class="p">,</span><span class="n">neut_types</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
@@ -1810,7 +1825,7 @@ public subroutine fida_mc()
             <span class="n">states</span><span class="o">=</span><span class="n">rates</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">weight</span><span class="o">/</span><span class="n">nphi</span>
 
             <span class="c">!! Calculate the spectra produced in each cell along the path</span>
-            <span class="n">loop_along_track</span><span class="p">:</span> <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ncell</span>
+            <span class="n">loop_along_track</span><span class="p">:</span> <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ntrack</span>
                 <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">)</span>
 
                 <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">beam_ion</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="nb">time</span><span class="p">,</span> <span class="n">states</span><span class="p">,</span> <span class="n">denn</span><span class="p">,</span> <span class="n">photons</span><span class="p">)</span>
@@ -1818,11 +1833,12 @@ public subroutine fida_mc()
                 <span class="k">call </span><span class="n">store_fida_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="k">class</span><span class="p">)</span>
             <span class="n">enddo</span> <span class="n">loop_along_track</span>
         <span class="n">enddo</span> <span class="n">phi_loop</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span><span class="k">then</span>
-<span class="k">          WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(f7.2,&quot;% completed&quot;,a,$)&#39;</span><span class="p">)</span> <span class="n">cnt</span><span class="o">*</span><span class="n">inv_maxcnt</span><span class="p">,</span><span class="nb">char</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
-        <span class="n">endif</span>
     <span class="n">enddo</span> <span class="n">loop_over_fast_ions</span>
     <span class="c">!$OMP END PARALLEL DO</span>
+
+<span class="cp">#ifdef _MPI</span>
+    <span class="k">call </span><span class="n">co_sum</span><span class="p">(</span><span class="n">spec</span><span class="p">%</span><span class="n">fida</span><span class="p">)</span>
+<span class="cp">#endif</span>
 
 <span class="k">end subroutine </span><span class="n">fida_mc</span>
 </pre></div>
@@ -1967,6 +1983,8 @@ public subroutine fida_mc()
       
       <a class="list-group-item" href="../proc/circle_grid_intersect.html">circle_grid_intersect</a>
       
+      <a class="list-group-item" href="../proc/cold_spec.html">cold_spec</a>
+      
       <a class="list-group-item" href="../proc/colrad.html">colrad</a>
       
       <a class="list-group-item" href="../proc/comabs.html">comabs</a>
@@ -1975,6 +1993,8 @@ public subroutine fida_mc()
       
       <a class="list-group-item" href="../proc/cross_product.html">cross_product</a>
       
+      <a class="list-group-item" href="../proc/cumsum.html">cumsum</a>
+      
       <a class="list-group-item" href="../proc/d_d_fusion_he.html">d_d_fusion_he</a>
       
       <a class="list-group-item" href="../proc/d_d_fusion_t.html">d_d_fusion_t</a>
@@ -1982,6 +2002,8 @@ public subroutine fida_mc()
       <a class="list-group-item" href="../proc/d_t_fusion.html">d_t_fusion</a>
       
       <a class="list-group-item" href="../proc/dcx.html">dcx</a>
+      
+      <a class="list-group-item" href="../proc/dcx_spec.html">dcx_spec</a>
       
       <a class="list-group-item" href="../interface/deriv.html">deriv</a>
       
@@ -2063,6 +2085,8 @@ public subroutine fida_mc()
       
       <a class="list-group-item" href="../proc/get_rate_matrix.html">get_rate_matrix</a>
       
+      <a class="list-group-item" href="../proc/get_rng.html">get_rng</a>
+      
       <a class="list-group-item" href="../proc/get_value.html">get_value</a>
       
       <a class="list-group-item" href="../proc/grid_intersect.html">grid_intersect</a>
@@ -2118,6 +2142,8 @@ public subroutine fida_mc()
       <a class="list-group-item" href="../proc/h5ltread_dataset_int_scalar_f.html">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../proc/halo.html">halo</a>
+      
+      <a class="list-group-item" href="../proc/halo_spec.html">halo_spec</a>
       
       <a class="list-group-item" href="../proc/hit_npa_detector.html">hit_npa_detector</a>
       
@@ -2198,6 +2224,10 @@ public subroutine fida_mc()
       <a class="list-group-item" href="../proc/mc_halo.html">mc_halo</a>
       
       <a class="list-group-item" href="../proc/mc_nbi.html">mc_nbi</a>
+      
+      <a class="list-group-item" href="../proc/mc_nbi_cell.html">mc_nbi_cell</a>
+      
+      <a class="list-group-item" href="../proc/nbi_spec.html">nbi_spec</a>
       
       <a class="list-group-item" href="../proc/ndmc.html">ndmc</a>
       
@@ -2335,11 +2365,19 @@ public subroutine fida_mc()
       
       <a class="list-group-item" href="../proc/p_ioniz_n.html">p_ioniz_n</a>
       
+      <a class="list-group-item" href="../proc/pfida_f.html">pfida_f</a>
+      
+      <a class="list-group-item" href="../proc/pfida_mc.html">pfida_mc</a>
+      
       <a class="list-group-item" href="../proc/pitch_to_vec.html">pitch_to_vec</a>
       
       <a class="list-group-item" href="../proc/plane_basis.html">plane_basis</a>
       
       <a class="list-group-item" href="../proc/plp_assign.html">plp_assign</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_f.html">pnpa_f</a>
+      
+      <a class="list-group-item" href="../proc/pnpa_mc.html">pnpa_mc</a>
       
       <a class="list-group-item" href="../proc/pp_add.html">pp_add</a>
       
@@ -2357,9 +2395,11 @@ public subroutine fida_mc()
       
       <a class="list-group-item" href="../interface/randind.html">randind</a>
       
-      <a class="list-group-item" href="../proc/randn.html">randn</a>
+      <a class="list-group-item" href="../interface/randind_cdf.html">randind_cdf</a>
       
-      <a class="list-group-item" href="../proc/randu.html">randu</a>
+      <a class="list-group-item" href="../interface/randn.html">randn</a>
+      
+      <a class="list-group-item" href="../interface/randu.html">randu</a>
       
       <a class="list-group-item" href="../proc/read_atomic_cross.html">read_atomic_cross</a>
       
@@ -2392,6 +2432,8 @@ public subroutine fida_mc()
       <a class="list-group-item" href="../proc/rng_init.html">rng_init</a>
       
       <a class="list-group-item" href="../proc/rng_normal.html">rng_normal</a>
+      
+      <a class="list-group-item" href="../proc/rng_seed.html">rng_seed</a>
       
       <a class="list-group-item" href="../proc/rng_uniform.html">rng_uniform</a>
       
@@ -2427,11 +2469,15 @@ public subroutine fida_mc()
       
       <a class="list-group-item" href="../proc/store_npa.html">store_npa</a>
       
+      <a class="list-group-item" href="../proc/store_photons.html">store_photons</a>
+      
       <a class="list-group-item" href="../proc/sub2ind.html">sub2ind</a>
       
       <a class="list-group-item" href="../proc/swap.html">swap</a>
       
       <a class="list-group-item" href="../proc/tb_zyx.html">tb_zyx</a>
+      
+      <a class="list-group-item" href="../proc/time.html">time</a>
       
       <a class="list-group-item" href="../proc/track.html">track</a>
       

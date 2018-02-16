@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p> 2.2% of total for derived types.</p>Including implementation: 9 statements,  2.2% of total for derived types.">9 statements</a>
+	  title="<p> 2.6% of total for derived types.</p>Including implementation: 11 statements,  2.6% of total for derived types.">11 statements</a>
      </li> 
      
      
@@ -182,7 +182,11 @@
       
       <a class="list-group-item" href="../type/spectra.html#variable-halo">halo</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-cold">cold</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-fida">fida</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-pfida">pfida</a>
       
     </div>
   </div>
@@ -337,7 +341,11 @@
       
       <a class="list-group-item" href="../type/spectra.html#variable-halo">halo</a>
       
+      <a class="list-group-item" href="../type/spectra.html#variable-cold">cold</a>
+      
       <a class="list-group-item" href="../type/spectra.html#variable-fida">fida</a>
+      
+      <a class="list-group-item" href="../type/spectra.html#variable-pfida">pfida</a>
       
     </div>
   </div>
@@ -475,11 +483,39 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-cold"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td><strong>cold</strong></td><td></td><td></td><td><p>Cold D-alpha emission: cold(lambda,chan)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-fida"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>fida</strong></td><td></td><td></td><td><p>FIDA emission: fida(lambda,chan,orbit_type)</p></td>
+  <td><strong>fida</strong></td><td></td><td></td><td><p>Active FIDA emission: fida(lambda,chan,orbit_type)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pfida"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>pfida</strong></td><td></td><td></td><td><p>Passive FIDA emission: pfida(lambda,chan,orbit_type)</p></td>
   
 </tr>
 
@@ -513,8 +549,12 @@
         <span class="c">!+ Direct CX emission: dcx(lambda,chan)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">halo</span>
         <span class="c">!+ Thermal halo emission: halo(lambda,chan)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>   <span class="kd">::</span> <span class="n">cold</span>
+        <span class="c">!+ Cold D-alpha emission: cold(lambda,chan)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fida</span>
-        <span class="c">!+ FIDA emission: fida(lambda,chan,orbit_type)</span>
+        <span class="c">!+ Active FIDA emission: fida(lambda,chan,orbit_type)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">pfida</span>
+        <span class="c">!+ Passive FIDA emission: pfida(lambda,chan,orbit_type)</span>
 <span class="k">end type </span><span class="n">Spectra</span>
 </pre></div>
 

@@ -622,12 +622,16 @@ type SpectralChords
     !+ Defines an spectral diagnostic system
     integer :: nchan = 0
         !+ Number of channels
+    integer :: ncell = 0
+        !+ Number of beam_grid cells with intersections
     type(LineOfSight), dimension(:), allocatable :: los
         !+ Line of sight array
     real(Float64), dimension(:), allocatable     :: radius
         !+ Radius of each line of sight
     type(LOSInters), dimension(:,:,:), allocatable :: inter
         !+ Array of LOS intersections with [[libfida:beam_grid]]
+    integer, dimension(:), allocatable :: cell
+        !+ Linear indices of beam_grid that have intersections
 end type SpectralChords
 
 type BoundedPlane
@@ -752,6 +756,8 @@ type Spectra
         !+ Direct CX emission: dcx(lambda,chan)
     real(Float64), dimension(:,:), allocatable   :: halo
         !+ Thermal halo emission: halo(lambda,chan)
+    real(Float64), dimension(:,:), allocatable   :: cold
+        !+ Cold D-alpha emission: cold(lambda,chan)
     real(Float64), dimension(:,:,:), allocatable :: fida
         !+ Active FIDA emission: fida(lambda,chan,orbit_type)
     real(Float64), dimension(:,:,:), allocatable :: pfida
@@ -847,8 +853,14 @@ type SimulationInputs
         !+ Calculate spectra: 0 = off, 1=on
     integer(Int32) :: calc_brems
         !+ Calculate bremmstruhlung: 0 = off, 1=on
-    integer(Int32) :: calc_bes
-        !+ Calculate BES: 0 = off, 1=on
+    integer(Int32) :: calc_nbi
+        !+ Calculate NBI: 0 = off, 1=on
+    integer(Int32) :: calc_dcx
+        !+ Calculate DCX: 0 = off, 1=on
+    integer(Int32) :: calc_halo
+        !+ Calculate Halo: 0 = off, 1=on
+    integer(Int32) :: calc_cold
+        !+ Calculate Cold D-alpha: 0 = off, 1=on
     integer(Int32) :: calc_fida
         !+ Calculate Active FIDA: 0 = off, 1=on
     integer(Int32) :: calc_pfida
@@ -1675,7 +1687,7 @@ subroutine read_inputs
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
     integer            :: pathlen, calc_neutron
-    integer            :: calc_brems, calc_bes
+    integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,no_flr
@@ -1692,7 +1704,8 @@ subroutine read_inputs
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
-        calc_brems, calc_bes, calc_fida, calc_pfida, calc_npa, calc_pnpa,calc_birth, no_flr, &
+        calc_brems, calc_nbi,calc_dcx,calc_halo, calc_cold, calc_fida, &
+        calc_pfida, calc_npa, calc_pnpa,calc_birth, no_flr, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
@@ -1726,13 +1739,17 @@ subroutine read_inputs
     inputs%neutrals_file=neutrals_file
 
     !!Simulation Switches
-    if((calc_brems+calc_bes+calc_fida+calc_pfida).gt.0) then
+    if((calc_brems+calc_nbi+calc_dcx+calc_halo+&
+        calc_cold+calc_fida+calc_pfida).gt.0) then
         inputs%calc_spec=1
     else
         inputs%calc_spec=0
     endif
     inputs%calc_brems=calc_brems
-    inputs%calc_bes=calc_bes
+    inputs%calc_nbi=calc_nbi
+    inputs%calc_dcx=calc_dcx
+    inputs%calc_halo=calc_halo
+    inputs%calc_cold=calc_cold
     inputs%calc_fida=calc_fida
     inputs%calc_pfida=calc_pfida
     inputs%calc_npa=calc_npa
@@ -2092,7 +2109,10 @@ subroutine read_chords
         inputs%calc_spec = 0
         inputs%calc_fida = 0
         inputs%calc_pfida = 0
-        inputs%calc_bes = 0
+        inputs%calc_nbi = 0
+        inputs%calc_dcx = 0
+        inputs%calc_halo = 0
+        inputs%calc_cold = 0
         inputs%calc_brems = 0
         inputs%calc_fida_wght = 0
         call h5fclose_f(fid, error)
@@ -2205,6 +2225,19 @@ subroutine read_chords
             enddo
         enddo
     enddo chan_loop
+
+    spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
+    allocate(spec_chords%cell(spec_chords%ncell))
+
+    nc = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+        if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
+            nc = nc + 1
+            spec_chords%cell(nc) = ic
+        endif
+    enddo
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"FIDA/BES System: ",a)') trim(adjustl(system))
@@ -3920,6 +3953,7 @@ subroutine write_spectra
     spec%third = factor*spec%third
     spec%dcx   = factor*spec%dcx
     spec%halo  = factor*spec%halo
+    spec%cold  = factor*spec%cold
     spec%fida  = factor*spec%fida
     spec%pfida = factor*spec%pfida
 
@@ -3967,7 +4001,7 @@ subroutine write_spectra
              "Ph/(s*nm*sr*m^2)",error )
     endif
 
-    if(inputs%calc_bes.ge.1) then
+    if(inputs%calc_nbi.ge.1) then
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
              spec%full, error)
@@ -3975,10 +4009,6 @@ subroutine write_spectra
              spec%half, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(1:2),&
              spec%third, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 2, dims(1:2), &
-             spec%dcx, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
-             spec%halo, error)
         !Add attributes
         call h5ltset_attribute_string_f(fid,"/full","description", &
              "Full energy component of the beam emmision: full(lambda,chan)", error)
@@ -3989,12 +4019,30 @@ subroutine write_spectra
         call h5ltset_attribute_string_f(fid,"/third","description", &
              "Third energy component of the beam emmision: third(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/third","units","Ph/(s*nm*sr*m^2)",error )
+    endif
+
+    if(inputs%calc_dcx.ge.1) then
+        call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 2, dims(1:2), &
+             spec%dcx, error)
         call h5ltset_attribute_string_f(fid,"/dcx","description", &
              "Direct Charge Exchange (DCX) emission: dcx(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
+    endif
+
+    if(inputs%calc_halo.ge.1) then
+        call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
+             spec%halo, error)
         call h5ltset_attribute_string_f(fid,"/halo","description", &
              "Halo component of the beam emmision: halo(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
+    endif
+
+    if(inputs%calc_cold.ge.1) then
+        call h5ltmake_compressed_dataset_double_f(fid, "/cold", 2, dims(1:2), &
+             spec%cold, error)
+        call h5ltset_attribute_string_f(fid,"/cold","description", &
+             "Cold D-alpha emission: cold(lambda,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/cold","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     if(inputs%calc_fida.ge.1) then
@@ -6794,16 +6842,15 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
 
 endsubroutine spectrum
 
-subroutine store_bes_photons(pos, vi, photons, neut_type)
-    !+ Store BES photons in [[libfida:spectra]]
-    real(Float64), dimension(3), intent(in) :: pos
+subroutine store_photons(pos, vi, photons, spectra)
+    !+ Store photons in `spectra`
+    real(Float64), dimension(3), intent(in)      :: pos
         !+ Position of neutral in beam grid coordinates
-    real(Float64), dimension(3), intent(in) :: vi
+    real(Float64), dimension(3), intent(in)      :: vi
         !+ Velocitiy of neutral [cm/s]
-    real(Float64), intent(in)               :: photons
+    real(Float64), intent(in)                    :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
-    integer,intent(in)                      :: neut_type
-        !+ Neutral type (full,half,third,halo)
+    real(Float64), dimension(:,:), intent(inout) :: spectra
 
     real(Float64), dimension(n_stark) :: lambda, intensity
     real(Float64) :: dlength, sigma_pi
@@ -6832,27 +6879,42 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            !$OMP CRITICAL(bes_spectrum)
-            select case (neut_type)
-                case (nbif_type)
-                    spec%full(bin,ichan) = spec%full(bin,ichan) + intensity(i)
-                case (nbih_type)
-                    spec%half(bin,ichan) = spec%half(bin,ichan) + intensity(i)
-                case (nbit_type)
-                    spec%third(bin,ichan) = spec%third(bin,ichan) + intensity(i)
-                case (dcx_type)
-                    spec%dcx(bin,ichan) = spec%dcx(bin,ichan) + intensity(i)
-                case (halo_type)
-                    spec%halo(bin,ichan) = spec%halo(bin,ichan) + intensity(i)
-                case default
-                    if(inputs%verbose.ge.0) then
-                        write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
-                    endif
-                    error stop
-            end select
-            !$OMP END CRITICAL(bes_spectrum)
+            !$OMP CRITICAL(store_photons1)
+            spectra(bin,ichan) = spectra(bin,ichan) + intensity(i)
+            !$OMP END CRITICAL(store_photons1)
         enddo loop_over_stark
     enddo loop_over_channels
+
+end subroutine store_photons
+
+subroutine store_bes_photons(pos, vi, photons, neut_type)
+    !+ Store BES photons in [[libfida:spectra]]
+    real(Float64), dimension(3), intent(in) :: pos
+        !+ Position of neutral in beam grid coordinates
+    real(Float64), dimension(3), intent(in) :: vi
+        !+ Velocitiy of neutral [cm/s]
+    real(Float64), intent(in)               :: photons
+        !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
+    integer,intent(in)                      :: neut_type
+        !+ Neutral type (full,half,third,halo)
+
+    select case (neut_type)
+           case (nbif_type)
+               call store_photons(pos,vi,photons,spec%full)
+           case (nbih_type)
+               call store_photons(pos,vi,photons,spec%half)
+           case (nbit_type)
+               call store_photons(pos,vi,photons,spec%third)
+           case (dcx_type)
+               call store_photons(pos,vi,photons,spec%dcx)
+           case (halo_type)
+               call store_photons(pos,vi,photons,spec%halo)
+           case default
+               if(inputs%verbose.ge.0) then
+                   write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
+               endif
+               error stop
+    end select
 
 end subroutine store_bes_photons
 
@@ -6869,55 +6931,20 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     logical, intent(in), optional           :: passive
         !+ Indicates whether photon is passive FIDA
 
-    real(Float64), dimension(n_stark) :: lambda, intensity
-    real(Float64) :: dlength, sigma_pi
-    type(LocalEMFields) :: fields
-    integer(Int32), dimension(3) :: ind
-    real(Float64), dimension(3) :: vp
-    type(LOSInters) :: inter
-    integer :: ichan, i, j, bin, iclass, nchan
+    integer :: iclass = 1
     logical :: pas = .False.
 
     if(present(orbit_class)) then
         iclass = orbit_class
-    else
-        iclass = 1
     endif
 
     if(present(passive)) pas = passive
 
-    call get_indices(pos,ind)
-    inter = spec_chords%inter(ind(1),ind(2),ind(3))
-    nchan = inter%nchan
-    if(nchan.eq.0) return
-
-    call get_fields(fields,pos=pos)
-
-    loop_over_channels: do j=1,nchan
-        ichan = inter%los_elem(j)%id
-        dlength = inter%los_elem(j)%length
-        sigma_pi = spec_chords%los(ichan)%sigma_pi
-        vp = pos - spec_chords%los(ichan)%lens
-        call spectrum(vp,vi,fields,sigma_pi,photons, &
-                      dlength,lambda,intensity)
-
-        loop_over_stark: do i=1,n_stark
-            bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
-            if (bin.lt.1) cycle loop_over_stark
-            if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            if(pas) then
-                !$OMP CRITICAL(pfida_spectrum)
-                spec%pfida(bin,ichan,iclass)= &
-                  spec%pfida(bin,ichan,iclass) + intensity(i)
-                !$OMP END CRITICAL(pfida_spectrum)
-            else
-                !$OMP CRITICAL(fida_spectrum)
-                spec%fida(bin,ichan,iclass)= &
-                  spec%fida(bin,ichan,iclass) + intensity(i)
-                !$OMP END CRITICAL(fida_spectrum)
-            endif
-        enddo loop_over_stark
-    enddo loop_over_channels
+    if(pas) then
+        call store_photons(pos, vi, photons, spec%pfida(:,:,iclass))
+    else
+        call store_photons(pos, vi, photons, spec%fida(:,:,iclass))
+    endif
 
 end subroutine store_fida_photons
 
@@ -7401,13 +7428,17 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     vnbi = vnbi*nbi%vinj/sqrt(real(efrac))
 end subroutine mc_nbi
 
-subroutine mc_nbi_cell(ind, vnbi)
-    !+ Generates a neutral beam a normalized velocity vector
-    !+ that passes through cell at `ind`
+subroutine mc_nbi_cell(ind, neut_type, vnbi, weight)
+    !+ Generates a neutral beam velocity vector
+    !+ that passes through cell at `ind` with weight `weight`
     integer, dimension(3), intent(in)        :: ind
         !+ Cell index
+    integer, intent(in)                      :: neut_type
+        !+ Neutral Type (1=Full,2=Half,3=Third)
     real(Float64), dimension(3), intent(out) :: vnbi
         !+ Normalized Velocity
+    real(Float64), intent(out)               :: weight
+        !+ Weigth/probability of trajectory
 
     real(Float64), dimension(3) :: rc         !! Center of cell in uvw coords
     real(Float64), dimension(3) :: uvw_rf     !! End position in xyz coords
@@ -7418,8 +7449,7 @@ subroutine mc_nbi_cell(ind, vnbi)
     real(Float64), dimension(3) :: xyz_ray    !! NBI velocity in xyz coords
     real(Float64), dimension(3) :: xyz_ape    !! Aperture plane intersection point
     real(Float64), dimension(3) :: randomu    !! uniform random numbers
-    real(Float64), dimension(3) :: r_enter, r_exit
-    real(Float64) :: sqrt_rho, theta
+    real(Float64) :: sqrt_rho, theta, vy, vz, theta_y, theta_z, py, pz
     integer :: i, j
     logical :: valid_trajectory
 
@@ -7471,7 +7501,7 @@ subroutine mc_nbi_cell(ind, vnbi)
         !! Convert to beam centerline coordinates to beam grid coordinates
         uvw_src = matmul(nbi%basis,xyz_src) + nbi%src
         uvw_ray = matmul(nbi%basis,xyz_ray)
-        vnbi = uvw_ray/norm2(uvw_ray)
+        vnbi = nbi%vinj*uvw_ray/norm2(uvw_ray)/sqrt(real(neut_type))
 
         exit rejection_loop
     enddo rejection_loop
@@ -7481,8 +7511,24 @@ subroutine mc_nbi_cell(ind, vnbi)
         call randu(randomu)
         uvw_rf = rc + (randomu - 0.5)*beam_grid%dr
         uvw_ray = uvw_rf - nbi%src
-        vnbi = uvw_ray/norm2(uvw_ray)
+        vnbi = nbi%vinj*uvw_ray/norm2(uvw_ray)/sqrt(real(neut_type))
     endif
+
+    !! Find probability of trajectory
+    vy = xyz_ray(2)/xyz_ray(1)
+    vz = xyz_ray(3)/xyz_ray(1)
+    theta_y = atan(vy + xyz_src(2)/nbi%focy)
+    theta_z = atan(vz + xyz_src(3)/nbi%focz)
+
+    py = (1.0/(1.0 + (vy + xyz_src(2)/nbi%focy)**2)) * &
+         exp(-(theta_y**2)/(2*nbi%divy(neut_type)**2)) / &
+         sqrt(2*nbi%divy(neut_type)**2)
+
+    pz = (1.0/(1.0 + (vz + xyz_src(3)/nbi%focy)**2)) * &
+         exp(-(theta_z**2)/(2*nbi%divz(neut_type)**2)) / &
+         sqrt(2*nbi%divz(neut_type)**2)
+
+    weight = py*pz
 
 end subroutine mc_nbi_cell
 
@@ -7556,7 +7602,7 @@ subroutine ndmc
                     call store_births(ind,neut_type,tracks(jj)%flux)
                 endif
 
-                if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
+                if((photons.gt.0.d0).and.(inputs%calc_nbi.ge.1)) then
                     call store_bes_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
                 endif
             enddo loop_along_track
@@ -7720,6 +7766,7 @@ subroutine dcx
                    sum(neut%third(:,i,j,k))
         papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
     enddo
+    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -7768,7 +7815,7 @@ subroutine dcx
                 call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
                 call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
-                if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
+                if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
                   call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
                 endif
             enddo loop_along_track
@@ -7840,6 +7887,7 @@ subroutine halo
             tot_denn = sum(dens_prev(:,i,j,k))
             papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
         enddo
+        !! TODO: Remove this once we have a 3D interpolation grid
         max_papprox = maxval(papprox)
         where (papprox.lt.(max_papprox*1.d-3))
             papprox = 0.0
@@ -7900,7 +7948,7 @@ subroutine halo
                     halo_iter_dens(cur_type) = &
                         halo_iter_dens(cur_type) + sum(denn)/nlaunch(i,j,k)
                     !$OMP END CRITICAL(halo1)
-                    if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
+                    if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                       call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                     endif
 
@@ -7938,73 +7986,160 @@ subroutine halo
 
 end subroutine halo
 
-subroutine bes
-    !+ Calculates approximate beam emmission (full, half, third, dcx, halo)
+subroutine nbi_spec
+    !+ Calculates approximate neutral beam emission (full, half, third)
     !+ from user supplied neutrals file
-    integer :: ic, i, j, k, it, ncell
-    real(Float64), dimension(3) :: ri, vhalo, vnbi, random3
+    integer :: ic, i, j, k, it
+    real(Float64), dimension(3) :: ri, vnbi, random3
     integer,dimension(3) :: ind
     !! Determination of the CX probability
-    type(LocalProfiles) :: plasma
     real(Float64) :: nbif_photons, nbih_photons, nbit_photons
-    real(Float64) :: dcx_photons, halo_photons
-    integer, dimension(beam_grid%ngrid) :: cell_ind
+    real(Float64) :: f_wght, h_wght, t_wght
+    real(Float64) :: f_tot, h_tot, t_tot
+    real(Float64), dimension(inputs%nlambda,spec_chords%nchan) :: full, half, third
     integer :: n = 10000
 
-    ncell = 0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-        if(spec_chords%inter(i,j,k)%nchan.gt.0) then
-            ncell = ncell + 1
-            cell_ind(ncell) = ic
-        endif
-    enddo
-
-    !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,it,ind,vhalo,random3,ri, &
-    !$OMP& nbif_photons,nbih_photons,nbit_photons,dcx_photons,halo_photons,plasma)
-    loop_over_cells: do ic = istart, ncell, istep
-        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
 
-        call get_plasma(plasma, pos=ri)
         nbif_photons = neut%full(3,i,j,k)*tables%einstein(2,3)
         nbih_photons = neut%half(3,i,j,k)*tables%einstein(2,3)
         nbit_photons = neut%third(3,i,j,k)*tables%einstein(2,3)
-        dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
-        halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
+        if((nbif_photons + nbih_photons + nbit_photons).le.0.0) then
+            cycle loop_over_cells
+        endif
+        f_tot = 0.0 ; h_tot = 0.0 ; t_tot = 0.0
+        full  = 0.0 ; half  = 0.0 ; third = 0.0
         do it=1, n
-            !! Get velocity vector that passes through the cell
-            call mc_nbi_cell(ind, vnbi)
-            vnbi = nbi%vinj*vnbi
-            call store_bes_photons(ri, vnbi, nbif_photons/n, nbif_type)
-            call store_bes_photons(ri, vnbi/sqrt(2.0), nbih_photons/n, nbih_type)
-            call store_bes_photons(ri, vnbi/sqrt(3.0), nbit_photons/n, nbit_type)
+            !! Full Spectra
+            call mc_nbi_cell(ind, nbif_type, vnbi, f_wght)
+            f_tot = f_tot + f_wght
+            call store_photons(ri, vnbi, f_wght*nbif_photons, full)
 
-            !! DCX Spectra
-            call randn(random3)
-            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
-            call store_bes_photons(ri, vhalo, dcx_photons/n, dcx_type)
+            !! Half Spectra
+            call mc_nbi_cell(ind, nbih_type, vnbi, h_wght)
+            h_tot = h_tot + h_wght
+            call store_photons(ri, vnbi, h_wght*nbih_photons, half)
 
-            !! Halo Spectra
-            call randn(random3)
-            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
-            call store_bes_photons(ri, vhalo, halo_photons/n, halo_type)
+            !! Third Spectra
+            call mc_nbi_cell(ind, nbit_type, vnbi, t_wght)
+            t_tot = t_tot + t_wght
+            call store_photons(ri, vnbi, t_wght*nbit_photons, third)
         enddo
+        spec%full = spec%full + full/f_tot
+        spec%half = spec%half + half/h_tot
+        spec%third = spec%third + third/t_tot
     enddo loop_over_cells
-    !$OMP END PARALLEL DO
 
 #ifdef _MPI
     !! Combine Spectra
     call co_sum(spec%full)
     call co_sum(spec%half)
     call co_sum(spec%third)
+#endif
+
+end subroutine nbi_spec
+
+subroutine dcx_spec
+    !+ Calculates DCX emission from user supplied neutrals file
+    integer :: ic, i, j, k, it
+    real(Float64), dimension(3) :: ri, vhalo, random3
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64) :: dcx_photons
+    integer :: n = 10000
+
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
+        if(dcx_photons.le.0.0) cycle loop_over_cells
+        call get_plasma(plasma, pos=ri)
+        do it=1, n
+            !! DCX Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_photons(ri, vhalo, dcx_photons/n, spec%dcx)
+        enddo
+    enddo loop_over_cells
+
+#ifdef _MPI
+    !! Combine Spectra
     call co_sum(spec%dcx)
+#endif
+
+end subroutine dcx_spec
+
+subroutine halo_spec
+    !+ Calculates halo emission from user supplied neutrals file
+    integer :: ic, i, j, k, it
+    real(Float64), dimension(3) :: ri, vhalo, random3
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64) :: halo_photons
+    integer :: n = 10000
+
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
+        if(halo_photons.le.0.0) cycle loop_over_cells
+        call get_plasma(plasma, pos=ri)
+        do it=1, n
+            !! Halo Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_photons(ri, vhalo, halo_photons/n, spec%halo)
+        enddo
+    enddo loop_over_cells
+
+#ifdef _MPI
+    !! Combine Spectra
     call co_sum(spec%halo)
 #endif
 
-end subroutine bes
+end subroutine halo_spec
+
+subroutine cold_spec
+    !+ Calculates cold D-alpha emission
+    integer :: ic, i, j, k, it, ncell
+    real(Float64), dimension(3) :: ri, vhalo, random3
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64) :: cold_photons
+    integer :: n = 10000
+
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        call get_plasma(plasma, pos=ri)
+        cold_photons = plasma%denn(3)*tables%einstein(2,3)
+        if(cold_photons.le.0.0) cycle loop_over_cells
+        do it=1, n
+            !! Cold Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_photons(ri, vhalo, cold_photons/n, spec%cold)
+        enddo
+    enddo loop_over_cells
+
+#ifdef _MPI
+    !! Combine Spectra
+    call co_sum(spec%cold)
+#endif
+
+end subroutine cold_spec
 
 subroutine fida_f
     !+ Calculate Active FIDA emission using a Fast-ion distribution function F(E,p,r,z)
@@ -8050,6 +8185,7 @@ subroutine fida_f
                           sum(neut%halo(:,i,j,k)))* &
                           plasma%denf
     enddo
+    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -8152,6 +8288,7 @@ subroutine pfida_f
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
+    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -8437,6 +8574,7 @@ subroutine npa_f
                         sum(neut%halo(:,i,j,k)))* &
                         plasma%denf
     enddo
+    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -8549,6 +8687,7 @@ subroutine pnpa_f
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k)=sum(plasma%denn)*plasma%denf
     enddo
+    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -9191,6 +9330,7 @@ subroutine fida_weights_mc
                         sum(neut%dcx(:,i,j,k)) + &
                         sum(neut%halo(:,i,j,k)))
     enddo
+    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -9813,6 +9953,7 @@ program fidasim
         allocate(spec%third(inputs%nlambda,spec_chords%nchan))
         allocate(spec%dcx(inputs%nlambda,spec_chords%nchan))
         allocate(spec%halo(inputs%nlambda,spec_chords%nchan))
+        allocate(spec%cold(inputs%nlambda,spec_chords%nchan))
         allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
         allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))
         spec%brems = 0.d0
@@ -9821,6 +9962,7 @@ program fidasim
         spec%third = 0.d0
         spec%dcx = 0.d0
         spec%halo = 0.d0
+        spec%cold = 0.d0
         spec%fida = 0.d0
         spec%pfida = 0.d0
     endif
@@ -9870,17 +10012,33 @@ program fidasim
     if(inputs%load_neutrals.eq.1) then
         call read_neutrals()
 
-        if(inputs%calc_bes.ge.1) then
+        if(inputs%calc_nbi.ge.1) then
             if(inputs%verbose.ge.1) then
-                write(*,*) 'bes:     ' , time(time_start)
+                write(*,*) 'nbi:     ' , time(time_start)
             endif
-            call bes()
+            call nbi_spec()
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+        endif
+
+        if(inputs%calc_dcx.ge.1) then
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'dcx:     ' , time(time_start)
+            endif
+            call dcx_spec()
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+        endif
+
+        if(inputs%calc_halo.ge.1) then
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'halo:    ' , time(time_start)
+            endif
+            call halo_spec()
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
         endif
     else
         !! ----------- BEAM NEUTRALS ---------- !!
         if(inputs%verbose.ge.1) then
-            write(*,*) 'ndmc:    ' , time(time_start)
+            write(*,*) 'nbi:     ' , time(time_start)
         endif
         call ndmc
         if(inputs%calc_birth.eq.1)then
@@ -9906,6 +10064,17 @@ program fidasim
 #else
         call write_neutrals()
 #endif
+        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+    endif
+
+    !! -----------------------------------------------------------------------
+    !!------------------------------ COLD D-ALPHA ----------------------------
+    !! -----------------------------------------------------------------------
+    if(inputs%calc_cold.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'cold:    ' ,time(time_start)
+        endif
+        call cold_spec()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 

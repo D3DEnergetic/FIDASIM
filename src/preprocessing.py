@@ -1187,7 +1187,7 @@ def check_npa(inp, npa):
         err = True
 
     w = np.logical_or(npa['a_shape'] > 2, npa['a_shape'] == 0)
-    nw = len(npa['a_shape'])
+    nw = len(npa['a_shape'][w])
     if nw != 0:
         error('Invalid aperture shape. Expected 1 (rectagular) or 2 (circular)')
         print('Invalid indices: {}'.format(np.arange(len(npa['a_shape']))[w]))

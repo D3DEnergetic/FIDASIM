@@ -34,10 +34,15 @@ PRO write_namelist, filename, inputs
     printf,55,"distribution_file = '" + inputs.distribution_file +"'    !! File containing fast-ion distribution"
     printf,55,''
     printf,55,'!! Simulation Switches'
-    printf,55,f='("calc_bes = ",i2 , "    !! Calculate Beam Emission and Halo Spectra")',inputs.calc_bes
+    printf,55,f='("calc_nbi = ",i2 , "    !! Calculate NBI Spectra")',inputs.calc_nbi
+    printf,55,f='("calc_dcx = ",i2 , "    !! Calculate Direct CX Spectra")',inputs.calc_dcx
+    printf,55,f='("calc_halo = ",i2 , "    !! Calculate Halo Spectra")',inputs.calc_halo
+    printf,55,f='("calc_cold = ",i2 , "    !! Calculate Cold D-alpha Spectra")',inputs.calc_cold
     printf,55,f='("calc_brems = ",i2 , "    !! Calculate Bremsstrahlung")',inputs.calc_brems
-    printf,55,f='("calc_fida = ",i2 , "    !! Calculate FIDA Spectra")',inputs.calc_fida
-    printf,55,f='("calc_npa = ",i2 , "   !! Calculate NPA")',inputs.calc_npa
+    printf,55,f='("calc_fida = ",i2 , "    !! Calculate Active FIDA Spectra")',inputs.calc_fida
+    printf,55,f='("calc_npa = ",i2 , "   !! Calculate Active NPA")',inputs.calc_npa
+    printf,55,f='("calc_pfida = ",i2 , "    !! Calculate Passive FIDA Spectra")',inputs.calc_pfida
+    printf,55,f='("calc_pnpa = ",i2 , "   !! Calculate Passive NPA")',inputs.calc_pnpa
     printf,55,f='("calc_neutron = ",i2 , "   !! Calculate B-T Neutron Rate")',inputs.calc_neutron
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
@@ -50,8 +55,10 @@ PRO write_namelist, filename, inputs
     printf,55,f='("verbose = ",i2,"    !! Verbose")',inputs.verbose
     printf,55,''
     printf,55,'!! Monte Carlo Settings'
-    printf,55,f='("n_fida = ",i9,"    !! Number of FIDA mc particles")',inputs.n_fida
-    printf,55,f='("n_npa = ",i9,"    !! Number of NPA mc particles")',inputs.n_npa
+    printf,55,f='("n_fida = ",i9,"    !! Number of Active FIDA mc particles")',inputs.n_fida
+    printf,55,f='("n_pfida = ",i9,"    !! Number of Passive FIDA mc particles")',inputs.n_pfida
+    printf,55,f='("n_npa = ",i9,"    !! Number of Active NPA mc particles")',inputs.n_npa
+    printf,55,f='("n_pnpa = ",i9,"    !! Number of Passive NPA mc particles")',inputs.n_pnpa
     printf,55,f='("n_nbi = ",i9,"    !! Number of NBI mc particles")',inputs.n_nbi
     printf,55,f='("n_halo = ",i9,"    !! Number of HALO mc particles")',inputs.n_halo
     printf,55,f='("n_dcx = ",i9,"     !! Number of DCX mc particles")',inputs.n_dcx

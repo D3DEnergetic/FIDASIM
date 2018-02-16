@@ -12,6 +12,7 @@ FUNCTION test_profiles,filename,grid,flux
     ;;   TE              DOUBLE    Array[nr,nz] [keV]
     ;;   DENE            DOUBLE    Array[nr,nz] [cm^-3]
     ;;   ZEFF            DOUBLE    Array[nr,nz]
+    ;;   DENN            DOUBLE    Array[nr,nz] [cm^-3]
 
 
     prof = read_ncdf(filename)
@@ -24,6 +25,7 @@ FUNCTION test_profiles,filename,grid,flux
     vt = grid.r2d*interpol(prof.omega*1.0d0,rho,flux) ;;cm/s
     vr = 0.d0*vt ;;cm/s
     vz = 0.d0*vt ;;cm/s
+    denn = zeff*0 + 1.0d8
     max_flux = max(abs(rho))
 
     s = size(flux,/dim)
@@ -32,8 +34,8 @@ FUNCTION test_profiles,filename,grid,flux
     mask[w] = 1
 
     ;;SAVE IN PROFILE STRUCTURE
-	profiles={time:1.d0,data_source:filename,mask:mask, $ 
-              te:te,ti:ti,vr:vr,vt:vt,vz:vz,dene:dene,zeff:zeff}
+	profiles={time:1.d0,data_source:filename,mask:mask, $
+              te:te,ti:ti,vr:vr,vt:vt,vz:vz,dene:dene,zeff:zeff,denn:denn}
 
 	return,profiles
 END

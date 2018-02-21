@@ -851,6 +851,8 @@ type SimulationInputs
     !! Simulation switches
     integer(Int32) :: calc_spec
         !+ Calculate spectra: 0 = off, 1=on
+    integer(Int32) :: calc_beam
+        !+ Calculate neutral beam: 0 = off, 1=on
     integer(Int32) :: calc_brems
         !+ Calculate bremmstruhlung: 0 = off, 1=on
     integer(Int32) :: calc_nbi
@@ -1745,6 +1747,15 @@ subroutine read_inputs
     else
         inputs%calc_spec=0
     endif
+
+    if((calc_nbi+calc_dcx+calc_halo+&
+        calc_fida+calc_npa+calc_birth+&
+        calc_fida_wght+calc_npa_wght).gt.0) then
+        inputs%calc_beam=1
+    else
+        inputs%calc_beam=0
+    endif
+
     inputs%calc_brems=calc_brems
     inputs%calc_nbi=calc_nbi
     inputs%calc_dcx=calc_dcx
@@ -2473,6 +2484,7 @@ subroutine read_equilibrium
     real(Float64), dimension(nlevs) :: rates, denn, rates_avg
     real(Float64), dimension(3) :: vi, random3
     integer :: error
+    integer :: n = 50
 
     integer, dimension(:,:), allocatable :: p_mask, f_mask
     real(Float64), dimension(:,:), allocatable :: denn2d
@@ -2557,7 +2569,7 @@ subroutine read_equilibrium
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
 
-    loop_over_cells: do ic=istart, inter_grid%nr*inter_grid%nz, istep
+    loop_over_cells: do ic=1, inter_grid%nr*inter_grid%nz
         call ind2sub(inter_grid%dims,ic,ind)
         ir = ind(1) ; iz = ind(2)
         if(p_mask(ir,iz).lt.0.5) cycle loop_over_cells
@@ -2566,13 +2578,13 @@ subroutine read_equilibrium
         plasma%in_plasma = .True.
 
         rates_avg = 0.0
-        do it=1,50
+        do it=1,n
             rates = 0.0
             rates(1) = 1.d19
             call randn(random3)
             vi = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
             call colrad(plasma, thermal_ion, vi, 1.0d-7, rates, denn, photons)
-            rates_avg = rates_avg + rates/50
+            rates_avg = rates_avg + rates/n
         enddo
         if(sum(rates_avg).le.0.0) cycle loop_over_cells
         equil%plasma(ir,iz)%denn = denn2d(ir,iz)*(rates_avg)/sum(rates_avg)
@@ -4073,7 +4085,9 @@ subroutine write_spectra
             call h5ltset_attribute_string_f(fid,"/pfida","description", &
                  "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan)", error)
         else
-            call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
+            if(inputs%calc_fida.le.0) then
+                call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
+            endif
             call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 3, &
                  dims, spec%pfida, error)
             !Add attributes
@@ -8060,6 +8074,7 @@ subroutine dcx_spec
         dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
         if(dcx_photons.le.0.0) cycle loop_over_cells
         call get_plasma(plasma, pos=ri)
+        if(.not.plasma%in_plasma) cycle loop_over_cells
         do it=1, n
             !! DCX Spectra
             call randn(random3)
@@ -8093,6 +8108,7 @@ subroutine halo_spec
         halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
         if(halo_photons.le.0.0) cycle loop_over_cells
         call get_plasma(plasma, pos=ri)
+        if(.not.plasma%in_plasma) cycle loop_over_cells
         do it=1, n
             !! Halo Spectra
             call randn(random3)
@@ -8124,6 +8140,7 @@ subroutine cold_spec
         ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
 
         call get_plasma(plasma, pos=ri)
+        if(.not.plasma%in_plasma) cycle loop_over_cells
         cold_photons = plasma%denn(3)*tables%einstein(2,3)
         if(cold_photons.le.0.0) cycle loop_over_cells
         do it=1, n
@@ -10036,35 +10053,37 @@ program fidasim
             if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
         endif
     else
-        !! ----------- BEAM NEUTRALS ---------- !!
-        if(inputs%verbose.ge.1) then
-            write(*,*) 'nbi:     ' , time(time_start)
-        endif
-        call ndmc
-        if(inputs%calc_birth.eq.1)then
-            call write_birth_profile()
-        endif
-        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+        if(inputs%calc_beam.ge.1) then
+            !! ----------- BEAM NEUTRALS ---------- !!
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'nbi:     ' , time(time_start)
+            endif
+            call ndmc
+            if(inputs%calc_birth.eq.1)then
+                call write_birth_profile()
+            endif
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
-        !! ---------- DCX (Direct charge exchange) ---------- !!
-        if(inputs%verbose.ge.1) then
-            write(*,*) 'dcx:     ' , time(time_start)
-        endif
-        call dcx()
-        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            !! ---------- DCX (Direct charge exchange) ---------- !!
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'dcx:     ' , time(time_start)
+            endif
+            call dcx()
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
-        !! ---------- HALO ---------- !!
-        if(inputs%verbose.ge.1) then
-            write(*,*) 'halo:    ' , time(time_start)
-        endif
-        call halo()
-        !! ---------- WRITE NEUTRALS ---------- !!
+            !! ---------- HALO ---------- !!
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'halo:    ' , time(time_start)
+            endif
+            call halo()
+            !! ---------- WRITE NEUTRALS ---------- !!
 #ifdef _MPI
-        if(this_image().eq.1) call write_neutrals()
+            if(this_image().eq.1) call write_neutrals()
 #else
-        call write_neutrals()
+            call write_neutrals()
 #endif
-        if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+        endif
     endif
 
     !! -----------------------------------------------------------------------

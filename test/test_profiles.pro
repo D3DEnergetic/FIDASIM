@@ -19,7 +19,7 @@ FUNCTION test_profiles,filename,grid,flux
 
     rho = double(prof.rho)
     dene = interpol(prof.dene*1.0d-6,rho,flux) ;;cm^-3
-    denn = 0*dene+9.0d7 ;;cm^-3
+    denn = 0*dene+1.0d8 ;;cm^-3
     ti = interpol(prof.ti*1.0d-3,rho,flux) ;;keV
     te = interpol(prof.te*1.0d-3,rho,flux) ;;keV
     zeff = interpol(prof.zeff*1.0d0,rho,flux)

@@ -2397,7 +2397,7 @@ subroutine read_equilibrium
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(2) :: dims
 
-    integer :: impc, i, k, it
+    integer :: impc, i, k, it, n=50
     integer :: error
 
     integer, dimension(:,:), allocatable :: p_mask, f_mask
@@ -2413,7 +2413,7 @@ subroutine read_equilibrium
         !+ Density of neutrals
     real(Float64)                                :: photons
     real(Float64), dimension(3)                  :: randomu
-        !+ Array of uniform random deviates
+        !+ Array of random normal deviates
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -2503,13 +2503,13 @@ subroutine read_equilibrium
             plasma%in_plasma = .True.
             states_avg = 0.d0
 
-            do it=1,50
+            do it=1,n
                 states=0.d0
                 states(1) = 1.d19
-                call randu(randomu)
+                call randn(randomu)
                 vn = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*randomu
                 call colrad(plasma,thermal_ion,vn,1.d-7,states,dens,photons)
-                states_avg = states_avg + states/50
+                states_avg = states_avg + states/n
             enddo
 
             if(sum(states_avg).le.0.0) cycle loop_over_r
@@ -9152,6 +9152,7 @@ program fidasim
         spec%brems = 0.d0
         spec%bes = 0.d0
         spec%fida = 0.d0
+        spec%pfida = 0.d0
     endif
 
     if(inputs%calc_npa.ge.1)then

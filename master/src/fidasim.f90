@@ -9919,7 +9919,9 @@ program fidasim
     call read_tables()
     call read_equilibrium()
     call make_beam_grid()
-    call read_beam()
+    if(inputs%calc_beam.ge.1) then
+        call read_beam()
+    endif
     call read_distribution()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))

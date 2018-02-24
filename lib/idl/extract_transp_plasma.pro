@@ -1,5 +1,5 @@
 FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
-            doplot=doplot, profiles=profiles, $
+            doplot=doplot, profiles=profiles, dn0out=dn0out, scrapeoff=scrapeoff,$
             sne=sne, ste=ste, sti=sti, simp=simp, srot=srot, snn=snn
     ;+#extract_transp_plasma
     ;+Extracts `plasma` structure from a TRANSP run
@@ -20,6 +20,10 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+
     ;+    **s(ne|te|ti|imp|rot|nn)**: Smooth profiles
     ;+
+    ;+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist
+    ;+
+    ;+    **scrapeoff**: scrapeoff decay length
+    ;+
     ;+##Example Usage
     ;+```idl
     ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, flux)
@@ -32,6 +36,8 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     t = zz.time
     dummy=min( abs(t-intime), idx)
     time = double(t[idx])
+
+    print, ' * Selecting profiles at :', time, ' s' ;pick the closest timeslice to TOI
 
     transp_ne = zz.ne_[*,idx] ;cm^-3
     transp_te = zz.te[*,idx]*1.d-3  ; kev
@@ -53,7 +59,21 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
       transp_omega = zz.omega[*,idx]  ; rad/s
     endelse
 
-    print, ' * Selecting profiles at :', time, ' s' ;pick the closest timeslice to TOI
+    if not keyword_set(dn0out) then dn0out = transp_nn[-1]
+    if not keyword_set(scrapeoff) then scrapeoff = 0.0
+
+    if scrapeoff gt 0.0 then begin
+        drho = abs(rho[-1] - rho[-2])
+        rho_sc = rho[-1] + drho*(dindgen(ceil(0.1/drho)) + 1)
+        sc = exp(-(rho_sc - rho[-1])/scrapeoff)
+        transp_ne = [transp_ne,transp_ne[-1]*sc]
+        transp_te = [transp_te,transp_te[-1]*sc]
+        transp_ti = [transp_ti,transp_ti[-1]*sc]
+        transp_nn = [transp_nn,0*sc + dn0out]
+        transp_zeff = [transp_zeff, (transp_zeff[-1]-1)*sc + 1]
+        transp_omega = [transp_omega,transp_omega[-1]*sc]
+        rho = [rho, rho_sc]
+    endif
 
     if keyword_set(doplot) then begin
         !p.charsize=2 & !x.minor=-1 & !y.minor=-1
@@ -62,7 +82,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     	window, 0, retain=2, xs=600, ys=800
         if keyword_set(sne) then begin
            z = smooth(transp_ne, sne)
-           plot,  x, transp_ne, title='Ne' 
+           plot,  x, transp_ne, title='Ne'
            oplot, x, z, psym=0, color=100
            transp_ne = z
         end
@@ -122,7 +142,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
 
     ;; Interpolate onto r-z grid
     dene=interpol(transp_ne,rho,flux) > 0.0
-    denn=interpol(transp_nn,rho,flux) > 0.0
+    denn=(10.d0^interpol(alog10(transp_nn),rho,flux)) > 0.0
     te=interpol(transp_te,rho,flux) > 0.0
     ti=interpol(transp_ti,rho,flux) > 0.0
     zeff=interpol(transp_zeff,rho,flux) > 1.0

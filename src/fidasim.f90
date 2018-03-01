@@ -6167,6 +6167,8 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     real(Float64), dimension(nlevs) :: H_H_depop, H_e_depop, H_Aq_depop
     integer :: ebi, tii, tei, n, err_status
 
+    real(Float64) :: mullog10 = log(10.0d0)
+
     H_H_pop = 0.d0
     H_e_pop = 0.d0
     H_Aq_pop = 0.d0
@@ -6211,7 +6213,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     where (H_H_pop.lt.tables%H_H%minlog_pop)
         H_H_pop = 0.d0
     elsewhere
-        H_H_pop = denp * 10.d0**H_H_pop
+        H_H_pop = denp * exp(H_H_pop*mullog10)
     end where
 
     H_H_depop = (b11*tables%H_H%log_depop(:,ebi,tii,i_type)   + &
@@ -6221,7 +6223,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     where (H_H_depop.lt.tables%H_H%minlog_depop)
         H_H_depop = 0.d0
     elsewhere
-        H_H_depop = denp * 10.d0**H_H_depop
+        H_H_depop = denp * exp(H_H_depop*mullog10)
     end where
 
     !!H_e
@@ -6256,7 +6258,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     where (H_e_pop.lt.tables%H_e%minlog_pop)
         H_e_pop = 0.d0
     elsewhere
-        H_e_pop = dene * 10.d0**H_e_pop
+        H_e_pop = dene * exp(H_e_pop*mullog10)
     end where
 
     H_e_depop = (b11*tables%H_e%log_depop(:,ebi,tei,i_type)   + &
@@ -6267,7 +6269,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     where (H_e_depop.lt.tables%H_e%minlog_depop)
         H_e_depop = 0.d0
     elsewhere
-        H_e_depop = dene * 10.d0**H_e_depop
+        H_e_depop = dene * exp(H_e_depop*mullog10)
     end where
 
     !!H_Aq
@@ -6302,7 +6304,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     where (H_Aq_pop.lt.tables%H_Aq%minlog_pop)
         H_Aq_pop = 0.d0
     elsewhere
-        H_Aq_pop = denimp * 10.d0**H_Aq_pop
+        H_Aq_pop = denimp * exp(H_Aq_pop*mullog10)
     end where
     H_Aq_depop = (b11*tables%H_Aq%log_depop(:,ebi,tii,i_type)   + &
                   b12*tables%H_Aq%log_depop(:,ebi,tii+1,i_type) + &
@@ -6312,7 +6314,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     where (H_Aq_depop.lt.tables%H_Aq%minlog_depop)
         H_Aq_depop = 0.d0
     elsewhere
-        H_Aq_depop = denimp * 10.d0**H_Aq_depop
+        H_Aq_depop = denimp * exp(H_Aq_depop*mullog10)
     end where
 
     rmat = tables%einstein + H_H_pop + H_e_pop + H_Aq_pop
@@ -7292,12 +7294,12 @@ subroutine dcx
 
     ccnt=0.d0
     inv_ng = 100.0/real(beam_grid%ngrid)
+    !$OMP PARALLEL DO collapse(3) schedule(dynamic,1) private(k,j,i,idcx,ind,vihalo, &
+    !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
     loop_along_z: do k = 1, beam_grid%nz
         loop_along_y: do j = 1, beam_grid%ny
             loop_along_x: do i = 1, beam_grid%nx
                 !! Loop over the markers
-                !$OMP PARALLEL DO schedule(guided) private(idcx,ind,vihalo, &
-                !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
                 loop_over_dcx: do idcx=1,int(nlaunch(i,j,k),Int64)
                     !! Calculate ri,vhalo and track
                     ind = [i, j, k]
@@ -7327,7 +7329,6 @@ subroutine dcx
 
                     enddo loop_along_track
                 enddo loop_over_dcx
-                !$OMP END PARALLEL DO
                 ccnt=ccnt+1
                 if (inputs%verbose.ge.2)then
                     WRITE(*,'(f7.2,"% completed",a,$)') ccnt*inv_ng,char(13)
@@ -7402,7 +7403,7 @@ subroutine halo
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') int(sum(nlaunch),Int64), seed_dcx
         endif
         ccnt=0.d0
-        !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
+        !$OMP PARALLEL DO schedule(dynamic,1) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
         !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
         loop_along_z: do k = 1, beam_grid%nz
             loop_along_y: do j = 1, beam_grid%ny

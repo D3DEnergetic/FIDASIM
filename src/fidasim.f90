@@ -7404,7 +7404,7 @@ subroutine halo
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') int(sum(nlaunch),Int64), seed_dcx
         endif
         ccnt=0.d0
-        !$OMP PARALLEL DO schedule(guided) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
+        !$OMP PARALLEL DO schedule(dynamic,1) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
         !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
         loop_along_z: do k = 1, beam_grid%nz
             loop_along_y: do j = 1, beam_grid%ny

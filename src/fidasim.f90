@@ -7294,12 +7294,12 @@ subroutine dcx
 
     ccnt=0.d0
     inv_ng = 100.0/real(beam_grid%ngrid)
+    !$OMP PARALLEL DO collapse(3) schedule(dynamic,1) private(k,j,i,idcx,ind,vihalo, &
+    !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
     loop_along_z: do k = 1, beam_grid%nz
         loop_along_y: do j = 1, beam_grid%ny
             loop_along_x: do i = 1, beam_grid%nx
                 !! Loop over the markers
-                !$OMP PARALLEL DO schedule(guided) private(idcx,ind,vihalo, &
-                !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
                 loop_over_dcx: do idcx=1,int(nlaunch(i,j,k),Int64)
                     !! Calculate ri,vhalo and track
                     ind = [i, j, k]
@@ -7329,7 +7329,6 @@ subroutine dcx
 
                     enddo loop_along_track
                 enddo loop_over_dcx
-                !$OMP END PARALLEL DO
                 ccnt=ccnt+1
                 if (inputs%verbose.ge.2)then
                     WRITE(*,'(f7.2,"% completed",a,$)') ccnt*inv_ng,char(13)

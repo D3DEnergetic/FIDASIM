@@ -6294,6 +6294,7 @@ subroutine bb_cx_rates(denn, vi, vn, rates)
     real(Float64) :: dlogE, logEmin, logeb
     real(Float64) :: vrel !! relative velocity
     integer :: ebi, neb, err
+    real(Float64) :: mullog10 = log(10.d0)
 
     !Eeff
     vrel=norm2(vi-vn)
@@ -6324,7 +6325,7 @@ subroutine bb_cx_rates(denn, vi, vn, rates)
     where (neut.lt.tables%H_H_cx_cross%minlog_cross)
         neut = 0.d0
     elsewhere
-        neut = 10.d0**neut
+        neut = exp(neut*mullog10)
     end where
 
     rates=matmul(neut,denn)*vrel
@@ -6351,6 +6352,7 @@ subroutine bt_cx_rates(plasma, denn, vi, i_type, rates)
     real(Float64) :: b11, b12, b21, b22, b_amu
     real(Float64), dimension(nlevs,nlevs) :: H_H_rate
     integer :: ebi, tii, n, err_status
+    real(Float64) :: mullog10 = log(10.d0)
 
     H_H_rate = 0.d0
 
@@ -6399,7 +6401,7 @@ subroutine bt_cx_rates(plasma, denn, vi, i_type, rates)
     where (H_H_rate.lt.tables%H_H_cx_rate%minlog_rate)
         H_H_rate = 0.d0
     elsewhere
-        H_H_rate = 10.d0**H_H_rate !cm^3/s
+        H_H_rate = exp(H_H_rate*mullog10) !cm^3/s
     end where
 
     rates=matmul(H_H_rate,denn) !1/s
@@ -6420,6 +6422,7 @@ subroutine get_neutron_rate(plasma, eb, rate)
     real(Float64) :: logeb, logti, lograte, denp
     type(InterpolCoeffs2D) :: c
     real(Float64) :: b11, b12, b21, b22
+    real(Float64) :: mullog10 = log(10.d0)
 
     logeb = log10(eb)
     logti = log10(plasma%ti)
@@ -6458,7 +6461,7 @@ subroutine get_neutron_rate(plasma, eb, rate)
     if (lograte.lt.tables%D_D%minlog_rate) then
         rate = 0.d0
     else
-        rate = denp * 10.d0**lograte
+        rate = denp * exp(lograte*mullog10)
     endif
 
 end subroutine get_neutron_rate
@@ -6532,6 +6535,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     real(Float64), dimension(nlevs,nlevs) :: H_H_pop, H_e_pop, H_Aq_pop
     real(Float64), dimension(nlevs) :: H_H_depop, H_e_depop, H_Aq_depop
     integer :: ebi, tii, tei, n, err_status
+    real(Float64) :: mullog10 = log(10.d0)
 
     H_H_pop = 0.d0
     H_e_pop = 0.d0
@@ -6575,7 +6579,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
         where (H_H_pop.lt.tables%H_H%minlog_pop)
             H_H_pop = 0.d0
         elsewhere
-            H_H_pop = denp * 10.d0**H_H_pop
+            H_H_pop = denp * exp(H_H_pop*mullog10)
         end where
 
         H_H_depop = (b11*tables%H_H%log_depop(:,ebi,tii,i_type)   + &
@@ -6585,7 +6589,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
         where (H_H_depop.lt.tables%H_H%minlog_depop)
             H_H_depop = 0.d0
         elsewhere
-            H_H_depop = denp * 10.d0**H_H_depop
+            H_H_depop = denp * exp(H_H_depop*mullog10)
         end where
     endif
 
@@ -6619,7 +6623,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
         where (H_e_pop.lt.tables%H_e%minlog_pop)
             H_e_pop = 0.d0
         elsewhere
-            H_e_pop = dene * 10.d0**H_e_pop
+            H_e_pop = dene * exp(H_e_pop*mullog10)
         end where
 
         H_e_depop = (b11*tables%H_e%log_depop(:,ebi,tei,i_type)   + &
@@ -6630,7 +6634,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
         where (H_e_depop.lt.tables%H_e%minlog_depop)
             H_e_depop = 0.d0
         elsewhere
-            H_e_depop = dene * 10.d0**H_e_depop
+            H_e_depop = dene * exp(H_e_depop*mullog10)
         end where
     endif
 
@@ -6664,7 +6668,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
         where (H_Aq_pop.lt.tables%H_Aq%minlog_pop)
             H_Aq_pop = 0.d0
         elsewhere
-            H_Aq_pop = denimp * 10.d0**H_Aq_pop
+            H_Aq_pop = denimp * exp(H_Aq_pop*mullog10)
         end where
         H_Aq_depop = (b11*tables%H_Aq%log_depop(:,ebi,tii,i_type)   + &
                       b12*tables%H_Aq%log_depop(:,ebi,tii+1,i_type) + &
@@ -6674,7 +6678,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
         where (H_Aq_depop.lt.tables%H_Aq%minlog_depop)
             H_Aq_depop = 0.d0
         elsewhere
-            H_Aq_depop = denimp * 10.d0**H_Aq_depop
+            H_Aq_depop = denimp * exp(H_Aq_depop*mullog10)
         end where
     endif
 

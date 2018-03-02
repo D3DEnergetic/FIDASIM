@@ -939,6 +939,8 @@ type ParticleTrack
         !+ Indices of cell
     real(Float64), dimension(3)  :: pos = 0.d0
         !+ Midpoint of track in cell [cm]
+    logical :: in_plasma = .False.
+        !+ Indicates whether mean position is in the plasma
 end type ParticleTrack
 
 type GyroSurface
@@ -2213,6 +2215,7 @@ subroutine read_chords
             call grid_intersect(r0, v0, length, r_enter, r_exit)
             call track(r_enter, v0, tracks, ntrack)
             track_loop: do j=1, ntrack
+                if(.not.tracks(j)%in_plasma) cycle track_loop
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
@@ -5525,6 +5528,8 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
                 call in_plasma(ri_tmp,in_plasma_tmp)
                 if(in_plasma2.eqv.in_plasma_tmp) exit track_fine
             enddo track_fine
+            tracks(cc)%in_plasma = in_plasma2
+            tracks(cc+1)%in_plasma = .not.in_plasma2
             tracks(cc)%pos = ri + 0.5*dt1*vn
             tracks(cc+1)%pos = ri + 0.5*(dt1 + dT)*vn
             tracks(cc)%time = dt1
@@ -5534,6 +5539,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             cc = cc + 2
             ncross = ncross + 1
         else
+            tracks(cc)%in_plasma = in_plasma2
             tracks(cc)%pos = ri + 0.5*dT*vn
             tracks(cc)%time = dT
             tracks(cc)%ind = ind

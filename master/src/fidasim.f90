@@ -8078,7 +8078,6 @@ subroutine dcx_spec
         dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
         if(dcx_photons.le.0.0) cycle loop_over_cells
         call get_plasma(plasma, pos=ri)
-        if(.not.plasma%in_plasma) cycle loop_over_cells
         do it=1, n
             !! DCX Spectra
             call randn(random3)
@@ -8112,7 +8111,6 @@ subroutine halo_spec
         halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
         if(halo_photons.le.0.0) cycle loop_over_cells
         call get_plasma(plasma, pos=ri)
-        if(.not.plasma%in_plasma) cycle loop_over_cells
         do it=1, n
             !! Halo Spectra
             call randn(random3)
@@ -8144,7 +8142,6 @@ subroutine cold_spec
         ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
 
         call get_plasma(plasma, pos=ri)
-        if(.not.plasma%in_plasma) cycle loop_over_cells
         cold_photons = plasma%denn(3)*tables%einstein(2,3)
         if(cold_photons.le.0.0) cycle loop_over_cells
         do it=1, n

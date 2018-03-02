@@ -608,6 +608,8 @@ type LOSElement
         !+ Line of sight index
     real(Float64) :: length
         !+ Length of crossing
+    real(Float64), dimension(3) :: pos
+        !+ Mean position in cell
 end type LOSElement
 
 type LOSInters
@@ -2088,13 +2090,14 @@ subroutine read_chords
     real(Float64), dimension(:,:), allocatable :: lenses
     real(Float64), dimension(:,:), allocatable :: axes
     real(Float64), dimension(:,:,:), allocatable :: dlength
+    real(Float64), dimension(:,:,:,:), allocatable :: pos
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
     type(LOSElement), dimension(:), allocatable :: los_elem
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(2) :: randomu
-    real(Float64) :: theta, sqrt_rho
+    real(Float64) :: theta, sqrt_rho, dl
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
 
@@ -2146,6 +2149,9 @@ subroutine read_chords
     allocate(dlength(beam_grid%nx, &
                      beam_grid%ny, &
                      beam_grid%nz) )
+    allocate(pos(3, beam_grid%nx, &
+                    beam_grid%ny, &
+                    beam_grid%nz) )
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -2191,6 +2197,7 @@ subroutine read_chords
         endif
 
         dlength = 0.d0
+        pos = 0.d0
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
         !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
         do ic=1,nc
@@ -2211,6 +2218,8 @@ subroutine read_chords
                 !$OMP CRITICAL(read_chords_1)
                 dlength(ind(1),ind(2),ind(3)) = &
                 dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                pos(:,ind(1),ind(2),ind(3)) = &
+                pos(:,ind(1),ind(2),ind(3)) + tracks(j)%pos*tracks(j)%time/real(nc) !time == distance
                 !$OMP END CRITICAL(read_chords_1)
             enddo track_loop
         enddo
@@ -2219,14 +2228,15 @@ subroutine read_chords
             do jj=1,beam_grid%ny
                 xloop: do ii=1, beam_grid%nx
                     if(dlength(ii,jj,kk).ne.0.d0) then
+                        dl = dlength(ii,jj,kk)
                         nc = spec_chords%inter(ii,jj,kk)%nchan + 1
                         if(nc.eq.1) then
                             allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
-                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dlength(ii,jj,kk))
+                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl, pos(:,ii,jj,kk)/dl)
                         else
                             allocate(los_elem(nc))
                             los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
-                            los_elem(nc) = LOSElement(i, dlength(ii,jj,kk))
+                            los_elem(nc) = LOSElement(i, dl, pos(:,ii,jj,kk)/dl)
                             deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
                             call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
                         endif
@@ -8020,7 +8030,7 @@ subroutine nbi_spec
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
 
         nbif_photons = neut%full(3,i,j,k)*tables%einstein(2,3)
         nbih_photons = neut%half(3,i,j,k)*tables%einstein(2,3)
@@ -8073,7 +8083,7 @@ subroutine dcx_spec
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
 
         dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
         if(dcx_photons.le.0.0) cycle loop_over_cells
@@ -8106,7 +8116,7 @@ subroutine halo_spec
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
 
         halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
         if(halo_photons.le.0.0) cycle loop_over_cells
@@ -8139,7 +8149,7 @@ subroutine cold_spec
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
 
         call get_plasma(plasma, pos=ri)
         cold_photons = plasma%denn(3)*tables%einstein(2,3)

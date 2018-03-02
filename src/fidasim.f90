@@ -608,8 +608,6 @@ type LOSElement
         !+ Line of sight index
     real(Float64) :: length
         !+ Length of crossing
-    real(Float64), dimension(3) :: pos
-        !+ Mean position in cell
 end type LOSElement
 
 type LOSInters
@@ -939,8 +937,6 @@ type ParticleTrack
         !+ Indices of cell
     real(Float64), dimension(3)  :: pos = 0.d0
         !+ Midpoint of track in cell [cm]
-    logical :: in_plasma = .False.
-        !+ Indicates whether mean position is in the plasma
 end type ParticleTrack
 
 type GyroSurface
@@ -2092,7 +2088,6 @@ subroutine read_chords
     real(Float64), dimension(:,:), allocatable :: lenses
     real(Float64), dimension(:,:), allocatable :: axes
     real(Float64), dimension(:,:,:), allocatable :: dlength
-    real(Float64), dimension(:,:,:,:), allocatable :: pos
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
     type(LOSElement), dimension(:), allocatable :: los_elem
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
@@ -2151,9 +2146,6 @@ subroutine read_chords
     allocate(dlength(beam_grid%nx, &
                      beam_grid%ny, &
                      beam_grid%nz) )
-    allocate(pos(3, beam_grid%nx, &
-                    beam_grid%ny, &
-                    beam_grid%nz) )
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -2199,7 +2191,6 @@ subroutine read_chords
         endif
 
         dlength = 0.d0
-        pos = 0.d0
         !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
         !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
         do ic=1,nc
@@ -2215,14 +2206,11 @@ subroutine read_chords
             call grid_intersect(r0, v0, length, r_enter, r_exit)
             call track(r_enter, v0, tracks, ntrack)
             track_loop: do j=1, ntrack
-                if(.not.tracks(j)%in_plasma) cycle track_loop
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
                 !$OMP CRITICAL(read_chords_1)
                 dlength(ind(1),ind(2),ind(3)) = &
                 dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                pos(:,ind(1),ind(2),ind(3)) = &
-                pos(:,ind(1),ind(2),ind(3)) + tracks(j)%pos*tracks(j)%time/real(nc) !time == distance
                 !$OMP END CRITICAL(read_chords_1)
             enddo track_loop
         enddo
@@ -2235,11 +2223,11 @@ subroutine read_chords
                         nc = spec_chords%inter(ii,jj,kk)%nchan + 1
                         if(nc.eq.1) then
                             allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
-                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl, pos(:,ii,jj,kk)/dl)
+                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
                         else
                             allocate(los_elem(nc))
                             los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
-                            los_elem(nc) = LOSElement(i, dl, pos(:,ii,jj,kk)/dl)
+                            los_elem(nc) = LOSElement(i, dl)
                             deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
                             call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
                         endif
@@ -5528,8 +5516,6 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
                 call in_plasma(ri_tmp,in_plasma_tmp)
                 if(in_plasma2.eqv.in_plasma_tmp) exit track_fine
             enddo track_fine
-            tracks(cc)%in_plasma = in_plasma2
-            tracks(cc+1)%in_plasma = .not.in_plasma2
             tracks(cc)%pos = ri + 0.5*dt1*vn
             tracks(cc+1)%pos = ri + 0.5*(dt1 + dT)*vn
             tracks(cc)%time = dt1
@@ -5539,7 +5525,6 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             cc = cc + 2
             ncross = ncross + 1
         else
-            tracks(cc)%in_plasma = in_plasma2
             tracks(cc)%pos = ri + 0.5*dT*vn
             tracks(cc)%time = dT
             tracks(cc)%ind = ind
@@ -8024,19 +8009,19 @@ subroutine nbi_spec
     !+ Calculates approximate neutral beam emission (full, half, third)
     !+ from user supplied neutrals file
     integer :: ic, i, j, k, it
-    real(Float64), dimension(3) :: ri, vnbi, random3
+    real(Float64), dimension(3) :: ri, vnbi, random3, rc
     integer,dimension(3) :: ind
     !! Determination of the CX probability
     real(Float64) :: nbif_photons, nbih_photons, nbit_photons
     real(Float64) :: f_wght, h_wght, t_wght
     real(Float64) :: f_tot, h_tot, t_tot
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan) :: full, half, third
+    logical :: inp
     integer :: n = 10000
 
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
 
         nbif_photons = neut%full(3,i,j,k)*tables%einstein(2,3)
         nbih_photons = neut%half(3,i,j,k)*tables%einstein(2,3)
@@ -8044,6 +8029,18 @@ subroutine nbi_spec
         if((nbif_photons + nbih_photons + nbit_photons).le.0.0) then
             cycle loop_over_cells
         endif
+
+        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        !Find a point in cell that is also in the plasma
+        ri = rc
+        call in_plasma(ri, inp)
+        do while (.not.inp)
+            call randu(random3)
+            ri = rc + beam_grid%dr*(random3 - 0.5)
+            call in_plasma(ri,inp)
+        enddo
+
         f_tot = 0.0 ; h_tot = 0.0 ; t_tot = 0.0
         full  = 0.0 ; half  = 0.0 ; third = 0.0
         do it=1, n
@@ -8079,20 +8076,32 @@ end subroutine nbi_spec
 subroutine dcx_spec
     !+ Calculates DCX emission from user supplied neutrals file
     integer :: ic, i, j, k, it
-    real(Float64), dimension(3) :: ri, vhalo, random3
+    real(Float64), dimension(3) :: ri, vhalo, random3, rc
     integer,dimension(3) :: ind
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     real(Float64) :: dcx_photons
+    logical :: inp
     integer :: n = 10000
 
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
 
         dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
         if(dcx_photons.le.0.0) cycle loop_over_cells
+
+        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        !Find a point in cell that is also in the plasma
+        ri = rc
+        call in_plasma(ri, inp)
+        do while (.not.inp)
+            call randu(random3)
+            ri = rc + beam_grid%dr*(random3 - 0.5)
+            call in_plasma(ri,inp)
+        enddo
+
         call get_plasma(plasma, pos=ri)
         do it=1, n
             !! DCX Spectra
@@ -8112,20 +8121,32 @@ end subroutine dcx_spec
 subroutine halo_spec
     !+ Calculates halo emission from user supplied neutrals file
     integer :: ic, i, j, k, it
-    real(Float64), dimension(3) :: ri, vhalo, random3
+    real(Float64), dimension(3) :: ri, vhalo, random3, rc
     integer,dimension(3) :: ind
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     real(Float64) :: halo_photons
+    logical :: inp
     integer :: n = 10000
 
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
 
         halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
         if(halo_photons.le.0.0) cycle loop_over_cells
+
+        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        !Find a point in cell that is also in the plasma
+        ri = rc
+        call in_plasma(ri, inp)
+        do while (.not.inp)
+            call randu(random3)
+            ri = rc + beam_grid%dr*(random3 - 0.5)
+            call in_plasma(ri,inp)
+        enddo
+
         call get_plasma(plasma, pos=ri)
         do it=1, n
             !! Halo Spectra
@@ -8155,11 +8176,12 @@ subroutine cold_spec
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = spec_chords%inter(i,j,k)%los_elem(1)%pos
+        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
 
         call get_plasma(plasma, pos=ri)
         cold_photons = plasma%denn(3)*tables%einstein(2,3)
         if(cold_photons.le.0.0) cycle loop_over_cells
+
         do it=1, n
             !! Cold Spectra
             call randn(random3)

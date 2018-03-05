@@ -23,9 +23,9 @@ contains
     !+are resized to have one norm close to 1.
     integer, intent(in)  :: n
         !+ Dimension of `mat`
-    real(double)         :: mat(0:n,0:n)
+    real(double)         :: mat(0:n-1,0:n-1)
         !+ `n`x`n` scaled matrix
-    real(double)         :: scal(0:n)
+    real(double)         :: scal(0:n-1)
         !+ Contains isolated eigenvalue in the positions 0-`low` and `high`-`n`-1
         !+ its other components contain the scaling factors for transforming `mat`
     integer, intent(out) :: high
@@ -136,9 +136,9 @@ contains
       !+ First nonzero row
     integer,intent(in)         :: high
       !+ Last nonzero row
-    real(double), intent(in)   ::  scal(0:n)
+    real(double), intent(in)   ::  scal(0:n-1)
       !+ Scaling data from balance
-    real(double), intent(inout):: eivec(0:n,0:n)
+    real(double), intent(inout):: eivec(0:n-1,0:n-1)
       !+ Input: n x n matrix of eigenvectors, as computed in qr2
       !+ Output: Non-normalized eigenvectors of the original matrix
 
@@ -176,11 +176,11 @@ contains
       !+First nonzero row
     integer,intent(in)   :: high
       !+Last nonzero row
-    real(double), intent(inout):: mat(0:n,0:n)
+    real(double), intent(inout):: mat(0:n-1,0:n-1)
       !+Input: `n`x`n` matrix
       !+Output: Upper Hessenberg matrix; additional information on the tranformation
       !+is stored in the lower triangle
-    integer,intent(out)  :: perm(0:n)
+    integer,intent(out)  :: perm(0:n-1)
       !+Permutation vector for elmtrans
 
     integer              :: i, j, m
@@ -228,11 +228,11 @@ contains
       !+ First nonzero row
     integer,intent(in)         :: high
       !+ Last nonzero row
-    real(double), intent(in)   :: mat(0:n,0:n)
+    real(double), intent(in)   :: mat(0:n-1,0:n-1)
       !+ `n`x`n` input matrix
-    integer,intent(in)         :: perm(0:n)
+    integer,intent(in)         :: perm(0:n-1)
       !+ Permutation data from elmhes
-    real(double),intent(out)   :: h(0:n,0:n)
+    real(double),intent(out)   :: h(0:n-1,0:n-1)
       !+ Hessenberg matrix
     integer                    :: i, j, k
     do i = 0, n-1
@@ -343,9 +343,9 @@ contains
     !+   eivec :  n x n matrix, whose columns are the eigenvectors
     integer,intent(in)         :: n
     integer,intent(in)         :: high, low
-    real(double), intent(in)   :: wr(0:n),wi(0:n)
-    real(double), intent(out)  :: eivec(0:n,0:n)
-    real(double)  :: h(0:n,0:n)
+    real(double), intent(in)   :: wr(0:n-1),wi(0:n-1)
+    real(double), intent(out)  :: eivec(0:n-1,0:n-1)
+    real(double)  :: h(0:n-1,0:n-1)
     integer :: rc
     integer :: i, j, m, k, na, l
     integer :: code, en
@@ -548,11 +548,11 @@ contains
     !+            entry is negative.
     integer,intent(in)          :: n
     integer,intent(in)          :: high, low
-    real(double) ,intent(out)   :: h(0:n,0:n)
-    real(double), intent(out)   :: wr(0:n),wi(0:n)
-    real(double), intent(out)   :: eivec(0:n,0:n)
+    real(double) ,intent(out)   :: h(0:n-1,0:n-1)
+    real(double), intent(out)   :: wr(0:n-1),wi(0:n-1)
+    real(double), intent(out)   :: eivec(0:n-1,0:n-1)
     integer,intent(out)         :: rc
-    integer,intent(out)         :: cnt(0:n)
+    integer,intent(out)         :: cnt(0:n-1)
     integer :: en
     integer :: i, j, na, iter, l, ll, m, k
     real(double)  :: p, q, r, s, t, w, x, y, z
@@ -809,15 +809,15 @@ contains
     real(double) ,intent(in),dimension(n,n)  :: matrix
     real(double) ,intent(out),dimension(n,n) :: eigvec
     real(double) ,intent(out),dimension(n)   :: eigval
-    real(double)     :: mat(0:n,0:n)
-    real(double)     :: eivec(0:n,0:n)
-    real(double)     :: valre(0:n) !real parts of eigenvalues
-    real(double)     :: valim(0:n) !imaginary parts of eigenvalues
+    real(double)     :: mat(0:n-1,0:n-1)
+    real(double)     :: eivec(0:n-1,0:n-1)
+    real(double)     :: valre(0:n-1) !real parts of eigenvalues
+    real(double)     :: valim(0:n-1) !imaginary parts of eigenvalues
     integer          :: rc             !return code
-    integer          :: cnt(0:n)   !Iteration counter
+    integer          :: cnt(0:n-1)   !Iteration counter
     integer          :: high, low
-    real(double)     :: d(0:n), scale(0:n)
-    integer          :: perm(0:n)
+    real(double)     :: d(0:n-1), scale(0:n-1)
+    integer          :: perm(0:n-1)
 
     cnt=0 ; d=0.d0
     mat(0:n-1,0:n-1)=matrix(1:n,1:n)

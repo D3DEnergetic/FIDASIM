@@ -556,6 +556,7 @@ contains
     integer :: en
     integer :: i, j, na, iter, l, ll, m, k
     real(double)  :: p, q, r, s, t, w, x, y, z
+    real(double)  :: r_p,r_r,r_s,r_x,r_z
 
     p=ZERO; q=ZERO; r=ZERO
     do i = 0, n-1
@@ -599,6 +600,7 @@ contains
              p = (y - x) * 0.5d0
              q = p * p + w
              z = DSQRT(DABS(q))
+             r_z = 1.0d0/z
              x = x + t
              h(en,en) = x + t
              h(na,na) = y + t
@@ -611,14 +613,15 @@ contains
                    z=p+z
                 endif
                 wr(na) = x + z
-                wr(en) = x - w / z
-                s = w - w / z
+                wr(en) = x - w * r_z
+                s = w - w * r_z
                 wi(na) = ZERO
                 wi(en) = ZERO
                 x = h(en,na)
                 r = DSQRT (x * x + z * z)
-                p = x / r
-                q = z / r
+                r_r = 1.0d0/r
+                p = x * r_r
+                q = z * r_r
                 do j = na, n-1
                    z = h(na,j)
                    h(na,j) = q * z + p * h(en,j)
@@ -663,13 +666,14 @@ contains
              z = h(m,m)
              r = x - z
              s = y - z
+             r_s = 1.0d0/s
              p = ( r * s - w ) / h(m+1,m) + h(m,m+1)
              q = h(m + 1,m + 1) - z - r - s
              r = h(m + 2,m + 1)
              s = DABS(p) + DABS(q) + DABS (r)
-             p = p / s
-             q = q / s
-             r = r / s
+             p = p * r_s
+             q = q * r_s
+             r = r * r_s
              if (m == l)  goto 12
              if (DABS(h(m,m-1)) * (DABS(q) + DABS(r)) <= XMACH_EPS * DABS(p) &
                   * (DABS(h(m-1,m-1)) + DABS(z) + DABS(h(m+1,m+1)))) then
@@ -693,23 +697,26 @@ contains
                 endif
                 x = DABS(p) + DABS(q) + DABS(r)
                 if (x == ZERO) goto 30                  !next k
-                p = p / x
-                q = q / x
-                r = r / x
+                r_x = 1.0d0/x
+                p = p * r_x
+                q = q * r_x
+                r = r * r_x
              endif
              s = DSQRT(p * p + q * q + r * r)
              if (p < ZERO) s = -s
+             r_s = 1.0d0/s
              if (k.ne.m) then
                 h(k,k-1) = -s * x
              else if (l.ne.m) then
                 h(k,k-1) = -h(k,k-1)
              endif
              p = p + s
-             x = p / s
-             y = q / s
-             z = r / s
-             q = q / p
-             r = r / p
+             r_p = 1.0d0/p
+             x = p * r_s
+             y = q * r_s
+             z = r * r_s
+             q = q * r_p
+             r = r * r_p
              do j = k, n-1                          !modify rows
                 p = h(k,j) + q * h(k+1,j)
                 if (k.ne.na) then

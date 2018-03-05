@@ -6705,19 +6705,14 @@ subroutine solve_colrad(matrix, states, dt, dens)
     real(Float64), dimension(nlevs,nlevs) :: vr, vl
     real(Float64), dimension(nlevs) :: eigval, coef, wr, wi, tmp1d
     real(Float64), dimension(nlevs) :: exp_eigval_dt
-    integer, parameter :: lworkmax = 250
+    integer, parameter :: lworkmax = 780
     real(Float64), dimension(lworkmax)  :: work
     integer, dimension(nlevs) :: ipiv
     integer :: lwork, info
 
     !+ Find eigenvalues and eigenvectors
-    tmp2d = matrix
-    !!query for optimal work space
-    lwork = -1
-    call dgeev('N','V',nlevs,tmp2d,nlevs,wr,wi,vl,nlevs,vr,nlevs,work,lwork,info)
-    lwork = min(lworkmax, int(work(1)))
-    !!do actual calculation
-    call dgeev('N','V',nlevs,tmp2d,nlevs,wr,wi,vl,nlevs,vr,nlevs,work,lwork,info)
+    tmp2d = matrix !dgeev overwrites tmp2d
+    call dgeev('N','V',nlevs,tmp2d,nlevs,wr,wi,vl,nlevs,vr,nlevs,work,lworkmax,info)
 
     eigvec = vr !right eigenvectors
     eigval = wr !real part of eigenvalues

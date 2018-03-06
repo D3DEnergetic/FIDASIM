@@ -600,7 +600,6 @@ contains
              p = (y - x) * 0.5d0
              q = p * p + w
              z = DSQRT(DABS(q))
-             r_z = 1.0d0/z
              x = x + t
              h(en,en) = x + t
              h(na,na) = y + t
@@ -612,6 +611,7 @@ contains
                 else
                    z=p+z
                 endif
+                r_z = 1.0d0/z
                 wr(na) = x + z
                 wr(en) = x - w * r_z
                 s = w - w * r_z
@@ -666,11 +666,11 @@ contains
              z = h(m,m)
              r = x - z
              s = y - z
-             r_s = 1.0d0/s
              p = ( r * s - w ) / h(m+1,m) + h(m,m+1)
              q = h(m + 1,m + 1) - z - r - s
              r = h(m + 2,m + 1)
              s = DABS(p) + DABS(q) + DABS (r)
+             r_s = 1.0d0/s
              p = p * r_s
              q = q * r_s
              r = r * r_s

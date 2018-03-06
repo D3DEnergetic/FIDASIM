@@ -5805,7 +5805,7 @@ subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
     !Store neutrals in [[libfida:neut]] at indices `ind`
     integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
-    integer, intent(in)                      :: neut_type
+    integer, value                           :: neut_type
         !+ Neutral type
     real(Float64), dimension(:), intent(in)  :: dens
         !+ Neutral density [neutrals/cm^3]
@@ -5828,6 +5828,31 @@ subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
     !$OMP END CRITICAL(store_neutrals_1)
 
 end subroutine store_neutrals
+
+subroutine store_neutrals_multi(nels,ind, neut_type, dens)
+    !Store neutrals in [[libfida:neut]] at indices `ind`
+    integer :: nels
+        !+ number of elements in the arrrays
+    integer(Int32), dimension(:,:), intent(in) :: ind   ! (3,nels)
+        !+ [[libfida:beam_grid]] indices
+    integer, value                             :: neut_type
+        !+ Neutral type
+    real(Float64), dimension(:,:), intent(in)  :: dens   ! (nlevs, nels)
+        !+ Neutral density [neutrals/cm^3]
+
+    integer :: n,i1,i2,i3
+
+    !$OMP CRITICAL(store_neutrals_m)
+    do n=1,nels
+      i1 = ind(1,n)
+      i2 = ind(2,n)
+      i3 = ind(3,n)
+      neut%dens(:,neut_type,i1,i2,i3) = &
+          neut%dens(:,neut_type,i1,i2,i3)+dens(:,n) ![neutrals/cm^3]
+    enddo
+    !$OMP END CRITICAL(store_neutrals_m)
+
+end subroutine store_neutrals_multi
 
 subroutine store_births(ind, neut_type, dflux)
     !+ Store birth particles/density in [[libfida:birth]]
@@ -7355,6 +7380,8 @@ subroutine halo
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
+    integer(Int32), dimension(:,:), allocatable :: idx_arr
+    real(Float64), dimension(:,:), allocatable  :: denn_arr
     real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
@@ -7367,6 +7394,7 @@ subroutine halo
     !! Halo iteration
     integer :: hh !! counters
     real(Float64) :: dcx_dens, halo_iteration_dens, seed_dcx
+    real(Float64) :: r_nlaunchijk, local_dens
     integer :: s1type  ! halo iteration
     integer :: s2type  ! halo iteration
 
@@ -7410,14 +7438,17 @@ subroutine halo
         endif
         ccnt=0.d0
         !$OMP PARALLEL DO schedule(dynamic,1) collapse(3) private(i,j,k,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma)
+        !$OMP& ri,tracks,ncell,rates,denn,states,jj,photons,plasma,r_nlaunchijk,&
+        !$OMP& idx_arr,denn_arr,local_dens)
         loop_along_z: do k = 1, beam_grid%nz
             loop_along_y: do j = 1, beam_grid%ny
                 loop_along_x: do i = 1, beam_grid%nx
+                    local_dens = 0.0d0
                     !! Loop over the markers
                     loop_over_halos: do ihalo=1,int(nlaunch(i,j,k),Int64)
                         !! Calculate ri,vhalo and track
                         ind = [i, j, k]
+                        r_nlaunchijk = 1.0d0/nlaunch(i,j,k)
                         call mc_halo(ind,vihalo,ri)
                         call track(ri,vihalo,tracks,ncell)
                         if(ncell.eq.0)cycle loop_over_halos
@@ -7432,19 +7463,29 @@ subroutine halo
                         !! Weight CX rates by ion source density
                         states = rates*plasma%denp
 
+                        allocate(idx_arr(3,ncell),denn_arr(nlevs,ncell))
                         loop_along_track: do jj=1,ncell
                             call get_plasma(plasma,pos=tracks(jj)%pos)
 
                             call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
-                            call store_neutrals(tracks(jj)%ind,s2type, &
-                                 denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
+                            idx_arr(:,jj) = tracks(jj)%ind
+                            denn_arr(:,jj) = denn*r_nlaunchijk
+                            if (plasma%in_plasma) then
+                               local_dens = local_dens + sum(denn_arr(:,jj))
+                            endif
 
                             if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
-                              call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
+                              call store_bes_photons(tracks(jj)%pos,vihalo,photons*r_nlaunchijk,halo_type)
                             endif
 
                         enddo loop_along_track
+
+                        call store_neutrals_multi(ncell,idx_arr,s2type,denn_arr)
+                        deallocate(denn_arr,idx_arr)
                     enddo loop_over_halos
+                    !$omp atomic update
+                       halo_iter_dens(s2type) = halo_iter_dens(s2type) + local_dens
+                    !$omp end atomic
                     ccnt=ccnt+1
                     if (inputs%verbose.ge.2)then
                         WRITE(*,'(f7.2,"% completed",a,$)') ccnt*inv_ng,char(13)

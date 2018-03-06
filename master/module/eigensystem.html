@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 6.2% of total for modules and submodules.">732 statements</a>
+	  title=" 6.3% of total for modules and submodules.">739 statements</a>
      </li> 
      
      
@@ -961,7 +961,7 @@ are resized to have one norm close to 1.</p>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>mat</strong>(0:n,0:n)</td><td><p><code>n</code>x<code>n</code> scaled matrix</p></td>
+  <td><strong>mat</strong>(0:n-1,0:n-1)</td><td><p><code>n</code>x<code>n</code> scaled matrix</p></td>
   
 </tr>
 
@@ -976,7 +976,7 @@ are resized to have one norm close to 1.</p>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>scal</strong>(0:n)</td><td><p>Contains isolated eigenvalue in the positions 0-<code>low</code> and <code>high</code>-<code>n</code>-1
+  <td><strong>scal</strong>(0:n-1)</td><td><p>Contains isolated eigenvalue in the positions 0-<code>low</code> and <code>high</code>-<code>n</code>-1
  its other components contain the scaling factors for transforming <code>mat</code></p></td>
   
 </tr>
@@ -1111,7 +1111,7 @@ public subroutine <a href='../proc/balback.html'>balback</a>(n, low, high, scal,
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>scal</strong>(0:n)</td><td><p>Scaling data from balance</p></td>
+  <td><strong>scal</strong>(0:n-1)</td><td><p>Scaling data from balance</p></td>
   
 </tr>
 
@@ -1126,7 +1126,7 @@ public subroutine <a href='../proc/balback.html'>balback</a>(n, low, high, scal,
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>eivec</strong>(0:n,0:n)</td><td></td>
+  <td><strong>eivec</strong>(0:n-1,0:n-1)</td><td></td>
   
 </tr>
 
@@ -1230,7 +1230,7 @@ public subroutine <a href='../proc/elmhes.html'>elmhes</a>(n, low, high, mat, pe
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>mat</strong>(0:n,0:n)</td><td><p>is stored in the lower triangle</p></td>
+  <td><strong>mat</strong>(0:n-1,0:n-1)</td><td><p>is stored in the lower triangle</p></td>
   
 </tr>
 
@@ -1245,7 +1245,7 @@ public subroutine <a href='../proc/elmhes.html'>elmhes</a>(n, low, high, mat, pe
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>perm</strong>(0:n)</td><td><p>Permutation vector for elmtrans</p></td>
+  <td><strong>perm</strong>(0:n-1)</td><td><p>Permutation vector for elmtrans</p></td>
   
 </tr>
 
@@ -1349,7 +1349,7 @@ public subroutine <a href='../proc/elmtrans.html'>elmtrans</a>(n, low, high, mat
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>mat</strong>(0:n,0:n)</td><td><p><code>n</code>x<code>n</code> input matrix</p></td>
+  <td><strong>mat</strong>(0:n-1,0:n-1)</td><td><p><code>n</code>x<code>n</code> input matrix</p></td>
   
 </tr>
 
@@ -1364,7 +1364,7 @@ public subroutine <a href='../proc/elmtrans.html'>elmtrans</a>(n, low, high, mat
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>perm</strong>(0:n)</td><td><p>Permutation data from elmhes</p></td>
+  <td><strong>perm</strong>(0:n-1)</td><td><p>Permutation data from elmhes</p></td>
   
 </tr>
 
@@ -1379,7 +1379,7 @@ public subroutine <a href='../proc/elmtrans.html'>elmtrans</a>(n, low, high, mat
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>h</strong>(0:n,0:n)</td><td><p>Hessenberg matrix</p></td>
+  <td><strong>h</strong>(0:n-1,0:n-1)</td><td><p>Hessenberg matrix</p></td>
   
 </tr>
 
@@ -1632,7 +1632,7 @@ public subroutine <a href='../proc/hqrvec.html'>hqrvec</a>(n, low, high, h, wr, 
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>h</strong>(0:n,0:n)</td><td></td>
+  <td><strong>h</strong>(0:n-1,0:n-1)</td><td></td>
   
 </tr>
 
@@ -1647,7 +1647,7 @@ public subroutine <a href='../proc/hqrvec.html'>hqrvec</a>(n, low, high, h, wr, 
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>wr</strong>(0:n)</td><td></td>
+  <td><strong>wr</strong>(0:n-1)</td><td></td>
   
 </tr>
 
@@ -1662,7 +1662,7 @@ public subroutine <a href='../proc/hqrvec.html'>hqrvec</a>(n, low, high, h, wr, 
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>wi</strong>(0:n)</td><td></td>
+  <td><strong>wi</strong>(0:n-1)</td><td></td>
   
 </tr>
 
@@ -1677,7 +1677,7 @@ public subroutine <a href='../proc/hqrvec.html'>hqrvec</a>(n, low, high, h, wr, 
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>eivec</strong>(0:n,0:n)</td><td></td>
+  <td><strong>eivec</strong>(0:n-1,0:n-1)</td><td></td>
   
 </tr>
 
@@ -1797,7 +1797,7 @@ of an  n * n upper Hessenberg matrix.</p>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>h</strong>(0:n,0:n)</td><td></td>
+  <td><strong>h</strong>(0:n-1,0:n-1)</td><td></td>
   
 </tr>
 
@@ -1812,7 +1812,7 @@ of an  n * n upper Hessenberg matrix.</p>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>wr</strong>(0:n)</td><td></td>
+  <td><strong>wr</strong>(0:n-1)</td><td></td>
   
 </tr>
 
@@ -1827,7 +1827,7 @@ of an  n * n upper Hessenberg matrix.</p>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>wi</strong>(0:n)</td><td></td>
+  <td><strong>wi</strong>(0:n-1)</td><td></td>
   
 </tr>
 
@@ -1842,7 +1842,7 @@ of an  n * n upper Hessenberg matrix.</p>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>eivec</strong>(0:n,0:n)</td><td></td>
+  <td><strong>eivec</strong>(0:n-1,0:n-1)</td><td></td>
   
 </tr>
 
@@ -1857,7 +1857,7 @@ of an  n * n upper Hessenberg matrix.</p>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>cnt</strong>(0:n)</td><td></td>
+  <td><strong>cnt</strong>(0:n-1)</td><td></td>
   
 </tr>
 

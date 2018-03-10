@@ -70,6 +70,8 @@ endif
 
 CFLAGS = $(COMMON_CFLAGS) $(UFLAGS)
 
+MPI_FC = $(FC)
+
 ifeq ($(DEBUG),y)
 	USE_OPENMP = n
 	USE_MPI = n

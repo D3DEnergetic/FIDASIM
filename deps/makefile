@@ -19,7 +19,7 @@ all: $(TARGETS)
 
 hdf5:
 	@printf "\nBuilding HDF5...\n"
-	tar -zxvf $(DEPS_DIR)/hdf5-1.8.16.tar.gz >> $(HDF5_LOG) 2>&1
+	tar -zxvf $(DEPS_DIR)/hdf5-1.8.16.tar.gz >> /dev/null 2>&1
 	cd $(DEPS_DIR)/hdf5-1.8.16; ./configure --prefix=$(DEPS_DIR)/hdf5 --enable-fortran --enable-cxx >> $(HDF5_LOG) 2>&1
 	cd $(DEPS_DIR)/hdf5-1.8.16; make >> $(HDF5_LOG) 2>&1; make install >> $(HDF5_LOG) 2>&1
 	cp $(DEPS_DIR)/hdf5-1.8.16/COPYING $(DEPS_DIR)/hdf5
@@ -29,15 +29,15 @@ hdf5:
 
 openblas:
 	@printf "Building OpenBLAS...\n"
-	tar -zxvf $(DEPS_DIR)/OpenBLAS-0.2.20.tar.gz > $(OPENBLAS_LOG) 2>&1
-	cd $(DEPS_DIR)/OpenBLAS-0.2.20; make USE_OPENMP=1 >> $(OPENBLAS_LOG) 2>&1
+	tar -zxvf $(DEPS_DIR)/OpenBLAS-0.2.20.tar.gz > /dev/null 2>&1
+	cd $(DEPS_DIR)/OpenBLAS-0.2.20; make USE_THREAD=0 >> $(OPENBLAS_LOG) 2>&1
 	cd $(DEPS_DIR)/OpenBLAS-0.2.20; make install PREFIX=$(DEPS_DIR)/openblas >> $(OPENBLAS_LOG) 2>&1
 	-rm -rf OpenBLAS-0.2.20
 	@printf "OpenBLAS build complete\n\n"
 
 opencoarrays:
 	@printf "\nBuilding OpenCoarrays...\n"
-	tar -zvxf $(DEPS_DIR)/OpenCoarrays-1.9.3.tar.gz >> $(OPENCOARRAYS_LOG) 2>&1
+	tar -zvxf $(DEPS_DIR)/OpenCoarrays-1.9.3.tar.gz >> /dev/null 2>&1
 	cd $(DEPS_DIR)/OpenCoarrays-1.9.3; ./install.sh --install-prefix=$(DEPS_DIR)/opencoarrays \
 	    -y --with-fortran $(FC) --with-c $(CC) --with-cxx $(CXX) >> $(OPENCOARRAYS_LOG) 2>&1
 	cp $(DEPS_DIR)/OpenCoarrays-1.9.3/LICENSE $(DEPS_DIR)/opencoarrays

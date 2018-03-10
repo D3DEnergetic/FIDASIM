@@ -64,6 +64,7 @@ ifneq ($(findstring gfortran, $(FC)),)
 endif
 
 
+MPI_FC = $(FC)
 CFLAGS = $(COMMON_CFLAGS) $(UFLAGS)
 
 ifeq ($(DEBUG),y)

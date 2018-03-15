@@ -2488,6 +2488,7 @@ subroutine read_equilibrium
     real(Float64), dimension(3) :: vi, random3
     integer :: error
     integer :: n = 50
+    logical :: path_valid
 
     integer, dimension(:,:), allocatable :: p_mask, f_mask
     real(Float64), dimension(:,:), allocatable :: denn2d
@@ -2512,6 +2513,7 @@ subroutine read_equilibrium
     allocate(p_mask(inter_grid%nr,inter_grid%nz))
     allocate(f_mask(inter_grid%nr,inter_grid%nz))
     allocate(denn2d(inter_grid%nr,inter_grid%nz))
+    denn2d = 0.d0
 
     dims = [inter_grid%nr, inter_grid%nz]
     call h5ltread_dataset_double_f(gid, "/plasma/r", inter_grid%r, dims(1:1), error)
@@ -2541,7 +2543,6 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/plasma/vr", equil%plasma%vr, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/vt", equil%plasma%vt, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/vz", equil%plasma%vz, dims, error)
-    call h5ltread_dataset_double_f(gid, "/plasma/denn", denn2d, dims, error)
     call h5ltread_dataset_int_f(gid, "/plasma/mask", p_mask, dims,error)
 
     impc = inputs%impurity_charge
@@ -2565,17 +2566,22 @@ subroutine read_equilibrium
         equil%plasma%ti = 0.0
     endwhere
 
-    where(denn2d.lt.0.0)
-        denn2d = 0.0
-    endwhere
-
     equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
     equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
+
+    call h5ltpath_valid_f(fid, "/plasma/denn", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(gid, "/plasma/denn", denn2d, dims, error)
+        where(denn2d.lt.0.0)
+            denn2d = 0.0
+        endwhere
+    endif
 
     loop_over_cells: do ic=1, inter_grid%nr*inter_grid%nz
         call ind2sub(inter_grid%dims,ic,ind)
         ir = ind(1) ; iz = ind(2)
         if(p_mask(ir,iz).lt.0.5) cycle loop_over_cells
+        if(denn2d(ir,iz).le.0.0) cycle loop_over_cells
         plasma = equil%plasma(ir,iz)
         plasma%vrot = [plasma%vr, plasma%vt, plasma%vz]
         plasma%in_plasma = .True.

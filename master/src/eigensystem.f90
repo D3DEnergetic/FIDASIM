@@ -469,10 +469,11 @@ contains
     j = n-1
     do while (j>=low)
        if(j<=high)then
-      m =j
+          m =j
        else
           j = high
        endif
+       if(j < 0) exit
        if (wi(j) < ZERO) then
           l=j-1
           do i = low, high

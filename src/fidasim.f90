@@ -7810,7 +7810,7 @@ subroutine dcx
     if(inputs%verbose.ge.1) then
        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
-    !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,idcx,ind,vihalo, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
     !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -7932,7 +7932,7 @@ subroutine halo
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
-        !$OMP PARALLEL DO schedule(guided) private(i,j,k,ic,ihalo,ind,vihalo, &
+        !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
         !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind)
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -10122,6 +10122,9 @@ program fidasim
             endif
             call halo()
             !! ---------- WRITE NEUTRALS ---------- !!
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'io:      ', time(time_start)
+            endif
 #ifdef _MPI
             if(this_image().eq.1) call write_neutrals()
 #else
@@ -10181,6 +10184,9 @@ program fidasim
     endif
 
     if(inputs%calc_spec.ge.1) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'io:      ', time(time_start)
+        endif
 #ifdef _MPI
         if(this_image().eq.1) call write_spectra()
 #else
@@ -10217,6 +10223,9 @@ program fidasim
     endif
 
     if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then
+        if(inputs%verbose.ge.1) then
+            write(*,*) 'io:      ', time(time_start)
+        endif
         call write_npa()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif

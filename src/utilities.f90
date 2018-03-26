@@ -13,6 +13,9 @@ public :: rng_type, rng_init, rng_seed, get_rng, rng, randind_cdf
 public :: rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
 public :: deriv
+#ifdef _DEF_INTR
+public :: norm2
+#endif
 
 integer, parameter :: Int32 = 4
 integer, parameter :: Int64 = kind(int8(1))
@@ -844,5 +847,17 @@ function time(time_start) result (time_str)
     endif
 
 end function time
+
+#ifdef _DEF_INTR
+! define missing intrinsics
+
+function norm2( in ) result ( res )
+  implicit none
+  real(Float64),dimension(:) :: in
+  real(Float64) :: res
+  res = sqrt(sum( in(:)**2 ))
+end function norm2
+
+#endif
 
 end module utilities

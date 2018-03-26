@@ -1048,19 +1048,6 @@ type(NPAWeights), save          :: nweight
 
 contains
 
-#ifdef _DEF_INTR
-! define missing intrinsics
-
-function norm2( in ) result ( res )
-  implicit none
-  real(Float64),dimension(:) :: in
-  real(Float64) :: res
-  res = sqrt(sum( in(:)**2 ))
-end function norm2
-
-#endif
-
-
 subroutine print_banner()
     !+ Prints FIDASIM banner
     write(*,'(a)') "   ____ ____ ___   ___    ____ ____ __  ___"

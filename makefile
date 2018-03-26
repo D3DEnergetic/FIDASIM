@@ -126,6 +126,11 @@ fidasim: deps src tables
 
 .PHONY: deps
 deps:
+ifneq ($(findstring pgf90, $(FC)),)
+ifeq ($(USE_MPI),y)
+	$(error MPI not supported with pgfortran)
+endif
+endif
 	@cd $(DEPS_DIR); make
 
 .PHONY: src

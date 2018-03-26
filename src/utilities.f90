@@ -278,7 +278,7 @@ function rng_uniform(self) result(u)
         !+ Uniform random deviate
 
     integer(Int32) :: ix,iy,k
-    real(Float64) :: AM 
+    real(Float64) :: am 
 
     ix = self%state(1)
     iy = self%state(2)

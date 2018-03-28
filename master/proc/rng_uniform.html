@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.1% of total for procedures.">16 statements</a>
+	  title=" 0.2% of total for procedures.">18 statements</a>
      </li> 
      
      
@@ -574,6 +574,8 @@
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
+      
+      <a class="list-group-item" href="../proc/norm2.html">norm2</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
@@ -1095,6 +1097,7 @@ public function rng_uniform(self) result(u)
         <span class="c">!+ Uniform random deviate</span>
 
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">,</span><span class="n">k</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">am</span> 
 
     <span class="n">ix</span> <span class="o">=</span> <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">iy</span> <span class="o">=</span> <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
@@ -1108,6 +1111,7 @@ public function rng_uniform(self) result(u)
     <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ix</span>
     <span class="n">self</span><span class="p">%</span><span class="n">state</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">iy</span>
 
+    <span class="n">am</span> <span class="o">=</span> <span class="nb">nearest</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span><span class="o">/</span><span class="n">IM</span>
     <span class="n">u</span> <span class="o">=</span> <span class="n">am</span><span class="o">*</span><span class="nb">ior</span><span class="p">(</span><span class="nb">iand</span><span class="p">(</span><span class="n">IM</span><span class="p">,</span><span class="nb">ieor</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">)),</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="k">end function </span><span class="n">rng_uniform</span>
@@ -1504,6 +1508,8 @@ public function rng_uniform(self) result(u)
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
+      
+      <a class="list-group-item" href="../proc/norm2.html">norm2</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

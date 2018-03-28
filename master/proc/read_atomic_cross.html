@@ -575,6 +575,8 @@
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
+      <a class="list-group-item" href="../proc/norm2.html">norm2</a>
+      
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
       <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
@@ -1293,7 +1295,7 @@ public subroutine read_atomic_cross(fid, grp, cross)
 <span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_ATOMIC_CROSS: Unknown atomic interaction: &#39;</span><span class="p">,</span> <span class="nb">trim</span><span class="p">(</span><span class="n">grp</span><span class="p">)</span>
         <span class="n">endif</span>
-        <span class="n">error</span> <span class="k">stop</span>
+        <span class="k">stop</span>
 <span class="k">    </span><span class="n">endif</span>
 
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/nenergy&quot;</span><span class="p">,</span> <span class="n">cross</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -1715,6 +1717,8 @@ public subroutine read_atomic_cross(fid, grp, cross)
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
+      
+      <a class="list-group-item" href="../proc/norm2.html">norm2</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

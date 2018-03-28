@@ -13,6 +13,9 @@ public :: rng_type, rng_init, rng_seed, get_rng, rng, randind_cdf
 public :: rng_uniform, rng_normal, randu, randn, randind
 public :: SparseArray, get_value, sparse
 public :: deriv
+#ifdef _DEF_INTR
+public :: norm2
+#endif
 
 integer, parameter :: Int32 = 4
 integer, parameter :: Int64 = kind(int8(1))
@@ -23,7 +26,6 @@ integer(Int32), parameter :: IA = 16807
 integer(Int32), parameter :: IM = 2147483647
 integer(Int32), parameter :: IQ = 127773
 integer(Int32), parameter :: IR = 2836
-real(Float64), protected :: AM = nearest(1.0,-1.0)/IM
 
 integer, parameter :: ns = 2
 
@@ -206,7 +208,7 @@ function rng_seed() result (seed)
     integer(Int32) :: seed
         !+ Seed value
 
-    open(89, file='/dev/urandom', access='SEQUENTIAL', form='UNFORMATTED')
+    open(89, file="/dev/urandom", access="stream", form="unformatted", action="read", status="old")
     read(89) seed
     close(89)
     seed = abs(seed)
@@ -276,6 +278,7 @@ function rng_uniform(self) result(u)
         !+ Uniform random deviate
 
     integer(Int32) :: ix,iy,k
+    real(Float64) :: am 
 
     ix = self%state(1)
     iy = self%state(2)
@@ -289,6 +292,7 @@ function rng_uniform(self) result(u)
     self%state(1) = ix
     self%state(2) = iy
 
+    am = nearest(1.0,-1.0)/IM
     u = am*ior(iand(IM,ieor(ix,iy)),1)
 
 end function rng_uniform
@@ -843,5 +847,17 @@ function time(time_start) result (time_str)
     endif
 
 end function time
+
+#ifdef _DEF_INTR
+! define missing intrinsics
+
+function norm2( in ) result ( res )
+  implicit none
+  real(Float64),dimension(:) :: in
+  real(Float64) :: res
+  res = sqrt(sum( in(:)**2 ))
+end function norm2
+
+#endif
 
 end module utilities

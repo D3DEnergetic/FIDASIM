@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 4.3% of total for modules and submodules.">511 statements</a>
+	  title=" 4.4% of total for modules and submodules.">519 statements</a>
      </li> 
      
      
@@ -167,8 +167,6 @@
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#vars-0">Variables</a></h3></div>
   <div id="vars-0" class="panel-collapse collapse">
     <div class="list-group">
-      
-      <a class="list-group-item" href="../module/utilities.html#variable-am">AM</a>
       
       <a class="list-group-item" href="../module/utilities.html#variable-rng">rng</a>
       
@@ -238,6 +236,8 @@
       <a class="list-group-item" href="../module/utilities.html#proc-get_value">get_value</a>
       
       <a class="list-group-item" href="../module/utilities.html#proc-time">time</a>
+      
+      <a class="list-group-item" href="../module/utilities.html#proc-norm2">norm2</a>
       
     </div>
   </div>
@@ -534,8 +534,6 @@
   <div id="vars-1" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../module/utilities.html#variable-am">AM</a>
-      
       <a class="list-group-item" href="../module/utilities.html#variable-rng">rng</a>
       
     </div>
@@ -605,6 +603,8 @@
       
       <a class="list-group-item" href="../module/utilities.html#proc-time">time</a>
       
+      <a class="list-group-item" href="../module/utilities.html#proc-norm2">norm2</a>
+      
     </div>
   </div>
 </div>
@@ -650,20 +650,6 @@
 
 
 <tbody>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-am"></span>real(kind=Float64),</td>
-  
-  <td>protected</td>
-  <td></td><td>::</td>
-  <td><strong>AM</strong></td><td> =</td><td>nearest(1.0, -1.0)/IM</td><td></td>
-  
-</tr>
 
   
   
@@ -2862,6 +2848,66 @@ public function <a href='../proc/time.html'>time</a>(time_start) result(time_str
      <h4>Return Value <small>character(len=30)
   </small></h4>
   <p>Time string</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-norm2"></span><h3>
+public function <a href='../proc/norm2.html'>norm2</a>(in) result(res)
+    
+    
+	 
+</h3></div>
+  <div class="panel-body">
+       
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>in</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=Float64)
+  </small></h4>
+  
     
 
   </div>

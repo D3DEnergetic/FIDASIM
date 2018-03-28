@@ -575,6 +575,8 @@
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
       
+      <a class="list-group-item" href="../proc/norm2.html">norm2</a>
+      
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       
       <a class="list-group-item" href="../proc/npa_gyro_range.html">npa_gyro_range</a>
@@ -1091,7 +1093,7 @@ public subroutine read_inputs()
     <span class="k">inquire</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">,</span><span class="n">exist</span><span class="o">=</span><span class="n">exis</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">exis</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;READ_INPUTS: Input file does not exist: &#39;</span><span class="p">,</span> <span class="nb">trim</span><span class="p">(</span><span class="n">namelist_file</span><span class="p">)</span>
-        <span class="n">error</span> <span class="k">stop</span>
+        <span class="k">stop</span>
 <span class="k">    </span><span class="n">endif</span>
 
     <span class="k">open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">)</span>
@@ -1276,7 +1278,7 @@ public subroutine read_inputs()
     <span class="n">endif</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">error</span> <span class="k">stop</span>
+<span class="k">        stop</span>
 <span class="k">    </span><span class="n">endif</span>
 
 <span class="k">end subroutine </span><span class="n">read_inputs</span>
@@ -1673,6 +1675,8 @@ public subroutine read_inputs()
       <a class="list-group-item" href="../proc/neutron_f.html">neutron_f</a>
       
       <a class="list-group-item" href="../proc/neutron_mc.html">neutron_mc</a>
+      
+      <a class="list-group-item" href="../proc/norm2.html">norm2</a>
       
       <a class="list-group-item" href="../proc/npa_f.html">npa_f</a>
       

@@ -946,7 +946,7 @@ contains
 
    ! first factorize a
    lu(:,:) = a(:,:)
-   call DGETRF(n,n,,lu,n,ipiv,info)
+   call DGETRF(n,n,lu,n,ipiv,info)
    if (info /= 0) stop 'sub linsolve: DGETRF failed!'
 
    x(:) = b(:)

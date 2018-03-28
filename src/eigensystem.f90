@@ -929,4 +929,36 @@ contains
     enddo
     b = y
   end subroutine matinv
+
+
+  subroutine linsolve(a,b,x)
+   !+ Solve linear equations A * X = B
+   real(double), dimension(:,:), intent(IN)  :: a ! assume a square
+   real(double), dimension(:), intent(IN)    :: b ! assume size(b) == size(a,1)
+   real(double), dimension(:), intent(OUT)   :: x ! assume size(x) == size(b)
+
+#ifdef _USE_BLAS
+   real(double), dimension(size(b),size(b)) :: lu
+   integer, dimension(size(b)) :: ipiv
+   integer :: n,info
+
+   n = size(b)
+
+   ! first factorize a
+   lu(:,:) = a(:,:)
+   call DGETRF(n,n,,lu,n,ipiv,info)
+   if (info /= 0) stop 'sub linsolve: DGETRF failed!'
+
+   x(:) = b(:)
+   call DGETRS('N',n,1,lu,n,ipiv,x,n,info)
+   if (info /= 0) stop 'sub linsolve: DGETRS failed!'
+
+#else
+   real(double), dimension(size(b),size(b)) :: a_inv
+   call matinv(a, a_inv)
+   x = matmul(a_inv, b)!coeffs determined from states at t=0
+#endif
+
+  end subroutine linsolve
+
 end module eigensystem

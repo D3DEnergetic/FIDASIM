@@ -15,9 +15,9 @@ LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
 
 #Compilers
-SUPPORTED_FC = gfortran
-SUPPORTED_CC = gcc
-SUPPORTED_CXX = g++
+SUPPORTED_FC = gfortran pgf90
+SUPPORTED_CC = gcc pgcc
+SUPPORTED_CXX = g++ pgc++
 
 HAS_FC := $(strip $(foreach SC, $(SUPPORTED_FC), $(findstring $(SC), $(FC))))
 ifeq ($(HAS_FC),)
@@ -61,6 +61,14 @@ ifneq ($(findstring gfortran, $(FC)),)
 	OPENMP_FLAGS = -fopenmp -D_OMP
 	MPI_FLAGS = -D_MPI
 	PROF_FLAGS = -pg -D_PROF
+endif
+ifneq ($(findstring pgf90, $(FC)),)
+        LFLAGS = -lm
+        COMMON_CFLAGS = -O3 -Mpreprocess -tp=haswell -D_DEF_INTR
+        DEBUG_CFLAGS = -O0 -g -Mpreprocess -traceback -D_DEF_INTR -D_DEBUG
+        OPENMP_FLAGS = -mp -D_OMP
+        MPI_FLAGS = -D_MPI
+        PROF_FLAGS = -pg -D_PROF
 endif
 
 
@@ -118,6 +126,11 @@ fidasim: deps src tables
 
 .PHONY: deps
 deps:
+ifneq ($(findstring pgf90, $(FC)),)
+ifeq ($(USE_MPI),y)
+	$(error MPI not supported with pgfortran)
+endif
+endif
 	@cd $(DEPS_DIR); make
 
 .PHONY: src

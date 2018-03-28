@@ -1722,7 +1722,7 @@ subroutine read_inputs
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
         write(*,'(a,a)') 'READ_INPUTS: Input file does not exist: ', trim(namelist_file)
-        error stop
+        stop
     endif
 
     open(13,file=namelist_file)
@@ -1907,7 +1907,7 @@ subroutine read_inputs
     endif
 
     if(error) then
-        error stop
+        stop
     endif
 
 end subroutine read_inputs
@@ -1991,7 +1991,7 @@ subroutine make_beam_grid
     if(n.le.(0.1*beam_grid%ngrid)) then
         write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
                         &Less than 10% of the beam grid cells fall within the plasma."
-        error stop
+        stop
     endif
 
 end subroutine make_beam_grid
@@ -2635,7 +2635,7 @@ subroutine read_equilibrium
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
     if (sum(equil%mask).le.0.d0) then
         write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
-        error stop
+        stop
     endif
 
 end subroutine read_equilibrium
@@ -2664,7 +2664,7 @@ subroutine read_f(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "READ_F: Distribution file has incompatable grid dimensions"
         endif
-        error stop
+        stop
     endif
 
     allocate(fbm%energy(fbm%nenergy), fbm%pitch(fbm%npitch), fbm%r(fbm%nr), fbm%z(fbm%nz))
@@ -2750,7 +2750,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
         endif
-        error stop
+        stop
     endif
 
     if(inputs%dist_type.eq.2) then
@@ -2817,7 +2817,7 @@ subroutine read_mc(fid, error)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: No mc particles in beam grid'
         endif
-        error stop
+        stop
     endif
 
     if(inputs%verbose.ge.1) then
@@ -2878,7 +2878,7 @@ subroutine read_atomic_cross(fid, grp, cross)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_CROSS: Unknown atomic interaction: ', trim(grp)
         endif
-        error stop
+        stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/nenergy", cross%nenergy, error)
@@ -2940,7 +2940,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_RATE: Unknown atomic interaction: ', trim(grp)
         endif
-        error stop
+        stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -3015,7 +3015,7 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
             if(inputs%verbose.ge.0) then
                 write(*,'(a,a)') 'READ_ATOMIC_RATE: Unsupported atomic interaction: ', trim(grp)
             endif
-            error stop
+            stop
         endif
     endif
 
@@ -3060,7 +3060,7 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_ATOMIC_TRANSITIONS: Unknown atomic interaction: ', trim(grp)
         endif
-        error stop
+        stop
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
@@ -4521,7 +4521,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_NEUTRALS: Neutrals file does not exist: ',inputs%neutrals_file
         endif
-        error stop
+        stop
     endif
 
     !Open HDF5 interface
@@ -4542,7 +4542,7 @@ subroutine read_neutrals
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
         endif
-        error stop
+        stop
     endif
 
     dims = [nlevs, nx, ny, nz]
@@ -4762,7 +4762,7 @@ function in_boundary(bplane, p) result(in_b)
             if(inputs%verbose.ge.0) then
                 write(*,'("IN_BOUNDARY: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            error stop
+            stop
     END SELECT
 
 end function in_boundary
@@ -4787,7 +4787,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                error stop
+                stop
             endif
             xx = [-bplane%hw,-bplane%hw,bplane%hw,bplane%hw]
             yy = [-bplane%hh,bplane%hh,bplane%hh,-bplane%hh]
@@ -4800,7 +4800,7 @@ subroutine boundary_edge(bplane, bedge, nb)
                 if(inputs%verbose.ge.0) then
                     write(*,'("BOUNDARY_EDGE: Incompatible boundary edge array : ",i2," > ",i2)') nb, size(bedge,2)
                 endif
-                error stop
+                stop
             endif
             dth = 2*pi/nb
             do i=1,nb
@@ -4813,7 +4813,7 @@ subroutine boundary_edge(bplane, bedge, nb)
             if(inputs%verbose.ge.0) then
                 write(*,'("BOUNDARY_EDGE: Unknown boundary shape: ",i2)') bplane%shape
             endif
-            error stop
+            stop
     end select
 
 end subroutine boundary_edge
@@ -6160,7 +6160,7 @@ subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
             if(inputs%verbose.ge.0) then
                 write(*,'("STORE_NEUTRALS: Unknown neutral type: ",i2)') neut_type
             endif
-            error stop
+            stop
     end select
     !$OMP END CRITICAL(store_neutrals_1)
 
@@ -6936,7 +6936,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
                if(inputs%verbose.ge.0) then
                    write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
                endif
-               error stop
+               stop
     end select
 
 end subroutine store_bes_photons
@@ -7205,7 +7205,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         if (1.0 - term1 - term2 .le. 0.0) then
             write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
                           1.0-term1-term2
-            error stop
+            stop
         endif
     else
         r_gyro = 0.d0
@@ -7444,7 +7444,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
             write(*,'(a)') "MC_NBI: A beam neutral has started inside the plasma."
             write(*,'(a)') "Move the beam grid closer to the source to fix"
         endif
-        error stop
+        stop
     endif
 
     !! Determine velocity of neutrals corrected by efrac
@@ -7668,7 +7668,7 @@ subroutine ndmc
             write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                                   100.*nbi_outside/(3.*inputs%n_nbi)
         endif
-        if(sum(neut%full).eq.0) error stop 'Beam does not intersect the grid!'
+        if(sum(neut%full).eq.0) stop 'Beam does not intersect the grid!'
     endif
 
 end subroutine ndmc
@@ -7893,7 +7893,7 @@ subroutine halo
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
         endif
-        error stop
+        stop
     endif
     dens_prev = neut%dcx
     n_halo = inputs%n_halo

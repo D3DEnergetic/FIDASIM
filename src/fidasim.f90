@@ -2115,7 +2115,7 @@ subroutine read_chords
     !!Check if SPEC group exists
     call h5ltpath_valid_f(fid, "/spec", .True., path_valid, error)
     if(.not.path_valid) then
-        if(inputs%verbose.ge.0) then
+        if(inputs%verbose.ge.1) then
             write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
             write(*,'(a)') 'Continuing without spectral diagnostics'
         endif
@@ -7658,9 +7658,11 @@ subroutine ndmc
         call co_sum(birth%dens)
     endif
     !! Combine spectra
-    call co_sum(spec%full)
-    call co_sum(spec%half)
-    call co_sum(spec%third)
+    if(inputs%calc_nbi.ge.1) then
+        call co_sum(spec%full)
+        call co_sum(spec%half)
+        call co_sum(spec%third)
+    endif
 #endif
 
     if(nbi_outside.gt.0)then
@@ -7849,7 +7851,9 @@ subroutine dcx
 #ifdef _MPI
     !! Combine densities
     call co_sum(neut%dcx)
-    call co_sum(spec%dcx)
+    if(inputs%calc_dcx.ge.1) then
+        call co_sum(spec%dcx)
+    endif
     call co_sum(halo_iter_dens(dcx_type))
 #endif
 
@@ -8003,8 +8007,10 @@ subroutine halo
         if(seed_dcx.lt.0.01) exit iterations
     enddo iterations
 #ifdef _MPI
-        !! Combine Spectra
+    !! Combine Spectra
+    if(inputs%calc_halo.ge.1) then
         call co_sum(spec%halo)
+    endif
 #endif
 
 end subroutine halo

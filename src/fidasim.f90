@@ -4,7 +4,7 @@ module libfida
 USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
 USE hdf5_extra !! Additional HDF5 routines
-USE eigensystem, ONLY : eigen, matinv
+USE eigensystem, ONLY : eigen, linsolve
 USE utilities
 
 implicit none
@@ -6716,7 +6716,7 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     real(Float64) :: vnet_square    !! net velocity of neutrals squared
     real(Float64) :: eb             !! Energy of the fast neutral
 
-    real(Float64), dimension(nlevs,nlevs) :: eigvec, eigvec_inv
+    real(Float64), dimension(nlevs,nlevs) :: eigvec
     real(Float64), dimension(nlevs) :: eigval, coef
     real(Float64), dimension(nlevs) :: exp_eigval_dt
     real(Float64) :: iflux !!Initial total flux
@@ -6742,8 +6742,7 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     call get_rate_matrix(plasma, i_type, eb, matrix)
 
     call eigen(nlevs,matrix, eigvec, eigval)
-    call matinv(eigvec, eigvec_inv)
-    coef = matmul(eigvec_inv, states)!coeffs determined from states at t=0
+    call linsolve(eigvec,states,coef) !coeffs determined from states at t=0
     exp_eigval_dt = exp(eigval*dt)   ! to improve speed (used twice)
     do n=1,nlevs
         if(eigval(n).eq.0.0) eigval(n)=eigval(n)+1 !protect against dividing by zero

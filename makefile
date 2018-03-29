@@ -63,9 +63,9 @@ ifneq ($(findstring gfortran, $(FC)),)
 	PROF_FLAGS = -pg -D_PROF
 endif
 ifneq ($(findstring pgf90, $(FC)),)
-        LFLAGS = -lm
-        COMMON_CFLAGS = -O3 -Mpreprocess -tp=haswell -D_DEF_INTR
-        DEBUG_CFLAGS = -O0 -g -Mpreprocess -traceback -D_DEF_INTR -D_DEBUG
+        LFLAGS = -lm -lblas
+        COMMON_CFLAGS = -O3 -Mpreprocess -tp=haswell -D_DEF_INTR -D_USE_BLAS
+        DEBUG_CFLAGS = -O0 -g -Mpreprocess -traceback -D_DEF_INTR -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -mp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF

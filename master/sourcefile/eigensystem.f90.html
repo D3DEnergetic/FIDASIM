@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 6.1% of total for source files.">740 statements</a>
+	  title=" 6.2% of total for source files.">758 statements</a>
      </li> 
      
      
@@ -1383,7 +1383,39 @@
 <a name="ln-929"></a>    <span class="n">enddo</span>
 <a name="ln-930"></a>    <span class="n">b</span> <span class="o">=</span> <span class="n">y</span>
 <a name="ln-931"></a>  <span class="k">end subroutine </span><span class="n">matinv</span>
-<a name="ln-932"></a><span class="k">end module </span><span class="n">eigensystem</span>
+<a name="ln-932"></a>
+<a name="ln-933"></a>
+<a name="ln-934"></a>  <span class="k">subroutine </span><span class="n">linsolve</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+<a name="ln-935"></a>   <span class="c">!+ Solve linear equations A * X = B</span>
+<a name="ln-936"></a>   <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">a</span> <span class="c">! assume a square</span>
+<a name="ln-937"></a>   <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">IN</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">b</span> <span class="c">! assume size(b) == size(a,1)</span>
+<a name="ln-938"></a>   <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">OUT</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">x</span> <span class="c">! assume size(x) == size(b)</span>
+<a name="ln-939"></a>
+<a name="ln-940"></a><span class="cp">#ifdef _USE_BLAS</span>
+<a name="ln-941"></a>   <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="kd">::</span> <span class="n">lu</span>
+<a name="ln-942"></a>   <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="kd">::</span> <span class="n">ipiv</span>
+<a name="ln-943"></a>   <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span><span class="p">,</span><span class="n">info</span>
+<a name="ln-944"></a>
+<a name="ln-945"></a>   <span class="n">n</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<a name="ln-946"></a>
+<a name="ln-947"></a>   <span class="c">! first factorize a</span>
+<a name="ln-948"></a>   <span class="n">lu</span><span class="p">(:,:)</span> <span class="o">=</span> <span class="n">a</span><span class="p">(:,:)</span>
+<a name="ln-949"></a>   <span class="k">call </span><span class="n">DGETRF</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">lu</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">ipiv</span><span class="p">,</span><span class="n">info</span><span class="p">)</span>
+<a name="ln-950"></a>   <span class="k">if</span> <span class="p">(</span><span class="n">info</span> <span class="o">/=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">stop</span> <span class="s1">&#39;sub linsolve: DGETRF failed!&#39;</span>
+<a name="ln-951"></a>
+<a name="ln-952"></a>   <span class="n">x</span><span class="p">(:)</span> <span class="o">=</span> <span class="n">b</span><span class="p">(:)</span>
+<a name="ln-953"></a>   <span class="k">call </span><span class="n">DGETRS</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">lu</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">ipiv</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">info</span><span class="p">)</span>
+<a name="ln-954"></a>   <span class="k">if</span> <span class="p">(</span><span class="n">info</span> <span class="o">/=</span> <span class="mi">0</span><span class="p">)</span> <span class="k">stop</span> <span class="s1">&#39;sub linsolve: DGETRS failed!&#39;</span>
+<a name="ln-955"></a>
+<a name="ln-956"></a><span class="cp">#else</span>
+<a name="ln-957"></a>   <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">),</span><span class="n">size</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="kd">::</span> <span class="n">a_inv</span>
+<a name="ln-958"></a>   <span class="k">call </span><span class="n">matinv</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">a_inv</span><span class="p">)</span>
+<a name="ln-959"></a>   <span class="n">x</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">a_inv</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span><span class="c">!coeffs determined from states at t=0</span>
+<a name="ln-960"></a><span class="cp">#endif</span>
+<a name="ln-961"></a>
+<a name="ln-962"></a>  <span class="k">end subroutine </span><span class="n">linsolve</span>
+<a name="ln-963"></a>
+<a name="ln-964"></a><span class="k">end module </span><span class="n">eigensystem</span>
 </pre></div>
 
     </section>

@@ -9376,7 +9376,7 @@ subroutine neutron_mc
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
-        write(*,*) 'write npa:    ' , time(time_start)
+        write(*,*) 'write neutrons:    ' , time(time_start)
         write(*,'(30X,a)') ''
     endif
 

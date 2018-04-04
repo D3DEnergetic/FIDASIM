@@ -558,13 +558,13 @@ def check_beam(inputs, nbi):
         schema['aoffz'] = na_double
         schema['adist'] = na_double
 
-    # Convert to np arrays for indexing
-    nbi['ashape'] = np.array(nbi['ashape'], dtype=int, ndmin=1)
-    nbi['awidy'] = np.array(nbi['awidy'], dtype=float, ndmin=1)
-    nbi['awidz'] = np.array(nbi['awidz'], dtype=float, ndmin=1)
-    nbi['aoffy'] = np.array(nbi['aoffy'], dtype=float, ndmin=1)
-    nbi['aoffz'] = np.array(nbi['aoffz'], dtype=float, ndmin=1)
-    nbi['adist'] = np.array(nbi['adist'], dtype=float, ndmin=1)
+        # Convert to np arrays for indexing
+        nbi['ashape'] = np.array(nbi['ashape'], dtype=int, ndmin=1)
+        nbi['awidy'] = np.array(nbi['awidy'], dtype=float, ndmin=1)
+        nbi['awidz'] = np.array(nbi['awidz'], dtype=float, ndmin=1)
+        nbi['aoffy'] = np.array(nbi['aoffy'], dtype=float, ndmin=1)
+        nbi['aoffz'] = np.array(nbi['aoffz'], dtype=float, ndmin=1)
+        nbi['adist'] = np.array(nbi['adist'], dtype=float, ndmin=1)
 
     err = check_dict_schema(schema, nbi, desc="beam geometry")
     if err:
@@ -594,21 +594,22 @@ def check_beam(inputs, nbi):
         error('Invalid widy. Expected widy > 0')
         err = True
 
-    if nbi['ashape'] not in [1, 2]:
-        error('Invalid aperture shape. Expected 1 (rectangular) or 2 (circular)')
-        err = True
+    if nbi['naperture'] > 0:
+        if nbi['ashape'] not in [1, 2]:
+            error('Invalid aperture shape. Expected 1 (rectangular) or 2 (circular)')
+            err = True
 
-    w = nbi['awidy'] < 0
-    nw = len(nbi['awidy'][w])
-    if nw > 0:
-        error('Invalid awidy. Expected awidy >= 0.0')
-        err = True
+        w = nbi['awidy'] < 0
+        nw = len(nbi['awidy'][w])
+        if nw > 0:
+            error('Invalid awidy. Expected awidy >= 0.0')
+            err = True
 
-    w = nbi['awidz'] < 0
-    nw = len(nbi['awidz'][w])
-    if nw > 0:
-        error('Invalid awidz. Expected awidz >= 0.0')
-        err = True
+        w = nbi['awidz'] < 0
+        nw = len(nbi['awidz'][w])
+        if nw > 0:
+            error('Invalid awidz. Expected awidz >= 0.0')
+            err = True
 
     # Machine coordinates
     origin = inputs['origin']

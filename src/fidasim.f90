@@ -11,6 +11,8 @@ implicit none
 
 character(30) :: version = ''
     !+ FIDASIM version number
+integer, dimension(8) :: time_start
+    !+ Start time
 integer, parameter, private   :: Int32   = 4
     !+ Defines a 32 bit integer
 integer, parameter, private   :: Int64   = 8
@@ -1989,8 +1991,10 @@ subroutine make_beam_grid
     endif
 
     if(n.le.(0.1*beam_grid%ngrid)) then
-        write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
-                        &Less than 10% of the beam grid cells fall within the plasma."
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "MAKE_BEAM_GRID: Beam grid definition is poorly defined. &
+                            &Less than 10% of the beam grid cells fall within the plasma."
+        endif
         stop
     endif
 
@@ -2011,6 +2015,15 @@ subroutine read_beam
 
     !!Open HDF5 file
     call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, fid, error)
+
+    !!Check if SPEC group exists
+    call h5ltpath_valid_f(fid, "/nbi", .True., path_valid, error)
+    if(.not.path_valid) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_BEAM: NBI geometry is not in the geometry file'
+        endif
+        stop
+    endif
 
     !!Open NBI group
     call h5gopen_f(fid, "/nbi", gid, error)
@@ -2575,6 +2588,16 @@ subroutine read_equilibrium
         where(denn2d.lt.0.0)
             denn2d = 0.0
         endwhere
+    else
+        if((inputs%calc_pnpa + inputs%calc_pfida + inputs%calc_cold).gt.0) then
+            if(inputs%verbose.ge.0) then
+                write(*,'(a)') "READ_EQUILIBRIUM: Cold neutral density was not provided"
+                write(*,'(a)') "Continuing without passive calculations"
+            endif
+        endif
+        inputs%calc_pnpa = 0
+        inputs%calc_pfida = 0
+        inputs%calc_cold = 0
     endif
 
     loop_over_cells: do ic=1, inter_grid%nr*inter_grid%nz
@@ -2634,7 +2657,9 @@ subroutine read_equilibrium
     equil%mask = 0.d0
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
     if (sum(equil%mask).le.0.d0) then
-        write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
+        endif
         stop
     endif
 
@@ -3457,7 +3482,7 @@ subroutine write_birth_profile
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(2) :: dim2
     integer(HSIZE_T), dimension(1) :: d
-    integer :: error, i, c, npart
+    integer :: error, i, c, npart, start_index, end_index
 
     character(charlim) :: filename
     real(Float64), dimension(:,:), allocatable :: ri
@@ -3466,6 +3491,10 @@ subroutine write_birth_profile
     integer, dimension(:), allocatable :: neut_types
     real(Float64), dimension(3) :: xyz,uvw,v_uvw
     logical :: do_write
+
+#ifdef _MPI
+    integer, save :: npart_image[*]
+#endif
 
     npart = birth%cnt-1
 
@@ -3482,8 +3511,20 @@ subroutine write_birth_profile
     inds = 0
     neut_types = 0
 
+    c = 0
+#ifdef _MPI
+    npart_image = birth%cnt - 1
+    sync all
+
+    do i=1,this_image()-1
+        c = c +  npart_image[i]
+    enddo
+#endif
+    start_index = 1 + c
+    end_index = birth%cnt - 1 + c
+
     c = 1
-    do i=istart,npart,istep
+    do i=start_index, end_index
         ! Convert position to rzphi
         xyz = birth%ri(:,c)
         call xyz_to_uvw(xyz,uvw)
@@ -3653,9 +3694,13 @@ subroutine write_npa
     real(Float64), dimension(:,:), allocatable :: ri, rf
     real(Float64), dimension(:), allocatable :: weight, energy, pitch
     integer, dimension(:), allocatable :: det
-    integer :: i, npart, c
+    integer :: i, npart, c, start_index, end_index
     character(charlim) :: filename = ''
     logical :: do_write = .True.
+
+#ifdef _MPI
+    integer, save :: npart_image[*]
+#endif
 
 #ifdef _MPI
     if(this_image().ne.1) do_write = .False.
@@ -3673,15 +3718,31 @@ subroutine write_npa
 
     !! Active
     allocate(dcount(npa_chords%nchan))
-    do i=1,npa_chords%nchan
-        dcount(i) = count(npa%part%detector.eq.i)
-    enddo
     npart = npa%npart
+    if(npart.gt.0) then
+        do i=1,npa_chords%nchan
+            dcount(i) = count(npa%part%detector.eq.i)
+        enddo
+    else
+        dcount = 0
+    endif
 
 #ifdef _MPI
     call co_sum(dcount)
     call co_sum(npart)
 #endif
+
+    c = 0
+#ifdef _MPI
+    npart_image = npa%npart
+    sync all
+
+    do i=1,this_image()-1
+        c = c +  npart_image[i]
+    enddo
+#endif
+    start_index = 1 + c
+    end_index = npa%npart + c
 
     if(npart.gt.0) then
         allocate(ri(3,npart),rf(3,npart))
@@ -3691,7 +3752,7 @@ subroutine write_npa
         weight = 0.d0 ; energy = 0.d0
         pitch = 0.d0  ; det = 0
         c = 1
-        do i=istart,npart,istep
+        do i=start_index, end_index
             ri(1,i) = npa%part(c)%xi
             ri(2,i) = npa%part(c)%yi
             ri(3,i) = npa%part(c)%zi
@@ -3714,7 +3775,7 @@ subroutine write_npa
 #endif
     endif
 
-    if(do_write) then
+    if(do_write.and.(inputs%calc_npa.ge.1)) then
         !Write Active Flux
         d(1) = 1
         dim2 = [npa%nenergy, npa%nchan]
@@ -3808,15 +3869,31 @@ subroutine write_npa
 
     !! Passive
     allocate(dcount(npa_chords%nchan))
-    do i=1,npa_chords%nchan
-        dcount(i) = count(pnpa%part%detector.eq.i)
-    enddo
     npart = pnpa%npart
+    if(npart.gt.0) then
+        do i=1,npa_chords%nchan
+            dcount(i) = count(pnpa%part%detector.eq.i)
+        enddo
+    else
+        dcount = 0
+    endif
 
 #ifdef _MPI
     call co_sum(dcount)
     call co_sum(npart)
 #endif
+
+    c = 0
+#ifdef _MPI
+    npart_image = pnpa%npart
+    sync all
+
+    do i=1,this_image()-1
+        c = c +  npart_image[i]
+    enddo
+#endif
+    start_index = 1 + c
+    end_index = pnpa%npart + c
 
     if(npart.gt.0) then
         allocate(ri(3,npart),rf(3,npart))
@@ -3826,7 +3903,7 @@ subroutine write_npa
         weight = 0.d0 ; energy = 0.d0
         pitch = 0.d0  ; det = 0
         c = 1
-        do i=istart,npart,istep
+        do i=start_index, end_index
             ri(1,i) = pnpa%part(c)%xi
             ri(2,i) = pnpa%part(c)%yi
             ri(3,i) = pnpa%part(c)%zi
@@ -3849,7 +3926,7 @@ subroutine write_npa
 #endif
     endif
 
-    if(do_write) then
+    if(do_write.and.(inputs%calc_pnpa.ge.1)) then
         !Write Passive Flux
         d(1) = 1
         dim2 = [npa%nenergy, npa%nchan]
@@ -8272,7 +8349,7 @@ subroutine fida_f
     endif
 
     !! Loop over all cells that have neutrals
-    !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ind,iion,vi,ri,fields, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &
     !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -8375,7 +8452,7 @@ subroutine pfida_f
     endif
 
     !! Loop over all cells that have neutrals
-    !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ind,iion,vi,ri,fields, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &
     !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -8448,7 +8525,7 @@ subroutine fida_mc
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
     !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
@@ -8540,7 +8617,7 @@ subroutine pfida_mc
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*nphi,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(guided) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,iphi,fast_ion,vi,ri,phi,tracks,s,c, &
     !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
@@ -8661,7 +8738,7 @@ subroutine npa_f
     endif
 
     !! Loop over all cells that can contribute to NPA signal
-    !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
     !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -8774,7 +8851,7 @@ subroutine pnpa_f
     endif
 
     !! Loop over all cells that can contribute to NPA signal
-    !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
     !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -9200,6 +9277,7 @@ subroutine neutron_f
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
+        write(*,*) 'write neutrons:    ' , time(time_start)
     endif
 
 #ifdef _MPI
@@ -9298,6 +9376,8 @@ subroutine neutron_mc
     if(inputs%verbose.ge.1) then
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
+        write(*,*) 'write npa:    ' , time(time_start)
+        write(*,'(30X,a)') ''
     endif
 
 #ifdef _MPI
@@ -9369,11 +9449,11 @@ subroutine fida_weights_mc
     allocate(fweight%mean_f(inputs%ne_wght,inputs%np_wght,spec_chords%nchan))
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T2,"Number of Channels: ",i5)') spec_chords%nchan
-        write(*,'(T2,"Nlambda: ",i4)') nwav
-        write(*,'(T2,"Nenergy: ",i3)') inputs%ne_wght
-        write(*,'(T2,"Maximum Energy: ",f7.2)') inputs%emax_wght
-        write(*,'(T2,"LOS averaged: ",a)') "False"
+        write(*,'(T3,"Number of Channels: ",i5)') spec_chords%nchan
+        write(*,'(T3,"Nlambda: ",i4)') nwav
+        write(*,'(T3,"Nenergy: ",i3)') inputs%ne_wght
+        write(*,'(T3,"Maximum Energy: ",f7.2)') inputs%emax_wght
+        write(*,'(T3,"LOS averaged: ",a)') "False"
     endif
 
     !! zero out arrays
@@ -9471,6 +9551,10 @@ subroutine fida_weights_mc
     fweight%weight = ((1.d-20)*phase_area/dEdP)*fweight%weight
     fweight%mean_f = ((1.d-20)*phase_area/dEdP)*fweight%mean_f
 
+    if(inputs%verbose.ge.1) then
+        write(*,*) 'write fida weights:    ' , time(time_start)
+    endif
+
 #ifdef _MPI
     call co_sum(fweight%weight)
     call co_sum(fweight%mean_f)
@@ -9549,13 +9633,13 @@ subroutine fida_weights_los
     mean_f = 0.d0
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T2,"Number of Channels: ",i5)') spec_chords%nchan
-        write(*,'(T2,"Nlambda: ",i4)') nwav
-        write(*,'(T2,"Nenergy: ",i3)') inputs%ne_wght
-        write(*,'(T2,"Npitch: ",i3)') inputs%np_wght
-        write(*,'(T2,"Ngyro: ", i3)') inputs%nphi_wght
-        write(*,'(T2,"Maximum Energy: ",f7.2)') inputs%emax_wght
-        write(*,'(T2,"LOS averaged: ",a)') "True"
+        write(*,'(T3,"Number of Channels: ",i5)') spec_chords%nchan
+        write(*,'(T3,"Nlambda: ",i4)') nwav
+        write(*,'(T3,"Nenergy: ",i3)') inputs%ne_wght
+        write(*,'(T3,"Npitch: ",i3)') inputs%np_wght
+        write(*,'(T3,"Ngyro: ", i3)') inputs%nphi_wght
+        write(*,'(T3,"Maximum Energy: ",f7.2)') inputs%emax_wght
+        write(*,'(T3,"LOS averaged: ",a)') "True"
         write(*,*) ''
     endif
 
@@ -9693,6 +9777,10 @@ subroutine fida_weights_los
 
     fweight%mean_f = fweight%mean_f/(dEdP)
 
+    if(inputs%verbose.ge.1) then
+        write(*,*) 'write fida weights:    ' , time(time_start)
+    endif
+
 #ifdef _MPI
     call co_sum(fweight%weight)
     call co_sum(fweight%mean_f)
@@ -9736,10 +9824,10 @@ subroutine npa_weights
     dP=abs(ptcharr(2)-ptcharr(1))
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T2,"Number of Channels: ",i3)') npa_chords%nchan
-        write(*,'(T2,"Nenergy: ",i3)') inputs%ne_wght
-        write(*,'(T2,"Npitch: ",i3)') inputs%np_wght
-        write(*,'(T2,"Maximum energy: ",f7.2)') inputs%emax_wght
+        write(*,'(T3,"Number of Channels: ",i3)') npa_chords%nchan
+        write(*,'(T3,"Nenergy: ",i3)') inputs%ne_wght
+        write(*,'(T3,"Npitch: ",i3)') inputs%np_wght
+        write(*,'(T3,"Maximum energy: ",f7.2)') inputs%emax_wght
         write(*,*) ''
     endif
 
@@ -9860,6 +9948,10 @@ subroutine npa_weights
         endif
     enddo
 
+    if(inputs%verbose.ge.1) then
+        write(*,*) 'write npa weights:    ' , time(time_start)
+    endif
+
 #ifdef _MPI
     if(this_image().eq.1) call write_npa_weights()
 #else
@@ -9882,7 +9974,6 @@ program fidasim
 #endif
     implicit none
     character(3)          :: arg = ''
-    integer, dimension(8) :: time_start
     integer               :: i,narg,nthreads,max_threads,seed
 
 #ifdef _VERSION
@@ -10128,7 +10219,8 @@ program fidasim
             call halo()
             !! ---------- WRITE NEUTRALS ---------- !!
             if(inputs%verbose.ge.1) then
-                write(*,*) 'io:      ', time(time_start)
+                write(*,'(30X,a)') ''
+                write(*,*) 'write neutrals:    ' , time(time_start)
             endif
 #ifdef _MPI
             if(this_image().eq.1) call write_neutrals()
@@ -10190,7 +10282,7 @@ program fidasim
 
     if(inputs%calc_spec.ge.1) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'io:      ', time(time_start)
+            write(*,*) 'write spectra:    ' , time(time_start)
         endif
 #ifdef _MPI
         if(this_image().eq.1) call write_spectra()
@@ -10229,7 +10321,7 @@ program fidasim
 
     if((inputs%calc_npa.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         if(inputs%verbose.ge.1) then
-            write(*,*) 'io:      ', time(time_start)
+            write(*,*) 'write npa:    ' , time(time_start)
         endif
         call write_npa()
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''

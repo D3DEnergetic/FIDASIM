@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title=" 0.6% of total for procedures.">63 statements</a>
+	  title=" 0.6% of total for procedures.">65 statements</a>
      </li> 
      
      
@@ -1335,8 +1335,10 @@ public subroutine make_beam_grid()
     <span class="n">endif</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">n</span><span class="p">.</span><span class="n">le</span><span class="p">.(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;MAKE_BEAM_GRID: Beam grid definition is poorly defined. &amp;</span>
-<span class="s2">                        &amp;Less than 10% of the beam grid cells fall within the plasma.&quot;</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;MAKE_BEAM_GRID: Beam grid definition is poorly defined. &amp;</span>
+<span class="s2">                            &amp;Less than 10% of the beam grid cells fall within the plasma.&quot;</span>
+        <span class="n">endif</span>
         <span class="k">stop</span>
 <span class="k">    </span><span class="n">endif</span>
 

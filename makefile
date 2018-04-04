@@ -15,7 +15,7 @@ LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
 
 #Compilers
-SUPPORTED_FC = gfortran pgf90
+SUPPORTED_FC = gfortran pgf90 ifort
 SUPPORTED_CC = gcc pgcc
 SUPPORTED_CXX = g++ pgc++
 
@@ -69,6 +69,14 @@ ifneq ($(findstring pgf90, $(FC)),)
         OPENMP_FLAGS = -mp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
+endif
+ifneq ($(findstring ifort, $(FC)),)
+        LFLAGS = -lm -mkl
+        COMMON_CFLAGS = -Ofast -xCORE-AVX2 -fpp -D_USE_BLAS
+        DEBUG_CFLAGS = -O0 -g -fpp -D_USE_BLAS -D_DEBUG
+        OPENMP_FLAGS = -qopenmp -D_OMP
+        MPI_FLAGS = -D_MPI
+        PROF_FLAGS = -p -D_PROF
 endif
 
 
@@ -131,6 +139,12 @@ ifeq ($(USE_MPI),y)
 	$(error MPI not supported with pgfortran)
 endif
 endif
+ifneq ($(findstring ifort, $(FC)),)
+ifeq ($(USE_MPI),y)
+	$(error MPI not supported with ifort)
+endif
+endif
+
 	@cd $(DEPS_DIR); make
 
 .PHONY: src

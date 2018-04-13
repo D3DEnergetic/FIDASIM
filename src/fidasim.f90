@@ -7955,15 +7955,30 @@ subroutine halo
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-    real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev,dens_cur
+    real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev
+    real(Float64), dimension(:,:,:,:,:),allocatable :: dens_cur
+    real(Float64) :: local_iter_dens
+    integer :: n_slices, cur_slice, is
+#ifdef _OMP
+    integer, external :: omp_get_max_threads, omp_get_thread_num
+#endif 
     !! Halo iteration
     integer(Int64) :: hh, n_halo !! counters
     real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
     integer :: prev_type  ! previous iteration
     integer :: cur_type  ! current iteration
 
+
     prev_type = fida_type
     cur_type = brems_type
+
+    cur_slice = 1
+    n_slices = 1
+#ifdef _OMP
+    n_slices = omp_get_max_threads()
+#endif
+
+    allocate(dens_cur(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz,n_slices))
 
     dens_prev = 0.d0
     dens_cur = 0.d0
@@ -8012,10 +8027,15 @@ subroutine halo
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
+
+        local_iter_dens = halo_iter_dens(cur_type)
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind) &
-        !$OMP& reduction(+: dens_cur,halo_iter_dens)
+        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice) &
+        !$OMP& reduction(+: local_iter_dens )
         loop_over_cells: do ic=istart,ncell,istep
+#ifdef _OMP
+            cur_slice = omp_get_thread_num()+1
+#endif
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
             !! Loop over the markers
@@ -8046,10 +8066,10 @@ subroutine halo
 
                     !! Store Neutrals
                     tind = tracks(jj)%ind
-                    dens_cur(:,tind(1),tind(2),tind(3)) = &
-                        dens_cur(:,tind(1),tind(2),tind(3)) + denn/nlaunch(i,j,k)
-                    halo_iter_dens(cur_type) = &
-                        halo_iter_dens(cur_type) + sum(denn)/nlaunch(i,j,k)
+                    dens_cur(:,tind(1),tind(2),tind(3),cur_slice) = &
+                        dens_cur(:,tind(1),tind(2),tind(3),cur_slice) + denn/nlaunch(i,j,k)
+                    local_iter_dens = &
+                        local_iter_dens + sum(denn)/nlaunch(i,j,k)
                     if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                       call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                     endif
@@ -8058,10 +8078,23 @@ subroutine halo
             enddo loop_over_halos
         enddo loop_over_cells
         !$OMP END PARALLEL DO
+        halo_iter_dens(cur_type) = local_iter_dens
+
+#ifdef _OMP
+        !$OMP PARALLEL DO private(i,j,is)
+        do i=1,beam_grid%nz
+         do j=1,beam_grid%ny
+          do is = 2, n_slices
+            dens_cur(:,:,j,i,1) = dens_cur(:,:,j,i,1) + dens_cur(:,:,j,i,is)
+          enddo
+         enddo
+        enddo
+#endif
+        ! at this point, dens_cur(*,1) contains all the info
 
 #ifdef _MPI
         !! Combine densities
-        call co_sum(dens_cur)
+        call co_sum(dens_cur(:,:,:,:,1))
         call co_sum(halo_iter_dens(cur_type))
 #endif
 
@@ -8072,9 +8105,12 @@ subroutine halo
 
         halo_iteration_dens = halo_iter_dens(cur_type)
         halo_iter_dens(prev_type) = halo_iter_dens(cur_type)
-        neut%halo = neut%halo + dens_cur
-        dens_prev = dens_cur
-        dens_cur = 0.d0
+        !$OMP PARALLEL DO private(i)
+        do i=1,beam_grid%nz
+          neut%halo(:,:,:,i) = neut%halo(:,:,:,i) + dens_cur(:,:,:,i,1)
+          dens_prev(:,:,:,i) = dens_cur(:,:,:,i,1)
+          dens_cur(:,:,:,i,:) = 0.d0
+        enddo
 
         seed_dcx = halo_iteration_dens/dcx_dens
         n_halo=int(inputs%n_halo*seed_dcx,Int64)
@@ -8087,6 +8123,8 @@ subroutine halo
         call co_sum(spec%halo)
     endif
 #endif
+
+    deallocate(dens_cur)
 
 end subroutine halo
 

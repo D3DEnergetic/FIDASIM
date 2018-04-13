@@ -2223,10 +2223,10 @@ subroutine read_chords
             track_loop: do j=1, ntrack
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
-                !$OMP CRITICAL(read_chords_1)
+                !$OMP ATOMIC UPDATE
                 dlength(ind(1),ind(2),ind(3)) = &
                 dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                !$OMP END CRITICAL(read_chords_1)
+                !$OMP END ATOMIC
             enddo track_loop
         enddo
         !$OMP END PARALLEL DO
@@ -2829,10 +2829,10 @@ subroutine read_mc(fid, error)
         ir = minpos(1)
         minpos = minloc(abs(inter_grid%z - particles%fast_ion(i)%z))
         iz = minpos(1)
-        !$OMP CRITICAL(mc_denf)
+        !$OMP ATOMIC UPDATE
         equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + weight(i) / &
                                    (2*pi*particles%fast_ion(i)%r*inter_grid%da)
-        !$OMP END CRITICAL(mc_denf)
+        !$OMP END ATOMIC
         cnt=cnt+1
     enddo particle_loop
     !$OMP END PARALLEL DO
@@ -6252,10 +6252,10 @@ subroutine store_births(ind, neut_type, dflux)
     real(Float64), intent(in)                :: dflux
         !+ Deposited flux
 
-    !$OMP CRITICAL(store_births_1)
+    !$OMP ATOMIC UPDATE
     birth%dens( neut_type,ind(1),ind(2),ind(3))= &
      birth%dens(neut_type,ind(1),ind(2),ind(3)) + dflux
-    !$OMP END CRITICAL(store_births_1)
+    !$OMP END ATOMIC
 end subroutine store_births
 
 subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
@@ -6978,9 +6978,9 @@ subroutine store_photons(pos, vi, photons, spectra)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            !$OMP CRITICAL(store_photons1)
+            !$OMP ATOMIC UPDATE
             spectra(bin,ichan) = spectra(bin,ichan) + intensity(i)
-            !$OMP END CRITICAL(store_photons1)
+            !$OMP END ATOMIC
         enddo loop_over_stark
     enddo loop_over_channels
 
@@ -7062,9 +7062,9 @@ subroutine store_neutrons(rate, orbit_class)
         iclass = 1
     endif
 
-    !$OMP CRITICAL(neutron_rate)
+    !$OMP ATOMIC UPDATE
     neutron%rate(iclass)= neutron%rate(iclass) + rate
-    !$OMP END CRITICAL(neutron_rate)
+    !$OMP END ATOMIC
 
 end subroutine store_neutrons
 
@@ -8013,7 +8013,8 @@ subroutine halo
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind)
+        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind) &
+        !$OMP& reduction(+: dens_cur,halo_iter_dens)
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8045,12 +8046,10 @@ subroutine halo
 
                     !! Store Neutrals
                     tind = tracks(jj)%ind
-                    !$OMP CRITICAL(halo1)
                     dens_cur(:,tind(1),tind(2),tind(3)) = &
                         dens_cur(:,tind(1),tind(2),tind(3)) + denn/nlaunch(i,j,k)
                     halo_iter_dens(cur_type) = &
                         halo_iter_dens(cur_type) + sum(denn)/nlaunch(i,j,k)
-                    !$OMP END CRITICAL(halo1)
                     if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                       call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                     endif

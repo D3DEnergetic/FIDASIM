@@ -21,6 +21,9 @@ module atomic_tables
 use H5LT
 use HDF5
 use hdf5_extra
+#ifdef _MPI
+use fidampi
+#endif
 
 IMPLICIT NONE
 
@@ -4698,10 +4701,10 @@ subroutine write_bb_H_H(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(cx)
-    call co_sum(excit)
-    call co_sum(ioniz)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(cx)
+    call fidampi_sum(excit)
+    call fidampi_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -4846,9 +4849,9 @@ subroutine write_bb_H_e(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(excit)
-    call co_sum(ioniz)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(excit)
+    call fidampi_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5005,10 +5008,10 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
     enddo
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(cx)
-    call co_sum(excit)
-    call co_sum(ioniz)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(cx)
+    call fidampi_sum(excit)
+    call fidampi_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5145,8 +5148,8 @@ subroutine write_bb_D_D(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(fusion)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(fusion)
 #endif
 
     if(verbose) then
@@ -5262,8 +5265,8 @@ subroutine write_bb_D_T(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(fusion)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(fusion)
 #endif
 
     if(verbose) then
@@ -5444,11 +5447,11 @@ subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(tarr)
-    call co_sum(cx)
-    call co_sum(excit)
-    call co_sum(ioniz)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(tarr)
+    call fidampi_sum(cx)
+    call fidampi_sum(excit)
+    call fidampi_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5667,10 +5670,10 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(tarr)
-    call co_sum(excit)
-    call co_sum(ioniz)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(tarr)
+    call fidampi_sum(excit)
+    call fidampi_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5909,11 +5912,11 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(tarr)
-    call co_sum(cx)
-    call co_sum(excit)
-    call co_sum(ioniz)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(tarr)
+    call fidampi_sum(cx)
+    call fidampi_sum(excit)
+    call fidampi_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -6108,9 +6111,9 @@ subroutine write_bt_D_D(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(tarr)
-    call co_sum(fusion)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(tarr)
+    call fidampi_sum(fusion)
 #endif
 
     if(verbose) then
@@ -6282,9 +6285,9 @@ subroutine write_bt_D_T(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call co_sum(ebarr)
-    call co_sum(tarr)
-    call co_sum(fusion)
+    call fidampi_sum(ebarr)
+    call fidampi_sum(tarr)
+    call fidampi_sum(fusion)
 #endif
 
     if(verbose) then
@@ -6502,12 +6505,12 @@ program generate_tables
 #endif
 
 #ifdef _MPI
-    istart = this_image()
-    istep = num_images()
-    if(this_image().ne.1) verbose = .False.
+    istart = fidampi_my_rank()+1
+    istep = fidampi_num_ranks()
+    if(fidampi_my_rank().ne.0) verbose = .False.
     if(verbose) then
         write(*,'(a)') "---- MPI settings ----"
-        write(*,'(T2,"Number of processes: ",i2)') num_images()
+        write(*,'(T2,"Number of processes: ",i2)') fidampi_num_ranks()
         write(*,*) ''
     endif
 #endif

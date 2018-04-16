@@ -10012,7 +10012,7 @@ program fidasim
     narg = command_argument_count()
     if(narg.eq.0) then
 #ifdef _MPI
-        if(fidampi_my_rank().eq.0) write(*,'(a)') "usage: cafrun -np [num_processes] ./fidasim namelist_file"
+        if(fidampi_my_rank().eq.0) write(*,'(a)') "usage: mpirun -np [num_processes] ./fidasim namelist_file"
 #else
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
 #endif

@@ -1831,7 +1831,7 @@ subroutine read_inputs
     beam_grid%origin=origin
 
 #ifdef _MPI
-    if(fidampi_my_rank().ne.1) inputs%verbose=0
+    if(fidampi_my_rank().ne.0) inputs%verbose=0
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -3496,7 +3496,8 @@ subroutine write_birth_profile
     logical :: do_write
 
 #ifdef _MPI
-    integer, save :: npart_image[*]
+    integer :: my_rank
+    integer, dimension(:), allocatable :: npart_image
 #endif
 
     npart = birth%cnt-1
@@ -3516,12 +3517,16 @@ subroutine write_birth_profile
 
     c = 0
 #ifdef _MPI
-    npart_image = birth%cnt - 1
-    sync all
+    my_rank = fidampi_my_rank()
+    allocate(npart_image(fidampi_num_ranks()))
+    npart_image(:) = 0
+    npart_image(my_rank) = birth%cnt - 1
+    call fidampi_sum(npart_image)
 
-    do i=1,fidampi_my_rank()-1
-        c = c +  npart_image[i]
+    do i=0,my_rank-1
+        c = c +  npart_image(i)
     enddo
+    deallocate(npart_image)
 #endif
     start_index = 1 + c
     end_index = birth%cnt - 1 + c
@@ -3553,7 +3558,7 @@ subroutine write_birth_profile
     call fidampi_sum(vi)
     call fidampi_sum(inds)
     call fidampi_sum(neut_types)
-    if(fidampi_my_rank().ne.1) do_write = .False.
+    if(fidampi_my_rank().ne.0) do_write = .False.
 #endif
 
     if(do_write) then
@@ -3702,11 +3707,15 @@ subroutine write_npa
     logical :: do_write = .True.
 
 #ifdef _MPI
-    integer, save :: npart_image[*]
+    integer :: my_rank
+    integer, dimension(:), allocatable :: npart_image
+
+    my_rank = fidampi_my_rank()
+    allocate(npart_image(fidampi_num_ranks()))
 #endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().ne.1) do_write = .False.
+    if(fidampi_my_rank().ne.0) do_write = .False.
 #endif
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.h5"
@@ -3737,12 +3746,14 @@ subroutine write_npa
 
     c = 0
 #ifdef _MPI
-    npart_image = npa%npart
-    sync all
+    npart_image(:) = 0
+    npart_image(my_rank) = npa%npart
+    call fidampi_sum(npart_image)
 
-    do i=1,fidampi_my_rank()-1
-        c = c +  npart_image[i]
+    do i=0,my_rank-1
+        c = c +  npart_image(i)
     enddo
+    deallocate(npart_image)
 #endif
     start_index = 1 + c
     end_index = npa%npart + c
@@ -3888,11 +3899,12 @@ subroutine write_npa
 
     c = 0
 #ifdef _MPI
-    npart_image = pnpa%npart
-    sync all
+    npart_image(:) = 0
+    npart_image(my_rank) = pnpa%npart
+    call fidampi_sum(npart_image)
 
-    do i=1,fidampi_my_rank()-1
-        c = c +  npart_image[i]
+    do i=0,my_rank-1
+        c = c +  npart_image(i)
     enddo
 #endif
     start_index = 1 + c
@@ -4026,6 +4038,10 @@ subroutine write_npa
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'NPA data written to: ',trim(filename)
     endif
+
+#ifdef _MPI
+    deallocate(npart_image)
+#endif
 
 end subroutine write_npa
 
@@ -9284,7 +9300,7 @@ subroutine neutron_f
     endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().eq.1) call write_neutrons()
+    if(fidampi_my_rank().eq.0) call write_neutrons()
 #else
     call write_neutrons()
 #endif
@@ -9384,7 +9400,7 @@ subroutine neutron_mc
     endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().eq.1) call write_neutrons()
+    if(fidampi_my_rank().eq.0) call write_neutrons()
 #else
     call write_neutrons()
 #endif
@@ -9561,7 +9577,7 @@ subroutine fida_weights_mc
 #ifdef _MPI
     call fidampi_sum(fweight%weight)
     call fidampi_sum(fweight%mean_f)
-    if(fidampi_my_rank().eq.1) call write_fida_weights()
+    if(fidampi_my_rank().eq.0) call write_fida_weights()
 #else
     call write_fida_weights()
 #endif
@@ -9787,7 +9803,7 @@ subroutine fida_weights_los
 #ifdef _MPI
     call fidampi_sum(fweight%weight)
     call fidampi_sum(fweight%mean_f)
-    if(fidampi_my_rank().eq.1) call write_fida_weights()
+    if(fidampi_my_rank().eq.0) call write_fida_weights()
 #else
     call write_fida_weights()
 #endif
@@ -9956,7 +9972,7 @@ subroutine npa_weights
     endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().eq.1) call write_npa_weights()
+    if(fidampi_my_rank().eq.0) call write_npa_weights()
 #else
     call write_npa_weights()
 #endif
@@ -9988,7 +10004,7 @@ program fidasim
 
 #ifdef _MPI
     call fidampi_init
-    if(fidampi_my_rank().eq.1) call print_banner()
+    if(fidampi_my_rank().eq.0) call print_banner()
 #else
     call print_banner()
 #endif
@@ -9996,7 +10012,7 @@ program fidasim
     narg = command_argument_count()
     if(narg.eq.0) then
 #ifdef _MPI
-        if(fidampi_my_rank().eq.1) write(*,'(a)') "usage: cafrun -np [num_processes] ./fidasim namelist_file"
+        if(fidampi_my_rank().eq.0) write(*,'(a)') "usage: cafrun -np [num_processes] ./fidasim namelist_file"
 #else
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
 #endif
@@ -10033,7 +10049,7 @@ program fidasim
 #endif
 
 #ifdef _MPI
-    istart = fidampi_my_rank()
+    istart = fidampi_my_rank()+1
     istep = fidampi_num_ranks()
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- MPI settings ----"
@@ -10230,7 +10246,7 @@ program fidasim
                 write(*,*) 'write neutrals:    ' , time(time_start)
             endif
 #ifdef _MPI
-            if(fidampi_my_rank().eq.1) call write_neutrals()
+            if(fidampi_my_rank().eq.0) call write_neutrals()
 #else
             call write_neutrals()
 #endif
@@ -10292,7 +10308,7 @@ program fidasim
             write(*,*) 'write spectra:    ' , time(time_start)
         endif
 #ifdef _MPI
-        if(fidampi_my_rank().eq.1) call write_spectra()
+        if(fidampi_my_rank().eq.0) call write_spectra()
 #else
         call write_spectra()
 #endif

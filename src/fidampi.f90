@@ -11,6 +11,40 @@ module fidampi
 
 contains
 
+  subroutine fidampi_init()
+    use mpi
+    implicit none
+
+    integer :: provided, ierr
+
+#ifdef _OMP
+    call MPI_INIT_THREAD(MPI_THREAD_FUNNELED,provided,ierr)
+#else
+    call MPI_INIT(ierr)
+#endif
+
+   num_ranks = 1
+   my_rank = 0
+   if (ierr/=0) then
+     write(*,*) "MPI initialization failed, assuming single MPI process"
+   else
+     call MPI_COMM_SIZE(MPI_COMM_WORLD,num_ranks,ierr)
+     if (num_ranks>1) then
+       call MPI_COMM_RANK(MPI_COMM_WORLD,my_rank,ierr)
+     endif
+   endif
+
+  end subroutine
+
+
+  recursive function fidampi_my_rank() result (n)
+    n = my_rank
+  end function
+
+  recursive function fidampi_num_ranks() result (n)
+    n = num_rank
+  end function
+
   recursive subroutine fidampi_sum_d0(A)
     use mpi
     implicit none
@@ -22,7 +56,7 @@ contains
     sizeA = 1
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -38,7 +72,7 @@ contains
     sizeA = size(A,1)
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -54,7 +88,7 @@ contains
     sizeA = size(A,1)*size(A,2)
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -70,7 +104,7 @@ contains
     sizeA = size(A,1)*size(A,2)*size(A,3)
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -86,7 +120,7 @@ contains
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -102,7 +136,7 @@ contains
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)*size(A,5)
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -118,7 +152,7 @@ contains
     sizeA = 1
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_INTEGER,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -134,7 +168,7 @@ contains
     sizeA = size(A,1)
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_INTEGER,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
@@ -150,7 +184,7 @@ contains
     sizeA = size(A,1)*size(A,2)
 
     if (num_ranks>1) then
-       call MPI_Allreduce(A,A,sizeA,MPI_INTEGER,MPI_Sum,ierr)
+       call MPI_Allreduce(A,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine

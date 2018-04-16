@@ -1727,6 +1727,71 @@ subroutine read_inputs
         stop
     endif
 
+    ! variables that are not changed not be auto-initalized
+    ! provide reasonable defaults here
+    result_dir="."
+    tables_file="."
+    distribution_file="."
+    geometry_file ="." 
+    equilibrium_file="."
+    neutrals_file="."
+    shot=0
+    time=0
+    runid="0"
+    calc_brems=0 
+    calc_nbi=0
+    calc_dcx=0
+    calc_halo=0
+    calc_cold=0
+    calc_fida=0
+    calc_pfida=0
+    calc_npa=0
+    calc_pnpa=0
+    calc_birth=0
+    no_flr=0
+    calc_fida_wght=0
+    calc_npa_wght=0
+    load_neutrals=0
+    verbose=0
+    calc_neutron=0
+    n_fida=0 
+    n_pfida=0 
+    n_npa=0
+    n_pnpa=0 
+    n_nbi=0
+    n_halo=0
+    n_dcx=0
+    n_birth=0
+    ab=0
+    pinj=0
+    einj=0
+    current_fractions=0 
+    ai=0 
+    impurity_charge=0
+    nx=0
+    ny=0
+    nz=0
+    xmin=0 
+    xmax=0 
+    ymin=0 
+    ymax=0
+    zmin=0
+    zmax=0
+    origin=0
+    alpha=0
+    beta=0
+    gamma=0
+    ne_wght=0 
+    np_wght=0 
+    nphi_wght=0
+    nlambda=0
+    lambdamin=0
+    lambdamax=0
+    emax_wght=0
+    nlambda_wght=0
+    lambdamin_wght=0
+    lambdamax_wght=0
+
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)

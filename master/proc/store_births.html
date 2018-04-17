@@ -1134,10 +1134,10 @@ public subroutine store_births(ind, neut_type, dflux)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">dflux</span>
         <span class="c">!+ Deposited flux</span>
 
-    <span class="c">!$OMP CRITICAL(store_births_1)</span>
+    <span class="c">!$OMP ATOMIC UPDATE</span>
     <span class="n">birth</span><span class="p">%</span><span class="n">dens</span><span class="p">(</span> <span class="n">neut_type</span><span class="p">,</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">=</span> <span class="p">&amp;</span>
      <span class="n">birth</span><span class="p">%</span><span class="n">dens</span><span class="p">(</span><span class="n">neut_type</span><span class="p">,</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="n">dflux</span>
-    <span class="c">!$OMP END CRITICAL(store_births_1)</span>
+    <span class="c">!$OMP END ATOMIC</span>
 <span class="k">end subroutine </span><span class="n">store_births</span>
 </pre></div>
 

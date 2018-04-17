@@ -1143,9 +1143,9 @@ public subroutine store_neutrons(rate, orbit_class)
 <span class="k">        </span><span class="n">iclass</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">endif</span>
 
-    <span class="c">!$OMP CRITICAL(neutron_rate)</span>
+    <span class="c">!$OMP ATOMIC UPDATE</span>
     <span class="n">neutron</span><span class="p">%</span><span class="n">rate</span><span class="p">(</span><span class="n">iclass</span><span class="p">)</span><span class="o">=</span> <span class="n">neutron</span><span class="p">%</span><span class="n">rate</span><span class="p">(</span><span class="n">iclass</span><span class="p">)</span> <span class="o">+</span> <span class="n">rate</span>
-    <span class="c">!$OMP END CRITICAL(neutron_rate)</span>
+    <span class="c">!$OMP END ATOMIC</span>
 
 <span class="k">end subroutine </span><span class="n">store_neutrons</span>
 </pre></div>

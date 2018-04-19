@@ -10490,6 +10490,10 @@ program fidasim
         if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
     endif
 
+#ifdef _MPI
+    call fidampi_clenup
+#endif
+
     if(inputs%verbose.ge.1) then
         write(*,*) 'END: hour:minute:second ', time(time_start)
     endif

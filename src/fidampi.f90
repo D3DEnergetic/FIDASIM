@@ -36,6 +36,16 @@ contains
 
   end subroutine
 
+  subroutine fidampi_clenup()
+    use mpi
+    implicit none
+   
+    integer :: ierr
+
+    call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+
+    call MPI_FINALIZE(ierr)
+  end subroutine
 
   recursive function fidampi_my_rank() result (n)
     n = my_rank

@@ -1730,6 +1730,71 @@ subroutine read_inputs
         stop
     endif
 
+    ! variables that are not changed not be auto-initalized
+    ! provide reasonable defaults here
+    result_dir="."
+    tables_file="."
+    distribution_file="."
+    geometry_file ="." 
+    equilibrium_file="."
+    neutrals_file="."
+    shot=0
+    time=0
+    runid="0"
+    calc_brems=0 
+    calc_nbi=0
+    calc_dcx=0
+    calc_halo=0
+    calc_cold=0
+    calc_fida=0
+    calc_pfida=0
+    calc_npa=0
+    calc_pnpa=0
+    calc_birth=0
+    no_flr=0
+    calc_fida_wght=0
+    calc_npa_wght=0
+    load_neutrals=0
+    verbose=0
+    calc_neutron=0
+    n_fida=0 
+    n_pfida=0 
+    n_npa=0
+    n_pnpa=0 
+    n_nbi=0
+    n_halo=0
+    n_dcx=0
+    n_birth=0
+    ab=0
+    pinj=0
+    einj=0
+    current_fractions=0 
+    ai=0 
+    impurity_charge=0
+    nx=0
+    ny=0
+    nz=0
+    xmin=0 
+    xmax=0 
+    ymin=0 
+    ymax=0
+    zmin=0
+    zmax=0
+    origin=0
+    alpha=0
+    beta=0
+    gamma=0
+    ne_wght=0 
+    np_wght=0 
+    nphi_wght=0
+    nlambda=0
+    lambdamin=0
+    lambdamax=0
+    emax_wght=0
+    nlambda_wght=0
+    lambdamin_wght=0
+    lambdamax_wght=0
+
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)
@@ -2226,10 +2291,10 @@ subroutine read_chords
             track_loop: do j=1, ntrack
                 ind = tracks(j)%ind
                 !inds can repeat so add rather than assign
-                !$OMP CRITICAL(read_chords_1)
+                !$OMP ATOMIC UPDATE
                 dlength(ind(1),ind(2),ind(3)) = &
                 dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                !$OMP END CRITICAL(read_chords_1)
+                !$OMP END ATOMIC
             enddo track_loop
         enddo
         !$OMP END PARALLEL DO
@@ -2832,10 +2897,10 @@ subroutine read_mc(fid, error)
         ir = minpos(1)
         minpos = minloc(abs(inter_grid%z - particles%fast_ion(i)%z))
         iz = minpos(1)
-        !$OMP CRITICAL(mc_denf)
+        !$OMP ATOMIC UPDATE
         equil%plasma(ir,iz)%denf = equil%plasma(ir,iz)%denf + weight(i) / &
                                    (2*pi*particles%fast_ion(i)%r*inter_grid%da)
-        !$OMP END CRITICAL(mc_denf)
+        !$OMP END ATOMIC
         cnt=cnt+1
     enddo particle_loop
     !$OMP END PARALLEL DO
@@ -6271,10 +6336,10 @@ subroutine store_births(ind, neut_type, dflux)
     real(Float64), intent(in)                :: dflux
         !+ Deposited flux
 
-    !$OMP CRITICAL(store_births_1)
+    !$OMP ATOMIC UPDATE
     birth%dens( neut_type,ind(1),ind(2),ind(3))= &
      birth%dens(neut_type,ind(1),ind(2),ind(3)) + dflux
-    !$OMP END CRITICAL(store_births_1)
+    !$OMP END ATOMIC
 end subroutine store_births
 
 subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
@@ -6997,9 +7062,9 @@ subroutine store_photons(pos, vi, photons, spectra)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            !$OMP CRITICAL(store_photons1)
+            !$OMP ATOMIC UPDATE
             spectra(bin,ichan) = spectra(bin,ichan) + intensity(i)
-            !$OMP END CRITICAL(store_photons1)
+            !$OMP END ATOMIC
         enddo loop_over_stark
     enddo loop_over_channels
 
@@ -7081,9 +7146,9 @@ subroutine store_neutrons(rate, orbit_class)
         iclass = 1
     endif
 
-    !$OMP CRITICAL(neutron_rate)
+    !$OMP ATOMIC UPDATE
     neutron%rate(iclass)= neutron%rate(iclass) + rate
-    !$OMP END CRITICAL(neutron_rate)
+    !$OMP END ATOMIC
 
 end subroutine store_neutrons
 
@@ -7974,15 +8039,30 @@ subroutine halo
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-    real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev,dens_cur
+    real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev
+    real(Float64), dimension(:,:,:,:,:),allocatable :: dens_cur
+    real(Float64) :: local_iter_dens
+    integer :: n_slices, cur_slice, is
+#ifdef _OMP
+    integer, external :: omp_get_max_threads, omp_get_thread_num
+#endif 
     !! Halo iteration
     integer(Int64) :: hh, n_halo !! counters
     real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
     integer :: prev_type  ! previous iteration
     integer :: cur_type  ! current iteration
 
+
     prev_type = fida_type
     cur_type = brems_type
+
+    cur_slice = 1
+    n_slices = 1
+#ifdef _OMP
+    n_slices = omp_get_max_threads()
+#endif
+
+    allocate(dens_cur(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz,n_slices))
 
     dens_prev = 0.d0
     dens_cur = 0.d0
@@ -8031,9 +8111,15 @@ subroutine halo
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
+
+        local_iter_dens = halo_iter_dens(cur_type)
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind)
+        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice) &
+        !$OMP& reduction(+: local_iter_dens )
         loop_over_cells: do ic=istart,ncell,istep
+#ifdef _OMP
+            cur_slice = omp_get_thread_num()+1
+#endif
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
             i = ind(1) ; j = ind(2) ; k = ind(3)
             !! Loop over the markers
@@ -8064,12 +8150,10 @@ subroutine halo
 
                     !! Store Neutrals
                     tind = tracks(jj)%ind
-                    !$OMP CRITICAL(halo1)
-                    dens_cur(:,tind(1),tind(2),tind(3)) = &
-                        dens_cur(:,tind(1),tind(2),tind(3)) + denn/nlaunch(i,j,k)
-                    halo_iter_dens(cur_type) = &
-                        halo_iter_dens(cur_type) + sum(denn)/nlaunch(i,j,k)
-                    !$OMP END CRITICAL(halo1)
+                    dens_cur(:,tind(1),tind(2),tind(3),cur_slice) = &
+                        dens_cur(:,tind(1),tind(2),tind(3),cur_slice) + denn/nlaunch(i,j,k)
+                    local_iter_dens = &
+                        local_iter_dens + sum(denn)/nlaunch(i,j,k)
                     if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                       call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                     endif
@@ -8078,10 +8162,23 @@ subroutine halo
             enddo loop_over_halos
         enddo loop_over_cells
         !$OMP END PARALLEL DO
+        halo_iter_dens(cur_type) = local_iter_dens
+
+#ifdef _OMP
+        !$OMP PARALLEL DO private(i,j,is)
+        do i=1,beam_grid%nz
+         do j=1,beam_grid%ny
+          do is = 2, n_slices
+            dens_cur(:,:,j,i,1) = dens_cur(:,:,j,i,1) + dens_cur(:,:,j,i,is)
+          enddo
+         enddo
+        enddo
+#endif
+        ! at this point, dens_cur(*,1) contains all the info
 
 #ifdef _MPI
         !! Combine densities
-        call fidampi_sum(dens_cur)
+        call fidampi_sum(dens_cur(:,:,:,:,1))
         call fidampi_sum(halo_iter_dens(cur_type))
 #endif
 
@@ -8092,9 +8189,12 @@ subroutine halo
 
         halo_iteration_dens = halo_iter_dens(cur_type)
         halo_iter_dens(prev_type) = halo_iter_dens(cur_type)
-        neut%halo = neut%halo + dens_cur
-        dens_prev = dens_cur
-        dens_cur = 0.d0
+        !$OMP PARALLEL DO private(i)
+        do i=1,beam_grid%nz
+          neut%halo(:,:,:,i) = neut%halo(:,:,:,i) + dens_cur(:,:,:,i,1)
+          dens_prev(:,:,:,i) = dens_cur(:,:,:,i,1)
+          dens_cur(:,:,:,i,:) = 0.d0
+        enddo
 
         seed_dcx = halo_iteration_dens/dcx_dens
         n_halo=int(inputs%n_halo*seed_dcx,Int64)
@@ -8107,6 +8207,8 @@ subroutine halo
         call fidampi_sum(spec%halo)
     endif
 #endif
+
+    deallocate(dens_cur)
 
 end subroutine halo
 

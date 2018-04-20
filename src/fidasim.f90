@@ -3583,7 +3583,7 @@ subroutine write_birth_profile
     c = 0
 #ifdef _MPI
     my_rank = fidampi_my_rank()
-    allocate(npart_image(fidampi_num_ranks()))
+    allocate(npart_image(0:fidampi_num_ranks()-1))
     npart_image(:) = 0
     npart_image(my_rank) = birth%cnt - 1
     call fidampi_sum(npart_image)
@@ -3776,7 +3776,7 @@ subroutine write_npa
     integer, dimension(:), allocatable :: npart_image
 
     my_rank = fidampi_my_rank()
-    allocate(npart_image(fidampi_num_ranks()))
+    allocate(npart_image(0:fidampi_num_ranks()-1))
 #endif
 
 #ifdef _MPI

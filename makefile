@@ -38,7 +38,7 @@ endif
 # User defined Flags
 VERSION := $(shell [ -e $(FIDASIM_DIR)/VERSION ] && cat $(FIDASIM_DIR)/VERSION)
 ifneq ($(VERSION),)
-	UFLAGS := -D_VERSION=\"$(VERSION)\"
+	U_FLAGS := -D_VERSION=\"$(VERSION)\"
 endif
 
 BUILD := $(shell command -v git >/dev/null 2>&1 && \
@@ -46,7 +46,7 @@ BUILD := $(shell command -v git >/dev/null 2>&1 && \
 	git describe --tags --always --dirty)
 
 ifneq ($(BUILD),)
-	UFLAGS := -D_VERSION=\"$(BUILD)\"
+	U_FLAGS := -D_VERSION=\"$(BUILD)\"
 endif
 
 # HDF5 variables
@@ -55,7 +55,7 @@ HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
 HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl -Wl,-rpath,$(HDF5_LIB)
 
 ifneq ($(findstring gfortran, $(FC)),)
-	LFLAGS = -lm
+	L_FLAGS = -lm
 	COMMON_CFLAGS = -Ofast -g -fbacktrace -cpp
 	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
 	OPENMP_FLAGS = -fopenmp -D_OMP
@@ -63,16 +63,16 @@ ifneq ($(findstring gfortran, $(FC)),)
 	PROF_FLAGS = -pg -D_PROF
 endif
 ifneq ($(findstring pgf90, $(FC)),)
-        LFLAGS = -lm -llapack -lblas
-        COMMON_CFLAGS = -O3 -Mpreprocess -tp=haswell -D_DEF_INTR -D_USE_BLAS
+        L_FLAGS = -lm -llapack -lblas
+        COMMON_CFLAGS = -O3 -Mpreprocess -D_DEF_INTR -D_USE_BLAS #-tp=haswell #Disable for now
         DEBUG_CFLAGS = -O0 -g -Mpreprocess -traceback -D_DEF_INTR -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -mp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
 endif
 ifneq ($(findstring ifort, $(FC)),)
-        LFLAGS = -lm -mkl
-        COMMON_CFLAGS = -Ofast -xCORE-AVX2 -fpp -D_USE_BLAS
+        L_FLAGS = -lm -mkl
+        COMMON_CFLAGS = -Ofast -fpp -D_USE_BLAS #-xCORE-AVX2 #Disable for now
         DEBUG_CFLAGS = -O0 -g -fpp -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -qopenmp -D_OMP
         MPI_FLAGS = -D_MPI
@@ -81,36 +81,36 @@ endif
 
 
 MPI_FC = $(FC)
-CFLAGS = $(COMMON_CFLAGS) $(UFLAGS)
+C_FLAGS = $(COMMON_CFLAGS) $(U_FLAGS)
 
 ifeq ($(DEBUG),y)
 	USE_OPENMP = n
 	USE_MPI = n
 	PROFILE = n
 	MPI_FC = $(FC)
-	CFLAGS = $(DEBUG_CFLAGS) $(UFLAGS)
+	C_FLAGS = $(DEBUG_CFLAGS) $(UFLAGS)
 endif
 
 ifeq ($(PROFILE),y)
 	USE_OPENMP = n
 	USE_MPI = n
 	MPI_FC = $(FC)
-	CFLAGS = $(COMMON_CFLAGS) $(UFLAGS) $(PROF_FLAGS)
+	C_FLAGS = $(COMMON_CFLAGS) $(U_FLAGS) $(PROF_FLAGS)
 endif
 
 ifeq ($(USE_MPI),y)
 	USE_OPENMP = n
 	MPI_FC = mpif90
-	CFLAGS = $(COMMON_CFLAGS) $(UFLAGS) $(MPI_FLAGS)
+	C_FLAGS = $(COMMON_CFLAGS) $(U_FLAGS) $(MPI_FLAGS)
 endif
 
 ifeq ($(USE_OPENMP),y)
 	MPI_FC = $(FC)
-	CFLAGS = $(COMMON_CFLAGS) $(UFLAGS) $(OPENMP_FLAGS)
+	C_FLAGS = $(COMMON_CFLAGS) $(U_FLAGS) $(OPENMP_FLAGS)
 endif
 
-LFLAGS := $(LFLAGS) $(HDF5_FLAGS) -L$(SRC_DIR)
-IFLAGS := -I$(HDF5_INCLUDE) -I$(SRC_DIR)
+L_FLAGS := $(L_FLAGS) $(HDF5_FLAGS) -L$(SRC_DIR)
+I_FLAGS := -I$(HDF5_INCLUDE) -I$(SRC_DIR)
 
 # atomic table variables
 NTHREADS = 1000
@@ -125,9 +125,9 @@ export DEPS_DIR
 export TABLES_DIR
 export MPI_FC
 export USE_MPI
-export CFLAGS
-export LFLAGS
-export IFLAGS
+export C_FLAGS
+export L_FLAGS
+export I_FLAGS
 export NTHREADS
 
 fidasim: deps src tables

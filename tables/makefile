@@ -2,10 +2,6 @@ SHELL = /bin/bash
 
 EX = $(TABLES_DIR)/generate_tables
 
-ifeq ($(USE_MPI),y)
-	EX := mpirun -np 1 $(EX)
-endif
-
 TBDEPS=$(SRC_DIR)/hdf5_extra.o
 TBDEPMODS=$(SRC_DIR)/hdf5_extra.mod
 ifeq ($(USE_MPI),y)
@@ -16,10 +12,10 @@ endif
 all: generate_tables table_settings
 
 generate_tables: atomic_tables.o $(TBDEPS)
-	$(MPI_FC) $(CFLAGS) $^ -o $@ $(LFLAGS)
+	$(MPI_FC) $(C_FLAGS) $^ -o $@ $(L_FLAGS)
 
 atomic_tables.o: atomic_tables.f90 $(TBDEPMODS)
-	$(MPI_FC) $(CFLAGS) -c $< $(IFLAGS)
+	$(MPI_FC) $(C_FLAGS) -c $< $(I_FLAGS)
 
 .PHONY: table_settings
 table_settings: table_settings.dat generate_tables

@@ -3818,7 +3818,6 @@ subroutine write_npa
     do i=0,my_rank-1
         c = c +  npart_image(i)
     enddo
-    deallocate(npart_image)
 #endif
     start_index = 1 + c
     end_index = npa%npart + c

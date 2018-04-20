@@ -63,7 +63,7 @@ ifneq ($(findstring gfortran, $(FC)),)
 	PROF_FLAGS = -pg -D_PROF
 endif
 ifneq ($(findstring pgf90, $(FC)),)
-        LFLAGS = -lm -lblas
+        LFLAGS = -lm -llapack -lblas
         COMMON_CFLAGS = -O3 -Mpreprocess -tp=haswell -D_DEF_INTR -D_USE_BLAS
         DEBUG_CFLAGS = -O0 -g -Mpreprocess -traceback -D_DEF_INTR -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -mp -D_OMP
@@ -100,7 +100,7 @@ endif
 
 ifeq ($(USE_MPI),y)
 	USE_OPENMP = n
-	MPI_FC = caf
+	MPI_FC = mpif90
 	CFLAGS = $(COMMON_CFLAGS) $(UFLAGS) $(MPI_FLAGS)
 endif
 
@@ -134,17 +134,6 @@ fidasim: deps src tables
 
 .PHONY: deps
 deps:
-ifneq ($(findstring pgf90, $(FC)),)
-ifeq ($(USE_MPI),y)
-	$(error MPI not supported with pgfortran)
-endif
-endif
-ifneq ($(findstring ifort, $(FC)),)
-ifeq ($(USE_MPI),y)
-	$(error MPI not supported with ifort)
-endif
-endif
-
 	@cd $(DEPS_DIR); make
 
 .PHONY: src

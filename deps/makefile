@@ -10,9 +10,6 @@ export OMPI_CC = $(CC)
 export OMPI_CXX = $(CXX)
 
 TARGETS = hdf5
-ifeq ($(USE_MPI),y)
-    TARGETS := $(TARGETS) opencoarrays
-endif
 
 all: $(TARGETS)
 
@@ -26,6 +23,7 @@ hdf5:
 	-rm -rf hdf5-1.8.16
 	@printf "HDF5 build complete\n\n"
 
+# Note: Not used anymore, left only for historical reasons
 opencoarrays:
 	@printf "\nBuilding OpenCoarrays...\n"
 	tar -zvxf $(DEPS_DIR)/OpenCoarrays-1.9.3.tar.gz >> $(OPENCOARRAYS_LOG) 2>&1

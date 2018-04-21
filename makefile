@@ -3,7 +3,7 @@ SHELL = /bin/bash
 #Default compiling options
 USE_OPENMP = y
 USE_MPI = n
-USE_ARCH = n
+ARCH = n
 PROFILE = n
 DEBUG = n
 
@@ -62,8 +62,8 @@ ifneq ($(findstring gfortran, $(FC)),)
         OPENMP_FLAGS = -fopenmp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
-ifneq ($(USE_ARCH),n)
-        COMMON_CFLAGS := $(COMMON_CFLAGS) -march=$(USE_ARCH)
+ifneq ($(ARCH),n)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -march=$(ARCH)
 endif
 endif
 ifneq ($(findstring pgf90, $(FC)),)
@@ -73,8 +73,8 @@ ifneq ($(findstring pgf90, $(FC)),)
         OPENMP_FLAGS = -mp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
-ifneq ($(USE_ARCH),n)
-        COMMON_CFLAGS := $(COMMON_CFLAGS) -tp=$(USE_ARCH)
+ifneq ($(ARCH),n)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -tp=$(ARCH)
 endif
 endif
 ifneq ($(findstring ifort, $(FC)),)
@@ -84,8 +84,8 @@ ifneq ($(findstring ifort, $(FC)),)
         OPENMP_FLAGS = -qopenmp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -p -D_PROF
-ifneq ($(USE_ARCH),n)
-        COMMON_CFLAGS := $(COMMON_CFLAGS) -ax$(USE_ARCH)
+ifneq ($(ARCH),n)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -x$(ARCH)
 endif
 endif
 

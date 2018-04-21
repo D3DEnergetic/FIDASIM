@@ -2,11 +2,11 @@ SHELL = /bin/bash
 
 EX = $(TABLES_DIR)/generate_tables
 
-TBDEPS=$(SRC_DIR)/hdf5_extra.o
-TBDEPMODS=$(SRC_DIR)/hdf5_extra.mod
+TBDEPS=$(SRC_DIR)/hdf5_utils.o $(SRC_DIR)/utilities.o
+TBDEPMODS=$(SRC_DIR)/hdf5_utils.mod $(SRC_DIR)/utilities.mod
 ifeq ($(USE_MPI),y)
-  TBDEPS    := $(SRC_DIR)/fidampi.o $(TBDEPS)
-  TBDEPMODS := $(SRC_DIR)/fidampi.mod $(TBDEPMODS)
+  TBDEPS    := $(SRC_DIR)/mpi_utils.o $(TBDEPS)
+  TBDEPMODS := $(SRC_DIR)/mpi_utils.mod $(TBDEPMODS)
 endif
 
 all: generate_tables table_settings

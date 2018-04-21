@@ -20,9 +20,9 @@ module atomic_tables
 !+ Nuclear fusion 32.4 1992.](http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta)
 use H5LT
 use HDF5
-use hdf5_extra
+use hdf5_utils
 #ifdef _MPI
-use fidampi
+use mpi_utils
 #endif
 
 IMPLICIT NONE
@@ -4701,10 +4701,10 @@ subroutine write_bb_H_H(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(cx)
-    call fidampi_sum(excit)
-    call fidampi_sum(ioniz)
+    call parallel_sum(ebarr)
+    call parallel_sum(cx)
+    call parallel_sum(excit)
+    call parallel_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -4849,9 +4849,9 @@ subroutine write_bb_H_e(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(excit)
-    call fidampi_sum(ioniz)
+    call parallel_sum(ebarr)
+    call parallel_sum(excit)
+    call parallel_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5008,10 +5008,10 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
     enddo
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(cx)
-    call fidampi_sum(excit)
-    call fidampi_sum(ioniz)
+    call parallel_sum(ebarr)
+    call parallel_sum(cx)
+    call parallel_sum(excit)
+    call parallel_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5148,8 +5148,8 @@ subroutine write_bb_D_D(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(fusion)
+    call parallel_sum(ebarr)
+    call parallel_sum(fusion)
 #endif
 
     if(verbose) then
@@ -5265,8 +5265,8 @@ subroutine write_bb_D_T(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(fusion)
+    call parallel_sum(ebarr)
+    call parallel_sum(fusion)
 #endif
 
     if(verbose) then
@@ -5447,11 +5447,11 @@ subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(tarr)
-    call fidampi_sum(cx)
-    call fidampi_sum(excit)
-    call fidampi_sum(ioniz)
+    call parallel_sum(ebarr)
+    call parallel_sum(tarr)
+    call parallel_sum(cx)
+    call parallel_sum(excit)
+    call parallel_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5670,10 +5670,10 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(tarr)
-    call fidampi_sum(excit)
-    call fidampi_sum(ioniz)
+    call parallel_sum(ebarr)
+    call parallel_sum(tarr)
+    call parallel_sum(excit)
+    call parallel_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -5912,11 +5912,11 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(tarr)
-    call fidampi_sum(cx)
-    call fidampi_sum(excit)
-    call fidampi_sum(ioniz)
+    call parallel_sum(ebarr)
+    call parallel_sum(tarr)
+    call parallel_sum(cx)
+    call parallel_sum(excit)
+    call parallel_sum(ioniz)
 #endif
 
     if(verbose) then
@@ -6111,9 +6111,9 @@ subroutine write_bt_D_D(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(tarr)
-    call fidampi_sum(fusion)
+    call parallel_sum(ebarr)
+    call parallel_sum(tarr)
+    call parallel_sum(fusion)
 #endif
 
     if(verbose) then
@@ -6285,9 +6285,9 @@ subroutine write_bt_D_T(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(ebarr)
-    call fidampi_sum(tarr)
-    call fidampi_sum(fusion)
+    call parallel_sum(ebarr)
+    call parallel_sum(tarr)
+    call parallel_sum(fusion)
 #endif
 
     if(verbose) then
@@ -6446,7 +6446,8 @@ program generate_tables
     use atomic_tables
     use H5LT
     use HDF5
-    use hdf5_extra
+    use hdf5_utils
+    use utilities
 
 #ifdef _OMP
   use omp_lib
@@ -6458,7 +6459,7 @@ program generate_tables
     character(len=200) :: tables_file = ''
     integer :: n_max, m_max
 
-    integer, dimension(8) :: time_arr, time_start, time_end
+    integer, dimension(8) :: time_start
     integer :: hour, minu, sec
     integer :: argc, max_threads, nthreads
     integer(HID_T) :: fid, gid
@@ -6505,12 +6506,13 @@ program generate_tables
 #endif
 
 #ifdef _MPI
-    istart = fidampi_my_rank()+1
-    istep = fidampi_num_ranks()
-    if(fidampi_my_rank().ne.0) verbose = .False.
+    call init_mpi()
+    istart = my_rank()+1
+    istep = num_ranks()
+    if(my_rank().ne.0) verbose = .False.
     if(verbose) then
         write(*,'(a)') "---- MPI settings ----"
-        write(*,'(T2,"Number of processes: ",i2)') fidampi_num_ranks()
+        write(*,'(T2,"Number of processes: ",i2)') num_ranks()
         write(*,*) ''
     endif
 #endif
@@ -6539,8 +6541,7 @@ program generate_tables
     endif
 
     !! Calculate cross sections
-    call date_and_time(values=time_arr)
-    if(verbose) write(*,"(A,I2,A,I2.2,A,I2.2)") 'Cross Sections:   ',time_arr(5),':',time_arr(6),':',time_arr(7)
+    if(verbose) write(*,*) 'Cross Sections:   ',time(time_start)
     call write_bb_H_H(gid, namelist_file, n_max, m_max)
     call write_bb_H_e(gid, namelist_file, n_max, m_max)
     call write_bb_H_Aq(gid, namelist_file, n_max, m_max)
@@ -6555,8 +6556,7 @@ program generate_tables
     endif
 
     !! Calculate reaction rates
-    call date_and_time(values=time_arr)
-    if(verbose) write(*,"(A,I2,A,I2.2,A,I2.2)") 'Reaction Rates:   ',time_arr(5),':',time_arr(6),':',time_arr(7)
+    if(verbose) write(*,*) 'Reaction Rates:   ',time(time_start)
     call write_bt_H_H(gid, namelist_file, n_max, m_max)
     call write_bt_H_e(gid, namelist_file, n_max, m_max)
     call write_bt_H_Aq(gid, namelist_file, n_max, m_max)
@@ -6582,22 +6582,13 @@ program generate_tables
         write(*,'(a)') "Atomic tables written to "//trim(tables_file)
         write(*,*) ''
     endif
-    call date_and_time (values=time_arr)
-    if(verbose) write(*,'(A,I2,":",I2.2,":",I2.2)') 'END: hour, minute, second: ',time_arr(5), time_arr(6),time_arr(7)
 
-    call date_and_time (values=time_end)
-    hour = time_end(5) - time_start(5)
-    minu = time_end(6) - time_start(6)
-    sec  = time_end(7) - time_start(7)
-    if (minu.lt.0.) then
-        minu = minu +60
-        hour = hour -1
-    endif
-    if (sec.lt.0.) then
-        sec  = sec +60
-        minu = minu -1
-    endif
+#ifdef _MPI
+    call cleanup_mpi()
+#endif
 
-    if(verbose) write(*,'(A,18X,I2,":",I2.2,":",I2.2)') 'duration:',hour,minu,sec
+    if(verbose) then
+        write(*,*) 'END: hour:minute:second ', time(time_start)
+    endif
 
 end program

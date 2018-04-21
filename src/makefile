@@ -1,19 +1,19 @@
 SHELL = /bin/bash
 
-FIDADEPS=fidasim.o eigensystem.o utilities.o hdf5_extra.o
+FIDADEPS=fidasim.o eigensystem.o utilities.o hdf5_utils.o
 
 ifeq ($(USE_MPI),y)
-   FIDADEPS := fidampi.o $(FIDADEPS)
+   FIDADEPS := mpi_utils.o $(FIDADEPS)
 endif
 
 
 $(FIDASIM_DIR)/fidasim: $(FIDADEPS)
 	$(MPI_FC) $(C_FLAGS) $^ -o $@ $(L_FLAGS)
 
-fidampi.o: fidampi.f90
+mpi_utils.o: mpi_utils.f90
 	$(MPI_FC) $(C_FLAGS) -c $(I_FLAGS) $<
 
-fidasim.o: fidasim.f90 eigensystem.mod utilities.mod hdf5_extra.mod fidampi.f90 fidampi.f90
+fidasim.o: fidasim.f90 eigensystem.mod utilities.mod hdf5_utils.mod mpi_utils.f90 mpi_utils.f90
 	$(MPI_FC) $(C_FLAGS) -c $(I_FLAGS) $<
 
 eigensystem.mod eigensystem.o: eigensystem.f90
@@ -22,7 +22,7 @@ eigensystem.mod eigensystem.o: eigensystem.f90
 utilities.mod utilities.o: utilities.f90
 	$(MPI_FC) $(C_FLAGS) -c $<
 
-hdf5_extra.mod hdf5_extra.o: hdf5_extra.f90
+hdf5_utils.mod hdf5_utils.o: hdf5_utils.f90
 	$(MPI_FC) $(C_FLAGS) -c $< $(I_FLAGS)
 
 clean:

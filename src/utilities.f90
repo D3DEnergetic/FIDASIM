@@ -217,7 +217,7 @@ end function rng_seed
 
 subroutine rng_init(self, seed)
 #ifdef _MPI
-    use fidampi
+    use mpi_utils
 #endif
 
     !+ Procedure to initialize a random number generator with a seed.
@@ -233,7 +233,7 @@ subroutine rng_init(self, seed)
         s = rng_seed()
     else
 #ifdef _MPI
-        s = seed + fidampi_my_rank()
+        s = seed + my_rank()
 #else
         s = seed
 #endif

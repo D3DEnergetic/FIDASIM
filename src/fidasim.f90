@@ -3,11 +3,11 @@ module libfida
 !+ Main FIDASIM library
 USE H5LT !! High level HDF5 Interface
 USE HDF5 !! Base HDF5
-USE hdf5_extra !! Additional HDF5 routines
+USE hdf5_utils !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, linsolve
 USE utilities
 #ifdef _MPI
-USE fidampi
+USE mpi_utils
 #endif
 
 implicit none
@@ -1896,7 +1896,7 @@ subroutine read_inputs
     beam_grid%origin=origin
 
 #ifdef _MPI
-    if(fidampi_my_rank().ne.0) inputs%verbose=0
+    if(my_rank().ne.0) inputs%verbose=0
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -2521,8 +2521,8 @@ subroutine read_npa
             enddo
             !$OMP END PARALLEL DO
 #ifdef _MPI
-            call fidampi_sum(eff_rds)
-            call fidampi_sum(probs)
+            call parallel_sum(eff_rds)
+            call parallel_sum(probs)
 #endif
             do ic = 1, beam_grid%ngrid
                 if(probs(ic).gt.0.0) then
@@ -3561,14 +3561,14 @@ subroutine write_birth_profile
     logical :: do_write
 
 #ifdef _MPI
-    integer :: my_rank
+    integer :: rank
     integer, dimension(:), allocatable :: npart_image
 #endif
 
     npart = birth%cnt-1
 
 #ifdef _MPI
-    call fidampi_sum(npart)
+    call parallel_sum(npart)
 #endif
 
     allocate(ri(3,npart))
@@ -3582,13 +3582,13 @@ subroutine write_birth_profile
 
     c = 0
 #ifdef _MPI
-    my_rank = fidampi_my_rank()
-    allocate(npart_image(0:fidampi_num_ranks()-1))
+    rank = my_rank()
+    allocate(npart_image(0:num_ranks()-1))
     npart_image(:) = 0
-    npart_image(my_rank) = birth%cnt - 1
-    call fidampi_sum(npart_image)
+    npart_image(rank) = birth%cnt - 1
+    call parallel_sum(npart_image)
 
-    do i=0,my_rank-1
+    do i=0,rank-1
         c = c +  npart_image(i)
     enddo
     deallocate(npart_image)
@@ -3619,11 +3619,11 @@ subroutine write_birth_profile
 
     do_write = .True.
 #ifdef _MPI
-    call fidampi_sum(ri)
-    call fidampi_sum(vi)
-    call fidampi_sum(inds)
-    call fidampi_sum(neut_types)
-    if(fidampi_my_rank().ne.0) do_write = .False.
+    call parallel_sum(ri)
+    call parallel_sum(vi)
+    call parallel_sum(inds)
+    call parallel_sum(neut_types)
+    if(my_rank().ne.0) do_write = .False.
 #endif
 
     if(do_write) then
@@ -3772,15 +3772,15 @@ subroutine write_npa
     logical :: do_write = .True.
 
 #ifdef _MPI
-    integer :: my_rank
+    integer :: rank
     integer, dimension(:), allocatable :: npart_image
 
-    my_rank = fidampi_my_rank()
-    allocate(npart_image(0:fidampi_num_ranks()-1))
+    rank = my_rank()
+    allocate(npart_image(0:num_ranks()-1))
 #endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().ne.0) do_write = .False.
+    if(my_rank().ne.0) do_write = .False.
 #endif
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_npa.h5"
@@ -3805,17 +3805,17 @@ subroutine write_npa
     endif
 
 #ifdef _MPI
-    call fidampi_sum(dcount)
-    call fidampi_sum(npart)
+    call parallel_sum(dcount)
+    call parallel_sum(npart)
 #endif
 
     c = 0
 #ifdef _MPI
     npart_image(:) = 0
-    npart_image(my_rank) = npa%npart
-    call fidampi_sum(npart_image)
+    npart_image(rank) = npa%npart
+    call parallel_sum(npart_image)
 
-    do i=0,my_rank-1
+    do i=0,rank-1
         c = c +  npart_image(i)
     enddo
 #endif
@@ -3844,12 +3844,12 @@ subroutine write_npa
             c = c + 1
         enddo
 #ifdef _MPI
-        call fidampi_sum(ri)
-        call fidampi_sum(rf)
-        call fidampi_sum(weight)
-        call fidampi_sum(energy)
-        call fidampi_sum(pitch)
-        call fidampi_sum(det)
+        call parallel_sum(ri)
+        call parallel_sum(rf)
+        call parallel_sum(weight)
+        call parallel_sum(energy)
+        call parallel_sum(pitch)
+        call parallel_sum(det)
 #endif
     endif
 
@@ -3957,17 +3957,17 @@ subroutine write_npa
     endif
 
 #ifdef _MPI
-    call fidampi_sum(dcount)
-    call fidampi_sum(npart)
+    call parallel_sum(dcount)
+    call parallel_sum(npart)
 #endif
 
     c = 0
 #ifdef _MPI
     npart_image(:) = 0
-    npart_image(my_rank) = pnpa%npart
-    call fidampi_sum(npart_image)
+    npart_image(rank) = pnpa%npart
+    call parallel_sum(npart_image)
 
-    do i=0,my_rank-1
+    do i=0,rank-1
         c = c +  npart_image(i)
     enddo
 #endif
@@ -3996,12 +3996,12 @@ subroutine write_npa
             c = c + 1
         enddo
 #ifdef _MPI
-        call fidampi_sum(ri)
-        call fidampi_sum(rf)
-        call fidampi_sum(weight)
-        call fidampi_sum(energy)
-        call fidampi_sum(pitch)
-        call fidampi_sum(det)
+        call parallel_sum(ri)
+        call parallel_sum(rf)
+        call parallel_sum(weight)
+        call parallel_sum(energy)
+        call parallel_sum(pitch)
+        call parallel_sum(det)
 #endif
     endif
 
@@ -7809,18 +7809,18 @@ subroutine ndmc
 
 #ifdef _MPI
     !! Combine beam neutrals
-    call fidampi_sum(neut%full)
-    call fidampi_sum(neut%half)
-    call fidampi_sum(neut%third)
-    call fidampi_sum(nbi_outside)
+    call parallel_sum(neut%full)
+    call parallel_sum(neut%half)
+    call parallel_sum(neut%third)
+    call parallel_sum(nbi_outside)
     if(inputs%calc_birth.ge.1) then
-        call fidampi_sum(birth%dens)
+        call parallel_sum(birth%dens)
     endif
     !! Combine spectra
     if(inputs%calc_nbi.ge.1) then
-        call fidampi_sum(spec%full)
-        call fidampi_sum(spec%half)
-        call fidampi_sum(spec%third)
+        call parallel_sum(spec%full)
+        call parallel_sum(spec%half)
+        call parallel_sum(spec%third)
     endif
 #endif
 
@@ -7908,7 +7908,7 @@ subroutine bremsstrahlung
 
 #ifdef _MPI
     !! Combine Brems
-    call fidampi_sum(spec%brems)
+    call parallel_sum(spec%brems)
 #endif
 
     deallocate(lambda_arr,brems)
@@ -8009,11 +8009,11 @@ subroutine dcx
 
 #ifdef _MPI
     !! Combine densities
-    call fidampi_sum(neut%dcx)
+    call parallel_sum(neut%dcx)
     if(inputs%calc_dcx.ge.1) then
-        call fidampi_sum(spec%dcx)
+        call parallel_sum(spec%dcx)
     endif
-    call fidampi_sum(halo_iter_dens(dcx_type))
+    call parallel_sum(halo_iter_dens(dcx_type))
 #endif
 
 end subroutine dcx
@@ -8177,8 +8177,8 @@ subroutine halo
 
 #ifdef _MPI
         !! Combine densities
-        call fidampi_sum(dens_cur(:,:,:,:,1))
-        call fidampi_sum(halo_iter_dens(cur_type))
+        call parallel_sum(dens_cur(:,:,:,:,1))
+        call parallel_sum(halo_iter_dens(cur_type))
 #endif
 
         if(halo_iter_dens(cur_type)/halo_iter_dens(prev_type).gt.1.0) then
@@ -8203,7 +8203,7 @@ subroutine halo
 #ifdef _MPI
     !! Combine Spectra
     if(inputs%calc_halo.ge.1) then
-        call fidampi_sum(spec%halo)
+        call parallel_sum(spec%halo)
     endif
 #endif
 
@@ -8272,9 +8272,9 @@ subroutine nbi_spec
 
 #ifdef _MPI
     !! Combine Spectra
-    call fidampi_sum(spec%full)
-    call fidampi_sum(spec%half)
-    call fidampi_sum(spec%third)
+    call parallel_sum(spec%full)
+    call parallel_sum(spec%half)
+    call parallel_sum(spec%third)
 #endif
 
 end subroutine nbi_spec
@@ -8319,7 +8319,7 @@ subroutine dcx_spec
 
 #ifdef _MPI
     !! Combine Spectra
-    call fidampi_sum(spec%dcx)
+    call parallel_sum(spec%dcx)
 #endif
 
 end subroutine dcx_spec
@@ -8364,7 +8364,7 @@ subroutine halo_spec
 
 #ifdef _MPI
     !! Combine Spectra
-    call fidampi_sum(spec%halo)
+    call parallel_sum(spec%halo)
 #endif
 
 end subroutine halo_spec
@@ -8398,7 +8398,7 @@ subroutine cold_spec
 
 #ifdef _MPI
     !! Combine Spectra
-    call fidampi_sum(spec%cold)
+    call parallel_sum(spec%cold)
 #endif
 
 end subroutine cold_spec
@@ -8507,7 +8507,7 @@ subroutine fida_f
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(spec%fida)
+    call parallel_sum(spec%fida)
 #endif
 
 end subroutine fida_f
@@ -8611,7 +8611,7 @@ subroutine pfida_f
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(spec%pfida)
+    call parallel_sum(spec%pfida)
 #endif
 
 end subroutine pfida_f
@@ -8704,7 +8704,7 @@ subroutine fida_mc
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(spec%fida)
+    call parallel_sum(spec%fida)
 #endif
 
 end subroutine fida_mc
@@ -8797,7 +8797,7 @@ subroutine pfida_mc
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(spec%pfida)
+    call parallel_sum(spec%pfida)
 #endif
 
 end subroutine pfida_mc
@@ -8911,8 +8911,8 @@ subroutine npa_f
 
     npart = npa%npart
 #ifdef _MPI
-    call fidampi_sum(npart)
-    call fidampi_sum(npa%flux)
+    call parallel_sum(npart)
+    call parallel_sum(npa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -9025,8 +9025,8 @@ subroutine pnpa_f
 
     npart = pnpa%npart
 #ifdef _MPI
-    call fidampi_sum(npart)
-    call fidampi_sum(pnpa%flux)
+    call parallel_sum(npart)
+    call parallel_sum(pnpa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -9170,8 +9170,8 @@ subroutine npa_mc
 
     npart = npa%npart
 #ifdef _MPI
-    call fidampi_sum(npart)
-    call fidampi_sum(npa%flux)
+    call parallel_sum(npart)
+    call parallel_sum(npa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -9317,8 +9317,8 @@ subroutine pnpa_mc
 
     npart = pnpa%npart
 #ifdef _MPI
-    call fidampi_sum(npart)
-    call fidampi_sum(pnpa%flux)
+    call parallel_sum(npart)
+    call parallel_sum(pnpa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -9390,8 +9390,8 @@ subroutine neutron_f
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(neutron%rate)
-    call fidampi_sum(neutron%weight)
+    call parallel_sum(neutron%rate)
+    call parallel_sum(neutron%weight)
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -9401,7 +9401,7 @@ subroutine neutron_f
     endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().eq.0) call write_neutrons()
+    if(my_rank().eq.0) call write_neutrons()
 #else
     call write_neutrons()
 #endif
@@ -9490,7 +9490,7 @@ subroutine neutron_mc
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call fidampi_sum(neutron%rate)
+    call parallel_sum(neutron%rate)
 #endif
 
     if(inputs%verbose.ge.1) then
@@ -9501,7 +9501,7 @@ subroutine neutron_mc
     endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().eq.0) call write_neutrons()
+    if(my_rank().eq.0) call write_neutrons()
 #else
     call write_neutrons()
 #endif
@@ -9676,9 +9676,9 @@ subroutine fida_weights_mc
     endif
 
 #ifdef _MPI
-    call fidampi_sum(fweight%weight)
-    call fidampi_sum(fweight%mean_f)
-    if(fidampi_my_rank().eq.0) call write_fida_weights()
+    call parallel_sum(fweight%weight)
+    call parallel_sum(fweight%mean_f)
+    if(my_rank().eq.0) call write_fida_weights()
 #else
     call write_fida_weights()
 #endif
@@ -9902,9 +9902,9 @@ subroutine fida_weights_los
     endif
 
 #ifdef _MPI
-    call fidampi_sum(fweight%weight)
-    call fidampi_sum(fweight%mean_f)
-    if(fidampi_my_rank().eq.0) call write_fida_weights()
+    call parallel_sum(fweight%weight)
+    call parallel_sum(fweight%mean_f)
+    if(my_rank().eq.0) call write_fida_weights()
 #else
     call write_fida_weights()
 #endif
@@ -10051,11 +10051,11 @@ subroutine npa_weights
     enddo loop_over_channels
 
 #ifdef _MPI
-    call fidampi_sum(nweight%weight)
-    call fidampi_sum(nweight%flux)
-    call fidampi_sum(nweight%cx)
-    call fidampi_sum(nweight%attenuation)
-    call fidampi_sum(nweight%emissivity)
+    call parallel_sum(nweight%weight)
+    call parallel_sum(nweight%flux)
+    call parallel_sum(nweight%cx)
+    call parallel_sum(nweight%attenuation)
+    call parallel_sum(nweight%emissivity)
 #endif
 
     do ichan=1,npa_chords%nchan
@@ -10073,7 +10073,7 @@ subroutine npa_weights
     endif
 
 #ifdef _MPI
-    if(fidampi_my_rank().eq.0) call write_npa_weights()
+    if(my_rank().eq.0) call write_npa_weights()
 #else
     call write_npa_weights()
 #endif
@@ -10088,12 +10088,12 @@ end module libfida
 program fidasim
     !+ FIDASIM {!../VERSION!}
     use libfida
-    use hdf5_extra
+    use hdf5_utils
 #ifdef _OMP
     use omp_lib
 #endif
 #ifdef _MPI
-    use fidampi
+    use mpi_utils
 #endif
     implicit none
     character(3)          :: arg = ''
@@ -10104,8 +10104,8 @@ program fidasim
 #endif
 
 #ifdef _MPI
-    call fidampi_init
-    if(fidampi_my_rank().eq.0) call print_banner()
+    call init_mpi()
+    if(my_rank().eq.0) call print_banner()
 #else
     call print_banner()
 #endif
@@ -10113,7 +10113,7 @@ program fidasim
     narg = command_argument_count()
     if(narg.eq.0) then
 #ifdef _MPI
-        if(fidampi_my_rank().eq.0) write(*,'(a)') "usage: mpirun -np [num_processes] ./fidasim namelist_file"
+        if(my_rank().eq.0) write(*,'(a)') "usage: mpirun -np [num_processes] ./fidasim namelist_file"
 #else
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
 #endif
@@ -10150,8 +10150,8 @@ program fidasim
 #endif
 
 #ifdef _MPI
-    istart = fidampi_my_rank()+1
-    istep = fidampi_num_ranks()
+    istart = my_rank()+1
+    istep = num_ranks()
     if(inputs%verbose.ge.1) then
         write(*,'(a)') "---- MPI settings ----"
         write(*,'(T2,"Number of processes: ",i3)') istep
@@ -10347,7 +10347,7 @@ program fidasim
                 write(*,*) 'write neutrals:    ' , time(time_start)
             endif
 #ifdef _MPI
-            if(fidampi_my_rank().eq.0) call write_neutrals()
+            if(my_rank().eq.0) call write_neutrals()
 #else
             call write_neutrals()
 #endif
@@ -10409,7 +10409,7 @@ program fidasim
             write(*,*) 'write spectra:    ' , time(time_start)
         endif
 #ifdef _MPI
-        if(fidampi_my_rank().eq.0) call write_spectra()
+        if(my_rank().eq.0) call write_spectra()
 #else
         call write_spectra()
 #endif
@@ -10490,7 +10490,7 @@ program fidasim
     endif
 
 #ifdef _MPI
-    call fidampi_clenup
+    call cleanup_mpi()
 #endif
 
     if(inputs%verbose.ge.1) then

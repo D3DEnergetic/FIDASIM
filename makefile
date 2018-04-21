@@ -3,6 +3,7 @@ SHELL = /bin/bash
 #Default compiling options
 USE_OPENMP = y
 USE_MPI = n
+USE_ARCH = n
 PROFILE = n
 DEBUG = n
 
@@ -55,20 +56,26 @@ HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
 HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl -Wl,-rpath,$(HDF5_LIB)
 
 ifneq ($(findstring gfortran, $(FC)),)
-	L_FLAGS = -lm
-	COMMON_CFLAGS = -Ofast -g -fbacktrace -cpp
-	DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
-	OPENMP_FLAGS = -fopenmp -D_OMP
-	MPI_FLAGS = -D_MPI
-	PROF_FLAGS = -pg -D_PROF
+        L_FLAGS = -lm
+        COMMON_CFLAGS = -Ofast -g -fbacktrace -cpp
+        DEBUG_CFLAGS = -O0 -g -cpp -fbacktrace -fcheck=all -Wall -ffpe-trap=invalid,zero,overflow -D_DEBUG
+        OPENMP_FLAGS = -fopenmp -D_OMP
+        MPI_FLAGS = -D_MPI
+        PROF_FLAGS = -pg -D_PROF
+ifneq ($(USE_ARCH),n)
+        COMMON_CFLAGS = $(COMMON_CFLAGS) -march=$(USE_ARCH)
+endif
 endif
 ifneq ($(findstring pgf90, $(FC)),)
         L_FLAGS = -lm -llapack -lblas
-        COMMON_CFLAGS = -O3 -Mpreprocess -D_DEF_INTR -D_USE_BLAS #-tp=haswell #Disable for now
+        COMMON_CFLAGS = -O3 -Mpreprocess -D_DEF_INTR -D_USE_BLAS
         DEBUG_CFLAGS = -O0 -g -Mpreprocess -traceback -D_DEF_INTR -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -mp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
+ifneq ($(USE_ARCH),n)
+        COMMON_CFLAGS = $(COMMON_CFLAGS) -tp=$(USE_ARCH)
+endif
 endif
 ifneq ($(findstring ifort, $(FC)),)
         L_FLAGS = -lm -mkl
@@ -77,6 +84,9 @@ ifneq ($(findstring ifort, $(FC)),)
         OPENMP_FLAGS = -qopenmp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -p -D_PROF
+ifneq ($(USE_ARCH),n)
+        COMMON_CFLAGS = $(COMMON_CFLAGS) -ax$(USE_ARCH)
+endif
 endif
 
 

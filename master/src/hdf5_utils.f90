@@ -1,5 +1,5 @@
 !+This file contains HDF5 helper routines for writing compressed data files
-MODULE hdf5_extra
+MODULE hdf5_utils
     !+ A library for writing compressed HDF5 files
 
 USE H5LT
@@ -81,7 +81,7 @@ subroutine check_compression_availability
         print*,'HDF5: gzip filter is not available for encoding and decoding'
         compress_data = .False.
     endif
-    
+
     !! Check for SHUFFLE filter
     call h5zfilter_avail_f(H5Z_FILTER_SHUFFLE_F, shuffle_avail, error)
     call h5zget_filter_info_f(H5Z_FILTER_SHUFFLE_F, shuf_info, error)
@@ -180,11 +180,11 @@ subroutine h5ltmake_compressed_dataset_double_f_1(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_DOUBLE, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_double_f_1
 
@@ -223,11 +223,11 @@ subroutine h5ltmake_compressed_dataset_double_f_2(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_DOUBLE, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_double_f_2
 
@@ -266,11 +266,11 @@ subroutine h5ltmake_compressed_dataset_double_f_3(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_DOUBLE, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_double_f_3
 
@@ -310,11 +310,11 @@ subroutine h5ltmake_compressed_dataset_double_f_4(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_DOUBLE, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_double_f_4
 
@@ -354,11 +354,11 @@ subroutine h5ltmake_compressed_dataset_double_f_5(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_DOUBLE, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_double_f_5
 
@@ -398,11 +398,11 @@ subroutine h5ltmake_compressed_dataset_double_f_6(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_DOUBLE, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_double_f_6
 
@@ -442,11 +442,11 @@ subroutine h5ltmake_compressed_dataset_double_f_7(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_DOUBLE, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_double_f_7
 
@@ -486,11 +486,11 @@ subroutine h5ltmake_compressed_dataset_int_f_1(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_INTEGER, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_int_f_1
 
@@ -529,11 +529,11 @@ subroutine h5ltmake_compressed_dataset_int_f_2(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_INTEGER, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_int_f_2
 
@@ -572,11 +572,11 @@ subroutine h5ltmake_compressed_dataset_int_f_3(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_INTEGER, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_int_f_3
 
@@ -614,11 +614,11 @@ subroutine h5ltmake_compressed_dataset_int_f_4(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_INTEGER, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 end subroutine h5ltmake_compressed_dataset_int_f_4
 
 subroutine h5ltmake_compressed_dataset_int_f_5(loc_id,&
@@ -657,11 +657,11 @@ subroutine h5ltmake_compressed_dataset_int_f_5(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_INTEGER, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 end subroutine h5ltmake_compressed_dataset_int_f_5
 
 subroutine h5ltmake_compressed_dataset_int_f_6(loc_id,&
@@ -700,11 +700,11 @@ subroutine h5ltmake_compressed_dataset_int_f_6(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_INTEGER, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_int_f_6
 
@@ -744,12 +744,12 @@ subroutine h5ltmake_compressed_dataset_int_f_7(loc_id,&
              did, error, dcpl_id=plist_id)
 
         call h5dwrite_f(did, H5T_NATIVE_INTEGER, buf, dims, error)
-        
+
         call h5sclose_f(sid, error)
         call h5pclose_f(plist_id, error)
         call h5dclose_f(did, error)
-    endif 
+    endif
 
 end subroutine h5ltmake_compressed_dataset_int_f_7
 
-END MODULE hdf5_extra
+END MODULE hdf5_utils

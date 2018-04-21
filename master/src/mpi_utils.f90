@@ -1,17 +1,17 @@
-module fidampi
+module mpi_utils
 
   integer, parameter, private   :: Float64 = 8
-  integer, private :: num_ranks, my_rank
+  integer, private :: numranks, myrank
 
-  interface fidampi_sum
-     module procedure fidampi_sum_d0, fidampi_sum_d1, fidampi_sum_d2, &
-                      fidampi_sum_d3, fidampi_sum_d4, fidampi_sum_d5,&
-                      fidampi_sum_i0, fidampi_sum_i1, fidampi_sum_i2
+  interface parallel_sum
+     module procedure parallel_sum_d0, parallel_sum_d1, parallel_sum_d2, &
+                      parallel_sum_d3, parallel_sum_d4, parallel_sum_d5,&
+                      parallel_sum_i0, parallel_sum_i1, parallel_sum_i2
   end interface
 
 contains
 
-  subroutine fidampi_init()
+  subroutine init_mpi()
     use mpi
     implicit none
 
@@ -23,23 +23,23 @@ contains
     call MPI_INIT(ierr)
 #endif
 
-   num_ranks = 1
-   my_rank = 0
+   numranks = 1
+   myrank = 0
    if (ierr/=0) then
      write(*,*) "MPI initialization failed, assuming single MPI process"
    else
-     call MPI_COMM_SIZE(MPI_COMM_WORLD,num_ranks,ierr)
-     if (num_ranks>1) then
-       call MPI_COMM_RANK(MPI_COMM_WORLD,my_rank,ierr)
+     call MPI_COMM_SIZE(MPI_COMM_WORLD,numranks,ierr)
+     if (numranks>1) then
+       call MPI_COMM_RANK(MPI_COMM_WORLD,myrank,ierr)
      endif
    endif
 
   end subroutine
 
-  subroutine fidampi_clenup()
+  subroutine cleanup_mpi()
     use mpi
     implicit none
-   
+
     integer :: ierr
 
     call MPI_BARRIER(MPI_COMM_WORLD,ierr)
@@ -47,15 +47,15 @@ contains
     call MPI_FINALIZE(ierr)
   end subroutine
 
-  recursive function fidampi_my_rank() result (n)
-    n = my_rank
+  recursive function my_rank() result (n)
+    n = myrank
   end function
 
-  recursive function fidampi_num_ranks() result (n)
-    n = num_ranks
+  recursive function num_ranks() result (n)
+    n = numranks
   end function
 
-  recursive subroutine fidampi_sum_d0(A)
+  recursive subroutine parallel_sum_d0(A)
     use mpi
     implicit none
 
@@ -65,29 +65,29 @@ contains
 
     sizeA = 1
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_d1(A)
+  recursive subroutine parallel_sum_d1(A)
     use mpi
-    implicit none  
+    implicit none
 
     real(Float64), dimension(:), intent(inout) :: A
-    
+
     integer :: sizeA,ierr
 
     sizeA = size(A,1)
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_d2(A)
+  recursive subroutine parallel_sum_d2(A)
     use mpi
     implicit none
 
@@ -97,13 +97,13 @@ contains
 
     sizeA = size(A,1)*size(A,2)
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_d3(A)
+  recursive subroutine parallel_sum_d3(A)
     use mpi
     implicit none
 
@@ -113,13 +113,13 @@ contains
 
     sizeA = size(A,1)*size(A,2)*size(A,3)
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_d4(A)
+  recursive subroutine parallel_sum_d4(A)
     use mpi
     implicit none
 
@@ -129,13 +129,13 @@ contains
 
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_d5(A)
+  recursive subroutine parallel_sum_d5(A)
     use mpi
     implicit none
 
@@ -145,13 +145,13 @@ contains
 
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)*size(A,5)
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_i0(A)
+  recursive subroutine parallel_sum_i0(A)
     use mpi
     implicit none
 
@@ -161,13 +161,13 @@ contains
 
     sizeA = 1
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_i1(A)
+  recursive subroutine parallel_sum_i1(A)
     use mpi
     implicit none
 
@@ -177,13 +177,13 @@ contains
 
     sizeA = size(A,1)
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 
   end subroutine
 
-  recursive subroutine fidampi_sum_i2(A)
+  recursive subroutine parallel_sum_i2(A)
     use mpi
     implicit none
 
@@ -193,7 +193,7 @@ contains
 
     sizeA = size(A,1)*size(A,2)
 
-    if (num_ranks>1) then
+    if (numranks>1) then
        call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
     endif ! else nothing to do
 

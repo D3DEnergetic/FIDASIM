@@ -63,7 +63,7 @@ ifneq ($(findstring gfortran, $(FC)),)
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
 ifneq ($(USE_ARCH),n)
-        COMMON_CFLAGS = $(COMMON_CFLAGS) -march=$(USE_ARCH)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -march=$(USE_ARCH)
 endif
 endif
 ifneq ($(findstring pgf90, $(FC)),)
@@ -74,7 +74,7 @@ ifneq ($(findstring pgf90, $(FC)),)
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -pg -D_PROF
 ifneq ($(USE_ARCH),n)
-        COMMON_CFLAGS = $(COMMON_CFLAGS) -tp=$(USE_ARCH)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -tp=$(USE_ARCH)
 endif
 endif
 ifneq ($(findstring ifort, $(FC)),)
@@ -85,7 +85,7 @@ ifneq ($(findstring ifort, $(FC)),)
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -p -D_PROF
 ifneq ($(USE_ARCH),n)
-        COMMON_CFLAGS = $(COMMON_CFLAGS) -ax$(USE_ARCH)
+        COMMON_CFLAGS := $(COMMON_CFLAGS) -ax$(USE_ARCH)
 endif
 endif
 

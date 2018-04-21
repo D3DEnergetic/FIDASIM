@@ -79,7 +79,7 @@ endif
 endif
 ifneq ($(findstring ifort, $(FC)),)
         L_FLAGS = -lm -mkl
-        COMMON_CFLAGS = -Ofast -fpp -D_USE_BLAS #-xCORE-AVX2 #Disable for now
+        COMMON_CFLAGS = -Ofast -fpp -D_USE_BLAS
         DEBUG_CFLAGS = -O0 -g -fpp -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -qopenmp -D_OMP
         MPI_FLAGS = -D_MPI

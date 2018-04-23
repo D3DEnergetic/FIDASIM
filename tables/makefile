@@ -2,17 +2,20 @@ SHELL = /bin/bash
 
 EX = $(TABLES_DIR)/generate_tables
 
+TBDEPS=$(SRC_DIR)/hdf5_utils.o $(SRC_DIR)/utilities.o
+TBDEPMODS=$(SRC_DIR)/hdf5_utils.mod $(SRC_DIR)/utilities.mod
 ifeq ($(USE_MPI),y)
-	EX := cafrun -np 1 $(EX)
+  TBDEPS    := $(SRC_DIR)/mpi_utils.o $(TBDEPS)
+  TBDEPMODS := $(SRC_DIR)/mpi_utils.mod $(TBDEPMODS)
 endif
 
 all: generate_tables table_settings
 
-generate_tables: atomic_tables.o $(SRC_DIR)/hdf5_extra.o
-	$(MPI_FC) $(CFLAGS) $^ -o $@ $(LFLAGS)
+generate_tables: atomic_tables.o $(TBDEPS)
+	$(MPI_FC) $(C_FLAGS) $^ -o $@ $(L_FLAGS)
 
-atomic_tables.o: atomic_tables.f90 $(SRC_DIR)/hdf5_extra.mod
-	$(MPI_FC) $(CFLAGS) -c $< $(IFLAGS)
+atomic_tables.o: atomic_tables.f90 $(TBDEPMODS)
+	$(MPI_FC) $(C_FLAGS) -c $< $(I_FLAGS)
 
 .PHONY: table_settings
 table_settings: table_settings.dat generate_tables

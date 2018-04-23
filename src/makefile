@@ -1,19 +1,29 @@
 SHELL = /bin/bash
 
-$(FIDASIM_DIR)/fidasim: fidasim.o eigensystem.o utilities.o hdf5_extra.o
-	$(MPI_FC) $(CFLAGS) $^ -o $@ $(LFLAGS)
+FIDADEPS=fidasim.o eigensystem.o utilities.o hdf5_utils.o
 
-fidasim.o: fidasim.f90 eigensystem.mod utilities.mod hdf5_extra.mod
-	$(MPI_FC) $(CFLAGS) -c $(IFLAGS)  $<
+ifeq ($(USE_MPI),y)
+   FIDADEPS := mpi_utils.o $(FIDADEPS)
+endif
+
+
+$(FIDASIM_DIR)/fidasim: $(FIDADEPS)
+	$(MPI_FC) $(C_FLAGS) $^ -o $@ $(L_FLAGS)
+
+mpi_utils.o: mpi_utils.f90
+	$(MPI_FC) $(C_FLAGS) -c $(I_FLAGS) $<
+
+fidasim.o: fidasim.f90 eigensystem.mod utilities.mod hdf5_utils.mod mpi_utils.f90 mpi_utils.f90
+	$(MPI_FC) $(C_FLAGS) -c $(I_FLAGS) $<
 
 eigensystem.mod eigensystem.o: eigensystem.f90
-	$(MPI_FC) $(CFLAGS) -c $(IFLAGS) $<
+	$(MPI_FC) $(C_FLAGS) -c $(I_FLAGS) $<
 
 utilities.mod utilities.o: utilities.f90
-	$(MPI_FC) $(CFLAGS) -c $<
+	$(MPI_FC) $(C_FLAGS) -c $<
 
-hdf5_extra.mod hdf5_extra.o: hdf5_extra.f90
-	$(MPI_FC) $(CFLAGS) -c $< $(IFLAGS)
+hdf5_utils.mod hdf5_utils.o: hdf5_utils.f90
+	$(MPI_FC) $(C_FLAGS) -c $< $(I_FLAGS)
 
 clean:
 	-rm -f *.mod *.o

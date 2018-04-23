@@ -216,6 +216,10 @@ function rng_seed() result (seed)
 end function rng_seed
 
 subroutine rng_init(self, seed)
+#ifdef _MPI
+    use mpi_utils
+#endif
+
     !+ Procedure to initialize a random number generator with a seed.
     !+ If seed is negative then random seed is used
     type(rng_type), intent(inout) :: self
@@ -229,7 +233,7 @@ subroutine rng_init(self, seed)
         s = rng_seed()
     else
 #ifdef _MPI
-        s = seed + this_image() - 1
+        s = seed + my_rank()
 #else
         s = seed
 #endif

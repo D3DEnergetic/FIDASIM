@@ -303,7 +303,7 @@ def main():
         use_mpi = is_mpi_executable(args.executable)
 
         if use_mpi:
-            pre_call = "cafrun -np {0} ".format(args.ntasks)
+            pre_call = "mpirun -np {0} ".format(args.ntasks)
             post_call = ""
         else:
             pre_call = ""

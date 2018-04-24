@@ -55,7 +55,7 @@ def test_chords():
     radius = np.sqrt(ulos**2 + vlos**2)
     id = np.array(["f1","f2","f3"])
 
-    chords = {"nchan":3L, "system":"SPECTRAL","id":id, "data_source":"run_tests:test_chords",
+    chords = {"nchan":3, "system":"SPECTRAL","id":id, "data_source":"run_tests:test_chords",
               "lens":lens, "axis":axis, "spot_size":spot_size, "sigma_pi":sigma_pi,
               "radius":radius}
 
@@ -144,13 +144,13 @@ def run_test(args):
     tfracs = 1.0-ffracs-hfracs
     current_fractions = np.array([ffracs,hfracs,tfracs])
 
-    basic_inputs = {"device":"test", "shot":1L, "time":1.0,
+    basic_inputs = {"device":"test", "shot":1, "time":1.0,
                     "einj":einj, "pinj":pinj, "current_fractions":current_fractions,
                     "ab":2.01410178e0, "ai":2.01410178e0, "impurity_charge":6,
                     "lambdamin":647e0, "lambdamax":667e0, "nlambda":2000,
-                    "n_fida":5000000L, "n_npa":5000000L, "n_nbi":50000L,
-                    "n_pfida":50000000L, "n_pnpa":50000000L,
-                    "n_halo":500000L, "n_dcx":500000L, "n_birth":10000L,
+                    "n_fida":5000000, "n_npa":5000000, "n_nbi":50000,
+                    "n_pfida":50000000, "n_pnpa":50000000,
+                    "n_halo":500000, "n_dcx":500000, "n_birth":10000,
                     "ne_wght":50, "np_wght":50,"nphi_wght":100,"emax_wght":100e0,
                     "nlambda_wght":1000,"lambdamin_wght":647e0,"lambdamax_wght":667e0,
                     "calc_npa":2, "calc_brems":1,"calc_fida":1,"calc_neutron":1,

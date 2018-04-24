@@ -53,7 +53,7 @@ def test_chords():
     sigma_pi = np.ones(3)
     spot_size = np.zeros(3)
     radius = np.sqrt(ulos**2 + vlos**2)
-    id = np.string_(["f1","f2","f3"])
+    id = np.array([b"f1",b"f2",b"f3"])
 
     chords = {"nchan":3, "system":"SPECTRAL","id":id, "data_source":"run_tests:test_chords",
               "lens":lens, "axis":axis, "spot_size":spot_size, "sigma_pi":sigma_pi,
@@ -72,7 +72,7 @@ def test_npa():
     vlos = np.array([-200.0,-170.0,-140.0])
     wlos = np.zeros(nchan)
     radius = np.sqrt(ulos**2 + vlos**2)
-    id = np.string_(["c1","c2","c3"])
+    id = np.array([b"c1",b"c2",b"c3"])
 
     a_cent  = np.zeros((3,nchan))
     a_redge = np.zeros((3,nchan))

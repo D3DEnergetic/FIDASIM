@@ -1,11 +1,6 @@
-PRO run_tests,result_dir,test_case=test_case
+PRO run_tests,result_dir,runid = runid
 
-
-   if not keyword_set(test_case) then begin
-     test_case = 'TEST_1A'
-   endif else begin
-     test_case = strupcase(test_case)
-   endelse
+   if not keyword_set(runid) then runid = 'test'
 
    fida_dir = get_fidasim_dir()
    test_dir = fida_dir+'/test/'
@@ -40,97 +35,24 @@ PRO run_tests,result_dir,test_case=test_case
                   alpha:0.d0,beta:0.d0,gamma:0.d0,$
                   origin:[0.d0,0.d0,0.d0]}
 
-   test_ids = ['1A','1B','2A','2B','3A','3B','4A','4B']
-   test_cases = 'TEST_' + test_ids
-   test_cases = [test_cases,'ALL']
-   run = strmatch(test_cases,test_case,/fold_case)
-   if total(run) eq 0 then begin
-       error, "Unknown test case",/halt
-   endif
-   if run[-1] eq 1 then run[*]=1
+   inputs = create_struct("runid",runid,$
+            "comment",'Non-rotated, Non-tilted grid; realistic profiles, flat distribution',$
+            basic_inputs, basic_bgrid)
 
-   for i=0,n_elements(test_ids)-1 do begin
-       if run[i] eq 0 then continue
-       PRINT, 'Preparing test case '+test_cases[i]
-       CASE test_cases[i] OF
-           "TEST_1A": BEGIN
-               inputs = create_struct("runid","test_1a",$
-                        "comment",'Non-rotated, Non-tilted grid; flat profiles',$
-                        basic_inputs, basic_bgrid)
-               nbi = test_beam(0.d0)
-           END
-           "TEST_1B": BEGIN
-               inputs = create_struct("runid",'test_1b',$
-                        "comment",'Non-rotated, Non-tilted grid; realistic profiles',$
-                        basic_inputs, basic_bgrid)
-               nbi = test_beam(0.d0)
-           END
-           "TEST_2A": BEGIN
-               nbi = test_beam(0.d0)
-               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
-                       length=120.d0,width=100.d0,height=140.d0)
-               inputs= create_struct("runid",'test_2a',$
-                       "comment",'Rotated, Non-tilted grid; flat profiles',$
-                       basic_inputs, bgrid)
-           END
-           "TEST_2B": BEGIN
-               nbi = test_beam(0.d0)
-               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
-                       length=120.d0,width=100.d0,height=140.d0)
-               inputs = create_struct("runid",'test_2b',$
-                        "comment",'Rotated, Non-tilted grid; realistic profiles',$
-                        basic_inputs, bgrid)
-           END
-           "TEST_3A": BEGIN
-               nbi = test_beam(0.25)
-               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
-                       length=120.d0,width=100.d0,height=140.d0)
-               inputs = create_struct("runid",'test_3a',$
-                        "comment",'Rotated, Tilted down grid; flat profiles',$
-                        basic_inputs, bgrid)
-           END
-           "TEST_3B": BEGIN
-               nbi = test_beam(0.25)
-               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
-                       length=120.d0,width=100.d0,height=140.d0)
-               inputs = create_struct("runid",'test_3b',$
-                        "comment",'Rotated, Tilted down grid; realistic profiles',$
-                        basic_inputs, bgrid)
+   nbi = test_beam(0.d0)
+   grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100)
+   equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux,g=g)
 
-           END
-           "TEST_4A": BEGIN
-               nbi = test_beam(-0.25)
-               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
-                       length=120.d0,width=100.d0,height=140.d0)
-               inputs = create_struct("runid",'test_4a',$
-                        "comment",'Rotated, Tilted up grid; flat profiles',$
-                        basic_inputs, bgrid)
+   equil = create_struct(equil,"geqdsk",g)
 
-           END
-           "TEST_4B": BEGIN
-               nbi = test_beam(-0.25)
-               bgrid = beam_grid(nbi,230.d0, nx=60, ny=50, nz=70, $
-                       length=120.d0,width=100.d0,height=140.d0)
-               inputs = create_struct("runid",'test_4b',$
-                        "comment",'Rotated, Tilted down grid; realistic profiles',$
-                        basic_inputs, bgrid)
-           END
-       ENDCASE
-       PRINT, inputs.comment
+   fbm = read_nubeam(test_dir+'test_fi_1.cdf',grid, btipsign=-1.0)
 
-       grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100)
-       equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux,g=g)
-       equil = create_struct(equil,"geqdsk",g)
-       fbm = read_nubeam(test_dir+'test_fi_2.cdf',grid,$
-                         btipsign=-1.0)
-       spec = test_chords()
-       npa = test_npa()
+   spec = test_chords()
+   npa = test_npa()
 
-       tcb = byte(strlowcase(test_cases[i]))
-       pfile = test_dir+'test_profiles_'+string(tcb[-1])+'.cdf'
-       plasma = test_profiles(pfile,grid,flux)
+   pfile = test_dir+'test_profiles.cdf'
+   plasma = test_profiles(pfile,grid,flux)
 
-       prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
-   endfor
+   prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
 
 end

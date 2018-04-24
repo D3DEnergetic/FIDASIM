@@ -7,199 +7,10 @@
 from __future__ import print_function
 import os
 import numpy as np
-import copy
 import datetime
 import h5py
 
 from fidasim.utils import *
-
-def aabb_intersect(rc, dr, r0, d0):
-    """
-    #+#aabb_intersect
-    #+Calculates intersection length of a ray and an axis aligned bounding box (AABB)
-    #+***
-    #+##Input Arguments
-    #+     **rc**: Center of AABB
-    #+
-    #+     **dr**: [length, width, height] of AABB
-    #+
-    #+     **r0**: starting point of ray
-    #+
-    #+     **d0**: direction of ray
-    #+
-    #+##Output Arguments
-    #+     **intersect**: Intersection length of ray and AABB
-    #+
-    #+     **ri**: Optional, ray enterence point
-    #+
-    #+     **rf**: Optional, ray exit point
-    #+
-    #+##Example Usage
-    #+```python
-    #+>>> intersect, r_enter, r_exit = aabb_intersect([0,0,0], [1,1,1], [-1,0,0], [1,0,0])
-    #+>>> print(intersect)
-    #+    1.0
-    #+>>> print(r_enter)
-    #+    -0.5  0.0  0.0
-    #+>>> print(r_exit)
-    #+     0.5  0.0  0.0
-    #+```
-    """
-    v0 = d0 / np.sqrt(np.sum(d0 ** 2.))
-
-    # There are 6 sides to a cube/grid
-    side_inter = np.zeros(6)
-
-    # Intersection points of ray with planes defined by grid
-    ipnts = np.zeros((3, 6))
-
-    # Find whether ray intersects each side
-    for i in range(6):
-        j = int(np.floor(i / 2))
-        ind = np.arange(3, dtype=int)
-        ind = ind[ind != j]
-        if np.abs(v0[j]) > 0.:   # just v0[j] != 0 right?
-            # Intersection point with plane
-            ipnts[:, i] = r0 + v0 * (((rc[j] + (np.mod(i, 2) - 0.5) * dr[j]) - r0[j]) / v0[j])
-
-            # Check if point on plane is within grid side
-            if (np.abs(ipnts[ind[0], i] - rc[ind[0]]) <= 0.5 * dr[ind[0]]) and \
-               (np.abs(ipnts[ind[1], i] - rc[ind[1]]) <= 0.5 * dr[ind[1]]):
-                side_inter[i] = 1
-
-    intersect = 0.0
-    r_enter = copy.deepcopy(r0)
-    r_exit = copy.deepcopy(r0)
-    ind = np.arange(side_inter.size)
-    ind = ind[side_inter != 0]
-    nw = side_inter[ind].size
-    if nw >= 2:
-        #Find two unique intersection points
-        nunique = 0
-        for i in range(nw - 1):
-            if np.sum(ipnts[:, ind[0]] == ipnts[:, ind[i + 1]]) != 3:
-                ind = [ind[0], ind[i + 1]]
-                nunique = 2
-                break
-
-        if nunique == 2:
-            vi = ipnts[:, ind[1]] - ipnts[:, ind[0]]
-            vi = vi / np.sqrt(np.sum(vi ** 2.))
-            dot_prod = np.sum(v0 * vi)
-            if dot_prod > 0.0:
-                r_enter = ipnts[:, ind[0]]
-                r_exit = ipnts[:, ind[1]]
-            else:
-                r_enter = ipnts[:, ind[1]]
-                r_exit = ipnts[:, ind[0]]
-
-            # Calculate intersection length
-            intersect = np.sqrt(np.sum((r_exit - r_enter) ** 2.))
-
-    return intersect, r_enter, r_exit
-
-def tb_zyx(alpha, beta, gamma):
-    """
-    #+#tb_zyx
-    #+Calculates Tait-Bryan z-y'-x" active rotation matrix given rotation angles `alpha`,`beta`,`gamma` in radians
-    #+***
-    #+##Arguments
-    #+     **alpha**: rotation angle about z [radians]
-    #+
-    #+     **beta**: rotation angle about y' [radians]
-    #+
-    #+     **gamma**: rotation angle about x" [radians]
-    #+
-    #+##Return Value
-    #+     Rotation Matrix [prefida](|url|/sourcefile/prefida.pro.html)
-    #+
-    #+##Example Usage
-    #+```dist
-    #+ >>> rot_mat = tb_zyx(!DPI/2, 0.0, !DPI/3)
-    #+```
-    """
-    sa = np.sin(alpha)
-    ca = np.cos(alpha)
-    sb = np.sin(beta)
-    cb = np.cos(beta)
-    sg = np.sin(gamma)
-    cg = np.cos(gamma)
-
-    r = np.zeros((3, 3))
-
-    r[0, 0] = ca * cb
-    r[0, 1] = ca * sb * sg - cg * sa
-    r[0, 2] = sa * sg + ca * cg * sb
-    r[1, 0] = cb * sa
-    r[1, 1] = ca * cg + sa * sb * sg
-    r[1, 2] = cg * sa * sb - ca * sg
-    r[2, 0] = -sb
-    r[2, 1] = cb * sg
-    r[2, 2] = cb * cg
-
-    return r
-
-def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
-    """
-    #+#uvw_to_xyz
-    #+ Express non-rotated coordinate `uvw` in rotated `xyz` coordinates
-    #+***
-    #+##Arguments
-    #+     **alpha**: Rotation angle about z [radians]
-    #+
-    #+     **beta**: Rotation angle about y' [radians]
-    #+
-    #+     **gamma**: Rotation angle about x" [radians]
-    #+
-    #+     **uvw**: Point in rotated coordinate system, (3, n)
-    #+
-    #+##Keyword Arguments
-    #+     **origin**: Origin of rotated coordinate system in non-rotated (uvw) coordinates, (3)
-    #+
-    #+##Output Arguments
-    #+     **xyz**: 'uvw' in 'xyz' coordinates
-    #+
-    #+##Example Usage
-    #+```python
-    #+>>> xyz = uvw_to_xyz(np.pi/2., 0.0, np.pi/3., uvw, origin=[.1, .2, 0.])
-    #+```
-    """
-    if origin is None:
-        origin = [0., 0., 0.]
-
-    # Make np arrays
-    uvw = np.array(uvw, dtype=float)
-    origin = np.array(origin, dtype=float)
-
-    # Do checks as this code does not allow multiple points to be entered (yet)
-    if uvw.ndim == 2:
-        s = uvw.shape
-        if s[0] != 3:
-            raise ValueError('uvw must be (3, n), but it has shape {}'.format(uvw.shape))
-        n = s[1]
-    elif uvw.ndim == 1:
-        if uvw.size != 3:
-            raise ValueError('uvw must have length 3, but it has length {}'.format(uvw.size))
-        n = 1
-    else:
-        raise ValueError('uvw must be (3) or (3, n)')
-
-    if origin.ndim != 1:
-        raise ValueError('origin must be 1D, but it has shape {}'.format(origin.shape))
-
-    if origin.size != 3:
-        raise ValueError('origin must have length 3, but it has length {}'.format(origin.size))
-
-    # Shift origin
-    uvw_shifted = uvw - np.squeeze(np.tile(origin, (n, 1)).T)
-
-    # Get rotation matrix
-    r = tb_zyx(alpha, beta, gamma)
-
-    # Apply rotation matrix
-    xyz = np.dot(r.T, uvw_shifted)
-
-    return xyz
 
 def check_dict_schema(schema, dic, desc=None):
     """
@@ -255,7 +66,7 @@ def check_dict_schema(schema, dic, desc=None):
                 err = True
 
             # Check for NaNs or Inf
-            if (not isinstance(dic[key], (str, dict, float, int))) and (str not in schema[key]['type']):
+            if (not isinstance(dic[key], (str, dict, float, int, long))) and (str not in schema[key]['type']):
                 if (dic[key][np.isnan(dic[key])].size > 0) or (dic[key][np.isinf(dic[key])].size > 0):
                     error('NaN or Infinity detected in "{}"'.format(key))
                     err = True
@@ -267,7 +78,7 @@ def check_dict_schema(schema, dic, desc=None):
                     err = True
 
             # Check shape
-            if isinstance(dic[key], (str, int, float)):
+            if isinstance(dic[key], (str, int, float, long)):
                 if (schema[key]['dims'] != 0) and (schema[key]['dims'] != [0]):
                     error('"{}" has the wrong shape. Expected ({})'.format(key, schema[key]['dims']))
                     err = True
@@ -297,10 +108,10 @@ def check_inputs(inputs):
                    'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': [int, np.int32, np.int64]}
+                'type': [int, long, np.int32, np.int64]}
 
     zero_long = {'dims': 0,
-                 'type': [int, np.int32, np.int64]}
+                 'type': [int, long, np.int32, np.int64]}
 
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
@@ -339,6 +150,8 @@ def check_inputs(inputs):
               'impurity_charge': zero_int,
               'n_fida': zero_long,
               'n_nbi': zero_long,
+              'n_pfida': zero_long,
+              'n_pnpa': zero_long,
               'n_dcx': zero_long,
               'n_npa': zero_long,
               'n_halo': zero_long,
@@ -352,6 +165,8 @@ def check_inputs(inputs):
               'lambdamax_wght': zero_double,
               'calc_npa': zero_int,
               'calc_fida': zero_int,
+              'calc_pnpa': zero_int,
+              'calc_pfida': zero_int,
               'calc_nbi': zero_int,
               'calc_dcx': zero_int,
               'calc_halo': zero_int,
@@ -459,7 +274,7 @@ def check_grid(grid):
     nz = grid['nz']
 
     zero_int = {'dims': 0,
-                'type': [int, np.int32, np.int64]}
+                'type': [int, long, np.int32, np.int64]}
 
     nrnz_doub = {'dims': [nr, nz],
                  'type': [float, np.float64]}
@@ -525,7 +340,7 @@ def check_beam(inputs, nbi):
                    'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': [int, np.int32, np.int64]}
+                'type': [int, long, np.int32, np.int64]}
 
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
@@ -537,7 +352,7 @@ def check_beam(inputs, nbi):
                  'type': [float, np.float64]}
 
     na_int = {'dims': [na],
-              'type': [int, np.int32, np.int64]}
+              'type': [int, long, np.int32, np.int64]}
 
     schema = {'data_source': zero_string,
               'name': zero_string,
@@ -711,13 +526,14 @@ def check_plasma(inputs, grid, plasma):
                    'type': [float, np.float64]}
 
     nrnz_int = {'dims': [nr, nz],
-                'type': [int, np.int32, np.int64]}
+                'type': [int, long, np.int32, np.int64]}
 
     schema = {'time': zero_double,
               'vr': nrnz_double,
               'vt': nrnz_double,
               'vz': nrnz_double,
               'dene': nrnz_double,
+              'denn': nrnz_double,
               'ti': nrnz_double,
               'te': nrnz_double,
               'zeff': nrnz_double,
@@ -799,7 +615,7 @@ def check_fields(inputs, grid, fields):
                    'type': [float, np.float64]}
 
     nrnz_int = {'dims': [nr, nz],
-                'type': [int, np.int32, np.int64]}
+                'type': [int, long, np.int32, np.int64]}
 
     schema = {'time': zero_double,
               'br': nrnz_double,
@@ -884,7 +700,7 @@ def check_distribution(inputs, grid, dist):
                        'type': [str]}
 
         zero_int = {'dims': 0,
-                    'type': [int, np.int32, np.int64]}
+                    'type': [int, long, np.int32, np.int64]}
 
         zero_double = {'dims': 0,
                        'type': [float, np.float64]}
@@ -921,10 +737,10 @@ def check_distribution(inputs, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': [int, np.int32, np.int64]}
+                    'type': [int, long, np.int32, np.int64]}
 
         zero_long = {'dims': 0,
-                     'type': [int, np.int32, np.int64]}
+                     'type': [int, long, np.int32, np.int64]}
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -936,7 +752,7 @@ def check_distribution(inputs, grid, dist):
                         'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': [int, np.int32, np.int64]}
+                     'type': [int, long, np.int32, np.int64]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,
@@ -965,10 +781,10 @@ def check_distribution(inputs, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': [int, np.int32, np.int64]}
+                    'type': [int, long, np.int32, np.int64]}
 
         zero_long = {'dims': 0,
-                     'type': [int, np.int32, np.int64]}
+                     'type': [int, long, np.int32, np.int64]}
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -980,7 +796,7 @@ def check_distribution(inputs, grid, dist):
                         'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': [int, np.int32, np.int64]}
+                     'type': [int, long, np.int32, np.int64]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,
@@ -1054,7 +870,7 @@ def check_spec(inputs, chords):
                    'type': [str]}
 
     zero_long = {'dims': 0,
-                 'type': [int, np.int32, np.int64]}
+                 'type': [int, long, np.int32, np.int64]}
 
     nchan_double = {'dims': [nchan],
                     'type': [float, np.float64]}
@@ -1150,13 +966,13 @@ def check_npa(inp, npa):
                    'type': [str]}
 
     zero_long = {'dims': 0,
-                 'type': [int, np.int32, np.int64]}
+                 'type': [int, long, np.int32, np.int64]}
 
     three_float = {'dims': [3, nchan],
                    'type': [float, np.float64]}
 
     nchan_int = {'dims': [nchan],
-                 'type': [int, np.int32, np.int64]}
+                 'type': [int, long, np.int32, np.int64]}
 
     nchan_float = {'dims': [nchan],
                     'type': [float, np.float64]}
@@ -1304,6 +1120,8 @@ def write_namelist(filename, inputs):
         f.write("calc_brems = {:d}    !! Calculate Bremsstrahlung\n".format(inputs['calc_brems']))
         f.write("calc_fida = {:d}    !! Calculate FIDA Spectra\n".format(inputs['calc_fida']))
         f.write("calc_npa = {:d}   !! Calculate NPA\n".format(inputs['calc_npa']))
+        f.write("calc_pfida = {:d}    !! Calculate Passive FIDA Spectra\n".format(inputs['calc_pfida']))
+        f.write("calc_pnpa = {:d}   !! Calculate Passive NPA\n".format(inputs['calc_pnpa']))
         f.write("calc_neutron = {:d}   !! Calculate B-T Neutron Rate\n".format(inputs['calc_neutron']))
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
@@ -1318,6 +1136,8 @@ def write_namelist(filename, inputs):
         f.write("!! Monte Carlo Settings\n")
         f.write("n_fida = {:d}    !! Number of FIDA mc particles\n".format(inputs['n_fida']))
         f.write("n_npa = {:d}    !! Number of NPA mc particles\n".format(inputs['n_npa']))
+        f.write("n_pfida = {:d}    !! Number of Passive FIDA mc particles\n".format(inputs['n_pfida']))
+        f.write("n_pnpa = {:d}    !! Number of Passive NPA mc particles\n".format(inputs['n_pnpa']))
         f.write("n_nbi = {:d}    !! Number of NBI mc particles\n".format(inputs['n_nbi']))
         f.write("n_halo = {:d}    !! Number of HALO mc particles\n".format(inputs['n_halo']))
         f.write("n_dcx = {:d}     !! Number of DCX mc particles\n".format(inputs['n_dcx']))
@@ -1543,6 +1363,7 @@ def write_equilibrium(filename, plasma, fields):
                               'te': 'Electron Temperature: Te(r,z)',
                               'ti': 'Ion Temperature: Ti(r,z)',
                               'zeff': 'Effective Nuclear Charge: Zeff(r,z)',
+                              'denn': 'Cold/Edge neutral density: Denn(r,z)',
                               'vr': 'Bulk plasma flow in the r-direction: Vr(r,z)',
                               'vt': 'Bulk plasma flow in the theta/torodial-direction: Vt(r,z)',
                               'vz': 'Bulk plasma flow in the z-direction: Vz(r,z)',
@@ -1556,6 +1377,7 @@ def write_equilibrium(filename, plasma, fields):
 
         plasma_units = {'time': 's',
                         'dene': 'cm^-3',
+                        'denn': 'cm^-3',
                         'te': 'keV',
                         'ti': 'keV',
                         'vr': 'cm/s',

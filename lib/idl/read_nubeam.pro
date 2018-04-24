@@ -12,10 +12,11 @@ FUNCTION grid_fbm,r2d,z2d,fbm,fdens,rout,zout
     start = [min(rout),min(zout)]
 
     triangulate, r2d, z2d, tr
-    index = lindgen(n_elements(tr))/3*3
+
     r2dt = r2d[tr[*]]
     z2dt = z2d[tr[*]]
     linTr = lindgen(size(tr,/dim))
+    index = lindgen(n_elements(tr))/3*3
     tr_num = round(griddata(r2dt,z2dt,float(index),triangles=linTr,/linear,$
              start=start,delta=delta,dimension=dim))
 
@@ -41,6 +42,21 @@ FUNCTION grid_fbm,r2d,z2d,fbm,fdens,rout,zout
         endfor
     endfor
     fbm_grid = fbm_grid > 0
+
+    ;; Catch points outside of triangulation
+    tr_ind = fix(griddata(r2d,z2d,indgen(nr2d),triangles=tr,/nearest_neighbor, $
+                      start=start,delta=delta,dimension=dim))
+    denf_nn = fdens[tr_ind]
+    fbm_grid_nn = fbm[*,*,tr_ind]
+
+    w = where(denf le 0.0,nw)
+    if nw ne 0 then begin
+        denf[w] = denf_nn[w]
+        inds=array_indices(denf,w)
+        for i=0,nw-1 do begin
+            fbm_grid[*,*,inds[0,i],inds[1,i]]=fbm_grid_nn[*,*,w[i]]
+        endfor
+    end
 
     return, {denf:denf, fbm:fbm_grid}
 END
@@ -145,7 +161,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     zgrid=grid.z
     dr = abs(rgrid[1]-rgrid[0])
     dz = abs(zgrid[1]-zgrid[0])
-    
+
     ;; FBM & DENF
     fdens=total(reform(total(fbm,1)),1)*dE*dP
     ntot = total(fdens*vars.bmvol)
@@ -153,12 +169,6 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     fstr = grid_fbm(r2d,z2d,fbm,fdens,rgrid,zgrid)
     denf = fstr.denf
     fbm_grid=fstr.fbm
-    
-    ;; enforce correct normalization
-    ntot_denf = (2*!dpi*dr*dz)*total(rgrid*total(denf,2))
-    denf = denf*(ntot/ntot_denf)
-    ntot_fbm = (2*!dpi*dr*dz*dE*dP)*total(rgrid*total(total(total(fbm_grid,1),1),2))
-    fbm_grid = fbm_grid*(ntot/ntot_fbm)
 
     ;; sort out positions more than 2 cm outside the separatrix
     rmaxis=mean(rsurf[*,0])
@@ -199,8 +209,15 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
         indices=array_indices(r_pts,index)
         for i=0,(size(indices))[2]-1 do begin
             fbm_grid[*,*,indices[0,i],indices[1,i]]=0.
+            denf[indices[0,i],indices[1,i]]=0.
         endfor
     endif
+
+    ;; enforce correct normalization
+    ntot_denf = (2*!dpi*dr*dz)*total(rgrid*total(denf,2))
+    denf = denf*(ntot/ntot_denf)
+    ntot_fbm = (2*!dpi*dr*dz*dE*dP)*total(rgrid*total(total(total(fbm_grid,1),1),2))
+    fbm_grid = fbm_grid*(ntot/ntot_fbm)
 
     fbm_struct={type:1,time:time,nenergy:fix(nenergy),energy:energy,npitch:fix(npitch),$
                 pitch:pitch,f:fbm_grid,denf:denf,data_source:file_expand_path(filename)}

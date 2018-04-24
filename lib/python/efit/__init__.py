@@ -1,1 +1,1 @@
-from efit import readg, fluxmap, rho_rz
+from efit.efit import readg, fluxmap, rho_rz

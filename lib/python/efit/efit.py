@@ -34,7 +34,7 @@ def readg(f):
 
     """
     #TODO: Make this into a class and precalculate psirz spline
-    if isinstance(f, basestring):
+    if isinstance(f, str):
         # If the input is a string, treat as file name
         with open(f) as fh: # Ensure file is closed
             return readg(fh) # Call again with file object
@@ -55,36 +55,36 @@ def readg(f):
     # Use a generator to read numbers
     token = file_numbers(f)
 
-    rdim   = float(token.next())
-    zdim   = float(token.next())
-    rcentr = float(token.next())
-    rleft  = float(token.next())
-    zmid   = float(token.next())
+    rdim   = float(next(token))
+    zdim   = float(next(token))
+    rcentr = float(next(token))
+    rleft  = float(next(token))
+    zmid   = float(next(token))
 
-    rmaxis = float(token.next())
-    zmaxis = float(token.next())
-    simag  = float(token.next())
-    sibry  = float(token.next())
-    bcentr = float(token.next())
+    rmaxis = float(next(token))
+    zmaxis = float(next(token))
+    simag  = float(next(token))
+    sibry  = float(next(token))
+    bcentr = float(next(token))
 
-    current= float(token.next())
-    simag  = float(token.next())
-    xdum   = float(token.next())
-    rmaxis = float(token.next())
-    xdum   = float(token.next())
+    current= float(next(token))
+    simag  = float(next(token))
+    xdum   = float(next(token))
+    rmaxis = float(next(token))
+    xdum   = float(next(token))
 
-    zmaxis = float(token.next())
-    xdum   = float(token.next())
-    sibry  = float(token.next())
-    xdum   = float(token.next())
-    xdum   = float(token.next())
+    zmaxis = float(next(token))
+    xdum   = float(next(token))
+    sibry  = float(next(token))
+    xdum   = float(next(token))
+    xdum   = float(next(token))
 
     # Read arrays
     def read_array(n, name="Unknown"):
         data = np.zeros([n])
         try:
             for i in np.arange(n):
-                data[i] = float(token.next())
+                data[i] = float(next(token))
         except:
             raise IOError("Failed reading array '"+name+"' of size ", n)
         return data
@@ -94,7 +94,7 @@ def readg(f):
         data = np.zeros([nw, nh])
         for j in np.arange(nh):
             for i in np.arange(nw):
-                data[i,j] = float(token.next())
+                data[i,j] = float(next(token))
         return data
 
     fpol   = read_array(nw, "fpol")
@@ -105,15 +105,15 @@ def readg(f):
     qpsi   = read_array(nw, "qpsi")
 
     # Read boundary and limiters, if present
-    nbbbs  = int(token.next())
-    limitr = int(token.next())
+    nbbbs  = int(next(token))
+    limitr = int(next(token))
 
     if nbbbs > 0:
         rbbbs = np.zeros([nbbbs])
         zbbbs = np.zeros([nbbbs])
         for i in range(nbbbs):
-            rbbbs[i] = float(token.next())
-            zbbbs[i] = float(token.next())
+            rbbbs[i] = float(next(token))
+            zbbbs[i] = float(next(token))
     else:
         rbbbs = [0]
         zbbbs = [0]
@@ -122,8 +122,8 @@ def readg(f):
         rlim = np.zeros([limitr])
         zlim = np.zeros([limitr])
         for i in range(limitr):
-            rlim[i] = float(token.next())
-            zlim[i] = float(token.next())
+            rlim[i] = float(next(token))
+            zlim[i] = float(next(token))
     else:
         rlim = [0]
         zlim = [0]

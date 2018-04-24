@@ -66,7 +66,7 @@ def check_dict_schema(schema, dic, desc=None):
                 err = True
 
             # Check for NaNs or Inf
-            if (not isinstance(dic[key], (str, dict, float, int, long))) and (str not in schema[key]['type']):
+            if (not isinstance(dic[key], (str, dict, float, int))) and (np.bytes_ not in schema[key]['type']):
                 if (dic[key][np.isnan(dic[key])].size > 0) or (dic[key][np.isinf(dic[key])].size > 0):
                     error('NaN or Infinity detected in "{}"'.format(key))
                     err = True
@@ -78,7 +78,7 @@ def check_dict_schema(schema, dic, desc=None):
                     err = True
 
             # Check shape
-            if isinstance(dic[key], (str, int, float, long)):
+            if isinstance(dic[key], (str, int, float)):
                 if (schema[key]['dims'] != 0) and (schema[key]['dims'] != [0]):
                     error('"{}" has the wrong shape. Expected ({})'.format(key, schema[key]['dims']))
                     err = True
@@ -108,10 +108,10 @@ def check_inputs(inputs):
                    'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': [int, long, np.int32, np.int64]}
+                'type': [int, np.int32, np.int64]}
 
     zero_long = {'dims': 0,
-                 'type': [int, long, np.int32, np.int64]}
+                 'type': [int, np.int32, np.int64]}
 
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
@@ -274,7 +274,7 @@ def check_grid(grid):
     nz = grid['nz']
 
     zero_int = {'dims': 0,
-                'type': [int, long, np.int32, np.int64]}
+                'type': [int, np.int32, np.int64]}
 
     nrnz_doub = {'dims': [nr, nz],
                  'type': [float, np.float64]}
@@ -340,7 +340,7 @@ def check_beam(inputs, nbi):
                    'type': [str]}
 
     zero_int = {'dims': 0,
-                'type': [int, long, np.int32, np.int64]}
+                'type': [int, np.int32, np.int64]}
 
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
@@ -352,7 +352,7 @@ def check_beam(inputs, nbi):
                  'type': [float, np.float64]}
 
     na_int = {'dims': [na],
-              'type': [int, long, np.int32, np.int64]}
+              'type': [int, np.int32, np.int64]}
 
     schema = {'data_source': zero_string,
               'name': zero_string,
@@ -526,7 +526,7 @@ def check_plasma(inputs, grid, plasma):
                    'type': [float, np.float64]}
 
     nrnz_int = {'dims': [nr, nz],
-                'type': [int, long, np.int32, np.int64]}
+                'type': [int, np.int32, np.int64]}
 
     schema = {'time': zero_double,
               'vr': nrnz_double,
@@ -615,7 +615,7 @@ def check_fields(inputs, grid, fields):
                    'type': [float, np.float64]}
 
     nrnz_int = {'dims': [nr, nz],
-                'type': [int, long, np.int32, np.int64]}
+                'type': [int, np.int32, np.int64]}
 
     schema = {'time': zero_double,
               'br': nrnz_double,
@@ -700,7 +700,7 @@ def check_distribution(inputs, grid, dist):
                        'type': [str]}
 
         zero_int = {'dims': 0,
-                    'type': [int, long, np.int32, np.int64]}
+                    'type': [int, np.int32, np.int64]}
 
         zero_double = {'dims': 0,
                        'type': [float, np.float64]}
@@ -737,10 +737,10 @@ def check_distribution(inputs, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': [int, long, np.int32, np.int64]}
+                    'type': [int, np.int32, np.int64]}
 
         zero_long = {'dims': 0,
-                     'type': [int, long, np.int32, np.int64]}
+                     'type': [int, np.int32, np.int64]}
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -752,7 +752,7 @@ def check_distribution(inputs, grid, dist):
                         'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': [int, long, np.int32, np.int64]}
+                     'type': [int, np.int32, np.int64]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,
@@ -781,10 +781,10 @@ def check_distribution(inputs, grid, dist):
         npart = dist['nparticle']
 
         zero_int = {'dims': 0,
-                    'type': [int, long, np.int32, np.int64]}
+                    'type': [int, np.int32, np.int64]}
 
         zero_long = {'dims': 0,
-                     'type': [int, long, np.int32, np.int64]}
+                     'type': [int, np.int32, np.int64]}
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -796,7 +796,7 @@ def check_distribution(inputs, grid, dist):
                         'type': [float, np.float64]}
 
         npart_int = {'dims': [npart],
-                     'type': [int, long, np.int32, np.int64]}
+                     'type': [int, np.int32, np.int64]}
 
         schema = {'type': zero_int,
                   'nparticle': zero_long,
@@ -870,13 +870,13 @@ def check_spec(inputs, chords):
                    'type': [str]}
 
     zero_long = {'dims': 0,
-                 'type': [int, long, np.int32, np.int64]}
+                 'type': [int, np.int32, np.int64]}
 
     nchan_double = {'dims': [nchan],
                     'type': [float, np.float64]}
 
     nchan_string = {'dims': [nchan],
-                    'type': [str, np.str_, np.bytes_]}
+                    'type': [np.bytes_]}
 
     three_nchan_float = {'dims': [3, nchan],
                          'type': [float, np.float64]}
@@ -966,19 +966,19 @@ def check_npa(inp, npa):
                    'type': [str]}
 
     zero_long = {'dims': 0,
-                 'type': [int, long, np.int32, np.int64]}
+                 'type': [int, np.int32, np.int64]}
 
     three_float = {'dims': [3, nchan],
                    'type': [float, np.float64]}
 
     nchan_int = {'dims': [nchan],
-                 'type': [int, long, np.int32, np.int64]}
+                 'type': [int, np.int32, np.int64]}
 
     nchan_float = {'dims': [nchan],
                     'type': [float, np.float64]}
 
     nchan_string = {'dims': [nchan],
-                    'type': [str, np.str_, np.bytes_]}
+                    'type': [np.bytes_]}
 
     schema = {'data_source': zero_string,
               'nchan': zero_long,

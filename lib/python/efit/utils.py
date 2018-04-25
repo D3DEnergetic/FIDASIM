@@ -3,10 +3,7 @@
 
 import numpy as np
 import scipy.interpolate
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import contour, clf
+import matplotlib._cntr as cntr
 
 def fluxmap(g):
     npts = g['nw']
@@ -26,8 +23,8 @@ def fluxmap(g):
     theta = np.linspace(0,2*np.pi,pts,endpoint=False)
     # Find r,theta of psi before boundary
     psi_i = g['ssimag'] + psi_eqdsk[-1]*dpsi # unnormalized
-    psi_contour = contour(g['r'],g['z'],g['psirz'], levels=[psi_i]).collections[0].get_paths()[0].vertices
-    clf()
+    R,Z = np.meshgrid(g['r'],g['z'])
+    psi_contour = cntr.Cntr(R,Z,g['psirz']).trace(psi_i,psi_i,0)[0]
     x_c = psi_contour[:,0] - g['rmaxis']
     y_c = psi_contour[:,1] - g['zmaxis']
     r_c = np.sqrt(x_c**2 + y_c**2)

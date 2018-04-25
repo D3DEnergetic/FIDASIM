@@ -162,7 +162,7 @@ def is_mpi_executable(executable):
 
     libraries = {}
     for line in ldd_out.splitlines():
-        match = re.match(r'\t(.*) => (.*) \(0x', line)
+        match = re.match(r'\t(.*) => (.*) \(0x', line.decode('utf-8'))
         if match:
             libraries[match.group(1)] = match.group(2)
 

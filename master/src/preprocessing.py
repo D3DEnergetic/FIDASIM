@@ -1260,7 +1260,7 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                      'aoffz': 'cm',
                      'adist': 'cm'}
 
-        write_data(g_nbi, nbi, nbi_description, nbi_units, name='nbi')
+        write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units, name='nbi')
 
         if spec is not None:
             # Create spec group
@@ -1286,7 +1286,7 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                           'radius': 'cm',
                           'spot_size': 'cm'}
 
-            write_data(g_spec, spec, spec_description, spec_units, name='spec')
+            write_data(g_spec, spec, desc=spec_description, units=spec_units, name='spec')
 
         if npa is not None:
             # Create npa group
@@ -1319,7 +1319,7 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                          'radius': 'cm',
                          'a_redge': 'cm'}
 
-            write_data(g_npa, npa, npa_description, npa_units, name='npa')
+            write_data(g_npa, npa, desc = npa_description, units = npa_units, name='npa')
 
     if os.path.isfile(filename):
         success('Geometry file created: ' + filename)
@@ -1388,7 +1388,7 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        write_data(g_plasma, plasma, plasma_description, plasma_units, name='plasma')
+        write_data(g_plasma, plasma, desc = plasma_description, units = plasma_units, name='plasma')
 
         # Create fields group
         g_fields = hf.create_group('fields')
@@ -1427,7 +1427,7 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        write_data(g_fields, fields, fields_description, fields_units, name='fields')
+        write_data(g_fields, fields, desc = fields_description, units = fields_units, name='fields')
 
     if os.path.isfile(filename):
         success('Equilibrium file created: '+filename)
@@ -1508,7 +1508,7 @@ def write_distribution(filename, distri):
         hf.attrs['description'] = 'Fast-ion distribution for FIDASIM'
         hf.attrs['coordinate_system'] = 'Cylindrical'
 
-        write_data(hf, distri, description, units, name='distribution')
+        write_data(hf, distri, desc = description, units=units, name='distribution')
 
     if os.path.isfile(filename):
         success('Distribution file created: ' + filename)

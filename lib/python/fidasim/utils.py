@@ -615,7 +615,7 @@ def beam_grid(nbi, rstart,
 
     return beam_grid
 
-def write_data(h5_obj, dic, desc, units, name=''):
+def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
     """
     #+#write_data
     #+ Write h5 datasets with attributes 'description' and 'units'
@@ -625,12 +625,12 @@ def write_data(h5_obj, dic, desc, units, name=''):
     #+
     #+     **dic**: Dict of data to save as h5 datasets
     #+
+    #+##Keyword Arguments
+    #+     **name**: Name/description of dic for clarity in raising errors
+    #+
     #+     **desc**: Dict with same keys as dic describing each item in dic
     #+
     #+     **units**: Dict with same keys as dic providing units of data in dic, doesn't have to be all keys of dic.
-    #+
-    #+##Keyword Arguments
-    #+     **name**: Name/description of dic for clarity in raising errors
     #+
     #+##Example Usage
     #+```python
@@ -638,6 +638,11 @@ def write_data(h5_obj, dic, desc, units, name=''):
     #+```
     """
     for key in dic:
+        if isinstance(dic[key], dict):
+            h5_grp = h5_obj.create_group(key)
+            write_data(h5_grp, dic[key])
+            continue
+
         # Transpose data to match expected by Fortran and historically provided by IDL
         if isinstance(dic[key], np.ndarray):
             if dic[key].ndim >= 2:
@@ -652,7 +657,8 @@ def write_data(h5_obj, dic, desc, units, name=''):
         ds = h5_obj.create_dataset(key, data = dic[key])
 
         # Add descrption attribute
-        ds.attrs['description'] = desc[key]
+        if key in desc:
+            ds.attrs['description'] = desc[key]
 
         # Add units attribute (if present)
         if key in units:
@@ -876,8 +882,9 @@ def extract_transp_plasma(filename, intime, grid, flux,
     mask[w] = 1
 
     # SAVE IN PROFILES STRUCTURE
-    plasma={"data_source":os.path.abspath(filename),"time":time,"profiles":profiles,
-            "mask":mask,"dene":dene,"denn":denn,"te":te,"ti":ti,"vr":vr,"vt":vt,"vz":vz,"zeff":zeff}
+    plasma={"data_source":os.path.abspath(filename),"time":time, "profiles":profiles,
+            "mask":mask,"dene":dene,"denn":denn,"te":te,"ti":ti,
+            "vr":vr,"vt":vt,"vz":vz,"zeff":zeff}
 
     return plasma
 

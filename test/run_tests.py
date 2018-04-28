@@ -126,7 +126,7 @@ def test_profiles(filename, grid, flux):
 
     profiles = {"time":1.0, "data_source":filename, "mask":mask,
                 "te":te, "ti":ti, "vr":vr, "vt":vt, "vz":vz,
-                "dene":dene, "zeff":zeff, "denn":denn}
+                "dene":dene, "zeff":zeff, "denn":denn,"profiles":prof}
 
     return profiles
 

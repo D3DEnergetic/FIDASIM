@@ -53,7 +53,7 @@ endif
 # HDF5 variables
 HDF5_LIB = $(DEPS_DIR)/hdf5/lib
 HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
-HDF5_FLAGS = -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl -Wl,-rpath,$(HDF5_LIB)
+HDF5_FLAGS = -L$(HDF5_LIB) -Wl,-Bstatic -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -Wl,-Bdynamic -lz -ldl
 
 ifneq ($(findstring gfortran, $(FC)),)
         L_FLAGS = -lm

@@ -79,8 +79,8 @@ endif
 endif
 ifneq ($(findstring ifort, $(FC)),)
         L_FLAGS = -lm -mkl
-        COMMON_CFLAGS = -Ofast -fpp -D_USE_BLAS
-        DEBUG_CFLAGS = -O0 -g -fpp -D_USE_BLAS -D_DEBUG
+        COMMON_CFLAGS = -Ofast -g -traceback -fpp -D_USE_BLAS
+        DEBUG_CFLAGS = -O0 -g -fpp -traceback -check all -D_USE_BLAS -D_DEBUG
         OPENMP_FLAGS = -qopenmp -D_OMP
         MPI_FLAGS = -D_MPI
         PROF_FLAGS = -p -D_PROF

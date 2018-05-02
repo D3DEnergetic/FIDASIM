@@ -1735,13 +1735,13 @@ subroutine read_inputs
     result_dir="."
     tables_file="."
     distribution_file="."
-    geometry_file ="." 
+    geometry_file ="."
     equilibrium_file="."
     neutrals_file="."
     shot=0
     time=0
     runid="0"
-    calc_brems=0 
+    calc_brems=0
     calc_nbi=0
     calc_dcx=0
     calc_halo=0
@@ -1757,10 +1757,10 @@ subroutine read_inputs
     load_neutrals=0
     verbose=0
     calc_neutron=0
-    n_fida=0 
-    n_pfida=0 
+    n_fida=0
+    n_pfida=0
     n_npa=0
-    n_pnpa=0 
+    n_pnpa=0
     n_nbi=0
     n_halo=0
     n_dcx=0
@@ -1768,15 +1768,15 @@ subroutine read_inputs
     ab=0
     pinj=0
     einj=0
-    current_fractions=0 
-    ai=0 
+    current_fractions=0
+    ai=0
     impurity_charge=0
     nx=0
     ny=0
     nz=0
-    xmin=0 
-    xmax=0 
-    ymin=0 
+    xmin=0
+    xmax=0
+    ymin=0
     ymax=0
     zmin=0
     zmax=0
@@ -1784,8 +1784,8 @@ subroutine read_inputs
     alpha=0
     beta=0
     gamma=0
-    ne_wght=0 
-    np_wght=0 
+    ne_wght=0
+    np_wght=0
     nphi_wght=0
     nlambda=0
     lambdamin=0
@@ -8044,7 +8044,7 @@ subroutine halo
     integer :: n_slices, cur_slice, is
 #ifdef _OMP
     integer, external :: omp_get_max_threads, omp_get_thread_num
-#endif 
+#endif
     !! Halo iteration
     integer(Int64) :: hh, n_halo !! counters
     real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
@@ -9716,6 +9716,7 @@ subroutine fida_weights_los
     integer, dimension(3) :: ind  !!actual cell
     real(Float64), dimension(3) :: ri
     integer(Int32) :: ntrack
+    logical :: inp
 
     real(Float64):: etov2, dEdP
 
@@ -9774,7 +9775,7 @@ subroutine fida_weights_los
         mean_f = 0.d0
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
-                do i=1,beam_grid%nx
+                x_loop: do i=1,beam_grid%nx
                     inter = spec_chords%inter(i,j,k)
                     cid = 0
                     cind = 0
@@ -9784,6 +9785,9 @@ subroutine fida_weights_los
                     enddo
                     if(cid.eq.ichan) then
                         ind = [i,j,k]
+                        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+                        call in_plasma(ri,inp)
+                        if(.not.inp) cycle x_loop
                         dlength = inter%los_elem(cind)%length
                         fdens = fdens + neut%full(:,i,j,k)*dlength
                         hdens = hdens + neut%half(:,i,j,k)*dlength
@@ -9794,8 +9798,8 @@ subroutine fida_weights_los
                                 neut%third(3,i,j,k) + neut%dcx(3,i,j,k) + &
                                 neut%halo(3,i,j,k))*dlength
 
-                        call get_plasma(plasma_cell,ind=ind)
-                        call get_fields(fields_cell,ind=ind)
+                        call get_plasma(plasma_cell,pos=ri)
+                        call get_fields(fields_cell,pos=ri)
                         plasma = plasma + wght*plasma_cell
                         fields = fields + wght*fields_cell
                         if (inputs%dist_type.eq.1) then
@@ -9808,7 +9812,7 @@ subroutine fida_weights_los
                         endif
                         wght_tot = wght_tot + wght
                     endif
-                enddo
+                enddo x_loop
             enddo
         enddo
 

@@ -4,6 +4,7 @@
 import numpy as np
 import scipy.interpolate
 import matplotlib._cntr as cntr
+import matplotlib.pyplot as plt
 
 def fluxmap(g):
     npts = g['nw']
@@ -24,7 +25,7 @@ def fluxmap(g):
     # Find r,theta of psi before boundary
     psi_i = g['ssimag'] + psi_eqdsk[-1]*dpsi # unnormalized
     R,Z = np.meshgrid(g['r'],g['z'])
-    psi_contour = cntr.Cntr(R,Z,g['psirz']).trace(psi_i,psi_i,0)[0]
+    psi_contour = [p for p in cntr.Cntr(R,Z,g['psirz']).trace(psi_i) if p.ndim == 2 and (p[0,0] == p[-1,0])][0]
     x_c = psi_contour[:,0] - g['rmaxis']
     y_c = psi_contour[:,1] - g['zmaxis']
     r_c = np.sqrt(x_c**2 + y_c**2)

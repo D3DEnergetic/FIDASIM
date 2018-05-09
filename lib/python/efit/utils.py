@@ -4,7 +4,6 @@
 import numpy as np
 import scipy.interpolate
 import matplotlib._cntr as cntr
-import matplotlib.pyplot as plt
 
 def fluxmap(g):
     npts = g['nw']

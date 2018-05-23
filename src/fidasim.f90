@@ -2261,7 +2261,7 @@ subroutine read_chords
 
         call grid_intersect(r0,v0,length,r_enter,r_exit)
         if(length.le.0.d0) then
-            if(inputs%verbose.ge.0) then
+            if(inputs%verbose.ge.1) then
                 WRITE(*,'("Channel ",i5," missed the beam grid")') i
             endif
             cycle chan_loop
@@ -7825,7 +7825,7 @@ subroutine ndmc
 #endif
 
     if(nbi_outside.gt.0)then
-        if(inputs%verbose.ge.0) then
+        if(inputs%verbose.ge.1) then
             write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
                                   100.*nbi_outside/(3.*inputs%n_nbi)
         endif

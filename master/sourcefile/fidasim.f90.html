@@ -9004,7 +9004,7 @@
 <a name="ln-8482"></a>
 <a name="ln-8483"></a>    <span class="c">!! Loop over all cells that have neutrals</span>
 <a name="ln-8484"></a>    <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &amp;</span>
-<a name="ln-8485"></a>    <span class="c">!$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch)</span>
+<a name="ln-8485"></a>    <span class="c">!$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch,los_intersect)</span>
 <a name="ln-8486"></a>    <span class="n">loop_over_cells</span><span class="p">:</span> <span class="k">do </span><span class="n">ic</span> <span class="o">=</span> <span class="n">istart</span><span class="p">,</span> <span class="n">ncell</span><span class="p">,</span> <span class="n">istep</span>
 <a name="ln-8487"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">cell_ind</span><span class="p">(</span><span class="n">ic</span><span class="p">),</span><span class="n">ind</span><span class="p">)</span>
 <a name="ln-8488"></a>        <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -9107,7 +9107,7 @@
 <a name="ln-8585"></a>
 <a name="ln-8586"></a>    <span class="c">!! Loop over all cells that have neutrals</span>
 <a name="ln-8587"></a>    <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &amp;</span>
-<a name="ln-8588"></a>    <span class="c">!$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch)</span>
+<a name="ln-8588"></a>    <span class="c">!$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch,los_intersect)</span>
 <a name="ln-8589"></a>    <span class="n">loop_over_cells</span><span class="p">:</span> <span class="k">do </span><span class="n">ic</span> <span class="o">=</span> <span class="n">istart</span><span class="p">,</span> <span class="n">ncell</span><span class="p">,</span> <span class="n">istep</span>
 <a name="ln-8590"></a>        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">cell_ind</span><span class="p">(</span><span class="n">ic</span><span class="p">),</span><span class="n">ind</span><span class="p">)</span>
 <a name="ln-8591"></a>        <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>

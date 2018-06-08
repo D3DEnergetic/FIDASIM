@@ -8237,6 +8237,9 @@ subroutine nbi_spec
     logical :: inp
     integer :: n = 10000
 
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& nbif_photons, nbih_photons, nbit_photons, rc, ri,inp, vnbi,&
+    !$OMP& random3,f_tot,h_tot,t_tot,full,half,third,f_wght,h_wght,t_wght)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8277,10 +8280,13 @@ subroutine nbi_spec
             t_tot = t_tot + t_wght
             call store_photons(ri, vnbi, t_wght*nbit_photons, third)
         enddo
+        !$OMP CRITICAL(nbi_spec_1)
         spec%full = spec%full + full/f_tot
         spec%half = spec%half + half/h_tot
         spec%third = spec%third + third/t_tot
+        !$OMP END CRITICAL(nbi_spec_1)
     enddo loop_over_cells
+    !$OMP END PARALLEL DO
 
 #ifdef _MPI
     !! Combine Spectra
@@ -8302,6 +8308,8 @@ subroutine dcx_spec
     logical :: inp
     integer :: n = 10000
 
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& dcx_photons, rc, ri, inp, vhalo, random3, plasma)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8328,6 +8336,7 @@ subroutine dcx_spec
             call store_photons(ri, vhalo, dcx_photons/n, spec%dcx)
         enddo
     enddo loop_over_cells
+    !$OMP END PARALLEL DO
 
 #ifdef _MPI
     !! Combine Spectra
@@ -8347,6 +8356,8 @@ subroutine halo_spec
     logical :: inp
     integer :: n = 10000
 
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& halo_photons, rc, ri, inp, vhalo, random3, plasma)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8373,6 +8384,7 @@ subroutine halo_spec
             call store_photons(ri, vhalo, halo_photons/n, spec%halo)
         enddo
     enddo loop_over_cells
+    !$OMP END PARALLEL DO
 
 #ifdef _MPI
     !! Combine Spectra
@@ -8391,6 +8403,8 @@ subroutine cold_spec
     real(Float64) :: cold_photons
     integer :: n = 10000
 
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& cold_photons, ri, vhalo, random3, plasma)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8407,6 +8421,7 @@ subroutine cold_spec
             call store_photons(ri, vhalo, cold_photons/n, spec%cold)
         enddo
     enddo loop_over_cells
+    !$OMP END PARALLEL DO
 
 #ifdef _MPI
     !! Combine Spectra

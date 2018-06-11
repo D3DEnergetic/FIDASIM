@@ -112,11 +112,25 @@ def test_profiles(filename, grid, flux):
     prof = fs.utils.read_ncdf(filename)
 
     rho = prof["rho"]
-    dene = interp1d(rho, prof["dene"]*1e-6,fill_value=0.0,bounds_error=False)(flux)
-    ti = interp1d(rho, prof["ti"]*1e-3,fill_value=0.0,bounds_error=False)(flux)
-    te = interp1d(rho, prof["te"]*1e-3,fill_value=0.0,bounds_error=False)(flux)
-    zeff = interp1d(rho, prof["zeff"]*1e0,fill_value=1.0,bounds_error=False)(flux)
-    vt = grid["r2d"]*interp1d(rho, prof["omega"]*1e0,fill_value=0.0,bounds_error=False)(flux)
+    dene_rho = prof["dene"]*1e-6
+    ti_rho = prof["ti"]*1e-3
+    te_rho = prof["te"]*1e-3
+    zeff_rho = prof["zeff"]*1e0
+    omega_rho = prof["omega"]*1e0
+
+    dene = interp1d(rho, dene_rho,fill_value='extrapolate')(flux)
+    dene = np.where(dene > 0.0, dene, 0.0).astype('float64')
+
+    ti = interp1d(rho, ti_rho,fill_value='extrapolate')(flux)
+    ti = np.where(ti > 0.0, ti, 0.0).astype('float64')
+
+    te = interp1d(rho, te_rho,fill_value='extrapolate')(flux)
+    ti = np.where(te > 0.0, te, 0.0).astype('float64')
+
+    zeff = interp1d(rho, zeff_rho,fill_value='extrapolate')(flux)
+    zeff = np.where(te > 1.0, te, 1.0).astype('float64')
+
+    vt = grid["r2d"]*interp1d(rho, omega_rho,fill_value='extrapolate')(flux)
     vr = 0*vt
     vz = 0*vt
     denn = zeff*0 + 1e8

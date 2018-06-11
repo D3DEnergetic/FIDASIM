@@ -3,6 +3,7 @@
 
 import numpy as np
 import scipy.interpolate
+from scipy.integrate import cumtrapz
 import matplotlib._cntr as cntr
 
 def fluxmap(g):
@@ -17,7 +18,7 @@ def fluxmap(g):
     nint = 100
     psi = np.linspace(0,psi_eqdsk[-1],100)
     q = scipy.interpolate.interp1d(psi_eqdsk, q_eqdsk,'cubic')(psi)
-    flux = 2*scipy.integrate.cumtrapz(q,psi,initial=0.0)*np.abs(dpsi)
+    flux = 2*cumtrapz(q,psi,initial=0.0)*np.abs(dpsi)
 
     pts = 101
     theta = np.linspace(0,2*np.pi,pts,endpoint=False)

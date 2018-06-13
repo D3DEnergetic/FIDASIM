@@ -849,6 +849,7 @@ def extract_transp_plasma(filename, intime, grid, flux,
                 "omega":transp_omega}
 
     # Interpolate onto r-z grid
+    dims = flux.shape
     f_dene = interp1d(rho,transp_ne,fill_value='extrapolate')
     dene = f_dene(flux)
     dene = np.where(dene > 0.0, dene, 0.0).astype('float64')
@@ -871,12 +872,11 @@ def extract_transp_plasma(filename, intime, grid, flux,
 
     f_omega = interp1d(rho,transp_omega,fill_value='extrapolate')
     vt = grid['r2d']*f_omega(flux).astype('float64')
-    vr = np.zeros((grid['nz'],grid['nr']),dtype='float64')
-    vz = np.zeros((grid['nz'],grid['nr']),dtype='float64')
+    vr = np.zeros(dims,dtype='float64')
+    vz = np.zeros(dims,dtype='float64')
 
     max_flux = max(abs(rho))
 
-    s = flux.shape
     mask = np.zeros(s,dtype='int')
     w = np.where(flux <= max_flux) #where we have profiles
     mask[w] = 1

@@ -3780,7 +3780,7 @@ subroutine write_npa
     integer, dimension(:), allocatable :: dcount
     real(Float64), dimension(:,:), allocatable :: ri, rf
     real(Float64), dimension(:), allocatable :: weight, energy, pitch
-    integer, dimension(:), allocatable :: det
+    integer, dimension(:), allocatable :: det, orbit_type
     integer :: i, npart, c, start_index, end_index
     character(charlim) :: filename = ''
     logical :: do_write = .True.
@@ -3839,10 +3839,11 @@ subroutine write_npa
     if(npart.gt.0) then
         allocate(ri(3,npart),rf(3,npart))
         allocate(weight(npart),energy(npart),pitch(npart))
-        allocate(det(npart))
+        allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
         weight = 0.d0 ; energy = 0.d0
         pitch = 0.d0  ; det = 0
+        orbit_type = 0
         c = 1
         do i=start_index, end_index
             ri(1,i) = npa%part(c)%xi
@@ -3855,6 +3856,7 @@ subroutine write_npa
             energy(i) = npa%part(c)%energy
             pitch(i) = npa%part(c)%pitch
             det(i) = npa%part(c)%detector
+            orbit_type(i) = npa%part(c)%class
             c = c + 1
         enddo
 #ifdef _MPI
@@ -3864,6 +3866,7 @@ subroutine write_npa
         call parallel_sum(energy)
         call parallel_sum(pitch)
         call parallel_sum(det)
+        call parallel_sum(orbit_type)
 #endif
     endif
 
@@ -3922,6 +3925,7 @@ subroutine write_npa
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
             call h5ltmake_compressed_dataset_int_f(gid,"detector",1,d, det, error)
+            call h5ltmake_compressed_dataset_int_f(gid,"class",1,d, orbit_type, error)
 
             !Add attributes
             call h5ltset_attribute_string_f(gid,"nparticle","description", &
@@ -3942,6 +3946,8 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"weight","units","neutrals/s",error)
             call h5ltset_attribute_string_f(gid,"detector","description", &
                  "Detector that the neutral particle hit", error)
+            call h5ltset_attribute_string_f(gid,"class","description", &
+                 "Class of the neutral particle", error)
 
             call h5ltset_attribute_string_f(fid,"/particles","coordinate_system", &
                  "Right-handed cartesian",error)
@@ -3956,7 +3962,7 @@ subroutine write_npa
     deallocate(dcount)
     if(npart.gt.0) then
         deallocate(ri,rf)
-        deallocate(energy,pitch,weight,det)
+        deallocate(energy,pitch,weight,det,orbit_type)
     endif
 
     !! Passive
@@ -3991,10 +3997,11 @@ subroutine write_npa
     if(npart.gt.0) then
         allocate(ri(3,npart),rf(3,npart))
         allocate(weight(npart),energy(npart),pitch(npart))
-        allocate(det(npart))
+        allocate(det(npart),orbit_type(npart))
         ri = 0.d0     ; rf = 0.d0
         weight = 0.d0 ; energy = 0.d0
         pitch = 0.d0  ; det = 0
+        orbit_type = 0
         c = 1
         do i=start_index, end_index
             ri(1,i) = pnpa%part(c)%xi
@@ -4007,6 +4014,7 @@ subroutine write_npa
             energy(i) = pnpa%part(c)%energy
             pitch(i) = pnpa%part(c)%pitch
             det(i) = pnpa%part(c)%detector
+            orbit_type(i) = pnpa%part(c)%class
             c = c + 1
         enddo
 #ifdef _MPI
@@ -4016,6 +4024,7 @@ subroutine write_npa
         call parallel_sum(energy)
         call parallel_sum(pitch)
         call parallel_sum(det)
+        call parallel_sum(orbit_type)
 #endif
     endif
 
@@ -4074,6 +4083,7 @@ subroutine write_npa
             call h5ltmake_compressed_dataset_double_f(gid,"energy",1,d, energy, error)
             call h5ltmake_compressed_dataset_double_f(gid,"weight",1,d, weight, error)
             call h5ltmake_compressed_dataset_int_f(gid,"detector",1,d, det, error)
+            call h5ltmake_compressed_dataset_int_f(gid,"class",1,d, orbit_type, error)
 
             !Add attributes
             call h5ltset_attribute_string_f(gid,"nparticle","description", &
@@ -4094,6 +4104,8 @@ subroutine write_npa
             call h5ltset_attribute_string_f(gid,"weight","units","neutrals/s",error)
             call h5ltset_attribute_string_f(gid,"detector","description", &
                  "Detector that the neutral particle hit", error)
+            call h5ltset_attribute_string_f(gid,"class","description", &
+                 "Class of the neutral particle", error)
 
             call h5ltset_attribute_string_f(fid,"/passive_particles","coordinate_system", &
                  "Right-handed cartesian",error)

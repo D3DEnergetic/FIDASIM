@@ -695,6 +695,8 @@ type NPAParticle
     !+ Defines a NPA particle
     integer       :: detector = 0
         !+ Detector NPA particle hit
+    integer(Int32) :: class = 0
+        !+ Orbit class id
     real(Float64) :: xi = 0.d0
         !+ Initial x position
     real(Float64) :: yi = 0.d0
@@ -6414,6 +6416,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
             call move_alloc(parts, pnpa%part)
         endif
         pnpa%part(pnpa%npart)%detector = det
+        pnpa%part(pnpa%npart)%class = iclass
         pnpa%part(pnpa%npart)%xi = uvw_ri(1)
         pnpa%part(pnpa%npart)%yi = uvw_ri(2)
         pnpa%part(pnpa%npart)%zi = uvw_ri(3)
@@ -6438,6 +6441,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
             call move_alloc(parts, npa%part)
         endif
         npa%part(npa%npart)%detector = det
+        npa%part(pnpa%npart)%class = iclass
         npa%part(npa%npart)%xi = uvw_ri(1)
         npa%part(npa%npart)%yi = uvw_ri(2)
         npa%part(npa%npart)%zi = uvw_ri(3)

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
 	  data-placement="bottom" data-html="true"
-	  title="<p>12.1% of total for derived types.</p>Including implementation: 52 statements, 12.1% of total for derived types.">52 statements</a>
+	  title="<p>12.3% of total for derived types.</p>Including implementation: 53 statements, 12.3% of total for derived types.">53 statements</a>
      </li> 
      
      
@@ -237,6 +237,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_neutron">calc_neutron</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-no_flr">no_flr</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-split">split</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
       
@@ -478,6 +480,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_neutron">calc_neutron</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-no_flr">no_flr</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-split">split</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
       
@@ -1040,6 +1044,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-split"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>split</strong></td><td></td><td></td><td><p>Split signals by fast ion class: 0=off, 1=on</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-verbose"></span>integer(kind=Int32),</td>
   
   <td>public</td>
@@ -1349,6 +1367,8 @@
         <span class="c">!+ Calculate neutron flux: 0 = off, 1=on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">no_flr</span>
         <span class="c">!+ Turns off Finite Larmor Radius effects: 0=off, 1=on</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">split</span>
+        <span class="c">!+ Split signals by fast ion class: 0=off, 1=on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">verbose</span>
         <span class="c">!+ Verbosity: &lt;0 = off++, 0 = off, 1=on, 2=on++</span>
 

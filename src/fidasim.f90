@@ -892,6 +892,8 @@ type SimulationInputs
         !+ Calculate neutron flux: 0 = off, 1=on
     integer(Int32) :: no_flr
         !+ Turns off Finite Larmor Radius effects: 0=off, 1=on
+    integer(Int32) :: split
+        !+ Split signals by fast ion class: 0=off, 1=on
     integer(Int32) :: verbose
         !+ Verbosity: <0 = off++, 0 = off, 1=on, 2=on++
 
@@ -1701,7 +1703,7 @@ subroutine read_inputs
     integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer            :: load_neutrals,verbose,no_flr
+    integer            :: load_neutrals,verbose,no_flr,split
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1716,7 +1718,7 @@ subroutine read_inputs
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_nbi,calc_dcx,calc_halo, calc_cold, calc_fida, &
-        calc_pfida, calc_npa, calc_pnpa,calc_birth, no_flr, &
+        calc_pfida, calc_npa, calc_pnpa,calc_birth, no_flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
@@ -1754,6 +1756,7 @@ subroutine read_inputs
     calc_pnpa=0
     calc_birth=0
     no_flr=0
+    split=1
     calc_fida_wght=0
     calc_npa_wght=0
     load_neutrals=0
@@ -2842,7 +2845,6 @@ subroutine read_mc(fid, error)
     endif
 
     call h5ltread_dataset_int_scalar_f(fid, "/nparticle", particles%nparticle, error)
-    call h5ltread_dataset_int_scalar_f(fid, "/nclass", particles%nclass, error)
 
     !!ALLOCATE SPACE
     allocate(particles%fast_ion(particles%nparticle))
@@ -2853,11 +2855,21 @@ subroutine read_mc(fid, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
     call h5ltread_dataset_int_f(fid, "/class", particles%fast_ion%class, dims, error)
 
-    if(any(particles%fast_ion%class.gt.particles%nclass)) then
+    if(any(particles%fast_ion%class.le.0)) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'READ_MC: Orbit class ID greater then the number of classes'
+            write(*,'(a)') 'READ_MC: Orbit class ID must be greater than 0'
         endif
         stop
+    endif
+
+    if(inputs%split.ge.1) then
+        call h5ltread_dataset_int_scalar_f(fid, "/nclass", particles%nclass, error)
+        if(any(particles%fast_ion%class.gt.particles%nclass)) then
+            if(inputs%verbose.ge.0) then
+                write(*,'(a)') 'READ_MC: Orbit class ID greater than the number of classes'
+            endif
+            stop
+        endif
     endif
 
     if(inputs%dist_type.eq.2) then
@@ -6384,7 +6396,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
     logical, intent(in), optional           :: passive
         !+ Indicates whether npa particle is passive
 
-    integer :: iclass
+    integer :: iclass, oclass
     type(LocalEMFields) :: fields
     real(Float64), dimension(3) :: uvw_ri, uvw_rf,vn_norm
     real(Float64) :: energy, pitch, dE
@@ -6393,9 +6405,11 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
     logical :: pas = .False.
 
     if(present(orbit_class)) then
-        iclass = orbit_class
+        iclass = min(orbit_class,particles%nclass)
+        oclass = orbit_class
     else
         iclass = 1
+        oclass = 1
     endif
 
     if(present(passive)) pas = passive
@@ -6428,7 +6442,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
             call move_alloc(parts, pnpa%part)
         endif
         pnpa%part(pnpa%npart)%detector = det
-        pnpa%part(pnpa%npart)%class = iclass
+        pnpa%part(pnpa%npart)%class = oclass
         pnpa%part(pnpa%npart)%xi = uvw_ri(1)
         pnpa%part(pnpa%npart)%yi = uvw_ri(2)
         pnpa%part(pnpa%npart)%zi = uvw_ri(3)
@@ -6453,7 +6467,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
             call move_alloc(parts, npa%part)
         endif
         npa%part(npa%npart)%detector = det
-        npa%part(pnpa%npart)%class = iclass
+        npa%part(pnpa%npart)%class = oclass
         npa%part(npa%npart)%xi = uvw_ri(1)
         npa%part(npa%npart)%yi = uvw_ri(2)
         npa%part(npa%npart)%zi = uvw_ri(3)
@@ -7145,7 +7159,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     logical :: pas = .False.
 
     if(present(orbit_class)) then
-        iclass = orbit_class
+        iclass = min(orbit_class,particles%nclass)
     endif
 
     if(present(passive)) pas = passive
@@ -7168,7 +7182,7 @@ subroutine store_neutrons(rate, orbit_class)
     integer :: iclass
 
     if(present(orbit_class)) then
-        iclass = orbit_class
+        iclass = min(orbit_class,particles%nclass)
     else
         iclass = 1
     endif

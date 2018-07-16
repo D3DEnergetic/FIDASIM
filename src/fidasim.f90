@@ -6397,6 +6397,7 @@ subroutine interpol3D_2D_arr(r, phi, z, f, rout, phiout, zout, fout, err, coeffs
     integer :: nphi
 
     err_status = 1
+    nphi = size(phi)
     if(present(coeffs)) then
         b = coeffs
         if(nphi .eq. 1) then

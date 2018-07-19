@@ -504,7 +504,7 @@ type NeutralBeam
     integer :: naperture
         !+ Number of beam apertures
     integer, dimension(:), allocatable       :: ashape
-        !+ Aperture shape 1="rectangular", 2="circular"
+        !+ Aperture shape 1="rectangular"3D_test/master_omp_f, 2="circular"
     real(Float64), dimension(:), allocatable :: awidy
         !+ Half width of the aperture(s) in y direction
     real(Float64), dimension(:), allocatable :: awidz
@@ -2648,7 +2648,12 @@ subroutine read_equilibrium
     !!Read in interpolation grid
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nr", inter_grid%nr, error)
     call h5ltread_dataset_int_scalar_f(gid, "/plasma/nz", inter_grid%nz, error)
-    call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", inter_grid%nphi, error)
+    call h5ltpath_valid_f(gid, "/plasma/nphi", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_int_scalar_f(gid, "/plasma/nphi", inter_grid%nphi, error)
+    else
+        inter_grid%nphi=1
+    endif
 
     inter_grid%dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
 
@@ -2663,7 +2668,11 @@ subroutine read_equilibrium
 
     call h5ltread_dataset_double_f(gid, "/plasma/r", inter_grid%r, dims(1:1), error)
     call h5ltread_dataset_double_f(gid, "/plasma/z", inter_grid%z, dims(2:2), error)
-    call h5ltread_dataset_double_f(gid, "/plasma/phi", inter_grid%phi, dims(3:3), error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(gid, "/plasma/phi", inter_grid%phi, dims(3:3), error)
+    else
+        inter_grid%phi=0.d0
+    endif
     call h5ltread_dataset_double_f(gid, "/plasma/r2d", inter_grid%r2d, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/z2d", inter_grid%z2d, dims, error)
 
@@ -2818,6 +2827,7 @@ subroutine read_f(fid, error)
     integer(HSIZE_T), dimension(5) :: dims
     real(Float64) :: dummy(1), denp_tot
     integer :: ir
+    logical :: path_valid
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
@@ -2827,7 +2837,12 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_int_scalar_f(fid,"/npitch", fbm%npitch, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nr", fbm%nr, error)
     call h5ltread_dataset_int_scalar_f(fid,"/nz", fbm%nz, error)
-    call h5ltread_dataset_int_scalar_f(fid,"/nphi", fbm%nphi, error)
+    call h5ltpath_valid_f(fid, "/nphi", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_int_scalar_f(fid,"/nphi", fbm%nphi, error)
+    else
+        fbm%nphi=1
+    endif
 
     if(((fbm%nr.ne.inter_grid%nr).or.(fbm%nz.ne.inter_grid%nz)).or.(fbm%nphi.ne.inter_grid%nphi)) then
         if(inputs%verbose.ge.0) then
@@ -2859,7 +2874,12 @@ subroutine read_f(fid, error)
     call h5ltread_dataset_double_f(fid, "/pitch", fbm%pitch, dims(2:2), error)
     call h5ltread_dataset_double_f(fid, "/r", fbm%r, dims(3:3), error)
     call h5ltread_dataset_double_f(fid, "/z", fbm%z, dims(4:4), error)
-    call h5ltread_dataset_double_f(fid, "/phi", fbm%phi, dims(5:5), error)
+    call h5ltpath_valid_f(fid, "/phi", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_double_f(fid, "/phi", fbm%phi, dims(5:5), error)
+    else
+        fbm%phi=0.d0
+    endif
 
     equil%plasma%denf = fbm%denf
 
@@ -2867,7 +2887,7 @@ subroutine read_f(fid, error)
     fbm%dp = abs(fbm%pitch(2) - fbm%pitch(1))
     fbm%dr = abs(fbm%r(2) - fbm%r(1))
     fbm%dz = abs(fbm%z(2) - fbm%z(1))
-    if (inter_grid%nphi .eq. 1) then
+    if (fbm%nphi .eq. 1) then
         fbm%dphi = 2*pi
     else
         fbm%dphi = abs(fbm%phi(2)-fbm%phi(1))

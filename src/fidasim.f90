@@ -10175,6 +10175,7 @@ program fidasim
     if(narg.eq.0) then
 #ifdef _MPI
         if(my_rank().eq.0) write(*,'(a)') "usage: mpirun -np [num_processes] ./fidasim namelist_file"
+        call cleanup_mpi()
 #else
         write(*,'(a)') "usage: ./fidasim namelist_file [num_threads]"
 #endif

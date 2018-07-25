@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 
-	 <meta name="description" content="">
+   
+   <meta name="description" content="">
     
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
@@ -17,6 +17,9 @@
     <link href="../../css/font-awesome.min.css" rel="stylesheet">
     <link href="../../css/local.css" rel="stylesheet">
     
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -26,13 +29,6 @@
     
     <script src="../../js/jquery-2.1.3.min.js"></script>
     <script src="../../js/svg-pan-zoom.min.js"></script>
-
-    
-    <script src="../../tipuesearch/tipuesearch_content.js"></script>
-    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
-    <script src="../../tipuesearch/tipuesearch_set.js"></script>
-    <script src="../../tipuesearch/tipuesearch.js"></script>
-    
 
   </head>
 
@@ -52,35 +48,39 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-				
+        
             <li><a href='../../page/index.html'>User Guide</a></li>
-	    
+      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
-		 aria-expanded="false">Contents <span class="caret"></span></a>
-	      <ul class="dropdown-menu">
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
               
             <li><a href="../../lists/files.html">Source Files</a></li>
-				
-				
+        
+        
+        
             <li><a href="../../lists/modules.html">Modules</a></li>
-				
+        
             
                                 
             <li><a href="../../lists/procedures.html">Procedures</a></li>
-				
-								
+        
+               
             <li><a href="../../lists/types.html">Derived Types</a></li>
-				
-				
+        
+        
             <li><a href="../../lists/programs.html">Programs</a></li>
-				
+        
             </ul>
             </li>
 
+
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
 
 
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
@@ -269,40 +269,50 @@ If there are no mirrors then <code>sigma_pi</code> is set to 1.0 .</p>
 <li>Bremsstrahlung</li>
 <li>Beam Emission (BES: Full, Half, Third)</li>
 <li>Halo Emission</li>
-<li>Fast-ion D-\(\alpha\) (FIDA)</li>
+<li>Fast-ion D-<script type="math/tex">\alpha</script> (FIDA)</li>
 </ul>
 <p style="text-align: center"><img alt="Spectra" src="../../media/fidasim_spectra.png" width="400"></p>
 <h2 id="bremsstrahlung">Bremsstrahlung</h2>
 <p>The largest source of background emission is visible bremsstrahlung. The local bremsstrahlung emissivity per unit wavelength is given by </p>
-<p>$$\frac{dN_B}{d\lambda} = 7.57 \times 10^{-9} \,  g \,  \frac{n_e^2 \, Z_{eff}}{\lambda \, T_e^{1/2}} e^{-hc/\lambda \,T_e} $$</p>
-<p>where \(\lambda\) is the wavelength in angstroms, \(n_e\) is the electron density in \(cm^{-3}\), \(T_e\) is the electron temperature in eV.
-The gaunt factor, \(g\), depends on \(T_e\) and \(Z_{eff}\). It can be approximated by</p>
-<p>$$ g = 5.542 - (3.108 - \ln(T_e/1000))(0.6905 - 0.1323/Z_{eff}) $$</p>
+<p>
+<script type="math/tex; mode=display">\frac{dN_B}{d\lambda} = 7.57 \times 10^{-9} \,  g \,  \frac{n_e^2 \, Z_{eff}}{\lambda \, T_e^{1/2}} e^{-hc/\lambda \,T_e} </script>
+</p>
+<p>where <script type="math/tex">\lambda</script> is the wavelength in angstroms, <script type="math/tex">n_e</script> is the electron density in <script type="math/tex">cm^{-3}</script>, <script type="math/tex">T_e</script> is the electron temperature in eV.
+The gaunt factor, <script type="math/tex">g</script>, depends on <script type="math/tex">T_e</script> and <script type="math/tex">Z_{eff}</script>. It can be approximated by</p>
+<p>
+<script type="math/tex; mode=display"> g = 5.542 - (3.108 - \ln(T_e/1000))(0.6905 - 0.1323/Z_{eff}) </script>
+</p>
 <p>To calculate the total emission "seen" by the line of sight the the local emissivity is integrated over the line of sight.</p>
 <h2 id="emission-by-neutrals">Emission by Neutrals</h2>
 <p>There are two processes in which neutrals can emit light: Excitation and Charge Exchange.</p>
 <p style="text-align: center"><img alt="Excitation" src="../../media/beam_emission.png" width="250">
 <img alt="Charge Exchange" src="../../media/fida_halo_emission.png" width="250"></p>
 <p>Excitation is the primary method in which beam neutrals emit light (BES).
-In short, a neutral particle collides with a charged particle, exciting into a higher energy (\(n=3\)) state.
-When the neutral particle relaxes (\(n: 3 \rightarrow 2\)) it emits a doppler shifted (656.1 nm) photon.</p>
+In short, a neutral particle collides with a charged particle, exciting into a higher energy (<script type="math/tex">n=3</script>) state.
+When the neutral particle relaxes (<script type="math/tex">n: 3 \rightarrow 2</script>) it emits a doppler shifted (656.1 nm) photon.</p>
 <p>Charge Exchange is the process by which the Halo and FIDA light is created.
 In a charge exchange reaction a thermal (Halo) or fast (FIDA) ion steals a electron from a neutral particle.
-The newly created neutral is born in an excited (\(n=3\) state and like the collisionally excited neutral it relaxes to a lower energy state (\n=2) and emits a doppler shifted (656.1 nm) photon.</p>
+The newly created neutral is born in an excited (<script type="math/tex">n=3</script> state and like the collisionally excited neutral it relaxes to a lower energy state (\n=2) and emits a doppler shifted (656.1 nm) photon.</p>
 <p style="text-align: center"><img alt="Stark Splitting and Doppler Shift" src="../../media/stark_doppler.png" width="400"></p>
 <p><img _=";" alt="Stark Splitting" src="../../media/stark_splitting.png" style="float: right" width="250">
 The motion of a ion in a magnetic field induces an electric field which causes Stark Spitting of the the atoms energy levels.
 Most atoms the strength of the Stark effect is quadratic in low electric fields and linear for strong electric fields. 
 Usually atoms never the linear regime but, due to degenerency between states of different angular momentum, hydrogenic atoms exhibit a linear Stark effect.
 The linear Stark energy component shifts are given by the following equations.</p>
-<p>$$\Delta \mathcal{E} = 3nk\frac{E}{Ze/4\pi\epsilon_0a_0^2}R_y\;\, \mathrm{for} \;\,k=0,\pm 1,\dots,\pm (n-1)$$</p>
-<p>As seen from the above equation, each energy level is split into \(2n-1\) parts.
-For the Balmer-alpha transition, this creates 15 distinct transitions from the \(n=3 \rightarrow 2\) state. </p>
+<p>
+<script type="math/tex; mode=display">\Delta \mathcal{E} = 3nk\frac{E}{Ze/4\pi\epsilon_0a_0^2}R_y\;\, \mathrm{for} \;\,k=0,\pm 1,\dots,\pm (n-1)</script>
+</p>
+<p>As seen from the above equation, each energy level is split into <script type="math/tex">2n-1</script> parts.
+For the Balmer-alpha transition, this creates 15 distinct transitions from the <script type="math/tex">n=3 \rightarrow 2</script> state. </p>
 <p>The relative intensity of the different Stark lines is given by</p>
-<p>$$ I_{rel}(i) = S_I(i)\,(1 \pm (\vec{v}_{ph} \cdot \vec{E})^2) $$
-$$ I_{rel}(i) = \frac{I_{rel}(i)}{\sum_i I_{rel}(i)} $$</p>
-<p>where positive and negative sums refer to \(\sigma\) and \(\pi\) lines respectively and \(S_I\) are the calculated relative Stark intensities for each transition given by</p>
-<p>$$S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 1] $$</p>
+<p>
+<script type="math/tex; mode=display"> I_{rel}(i) = S_I(i)\,(1 \pm (\vec{v}_{ph} \cdot \vec{E})^2) </script>
+<script type="math/tex; mode=display"> I_{rel}(i) = \frac{I_{rel}(i)}{\sum_i I_{rel}(i)} </script>
+</p>
+<p>where positive and negative sums refer to <script type="math/tex">\sigma</script> and <script type="math/tex">\pi</script> lines respectively and <script type="math/tex">S_I</script> are the calculated relative Stark intensities for each transition given by</p>
+<p>
+<script type="math/tex; mode=display">S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 1] </script>
+</p>
 <h1 id="relevant-namelist-settings">Relevant Namelist Settings</h1>
 <ul>
 <li><code>calc_fida</code>: Calculate FIDA spectra</li>
@@ -445,7 +455,8 @@ $$ I_{rel}(i) = \frac{I_{rel}(i)}{\sum_i I_{rel}(i)} $$</p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+                                          </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 
@@ -476,12 +487,17 @@ $$ I_{rel}(i) = \frac{I_{rel}(i)}{\sum_i I_{rel}(i)} $$</p>
       MathJax.Hub.Config({
         TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
         jax: ['input/TeX','input/MathML','output/HTML-CSS'],
-        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
-        'HTML-CSS': { 
-           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
-        }
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+    
   </body>
 </html>

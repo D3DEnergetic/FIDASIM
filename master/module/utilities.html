@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 
-	 <meta name="description" content="">
+   
+   <meta name="description" content="">
     
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
@@ -17,6 +17,9 @@
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
     
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -26,13 +29,6 @@
     
     <script src="../js/jquery-2.1.3.min.js"></script>
     <script src="../js/svg-pan-zoom.min.js"></script>
-
-    
-    <script src="../tipuesearch/tipuesearch_content.js"></script>
-    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    <script src="../tipuesearch/tipuesearch_set.js"></script>
-    <script src="../tipuesearch/tipuesearch.js"></script>
-    
 
   </head>
 
@@ -52,35 +48,39 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-				
+        
             <li><a href='../page/index.html'>User Guide</a></li>
-	    
+      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
-		 aria-expanded="false">Contents <span class="caret"></span></a>
-	      <ul class="dropdown-menu">
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
               
             <li><a href="../lists/files.html">Source Files</a></li>
-				
-				
+        
+        
+        
             <li><a href="../lists/modules.html">Modules</a></li>
-				
+        
             
                                 
             <li><a href="../lists/procedures.html">Procedures</a></li>
-				
-								
+        
+               
             <li><a href="../lists/types.html">Derived Types</a></li>
-				
-				
+        
+        
             <li><a href="../lists/programs.html">Programs</a></li>
-				
+        
             </ul>
             </li>
 
+
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
 
 
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
@@ -131,17 +131,21 @@
     
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
-	  data-placement="bottom" data-html="true"
-	  title=" 4.3% of total for modules and submodules.">520 statements</a>
+    data-placement="bottom" data-html="true"
+    title=" 4.3% of total for modules and submodules.">520 statements</a>
      </li> 
+     
      
      
     <li><i class="fa fa-code"></i><a href="../src/utilities.f90"> Source File</a></li>
      
+     
   </ul>
   <ol class="breadcrumb in-well text-right">
   
+    
      <li><a href='../sourcefile/utilities.f90.html'>utilities.f90</a></li>
+    
   
      <li class="active">utilities</li>
   </ol>
@@ -161,6 +165,9 @@
     
 <div id="sidebar">
   
+<h3>Contents</h3>
+ 
+
 
 
 <div class="panel panel-primary">
@@ -173,6 +180,7 @@
     </div>
   </div>
 </div>
+
 
 
 
@@ -204,6 +212,7 @@
 
 
 
+
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
   <div id="types-0" class="panel-collapse collapse">
@@ -216,6 +225,7 @@
     </div>
   </div>
 </div>
+
 
 
 <div class="panel panel-primary">
@@ -244,6 +254,7 @@
 </div>
 
 
+
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
   <div class="list-group">
@@ -267,47 +278,34 @@
 
 
 
-  <hr>
-  
 
-<div class="panel panel-default">
-  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-0">All Modules</a></h3></div>
-  <div id="allmods-0" class="panel-collapse collapse">
-    <div class="list-group">
-      
-      <a class="list-group-item" href="../module/atomic_tables.html">atomic_tables</a>
-      
-      <a class="list-group-item" href="../module/eigensystem.html">eigensystem</a>
-      
-      <a class="list-group-item" href="../module/hdf5_utils.html">hdf5_utils</a>
-      
-      <a class="list-group-item" href="../module/libfida.html">libfida</a>
-      
-      <a class="list-group-item" href="../module/mpi_utils.html">mpi_utils</a>
-      
-      <a class="list-group-item" href="../module/utilities.html">utilities</a>
-      
-    </div>
-  </div>
 </div>
-
-
-</div>  
 
     </div>
     
     <div class="col-md-9" id='text'>
-      
+    <p>Utilities for parallel random number generation and sparse arrays</p>
+      <br>
     
   
-    <ul class="list-inline">
-      <li><h4>Uses:</h4></li>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Uses</h3>
+      </div>
+      <ul class="list-group">
       
-      <li><a href="https://gcc.gnu.org/onlinedocs/gcc-4.4.3/libgomp/Runtime-Library-Routines.html">omp_lib</a></li>
-      
-    </ul>
+      <li class="list-group-item">
+  <ul class="list-inline">
     
-                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <li><a href="https://gcc.gnu.org/onlinedocs/gcc-4.4.3/libgomp/Runtime-Library-Routines.html">omp_lib</a></li>
+    
+  </ul>
+      </li>
+      
+      
+      
+      <li class="list-group-item">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
@@ -331,24 +329,14 @@
 </a>
 </g>
 </g>
-<!-- omp_lib&#45;&gt;module~utilities -->
-<g id="module~~utilities~~UsesGraph_edge1" class="edge"><title>omp_lib&#45;&gt;module~utilities</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.4029,-12C62.3932,-12 71.3106,-12 79.8241,-12"/>
-<polygon fill="#000000" stroke="#000000" points="79.919,-15.5001 89.919,-12 79.919,-8.5001 79.919,-15.5001"/>
+<!-- module~utilities&#45;&gt;omp_lib -->
+<g id="module~~utilities~~UsesGraph_edge1" class="edge"><title>module~utilities&#45;&gt;omp_lib</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M89.5971,-12C81.6068,-12 72.6894,-12 64.1759,-12"/>
+<polygon fill="#000000" stroke="#000000" points="64.081,-8.5001 54.081,-12 64.081,-15.5001 64.081,-8.5001"/>
 </g>
 </g>
 </svg>
-</div>
-                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
-                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
-                  <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                      </div>
-                      <div class="modal-body">
-                        
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
     <p>Nodes of different colours represent the following: </p>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -395,25 +383,28 @@
 </svg>
 
     
-    <p>Solid arrows point from a parent (sub)module to the submodule which is
-    descended from it. Dashed arrows point from a module being used to the
-    module or program unit using it.
+    <p>Solid arrows point from a submodule to the (sub)module which it is
+    descended from. Dashed arrows point from a module or program unit to 
+    modules which it uses.
     </p>
-    
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
+    </div></div></div></div>
+      </li>
+      
+      </ul>
+    </div>
     
 
     
-    <p>Utilities for parallel random number generation and sparse arrays</p>
     
-    
-    <h3>Used By</h3>
-    
-                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Used by</h3>
+      </div>
+      <ul class="list-group">
+  
+  
+  <li class="list-group-item">
+    <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
@@ -429,58 +420,48 @@
 <polygon fill="none" stroke="black" points="54,-45 0,-45 0,-21 54,-21 54,-45"/>
 <text text-anchor="middle" x="27" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">utilities</text>
 </g>
-<!-- module~libfida -->
-<g id="module~~utilities~~UsedByGraph_node2" class="node"><title>module~libfida</title>
-<g id="a_module~~utilities~~UsedByGraph_node2"><a xlink:href="../module/libfida.html" xlink:title="libfida">
-<polygon fill="#337ab7" stroke="#337ab7" points="162,-66 108,-66 108,-42 162,-42 162,-66"/>
-<text text-anchor="middle" x="135" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">libfida</text>
-</a>
-</g>
-</g>
-<!-- module~utilities&#45;&gt;module~libfida -->
-<g id="module~~utilities~~UsedByGraph_edge2" class="edge"><title>module~utilities&#45;&gt;module~libfida</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.2023,-38.191C67.325,-40.7908 83.4222,-43.9799 97.7132,-46.8111"/>
-<polygon fill="#000000" stroke="#000000" points="97.2423,-50.2858 107.732,-48.7959 98.6027,-43.4192 97.2423,-50.2858"/>
-</g>
 <!-- program~generate_tables -->
-<g id="module~~utilities~~UsedByGraph_node3" class="node"><title>program~generate_tables</title>
-<g id="a_module~~utilities~~UsedByGraph_node3"><a xlink:href="../program/generate_tables.html" xlink:title="generate_tables">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="180,-24 90,-24 90,-0 180,-0 180,-24"/>
-<text text-anchor="middle" x="135" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
+<g id="module~~utilities~~UsedByGraph_node2" class="node"><title>program~generate_tables</title>
+<g id="a_module~~utilities~~UsedByGraph_node2"><a xlink:href=".././program/generate_tables.html" xlink:title="generate_tables">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="180,-66 90,-66 90,-42 180,-42 180,-66"/>
+<text text-anchor="middle" x="135" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">generate_tables</text>
 </a>
 </g>
 </g>
-<!-- module~utilities&#45;&gt;program~generate_tables -->
-<g id="module~~utilities~~UsedByGraph_edge3" class="edge"><title>module~utilities&#45;&gt;program~generate_tables</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M54.2023,-27.809C62.042,-26.2558 70.9433,-24.4924 79.8869,-22.7205"/>
-<polygon fill="#000000" stroke="#000000" points="80.819,-26.104 89.9482,-20.7272 79.4586,-19.2374 80.819,-26.104"/>
+<!-- program~generate_tables&#45;&gt;module~utilities -->
+<g id="module~~utilities~~UsedByGraph_edge1" class="edge"><title>program~generate_tables&#45;&gt;module~utilities</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M89.9673,-45.2765C81.3133,-43.5621 72.3308,-41.7825 63.9791,-40.1279"/>
+<polygon fill="#000000" stroke="#000000" points="64.6589,-36.6947 54.1693,-38.1845 63.2984,-43.5612 64.6589,-36.6947"/>
+</g>
+<!-- module~libfida -->
+<g id="module~~utilities~~UsedByGraph_node3" class="node"><title>module~libfida</title>
+<g id="a_module~~utilities~~UsedByGraph_node3"><a xlink:href=".././module/libfida.html" xlink:title="libfida">
+<polygon fill="#337ab7" stroke="#337ab7" points="162,-24 108,-24 108,-0 162,-0 162,-24"/>
+<text text-anchor="middle" x="135" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">libfida</text>
+</a>
+</g>
+</g>
+<!-- module~libfida&#45;&gt;module~utilities -->
+<g id="module~~utilities~~UsedByGraph_edge2" class="edge"><title>module~libfida&#45;&gt;module~utilities</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M107.798,-17.191C94.675,-19.7908 78.5778,-22.9799 64.2868,-25.8111"/>
+<polygon fill="#000000" stroke="#000000" points="63.3973,-22.4192 54.2682,-27.7959 64.7577,-29.2858 63.3973,-22.4192"/>
 </g>
 <!-- program~fidasim -->
 <g id="module~~utilities~~UsedByGraph_node4" class="node"><title>program~fidasim</title>
-<g id="a_module~~utilities~~UsedByGraph_node4"><a xlink:href="../program/fidasim.html" xlink:title="fidasim">
-<polygon fill="#f0ad4e" stroke="#f0ad4e" points="270,-66 216,-66 216,-42 270,-42 270,-66"/>
-<text text-anchor="middle" x="243" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+<g id="a_module~~utilities~~UsedByGraph_node4"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="270,-24 216,-24 216,-0 270,-0 270,-24"/>
+<text text-anchor="middle" x="243" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
 </a>
 </g>
 </g>
-<!-- module~libfida&#45;&gt;program~fidasim -->
-<g id="module~~utilities~~UsedByGraph_edge1" class="edge"><title>module~libfida&#45;&gt;program~fidasim</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M162.202,-54C175.325,-54 191.422,-54 205.713,-54"/>
-<polygon fill="#000000" stroke="#000000" points="205.732,-57.5001 215.732,-54 205.732,-50.5001 205.732,-57.5001"/>
+<!-- program~fidasim&#45;&gt;module~libfida -->
+<g id="module~~utilities~~UsedByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;module~libfida</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M215.798,-12C202.675,-12 186.578,-12 172.287,-12"/>
+<polygon fill="#000000" stroke="#000000" points="172.268,-8.5001 162.268,-12 172.268,-15.5001 172.268,-8.5001"/>
 </g>
 </g>
 </svg>
-</div>
-                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
-                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
-                  <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                      </div>
-                      <div class="modal-body">
-                        
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
     <p>Nodes of different colours represent the following: </p>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -527,21 +508,24 @@
 </svg>
 
     
-    <p>Solid arrows point from a parent (sub)module to the submodule which is
-    descended from it. Dashed arrows point from a module being used to the
-    module or program unit using it.
+    <p>Solid arrows point from a submodule to the (sub)module which it is
+    descended from. Dashed arrows point from a module or program unit to 
+    modules which it uses.
     </p>
+    </div></div></div></div>
+  </li>
+  
+      </ul>
+    </div>
     
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
+
     <br>
-    
 
     <section class="visible-xs visible-sm hidden-md">
       
+<h3>Contents</h3>
+ 
+
 
 
 <div class="panel panel-primary">
@@ -554,6 +538,7 @@
     </div>
   </div>
 </div>
+
 
 
 
@@ -585,6 +570,7 @@
 
 
 
+
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
   <div id="types-1" class="panel-collapse collapse">
@@ -597,6 +583,7 @@
     </div>
   </div>
 </div>
+
 
 
 <div class="panel panel-primary">
@@ -625,6 +612,7 @@
 </div>
 
 
+
 <div class="panel panel-primary">
   <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
   <div class="list-group">
@@ -639,6 +627,7 @@
     </div>
   </div>
 </div>
+
 
 
 
@@ -691,9 +680,9 @@
     
     
     <section>
-	 <h2>Interfaces</h2>
-	 
-	   
+   <h2>Interfaces</h2>
+   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="interface-randu"></span><h3>public interface <a href='../interface/randu.html'>randu</a>
     
@@ -710,7 +699,7 @@
 private subroutine randu_arr(randomu)
     
     
-	 
+   
 </h3>
     
 
@@ -762,7 +751,7 @@ private subroutine randu_arr(randomu)
 private subroutine randu_r_arr(r, randomu)
     
     
-	 
+   
 </h3>
     
 
@@ -827,7 +816,7 @@ private subroutine randu_r_arr(r, randomu)
 </div>
 
     
-	   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="interface-randn"></span><h3>public interface <a href='../interface/randn.html'>randn</a>
     
@@ -844,7 +833,7 @@ private subroutine randu_r_arr(r, randomu)
 private subroutine randn_arr(randomn)
     
     
-	 
+   
 </h3>
     
 
@@ -896,7 +885,7 @@ private subroutine randn_arr(randomn)
 private subroutine randn_r_arr(r, randomn)
     
     
-	 
+   
 </h3>
     
 
@@ -961,7 +950,7 @@ private subroutine randn_r_arr(r, randomn)
 </div>
 
     
-	   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="interface-randind_cdf"></span><h3>public interface <a href='../interface/randind_cdf.html'>randind_cdf</a>
     
@@ -983,7 +972,7 @@ private subroutine randn_r_arr(r, randomn)
 private subroutine randind_r_cdf_1(r, cdf, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1065,7 +1054,7 @@ private subroutine randind_r_cdf_1(r, cdf, randomi)
 private subroutine randind_cdf_1(cdf, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1130,7 +1119,7 @@ private subroutine randind_cdf_1(cdf, randomi)
 </div>
 
     
-	   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="interface-randind"></span><h3>public interface <a href='../interface/randind.html'>randind</a>
     
@@ -1152,7 +1141,7 @@ private subroutine randind_cdf_1(cdf, randomi)
 private subroutine randind_n(n, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1219,7 +1208,7 @@ private subroutine randind_n(n, randomi)
 private subroutine randind_w_1(w, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1286,7 +1275,7 @@ private subroutine randind_w_1(w, randomi)
 private subroutine randind_w_2(w, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1353,7 +1342,7 @@ private subroutine randind_w_2(w, randomi)
 private subroutine randind_w_3(w, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1420,7 +1409,7 @@ private subroutine randind_w_3(w, randomi)
 private subroutine randind_r_n(r, n, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1502,7 +1491,7 @@ private subroutine randind_r_n(r, n, randomi)
 private subroutine randind_r_w_1(r, w, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1584,7 +1573,7 @@ private subroutine randind_r_w_1(r, w, randomi)
 private subroutine randind_r_w_2(r, w, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1666,7 +1655,7 @@ private subroutine randind_r_w_2(r, w, randomi)
 private subroutine randind_r_w_3(r, w, randomi)
     
     
-	 
+   
 </h3>
     
 
@@ -1746,7 +1735,7 @@ private subroutine randind_r_w_3(r, w, randomi)
 </div>
 
     
-	   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="interface-sparse"></span><h3>public interface <a href='../interface/sparse.html'>sparse</a>
     
@@ -1768,7 +1757,7 @@ private subroutine randind_r_w_3(r, w, randomi)
 private subroutine sparse_1(A, SA)
     
     
-	 
+   
 </h3>
     
 
@@ -1835,7 +1824,7 @@ private subroutine sparse_1(A, SA)
 private subroutine sparse_2(A, SA)
     
     
-	 
+   
 </h3>
     
 
@@ -1902,7 +1891,7 @@ private subroutine sparse_2(A, SA)
 private subroutine sparse_3(A, SA)
     
     
-	 
+   
 </h3>
     
 
@@ -1969,7 +1958,7 @@ private subroutine sparse_3(A, SA)
 private subroutine sparse_4(A, SA)
     
     
-	 
+   
 </h3>
     
 
@@ -2034,7 +2023,7 @@ private subroutine sparse_4(A, SA)
 </div>
 
     
-	   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="interface-deriv"></span><h3>public interface <a href='../interface/deriv.html'>deriv</a>
     
@@ -2056,7 +2045,7 @@ private subroutine sparse_4(A, SA)
 private subroutine deriv_1d(x, y, yp)
     
     
-	 
+   
 </h3>
     
 
@@ -2138,7 +2127,7 @@ private subroutine deriv_1d(x, y, yp)
 private subroutine deriv_2d(x, y, z, zxp, zyp)
     
     
-	 
+   
 </h3>
     
 
@@ -2250,7 +2239,7 @@ private subroutine deriv_2d(x, y, z, zxp, zyp)
 
     
     </section>
-	<br>
+  <br>
     
 
     
@@ -2258,8 +2247,8 @@ private subroutine deriv_2d(x, y, z, zxp, zyp)
     
     <section>
      <h2>Derived Types</h2>
-	 
-	   
+   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="type-rng_type"></span><h3>type, public :: <a href='../type/rng_type.html'>rng_type</a>
     
@@ -2320,7 +2309,7 @@ private subroutine deriv_2d(x, y, z, zxp, zyp)
 </div>
 
      
-	   
+     
 <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="type-sparsearray"></span><h3>type, public :: <a href='../type/sparsearray.html'>SparseArray</a>
     
@@ -2421,7 +2410,7 @@ private subroutine deriv_2d(x, y, z, zxp, zyp)
 
      
     </section>
-	<br>
+  <br>
     
     
      
@@ -2434,7 +2423,7 @@ private subroutine deriv_2d(x, y, z, zxp, zyp)
 public function <a href='../proc/sub2ind.html'>sub2ind</a>(dims, subs) result(ind)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2518,7 +2507,7 @@ public function <a href='../proc/sub2ind.html'>sub2ind</a>(dims, subs) result(in
 public function <a href='../proc/rng_seed.html'>rng_seed</a>() result(seed)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2557,7 +2546,7 @@ public function <a href='../proc/rng_seed.html'>rng_seed</a>() result(seed)
 public function <a href='../proc/get_rng.html'>get_rng</a>() result(r)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2588,7 +2577,7 @@ public function <a href='../proc/get_rng.html'>get_rng</a>() result(r)
 public function <a href='../proc/rng_uniform.html'>rng_uniform</a>(self) result(u)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2656,7 +2645,7 @@ public function <a href='../proc/rng_uniform.html'>rng_uniform</a>(self) result(
 public function <a href='../proc/rng_normal.html'>rng_normal</a>(self) result(n)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2724,7 +2713,7 @@ public function <a href='../proc/rng_normal.html'>rng_normal</a>(self) result(n)
 public function <a href='../proc/get_value.html'>get_value</a>(SA, subs) result(val)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2807,7 +2796,7 @@ public function <a href='../proc/get_value.html'>get_value</a>(SA, subs) result(
 public function <a href='../proc/time.html'>time</a>(time_start) result(time_str)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2875,7 +2864,7 @@ public function <a href='../proc/time.html'>time</a>(time_start) result(time_str
 public function <a href='../proc/norm2.html'>norm2</a>(in) result(res)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -2943,7 +2932,7 @@ public function <a href='../proc/norm2.html'>norm2</a>(in) result(res)
 public subroutine <a href='../proc/ind2sub.html'>ind2sub</a>(dims, ind, subs)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -3033,7 +3022,7 @@ public subroutine <a href='../proc/ind2sub.html'>ind2sub</a>(dims, ind, subs)
 public subroutine <a href='../proc/rng_init.html'>rng_init</a>(self, seed)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -3108,7 +3097,7 @@ public subroutine <a href='../proc/rng_init.html'>rng_init</a>(self, seed)
 public subroutine <a href='../proc/cumsum.html'>cumsum</a>(x, cs)
     
     
-	 
+   
 </h3></div>
   <div class="panel-body">
        
@@ -3184,40 +3173,14 @@ public subroutine <a href='../proc/cumsum.html'>cumsum</a>(x, cs)
     </div>
   </div>
 
-  <section class="visible-xs visible-sm hidden-md">
-    <hr>
-    
-
-<div class="panel panel-default">
-  <div class="panel-heading text-left"><h3 class="panel-title"><a data-toggle="collapse" href="#allmods-1">All Modules</a></h3></div>
-  <div id="allmods-1" class="panel-collapse collapse">
-    <div class="list-group">
-      
-      <a class="list-group-item" href="../module/atomic_tables.html">atomic_tables</a>
-      
-      <a class="list-group-item" href="../module/eigensystem.html">eigensystem</a>
-      
-      <a class="list-group-item" href="../module/hdf5_utils.html">hdf5_utils</a>
-      
-      <a class="list-group-item" href="../module/libfida.html">libfida</a>
-      
-      <a class="list-group-item" href="../module/mpi_utils.html">mpi_utils</a>
-      
-      <a class="list-group-item" href="../module/utilities.html">utilities</a>
-      
-    </div>
-  </div>
-</div>
-
-
-  </section>
   
     <hr>    
     </div> <!-- /container -->
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+                                          </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 
@@ -3248,12 +3211,17 @@ public subroutine <a href='../proc/cumsum.html'>cumsum</a>(x, cs)
       MathJax.Hub.Config({
         TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
         jax: ['input/TeX','input/MathML','output/HTML-CSS'],
-        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
-        'HTML-CSS': { 
-           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
-        }
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
   </body>
 </html>

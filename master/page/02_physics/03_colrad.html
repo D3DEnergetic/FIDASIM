@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 
-	 <meta name="description" content="">
+   
+   <meta name="description" content="">
     
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
@@ -17,6 +17,9 @@
     <link href="../../css/font-awesome.min.css" rel="stylesheet">
     <link href="../../css/local.css" rel="stylesheet">
     
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -26,13 +29,6 @@
     
     <script src="../../js/jquery-2.1.3.min.js"></script>
     <script src="../../js/svg-pan-zoom.min.js"></script>
-
-    
-    <script src="../../tipuesearch/tipuesearch_content.js"></script>
-    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
-    <script src="../../tipuesearch/tipuesearch_set.js"></script>
-    <script src="../../tipuesearch/tipuesearch.js"></script>
-    
 
   </head>
 
@@ -52,35 +48,39 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-				
+        
             <li><a href='../../page/index.html'>User Guide</a></li>
-	    
+      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
-		 aria-expanded="false">Contents <span class="caret"></span></a>
-	      <ul class="dropdown-menu">
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
               
             <li><a href="../../lists/files.html">Source Files</a></li>
-				
-				
+        
+        
+        
             <li><a href="../../lists/modules.html">Modules</a></li>
-				
+        
             
                                 
             <li><a href="../../lists/procedures.html">Procedures</a></li>
-				
-								
+        
+               
             <li><a href="../../lists/types.html">Derived Types</a></li>
-				
-				
+        
+        
             <li><a href="../../lists/programs.html">Programs</a></li>
-				
+        
             </ul>
             </li>
 
+
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
 
 
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
@@ -150,56 +150,72 @@
 <p>The collisions that a neutral particle experiences as it travels through a plasma changes the distribution of its energy level population.
 The types of collisions that FIDASIM takes into account is as follows</p>
 <ul>
-<li>Spontaneous decay: \(A_{m \rightarrow n} / A_{n \rightarrow m}\)</li>
-<li>Electron-impact excitation/de-excitation: \(q^e_{m \rightarrow n} / q^e_{n \rightarrow m}\)</li>
-<li>Ion-impact excitation/de-excitation: \(q^i_{m \rightarrow n} / q^i_{n \rightarrow m}\)</li>
-<li>Impurity-impact excitation/de-excitation: \(q^Z_{m \rightarrow n} / q^Z_{n \rightarrow m}\)</li>
-<li>Electron-impact ionization: \(I^e_n\)</li>
-<li>Ion-impact ionization: \(I^i_n\)</li>
-<li>Impurity-impact ionization: \(I^Z_n\)</li>
-<li>Charge exchange with ions: \(X^i_n\)</li>
-<li>Charge exchange with impurities: \(X^Z_n\)</li>
+<li>Spontaneous decay: <script type="math/tex">A_{m \rightarrow n} / A_{n \rightarrow m}</script>
+</li>
+<li>Electron-impact excitation/de-excitation: <script type="math/tex">q^e_{m \rightarrow n} / q^e_{n \rightarrow m}</script>
+</li>
+<li>Ion-impact excitation/de-excitation: <script type="math/tex">q^i_{m \rightarrow n} / q^i_{n \rightarrow m}</script>
+</li>
+<li>Impurity-impact excitation/de-excitation: <script type="math/tex">q^Z_{m \rightarrow n} / q^Z_{n \rightarrow m}</script>
+</li>
+<li>Electron-impact ionization: <script type="math/tex">I^e_n</script>
+</li>
+<li>Ion-impact ionization: <script type="math/tex">I^i_n</script>
+</li>
+<li>Impurity-impact ionization: <script type="math/tex">I^Z_n</script>
+</li>
+<li>Charge exchange with ions: <script type="math/tex">X^i_n</script>
+</li>
+<li>Charge exchange with impurities: <script type="math/tex">X^Z_n</script>
+</li>
 </ul>
-<p>The above rate coefficients have units of \(cm^3/s\) and are calculated by averaging the respective collisional cross sections with a Maxwellian of the relevent species.
-The population of the \(n^{th}\) energy level of a neutral atom, \(f_n\), can be described by the following time dependent differential equation
-$$
+<p>The above rate coefficients have units of <script type="math/tex">cm^3/s</script> and are calculated by averaging the respective collisional cross sections with a Maxwellian of the relevent species.
+The population of the <script type="math/tex">n^{th}</script> energy level of a neutral atom, <script type="math/tex">f_n</script>, can be described by the following time dependent differential equation
+<script type="math/tex; mode=display">
 \frac{df_n}{dt} = - \left ( \sum_{k=i,Z} f_n d_k X^k_n + \sum_{k=e,i,Z} f_n d_k I^k_n \right ) \\
-+ \sum_{m&gt;n} \left (f_m A_{m \rightarrow n} + \sum_{k=e,i,Z} (f_m d_k q^k_{m \rightarrow n} - f_n d_k q^k_{n \rightarrow m}) \right ) \\
-+ \sum_{n&gt;m} \left (-f_n A_{n \rightarrow m} + \sum_{k=e,i,Z} (f_m d_k q^k_{m \rightarrow n} - f_n d_k q^k_{n \rightarrow m}) \right )
-$$
-where the \(d_k\) are the respective target densities.</p>
-<p>By rearranging the terms and letting \(q^k_{n \rightarrow m}\) represent excitation/de-excitation depending on the order of the indices we can get the following equation
-$$
++ \sum_{m>n} \left (f_m A_{m \rightarrow n} + \sum_{k=e,i,Z} (f_m d_k q^k_{m \rightarrow n} - f_n d_k q^k_{n \rightarrow m}) \right ) \\
++ \sum_{n>m} \left (-f_n A_{n \rightarrow m} + \sum_{k=e,i,Z} (f_m d_k q^k_{m \rightarrow n} - f_n d_k q^k_{n \rightarrow m}) \right )
+</script>
+where the <script type="math/tex">d_k</script> are the respective target densities.</p>
+<p>By rearranging the terms and letting <script type="math/tex">q^k_{n \rightarrow m}</script> represent excitation/de-excitation depending on the order of the indices we can get the following equation
+<script type="math/tex; mode=display">
 \frac{df_n}{dt} = C_{n,n} f_n + \sum_{m \ne n} C_{n,m} f_m
-$$
+</script>
 where
-$$
+<script type="math/tex; mode=display">
 C_{n,n} = - \left [ \sum_{k=i,Z} d_k X^k_n + \sum_{k=e,i,Z} d_k I^k_n + \sum_{m \ne n} \left ( A_{n \rightarrow m} + \sum_{k=e,i,Z} d_k q^k_{n \rightarrow m} \right ) \right ]
-$$
+</script>
 and 
-$$
+<script type="math/tex; mode=display">
 C_{n,m} = A_{m \rightarrow n} + \sum_{k=e,i,Z} d_k q^k_{m \rightarrow n}
-$$</p>
+</script>
+</p>
 <p>The system of differential equations can be compactly represented as a matrix multiplication.
-$$
+<script type="math/tex; mode=display">
 \frac{d \mathbf{f}}{dt} = \mathbf{C} \cdot \mathbf{f}
-$$</p>
+</script>
+</p>
 <p>The solution of this matrix differential equation takes the form of a matrix exponential</p>
-<p>$$\mathbf{f}(t) = e^{\mathbf{C} t} \cdot \mathbf{f}(0) = \mathbf{S} \cdot e^{\mathbf{\Lambda} t} \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0)$$</p>
-<p>where \(\mathbf{f}(t)\) is a vector of the neutral population flux [1/s] for each energy state at time \(t\), \(\mathbf{S}\) is the matrix of the eigenvectors of \( \mathbf{C} \) and \( \mathbf{\Lambda} \) is a diagonal matrix containing the eigenvalues of \( \mathbf{C} \). 
+<p>
+<script type="math/tex; mode=display">\mathbf{f}(t) = e^{\mathbf{C} t} \cdot \mathbf{f}(0) = \mathbf{S} \cdot e^{\mathbf{\Lambda} t} \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0)</script>
+</p>
+<p>where <script type="math/tex">\mathbf{f}(t)</script> is a vector of the neutral population flux [1/s] for each energy state at time <script type="math/tex">t</script>, <script type="math/tex">\mathbf{S}</script> is the matrix of the eigenvectors of <script type="math/tex"> \mathbf{C} </script> and <script type="math/tex"> \mathbf{\Lambda} </script> is a diagonal matrix containing the eigenvalues of <script type="math/tex"> \mathbf{C} </script>. 
 The fractional flux of a neutral traveling through a uniform plasma is shown below.</p>
 <p style="text-align: center"><img alt="" src="../../media/neutral_attenuation.png"></p>
 <p>As you can see the relative populations between states converges fairly quickly.</p>
-<p>The number of neutrals in a given state after a time \(t\), \(\mathbf{n}(t)\), is given by</p>
-<p>$$\mathbf{n}(t) = \mathbf{S} \cdot ( \mathbf{\Lambda}^{-1} \cdot e^{\mathbf{\Lambda} t} - \mathbf{\Lambda}^{-1} ) \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0) $$</p>
-<p>If \(t\) represents the time spent inside a grid cell the neutral density can be calculated by dividing the above equation by \(V_{cell}\).
+<p>The number of neutrals in a given state after a time <script type="math/tex">t</script>, <script type="math/tex">\mathbf{n}(t)</script>, is given by</p>
+<p>
+<script type="math/tex; mode=display">\mathbf{n}(t) = \mathbf{S} \cdot ( \mathbf{\Lambda}^{-1} \cdot e^{\mathbf{\Lambda} t} - \mathbf{\Lambda}^{-1} ) \cdot \mathbf{S}^{-1} \cdot \mathbf{f}(0) </script>
+</p>
+<p>If <script type="math/tex">t</script> represents the time spent inside a grid cell the neutral density can be calculated by dividing the above equation by <script type="math/tex">V_{cell}</script>.
 The total neutral density of a mc marker is shown below.</p>
 <p style="text-align: center"><img alt="" src="../../media/neutral_dens.png"></p>
 <p>As you can see over time the total number of neutrals decreases exponentially.</p>
 <h1 id="fortran-references">Fortran References</h1>
 <ul>
 <li><a href="../../proc/colrad.html">colrad</a>: Fortran implementation</li>
-<li><a href="../../proc/get_rate_matrix.html">get_rate_matrix</a>: Constructs rate matrix \(A\)</li>
+<li><a href="../../proc/get_rate_matrix.html">get_rate_matrix</a>: Constructs rate matrix <script type="math/tex">A</script>
+</li>
 <li><a href="../../type/atomicrates.html">AtomicRates</a>: Derived type that stores populating and de-populating transitions</li>
 </ul>
     </div>
@@ -321,7 +337,8 @@ The total neutral density of a mc marker is shown below.</p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+                                          </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 
@@ -352,12 +369,17 @@ The total neutral density of a mc marker is shown below.</p>
       MathJax.Hub.Config({
         TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
         jax: ['input/TeX','input/MathML','output/HTML-CSS'],
-        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
-        'HTML-CSS': { 
-           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
-        }
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+    
   </body>
 </html>

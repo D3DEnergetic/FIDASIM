@@ -121,13 +121,12 @@ The default settings should be appropriate for most use cases, however, it may b
 In that case edit the file `tables/default_settings.dat` before running the following command
 
 ```bash
-make atomic_tables
+./tables/generate_tables ./tables/default_settings.dat [num_threads]
 ```
 
 @warning
 This is computationally expensive so make sure you run this on a computer
-where you won't get angry emails for using up all the CPU's.
-Optionally you can add `NTHREADS=#` to the command to set the number of threads.
+where you won't get angry emails for using up all the CPU's
 
 Now would be a good time to get more coffee... or maybe a nap.
 

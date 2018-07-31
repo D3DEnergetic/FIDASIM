@@ -18,6 +18,7 @@ module atomic_tables
 !+Physical Review A 41.9 1990.](http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837)
 !+7. [Bosch, H-S., and G. M. Hale. *Improved formulas for fusion cross-sections and thermal reactivities.*
 !+ Nuclear fusion 32.4 1992.](http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta)
+!+8. [Aladdin Database: R.K. Janev, W.D. Langer, K. Evans Jr., D.E. Post Jr. H-HE-PLASMA (1987)](https://www-amdis.iaea.org/ALADDIN/collision.html)
 use H5LT
 use HDF5
 use hdf5_utils
@@ -236,6 +237,90 @@ function p_cx_janev(Erel,n) result(sigma)
 
 end function p_cx_janev
 
+function aljan1(energy, pcf) result(sigma)
+    !+ Fit function for [[p_cx_1_2_janev]]
+    real(Float64), intent(in) :: energy
+        !+ Relative collision energy [eV]
+    real(Float64), dimension(:), intent(in) :: pcf
+        !+ Fit Coefficients
+    real(Float64) :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64) :: aloge1, aloge, xjan, xcon, emin, emax
+    integer :: i
+
+    emin = pcf(2)
+    emax = pcf(3)
+    if((energy.lt.emin).or.(energy.gt.emax)) then
+        sigma = 0
+        return
+    endif
+
+    aloge1 = log(energy)
+    aloge = aloge1
+    xjan = pcf(4)
+    do i = 5, 12
+        xcon = pcf(i)*aloge
+        xjan = xjan + xcon
+        aloge = aloge * aloge1
+    enddo
+    sigma = exp(xjan)
+end
+
+function p_cx_1_2_janev(Erel) result(sigma)
+    !+Calculates cross section for a proton-Hydrogen charge exchange interaction
+    !+from the \(n=1\) state to the \(m=2\) state at energy `Erel`
+    !+
+    !+###Equation
+    !+ $$H^+ + H(1) \rightarrow H(2) + H^+$$
+    !+###References
+    !+* Ref. 8 [[atomic_tables(module)]]
+    real(Float64), intent(in) :: Erel
+        !+ Relative collision energy [keV/amu]
+    real(Float64)             :: sigma
+        !+ Cross Section [\(cm^2\)]
+
+    real(Float64), dimension(12), parameter :: c2s = [0.d0, 262.d0, 20000.d0, &
+                                                     -13273.250877640001d0,   &
+                                                      13175.766145199999d0,   &
+                                                     -5683.9321578580002d0,   &
+                                                      1386.3097801490001d0,   &
+                                                     -208.97945613069999d0,   &
+                                                      19.92976245274d0,       &
+                                                     -1.1738005761570001d0,   &
+                                                      0.039024228107669999d0, &
+                                                     -0.00056062403399319998d0]
+
+    real(Float64), dimension(12), parameter :: c2p = [0.d0, 19.d0 ,20000.d0,   &
+                                                     -21.975719499349999d0,   &
+                                                     -47.425022512600002d0,   &
+                                                      36.280131405959999d0,   &
+                                                     -14.23003075866d0,       &
+                                                      3.2730902401440001d0,   &
+                                                     -0.45579289122599997d0,  &
+                                                      0.037735883474579998d0, &
+                                                     -0.001707904867106d0,    &
+                                                      3.251203344615d-5]
+
+    real(Float64) :: e, sigma2s, sigma2p,logsig1,logsig2,slope
+
+    e = Erel*1.d3
+
+    sigma2s = aljan1(e,c2s)
+    sigma2p = aljan1(e,c2p)
+
+    if(e.gt.c2p(2)) then
+        sigma = sigma2s + sigma2p
+    else
+        ! linearly extrapolate in log-space
+        logsig2 = log(aljan1(c2p(2)+1,c2s) + aljan1(c2p(2)+1,c2p))
+        logsig1 = log(aljan1(c2p(2),c2s) + aljan1(c2p(2),c2p))
+        slope = (logsig2 - logsig1)/(log(c2p(2)+1) - log(c2p(2)))
+        sigma = exp(slope*(log(e) - log(c2p(2))) + logsig1)
+    endif
+
+end
+
 function p_cx_1_1_adas(Erel) result(sigma)
     !+Calculates cross section for a proton-Hydrogen charge exchange interaction
     !+from the \(n=1\) state to the \(m=1\) state at energy `Erel`
@@ -399,7 +484,9 @@ function p_cx_1(Erel,m_max) result(sigma)
     !+###Equation
     !+ $$H^+ + H(1) \rightarrow H(m=1..m_{max}) + H^+$$
     !+###References
+    !+* Ref. 2 [[atomic_tables(module)]]
     !+* Ref. 4 [[atomic_tables(module)]]
+    !+* Ref. 8 [[atomic_tables(module)]]
     real(Float64), intent(in)       :: Erel
         !+ Relative collision energy [keV/amu]
     integer, intent(in)             :: m_max
@@ -414,9 +501,17 @@ function p_cx_1(Erel,m_max) result(sigma)
     do i=1,m_max
         select case (i)
             case (1)
-                sigma(1) = p_cx_1_1_adas(Erel)
+                if(Erel.le.2.0) then
+                    sigma(1) = p_cx_janev(Erel, 1)
+                else
+                    sigma(1) = p_cx_1_1_adas(Erel)
+                endif
             case (2)
-                sigma(2) = p_cx_1_2_adas(Erel)
+                if(Erel.le.2.0) then
+                    sigma(2) = p_cx_1_2_janev(Erel)
+                else
+                    sigma(2) = p_cx_1_2_adas(Erel)
+                endif
             case (3)
                 sigma(3) = p_cx_1_3_adas(Erel)
             case (4)
@@ -426,7 +521,7 @@ function p_cx_1(Erel,m_max) result(sigma)
         end select
     enddo
 
-    !Normalize to Janev
+    !Normalize to Janev to be consistent with other n levels (p_cx_2/3/...)
     norm_fac = p_cx_janev(Erel, 1)/sum(sigma)
     sigma = norm_fac*sigma
 
@@ -588,6 +683,7 @@ function p_cx_2(Erel,m_max) result(sigma)
     !+###Equation
     !+ $$H^+ + H(2) \rightarrow H(m=1..m_{max}) + H^+$$
     !+###References
+    !+* Ref. 2 [[atomic_tables(module)]]
     !+* Ref. 4 [[atomic_tables(module)]]
     real(Float64), intent(in)       :: Erel
         !+ Relative collision energy [keV/amu]
@@ -884,7 +980,9 @@ function p_cx_n(Erel, n, m_max) result(sigma)
     !+###Equation
     !+ $$H^+ + H(n) \rightarrow H(m=1..m_{max}) + H^+$$
     !+###References
+    !+* Ref. 2 [[atomic_tables(module)]]
     !+* Ref. 4 [[atomic_tables(module)]]
+    !+* Ref. 8 [[atomic_tables(module)]]
     real(Float64), intent(in)       :: Erel
         !+ Relative collision energy [keV/amu]
     integer, intent(in)             :: n
@@ -945,7 +1043,9 @@ function p_cx_n_m(Erel, n, m) result(sigma)
     !+###Equation
     !+ $$H^+ + H(n) \rightarrow H(m) + H^+$$
     !+###References
+    !+* Ref. 2 [[atomic_tables(module)]]
     !+* Ref. 4 [[atomic_tables(module)]]
+    !+* Ref. 8 [[atomic_tables(module)]]
     real(Float64), intent(in) :: Erel
         !+ Relative collision energy [keV/amu]
     integer, intent(in)       :: n
@@ -974,7 +1074,9 @@ function p_cx(Erel, n_max, m_max) result(sigma)
     !+###Equation
     !+ $$H^+ + H(n=1..n_{max}) \rightarrow H(m=1..m_{max}) + H^+$$
     !+###References
+    !+* Ref. 2 [[atomic_tables(module)]]
     !+* Ref. 4 [[atomic_tables(module)]]
+    !+* Ref. 8 [[atomic_tables(module)]]
     real(Float64), intent(in)             :: Erel
         !+ Relative collision energy [keV/amu]
     integer, intent(in)                   :: n_max
@@ -4634,6 +4736,7 @@ subroutine write_bb_H_H(id, namelist_file, n_max, m_max)
     integer, intent(in)           :: m_max
         !+ Number of final atomic energy states to calculate
 
+    logical :: calculate
     real(Float64) :: emin
     real(Float64) :: emax
     integer :: nenergy
@@ -4653,9 +4756,9 @@ subroutine write_bb_H_H(id, namelist_file, n_max, m_max)
     integer :: i, cnt, error
     logical :: exis
 
-    NAMELIST /H_H_cross/ nenergy, emin, emax
+    NAMELIST /H_H_cross/ calculate, nenergy, emin, emax
 
-    nenergy = 200; emin = 1.d-3 ; emax = 8.d2
+    calculate = .True.; nenergy = 200; emin = 1.d-3 ; emax = 8.d2
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -4666,6 +4769,8 @@ subroutine write_bb_H_H(id, namelist_file, n_max, m_max)
         read(13,NML=H_H_cross)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(ioniz(n_max,nenergy))
@@ -4784,6 +4889,7 @@ subroutine write_bb_H_e(id, namelist_file, n_max, m_max)
     integer, intent(in)           :: m_max
         !+ Number of final atomic energy states to calculate
 
+    logical :: calculate
     real(Float64) :: emin
     real(Float64) :: emax
     integer :: nenergy
@@ -4803,9 +4909,9 @@ subroutine write_bb_H_e(id, namelist_file, n_max, m_max)
     integer :: i, cnt, error
     logical :: exis
 
-    NAMELIST /H_e_cross/ nenergy, emin, emax
+    NAMELIST /H_e_cross/ calculate, nenergy, emin, emax
 
-    nenergy = 200; emin = 1.d-3 ; emax = 8.d2
+    calculate = .True.; nenergy = 200; emin = 1.d-3 ; emax = 8.d2
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -4816,6 +4922,8 @@ subroutine write_bb_H_e(id, namelist_file, n_max, m_max)
         read(13,NML=H_e_cross)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(ioniz(n_max,nenergy))
@@ -4925,7 +5033,8 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
     integer, intent(in)           :: m_max
         !+ Number of final atomic energy states to calculate
 
-    integer :: q
+    logical :: calculate
+    integer :: q(10) = 0
     real(Float64) :: emin
     real(Float64) :: emax
     integer :: nenergy
@@ -4944,13 +5053,13 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
 
     character(len=10) :: aname
     character(len=5) :: asym
-    integer :: i, cnt, error
+    integer :: i, iq, cnt, error
     logical :: exis
 
-    NAMELIST /H_Aq_cross/ q, nenergy, emin, emax
+    NAMELIST /H_Aq_cross/ calculate, q, nenergy, emin, emax
 
     nenergy = 200; emin = 1.d-3 ; emax = 8.d2
-    q = 6
+    calculate = .True.; q(1) = 6
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -4962,121 +5071,127 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
         close(13)
     endif
 
-    allocate(ebarr(nenergy))
-    allocate(ioniz(n_max,nenergy))
-    allocate(cx(n_max,nenergy))
-    allocate(excit(n_max,m_max,nenergy))
+    if(.not.calculate) return
 
-    ebarr = 0.d0
-    ioniz = 0.d0
-    cx = 0.d0
-    excit = 0.d0
+    q_loop: do iq=1, size(q)
+        if(q(iq).eq.0) cycle q_loop
 
-    select case (q)
-        case (5)
-            aname = "Boron"
-            asym = "H_B5"
-        case (6)
-            aname = "Carbon"
-            asym = "H_C6"
-        case DEFAULT
-            aname = "Impurity"
-            asym = "H_Aq"
-    end select
+        allocate(ebarr(nenergy))
+        allocate(ioniz(n_max,nenergy))
+        allocate(cx(n_max,nenergy))
+        allocate(excit(n_max,m_max,nenergy))
 
-    if(verbose) then
-        write(*,'(a)') "---- H-"//trim(adjustl(aname))//" cross sections settings ----"
-        write(*,'(T2,"q = ", i2)') q
-        write(*,'(T2,"Emin = ",e9.2, " keV")') emin
-        write(*,'(T2,"Emax = ",e9.2, " keV")') emax
-        write(*,'(T2,"Nenergy = ", i4)') nenergy
-        write(*,*) ''
-    endif
+        ebarr = 0.d0
+        ioniz = 0.d0
+        cx = 0.d0
+        excit = 0.d0
 
-    cnt = 0
-    dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
-    !$OMP PARALLEL DO private(i, eb)
-    do i=istart, nenergy, istep
-        eb = 10.d0**(log10(emin) + (i-1)*dlogE)
-        ebarr(i) = eb
+        select case (q(iq))
+            case (5)
+                aname = "Boron"
+                asym = "H_B5"
+            case (6)
+                aname = "Carbon"
+                asym = "H_C6"
+            case DEFAULT
+                write(aname,'("Impurity-",i1)') q(iq)
+                write(asym,'("H_A",i1)') q(iq)
+        end select
 
-        cx(:,i) = Aq_cx(eb, q, n_max)
-        ioniz(:,i) = Aq_ioniz(eb, q, n_max)
-        excit(:,:,i) = Aq_excit(eb, q, n_max, m_max)
-        cnt = cnt + 1
-        if(verbose) WRITE(*,'(f7.2,"%",a,$)') 100*cnt*istep/real(nenergy),char(13)
-    enddo
+        if(verbose) then
+            write(*,'(a)') "---- H-"//trim(adjustl(aname))//" cross sections settings ----"
+            write(*,'(T2,"q = ", i2)') q(iq)
+            write(*,'(T2,"Emin = ",e9.2, " keV")') emin
+            write(*,'(T2,"Emax = ",e9.2, " keV")') emax
+            write(*,'(T2,"Nenergy = ", i4)') nenergy
+            write(*,*) ''
+        endif
+
+        cnt = 0
+        dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
+        !$OMP PARALLEL DO private(i, eb)
+        do i=istart, nenergy, istep
+            eb = 10.d0**(log10(emin) + (i-1)*dlogE)
+            ebarr(i) = eb
+
+            cx(:,i) = Aq_cx(eb, q(iq), n_max)
+            ioniz(:,i) = Aq_ioniz(eb, q(iq), n_max)
+            excit(:,:,i) = Aq_excit(eb, q(iq), n_max, m_max)
+            cnt = cnt + 1
+            if(verbose) WRITE(*,'(f7.2,"%",a,$)') 100*cnt*istep/real(nenergy),char(13)
+        enddo
 
 #ifdef _MPI
-    call parallel_sum(ebarr)
-    call parallel_sum(cx)
-    call parallel_sum(excit)
-    call parallel_sum(ioniz)
+        call parallel_sum(ebarr)
+        call parallel_sum(cx)
+        call parallel_sum(excit)
+        call parallel_sum(ioniz)
 #endif
 
-    if(verbose) then
-        call h5gcreate_f(id, trim(adjustl(asym)), gid, error)
+        if(verbose) then
+            call h5gcreate_f(id, trim(adjustl(asym)), gid, error)
 
-        dim1 = [1]
-        dim2 = [n_max, nenergy]
-        dim3 = [n_max, m_max, nenergy]
+            dim1 = [1]
+            dim2 = [n_max, nenergy]
+            dim3 = [n_max, m_max, nenergy]
 
-        call h5ltmake_dataset_int_f(gid, "nenergy", 0, dim1, [nenergy], error)
-        call h5ltmake_dataset_int_f(gid, "n_max", 0, dim1, [n_max], error)
-        call h5ltmake_dataset_int_f(gid, "m_max", 0, dim1, [m_max], error)
-        call h5ltmake_dataset_double_f(gid, "dlogE", 0, dim1, [dlogE], error)
-        call h5ltmake_dataset_double_f(gid, "emin", 0, dim1, [emin], error)
-        call h5ltmake_dataset_double_f(gid, "emax", 0, dim1, [emax], error)
+            call h5ltmake_dataset_int_f(gid, "nenergy", 0, dim1, [nenergy], error)
+            call h5ltmake_dataset_int_f(gid, "n_max", 0, dim1, [n_max], error)
+            call h5ltmake_dataset_int_f(gid, "m_max", 0, dim1, [m_max], error)
+            call h5ltmake_dataset_double_f(gid, "dlogE", 0, dim1, [dlogE], error)
+            call h5ltmake_dataset_double_f(gid, "emin", 0, dim1, [emin], error)
+            call h5ltmake_dataset_double_f(gid, "emax", 0, dim1, [emax], error)
 
-        dim1 = [nenergy]
-        call h5ltmake_compressed_dataset_double_f(gid, "energy", 1, dim1, ebarr, error)
-        call h5ltmake_compressed_dataset_double_f(gid, "cx", 2, dim2, cx, error)
-        call h5ltmake_compressed_dataset_double_f(gid, "ionization", 2, dim2, ioniz, error)
-        call h5ltmake_compressed_dataset_double_f(gid, "excitation", 3, dim3, excit, error)
+            dim1 = [nenergy]
+            call h5ltmake_compressed_dataset_double_f(gid, "energy", 1, dim1, ebarr, error)
+            call h5ltmake_compressed_dataset_double_f(gid, "cx", 2, dim2, cx, error)
+            call h5ltmake_compressed_dataset_double_f(gid, "ionization", 2, dim2, ioniz, error)
+            call h5ltmake_compressed_dataset_double_f(gid, "excitation", 3, dim3, excit, error)
 
-        call h5ltset_attribute_string_f(id, trim(adjustl(asym)), "description", &
-             "Cross sections for Hydrogen-"//trim(adjustl(aname))//" interactions", error)
-        call h5ltset_attribute_string_f(gid, "nenergy", "description", &
-             "Number of nucleon energy values", error)
-        call h5ltset_attribute_string_f(gid, "n_max", "description", &
-             "Number of initial energy levels", error)
-        call h5ltset_attribute_string_f(gid, "m_max", "description", &
-             "Number of final energy levels", error)
-        call h5ltset_attribute_string_f(gid, "energy", "description", &
-             "Nucleon energy values", error)
-        call h5ltset_attribute_string_f(gid, "energy", "units", "keV/amu", error)
-        call h5ltset_attribute_string_f(gid, "dlogE", "description", &
-             "Energy spacing in log-10", error)
-        call h5ltset_attribute_string_f(gid, "dlogE", "units", "log10(keV/amu)", error)
-        call h5ltset_attribute_string_f(gid, "emin","description", &
-             "Minimum energy", error)
-        call h5ltset_attribute_string_f(gid, "emin", "units", "keV/amu", error)
-        call h5ltset_attribute_string_f(gid, "emax","description", &
-             "Maximum energy", error)
-        call h5ltset_attribute_string_f(gid, "emax", "units", "keV/amu", error)
+            call h5ltset_attribute_string_f(id, trim(adjustl(asym)), "description", &
+                 "Cross sections for Hydrogen-"//trim(adjustl(aname))//" interactions", error)
+            call h5ltset_attribute_string_f(gid, "nenergy", "description", &
+                 "Number of nucleon energy values", error)
+            call h5ltset_attribute_string_f(gid, "n_max", "description", &
+                 "Number of initial energy levels", error)
+            call h5ltset_attribute_string_f(gid, "m_max", "description", &
+                 "Number of final energy levels", error)
+            call h5ltset_attribute_string_f(gid, "energy", "description", &
+                 "Nucleon energy values", error)
+            call h5ltset_attribute_string_f(gid, "energy", "units", "keV/amu", error)
+            call h5ltset_attribute_string_f(gid, "dlogE", "description", &
+                 "Energy spacing in log-10", error)
+            call h5ltset_attribute_string_f(gid, "dlogE", "units", "log10(keV/amu)", error)
+            call h5ltset_attribute_string_f(gid, "emin","description", &
+                 "Minimum energy", error)
+            call h5ltset_attribute_string_f(gid, "emin", "units", "keV/amu", error)
+            call h5ltset_attribute_string_f(gid, "emax","description", &
+                 "Maximum energy", error)
+            call h5ltset_attribute_string_f(gid, "emax", "units", "keV/amu", error)
 
-        call h5ltset_attribute_string_f(gid, "cx", "description", &
-             "n resolved charge exchange / electron capture cross sections: cx(n,energy)", error)
-        call h5ltset_attribute_string_f(gid, "cx", "units", "cm^2", error)
-        call h5ltset_attribute_string_f(gid, "cx", "reaction", &
-             "A(q+) + H(n) -> A((q-1)+) + H(+)", error)
+            call h5ltset_attribute_string_f(gid, "cx", "description", &
+                 "n resolved charge exchange / electron capture cross sections: cx(n,energy)", error)
+            call h5ltset_attribute_string_f(gid, "cx", "units", "cm^2", error)
+            call h5ltset_attribute_string_f(gid, "cx", "reaction", &
+                 "A(q+) + H(n) -> A((q-1)+) + H(+)", error)
 
-        call h5ltset_attribute_string_f(gid, "excitation", "description", &
-             "n/m resolved excitation cross sections: excitation(n,m,energy)", error)
-        call h5ltset_attribute_string_f(gid, "excitation", "units", "cm^2", error)
-        call h5ltset_attribute_string_f(gid, "excitation", "reaction", &
-             "A(q+) + H(n) -> A(q+) + H(m), m > n", error)
+            call h5ltset_attribute_string_f(gid, "excitation", "description", &
+                 "n/m resolved excitation cross sections: excitation(n,m,energy)", error)
+            call h5ltset_attribute_string_f(gid, "excitation", "units", "cm^2", error)
+            call h5ltset_attribute_string_f(gid, "excitation", "reaction", &
+                 "A(q+) + H(n) -> A(q+) + H(m), m > n", error)
 
-        call h5ltset_attribute_string_f(gid, "ionization", "description", &
-             "n resolved ionization cross sections: ionization(n,energy)", error)
-        call h5ltset_attribute_string_f(gid, "ionization", "units", "cm^2", error)
-        call h5ltset_attribute_string_f(gid, "ionization", "reaction", &
-             "A(q+) + H(n) -> A(q+) + H(+) + e-", error)
+            call h5ltset_attribute_string_f(gid, "ionization", "description", &
+                 "n resolved ionization cross sections: ionization(n,energy)", error)
+            call h5ltset_attribute_string_f(gid, "ionization", "units", "cm^2", error)
+            call h5ltset_attribute_string_f(gid, "ionization", "reaction", &
+                 "A(q+) + H(n) -> A(q+) + H(+) + e-", error)
 
-        call h5gclose_f(gid, error)
-    endif
+            call h5gclose_f(gid, error)
+        endif
 
-    deallocate(ebarr, ioniz, cx, excit)
+        deallocate(ebarr, ioniz, cx, excit)
+    enddo q_loop
 
 end subroutine write_bb_H_Aq
 
@@ -5087,6 +5202,7 @@ subroutine write_bb_D_D(id, namelist_file)
     character(len=*), intent(in)  :: namelist_file
         !+ Namelist file that contains settings
 
+    logical :: calculate
     integer :: nbranch = 2
     real(Float64) :: emin
     real(Float64) :: emax
@@ -5105,9 +5221,9 @@ subroutine write_bb_D_D(id, namelist_file)
     integer :: i, cnt, error
     logical :: exis
 
-    NAMELIST /D_D_cross/ nenergy, emin, emax
+    NAMELIST /D_D_cross/ calculate, nenergy, emin, emax
 
-    nenergy = 200; emin = 1.d-3 ; emax = 8.d2
+    calculate = .True.; nenergy = 200; emin = 1.d-3 ; emax = 8.d2
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -5118,6 +5234,8 @@ subroutine write_bb_D_D(id, namelist_file)
         read(13,NML=D_D_cross)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(fusion(nenergy,nbranch))
@@ -5205,6 +5323,7 @@ subroutine write_bb_D_T(id, namelist_file)
     character(len=*), intent(in)  :: namelist_file
         !+ Namelist file that contains settings
 
+    logical :: calculate
     integer :: nbranch = 1
     real(Float64) :: emin
     real(Float64) :: emax
@@ -5223,9 +5342,9 @@ subroutine write_bb_D_T(id, namelist_file)
     integer :: i, cnt, error
     logical :: exis
 
-    NAMELIST /D_T_cross/ nenergy, emin, emax
+    NAMELIST /D_T_cross/ calculate, nenergy, emin, emax
 
-    nenergy = 200; emin = 1.d-3 ; emax = 8.d2
+    calculate = .True.; nenergy = 200; emin = 1.d-3 ; emax = 8.d2
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -5236,6 +5355,8 @@ subroutine write_bb_D_T(id, namelist_file)
         read(13,NML=D_T_cross)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(fusion(nenergy,nbranch))
@@ -5328,6 +5449,7 @@ subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
     integer, intent(in)           :: m_max
         !+ Number of final atomic energy states to calculate
 
+    logical :: calculate
     real(Float64) :: emin
     real(Float64) :: emax
     integer :: nenergy
@@ -5360,10 +5482,11 @@ subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
     real(Float64), dimension(2,n_bt_amu) :: a
     logical :: exis
 
-    NAMELIST /H_H_rates/ nenergy, emin, emax, ntemp, tmin, tmax
+    NAMELIST /H_H_rates/ calculate, nenergy, emin, emax, ntemp, tmin, tmax
 
     nenergy = 100; emin = 1.d-3 ; emax = 4.d2
     ntemp = 100; tmin = 1.d-3 ; tmax = 2.d1
+    calculate = .True.
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -5374,6 +5497,8 @@ subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
         read(13,NML=H_H_rates)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(tarr(ntemp))
@@ -5559,6 +5684,8 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     integer, intent(in)           :: m_max
         !+ Number of final atomic energy states to calculate
 
+    logical :: calculate
+
     real(Float64) :: emin
     real(Float64) :: emax
     integer :: nenergy
@@ -5591,10 +5718,11 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     real(Float64), dimension(2,n_bt_amu) :: a
     logical :: exis
 
-    NAMELIST /H_e_rates/ nenergy, emin, emax, ntemp, tmin, tmax
+    NAMELIST /H_e_rates/ calculate, nenergy, emin, emax, ntemp, tmin, tmax
 
     nenergy = 100; emin = 1.d-3 ; emax = 4.d2
     ntemp = 100; tmin = 1.d-3 ; tmax = 2.d1
+    calculate = .True.
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -5605,6 +5733,8 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
         read(13,NML=H_e_rates)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(tarr(ntemp))
@@ -5774,7 +5904,8 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
     integer, intent(in)           :: m_max
         !+ Number of final atomic energy states to calculate
 
-    integer :: q
+    logical :: calculate
+    integer :: q(10) = 0
     real(Float64) :: mass
 
     real(Float64) :: emin
@@ -5803,7 +5934,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(5) :: dim5
 
-    integer :: ie, it, ia, n, m, error, cnt
+    integer :: iq, ie, it, ia, n, m, error, cnt
     real(Float64) :: rate
     integer, parameter :: n_bt_amu = 2
     real(Float64), dimension(2,n_bt_amu) :: a
@@ -5812,9 +5943,9 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
     character(len=5) :: asym
     logical :: exis
 
-    NAMELIST /H_Aq_rates/ q, mass, nenergy, emin, emax, ntemp, tmin, tmax
+    NAMELIST /H_Aq_rates/ calculate, q, mass, nenergy, emin, emax, ntemp, tmin, tmax
 
-    q = 6 ; mass = C_amu
+    calculate = .True. ; q(1) = 6 ; mass = C_amu
     nenergy = 100; emin = 1.d-3 ; emax = 4.d2
     ntemp = 100; tmin = 1.d-3 ; tmax = 2.d1
     inquire(file=namelist_file,exist=exis)
@@ -5827,190 +5958,196 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
         close(13)
     endif
 
-    allocate(ebarr(nenergy))
-    allocate(tarr(ntemp))
-    allocate(ioniz(n_max,nenergy,ntemp,n_bt_amu))
-    allocate(cx(n_max,nenergy,ntemp,n_bt_amu))
-    allocate(excit(n_max,m_max,nenergy,ntemp,n_bt_amu))
+    if(.not.calculate) return
+
+    q_loop: do iq=1, size(q)
+        if(q(iq).eq.0) cycle q_loop
+
+        allocate(ebarr(nenergy))
+        allocate(tarr(ntemp))
+        allocate(ioniz(n_max,nenergy,ntemp,n_bt_amu))
+        allocate(cx(n_max,nenergy,ntemp,n_bt_amu))
+        allocate(excit(n_max,m_max,nenergy,ntemp,n_bt_amu))
 
 
-    select case (q)
-      case (5)
-          aname = "Boron"
-          asym = "H_B5"
-      case (6)
-          aname = "Carbon"
-          asym = "H_C6"
-      case DEFAULT
-          aname = "Impurity"
-          asym = "H_Aq"
-    end select
+        select case (q(iq))
+          case (5)
+              aname = "Boron"
+              asym = "H_B5"
+          case (6)
+              aname = "Carbon"
+              asym = "H_C6"
+          case DEFAULT
+              write(aname,'("Impurity-",i1)') q(iq)
+              write(asym,'("H_A",i1)') q(iq)
+        end select
 
-    ebarr = 0.d0
-    ioniz = 0.d0
-    cx = 0.d0
-    excit = 0.d0
-    a(:,1) = [H1_amu, mass]
-    a(:,2) = [H2_amu, mass]
+        ebarr = 0.d0
+        ioniz = 0.d0
+        cx = 0.d0
+        excit = 0.d0
+        a(:,1) = [H1_amu, mass]
+        a(:,2) = [H2_amu, mass]
 
-    dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
-    do ie=1, nenergy
-        ebarr(ie) = 10.d0**(log10(emin) + (ie-1)*dlogE)
-    enddo
-
-    dlogT = (log10(tmax) - log10(tmin))/(ntemp - 1)
-    do it=1, ntemp
-        tarr(it) = 10.d0**(log10(tmin) + (it-1)*dlogT)
-    enddo
-
-    if(verbose) then
-        write(*,'(a)') "---- H-"//trim(adjustl(aname))//" reaction rates settings ----"
-        write(*,'(T2,"q = ", i2)') q
-        write(*,'(T2,"mass = ",f7.2, " amu")') mass
-        write(*,'(T2,"Emin = ",e9.2, " keV")') emin
-        write(*,'(T2,"Emax = ",e9.2, " keV")') emax
-        write(*,'(T2,"Nenergy = ", i4)') nenergy
-        write(*,'(T2,"Tmin = ",e9.2, " keV")') tmin
-        write(*,'(T2,"Tmax = ",e9.2, " keV")') tmax
-        write(*,'(T2,"Ntemp = ", i4)') ntemp
-        write(*,*) ''
-    endif
-
-    cnt = 0
-    !$OMP PARALLEL DO private(ie, it, ia, n, m, eb, ti, rate)
-    do ie=istart, nenergy, istep
-        eb = ebarr(ie)
-        do it=1, ntemp
-            ti = tarr(it)
-            do ia=1, n_bt_amu
-                do n=1, n_max
-                    do m=1, m_max
-                        if(m.gt.n) then
-                            call bt_maxwellian(Aq_excit_n_m, q, ti, eb, &
-                                               a(2,ia), a(1,ia), n, m, rate)
-                            excit(n,m,ie,it,ia) = rate
-
-                            call bt_maxwellian(Aq_excit_n_m, q, ti, eb, &
-                                               a(2,ia), a(1,ia), n, m, &
-                                               rate, deexcit=.True.)
-                            excit(m,n,ie,it,ia) = rate
-                        endif
-                    enddo
-                    call bt_maxwellian(Aq_cx_n, q, ti, eb, &
-                                       a(2,ia), a(1,ia), n, rate)
-                    cx(n,ie,it,ia) = rate
-
-                    call bt_maxwellian(Aq_ioniz_n, q, ti, eb, &
-                                       a(2,ia), a(1,ia), n, rate)
-                    ioniz(n,ie,it,ia) = rate
-                enddo
-            enddo
-            cnt = cnt + 1
-            if(verbose) WRITE(*,'(f7.2,"%",a,$)') 100*istep*cnt/real(nenergy*ntemp),char(13)
+        dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
+        do ie=1, nenergy
+            ebarr(ie) = 10.d0**(log10(emin) + (ie-1)*dlogE)
         enddo
-    enddo
-    !$OMP END PARALLEL DO
+
+        dlogT = (log10(tmax) - log10(tmin))/(ntemp - 1)
+        do it=1, ntemp
+            tarr(it) = 10.d0**(log10(tmin) + (it-1)*dlogT)
+        enddo
+
+        if(verbose) then
+            write(*,'(a)') "---- H-"//trim(adjustl(aname))//" reaction rates settings ----"
+            write(*,'(T2,"q = ", i2)') q(iq)
+            write(*,'(T2,"mass = ",f7.2, " amu")') mass
+            write(*,'(T2,"Emin = ",e9.2, " keV")') emin
+            write(*,'(T2,"Emax = ",e9.2, " keV")') emax
+            write(*,'(T2,"Nenergy = ", i4)') nenergy
+            write(*,'(T2,"Tmin = ",e9.2, " keV")') tmin
+            write(*,'(T2,"Tmax = ",e9.2, " keV")') tmax
+            write(*,'(T2,"Ntemp = ", i4)') ntemp
+            write(*,*) ''
+        endif
+
+        cnt = 0
+        !$OMP PARALLEL DO private(ie, it, ia, n, m, eb, ti, rate)
+        do ie=istart, nenergy, istep
+            eb = ebarr(ie)
+            do it=1, ntemp
+                ti = tarr(it)
+                do ia=1, n_bt_amu
+                    do n=1, n_max
+                        do m=1, m_max
+                            if(m.gt.n) then
+                                call bt_maxwellian(Aq_excit_n_m, q(iq), ti, eb, &
+                                                   a(2,ia), a(1,ia), n, m, rate)
+                                excit(n,m,ie,it,ia) = rate
+
+                                call bt_maxwellian(Aq_excit_n_m, q(iq), ti, eb, &
+                                                   a(2,ia), a(1,ia), n, m, &
+                                                   rate, deexcit=.True.)
+                                excit(m,n,ie,it,ia) = rate
+                            endif
+                        enddo
+                        call bt_maxwellian(Aq_cx_n, q(iq), ti, eb, &
+                                           a(2,ia), a(1,ia), n, rate)
+                        cx(n,ie,it,ia) = rate
+
+                        call bt_maxwellian(Aq_ioniz_n, q(iq), ti, eb, &
+                                           a(2,ia), a(1,ia), n, rate)
+                        ioniz(n,ie,it,ia) = rate
+                    enddo
+                enddo
+                cnt = cnt + 1
+                if(verbose) WRITE(*,'(f7.2,"%",a,$)') 100*istep*cnt/real(nenergy*ntemp),char(13)
+            enddo
+        enddo
+        !$OMP END PARALLEL DO
 
 #ifdef _MPI
-    call parallel_sum(ebarr)
-    call parallel_sum(tarr)
-    call parallel_sum(cx)
-    call parallel_sum(excit)
-    call parallel_sum(ioniz)
+        call parallel_sum(ebarr)
+        call parallel_sum(tarr)
+        call parallel_sum(cx)
+        call parallel_sum(excit)
+        call parallel_sum(ioniz)
 #endif
 
-    if(verbose) then
-        call h5gcreate_f(id, trim(adjustl(asym)), gid, error)
+        if(verbose) then
+            call h5gcreate_f(id, trim(adjustl(asym)), gid, error)
 
-        dim1 = [1]
-        dim4 = [n_max, nenergy, ntemp, n_bt_amu]
-        dim5 = [n_max, m_max, nenergy, ntemp, n_bt_amu]
-        call h5ltmake_dataset_int_f(gid, "nenergy", 0, dim1, [nenergy], error)
-        call h5ltmake_dataset_int_f(gid, "ntemp", 0, dim1, [ntemp], error)
-        call h5ltmake_dataset_int_f(gid, "n_bt_amu", 0, dim1, [n_bt_amu], error)
-        call h5ltmake_dataset_int_f(gid, "n_max", 0, dim1, [n_max], error)
-        call h5ltmake_dataset_int_f(gid, "m_max", 0, dim1, [m_max], error)
-        call h5ltmake_dataset_double_f(gid, "dlogE", 0, dim1, [dlogE], error)
-        call h5ltmake_dataset_double_f(gid, "emin", 0, dim1, [emin], error)
-        call h5ltmake_dataset_double_f(gid, "emax", 0, dim1, [emax], error)
-        call h5ltmake_dataset_double_f(gid, "dlogT", 0, dim1, [dlogT], error)
-        call h5ltmake_dataset_double_f(gid, "tmin", 0, dim1, [tmin], error)
-        call h5ltmake_dataset_double_f(gid, "tmax", 0, dim1, [tmax], error)
+            dim1 = [1]
+            dim4 = [n_max, nenergy, ntemp, n_bt_amu]
+            dim5 = [n_max, m_max, nenergy, ntemp, n_bt_amu]
+            call h5ltmake_dataset_int_f(gid, "nenergy", 0, dim1, [nenergy], error)
+            call h5ltmake_dataset_int_f(gid, "ntemp", 0, dim1, [ntemp], error)
+            call h5ltmake_dataset_int_f(gid, "n_bt_amu", 0, dim1, [n_bt_amu], error)
+            call h5ltmake_dataset_int_f(gid, "n_max", 0, dim1, [n_max], error)
+            call h5ltmake_dataset_int_f(gid, "m_max", 0, dim1, [m_max], error)
+            call h5ltmake_dataset_double_f(gid, "dlogE", 0, dim1, [dlogE], error)
+            call h5ltmake_dataset_double_f(gid, "emin", 0, dim1, [emin], error)
+            call h5ltmake_dataset_double_f(gid, "emax", 0, dim1, [emax], error)
+            call h5ltmake_dataset_double_f(gid, "dlogT", 0, dim1, [dlogT], error)
+            call h5ltmake_dataset_double_f(gid, "tmin", 0, dim1, [tmin], error)
+            call h5ltmake_dataset_double_f(gid, "tmax", 0, dim1, [tmax], error)
 
-        dim2 = [2,n_bt_amu]
-        call h5ltmake_compressed_dataset_double_f(gid, "bt_amu", 2, dim2, a, error)
-        dim1 = [nenergy]
-        call h5ltmake_compressed_dataset_double_f(gid, "energy", 1, dim1, ebarr, error)
-        dim1 = [ntemp]
-        call h5ltmake_compressed_dataset_double_f(gid, "temperature", 1, dim1, tarr, error)
-        call h5ltmake_compressed_dataset_double_f(gid, "cx", 4, dim4, cx, error)
-        call h5ltmake_compressed_dataset_double_f(gid, "ionization", 4, dim4, ioniz, error)
-        call h5ltmake_compressed_dataset_double_f(gid, "excitation", 5, dim5, excit, error)
+            dim2 = [2,n_bt_amu]
+            call h5ltmake_compressed_dataset_double_f(gid, "bt_amu", 2, dim2, a, error)
+            dim1 = [nenergy]
+            call h5ltmake_compressed_dataset_double_f(gid, "energy", 1, dim1, ebarr, error)
+            dim1 = [ntemp]
+            call h5ltmake_compressed_dataset_double_f(gid, "temperature", 1, dim1, tarr, error)
+            call h5ltmake_compressed_dataset_double_f(gid, "cx", 4, dim4, cx, error)
+            call h5ltmake_compressed_dataset_double_f(gid, "ionization", 4, dim4, ioniz, error)
+            call h5ltmake_compressed_dataset_double_f(gid, "excitation", 5, dim5, excit, error)
 
-        call h5ltset_attribute_string_f(id, trim(adjustl(asym)), "description", &
-             "Beam-Target reaction rates for Hydrogen(beam)-"//trim(adjustl(aname))// &
-             "(target) interactions", error)
-        call h5ltset_attribute_string_f(gid, "nenergy", "description", &
-             "Number of energy values", error)
-        call h5ltset_attribute_string_f(gid, "ntemp", "description", &
-             "Number of target temperature values", error)
-        call h5ltset_attribute_string_f(gid, "n_bt_amu", "description", &
-             "Number of beam-target amu combinations", error)
-        call h5ltset_attribute_string_f(gid, "n_max", "description", &
-             "Number of initial energy levels", error)
-        call h5ltset_attribute_string_f(gid, "m_max", "description", &
-             "Number of final energy levels", error)
+            call h5ltset_attribute_string_f(id, trim(adjustl(asym)), "description", &
+                 "Beam-Target reaction rates for Hydrogen(beam)-"//trim(adjustl(aname))// &
+                 "(target) interactions", error)
+            call h5ltset_attribute_string_f(gid, "nenergy", "description", &
+                 "Number of energy values", error)
+            call h5ltset_attribute_string_f(gid, "ntemp", "description", &
+                 "Number of target temperature values", error)
+            call h5ltset_attribute_string_f(gid, "n_bt_amu", "description", &
+                 "Number of beam-target amu combinations", error)
+            call h5ltset_attribute_string_f(gid, "n_max", "description", &
+                 "Number of initial energy levels", error)
+            call h5ltset_attribute_string_f(gid, "m_max", "description", &
+                 "Number of final energy levels", error)
 
-        call h5ltset_attribute_string_f(gid, "bt_amu", "description", &
-             "Combinations of beam-target amu's e.g. b_amu, t_amu = bt_amu[:,i]", error)
-        call h5ltset_attribute_string_f(gid, "energy", "description", &
-             "Energy values", error)
-        call h5ltset_attribute_string_f(gid, "energy", "units", "keV", error)
-        call h5ltset_attribute_string_f(gid, "dlogE", "description", &
-             "Energy spacing in log-10", error)
-        call h5ltset_attribute_string_f(gid, "dlogE", "units", "log10(keV)", error)
-        call h5ltset_attribute_string_f(gid, "emin","description", &
-             "Minimum energy", error)
-        call h5ltset_attribute_string_f(gid, "emin", "units", "keV", error)
-        call h5ltset_attribute_string_f(gid, "emax","description", &
-             "Maximum energy", error)
-        call h5ltset_attribute_string_f(gid, "emax", "units", "keV", error)
+            call h5ltset_attribute_string_f(gid, "bt_amu", "description", &
+                 "Combinations of beam-target amu's e.g. b_amu, t_amu = bt_amu[:,i]", error)
+            call h5ltset_attribute_string_f(gid, "energy", "description", &
+                 "Energy values", error)
+            call h5ltset_attribute_string_f(gid, "energy", "units", "keV", error)
+            call h5ltset_attribute_string_f(gid, "dlogE", "description", &
+                 "Energy spacing in log-10", error)
+            call h5ltset_attribute_string_f(gid, "dlogE", "units", "log10(keV)", error)
+            call h5ltset_attribute_string_f(gid, "emin","description", &
+                 "Minimum energy", error)
+            call h5ltset_attribute_string_f(gid, "emin", "units", "keV", error)
+            call h5ltset_attribute_string_f(gid, "emax","description", &
+                 "Maximum energy", error)
+            call h5ltset_attribute_string_f(gid, "emax", "units", "keV", error)
 
-        call h5ltset_attribute_string_f(gid, "temperature", "description", &
-             "Target temperature values", error)
-        call h5ltset_attribute_string_f(gid, "temperature", "units", "keV", error)
-        call h5ltset_attribute_string_f(gid, "dlogT", "description", &
-             "Temperature spacing in log-10", error)
-        call h5ltset_attribute_string_f(gid, "dlogT", "units", "log10(keV)", error)
-        call h5ltset_attribute_string_f(gid, "tmin","description", &
-             "Minimum temperature", error)
-        call h5ltset_attribute_string_f(gid, "tmin", "units", "keV", error)
-        call h5ltset_attribute_string_f(gid, "tmax","description", &
-             "Maximum temperature", error)
-        call h5ltset_attribute_string_f(gid, "tmax", "units", "keV", error)
+            call h5ltset_attribute_string_f(gid, "temperature", "description", &
+                 "Target temperature values", error)
+            call h5ltset_attribute_string_f(gid, "temperature", "units", "keV", error)
+            call h5ltset_attribute_string_f(gid, "dlogT", "description", &
+                 "Temperature spacing in log-10", error)
+            call h5ltset_attribute_string_f(gid, "dlogT", "units", "log10(keV)", error)
+            call h5ltset_attribute_string_f(gid, "tmin","description", &
+                 "Minimum temperature", error)
+            call h5ltset_attribute_string_f(gid, "tmin", "units", "keV", error)
+            call h5ltset_attribute_string_f(gid, "tmax","description", &
+                 "Maximum temperature", error)
+            call h5ltset_attribute_string_f(gid, "tmax", "units", "keV", error)
 
-        call h5ltset_attribute_string_f(gid, "cx", "description", &
-             "n-resolved charge exchange reaction rates: cx(n,energy,temp,bt_amu)", error)
-        call h5ltset_attribute_string_f(gid, "cx", "units", "cm^3/s", error)
-        call h5ltset_attribute_string_f(gid, "cx", "reaction", &
-             "A(q+) + H(n) -> A((q-1)+) + H(+)", error)
+            call h5ltset_attribute_string_f(gid, "cx", "description", &
+                 "n-resolved charge exchange reaction rates: cx(n,energy,temp,bt_amu)", error)
+            call h5ltset_attribute_string_f(gid, "cx", "units", "cm^3/s", error)
+            call h5ltset_attribute_string_f(gid, "cx", "reaction", &
+                 "A(q+) + H(n) -> A((q-1)+) + H(+)", error)
 
-        call h5ltset_attribute_string_f(gid, "excitation", "description", &
-             "n/m resolved (de-)excitation reaction rates: excitation(n,m,energy,temp,bt_amu)", error)
-        call h5ltset_attribute_string_f(gid, "excitation", "units", "cm^3/s", error)
-        call h5ltset_attribute_string_f(gid, "excitation", "reaction", &
-             "A(q+) + H(n) -> A(q+) + H(m); m > n excitation, m < n de-excitation", error)
+            call h5ltset_attribute_string_f(gid, "excitation", "description", &
+                 "n/m resolved (de-)excitation reaction rates: excitation(n,m,energy,temp,bt_amu)", error)
+            call h5ltset_attribute_string_f(gid, "excitation", "units", "cm^3/s", error)
+            call h5ltset_attribute_string_f(gid, "excitation", "reaction", &
+                 "A(q+) + H(n) -> A(q+) + H(m); m > n excitation, m < n de-excitation", error)
 
-        call h5ltset_attribute_string_f(gid, "ionization", "description", &
-             "n resolved ionization reaction rates: ionization(n,energy,temp,bt_amu)", error)
-        call h5ltset_attribute_string_f(gid, "ionization", "units", "cm^3/s", error)
-        call h5ltset_attribute_string_f(gid, "ionization", "reaction", &
-             "A(q+) + H(n) -> A(q+) + H(+) + e-", error)
+            call h5ltset_attribute_string_f(gid, "ionization", "description", &
+                 "n resolved ionization reaction rates: ionization(n,energy,temp,bt_amu)", error)
+            call h5ltset_attribute_string_f(gid, "ionization", "units", "cm^3/s", error)
+            call h5ltset_attribute_string_f(gid, "ionization", "reaction", &
+                 "A(q+) + H(n) -> A(q+) + H(+) + e-", error)
 
-        call h5gclose_f(gid, error)
-    endif
+            call h5gclose_f(gid, error)
+        endif
 
-    deallocate(ebarr, tarr, excit, ioniz)
+        deallocate(ebarr, tarr, excit, ioniz, cx)
+    enddo q_loop
 
 end subroutine write_bt_H_Aq
 
@@ -6021,6 +6158,7 @@ subroutine write_bt_D_D(id, namelist_file)
     character(len=*), intent(in)  :: namelist_file
         !+ Namelist file that contains settings
 
+    logical :: calculate
     integer :: nbranch = 2
     real(Float64), dimension(2) :: bt_amu = [H2_amu, H2_amu]
 
@@ -6050,10 +6188,11 @@ subroutine write_bt_D_D(id, namelist_file)
     real(Float64) :: rate_a, rate_b
     logical :: exis
 
-    NAMELIST /D_D_rates/ nenergy, emin, emax, ntemp, tmin, tmax
+    NAMELIST /D_D_rates/ calculate, nenergy, emin, emax, ntemp, tmin, tmax
 
     nenergy = 100; emin = 1.d-3 ; emax = 4.d2
     ntemp = 100; tmin = 1.d-3 ; tmax = 2.d1
+    calculate = .True.
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -6064,6 +6203,8 @@ subroutine write_bt_D_D(id, namelist_file)
         read(13,NML=D_D_rates)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(tarr(ntemp))
@@ -6200,6 +6341,7 @@ subroutine write_bt_D_T(id, namelist_file)
     integer :: nbranch = 1
     real(Float64), dimension(2) :: bt_amu = [H2_amu, H3_amu]
 
+    logical :: calculate
     real(Float64) :: emin
     real(Float64) :: emax
     integer :: nenergy
@@ -6226,10 +6368,11 @@ subroutine write_bt_D_T(id, namelist_file)
     real(Float64) :: rate
     logical :: exis
 
-    NAMELIST /D_T_rates/ nenergy, emin, emax, ntemp, tmin, tmax
+    NAMELIST /D_T_rates/ calculate, nenergy, emin, emax, ntemp, tmin, tmax
 
     nenergy = 100; emin = 1.d-3 ; emax = 4.d2
     ntemp = 100; tmin = 1.d-3 ; tmax = 2.d1
+    calculate = .True.
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -6240,6 +6383,8 @@ subroutine write_bt_D_T(id, namelist_file)
         read(13,NML=D_T_rates)
         close(13)
     endif
+
+    if(.not.calculate) return
 
     allocate(ebarr(nenergy))
     allocate(tarr(ntemp))
@@ -6375,31 +6520,37 @@ subroutine print_default_namelist
     write(*,'(a)') "/"
     write(*,'(a)') "!Hydrogen-Hydrogen Cross Sections"
     write(*,'(a)') "&H_H_cross"
+    write(*,'(a)') "calculate = T, !Calculate Table"
     write(*,'(a)') "nenergy = 200, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
     write(*,'(a)') "/"
     write(*,'(a)') "!Hydrogen-Electron Cross Sections"
     write(*,'(a)') "&H_e_cross"
+    write(*,'(a)') "calculate = T, !Calculate Table"
     write(*,'(a)') "nenergy = 200, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
     write(*,'(a)') "/"
-    write(*,'(a)') "!Hydrogen-Impurity Cross Sections"
+    write(*,'(a)') "!Hydrogen-Impurity Cross Sections. Up to 10 impurity charges"
     write(*,'(a)') "&H_Aq_cross"
-    write(*,'(a)') "q = 6,         !Impurity charge: Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "calculate = T, !Calculate Table"
+    write(*,'(a)') "q(1) = 5,      !Impurity charge: Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "q(2) = 6,      !Impurity charge: Boron: 5, Carbon: 6, ..."
     write(*,'(a)') "nenergy = 200, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
     write(*,'(a)') "/"
     write(*,'(a)') "!Deuterium-Deuterium Nuclear Cross Sections"
     write(*,'(a)') "&D_D_cross"
+    write(*,'(a)') "calculate = T, !Calculate Table"
     write(*,'(a)') "nenergy = 200, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 8.0E2   !Maximum energy [keV]"
     write(*,'(a)') "/"
     write(*,'(a)') "!Hydrogen-Hydrogen Reaction Rates"
     write(*,'(a)') "&H_H_rates"
+    write(*,'(a)') "calculate = T, !Calculate Table"
     write(*,'(a)') "nenergy = 100, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
@@ -6409,6 +6560,7 @@ subroutine print_default_namelist
     write(*,'(a)') "/"
     write(*,'(a)') "!Hydrogen-Electron Reaction Rates"
     write(*,'(a)') "&H_e_rates"
+    write(*,'(a)') "calculate = T, !Calculate Table"
     write(*,'(a)') "nenergy = 100, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
@@ -6416,9 +6568,11 @@ subroutine print_default_namelist
     write(*,'(a)') "tmin = 1.0E-3, !Minimum electron temperature [keV]"
     write(*,'(a)') "tmax = 2.0E1   !Maximum electron temperature [keV]"
     write(*,'(a)') "/"
-    write(*,'(a)') "!Hydrogen-Impurity Reaction Rates"
+    write(*,'(a)') "!Hydrogen-Impurity Reaction Rates. Up to 10 impurity charges"
     write(*,'(a)') "&H_Aq_rates"
-    write(*,'(a)') "q = 6,         !Impurity charge: Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "calculate = T, !Calculate Table"
+    write(*,'(a)') "q(1) = 5,      !Impurity charge: Boron: 5, Carbon: 6, ..."
+    write(*,'(a)') "q(2) = 6,      !Impurity charge: Boron: 5, Carbon: 6, ..."
     write(*,'(a)') "mass = 12.011, !Impurity mass [amu]"
     write(*,'(a)') "nenergy = 100, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
@@ -6429,6 +6583,7 @@ subroutine print_default_namelist
     write(*,'(a)') "/"
     write(*,'(a)') "!Deuterium-Deuterium Nuclear Reaction Rates"
     write(*,'(a)') "&D_D_rates"
+    write(*,'(a)') "calculate = T, !Calculate Table"
     write(*,'(a)') "nenergy = 100, !Number of energy values"
     write(*,'(a)') "emin = 1.0E-3, !Minimum energy [keV]"
     write(*,'(a)') "emax = 4.0E2,  !Maximum energy [keV]"
@@ -6541,7 +6696,10 @@ program generate_tables
     endif
 
     !! Calculate cross sections
-    if(verbose) write(*,*) 'Cross Sections:   ',time(time_start)
+    if(verbose) then
+        write(*,*) 'Cross Sections:   ',time(time_start)
+        write(*,*) ''
+    endif
     call write_bb_H_H(gid, namelist_file, n_max, m_max)
     call write_bb_H_e(gid, namelist_file, n_max, m_max)
     call write_bb_H_Aq(gid, namelist_file, n_max, m_max)
@@ -6556,7 +6714,10 @@ program generate_tables
     endif
 
     !! Calculate reaction rates
-    if(verbose) write(*,*) 'Reaction Rates:   ',time(time_start)
+    if(verbose) then
+        write(*,*) 'Reaction Rates:   ',time(time_start)
+        write(*,*) ''
+    endif
     call write_bt_H_H(gid, namelist_file, n_max, m_max)
     call write_bt_H_e(gid, namelist_file, n_max, m_max)
     call write_bt_H_Aq(gid, namelist_file, n_max, m_max)

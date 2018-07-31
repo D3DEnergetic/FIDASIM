@@ -270,13 +270,12 @@ usage: ./fidasim namelist_file <span class="o">[</span>num_threads<span class="o
 The following code snippit will generate the atomic tables using the default settings.
 The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
 In that case edit the file <code>tables/default_settings.dat</code> before running the following command</p>
-<div class="codehilite"><pre><span></span>make atomic_tables
+<div class="codehilite"><pre><span></span>./tables/generate_tables ./tables/default_settings.dat <span class="o">[</span>num_threads<span class="o">]</span>
 </pre></div>
 
 
 <p></p><div class="alert alert-warning" role="alert"><h4>Warning</h4><p>This is computationally expensive so make sure you run this on a computer
-where you won't get angry emails for using up all the CPU's.
-Optionally you can add <code>NTHREADS=#</code> to the command to set the number of threads.</p></div>
+where you won't get angry emails for using up all the CPU's</p></div>
 <p>Now would be a good time to get more coffee... or maybe a nap.</p>
 <h2 id="run-a-test-case">Run a test case</h2>
 <p>From within IDL</p>

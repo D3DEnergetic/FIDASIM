@@ -270,15 +270,7 @@ Also we normalize the m levels to the Janev tables for consistancy.</p></div>
   </tr>
 </table></p>
 <h1 id="generating-tables">Generating Tables</h1>
-<p>FIDASIM provides a routine, <a href="../../program/generate_tables.html">generate_tables</a> to generate the atomic tables. 
-To generate the atomic tables with the default settings all you need to do is, from the install directory, run</p>
-<div class="codehilite"><pre><span></span>make atomic_tables
-</pre></div>
-
-
-<p></p><div class="alert alert-warning" role="alert"><h4>Warning</h4><p>This is computationally expensive so make sure you run this on a computer 
-where you won't get angry emails for using up all the CPU's.
-Optionally you can add <code>NTHREADS=#</code> to the command to set the number of threads.</p></div>
+<p>FIDASIM provides a routine, <a href="../../program/generate_tables.html">generate_tables</a> to generate the atomic tables.</p>
 <p>The default settings should be appropriate for most devices but in some cases it may be necessary to generate custom tables.
 For instance, the default tables are calculated assuming the main impurity is Carbon-6 so it would be inappropriate to the default tables if you have a different main impurity.
 To generate custom tables from the tables directory run </p>
@@ -303,6 +295,7 @@ To generate custom tables from the tables directory run </p>
 <li><a href="http://www-pub.iaea.org/books/IAEABooks/1839/Atomic-and-Plasma-Material-Interaction-Data-for-Fusion">R.K. Janev and J.J. Smith. <em>Cross sections for collision processes of hydrogen atoms with electrons, protons and multiply charged ions.</em> Atomic and Plasma-Material Interaction Data for Fusion: Volume 4, 1993.</a> </li>
 <li><a href="http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837">Reinhold, C. O., R. E. Olson, and W. Fritsch. <em>Excitation of atomic hydrogen by fully stripped ions.</em> Physical Review A 41.9 1990.</a></li>
 <li><a href="http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta">Bosch, H-S., and G. M. Hale. <em>Improved formulas for fusion cross-sections and thermal reactivities.</em> !+ Nuclear fusion 32.4 1992.</a></li>
+<li><a href="https://www-amdis.iaea.org/ALADDIN/collision.html">Aladdin Database: R.K. Janev, W.D. Langer, K. Evans Jr., D.E. Post Jr. H-HE-PLASMA (1987)</a></li>
 </ol>
 <p>A more precice references can be found in the Fortran function documentation. For example, <a href="../../proc/p_cx_janev.html">p_cx_janev</a></p>
 <h1 id="relevent-namelist-settings">Relevent Namelist Settings</h1>

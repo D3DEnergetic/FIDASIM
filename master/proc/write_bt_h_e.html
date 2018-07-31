@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.4% of total for procedures.">157 statements</a>
+    title=" 1.4% of total for procedures.">160 statements</a>
      </li> 
      
      
@@ -1310,6 +1310,8 @@ public subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">m_max</span>
         <span class="c">!+ Number of final atomic energy states to calculate</span>
 
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">calculate</span>
+
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emin</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emax</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nenergy</span>
@@ -1342,10 +1344,11 @@ public subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">exis</span>
 
-    <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">H_e_rates</span><span class="o">/</span> <span class="n">nenergy</span><span class="p">,</span> <span class="n">emin</span><span class="p">,</span> <span class="n">emax</span><span class="p">,</span> <span class="n">ntemp</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span>
+    <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">H_e_rates</span><span class="o">/</span> <span class="n">calculate</span><span class="p">,</span> <span class="n">nenergy</span><span class="p">,</span> <span class="n">emin</span><span class="p">,</span> <span class="n">emax</span><span class="p">,</span> <span class="n">ntemp</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span>
 
     <span class="n">nenergy</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">emin</span> <span class="o">=</span> <span class="mf">1.d-3</span> <span class="p">;</span> <span class="n">emax</span> <span class="o">=</span> <span class="mf">4.d2</span>
     <span class="n">ntemp</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">tmin</span> <span class="o">=</span> <span class="mf">1.d-3</span> <span class="p">;</span> <span class="n">tmax</span> <span class="o">=</span> <span class="mf">2.d1</span>
+    <span class="n">calculate</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
 
     <span class="k">inquire</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">,</span><span class="n">exist</span><span class="o">=</span><span class="n">exis</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">exis</span><span class="p">)</span> <span class="k">then</span>
@@ -1357,7 +1360,9 @@ public subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
         <span class="k">close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
     <span class="n">endif</span>
 
-    <span class="k">allocate</span><span class="p">(</span><span class="n">ebarr</span><span class="p">(</span><span class="n">nenergy</span><span class="p">))</span>
+    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">calculate</span><span class="p">)</span> <span class="k">return</span>
+
+<span class="k">    allocate</span><span class="p">(</span><span class="n">ebarr</span><span class="p">(</span><span class="n">nenergy</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">tarr</span><span class="p">(</span><span class="n">ntemp</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">ioniz</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="n">nenergy</span><span class="p">,</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">excit</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span><span class="n">m_max</span><span class="p">,</span><span class="n">nenergy</span><span class="p">,</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">))</span>

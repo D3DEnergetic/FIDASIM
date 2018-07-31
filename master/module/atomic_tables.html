@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="28.0% of total for modules and submodules.">3407 statements</a>
+    title="28.6% of total for modules and submodules.">3501 statements</a>
      </li> 
      
      
@@ -244,6 +244,10 @@
       <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_n_janev">p_cx_n_janev</a>
       
       <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_janev">p_cx_janev</a>
+      
+      <a class="list-group-item" href="../module/atomic_tables.html#proc-aljan1">aljan1</a>
+      
+      <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_1_2_janev">p_cx_1_2_janev</a>
       
       <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_1_1_adas">p_cx_1_1_adas</a>
       
@@ -549,6 +553,7 @@ Volume 4, 1993.</a></li>
 Physical Review A 41.9 1990.</a></li>
 <li><a href="http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta">Bosch, H-S., and G. M. Hale. <em>Improved formulas for fusion cross-sections and thermal reactivities.</em>
  Nuclear fusion 32.4 1992.</a></li>
+<li><a href="https://www-amdis.iaea.org/ALADDIN/collision.html">Aladdin Database: R.K. Janev, W.D. Langer, K. Evans Jr., D.E. Post Jr. H-HE-PLASMA (1987)</a></li>
 </ol>
       <br>
     
@@ -890,6 +895,10 @@ Physical Review A 41.9 1990.</a></li>
       <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_n_janev">p_cx_n_janev</a>
       
       <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_janev">p_cx_janev</a>
+      
+      <a class="list-group-item" href="../module/atomic_tables.html#proc-aljan1">aljan1</a>
+      
+      <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_1_2_janev">p_cx_1_2_janev</a>
       
       <a class="list-group-item" href="../module/atomic_tables.html#proc-p_cx_1_1_adas">p_cx_1_1_adas</a>
       
@@ -2984,6 +2993,158 @@ public function <a href='../proc/p_cx_janev.html'>p_cx_janev</a>(Erel, n) result
   
   <td></td><td>::</td>
   <td><strong>n</strong></td><td><p>Initial atomic energy level/state</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=Float64)
+  </small></h4>
+  <p>Cross Section [<script type="math/tex">cm^2</script>]</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-aljan1"></span><h3>
+public function <a href='../proc/aljan1.html'>aljan1</a>(energy, pcf) result(sigma)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Fit function for <a href="../proc/p_cx_1_2_janev.html">p_cx_1_2_janev</a></p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>energy</strong></td><td><p>Relative collision energy [eV]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>pcf</strong></td><td><p>Fit Coefficients</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=Float64)
+  </small></h4>
+  <p>Cross Section [<script type="math/tex">cm^2</script>]</p>
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-p_cx_1_2_janev"></span><h3>
+public function <a href='../proc/p_cx_1_2_janev.html'>p_cx_1_2_janev</a>(Erel) result(sigma)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates cross section for a proton-Hydrogen charge exchange interaction
+from the <script type="math/tex">n=1</script> state to the <script type="math/tex">m=2</script> state at energy <code>Erel</code></p><a href="../proc/p_cx_1_2_janev.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>Erel</strong></td><td><p>Relative collision energy [keV/amu]</p></td>
   
 </tr>
 

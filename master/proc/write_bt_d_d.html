@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.1% of total for procedures.">129 statements</a>
+    title=" 1.2% of total for procedures.">132 statements</a>
      </li> 
      
      
@@ -1276,6 +1276,7 @@ public subroutine write_bt_D_D(id, namelist_file)
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">namelist_file</span>
         <span class="c">!+ Namelist file that contains settings</span>
 
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">calculate</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nbranch</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">bt_amu</span> <span class="o">=</span> <span class="p">[</span><span class="n">H2_amu</span><span class="p">,</span> <span class="n">H2_amu</span><span class="p">]</span>
 
@@ -1305,10 +1306,11 @@ public subroutine write_bt_D_D(id, namelist_file)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rate_a</span><span class="p">,</span> <span class="n">rate_b</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">exis</span>
 
-    <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">D_D_rates</span><span class="o">/</span> <span class="n">nenergy</span><span class="p">,</span> <span class="n">emin</span><span class="p">,</span> <span class="n">emax</span><span class="p">,</span> <span class="n">ntemp</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span>
+    <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">D_D_rates</span><span class="o">/</span> <span class="n">calculate</span><span class="p">,</span> <span class="n">nenergy</span><span class="p">,</span> <span class="n">emin</span><span class="p">,</span> <span class="n">emax</span><span class="p">,</span> <span class="n">ntemp</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span>
 
     <span class="n">nenergy</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">emin</span> <span class="o">=</span> <span class="mf">1.d-3</span> <span class="p">;</span> <span class="n">emax</span> <span class="o">=</span> <span class="mf">4.d2</span>
     <span class="n">ntemp</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="n">tmin</span> <span class="o">=</span> <span class="mf">1.d-3</span> <span class="p">;</span> <span class="n">tmax</span> <span class="o">=</span> <span class="mf">2.d1</span>
+    <span class="n">calculate</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
 
     <span class="k">inquire</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">,</span><span class="n">exist</span><span class="o">=</span><span class="n">exis</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">exis</span><span class="p">)</span> <span class="k">then</span>
@@ -1320,7 +1322,9 @@ public subroutine write_bt_D_D(id, namelist_file)
         <span class="k">close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
     <span class="n">endif</span>
 
-    <span class="k">allocate</span><span class="p">(</span><span class="n">ebarr</span><span class="p">(</span><span class="n">nenergy</span><span class="p">))</span>
+    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">calculate</span><span class="p">)</span> <span class="k">return</span>
+
+<span class="k">    allocate</span><span class="p">(</span><span class="n">ebarr</span><span class="p">(</span><span class="n">nenergy</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">tarr</span><span class="p">(</span><span class="n">ntemp</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">fusion</span><span class="p">(</span><span class="n">nenergy</span><span class="p">,</span><span class="n">ntemp</span><span class="p">,</span><span class="n">nbranch</span><span class="p">))</span>
 

@@ -521,9 +521,9 @@ function p_cx_1(Erel,m_max) result(sigma)
         end select
     enddo
 
-    !Normalize to Janev
-    !norm_fac = p_cx_janev(Erel, 1)/sum(sigma)
-    !sigma = norm_fac*sigma
+    !Normalize to Janev to be consistent with other n levels (p_cx_2/3/...)
+    norm_fac = p_cx_janev(Erel, 1)/sum(sigma)
+    sigma = norm_fac*sigma
 
 end function p_cx_1
 
@@ -711,8 +711,8 @@ function p_cx_2(Erel,m_max) result(sigma)
 
     call m_spread(2,m_max,sigma_n,sigma)
 
-    !norm_fac = p_cx_janev(Erel, 2)/sum(sigma)
-    !sigma = sigma*norm_fac
+    norm_fac = p_cx_janev(Erel, 2)/sum(sigma)
+    sigma = sigma*norm_fac
 
 end function p_cx_2
 
@@ -960,8 +960,8 @@ function p_cx_3(Erel,m_max) result(sigma)
         call m_spread(3, m_max, sigma_m6, sigma)
     endif
 
-    !norm_fac = p_cx_janev(Erel, 3)/sum(sigma)
-    !sigma = sigma*norm_fac
+    norm_fac = p_cx_janev(Erel, 3)/sum(sigma)
+    sigma = sigma*norm_fac
 
 end function p_cx_3
 
@@ -1031,8 +1031,8 @@ function p_cx_n(Erel, n, m_max) result(sigma)
     sigma_n = max(p_cx_janev(Erel,n) - sum(sigma),0.0)
     call m_spread(n, m_max, sigma_n, sigma)
 
-    !norm_fac = p_cx_janev(Erel, n)/sum(sigma)
-    !sigma = norm_fac*sigma
+    norm_fac = p_cx_janev(Erel, n)/sum(sigma)
+    sigma = norm_fac*sigma
 
 end function p_cx_n
 

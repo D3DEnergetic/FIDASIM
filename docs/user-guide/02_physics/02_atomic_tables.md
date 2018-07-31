@@ -115,17 +115,7 @@ A summary of the various approximations used in the charge exchange tables is gi
 </table>
 
 #Generating Tables
-FIDASIM provides a routine, [[generate_tables(program)]] to generate the atomic tables. 
-To generate the atomic tables with the default settings all you need to do is, from the install directory, run
-
-```bash
-make atomic_tables
-```
-
-@warning
-This is computationally expensive so make sure you run this on a computer 
-where you won't get angry emails for using up all the CPU's.
-Optionally you can add `NTHREADS=#` to the command to set the number of threads.
+FIDASIM provides a routine, [[generate_tables(program)]] to generate the atomic tables.
 
 The default settings should be appropriate for most devices but in some cases it may be necessary to generate custom tables.
 For instance, the default tables are calculated assuming the main impurity is Carbon-6 so it would be inappropriate to the default tables if you have a different main impurity.
@@ -151,6 +141,7 @@ The atomic data is taken from a variety of sources [1-5]
 5. [R.K. Janev and J.J. Smith. *Cross sections for collision processes of hydrogen atoms with electrons, protons and multiply charged ions.* Atomic and Plasma-Material Interaction Data for Fusion: Volume 4, 1993.](http://www-pub.iaea.org/books/IAEABooks/1839/Atomic-and-Plasma-Material-Interaction-Data-for-Fusion) 
 6. [Reinhold, C. O., R. E. Olson, and W. Fritsch. *Excitation of atomic hydrogen by fully stripped ions.* Physical Review A 41.9 1990.](http://journals.aps.org/pra/abstract/10.1103/PhysRevA.41.4837)
 7. [Bosch, H-S., and G. M. Hale. *Improved formulas for fusion cross-sections and thermal reactivities.* !+ Nuclear fusion 32.4 1992.](http://iopscience.iop.org/article/10.1088/0029-5515/32/4/I07/meta)
+8. [Aladdin Database: R.K. Janev, W.D. Langer, K. Evans Jr., D.E. Post Jr. H-HE-PLASMA (1987)](https://www-amdis.iaea.org/ALADDIN/collision.html)
 
 A more precice references can be found in the Fortran function documentation. For example, [[p_cx_janev]]
 

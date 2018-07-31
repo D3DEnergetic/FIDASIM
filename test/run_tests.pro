@@ -1,4 +1,4 @@
-PRO run_tests,result_dir,runid = runid
+PRO run_tests,result_dir,runid=runid,
 
    if not keyword_set(runid) then runid = 'test'
 
@@ -40,7 +40,7 @@ PRO run_tests,result_dir,runid = runid
             basic_inputs, basic_bgrid)
 
    nbi = test_beam(0.d0)
-   grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100)
+   grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100,phimin=4*!dpi/3,phimax=5*!dpi/3,nphi=5)
    equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux,g=g)
 
    equil = create_struct(equil,"geqdsk",g)

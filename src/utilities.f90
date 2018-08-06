@@ -813,23 +813,23 @@ subroutine deriv_2d(x,y,z,zxp,zyp)
 
 end subroutine deriv_2d
 
-subroutine deriv_3d(r,phi,z,f,frp,fphip,fzp)
+subroutine deriv_3d(r,z,phi,f,frp,fzp,fphip,)
     !+ Uses 3 point lagrangian method to calculate the partial derivative
-    !+ of an array F w.r.t R, Phi and Z
+    !+ of an array F w.r.t R, Z and Phi
     real(Float64), dimension(:), intent(in)  :: r
         !+ R Values
-    real(Float64), dimension(:), intent(in)  :: phi
-        !+ Phi Values
     real(Float64), dimension(:), intent(in)  :: z
         !+ Z Values
+    real(Float64), dimension(:), intent(in)  :: phi
+        !+ Phi Values
     real(Float64), dimension(:,:,:), intent(in)  :: f
         !+ F Values
     real(Float64), dimension(:,:,:), intent(out) :: frp
         !+ Derivative of F w.r.t. R
-    real(Float64), dimension(:,:,:), intent(out) :: fphip
-        !+ Derivative of F w.r.t. Phi
     real(Float64), dimension(:,:,:), intent(out) :: fzp
         !+ Derivative of F w.r.t. Z
+    real(Float64), dimension(:,:,:), intent(out) :: fphip
+        !+ Derivative of F w.r.t. Phi
 
     integer :: i,n
         !! temporary values for loops

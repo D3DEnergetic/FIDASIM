@@ -1,4 +1,4 @@
-    !+ This file contains the main routines for FIDASIM {!../VERSION!}
+!+ This file contains the main routines for FIDASIM {!../VERSION!}
 module libfida
 !+ Main FIDASIM library
 USE H5LT !! High level HDF5 Interface
@@ -240,7 +240,7 @@ type InterpolationGrid
     real(Float64)  :: da
         !+ Grid element area [\(cm^2\)]
     real(Float64)  :: dv
-        !+ Grid element volume [\(cm^2\)]
+        !+ dr*dz*dphi [\(rad*cm^2\)]
     integer(Int32) :: dims(3)
         !+ Dimension of the interpolation grid
     real(Float64), dimension(:),   allocatable :: r
@@ -379,20 +379,20 @@ type FastIonDistribution
         !+ Number of pitches
     integer(Int32) :: nr
         !+ Number of radii
-    integer(Int32) :: nphi
-        !+ Number of phi values
     integer(Int32) :: nz
         !+ Number of z values
+    integer(Int32) :: nphi
+        !+ Number of phi values
     real(Float64)  :: dE
         !+ Energy spacing [keV]
     real(Float64)  :: dp
         !+ Pitch spacing
     real(Float64)  :: dr
         !+ Radial spacing [cm]
-    real(Float64)  :: dphi
-        !+ Angular spacing [rad]
     real(Float64)  :: dz
         !+ Z spacing [cm]
+    real(Float64)  :: dphi
+        !+ Angular spacing [rad]
     real(Float64)  :: emin
         !+ Minimum energy [keV]
     real(Float64)  :: emax
@@ -405,6 +405,24 @@ type FastIonDistribution
         !+ Maximum pitch
     real(Float64)  :: p_range
         !+ Pitch interval length
+    real(Float64)  :: rmin
+        !+ Minimum radius [cm]
+    real(Float64)  :: rmax
+        !+ Maximum radius [cm]
+    real(Float64)  :: r_range
+        !+ Radius interval length [cm]
+    real(Float64)  :: zmin
+        !+ Minimum Z [cm]
+    real(Float64)  :: zmax
+        !+ Maximum Z [cm]
+    real(Float64)  :: z_range
+        !+ Z interval length [cm]
+    real(Float64)  :: phimin
+        !+ Minimum Phi [rad]
+    real(Float64)  :: phimax
+        !+ Maximum Phi [rad]
+    real(Float64)  :: phi_range
+        !+ Phi interval length [rad]
     real(Float64)  :: n_tot = 0.d0
         !+ Total Number of fast-ions
     real(Float64), dimension(:), allocatable       :: energy
@@ -504,7 +522,7 @@ type NeutralBeam
     integer :: naperture
         !+ Number of beam apertures
     integer, dimension(:), allocatable       :: ashape
-        !+ Aperture shape 1="rectangular"3D_test/master_omp_f, 2="circular"
+        !+ Aperture shape 1="rectangular", 2="circular"
     real(Float64), dimension(:), allocatable :: awidy
         !+ Half width of the aperture(s) in y direction
     real(Float64), dimension(:), allocatable :: awidz
@@ -779,7 +797,7 @@ type NPAResults
         !+ Number of particles that hit a detector
     integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
-    integer(Int32) :: nenergy = 122
+    integer(Int32) :: nenergy = 100
         !+ Number of energy values
     type(NPAParticle), dimension(:), allocatable :: part
         !+ Array of NPA particles
@@ -2689,8 +2707,8 @@ subroutine read_equilibrium
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Interpolation grid settings ----'
         write(*,'(T2,"Nr: ",i3)') inter_grid%nr
-        write(*,'(T2,"Nphi: ",i3)') inter_grid%nphi
         write(*,'(T2,"Nz: ",i3)') inter_grid%nz
+        write(*,'(T2,"Nphi: ",i3)') inter_grid%nphi
         write(*,'(T2,"dA: ", f5.2," [cm^2]")') inter_grid%da
         write(*,*) ''
     endif
@@ -2788,12 +2806,12 @@ subroutine read_equilibrium
     call h5ltread_dataset_int_f(gid, "/fields/mask", f_mask, dims,error)
 
     !!Calculate B field derivatives
-    call deriv(inter_grid%r, inter_grid%phi, inter_grid%z, equil%fields%br, &
-        equil%fields%dbr_dr, equil%fields%dbr_dphi, equil%fields%dbr_dz)
-    call deriv(inter_grid%r, inter_grid%phi, inter_grid%z, equil%fields%bt, &
-        equil%fields%dbt_dr, equil%fields%dbt_dphi, equil%fields%dbt_dz)
-    call deriv(inter_grid%r, inter_grid%phi, inter_grid%z, equil%fields%bz, &
-        equil%fields%dbz_dr, equil%fields%dbz_dphi, equil%fields%dbz_dz)
+    call deriv(inter_grid%r, inter_grid%z, inter_grid%phi, equil%fields%br, &
+        equil%fields%dbr_dr, equil%fields%dbr_dz, equil%fields%dbr_dphi)
+    call deriv(inter_grid%r, inter_grid%z, inter_grid%phi, equil%fields%bt, &
+        equil%fields%dbt_dr, equil%fields%dbt_dz, equil%fields%dbt_dphi)
+    call deriv(inter_grid%r, inter_grid%z, inter_grid%phi, equil%fields%bz, &
+        equil%fields%dbz_dr, equil%fields%dbz_dz, equil%fields%dbz_dphi)
 
     !!Close FIELDS group
     call h5gclose_f(gid, error)
@@ -2807,7 +2825,6 @@ subroutine read_equilibrium
     allocate(equil%mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     equil%mask = 0.d0
     where ((p_mask.eq.1).and.(f_mask.eq.1)) equil%mask = 1.d0
-    where (p_mask.eq.1) equil%mask = 1.d0
     if (sum(equil%mask).le.0.d0) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "READ_EQUILIBRIUM: Plasma and/or fields are not well defined anywhere"
@@ -2924,8 +2941,14 @@ subroutine read_f(fid, error)
         write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z,Phi)"
         write(*,'(T2,"Nenergy = ",i3)') fbm%nenergy
         write(*,'(T2,"Npitch  = ",i3)') fbm%npitch
+        write(*,'(T2,"Nr  = ",i3)') fbm%nr
+        write(*,'(T2,"Nz  = ",i3)') fbm%nz
+        write(*,'(T2,"Nphi  = ",i3)') fbm%nphi
         write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")') fbm%emin,fbm%emax
         write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")') fbm%pmin,fbm%pmax
+        write(*,'(T2,"R  range = [",f5.2,",",f5.2,"]")') fbm%rmin,fbm%rmax
+        write(*,'(T2,"Z  range = [",f5.2,",",f5.2,"]")') fbm%zmin,fbm%zmax
+        write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
         write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
     endif
@@ -3015,14 +3038,7 @@ subroutine read_mc(fid, error)
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
         endif
 
-        !! Bound fast_ion(i)%phi between 0 and 2*pi
-        do while (particles%fast_ion(i)%phi .gt. 2*pi)
-            particles%fast_ion(i)%phi = particles%fast_ion(i)%phi - 2*pi
-        enddo
-        do while (particles%fast_ion(i)%phi .lt. 0.0)
-            particles%fast_ion(i)%phi = particles%fast_ion(i)%phi + 2*pi
-        enddo
-
+        particles%fast_ion(i)%phi = modulo(particles%fast_ion(i)%phi, 2*pi)
         if(particles%axisym) then
             uvw = [particles%fast_ion(i)%r, 0.d0 , particles%fast_ion(i)%z]
         else
@@ -6048,7 +6064,7 @@ subroutine interpol2D_coeff_arr(x,y,xout,yout,c,err)
 
 end subroutine interpol2D_coeff_arr
 
-subroutine cyl_interpol3D_coeff(rmin,dr,nr,phimin,dphi,nphi,zmin,dz,nz,rout,phiout,zout,c,err)
+subroutine cyl_interpol3D_coeff(rmin,dr,nr,zmin,dz,nz,phimin,dphi,nphi,rout,zout,phiout,c,err)
     !+ Cylindrical interpolation coefficients and indicies for a 3D grid
     real(Float64), intent(in)           :: rmin
         !+ Minimum R
@@ -6056,24 +6072,24 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,phimin,dphi,nphi,zmin,dz,nz,rout,phio
         !+ R spacing
     integer, intent(in)                 :: nr
         !+ Number of R points
-    real(Float64), intent(in)           :: phimin
-        !+ Minimum phi
-    real(Float64), intent(in)           :: dphi
-        !+ Phi spacing
-    integer, intent(in)                 :: nphi
-        !+ Number of phi points
     real(Float64), intent(in)           :: zmin
         !+ Minimum Z
     real(Float64), intent(in)           :: dz
         !+ Z spacing
     integer, intent(in)                 :: nz
         !+ Number of Z points
+    real(Float64), intent(in)           :: phimin
+        !+ Minimum phi
+    real(Float64), intent(in)           :: dphi
+        !+ Phi spacing
+    integer, intent(in)                 :: nphi
+        !+ Number of phi points
     real(Float64), intent(in)           :: rout
         !+ R value to interpolate
-    real(Float64), intent(in)           :: phiout
-        !+ Phi value to interpolate
     real(Float64), intent(in)           :: zout
         !+ Z value to interpolate
+    real(Float64), intent(in)           :: phiout
+        !+ Phi value to interpolate
     type(InterpolCoeffs3D), intent(out) :: c
         !+ Interpolation Coefficients
     integer, intent(out), optional      :: err
@@ -6084,20 +6100,12 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,phimin,dphi,nphi,zmin,dz,nz,rout,phio
     real(Float64) :: phi
     integer :: i, j, k, err_status
 
-    !! Bound phiout between 0 and 2*pi
-    phi = phiout
-    do while (phi .gt. 2*pi)
-        phi = phi - 2*pi
-    enddo
-
-    do while (phi .lt. 0.0)
-        phi = phi + 2*pi
-    enddo
+    phi = modulo(phi,2*pi)
 
     err_status = 1
     rp = max(rout,rmin)
-    phip = max(phi,phimin)
     zp = max(zout,zmin)
+    phip = max(phi,phimin)
     i = floor((rp-rmin)/dr)+1
     j = floor((zp-zmin)/dz)+1
     k = floor((phip-phimin)/dphi)+1
@@ -6145,7 +6153,7 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,phimin,dphi,nphi,zmin,dz,nz,rout,phio
 
 end subroutine cyl_interpol3D_coeff
 
-subroutine cyl_interpol3D_coeff_arr(r,phi,z,rout,phiout,zout,c,err)
+subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
     !+ Cylindrical interpolation coefficients and indicies for a 3D grid
     real(Float64), dimension(:), intent(in) :: r
         !+ R values

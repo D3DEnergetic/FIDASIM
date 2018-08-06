@@ -24,18 +24,15 @@ FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi
     ;+```
 
     if not keyword_set(phimin) then phimin = 0.0 ;rad
-    if not keyword_set(nphi) then begin
-        nphi = 1
-        dphi = 0.0
-    endif else begin
-        dphi = (phimax-phimin)/(nphi-1)
-    endelse
+    if not keyword_set(phimax) then phimax = 0.0 ;rad
+    if not keyword_set(nphi) then nphi = 1
 
     dr = (rmax-rmin)/(nr-1)
     dz = (zmax-zmin)/(nz-1)
+    dphi = (phimax-phimin)/(nphi-1)
     r = rmin + dr*dindgen(nr)
-    phi = phimin + dphi*dindgen(nphi)
     z = zmin + dz*dindgen(nz)
+    phi = phimin + dphi*dindgen(nphi)
 
     r2d = r # replicate(1,nz)
     z2d = replicate(1,nr) # z

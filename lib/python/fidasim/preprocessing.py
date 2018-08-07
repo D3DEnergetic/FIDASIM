@@ -7,199 +7,10 @@
 from __future__ import print_function
 import os
 import numpy as np
-import copy
 import datetime
 import h5py
 
 from fidasim.utils import *
-
-def aabb_intersect(rc, dr, r0, d0):
-    """
-    #+#aabb_intersect
-    #+Calculates intersection length of a ray and an axis aligned bounding box (AABB)
-    #+***
-    #+##Input Arguments
-    #+     **rc**: Center of AABB
-    #+
-    #+     **dr**: [length, width, height] of AABB
-    #+
-    #+     **r0**: starting point of ray
-    #+
-    #+     **d0**: direction of ray
-    #+
-    #+##Output Arguments
-    #+     **intersect**: Intersection length of ray and AABB
-    #+
-    #+     **ri**: Optional, ray enterence point
-    #+
-    #+     **rf**: Optional, ray exit point
-    #+
-    #+##Example Usage
-    #+```python
-    #+>>> intersect, r_enter, r_exit = aabb_intersect([0,0,0], [1,1,1], [-1,0,0], [1,0,0])
-    #+>>> print(intersect)
-    #+    1.0
-    #+>>> print(r_enter)
-    #+    -0.5  0.0  0.0
-    #+>>> print(r_exit)
-    #+     0.5  0.0  0.0
-    #+```
-    """
-    v0 = d0 / np.sqrt(np.sum(d0 ** 2.))
-
-    # There are 6 sides to a cube/grid
-    side_inter = np.zeros(6)
-
-    # Intersection points of ray with planes defined by grid
-    ipnts = np.zeros((3, 6))
-
-    # Find whether ray intersects each side
-    for i in range(6):
-        j = int(np.floor(i / 2))
-        ind = np.arange(3, dtype=int)
-        ind = ind[ind != j]
-        if np.abs(v0[j]) > 0.:   # just v0[j] != 0 right?
-            # Intersection point with plane
-            ipnts[:, i] = r0 + v0 * (((rc[j] + (np.mod(i, 2) - 0.5) * dr[j]) - r0[j]) / v0[j])
-
-            # Check if point on plane is within grid side
-            if (np.abs(ipnts[ind[0], i] - rc[ind[0]]) <= 0.5 * dr[ind[0]]) and \
-               (np.abs(ipnts[ind[1], i] - rc[ind[1]]) <= 0.5 * dr[ind[1]]):
-                side_inter[i] = 1
-
-    intersect = 0.0
-    r_enter = copy.deepcopy(r0)
-    r_exit = copy.deepcopy(r0)
-    ind = np.arange(side_inter.size)
-    ind = ind[side_inter != 0]
-    nw = side_inter[ind].size
-    if nw >= 2:
-        #Find two unique intersection points
-        nunique = 0
-        for i in range(nw - 1):
-            if np.sum(ipnts[:, ind[0]] == ipnts[:, ind[i + 1]]) != 3:
-                ind = [ind[0], ind[i + 1]]
-                nunique = 2
-                break
-
-        if nunique == 2:
-            vi = ipnts[:, ind[1]] - ipnts[:, ind[0]]
-            vi = vi / np.sqrt(np.sum(vi ** 2.))
-            dot_prod = np.sum(v0 * vi)
-            if dot_prod > 0.0:
-                r_enter = ipnts[:, ind[0]]
-                r_exit = ipnts[:, ind[1]]
-            else:
-                r_enter = ipnts[:, ind[1]]
-                r_exit = ipnts[:, ind[0]]
-
-            # Calculate intersection length
-            intersect = np.sqrt(np.sum((r_exit - r_enter) ** 2.))
-
-    return intersect, r_enter, r_exit
-
-def tb_zyx(alpha, beta, gamma):
-    """
-    #+#tb_zyx
-    #+Calculates Tait-Bryan z-y'-x" active rotation matrix given rotation angles `alpha`,`beta`,`gamma` in radians
-    #+***
-    #+##Arguments
-    #+     **alpha**: rotation angle about z [radians]
-    #+
-    #+     **beta**: rotation angle about y' [radians]
-    #+
-    #+     **gamma**: rotation angle about x" [radians]
-    #+
-    #+##Return Value
-    #+     Rotation Matrix [prefida](|url|/sourcefile/prefida.pro.html)
-    #+
-    #+##Example Usage
-    #+```dist
-    #+ >>> rot_mat = tb_zyx(!DPI/2, 0.0, !DPI/3)
-    #+```
-    """
-    sa = np.sin(alpha)
-    ca = np.cos(alpha)
-    sb = np.sin(beta)
-    cb = np.cos(beta)
-    sg = np.sin(gamma)
-    cg = np.cos(gamma)
-
-    r = np.zeros((3, 3))
-
-    r[0, 0] = ca * cb
-    r[0, 1] = ca * sb * sg - cg * sa
-    r[0, 2] = sa * sg + ca * cg * sb
-    r[1, 0] = cb * sa
-    r[1, 1] = ca * cg + sa * sb * sg
-    r[1, 2] = cg * sa * sb - ca * sg
-    r[2, 0] = -sb
-    r[2, 1] = cb * sg
-    r[2, 2] = cb * cg
-
-    return r
-
-def uvw_to_xyz(alpha, beta, gamma, uvw, origin=None):
-    """
-    #+#uvw_to_xyz
-    #+ Express non-rotated coordinate `uvw` in rotated `xyz` coordinates
-    #+***
-    #+##Arguments
-    #+     **alpha**: Rotation angle about z [radians]
-    #+
-    #+     **beta**: Rotation angle about y' [radians]
-    #+
-    #+     **gamma**: Rotation angle about x" [radians]
-    #+
-    #+     **uvw**: Point in rotated coordinate system, (3, n)
-    #+
-    #+##Keyword Arguments
-    #+     **origin**: Origin of rotated coordinate system in non-rotated (uvw) coordinates, (3)
-    #+
-    #+##Output Arguments
-    #+     **xyz**: 'uvw' in 'xyz' coordinates
-    #+
-    #+##Example Usage
-    #+```python
-    #+>>> xyz = uvw_to_xyz(np.pi/2., 0.0, np.pi/3., uvw, origin=[.1, .2, 0.])
-    #+```
-    """
-    if origin is None:
-        origin = [0., 0., 0.]
-
-    # Make np arrays
-    uvw = np.array(uvw, dtype=float)
-    origin = np.array(origin, dtype=float)
-
-    # Do checks as this code does not allow multiple points to be entered (yet)
-    if uvw.ndim == 2:
-        s = uvw.shape
-        if s[0] != 3:
-            raise ValueError('uvw must be (3, n), but it has shape {}'.format(uvw.shape))
-        n = s[1]
-    elif uvw.ndim == 1:
-        if uvw.size != 3:
-            raise ValueError('uvw must have length 3, but it has length {}'.format(uvw.size))
-        n = 1
-    else:
-        raise ValueError('uvw must be (3) or (3, n)')
-
-    if origin.ndim != 1:
-        raise ValueError('origin must be 1D, but it has shape {}'.format(origin.shape))
-
-    if origin.size != 3:
-        raise ValueError('origin must have length 3, but it has length {}'.format(origin.size))
-
-    # Shift origin
-    uvw_shifted = uvw - np.squeeze(np.tile(origin, (n, 1)).T)
-
-    # Get rotation matrix
-    r = tb_zyx(alpha, beta, gamma)
-
-    # Apply rotation matrix
-    xyz = np.dot(r.T, uvw_shifted)
-
-    return xyz
 
 def check_dict_schema(schema, dic, desc=None):
     """
@@ -255,7 +66,7 @@ def check_dict_schema(schema, dic, desc=None):
                 err = True
 
             # Check for NaNs or Inf
-            if (not isinstance(dic[key], (str, dict, float, int))) and (str not in schema[key]['type']):
+            if (not isinstance(dic[key], (str, dict, float, int))) and (np.bytes_ not in schema[key]['type']):
                 if (dic[key][np.isnan(dic[key])].size > 0) or (dic[key][np.isinf(dic[key])].size > 0):
                     error('NaN or Infinity detected in "{}"'.format(key))
                     err = True
@@ -1057,7 +868,7 @@ def check_spec(inputs, chords):
                     'type': [float, np.float64]}
 
     nchan_string = {'dims': [nchan],
-                    'type': [str, np.str_, np.bytes_]}
+                    'type': [np.bytes_]}
 
     three_nchan_float = {'dims': [3, nchan],
                          'type': [float, np.float64]}
@@ -1159,7 +970,7 @@ def check_npa(inp, npa):
                     'type': [float, np.float64]}
 
     nchan_string = {'dims': [nchan],
-                    'type': [str, np.str_, np.bytes_]}
+                    'type': [np.bytes_]}
 
     schema = {'data_source': zero_string,
               'nchan': zero_long,
@@ -1434,7 +1245,7 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                      'aoffz': 'cm',
                      'adist': 'cm'}
 
-        write_data(g_nbi, nbi, nbi_description, nbi_units, name='nbi')
+        write_data(g_nbi, nbi, desc = nbi_description, units=nbi_units, name='nbi')
 
         if spec is not None:
             # Create spec group
@@ -1460,7 +1271,7 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                           'radius': 'cm',
                           'spot_size': 'cm'}
 
-            write_data(g_spec, spec, spec_description, spec_units, name='spec')
+            write_data(g_spec, spec, desc=spec_description, units=spec_units, name='spec')
 
         if npa is not None:
             # Create npa group
@@ -1493,7 +1304,7 @@ def write_geometry(filename, nbi, spec=None, npa=None):
                          'radius': 'cm',
                          'a_redge': 'cm'}
 
-            write_data(g_npa, npa, npa_description, npa_units, name='npa')
+            write_data(g_npa, npa, desc = npa_description, units = npa_units, name='npa')
 
     if os.path.isfile(filename):
         success('Geometry file created: ' + filename)
@@ -1560,7 +1371,7 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        write_data(g_plasma, plasma, plasma_description, plasma_units, name='plasma')
+        write_data(g_plasma, plasma, desc = plasma_description, units = plasma_units, name='plasma')
 
         # Create fields group
         g_fields = hf.create_group('fields')
@@ -1599,7 +1410,7 @@ def write_equilibrium(filename, plasma, fields):
                         'r2d': 'cm',
                         'z2d': 'cm'}
 
-        write_data(g_fields, fields, fields_description, fields_units, name='fields')
+        write_data(g_fields, fields, desc = fields_description, units = fields_units, name='fields')
 
     if os.path.isfile(filename):
         success('Equilibrium file created: '+filename)
@@ -1680,7 +1491,7 @@ def write_distribution(filename, distri):
         hf.attrs['description'] = 'Fast-ion distribution for FIDASIM'
         hf.attrs['coordinate_system'] = 'Cylindrical'
 
-        write_data(hf, distri, description, units, name='distribution')
+        write_data(hf, distri, desc = description, units=units, name='distribution')
 
     if os.path.isfile(filename):
         success('Distribution file created: ' + filename)

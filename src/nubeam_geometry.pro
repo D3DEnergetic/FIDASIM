@@ -29,6 +29,8 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ;+
     ;+     **NUBEAM.XYBSCA**: Elevation above/below vacuum vessel midplane of center of beam source grid [cm]
     ;+
+    ;+     **NUBEAM.NLJCCW**: Orientation of Ip. 1 for True/Counter-clockwise current, 0 or -1 for False/Clock-wise current
+    ;+
     ;+     **NUBEAM.NLCO**: 1 for Co-beam, 0 or -1 for Counter-beam
     ;+
     ;+     **NUBEAM.NBAPSHA**: Vector of aperture shapes 1=rectangular, 2=circular
@@ -62,6 +64,13 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
 
     if not keyword_set(angle) then angle=0
     if nubeam.nlco eq 0 then nubeam.nlco = -1
+    if where(tag_names(nubeam) eq 'NLJCCW') ge 0 then begin
+        if nubeam.nljccw eq 0 then nubeam.nljccw = -1
+    endif else begin
+        warn("Current orientation not specified. Assuming Counter-clockwise.")
+        nubeam = create_struct(nubeam, 'NLJCCW', 1)
+    endelse
+
 
     phi_s=(nubeam.XBZETA+angle)*!DPI/180.0
     zs=nubeam.XYBSCA
@@ -74,14 +83,14 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     ra=sqrt(nubeam.RTCENA^2.0 + pdat^2.0)
     beta_s=acos(nubeam.RTCENA/rs)
     beta_a=acos(nubeam.RTCENA/ra)
-    phi_a=phi_s+nubeam.NLCO*(beta_s-beta_a)
+    phi_a=phi_s + nubeam.NLJCCW*nubeam.NLCO*(beta_s-beta_a)
 
     src=[rs*cos(phi_s),rs*sin(phi_s),zs]
     aper_src=[ra*cos(phi_a),ra*sin(phi_a),za]
     axis=(aper_src-src)
     axis=axis/sqrt(total(axis^2))
     pos=src+axis*nubeam.XLBTNA
-  
+
     if keyword_set(verbose) then begin
         print,'Source position: ',src
         print,'1st Aperture position: ',aper_src
@@ -102,6 +111,6 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
            awidy:double(nubeam.rapedga),awidz:double(nubeam.xzpedga), $
            aoffy:double(nubeam.xrapoffa),aoffz:double(nubeam.xzapoffa), $
            adist:double(nubeam.xlbapa) }
- 
+
     return, nbi
 END

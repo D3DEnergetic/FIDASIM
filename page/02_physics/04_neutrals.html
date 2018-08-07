@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 
-	 <meta name="description" content="">
+   
+   <meta name="description" content="">
     
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
@@ -17,6 +17,9 @@
     <link href="../../css/font-awesome.min.css" rel="stylesheet">
     <link href="../../css/local.css" rel="stylesheet">
     
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -26,13 +29,6 @@
     
     <script src="../../js/jquery-2.1.3.min.js"></script>
     <script src="../../js/svg-pan-zoom.min.js"></script>
-
-    
-    <script src="../../tipuesearch/tipuesearch_content.js"></script>
-    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
-    <script src="../../tipuesearch/tipuesearch_set.js"></script>
-    <script src="../../tipuesearch/tipuesearch.js"></script>
-    
 
   </head>
 
@@ -48,39 +44,43 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.2.4</small></a>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.3.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-				
+        
             <li><a href='../../page/index.html'>User Guide</a></li>
-	    
+      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
-		 aria-expanded="false">Contents <span class="caret"></span></a>
-	      <ul class="dropdown-menu">
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
               
             <li><a href="../../lists/files.html">Source Files</a></li>
-				
-				
+        
+        
+        
             <li><a href="../../lists/modules.html">Modules</a></li>
-				
+        
             
                                 
             <li><a href="../../lists/procedures.html">Procedures</a></li>
-				
-								
+        
+               
             <li><a href="../../lists/types.html">Derived Types</a></li>
-				
-				
+        
+        
             <li><a href="../../lists/programs.html">Programs</a></li>
-				
+        
             </ul>
             </li>
 
+
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
 
 
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
@@ -172,8 +172,8 @@ text-align: center;
 FIDASIM requires that the grid be axis-aligned to easily track particles through the grid.
 However, it is extremely useful to be able to align the grid along the beam centerline.
 To facilitate this FIDASIM allows the user to define arbitrary Cartesian coordinate system (beam grid coordinates) that all calculations are done in.</p>
-<p>FIDASIM uses <a href="https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles">Tait-Bryan rotation angles</a> (<code>alpha</code>,<code>beta</code>,<code>gamma</code>) to define a intrinsic rotation matrix, \(R\), that is used to transform from beam grid coordinates(xyz) to machine coordinates(uvw)
-$$ \mathrm{uvw = R \cdot xyz + origin} $$
+<p>FIDASIM uses <a href="https://en.wikipedia.org/wiki/Euler_angles#Tait.E2.80.93Bryan_angles">Tait-Bryan rotation angles</a> (<code>alpha</code>,<code>beta</code>,<code>gamma</code>) to define a intrinsic rotation matrix, <script type="math/tex">R</script>, that is used to transform from beam grid coordinates(xyz) to machine coordinates(uvw)
+<script type="math/tex; mode=display"> \mathrm{uvw = R \cdot xyz + origin} </script>
 If the rotation angles and <code>origin</code> are set to zero then the rotation matrix is the Identity matrix and the coordinate system is identical to machine coordinates (Standard Cartesian). </p>
 <p>Understanding these variables can be difficult and can best be described by an example. </p>
 <ol>
@@ -305,16 +305,16 @@ If the rotation angles and <code>origin</code> are set to zero then the rotation
 </table>
 <h1 id="neutral-beam-geometry">Neutral Beam Geometry</h1>
 <p>A neutral beam is defined by a source position and an axis such that a position along the beam centerline is defined as
-$$\vec{C}(t) = \vec{s} + \vec{a} \cdot t$$
-where \(\vec{C}(t)\) is the position along the centerline parameterized by \(t\), \(\vec{s}\) is the source position in machine coordinates, and \(\vec{a}\) is the axis.</p>
+<script type="math/tex; mode=display">\vec{C}(t) = \vec{s} + \vec{a} \cdot t</script>
+where <script type="math/tex">\vec{C}(t)</script> is the position along the centerline parameterized by <script type="math/tex">t</script>, <script type="math/tex">\vec{s}</script> is the source position in machine coordinates, and <script type="math/tex">\vec{a}</script> is the axis.</p>
 <p>The ion source is defined by its shape (circular or rectangular), size (half width and height), focal length (vertical and horizontal), and divergence (energy dependent).
 The neutral beam is simulated by firing particles from random positions on the source plate.
 The trajectory of the particles is determined by the following equations (+x into the plasma)
-$$v_x = 1$$
-$$v_y = -\frac{y_s}{f_y} + \tan(\mathcal{N}(0,\beta_y^2))$$
-$$v_z = -\frac{z_s}{f_z} + \tan(\mathcal{N}(0,\beta_z^2))$$
-where \(y_s\) and \(z_s\) are random positions on the source plate in the horizontal and vertical directions respectively, 
-\(f_{y/z}\) are the focal lengths, and \(\beta_{y/z}\) are the divergences. Examples of different trajectories are shown below.</p>
+<script type="math/tex; mode=display">v_x = 1</script>
+<script type="math/tex; mode=display">v_y = -\frac{y_s}{f_y} + \tan(\mathcal{N}(0,\beta_y^2))</script>
+<script type="math/tex; mode=display">v_z = -\frac{z_s}{f_z} + \tan(\mathcal{N}(0,\beta_z^2))</script>
+where <script type="math/tex">y_s</script> and <script type="math/tex">z_s</script> are random positions on the source plate in the horizontal and vertical directions respectively, 
+<script type="math/tex">f_{y/z}</script> are the focal lengths, and <script type="math/tex">\beta_{y/z}</script> are the divergences. Examples of different trajectories are shown below.</p>
 <p style="text-align: center"><img alt="" src="../../media/beam_divergence.png"></p>
 <p>Not shown above are the beam aperture(s) which collimates the neutral beam.
 Apertures are represented in FIDASIM by their shape (circular or rectangular), size (half width and
@@ -480,14 +480,14 @@ It is assumed that the plane of the aperture(s) is parallel to the plane of the 
 </tbody>
 </table>
 <h1 id="neutral-beam-density">Neutral Beam Density</h1>
-<p>Neutral Hydrogen beams usually contain atoms with different energies: \(H(E_{inj})\) (Full), \(H(E_{inj}/2)\) (Half),\(H(E_{inj}/3)\) (Third).
-This splitting of energy is due to multiple atomic and molecular species being accelerated to the same kinetic energy, \(E_{inj}\).
+<p>Neutral Hydrogen beams usually contain atoms with different energies: <script type="math/tex">H(E_{inj})</script> (Full), <script type="math/tex">H(E_{inj}/2)</script> (Half),<script type="math/tex">H(E_{inj}/3)</script> (Third).
+This splitting of energy is due to multiple atomic and molecular species being accelerated to the same kinetic energy, <script type="math/tex">E_{inj}</script>.
 Each beam species will attenuate differently into the plasma and need to be treated separetely.
 It is assumed that each neutral is in the ground state with initial flux given by
-$$ F_i(n=1) = \frac{dN_i}{dt} = C_i \cdot \frac{dN_{tot}}{dt} $$
-where \(C_i\) is current fraction for the \(i_{th}\) energy component and \(dN_{tot}/dt\) is the total flux of neutrals given by
-$$\frac{dN_{tot}}{dt} = \frac{P_{inj}}{C_1 E_{inj}+ C_2 E_{inj}/2 + C_3 E_{inj}/3} $$
-where \(P_{inj}\) is the beam power.</p>
+<script type="math/tex; mode=display"> F_i(n=1) = \frac{dN_i}{dt} = C_i \cdot \frac{dN_{tot}}{dt} </script>
+where <script type="math/tex">C_i</script> is current fraction for the <script type="math/tex">i_{th}</script> energy component and <script type="math/tex">dN_{tot}/dt</script> is the total flux of neutrals given by
+<script type="math/tex; mode=display">\frac{dN_{tot}}{dt} = \frac{P_{inj}}{C_1 E_{inj}+ C_2 E_{inj}/2 + C_3 E_{inj}/3} </script>
+where <script type="math/tex">P_{inj}</script> is the beam power.</p>
 <p>Within each beam grid cell along the neutral trajectory the flux is modified using the <a href="./03_colrad.html">collisional radiative model</a> and the neutral density is calculated.
 The figure below illustrates the different beam attenuation profiles.</p>
 <p style="text-align: center"><img alt="" src="../../media/neutral_beam.png"></p>
@@ -497,11 +497,21 @@ After neutralization, the newly created thermal neutrals travel ballistically an
 This process is then repeated multiple times in a recursive fashion producing fewer and fewer neutrals.
 The effect of this process is a Halo of neutrals surrounding the neutral beam.</p>
 <p>FIDASIM uses the following scheme to calculate the DCX+Halo contribution.</p>
-<p>\(\rm{DCX:\,\,\,} \quad H_{t_0}^+ + H_b \rightarrow H_{t_0} + H_b^+\)</p>
-<p>\(\rm{Halo\,1:} \quad H_{t_1}^+ + H_{t_0} \rightarrow H_{t_1} + H_{t_0}^+\)</p>
-<p>\(\rm{Halo\,2:} \quad H_{t_2}^+ + H_{t_1} \rightarrow H_{t_2} + H_{t_1}^+\)</p>
-<p>\(\vdots\)</p>
-<p>\(\rm{Halo\,n:} \quad H_{t_n}^+ + H_{t_{(n-1)}} \rightarrow H_{t_n} + H_{t_{(n-1)}}^+\)</p>
+<p>
+<script type="math/tex">\rm{DCX:\,\,\,} \quad H_{t_0}^+ + H_b \rightarrow H_{t_0} + H_b^+</script>
+</p>
+<p>
+<script type="math/tex">\rm{Halo\,1:} \quad H_{t_1}^+ + H_{t_0} \rightarrow H_{t_1} + H_{t_0}^+</script>
+</p>
+<p>
+<script type="math/tex">\rm{Halo\,2:} \quad H_{t_2}^+ + H_{t_1} \rightarrow H_{t_2} + H_{t_1}^+</script>
+</p>
+<p>
+<script type="math/tex">\vdots</script>
+</p>
+<p>
+<script type="math/tex">\rm{Halo\,n:} \quad H_{t_n}^+ + H_{t_{(n-1)}} \rightarrow H_{t_n} + H_{t_{(n-1)}}^+</script>
+</p>
 <p>After a few iterations the halo density converges and the calculation ends.</p>
 <h1 id="relevent-namelist-settings">Relevent Namelist Settings</h1>
 <ul>
@@ -648,7 +658,8 @@ The effect of this process is a Halo of neutrals surrounding the neutral beam.</
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+                                          </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 
@@ -679,12 +690,17 @@ The effect of this process is a Halo of neutrals surrounding the neutral beam.</
       MathJax.Hub.Config({
         TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
         jax: ['input/TeX','input/MathML','output/HTML-CSS'],
-        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
-        'HTML-CSS': { 
-           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
-        }
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+    
   </body>
 </html>

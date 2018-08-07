@@ -2501,7 +2501,7 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(4) :: dims
-    real(Float64) :: dummy(1)
+    real(Float64) :: dummy(1), denp_tot
     integer :: ir
 
     if(inputs%verbose.ge.1) then
@@ -2549,9 +2549,21 @@ subroutine read_f(fid, error)
     fbm%pmax = dummy(1)
     fbm%p_range = fbm%pmax - fbm%pmin
 
+    denp_tot = 0.0
     do ir=1,fbm%nr
         fbm%n_tot = fbm%n_tot + 2*pi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:))*fbm%r(ir)
+        denp_tot = denp_tot + 2*pi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:)%denp)*fbm%r(ir)
     enddo
+
+    if(fbm%n_tot.ge.denp_tot) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a," (",ES10.3," >=",ES10.3,")")') &
+                "READ_F: The total of number of fast ions exceeded the total number of thermal ions.", &
+                 fbm%n_tot, denp_tot
+            write(*,'(a)') "This is usually caused by zeff being incorrect."
+        endif
+        stop
+    endif
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z)"
@@ -7592,7 +7604,7 @@ subroutine fida_f
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields, &
+        !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields,los_intersect, &
         !$OMP tracks,ncell,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for velocity and position
@@ -8358,6 +8370,7 @@ subroutine fida_weights_los
     integer, dimension(3) :: ind  !!actual cell
     real(Float64), dimension(3) :: ri
     integer(Int32) :: ncell
+    logical :: inp
 
     real(Float64):: etov2, dEdP
 
@@ -8415,7 +8428,7 @@ subroutine fida_weights_los
         mean_f = 0.d0
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
-                do i=1,beam_grid%nx
+                x_loop: do i=1,beam_grid%nx
                     inter = spec_chords%inter(i,j,k)
                     cid = 0
                     cind = 0
@@ -8425,6 +8438,9 @@ subroutine fida_weights_los
                     enddo
                     if(cid.eq.ichan) then
                         ind = [i,j,k]
+                        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+                        call in_plasma(ri, inp)
+                        if(.not.inp) cycle x_loop
                         dlength = inter%los_elem(cind)%length
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
                         hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength
@@ -8432,8 +8448,8 @@ subroutine fida_weights_los
                         halodens = halodens + neut%dens(:,halo_type,i,j,k)*dlength
                         wght = sum(neut%dens(3,1:4,i,j,k))*dlength
 
-                        call get_plasma(plasma_cell,ind=ind)
-                        call get_fields(fields_cell,ind=ind)
+                        call get_plasma(plasma_cell,pos=ri)
+                        call get_fields(fields_cell,pos=ri)
                         plasma = plasma + wght*plasma_cell
                         fields = fields + wght*fields_cell
                         if (inputs%dist_type.eq.1) then
@@ -8446,7 +8462,7 @@ subroutine fida_weights_los
                         endif
                         wght_tot = wght_tot + wght
                     endif
-                enddo
+                enddo x_loop
             enddo
         enddo
 

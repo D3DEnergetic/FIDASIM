@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 
-	 <meta name="description" content="">
+   
+   <meta name="description" content="">
     
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
@@ -17,6 +17,9 @@
     <link href="../../css/font-awesome.min.css" rel="stylesheet">
     <link href="../../css/local.css" rel="stylesheet">
     
+    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -26,13 +29,6 @@
     
     <script src="../../js/jquery-2.1.3.min.js"></script>
     <script src="../../js/svg-pan-zoom.min.js"></script>
-
-    
-    <script src="../../tipuesearch/tipuesearch_content.js"></script>
-    <link  href="../../tipuesearch/tipuesearch.css" rel="stylesheet">
-    <script src="../../tipuesearch/tipuesearch_set.js"></script>
-    <script src="../../tipuesearch/tipuesearch.js"></script>
-    
 
   </head>
 
@@ -48,39 +44,43 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.2.4</small></a>
+          <a class="navbar-brand" href="../../index.html">FIDASIM <small>1.3.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-				
+        
             <li><a href='../../page/index.html'>User Guide</a></li>
-	    
+      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
-		 aria-expanded="false">Contents <span class="caret"></span></a>
-	      <ul class="dropdown-menu">
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
               
             <li><a href="../../lists/files.html">Source Files</a></li>
-				
-				
+        
+        
+        
             <li><a href="../../lists/modules.html">Modules</a></li>
-				
+        
             
                                 
             <li><a href="../../lists/procedures.html">Procedures</a></li>
-				
-								
+        
+               
             <li><a href="../../lists/types.html">Derived Types</a></li>
-				
-				
+        
+        
             <li><a href="../../lists/programs.html">Programs</a></li>
-				
+        
             </ul>
             </li>
 
+
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/files.html">Source Files</a></li>
+
 
 
 <li class="visible-xs hidden-sm visible-lg"><a href="../../lists/modules.html">Modules</a></li>
@@ -159,43 +159,49 @@ An example of this process is shown below.</p>
 <p>The calculation of the FIDA weight function can be broken up into 3 parts.</p>
 <ol>
 <li>Probability of a fast-ion charge exchanging with a neutral to create a fast neutral.</li>
-<li>Probability of a fast neutral undergoing a Balmer-\(\alpha\) transition and emitting a photon within the LOS.</li>
+<li>Probability of a fast neutral undergoing a Balmer-<script type="math/tex">\alpha</script> transition and emitting a photon within the LOS.</li>
 <li>Probability of a photon landing in a certain wavelength region.</li>
 </ol>
 <p>The product of these probabilities will be proportional to the FIDA weight function.</p>
 <p>The probabilities mentioned above are implicitly local quantities, however, in reality the neutral population and the diagnostic geometry have spatial extent. 
 The (exact) expected FIDA signal is given by</p>
-<p>$$
+<p>
+<script type="math/tex; mode=display">
 S(\lambda) = \sum_{cells} \left (\sum_{E,p} W_i(E,p,\lambda) \times F_i(E,p) \, \Delta E \Delta p \right )
-$$</p>
-<p>In order to calculate a single representative weight function for a given diagnostic (\(W(\lambda,E,p)\), spatial averaging is needed.</p>
+</script>
+</p>
+<p>In order to calculate a single representative weight function for a given diagnostic (<script type="math/tex">W(\lambda,E,p)</script>, spatial averaging is needed.</p>
 <p>FIDASIM offers two different ways of calculating the FIDA weight functions; each using a different spatial averaging method.</p>
 <hr>
 <p><code>calc_fida_wght = 1</code></p>
 <p>With this switch the FIDA weight function is calculated using LOS integrated neutral density and weighted plasma parameters given by</p>
-<p>$$
+<p>
+<script type="math/tex; mode=display">
 k_{mean} = \frac{\int k \times (d_{beam} + d_{halo}) \,dl}{\int (d_{beam} + d_{halo}) \, dl}
-$$</p>
-<p>where \(k\) represents the various plasma parameters and distribution function.</p>
+</script>
+</p>
+<p>where <script type="math/tex">k</script> represents the various plasma parameters and distribution function.</p>
 <p>Using this method the FIDA spectra can be estimated by 
-$$
+<script type="math/tex; mode=display">
 S_{approx}(\lambda) = \sum_{E,p} \overline{W}(E,p,\lambda) \times \overline{F}(E,p) \Delta E \Delta p
-$$</p>
-<p>where \(\overline{W}\) is the weight function calculated with LOS-averaged quantities and \(\overline{F}\) is the LOS-averaged fast-ion distribution function. </p>
+</script>
+</p>
+<p>where <script type="math/tex">\overline{W}</script> is the weight function calculated with LOS-averaged quantities and <script type="math/tex">\overline{F}</script> is the LOS-averaged fast-ion distribution function. </p>
 <hr>
 <p><code>calc_fida_wght = 2</code></p>
 <p>With this switch it is assumed that over the line of sight the fast-ion distribution is approximately constant.
-$$
+<script type="math/tex; mode=display">
 S_{approx}(\lambda) = \sum_{E,p} \overline{F}(E,p) \times \overline{W}(E,p,\lambda) \, \Delta E \Delta p
-$$
+</script>
 where
-$$
+<script type="math/tex; mode=display">
 \overline{W} = \sum_{cells} W_i
-$$
+</script>
 and
-$$
+<script type="math/tex; mode=display">
 \overline{F}(E,p) = \frac{\sum_{cells} \sum_{\lambda} W_i(E,p,\lambda) \times F_i(E,p)}{\sum_{\lambda}\overline{W}(E,p,\lambda)}
-$$</p>
+</script>
+</p>
 <p>This method is more computationally intensive and uses a Monte Carlo method which introduces some noise.
 Regardless, this method is more accurate then the previous method and should be used in analysis where accuracy is paramount, e.g. velocity space tomography. </p>
 <p></p><div class="alert alert-info" role="alert"><h4>Note</h4><p>The FIDA signal produced by <code>calc_fida = 1</code> will sometimes significantly differ from the estimated FIDA spectra produced by convolving the weight functions with the fast-ion distribution. This is due to the approximations made in the weight function calculation. In general you can use the <code>calc_fida=1</code> result to test the approximations used by <code>calc_fida_wght=1/2</code></p></div>
@@ -209,9 +215,11 @@ Regardless, this method is more accurate then the previous method and should be 
 <p>The product of these probabilities will be proportional to the NPA weight function.</p>
 <p>The probabilities mentioned above are implicitly local quantities, however, in reality the neutral population and the diagnostic geometry have spatial extent. 
 The (exact) expected NPA signal is given by</p>
-<p>$$
+<p>
+<script type="math/tex; mode=display">
 flux(E) = \sum_{cells} \left (\sum_{p} W_i(E,p) \times F_i(E,p) \, \Delta p \right )
-$$</p>
+</script>
+</p>
 <p>The NPA weight functions are calculated using the same assumptions as the FIDA weight functions (<code>calc_fida_wght=2</code>).</p>
 <p>If <code>calc_npa_wght = 2</code> is set then the individual compenents of the npa weight function are also outputed. </p>
     </div>
@@ -333,7 +341,8 @@ $$</p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+                                          </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 
@@ -364,12 +373,17 @@ $$</p>
       MathJax.Hub.Config({
         TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
         jax: ['input/TeX','input/MathML','output/HTML-CSS'],
-        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
-        'HTML-CSS': { 
-           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
-        }
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../../tipuesearch/tipuesearch.js"></script>
+    
+    
   </body>
 </html>

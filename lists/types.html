@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 
-	 <meta name="description" content="">
+   
+   <meta name="description" content="">
     
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../favicon.png">
@@ -19,6 +19,9 @@ All Types &ndash; FIDASIM
     <link href="../css/font-awesome.min.css" rel="stylesheet">
     <link href="../css/local.css" rel="stylesheet">
     
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -28,13 +31,6 @@ All Types &ndash; FIDASIM
     
     <script src="../js/jquery-2.1.3.min.js"></script>
     <script src="../js/svg-pan-zoom.min.js"></script>
-
-    
-    <script src="../tipuesearch/tipuesearch_content.js"></script>
-    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
-    <script src="../tipuesearch/tipuesearch_set.js"></script>
-    <script src="../tipuesearch/tipuesearch.js"></script>
-    
 
   </head>
 
@@ -50,39 +46,43 @@ All Types &ndash; FIDASIM
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.2.4</small></a>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>1.3.0</small></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-				
+        
             <li><a href='../page/index.html'>User Guide</a></li>
-	    
+      
             <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
               <a href="#" class="dropdown-toggle"
               data-toggle="dropdown" role="button"
               aria-haspopup="true"
-		 aria-expanded="false">Contents <span class="caret"></span></a>
-	      <ul class="dropdown-menu">
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
               
             <li><a href="../lists/files.html">Source Files</a></li>
-				
-				
+        
+        
+        
             <li><a href="../lists/modules.html">Modules</a></li>
-				
+        
             
                                 
             <li><a href="../lists/procedures.html">Procedures</a></li>
-				
-								
+        
+               
             <li><a href="../lists/types.html">Derived Types</a></li>
-				
-				
+        
+        
             <li><a href="../lists/programs.html">Programs</a></li>
-				
+        
             </ul>
             </li>
 
+
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
 
 
 <li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
@@ -150,11 +150,12 @@ All Types &ndash; FIDASIM
 			 
 			   <tr><td><a href='../type/gyrosurface.html'>GyroSurface</a></td><td><a href='../module/libfida.html'>libfida</a></td><td>None</td><td><p>Surface containing the fast-ion velocity vectors for all values of the
  gyro-angle. It takes the form of a hyperboloid 
- \((x(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(cos(\gamma + \pi/2) - \omega_i t sin(\gamma + \pi/2)) \)
- \((y(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(sin(\gamma + \pi/2) + \omega_i t cos(\gamma + \pi/2)) \)
- \((z(\gamma,t) = \alpha \omega_i \rm{pitch} t\)
- where \(\gamma\) is the gyro-angle, \(\omega_i\) is the ion
- gyro-frequency and \(\alpha = V/\omega_i \)</p></td></tr>
+ <script type="math/tex">(x(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(cos(\gamma + \pi/2) - \omega_i t sin(\gamma + \pi/2)) </script>
+<script type="math/tex">(y(\gamma,t) = \alpha \sqrt{1-\rm{pitch}^2}(sin(\gamma + \pi/2) + \omega_i t cos(\gamma + \pi/2)) </script>
+<script type="math/tex">(z(\gamma,t) = \alpha \omega_i \rm{pitch} t</script>
+ where <script type="math/tex">\gamma</script> is the gyro-angle, <script type="math/tex">\omega_i</script> is the ion
+ gyro-frequency and <script type="math/tex">\alpha = V/\omega_i </script>
+</p></td></tr>
 			 
 			   <tr><td><a href='../type/interpolationgrid.html'>InterpolationGrid</a></td><td><a href='../module/libfida.html'>libfida</a></td><td>None</td><td><p>Defines a 2D R-Z grid for interpolating plasma parameters and fields</p></td></tr>
 			 
@@ -207,449 +208,438 @@ All Types &ndash; FIDASIM
 			   <tr><td><a href='../type/spectralchords.html'>SpectralChords</a></td><td><a href='../module/libfida.html'>libfida</a></td><td>None</td><td><p>Defines an spectral diagnostic system</p></td></tr>
 			 
 			 </tbody></table>
-             
-                <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+             <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 2.36.0 (20140111.2315)
  -->
 <!-- Title: type~~graph~~TypeGraph Pages: 1 -->
-<svg id="typegraphTypeGraph" width="460pt" height="1144pt"
- viewBox="0.00 0.00 460.00 1144.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<g id="type~~graph~~TypeGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 1140)">
+<svg id="typegraphTypeGraph" width="520pt" height="1121pt"
+ viewBox="0.00 0.00 520.00 1121.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="type~~graph~~TypeGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 1117)">
 <title>type~~graph~~TypeGraph</title>
-<polygon fill="white" stroke="none" points="-4,4 -4,-1140 456,-1140 456,4 -4,4"/>
-<!-- type~npaparticle -->
-<g id="type~~graph~~TypeGraph_node1" class="node"><title>type~npaparticle</title>
-<g id="a_type~~graph~~TypeGraph_node1"><a xlink:href="../type/npaparticle.html" xlink:title="NPAParticle">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="88.5,-24 19.5,-24 19.5,-0 88.5,-0 88.5,-24"/>
-<text text-anchor="middle" x="54" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAParticle</text>
-</a>
-</g>
-</g>
-<!-- type~nparesults -->
-<g id="type~~graph~~TypeGraph_node20" class="node"><title>type~nparesults</title>
-<g id="a_type~~graph~~TypeGraph_node20"><a xlink:href="../type/nparesults.html" xlink:title="NPAResults">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="299.5,-24 230.5,-24 230.5,-0 299.5,-0 299.5,-24"/>
-<text text-anchor="middle" x="265" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAResults</text>
-</a>
-</g>
-</g>
-<!-- type~npaparticle&#45;&gt;type~nparesults -->
-<g id="type~~graph~~TypeGraph_edge9" class="edge"><title>type~npaparticle&#45;&gt;type~nparesults</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M88.5795,-12C124.276,-12 180.877,-12 220.089,-12"/>
-<polygon fill="#000000" stroke="#000000" points="220.157,-15.5001 230.157,-12 220.157,-8.5001 220.157,-15.5001"/>
-<text text-anchor="middle" x="164" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">part</text>
-</g>
-<!-- type~particletrack -->
-<g id="type~~graph~~TypeGraph_node2" class="node"><title>type~particletrack</title>
-<g id="a_type~~graph~~TypeGraph_node2"><a xlink:href="../type/particletrack.html" xlink:title="ParticleTrack">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="91.5,-66 16.5,-66 16.5,-42 91.5,-42 91.5,-66"/>
-<text text-anchor="middle" x="54" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ParticleTrack</text>
-</a>
-</g>
-</g>
-<!-- type~simulationinputs -->
-<g id="type~~graph~~TypeGraph_node3" class="node"><title>type~simulationinputs</title>
-<g id="a_type~~graph~~TypeGraph_node3"><a xlink:href="../type/simulationinputs.html" xlink:title="SimulationInputs">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="99.5,-108 8.5,-108 8.5,-84 99.5,-84 99.5,-108"/>
-<text text-anchor="middle" x="54" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SimulationInputs</text>
-</a>
-</g>
-</g>
-<!-- type~nuclearrates -->
-<g id="type~~graph~~TypeGraph_node4" class="node"><title>type~nuclearrates</title>
-<g id="a_type~~graph~~TypeGraph_node4"><a xlink:href="../type/nuclearrates.html" xlink:title="NuclearRates">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="92.5,-276 15.5,-276 15.5,-252 92.5,-252 92.5,-276"/>
-<text text-anchor="middle" x="54" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NuclearRates</text>
-</a>
-</g>
-</g>
-<!-- type~atomictables -->
-<g id="type~~graph~~TypeGraph_node15" class="node"><title>type~atomictables</title>
-<g id="a_type~~graph~~TypeGraph_node15"><a xlink:href="../type/atomictables.html" xlink:title="AtomicTables">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="303.5,-213 226.5,-213 226.5,-189 303.5,-189 303.5,-213"/>
-<text text-anchor="middle" x="265" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicTables</text>
-</a>
-</g>
-</g>
-<!-- type~nuclearrates&#45;&gt;type~atomictables -->
-<g id="type~~graph~~TypeGraph_edge6" class="edge"><title>type~nuclearrates&#45;&gt;type~atomictables</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M92.7128,-257.083C122.744,-251.084 165.628,-241.416 202,-229 211.54,-225.743 221.611,-221.546 230.797,-217.397"/>
-<polygon fill="#000000" stroke="#000000" points="232.393,-220.515 239.992,-213.132 229.447,-214.165 232.393,-220.515"/>
-<text text-anchor="middle" x="164" y="-252.4" font-family="Helvetica,sans-Serif" font-size="9.50">D_D</text>
-</g>
-<!-- type~neutraldensity -->
-<g id="type~~graph~~TypeGraph_node5" class="node"><title>type~neutraldensity</title>
-<g id="a_type~~graph~~TypeGraph_node5"><a xlink:href="../type/neutraldensity.html" xlink:title="NeutralDensity">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="95,-318 13,-318 13,-294 95,-294 95,-318"/>
-<text text-anchor="middle" x="54" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NeutralDensity</text>
-</a>
-</g>
-</g>
-<!-- type~spectralchords -->
-<g id="type~~graph~~TypeGraph_node6" class="node"><title>type~spectralchords</title>
-<g id="a_type~~graph~~TypeGraph_node6"><a xlink:href="../type/spectralchords.html" xlink:title="SpectralChords">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="452,-337 366,-337 366,-313 452,-313 452,-337"/>
-<text text-anchor="middle" x="409" y="-322.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SpectralChords</text>
-</a>
-</g>
-</g>
-<!-- type~fastiondistribution -->
-<g id="type~~graph~~TypeGraph_node7" class="node"><title>type~fastiondistribution</title>
-<g id="a_type~~graph~~TypeGraph_node7"><a xlink:href="../type/fastiondistribution.html" xlink:title="FastIonDistribution">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="105,-402 3,-402 3,-378 105,-378 105,-402"/>
-<text text-anchor="middle" x="54" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FastIonDistribution</text>
-</a>
-</g>
-</g>
-<!-- type~interpolcoeffs1d -->
-<g id="type~~graph~~TypeGraph_node8" class="node"><title>type~interpolcoeffs1d</title>
-<g id="a_type~~graph~~TypeGraph_node8"><a xlink:href="../type/interpolcoeffs1d.html" xlink:title="InterpolCoeffs1D">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="100.5,-444 7.5,-444 7.5,-420 100.5,-420 100.5,-444"/>
-<text text-anchor="middle" x="54" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InterpolCoeffs1D</text>
-</a>
-</g>
-</g>
-<!-- type~fastion -->
-<g id="type~~graph~~TypeGraph_node9" class="node"><title>type~fastion</title>
-<g id="a_type~~graph~~TypeGraph_node9"><a xlink:href="../type/fastion.html" xlink:title="FastIon">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="81,-486 27,-486 27,-462 81,-462 81,-486"/>
-<text text-anchor="middle" x="54" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FastIon</text>
-</a>
-</g>
-</g>
-<!-- type~fastionparticles -->
-<g id="type~~graph~~TypeGraph_node12" class="node"><title>type~fastionparticles</title>
-<g id="a_type~~graph~~TypeGraph_node12"><a xlink:href="../type/fastionparticles.html" xlink:title="FastIonParticles">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="309.5,-486 220.5,-486 220.5,-462 309.5,-462 309.5,-486"/>
-<text text-anchor="middle" x="265" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FastIonParticles</text>
-</a>
-</g>
-</g>
-<!-- type~fastion&#45;&gt;type~fastionparticles -->
-<g id="type~~graph~~TypeGraph_edge4" class="edge"><title>type~fastion&#45;&gt;type~fastionparticles</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M81.0474,-474C113.227,-474 168.797,-474 210.272,-474"/>
-<polygon fill="#000000" stroke="#000000" points="210.49,-477.5 220.49,-474 210.49,-470.5 210.49,-477.5"/>
-<text text-anchor="middle" x="164" y="-476.4" font-family="Helvetica,sans-Serif" font-size="9.50">fast_ion</text>
-</g>
-<!-- type~losinters -->
-<g id="type~~graph~~TypeGraph_node10" class="node"><title>type~losinters</title>
-<g id="a_type~~graph~~TypeGraph_node10"><a xlink:href="../type/losinters.html" xlink:title="LOSInters">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="295.5,-360 234.5,-360 234.5,-336 295.5,-336 295.5,-360"/>
-<text text-anchor="middle" x="265" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LOSInters</text>
-</a>
-</g>
-</g>
-<!-- type~losinters&#45;&gt;type~spectralchords -->
-<g id="type~~graph~~TypeGraph_edge2" class="edge"><title>type~losinters&#45;&gt;type~spectralchords</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M295.768,-343.178C313.161,-340.361 335.606,-336.726 355.847,-333.447"/>
-<polygon fill="#000000" stroke="#000000" points="356.572,-336.876 365.883,-331.822 355.452,-329.966 356.572,-336.876"/>
-<text text-anchor="middle" x="338" y="-340.4" font-family="Helvetica,sans-Serif" font-size="9.50">inter</text>
-</g>
-<!-- type~beamgrid -->
-<g id="type~~graph~~TypeGraph_node11" class="node"><title>type~beamgrid</title>
-<g id="a_type~~graph~~TypeGraph_node11"><a xlink:href="../type/beamgrid.html" xlink:title="BeamGrid">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="84.5,-528 23.5,-528 23.5,-504 84.5,-504 84.5,-528"/>
-<text text-anchor="middle" x="54" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BeamGrid</text>
-</a>
-</g>
-</g>
-<!-- type~boundedplane -->
-<g id="type~~graph~~TypeGraph_node13" class="node"><title>type~boundedplane</title>
-<g id="a_type~~graph~~TypeGraph_node13"><a xlink:href="../type/boundedplane.html" xlink:title="BoundedPlane">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="95,-570 13,-570 13,-546 95,-546 95,-570"/>
-<text text-anchor="middle" x="54" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BoundedPlane</text>
-</a>
-</g>
-</g>
-<!-- type~npadetector -->
-<g id="type~~graph~~TypeGraph_node21" class="node"><title>type~npadetector</title>
-<g id="a_type~~graph~~TypeGraph_node21"><a xlink:href="../type/npadetector.html" xlink:title="NPADetector">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="302,-570 228,-570 228,-546 302,-546 302,-570"/>
-<text text-anchor="middle" x="265" y="-555.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPADetector</text>
-</a>
-</g>
-</g>
-<!-- type~boundedplane&#45;&gt;type~npadetector -->
-<g id="type~~graph~~TypeGraph_edge10" class="edge"><title>type~boundedplane&#45;&gt;type~npadetector</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M95.2973,-558C130.169,-558 180.614,-558 217.252,-558"/>
-<polygon fill="#000000" stroke="#000000" points="217.67,-561.5 227.67,-558 217.67,-554.5 217.67,-561.5"/>
-<text text-anchor="middle" x="164" y="-560.4" font-family="Helvetica,sans-Serif" font-size="9.50">detector, aperture</text>
-</g>
-<!-- type~interpolationgrid -->
-<g id="type~~graph~~TypeGraph_node14" class="node"><title>type~interpolationgrid</title>
-<g id="a_type~~graph~~TypeGraph_node14"><a xlink:href="../type/interpolationgrid.html" xlink:title="InterpolationGrid">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="100,-612 8,-612 8,-588 100,-588 100,-612"/>
-<text text-anchor="middle" x="54" y="-597.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InterpolationGrid</text>
-</a>
-</g>
-</g>
-<!-- type~npaweights -->
-<g id="type~~graph~~TypeGraph_node16" class="node"><title>type~npaweights</title>
-<g id="a_type~~graph~~TypeGraph_node16"><a xlink:href="../type/npaweights.html" xlink:title="NPAWeights">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="90,-654 18,-654 18,-630 90,-630 90,-654"/>
-<text text-anchor="middle" x="54" y="-639.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAWeights</text>
-</a>
-</g>
-</g>
-<!-- type~emfields -->
-<g id="type~~graph~~TypeGraph_node17" class="node"><title>type~emfields</title>
-<g id="a_type~~graph~~TypeGraph_node17"><a xlink:href="../type/emfields.html" xlink:title="EMFields">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="82.5,-800 25.5,-800 25.5,-776 82.5,-776 82.5,-800"/>
-<text text-anchor="middle" x="54" y="-785.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">EMFields</text>
-</a>
-</g>
-</g>
-<!-- type~localemfields -->
-<g id="type~~graph~~TypeGraph_node22" class="node"><title>type~localemfields</title>
-<g id="a_type~~graph~~TypeGraph_node22"><a xlink:href="../type/localemfields.html" xlink:title="LocalEMFields">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="306,-710 224,-710 224,-686 306,-686 306,-710"/>
-<text text-anchor="middle" x="265" y="-695.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LocalEMFields</text>
-</a>
-</g>
-</g>
-<!-- type~emfields&#45;&gt;type~localemfields -->
-<g id="type~~graph~~TypeGraph_edge12" class="edge"><title>type~emfields&#45;&gt;type~localemfields</title>
-<path fill="none" stroke="#000000" d="M82.6833,-785.483C113.329,-781.795 163.483,-773.038 202,-753 218.963,-744.175 235.022,-729.692 246.545,-717.802"/>
-<polygon fill="#000000" stroke="#000000" points="249.148,-720.143 253.425,-710.449 244.037,-715.36 249.148,-720.143"/>
-</g>
-<!-- type~equilibrium -->
-<g id="type~~graph~~TypeGraph_node35" class="node"><title>type~equilibrium</title>
-<g id="a_type~~graph~~TypeGraph_node35"><a xlink:href="../type/equilibrium.html" xlink:title="Equilibrium">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="297.5,-783 232.5,-783 232.5,-759 297.5,-759 297.5,-783"/>
-<text text-anchor="middle" x="265" y="-768.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Equilibrium</text>
-</a>
-</g>
-</g>
-<!-- type~emfields&#45;&gt;type~equilibrium -->
-<g id="type~~graph~~TypeGraph_edge15" class="edge"><title>type~emfields&#45;&gt;type~equilibrium</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M82.664,-786.486C112.234,-784.782 160.474,-781.755 202,-778 208.513,-777.411 215.403,-776.711 222.129,-775.984"/>
-<polygon fill="#000000" stroke="#000000" points="222.934,-779.416 232.487,-774.833 222.161,-772.459 222.934,-779.416"/>
-<text text-anchor="middle" x="164" y="-785.4" font-family="Helvetica,sans-Serif" font-size="9.50">fields</text>
-</g>
-<!-- type~birthprofile -->
-<g id="type~~graph~~TypeGraph_node18" class="node"><title>type~birthprofile</title>
-<g id="a_type~~graph~~TypeGraph_node18"><a xlink:href="../type/birthprofile.html" xlink:title="BirthProfile">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="86,-842 22,-842 22,-818 86,-818 86,-842"/>
-<text text-anchor="middle" x="54" y="-827.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BirthProfile</text>
-</a>
-</g>
-</g>
-<!-- type~spectra -->
-<g id="type~~graph~~TypeGraph_node19" class="node"><title>type~spectra</title>
-<g id="a_type~~graph~~TypeGraph_node19"><a xlink:href="../type/spectra.html" xlink:title="Spectra">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="81,-884 27,-884 27,-860 81,-860 81,-884"/>
-<text text-anchor="middle" x="54" y="-869.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Spectra</text>
-</a>
-</g>
-</g>
-<!-- type~npachords -->
-<g id="type~~graph~~TypeGraph_node26" class="node"><title>type~npachords</title>
-<g id="a_type~~graph~~TypeGraph_node26"><a xlink:href="../type/npachords.html" xlink:title="NPAChords">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="443,-546 375,-546 375,-522 443,-522 443,-546"/>
-<text text-anchor="middle" x="409" y="-531.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAChords</text>
-</a>
-</g>
-</g>
-<!-- type~npadetector&#45;&gt;type~npachords -->
-<g id="type~~graph~~TypeGraph_edge13" class="edge"><title>type~npadetector&#45;&gt;type~npachords</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M302.2,-551.882C321.233,-548.665 344.698,-544.699 364.69,-541.32"/>
-<polygon fill="#000000" stroke="#000000" points="365.509,-544.731 374.786,-539.614 364.342,-537.829 365.509,-544.731"/>
-<text text-anchor="middle" x="338" y="-549.4" font-family="Helvetica,sans-Serif" font-size="9.50">det</text>
-</g>
-<!-- type~rng_type -->
-<g id="type~~graph~~TypeGraph_node23" class="node"><title>type~rng_type</title>
-<g id="a_type~~graph~~TypeGraph_node23"><a xlink:href="../type/rng_type.html" xlink:title="rng_type">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="81.5,-926 26.5,-926 26.5,-902 81.5,-902 81.5,-926"/>
-<text text-anchor="middle" x="54" y="-911.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_type</text>
-</a>
-</g>
-</g>
-<!-- type~neutronrate -->
-<g id="type~~graph~~TypeGraph_node24" class="node"><title>type~neutronrate</title>
-<g id="a_type~~graph~~TypeGraph_node24"><a xlink:href="../type/neutronrate.html" xlink:title="NeutronRate">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="90.5,-968 17.5,-968 17.5,-944 90.5,-944 90.5,-968"/>
-<text text-anchor="middle" x="54" y="-953.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NeutronRate</text>
-</a>
-</g>
-</g>
-<!-- type~interpolcoeffs2d -->
-<g id="type~~graph~~TypeGraph_node25" class="node"><title>type~interpolcoeffs2d</title>
-<g id="a_type~~graph~~TypeGraph_node25"><a xlink:href="../type/interpolcoeffs2d.html" xlink:title="InterpolCoeffs2D">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="100.5,-696 7.5,-696 7.5,-672 100.5,-672 100.5,-696"/>
-<text text-anchor="middle" x="54" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InterpolCoeffs2D</text>
-</a>
-</g>
-</g>
-<!-- type~interpolcoeffs2d&#45;&gt;type~localemfields -->
-<g id="type~~graph~~TypeGraph_edge11" class="edge"><title>type~interpolcoeffs2d&#45;&gt;type~localemfields</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M100.608,-687.055C133.916,-689.286 179.075,-692.311 213.477,-694.616"/>
-<polygon fill="#000000" stroke="#000000" points="213.571,-698.13 223.783,-695.306 214.039,-691.145 213.571,-698.13"/>
-<text text-anchor="middle" x="164" y="-695.4" font-family="Helvetica,sans-Serif" font-size="9.50">c</text>
-</g>
-<!-- type~localprofiles -->
-<g id="type~~graph~~TypeGraph_node39" class="node"><title>type~localprofiles</title>
-<g id="a_type~~graph~~TypeGraph_node39"><a xlink:href="../type/localprofiles.html" xlink:title="LocalProfiles">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="301.5,-666 228.5,-666 228.5,-642 301.5,-642 301.5,-666"/>
-<text text-anchor="middle" x="265" y="-651.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LocalProfiles</text>
-</a>
-</g>
-</g>
-<!-- type~interpolcoeffs2d&#45;&gt;type~localprofiles -->
-<g id="type~~graph~~TypeGraph_edge17" class="edge"><title>type~interpolcoeffs2d&#45;&gt;type~localprofiles</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M100.608,-677.453C135.48,-672.448 183.344,-665.577 218.252,-660.567"/>
-<polygon fill="#000000" stroke="#000000" points="218.784,-664.026 228.185,-659.141 217.789,-657.097 218.784,-664.026"/>
-<text text-anchor="middle" x="164" y="-675.4" font-family="Helvetica,sans-Serif" font-size="9.50">c</text>
-</g>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1117 516,-1117 516,4 -4,4"/>
 <!-- type~lineofsight -->
-<g id="type~~graph~~TypeGraph_node27" class="node"><title>type~lineofsight</title>
-<g id="a_type~~graph~~TypeGraph_node27"><a xlink:href="../type/lineofsight.html" xlink:title="LineOfSight">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="299,-318 231,-318 231,-294 299,-294 299,-318"/>
-<text text-anchor="middle" x="265" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LineOfSight</text>
-</a>
-</g>
-</g>
-<!-- type~lineofsight&#45;&gt;type~spectralchords -->
-<g id="type~~graph~~TypeGraph_edge1" class="edge"><title>type~lineofsight&#45;&gt;type~spectralchords</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M299.246,-306.757C314.207,-307.423 332.053,-308.67 348,-311 350.638,-311.385 353.331,-311.828 356.043,-312.314"/>
-<polygon fill="#000000" stroke="#000000" points="355.399,-315.755 365.884,-314.234 356.739,-308.884 355.399,-315.755"/>
-<text text-anchor="middle" x="338" y="-313.4" font-family="Helvetica,sans-Serif" font-size="9.50">los</text>
-</g>
-<!-- type~gyrosurface -->
-<g id="type~~graph~~TypeGraph_node28" class="node"><title>type~gyrosurface</title>
-<g id="a_type~~graph~~TypeGraph_node28"><a xlink:href="../type/gyrosurface.html" xlink:title="GyroSurface">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="90.5,-1010 17.5,-1010 17.5,-986 90.5,-986 90.5,-1010"/>
-<text text-anchor="middle" x="54" y="-995.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">GyroSurface</text>
+<g id="type~~graph~~TypeGraph_node1" class="node"><title>type~lineofsight</title>
+<g id="a_type~~graph~~TypeGraph_node1"><a xlink:href=".././type/lineofsight.html" xlink:title="LineOfSight">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="282,-66 214,-66 214,-42 282,-42 282,-66"/>
+<text text-anchor="middle" x="248" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LineOfSight</text>
 </a>
 </g>
 </g>
 <!-- type~neutralbeam -->
-<g id="type~~graph~~TypeGraph_node29" class="node"><title>type~neutralbeam</title>
-<g id="a_type~~graph~~TypeGraph_node29"><a xlink:href="../type/neutralbeam.html" xlink:title="NeutralBeam">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="91.5,-1052 16.5,-1052 16.5,-1028 91.5,-1028 91.5,-1052"/>
-<text text-anchor="middle" x="54" y="-1037.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NeutralBeam</text>
+<g id="type~~graph~~TypeGraph_node2" class="node"><title>type~neutralbeam</title>
+<g id="a_type~~graph~~TypeGraph_node2"><a xlink:href=".././type/neutralbeam.html" xlink:title="NeutralBeam">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="498.5,-112 423.5,-112 423.5,-88 498.5,-88 498.5,-112"/>
+<text text-anchor="middle" x="461" y="-97.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NeutralBeam</text>
 </a>
 </g>
 </g>
-<!-- type~fidaweights -->
-<g id="type~~graph~~TypeGraph_node30" class="node"><title>type~fidaweights</title>
-<g id="a_type~~graph~~TypeGraph_node30"><a xlink:href="../type/fidaweights.html" xlink:title="FIDAWeights">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="91.5,-1094 16.5,-1094 16.5,-1070 91.5,-1070 91.5,-1094"/>
-<text text-anchor="middle" x="54" y="-1079.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FIDAWeights</text>
+<!-- type~atomictransitions -->
+<g id="type~~graph~~TypeGraph_node3" class="node"><title>type~atomictransitions</title>
+<g id="a_type~~graph~~TypeGraph_node3"><a xlink:href=".././type/atomictransitions.html" xlink:title="AtomicTransitions">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="296.5,-234 199.5,-234 199.5,-210 296.5,-210 296.5,-234"/>
+<text text-anchor="middle" x="248" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicTransitions</text>
 </a>
 </g>
+</g>
+<!-- type~gyrosurface -->
+<g id="type~~graph~~TypeGraph_node4" class="node"><title>type~gyrosurface</title>
+<g id="a_type~~graph~~TypeGraph_node4"><a xlink:href=".././type/gyrosurface.html" xlink:title="GyroSurface">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="497.5,-225 424.5,-225 424.5,-201 497.5,-201 497.5,-225"/>
+<text text-anchor="middle" x="461" y="-210.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">GyroSurface</text>
+</a>
+</g>
+</g>
+<!-- type~interpolcoeffs2d -->
+<g id="type~~graph~~TypeGraph_node5" class="node"><title>type~interpolcoeffs2d</title>
+<g id="a_type~~graph~~TypeGraph_node5"><a xlink:href=".././type/interpolcoeffs2d.html" xlink:title="InterpolCoeffs2D">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="294.5,-402 201.5,-402 201.5,-378 294.5,-378 294.5,-402"/>
+<text text-anchor="middle" x="248" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InterpolCoeffs2D</text>
+</a>
+</g>
+</g>
+<!-- type~npaweights -->
+<g id="type~~graph~~TypeGraph_node6" class="node"><title>type~npaweights</title>
+<g id="a_type~~graph~~TypeGraph_node6"><a xlink:href=".././type/npaweights.html" xlink:title="NPAWeights">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="497,-441 425,-441 425,-417 497,-417 497,-441"/>
+<text text-anchor="middle" x="461" y="-426.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAWeights</text>
+</a>
+</g>
+</g>
+<!-- type~birthprofile -->
+<g id="type~~graph~~TypeGraph_node7" class="node"><title>type~birthprofile</title>
+<g id="a_type~~graph~~TypeGraph_node7"><a xlink:href=".././type/birthprofile.html" xlink:title="BirthProfile">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="493,-483 429,-483 429,-459 493,-459 493,-483"/>
+<text text-anchor="middle" x="461" y="-468.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BirthProfile</text>
+</a>
+</g>
+</g>
+<!-- type~nuclearrates -->
+<g id="type~~graph~~TypeGraph_node8" class="node"><title>type~nuclearrates</title>
+<g id="a_type~~graph~~TypeGraph_node8"><a xlink:href=".././type/nuclearrates.html" xlink:title="NuclearRates">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="286.5,-192 209.5,-192 209.5,-168 286.5,-168 286.5,-192"/>
+<text text-anchor="middle" x="248" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NuclearRates</text>
+</a>
+</g>
+</g>
+<!-- type~atomictables -->
+<g id="type~~graph~~TypeGraph_node9" class="node"><title>type~atomictables</title>
+<g id="a_type~~graph~~TypeGraph_node9"><a xlink:href=".././type/atomictables.html" xlink:title="AtomicTables">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="499.5,-163 422.5,-163 422.5,-139 499.5,-139 499.5,-163"/>
+<text text-anchor="middle" x="461" y="-148.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicTables</text>
+</a>
+</g>
+</g>
+<!-- type~atomictables&#45;&gt;type~atomictransitions -->
+<g id="type~~graph~~TypeGraph_edge1" class="edge"><title>type~atomictables&#45;&gt;type~atomictransitions</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M437.809,-163.112C424.745,-169.9 407.745,-178.15 392,-184 364.456,-194.235 332.977,-202.91 306.578,-209.376"/>
+<polygon fill="#000000" stroke="#000000" points="305.632,-206.004 296.728,-211.745 307.269,-212.81 305.632,-206.004"/>
+<text text-anchor="middle" x="356" y="-208.4" font-family="Helvetica,sans-Serif" font-size="9.50">H_H, H_e, H_Aq</text>
+</g>
+<!-- type~atomictables&#45;&gt;type~nuclearrates -->
+<g id="type~~graph~~TypeGraph_edge3" class="edge"><title>type~atomictables&#45;&gt;type~nuclearrates</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M422.277,-156.185C387.28,-160.995 335.027,-168.176 297.056,-173.395"/>
+<polygon fill="#000000" stroke="#000000" points="296.181,-169.982 286.751,-174.811 297.135,-176.917 296.181,-169.982"/>
+<text text-anchor="middle" x="356" y="-172.4" font-family="Helvetica,sans-Serif" font-size="9.50">D_D</text>
+</g>
+<!-- type~atomiccrosssection -->
+<g id="type~~graph~~TypeGraph_node26" class="node"><title>type~atomiccrosssection</title>
+<g id="a_type~~graph~~TypeGraph_node26"><a xlink:href=".././type/atomiccrosssection.html" xlink:title="AtomicCrossSection">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="302,-150 194,-150 194,-126 302,-126 302,-150"/>
+<text text-anchor="middle" x="248" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicCrossSection</text>
+</a>
+</g>
+</g>
+<!-- type~atomictables&#45;&gt;type~atomiccrosssection -->
+<g id="type~~graph~~TypeGraph_edge4" class="edge"><title>type~atomictables&#45;&gt;type~atomiccrosssection</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M422.277,-148.676C391.853,-146.801 348.388,-144.123 312.602,-141.919"/>
+<polygon fill="#000000" stroke="#000000" points="312.445,-138.402 302.248,-141.281 312.014,-145.389 312.445,-138.402"/>
+<text text-anchor="middle" x="356" y="-149.4" font-family="Helvetica,sans-Serif" font-size="9.50">H_H_cx_cross</text>
 </g>
 <!-- type~atomicrates -->
-<g id="type~~graph~~TypeGraph_node31" class="node"><title>type~atomicrates</title>
-<g id="a_type~~graph~~TypeGraph_node31"><a xlink:href="../type/atomicrates.html" xlink:title="AtomicRates">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="90.5,-234 17.5,-234 17.5,-210 90.5,-210 90.5,-234"/>
-<text text-anchor="middle" x="54" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicRates</text>
+<g id="type~~graph~~TypeGraph_node32" class="node"><title>type~atomicrates</title>
+<g id="a_type~~graph~~TypeGraph_node32"><a xlink:href=".././type/atomicrates.html" xlink:title="AtomicRates">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="284.5,-108 211.5,-108 211.5,-84 284.5,-84 284.5,-108"/>
+<text text-anchor="middle" x="248" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicRates</text>
 </a>
 </g>
 </g>
-<!-- type~atomicrates&#45;&gt;type~atomictables -->
-<g id="type~~graph~~TypeGraph_edge8" class="edge"><title>type~atomicrates&#45;&gt;type~atomictables</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M90.9284,-218.39C125.493,-214.917 177.978,-209.643 216.087,-205.814"/>
-<polygon fill="#000000" stroke="#000000" points="216.828,-209.258 226.428,-204.775 216.128,-202.293 216.828,-209.258"/>
-<text text-anchor="middle" x="164" y="-217.4" font-family="Helvetica,sans-Serif" font-size="9.50">H_H_cx_rate</text>
+<!-- type~atomictables&#45;&gt;type~atomicrates -->
+<g id="type~~graph~~TypeGraph_edge2" class="edge"><title>type~atomictables&#45;&gt;type~atomicrates</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M424.53,-138.887C414.105,-135.5 402.644,-131.944 392,-129 359.74,-120.077 322.933,-111.622 294.741,-105.504"/>
+<polygon fill="#000000" stroke="#000000" points="295.281,-102.04 284.768,-103.36 293.809,-108.884 295.281,-102.04"/>
+<text text-anchor="middle" x="356" y="-131.4" font-family="Helvetica,sans-Serif" font-size="9.50">H_H_cx_rate</text>
 </g>
-<!-- type~sparsearray -->
-<g id="type~~graph~~TypeGraph_node32" class="node"><title>type~sparsearray</title>
-<g id="a_type~~graph~~TypeGraph_node32"><a xlink:href="../type/sparsearray.html" xlink:title="SparseArray">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="90,-1136 18,-1136 18,-1112 90,-1112 90,-1136"/>
-<text text-anchor="middle" x="54" y="-1121.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SparseArray</text>
+<!-- type~fastionparticles -->
+<g id="type~~graph~~TypeGraph_node10" class="node"><title>type~fastionparticles</title>
+<g id="a_type~~graph~~TypeGraph_node10"><a xlink:href=".././type/fastionparticles.html" xlink:title="FastIonParticles">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="505.5,-525 416.5,-525 416.5,-501 505.5,-501 505.5,-525"/>
+<text text-anchor="middle" x="461" y="-510.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FastIonParticles</text>
+</a>
+</g>
+</g>
+<!-- type~fastion -->
+<g id="type~~graph~~TypeGraph_node19" class="node"><title>type~fastion</title>
+<g id="a_type~~graph~~TypeGraph_node19"><a xlink:href=".././type/fastion.html" xlink:title="FastIon">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="275,-525 221,-525 221,-501 275,-501 275,-525"/>
+<text text-anchor="middle" x="248" y="-510.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FastIon</text>
+</a>
+</g>
+</g>
+<!-- type~fastionparticles&#45;&gt;type~fastion -->
+<g id="type~~graph~~TypeGraph_edge5" class="edge"><title>type~fastionparticles&#45;&gt;type~fastion</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M416.281,-513C377.499,-513 321.519,-513 285.196,-513"/>
+<polygon fill="#000000" stroke="#000000" points="285.05,-509.5 275.05,-513 285.05,-516.5 285.05,-509.5"/>
+<text text-anchor="middle" x="356" y="-515.4" font-family="Helvetica,sans-Serif" font-size="9.50">fast_ion</text>
+</g>
+<!-- type~loselement -->
+<g id="type~~graph~~TypeGraph_node11" class="node"><title>type~loselement</title>
+<g id="a_type~~graph~~TypeGraph_node11"><a xlink:href=".././type/loselement.html" xlink:title="LOSElement">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="77.5,-24 4.5,-24 4.5,-0 77.5,-0 77.5,-24"/>
+<text text-anchor="middle" x="41" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LOSElement</text>
+</a>
+</g>
+</g>
+<!-- type~nparesults -->
+<g id="type~~graph~~TypeGraph_node12" class="node"><title>type~nparesults</title>
+<g id="a_type~~graph~~TypeGraph_node12"><a xlink:href=".././type/nparesults.html" xlink:title="NPAResults">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="495.5,-567 426.5,-567 426.5,-543 495.5,-543 495.5,-567"/>
+<text text-anchor="middle" x="461" y="-552.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAResults</text>
+</a>
+</g>
+</g>
+<!-- type~npaparticle -->
+<g id="type~~graph~~TypeGraph_node37" class="node"><title>type~npaparticle</title>
+<g id="a_type~~graph~~TypeGraph_node37"><a xlink:href=".././type/npaparticle.html" xlink:title="NPAParticle">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="282.5,-567 213.5,-567 213.5,-543 282.5,-543 282.5,-567"/>
+<text text-anchor="middle" x="248" y="-552.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAParticle</text>
+</a>
+</g>
+</g>
+<!-- type~nparesults&#45;&gt;type~npaparticle -->
+<g id="type~~graph~~TypeGraph_edge6" class="edge"><title>type~nparesults&#45;&gt;type~npaparticle</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M426.099,-555C389.954,-555 332.579,-555 292.979,-555"/>
+<polygon fill="#000000" stroke="#000000" points="292.817,-551.5 282.817,-555 292.817,-558.5 292.817,-551.5"/>
+<text text-anchor="middle" x="356" y="-557.4" font-family="Helvetica,sans-Serif" font-size="9.50">part</text>
+</g>
+<!-- type~beamgrid -->
+<g id="type~~graph~~TypeGraph_node13" class="node"><title>type~beamgrid</title>
+<g id="a_type~~graph~~TypeGraph_node13"><a xlink:href=".././type/beamgrid.html" xlink:title="BeamGrid">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="491.5,-609 430.5,-609 430.5,-585 491.5,-585 491.5,-609"/>
+<text text-anchor="middle" x="461" y="-594.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BeamGrid</text>
+</a>
+</g>
+</g>
+<!-- type~particletrack -->
+<g id="type~~graph~~TypeGraph_node14" class="node"><title>type~particletrack</title>
+<g id="a_type~~graph~~TypeGraph_node14"><a xlink:href=".././type/particletrack.html" xlink:title="ParticleTrack">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="498.5,-651 423.5,-651 423.5,-627 498.5,-627 498.5,-651"/>
+<text text-anchor="middle" x="461" y="-636.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ParticleTrack</text>
+</a>
+</g>
+</g>
+<!-- type~neutraldensity -->
+<g id="type~~graph~~TypeGraph_node15" class="node"><title>type~neutraldensity</title>
+<g id="a_type~~graph~~TypeGraph_node15"><a xlink:href=".././type/neutraldensity.html" xlink:title="NeutralDensity">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="502,-693 420,-693 420,-669 502,-669 502,-693"/>
+<text text-anchor="middle" x="461" y="-678.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NeutralDensity</text>
+</a>
+</g>
+</g>
+<!-- type~losinters -->
+<g id="type~~graph~~TypeGraph_node16" class="node"><title>type~losinters</title>
+<g id="a_type~~graph~~TypeGraph_node16"><a xlink:href=".././type/losinters.html" xlink:title="LOSInters">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="278.5,-24 217.5,-24 217.5,-0 278.5,-0 278.5,-24"/>
+<text text-anchor="middle" x="248" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LOSInters</text>
+</a>
+</g>
+</g>
+<!-- type~losinters&#45;&gt;type~loselement -->
+<g id="type~~graph~~TypeGraph_edge7" class="edge"><title>type~losinters&#45;&gt;type~loselement</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M217.191,-12C183.246,-12 127.386,-12 87.8794,-12"/>
+<polygon fill="#000000" stroke="#000000" points="87.7074,-8.5001 77.7074,-12 87.7073,-15.5001 87.7074,-8.5001"/>
+<text text-anchor="middle" x="138" y="-14.4" font-family="Helvetica,sans-Serif" font-size="9.50">los_elem</text>
+</g>
+<!-- type~spectralchords -->
+<g id="type~~graph~~TypeGraph_node17" class="node"><title>type~spectralchords</title>
+<g id="a_type~~graph~~TypeGraph_node17"><a xlink:href=".././type/spectralchords.html" xlink:title="SpectralChords">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="504,-52 418,-52 418,-28 504,-28 504,-52"/>
+<text text-anchor="middle" x="461" y="-37.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SpectralChords</text>
+</a>
+</g>
+</g>
+<!-- type~spectralchords&#45;&gt;type~lineofsight -->
+<g id="type~~graph~~TypeGraph_edge9" class="edge"><title>type~spectralchords&#45;&gt;type~lineofsight</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M417.808,-42.7995C381.468,-45.2107 329.224,-48.6771 292.507,-51.1133"/>
+<polygon fill="#000000" stroke="#000000" points="291.864,-47.6482 282.117,-51.8026 292.327,-54.6328 291.864,-47.6482"/>
+<text text-anchor="middle" x="356" y="-52.4" font-family="Helvetica,sans-Serif" font-size="9.50">los</text>
+</g>
+<!-- type~spectralchords&#45;&gt;type~losinters -->
+<g id="type~~graph~~TypeGraph_edge8" class="edge"><title>type~spectralchords&#45;&gt;type~losinters</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M417.808,-34.4011C380.264,-29.4189 325.745,-22.1841 288.909,-17.296"/>
+<polygon fill="#000000" stroke="#000000" points="288.925,-13.7675 278.551,-15.9215 288.004,-20.7066 288.925,-13.7675"/>
+<text text-anchor="middle" x="356" y="-33.4" font-family="Helvetica,sans-Serif" font-size="9.50">inter</text>
+</g>
+<!-- type~neutronrate -->
+<g id="type~~graph~~TypeGraph_node18" class="node"><title>type~neutronrate</title>
+<g id="a_type~~graph~~TypeGraph_node18"><a xlink:href=".././type/neutronrate.html" xlink:title="NeutronRate">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="497.5,-735 424.5,-735 424.5,-711 497.5,-711 497.5,-735"/>
+<text text-anchor="middle" x="461" y="-720.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NeutronRate</text>
+</a>
+</g>
+</g>
+<!-- type~fastiondistribution -->
+<g id="type~~graph~~TypeGraph_node20" class="node"><title>type~fastiondistribution</title>
+<g id="a_type~~graph~~TypeGraph_node20"><a xlink:href=".././type/fastiondistribution.html" xlink:title="FastIonDistribution">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="512,-777 410,-777 410,-753 512,-753 512,-777"/>
+<text text-anchor="middle" x="461" y="-762.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FastIonDistribution</text>
+</a>
+</g>
+</g>
+<!-- type~spectra -->
+<g id="type~~graph~~TypeGraph_node21" class="node"><title>type~spectra</title>
+<g id="a_type~~graph~~TypeGraph_node21"><a xlink:href=".././type/spectra.html" xlink:title="Spectra">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="488,-819 434,-819 434,-795 488,-795 488,-819"/>
+<text text-anchor="middle" x="461" y="-804.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Spectra</text>
+</a>
+</g>
+</g>
+<!-- type~equilibrium -->
+<g id="type~~graph~~TypeGraph_node22" class="node"><title>type~equilibrium</title>
+<g id="a_type~~graph~~TypeGraph_node22"><a xlink:href=".././type/equilibrium.html" xlink:title="Equilibrium">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="493.5,-283 428.5,-283 428.5,-259 493.5,-259 493.5,-283"/>
+<text text-anchor="middle" x="461" y="-268.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Equilibrium</text>
 </a>
 </g>
 </g>
 <!-- type~profiles -->
-<g id="type~~graph~~TypeGraph_node33" class="node"><title>type~profiles</title>
-<g id="a_type~~graph~~TypeGraph_node33"><a xlink:href="../type/profiles.html" xlink:title="Profiles">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="81,-746 27,-746 27,-722 81,-722 81,-746"/>
-<text text-anchor="middle" x="54" y="-731.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Profiles</text>
+<g id="type~~graph~~TypeGraph_node24" class="node"><title>type~profiles</title>
+<g id="a_type~~graph~~TypeGraph_node24"><a xlink:href=".././type/profiles.html" xlink:title="Profiles">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="275,-301 221,-301 221,-277 275,-277 275,-301"/>
+<text text-anchor="middle" x="248" y="-286.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Profiles</text>
 </a>
 </g>
 </g>
-<!-- type~profiles&#45;&gt;type~equilibrium -->
-<g id="type~~graph~~TypeGraph_edge16" class="edge"><title>type~profiles&#45;&gt;type~equilibrium</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M81.0474,-738.611C116.53,-744.893 180.452,-756.209 222.557,-763.663"/>
-<polygon fill="#000000" stroke="#000000" points="222.042,-767.126 232.499,-765.423 223.263,-760.234 222.042,-767.126"/>
-<text text-anchor="middle" x="164" y="-761.4" font-family="Helvetica,sans-Serif" font-size="9.50">plasma</text>
+<!-- type~equilibrium&#45;&gt;type~profiles -->
+<g id="type~~graph~~TypeGraph_edge10" class="edge"><title>type~equilibrium&#45;&gt;type~profiles</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M428.262,-261.817C399.674,-254.908 356.638,-247.901 320,-256 305.51,-259.203 290.467,-265.675 277.977,-272.046"/>
+<polygon fill="#000000" stroke="#000000" points="276.155,-269.051 268.975,-276.843 279.446,-275.229 276.155,-269.051"/>
+<text text-anchor="middle" x="356" y="-258.4" font-family="Helvetica,sans-Serif" font-size="9.50">plasma</text>
 </g>
-<!-- type~profiles&#45;&gt;type~localprofiles -->
-<g id="type~~graph~~TypeGraph_edge18" class="edge"><title>type~profiles&#45;&gt;type~localprofiles</title>
-<path fill="none" stroke="#000000" d="M81.267,-731.226C111.958,-727.07 163.443,-717.198 202,-695 211.805,-689.355 210.882,-683.698 220,-677 222.794,-674.948 225.796,-672.973 228.872,-671.101"/>
-<polygon fill="#000000" stroke="#000000" points="230.662,-674.109 237.624,-666.123 227.201,-668.025 230.662,-674.109"/>
-</g>
-<!-- type~atomictransitions -->
-<g id="type~~graph~~TypeGraph_node34" class="node"><title>type~atomictransitions</title>
-<g id="a_type~~graph~~TypeGraph_node34"><a xlink:href="../type/atomictransitions.html" xlink:title="AtomicTransitions">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="102.5,-192 5.5,-192 5.5,-168 102.5,-168 102.5,-192"/>
-<text text-anchor="middle" x="54" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicTransitions</text>
+<!-- type~emfields -->
+<g id="type~~graph~~TypeGraph_node29" class="node"><title>type~emfields</title>
+<g id="a_type~~graph~~TypeGraph_node29"><a xlink:href=".././type/emfields.html" xlink:title="EMFields">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="276.5,-357 219.5,-357 219.5,-333 276.5,-333 276.5,-357"/>
+<text text-anchor="middle" x="248" y="-342.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">EMFields</text>
 </a>
 </g>
 </g>
-<!-- type~atomictransitions&#45;&gt;type~atomictables -->
-<g id="type~~graph~~TypeGraph_edge5" class="edge"><title>type~atomictransitions&#45;&gt;type~atomictables</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M102.789,-181.948C131.601,-183.445 168.992,-185.961 202,-190 206.703,-190.576 211.591,-191.271 216.466,-192.031"/>
-<polygon fill="#000000" stroke="#000000" points="215.958,-195.494 226.393,-193.659 217.091,-188.586 215.958,-195.494"/>
-<text text-anchor="middle" x="164" y="-192.4" font-family="Helvetica,sans-Serif" font-size="9.50">H_H, H_e, H_Aq</text>
+<!-- type~equilibrium&#45;&gt;type~emfields -->
+<g id="type~~graph~~TypeGraph_edge11" class="edge"><title>type~equilibrium&#45;&gt;type~emfields</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M428.411,-282.079C390.389,-295.413 326.627,-317.775 286.244,-331.938"/>
+<polygon fill="#000000" stroke="#000000" points="285.037,-328.652 276.759,-335.265 287.354,-335.258 285.037,-328.652"/>
+<text text-anchor="middle" x="356" y="-321.4" font-family="Helvetica,sans-Serif" font-size="9.50">fields</text>
+</g>
+<!-- type~interpolationgrid -->
+<g id="type~~graph~~TypeGraph_node23" class="node"><title>type~interpolationgrid</title>
+<g id="a_type~~graph~~TypeGraph_node23"><a xlink:href=".././type/interpolationgrid.html" xlink:title="InterpolationGrid">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="507,-861 415,-861 415,-837 507,-837 507,-861"/>
+<text text-anchor="middle" x="461" y="-846.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InterpolationGrid</text>
+</a>
+</g>
 </g>
 <!-- type~npaprobability -->
-<g id="type~~graph~~TypeGraph_node36" class="node"><title>type~npaprobability</title>
-<g id="a_type~~graph~~TypeGraph_node36"><a xlink:href="../type/npaprobability.html" xlink:title="NPAProbability">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="306.5,-528 223.5,-528 223.5,-504 306.5,-504 306.5,-528"/>
-<text text-anchor="middle" x="265" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAProbability</text>
+<g id="type~~graph~~TypeGraph_node25" class="node"><title>type~npaprobability</title>
+<g id="a_type~~graph~~TypeGraph_node25"><a xlink:href=".././type/npaprobability.html" xlink:title="NPAProbability">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="289.5,-924 206.5,-924 206.5,-900 289.5,-900 289.5,-924"/>
+<text text-anchor="middle" x="248" y="-909.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAProbability</text>
 </a>
 </g>
 </g>
-<!-- type~npaprobability&#45;&gt;type~npachords -->
-<g id="type~~graph~~TypeGraph_edge14" class="edge"><title>type~npaprobability&#45;&gt;type~npachords</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M306.578,-517.248C319.825,-517.982 334.578,-519.148 348,-521 353.477,-521.756 359.198,-522.739 364.839,-523.827"/>
-<polygon fill="#000000" stroke="#000000" points="364.339,-527.297 374.838,-525.87 365.741,-520.439 364.339,-527.297"/>
-<text text-anchor="middle" x="338" y="-523.4" font-family="Helvetica,sans-Serif" font-size="9.50">phit</text>
-</g>
-<!-- type~loselement -->
-<g id="type~~graph~~TypeGraph_node37" class="node"><title>type~loselement</title>
-<g id="a_type~~graph~~TypeGraph_node37"><a xlink:href="../type/loselement.html" xlink:title="LOSElement">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="90.5,-360 17.5,-360 17.5,-336 90.5,-336 90.5,-360"/>
-<text text-anchor="middle" x="54" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LOSElement</text>
+<!-- type~boundedplane -->
+<g id="type~~graph~~TypeGraph_node27" class="node"><title>type~boundedplane</title>
+<g id="a_type~~graph~~TypeGraph_node27"><a xlink:href=".././type/boundedplane.html" xlink:title="BoundedPlane">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="82,-882 0,-882 0,-858 82,-858 82,-882"/>
+<text text-anchor="middle" x="41" y="-867.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">BoundedPlane</text>
 </a>
 </g>
 </g>
-<!-- type~loselement&#45;&gt;type~losinters -->
-<g id="type~~graph~~TypeGraph_edge3" class="edge"><title>type~loselement&#45;&gt;type~losinters</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M90.9284,-348C127.947,-348 185.52,-348 223.974,-348"/>
-<polygon fill="#000000" stroke="#000000" points="224.28,-351.5 234.28,-348 224.28,-344.5 224.28,-351.5"/>
-<text text-anchor="middle" x="164" y="-350.4" font-family="Helvetica,sans-Serif" font-size="9.50">los_elem</text>
-</g>
-<!-- type~atomiccrosssection -->
-<g id="type~~graph~~TypeGraph_node38" class="node"><title>type~atomiccrosssection</title>
-<g id="a_type~~graph~~TypeGraph_node38"><a xlink:href="../type/atomiccrosssection.html" xlink:title="AtomicCrossSection">
-<polygon fill="#5cb85c" stroke="#5cb85c" points="108,-150 0,-150 0,-126 108,-126 108,-150"/>
-<text text-anchor="middle" x="54" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">AtomicCrossSection</text>
+<!-- type~sparsearray -->
+<g id="type~~graph~~TypeGraph_node28" class="node"><title>type~sparsearray</title>
+<g id="a_type~~graph~~TypeGraph_node28"><a xlink:href=".././type/sparsearray.html" xlink:title="SparseArray">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="497,-945 425,-945 425,-921 497,-921 497,-945"/>
+<text text-anchor="middle" x="461" y="-930.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SparseArray</text>
 </a>
 </g>
 </g>
-<!-- type~atomiccrosssection&#45;&gt;type~atomictables -->
-<g id="type~~graph~~TypeGraph_edge7" class="edge"><title>type~atomiccrosssection&#45;&gt;type~atomictables</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M108.271,-146.287C136.584,-151.512 171.703,-159.317 202,-170 212.751,-173.791 224.035,-179.021 233.985,-184.106"/>
-<polygon fill="#000000" stroke="#000000" points="232.577,-187.32 243.055,-188.885 235.84,-181.127 232.577,-187.32"/>
-<text text-anchor="middle" x="164" y="-172.4" font-family="Helvetica,sans-Serif" font-size="9.50">H_H_cx_cross</text>
+<!-- type~rng_type -->
+<g id="type~~graph~~TypeGraph_node30" class="node"><title>type~rng_type</title>
+<g id="a_type~~graph~~TypeGraph_node30"><a xlink:href=".././type/rng_type.html" xlink:title="rng_type">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="488.5,-987 433.5,-987 433.5,-963 488.5,-963 488.5,-987"/>
+<text text-anchor="middle" x="461" y="-972.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_type</text>
+</a>
+</g>
+</g>
+<!-- type~interpolcoeffs1d -->
+<g id="type~~graph~~TypeGraph_node31" class="node"><title>type~interpolcoeffs1d</title>
+<g id="a_type~~graph~~TypeGraph_node31"><a xlink:href=".././type/interpolcoeffs1d.html" xlink:title="InterpolCoeffs1D">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="507.5,-1029 414.5,-1029 414.5,-1005 507.5,-1005 507.5,-1029"/>
+<text text-anchor="middle" x="461" y="-1014.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">InterpolCoeffs1D</text>
+</a>
+</g>
+</g>
+<!-- type~simulationinputs -->
+<g id="type~~graph~~TypeGraph_node33" class="node"><title>type~simulationinputs</title>
+<g id="a_type~~graph~~TypeGraph_node33"><a xlink:href=".././type/simulationinputs.html" xlink:title="SimulationInputs">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="506.5,-1071 415.5,-1071 415.5,-1047 506.5,-1047 506.5,-1071"/>
+<text text-anchor="middle" x="461" y="-1056.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">SimulationInputs</text>
+</a>
+</g>
+</g>
+<!-- type~localprofiles -->
+<g id="type~~graph~~TypeGraph_node34" class="node"><title>type~localprofiles</title>
+<g id="a_type~~graph~~TypeGraph_node34"><a xlink:href=".././type/localprofiles.html" xlink:title="LocalProfiles">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="497.5,-341 424.5,-341 424.5,-317 497.5,-317 497.5,-341"/>
+<text text-anchor="middle" x="461" y="-326.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LocalProfiles</text>
+</a>
+</g>
+</g>
+<!-- type~localprofiles&#45;&gt;type~interpolcoeffs2d -->
+<g id="type~~graph~~TypeGraph_edge12" class="edge"><title>type~localprofiles&#45;&gt;type~interpolcoeffs2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M424.207,-339.348C390.316,-349.146 339.055,-363.965 300.722,-375.047"/>
+<polygon fill="#000000" stroke="#000000" points="299.412,-371.783 290.777,-377.922 301.356,-378.507 299.412,-371.783"/>
+<text text-anchor="middle" x="356" y="-371.4" font-family="Helvetica,sans-Serif" font-size="9.50">c</text>
+</g>
+<!-- type~localprofiles&#45;&gt;type~profiles -->
+<g id="type~~graph~~TypeGraph_edge13" class="edge"><title>type~localprofiles&#45;&gt;type~profiles</title>
+<path fill="none" stroke="#000000" d="M424.207,-322.215C385.459,-314.869 324.005,-303.219 285.128,-295.849"/>
+<polygon fill="#000000" stroke="#000000" points="285.755,-292.406 275.278,-293.982 284.451,-299.283 285.755,-292.406"/>
+</g>
+<!-- type~npadetector -->
+<g id="type~~graph~~TypeGraph_node35" class="node"><title>type~npadetector</title>
+<g id="a_type~~graph~~TypeGraph_node35"><a xlink:href=".././type/npadetector.html" xlink:title="NPADetector">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="285,-882 211,-882 211,-858 285,-858 285,-882"/>
+<text text-anchor="middle" x="248" y="-867.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPADetector</text>
+</a>
+</g>
+</g>
+<!-- type~npadetector&#45;&gt;type~boundedplane -->
+<g id="type~~graph~~TypeGraph_edge14" class="edge"><title>type~npadetector&#45;&gt;type~boundedplane</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M210.822,-870C177.831,-870 128.776,-870 92.0351,-870"/>
+<polygon fill="#000000" stroke="#000000" points="92.0223,-866.5 82.0222,-870 92.0222,-873.5 92.0223,-866.5"/>
+<text text-anchor="middle" x="138" y="-872.4" font-family="Helvetica,sans-Serif" font-size="9.50">detector, aperture</text>
+</g>
+<!-- type~fidaweights -->
+<g id="type~~graph~~TypeGraph_node36" class="node"><title>type~fidaweights</title>
+<g id="a_type~~graph~~TypeGraph_node36"><a xlink:href=".././type/fidaweights.html" xlink:title="FIDAWeights">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="498.5,-1113 423.5,-1113 423.5,-1089 498.5,-1089 498.5,-1113"/>
+<text text-anchor="middle" x="461" y="-1098.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">FIDAWeights</text>
+</a>
+</g>
+</g>
+<!-- type~localemfields -->
+<g id="type~~graph~~TypeGraph_node38" class="node"><title>type~localemfields</title>
+<g id="a_type~~graph~~TypeGraph_node38"><a xlink:href=".././type/localemfields.html" xlink:title="LocalEMFields">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="502,-399 420,-399 420,-375 502,-375 502,-399"/>
+<text text-anchor="middle" x="461" y="-384.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">LocalEMFields</text>
+</a>
+</g>
+</g>
+<!-- type~localemfields&#45;&gt;type~interpolcoeffs2d -->
+<g id="type~~graph~~TypeGraph_edge15" class="edge"><title>type~localemfields&#45;&gt;type~interpolcoeffs2d</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M419.816,-387.571C387.277,-388.034 341.07,-388.691 304.918,-389.205"/>
+<polygon fill="#000000" stroke="#000000" points="304.478,-385.711 294.529,-389.353 304.578,-392.71 304.478,-385.711"/>
+<text text-anchor="middle" x="356" y="-391.4" font-family="Helvetica,sans-Serif" font-size="9.50">c</text>
+</g>
+<!-- type~localemfields&#45;&gt;type~emfields -->
+<g id="type~~graph~~TypeGraph_edge16" class="edge"><title>type~localemfields&#45;&gt;type~emfields</title>
+<path fill="none" stroke="#000000" d="M419.816,-379.001C381.454,-371.365 324.095,-359.948 286.612,-352.487"/>
+<polygon fill="#000000" stroke="#000000" points="287.09,-349.013 276.599,-350.494 285.723,-355.879 287.09,-349.013"/>
+</g>
+<!-- type~npachords -->
+<g id="type~~graph~~TypeGraph_node39" class="node"><title>type~npachords</title>
+<g id="a_type~~graph~~TypeGraph_node39"><a xlink:href=".././type/npachords.html" xlink:title="NPAChords">
+<polygon fill="#5cb85c" stroke="#5cb85c" points="495,-903 427,-903 427,-879 495,-879 495,-903"/>
+<text text-anchor="middle" x="461" y="-888.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">NPAChords</text>
+</a>
+</g>
+</g>
+<!-- type~npachords&#45;&gt;type~npaprobability -->
+<g id="type~~graph~~TypeGraph_edge17" class="edge"><title>type~npachords&#45;&gt;type~npaprobability</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M426.566,-894.328C392.538,-897.714 339.35,-903.008 300.049,-906.919"/>
+<polygon fill="#000000" stroke="#000000" points="299.474,-903.459 289.87,-907.932 300.167,-910.425 299.474,-903.459"/>
+<text text-anchor="middle" x="356" y="-906.4" font-family="Helvetica,sans-Serif" font-size="9.50">phit</text>
+</g>
+<!-- type~npachords&#45;&gt;type~npadetector -->
+<g id="type~~graph~~TypeGraph_edge18" class="edge"><title>type~npachords&#45;&gt;type~npadetector</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M426.816,-886.918C415.75,-885.604 403.35,-884.183 392,-883 359.791,-879.642 323.449,-876.344 295.461,-873.911"/>
+<polygon fill="#000000" stroke="#000000" points="295.434,-870.395 285.17,-873.022 294.832,-877.37 295.434,-870.395"/>
+<text text-anchor="middle" x="356" y="-885.4" font-family="Helvetica,sans-Serif" font-size="9.50">det</text>
 </g>
 </g>
 </svg>
-</div>
-                <div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div>
-                <div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog">
-                  <div class="modal-dialog modal-lg" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="-graph-help-label">Graph Key</h4>
-                      </div>
-                      <div class="modal-body">
-                        
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
     <p>Nodes of different colours represent the following: </p>
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
@@ -676,17 +666,12 @@ All Types &ndash; FIDASIM
 </svg>
 
     
-    <p>Solid arrows point from one derived type to another which extends
-    (inherits from) it. Dashed arrows point from a derived type to another
-    type containing it as a components, with a label listing the name(s) of
+    <p>Solid arrows point from a derived type to the parent type which it
+    extends. Dashed arrows point from a derived type to the other
+    types it contains as a components, with a label listing the name(s) of
     said component(s).
     </p>
-    
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
+    </div></div></div></div>
         </div>
       </div>
 
@@ -695,7 +680,8 @@ All Types &ndash; FIDASIM
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 </p></div>
+        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+                                          </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">
             Documentation generated by 
@@ -726,12 +712,17 @@ All Types &ndash; FIDASIM
       MathJax.Hub.Config({
         TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
         jax: ['input/TeX','input/MathML','output/HTML-CSS'],
-        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],
-        'HTML-CSS': { 
-           styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: '#000000 ! important'} }
-        }
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
       });
     </script>
-    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
   </body>
 </html>

@@ -8358,6 +8358,7 @@ subroutine fida_weights_los
     integer, dimension(3) :: ind  !!actual cell
     real(Float64), dimension(3) :: ri
     integer(Int32) :: ncell
+    logical :: inp
 
     real(Float64):: etov2, dEdP
 
@@ -8415,7 +8416,7 @@ subroutine fida_weights_los
         mean_f = 0.d0
         do k=1,beam_grid%nz
             do j=1,beam_grid%ny
-                do i=1,beam_grid%nx
+                x_loop: do i=1,beam_grid%nx
                     inter = spec_chords%inter(i,j,k)
                     cid = 0
                     cind = 0
@@ -8425,6 +8426,9 @@ subroutine fida_weights_los
                     enddo
                     if(cid.eq.ichan) then
                         ind = [i,j,k]
+                        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+                        call in_plasma(ri, inp)
+                        if(.not.inp) cycle x_loop
                         dlength = inter%los_elem(cind)%length
                         fdens = fdens + neut%dens(:,nbif_type,i,j,k)*dlength
                         hdens = hdens + neut%dens(:,nbih_type,i,j,k)*dlength
@@ -8432,8 +8436,8 @@ subroutine fida_weights_los
                         halodens = halodens + neut%dens(:,halo_type,i,j,k)*dlength
                         wght = sum(neut%dens(3,1:4,i,j,k))*dlength
 
-                        call get_plasma(plasma_cell,ind=ind)
-                        call get_fields(fields_cell,ind=ind)
+                        call get_plasma(plasma_cell,pos=ri)
+                        call get_fields(fields_cell,pos=ri)
                         plasma = plasma + wght*plasma_cell
                         fields = fields + wght*fields_cell
                         if (inputs%dist_type.eq.1) then
@@ -8446,7 +8450,7 @@ subroutine fida_weights_los
                         endif
                         wght_tot = wght_tot + wght
                     endif
-                enddo
+                enddo x_loop
             enddo
         enddo
 

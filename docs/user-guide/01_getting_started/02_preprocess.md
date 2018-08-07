@@ -71,9 +71,14 @@ Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine [read_geqdsk.pro](|url|/sourcefile/read_geqdsk.pro.html) to calculate the [fields structure](../03_technical/01_prefida_inputs.html#fields-structure) from EFITs GEQDSK file.
 
 ```
-IDL> fields = read_geqdsk('g159243.00300',grid,flux=flux)
+IDL> fields = read_geqdsk('g159243.00300',grid,flux=flux,btipsign=btipsign)
 ```
-where `grid` is the interpolation grid and the `flux` keyword is a named variable that recieves the torodial flux upon executation.
+or in Python
+```python
+>>> from fidasim.utils import read_geqdsk
+>>> fields, flux, btipsign = read_geqdsk('g159243.00300',grid)
+```
+where `grid` is the interpolation grid, `flux` keyword is a named variable that recieves the torodial flux upon executation, and `btipsign` is a named variable that recieves the Bt-Ip sign (-1 for anti-parallel, 1 for parallel).
 
 #Extracting GEQDSK file and Plasma Parameters from TRANSP
 It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. 
@@ -88,10 +93,15 @@ will create a GEQDSK file for every `.DATA*` file in the `159243H06` TRANSP run.
 Run `extract_transp_geqdsk -h` for the full documentation.
 
 
-The IDL routine [extract_transp_plasma.pro](|url|/sourcefile/extract_transp_plasma.pro.html) creates the [plasma structure](../03_technical/01_prefida_inputs.html#plasma-structure) at a given time. 
+The IDL routine [extract_transp_plasma.pro](|url|/sourcefile/extract_transp_plasma.pro.html) or the equivalent Python function creates the [plasma structure](../03_technical/01_prefida_inputs.html#plasma-structure) at a given time. 
 
 ```
 IDL> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,flux)
+```
+or in Python
+```python
+>>> from fidasim.utils import extract_transp_plasma
+>>> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,flux)
 ```
 where `grid` is the interpolation grid and `flux` is the torodial flux.
 
@@ -100,7 +110,12 @@ The IDL routine [nubeam_geometry.pro](|url|/sourcefile/nubeam_geometry.pro.html)
 ```
 IDL> nbi = nubeam_geometry(nubeam)
 ```
-where `nubeam` is a structure containing the NUBEAM geometry variables taken from the TRANSP namelist.
+or in Python
+```python
+>>> from fidasim.utils import nubeam_geometry
+>>> nbi = nubeam_geometry(nubeam)
+```
+where `nubeam` is a structure/dictionary containing the NUBEAM geometry variables taken from the TRANSP namelist.
 
 #Extracting the Fast-ion Distribution Function from TRANSP/NUBEAM
 The python script, `extract_transp_fbm`, provides a easy way to extract the fast-ion distribution. For example: 
@@ -111,7 +126,7 @@ extracts a distribution function for every `.DATA*` file in the `159243H06` TRAN
 Run `extract_transp_fbm -h` for the full documentation.
 
 #Reading NUBEAM/SPIRAL Fast-ion Distributions
-Out of the box, FIDASIM provides IDL routines for reading different fast-ion distributions.
+Out of the box, FIDASIM provides IDL and Python routines for reading different fast-ion distributions.
 We provide routines for:
 
 * [read_nubeam.pro](|url|/sourcefile/read_nubeam.pro.html): TRANSP/NUBEAM distribution functions
@@ -119,7 +134,12 @@ We provide routines for:
 * [read_spiral.pro](|url|/sourcefile/read_spiral.pro.html): SPIRAL Guiding Center distribution
 
 ```
-IDL> f = read_nubeam(nubeam_distribution,grid,btipsign = -1) 
-IDL> mcf = read_mc_nubeam(mc_nubeam_distribution,Ntotal=1e19,btipsign=-1)
+IDL> f = read_nubeam(nubeam_distribution_file,grid,btipsign = -1) 
+IDL> mcf = read_mc_nubeam(mc_nubeam_distribution_file,Ntotal=1e19,btipsign=-1)
 IDL> s = read_spiral(spiral_file,Ntotal=1e19,btipsign=-1)
+```
+or in Python
+```python
+>>> from fidasim.utils import read_nubeam
+>>> f = read_nubeam(nubeam_distribution_file, grid, btipsign=-1)
 ```

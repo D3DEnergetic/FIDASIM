@@ -797,7 +797,7 @@ type NPAResults
         !+ Number of particles that hit a detector
     integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
-    integer(Int32) :: nenergy = 100
+    integer(Int32) :: nenergy = 122
         !+ Number of energy values
     type(NPAParticle), dimension(:), allocatable :: part
         !+ Array of NPA particles
@@ -2920,6 +2920,27 @@ subroutine read_f(fid, error)
     dummy = maxval(fbm%pitch)
     fbm%pmax = dummy(1)
     fbm%p_range = fbm%pmax - fbm%pmin
+    dummy = minval(fbm%r)
+    fbm%rmin = dummy(1)
+    dummy = maxval(fbm%r)
+    fbm%rmax = dummy(1)
+    fbm%r_range = fbm%rmax - fbm%rmin
+    dummy = minval(fbm%z)
+    fbm%zmin = dummy(1)
+    dummy = maxval(fbm%z)
+    fbm%zmax = dummy(1)
+    fbm%z_range = fbm%zmax - fbm%zmin
+    dummy = minval(fbm%phi)
+    fbm%phimin = dummy(1)
+    dummy = maxval(fbm%phi)
+    fbm%phimax = dummy(1)
+    fbm%phi_range = fbm%phimax - fbm%phimin
+
+    print*,'**************************'
+    print*,fbm%rmin,fbm%rmax
+    print*,fbm%zmin,fbm%zmax
+    print*,fbm%phimin,fbm%phimax
+    print*,'**************************'
 
     denp_tot = 0.0
     do ir=1,fbm%nr
@@ -2946,8 +2967,8 @@ subroutine read_f(fid, error)
         write(*,'(T2,"Nphi  = ",i3)') fbm%nphi
         write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")') fbm%emin,fbm%emax
         write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")') fbm%pmin,fbm%pmax
-        write(*,'(T2,"R  range = [",f5.2,",",f5.2,"]")') fbm%rmin,fbm%rmax
-        write(*,'(T2,"Z  range = [",f5.2,",",f5.2,"]")') fbm%zmin,fbm%zmax
+        write(*,'(T2,"R  range = [",f6.2,",",f6.2,"]")') fbm%rmin,fbm%rmax
+        write(*,'(T2,"Z  range = [",f6.2,",",f6.2,"]")') fbm%zmin,fbm%zmax
         write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
         write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
@@ -9876,6 +9897,7 @@ subroutine neutron_f
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square, factor
+    real(Float64)  :: s, c
 
     allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
     neutron%weight = 0.d0
@@ -9887,17 +9909,26 @@ subroutine neutron_f
         r_loop: do ir=1, fbm%nr
             phi_loop: do iphi = 1, fbm%nphi
                 !! Calculate position
-                uvw(1) = fbm%r(ir)*cos(fbm%phi(iphi))
-                uvw(2) = fbm%r(ir)*sin(fbm%phi(iphi))
+                if(fbm%nphi.eq.1) then
+                    s = 0.d0
+                    c = 1.d0
+                else
+                    s = sin(fbm%phi(iphi))
+                    c = cos(fbm%phi(iphi))
+                endif
+
+                uvw(1) = fbm%r(ir)*c
+                uvw(2) = fbm%r(ir)*s
                 uvw(3) = fbm%z(iz)
+
                 call uvw_to_xyz(uvw, rg)
 
                 !! Get fields
                 call get_fields(fields,pos=rg)
-                if(.not.fields%in_plasma) cycle r_loop
+                if(.not.fields%in_plasma) cycle phi_loop
 
-                factor = fbm%dphi*fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz/ngamma
-                !! Loop over energy/pitch/phi
+                factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi/ngamma
+                !! Loop over energy/pitch/gamma
                 pitch_loop: do ip = 1, fbm%npitch
                     pitch = fbm%pitch(ip)
                     energy_loop: do ie =1, fbm%nenergy
@@ -9951,7 +9982,7 @@ end subroutine neutron_f
 
 subroutine neutron_mc
     !+ Calculate neutron flux using a Monte Carlo Fast-ion distribution
-    integer :: iion, nphi, iphi
+    integer :: iion, ngamma, igamma
     type(FastIon) :: fast_ion
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
@@ -9967,9 +9998,9 @@ subroutine neutron_mc
     endif
 
     rate=0.0
-    nphi = 20
+    ngamma = 20
     !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg,s,c, &
-    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,iphi)
+    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions
@@ -9992,7 +10023,7 @@ subroutine neutron_mc
             call get_fields(fields, pos=rg)
             if(.not.fields%in_plasma) cycle loop_over_fast_ions
 
-            gyro_loop: do iphi=1,nphi
+            gyro_loop: do igamma=1,ngamma
                 !! Correct for Gyro-motion
                 call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, ri, vi)
 
@@ -10006,7 +10037,7 @@ subroutine neutron_mc
 
                 !! Get neutron production rate
                 call get_neutron_rate(plasma, eb, rate)
-                rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv/nphi
+                rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv/ngamma
 
                 !! Store neutrons
                 call store_neutrons(rate, fast_ion%class)

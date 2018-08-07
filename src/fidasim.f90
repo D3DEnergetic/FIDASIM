@@ -7592,7 +7592,7 @@ subroutine fida_f
         j = pcell(2,ip)
         k = pcell(3,ip)
         ind = [i, j, k]
-        !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields, &
+        !$OMP PARALLEL DO schedule(guided) private(ip,iion,vi,ri,fields,los_intersect, &
         !$OMP tracks,ncell,jj,plasma,rates,denn,states,photons,denf,eb,ptch)
         loop_over_fast_ions: do iion=1,int(nlaunch(i, j, k),Int64)
             !! Sample fast ion distribution for velocity and position

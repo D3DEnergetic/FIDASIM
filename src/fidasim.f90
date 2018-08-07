@@ -2501,7 +2501,7 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(4) :: dims
-    real(Float64) :: dummy(1)
+    real(Float64) :: dummy(1), denp_tot
     integer :: ir
 
     if(inputs%verbose.ge.1) then
@@ -2549,9 +2549,21 @@ subroutine read_f(fid, error)
     fbm%pmax = dummy(1)
     fbm%p_range = fbm%pmax - fbm%pmin
 
+    denp_tot = 0.0
     do ir=1,fbm%nr
         fbm%n_tot = fbm%n_tot + 2*pi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:))*fbm%r(ir)
+        denp_tot = denp_tot + 2*pi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:)%denp)*fbm%r(ir)
     enddo
+
+    if(fbm%n_tot.ge.denp_tot) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a," (",ES10.3," >=",ES10.3,")")') &
+                "READ_F: The total of number of fast ions exceeded the total number of thermal ions.", &
+                 fbm%n_tot, denp_tot
+            write(*,'(a)') "This is usually caused by zeff being incorrect."
+        endif
+        stop
+    endif
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z)"

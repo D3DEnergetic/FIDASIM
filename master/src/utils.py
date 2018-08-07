@@ -1073,6 +1073,8 @@ def nubeam_geometry(nubeam, angle=0.0, verbose=False):
     #+
     #+     **NUBEAM["XYBSCA"]**: Elevation above/below vacuum vessel midplane of center of beam source grid [cm]
     #+
+    #+     **NUBEAM["NLJCCW"]**: Orientation of Ip. 1 for True/Counter-clockwise current, 0 or -1 for False/Clock-wise current
+    #+
     #+     **NUBEAM["NLCO"]**: 1 for Co-beam, 0 or -1 for Counter-beam
     #+
     #+     **NUBEAM["NBAPSHA"]**: Vector of aperture shapes 1=rectangular, 2=circular
@@ -1106,6 +1108,13 @@ def nubeam_geometry(nubeam, angle=0.0, verbose=False):
     if nubeam["NLCO"] == 0:
         nubeam["NLCO"] = -1
 
+    if "NLJCCW" in nubeam:
+        if nubeam["NLJCCW"] == 0:
+            nubeam["NLJCCW"] = -1
+    else:
+        warn("Current orientation not specified. Assuming Counter-clockwise.")
+        nubeam["NLJCCW"] = 1
+
     phi_s = (nubeam["XBZETA"] + angle)*np.pi/180.0
     zs = nubeam["XYBSCA"]
     za = nubeam["XYBAPA"][0]
@@ -1117,7 +1126,7 @@ def nubeam_geometry(nubeam, angle=0.0, verbose=False):
     ra = np.sqrt(nubeam["RTCENA"]**2 + pdat**2.0)
     beta_s = np.arccos(nubeam["RTCENA"]/rs)
     beta_a = np.arccos(nubeam["RTCENA"]/ra)
-    phi_a = phi_s + nubeam["NLCO"]*(beta_s-beta_a)
+    phi_a = phi_s + nubeam["NLCO"]*nubeam["NLCO"]*(beta_s-beta_a)
 
     src = np.array([rs*np.cos(phi_s), rs*np.sin(phi_s),zs])
     aper_src = np.array([ra*np.cos(phi_a), ra*np.sin(phi_a),za])

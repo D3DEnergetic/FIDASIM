@@ -2936,12 +2936,6 @@ subroutine read_f(fid, error)
     fbm%phimax = dummy(1)
     fbm%phi_range = fbm%phimax - fbm%phimin
 
-    print*,'**************************'
-    print*,fbm%rmin,fbm%rmax
-    print*,fbm%zmin,fbm%zmax
-    print*,fbm%phimin,fbm%phimax
-    print*,'**************************'
-
     denp_tot = 0.0
     do ir=1,fbm%nr
         fbm%n_tot = fbm%n_tot + fbm%dphi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:,:))*fbm%r(ir)
@@ -2968,7 +2962,7 @@ subroutine read_f(fid, error)
         write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")') fbm%emin,fbm%emax
         write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")') fbm%pmin,fbm%pmax
         write(*,'(T2,"R  range = [",f6.2,",",f6.2,"]")') fbm%rmin,fbm%rmax
-        write(*,'(T2,"Z  range = [",f6.2,",",f6.2,"]")') fbm%zmin,fbm%zmax
+        write(*,'(T2,"Z  range = [",f7.2,",",f6.2,"]")') fbm%zmin,fbm%zmax
         write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
         write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''

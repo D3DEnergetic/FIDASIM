@@ -28,10 +28,12 @@ FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi
     if not keyword_set(nphi) then begin
         nphi = 1
         dphi = 0.0
-    endif else dphi = (phimax-phimin)/(nphi-1)
+    endif else begin
+        dphi = (phimax-phimin)/(nphi)
+    endelse
 
-    dr = (rmax-rmin)/(nr-1)
-    dz = (zmax-zmin)/(nz-1)
+    dr = (rmax-rmin)/nr
+    dz = (zmax-zmin)/nz
     r = rmin + dr*dindgen(nr)
     z = zmin + dz*dindgen(nz)
     phi = phimin + dphi*dindgen(nphi)

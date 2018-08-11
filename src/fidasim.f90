@@ -9584,7 +9584,7 @@ subroutine npa_mc
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
     real(Float64), dimension(3) :: ri, rf, rg, vi
-    integer :: det,j,ichan,ir,nrange,it
+    integer :: det,ichan,ir,nrange,it
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
     real(Float64), dimension(nlevs) :: rates

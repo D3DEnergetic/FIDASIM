@@ -9994,7 +9994,7 @@ subroutine neutron_mc
     rate=0.0
     ngamma = 20
     !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg,s,c, &
-    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma)
+    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions

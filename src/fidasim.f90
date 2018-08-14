@@ -771,6 +771,8 @@ type Spectra
         !+ Active FIDA emission: fida(lambda,chan,orbit_type)
     real(Float64), dimension(:,:,:), allocatable :: pfida
         !+ Passive FIDA emission: pfida(lambda,chan,orbit_type)
+    real(Float64), dimension(:,:,:,:), allocatable :: ndens_source
+        !+ Thermal halo neutral density: dens(chan,x,y,z)
 end type Spectra
 
 type NeutronRate
@@ -4151,6 +4153,7 @@ subroutine write_spectra
     !+ Writes [[libfida:spectra]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(3) :: dims
+    integer(HSIZE_T), dimension(4) :: dims_4d
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
 
@@ -4192,6 +4195,9 @@ subroutine write_spectra
     dims(1) = inputs%nlambda
     dims(2) = spec_chords%nchan
     dims(3) = particles%nclass
+    dims_4d = [spec_chords%nchan, beam_grid%nx, beam_grid%ny, beam_grid%nz]
+    call h5ltmake_compressed_dataset_double_f(fid, "/ndens_source", 4, dims_4d, &
+         spec%ndens_source, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
          lambda_arr, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
@@ -7066,7 +7072,7 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
 
 endsubroutine spectrum
 
-subroutine store_photons(pos, vi, photons, spectra)
+subroutine store_photons(pos, vi, photons, spectra, track_origin)
     !+ Store photons in `spectra`
     real(Float64), dimension(3), intent(in)      :: pos
         !+ Position of neutral in beam grid coordinates
@@ -7075,6 +7081,7 @@ subroutine store_photons(pos, vi, photons, spectra)
     real(Float64), intent(in)                    :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     real(Float64), dimension(:,:), intent(inout) :: spectra
+    integer(Int32), dimension(3), intent(in),optional :: track_origin
 
     real(Float64), dimension(n_stark) :: lambda, intensity
     real(Float64) :: dlength, sigma_pi
@@ -7099,6 +7106,11 @@ subroutine store_photons(pos, vi, photons, spectra)
         call spectrum(vp,vi,fields,sigma_pi,photons, &
                       dlength,lambda,intensity)
 
+        if(present(track_origin)) then
+           !$OMP ATOMIC UPDATE
+           spec%ndens_source(ichan,track_origin(1),track_origin(2),track_origin(3)) = spec%ndens_source(ichan,track_origin(1),track_origin(2),track_origin(3)) + SUM(intensity)
+           !$OMP END ATOMIC
+        endif
         loop_over_stark: do i=1,n_stark
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
@@ -7111,7 +7123,7 @@ subroutine store_photons(pos, vi, photons, spectra)
 
 end subroutine store_photons
 
-subroutine store_bes_photons(pos, vi, photons, neut_type)
+subroutine store_bes_photons(pos, vi, photons, neut_type, track_origin)
     !+ Store BES photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
@@ -7121,6 +7133,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     integer,intent(in)                      :: neut_type
         !+ Neutral type (full,half,third,halo)
+    integer(Int32), dimension(3), intent(in):: track_origin
 
     select case (neut_type)
            case (nbif_type)
@@ -7130,10 +7143,10 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
            case (nbit_type)
                call store_photons(pos,vi,photons,spec%third)
            case (dcx_type)
-               call store_photons(pos,vi,photons,spec%dcx)
+               call store_photons(pos,vi,photons,spec%dcx,track_origin)
            case (halo_type)
-               call store_photons(pos,vi,photons,spec%halo)
-           case default
+               call store_photons(pos,vi,photons,spec%halo,track_origin)
+            case default
                if(inputs%verbose.ge.0) then
                    write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
                endif
@@ -7827,7 +7840,7 @@ subroutine ndmc
                 endif
 
                 if((photons.gt.0.d0).and.(inputs%calc_nbi.ge.1)) then
-                    call store_bes_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
+                    call store_bes_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type,tracks(1)%ind)
                 endif
             enddo loop_along_track
             if(inputs%calc_birth.ge.1) then
@@ -7863,6 +7876,7 @@ subroutine ndmc
         call parallel_sum(spec%full)
         call parallel_sum(spec%half)
         call parallel_sum(spec%third)
+        call parallel_sum(spec%ndens_source)
     endif
 #endif
 
@@ -8042,7 +8056,7 @@ subroutine dcx
                 call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
                 if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
-                  call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
+                  call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type,tracks(1)%ind)
                 endif
             enddo loop_along_track
         enddo loop_over_dcx
@@ -8054,6 +8068,7 @@ subroutine dcx
     call parallel_sum(neut%dcx)
     if(inputs%calc_dcx.ge.1) then
         call parallel_sum(spec%dcx)
+        call parallel_sum(spec%ndens_source)
     endif
     call parallel_sum(halo_iter_dens(dcx_type))
 #endif
@@ -8196,7 +8211,7 @@ subroutine halo
                     local_iter_dens = &
                         local_iter_dens + sum(denn)/nlaunch(i,j,k)
                     if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
-                      call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
+                      call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type,tracks(1)%ind)
                     endif
 
                 enddo loop_along_track
@@ -8246,6 +8261,7 @@ subroutine halo
     !! Combine Spectra
     if(inputs%calc_halo.ge.1) then
         call parallel_sum(spec%halo)
+        call parallel_sum(spec%ndens_source)
     endif
 #endif
 
@@ -10300,6 +10316,7 @@ program fidasim
         allocate(spec%cold(inputs%nlambda,spec_chords%nchan))
         allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
         allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))
+        allocate(spec%ndens_source(spec_chords%nchan,beam_grid%nx,beam_grid%ny,beam_grid%nz))
         spec%brems = 0.d0
         spec%full = 0.d0
         spec%half = 0.d0
@@ -10309,6 +10326,7 @@ program fidasim
         spec%cold = 0.d0
         spec%fida = 0.d0
         spec%pfida = 0.d0
+        spec%ndens_source = 0.d0
     endif
 
     if(inputs%calc_npa.ge.1)then

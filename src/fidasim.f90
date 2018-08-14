@@ -3047,7 +3047,7 @@ subroutine read_mc(fid, error)
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
     !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,minpos,fields,uvw,phi,ri,vi, &
-    !$OMP& delta_phi,phi_enter,phi_exit,C_xyz,xyz,xp,yp,zp,dum)
+    !$OMP& delta_phi,phi_enter,phi_exit,C_xyz,xyz,xp,yp,zp,dum,inp)
     particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)

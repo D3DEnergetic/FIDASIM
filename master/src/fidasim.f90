@@ -6467,7 +6467,7 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
             call move_alloc(parts, npa%part)
         endif
         npa%part(npa%npart)%detector = det
-        npa%part(pnpa%npart)%class = oclass
+        npa%part(npa%npart)%class = oclass
         npa%part(npa%npart)%xi = uvw_ri(1)
         npa%part(npa%npart)%yi = uvw_ri(2)
         npa%part(npa%npart)%zi = uvw_ri(3)

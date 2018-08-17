@@ -25,5 +25,5 @@ If another process is hogging a core it will cause FIDASIM to stall.
 To prevent this use the `num_threads` optional argument as shown below
 
 ```
-fidasim ./test_1a_inputs.dat 8
+fidasim ./test_inputs.dat 8
 ```

@@ -11,12 +11,12 @@ PREFIDA([IDL](|url|/sourcefile/prefida.pro.html),[Python](|url|/sourcefile/prepr
 
 PREFIDA is called as follows
 ```idl
-IDL> prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
+IDL> prefida, inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa
 ```
 or using Python
 ```python
->>> import fidasim
->>> fidasim.prefida(inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa)
+>>> import preprocessing
+>>> preprocessing.prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa)
 ```
 where arguments are defined as follows. Click the argument's description for extreme detail.
 
@@ -25,7 +25,7 @@ where arguments are defined as follows. Click the argument's description for ext
 * `nbi`: [Neutral Beam Geometry](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure)
 * `fields`: [Electromagnetic Fields](../03_technical/01_prefida_inputs.html#fields-structure)
 * `plasma`: [Plasma Parameters](../03_technical/01_prefida_inputs.html#plasma-structure)
-* `dist`: [Fast-ion Distribution](../03_technical/01_prefida_inputs.html#distribution-structure)
+* `fbm`: [Fast-ion Distribution](../03_technical/01_prefida_inputs.html#distribution-structure)
 * `spec`: [Spectral Geometry](../03_technical/01_prefida_inputs.html#spectral-geometry-structure)
 * `npa`: [NPA Geometry](../03_technical/01_prefida_inputs.html#npa-geometry-structure)
 
@@ -41,16 +41,16 @@ Click [here](./05_devices.html) to find out if someone has done your work for yo
 
 #Making Grids
 PREFIDA uses two types of grids: the [Interpolation Grid](../03_technical/01_prefida_inputs.html#interpolation-grid-structure) and the [Beam Grid](../03_technical/01_prefida_inputs.html#beam-grid-settings). 
-The Interpolation Grid is 2D grid in the R-Z plane and as the name suggests it is used for interpolating the [plasma parameters](../03_technical/01_prefida_inputs.html#plasma-structure) and the [electromagnetic fields](../03_technical/01_prefida_inputs.html#fields-structure). 
+The Interpolation Grid is a 3D cylindrical grid in R, Phi and Z. It is used for interpolating the [plasma parameters](../03_technical/01_prefida_inputs.html#plasma-structure) and the [electromagnetic fields](../03_technical/01_prefida_inputs.html#fields-structure). 
 The routine `rz_grid`([IDL](|url|/sourcefile/rz_grid.pro.html),[Python](|url|/sourcefile/utils.py.html#rz_grid)) can be used to easily create the interpolation `grid` structure.
 
 ```idl
-IDL> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+IDL> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi)
 ```
 or in Python
 ```python
 >>> from fidasim.utils import rz_grid
->>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+>>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi)
 ```
 
 The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 

@@ -13,7 +13,7 @@ lstagner@computer:~/FIDASIM$ ./fidasim
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
 /_/  /___//____//_/ |_|/___//___//_/  /_/  
                                            
-Version: v2.0.0-dev-96-g30a264b
+Version: v2.0.0-dev
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -39,7 +39,7 @@ By default FIDASIM will use all the threads available. If another process is hog
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
 /_/  /___//____//_/ |_|/___//___//_/  /_/  
                                            
-Version: v2.0.0-dev-96-g30a264b
+Version: v2.0.0-dev
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/

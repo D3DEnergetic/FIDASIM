@@ -63,14 +63,14 @@ PRO write_distribution, filename, distri
 
         f_desc = {attribute,obj:'/f', $
                   name:'description', $
-                  data:'Fast-ion density function: F(E,p,R,Z,Phi)'}
+                  data:'Fast-ion density function: F(E,p,R,Z[,Ph]i)'}
         f_unit = {attribute,obj:'/f', $
                   name:'units', $
                   data:'fast-ions/(dE*dP*cm^3)'} 
 
         denf_desc = {attribute,obj:'/denf', $
                      name:'description', $
-                     data:'Fast-ion density: Denf(r,z,phi)'}
+                     data:'Fast-ion density: Denf(r,z[,phi])'}
         denf_unit = {attribute,obj:'/denf', $
                      name:'units', $
                      data:'cm^-3'} 
@@ -85,7 +85,7 @@ PRO write_distribution, filename, distri
 
         nphi_desc = {attribute,obj:'/nphi', $
                    name:'description', $
-                   data:'Number of Phi values'}
+                   data:'Number of Phi values (Optional)'}
 
         r_desc = {attribute,obj:'/r', $
                   name:'description', $
@@ -103,7 +103,7 @@ PRO write_distribution, filename, distri
 
         phi_desc = {attribute,obj:'/phi', $
                   name:'description', $
-                  data:'Phi'}
+                  data:'Phi (Optional)'}
         phi_unit = {attribute,obj:'/phi', $
                   name:'units', $
                   data:'rad'}
@@ -163,7 +163,7 @@ PRO write_distribution, filename, distri
 
         phi_desc = {attribute,obj:'/phi', $
                   name:'description', $
-                  data:'Phi position of a MC particle'}
+                  data:'Phi position of a MC particle (Optional)'}
         phi_unit = {attribute,obj:'/phi', $
                   name:'units', $
                   data:'rad'}

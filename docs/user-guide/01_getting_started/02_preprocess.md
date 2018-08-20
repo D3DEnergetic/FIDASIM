@@ -16,7 +16,7 @@ IDL> prefida, inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa
 or using Python
 ```python
 >>> import preprocessing
->>> preprocessing.prefida(inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa)
+>>> preprocessing.prefida(inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa)
 ```
 where arguments are defined as follows. Click the argument's description for extreme detail.
 
@@ -41,17 +41,27 @@ Click [here](./05_devices.html) to find out if someone has done your work for yo
 
 #Making Grids
 PREFIDA uses two types of grids: the [Interpolation Grid](../03_technical/01_prefida_inputs.html#interpolation-grid-structure) and the [Beam Grid](../03_technical/01_prefida_inputs.html#beam-grid-settings). 
-The Interpolation Grid is a 3D cylindrical grid in R, Phi and Z. It is used for interpolating the [plasma parameters](../03_technical/01_prefida_inputs.html#plasma-structure) and the [electromagnetic fields](../03_technical/01_prefida_inputs.html#fields-structure). 
-The routine `rz_grid`([IDL](|url|/sourcefile/rz_grid.pro.html),[Python](|url|/sourcefile/utils.py.html#rz_grid)) can be used to easily create the interpolation `grid` structure.
-
+By default, the Interpolation Grid is a 2D grid in the R-Z plane that is used for interpolating the [plasma parameters](../03_technical/01_prefida_inputs.html#plasma-structure) and the [electromagnetic fields](../03_technical/01_prefida_inputs.html#fields-structure).
+A 3D cylindrical grid in R, Z and Phi can be created if the user inputs phi variable information. 
+The routine `rz_grid`([IDL](|url|/sourcefile/rz_grid.pro.html),[Python](|url|/sourcefile/utils.py.html#rz_grid)) accomplishes the task and creates the `grid` structure. For example, the command below will create a 2D grid,
+```idl
+IDL> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+```
+whereas the following command will create a 3D grid,
 ```idl
 IDL> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi)
 ```
-or in Python
+In Python, the 2D grid can be created with,
+```python
+>>> from fidasim.utils import rz_grid
+>>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz)
+```
+and the 3D grid with,
 ```python
 >>> from fidasim.utils import rz_grid
 >>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi)
 ```
+The output 2D grid structure will have Phi = 0.0 and nphi = 1, but the 3D grid structure will have values based on what the user input.
 
 The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
 To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.

@@ -293,8 +293,6 @@ type, extends( Profiles ) :: LocalProfiles
         !+ Position in machine coordinates
     real(Float64), dimension(3) :: vrot = 0.d0
         !+ Plasma rotation in beam grid coordinates
-    type(InterpolCoeffs2D) :: c
-        !+ Linear Interpolation Coefficients and indicies for interpolation at `pos`
     type(InterpolCoeffs3D) :: b
         !+ Cylindrical Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalProfiles
@@ -355,8 +353,6 @@ type, extends( EMFields ) :: LocalEMFields
         !+ Vector perpendicular to `b_norm` and `a_norm`
     real(Float64), dimension(3) :: e_norm = 0.d0
         !+ Direction of electric field in beam grid coordinates
-    type(InterpolCoeffs2D) :: c
-        !+ Linear Interpolation Coefficients and indicies for interpolation at `pos`
     type(InterpolCoeffs3D) :: b
         !+ Cylindrical Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalEMFields
@@ -6172,16 +6168,16 @@ subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
     !+ Cylindrical interpolation coefficients and indicies for a 3D grid
     real(Float64), dimension(:), intent(in) :: r
         !+ R values
-    real(Float64), dimension(:), intent(in) :: phi
-        !+ Phi values
     real(Float64), dimension(:), intent(in) :: z
         !+ Z values
+    real(Float64), dimension(:), intent(in) :: phi
+        !+ Phi values
     real(Float64), intent(in)               :: rout
         !+ R value to interpolate
-    real(Float64), intent(in)               :: phiout
-        !+ Phi value to interpolate
     real(Float64), intent(in)               :: zout
         !+ Z value to interpolate
+    real(Float64), intent(in)               :: phiout
+        !+ Phi value to interpolate
     type(InterpolCoeffs3D), intent(out)     :: c
         !+ Cylindrical Interpolation Coefficients
     integer, intent(out), optional          :: err
@@ -6217,7 +6213,7 @@ subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
     else
         phimin = phi(1)
         dphi = abs(phi(2)-phi(1))
-        call cyl_interpol3D_coeff(rmin, dr, sr, phimin, dphi, sphi, zmin, dz, sz, rout, phiout, zout, c, err_status)
+        call cyl_interpol3D_coeff(rmin, dr, sr, zmin, dz, sz, phimin, dphi, sphi, rout, zout, phiout, c, err_status)
     endif
 
     if(present(err)) err = err_status
@@ -6345,24 +6341,24 @@ subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err, coeffs)
 
 end subroutine interpol2D_2D_arr
 
-subroutine interpol3D_arr(r, phi, z, d, rout, phiout, zout, dout, err, coeffs)
-    !+ Performs cylindrical interpolation on a 3D grid f(r,phi,z)
+subroutine interpol3D_arr(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
+    !+ Performs cylindrical interpolation on a 3D grid f(r,z,phi)
     real(Float64), dimension(:), intent(in) :: r
         !+ R values
-    real(Float64), dimension(:), intent(in) :: phi
-        !+ Phi values
     real(Float64), dimension(:), intent(in) :: z
         !+ Z values
+    real(Float64), dimension(:), intent(in) :: phi
+        !+ Phi values
     real(Float64), dimension(:,:,:), intent(in) :: d
-        !+ Values at r,phi,z: d(r,phi,z)
+        !+ Values at r,z,phi: d(r,z,phi)
     real(Float64), intent(in)               :: rout
         !+ R value to interpolate
-    real(Float64), intent(in)               :: phiout
-        !+ Phi value to interpolate
     real(Float64), intent(in)               :: zout
         !+ Z value to interpolate
+    real(Float64), intent(in)               :: phiout
+        !+ Phi value to interpolate
     real(Float64), intent(out)                :: dout
-        !+ Interpolant: d(rout,phiout,zout)
+        !+ Interpolant: d(rout,zout,phiout)
     integer, intent(out), optional          :: err
         !+ Error code
     type(InterpolCoeffs3D), intent(in), optional :: coeffs
@@ -6385,7 +6381,7 @@ subroutine interpol3D_arr(r, phi, z, d, rout, phiout, zout, dout, err, coeffs)
         endif
         err_status = 0
     else
-        call interpol_coeff(r,phi,z,rout,phiout,zout,b,err)
+        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err)
     endif
 
 
@@ -6399,9 +6395,9 @@ subroutine interpol3D_arr(r, phi, z, d, rout, phiout, zout, dout, err, coeffs)
             k2 = k+1
         endif
 
-        dout = b%b111*d(i,j,k) + b%b121*d(i,j+1,k) + &
+        dout = b%b111*d(i,j,k2) + b%b121*d(i,j+1,k2) + &
             b%b112*d(i,j,k2) + b%b122*d(i,j+1,k2) + &
-            b%b211*d(i+1,j,k) + b%b221*d(i+1,j+1,k) + &
+            b%b211*d(i+1,j,k2) + b%b221*d(i+1,j+1,k2) + &
             b%b212*d(i+1,j,k2) + b%b222*d(i+1,j+1,k2)
     else
         dout = 0.d0
@@ -6411,25 +6407,25 @@ subroutine interpol3D_arr(r, phi, z, d, rout, phiout, zout, dout, err, coeffs)
 
 end subroutine interpol3D_arr
 
-subroutine interpol3D_2D_arr(r, phi, z, f, rout, phiout, zout, fout, err, coeffs)
+subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs)
     !+ Performs cylindrical interpolation on a 3D grid of 2D arrays
-    !+ f(:,:,r,phi,z)
+    !+ f(:,:,r,z,phi)
     real(Float64), dimension(:), intent(in) :: r
         !+ R values
-    real(Float64), dimension(:), intent(in) :: phi
-        !+ Phi values
     real(Float64), dimension(:), intent(in) :: z
         !+ Z values
+    real(Float64), dimension(:), intent(in) :: phi
+        !+ Phi values
     real(Float64), dimension(:,:,:,:,:), intent(in) :: f
-        !+ Values at r,phi,z: f(:,:,x,y)
+        !+ Values at r,z,phi: f(:,:,r,z,phi)
     real(Float64), intent(in)               :: rout
         !+ R value to interpolate
-    real(Float64), intent(in)               :: phiout
-        !+ Phi value to interpolate
     real(Float64), intent(in)               :: zout
         !+ Z value to interpolate
+    real(Float64), intent(in)               :: phiout
+        !+ Phi value to interpolate
     real(Float64), dimension(:,:), intent(out)    :: fout
-        !+ Interpolant: f(:,:,rout,phiout,zout)
+        !+ Interpolant: f(:,:,rout,zout,phiout)
     integer, intent(out), optional          :: err
         !+ Error code
     type(InterpolCoeffs3D), intent(in), optional :: coeffs
@@ -6447,12 +6443,12 @@ subroutine interpol3D_2D_arr(r, phi, z, f, rout, phiout, zout, fout, err, coeffs
             b%b212 = 0
             b%b222 = 0
             b%b122 = 0
-            b%b112 = 0
+            b%b112 = k
             b%k = 1
         endif
         err_status = 0
     else
-        call interpol_coeff(r,phi,z,rout,phiout,zout,b,err)
+        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err)
     endif
 
     if(err_status.eq.0) then
@@ -6464,9 +6460,9 @@ subroutine interpol3D_2D_arr(r, phi, z, f, rout, phiout, zout, fout, err, coeffs
         else
             k2 = k+1
         endif
-        fout = b%b111*f(:,:,i,j,k) + b%b121*f(:,:,i,j+1,k) + &
+        fout = b%b111*f(:,:,i,j,k2) + b%b121*f(:,:,i,j+1,k2) + &
             b%b112*f(:,:,i,j,k2) + b%b122*f(:,:,i,j+1,k2) + &
-            b%b211*f(:,:,i+1,j,k) + b%b221*f(:,:,i+1,j+1,k) + &
+            b%b211*f(:,:,i+1,j,k2) + b%b221*f(:,:,i+1,j+1,k2) + &
             b%b212*f(:,:,i+1,j,k2) + b%b222*f(:,:,i+1,j+1,k2)
     else
         fout = 0.0
@@ -6526,10 +6522,10 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
         else
             k2 = k+1
         endif
-        mask = b%b111*equil%mask(i,j,k) + b%b112*equil%mask(i,j,k2) + &
-            b%b121*equil%mask(i,j+1,k) + b%b122*equil%mask(i,j+1,k2) + &
-            b%b211*equil%mask(i+1,j,k) + b%b212*equil%mask(i+1,j,k2) + &
-            b%b221*equil%mask(i+1,j+1,k) + b%b222*equil%mask(i+1,j+1,k2)
+        mask = b%b111*equil%mask(i,j,k2) + b%b112*equil%mask(i,j,k2) + &
+            b%b121*equil%mask(i,j+1,k2) + b%b122*equil%mask(i,j+1,k2) + &
+            b%b211*equil%mask(i+1,j,k2) + b%b212*equil%mask(i+1,j,k2) + &
+            b%b221*equil%mask(i+1,j+1,k2) + b%b222*equil%mask(i+1,j+1,k2)
         if((mask.ge.0.5).and.(err.eq.0)) then
             inp = .True.
         endif
@@ -6572,9 +6568,9 @@ subroutine get_plasma(plasma, pos, ind)
             k2 = k+1
         endif
 
-        plasma = coeffs%b111*equil%plasma(i,j,k) + coeffs%b121*equil%plasma(i,j+1,k) + &
+        plasma = coeffs%b111*equil%plasma(i,j,k2) + coeffs%b121*equil%plasma(i,j+1,k2) + &
             coeffs%b112*equil%plasma(i,j,k2) + coeffs%b122*equil%plasma(i,j+1,k2) + &
-            coeffs%b211*equil%plasma(i+1,j,k) + coeffs%b221*equil%plasma(i+1,j+1,k) + &
+            coeffs%b211*equil%plasma(i+1,j,k2) + coeffs%b221*equil%plasma(i+1,j+1,k2) + &
             coeffs%b212*equil%plasma(i+1,j,k2) + coeffs%b222*equil%plasma(i+1,j+1,k2)
 
         s = sin(phi) ; c = cos(phi)
@@ -6659,9 +6655,9 @@ subroutine get_fields(fields, pos, ind, machine_coords)
             k2 = k+1
         endif
 
-        fields = coeffs%b111*equil%fields(i,j,k) + coeffs%b121*equil%fields(i,j+1,k) + &
+        fields = coeffs%b111*equil%fields(i,j,k2) + coeffs%b121*equil%fields(i,j+1,k2) + &
             coeffs%b112*equil%fields(i,j,k2) + coeffs%b122*equil%fields(i,j+1,k2) + &
-            coeffs%b211*equil%fields(i+1,j,k) + coeffs%b221*equil%fields(i+1,j+1,k) + &
+            coeffs%b211*equil%fields(i+1,j,k2) + coeffs%b221*equil%fields(i+1,j+1,k2) + &
             coeffs%b212*equil%fields(i+1,j,k2) + coeffs%b222*equil%fields(i+1,j+1,k2)
 
         phi = atan2(uvw(2),uvw(1))

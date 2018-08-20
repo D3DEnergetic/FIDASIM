@@ -81,7 +81,7 @@ In short, a neutral particle collides with a charged particle, exciting into a h
 When the neutral particle relaxes (\(n: 3 \rightarrow 2\)) it emits a doppler shifted (656.1 nm) photon.
 
 Charge Exchange is the process by which the Halo and FIDA light is created.
-In a charge exchange reaction a thermal (DCX, Halo) or fast (FIDA) ion steals a electron from a neutral particle.
+In a charge exchange reaction a thermal (DCX, Halo) or fast (FIDA) ion steals an electron from a neutral particle.
 The newly created neutral is born in an excited (\(n=3\) state and like the collisionally excited neutral it relaxes to a lower energy state (\n=2\) and emits a doppler shifted (656.1 nm) photon.
 
 ![Stark Splitting and Doppler Shift](|media|/stark_doppler.png){: width="400"}
@@ -108,9 +108,9 @@ where positive and negative sums refer to \(\sigma\) and \(\pi\) lines respectiv
 $$S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 1] $$
 
 # Relevant Namelist Settings
-* `calc_nbi`: Calculate NBI spectra
-* `calc_dcx`: Calculate DCX spectra
-* `calc_halo`: Calculate HALO spectra
+* `calc_nbi`: Calculate NBI spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
+* `calc_dcx`: Calculate DCX spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
+* `calc_halo`: Calculate HALO spectra(approximate calculations if neutrals are loaded, i.e., load_neutrals=1) 
 * `calc_cold`: Calculate Cold D-alpha spectra
 * `calc_brems`: Calculate Bremsstrahlung
 * `calc_fida`: Calculate FIDA spectra

@@ -72,7 +72,6 @@ An example of the calculated NPA flux for the two different methods are shown be
 * `calc_npa_wght`: Calculate NPA weight function and flux using the weight function method
 * `ne_wght`: Number of energies in weight function calculation
 * `np_wght`: Number of pitches in weight function calculation
-* `nphi_wght`: Number of Gyro-angles in weight function calculation
 * `emax_wght`: Maximum energy in weight function calculation
 
 # Fortran References

@@ -154,10 +154,10 @@ The `grid` structure contains the definition of the 3D cylindrical grid that the
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:-----------------------------------------|
 | `nr`                | Int16   | 0    | NA          | NA    | Number of radii                          |
 | `nz`                | Int16   | 0    | NA          | NA    | Number of z values                       |
-| `nphi`              | Int16   | 0    | NA          | NA    | Number of phi values                     |
+| `nphi`              | Int16   | 0    | NA          | NA    | Number of phi values (Optional)          |
 | `r`                 | Float64 | 1    | [`nr`]      | cm    | Array of radii                           |
 | `z`                 | Float64 | 1    | [`nz`]      | cm    | Array of z values                        |
-| `phi`               | Float64 | 1    | [`nphi`]    | rad   | Array of phi values                      |
+| `phi`               | Float64 | 1    | [`nphi`]    | rad   | Array of phi values (Optional)           |
 | `r2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of radii `r = r2d(r,z)`         |
 | `z2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of z values `z = z2d(r,z)`      |
 
@@ -203,8 +203,8 @@ Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more
 | `er`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Radial component of the electric field                        |
 | `et`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Torodial/Phi component of the electric field                  |
 | `ez`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Z component of the electric field                             |
-| `description`       | String  | 0    | NA          | NA    | Electromagnetic Field                    |
-| `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                              |
+| `description`       | String  | 0    | NA          | NA    | Electromagnetic Field                                         |
+| `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                                                   |
 
 #Plasma Structure
 This structure contain the plasma parameters mapped onto the interpolation grid.
@@ -222,8 +222,8 @@ Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more
 | `vr`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Radial component of the bulk plasma rotation/flow             |
 | `vt`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow       |
 | `vz`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Z component of the bulk plasma rotation/flow                  |
-| `description`       | String  | 0    | NA          | NA    | Plasma Parameters                        |
-| `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                              |
+| `description`       | String  | 0    | NA          | NA    | Plasma Parameters                                             |
+| `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                                                   |
 
 #Distribution Structure
 The `dist` structure contains the fast-ion distribution which can be one of three different types.
@@ -232,18 +232,18 @@ Click [here](../02_physics/01_plasma.html#distributions) for more information.
 ##Fast-ion Distribution Function
 |       Variable      |   Type  | Rank |           Dimensions           |          Units         |           Description           |
 |:-------------------:|:-------:|:----:|:------------------------------:|:----------------------:|:--------------------------------| 
-| `type`              | Int16   | 0    | NA                                    | NA                     | Distribution type (1)               |
-| `r`                 | Float64 | 1    | [`nr`]                                | cm                     | Array of radii                      |
-| `z`                 | Float64 | 1    | [`nz`]                                | cm                     | Array of z values                   |
-| `phi`               | Float64 | 1    | [`nphi`]                              | cm                     | Array of phi values                 |    
-| `time`              | Float64 | 0    | NA                                    | s                      | Time of the distribution            |
-| `data_source`       | String  | 0    | NA                                    | NA                     | Source of the distribution data     |
-| `nenergy`           | Int16   | 0    | NA                                    | NA                     | Number of energy values             |
-| `npitch`            | Int16   | 0    | NA                                    | NA                     | Number of pitch values              |
-| `energy`            | Float64 | 1    | [`nenergy`]                           | keV                    | Energy array                        |
-| `pitch`             | Float64 | 1    | [`npitch`]                            | NA                     | Pitch array w.r.t magnetic field    |
-| `denf`              | Float64 | 3    | [`nr`,`nz`,`nphi`]                    | cm^-3                  | Fast-ion density                    |
-| `f`                 | Float64 | 5    | [`nenergy`,`npitch`,`nr`,`nz`,`nphi`] | fast-ions/(dE dP cm^3) | Fast-ion distribution F(E,p,R,Z,Phi)|
+| `type`              | Int16   | 0    | NA                                      | NA                     | Distribution type (1)                  |
+| `r`                 | Float64 | 1    | [`nr`]                                  | cm                     | Array of radii                         |
+| `z`                 | Float64 | 1    | [`nz`]                                  | cm                     | Array of z values                      |
+| `phi`               | Float64 | 1    | [`nphi`]                                | cm                     | Array of phi values (Optional)         |
+| `time`              | Float64 | 0    | NA                                      | s                      | Time of the distribution               |
+| `data_source`       | String  | 0    | NA                                      | NA                     | Source of the distribution data        |
+| `nenergy`           | Int16   | 0    | NA                                      | NA                     | Number of energy values                |
+| `npitch`            | Int16   | 0    | NA                                      | NA                     | Number of pitch values                 |
+| `energy`            | Float64 | 1    | [`nenergy`]                             | keV                    | Energy array                           |
+| `pitch`             | Float64 | 1    | [`npitch`]                              | NA                     | Pitch array w.r.t magnetic field       |
+| `denf`              | Float64 | 3    | [`nr`,`nz`[,`nphi`]]                    | cm^-3                  | Fast-ion density                       |
+| `f`                 | Float64 | 5    | [`nenergy`,`npitch`,`nr`,`nz`[,`nphi`]] | fast-ions/(dE dP cm^3) | Fast-ion distribution F(E,p,R,Z[,Phi]) |
 
 ##Guiding Center Monte Carlo Distribution
 The sum(`weight`) = # of Fast-ions in phase space sampled by the MC particles.
@@ -253,17 +253,17 @@ The `class` variable can take values in the range of 1:`nclass`.
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
-| `type`              | Int16   | 0    | NA           | NA    | Distribution type (2)           |
-| `time`              | Float64 | 0    | NA           | s     | Time of the distribution        |
-| `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data |
-| `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles          |
-| `nclass`            | Int16   | 0    | NA           | NA    | Number of orbit classes         |
-| `class`             | Int16   | 1    | [`nparticle`]| NA    | Orbit class of the MC particle  |
-| `weight`            | Float64 | 1    | [`nparticle`]| fast-ions| Weight of the MC particle    |
-| `r`                 | Float64 | 1    | [`nparticle`]| cm    | R positions of the MC particle  |
-| `z`                 | Float64 | 1    | [`nparticle`]| cm    | Z positions of the MC particle  |
-| `phi`               | Float64 | 1    | [`nparticle`]| rad   | Phi positions of the MC particle|
-| `energy`            | Float64 | 1    | [`nparticle`]| keV   | Energy of the MC particle       |
+| `type`              | Int16   | 0    | NA           | NA    | Distribution type (2)                             |
+| `time`              | Float64 | 0    | NA           | s     | Time of the distribution                          |
+| `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data                   |
+| `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles                            |
+| `nclass`            | Int16   | 0    | NA           | NA    | Number of orbit classes                           |
+| `class`             | Int16   | 1    | [`nparticle`]| NA    | Orbit class of the MC particle                    |
+| `weight`            | Float64 | 1    | [`nparticle`]| fast-ions| Weight of the MC particle                      |
+| `r`                 | Float64 | 1    | [`nparticle`]| cm    | R positions of the MC particle                    |
+| `z`                 | Float64 | 1    | [`nparticle`]| cm    | Z positions of the MC particle                    |
+| `phi`               | Float64 | 1    | [`nparticle`]| rad   | Phi positions of the MC particle (Optional)       |
+| `energy`            | Float64 | 1    | [`nparticle`]| keV   | Energy of the MC particle                         |
 | `pitch`             | Float64 | 1    | [`nparticle`]| NA    | Pitch w.r.t the magnetic field of the MC particle |
 
 ##Full-Orbit Monte Carlo Distribution
@@ -273,19 +273,19 @@ The `class` variable can take values in the range of 1:`nclass`.
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
 |:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
-| `type`              | Int16   | 0    | NA           | NA    | Distribution type (3)           |
-| `time`              | Float64 | 0    | NA           | s     | Time of the distribution        |
-| `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data |
-| `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles          |
-| `nclass`            | Int16   | 0    | NA           | NA    | Number of orbit classes         |
-| `class`             | Int16   | 1    | [`nparticle`]| NA    | Orbit class of the MC particle  |
-| `weight`            | Float64 | 1    | [`nparticle`]| fast-ions| Weight of the MC particle    |
-| `r`                 | Float64 | 1    | [`nparticle`]| cm    | R positions of the MC particle  |
-| `z`                 | Float64 | 1    | [`nparticle`]| cm    | Z positions of the MC particle  |
-| `phi`               | Float64 | 1    | [`nparticle`]| rad   | Phi positions of the MC particle|
-| `vr`                | Float64 | 1    | [`nparticle`]| cm/s  | Radial component of the MC particle velocity |
+| `type`              | Int16   | 0    | NA           | NA    | Distribution type (3)                              |
+| `time`              | Float64 | 0    | NA           | s     | Time of the distribution                           |
+| `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data                    |
+| `nparticle`         | Int32   | 0    | NA           | NA    | Number of MC particles                             |
+| `nclass`            | Int16   | 0    | NA           | NA    | Number of orbit classes                            |
+| `class`             | Int16   | 1    | [`nparticle`]| NA    | Orbit class of the MC particle                     |
+| `weight`            | Float64 | 1    | [`nparticle`]| fast-ions| Weight of the MC particle                       |
+| `r`                 | Float64 | 1    | [`nparticle`]| cm    | R positions of the MC particle                     |
+| `z`                 | Float64 | 1    | [`nparticle`]| cm    | Z positions of the MC particle                     |
+| `phi`               | Float64 | 1    | [`nparticle`]| rad   | Phi positions of the MC particle (Optional)        |
+| `vr`                | Float64 | 1    | [`nparticle`]| cm/s  | Radial component of the MC particle velocity       |
 | `vt`                | Float64 | 1    | [`nparticle`]| cm/s  | Torodial/Phi component of the MC particle velocity |
-| `vz`                | Float64 | 1    | [`nparticle`]| cm/s  | Z component of the MC particle velocity |
+| `vz`                | Float64 | 1    | [`nparticle`]| cm/s  | Z component of the MC particle velocity            |
 
 #Spectral Geometry Structure
 This structure contains the geometry of the spectroscopic systems 

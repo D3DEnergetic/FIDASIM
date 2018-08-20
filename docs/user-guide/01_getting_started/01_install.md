@@ -105,7 +105,7 @@ user@computer:~/FIDASIM-{!../VERSION!}$ ./fidasim
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
 /_/  /___//____//_/ |_|/___//___//_/  /_/
 
-Version: v2.0.0-dev-96-g30a264b
+Version: v2.0.0-dev
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -116,7 +116,7 @@ Good job! You installed FIDASIM! But wait there's more.
 Calculating reaction rates on the fly is time consuming so we need to pre-compute them to save time.
 The following code snippit will generate the atomic tables using the default settings.
 The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
-In that case edit the file `FIDASIM/tables/table_settings.dat` before running the following command
+In that case edit the file `tables/table_settings.dat` before running the following command
 
 ```bash
 make atomic_tables
@@ -154,7 +154,7 @@ It should print out the following.
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
 /_/  /___//____//_/ |_|/___//___//_/  /_/  
                                            
-Version: v2.0.0-dev-96-g30a264b
+Version: v2.0.0-dev
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/

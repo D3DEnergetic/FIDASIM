@@ -110,14 +110,14 @@ $$S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 
 # Relevant Namelist Settings
 * `calc_nbi`: Calculate NBI spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
 * `calc_dcx`: Calculate DCX spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
-* `calc_halo`: Calculate HALO spectra(approximate calculations if neutrals are loaded, i.e., load_neutrals=1) 
+* `calc_halo`: Calculate Halo spectra(approximate calculations if neutrals are loaded, i.e., load_neutrals=1) 
 * `calc_cold`: Calculate Cold D-alpha spectra
 * `calc_brems`: Calculate Bremsstrahlung
 * `calc_fida`: Calculate FIDA spectra
 * `calc_pfida`: Calculate pFIDA spectra
 * `calc_fida_wght`: Calculate FIDA weight function and emission using the weight function method
 * `n_fida`: Number of Monte Carlo particles used in FIDA spectra calculation
-* `n_pfida`: Number of Monte Carlo particles used in pFIDA spectra calculation
+* `n_pfida`: Number of Monte Carlo particles used in passive FIDA spectra calculation
 * `n_nbi`: Number of Monte Carlo particles used in NBI spectra calculation
 * `n_halo`: Number of Monte Carlo particles used in Halo spectra calculation
 * `n_dcx`: Number of Monte Carlo particles used in DCX spectra calculation
@@ -133,7 +133,7 @@ $$S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 
 * [[bremsstrahlung]]: Calculates Bremsstrahlung
 * [[spectrum]]: Calculates Doppler shift and Stark splitting.
 * [[ndmc]]: Calculates BES spectra
-* [[dcx]]: Calculates DCX neutrals contribution to the Halo spectra
+* [[dcx]]: Calculates DCX neutrals contribution to the DCX spectra
 * [[halo]]: Calculates thermal neutrals contribution to the Halo Spectra
 * [[fida_f]]: Calculates FIDA light using a distribution function
 * [[fida_mc]]: Calculates FIDA light using a particle distribution

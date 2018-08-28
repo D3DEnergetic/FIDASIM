@@ -47,7 +47,7 @@ A value of two will turn on additional functionality.
 | `calc_fida`         | Int16   | 0    | NA         | NA    | Calculate FIDA spectra                   |
 | `calc_npa`          | Int16   | 0    | NA         | NA    | Calculate NPA flux                       |
 | `calc_pfida`        | Int16   | 0    | NA         | NA    | Calculate passive FIDA spectra           |
-| `calc_pnpa`         | Int16   | 0    | NA         | NA    | Calculate pNPA flux                      |
+| `calc_pnpa`         | Int16   | 0    | NA         | NA    | Calculate passive NPA flux                      |
 | `calc_neutron`      | Int16   | 0    | NA         | NA    | Calculate B-T Neutron rate               |
 | `calc_birth`        | Int16   | 0    | NA         | NA    | Calculate Birth profile                  |
 | `calc_fida_wght`    | Int16   | 0    | NA         | NA    | Calculate FIDA weight functions          | 
@@ -148,7 +148,7 @@ Click [here](../02_physics/07_weights.html) for more information.
 | `lambdamax_wght`    | Float64 | 0    | NA         | nm    | Maximum weight function wavelength       |
 
 #Interpolation Grid Structure
-The `grid` structure contains the definition of the 3D cylindrical grid that the plasma parameters and electromagnetic fields are mapped onto. 
+The `grid` structure contains the definition of the 2D/3D cylindrical grid that the plasma parameters and electromagnetic fields are mapped onto. 
 
 |       Variable      |   Type  | Rank |  Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:-----------------------------------------|
@@ -196,13 +196,13 @@ Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:--------------------------------------------------------------| 
 | `time`              | Float64 | 0    | NA          | s     | Time when the fields data were collected/reconstructed        |
 | `data_source`       | String  | 0    | NA          | NA    | Source of the fields data                                     |
-| `mask`              | Int16   | 2    | [`nr`,`nz`] | NA    | Boolean mask that indicates where the fields are well defined |
-| `br`                | Float64 | 2    | [`nr`,`nz`] | T     | Radial component of the magnetic field                        |
-| `bt`                | Float64 | 2    | [`nr`,`nz`] | T     | Torodial/Phi component of the magnetic field                  |
-| `bz`                | Float64 | 2    | [`nr`,`nz`] | T     | Z component of the magnetic field                             |
-| `er`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Radial component of the electric field                        |
-| `et`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Torodial/Phi component of the electric field                  |
-| `ez`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Z component of the electric field                             |
+| `mask`              | Int16   | 2/3    | [`nr`,`nz`[,`nphi`]] | NA    | Boolean mask that indicates where the fields are well defined |
+| `br`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | T     | Radial component of the magnetic field                        |
+| `bt`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | T     | Torodial/Phi component of the magnetic field                  |
+| `bz`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | T     | Z component of the magnetic field                             |
+| `er`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | V/m   | Radial component of the electric field                        |
+| `et`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | V/m   | Torodial/Phi component of the electric field                  |
+| `ez`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | V/m   | Z component of the electric field                             |
 | `description`       | String  | 0    | NA          | NA    | Electromagnetic Field                                         |
 | `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                                                   |
 
@@ -214,14 +214,14 @@ Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more
 |:-------------------:|:-------:|:----:|:-----------:|:-----:|:--------------------------------------------------------------| 
 | `time`              | Float64 | 0    | NA          | s     | Time when the plasma parameter data was collected             |
 | `data_source`       | String  | 0    | NA          | NA    | Source of the plasma parameter data                           |
-| `mask`              | Int16   | 2    | [`nr`,`nz`] | NA    | Boolean mask that indicates where the plasma is well defined  |
-| `te`                | Float64 | 2    | [`nr`,`nz`] | keV   | Electron temperature                                          |
-| `ti`                | Float64 | 2    | [`nr`,`nz`] | keV   | Ion temperature                                               |
-| `dene`              | Float64 | 2    | [`nr`,`nz`] | cm^-3 | Electron density                                              |
-| `zeff`              | Float64 | 2    | [`nr`,`nz`] | NA    | Z-effective                                                   |
-| `vr`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Radial component of the bulk plasma rotation/flow             |
-| `vt`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow       |
-| `vz`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Z component of the bulk plasma rotation/flow                  |
+| `mask`              | Int16   | 2/3    | [`nr`,`nz`[,`nphi`]] | NA    | Boolean mask that indicates where the plasma is well defined  |
+| `te`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | keV   | Electron temperature                                          |
+| `ti`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | keV   | Ion temperature                                               |
+| `dene`              | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | cm^-3 | Electron density                                              |
+| `zeff`              | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | NA    | Z-effective                                                   |
+| `vr`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | cm/s  | Radial component of the bulk plasma rotation/flow             |
+| `vt`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow       |
+| `vz`                | Float64 | 2/3    | [`nr`,`nz`[,`nphi`]] | cm/s  | Z component of the bulk plasma rotation/flow                  |
 | `description`       | String  | 0    | NA          | NA    | Plasma Parameters                                             |
 | `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                                                   |
 

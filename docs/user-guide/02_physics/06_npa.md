@@ -67,7 +67,7 @@ An example of the calculated NPA flux for the two different methods are shown be
 
 # Relevant Namelist Settings
 * `n_npa`: Number of Monte Carlo particles used in MC-NPA calculation
-* `n_pnpa`: Number of Monte Carlo particles used in MC-pNPA calculation
+* `n_pnpa`: Number of Monte Carlo particles used in passive MC-NPA calculation
 * `calc_npa`: Calculate NPA flux using the Monte Carlo Method
 * `calc_npa_wght`: Calculate NPA weight function and flux using the weight function method
 * `ne_wght`: Number of energies in weight function calculation
@@ -77,4 +77,5 @@ An example of the calculated NPA flux for the two different methods are shown be
 # Fortran References
 * [[read_npa]]: Reads NPA geometry and calculates NPA geometric factor
 * [[npa_f]]: MC-NPA routine
+* [[pnpa_f]]: passive MC-NPA routine
 * [[npa_weights]]: WF-NPA routine

@@ -11,7 +11,7 @@ PREFIDA([IDL](|url|/sourcefile/prefida.pro.html),[Python](|url|/sourcefile/prepr
 
 PREFIDA is called as follows
 ```idl
-IDL> prefida, inputs, grid, nbi, plasma, fields, fbm, spec=spec, npa=npa
+IDL> prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
 ```
 or using Python
 ```python
@@ -25,7 +25,7 @@ where arguments are defined as follows. Click the argument's description for ext
 * `nbi`: [Neutral Beam Geometry](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure)
 * `fields`: [Electromagnetic Fields](../03_technical/01_prefida_inputs.html#fields-structure)
 * `plasma`: [Plasma Parameters](../03_technical/01_prefida_inputs.html#plasma-structure)
-* `fbm`: [Fast-ion Distribution](../03_technical/01_prefida_inputs.html#distribution-structure)
+* `dist`: [Fast-ion Distribution](../03_technical/01_prefida_inputs.html#distribution-structure)
 * `spec`: [Spectral Geometry](../03_technical/01_prefida_inputs.html#spectral-geometry-structure)
 * `npa`: [NPA Geometry](../03_technical/01_prefida_inputs.html#npa-geometry-structure)
 

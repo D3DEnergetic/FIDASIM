@@ -6510,7 +6510,7 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
     W = uvw(3)
     phi = atan2(uvw(2),uvw(1))
     !! Interpolate mask value
-    call interpol_coeff(inter_grid%r, inter_grid%phi, inter_grid%z, R, phi, W, b, err)
+    call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phi, b, err)
 
     inp = .False.
     if(err.eq.0) then
@@ -6715,8 +6715,8 @@ subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
     integer :: err
 
     if(present(coeffs)) then
-        call interpol(fbm%r, fbm%phi, fbm%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
-        call interpol(fbm%r, fbm%phi, fbm%z, fbm%denf, R, Phi, Z, denf, err, coeffs)
+        call interpol(fbm%r, fbm%z, fbm%phi, fbm%f, R, Z, Phi, fbeam, err, coeffs)
+        call interpol(fbm%r, fbm%z, fbm%phi, fbm%denf, R, Z, Phi, denf, err, coeffs)
     else
         if(present(ind)) call get_position(ind,xyz)
         if(present(pos)) xyz = pos
@@ -6727,8 +6727,8 @@ subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
         Z = uvw(3)
         Phi = atan2(uvw(2),uvw(1))
 
-        call interpol(fbm%r, fbm%phi, fbm%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
-        call interpol(fbm%r, fbm%phi, fbm%z, fbm%denf, R, Phi, Z, denf, err, coeffs)
+        call interpol(fbm%r, fbm%z, fbm%phi, fbm%f, R, Z, Phi, fbeam, err, coeffs)
+        call interpol(fbm%r, fbm%z, fbm%phi, fbm%denf, R, Z, Phi, denf, err, coeffs)
     endif
 
 end subroutine get_distribution
@@ -6766,7 +6766,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
 
     if((dE.le.fbm%dE).and.(dp.le.fbm%dp)) then
         if(present(coeffs)) then
-            call interpol(inter_grid%r, inter_grid%phi, inter_grid%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
+            call interpol(inter_grid%r, inter_grid%z, inter_grid%phi, fbm%f, R, Z, Phi, fbeam, err, coeffs)
         else
             if(present(ind)) call get_position(ind,xyz)
             if(present(pos)) xyz = pos
@@ -6777,7 +6777,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
             Z = uvw(3)
             Phi = atan2(uvw(2),uvw(1))
 
-            call interpol(inter_grid%r, inter_grid%phi, inter_grid%z, fbm%f, R, Phi, Z, fbeam, err, coeffs)
+            call interpol(inter_grid%r, inter_grid%z, inter_grid%phi, fbm%f, R, Z, Phi, fbeam, err, coeffs)
         endif
         denf = fbeam(epi(1),epi(2))
     else

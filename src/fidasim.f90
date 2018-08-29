@@ -6395,9 +6395,9 @@ subroutine interpol3D_arr(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
             k2 = k+1
         endif
 
-        dout = b%b111*d(i,j,k2) + b%b121*d(i,j+1,k2) + &
+        dout = b%b111*d(i,j,k) + b%b121*d(i,j+1,k) + &
             b%b112*d(i,j,k2) + b%b122*d(i,j+1,k2) + &
-            b%b211*d(i+1,j,k2) + b%b221*d(i+1,j+1,k2) + &
+            b%b211*d(i+1,j,k) + b%b221*d(i+1,j+1,k) + &
             b%b212*d(i+1,j,k2) + b%b222*d(i+1,j+1,k2)
     else
         dout = 0.d0
@@ -6460,9 +6460,9 @@ subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs
         else
             k2 = k+1
         endif
-        fout = b%b111*f(:,:,i,j,k2) + b%b121*f(:,:,i,j+1,k2) + &
+        fout = b%b111*f(:,:,i,j,k) + b%b121*f(:,:,i,j+1,k) + &
             b%b112*f(:,:,i,j,k2) + b%b122*f(:,:,i,j+1,k2) + &
-            b%b211*f(:,:,i+1,j,k2) + b%b221*f(:,:,i+1,j+1,k2) + &
+            b%b211*f(:,:,i+1,j,k) + b%b221*f(:,:,i+1,j+1,k) + &
             b%b212*f(:,:,i+1,j,k2) + b%b222*f(:,:,i+1,j+1,k2)
     else
         fout = 0.0
@@ -6522,10 +6522,10 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
         else
             k2 = k+1
         endif
-        mask = b%b111*equil%mask(i,j,k2) + b%b112*equil%mask(i,j,k2) + &
-            b%b121*equil%mask(i,j+1,k2) + b%b122*equil%mask(i,j+1,k2) + &
-            b%b211*equil%mask(i+1,j,k2) + b%b212*equil%mask(i+1,j,k2) + &
-            b%b221*equil%mask(i+1,j+1,k2) + b%b222*equil%mask(i+1,j+1,k2)
+        mask = b%b111*equil%mask(i,j,k) + b%b112*equil%mask(i,j,k2) + &
+            b%b121*equil%mask(i,j+1,k) + b%b122*equil%mask(i,j+1,k2) + &
+            b%b211*equil%mask(i+1,j,k) + b%b212*equil%mask(i+1,j,k2) + &
+            b%b221*equil%mask(i+1,j+1,k) + b%b222*equil%mask(i+1,j+1,k2)
         if((mask.ge.0.5).and.(err.eq.0)) then
             inp = .True.
         endif
@@ -6568,9 +6568,9 @@ subroutine get_plasma(plasma, pos, ind)
             k2 = k+1
         endif
 
-        plasma = coeffs%b111*equil%plasma(i,j,k2) + coeffs%b121*equil%plasma(i,j+1,k2) + &
+        plasma = coeffs%b111*equil%plasma(i,j,k) + coeffs%b121*equil%plasma(i,j+1,k) + &
             coeffs%b112*equil%plasma(i,j,k2) + coeffs%b122*equil%plasma(i,j+1,k2) + &
-            coeffs%b211*equil%plasma(i+1,j,k2) + coeffs%b221*equil%plasma(i+1,j+1,k2) + &
+            coeffs%b211*equil%plasma(i+1,j,k) + coeffs%b221*equil%plasma(i+1,j+1,k) + &
             coeffs%b212*equil%plasma(i+1,j,k2) + coeffs%b222*equil%plasma(i+1,j+1,k2)
 
         s = sin(phi) ; c = cos(phi)
@@ -6655,9 +6655,9 @@ subroutine get_fields(fields, pos, ind, machine_coords)
             k2 = k+1
         endif
 
-        fields = coeffs%b111*equil%fields(i,j,k2) + coeffs%b121*equil%fields(i,j+1,k2) + &
+        fields = coeffs%b111*equil%fields(i,j,k) + coeffs%b121*equil%fields(i,j+1,k) + &
             coeffs%b112*equil%fields(i,j,k2) + coeffs%b122*equil%fields(i,j+1,k2) + &
-            coeffs%b211*equil%fields(i+1,j,k2) + coeffs%b221*equil%fields(i+1,j+1,k2) + &
+            coeffs%b211*equil%fields(i+1,j,k) + coeffs%b221*equil%fields(i+1,j+1,k) + &
             coeffs%b212*equil%fields(i+1,j,k2) + coeffs%b222*equil%fields(i+1,j+1,k2)
 
         phi = atan2(uvw(2),uvw(1))

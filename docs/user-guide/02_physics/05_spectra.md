@@ -50,7 +50,9 @@ FIDASIM can calculate the following spectra
 * Bremsstrahlung
 * Beam Emission (BES: Full, Half, Third)
 * Halo Emission
-* Fast-ion D-\(\alpha\) (FIDA)
+* Thermal Ion direct charge exchange (DCX)
+* Fast-ion D-\(\alpha\) (active and passive FIDA)
+* Cold D-\(\alpha\)
 
 ![Spectra](|media|/fidasim_spectra.png){: width="400"}
 {: style="text-align: center"}
@@ -79,7 +81,7 @@ In short, a neutral particle collides with a charged particle, exciting into a h
 When the neutral particle relaxes (\(n: 3 \rightarrow 2\)) it emits a doppler shifted (656.1 nm) photon.
 
 Charge Exchange is the process by which the Halo and FIDA light is created.
-In a charge exchange reaction a thermal (Halo) or fast (FIDA) ion steals a electron from a neutral particle.
+In a charge exchange reaction a thermal (DCX, Halo) or fast (FIDA) ion steals an electron from a neutral particle.
 The newly created neutral is born in an excited (\(n=3\) state and like the collisionally excited neutral it relaxes to a lower energy state (\n=2\) and emits a doppler shifted (656.1 nm) photon.
 
 ![Stark Splitting and Doppler Shift](|media|/stark_doppler.png){: width="400"}
@@ -106,22 +108,32 @@ where positive and negative sums refer to \(\sigma\) and \(\pi\) lines respectiv
 $$S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 1] $$
 
 # Relevant Namelist Settings
-* `calc_fida`: Calculate FIDA spectra
+* `calc_nbi`: Calculate NBI spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
+* `calc_dcx`: Calculate DCX spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
+* `calc_halo`: Calculate Halo spectra(approximate calculations if neutrals are loaded, i.e., load_neutrals=1) 
+* `calc_cold`: Calculate Cold D-alpha spectra
 * `calc_brems`: Calculate Bremsstrahlung
-* `calc_bes`: Calculate Beam Emission and Halo
-* `dump_dcx`: Dump DCX spectra
+* `calc_fida`: Calculate FIDA spectra
+* `calc_pfida`: Calculate pFIDA spectra
+* `calc_fida_wght`: Calculate FIDA weight function and emission using the weight function method
 * `n_fida`: Number of Monte Carlo particles used in FIDA spectra calculation
-* `n_nbi`: Number of Monte Carlo particles used in BES spectra calculation
-* `n_dcx` and `n_halo`: Number of particles used in Halo spectra calculation
+* `n_pfida`: Number of Monte Carlo particles used in passive FIDA spectra calculation
+* `n_nbi`: Number of Monte Carlo particles used in NBI spectra calculation
+* `n_halo`: Number of Monte Carlo particles used in Halo spectra calculation
+* `n_dcx`: Number of Monte Carlo particles used in DCX spectra calculation
+* `n_birth`: Number of Monte Carlo particles used in BIRTH calculation
 * `nlambda`: Number of wavelength bins
 * `lambdamin`: Minimum wavelength [nm]
 * `lambdamax`: Maximum wavelength [nm]
+* `nlambda_wght`: Number of wavelength bins for weights
+* `lambdamin_wght`: Minimum wavelength for weights [nm]
+* `lambdamax_wght`: Maximum wavelength for weights [nm]
 
 # Fortran References
 * [[bremsstrahlung]]: Calculates Bremsstrahlung
 * [[spectrum]]: Calculates Doppler shift and Stark splitting.
 * [[ndmc]]: Calculates BES spectra
-* [[dcx]]: Calculates DCX neutrals contribution to the Halo spectra
+* [[dcx]]: Calculates DCX neutrals contribution to the DCX spectra
 * [[halo]]: Calculates thermal neutrals contribution to the Halo Spectra
 * [[fida_f]]: Calculates FIDA light using a distribution function
 * [[fida_mc]]: Calculates FIDA light using a particle distribution

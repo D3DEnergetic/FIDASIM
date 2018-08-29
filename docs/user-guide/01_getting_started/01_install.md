@@ -105,12 +105,10 @@ user@computer:~/FIDASIM-{!../VERSION!}$ ./fidasim
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
 /_/  /___//____//_/ |_|/___//___//_/  /_/
 
-Version: 1.0.1
+Version: v2.0.0-dev
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
-
-usage: ./fidasim namelist_file [num_threads]
 ```
 Good job! You installed FIDASIM! But wait there's more.
 
@@ -118,7 +116,7 @@ Good job! You installed FIDASIM! But wait there's more.
 Calculating reaction rates on the fly is time consuming so we need to pre-compute them to save time.
 The following code snippit will generate the atomic tables using the default settings.
 The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
-In that case edit the file `tables/default_settings.dat` before running the following command
+In that case edit the file `tables/table_settings.dat` before running the following command
 
 ```bash
 ./tables/generate_tables ./tables/default_settings.dat [num_threads]
@@ -152,10 +150,10 @@ It should print out the following.
 [lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
- / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
-/_/  /___//____//_/ |_|/___//___//_/  /_/
-
-Version: 1.0.0
+ / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
+/_/  /___//____//_/ |_|/___//___//_/  /_/  
+                                           
+Version: v2.0.0-dev
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -163,17 +161,29 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
 ---- Shot settings ----
  Shot:        1
  Time: 1000 [ms]
- Runid: test_1a
-
+ Runid: test
+ 
 ---- Input files ----
- Tables file: /u/lstagner/FIDASIM/tables/atomic_tables.h5
- Geometry file: /p/fida/lstagner/TEST/test_1a_geometry.h5
- Equilibrium file: /p/fida/lstagner/TEST/test_1a_equilibrium.h5
- Distribution file: /p/fida/lstagner/TEST/test_1a_distribution.h5
-
+ Tables file: /p/fida/FIDASIM/tables/atomic_tables.h5
+ Geometry file: /p/fida/lstagner/TEST/test_geometry.h5
+ Equilibrium file: /p/fida/lstagner/TEST/test_equilibrium.h5
+ Distribution file: /p/fida/lstagner/TEST/test_distribution.h5
+ 
 ---- OpenMP settings ----
  Number of threads: 16
-
+ 
+---- Atomic tables settings ----
+ Maximum n/m:  6
+ Beam/Fast-ion mass:  2.014 [amu]
+ Thermal/Bulk-ion mass:  2.014 [amu]
+ Impurity mass: 12.011 [amu]
+ 
+---- Interpolation grid settings ----
+ Nr:  70
+ Nz: 100
+ Nphi:   1
+ dA:  4.00 [cm^2]
+ 
 ---- Beam grid settings ----
  Nx:  50
  Ny:  60
@@ -183,118 +193,136 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  beta:   0.00 [rad]
  gamma:  0.00 [rad]
  origin: [   0.00,   0.00,   0.00] [cm]
-
----- Interpolation grid settings ----
- Nr:  70
- Nz: 100
- dA: 4.10 [cm^2]
-
+ Number of cells in plasma:   184494
+ 
 ---- Neutral beam settings ----
  Beam: test_beam
  Power:    1.70 [MW]
- Voltage: 72.50 [keV]
-
----- Atomic tables settings ----
- Maximum n/m:  6
- Beam/Fast-ion mass:  2.014 [amu]
- Thermal/Bulk-ion mass:  2.014 [amu]
- Impurity mass: 12.011 [amu]
-
+ Voltage:  72.50 [keV]
+ 
 ---- Fast-ion distribution settings ----
- Distribution type: Fast-ion Density Function F(energy,pitch,R,Z)
- Nenergy =   6
- Npitch  =   6
- Energy range = [67.33, 75.44]
- Pitch  range = [-0.10, 0.10]
-
+ Distribution type: Fast-ion Density Function F(energy,pitch,R,Z,Phi)
+ Nenergy =  75
+ Npitch  =  50
+ Nr  =  70
+ Nz  = 100
+ Nphi  =   1
+ Energy range = [ 0.81,120.87]
+ Pitch  range = [-0.98, 0.98]
+ R  range = [100.00,238.00]
+ Z  range = [-100.00, 98.00]
+ Phi  range = [ 0.00, 0.00]
+ Ntotal =  1.214E+19
+ 
 ---- FIDA/BES settings ----
  FIDA/BES System: SPECTRAL
- Number of channels:   3
-
+ Number of channels:     3
+ 
 ---- NPA settings ----
  NPA System: NPA
  Number of channels:   3
- Calculating hit probabilities for NPA channels
-
-ndmc:     1:43:23
+                                                  
+ nbi:     19:06:28 --- elapsed: 0:00:23 
      # of markers:     50000
-   birth profile written to: /p/fida/lstagner/TEST/test_1a_birth.h5
-
-dcx:      1:43:41
-     # of markers:    505020
-   dcx written to: /p/fida/lstagner/TEST/test_1a_dcx.h5
-
-halo:     1:44:32
-     # of markers:    505180
-     # of markers:    310573
-     # of markers:    188148
-     # of markers:    110872
-     # of markers:     62806
-     # of markers:     32484
-     # of markers:     13881
-   neutral density written to: /p/fida/lstagner/TEST/test_1a_neutrals.h5
-
-bremsstrahlung:     1:46:25
-
-fida:     1:46:25
-     # of markers:   5049813
-
-   Spectra written to: /p/fida/lstagner/TEST/test_1a_spectra.h5
-
-npa:     1:47:46
-     # of markers:    505074
-Number of NPA particles that hit a detector:   125638
-
-   NPA data written to: /p/fida/lstagner/TEST/test_1a_npa.h5
-
-fida weight function:     1:49:46
- Number of Channels:   3
- Nlambda: 1000
- Nenergy:  50
- Npitch:  50
- Ngyro: 100
- Maximum Energy:  100.00
- LOS averaged: True
-
-   Channel:   1
+   birth profile written to: /p/fida/lstagner/TEST/test_birth.h5
+                              
+ dcx:     19:06:42 --- elapsed: 0:00:37 
+     # of markers:    500000
+                              
+ halo:    19:07:13 --- elapsed: 0:01:08 
+     # of markers:    527175 --- Seed/DCX: 1.000
+     # of markers:    672040 --- Seed/DCX: 0.600
+     # of markers:    792640 --- Seed/DCX: 0.366
+     # of markers:    873160 --- Seed/DCX: 0.225
+     # of markers:    900615 --- Seed/DCX: 0.139
+     # of markers:    913130 --- Seed/DCX: 0.086
+     # of markers:    919085 --- Seed/DCX: 0.053
+     # of markers:    921060 --- Seed/DCX: 0.033
+     # of markers:    921935 --- Seed/DCX: 0.020
+     # of markers:    922180 --- Seed/DCX: 0.013
+                              
+ write neutrals:    19:14:31 --- elapsed: 0:08:26 
+   neutral density written to: /p/fida/lstagner/TEST/test_neutrals.h5
+                              
+ cold:    19:14:35 --- elapsed: 0:08:30 
+                              
+ bremsstrahlung:    19:14:36 --- elapsed: 0:08:31 
+                              
+ fida:    19:14:36 --- elapsed: 0:08:31 
+     # of markers:   5000000
+                              
+ pfida:   19:15:19 --- elapsed: 0:09:14 
+     # of markers:  50000000
+                              
+ write spectra:    19:20:47 --- elapsed: 0:14:42 
+   Spectra written to: /p/fida/lstagner/TEST/test_spectra.h5
+                              
+ npa:     19:20:47 --- elapsed: 0:14:42 
+     # of markers:      5000000
+   Number of Active NPA particles that hit a detector:    40733
+                              
+ pnpa:     19:21:21 --- elapsed: 0:15:16 
+     # of markers:     50000000
+   Number of Passive NPA particles that hit a detector:   116510
+                              
+ write npa:    19:26:47 --- elapsed: 0:20:42 
+   NPA data written to: /p/fida/lstagner/TEST/test_npa.h5
+                              
+ neutron rate:    19:26:47 --- elapsed: 0:20:42 
+   Rate:      5.97592E+14 [neutrons/s]
+                              
+ write neutrons:    19:28:16 --- elapsed: 0:22:11 
+   Neutrons written to: /p/fida/lstagner/TEST/test_neutrons.h5
+                              
+ fida weight function:    19:28:25 --- elapsed: 0:22:20 
+  Number of Channels:     3
+  Nlambda: 1000
+  Nenergy:  50
+  Npitch:  50
+  Ngyro: 100
+  Maximum Energy:  100.00
+  LOS averaged: True
+ 
+   Channel:     1
    Radius:  200.00
-   Mean Fast-ion Density:    7.97429E+11
-
-   Channel:   2
+   Mean Fast-ion Density:    5.00757E+11
+ 
+   Channel:     2
    Radius:  170.00
-   Mean Fast-ion Density:    7.98346E+11
-
-   Channel:   3
+   Mean Fast-ion Density:    5.00757E+11
+ 
+   Channel:     3
    Radius:  140.00
-   Mean Fast-ion Density:    7.98330E+11
-
-   FIDA weights written to: /p/fida/lstagner/TEST/test_1a_fida_weights.h5
-
-npa weight function:     1:50:02
- Number of Channels:   3
- Nenergy:  50
- Npitch:  50
- Maximum energy:  100.00
-
+   Mean Fast-ion Density:    5.00757E+11
+ 
+ write fida weights:    19:28:41 --- elapsed: 0:22:36 
+   FIDA weights written to: /p/fida/lstagner/TEST/test_fida_weights.h5
+                              
+ npa weight function:    19:28:48 --- elapsed: 0:22:43 
+  Number of Channels:   3
+  Nenergy:  50
+  Npitch:  50
+  Maximum energy:  100.00
+ 
    Channel:   1
    Radius:    200.000
-   Flux:      1.22243E+14
-   Weight:    3.79893E+03
-
+   Flux:      0.00000E+00
+   Weight:    3.48351E+03
+ 
    Channel:   2
    Radius:    170.000
-   Flux:      1.07364E+14
-   Weight:    1.85565E+03
-
+   Flux:      0.00000E+00
+   Weight:    1.41572E+03
+ 
    Channel:   3
    Radius:    140.000
-   Flux:      3.46488E+13
-   Weight:    8.81099E+02
-
-   NPA weights written to: /p/fida/lstagner/TEST/test_1a_npa_weights.h5
-
-END: hour, minute, second:  1:53:07
-duration:                   0:15:53
+   Flux:      0.00000E+00
+   Weight:    8.38209E+02
+ 
+ write npa weights:    19:33:50 --- elapsed: 0:27:45 
+   NPA weights written to: /p/fida/lstagner/TEST/test_npa_weights.h5
+                              
+ END: hour:minute:second 19:33:50 --- elapsed: 0:27:45 
 ```
 
 Congratulations! You followed the instructions.

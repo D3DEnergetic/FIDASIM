@@ -1,7 +1,7 @@
 title: Devices using FIDASIM
 
 #DIII-D
-FIDASIM is being used at DIII-D for simulating and validating their FIDA and NPA diagnostics.
+FIDASIM is being used at DIII-D for simulating and validating their FIDA, NPA and neutron diagnostics.
 It it also being used in charge exchange recombination spectroscopy to validate deuterium density measurements.
 
 The routines for running a DIII-D FIDASIM run are available [here](https://github.com/D3DEnergetic/d3d-fidasim)

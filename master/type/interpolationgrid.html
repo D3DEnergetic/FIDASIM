@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 2.8% of total for derived types.</p>Including implementation: 12 statements,  2.8% of total for derived types.">12 statements</a>
+    title="<p> 3.4% of total for derived types.</p>Including implementation: 16 statements,  3.4% of total for derived types.">16 statements</a>
      </li> 
      
      
@@ -179,17 +179,25 @@
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-nr">nr</a>
       
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-nphi">nphi</a>
+      
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-nz%7E2">nz</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-dr%7E2">dr</a>
+      
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-dphi">dphi</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-dz">dz</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-da">da</a>
       
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-dv%7E2">dv</a>
+      
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-dims%7E2">dims</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-r">r</a>
+      
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-phi">phi</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-z">z</a>
       
@@ -235,7 +243,7 @@
     
     <div class="col-md-9" id='text'>
       <h2>type, public :: InterpolationGrid</h2>
-    <p>Defines a 2D R-Z grid for interpolating plasma parameters and fields</p>
+    <p>Defines a 3D R-Z-phi grid for interpolating plasma parameters and fields</p>
     
     
     
@@ -255,17 +263,25 @@
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-nr">nr</a>
       
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-nphi">nphi</a>
+      
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-nz%7E2">nz</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-dr%7E2">dr</a>
+      
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-dphi">dphi</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-dz">dz</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-da">da</a>
       
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-dv%7E2">dv</a>
+      
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-dims%7E2">dims</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-r">r</a>
+      
+      <a class="list-group-item" href="../type/interpolationgrid.html#variable-phi">phi</a>
       
       <a class="list-group-item" href="../type/interpolationgrid.html#variable-z">z</a>
       
@@ -341,6 +357,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-nphi"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nphi</strong></td><td></td><td></td><td><p>Number of phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-nz%7E2"></span>integer(kind=Int32),</td>
   
   <td>public</td>
@@ -360,6 +390,20 @@
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>dr</strong></td><td></td><td></td><td><p>Radial spacing [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dphi</strong></td><td></td><td></td><td><p>Angular spacing [rad]</p></td>
   
 </tr>
 
@@ -397,11 +441,25 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-dv%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dv</strong></td><td></td><td></td><td><p>dr<em>dz</em>dphi [<script type="math/tex">rad*cm^2</script>]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dims%7E2"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>dims</strong>(2)</td><td></td><td></td><td><p>Dimension of the interpolation grid</p></td>
+  <td><strong>dims</strong>(3)</td><td></td><td></td><td><p>Dimension of the interpolation grid</p></td>
   
 </tr>
 
@@ -416,6 +474,20 @@
   <td>public,</td>
   <td>dimension(:), allocatable</td><td>::</td>
   <td><strong>r</strong></td><td></td><td></td><td><p>Radii values [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-phi"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>phi</strong></td><td></td><td></td><td><p>Angular values [rad]</p></td>
   
 </tr>
 
@@ -478,21 +550,29 @@
     <section>
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">InterpolationGrid</span>
-    <span class="c">!+ Defines a 2D R-Z grid for interpolating plasma parameters and fields</span>
+    <span class="c">!+ Defines a 3D R-Z-phi grid for interpolating plasma parameters and fields</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nr</span>
         <span class="c">!+ Number of Radii</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nphi</span>
+        <span class="c">!+ Number of phi values</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nz</span>
         <span class="c">!+ Number of Z values</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dr</span>
         <span class="c">!+ Radial spacing [cm]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dphi</span>
+        <span class="c">!+ Angular spacing [rad]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dz</span>
         <span class="c">!+ Vertical spacing [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">da</span>
         <span class="c">!+ Grid element area [\(cm^2\)]</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">dv</span>
+        <span class="c">!+ dr*dz*dphi [\(rad*cm^2\)]</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="c">!+ Dimension of the interpolation grid</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span>   <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">r</span>
         <span class="c">!+ Radii values [cm]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span>   <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">phi</span>
+        <span class="c">!+ Angular values [rad]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span>   <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">z</span>
         <span class="c">!+ Z values [cm]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">r2d</span>

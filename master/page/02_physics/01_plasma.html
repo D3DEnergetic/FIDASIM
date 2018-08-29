@@ -143,7 +143,7 @@
 <ul>
 <li><a href="#plasma-parameters-and-fields">Plasma Parameters and Fields</a></li>
 <li><a href="#distributions">Distributions</a><ul>
-<li><a href="#guiding-center-distribution-function-feprz">Guiding Center Distribution Function: F(E,p,R,Z)</a></li>
+<li><a href="#guiding-center-distribution-function-feprzphi">Guiding Center Distribution Function: F(E,p,R,Z[,Phi])</a></li>
 <li><a href="#guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</a></li>
 <li><a href="#full-orbit-monte-carlo-distribution">Full-orbit Monte Carlo Distribution</a></li>
 </ul>
@@ -173,9 +173,7 @@ text-align: center;
 <p><img alt="" src="../../media/cross_section.png" style="float: left">
 It is common in Tokamaks to input the plasma parameters and fields as flux functions.
 However, this approach makes several assumptions that may not be true in non-tokamak devices.
-In FIDASIM the plasma parameters and fields are mapped onto a 2D R-Z grid.
-This only assumes axisymmetric profiles within the region of interest.
-In addition to plasma parameters a boolean mask is used to indicate where the plasma and fields are well defined.</p>
+The default settings of FIDASIM are to map the plasma parameters and fields onto the 2D R-Z grid. If the user inputs any Phi variable information, the plasma parameters and fields will be mapped onto a 3D R-Z-Phi cylindrical grid. Furthermore, a boolean mask is used to indicate where the plasma and fields are well defined.</p>
 <p>FIDASIM reads the plasma parameters and fields from an HDF5 file structured as follows...</p>
 <div class="codehilite"><pre><span></span>[runid]_equilibrium.h5
 ├── plasma          
@@ -213,6 +211,14 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 <td align="left">Number of z values</td>
 </tr>
 <tr>
+<td align="center"><code>nphi</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of phi values (Optional)</td>
+</tr>
+<tr>
 <td align="center"><code>r</code></td>
 <td align="center">Float64</td>
 <td align="center">1</td>
@@ -227,6 +233,14 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 <td align="center">[<code>nz</code>]</td>
 <td align="center">cm</td>
 <td align="left">Array of z values</td>
+</tr>
+<tr>
+<td align="center"><code>phi</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nphi</code>]</td>
+<td align="center">rad</td>
+<td align="left">Array of phi values (Optional)</td>
 </tr>
 <tr>
 <td align="center"><code>r2d</code></td>
@@ -293,6 +307,14 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 <td align="left">Electron density</td>
 </tr>
 <tr>
+<td align="center"><code>denn</code></td>
+<td align="center">Float64</td>
+<td align="center">2</td>
+<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">cm^-3</td>
+<td align="left">Cold neutral density</td>
+</tr>
+<tr>
 <td align="center"><code>zeff</code></td>
 <td align="center">Float64</td>
 <td align="center">2</td>
@@ -323,6 +345,22 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 <td align="center">[<code>nr</code>,<code>nz</code>]</td>
 <td align="center">cm/s</td>
 <td align="left">Z component of the bulk plasma rotation/flow</td>
+</tr>
+<tr>
+<td align="center"><code>description</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Plasma Parameters</td>
+</tr>
+<tr>
+<td align="center"><code>coordinate system</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Cylindrical</td>
 </tr>
 </tbody>
 </table>
@@ -356,6 +394,14 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 <td align="left">Number of z values</td>
 </tr>
 <tr>
+<td align="center"><code>nphi</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of phi values (Optional)</td>
+</tr>
+<tr>
 <td align="center"><code>r</code></td>
 <td align="center">Float64</td>
 <td align="center">1</td>
@@ -370,6 +416,14 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 <td align="center">[<code>nz</code>]</td>
 <td align="center">cm</td>
 <td align="left">Array of z values</td>
+</tr>
+<tr>
+<td align="center"><code>phi</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nphi</code>]</td>
+<td align="center">rad</td>
+<td align="left">Array of phi values (Optional)</td>
 </tr>
 <tr>
 <td align="center"><code>r2d</code></td>
@@ -459,6 +513,22 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 <td align="center">V/m</td>
 <td align="left">Z component of the electric field</td>
 </tr>
+<tr>
+<td align="center"><code>description</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Electromagnetic Field</td>
+</tr>
+<tr>
+<td align="center"><code>coordinate system</code></td>
+<td align="center">String</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Cylindrical</td>
+</tr>
 </tbody>
 </table>
 <h1 id="distributions">Distributions</h1>
@@ -466,13 +536,13 @@ In addition to plasma parameters a boolean mask is used to indicate where the pl
 This means that we need to input the fast-ion distribution function into FIDASIM.
 FIDASIM accepts three different types of fast-ion distributions.</p>
 <ol>
-<li>Guiding Center Distribution Function: F(E,p,R,Z)</li>
+<li>Guiding Center Distribution Function: F(E,p,R,Z[,Phi])</li>
 <li>Guiding Center Monte Carlo distribution</li>
 <li>Full-orbit Monte Carlo distribution</li>
 </ol>
 <p>Supporting different types of distributions greatly facilitates the study of fast-ion transport.</p>
 <p>FIDASIM reads the fast-ion distribution from an HDF5 file that has the following variables depending on the distribution type.</p>
-<h2 id="guiding-center-distribution-function-feprz">Guiding Center Distribution Function: F(E,p,R,Z)</h2>
+<h2 id="guiding-center-distribution-function-feprzphi">Guiding Center Distribution Function: F(E,p,R,Z[,Phi])</h2>
 <table>
 <thead>
 <tr>
@@ -510,6 +580,14 @@ FIDASIM accepts three different types of fast-ion distributions.</p>
 <td align="left">Number of z values</td>
 </tr>
 <tr>
+<td align="center"><code>nphi</code></td>
+<td align="center">Int16</td>
+<td align="center">0</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">Number of phi values (Optional)</td>
+</tr>
+<tr>
 <td align="center"><code>r</code></td>
 <td align="center">Float64</td>
 <td align="center">1</td>
@@ -524,6 +602,14 @@ FIDASIM accepts three different types of fast-ion distributions.</p>
 <td align="center">[<code>nz</code>]</td>
 <td align="center">cm</td>
 <td align="left">Array of z values</td>
+</tr>
+<tr>
+<td align="center"><code>phi</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nphi</code>]</td>
+<td align="center">cm</td>
+<td align="left">Array of phi values (Optional)</td>
 </tr>
 <tr>
 <td align="center"><code>r2d</code></td>
@@ -592,23 +678,23 @@ FIDASIM accepts three different types of fast-ion distributions.</p>
 <tr>
 <td align="center"><code>denf</code></td>
 <td align="center">Float64</td>
-<td align="center">2</td>
-<td align="center">[<code>nr</code>,<code>nz</code>]</td>
+<td align="center">3</td>
+<td align="center">[<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">cm^-3</td>
 <td align="left">Fast-ion density</td>
 </tr>
 <tr>
 <td align="center"><code>f</code></td>
 <td align="center">Float64</td>
-<td align="center">4</td>
-<td align="center">[<code>nenergy</code>,<code>npitch</code>,<code>nr</code>,<code>nz</code>]</td>
+<td align="center">5</td>
+<td align="center">[<code>nenergy</code>,<code>npitch</code>,<code>nr</code>,<code>nz</code>[,<code>nphi</code>]]</td>
 <td align="center">fast-ions/(dE dP cm^3)</td>
-<td align="left">Fast-ion distribution F(E,p,R,Z)</td>
+<td align="left">Fast-ion distribution F(E,p,R,Z[,Phi])</td>
 </tr>
 </tbody>
 </table>
-<p>The Guiding Center Distribution Function is a function of Energy, pitch, R, and Z.
-The distribution is mapped on the same R-Z grid as the plasma parameters and fields.</p>
+<p>The Guiding Center Distribution Function is a function of Energy, pitch, R, Z and Phi.
+The distribution can be mapped onto the 2D R-Z grid or 3D cylindrical grid, where the plasma parameters and fields are defined.</p>
 <h2 id="guiding-center-monte-carlo-distribution">Guiding Center Monte Carlo Distribution</h2>
 <table>
 <thead>
@@ -693,6 +779,14 @@ The distribution is mapped on the same R-Z grid as the plasma parameters and fie
 <td align="center">[<code>nparticle</code>]</td>
 <td align="center">cm</td>
 <td align="left">Z positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>phi</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">rad</td>
+<td align="left">Phi positions of the MC particle (Optional)</td>
 </tr>
 <tr>
 <td align="center"><code>energy</code></td>
@@ -799,6 +893,14 @@ If there are multiple classes of particles the FIDA signal for each class will b
 <td align="center">[<code>nparticle</code>]</td>
 <td align="center">cm</td>
 <td align="left">Z positions of the MC particle</td>
+</tr>
+<tr>
+<td align="center"><code>phi</code></td>
+<td align="center">Float64</td>
+<td align="center">1</td>
+<td align="center">[<code>nparticle</code>]</td>
+<td align="center">rad</td>
+<td align="left">Phi positions of the MC particle (Optional)</td>
 </tr>
 <tr>
 <td align="center"><code>vr</code></td>

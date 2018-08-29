@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="56.4% of total for modules and submodules.">6909 statements</a>
+    title="57.6% of total for modules and submodules.">7287 statements</a>
      </li> 
      
      
@@ -331,6 +331,8 @@
       <a class="list-group-item" href="../module/libfida.html#type-interpolcoeffs1d">InterpolCoeffs1D</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-interpolcoeffs2d">InterpolCoeffs2D</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#type-interpolcoeffs3d">InterpolCoeffs3D</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-beamgrid">BeamGrid</a>
       
@@ -594,11 +596,19 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-interpol2d_coeff_arr">interpol2D_coeff_arr</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-cyl_interpol3d_coeff">cyl_interpol3D_coeff</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-cyl_interpol3d_coeff_arr">cyl_interpol3D_coeff_arr</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-interpol1d_arr">interpol1D_arr</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-interpol2d_arr">interpol2D_arr</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-interpol2d_2d_arr">interpol2D_2D_arr</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-interpol3d_arr">interpol3D_arr</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-interpol3d_2d_arr">interpol3D_2D_arr</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-in_plasma">in_plasma</a>
       
@@ -1194,6 +1204,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-interpolcoeffs2d">InterpolCoeffs2D</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-interpolcoeffs3d">InterpolCoeffs3D</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-beamgrid">BeamGrid</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-interpolationgrid">InterpolationGrid</a>
@@ -1456,11 +1468,19 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-interpol2d_coeff_arr">interpol2D_coeff_arr</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-cyl_interpol3d_coeff">cyl_interpol3D_coeff</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-cyl_interpol3d_coeff_arr">cyl_interpol3D_coeff_arr</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-interpol1d_arr">interpol1D_arr</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-interpol2d_arr">interpol2D_arr</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-interpol2d_2d_arr">interpol2D_2D_arr</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-interpol3d_arr">interpol3D_arr</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-interpol3d_2d_arr">interpol3D_2D_arr</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-in_plasma">in_plasma</a>
       
@@ -4804,7 +4824,7 @@ public function <a href='../proc/lfs_divide.html'>lfs_divide</a>(p1, real_scalar
   
   <div class="panel-body">
     
-    <p>Calculates linear interpolation coefficients</p>
+    <p>Calculates interpolation coefficients</p>
   </div>
   
   <ul class="list-group">
@@ -5357,6 +5377,418 @@ public subroutine <a href='../proc/interpol2d_coeff_arr.html'>interpol2D_coeff_a
 
     </li>
   
+    <li class="list-group-item">
+    
+    
+    <h3>
+public subroutine <a href='../proc/cyl_interpol3d_coeff.html'>cyl_interpol3D_coeff</a>(rmin, dr, nr, zmin, dz, nz, phimin, dphi, nphi, rout, zout, phiout, c, err)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Cylindrical interpolation coefficients and indicies for a 3D grid</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rmin</strong></td><td><p>Minimum R</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dr</strong></td><td><p>R spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nr</strong></td><td><p>Number of R points</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zmin</strong></td><td><p>Minimum Z</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dz</strong></td><td><p>Z spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nz</strong></td><td><p>Number of Z points</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phimin</strong></td><td><p>Minimum phi</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dphi</strong></td><td><p>Phi spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nphi</strong></td><td><p>Number of phi points</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>c</strong></td><td><p>Interpolation Coefficients</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public subroutine <a href='../proc/cyl_interpol3d_coeff_arr.html'>cyl_interpol3D_coeff_arr</a>(r, z, phi, rout, zout, phiout, c, err)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Cylindrical interpolation coefficients and indicies for a 3D grid</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>r</strong></td><td><p>R values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>z</strong></td><td><p>Z values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>phi</strong></td><td><p>Phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>c</strong></td><td><p>Cylindrical Interpolation Coefficients</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
   
   </ul>
 </div>
@@ -5370,7 +5802,7 @@ public subroutine <a href='../proc/interpol2d_coeff_arr.html'>interpol2D_coeff_a
   
   <div class="panel-body">
     
-    <p>Performs linear/bilinear interpolation</p>
+    <p>Performs linear/bilinear/cylindrical interpolation</p>
   </div>
   
   <ul class="list-group">
@@ -5830,6 +6262,389 @@ public subroutine <a href='../proc/interpol2d_2d_arr.html'>interpol2D_2D_arr</a>
 
     </li>
   
+    <li class="list-group-item">
+    
+    
+    <h3>
+public subroutine <a href='../proc/interpol3d_arr.html'>interpol3D_arr</a>(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Performs cylindrical interpolation on a 3D grid f(r,z,phi)</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>r</strong></td><td><p>R values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>z</strong></td><td><p>Z values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>phi</strong></td><td><p>Phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>d</strong></td><td><p>Values at r,z,phi: d(r,z,phi)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dout</strong></td><td><p>Interpolant: d(rout,zout,phiout)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>coeffs</strong></td><td><p>Precomputed Linear Interpolation Coefficients</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public subroutine <a href='../proc/interpol3d_2d_arr.html'>interpol3D_2D_arr</a>(r, z, phi, f, rout, zout, phiout, fout, err, coeffs)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Performs cylindrical interpolation on a 3D grid of 2D arrays
+ f(:,:,r,z,phi)</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>r</strong></td><td><p>R values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>z</strong></td><td><p>Z values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>phi</strong></td><td><p>Phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:,:,:)</td><td>::</td>
+  <td><strong>f</strong></td><td><p>Values at r,z,phi: f(:,:,r,z,phi)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>fout</strong></td><td><p>Interpolant: f(:,:,rout,zout,phiout)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>coeffs</strong></td><td><p>Precomputed Linear Interpolation Coefficients</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
   
   </ul>
 </div>
@@ -6023,6 +6838,193 @@ public subroutine <a href='../proc/interpol2d_2d_arr.html'>interpol2D_2D_arr</a>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>b22</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i+1,j+1) term</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+     
+<div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-interpolcoeffs3d"></span><h3>type, public :: <a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>3D Cylindrical Interpolation Coefficients and indices</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-i%7E3"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>i</strong></td><td> =</td><td>0</td><td><p>Index of R before <code>xout</code></p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-j%7E2"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>j</strong></td><td> =</td><td>0</td><td><p>Index of Phi before <code>yout</code></p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-k"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>k</strong></td><td> =</td><td>0</td><td><p>Index of Z before <code>zout</code></p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b111"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b111</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i,j,k) term</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b121"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b121</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i,j+1,k) term</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b112"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b112</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i,j,k+1) term</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b122"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b122</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i,j+1,k+1) term</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b211"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b211</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i+1,j,k) term</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b212"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b212</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i+1,j,k+1) term</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b221"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b221</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i+1,j+1,k) term</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-b222"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>b222</strong></td><td> =</td><td>0.d0</td><td><p>Coefficient for z(i+1,j+1,k+1) term</p></td>
   
 </tr>
 
@@ -6457,7 +7459,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <div class="panel-body">
     
     
-    <p>Defines a 2D R-Z grid for interpolating plasma parameters and fields</p>
+    <p>Defines a 3D R-Z-phi grid for interpolating plasma parameters and fields</p>
     
      
      <h4>Components</h4>
@@ -6482,6 +7484,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>nr</strong></td><td></td><td></td><td><p>Number of Radii</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nphi"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nphi</strong></td><td></td><td></td><td><p>Number of phi values</p></td>
   
 </tr>
 
@@ -6519,6 +7535,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dphi</strong></td><td></td><td></td><td><p>Angular spacing [rad]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dz"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -6547,11 +7577,25 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-dv%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dv</strong></td><td></td><td></td><td><p>dr<em>dz</em>dphi [<script type="math/tex">rad*cm^2</script>]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dims%7E2"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>dims</strong>(2)</td><td></td><td></td><td><p>Dimension of the interpolation grid</p></td>
+  <td><strong>dims</strong>(3)</td><td></td><td></td><td><p>Dimension of the interpolation grid</p></td>
   
 </tr>
 
@@ -6566,6 +7610,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public,</td>
   <td>dimension(:), allocatable</td><td>::</td>
   <td><strong>r</strong></td><td></td><td></td><td><p>Radii values [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-phi"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>phi</strong></td><td></td><td></td><td><p>Angular values [rad]</p></td>
   
 </tr>
 
@@ -7061,11 +8119,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-c"></span>type(<a href='../type/interpolcoeffs2d.html'>InterpolCoeffs2D</a>),</td>
+  <td><span class="anchor" id="variable-b"></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>c</strong></td><td></td><td></td><td><p>Linear Interpolation Coefficients and indicies for interpolation at <code>pos</code></p></td>
+  <td><strong>b</strong></td><td></td><td></td><td><p>Cylindrical Interpolation Coefficients and indicies for interpolation at <code>pos</code></p></td>
   
 </tr>
 
@@ -7206,6 +8264,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-dbr_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dbr_dz"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -7234,6 +8306,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-dbt_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dbt_dz"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -7253,6 +8339,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>dbz_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the radial magnetic field [T/m]</p></td>
   
 </tr>
 
@@ -7407,6 +8507,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-dbr_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dbr_dz"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -7435,6 +8549,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-dbt_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dbt_dz"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -7454,6 +8582,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>dbz_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the radial magnetic field [T/m]</p></td>
   
 </tr>
 
@@ -7617,11 +8759,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-c%7E2"></span>type(<a href='../type/interpolcoeffs2d.html'>InterpolCoeffs2D</a>),</td>
+  <td><span class="anchor" id="variable-b%7E2"></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>c</strong></td><td></td><td></td><td><p>Linear Interpolation Coefficients and indicies for interpolation at <code>pos</code></p></td>
+  <td><strong>b</strong></td><td></td><td></td><td><p>Cylindrical Interpolation Coefficients and indicies for interpolation at <code>pos</code></p></td>
   
 </tr>
 
@@ -7667,7 +8809,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-fields"></span>type(<a href='../type/emfields.html'>EMFields</a>),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>fields</strong></td><td></td><td></td><td><p>Electro-magnetic fields at points defined in <a href="../module/libfida.html#variable-inter_grid">inter_grid</a></p></td>
   
 </tr>
@@ -7681,7 +8823,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-plasma"></span>type(<a href='../type/profiles.html'>Profiles</a>),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>plasma</strong></td><td></td><td></td><td><p>Plasma parameters at points defined in <a href="../module/libfida.html#variable-inter_grid">inter_grid</a></p></td>
   
 </tr>
@@ -7695,7 +8837,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-mask"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>mask</strong></td><td></td><td></td><td><p>Indicates whether fields and plasma are well-defined at points defined in <a href="../module/libfida.html#variable-inter_grid">inter_grid</a></p></td>
   
 </tr>
@@ -7719,7 +8861,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <div class="panel-body">
     
     
-    <p>Defines a Guiding Center Fast-ion Distribution Function: F(E,p,R,Z)</p>
+    <p>Defines a Guiding Center Fast-ion Distribution Function: F(E,p,R,Z,Phi)</p>
     
      
      <h4>Components</h4>
@@ -7795,6 +8937,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-nphi%7E2"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>nphi</strong></td><td></td><td></td><td><p>Number of phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-de"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -7842,6 +8998,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>dz</strong></td><td></td><td></td><td><p>Z spacing [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dphi%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dphi</strong></td><td></td><td></td><td><p>Angular spacing [rad]</p></td>
   
 </tr>
 
@@ -7935,6 +9105,132 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-rmin"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rmin</strong></td><td></td><td></td><td><p>Minimum radius [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rmax"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rmax</strong></td><td></td><td></td><td><p>Maximum radius [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-r_range"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>r_range</strong></td><td></td><td></td><td><p>Radius interval length [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zmin%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>zmin</strong></td><td></td><td></td><td><p>Minimum Z [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zmax%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>zmax</strong></td><td></td><td></td><td><p>Maximum Z [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-z_range"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>z_range</strong></td><td></td><td></td><td><p>Z interval length [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-phimin"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>phimin</strong></td><td></td><td></td><td><p>Minimum Phi [rad]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-phimax"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>phimax</strong></td><td></td><td></td><td><p>Maximum Phi [rad]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-phi_range"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>phi_range</strong></td><td></td><td></td><td><p>Phi interval length [rad]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-n_tot"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -8005,11 +9301,25 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
+  <td><span class="anchor" id="variable-phi%7E2"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>phi</strong></td><td></td><td></td><td><p>Angles [rad]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-denf%7E2"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>denf</strong></td><td></td><td></td><td><p>Fast-ion density defined on the <a href="../module/libfida.html#variable-inter_grid">inter_grid</a>: denf(R,Z)</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>denf</strong></td><td></td><td></td><td><p>Fast-ion density defined on the <a href="../module/libfida.html#variable-inter_grid">inter_grid</a>: denf(R,Z,Phi)</p></td>
   
 </tr>
 
@@ -8022,8 +9332,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-f"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
-  <td><strong>f</strong></td><td></td><td></td><td><p>Fast-ion distribution function defined on the <a href="../module/libfida.html#variable-inter_grid">inter_grid</a>: F(E,p,R,Z)</p></td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>f</strong></td><td></td><td></td><td><p>Fast-ion distribution function defined on the <a href="../module/libfida.html#variable-inter_grid">inter_grid</a>: F(E,p,R,Z,Phi)</p></td>
   
 </tr>
 
@@ -8085,6 +9395,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>r</strong></td><td> =</td><td>0.d0</td><td><p>Radial position of fast-ion [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-phi%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>phi</strong></td><td> =</td><td>0.d0</td><td><p>Angular position of fast-ion [rad]</p></td>
   
 </tr>
 
@@ -8300,6 +9624,20 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>nclass</strong></td><td> =</td><td>1</td><td><p>Number of orbit classes</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-axisym"></span>logical,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>axisym</strong></td><td> =</td><td>.True.</td><td><p>Indicates whether distribution function is axisymmetric</p></td>
   
 </tr>
 
@@ -10983,8 +12321,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-weight%7E3"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
-  <td><strong>weight</strong></td><td></td><td></td><td><p>Neutron rate weight: weight(E,p,R,Z)</p></td>
+  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>weight</strong></td><td></td><td></td><td><p>Neutron rate weight: weight(E,p,R,Z,Phi)</p></td>
   
 </tr>
 
@@ -19058,6 +20396,424 @@ public subroutine <a href='../proc/interpol2d_coeff_arr.html'>interpol2D_coeff_a
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-cyl_interpol3d_coeff"></span><h3>
+public subroutine <a href='../proc/cyl_interpol3d_coeff.html'>cyl_interpol3D_coeff</a>(rmin, dr, nr, zmin, dz, nz, phimin, dphi, nphi, rout, zout, phiout, c, err)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Cylindrical interpolation coefficients and indicies for a 3D grid</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rmin</strong></td><td><p>Minimum R</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dr</strong></td><td><p>R spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nr</strong></td><td><p>Number of R points</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zmin</strong></td><td><p>Minimum Z</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dz</strong></td><td><p>Z spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nz</strong></td><td><p>Number of Z points</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phimin</strong></td><td><p>Minimum phi</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dphi</strong></td><td><p>Phi spacing</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nphi</strong></td><td><p>Number of phi points</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>c</strong></td><td><p>Interpolation Coefficients</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-cyl_interpol3d_coeff_arr"></span><h3>
+public subroutine <a href='../proc/cyl_interpol3d_coeff_arr.html'>cyl_interpol3D_coeff_arr</a>(r, z, phi, rout, zout, phiout, c, err)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Cylindrical interpolation coefficients and indicies for a 3D grid</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>r</strong></td><td><p>R values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>z</strong></td><td><p>Z values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>phi</strong></td><td><p>Phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>c</strong></td><td><p>Cylindrical Interpolation Coefficients</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-interpol1d_arr"></span><h3>
 public subroutine <a href='../proc/interpol1d_arr.html'>interpol1D_arr</a>(x, y, xout, yout, err, coeffs)
     
@@ -19520,6 +21276,395 @@ public subroutine <a href='../proc/interpol2d_2d_arr.html'>interpol2D_2D_arr</a>
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-interpol3d_arr"></span><h3>
+public subroutine <a href='../proc/interpol3d_arr.html'>interpol3D_arr</a>(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Performs cylindrical interpolation on a 3D grid f(r,z,phi)</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>r</strong></td><td><p>R values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>z</strong></td><td><p>Z values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>phi</strong></td><td><p>Phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>d</strong></td><td><p>Values at r,z,phi: d(r,z,phi)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dout</strong></td><td><p>Interpolant: d(rout,zout,phiout)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>coeffs</strong></td><td><p>Precomputed Linear Interpolation Coefficients</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-interpol3d_2d_arr"></span><h3>
+public subroutine <a href='../proc/interpol3d_2d_arr.html'>interpol3D_2D_arr</a>(r, z, phi, f, rout, zout, phiout, fout, err, coeffs)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Performs cylindrical interpolation on a 3D grid of 2D arrays
+ f(:,:,r,z,phi)</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>r</strong></td><td><p>R values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>z</strong></td><td><p>Z values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>phi</strong></td><td><p>Phi values</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:,:,:)</td><td>::</td>
+  <td><strong>f</strong></td><td><p>Values at r,z,phi: f(:,:,r,z,phi)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rout</strong></td><td><p>R value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zout</strong></td><td><p>Z value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>phiout</strong></td><td><p>Phi value to interpolate</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>fout</strong></td><td><p>Interpolant: f(:,:,rout,zout,phiout)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(out),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>err</strong></td><td><p>Error code</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>coeffs</strong></td><td><p>Precomputed Linear Interpolation Coefficients</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-in_plasma"></span><h3>
 public subroutine <a href='../proc/in_plasma.html'>in_plasma</a>(xyz, inp, machine_coords, coeffs, uvw_out)
     
@@ -19603,7 +21748,7 @@ public subroutine <a href='../proc/in_plasma.html'>in_plasma</a>(xyz, inp, machi
   
 <tr>
   
-  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs2d.html'>InterpolCoeffs2D</a>),</td>
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
   <td>intent(out),</td>
   <td>optional</td>
   
@@ -20020,7 +22165,7 @@ public subroutine <a href='../proc/get_distribution.html'>get_distribution</a>(f
   
 <tr>
   
-  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs2d.html'>InterpolCoeffs2D</a>),</td>
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
   <td>intent(in),</td>
   <td>optional</td>
   
@@ -20155,7 +22300,7 @@ public subroutine <a href='../proc/get_ep_denf.html'>get_ep_denf</a>(energy, pit
   
 <tr>
   
-  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs2d.html'>InterpolCoeffs2D</a>),</td>
+  <td><span class="anchor" ></span>type(<a href='../type/interpolcoeffs3d.html'>InterpolCoeffs3D</a>),</td>
   <td>intent(in),</td>
   <td>optional</td>
   

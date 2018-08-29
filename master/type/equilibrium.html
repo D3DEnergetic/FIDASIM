@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 1.2% of total for derived types.</p>Including implementation: 5 statements,  1.2% of total for derived types.">5 statements</a>
+    title="<p> 1.1% of total for derived types.</p>Including implementation: 5 statements,  1.1% of total for derived types.">5 statements</a>
      </li> 
      
      
@@ -389,7 +389,7 @@
   <td><span class="anchor" id="variable-fields"></span>type(<a href='../type/emfields.html'>EMFields</a>),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>fields</strong></td><td></td><td></td><td><p>Electro-magnetic fields at points defined in <a href="../module/libfida.html#variable-inter_grid">inter_grid</a></p></td>
   
 </tr>
@@ -403,7 +403,7 @@
   <td><span class="anchor" id="variable-plasma"></span>type(<a href='../type/profiles.html'>Profiles</a>),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>plasma</strong></td><td></td><td></td><td><p>Plasma parameters at points defined in <a href="../module/libfida.html#variable-inter_grid">inter_grid</a></p></td>
   
 </tr>
@@ -417,7 +417,7 @@
   <td><span class="anchor" id="variable-mask"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>mask</strong></td><td></td><td></td><td><p>Indicates whether fields and plasma are well-defined at points defined in <a href="../module/libfida.html#variable-inter_grid">inter_grid</a></p></td>
   
 </tr>
@@ -440,11 +440,11 @@
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">Equilibrium</span>
     <span class="c">!+MHD Equilbrium</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">EMFields</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fields</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">EMFields</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electro-magnetic fields at points defined in [[libfida:inter_grid]]</span>
-    <span class="k">type</span><span class="p">(</span><span class="n">Profiles</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">plasma</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">Profiles</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">plasma</span>
         <span class="c">!+ Plasma parameters at points defined in [[libfida:inter_grid]]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">mask</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">mask</span>
         <span class="c">!+ Indicates whether fields and plasma are well-defined at points defined in [[libfida:inter_grid]]</span>
 <span class="k">end type </span><span class="n">Equilibrium</span>
 </pre></div>

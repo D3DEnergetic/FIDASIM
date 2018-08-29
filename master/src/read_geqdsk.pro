@@ -186,20 +186,19 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi
     er=-(shift(epot,-1,0) - shift(epot,1,0))/(g.r[2]-g.r[0])
     ez1=-(shift(epot,0,-1) - shift(epot,0,1))/(g.z[2]-g.z[0])
 
-    ;; Interpolate cylindrical fields onto (r,w) mesh
-    b_r=dblarr(grid.nr,grid.nz) & b_t=b_r & b_z=b_r
-    e_r=dblarr(grid.nr,grid.nz) & e_t=e_r & e_z=e_r
+    ;; Interpolate cylindrical fields onto (r,w,phi) mesh
+    b_r=dblarr(grid.nr,grid.nz,grid.nphi) & b_t=b_r & b_z=b_r
+    e_r=dblarr(grid.nr,grid.nz,grid.nphi) & e_t=e_r & e_z=e_r
 
     for i=0L,grid.nr-1 do for j=0L,grid.nz-1 do begin
             rgrid=(.01*grid.r2d[i,j] - g.r[0])/(g.r[1]-g.r[0]) ; in grid units
             zgrid=(.01*grid.z2d[i,j] - g.z[0])/(g.z[1]-g.z[0])    ; WWH 3/31/07
-            b_r[i,j]  =interpolate(br,[rgrid],[zgrid])
-            e_r[i,j]  =interpolate(er,[rgrid],[zgrid])
-            b_t[i,j]  =interpolate(bphi,[rgrid],[zgrid])
-            e_z[i,j]  =interpolate(ez1,[rgrid],[zgrid])
-            b_z[i,j]  =interpolate(bz1,[rgrid],[zgrid])
+            b_r[i,j,*]  =interpolate(br,[rgrid],[zgrid])
+            e_r[i,j,*]  =interpolate(er,[rgrid],[zgrid])
+            b_t[i,j,*]  =interpolate(bphi,[rgrid],[zgrid])
+            e_z[i,j,*]  =interpolate(ez1,[rgrid],[zgrid])
+            b_z[i,j,*]  =interpolate(bz1,[rgrid],[zgrid])
     endfor
-
     flux = fluxgrid
     mask = in_vessel(100*g.lim[0,*],100*g.lim[1,*],grid.r2d,grid.z2d)
 

@@ -269,7 +269,10 @@ If there are no mirrors then <code>sigma_pi</code> is set to 1.0 .</p>
 <li>Bremsstrahlung</li>
 <li>Beam Emission (BES: Full, Half, Third)</li>
 <li>Halo Emission</li>
-<li>Fast-ion D-<script type="math/tex">\alpha</script> (FIDA)</li>
+<li>Thermal Ion direct charge exchange (DCX)</li>
+<li>Fast-ion D-<script type="math/tex">\alpha</script> (active and passive FIDA)</li>
+<li>Cold D-<script type="math/tex">\alpha</script>
+</li>
 </ul>
 <p style="text-align: center"><img alt="Spectra" src="../../media/fidasim_spectra.png" width="400"></p>
 <h2 id="bremsstrahlung">Bremsstrahlung</h2>
@@ -291,7 +294,7 @@ The gaunt factor, <script type="math/tex">g</script>, depends on <script type="m
 In short, a neutral particle collides with a charged particle, exciting into a higher energy (<script type="math/tex">n=3</script>) state.
 When the neutral particle relaxes (<script type="math/tex">n: 3 \rightarrow 2</script>) it emits a doppler shifted (656.1 nm) photon.</p>
 <p>Charge Exchange is the process by which the Halo and FIDA light is created.
-In a charge exchange reaction a thermal (Halo) or fast (FIDA) ion steals a electron from a neutral particle.
+In a charge exchange reaction a thermal (DCX, Halo) or fast (FIDA) ion steals an electron from a neutral particle.
 The newly created neutral is born in an excited (<script type="math/tex">n=3</script> state and like the collisionally excited neutral it relaxes to a lower energy state (\n=2) and emits a doppler shifted (656.1 nm) photon.</p>
 <p style="text-align: center"><img alt="Stark Splitting and Doppler Shift" src="../../media/stark_doppler.png" width="400"></p>
 <p><img _=";" alt="Stark Splitting" src="../../media/stark_splitting.png" style="float: right" width="250">
@@ -315,23 +318,33 @@ For the Balmer-alpha transition, this creates 15 distinct transitions from the <
 </p>
 <h1 id="relevant-namelist-settings">Relevant Namelist Settings</h1>
 <ul>
-<li><code>calc_fida</code>: Calculate FIDA spectra</li>
+<li><code>calc_nbi</code>: Calculate NBI spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)</li>
+<li><code>calc_dcx</code>: Calculate DCX spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)</li>
+<li><code>calc_halo</code>: Calculate Halo spectra(approximate calculations if neutrals are loaded, i.e., load_neutrals=1) </li>
+<li><code>calc_cold</code>: Calculate Cold D-alpha spectra</li>
 <li><code>calc_brems</code>: Calculate Bremsstrahlung</li>
-<li><code>calc_bes</code>: Calculate Beam Emission and Halo</li>
-<li><code>dump_dcx</code>: Dump DCX spectra</li>
+<li><code>calc_fida</code>: Calculate FIDA spectra</li>
+<li><code>calc_pfida</code>: Calculate pFIDA spectra</li>
+<li><code>calc_fida_wght</code>: Calculate FIDA weight function and emission using the weight function method</li>
 <li><code>n_fida</code>: Number of Monte Carlo particles used in FIDA spectra calculation</li>
-<li><code>n_nbi</code>: Number of Monte Carlo particles used in BES spectra calculation</li>
-<li><code>n_dcx</code> and <code>n_halo</code>: Number of particles used in Halo spectra calculation</li>
+<li><code>n_pfida</code>: Number of Monte Carlo particles used in passive FIDA spectra calculation</li>
+<li><code>n_nbi</code>: Number of Monte Carlo particles used in NBI spectra calculation</li>
+<li><code>n_halo</code>: Number of Monte Carlo particles used in Halo spectra calculation</li>
+<li><code>n_dcx</code>: Number of Monte Carlo particles used in DCX spectra calculation</li>
+<li><code>n_birth</code>: Number of Monte Carlo particles used in BIRTH calculation</li>
 <li><code>nlambda</code>: Number of wavelength bins</li>
 <li><code>lambdamin</code>: Minimum wavelength [nm]</li>
 <li><code>lambdamax</code>: Maximum wavelength [nm]</li>
+<li><code>nlambda_wght</code>: Number of wavelength bins for weights</li>
+<li><code>lambdamin_wght</code>: Minimum wavelength for weights [nm]</li>
+<li><code>lambdamax_wght</code>: Maximum wavelength for weights [nm]</li>
 </ul>
 <h1 id="fortran-references">Fortran References</h1>
 <ul>
 <li><a href="../../proc/bremsstrahlung.html">bremsstrahlung</a>: Calculates Bremsstrahlung</li>
 <li><a href="../../proc/spectrum.html">spectrum</a>: Calculates Doppler shift and Stark splitting.</li>
 <li><a href="../../proc/ndmc.html">ndmc</a>: Calculates BES spectra</li>
-<li><a href="../../proc/dcx.html">dcx</a>: Calculates DCX neutrals contribution to the Halo spectra</li>
+<li><a href="../../proc/dcx.html">dcx</a>: Calculates DCX neutrals contribution to the DCX spectra</li>
 <li><a href="../../proc/halo.html">halo</a>: Calculates thermal neutrals contribution to the Halo Spectra</li>
 <li><a href="../../proc/fida_f.html">fida_f</a>: Calculates FIDA light using a distribution function</li>
 <li><a href="../../proc/fida_mc.html">fida_mc</a>: Calculates FIDA light using a particle distribution</li>

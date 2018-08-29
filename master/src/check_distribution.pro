@@ -45,17 +45,18 @@ PRO check_distribution, inp, grid, dist
             nen = dist.nenergy
             nr = grid.nr
             nz = grid.nz
+            nphi = grid.nphi
             zero_string = {dims:0, type:'STRING'}
             zero_int = {dims:0, type:'INT'}
             zero_double = {dims:0, type:'DOUBLE'}
-            nrnz_double = {dims:[nr,nz], type:'DOUBLE'}
+            nrnznphi_double = {dims:[nr,nz,nphi], type:'DOUBLE'}
             schema = {type:zero_int, $
                       nenergy:zero_int, $
                       npitch:zero_int, $
                       energy:{dims:[nen], type:'DOUBLE'},$
                       pitch:{dims:[np], type:'DOUBLE'}, $
-                      denf:nrnz_double, $ 
-                      f:{dims:[nen,np,nr,nz], type:'DOUBLE'}, $
+                      denf:nrnznphi_double, $ 
+                      f:{dims:[nen,np,nr,nz,nphi], type:'DOUBLE'}, $
                       time:zero_double, $
                       data_source:zero_string}
 

@@ -349,7 +349,7 @@ def line_basis(r0, v0):
     R = tb_zyx(alpha,beta,0.0)
     return R
 
-def rz_grid(rmin, rmax, nr, zmin, zmax, nz):
+def rz_grid(rmin, rmax, nr, zmin, zmax, nz, phimin=0.0, phimax=0.0, nphi=1):
     """
     #+#rz_grid
     #+Creates interpolation grid
@@ -365,20 +365,28 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz):
     #+
     #+    **zmax**: Maximum Z value [cm]
     #+
-    #+    **nz**: Number of z values
+    #+    **nz**: Number of Z values
+    #+
+    #+    **phimin**: Minimum Phi value [rad]
+    #+
+    #+    **phimax**: Maximum Phi value [rad]
+    #+
+    #+    **nphi**: Number of Phi values 
     #+
     #+##Return Value
     #+Interpolation grid dictionary
     #+
     #+##Example Usage
     #+```python
-    #+>>> grid = rz_grid(0,200.0,200,-100,100,200)
+    #+>>> grid = rz_grid(0,200.0,200,-100,100,200,phimin=4*np.pi/3,phimax=5*np.pi/3,nphi=5)
     #+```
     """
-    dr = (rmax - rmin) / (nr - 1)
-    dz = (zmax - zmin) / (nz - 1)
+    dr = (rmax - rmin) / nr
+    dz = (zmax - zmin) / nz
+    dphi = (phimax - phimin) / nphi
     r = rmin + dr * np.arange(nr, dtype=np.float64)
     z = zmin + dz * np.arange(nz, dtype=np.float64)
+    phi = phimin + dphi * np.arange(nphi, dtype=np.float64)
 
     r2d = np.tile(r, (nz, 1)).T
     z2d = np.tile(z, (nr, 1))
@@ -387,8 +395,10 @@ def rz_grid(rmin, rmax, nr, zmin, zmax, nz):
             'z2d': z2d,
             'r': r,
             'z': z,
+            'phi': phi,
             'nr': nr,
-            'nz': nz}
+            'nz': nz,
+            'nphi': nphi}
 
     return grid
 

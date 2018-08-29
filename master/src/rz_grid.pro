@@ -1,4 +1,4 @@
-FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz
+FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi
     ;+#rz_grid
     ;+Creates interpolation grid
     ;+***
@@ -20,19 +20,25 @@ FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> grid = rz_grid(0,200.0,200,-100,100,200)
+    ;+IDL> grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100, phimin=4*!dpi/3, phimax=5*!dpi/3, nphi=5)
     ;+```
 
-    dr = (rmax-rmin)/(nr-1)
-    dz = (zmax-zmin)/(nz-1)
+    if not keyword_set(phimin) then phimin = 0.0 ;rad
+    if not keyword_set(phimax) then phimax = 0.0 ;rad
+    if not keyword_set(nphi) then nphi = 1
+
+    dr = (rmax-rmin)/nr
+    dz = (zmax-zmin)/nz
+    dphi = (phimax-phimin)/(nphi)
     r = rmin + dr*dindgen(nr)
     z = zmin + dz*dindgen(nz)
+    phi = phimin + dphi*dindgen(nphi)
 
     r2d = r # replicate(1,nz)
     z2d = replicate(1,nr) # z
 
 
-    grid = {r2d:r2d,z2d:z2d,r:r,z:z,nr:nr,nz:nz}
+    grid = {r2d:r2d,z2d:z2d,r:r,z:z,phi:phi,nr:nr,nz:nz,nphi:nphi}
     
     return, grid
 END

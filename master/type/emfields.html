@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 3.3% of total for derived types.</p>Including implementation: 14 statements,  3.3% of total for derived types.">14 statements</a>
+    title="<p> 3.7% of total for derived types.</p>Including implementation: 17 statements,  3.7% of total for derived types.">17 statements</a>
      </li> 
      
      
@@ -191,13 +191,19 @@
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbr_dr">dbr_dr</a>
       
+      <a class="list-group-item" href="../type/emfields.html#variable-dbr_dphi">dbr_dphi</a>
+      
       <a class="list-group-item" href="../type/emfields.html#variable-dbr_dz">dbr_dz</a>
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbt_dr">dbt_dr</a>
       
+      <a class="list-group-item" href="../type/emfields.html#variable-dbt_dphi">dbt_dphi</a>
+      
       <a class="list-group-item" href="../type/emfields.html#variable-dbt_dz">dbt_dz</a>
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbz_dr">dbz_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbz_dphi">dbz_dphi</a>
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbz_dz">dbz_dz</a>
       
@@ -357,13 +363,19 @@
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbr_dr">dbr_dr</a>
       
+      <a class="list-group-item" href="../type/emfields.html#variable-dbr_dphi">dbr_dphi</a>
+      
       <a class="list-group-item" href="../type/emfields.html#variable-dbr_dz">dbr_dz</a>
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbt_dr">dbt_dr</a>
       
+      <a class="list-group-item" href="../type/emfields.html#variable-dbt_dphi">dbt_dphi</a>
+      
       <a class="list-group-item" href="../type/emfields.html#variable-dbt_dz">dbt_dz</a>
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbz_dr">dbz_dr</a>
+      
+      <a class="list-group-item" href="../type/emfields.html#variable-dbz_dphi">dbz_dphi</a>
       
       <a class="list-group-item" href="../type/emfields.html#variable-dbz_dz">dbz_dz</a>
       
@@ -519,6 +531,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-dbr_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbr_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dbr_dz"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -547,6 +573,20 @@
   
 <tr>
   
+  <td><span class="anchor" id="variable-dbt_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbt_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the torodial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
   <td><span class="anchor" id="variable-dbt_dz"></span>real(kind=Float64),</td>
   
   <td>public</td>
@@ -566,6 +606,20 @@
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>dbz_dr</strong></td><td> =</td><td>0.d0</td><td><p>Radial derivative of the radial magnetic field [T/m]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbz_dphi"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dbz_dphi</strong></td><td> =</td><td>0.d0</td><td><p>Angular derivative of the radial magnetic field [T/m]</p></td>
   
 </tr>
 
@@ -615,14 +669,20 @@
         <span class="c">!+ Vertical electric field [V/m]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbr_dr</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Radial derivative of the radial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbr_dphi</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Angular derivative of the radial magnetic field [T/m]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbr_dz</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Vertical derivative of the radial magnetic field [T/m]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbt_dr</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Radial derivative of the torodial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbt_dphi</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Angular derivative of the torodial magnetic field [T/m]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbt_dz</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Vertical derivative of the torodial magnetic field [T/m]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbz_dr</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Radial derivative of the radial magnetic field [T/m]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbz_dphi</span> <span class="o">=</span> <span class="mf">0.d0</span>
+        <span class="c">!+ Angular derivative of the radial magnetic field [T/m]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dbz_dz</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Vertical derivative of the vertical magnetic field [T/m]</span>
 <span class="k">end type </span><span class="n">EMFields</span>

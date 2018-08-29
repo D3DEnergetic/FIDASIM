@@ -157,6 +157,7 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     ;; ------points outside the separatrix
     nr=grid.nr
     nz=grid.nz
+    nphi=grid.nphi
     rgrid=grid.r
     zgrid=grid.z
     dr = abs(rgrid[1]-rgrid[0])
@@ -218,6 +219,9 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     denf = denf*(ntot/ntot_denf)
     ntot_fbm = (2*!dpi*dr*dz*dE*dP)*total(rgrid*total(total(total(fbm_grid,1),1),2))
     fbm_grid = fbm_grid*(ntot/ntot_fbm)
+
+    denf=rebin(denf,nr,nz,nphi)
+    fbm_grid=rebin(fbm_grid,nenergy,npitch,nr,nz,nphi)
 
     fbm_struct={type:1,time:time,nenergy:fix(nenergy),energy:energy,npitch:fix(npitch),$
                 pitch:pitch,f:fbm_grid,denf:denf,data_source:file_expand_path(filename)}

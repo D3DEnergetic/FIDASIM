@@ -67,7 +67,7 @@ FUNCTION nubeam_geometry, nubeam, angle=angle, verbose=verbose,plot=plot
     if where(tag_names(nubeam) eq 'NLJCCW') ge 0 then begin
         if nubeam.nljccw eq 0 then nubeam.nljccw = -1
     endif else begin
-        warn("Current orientation not specified. Assuming Counter-clockwise.")
+        warn,'Current orientation not specified. Assuming Counter-clockwise.'
         nubeam = create_struct(nubeam, 'NLJCCW', 1)
     endelse
 

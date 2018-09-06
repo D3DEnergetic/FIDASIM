@@ -10988,7 +10988,7 @@ program fidasim
     else
         if(inputs%calc_beam.ge.1) then
             !! ----------- BEAM NEUTRALS ---------- !!
-            if(inputs%calc_nbi_dens) then
+            if(inputs%calc_nbi_dens.ge.1) then
                 if(inputs%verbose.ge.1) then
                     write(*,*) 'nbi:     ' , time(time_start)
                 endif

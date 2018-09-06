@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p>11.4% of total for derived types.</p>Including implementation: 53 statements, 11.4% of total for derived types.">53 statements</a>
+    title="<p>12.0% of total for derived types.</p>Including implementation: 56 statements, 12.0% of total for derived types.">56 statements</a>
      </li> 
      
      
@@ -214,6 +214,12 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_spec">calc_spec</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_beam">calc_beam</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_nbi_dens">calc_nbi_dens</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_dcx_dens">calc_dcx_dens</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_halo_dens">calc_halo_dens</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_brems">calc_brems</a>
       
@@ -372,6 +378,12 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_spec">calc_spec</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_beam">calc_beam</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_nbi_dens">calc_nbi_dens</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_dcx_dens">calc_dcx_dens</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_halo_dens">calc_halo_dens</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-calc_brems">calc_brems</a>
       
@@ -748,7 +760,49 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>calc_beam</strong></td><td></td><td></td><td><p>Calculate neutral beam: 0 = off, 1=on</p></td>
+  <td><strong>calc_beam</strong></td><td></td><td></td><td><p>Calculate beam densities: 0 = off, 1=on</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_nbi_dens"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>calc_nbi_dens</strong></td><td></td><td></td><td><p>Calculate neutral beam density: 0 = off, 1=on</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_dcx_dens"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>calc_dcx_dens</strong></td><td></td><td></td><td><p>Calculate Direct Charge Exchange (DCX) density: 0 = off, 1=on</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_halo_dens"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>calc_halo_dens</strong></td><td></td><td></td><td><p>Calculate Thermal Halo density: 0 = off, 1=on</p></td>
   
 </tr>
 
@@ -1260,7 +1314,13 @@
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_spec</span>
         <span class="c">!+ Calculate spectra: 0 = off, 1=on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_beam</span>
-        <span class="c">!+ Calculate neutral beam: 0 = off, 1=on</span>
+        <span class="c">!+ Calculate beam densities: 0 = off, 1=on</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_nbi_dens</span>
+        <span class="c">!+ Calculate neutral beam density: 0 = off, 1=on</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_dcx_dens</span>
+        <span class="c">!+ Calculate Direct Charge Exchange (DCX) density: 0 = off, 1=on</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_halo_dens</span>
+        <span class="c">!+ Calculate Thermal Halo density: 0 = off, 1=on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_brems</span>
         <span class="c">!+ Calculate bremmstruhlung: 0 = off, 1=on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">calc_nbi</span>

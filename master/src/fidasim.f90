@@ -929,7 +929,13 @@ type SimulationInputs
     integer(Int32) :: calc_spec
         !+ Calculate spectra: 0 = off, 1=on
     integer(Int32) :: calc_beam
-        !+ Calculate neutral beam: 0 = off, 1=on
+        !+ Calculate beam densities: 0 = off, 1=on
+    integer(Int32) :: calc_nbi_dens
+        !+ Calculate neutral beam density: 0 = off, 1=on
+    integer(Int32) :: calc_dcx_dens
+        !+ Calculate Direct Charge Exchange (DCX) density: 0 = off, 1=on
+    integer(Int32) :: calc_halo_dens
+        !+ Calculate Thermal Halo density: 0 = off, 1=on
     integer(Int32) :: calc_brems
         !+ Calculate bremmstruhlung: 0 = off, 1=on
     integer(Int32) :: calc_nbi
@@ -1896,12 +1902,30 @@ subroutine read_inputs
         inputs%calc_spec=0
     endif
 
-    if((calc_nbi+calc_dcx+calc_halo+&
-        calc_fida+calc_npa+calc_birth+&
+    inputs%calc_beam = 0
+    if((calc_nbi+calc_birth+calc_dcx+&
+        calc_halo+calc_fida+calc_npa+&
         calc_fida_wght+calc_npa_wght).gt.0) then
+        inputs%calc_nbi_dens=1
         inputs%calc_beam=1
     else
-        inputs%calc_beam=0
+        inputs%calc_nbi_dens=0
+    endif
+
+    if((calc_dcx+calc_halo+calc_fida+calc_npa+&
+        calc_fida_wght+calc_npa_wght).gt.0) then
+        inputs%calc_dcx_dens=1
+        inputs%calc_beam=1
+    else
+        inputs%calc_dcx_dens=0
+    endif
+
+    if((calc_halo+calc_fida+calc_npa+&
+        calc_fida_wght+calc_npa_wght).gt.0) then
+        inputs%calc_halo_dens=1
+        inputs%calc_beam=1
+    else
+        inputs%calc_halo_dens=0
     endif
 
     inputs%calc_brems=calc_brems
@@ -1920,6 +1944,7 @@ subroutine read_inputs
     inputs%load_neutrals=load_neutrals
     inputs%verbose=verbose
     inputs%no_flr = no_flr
+    inputs%split = split
 
     !!Monte Carlo Settings
     inputs%n_fida=max(10,n_fida)
@@ -2704,7 +2729,9 @@ subroutine read_equilibrium
         write(*,'(a)') '---- Interpolation grid settings ----'
         write(*,'(T2,"Nr: ",i3)') inter_grid%nr
         write(*,'(T2,"Nz: ",i3)') inter_grid%nz
-        write(*,'(T2,"Nphi: ",i3)') inter_grid%nphi
+        if(inter_grid%nphi.gt.1) then
+            write(*,'(T2,"Nphi: ",i3)') inter_grid%nphi
+        endif
         write(*,'(T2,"dA: ", f5.2," [cm^2]")') inter_grid%da
         write(*,*) ''
     endif
@@ -2949,17 +2976,25 @@ subroutine read_f(fid, error)
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T2,"Distribution type: ",a)') "Fast-ion Density Function F(energy,pitch,R,Z,Phi)"
+        if(fbm%nphi.gt.1) then
+            write(*,'(T2,"Distribution type: ",a)') "Non-axisymmetric Fast-ion Density Function F(energy,pitch,R,Z,Phi)"
+        else
+            write(*,'(T2,"Distribution type: ",a)') "Axisymmetric Fast-ion Density Function F(energy,pitch,R,Z)"
+        endif
         write(*,'(T2,"Nenergy = ",i3)') fbm%nenergy
         write(*,'(T2,"Npitch  = ",i3)') fbm%npitch
         write(*,'(T2,"Nr  = ",i3)') fbm%nr
         write(*,'(T2,"Nz  = ",i3)') fbm%nz
-        write(*,'(T2,"Nphi  = ",i3)') fbm%nphi
+        if(fbm%nphi.gt.1) then
+            write(*,'(T2,"Nphi  = ",i3)') fbm%nphi
+        endif
         write(*,'(T2,"Energy range = [",f5.2,",",f6.2,"]")') fbm%emin,fbm%emax
         write(*,'(T2,"Pitch  range = [",f5.2,",",f5.2,"]")') fbm%pmin,fbm%pmax
         write(*,'(T2,"R  range = [",f6.2,",",f6.2,"]")') fbm%rmin,fbm%rmax
         write(*,'(T2,"Z  range = [",f7.2,",",f6.2,"]")') fbm%zmin,fbm%zmax
-        write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
+        if(fbm%nphi.gt.1) then
+            write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') fbm%phimin,fbm%phimax
+        endif
         write(*,'(T2,"Ntotal = ",ES10.3)') fbm%n_tot
         write(*,*) ''
     endif
@@ -2982,7 +3017,7 @@ subroutine read_mc(fid, error)
     type(LocalEMFields) :: fields
     integer :: cnt,num
     logical :: inp,path_valid
-    character(len=32) :: dist_type_name = ''
+    character(len=50) :: dist_type_name = ''
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Fast-ion distribution settings ----'
@@ -3022,12 +3057,20 @@ subroutine read_mc(fid, error)
     endif
 
     if(inputs%dist_type.eq.2) then
-        dist_type_name = "Guiding Center Monte Carlo"
+        if(particles%axisym) then
+            dist_type_name = "Axisymmetric Guiding Center Monte Carlo"
+        else
+            dist_type_name = "Non-axisymmetric Guiding Center Monte Carlo"
+        endif
         call h5ltread_dataset_double_f(fid, "/energy", particles%fast_ion%energy, dims, error)
         call h5ltread_dataset_double_f(fid, "/pitch", particles%fast_ion%pitch, dims, error)
         particles%fast_ion%vabs  = sqrt(particles%fast_ion%energy/(v2_to_E_per_amu*inputs%ab))
     else
-        dist_type_name = "Full Orbit Monte Carlo"
+        if(particles%axisym) then
+            dist_type_name = "Axisymmetric Full Orbit Monte Carlo"
+        else
+            dist_type_name = "Non-axisymmetric Full Orbit Monte Carlo"
+        endif
         call h5ltread_dataset_double_f(fid, "/vr", particles%fast_ion%vr, dims, error)
         call h5ltread_dataset_double_f(fid, "/vt", particles%fast_ion%vt, dims, error)
         call h5ltread_dataset_double_f(fid, "/vz", particles%fast_ion%vz, dims, error)
@@ -3900,39 +3943,45 @@ subroutine write_neutrals
     dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz]
     d(1) =1
     call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
-         neut%full, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/hdens", 4, dims, &
-         neut%half, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/tdens", 4, dims, &
-         neut%third, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/dcxdens", 4, dims, &
-         neut%dcx, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
-         neut%halo, error)
-
-    !Write attributes
     call h5ltset_attribute_string_f(fid,"/nlevel","description", &
          "Number of atomic energy levels", error)
-    call h5ltset_attribute_string_f(fid,"/fdens","description", &
-         "Neutral density for the full energy component of the beam: fdens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
 
-    call h5ltset_attribute_string_f(fid,"/hdens","description", &
-         "Neutral density for the half energy component of the beam: hdens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/hdens","units","neutrals*cm^-3",error)
+    if(inputs%calc_nbi.ge.1) then
+        call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
+             neut%full, error)
+        call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/hdens", 4, dims, &
+             neut%half, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/tdens", 4, dims, &
+             neut%third, error)
 
-    call h5ltset_attribute_string_f(fid,"/tdens","description", &
-         "Neutral density for the third energy component of the beam: tdens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
+        call h5ltset_attribute_string_f(fid,"/fdens","description", &
+             "Neutral density for the full energy component of the beam: fdens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/hdens","description", &
+             "Neutral density for the half energy component of the beam: hdens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/hdens","units","neutrals*cm^-3",error)
+        call h5ltset_attribute_string_f(fid,"/tdens","description", &
+             "Neutral density for the third energy component of the beam: tdens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
+    endif
 
-    call h5ltset_attribute_string_f(fid,"/dcxdens","description", &
-         "Direct Charge Exchange (DCX) neutral density: dcxdens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/dcxdens","units","neutrals*cm^-3",error)
+    if(inputs%calc_dcx.ge.1) then
+        call h5ltmake_compressed_dataset_double_f(fid, "/dcxdens", 4, dims, &
+             neut%dcx, error)
 
-    call h5ltset_attribute_string_f(fid,"/halodens","description", &
-         "Neutral density of the beam halo: halodens(level,x,y,z)", error)
-    call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
+        call h5ltset_attribute_string_f(fid,"/dcxdens","description", &
+             "Direct Charge Exchange (DCX) neutral density: dcxdens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/dcxdens","units","neutrals*cm^-3",error)
+    endif
+
+    if(inputs%calc_halo.ge.1) then
+        call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
+             neut%halo, error)
+
+        call h5ltset_attribute_string_f(fid,"/halodens","description", &
+             "Neutral density of the beam halo: halodens(level,x,y,z)", error)
+        call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
+    endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description", &
@@ -4873,7 +4922,7 @@ subroutine read_neutrals
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(4) :: dims
     integer :: error,nx,ny,nz
-    logical :: exis
+    logical :: exis,fatal_error
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- loading neutrals ----'
@@ -4904,26 +4953,72 @@ subroutine read_neutrals
     call h5ltread_dataset_int_scalar_f(gid,"nz", nz, error)
     call h5gclose_f(gid, error)
 
+    fatal_error = .False.
     if((nx.ne.beam_grid%nx).or. &
        (ny.ne.beam_grid%ny).or. &
        (nz.ne.beam_grid%nz)) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_NEUTRALS: Neutrals file has incompatable grid dimensions'
         endif
-        stop
+        fatal_error = .True.
     endif
 
+    !Check to make sure the neutrals file has all the needed neutrals
+    call h5ltpath_valid_f(fid, "/fdens", .True., exis, error)
+    if((.not.exis).and.(inputs%calc_nbi_dens.ge.1)) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_NEUTRALS: Full energy neutral density is not in the neutrals file'
+        endif
+        fatal_error = .True.
+    endif
+    call h5ltpath_valid_f(fid, "/hdens", .True., exis, error)
+    if((.not.exis).and.(inputs%calc_nbi_dens.ge.1)) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_NEUTRALS: Half energy neutral density is not in the neutrals file'
+        endif
+        fatal_error = .True.
+    endif
+    call h5ltpath_valid_f(fid, "/tdens", .True., exis, error)
+    if((.not.exis).and.(inputs%calc_nbi_dens.ge.1)) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_NEUTRALS: Third energy neutral density is not in the neutrals file'
+        endif
+        fatal_error = .True.
+    endif
+    call h5ltpath_valid_f(fid, "/dcxdens", .True., exis, error)
+    if((.not.exis).and.(inputs%calc_dcx_dens.ge.1)) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_NEUTRALS: Direct Charge Exchange (DCX) neutral density is not in the neutrals file'
+        endif
+        fatal_error = .True.
+    endif
+    call h5ltpath_valid_f(fid, "/halodens", .True., exis, error)
+    if((.not.exis).and.(inputs%calc_halo_dens.ge.1)) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'READ_NEUTRALS: Thermal Halo neutral density is not in the neutrals file'
+        endif
+        fatal_error = .True.
+    endif
+
+    if(fatal_error) stop
+
     dims = [nlevs, nx, ny, nz]
-    call h5ltread_dataset_double_f(fid,"/fdens", &
-         neut%full, dims, error)
-    call h5ltread_dataset_double_f(fid,"/hdens", &
-         neut%half, dims, error)
-    call h5ltread_dataset_double_f(fid,"/tdens", &
-         neut%third, dims, error)
-    call h5ltread_dataset_double_f(fid,"/dcxdens", &
-         neut%dcx, dims, error)
-    call h5ltread_dataset_double_f(fid,"/halodens", &
-         neut%halo, dims, error)
+    if(inputs%calc_nbi_dens.ge.1) then
+        call h5ltread_dataset_double_f(fid,"/fdens", &
+             neut%full, dims, error)
+        call h5ltread_dataset_double_f(fid,"/hdens", &
+             neut%half, dims, error)
+        call h5ltread_dataset_double_f(fid,"/tdens", &
+             neut%third, dims, error)
+    endif
+    if(inputs%calc_dcx_dens.ge.1) then
+        call h5ltread_dataset_double_f(fid,"/dcxdens", &
+             neut%dcx, dims, error)
+    endif
+    if(inputs%calc_halo_dens.ge.1) then
+        call h5ltread_dataset_double_f(fid,"/halodens", &
+             neut%halo, dims, error)
+    endif
 
     !Close file
     call h5fclose_f(fid, error)
@@ -10893,38 +10988,52 @@ program fidasim
     else
         if(inputs%calc_beam.ge.1) then
             !! ----------- BEAM NEUTRALS ---------- !!
-            if(inputs%verbose.ge.1) then
-                write(*,*) 'nbi:     ' , time(time_start)
+            if(inputs%calc_nbi_dens.ge.1) then
+                if(inputs%verbose.ge.1) then
+                    write(*,*) 'nbi:     ' , time(time_start)
+                endif
+                call ndmc
+                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+
+                if(inputs%calc_birth.eq.1)then
+                    if(inputs%verbose.ge.1) then
+                        write(*,*) 'write birth:    ' , time(time_start)
+                    endif
+                    call write_birth_profile()
+                endif
+                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
             endif
-            call ndmc
-            if(inputs%calc_birth.eq.1)then
-                call write_birth_profile()
-            endif
-            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
             !! ---------- DCX (Direct charge exchange) ---------- !!
-            if(inputs%verbose.ge.1) then
-                write(*,*) 'dcx:     ' , time(time_start)
+            if(inputs%calc_dcx_dens.ge.1) then
+                if(inputs%verbose.ge.1) then
+                    write(*,*) 'dcx:     ' , time(time_start)
+                endif
+                call dcx()
+                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
             endif
-            call dcx()
-            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
             !! ---------- HALO ---------- !!
-            if(inputs%verbose.ge.1) then
-                write(*,*) 'halo:    ' , time(time_start)
+            if(inputs%calc_halo_dens.ge.1) then
+                if(inputs%verbose.ge.1) then
+                    write(*,*) 'halo:    ' , time(time_start)
+                endif
+                call halo()
+                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
             endif
-            call halo()
+
             !! ---------- WRITE NEUTRALS ---------- !!
-            if(inputs%verbose.ge.1) then
-                write(*,'(30X,a)') ''
-                write(*,*) 'write neutrals:    ' , time(time_start)
-            endif
+            if((inputs%calc_nbi+inputs%calc_dcx+inputs%calc_halo).ge.1) then
+                if(inputs%verbose.ge.1) then
+                    write(*,*) 'write neutrals:    ' , time(time_start)
+                endif
 #ifdef _MPI
-            if(my_rank().eq.0) call write_neutrals()
+                if(my_rank().eq.0) call write_neutrals()
 #else
-            call write_neutrals()
+                call write_neutrals()
 #endif
-            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            endif
         endif
     endif
 

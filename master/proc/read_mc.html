@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.0% of total for procedures.">121 statements</a>
+    title=" 1.1% of total for procedures.">129 statements</a>
      </li> 
      
      
@@ -825,7 +825,7 @@ public subroutine read_mc(fid, error)
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">cnt</span><span class="p">,</span><span class="n">num</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">inp</span><span class="p">,</span><span class="n">path_valid</span>
-    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dist_type_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dist_type_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;---- Fast-ion distribution settings ----&#39;</span>
@@ -865,12 +865,20 @@ public subroutine read_mc(fid, error)
     <span class="n">endif</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Guiding Center Monte Carlo&quot;</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Axisymmetric Guiding Center Monte Carlo&quot;</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Non-axisymmetric Guiding Center Monte Carlo&quot;</span>
+        <span class="n">endif</span>
         <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/energy&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
         <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/pitch&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
         <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="p">))</span>
     <span class="k">else</span>
-<span class="k">        </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Full Orbit Monte Carlo&quot;</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Axisymmetric Full Orbit Monte Carlo&quot;</span>
+        <span class="k">else</span>
+<span class="k">            </span><span class="n">dist_type_name</span> <span class="o">=</span> <span class="s2">&quot;Non-axisymmetric Full Orbit Monte Carlo&quot;</span>
+        <span class="n">endif</span>
         <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vr&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vr</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
         <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vt&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vt</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
         <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/vz&quot;</span><span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vz</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>

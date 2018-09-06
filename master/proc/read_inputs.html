@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.0% of total for procedures.">232 statements</a>
+    title=" 2.1% of total for procedures.">247 statements</a>
      </li> 
      
      
@@ -606,12 +606,30 @@ public subroutine read_inputs()
 <span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_spec</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">endif</span>
 
-    <span class="k">if</span><span class="p">((</span><span class="n">calc_nbi</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">calc_halo</span><span class="o">+</span><span class="p">&amp;</span>
-        <span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_npa</span><span class="o">+</span><span class="n">calc_birth</span><span class="o">+</span><span class="p">&amp;</span>
+    <span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">calc_nbi</span><span class="o">+</span><span class="n">calc_birth</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="p">&amp;</span>
+        <span class="n">calc_halo</span><span class="o">+</span><span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_npa</span><span class="o">+</span><span class="p">&amp;</span>
         <span class="n">calc_fida_wght</span><span class="o">+</span><span class="n">calc_npa_wght</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span><span class="o">=</span><span class="mi">1</span>
+<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi_dens</span><span class="o">=</span><span class="mi">1</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span><span class="o">=</span><span class="mi">1</span>
     <span class="k">else</span>
-<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi_dens</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">((</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">calc_halo</span><span class="o">+</span><span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_npa</span><span class="o">+</span><span class="p">&amp;</span>
+        <span class="n">calc_fida_wght</span><span class="o">+</span><span class="n">calc_npa_wght</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx_dens</span><span class="o">=</span><span class="mi">1</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span><span class="o">=</span><span class="mi">1</span>
+    <span class="k">else</span>
+<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx_dens</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">((</span><span class="n">calc_halo</span><span class="o">+</span><span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_npa</span><span class="o">+</span><span class="p">&amp;</span>
+        <span class="n">calc_fida_wght</span><span class="o">+</span><span class="n">calc_npa_wght</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo_dens</span><span class="o">=</span><span class="mi">1</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span><span class="o">=</span><span class="mi">1</span>
+    <span class="k">else</span>
+<span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo_dens</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">endif</span>
 
     <span class="n">inputs</span><span class="p">%</span><span class="n">calc_brems</span><span class="o">=</span><span class="n">calc_brems</span>
@@ -630,6 +648,7 @@ public subroutine read_inputs()
     <span class="n">inputs</span><span class="p">%</span><span class="n">load_neutrals</span><span class="o">=</span><span class="n">load_neutrals</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">no_flr</span> <span class="o">=</span> <span class="n">no_flr</span>
+    <span class="n">inputs</span><span class="p">%</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span>
 
     <span class="c">!!Monte Carlo Settings</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">n_fida</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="n">n_fida</span><span class="p">)</span>

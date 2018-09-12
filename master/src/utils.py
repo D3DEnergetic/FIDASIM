@@ -887,7 +887,7 @@ def extract_transp_plasma(filename, intime, grid, flux,
 
     max_flux = max(abs(rho))
 
-    mask = np.zeros(s,dtype='int')
+    mask = np.zeros(dims,dtype='int')
     w = np.where(flux <= max_flux) #where we have profiles
     mask[w] = 1
 

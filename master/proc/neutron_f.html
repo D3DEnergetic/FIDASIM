@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.5% of total for procedures.">61 statements</a>
+    title=" 0.6% of total for procedures.">65 statements</a>
      </li> 
      
      
@@ -1582,8 +1582,10 @@ public subroutine neutron_f()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vnet_square</span><span class="p">,</span> <span class="n">factor</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">s</span><span class="p">,</span> <span class="n">c</span>
 
-    <span class="k">allocate</span><span class="p">(</span><span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nphi</span><span class="p">))</span>
-    <span class="n">neutron</span><span class="p">%</span><span class="n">weight</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_neutron</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        allocate</span><span class="p">(</span><span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">nphi</span><span class="p">))</span>
+        <span class="n">neutron</span><span class="p">%</span><span class="n">weight</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="n">endif</span>
 
     <span class="n">ngamma</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="c">!$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&amp;</span>
@@ -1629,9 +1631,11 @@ public subroutine neutron_f()
 
                             <span class="c">!! Get neutron production rate</span>
                             <span class="k">call </span><span class="n">get_neutron_rate</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">erel</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>
-                            <span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">ie</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">,</span><span class="n">iphi</span><span class="p">)</span> <span class="o">=</span> <span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">ie</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">,</span><span class="n">iphi</span><span class="p">)</span> <span class="p">&amp;</span>
-                                                        <span class="o">+</span> <span class="n">rate</span><span class="o">*</span><span class="n">factor</span>
                             <span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span><span class="o">*</span><span class="n">fbm</span><span class="p">%</span><span class="n">f</span><span class="p">(</span><span class="n">ie</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">,</span><span class="n">iphi</span><span class="p">)</span><span class="o">*</span><span class="n">factor</span>
+                            <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_neutron</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                                </span><span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">ie</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">,</span><span class="n">iphi</span><span class="p">)</span> <span class="o">=</span> <span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">(</span><span class="n">ie</span><span class="p">,</span><span class="n">ip</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">iz</span><span class="p">,</span><span class="n">iphi</span><span class="p">)</span> <span class="p">&amp;</span>
+                                                                 <span class="o">+</span> <span class="n">rate</span><span class="o">*</span><span class="n">factor</span>
+                            <span class="n">endif</span>
 
                             <span class="c">!! Store neutrons</span>
                             <span class="k">call </span><span class="n">store_neutrons</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
@@ -1645,7 +1649,7 @@ public subroutine neutron_f()
 
 <span class="cp">#ifdef _MPI</span>
     <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">neutron</span><span class="p">%</span><span class="n">rate</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_neutron</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">neutron</span><span class="p">%</span><span class="n">weight</span><span class="p">)</span>
 <span class="cp">#endif</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>

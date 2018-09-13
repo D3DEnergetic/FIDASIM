@@ -963,7 +963,7 @@ type SimulationInputs
     integer(Int32) :: calc_birth
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
-        !+ Calculate neutron flux: 0 = off, 1=on
+        !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
     integer(Int32) :: no_flr
         !+ Turns off Finite Larmor Radius effects: 0=off, 1=on
     integer(Int32) :: split
@@ -4572,7 +4572,7 @@ subroutine write_neutrons
     endif
     call h5ltset_attribute_string_f(fid,"/rate","units","neutrons/s",error )
 
-    if(inputs%dist_type.eq.1) then
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neutron.ge.2)) then
         dim1(1) = 1
         call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
@@ -9984,8 +9984,10 @@ subroutine neutron_f
     real(Float64)  :: vnet_square, factor
     real(Float64)  :: s, c
 
-    allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
-    neutron%weight = 0.d0
+    if(inputs%calc_neutron.ge.2) then
+        allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
+        neutron%weight = 0.d0
+    endif
 
     ngamma = 20
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
@@ -10031,9 +10033,11 @@ subroutine neutron_f
 
                             !! Get neutron production rate
                             call get_neutron_rate(plasma, erel, rate)
-                            neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
-                                                        + rate*factor
                             rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
+                            if(inputs%calc_neutron.ge.2) then
+                                neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
+                                                                 + rate*factor
+                            endif
 
                             !! Store neutrons
                             call store_neutrons(rate)
@@ -10047,7 +10051,7 @@ subroutine neutron_f
 
 #ifdef _MPI
     call parallel_sum(neutron%rate)
-    call parallel_sum(neutron%weight)
+    if(inputs%calc_neutron.ge.2) call parallel_sum(neutron%weight)
 #endif
 
     if(inputs%verbose.ge.1) then

@@ -496,7 +496,7 @@ in the <script type="math/tex">n=1</script> state colliding with a fully strippe
                                                     <span class="mf">2.614113716d-1</span> <span class="p">]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">e</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span>
 
-    <span class="n">e</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">eb</span><span class="o">*</span><span class="mf">1.d3</span><span class="p">,</span><span class="mi">1</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">eb</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="mf">1.d3</span> <span class="c">!set lower limit to be 1keV</span>
     <span class="n">l</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">4.d5</span><span class="p">)</span> <span class="k">then</span>

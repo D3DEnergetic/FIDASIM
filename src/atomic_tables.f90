@@ -2590,7 +2590,7 @@ function B5_cx_1_adas(eb) result(sigma)
                                                     2.614113716d-1 ]
     real(Float64) :: e, l, p
 
-    e = max(eb*1.d3,10.0)
+    e = max(eb,1.0)*1.d3 !set lower limit to be 1keV
     l = log10(e)
 
     if(e.le.4.d5) then

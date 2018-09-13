@@ -15,6 +15,9 @@ TABLES_DIR = $(FIDASIM_DIR)/tables
 LIB_DIR = $(FIDASIM_DIR)/lib
 DOCS_DIR = $(FIDASIM_DIR)/docs
 
+#Operating Systems
+OS := $(shell uname)
+
 #Compilers
 SUPPORTED_FC = gfortran pgf90 ifort
 SUPPORTED_CC = gcc pgcc
@@ -53,7 +56,12 @@ endif
 # HDF5 variables
 HDF5_LIB = $(DEPS_DIR)/hdf5/lib
 HDF5_INCLUDE = $(DEPS_DIR)/hdf5/include
-HDF5_FLAGS = -L$(HDF5_LIB) -Wl,-Bstatic -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -Wl,-Bdynamic -lz -ldl
+ifeq ($(OS),Linux)
+	HDF5_FLAGS = -L$(HDF5_LIB) -Wl,-Bstatic -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -Wl,-Bdynamic -lz -ldl
+endif
+ifeq ($(OS),Darwin)
+	HDF5_FLAGS = -L/usr/lib -L$(HDF5_LIB) -lhdf5_fortran -lhdf5hl_fortran -lhdf5_hl -lhdf5 -lz -ldl -Wl,-rpath,$(HDF5_LIB)
+endif
 
 ifneq ($(findstring gfortran, $(FC)),)
         L_FLAGS = -lm

@@ -8,7 +8,7 @@ summary: ![FIDASIM](|media|/fidasim-logo.png)
 author: Luke Stagner
 author_description: ORISE Postdoctoral Fellow stationed at General Atomics
 github: https://github.com/lstagner
-email: lstagner@uci.edu
+email: stagnerl@fusion.gat.com
 docmark: +
 source: true
 graph: true

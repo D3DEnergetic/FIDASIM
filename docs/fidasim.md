@@ -6,7 +6,7 @@ project_download: https://github.com/D3DEnergetic/FIDASIM/releases
 summary: ![FIDASIM](|media|/fidasim-logo.png)
          {: style="text-align: center" }
 author: Luke Stagner
-author_description: ORISE Postdoctoral Fellow stationed at General Atomics
+author_description: ORISE Postdoctoral Fellow
 github: https://github.com/lstagner
 email: stagnerl@fusion.gat.com
 docmark: +

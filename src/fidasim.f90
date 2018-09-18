@@ -10164,7 +10164,6 @@ subroutine neutron_mc
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
         write(*,*) 'write neutrons:    ' , time(time_start)
-        write(*,'(30X,a)') ''
     endif
 
 #ifdef _MPI

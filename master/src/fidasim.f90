@@ -7519,12 +7519,13 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     states = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
     dens   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
 
-    if ((minval(states).lt.0).or.(minval(dens).lt.0)) then
-        do n=1,nlevs
-            if(states(n).lt.0) states(n)=0.d0
-            if(dens(n).lt.0) dens(n)=0.d0
-        enddo
-    endif
+    where (states.lt.0)
+        states = 0.d0
+    endwhere
+
+    where (dens.lt.0)
+        dens = 0.d0
+    endwhere
 
     photons=dens(3)*tables%einstein(2,3) !! - [Ph/(s*cm^3)] - !!
 

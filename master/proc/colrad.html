@@ -1058,12 +1058,13 @@ public subroutine colrad(plasma, i_type, vn, dt, states, dens, photons)
     <span class="n">states</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">eigvec</span><span class="p">,</span> <span class="n">coef</span> <span class="o">*</span> <span class="n">exp_eigval_dt</span><span class="p">)</span>  <span class="c">![neutrals/cm^3/s]!</span>
     <span class="n">dens</span>   <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">eigvec</span><span class="p">,</span><span class="n">coef</span><span class="o">*</span><span class="p">(</span><span class="n">exp_eigval_dt</span><span class="o">-</span><span class="mf">1.d0</span><span class="p">)</span><span class="o">/</span><span class="n">eigval</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">((</span><span class="nb">minval</span><span class="p">(</span><span class="n">states</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">or</span><span class="p">.(</span><span class="nb">minval</span><span class="p">(</span><span class="n">dens</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">        do </span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nlevs</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">states</span><span class="p">(</span><span class="n">n</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="n">states</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">=</span><span class="mf">0.d0</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">dens</span><span class="p">(</span><span class="n">n</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="n">dens</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">=</span><span class="mf">0.d0</span>
-        <span class="n">enddo</span>
-    <span class="n">endif</span>
+    <span class="k">where</span> <span class="p">(</span><span class="n">states</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="n">endwhere</span>
+
+    <span class="k">where</span> <span class="p">(</span><span class="n">dens</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dens</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="n">endwhere</span>
 
     <span class="n">photons</span><span class="o">=</span><span class="n">dens</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">einstein</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="c">!! - [Ph/(s*cm^3)] - !!</span>
 

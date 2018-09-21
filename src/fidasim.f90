@@ -258,6 +258,10 @@ type InterpolationGrid
         !+ 2D R grid [cm]
     real(Float64), dimension(:,:), allocatable :: z2d
         !+ 2D Z grid [cm]
+    integer(Int32) :: ntrack
+        !+ Maximum number of cell for particle tracking
+    integer(Int32) :: ngrid
+        !+ Number of cells
 end type InterpolationGrid
 
 type Profiles
@@ -5750,6 +5754,28 @@ subroutine uvw_to_xyz(uvw,xyz)
 
 end subroutine uvw_to_xyz
 
+subroutine cyl_to_uvw(cyl, uvw)
+    !+ Convert cylindrical coordinate `cyl` to machine coordinate `uvw`
+    real(Float64), dimension(3), intent(in)  :: cyl
+    real(Float64), dimension(3), intent(out) :: uvw
+
+    uvw(1) = cyl(1) * cos(cyl(3))
+    uvw(2) = cyl(1) * sin(cyl(3))
+    uvw(3) = cyl(2)
+
+end subroutine cyl_to_uvw
+
+subroutine uvw_to_cyl(uvw,cyl)
+    !+ Convert machine coordinate `uvw` to cylindrical coordinate `cyl`
+    real(Float64), dimension(3), intent(in)  :: uvw
+    real(Float64), dimension(3), intent(out) :: cyl
+
+    cyl(1) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
+    cyl(2) = uvw(3)
+    cyl(3) = atan2(uvw(2),uvw(1))
+
+end subroutine uvw_to_cyl
+
 subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
     !+ Calculates a particles intersection length with the [[libfida:beam_grid]]
     real(Float64), dimension(3), intent(in)           :: r0
@@ -6008,6 +6034,37 @@ subroutine get_indices(pos, ind)
 
 end subroutine get_indices
 
+subroutine get_inter_grid_indices(pos, ind)
+    !+ Find closests [[libfida:inter_grid]] indices `ind` to position `pos`
+    real(Float64),  dimension(3), intent(in)  :: pos
+        !+ Position [cm]
+    integer(Int32), dimension(3), intent(out) :: ind
+        !+ Closest indices to position
+
+    real(Float64),  dimension(3) :: mini, differentials
+    integer(Int32), dimension(3) :: maxind
+    integer :: i
+
+    maxind(1) = inter_grid%nr
+    maxind(2) = inter_grid%nz
+    maxind(3) = inter_grid%nphi
+
+    mini(1) = minval(inter_grid%r)
+    mini(2) = minval(inter_grid%z)
+    mini(3) = minval(inter_grid%phi)
+
+    differentials(1) = inter_grid%dr
+    differentials(2) = inter_grid%dz
+    differentials(3) = inter_grid%dphi
+
+    do i=1,3
+        ind(i) = floor((pos(i)-mini(i))/differentials(i)) + 1
+        if (ind(i).gt.maxind(i)) ind(i)=maxind(i)
+        if (ind(i).lt.1) ind(i)=1
+    enddo
+
+end subroutine get_inter_grid_indices
+
 subroutine get_position(ind, pos)
     !+ Get position `pos` given [[libfida:beam_grid]] indices `ind`
     integer(Int32), dimension(3), intent(in) :: ind
@@ -6020,6 +6077,33 @@ subroutine get_position(ind, pos)
     pos(3) = beam_grid%zc(ind(3))
 
 end subroutine get_position
+
+subroutine get_inter_grid_position(ind, pos, machine_coords)
+    !+ Get position `pos` given [[libfida:inter_grid]] indices `ind`
+    integer(Int32), dimension(3), intent(in) :: ind
+        !+ [[libfida:inter_grid]] indices
+    real(Float64), dimension(3), intent(out) :: pos
+        !+ Position [cm]
+    logical, intent(in), optional            :: machine_coords
+        !+ Indicator for `pos` to be in machine coordinates
+
+    real(Float64), dimension(3) :: pos_temp
+    logical :: mc
+    if(present(machine_coords)) mc = machine_coords
+
+    pos_temp(1) = inter_grid%r(ind(1))
+    pos_temp(2) = inter_grid%z(ind(2))
+    pos_temp(3) = inter_grid%phi(ind(3))
+
+!!! Maybe take this out
+    if(mc) then
+        call cyl_to_uvw(pos_temp, pos)
+    else
+        pos = pos_temp
+    endif
+!!! End
+
+end subroutine get_inter_grid_position
 
 subroutine track(rin, vin, tracks, ntrack, los_intersect)
     !+ Computes the path of a neutral through the [[libfida:beam_grid]]
@@ -6128,6 +6212,116 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     endif
 
 end subroutine track
+
+subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
+    !+ Computes the path of a neutral through the [[libfida:beam_grid]]
+    real(Float64), dimension(3), intent(in)          :: rin
+        !+ Initial position of particle
+    real(Float64), dimension(3), intent(in)          :: vin
+        !+ Initial velocity of particle
+    type(ParticleTrack), dimension(:), intent(inout) :: tracks
+        !+ Array of [[ParticleTrack]] type
+    integer(Int32), intent(out)                      :: ntrack
+        !+ Number of cells that a particle crosses
+    logical, intent(out), optional                   :: los_intersect
+        !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
+
+    integer :: cc, i, ii, mind,ncross
+    integer, dimension(3) :: ind
+    logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
+    real(Float64) :: dT, dt1, inv_50
+    real(Float64), dimension(3) :: dt_arr, dr
+    real(Float64), dimension(3) :: vn, inv_vn
+    real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
+    integer, dimension(3) :: sgn
+    integer, dimension(3) :: gdims
+    integer, dimension(1) :: minpos
+
+    vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
+
+    if(dot_product(vin,vin).eq.0.0) then
+        return
+    endif
+
+    gdims(1) = beam_grid%nx
+    gdims(2) = beam_grid%ny
+    gdims(3) = beam_grid%nz
+
+    !! define actual cell
+    call get_indices(ri,ind)
+    ri_cell = [beam_grid%xc(ind(1)), &
+               beam_grid%yc(ind(2)), &
+               beam_grid%zc(ind(3))]
+
+    do i=1,3
+        if (vn(i).gt.0.0) sgn(i) = 1
+        if (vn(i).lt.0.0) sgn(i) =-1
+        if (vn(i).eq.0.0) vn(i)  = 1.0d-3
+    enddo
+
+    dr = beam_grid%dr*sgn
+    inv_vn = 1/vn
+    inv_50 = 1.0/50.0
+    cc=1
+    los_inter = .False.
+    tracks%time = 0.d0
+    tracks%flux = 0.d0
+    ncross = 0
+    call in_plasma(ri,in_plasma1)
+    track_loop: do i=1,beam_grid%ntrack
+        if(cc.gt.beam_grid%ntrack) exit track_loop
+
+        if((spec_chords%inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
+            .and.(.not.los_inter))then
+            los_inter = .True.
+        endif
+        dt_arr = abs(( (ri_cell + 0.5*dr) - ri)*inv_vn)
+        minpos = minloc(dt_arr)
+        mind = minpos(1)
+        dT = dt_arr(mind)
+        ri_tmp = ri + dT*vn
+        call in_plasma(ri_tmp,in_plasma2)
+        if(in_plasma1.neqv.in_plasma2) then
+            dt1 = 0.0
+            track_fine: do ii=1,50
+                dt1 = dt1 + dT*inv_50
+                ri_tmp = ri + vn*dt1
+                call in_plasma(ri_tmp,in_plasma_tmp)
+                if(in_plasma2.eqv.in_plasma_tmp) exit track_fine
+            enddo track_fine
+            tracks(cc)%pos = ri + 0.5*dt1*vn
+            tracks(cc+1)%pos = ri + 0.5*(dt1 + dT)*vn
+            tracks(cc)%time = dt1
+            tracks(cc+1)%time = dT - dt1
+            tracks(cc)%ind = ind
+            tracks(cc+1)%ind = ind
+            cc = cc + 2
+            ncross = ncross + 1
+        else
+            tracks(cc)%pos = ri + 0.5*dT*vn
+            tracks(cc)%time = dT
+            tracks(cc)%ind = ind
+            cc = cc + 1
+        endif
+        in_plasma1 = in_plasma2
+
+        ri = ri + dT*vn
+        ind(mind) = ind(mind) + sgn(mind)
+        ri_cell(mind) = ri_cell(mind) + dr(mind)
+
+        if (ind(mind).gt.gdims(mind)) exit track_loop
+        if (ind(mind).lt.1) exit track_loop
+        if (ncross.ge.2) then
+            cc = cc - 1 !dont include last segment
+            exit track_loop
+        endif
+    enddo track_loop
+    ntrack = cc-1
+    if(present(los_intersect)) then
+        los_intersect = los_inter
+    endif
+
+end subroutine track_cylindrical
 
 !============================================================================
 !---------------------------Interpolation Routines---------------------------
@@ -8023,6 +8217,48 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
 
 end subroutine get_nlaunch
 
+subroutine get_nlaunch_inter_grid(nr_markers,papprox, nlaunch)
+    !+ Sets the number of MC markers launched from each [[libfida:inter_grid]] cell
+    integer(Int64), intent(in)                    :: nr_markers
+        !+ Approximate total number of markers to launch
+    real(Float64), dimension(:,:,:), intent(in)   :: papprox
+        !+ [[libfida:inter_grid]] cell weights
+    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+        !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
+
+    logical, dimension(inter_grid%nr,inter_grid%nz,inter_grid%nphi) :: mask
+    real(Float64), dimension(inter_grid%ngrid) :: cdf
+    integer  :: c, i, j, k, nc, nm, ind(3)
+    integer  :: nmin = 5
+    integer, dimension(1) :: randomi
+    type(rng_type) :: r
+
+    !! Fill in minimum number of markers per cell
+    nlaunch = 0
+    mask = papprox.gt.0.0
+    where(mask)
+        nlaunch = nmin
+    endwhere
+
+    !! If there are any left over distribute according to papprox
+    nc = count(mask)
+    if(nr_markers.gt.(nmin*nc)) then
+        nm = nr_markers - nmin*nc
+
+        !! precalculate cdf to save time
+        call cumsum(reshape(papprox,[inter_grid%ngrid]), cdf)
+        !! use the same seed for all processes
+        call rng_init(r, 932117)
+        do c=1, nm
+            call randind_cdf(r, cdf, randomi)
+            call ind2sub(inter_grid%dims, randomi(1), ind)
+            i = ind(1) ; j = ind(2) ; k = ind(3)
+            nlaunch(i,j,k) = nlaunch(i,j,k) + 1
+        enddo
+    endif
+
+end subroutine get_nlaunch_inter_grid
+
 subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
     !+ Calculates velocity vector from pitch, gyroangle and fields
     real(Float64), intent(in)                :: pitch
@@ -8209,6 +8445,45 @@ subroutine mc_fastion(ind,fields,eb,ptch,denf)
     ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
 
 end subroutine mc_fastion
+
+subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf)
+    !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:inter_grid]] index
+    integer, dimension(3), intent(in) :: ind
+        !+ [[libfida:inter_grid]] index
+    type(LocalEMFields), intent(out)       :: fields
+        !+ Electromagnetic fields at the guiding center
+    real(Float64), intent(out)             :: eb
+        !+ Energy of the fast ion
+    real(Float64), intent(out)             :: ptch
+        !+ Pitch of the fast ion
+    real(Float64), intent(out)             :: denf
+        !+ Fast-ion density at guiding center
+
+    real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
+    real(Float64), dimension(3) :: rg
+    real(Float64), dimension(3) :: randomu3
+    integer, dimension(2,1) :: ep_ind
+
+    call randu(randomu3)
+    rg(1) = inter_grid%r(ind(1)) + 0.5 * inter_grid%dr + inter_grid%dr * (randomu3(1) - 0.5)
+    rg(2) = inter_grid%z(ind(2)) + 0.5 * inter_grid%dz + inter_grid%dz * (randomu3(2) - 0.5)
+    !!! Not sure how to handle the axisymmetric case here
+    rg(3) = inter_grid%phi(ind(3)) + 0.5 * inter_grid%dphi + inter_grid%dphi * (randomu3(3) - 0.5)
+    !!! End
+    denf=0.d0
+
+    !!! Still have to attend to all of these things
+    call get_fields(fields,pos=rg)
+    if(.not.fields%in_plasma) return
+
+    call get_distribution(fbeam,denf,pos=rg, coeffs=fields%b)
+    call randind(fbeam,ep_ind)
+    call randu(randomu3)
+    eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
+    ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
+    !!! End
+
+end subroutine mc_fastion_inter_grid
 
 subroutine mc_halo(ind,vhalo,ri,plasma_in)
     !+ Sample thermal Maxwellian distribution at [[libfida:beam_grid]] indices `ind`

@@ -85,7 +85,7 @@ contains
     sizeA = size(A,1)
 
     if (numranks>1) then
-        nbytes = c_sizeof(A)
+        nbytes = Float64*sizeA
         if (nbytes.gt.max_bytes) then
             h = int(sizeA/2)
             call parallel_sum_d1(A(1:h))
@@ -111,7 +111,7 @@ contains
     sizeA = size(A,1)*size(A,2)
 
     if (numranks>1) then
-        nbytes = c_sizeof(A)
+        nbytes = Float64*sizeA
         if (nbytes.gt.max_bytes) then
             h = int(sizeA/2)
             call c_f_pointer(c_loc(A), A_ptr, [sizeA])
@@ -138,7 +138,7 @@ contains
     sizeA = size(A,1)*size(A,2)*size(A,3)
 
     if (numranks>1) then
-        nbytes = c_sizeof(A)
+        nbytes = Float64*sizeA
         if (nbytes.gt.max_bytes) then
             h = int(sizeA/2)
             call c_f_pointer(c_loc(A), A_ptr, [sizeA])
@@ -165,7 +165,7 @@ contains
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)
 
     if (numranks>1) then
-        nbytes = c_sizeof(A)
+        nbytes = Float64*sizeA
         if (nbytes.gt.max_bytes) then
             h = int(sizeA/2)
             call c_f_pointer(c_loc(A), A_ptr, [sizeA])
@@ -192,7 +192,7 @@ contains
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)*size(A,5)
 
     if (numranks>1) then
-        nbytes = c_sizeof(A)
+        nbytes = Float64*sizeA
         if (nbytes.gt.max_bytes) then
             h = int(sizeA/2)
             call c_f_pointer(c_loc(A), A_ptr, [sizeA])
@@ -234,7 +234,7 @@ contains
     sizeA = size(A,1)
 
     if (numranks>1) then
-        nbytes = c_sizeof(A)
+        nbytes = kind(1)*sizeA
         if (nbytes.gt.max_bytes) then
             h = int(sizeA/2)
             call parallel_sum_i1(A(1:h))
@@ -260,7 +260,7 @@ contains
     sizeA = size(A,1)*size(A,2)
 
     if (numranks>1) then
-        nbytes = c_sizeof(A)
+        nbytes = kind(1)*sizeA
         if (nbytes.gt.max_bytes) then
             h = int(sizeA/2)
             call c_f_pointer(c_loc(A), A_ptr, [sizeA])

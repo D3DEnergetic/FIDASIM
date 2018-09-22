@@ -6,6 +6,7 @@ USE HDF5 !! Base HDF5
 USE hdf5_utils !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, linsolve
 USE utilities
+USE ISO_C_BINDING
 #ifdef _MPI
 USE mpi_utils
 #endif
@@ -7858,7 +7859,7 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell
     integer(Int64), intent(in)                    :: nr_markers
         !+ Approximate total number of markers to launch
-    real(Float64), dimension(:,:,:), intent(in)   :: papprox
+    real(Float64), dimension(:,:,:), target, intent(in)   :: papprox
         !+ [[libfida:beam_grid]] cell weights
     integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
@@ -7869,6 +7870,7 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
     integer  :: nmin = 5
     integer, dimension(1) :: randomi
     type(rng_type) :: r
+    real(Float64), pointer :: papprox_ptr(:)
 
     !! Fill in minimum number of markers per cell
     nlaunch = 0
@@ -7883,7 +7885,9 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
         nm = nr_markers - nmin*nc
 
         !! precalculate cdf to save time
-        call cumsum(reshape(papprox,[beam_grid%ngrid]), cdf)
+        call c_f_pointer(c_loc(papprox), papprox_ptr, [beam_grid%ngrid])
+        call cumsum(papprox_ptr, cdf)
+
         !! use the same seed for all processes
         call rng_init(r, 932117)
         do c=1, nm
@@ -11004,8 +11008,8 @@ program fidasim
                         write(*,*) 'write birth:    ' , time(time_start)
                     endif
                     call write_birth_profile()
+                    if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
-                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
             endif
 
             !! ---------- DCX (Direct charge exchange) ---------- !!

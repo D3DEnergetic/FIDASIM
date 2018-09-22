@@ -6,6 +6,7 @@ module utilities
   use omp_lib
 #endif
 
+use iso_c_binding
 implicit none
 private
 public :: ind2sub, sub2ind, time, cumsum
@@ -72,10 +73,14 @@ interface randind
     module procedure randind_w_1
     module procedure randind_w_2
     module procedure randind_w_3
+    module procedure randind_w_4
+    module procedure randind_w_5
     module procedure randind_r_n
     module procedure randind_r_w_1
     module procedure randind_r_w_2
     module procedure randind_r_w_3
+    module procedure randind_r_w_4
+    module procedure randind_r_w_5
 end interface
 
 interface search_sorted_first
@@ -521,7 +526,7 @@ subroutine randind_r_w_2(r, w, randomi)
     !+ Generate an array of random subscripts of an 2D array distributed according to `w`
     type(rng_type), intent(inout) :: r
         !+ Random Number Generator
-    real(Float64), dimension(:,:), intent(in) :: w
+    real(Float64), dimension(:,:), target, intent(in) :: w
         !+ 2D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts
@@ -529,11 +534,13 @@ subroutine randind_r_w_2(r, w, randomi)
     integer :: i,nw
     integer, dimension(2) :: subs
     integer, dimension(size(randomi,2)) :: randi
+    real(Float64), pointer :: w_ptr(:)
 
     randomi = 0
     nw = size(w)
 
-    call randind_r_w_1(r, reshape(w,[nw]),randi)
+    call c_f_pointer(c_loc(w), w_ptr, [nw])
+    call randind_r_w_1(r, w_ptr,randi)
     do i=1,size(randomi,2)
         call ind2sub(shape(w),randi(i),subs)
         randomi(:,i) = subs
@@ -560,7 +567,7 @@ subroutine randind_r_w_3(r, w, randomi)
     !+ Generate an array of random subscripts of an 3D array distributed according to `w`
     type(rng_type), intent(inout) :: r
         !+ Random Number Generator
-    real(Float64), dimension(:,:,:), intent(in) :: w
+    real(Float64), dimension(:,:,:), target, intent(in) :: w
         !+ 3D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts
@@ -568,11 +575,13 @@ subroutine randind_r_w_3(r, w, randomi)
     integer :: i,nw
     integer, dimension(3) :: subs
     integer, dimension(size(randomi,2)) :: randi
+    real(Float64), pointer :: w_ptr(:)
 
     randomi = 0
     nw = size(w)
 
-    call randind_r_w_1(r,reshape(w,[nw]),randi)
+    call c_f_pointer(c_loc(w), w_ptr, [nw])
+    call randind_r_w_1(r, w_ptr, randi)
     do i=1,size(randomi,2)
         call ind2sub(shape(w),randi(i),subs)
         randomi(:,i) = subs
@@ -594,6 +603,88 @@ subroutine randind_w_3(w, randomi)
     call update_rng(r)
 
 end subroutine randind_w_3
+
+subroutine randind_r_w_4(r, w, randomi)
+    !+ Generate an array of random subscripts of an 4D array distributed according to `w`
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
+    real(Float64), dimension(:,:,:,:), target, intent(in) :: w
+        !+ 4D array of subscript weights
+    integer, dimension(:,:), intent(out)      :: randomi
+        !+ A 2D (ndim, :) array of random subscripts
+
+    integer :: i,nw
+    integer, dimension(4) :: subs
+    integer, dimension(size(randomi,2)) :: randi
+    real(Float64), pointer :: w_ptr(:)
+
+    randomi = 0
+    nw = size(w)
+
+    call c_f_pointer(c_loc(w), w_ptr, [nw])
+    call randind_r_w_1(r, w_ptr, randi)
+    do i=1,size(randomi,2)
+        call ind2sub(shape(w),randi(i),subs)
+        randomi(:,i) = subs
+    enddo
+
+end subroutine randind_r_w_4
+
+subroutine randind_w_4(w, randomi)
+    !+ Generate an array of random subscripts of an 4D array distributed according to `w`
+    real(Float64), dimension(:,:,:,:), intent(in) :: w
+        !+ 4D array of subscript weights
+    integer, dimension(:,:), intent(out)      :: randomi
+        !+ A 2D (ndim, :) array of random subscripts
+
+    type(rng_type) :: r
+
+    r = get_rng()
+    call randind_r_w_4(r, w, randomi)
+    call update_rng(r)
+
+end subroutine randind_w_4
+
+subroutine randind_r_w_5(r, w, randomi)
+    !+ Generate an array of random subscripts of an 5D array distributed according to `w`
+    type(rng_type), intent(inout) :: r
+        !+ Random Number Generator
+    real(Float64), dimension(:,:,:,:,:), target, intent(in) :: w
+        !+ 5D array of subscript weights
+    integer, dimension(:,:), intent(out)      :: randomi
+        !+ A 2D (ndim, :) array of random subscripts
+
+    integer :: i,nw
+    integer, dimension(5) :: subs
+    integer, dimension(size(randomi,2)) :: randi
+    real(Float64), pointer :: w_ptr(:)
+
+    randomi = 0
+    nw = size(w)
+
+    call c_f_pointer(c_loc(w), w_ptr, [nw])
+    call randind_r_w_1(r, w_ptr, randi)
+    do i=1,size(randomi,2)
+        call ind2sub(shape(w),randi(i),subs)
+        randomi(:,i) = subs
+    enddo
+
+end subroutine randind_r_w_5
+
+subroutine randind_w_5(w, randomi)
+    !+ Generate an array of random subscripts of an 5D array distributed according to `w`
+    real(Float64), dimension(:,:,:,:,:), intent(in) :: w
+        !+ 5D array of subscript weights
+    integer, dimension(:,:), intent(out)      :: randomi
+        !+ A 2D (ndim, :) array of random subscripts
+
+    type(rng_type) :: r
+
+    r = get_rng()
+    call randind_r_w_5(r, w, randomi)
+    call update_rng(r)
+
+end subroutine randind_w_5
 
 !============================================================================
 !------------------------------Sparse Routines-------------------------------

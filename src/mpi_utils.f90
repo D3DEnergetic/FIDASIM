@@ -102,7 +102,7 @@ contains
     use iso_c_binding
     implicit none
 
-    real(Float64), dimension(:,:), intent(inout) :: A
+    real(Float64), dimension(:,:), target, intent(inout) :: A
 
     integer :: sizeA,h,ierr
     integer(C_SIZE_T) :: nbytes
@@ -129,7 +129,7 @@ contains
     use iso_c_binding
     implicit none
 
-    real(Float64), dimension(:,:,:), intent(inout) :: A
+    real(Float64), dimension(:,:,:), target, intent(inout) :: A
 
     integer :: sizeA,h,ierr
     integer(C_SIZE_T) :: nbytes
@@ -156,7 +156,7 @@ contains
     use iso_c_binding
     implicit none
 
-    real(Float64), dimension(:,:,:,:), intent(inout) :: A
+    real(Float64), dimension(:,:,:,:), target, intent(inout) :: A
 
     integer :: sizeA,h,ierr
     integer(C_SIZE_T) :: nbytes
@@ -183,7 +183,7 @@ contains
     use iso_c_binding
     implicit none
 
-    real(Float64), dimension(:,:,:,:,:), intent(inout) :: A
+    real(Float64), dimension(:,:,:,:,:), target, intent(inout) :: A
 
     integer :: sizeA,h,ierr
     integer(C_SIZE_T) :: nbytes
@@ -251,7 +251,7 @@ contains
     use iso_c_binding
     implicit none
 
-    integer, dimension(:,:), intent(inout) :: A
+    integer, dimension(:,:), target, intent(inout) :: A
 
     integer :: sizeA,h,ierr
     integer(C_SIZE_T) :: nbytes

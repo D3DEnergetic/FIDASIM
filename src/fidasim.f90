@@ -7859,7 +7859,7 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell
     integer(Int64), intent(in)                    :: nr_markers
         !+ Approximate total number of markers to launch
-    real(Float64), dimension(:,:,:), intent(in)   :: papprox
+    real(Float64), dimension(:,:,:), target, intent(in)   :: papprox
         !+ [[libfida:beam_grid]] cell weights
     integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)

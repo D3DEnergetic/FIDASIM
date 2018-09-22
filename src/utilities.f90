@@ -526,7 +526,7 @@ subroutine randind_r_w_2(r, w, randomi)
     !+ Generate an array of random subscripts of an 2D array distributed according to `w`
     type(rng_type), intent(inout) :: r
         !+ Random Number Generator
-    real(Float64), dimension(:,:), intent(in) :: w
+    real(Float64), dimension(:,:), target, intent(in) :: w
         !+ 2D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts
@@ -567,7 +567,7 @@ subroutine randind_r_w_3(r, w, randomi)
     !+ Generate an array of random subscripts of an 3D array distributed according to `w`
     type(rng_type), intent(inout) :: r
         !+ Random Number Generator
-    real(Float64), dimension(:,:,:), intent(in) :: w
+    real(Float64), dimension(:,:,:), target, intent(in) :: w
         !+ 3D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts
@@ -608,7 +608,7 @@ subroutine randind_r_w_4(r, w, randomi)
     !+ Generate an array of random subscripts of an 4D array distributed according to `w`
     type(rng_type), intent(inout) :: r
         !+ Random Number Generator
-    real(Float64), dimension(:,:,:,:), intent(in) :: w
+    real(Float64), dimension(:,:,:,:), target, intent(in) :: w
         !+ 4D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts
@@ -649,7 +649,7 @@ subroutine randind_r_w_5(r, w, randomi)
     !+ Generate an array of random subscripts of an 5D array distributed according to `w`
     type(rng_type), intent(inout) :: r
         !+ Random Number Generator
-    real(Float64), dimension(:,:,:,:,:), intent(in) :: w
+    real(Float64), dimension(:,:,:,:,:), target, intent(in) :: w
         !+ 5D array of subscript weights
     integer, dimension(:,:), intent(out)      :: randomi
         !+ A 2D (ndim, :) array of random subscripts

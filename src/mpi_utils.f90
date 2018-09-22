@@ -1,6 +1,7 @@
 module mpi_utils
 
   integer, parameter, private   :: Float64 = 8
+  real, parameter, private      :: max_bytes = 2*1e9 !!GigaBytes
   integer, private :: numranks, myrank
 
   interface parallel_sum
@@ -73,80 +74,133 @@ contains
 
   recursive subroutine parallel_sum_d1(A)
     use mpi
+    use iso_c_binding
     implicit none
 
     real(Float64), dimension(:), intent(inout) :: A
 
-    integer :: sizeA,ierr
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
 
     sizeA = size(A,1)
 
     if (numranks>1) then
-       call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        nbytes = c_sizeof(A)
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call parallel_sum_d1(A(1:h))
+            call parallel_sum_d1(A((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
     endif ! else nothing to do
 
   end subroutine
 
   recursive subroutine parallel_sum_d2(A)
     use mpi
+    use iso_c_binding
     implicit none
 
     real(Float64), dimension(:,:), intent(inout) :: A
 
-    integer :: sizeA,ierr
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
+    real(Float64), pointer :: A_ptr(:)
 
     sizeA = size(A,1)*size(A,2)
 
     if (numranks>1) then
-       call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        nbytes = c_sizeof(A)
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call c_f_pointer(c_loc(A), A_ptr, [sizeA])
+            call parallel_sum_d1(A_ptr(1:h))
+            call parallel_sum_d1(A_ptr((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
     endif ! else nothing to do
 
   end subroutine
 
   recursive subroutine parallel_sum_d3(A)
     use mpi
+    use iso_c_binding
     implicit none
 
     real(Float64), dimension(:,:,:), intent(inout) :: A
 
-    integer :: sizeA,ierr
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
+    real(Float64), pointer :: A_ptr(:)
 
     sizeA = size(A,1)*size(A,2)*size(A,3)
 
     if (numranks>1) then
-       call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        nbytes = c_sizeof(A)
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call c_f_pointer(c_loc(A), A_ptr, [sizeA])
+            call parallel_sum_d1(A_ptr(1:h))
+            call parallel_sum_d1(A_ptr((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
     endif ! else nothing to do
 
   end subroutine
 
   recursive subroutine parallel_sum_d4(A)
     use mpi
+    use iso_c_binding
     implicit none
 
     real(Float64), dimension(:,:,:,:), intent(inout) :: A
 
-    integer :: sizeA,ierr
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
+    real(Float64), pointer :: A_ptr(:)
 
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)
 
     if (numranks>1) then
-       call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        nbytes = c_sizeof(A)
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call c_f_pointer(c_loc(A), A_ptr, [sizeA])
+            call parallel_sum_d1(A_ptr(1:h))
+            call parallel_sum_d1(A_ptr((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
     endif ! else nothing to do
 
   end subroutine
 
   recursive subroutine parallel_sum_d5(A)
     use mpi
+    use iso_c_binding
     implicit none
 
     real(Float64), dimension(:,:,:,:,:), intent(inout) :: A
 
-    integer :: sizeA,ierr
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
+    real(Float64), pointer :: A_ptr(:)
 
     sizeA = size(A,1)*size(A,2)*size(A,3)*size(A,4)*size(A,5)
 
     if (numranks>1) then
-       call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        nbytes = c_sizeof(A)
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call c_f_pointer(c_loc(A), A_ptr, [sizeA])
+            call parallel_sum_d1(A_ptr(1:h))
+            call parallel_sum_d1(A_ptr((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
     endif ! else nothing to do
 
   end subroutine
@@ -169,32 +223,52 @@ contains
 
   recursive subroutine parallel_sum_i1(A)
     use mpi
+    use iso_c_binding
     implicit none
 
     integer, dimension(:), intent(inout) :: A
 
-    integer :: sizeA,ierr
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
 
     sizeA = size(A,1)
 
     if (numranks>1) then
-       call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
+        nbytes = c_sizeof(A)
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call parallel_sum_i1(A(1:h))
+            call parallel_sum_i1(A((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
     endif ! else nothing to do
 
   end subroutine
 
   recursive subroutine parallel_sum_i2(A)
     use mpi
+    use iso_c_binding
     implicit none
 
     integer, dimension(:,:), intent(inout) :: A
 
-    integer :: sizeA,ierr
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
+    integer, pointer :: A_ptr(:)
 
     sizeA = size(A,1)*size(A,2)
 
     if (numranks>1) then
-       call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
+        nbytes = c_sizeof(A)
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call c_f_pointer(c_loc(A), A_ptr, [sizeA])
+            call parallel_sum_i1(A_ptr(1:h))
+            call parallel_sum_i1(A_ptr((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
     endif ! else nothing to do
 
   end subroutine

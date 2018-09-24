@@ -2328,12 +2328,13 @@ subroutine read_chords
     real(Float64), dimension(:,:,:), allocatable :: dlength
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
     type(LOSElement), dimension(:), allocatable :: los_elem
+    type(ParticleTrack), dimension(:), allocatable :: tracks
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(2) :: randomu
     real(Float64) :: theta, sqrt_rho, dl
-    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+    !type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
 
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
@@ -2381,9 +2382,6 @@ subroutine read_chords
     allocate(sigma_pi(spec_chords%nchan))
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
-    allocate(dlength(beam_grid%nx, &
-                     beam_grid%ny, &
-                     beam_grid%nz) )
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -2401,93 +2399,199 @@ subroutine read_chords
     !!Close HDF5 interface
     call h5close_f(error)
 
-    chan_loop: do i=1,spec_chords%nchan
-        call uvw_to_xyz(lenses(:,i),xyz_lens)
-        xyz_axis = matmul(beam_grid%inv_basis,axes(:,i))
-        spec_chords%los(i)%lens = xyz_lens
-        spec_chords%los(i)%axis = xyz_axis
-        spec_chords%los(i)%sigma_pi = sigma_pi(i)
-        spec_chords%los(i)%spot_size = spot_size(i)
+    if(inter_grid%nphi.gt.1) then
+        allocate(tracks(inter_grid%ntrack))
+        allocate(dlength(inter_grid%nr, &
+                         inter_grid%nz, &
+                         inter_grid%nphi) )
+        inter_grid_chan_loop: do i=1,spec_chords%nchan
+            !call uvw_to_xyz(lenses(:,i),xyz_lens)
+            !xyz_axis = matmul(beam_grid%inv_basis,axes(:,i))
+            spec_chords%los(i)%lens = lenses(:,i)
+            spec_chords%los(i)%axis = axes(:,i)
+            spec_chords%los(i)%sigma_pi = sigma_pi(i)
+            spec_chords%los(i)%spot_size = spot_size(i)
 
-        r0 = xyz_lens
-        v0 = xyz_axis
-        v0 = v0/norm2(v0)
-        call line_basis(r0,v0,basis)
+            r0 = lenses(:,i)
+            v0 = axes(:,i)
+            v0 = v0/norm2(v0)
+            !!! Double check what this does
+            call line_basis(r0,v0,basis)
+            !!! End
 
-        call grid_intersect(r0,v0,length,r_enter,r_exit)
-        if(length.le.0.d0) then
-            if(inputs%verbose.ge.1) then
-                WRITE(*,'("Channel ",i5," missed the beam grid")') i
+            !!! Maybe see if the los misses the interpolation grid. Seems pointless
+            !call grid_intersect(r0,v0,length,r_enter,r_exit)
+            !if(length.le.0.d0) then
+            !    if(inputs%verbose.ge.1) then
+            !        WRITE(*,'("Channel ",i5," missed the beam grid")') i
+            !    endif
+            !    cycle inter_grid_chan_loop
+            !endif
+            !!! End
+
+            if(spot_size(i).le.0.d0) then
+                nc = 1
+            else
+                nc = 100
             endif
-            cycle chan_loop
-        endif
 
-        if(spot_size(i).le.0.d0) then
-            nc = 1
-        else
-            nc = 100
-        endif
+            dlength = 0.d0
+            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
+            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            do ic=1,nc
+                ! Uniformally sample within spot size
+                call randu(randomu)
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                r0(1) = 0.d0
+                r0(2) = spot_size(i)*sqrt_rho*cos(theta)
+                r0(3) = spot_size(i)*sqrt_rho*sin(theta)
+                r0 = matmul(basis,r0) + xyz_lens
 
-        dlength = 0.d0
-        !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-        !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
-        do ic=1,nc
-            ! Uniformally sample within spot size
-            call randu(randomu)
-            sqrt_rho = sqrt(randomu(1))
-            theta = 2*pi*randomu(2)
-            r0(1) = 0.d0
-            r0(2) = spot_size(i)*sqrt_rho*cos(theta)
-            r0(3) = spot_size(i)*sqrt_rho*sin(theta)
-            r0 = matmul(basis,r0) + xyz_lens
-
-            call grid_intersect(r0, v0, length, r_enter, r_exit)
-            call track(r_enter, v0, tracks, ntrack)
-            track_loop: do j=1, ntrack
-                ind = tracks(j)%ind
-                !inds can repeat so add rather than assign
-                !$OMP ATOMIC UPDATE
-                dlength(ind(1),ind(2),ind(3)) = &
-                dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                !$OMP END ATOMIC
-            enddo track_loop
-        enddo
-        !$OMP END PARALLEL DO
-        do kk=1,beam_grid%nz
-            do jj=1,beam_grid%ny
-                xloop: do ii=1, beam_grid%nx
-                    if(dlength(ii,jj,kk).ne.0.d0) then
-                        dl = dlength(ii,jj,kk)
-                        nc = spec_chords%inter(ii,jj,kk)%nchan + 1
-                        if(nc.eq.1) then
-                            allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
-                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
-                        else
-                            allocate(los_elem(nc))
-                            los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
-                            los_elem(nc) = LOSElement(i, dl)
-                            deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
-                            call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
-                        endif
-                        spec_chords%inter(ii,jj,kk)%nchan = nc
-                    endif
-                enddo xloop
+                !!! Again, maybe pointless to have this
+                !call grid_intersect(r0, v0, length, r_enter, r_exit)
+                !!! End
+                !!! Double check the functionality of this
+                call track_cylindrical(r0, v0, tracks, ntrack)
+                !!! End
+                inter_grid_track_loop: do j=1, ntrack
+                    ind = tracks(j)%ind
+                    !inds can repeat so add rather than assign
+                    !$OMP ATOMIC UPDATE
+                    dlength(ind(1),ind(2),ind(3)) = &
+                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                    !$OMP END ATOMIC
+                enddo inter_grid_track_loop
             enddo
+            !$OMP END PARALLEL DO
+            do kk=1,inter_grid%nphi
+                do jj=1,inter_grid%nz
+                    rloop: do ii=1, inter_grid%nr
+                        if(dlength(ii,jj,kk).ne.0.d0) then
+                            dl = dlength(ii,jj,kk)
+                            nc = spec_chords%inter(ii,jj,kk)%nchan + 1
+                            if(nc.eq.1) then
+                                allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
+                                spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
+                            else
+                                allocate(los_elem(nc))
+                                los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
+                                los_elem(nc) = LOSElement(i, dl)
+                                deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
+                                call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
+                            endif
+                            spec_chords%inter(ii,jj,kk)%nchan = nc
+                        endif
+                    enddo rloop
+                enddo
+            enddo
+        enddo inter_grid_chan_loop
+
+        spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
+        allocate(spec_chords%cell(spec_chords%ncell))
+
+        nc = 0
+        do ic=1,inter_grid%ngrid
+            call ind2sub(inter_grid%dims,ic,ind)
+            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+            if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
+                nc = nc + 1
+                spec_chords%cell(nc) = ic
+            endif
         enddo
-    enddo chan_loop
+    else
+        allocate(dlength(beam_grid%nx, &
+                         beam_grid%ny, &
+                         beam_grid%nz) )
+        allocate(tracks(beam_grid%ntrack))
+        chan_loop: do i=1,spec_chords%nchan
+            call uvw_to_xyz(lenses(:,i),xyz_lens)
+            xyz_axis = matmul(beam_grid%inv_basis,axes(:,i))
+            spec_chords%los(i)%lens = xyz_lens
+            spec_chords%los(i)%axis = xyz_axis
+            spec_chords%los(i)%sigma_pi = sigma_pi(i)
+            spec_chords%los(i)%spot_size = spot_size(i)
 
-    spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
-    allocate(spec_chords%cell(spec_chords%ncell))
+            r0 = xyz_lens
+            v0 = xyz_axis
+            v0 = v0/norm2(v0)
+            call line_basis(r0,v0,basis)
 
-    nc = 0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
-        ii = ind(1) ; jj = ind(2) ; kk = ind(3)
-        if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
-            nc = nc + 1
-            spec_chords%cell(nc) = ic
-        endif
-    enddo
+            call grid_intersect(r0,v0,length,r_enter,r_exit)
+            if(length.le.0.d0) then
+                if(inputs%verbose.ge.1) then
+                    WRITE(*,'("Channel ",i5," missed the beam grid")') i
+                endif
+                cycle chan_loop
+            endif
+
+            if(spot_size(i).le.0.d0) then
+                nc = 1
+            else
+                nc = 100
+            endif
+
+            dlength = 0.d0
+            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
+            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            do ic=1,nc
+                ! Uniformally sample within spot size
+                call randu(randomu)
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                r0(1) = 0.d0
+                r0(2) = spot_size(i)*sqrt_rho*cos(theta)
+                r0(3) = spot_size(i)*sqrt_rho*sin(theta)
+                r0 = matmul(basis,r0) + xyz_lens
+
+                call grid_intersect(r0, v0, length, r_enter, r_exit)
+                call track(r_enter, v0, tracks, ntrack)
+                track_loop: do j=1, ntrack
+                    ind = tracks(j)%ind
+                    !inds can repeat so add rather than assign
+                    !$OMP ATOMIC UPDATE
+                    dlength(ind(1),ind(2),ind(3)) = &
+                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                    !$OMP END ATOMIC
+                enddo track_loop
+            enddo
+            !$OMP END PARALLEL DO
+            do kk=1,beam_grid%nz
+                do jj=1,beam_grid%ny
+                    xloop: do ii=1, beam_grid%nx
+                        if(dlength(ii,jj,kk).ne.0.d0) then
+                            dl = dlength(ii,jj,kk)
+                            nc = spec_chords%inter(ii,jj,kk)%nchan + 1
+                            if(nc.eq.1) then
+                                allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
+                                spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
+                            else
+                                allocate(los_elem(nc))
+                                los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
+                                los_elem(nc) = LOSElement(i, dl)
+                                deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
+                                call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
+                            endif
+                            spec_chords%inter(ii,jj,kk)%nchan = nc
+                        endif
+                    enddo xloop
+                enddo
+            enddo
+        enddo chan_loop
+
+        spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
+        allocate(spec_chords%cell(spec_chords%ncell))
+
+        nc = 0
+        do ic=1,beam_grid%ngrid
+            call ind2sub(beam_grid%dims,ic,ind)
+            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+            if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
+                nc = nc + 1
+                spec_chords%cell(nc) = ic
+            endif
+        enddo
+    endif
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"FIDA/BES System: ",a)') trim(adjustl(system))

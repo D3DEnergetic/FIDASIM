@@ -5320,6 +5320,26 @@ subroutine tb_zyx(alpha, beta, gamma, basis, inv_basis)
 
 end subroutine tb_zyx
 
+subroutine rz_normal_vector(uvw, redge, tedge, n)
+    !+ Calculates the unit normal vector from an R-Z plane defined on [[libfida:inter_grid]]
+    real(Float64), dimension(3), intent(in)              :: uvw
+        !+ Position in cylindrical coordinates
+    real(Float64), dimension(3), intent(in)              :: redge
+        !+ Right edge of plane
+    real(Float64), dimension(3), intent(in)              :: tedge
+        !+ Top edge of plane
+    real(Float64), dimension(3), intent(out)             :: n
+        !+ Resultant unit normal vector in machine coordinates
+
+    real(Float64), dimension(3) :: a, b
+
+    a = tedge - uvw
+    b = redge - uvw
+    n = cross_product(a, b)
+    n = n/norm2(n)
+
+end subroutine rz_normal_vector
+
 subroutine line_basis(r0, v0, basis, inv_basis)
     !+ Calculates basis from a line with +x in the direction of line
     real(Float64), dimension(3), intent(in)              :: r0
@@ -5401,6 +5421,53 @@ subroutine line_plane_intersect(l0, l, p0, n, p, t)
     p = l0 + t*l
 
 end subroutine line_plane_intersect
+
+subroutine line_circle_intersect(l0, l, p0, p, t)
+    !+ Calculates the intersection of a line and a circle
+    real(Float64), dimension(3), intent(in)  :: l0
+        !+ Point on line
+    real(Float64), dimension(3), intent(in)  :: l 
+        !+ Ray of line
+    real(Float64), dimension(3), intent(in)  :: p0
+        !+ Point on circle
+    real(Float64), dimension(3), intent(out) :: p
+        !+ Line-circle intersect point
+    real(Float64), intent(out)               :: t
+        !+ "time" to intersect
+
+    real(Float64), dimension(2) :: times
+    logical, dimension(2) :: mask
+    real(Float64)               :: r, vx, vy, x0, y0
+    real(Float64)               :: radicand, npos
+
+    r = sqrt(p0(1) * p0(1) + p0(2) * p0(2))
+    x0 = l0(1)
+    y0 = l0(2)
+    vx = l(1)
+    vy = l(2)            
+
+    if((vx.eq.0.d0).and.(vy.eq.0.d0)) then
+        t = 0.d0        ! Parallel to plane made by the arc's tangent line
+    else
+        radicand = r**2 * (vx**2 + vy**2) - (vy * x0 - vx * y0)**2
+        if(radicand.lt.0) then
+            t = 0.d0    ! Parallel to the line made by the arc's tangent line
+        else
+            times(1) = (- vx * x0 - vy * y0 - sqrt(radicand)) / (vx**2 + vy**2)
+            times(2) = (- vx * x0 - vy * y0 + sqrt(radicand)) / (vx**2 + vy**2)
+            mask = times.gt.0
+            npos = count(mask)
+            if(npos.gt.0) then
+                t = minval(times, mask=times.gt.0)
+            else
+                ! What if t=0, i.e., particle on surface?
+                t = maxval(times, mask=times.le.0)
+            endif
+        endif
+    endif
+    p = l0 + l * t
+
+end subroutine line_circle_intersect
 
 function in_boundary(bplane, p) result(in_b)
     !+ Indicator function for determining if a point on a plane is within the plane boundary
@@ -6333,12 +6400,15 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer :: cc, i, ii, mind,ncross
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
-    real(Float64) :: dT, dt1, inv_50
-    real(Float64), dimension(3) :: dt_arr
+    real(Float64) :: dT, dt1, inv_50, t, dr, dz
+    real(Float64), dimension(6) :: dt_arr
     !real(Float64), dimension(3) :: dt_arr, dr
     !real(Float64), dimension(3) :: vn, inv_vn
     real(Float64), dimension(3) :: vn
     real(Float64), dimension(3) :: ri, ri_tmp
+    real(Float64), dimension(3) :: side_min, side_max, p0_min, p0_max, p, n0, nz
+    real(Float64), dimension(3) :: redge, tedge
+    integer :: ir, iz, iphi
     !real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
     !integer, dimension(3) :: sgn
     !integer, dimension(3) :: gdims
@@ -6347,7 +6417,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
     vn = vin ;  ri = rin ; ntrack = 0
 
-    if(dot_product(vin,vin).eq.0.0) then
+    if(dot_product(vn,vn).eq.0.0) then
         return
     endif
 
@@ -6358,8 +6428,26 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !!! End
 
     !! define actual cell
-    !!! At this point, I have gotten the interpolation grid indices for ri
+    !!! ind is in rzphi
     call get_inter_grid_indices(ri,ind)
+    ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
+    ! Define vertical planes
+    side_min(1) = inter_grid%r(ir)
+    side_min(2) = inter_grid%z(iz)
+    side_min(3) = inter_grid%phi(iphi)
+    call cyl_to_uvw(side_min, p0_min)
+    side_max(1) = inter_grid%r(ir)
+    side_max(2) = inter_grid%z(iz)
+    !!! I wonder if there will be issues when iphi reaches the end
+    side_max(3) = inter_grid%phi(iphi+1)
+    !!! End
+    call cyl_to_uvw(side_max, p0_max)
+    nz(1) = 0.d0
+    nz(2) = 0.d0
+    nz(3) = 1.d0
+    dr = inter_grid%dr
+    dz = inter_grid%dz
+
     !ri_cell = [beam_grid%xc(ind(1)), &
     !           beam_grid%yc(ind(2)), &
     !           beam_grid%zc(ind(3))]
@@ -6385,37 +6473,64 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     tracks%flux = 0.d0
     ncross = 0
     !!! End
+    print*,'* track_cylindrical *'
+    print*,'ri_before = ', ri
+    print*,'vn_before = ', vn
     call in_plasma(ri,in_plasma1,machine_coords=.True.)
     track_loop: do i=1,inter_grid%ntrack
         if(cc.gt.inter_grid%ntrack) exit track_loop
 
-        !!! Current point
         if((spec_chords%inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
             .and.(.not.los_inter))then
             los_inter = .True.
         endif
-        !!! End`
-        !!! Here he creates his dt_arr, I should replace it with mine
-        !dt_arr = abs(( (ri_cell + 0.5*dr) - ri)*inv_vn)
-        !!! End
-        !!! Handle with care, but probably keep
-        minpos = minloc(dt_arr)
+
+        !!! 1st vertical plane
+        redge(1) = p0_min(1) + dr * cos(inter_grid%phi(iphi))
+        redge(2) = p0_min(2) + dr * sin(inter_grid%phi(iphi))
+        redge(3) = p0_min(3)
+        tedge(1) = p0_min(1)
+        tedge(2) = p0_min(2)
+        tedge(3) = p0_min(3) + dz
+        call rz_normal_vector(p0_min, redge, tedge, n0)
+        call line_plane_intersect(ri, vn, p0_min, n0, p, t)
+        dt_arr(1) = t
+        !!! Bottom horizontal plane
+        call line_plane_intersect(ri, vn, p0_min, nz, p, t)
+        dt_arr(2) = t
+        !!! Top horizontal plane
+        call line_plane_intersect(ri, vn, tedge, nz, p, t)
+        dt_arr(3) = t
+        !!! Inner circle
+        call line_circle_intersect(ri, vn, p0_min, p, t)
+        dt_arr(4) = t
+        !!! Outer circle
+        call line_circle_intersect(ri, vn, redge, p, t)
+        dt_arr(5) = t
+        !!! 2nd vertical plane
+        redge(1) = p0_max(1) + dr * cos(inter_grid%phi(iphi+1))
+        redge(2) = p0_max(2) + dr * sin(inter_grid%phi(iphi+1))
+        redge(3) = p0_max(3)
+        tedge(1) = p0_max(1)
+        tedge(2) = p0_max(2)
+        tedge(3) = p0_max(3) + dz
+        call rz_normal_vector(p0_max, redge, tedge, n0)
+        call line_plane_intersect(ri, vn, p0_max, n0, p, t)
+        dt_arr(6) = t
+
+        minpos = minloc(dt_arr, mask=dt_arr.gt.0)
         mind = minpos(1)
         dT = dt_arr(mind)
-        !!! End
+        print*,'i_ntrack = ', i
+        print*,'t_min = ', dT
         ri_tmp = ri + dT*vn
-        !!! Double check that the right inputs are set here
-        call in_plasma(ri_tmp,in_plasma2)
-        !!! End
-        !!! Probably keep everything below, but double check after insertin code
+        call in_plasma(ri_tmp,in_plasma2,machine_coords=.True.)
         if(in_plasma1.neqv.in_plasma2) then
             dt1 = 0.0
             track_fine: do ii=1,50
                 dt1 = dt1 + dT*inv_50
                 ri_tmp = ri + vn*dt1
-                !!! Double check that the right inputs are set here
-                call in_plasma(ri_tmp,in_plasma_tmp)
-                !!! End
+                call in_plasma(ri_tmp,in_plasma_tmp,machine_coords=.True.)
                 if(in_plasma2.eqv.in_plasma_tmp) exit track_fine
             enddo track_fine
             tracks(cc)%pos = ri + 0.5*dt1*vn
@@ -6434,9 +6549,8 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         endif
         in_plasma1 = in_plasma2
 
-        !!! End
-        !!! Need to make sure that the advancement is doing what it is supposed to
         ri = ri + dT*vn
+        print*,'ri_adv = ',ri
         !ind(mind) = ind(mind) + sgn(mind)
         !ri_cell(mind) = ri_cell(mind) + dr(mind)
 
@@ -6453,10 +6567,11 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     if(present(los_intersect)) then
         los_intersect = los_inter
     endif
-        !!! End
 
 end subroutine track_cylindrical
 
+!============================================================================
+!---------------------------Interpolation Routines---------------------------
 !============================================================================
 subroutine interpol1D_coeff(xmin,dx,nx,xout,c,err)
     !+ Linear interpolation coefficients and index for a 1D grid y(x)
@@ -9794,6 +9909,7 @@ subroutine pfida_f
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
+    print*,'*** pfida_f ***'
 
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &
@@ -9810,14 +9926,13 @@ subroutine pfida_f
             call gyro_correction(fields, eb, ptch, ri, vi)
 
             !! Find the particles path through the interpolation grid
-            !!! Current position.
+            print*,'ic = ',ic
             call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)
-            !!! End
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_plasma(plasma, pos = ri)
+            call get_plasma_inter_grid(plasma, pos = ri)
             call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
@@ -9826,7 +9941,7 @@ subroutine pfida_f
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
-                call get_plasma(plasma,pos=tracks(jj)%pos)
+                call get_plasma_inter_grid(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
 

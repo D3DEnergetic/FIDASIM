@@ -1,0 +1,415 @@
+#!/usr/bin/env python2.7
+import os
+import re
+import h5py
+import glob
+import argparse
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import (FormatStrFormatter, AutoMinorLocator,
+        LogLocator, AutoLocator)
+
+def extract_runid(f):
+        return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[0:-1])
+
+def extract_file_type(f):
+    return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[-1::])
+
+def to_plot_f(file_path):
+    spec = []
+    npa = []
+    neut = []
+    to_plot = [spec, npa, neut]
+    plt_mask = ['spectra', 'npa', 'neutrons']
+    for i in range(len(file_path)):
+        plt_type = extract_file_type(file_path[i])
+        index = plt_mask.index(plt_type)
+        to_plot[index].append(file_path[i])
+    return to_plot
+
+def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
+        cold=False, dcx=False, full=False, half=False, halo=False,
+        third=False, plot_all=False, log=False,
+        ac=False, lc=[], rc=[], xlim=[], ylim=[]):
+
+    if len(lc) == 0 and len(rc) == 0 and not ac:
+        print('** ERROR: Spectra channel arguments were NOT defined. **')
+        raise SystemExit
+    if np.sum(fida+pfida+brems+cold+dcx+full+half+halo+third+plot_all) == 0:
+        print('** ERROR: Spectra switches were NOT defined. **')
+        raise SystemExit
+    # Define and initialize arrays that will be used to extract and
+    # store data
+    label = ['fida', 'pfida', 'brems', 'cold', 'dcx', 'full', 'half',
+            'third', 'halo']
+    mask = [fida, pfida, brems, cold, dcx, full, half, third, halo]
+    data_set = []
+    lamb_set = []
+    label_set = []
+
+    # Read in spectra files and extract data
+    for i in range(len(file_paths)):
+        data = []
+        l = []
+        f = h5py.File(file_paths[i], 'r')
+        lamb = f['lambda'].value
+        lamb_set.append(lamb)
+        if plot_all:
+            for j in range(len(label)):
+                data.append(f[label[j]])
+                l.append(extract_runid(file_paths[i]) + '_' +
+                        label[j])
+        else:
+            for k in range(len(mask)):
+                if mask[k]:
+                    data.append(f[label[k]])
+                    l.append(extract_runid(file_paths[i]) + '_' +
+                            label[k])
+        data_set.append(data)
+        label_set.append(l)
+
+    # Define the list of channels to plot
+    if ac:
+        n_ch = data_set[0][0].value.shape[0]
+        ch_i = range(data_set[0][0].value.shape[0])
+    elif len(lc)>0:
+        n_ch = len(lc)
+        ch_i = np.array(lc)-1
+    else:
+        n_ch = rc[1] - rc[0] + 1
+        ch_i = range(rc[0]-1,rc[1])
+
+    if n_ch > 9:
+        subplt_dim = 3
+    else:
+        subplt_dim = np.ceil(np.sqrt(n_ch))
+
+    # Plotting
+    fig_count = 0
+    for fi, ch_i2 in enumerate(ch_i):       # Channel Loop
+        # Create number of figs
+        mod_i = fi%9
+        if mod_i==0:
+            fig_count += 1
+            if subplt_dim==3:
+                fig,ax = plt.subplots(3,3,figsize=(9,9))
+            elif subplt_dim==2:
+                fig,ax = plt.subplots(2,2,figsize=(9,9))
+            else:
+                fig,ax = plt.subplots(1,figsize=(9,9))
+                ax = np.array(ax)
+            fig.canvas.set_window_title('Spectral Plots '+str(fig_count))
+            ax = ax.flatten()
+            fig.text(0.5,0.02, 'Wavelength $(nm)$', ha='center', fontsize=12)
+            fig.text(0.02,0.5, 'Radiance $(Ph\,s^{-1}\,nm^{-1}\,sr^{-1}\,m^{-2})$',
+                    va='center', rotation='vertical', fontsize=12)
+            leg_labels = []
+            for i in range(len(label_set)):         # Labels for legend loops
+                for j in range(len(label_set[i])):
+                    leg_labels.append(label_set[i][j])
+
+        # Handle x axis ticks
+        majorLocatorx = AutoLocator()
+        minorLocatorx = AutoMinorLocator()
+        majorFormatter = FormatStrFormatter('%d')
+        ax[mod_i].xaxis.set_major_locator(majorLocatorx)
+        ax[mod_i].xaxis.set_minor_locator(minorLocatorx)
+        ax[mod_i].xaxis.set_major_formatter(majorFormatter)
+        ax[mod_i].tick_params(axis='x', which='both', labelsize=10, direction='in',
+                top=1)
+        # Handle y axis ticks
+        if log==1:
+            ax[mod_i].set_yscale('log')
+            minorLocatory = LogLocator(base=100.0,subs=(2.0,4.0,6.0,8.0,20.0,
+                40.0,60.0,80.0),numticks=100)
+            ax[mod_i].yaxis.set_minor_locator(minorLocatory)
+        else:
+            minorLocatory = AutoMinorLocator(5)
+            ax[mod_i].yaxis.set_minor_locator(minorLocatory)
+        ax[mod_i].tick_params(axis='y', which='both', labelsize=10, direction='in',
+                right=1)
+
+        # Create plots
+        for i in range(len(file_paths)):
+            for d in range(len(data_set[i])):
+                ax[mod_i].plot(lamb_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
+
+        # Override axes limits if the user requested it
+        if len(xlim)==2:
+            ax[mod_i].set_xlim(xlim)
+        if len(ylim)==2:
+            ax[mod_i].set_ylim(ylim)
+
+        # Legends and titles
+        subp_title = 'Ch. ' + str(ch_i2+1)
+        ax[mod_i].set_title(subp_title, loc='right', fontsize=10)
+        handles, labels = ax[mod_i].get_legend_handles_labels()
+        fig.legend(handles, labels, loc='upper center', ncol = 6)
+    return
+
+def plt_npa(file_paths, flux=False, pflux=False, plot_all=False,
+        ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[]):
+
+    if len(lc) == 0 and len(rc) == 0 and not ac:
+        print('** ERROR: NPA channel arguments were NOT defined. **')
+        raise SystemExit
+    if np.sum(flux + pflux + plot_all) == 0:
+        print('** ERROR: NPA flux switches were NOT defined. **')
+        raise SystemExit
+    # Define and initialize arrays that will be used to extract and
+    # store data
+    label = ['flux', 'pflux']
+    mask = [flux, pflux]
+    data_set = []
+    energy_set = []
+    label_set = []
+
+    # Read in NPA files and extract data
+    for i in range(len(file_paths)):
+        data = []
+        l = []
+        f = h5py.File(file_paths[i], 'r')
+        energy = f['energy'].value
+        energy_set.append(energy)
+        if plot_all:
+            for j in range(len(label)):
+                data.append(f[label[j]])
+                l.append(extract_runid(file_paths[i]) + '_' +
+                        label[j])
+        else:
+            for k in range(len(mask)):
+                if mask[k]:
+                    data.append(f[label[k]])
+                    l.append(extract_runid(file_paths[i]) + '_' +
+                            label[k])
+        data_set.append(data)
+        label_set.append(l)
+
+    # Define the list of channels to plot
+    if ac:
+        n_ch = data_set[0][0].value.shape[0]
+        ch_i = range(data_set[0][0].value.shape[0])
+    elif len(lc)>0:
+        n_ch = len(lc)
+        ch_i = np.array(lc)-1
+    else:
+        n_ch = rc[1] - rc[0] + 1
+        ch_i = range(rc[0]-1,rc[1])
+
+    if n_ch > 9:
+        subplt_dim = 3
+    else:
+        subplt_dim = np.ceil(np.sqrt(n_ch))
+
+    # Plotting
+    fig_count = 0
+    for fi, ch_i2 in enumerate(ch_i):           # Channel Loop
+        # Create number of figs
+        mod_i = fi%9
+        if mod_i==0:
+            fig_count += 1
+            if subplt_dim==3:
+                fig,ax = plt.subplots(3,3,figsize=(9,9))
+            elif subplt_dim==2:
+                fig,ax = plt.subplots(2,2,figsize=(9,9))
+            else:
+                fig,ax = plt.subplots(1,figsize=(9,9))
+                ax = np.array(ax)
+            fig.canvas.set_window_title('NPA Plots '+str(fig_count))
+            ax = ax.flatten()
+            fig.text(0.5,0.02, 'Energy $(keV)$', ha='center', fontsize=12)
+            fig.text(0.02,0.5, 'Flux $(neutrals\,s^{-1}\,dE^{-1})$',
+                    va='center', rotation='vertical', fontsize=12)
+            leg_labels = []
+            for i in range(len(label_set)):         # Labels for legends loops
+                for j in range(len(label_set[i])):
+                    leg_labels.append(label_set[i][j])
+
+        # Handle x axis ticks
+        majorLocatorx = AutoLocator()
+        minorLocatorx = AutoMinorLocator()
+        majorFormatter = FormatStrFormatter('%d')
+        ax[mod_i].xaxis.set_major_locator(majorLocatorx)
+        ax[mod_i].xaxis.set_minor_locator(minorLocatorx)
+        ax[mod_i].xaxis.set_major_formatter(majorFormatter)
+        ax[mod_i].tick_params(axis='x', which='both', labelsize=10, direction='in',
+                top=1)
+        # Handle y axis ticks
+        if log==1:
+            ax[mod_i].set_yscale('log')
+            minorLocatory = LogLocator(base=10.0,subs=(2.0,3.0,4.0,5.0,6.0,7.0,
+                8.0,9.0), numticks=100)
+            ax[mod_i].yaxis.set_minor_locator(minorLocatory)
+        else:
+            minorLocatory = AutoMinorLocator(5)
+            ax[mod_i].yaxis.set_minor_locator(minorLocatory)
+        ax[mod_i].tick_params(axis='y', which='both', labelsize=10, direction='in',
+                right=1)
+
+        # Create plots
+        for i in range(len(file_paths)):
+            for d in range(len(data_set[i])):
+                ax[mod_i].plot(energy_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
+
+        # Override axes limits if the user requested it
+        if len(xlim)==2:
+            ax[mod_i].set_xlim(xlim)
+        if len(ylim)==2:
+            ax[mod_i].set_ylim(ylim)
+
+        # Legends and titles
+        subp_title = 'Ch. ' + str(ch_i2+1)
+        ax[mod_i].set_title(subp_title, loc='right', fontsize=10)
+        handles, labels = ax[mod_i].get_legend_handles_labels()
+        fig.legend(handles, labels, loc='upper center', ncol = 6)
+    return 
+
+def get_neutron_rate(file_paths, N=1):
+
+    data_set = np.empty(N)
+    label_set = []
+
+    print('\n\nNeutron rate(s):\n')
+    # Read in neutron files and extract data
+    for i in range(N):
+        f = h5py.File(file_paths[i], 'r')
+        rate = f['rate'].value
+        data_set[i] = rate
+        label_set.append(extract_runid(file_paths[i]) + ' neutron rate')
+        print(label_set[i]+' = '+ "{:.4e}".format(data_set[i])+' neutrons/s')
+    print('\n')
+    return
+
+def main():
+    parser = argparse.ArgumentParser(description="Plots FIDASIM outputs")
+    # Check to see what the user can do with -d, this should match the argument of plot_inputs
+    parser.add_argument('-d', '--directory', type=str,
+                        help='Folder path where your file(s) are located')
+    # Check to see if a user can input more than one ID, this should match the argument of plot_inputs
+    parser.add_argument('-r','--runids',
+                        nargs='+',
+                        help = 'Run ID')
+    parser.add_argument('-p', '--path', type=str,
+                        nargs='+',
+                        help='Full file path of file(s)')
+    parser.add_argument('-f', '--fida',
+                        default = False, action='store_true',
+                        help='On switch for active FIDA emission')
+    parser.add_argument('-pf', '--pfida',
+                        default = False, action='store_true',
+                        help='On switch for passive FIDA emission')
+    parser.add_argument('-b', '--brems',
+                        default = False, action='store_true',
+                        help='On switch for Bremsstrahlung')
+    parser.add_argument('-c', '--cold',
+                        default = False, action='store_true',
+                        help='On switch for cold neutral emission')
+    parser.add_argument('-dc', '--dcx',
+                        default = False, action='store_true',
+                        help='On switch for thermal ion DCX emission')
+    parser.add_argument('-fl', '--full',
+                        default = False, action='store_true',
+                        help='On switch for full energy component of the beam emission')
+    parser.add_argument('-hf', '--half',
+                        default = False, action='store_true',
+                        help='On switch for half energy component of the beam emission')
+    parser.add_argument('-t', '--third',
+                        default = False, action='store_true',
+                        help='On switch for third energy component of the beam emission')
+    parser.add_argument('-hl', '--halo',
+                        default = False, action='store_true',
+                        help='On switch for halo beam emission')
+    parser.add_argument('-s', '--spectra',
+                        default = False, action='store_true',
+                        help='On switch for all spectra')
+    parser.add_argument('-as', '--allschan',
+                        default = False, action='store_true',
+                        help='On switch for all spectra channels')
+    parser.add_argument('-ls', '--listschan', type=int,
+                        default = [], nargs='+',
+                        help='List of spectra channels')
+    parser.add_argument('-rs', '--rangeschan', type=int,
+                        default = [], nargs='+',
+                        help='Range of spectra channels')
+    parser.add_argument('-sx', '--sxlim', type=float,
+                        default = [], nargs='+',
+                        help='Set the wavelength axis limits')
+    parser.add_argument('-sy', '--sylim', type=float,
+                        default = [], nargs='+',
+                        help='Set the radiance axis limits')
+    parser.add_argument('-sl', '--slog',
+                        default = False, action='store_true',
+                        help='Set the radiance axis to a log scale')
+    parser.add_argument('-n', '--npaflux',
+                        default = False, action='store_true',
+                        help='On switch for active NPA flux')
+    parser.add_argument('-pn', '--pnpaflux',
+                        default = False, action='store_true',
+                        help='On switch for passive NPA flux')
+    parser.add_argument('-fx', '--flux',
+                        default = False, action='store_true',
+                        help='On switch for both active and passive flux')
+    parser.add_argument('-an', '--allnchan',
+                        default = False, action='store_true',
+                        help='On switch for all NPA channels')
+    parser.add_argument('-ln', '--listnchan', type=int,
+                        default = [], nargs='+',
+                        help='List of NPA channels')
+    parser.add_argument('-rn', '--rangenchan', type=int,
+                        default = [], nargs='+',
+                        help='Range of NPA channels')
+    parser.add_argument('-nx', '--nxlim', type=float,
+                        default = [], nargs='+',
+                        help='Set the wavelength axis limits')
+    parser.add_argument('-ny', '--nylim', type=float,
+                        default = [], nargs='+',
+                        help='Set the flux axis limits')
+    parser.add_argument('-nl', '--nlog',
+                        default = False, action='store_true',
+                        help='Set the flux axis to a log scale')
+
+    args = parser.parse_args()
+
+    # Create list of things to plot from the user's manual input
+    if args.path is not None:
+        for p in args.path:
+            fileordir = os.path.abspath(p)
+            if not os.path.isfile(fileordir):
+                raise IOError('File path doesn\'t exist')
+        to_plot = to_plot_f(args.path)
+
+    # Create list of things to plot from the -d folder
+    # The list creation is [[spectra data], [npa data], [neutron data]]
+    if args.directory is not None:
+        fileordir = os.path.abspath(args.directory)
+        if os.path.isfile(fileordir):
+            fileordir = [fileordir]
+            to_plot = to_plot_f(fileordir)
+        elif os.path.isdir(fileordir):
+            allfiles = os.listdir(fileordir)
+            to_plot = []
+            if args.runids is not None:
+                to_plot.append([fileordir + '/' + f for f in allfiles for r in args.runids if re.search(r+'_spectra\.h5',f)])
+                to_plot.append([fileordir + '/' + f for f in allfiles for r in args.runids if re.search(r+'_npa\.h5',f)])
+                to_plot.append([fileordir + '/' + f for f in allfiles for r in args.runids if re.search(r+'_neutrons\.h5',f)])
+            else:
+                to_plot.append([fileordir+'/'+ f for f in allfiles if re.search('.*_spectra\.h5',f)])
+                to_plot.append([fileordir+'/'+ f for f in allfiles if re.search('.*_npa\.h5',f)])
+                to_plot.append([fileordir+'/'+ f for f in allfiles if re.search('.*_neutrons\.h5',f)])
+        else:
+            raise IOError('Not a file or directory')
+
+    if len(to_plot[0])>0:
+        plt_spectra(to_plot[0], fida=args.fida, pfida=args.pfida, brems=args.brems, cold=args.cold, dcx=args.dcx, full=args.full, half=args.half, halo=args.halo, third=args.third, plot_all=args.spectra, log=args.slog, ac=args.allschan, lc=args.listschan, rc=args.rangeschan, xlim=args.sxlim, ylim=args.sylim)
+
+    if len(to_plot[1])>0:
+        plt_npa(to_plot[1], flux=args.npaflux, pflux=args.pnpaflux, plot_all=args.flux, log=args.nlog, ac=args.allnchan, lc=args.listnchan, rc=args.rangenchan, xlim=args.nxlim, ylim=args.nylim)
+
+    if len(to_plot[2])>0:
+        num_neutron_f = len(to_plot[2])
+        get_neutron_rate(to_plot[2], N=num_neutron_f)
+
+    plt.show()
+
+if __name__=='__main__':
+    main()

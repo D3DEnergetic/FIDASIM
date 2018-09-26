@@ -16,7 +16,7 @@ try:
     import f90nml   # Portal does not have f90nml capabilities
 except:
     f90 = False
-    print('** Warning: f90nml library not found. Beam grid will NOT be plotted')
+    print('Warning: f90nml library not found. Beam grid will NOT be plotted')
 
 # Define functions needed for beam grid transformations
 def tb_zyx(alpha, beta, gamma):
@@ -129,30 +129,34 @@ def main():
 
 ### Test this
     # Read hdf5 files
-    if f90 and args.geometry is not None:
+    if (f90 and args.geometry) or plot_all:
         try:
             nml_file = os.path.join(args.directory, args.runid+'_inputs.dat')
             nml = f90nml.read(nml_file)['fidasim_inputs']
         except:
-            raise IOError('Double check your directory, runid and/or path. The inputs file was not found')
-    if args.geometry is not None:
+            print('Error: Double check your directory, runid and/or path. The inputs file was not found')
+            raise SystemExit
+    if args.geometry or plot_all:
         try:
             geo_file = os.path.join(args.directory, args.runid+'_geometry.h5')
             geo = h5.File(geo_file, 'r')
         except:
-            raise IOError('Double check your directory, runid and/or path. The geometry file was not found')
-    if args.plasma is not None or args.fields is not None:
+            print('Error: Double check your directory, runid and/or path. The geometry file was not found')
+            raise SystemExit
+    if args.plasma or args.fields or args.geometry or args.distribution or plot_all:
         try:
             eq_file = os.path.join(args.directory, args.runid+'_equilibrium.h5')
             eq = h5.File(eq_file, 'r')
         except:
-            raise IOError('Double check your directory, runid and/or path. The equilibrium file was not found')
-    if args.distribution is not None:
+            print('Error: Double check your directory, runid and/or path. The equilibrium file was not found')
+            raise SystemExit
+    if args.distribution or plot_all:
         try:
             dist_file = os.path.join(args.directory, args.runid+'_distribution.h5')
             dist = h5.File(dist_file, 'r')
         except:
-            raise IOError('Double check your directory, runid and/or path. The distribution file was not found')
+            print('Error: Double check your directory, runid and/or path. The distribution file was not found')
+            raise SystemExit
 
     # Define the limiting mask
     if args.fields or args.plasma or args.distribution or plot_all:
@@ -162,17 +166,23 @@ def main():
 
     # Error checks for attempting to simultaneously plot two line outs on the same figure
     if args.eplineout is not None and args.pelineout is not None:
-        raise IOError('Cannot plot both ep and pe line outs. Pick one only')
+        print('Error: Cannot plot both ep and pe line outs. Pick one only')
+        raise SystemExit
     if args.erlineout is not None and args.relineout is not None:
-        raise IOError('Cannot plot both er and re line outs. Pick one only')
+        print('Error: Cannot plot both er and re line outs. Pick one only')
+        raise SystemExit
     if args.prlineout is not None and args.rplineout is not None:
-        raise IOError('Cannot plot both pr and rp line outs. Pick one only')
+        print('Error: Cannot plot both pr and rp line outs. Pick one only')
+        raise SystemExit
     if args.zelineout is not None and args.ezlineout is not None:
-        raise IOError('Cannot plot both ez and ze line outs. Pick one only')
+        print('Error: Cannot plot both ez and ze line outs. Pick one only')
+        raise SystemExit
     if args.zplineout is not None and args.pzlineout is not None:
-        raise IOError('Cannot plot both pz and zp line outs. Pick one only')
+        print('Error: Cannot plot both pz and zp line outs. Pick one only')
+        raise SystemExit
     if args.rzlineout is not None and args.zrlineout is not None: 
-        raise IOError('Cannot plot both rz and zr line outs. Pick one only')
+        print('Error: Cannot plot both rz and zr line outs. Pick one only')
+        raise SystemExit
 
     # Define lineout flags that will be called in the big plot distribution loop
     lout_flag = {}

@@ -240,7 +240,7 @@ contains
             call parallel_sum_i1(A(1:h))
             call parallel_sum_i1(A((h+1):sizeA))
         else
-            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
         endif
     endif ! else nothing to do
 
@@ -267,7 +267,7 @@ contains
             call parallel_sum_i1(A_ptr(1:h))
             call parallel_sum_i1(A_ptr((h+1):sizeA))
         else
-            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_DOUBLE,MPI_Sum,MPI_COMM_WORLD,ierr)
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
         endif
     endif ! else nothing to do
 

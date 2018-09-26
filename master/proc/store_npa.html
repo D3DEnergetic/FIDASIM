@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.7% of total for procedures.">80 statements</a>
+    title=" 0.7% of total for procedures.">84 statements</a>
      </li> 
      
      
@@ -856,7 +856,12 @@ public subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
 
     <span class="c">! Calculate energy</span>
     <span class="n">energy</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">*</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">vn</span><span class="p">,</span><span class="n">vn</span><span class="p">)</span>
-    <span class="n">dE</span> <span class="o">=</span> <span class="n">npa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">npa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pas</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">dE</span> <span class="o">=</span> <span class="n">pnpa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">pnpa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span>
+<span class="k">        </span><span class="n">dE</span> <span class="o">=</span> <span class="n">npa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">npa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">endif</span>
+
 
     <span class="c">! Calculate pitch if distribution actually uses pitch</span>
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>

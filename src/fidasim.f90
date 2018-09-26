@@ -4144,7 +4144,7 @@ subroutine write_npa
              "Number of particles that hit the detector: count(chan)", error)
 
 
-        if((npart.ne.0).and.(inputs%calc_npa.ge.2)) then
+        if((npart.gt.0).and.(inputs%calc_npa.ge.2)) then
             !Create Group
             call h5gcreate_f(fid,"/particles",gid, error)
             call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npart], error)
@@ -4262,8 +4262,8 @@ subroutine write_npa
     if(do_write.and.(inputs%calc_pnpa.ge.1)) then
         !Write Passive Flux
         d(1) = 1
-        dim2 = [npa%nenergy, npa%nchan]
-        dim3 = [npa%nenergy, npa%nchan, particles%nclass]
+        dim2 = [pnpa%nenergy, pnpa%nchan]
+        dim3 = [pnpa%nenergy, pnpa%nchan, particles%nclass]
         if(particles%nclass.gt.1) then
             call h5ltmake_compressed_dataset_double_f(fid,"/pflux",3,dim3,pnpa%flux, error)
             call h5ltset_attribute_string_f(fid,"/pflux", "description", &
@@ -4279,10 +4279,10 @@ subroutine write_npa
              "Number of passive particles that hit the detector: pcount(chan)", error)
 
         if(inputs%calc_npa.le.0) then
-            call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [npa%nenergy], error)
-            call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [npa%nchan], error)
+            call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [pnpa%nenergy], error)
+            call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [pnpa%nchan], error)
             call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim2(1:1),&
-                 npa%energy, error)
+                 pnpa%energy, error)
             call h5ltmake_compressed_dataset_double_f(fid,"/radius",1,dim2(2:2),&
                  npa_chords%radius, error)
 
@@ -4302,7 +4302,7 @@ subroutine write_npa
             call h5ltset_attribute_string_f(fid,"/radius","units","cm",error)
         endif
 
-        if((npart.ne.0).and.(inputs%calc_pnpa.ge.2)) then
+        if((npart.gt.0).and.(inputs%calc_pnpa.ge.2)) then
             !Create Group
             call h5gcreate_f(fid,"/passive_particles",gid, error)
             call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npart], error)
@@ -6539,7 +6539,7 @@ subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs
             b%b212 = 0
             b%b222 = 0
             b%b122 = 0
-            b%b112 = k
+            b%b112 = 0
             b%k = 1
         endif
         err_status = 0
@@ -6987,7 +6987,12 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
 
     ! Calculate energy
     energy = inputs%ab*v2_to_E_per_amu*dot_product(vn,vn)
-    dE = npa%energy(2)-npa%energy(1)
+    if(pas) then
+        dE = pnpa%energy(2)-pnpa%energy(1)
+    else
+        dE = npa%energy(2)-npa%energy(1)
+    endif
+
 
     ! Calculate pitch if distribution actually uses pitch
     if(inputs%dist_type.le.2) then
@@ -10868,7 +10873,7 @@ program fidasim
         call read_chords()
     endif
 
-    if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1)) then
+    if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
     endif
 

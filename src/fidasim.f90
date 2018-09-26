@@ -2446,7 +2446,7 @@ subroutine read_chords
                 r0(1) = 0.d0
                 r0(2) = spot_size(i)*sqrt_rho*cos(theta)
                 r0(3) = spot_size(i)*sqrt_rho*sin(theta)
-                r0 = matmul(basis,r0) + xyz_lens
+                r0 = matmul(basis,r0) + lenses(:,i)
 
                 !!! Again, maybe pointless to have this
                 !call grid_intersect(r0, v0, length, r_enter, r_exit)
@@ -2883,6 +2883,9 @@ subroutine read_equilibrium
         inter_grid%dphi = abs(inter_grid%phi(2)-inter_grid%phi(1))
     endif
     inter_grid%dv = inter_grid%dr*inter_grid%dphi*inter_grid%dz
+
+    inter_grid%ntrack = inter_grid%nr+inter_grid%nz+inter_grid%nphi
+    inter_grid%ngrid  = inter_grid%nr*inter_grid%nz*inter_grid%nphi
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Interpolation grid settings ----'
@@ -6473,9 +6476,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     tracks%flux = 0.d0
     ncross = 0
     !!! End
-    print*,'* track_cylindrical *'
-    print*,'ri_before = ', ri
-    print*,'vn_before = ', vn
     call in_plasma(ri,in_plasma1,machine_coords=.True.)
     track_loop: do i=1,inter_grid%ntrack
         if(cc.gt.inter_grid%ntrack) exit track_loop
@@ -6518,11 +6518,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call line_plane_intersect(ri, vn, p0_max, n0, p, t)
         dt_arr(6) = t
 
-        minpos = minloc(dt_arr, mask=dt_arr.gt.0)
+        minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
         mind = minpos(1)
         dT = dt_arr(mind)
-        print*,'i_ntrack = ', i
-        print*,'t_min = ', dT
         ri_tmp = ri + dT*vn
         call in_plasma(ri_tmp,in_plasma2,machine_coords=.True.)
         if(in_plasma1.neqv.in_plasma2) then
@@ -6550,7 +6548,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         in_plasma1 = in_plasma2
 
         ri = ri + dT*vn
-        print*,'ri_adv = ',ri
         !ind(mind) = ind(mind) + sgn(mind)
         !ri_cell(mind) = ri_cell(mind) + dr(mind)
 
@@ -9909,7 +9906,6 @@ subroutine pfida_f
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
-    print*,'*** pfida_f ***'
 
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &
@@ -9926,7 +9922,6 @@ subroutine pfida_f
             call gyro_correction(fields, eb, ptch, ri, vi)
 
             !! Find the particles path through the interpolation grid
-            print*,'ic = ',ic
             call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ntrack.eq.0) cycle loop_over_fast_ions

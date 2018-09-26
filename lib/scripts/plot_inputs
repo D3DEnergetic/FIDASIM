@@ -1,4 +1,6 @@
 #!/usr/bin/env python2.7
+
+# Import libraries
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -8,13 +10,15 @@ from scipy.linalg import norm
 import h5py as h5
 import numpy as np
 import os
+
 try:
     f90 = True
-    import f90nml
+    import f90nml   # Portal does not have f90nml capabilities
 except:
     f90 = False
-    print('** Warning: f90nml library not found. Beam grid will not be plotted. **')
+    print('** Warning: f90nml library not found. Beam grid will NOT be plotted')
 
+# Define functions needed for beam grid transformations
 def tb_zyx(alpha, beta, gamma):
     # Refer to utils.py for more documentation
     sa = np.sin(alpha)
@@ -34,7 +38,6 @@ def tb_zyx(alpha, beta, gamma):
     r[2, 1] = cb * sg
     r[2, 2] = cb * cg
     return r
-
 def xyz_to_uvw(alpha, beta, gamma, xyz, origin = np.zeros(3)):
     # Refer to utils.py for more documentation
     xyz = np.array(xyz)
@@ -58,6 +61,7 @@ def xyz_to_uvw(alpha, beta, gamma, xyz, origin = np.zeros(3)):
     R = tb_zyx(alpha,beta,gamma)
     uvw = np.dot(R, xyz)
     return uvw + np.squeeze(np.tile(origin, (n, 1)).T)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Plots FIDASIM inputs")
@@ -120,63 +124,57 @@ def main():
 
     args = parser.parse_args()
 
+
     plot_all = (not args.geometry) and (not args.plasma) and (not args.fields) and (not args.distribution)
 
+### Test this
     # Read hdf5 files
-    if f90:
+    if f90 and args.geometry is not None:
         try:
             nml_file = os.path.join(args.directory, args.runid+'_inputs.dat')
             nml = f90nml.read(nml_file)['fidasim_inputs']
         except:
-            print('\n** ERROR MESSAGE: Double check your directory and/or runid. The inputs file was not found.  **\n')
-            #raise SystemExit
-    try:
-        geo_file = os.path.join(args.directory, args.runid+'_geometry.h5')
-        geo = h5.File(geo_file, 'r')
-    except:
-        print('\n** ERROR MESSAGE: Double check your directory and/or runid. The geometry file was not found. **\n')
-        #raise SystemExit
-    try:
-        eq_file = os.path.join(args.directory, args.runid+'_equilibrium.h5')
-        eq = h5.File(eq_file, 'r')
-    except:
-        print('\n** ERROR MESSAGE: Double check your directory and/or runid. The equilibrium file was not found. **\n')
-        #raise SystemExit
-    try:
-        dist_file = os.path.join(args.directory, args.runid+'_distribution.h5')
-        dist = h5.File(dist_file, 'r')
-    except:
-        print('\n** ERROR MESSAGE: Double check your directory and/or runid. The distribution file was not found. **\n')
-        #raise SystemExit
+            raise IOError('Double check your directory, runid and/or path. The inputs file was not found')
+    if args.geometry is not None:
+        try:
+            geo_file = os.path.join(args.directory, args.runid+'_geometry.h5')
+            geo = h5.File(geo_file, 'r')
+        except:
+            raise IOError('Double check your directory, runid and/or path. The geometry file was not found')
+    if args.plasma is not None or args.fields is not None:
+        try:
+            eq_file = os.path.join(args.directory, args.runid+'_equilibrium.h5')
+            eq = h5.File(eq_file, 'r')
+        except:
+            raise IOError('Double check your directory, runid and/or path. The equilibrium file was not found')
+    if args.distribution is not None:
+        try:
+            dist_file = os.path.join(args.directory, args.runid+'_distribution.h5')
+            dist = h5.File(dist_file, 'r')
+        except:
+            raise IOError('Double check your directory, runid and/or path. The distribution file was not found')
 
-
-    # Define mask
+    # Define the limiting mask
     if args.fields or args.plasma or args.distribution or plot_all:
         pmask = eq["/plasma/mask"].value
         fmask = eq["/fields/mask"].value
         mask = np.multiply(pmask, fmask)
 
-    # Error checks for line outs
+    # Error checks for attempting to simultaneously plot two line outs on the same figure
     if args.eplineout is not None and args.pelineout is not None:
-        print('** ERROR: Cannot plot both ep and pe line outs, i.e., pick one only. **')
-        raise SystemExit
+        raise IOError('Cannot plot both ep and pe line outs. Pick one only')
     if args.erlineout is not None and args.relineout is not None:
-        print('** ERROR: Cannot plot both er and re line outs, i.e., pick one only. **')
-        raise SystemExit
+        raise IOError('Cannot plot both er and re line outs. Pick one only')
     if args.prlineout is not None and args.rplineout is not None:
-        print('** ERROR: Cannot plot both pr and rp line outs, i.e., pick one only. **')
-        raise SystemExit
+        raise IOError('Cannot plot both pr and rp line outs. Pick one only')
     if args.zelineout is not None and args.ezlineout is not None:
-        print('** ERROR: Cannot plot both ez and ze line outs, i.e., pick one only. **')
-        raise SystemExit
+        raise IOError('Cannot plot both ez and ze line outs. Pick one only')
     if args.zplineout is not None and args.pzlineout is not None:
-        print('** ERROR: Cannot plot both pz and zp line outs, i.e., pick one only. **')
-        raise SystemExit
+        raise IOError('Cannot plot both pz and zp line outs. Pick one only')
     if args.rzlineout is not None and args.zrlineout is not None: 
-        print('** ERROR: Cannot plot both rz and zr line outs, i.e., pick one only. **')
-        raise SystemExit
+        raise IOError('Cannot plot both rz and zr line outs. Pick one only')
 
-    # Line out flags needed for the distribution function loop
+    # Define lineout flags that will be called in the big plot distribution loop
     lout_flag = {}
     if args.eplineout is not None or args.pelineout is not None:
         lout_flag['pitchenergy'] = [args.pelineout, args.eplineout]
@@ -194,15 +192,10 @@ def main():
     # Plot geometry
     if args.geometry or plot_all:
 
-        try:
-            r = eq["/plasma/r"].value
-            z = eq["/plasma/z"].value
-            rmin, rmax = np.min(r),np.max(r)
-            zmin, zmax = np.min(z),np.max(z)
-        except:
-            rmin, rmax = 50.0, 200.0
-            zmin, zmax = -100.0, 100.0
-            print('Equilibrium file not found, using default values for axes limits')
+        r = eq["/plasma/r"].value
+        z = eq["/plasma/z"].value
+        rmin, rmax = np.min(r),np.max(r)
+        zmin, zmax = np.min(z),np.max(z)
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
@@ -249,15 +242,11 @@ def main():
 
             t = np.linspace(0, mag, 2)
             theta = np.linspace(0, 2 * np.pi, 1000)
-            #use meshgrid to make 2d arrays
             t, theta = np.meshgrid(t, theta)
-            #generate coordinates for surface
             u, v, w = [centerline[0,i] + axis[i] * t + rz * np.sin(theta) * n1[i] +
                     ry * np.cos(theta) * n2[i] for i in [0, 1, 2]]
             # Plot
             ax.plot_surface(u, v, w, color='white',alpha=0.1)
-            #ax.scatter3D(u, v, w)
-            #ax.plot(*zip(p0, p1), color = 'red')
             if f90:
                 # Beam Grid
                 # Plot beam grid origin
@@ -313,6 +302,7 @@ def main():
                 los = d_cent + t.reshape(2,1)*axis
                 ax.plot(los[:,0],los[:,1],los[:,2],color=colors[i+f_nchan],label = "NPA Ch. {0}".format(i+1))
 
+        # Set axes limits for an equal aspect ratio visualization
         X = np.array([-rmax,rmax])
         Y = np.array([-rmax,rmax])
         Z = np.array([-zmax,zmax])
@@ -400,7 +390,7 @@ def main():
         if args.zrlineout is not None:
             zi = np.abs(z-args.zrlineout).argmin()       # Z lineout index
 
-        #Interpolation grid ranges
+        # Interpolation grid ranges
         rmin, rmax = np.min(r),np.max(r)
         zmin, zmax = np.min(z),np.max(z)
 
@@ -535,7 +525,7 @@ def main():
                 fig.colorbar(c,shrink=0.87,format='%0.2e', ax=ax[0])
                 fig.tight_layout()
 
-        #Fast-ion density
+        # Fast-ion density
         r = dist["/r"].value
         z = dist["/z"].value
         if args.rzlineout is not None:

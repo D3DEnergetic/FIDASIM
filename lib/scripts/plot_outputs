@@ -9,12 +9,14 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import (FormatStrFormatter, AutoMinorLocator,
         LogLocator, AutoLocator)
 
+# Define some functions that are called by the main functions below
 def extract_runid(f):
         return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[0:-1])
 
 def extract_file_type(f):
     return '_'.join(os.path.splitext(os.path.basename(f))[0].split("_")[-1::])
 
+# Function that creates a list of things to plot
 def to_plot_f(file_path):
     spec = []
     npa = []
@@ -27,6 +29,7 @@ def to_plot_f(file_path):
         to_plot[index].append(file_path[i])
     return to_plot
 
+# Define main plotting functions
 def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
         cold=False, dcx=False, full=False, half=False, halo=False,
         third=False, plot_all=False, log=False,
@@ -262,8 +265,9 @@ def plt_npa(file_paths, flux=False, pflux=False, plot_all=False,
         ax[mod_i].set_title(subp_title, loc='right', fontsize=10)
         handles, labels = ax[mod_i].get_legend_handles_labels()
         fig.legend(handles, labels, loc='upper center', ncol = 6)
-    return 
+    return
 
+# Define function that prints the neutron rate(s)
 def get_neutron_rate(file_paths, N=1):
 
     data_set = np.empty(N)
@@ -282,10 +286,8 @@ def get_neutron_rate(file_paths, N=1):
 
 def main():
     parser = argparse.ArgumentParser(description="Plots FIDASIM outputs")
-    # Check to see what the user can do with -d, this should match the argument of plot_inputs
     parser.add_argument('-d', '--directory', type=str,
                         help='Folder path where your file(s) are located')
-    # Check to see if a user can input more than one ID, this should match the argument of plot_inputs
     parser.add_argument('-r','--runids',
                         nargs='+',
                         help = 'Run ID')
@@ -370,7 +372,7 @@ def main():
 
     args = parser.parse_args()
 
-    # Create list of things to plot from the user's manual input
+    # Create list of things to plot from the user's -p input
     if args.path is not None:
         for p in args.path:
             fileordir = os.path.abspath(p)
@@ -397,7 +399,8 @@ def main():
                 to_plot.append([fileordir+'/'+ f for f in allfiles if re.search('.*_npa\.h5',f)])
                 to_plot.append([fileordir+'/'+ f for f in allfiles if re.search('.*_neutrons\.h5',f)])
         else:
-            raise IOError('Not a file or directory')
+            print('Not a file or directory')
+            raise SystemExit
 
     if len(to_plot[0])>0:
         plt_spectra(to_plot[0], fida=args.fida, pfida=args.pfida, brems=args.brems, cold=args.cold, dcx=args.dcx, full=args.full, half=args.half, halo=args.halo, third=args.third, plot_all=args.spectra, log=args.slog, ac=args.allschan, lc=args.listschan, rc=args.rangeschan, xlim=args.sxlim, ylim=args.sylim)

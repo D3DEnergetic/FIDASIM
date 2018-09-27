@@ -192,7 +192,7 @@ What if you are only interested in the active FIDA emission?
 What if you only want to view channels 1 and 3?
 The example below does this for two different files located in different folders.
 ```
-plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /p/fida/lstagner/TEST/test_2a_spectra.h5 -f -ls 1 3
+plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls 1 3
 ```
 
 Now that you have a grasp on how the script works, take a look at the help documentation `plot_outputs -h` to see what else the code is capable of.

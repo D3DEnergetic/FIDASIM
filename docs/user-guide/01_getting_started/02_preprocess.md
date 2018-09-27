@@ -155,6 +155,7 @@ or in Python
 ```
 
 #Visualization: Inputs
+
 Visualizing your inputs can be done by executing `plot_inputs` found in `lib/scripts/`
 
 Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
@@ -174,7 +175,6 @@ In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or 
 If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.
 
 If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
-This input informs the script to add lineouts where applicable.
 For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command
 ```
 plot_inputs /p/fida/lstagner/TEST/ test -p -rz 170

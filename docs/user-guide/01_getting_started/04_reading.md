@@ -173,9 +173,10 @@ julia> h5read("test_geometry.h5","/nbi/src")
 ```
 
 #Visualization: Outputs
+
 Visualizing your outputs can be done by executing `plot_outputs` found in `lib/scripts/`
 
-You can plot your spectra and npa files, and print the neutron rate in various ways.
+Plotting data from your spectra or npa files, and printing the neutron rate can be done in various ways.
 Let's start with the easiest method first.
 Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
 Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
@@ -185,11 +186,10 @@ plot_outputs -d /p/fida/lstagner/TEST/ -s -as -n -an
 ```
 If you are interested in only one shot, add `-r` to your command to indicate the run ID you wish to analyze.
 
-Let's consider now a more specific example.
+Let's now consider a more specific example.
 What if your files are scattered around in different folders?
 What if you are only interested in the active FIDA emission?
 What if you only want to view channels 1 and 3?
-Don't worry, this is also easy to accomplish.
 The example below does this for two different files located in different folders.
 ```
 plot_outputs -p /p/fida/lstagner/TEST/test_spectra.h5 /p/fida/lstagner/DIFFERENT_TEST/different_test_spectra.h5 -f -ls 1 3

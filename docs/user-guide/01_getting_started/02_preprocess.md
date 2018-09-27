@@ -163,12 +163,12 @@ Below are brief descriptions and examples of what the script can currently handl
 
 To plot all of your inputs, simply indicate the directory and run ID.
 ```
-plot_inputs /p/fida/lstagner/TEST/ test
+plot_inputs /p/fida/lstagner/TEST/ test_1a
 ```
 
 To plot only the beam and diagnostic geometry, append the optional argument -g
 ```
-plot_inputs /p/fida/lstagner/TEST/ test -g
+plot_inputs /p/fida/lstagner/TEST/ test_1a -g
 ```
 In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.
 
@@ -177,7 +177,7 @@ If you are plotting many FIDA or NPA line of sights, then it might be beneficial
 If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
 For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command
 ```
-plot_inputs /p/fida/lstagner/TEST/ test -p -rz 170
+plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz 170
 ```
 
-There are many more possible lineouts that can be viewed, so run `plot_inputs -h` to see what else is available.
+There are many more possible lineouts that can be viewed, so run `plot_inputs -h` to look at the help documentation.

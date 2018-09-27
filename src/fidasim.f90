@@ -8474,7 +8474,7 @@ subroutine bremsstrahlung
 
     dlength = 0.3 !cm
     !! $OMP PARALLEL DO schedule(guided) private(ichan,xyz,vi,basis,spot_size, &
-    !! $OMP& ic, nc,randomu,sqrt_rho,theta,r0,plasma,gaunt,brems)
+    !! $OMP& max_length, ic, nc,randomu,sqrt_rho,theta,r0,plasma,gaunt,brems)
     loop_over_channels: do ichan=istart,spec_chords%nchan,istep
         xyz = spec_chords%los(ichan)%lens
         vi = spec_chords%los(ichan)%axis
@@ -8488,7 +8488,7 @@ subroutine bremsstrahlung
             nc = 100
         endif
 
-        do ic=1,nc
+        loop_over_los: do ic=1,nc
             call randu(randomu)
             sqrt_rho = sqrt(randomu(1))
             theta = 2*pi*randomu(2)
@@ -8504,15 +8504,15 @@ subroutine bremsstrahlung
                 r0 = r0 + vi*dlength ! move dlength
                 call get_plasma(plasma,pos=r0)
                 max_length = max_length + dlength
-                if(max_length.gt.300) cycle loop_over_channels
+                if(max_length.gt.300) cycle loop_over_los
             enddo
 
             ! Calculate bremsstrahlung along los
             do while (plasma%in_plasma)
                 if(plasma%te.gt.0.0) then
                     gaunt = 5.542-(3.108-log(plasma%te))*(0.6905-0.1323/plasma%zeff)
-                    brems = 7.57d-9*gaunt*plasma%dene**2*plasma%zeff/(lambda_arr &
-                            *sqrt(plasma%te*1000.0))*exp(-h_planck*c0/(lambda_arr*plasma%te*1000.0)) &
+                    brems = (7.57d-9)*gaunt*((plasma%dene**2)*plasma%zeff/(lambda_arr &
+                            *sqrt(plasma%te*1000.0)))*exp(-h_planck*c0/((1.d-10)*lambda_arr*plasma%te*1.d3)) &
                             *dlambda*(4.d0*pi)*1.d-4
 
                     spec%brems(:,ichan)= spec%brems(:,ichan) + (brems*dlength*1.d-2)/nc
@@ -8521,7 +8521,7 @@ subroutine bremsstrahlung
                 r0 = r0 + vi*dlength
                 call get_plasma(plasma,pos=r0)
             enddo
-        enddo
+        enddo loop_over_los
     enddo loop_over_channels
     !! $OMP END PARALLEL DO
 

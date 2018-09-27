@@ -169,14 +169,15 @@ To plot only the beam and diagnostic geometry, append the optional argument -g
 ```
 plot_inputs /p/fida/lstagner/TEST/ test -g
 ```
-If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.
-
 In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.
 
-If you wish to plot lineouts on all of your figures, simply indicate the dimension and value you want to cut through.
+If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.
+
+If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
+This input informs the script to add lineouts where applicable.
 For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command
 ```
 plot_inputs /p/fida/lstagner/TEST/ test -p -rz 170
 ```
 
-There are many more possible lineouts that can be viewed, so please run `plot_inputs -h` to see what else is available.
+There are many more possible lineouts that can be viewed, so run `plot_inputs -h` to see what else is available.

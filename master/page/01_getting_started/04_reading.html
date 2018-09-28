@@ -149,6 +149,7 @@
 <li><a href="#using-julia">Using Julia</a></li>
 </ul>
 </li>
+<li><a href="#visualization-outputs">Visualization: Outputs</a></li>
 </ul>
 </div>
 <h2 id="using-hdf5-tools">Using HDF5 tools</h2>
@@ -315,6 +316,30 @@ IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
 <span class="o">-</span><span class="mf">532.0</span>
 <span class="mf">0.0</span>
 </pre></div>
+
+
+<h1 id="visualization-outputs">Visualization: Outputs</h1>
+<p>Visualizing your outputs can be done by executing <code>plot_outputs</code> found in <code>lib/scripts/</code></p>
+<p>Plotting data from your spectra or npa files, and printing the neutron rate can be done in various ways.
+Let's start with the easiest method first.
+Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
+Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
+Furthermore, it will also print out the neutron rate.</p>
+<div class="codehilite"><pre><span></span>plot_outputs -d /p/fida/lstagner/TEST/ -s -as -n -an
+</pre></div>
+
+
+<p>If you are interested in only one shot, e.g. test_1a, add <code>-r test_1a</code> to your command.</p>
+<p>Let's now consider a more specific example.
+What if your files are scattered around in different folders?
+What if you are only interested in the active FIDA emission?
+What if you only want to view channels 1 and 3?
+The example below does this for two different files located in different folders.</p>
+<div class="codehilite"><pre><span></span>plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls 1 3
+</pre></div>
+
+
+<p>Now that you have a grasp on how the script works, take a look at the help documentation <code>plot_outputs -h</code> to see what else the code is capable of.</p>
     </div>
     
     <div class="col-md-3 col-md-pull-9">

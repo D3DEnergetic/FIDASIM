@@ -1,3 +1,5 @@
+dist: trusty
+
 language: python
 
 python:
@@ -13,21 +15,23 @@ branches:
     - release-1.0
 
 addons:
-  apt:  
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
     - git
-    - gcc
-    - g++
-    - gfortran
+    - gcc-5
+    - g++-5
+    - gfortran-5
     - zlib1g-dev
     - linkchecker
     - python-pip
     - graphviz
 
 install:
-  - export FC=gfortran
-  - export CC=gcc
-  - export CXX=g++
+  - export FC=gfortran-5
+  - export CC=gcc-5
+  - export CXX=g++-5
   - pip install --upgrade graphviz
   - (pip install --upgrade ford && ford --version)
   - pip install -Iv markdown==2.6.9

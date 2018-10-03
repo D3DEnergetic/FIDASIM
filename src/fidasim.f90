@@ -6,6 +6,7 @@ USE HDF5 !! Base HDF5
 USE hdf5_utils !! Additional HDF5 routines
 USE eigensystem, ONLY : eigen, linsolve
 USE utilities
+USE ISO_C_BINDING
 #ifdef _MPI
 USE mpi_utils
 #endif
@@ -4143,7 +4144,7 @@ subroutine write_npa
              "Number of particles that hit the detector: count(chan)", error)
 
 
-        if((npart.ne.0).and.(inputs%calc_npa.ge.2)) then
+        if((npart.gt.0).and.(inputs%calc_npa.ge.2)) then
             !Create Group
             call h5gcreate_f(fid,"/particles",gid, error)
             call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npart], error)
@@ -4261,8 +4262,8 @@ subroutine write_npa
     if(do_write.and.(inputs%calc_pnpa.ge.1)) then
         !Write Passive Flux
         d(1) = 1
-        dim2 = [npa%nenergy, npa%nchan]
-        dim3 = [npa%nenergy, npa%nchan, particles%nclass]
+        dim2 = [pnpa%nenergy, pnpa%nchan]
+        dim3 = [pnpa%nenergy, pnpa%nchan, particles%nclass]
         if(particles%nclass.gt.1) then
             call h5ltmake_compressed_dataset_double_f(fid,"/pflux",3,dim3,pnpa%flux, error)
             call h5ltset_attribute_string_f(fid,"/pflux", "description", &
@@ -4278,10 +4279,10 @@ subroutine write_npa
              "Number of passive particles that hit the detector: pcount(chan)", error)
 
         if(inputs%calc_npa.le.0) then
-            call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [npa%nenergy], error)
-            call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [npa%nchan], error)
+            call h5ltmake_dataset_int_f(fid,"/nenergy", 0, d, [pnpa%nenergy], error)
+            call h5ltmake_dataset_int_f(fid,"/nchan", 0, d, [pnpa%nchan], error)
             call h5ltmake_compressed_dataset_double_f(fid,"/energy",1,dim2(1:1),&
-                 npa%energy, error)
+                 pnpa%energy, error)
             call h5ltmake_compressed_dataset_double_f(fid,"/radius",1,dim2(2:2),&
                  npa_chords%radius, error)
 
@@ -4301,7 +4302,7 @@ subroutine write_npa
             call h5ltset_attribute_string_f(fid,"/radius","units","cm",error)
         endif
 
-        if((npart.ne.0).and.(inputs%calc_pnpa.ge.2)) then
+        if((npart.gt.0).and.(inputs%calc_pnpa.ge.2)) then
             !Create Group
             call h5gcreate_f(fid,"/passive_particles",gid, error)
             call h5ltmake_dataset_int_f(gid, "nparticle", 0, d, [npart], error)
@@ -6538,7 +6539,7 @@ subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs
             b%b212 = 0
             b%b222 = 0
             b%b122 = 0
-            b%b112 = k
+            b%b112 = 0
             b%k = 1
         endif
         err_status = 0
@@ -6986,7 +6987,12 @@ subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
 
     ! Calculate energy
     energy = inputs%ab*v2_to_E_per_amu*dot_product(vn,vn)
-    dE = npa%energy(2)-npa%energy(1)
+    if(pas) then
+        dE = pnpa%energy(2)-pnpa%energy(1)
+    else
+        dE = npa%energy(2)-npa%energy(1)
+    endif
+
 
     ! Calculate pitch if distribution actually uses pitch
     if(inputs%dist_type.le.2) then
@@ -7519,12 +7525,13 @@ subroutine colrad(plasma,i_type,vn,dt,states,dens,photons)
     states = matmul(eigvec, coef * exp_eigval_dt)  ![neutrals/cm^3/s]!
     dens   = matmul(eigvec,coef*(exp_eigval_dt-1.d0)/eigval)
 
-    if ((minval(states).lt.0).or.(minval(dens).lt.0)) then
-        do n=1,nlevs
-            if(states(n).lt.0) states(n)=0.d0
-            if(dens(n).lt.0) dens(n)=0.d0
-        enddo
-    endif
+    where (states.lt.0)
+        states = 0.d0
+    endwhere
+
+    where (dens.lt.0)
+        dens = 0.d0
+    endwhere
 
     photons=dens(3)*tables%einstein(2,3) !! - [Ph/(s*cm^3)] - !!
 
@@ -7857,7 +7864,7 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
     !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell
     integer(Int64), intent(in)                    :: nr_markers
         !+ Approximate total number of markers to launch
-    real(Float64), dimension(:,:,:), intent(in)   :: papprox
+    real(Float64), dimension(:,:,:), target, intent(in)   :: papprox
         !+ [[libfida:beam_grid]] cell weights
     integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
@@ -7868,6 +7875,7 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
     integer  :: nmin = 5
     integer, dimension(1) :: randomi
     type(rng_type) :: r
+    real(Float64), pointer :: papprox_ptr(:)
 
     !! Fill in minimum number of markers per cell
     nlaunch = 0
@@ -7882,7 +7890,9 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
         nm = nr_markers - nmin*nc
 
         !! precalculate cdf to save time
-        call cumsum(reshape(papprox,[beam_grid%ngrid]), cdf)
+        call c_f_pointer(c_loc(papprox), papprox_ptr, [beam_grid%ngrid])
+        call cumsum(papprox_ptr, cdf)
+
         !! use the same seed for all processes
         call rng_init(r, 932117)
         do c=1, nm
@@ -8464,7 +8474,7 @@ subroutine bremsstrahlung
 
     dlength = 0.3 !cm
     !! $OMP PARALLEL DO schedule(guided) private(ichan,xyz,vi,basis,spot_size, &
-    !! $OMP& ic, nc,randomu,sqrt_rho,theta,r0,plasma,gaunt,brems)
+    !! $OMP& max_length, ic, nc,randomu,sqrt_rho,theta,r0,plasma,gaunt,brems)
     loop_over_channels: do ichan=istart,spec_chords%nchan,istep
         xyz = spec_chords%los(ichan)%lens
         vi = spec_chords%los(ichan)%axis
@@ -8478,7 +8488,7 @@ subroutine bremsstrahlung
             nc = 100
         endif
 
-        do ic=1,nc
+        loop_over_los: do ic=1,nc
             call randu(randomu)
             sqrt_rho = sqrt(randomu(1))
             theta = 2*pi*randomu(2)
@@ -8494,15 +8504,15 @@ subroutine bremsstrahlung
                 r0 = r0 + vi*dlength ! move dlength
                 call get_plasma(plasma,pos=r0)
                 max_length = max_length + dlength
-                if(max_length.gt.300) cycle loop_over_channels
+                if(max_length.gt.300) cycle loop_over_los
             enddo
 
             ! Calculate bremsstrahlung along los
             do while (plasma%in_plasma)
                 if(plasma%te.gt.0.0) then
                     gaunt = 5.542-(3.108-log(plasma%te))*(0.6905-0.1323/plasma%zeff)
-                    brems = 7.57d-9*gaunt*plasma%dene**2*plasma%zeff/(lambda_arr &
-                            *sqrt(plasma%te*1000.0))*exp(-h_planck*c0/(lambda_arr*plasma%te*1000.0)) &
+                    brems = (7.57d-9)*gaunt*((plasma%dene**2)*plasma%zeff/(lambda_arr &
+                            *sqrt(plasma%te*1000.0)))*exp(-h_planck*c0/((1.d-10)*lambda_arr*plasma%te*1.d3)) &
                             *dlambda*(4.d0*pi)*1.d-4
 
                     spec%brems(:,ichan)= spec%brems(:,ichan) + (brems*dlength*1.d-2)/nc
@@ -8511,7 +8521,7 @@ subroutine bremsstrahlung
                 r0 = r0 + vi*dlength
                 call get_plasma(plasma,pos=r0)
             enddo
-        enddo
+        enddo loop_over_los
     enddo loop_over_channels
     !! $OMP END PARALLEL DO
 
@@ -10164,7 +10174,6 @@ subroutine neutron_mc
         write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Rate:   ',sum(neutron%rate)
         write(*,'(30X,a)') ''
         write(*,*) 'write neutrons:    ' , time(time_start)
-        write(*,'(30X,a)') ''
     endif
 
 #ifdef _MPI
@@ -10864,7 +10873,7 @@ program fidasim
         call read_chords()
     endif
 
-    if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1)) then
+    if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
     endif
 
@@ -11004,8 +11013,8 @@ program fidasim
                         write(*,*) 'write birth:    ' , time(time_start)
                     endif
                     call write_birth_profile()
+                    if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
                 endif
-                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
             endif
 
             !! ---------- DCX (Direct charge exchange) ---------- !!

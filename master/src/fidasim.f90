@@ -804,18 +804,32 @@ type NPAResults
         !+ Neutral particle flux: flux(energy,chan, orbit_type) [neutrals/(s*dE)]
 end type NPAResults
 
+type BirthParticle
+    !+ Defines a Birth particle
+    integer :: neut_type = 0
+        !+ Birth type (1=Full, 2=Half, 3=Third)
+    integer(Int32), dimension(3) :: ind = 0
+        !+ Initial [[libfida:beam_grid]] indices
+    real(Float64), dimension(3) :: ri = 0.d0
+        !+ Initial position in beam grid coordinates [cm]
+    real(Float64), dimension(3) :: vi = 0.d0
+        !+ Initial velocity in beam grid coordinates [cm/s]
+    real(Float64), dimension(3) :: ri_gc = 0.d0
+        !+ Initial guiding-center position in beam grid coordinates [cm]
+    real(Float64) :: weight = 0.d0
+        !+ NPA particle weight [fast-ions/s]
+    real(Float64) :: energy = 0.d0
+        !+ Birth Energy [keV]
+    real(Float64) :: pitch = 0.d0
+        !+ Birth Pitch
+end type BirthParticle
+
 type BirthProfile
     !+ Birth profile structure
     integer :: cnt = 1
         !+ Particle counter
-    integer, dimension(:), allocatable             :: neut_type
-        !+ Particle birth type (1=Full, 2=Half, 3=Third)
-    real(Float64), dimension(:,:), allocatable     :: ri
-        !+ Particle birth position [cm]
-    real(Float64), dimension(:,:), allocatable     :: vi
-        !+ Particle birth velocity [cm/s]
-    integer, dimension(:,:), allocatable           :: ind
-        !+ Particle [[libfida:beam_grid]] indices
+    type(BirthParticle), dimension(:), allocatable :: part
+        !+ Array of birth particles
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Birth density: dens(neutral_type,x,y,z) [fast-ions/(s*cm^3)]
 end type BirthProfile
@@ -1049,10 +1063,10 @@ end type GyroSurface
 
 interface assignment(=)
     !+ Allows for assigning [[Profiles]],[[LocalProfiles]],
-    !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], and [[NPAParticle]]
+    !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], [[NPAParticle]], and [[BirthParticle]]
     module procedure pp_assign, lpp_assign, plp_assign, lplp_assign, &
                      ff_assign, lff_assign, flf_assign, lflf_assign, &
-                     fast_ion_assign,npa_part_assign
+                     fast_ion_assign,npa_part_assign,birth_part_assign
 end interface
 
 interface operator(+)
@@ -1225,6 +1239,22 @@ subroutine npa_part_assign(p1, p2)
     p1%detector = p2%detector
 
 end subroutine npa_part_assign
+
+subroutine birth_part_assign(p1, p2)
+    !+ Defines how to assign [[BirthParticle]] types to eachother
+    type(BirthParticle), intent(in)  :: p2
+    type(BirthParticle), intent(out) :: p1
+
+    p1%neut_type = p2%neut_type
+    p1%ind       = p2%ind
+    p1%ri        = p2%ri
+    p1%vi        = p2%vi
+    p1%ri_gc     = p2%ri_gc
+    p1%weight    = p2%weight
+    p1%energy    = p2%energy
+    p1%pitch     = p2%pitch
+
+end subroutine birth_part_assign
 
 subroutine pp_assign(p1, p2)
     !+ Defines how to assign [[Profiles]] types to eachother
@@ -3792,11 +3822,14 @@ subroutine write_birth_profile
     integer :: error, i, c, npart, start_index, end_index
 
     character(charlim) :: filename
-    real(Float64), dimension(:,:), allocatable :: ri
+    type(LocalEMFields) :: fields
+    type(BirthParticle) :: part
+    real(Float64), dimension(:,:), allocatable :: ri, ri_gc
     real(Float64), dimension(:,:), allocatable :: vi
+    real(Float64), dimension(:), allocatable :: energy, pitch, weight
     integer, dimension(:,:), allocatable :: inds
     integer, dimension(:), allocatable :: neut_types
-    real(Float64), dimension(3) :: xyz,uvw,v_uvw
+    real(Float64), dimension(3) :: xyz,v_xyz,uvw,v_uvw,r_gyro,uvw_gc
     logical :: do_write
 
 #ifdef _MPI
@@ -3805,17 +3838,22 @@ subroutine write_birth_profile
 #endif
 
     npart = birth%cnt-1
-
 #ifdef _MPI
     call parallel_sum(npart)
 #endif
 
     allocate(ri(3,npart))
     allocate(vi(3,npart))
+    allocate(ri_gc(3,npart))
+    allocate(energy(npart),pitch(npart),weight(npart))
     allocate(inds(3,npart))
     allocate(neut_types(npart))
     ri = 0.d0
     vi = 0.d0
+    ri_gc = 0.d0
+    energy = 0.d0
+    pitch = 0.d0
+    weight = 0.d0
     inds = 0
     neut_types = 0
 
@@ -3837,20 +3875,34 @@ subroutine write_birth_profile
 
     c = 1
     do i=start_index, end_index
+        part = birth%part(c)
         ! Convert position to rzphi
-        xyz = birth%ri(:,c)
+        xyz = part%ri
+        v_xyz = part%vi
+
+        inds(:,i) = part%ind
+        neut_types(i) = part%neut_type
+        energy(i) = part%energy
+        weight(i) = part%weight
+
+        ! Get guiding center positions
+        pitch(i) = part%pitch
+        call xyz_to_uvw(part%ri_gc, uvw_gc)
+        ri_gc(1,i) = sqrt(uvw_gc(1)*uvw_gc(1) + uvw_gc(2)*uvw_gc(2))
+        ri_gc(2,i) = uvw_gc(3)
+        ri_gc(3,i) = atan2(uvw_gc(2),uvw_gc(1))
+
+        ! Get position in cylindrical
         call xyz_to_uvw(xyz,uvw)
         ri(1,i) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
         ri(2,i) = uvw(3)
         ri(3,i) = atan2(uvw(2),uvw(1))
 
-        ! Convert velocity to rzphi
-        v_uvw = matmul(beam_grid%basis, birth%vi(:,c))
+        ! Convert velocity to cylindrical
+        v_uvw = matmul(beam_grid%basis, v_xyz)
         vi(1,i) = v_uvw(1)*cos(ri(3,i)) + v_uvw(2)*sin(ri(3,i))
         vi(2,i) = v_uvw(3)
         vi(3,i) = -v_uvw(1)*sin(ri(3,i)) + v_uvw(2)*cos(ri(3,i))
-        inds(:,i) = birth%ind(:,c)
-        neut_types(i) = birth%neut_type(c)
         c = c + 1
     enddo
 
@@ -3858,6 +3910,10 @@ subroutine write_birth_profile
 
     do_write = .True.
 #ifdef _MPI
+    call parallel_sum(ri_gc)
+    call parallel_sum(energy)
+    call parallel_sum(pitch)
+    call parallel_sum(weight)
     call parallel_sum(ri)
     call parallel_sum(vi)
     call parallel_sum(inds)
@@ -3879,9 +3935,13 @@ subroutine write_birth_profile
         dim4 = shape(birth%dens)
         call h5ltmake_compressed_dataset_double_f(fid,"/dens", 4, dim4, birth%dens, error)
         dim2 = [3, npart]
+        call h5ltmake_compressed_dataset_double_f(fid,"/ri_gc", 2, dim2, ri_gc, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/ri", 2, dim2, ri, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/vi", 2, dim2, vi, error)
         call h5ltmake_compressed_dataset_int_f(fid,"/ind", 2, dim2, inds, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim2(2:2), energy, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim2(2:2), pitch, error)
+        call h5ltmake_compressed_dataset_double_f(fid,"/weight", 1, dim2(2:2), weight, error)
         call h5ltmake_compressed_dataset_int_f(fid,"/type", 1, dim2(2:2), neut_types, error)
 
         !Add attributes
@@ -3891,12 +3951,23 @@ subroutine write_birth_profile
              "Birth density: dens(beam_component,x,y,z)", error)
         call h5ltset_attribute_string_f(fid, "/dens", "units", &
              "fast-ions/(s*cm^3)", error)
+        call h5ltset_attribute_string_f(fid, "/ri_gc", "description", &
+             "Fast-ion guiding-center birth position in R-Z-Phi: ri_gc([r,z,phi],particle)", error)
+        call h5ltset_attribute_string_f(fid, "/ri_gc", "units", "cm, radians", error)
         call h5ltset_attribute_string_f(fid, "/ri", "description", &
              "Fast-ion birth position in R-Z-Phi: ri([r,z,phi],particle)", error)
         call h5ltset_attribute_string_f(fid, "/ri", "units", "cm, radians", error)
         call h5ltset_attribute_string_f(fid, "/vi", "description", &
              "Fast-ion birth velocity in R-Z-Phi: vi([r,z,phi],particle)", error)
         call h5ltset_attribute_string_f(fid, "/vi", "units", "cm/s", error)
+        call h5ltset_attribute_string_f(fid, "/energy", "description", &
+             "Fast-ion birth energy: energy(particle)", error)
+        call h5ltset_attribute_string_f(fid, "/energy", "units", "keV", error)
+        call h5ltset_attribute_string_f(fid, "/weight", "description", &
+             "Fast-ion birth weight: weight(particle)", error)
+        call h5ltset_attribute_string_f(fid, "/weight", "units", "fast-ions/s", error)
+        call h5ltset_attribute_string_f(fid, "/pitch", "description", &
+             "Fast-ion birth pitch: pitch(particle)", error)
         call h5ltset_attribute_string_f(fid, "/ind", "description", &
              "Fast-ion birth beam grid indices: ind([i,j,k],particle)", error)
         call h5ltset_attribute_string_f(fid, "/type", "description", &
@@ -3915,7 +3986,10 @@ subroutine write_birth_profile
         call h5close_f(error)
     endif
 
-    deallocate(ri,vi)
+    ! Deallocate arrays since they aren't needed anymore
+    deallocate(ri,vi,ri_gc,energy,pitch,neut_types,inds)
+    deallocate(birth%dens,birth%part)
+
     if(inputs%verbose.ge.1) then
         write(*,'(T4,a,a)') 'birth profile written to: ',trim(filename)
     endif
@@ -8347,17 +8421,21 @@ subroutine ndmc
     integer(Int64) :: jj, ii, kk, cnt
     integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
-    integer(Int64), dimension(3) :: nl_birth
     type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
     real(Float64), dimension(nlevs) :: states, dens
-    real(Float64) :: photons, iflux
+    real(Float64) :: photons, iflux,flux_tot
     integer(Int32), dimension(3) :: ind
+    real(Float64), dimension(3) :: ri,ri_gc,r_gyro
     real(Float64), dimension(1) :: randomu
     integer, dimension(1) :: randi
     logical :: err
 
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi
+        if(inputs%calc_birth.ge.1) then
+            write(*,'(T6,"# of birth markers: 3 x",i9)') int(inputs%n_nbi*inputs%n_birth)
+        endif
     endif
 
     !! # of injected neutrals = NBI power/energy_per_particle
@@ -8368,17 +8446,9 @@ subroutine ndmc
 
     nlaunch=real(inputs%n_nbi)
     !$OMP PARALLEL DO schedule(guided) &
-    !$OMP& private(vnbi,rnbi,tracks,ntrack,plasma,nl_birth,randi, &
-    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err)
+    !$OMP& private(vnbi,rnbi,tracks,ntrack,plasma,fields,randi,flux_tot, &
+    !$OMP& states,dens,iflux,photons,neut_type,jj,ii,kk,ind,err,ri,ri_gc,r_gyro)
     loop_over_markers: do ii=istart,inputs%n_nbi,istep
-        if(inputs%calc_birth.ge.1) then
-            !! Determine the type of birth particle (1, 2, or 3)
-            nl_birth = 0
-            do kk=1,inputs%n_birth
-                call randind(nbi%current_fractions,randi)
-                nl_birth(randi(1)) = nl_birth(randi(1)) + 1
-            enddo
-        endif
         energy_fractions: do neut_type=1,3
             !! (type = 1: full energy, =2: half energy, =3: third energy
             call mc_nbi(vnbi,neut_type,rnbi,err)
@@ -8388,6 +8458,7 @@ subroutine ndmc
             if(ntrack.eq.0) cycle energy_fractions
 
             !! Solve collisional radiative model along track
+            flux_tot = 0.d0
             states=0.d0
             states(1)=nneutrals*nbi%current_fractions(neut_type)/beam_grid%dv
             loop_along_track: do jj=1,ntrack
@@ -8397,7 +8468,8 @@ subroutine ndmc
 
                 call colrad(plasma,beam_ion,vnbi,tracks(jj)%time,states,dens,photons)
                 call store_neutrals(ind,neut_type,dens/nlaunch,vnbi)
-                tracks(jj)%flux = (iflux - sum(states))*beam_grid%dv/nlaunch
+                tracks(jj)%flux = (iflux - sum(states))/nlaunch
+                flux_tot = flux_tot + tracks(jj)%flux*beam_grid%dv
 
                 if(inputs%calc_birth.ge.1) then
                     call store_births(ind,neut_type,tracks(jj)%flux)
@@ -8407,18 +8479,25 @@ subroutine ndmc
                     call store_bes_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
                 endif
             enddo loop_along_track
-            if(inputs%calc_birth.ge.1) then
+            if((inputs%calc_birth.ge.1).and.(flux_tot.gt.0.d0)) then
                 !! Sample according to deposited flux along neutral trajectory
                 !$OMP CRITICAL(ndmc_birth)
-                do kk=1,nl_birth(neut_type)
+                do kk=1,inputs%n_birth
                     call randind(tracks(1:ntrack)%flux,randi)
                     call randu(randomu)
-                    birth%neut_type(birth%cnt) = neut_type
-                    birth%ind(:,birth%cnt) = tracks(randi(1))%ind
-                    birth%vi(:,birth%cnt) = vnbi
-                    birth%ri(:,birth%cnt) = tracks(randi(1))%pos + &
-                                            vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
-                    birth%cnt = birth%cnt+1
+                    birth%part(birth%cnt)%neut_type = neut_type
+                    birth%part(birth%cnt)%energy = nbi%vinj/sqrt(real(neut_type))
+                    birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
+                    birth%part(birth%cnt)%ind = tracks(randi(1))%ind
+                    birth%part(birth%cnt)%vi = vnbi
+                    ri = tracks(randi(1))%pos + vnbi*(tracks(randi(1))%time*(randomu(1)-0.5))
+                    birth%part(birth%cnt)%ri = ri
+
+                    call get_fields(fields,pos=ri)
+                    birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vnbi/norm2(vnbi))
+                    call gyro_step(vnbi,fields,r_gyro)
+                    birth%part(birth%cnt)%ri_gc = ri + r_gyro
+                    birth%cnt = birth%cnt + 1
                 enddo
                 !$OMP END CRITICAL(ndmc_birth)
             endif
@@ -8445,8 +8524,8 @@ subroutine ndmc
 
     if(nbi_outside.gt.0)then
         if(inputs%verbose.ge.1) then
-            write(*,'(T4,a, f6.2)') 'Percent of markers outside the grid: ', &
-                                  100.*nbi_outside/(3.*inputs%n_nbi)
+            write(*,'(T4,a, f6.2,a)') 'Percent of markers outside the grid: ', &
+                                  100.*nbi_outside/(3.*inputs%n_nbi),'%'
         endif
         if(sum(neut%full).eq.0) stop 'Beam does not intersect the grid!'
     endif
@@ -10898,15 +10977,7 @@ program fidasim
                             beam_grid%nx, &
                             beam_grid%ny, &
                             beam_grid%nz))
-        allocate(birth%neut_type(int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ind(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%ri(3,int(inputs%n_birth*inputs%n_nbi)))
-        allocate(birth%vi(3,int(inputs%n_birth*inputs%n_nbi)))
-        birth%neut_type = 0
-        birth%dens = 0.d0
-        birth%ind = 0
-        birth%ri = 0.d0
-        birth%vi = 0.d0
+        allocate(birth%part(int(3*inputs%n_birth*inputs%n_nbi)))
     endif
 
     if(inputs%calc_spec.ge.1) then

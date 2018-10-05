@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="57.3% of total for modules and submodules.">7382 statements</a>
+    title="57.5% of total for modules and submodules.">7441 statements</a>
      </li> 
      
      
@@ -386,6 +386,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-nparesults">NPAResults</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-birthparticle">BirthParticle</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-birthprofile">BirthProfile</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-spectra">Spectra</a>
@@ -487,6 +489,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-fast_ion_assign">fast_ion_assign</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-npa_part_assign">npa_part_assign</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-birth_part_assign">birth_part_assign</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-pp_assign">pp_assign</a>
       
@@ -1278,6 +1282,8 @@
       
       <a class="list-group-item" href="../module/libfida.html#type-nparesults">NPAResults</a>
       
+      <a class="list-group-item" href="../module/libfida.html#type-birthparticle">BirthParticle</a>
+      
       <a class="list-group-item" href="../module/libfida.html#type-birthprofile">BirthProfile</a>
       
       <a class="list-group-item" href="../module/libfida.html#type-spectra">Spectra</a>
@@ -1379,6 +1385,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-fast_ion_assign">fast_ion_assign</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-npa_part_assign">npa_part_assign</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-birth_part_assign">birth_part_assign</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-pp_assign">pp_assign</a>
       
@@ -2430,7 +2438,7 @@
   <div class="panel-body">
     
     <p>Allows for assigning <a href="../type/profiles.html">Profiles</a>,<a href="../type/localprofiles.html">LocalProfiles</a>,
- <a href="../type/emfields.html">EMFields</a>,<a href="../type/localemfields.html">LocalEMFields</a>,<a href="../type/fastion.html">FastIon</a>, and <a href="../type/npaparticle.html">NPAParticle</a></p>
+ <a href="../type/emfields.html">EMFields</a>,<a href="../type/localemfields.html">LocalEMFields</a>,<a href="../type/fastion.html">FastIon</a>, <a href="../type/npaparticle.html">NPAParticle</a>, and <a href="../type/birthparticle.html">BirthParticle</a></p>
   </div>
   
   <ul class="list-group">
@@ -3130,6 +3138,77 @@ public subroutine <a href='../proc/npa_part_assign.html'>npa_part_assign</a>(p1,
 <tr>
   
   <td><span class="anchor" ></span>type(<a href='../type/npaparticle.html'>NPAParticle</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public subroutine <a href='../proc/birth_part_assign.html'>birth_part_assign</a>(p1, p2)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Defines how to assign <a href="../type/birthparticle.html">BirthParticle</a> types to eachother</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/birthparticle.html'>BirthParticle</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/birthparticle.html'>BirthParticle</a>),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -12022,6 +12101,151 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
      
      
 <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="type-birthparticle"></span><h3>type, public :: <a href='../type/birthparticle.html'>BirthParticle</a>
+    
+  </h3></div>
+  <div class="panel-body">
+    
+    
+    <p>Defines a Birth particle</p>
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-neut_type"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>neut_type</strong></td><td> =</td><td>0</td><td><p>Birth type (1=Full, 2=Half, 3=Third)</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ind"></span>integer(kind=Int32),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ind</strong></td><td> =</td><td>0</td><td><p>Initial <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ri"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ri</strong></td><td> =</td><td>0.d0</td><td><p>Initial position in beam grid coordinates [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-vi"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vi</strong></td><td> =</td><td>0.d0</td><td><p>Initial velocity in beam grid coordinates [cm/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ri_gc"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ri_gc</strong></td><td> =</td><td>0.d0</td><td><p>Initial guiding-center position in beam grid coordinates [cm]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-weight%7E3"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>weight</strong></td><td> =</td><td>0.d0</td><td><p>NPA particle weight [fast-ions/s]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-energy%7E5"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>energy</strong></td><td> =</td><td>0.d0</td><td><p>Birth Energy [keV]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pitch%7E5"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>pitch</strong></td><td> =</td><td>0.d0</td><td><p>Birth Pitch</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+          
+     
+  </div>
+</div>
+
+     
+     
+<div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="type-birthprofile"></span><h3>type, public :: <a href='../type/birthprofile.html'>BirthProfile</a>
     
   </h3></div>
@@ -12062,53 +12286,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-neut_type"></span>integer,</td>
+  <td><span class="anchor" id="variable-part%7E2"></span>type(<a href='../type/birthparticle.html'>BirthParticle</a>),</td>
   
   <td>public,</td>
   <td>dimension(:), allocatable</td><td>::</td>
-  <td><strong>neut_type</strong></td><td></td><td></td><td><p>Particle birth type (1=Full, 2=Half, 3=Third)</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-ri"></span>real(kind=Float64),</td>
-  
-  <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>ri</strong></td><td></td><td></td><td><p>Particle birth position [cm]</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-vi"></span>real(kind=Float64),</td>
-  
-  <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>vi</strong></td><td></td><td></td><td><p>Particle birth velocity [cm/s]</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-ind"></span>integer,</td>
-  
-  <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>ind</strong></td><td></td><td></td><td><p>Particle <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices</p></td>
+  <td><strong>part</strong></td><td></td><td></td><td><p>Array of birth particles</p></td>
   
 </tr>
 
@@ -12338,7 +12520,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-weight%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-weight%7E4"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
@@ -12502,7 +12684,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-weight%7E4"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-weight%7E5"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:,:), allocatable</td><td>::</td>
@@ -12591,7 +12773,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-weight%7E5"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-weight%7E6"></span>real(kind=Float64),</td>
   
   <td>public,</td>
   <td>dimension(:,:,:), allocatable</td><td>::</td>
@@ -16171,6 +16353,80 @@ public subroutine <a href='../proc/npa_part_assign.html'>npa_part_assign</a>(p1,
 <tr>
   
   <td><span class="anchor" ></span>type(<a href='../type/npaparticle.html'>NPAParticle</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-birth_part_assign"></span><h3>
+public subroutine <a href='../proc/birth_part_assign.html'>birth_part_assign</a>(p1, p2)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Defines how to assign <a href="../type/birthparticle.html">BirthParticle</a> types to eachother</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/birthparticle.html'>BirthParticle</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>p1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/birthparticle.html'>BirthParticle</a>),</td>
   <td>intent(in)</td>
   <td></td>
   

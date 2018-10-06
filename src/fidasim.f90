@@ -486,10 +486,8 @@ type FastIonParticles
         !+ Fast-ion particles
 end type FastIonParticles
 
-type NeutralBeam
-    !+ Defines a neutral beam with +x defined to be into the plasma
-    character(25) :: name = ''
-        !+ Beam name
+type Beamlet
+    !+ Defines the geometry of a neutral beamlet
     integer       :: shape
         !+ Beam source shape 1="rectangular", 2="circular"
     real(Float64) :: widy
@@ -500,26 +498,14 @@ type NeutralBeam
         !+ Focal length in y direction
     real(Float64) :: focz
         !+ Focal length in z direction
-    real(Float64) :: einj
-        !+ NBI voltage  [kV]
-    real(Float64) :: pinj
-        !+ NBI power    [MW]
-    real(Float64) :: vinj
-        !+ NBI velocity [cm/s]
-    real(Float64) :: alpha
-        !+ Z rotation not same as [[libfida:beam_grid]] alpha
-    real(Float64) :: beta
-        !+ Tilt rotation not same as [[libfida:beam_grid]] beta
     real(Float64), dimension(3)   :: divy
         !+ Energy dependent divergence in y direction
     real(Float64), dimension(3)   :: divz
         !+ Energy dependent divergence in z direction
-    real(Float64), dimension(3)   :: current_fractions
-        !+ Fractions of full, half, and third energy neutrals
     real(Float64), dimension(3)   :: src
         !+ Position of source in beam grid coordinates [cm]
     real(Float64), dimension(3)   :: axis
-        !+ Beam centerline
+        !+ Beamlet centerline
     integer :: naperture
         !+ Number of beam apertures
     integer, dimension(:), allocatable       :: ashape
@@ -529,15 +515,37 @@ type NeutralBeam
     real(Float64), dimension(:), allocatable :: awidz
         !+ Half height of the aperture(s) in z direction
     real(Float64), dimension(:), allocatable :: aoffy
-        !+ Horizontal (y) offset of the aperture(s) relative to the beam centerline [cm]
+        !+ Horizontal (y) offset of the aperture(s) relative to the beamlet centerline [cm]
     real(Float64), dimension(:), allocatable :: aoffz
-        !+ Vertical (z) offset of the aperture(s) relative to the beam centerline [cm]
+        !+ Vertical (z) offset of the aperture(s) relative to the beamlet centerline [cm]
     real(Float64), dimension(:), allocatable :: adist
-        !+ Distance from the center of the beam source grid to the aperture(s) plane [cm]
+        !+ Distance from the center of the beamlet source grid to the aperture(s) plane [cm]
+    real(Float64) :: alpha
+        !+ Z rotation not same as [[libfida:beam_grid]] alpha
+    real(Float64) :: beta
+        !+ Tilt rotation not same as [[libfida:beam_grid]] beta
     real(Float64), dimension(3,3) :: basis
         !+ Beam basis for converting from centerline coordinates to beam grid coordinates
     real(Float64), dimension(3,3) :: inv_basis
         !+ Inverse basis for reverse transfomation
+end type Beamlet
+
+type NeutralBeam
+    !+ Defines a neutral beam with +x defined to be into the plasma
+    integer :: nbeamlet = 1
+        !+ Number of beamlets comprising the neutral beam
+    character(25) :: name = ''
+        !+ Beam name
+    real(Float64) :: einj
+        !+ NBI voltage  [kV]
+    real(Float64) :: pinj
+        !+ NBI power    [MW]
+    real(Float64) :: vinj
+        !+ NBI velocity [cm/s]
+    real(Float64), dimension(3)   :: current_fractions
+        !+ Fractions of full, half, and third energy neutrals
+    type(Beamlet), dimension(:), allocatable :: beamlet
+        !+ Array of beamlets comprising the neutral beam
 end type NeutralBeam
 
 type AtomicCrossSection
@@ -1125,7 +1133,7 @@ type(FastIonParticles), save    :: particles
     !+ Variable containing a MC fast-ion distribution
 type(Equilibrium), save         :: equil
     !+ Variable containing the plasma parameters and fields
-type(NeutralBeam), save         :: nbi
+type(NeutralBeam), dimension(:), allocatable, save :: nbi
     !+ Variable containing the neutral beam geometry and settings
 type(AtomicTables), save        :: tables
     !+ Variable containing the atomic tables
@@ -2213,12 +2221,17 @@ end subroutine make_beam_grid
 subroutine read_beam
     !+ Reads neutral beam geometry and stores the quantities in [[libfida:nbi]]
     integer(HID_T) :: fid, gid
-    integer(HSIZE_T), dimension(1) :: dims
+    integer(HSIZE_T), dimension(2) :: dims
 
-    real(Float64), dimension(3) ::uvw_src, uvw_axis, pos
+    real(Float64), dimension(3) :: pos
+    real(Float64), dimension(:,:), allocatable ::uvw_src, uvw_axis, divy, divz
+    real(Float64), dimension(:), allocatable :: focy, focz, widy, widz
+    integer, dimension(:), allocatable :: naperture,sshape
+    integer, dimension(:,:), allocatable :: ashape
+    real(Float64), dimension(:,:), allocatable :: awidy, awidz, aoffy, aoffz, adist
     real(Float64) :: dis
     logical :: path_valid
-    integer :: error
+    integer :: error,nb,na
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -2238,39 +2251,52 @@ subroutine read_beam
     !!Open NBI group
     call h5gopen_f(fid, "/nbi", gid, error)
 
+    !! Allocate space for geometry
+    call h5ltpath_valid_f(gid, "/nbi/nbeamlet", .True., path_valid, error)
+    if(path_valid) then
+        call h5ltread_dataset_int_scalar_f(gid,"/nbi/nbeamlet",nbi%nbeamlet, error)
+    endif
+    nb = nbi%nbeamlet
+    allocate(nbi%beamlet(nb))
+
+    !! allocate temporary storage arrays
+    allocate(uvw_src(3,nb),uvw_axis(3,nb),divy(3,nb),divz(3,nb))
+    allocate(focy(nb),focz(nb),widy(nb),widz(nb),sshape(nb))
+
     !!Read in beam definitions
     call h5ltread_dataset_string_f(gid, "/nbi/name",nbi%name, error)
-    dims(1) = 3
+    dims = [3, nb]
     call h5ltread_dataset_double_f(gid, "/nbi/src", uvw_src, dims, error)
     call h5ltread_dataset_double_f(gid, "/nbi/axis", uvw_axis, dims, error)
-    call h5ltread_dataset_double_f(gid, "/nbi/divy", nbi%divy, dims, error)
-    call h5ltread_dataset_double_f(gid, "/nbi/divz", nbi%divz, dims, error)
-    call h5ltread_dataset_int_scalar_f(gid, "/nbi/shape", nbi%shape, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/focy", nbi%focy, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/focz", nbi%focz, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/widy", nbi%widy, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/widz", nbi%widz, error)
+    call h5ltread_dataset_double_f(gid, "/nbi/divy", divy, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nbi/divz", divz, dims, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/nbi/shape", sshape, error)
+    call h5ltread_dataset_double_scalar_f(gid, "/nbi/focy", focy, error)
+    call h5ltread_dataset_double_scalar_f(gid, "/nbi/focz", focz, error)
+    call h5ltread_dataset_double_scalar_f(gid, "/nbi/widy", widy, error)
+    call h5ltread_dataset_double_scalar_f(gid, "/nbi/widz", widz, error)
 
     !!Read in aperture definitions
     !! Check for naperture for compatibility with old runs
+    allocate(naperture(nb))
+    naperture = 0
     call h5ltpath_valid_f(gid, "/nbi/naperture", .True., path_valid, error)
     if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(gid,"/nbi/naperture",nbi%naperture, error)
-    else
-        nbi%naperture = 0
+        call h5ltread_dataset_int_scalar_f(gid,"/nbi/naperture",naperture, error)
     endif
-    if(nbi%naperture.gt.0) then
-        allocate(nbi%ashape(nbi%naperture), nbi%adist(nbi%naperture), &
-                 nbi%awidy(nbi%naperture), nbi%awidz(nbi%naperture),  &
-                 nbi%aoffy(nbi%naperture), nbi%aoffz(nbi%naperture)   )
+    if(any(naperture.gt.0)) then
+        na = max(naperture)
+        allocate(ashape(na,nb), adist(na,nb), &
+                 awidy(na,nb), awidz(na,nb),  &
+                 aoffy(na,nb), aoffz(na,nb)   )
 
-        dims(1) = nbi%naperture
-        call h5ltread_dataset_int_f(gid, "/nbi/ashape", nbi%ashape, dims, error)
-        call h5ltread_dataset_double_f(gid, "/nbi/awidy", nbi%awidy, dims, error)
-        call h5ltread_dataset_double_f(gid, "/nbi/awidz", nbi%awidz, dims, error)
-        call h5ltread_dataset_double_f(gid, "/nbi/aoffy", nbi%aoffy, dims, error)
-        call h5ltread_dataset_double_f(gid, "/nbi/aoffz", nbi%aoffz, dims, error)
-        call h5ltread_dataset_double_f(gid, "/nbi/adist", nbi%adist, dims, error)
+        dims = [na,nb]
+        call h5ltread_dataset_int_f(gid, "/nbi/ashape", ashape, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/awidy", awidy, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/awidz", awidz, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/aoffy", aoffy, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/aoffz", aoffz, dims, error)
+        call h5ltread_dataset_double_f(gid, "/nbi/adist", adist, dims, error)
     endif
 
     !!Close NBI group
@@ -2282,17 +2308,50 @@ subroutine read_beam
     !!Close HDF5 interface
     call h5close_f(error)
 
-    !!Convert to beam grid coordinates
-    call uvw_to_xyz(uvw_src,nbi%src)
-    nbi%axis = matmul(beam_grid%inv_basis,uvw_axis)
-
     nbi%vinj=sqrt(2.d0*nbi%einj*1.d3 *e0/(inputs%ab*mass_u))*1.d2 !! [cm/s]
-    pos = nbi%src + 200.0*nbi%axis
-    dis = sqrt(sum((pos - nbi%src)**2))
-    nbi%beta = asin((nbi%src(3) - pos(3))/dis)
-    nbi%alpha = atan2(pos(2)-nbi%src(2),pos(1)-nbi%src(1))
 
-    call tb_zyx(nbi%alpha,nbi%beta,0.d0,nbi%basis,nbi%inv_basis)
+    !!Convert to beam grid coordinates
+    do i=1,nbi%nbeamlet
+        call uvw_to_xyz(uvw_src(:,i),nbi%beamlet(i)%src)
+        nbi%beamlet(i)%axis = matmul(beam_grid%inv_basis,uvw_axis(:,i))
+
+        pos = nbi%beamlet(i)%src + 200.0*nbi%beamlet(i)%axis
+        dis = sqrt(sum((pos - nbi%beamlet(i)%src)**2))
+        nbi%beamlet(i)%beta = asin((nbi%beamlet(i)%src(3) - pos(3))/dis)
+        nbi%beamlet(i)%alpha = atan2(pos(2)-nbi%beamlet(i)%src(2),pos(1)-nbi%beamlet(i)%src(1))
+
+        call tb_zyx(nbi%beamlet(i)%alpha,nbi%beamlet(i)%beta,0.d0, &
+                    nbi%beamlet(i)%basis,nbi%beamlet(i)%inv_basis)
+
+        nbi%beamlet(i)%shape = sshape(i)
+        nbi%beamlet(i)%divy = divy(:,i)
+        nbi%beamlet(i)%divz = divz(:,i)
+        nbi%beamlet(i)%focy = focy(i)
+        nbi%beamlet(i)%focz = focz(i)
+        nbi%beamlet(i)%widy = widy(i)
+        nbi%beamlet(i)%widz = widz(i)
+
+        nbi%beamlet(i)%naperture = naperture(i)
+        if naperture(i).gt.0 then
+            na = naperture(i)
+            allocate(nbi%beamlet(i)%ashape(na))
+            allocate(nbi%beamlet(i)%adist(na))
+            allocate(nbi%beamlet(i)%awidy(na))
+            allocate(nbi%beamlet(i)%awidz(na))
+            allocate(nbi%beamlet(i)%aoffy(na))
+            allocate(nbi%beamlet(i)%aoffz(na))
+            nbi%beamlet(i)%ashape = ashape(:,i)
+            nbi%beamlet(i)%adist = adist(:,i)
+            nbi%beamlet(i)%awidy = awidy(:,i)
+            nbi%beamlet(i)%awidz = awidz(:,i)
+            nbi%beamlet(i)%aoffy = aoffy(:,i)
+            nbi%beamlet(i)%aoffz = aoffz(:,i)
+        endif
+    enddo
+
+    !! Deallocate tempory storage arrays
+    deallocate(uvw_src,uvw_axis,sshape,divy,divz,focy,focz,widy,widz)
+    deallocate(naperture,ashape,adist,awidy,awidz,aoffy,aoffz)
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Neutral beam settings ----'
@@ -8246,6 +8305,7 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     logical, intent(out)                     :: err
         !+ Error Code
 
+    type(Beamlet) :: beam
     real(Float64), dimension(3) :: r_exit
     real(Float64), dimension(3) :: uvw_src    !! Start position on ion source
     real(Float64), dimension(3) :: xyz_src    !! Start position on ion source
@@ -8258,6 +8318,8 @@ subroutine mc_nbi(vnbi,efrac,rnbi,err)
     integer :: i, j
     logical :: inp, valid_trajectory
 
+    call randu(randomu)
+    beam = nbi%beamlet(ceiling(nbi%nbeamlet*randomu(1)))
     err = .False.
     valid_trajectory = .False.
     rejection_loop: do i=1,1000

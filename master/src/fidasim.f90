@@ -8486,7 +8486,7 @@ subroutine ndmc
                     call randind(tracks(1:ntrack)%flux,randi)
                     call randu(randomu)
                     birth%part(birth%cnt)%neut_type = neut_type
-                    birth%part(birth%cnt)%energy = nbi%vinj/sqrt(real(neut_type))
+                    birth%part(birth%cnt)%energy = nbi%einj/real(neut_type)
                     birth%part(birth%cnt)%weight = flux_tot/inputs%n_birth
                     birth%part(birth%cnt)%ind = tracks(randi(1))%ind
                     birth%part(birth%cnt)%vi = vnbi

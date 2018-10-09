@@ -821,7 +821,7 @@ type BirthParticle
     real(Float64) :: energy = 0.d0
         !+ Birth Energy [keV]
     real(Float64) :: pitch = 0.d0
-        !+ Birth Pitch
+        !+ Birth Pitch w.r.t. the magnetic field
 end type BirthParticle
 
 type BirthProfile
@@ -3967,7 +3967,7 @@ subroutine write_birth_profile
              "Fast-ion birth weight: weight(particle)", error)
         call h5ltset_attribute_string_f(fid, "/weight", "units", "fast-ions/s", error)
         call h5ltset_attribute_string_f(fid, "/pitch", "description", &
-             "Fast-ion birth pitch: pitch(particle)", error)
+             "Fast-ion birth pitch w.r.t. the magnetic field: pitch(particle)", error)
         call h5ltset_attribute_string_f(fid, "/ind", "description", &
              "Fast-ion birth beam grid indices: ind([i,j,k],particle)", error)
         call h5ltset_attribute_string_f(fid, "/type", "description", &
@@ -9353,7 +9353,11 @@ subroutine fida_mc
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
-    ngamma = ceiling(dble(inputs%n_fida)/particles%nparticle)
+    ngamma = 1
+    if(particles%axisym.or.(inputs%dist_type.eq.2)) then
+        ngamma = ceiling(dble(inputs%n_fida)/particles%nparticle)
+    endif
+
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
@@ -9450,7 +9454,11 @@ subroutine pfida_mc
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
-    ngamma = ceiling(dble(inputs%n_pfida)/particles%nparticle)
+    ngamma = 1
+    if(particles%axisym.or.(inputs%dist_type.eq.2)) then
+        ngamma = ceiling(dble(inputs%n_pfida)/particles%nparticle)
+    endif
+
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
@@ -9777,7 +9785,11 @@ subroutine npa_mc
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
 
-    ngamma = ceiling(dble(inputs%n_npa)/particles%nparticle)
+    ngamma = 1
+    if(particles%axisym.or.(inputs%dist_type.eq.2)) then
+        ngamma = ceiling(dble(inputs%n_npa)/particles%nparticle)
+    endif
+
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
@@ -9927,7 +9939,11 @@ subroutine pnpa_mc
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
 
-    ngamma = ceiling(dble(inputs%n_pnpa)/particles%nparticle)
+    ngamma = 1
+    if(particles%axisym.or.(inputs%dist_type.eq.2)) then
+        ngamma = ceiling(dble(inputs%n_pnpa)/particles%nparticle)
+    endif
+
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif

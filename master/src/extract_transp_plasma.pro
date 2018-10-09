@@ -1,5 +1,6 @@
 FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
-            doplot=doplot, profiles=profiles, dn0out=dn0out, scrapeoff=scrapeoff,$
+            doplot=doplot, profiles=profiles, dn0out=dn0out, $
+            scrapeoff=scrapeoff, rho_scrapeoff=rho_scrapeoff,$
             sne=sne, ste=ste, sti=sti, simp=simp, srot=srot, snn=snn
     ;+#extract_transp_plasma
     ;+Extracts `plasma` structure from a TRANSP run
@@ -23,6 +24,8 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist
     ;+
     ;+    **scrapeoff**: scrapeoff decay length
+    ;+
+    ;+    **rho_scrapeoff**: scrapeoff length, default = 0.1
     ;+
     ;+##Example Usage
     ;+```idl
@@ -61,10 +64,11 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
 
     if not keyword_set(dn0out) then dn0out = transp_nn[-1]
     if not keyword_set(scrapeoff) then scrapeoff = 0.0
+    if not keyword_set(rho_scrapeoff) then rho_scrapeoff = 0.1
 
     if scrapeoff gt 0.0 then begin
         drho = abs(rho[-1] - rho[-2])
-        rho_sc = rho[-1] + drho*(dindgen(ceil(0.1/drho)) + 1)
+        rho_sc = rho[-1] + drho*(dindgen(ceil(rho_scrapeoff/drho)) + 1)
         sc = exp(-(rho_sc - rho[-1])/scrapeoff)
         transp_ne = [transp_ne,transp_ne[-1]*sc]
         transp_te = [transp_te,transp_te[-1]*sc]

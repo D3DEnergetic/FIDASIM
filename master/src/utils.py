@@ -780,7 +780,7 @@ def read_ncdf(filename, vars=None):
     return d
 
 def extract_transp_plasma(filename, intime, grid, flux,
-                          dn0out=None, scrapeoff=None):
+                          dn0out=None, scrapeoff=None,rho_scrapeoff=0.1):
     '''
     #+#extract_transp_plasma
     #+Extracts `plasma` structure from a TRANSP run
@@ -798,6 +798,8 @@ def extract_transp_plasma(filename, intime, grid, flux,
     #+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist
     #+
     #+    **scrapeoff**: scrapeoff decay length
+    #+
+    #+    **rho_scrapeoff**: scrapeoff length, default = 0.1
     #+
     #+##Example Usage
     #+```python
@@ -840,7 +842,7 @@ def extract_transp_plasma(filename, intime, grid, flux,
 
     if scrapeoff > 0.0:
         drho = abs(rho[-1] - rho[-2])
-        rho_sc = rho[-1] + drho*(range(np.ceil(0.1/drho)) + 1)
+        rho_sc = rho[-1] + drho*(range(np.ceil(rho_scrapeoff/drho)) + 1)
         sc = np.exp(-(rho_sc - rho[-1])/scrapeoff)
         transp_ne = np.append(transp_ne,transp_ne[-1]*sc)
         transp_te = np.append(transp_te,transp_te[-1]*sc)

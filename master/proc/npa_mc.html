@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.8% of total for procedures.">100 statements</a>
+    title=" 0.9% of total for procedures.">103 statements</a>
      </li> 
      
      
@@ -1333,7 +1333,11 @@ public subroutine npa_mc()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">s</span><span class="p">,</span><span class="n">c</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
 
-    <span class="n">ngamma</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="nb">dble</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">n_npa</span><span class="p">)</span><span class="o">/</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">)</span>
+    <span class="n">ngamma</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">.</span><span class="nb">or</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">2</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">ngamma</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="nb">dble</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">n_npa</span><span class="p">)</span><span class="o">/</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">)</span>
+    <span class="n">endif</span>
+
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i9)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="o">*</span><span class="n">ngamma</span><span class="p">,</span><span class="n">Int64</span><span class="p">)</span>
     <span class="n">endif</span>

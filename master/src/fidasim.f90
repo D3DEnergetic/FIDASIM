@@ -2514,6 +2514,7 @@ subroutine read_npa
             write(*,'(a)') 'Continuing without NPA diagnostics'
         endif
         inputs%calc_npa = 0
+        inputs%calc_pnpa = 0
         inputs%calc_npa_wght = 0
         call h5fclose_f(fid, error)
         call h5close_f(error)
@@ -6551,7 +6552,7 @@ subroutine interpol3D_arr(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
         endif
         err_status = 0
     else
-        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err)
+        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err_status)
     endif
 
 
@@ -6618,7 +6619,7 @@ subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs
         endif
         err_status = 0
     else
-        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err)
+        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err_status)
     endif
 
     if(err_status.eq.0) then
@@ -6897,8 +6898,8 @@ subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
         Z = uvw(3)
         Phi = atan2(uvw(2),uvw(1))
 
-        call interpol(fbm%r, fbm%z, fbm%phi, fbm%f, R, Z, Phi, fbeam, err, coeffs)
-        call interpol(fbm%r, fbm%z, fbm%phi, fbm%denf, R, Z, Phi, denf, err, coeffs)
+        call interpol(fbm%r, fbm%z, fbm%phi, fbm%f, R, Z, Phi, fbeam, err)
+        call interpol(fbm%r, fbm%z, fbm%phi, fbm%denf, R, Z, Phi, denf, err)
     endif
 
 end subroutine get_distribution
@@ -6947,7 +6948,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
             Z = uvw(3)
             Phi = atan2(uvw(2),uvw(1))
 
-            call interpol(inter_grid%r, inter_grid%z, inter_grid%phi, fbm%f, R, Z, Phi, fbeam, err, coeffs)
+            call interpol(inter_grid%r, inter_grid%z, inter_grid%phi, fbm%f, R, Z, Phi, fbeam, err)
         endif
         denf = fbeam(epi(1),epi(2))
     else

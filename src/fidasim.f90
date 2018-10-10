@@ -2514,6 +2514,7 @@ subroutine read_npa
             write(*,'(a)') 'Continuing without NPA diagnostics'
         endif
         inputs%calc_npa = 0
+        inputs%calc_pnpa = 0
         inputs%calc_npa_wght = 0
         call h5fclose_f(fid, error)
         call h5close_f(error)

@@ -2477,7 +2477,6 @@ subroutine read_chords
             enddo
             !!! write to hdf5 dlength index 1
             !$OMP END PARALLEL DO
-            stop
             do kk=1,inter_grid%nphi
                 do jj=1,inter_grid%nz
                     rloop: do ii=1, inter_grid%nr
@@ -6622,44 +6621,44 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     ri_cyl(3) = atan2(ri(2), ri(1))
     call get_inter_grid_indices(ri_cyl,ind)
     !!! End
-    ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
+    !ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
 
     !!! I need to better handle the case when the particle never hits a surface
     !!! Make this more efficient later
     if(sgn(1).gt.1.0d-15) then
-        arc_cyl(1) = inter_grid%r(ir+1)
-        arc_cyl(2) = inter_grid%z(iz)
-        arc_cyl(3) = inter_grid%phi(iphi)
+        arc_cyl(1) = inter_grid%r(ind(1)+1)
+        arc_cyl(2) = inter_grid%z(ind(2))
+        arc_cyl(3) = inter_grid%phi(ind(3))
         call cyl_to_uvw(arc_cyl,arc)
     endif
     if(sgn(1).le.0.d0) then
-        arc_cyl(1) = inter_grid%r(ir)
-        arc_cyl(2) = inter_grid%z(iz)
-        arc_cyl(3) = inter_grid%phi(iphi)
+        arc_cyl(1) = inter_grid%r(ind(1))
+        arc_cyl(2) = inter_grid%z(ind(2))
+        arc_cyl(3) = inter_grid%phi(ind(3))
         call cyl_to_uvw(arc_cyl,arc)
     endif
     if(sgn(2).gt.1.0d-15) then
-        h_plane_cyl(1) = inter_grid%r(ir)
-        h_plane_cyl(2) = inter_grid%z(iz+1)
-        h_plane_cyl(3) = inter_grid%phi(iphi)
+        h_plane_cyl(1) = inter_grid%r(ind(1))
+        h_plane_cyl(2) = inter_grid%z(ind(2)+1)
+        h_plane_cyl(3) = inter_grid%phi(ind(3))
         call cyl_to_uvw(h_plane_cyl,h_plane)
     endif
     if(sgn(2).le.0.d0) then
-        h_plane_cyl(1) = inter_grid%r(ir)
-        h_plane_cyl(2) = inter_grid%z(iz)
-        h_plane_cyl(3) = inter_grid%phi(iphi)
+        h_plane_cyl(1) = inter_grid%r(ind(1))
+        h_plane_cyl(2) = inter_grid%z(ind(2))
+        h_plane_cyl(3) = inter_grid%phi(ind(3))
         call cyl_to_uvw(h_plane_cyl,h_plane)
     endif
     if(sgn(3).gt.1.0d-15) then
-        v_plane_cyl(1) = inter_grid%r(ir)
-        v_plane_cyl(2) = inter_grid%z(iz)
-        v_plane_cyl(3) = inter_grid%phi(iphi+1)
+        v_plane_cyl(1) = inter_grid%r(ind(1))
+        v_plane_cyl(2) = inter_grid%z(ind(2))
+        v_plane_cyl(3) = inter_grid%phi(ind(3)+1)
         call cyl_to_uvw(v_plane_cyl,v_plane)
     endif
     if(sgn(3).le.0.d0) then
-        v_plane_cyl(1) = inter_grid%r(ir)
-        v_plane_cyl(2) = inter_grid%z(iz)
-        v_plane_cyl(3) = inter_grid%phi(iphi)
+        v_plane_cyl(1) = inter_grid%r(ind(1))
+        v_plane_cyl(2) = inter_grid%z(ind(2))
+        v_plane_cyl(3) = inter_grid%phi(ind(3))
         call cyl_to_uvw(v_plane_cyl,v_plane)
     endif
     !!! End
@@ -6749,15 +6748,9 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         in_plasma1 = in_plasma2
 
         ri = ri + dT*vn
-        print*,'ri = ', ri
         ind(mind) = ind(mind) + sgn(mind)
-        !!! mind is in rzphi, but ri is in mc. Need to fix discrepancy
-        !!! Need to handle this discrepancy better later
-        ri_cyl(mind) = ri_cyl(mind) + dr(mind)
-        print*,'ri_cyl_adv = ', ri_cyl
-        call cyl_to_uvw(ri_cyl,ri)
         print*,'ri_adv = ', ri
-        print*,'ind = ', ind
+        print*,'ind_adv = ', ind
         print*,'loop i = ', i
         print*,'******************************************************************************************'
 
@@ -6767,62 +6760,34 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
-        if (i.eq.3) stop
-
-        call get_inter_grid_indices(ri_cyl,ind)
-        !!! End
-        ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
-
-        !!! I need to better handle the case when the particle never hits a surface
-        !!! Make this more efficient later
-        if(sgn(1).gt.1.0d-15) then
-            arc_cyl(1) = inter_grid%r(ir+1)
-            arc_cyl(2) = inter_grid%z(iz)
-            arc_cyl(3) = inter_grid%phi(iphi)
+        !!! Need to optiimize this somehow
+        if(mind.eq.1) then
+            arc_cyl(mind) = arc_cyl(mind) + dr(mind)
             call cyl_to_uvw(arc_cyl,arc)
         endif
-        if(sgn(1).le.0.d0) then
-            arc_cyl(1) = inter_grid%r(ir)
-            arc_cyl(2) = inter_grid%z(iz)
-            arc_cyl(3) = inter_grid%phi(iphi)
-            call cyl_to_uvw(arc_cyl,arc)
-        endif
-        if(sgn(2).gt.1.0d-15) then
-            h_plane_cyl(1) = inter_grid%r(ir)
-            h_plane_cyl(2) = inter_grid%z(iz+1)
-            h_plane_cyl(3) = inter_grid%phi(iphi)
+        if(mind.eq.2) then
+            h_plane_cyl(mind) = h_plane_cyl(mind) + dr(mind)
             call cyl_to_uvw(h_plane_cyl,h_plane)
         endif
-        if(sgn(2).le.0.d0) then
-            h_plane_cyl(1) = inter_grid%r(ir)
-            h_plane_cyl(2) = inter_grid%z(iz)
-            h_plane_cyl(3) = inter_grid%phi(iphi)
-            call cyl_to_uvw(h_plane_cyl,h_plane)
-        endif
-        if(sgn(3).gt.1.0d-15) then
-            v_plane_cyl(1) = inter_grid%r(ir)
-            v_plane_cyl(2) = inter_grid%z(iz)
-            v_plane_cyl(3) = inter_grid%phi(iphi+1)
+        if(mind.eq.3) then
+            v_plane_cyl(mind) = v_plane_cyl(mind) + dr(mind)
             call cyl_to_uvw(v_plane_cyl,v_plane)
-        endif
-        if(sgn(3).le.0.d0) then
-            v_plane_cyl(1) = inter_grid%r(ir)
-            v_plane_cyl(2) = inter_grid%z(iz)
-            v_plane_cyl(3) = inter_grid%phi(iphi)
-            call cyl_to_uvw(v_plane_cyl,v_plane)
+            redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
+            redge_cyl(2) = v_plane_cyl(2)
+            redge_cyl(3) = v_plane_cyl(3)
+            call cyl_to_uvw(redge_cyl,redge)
+            tedge_cyl(1) = v_plane_cyl(1)
+            tedge_cyl(2) = v_plane_cyl(2) + inter_grid%dz
+            tedge_cyl(3) = v_plane_cyl(3)
+            call cyl_to_uvw(tedge_cyl,tedge)
+            call rz_normal_vector(v_plane, redge, tedge, n0)
         endif
         !!! End
-
-        redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
-        redge_cyl(2) = v_plane_cyl(2)
-        redge_cyl(3) = v_plane_cyl(3)
-        call cyl_to_uvw(redge_cyl,redge)
-        tedge_cyl(1) = v_plane_cyl(1)
-        tedge_cyl(2) = v_plane_cyl(2) + inter_grid%dz
-        tedge_cyl(3) = v_plane_cyl(3)
-        call cyl_to_uvw(tedge_cyl,tedge)
-        call rz_normal_vector(v_plane, redge, tedge, n0)
-        !!! End
+        !if (i.eq.3) stop
+        print*,'ri = ', ri
+        ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+        ri_cyl(2) = ri(3)
+        ri_cyl(3) = atan2(ri(2), ri(1))
         print*,'ri_cyl = ',ri_cyl
         print*,'vn_cyl = ', vn_cyl
         print*,'sgn = ', sgn
@@ -6838,7 +6803,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         print*,'tedge = ',tedge
         print*,'n0 = ',n0
         print*,''
-
     enddo track_loop
     ntrack = cc-1
     if(present(los_intersect)) then

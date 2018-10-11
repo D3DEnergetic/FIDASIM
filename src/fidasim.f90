@@ -953,7 +953,7 @@ type SimulationInputs
         !+ Calculate Thermal Halo density: 0 = off, 1=on
     integer(Int32) :: calc_brems
         !+ Calculate bremmstruhlung: 0 = off, 1=on
-    integer(Int32) :: calc_nbi
+    integer(Int32) :: calc_bes
         !+ Calculate NBI: 0 = off, 1=on
     integer(Int32) :: calc_dcx
         !+ Calculate DCX: 0 = off, 1=on
@@ -1808,7 +1808,7 @@ subroutine read_inputs
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
     integer            :: pathlen, calc_neutron
-    integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold
+    integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,no_flr,split
@@ -1825,7 +1825,7 @@ subroutine read_inputs
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
-        calc_brems, calc_nbi,calc_dcx,calc_halo, calc_cold, calc_fida, &
+        calc_brems, calc_nbi,calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, no_flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
@@ -1855,6 +1855,7 @@ subroutine read_inputs
     runid="0"
     calc_brems=0
     calc_nbi=0
+    calc_bes=0
     calc_dcx=0
     calc_halo=0
     calc_cold=0
@@ -1912,6 +1913,9 @@ subroutine read_inputs
     read(13,NML=fidasim_inputs)
     close(13)
 
+    !!TODO remove before release
+    if (calc_nbi.gt.0) calc_bes=1
+
     !!General Information
     inputs%shot_number=shot
     inputs%time=time
@@ -1926,7 +1930,7 @@ subroutine read_inputs
     inputs%neutrals_file=neutrals_file
 
     !!Simulation Switches
-    if((calc_brems+calc_nbi+calc_dcx+calc_halo+&
+    if((calc_brems+calc_bes+calc_dcx+calc_halo+&
         calc_cold+calc_fida+calc_pfida).gt.0) then
         inputs%calc_spec=1
     else
@@ -1934,7 +1938,7 @@ subroutine read_inputs
     endif
 
     inputs%calc_beam = 0
-    if((calc_nbi+calc_birth+calc_dcx+&
+    if((calc_bes+calc_birth+calc_dcx+&
         calc_halo+calc_fida+calc_npa+&
         calc_fida_wght+calc_npa_wght).gt.0) then
         inputs%calc_nbi_dens=1
@@ -1960,7 +1964,7 @@ subroutine read_inputs
     endif
 
     inputs%calc_brems=calc_brems
-    inputs%calc_nbi=calc_nbi
+    inputs%calc_bes=calc_bes
     inputs%calc_dcx=calc_dcx
     inputs%calc_halo=calc_halo
     inputs%calc_cold=calc_cold
@@ -2335,7 +2339,7 @@ subroutine read_chords
         inputs%calc_spec = 0
         inputs%calc_fida = 0
         inputs%calc_pfida = 0
-        inputs%calc_nbi = 0
+        inputs%calc_bes = 0
         inputs%calc_dcx = 0
         inputs%calc_halo = 0
         inputs%calc_cold = 0
@@ -4022,7 +4026,7 @@ subroutine write_neutrals
     call h5ltset_attribute_string_f(fid,"/nlevel","description", &
          "Number of atomic energy levels", error)
 
-    if(inputs%calc_nbi.ge.1) then
+    if(inputs%calc_bes.ge.1) then
         call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
              neut%full, error)
         call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
@@ -4514,7 +4518,7 @@ subroutine write_spectra
              "Ph/(s*nm*sr*m^2)",error )
     endif
 
-    if(inputs%calc_nbi.ge.1) then
+    if(inputs%calc_bes.ge.1) then
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
              spec%full, error)
@@ -8480,7 +8484,7 @@ subroutine ndmc
                     call store_births(ind,neut_type,tracks(jj)%flux)
                 endif
 
-                if((photons.gt.0.d0).and.(inputs%calc_nbi.ge.1)) then
+                if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
                     call store_bes_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
                 endif
             enddo loop_along_track
@@ -8520,7 +8524,7 @@ subroutine ndmc
         call parallel_sum(birth%dens)
     endif
     !! Combine spectra
-    if(inputs%calc_nbi.ge.1) then
+    if(inputs%calc_bes.ge.1) then
         call parallel_sum(spec%full)
         call parallel_sum(spec%half)
         call parallel_sum(spec%third)
@@ -11067,7 +11071,7 @@ program fidasim
     if(inputs%load_neutrals.eq.1) then
         call read_neutrals()
 
-        if(inputs%calc_nbi.ge.1) then
+        if(inputs%calc_bes.ge.1) then
             if(inputs%verbose.ge.1) then
                 write(*,*) 'nbi:     ' , time(time_start)
             endif
@@ -11128,7 +11132,7 @@ program fidasim
             endif
 
             !! ---------- WRITE NEUTRALS ---------- !!
-            if((inputs%calc_nbi+inputs%calc_dcx+inputs%calc_halo).ge.1) then
+            if((inputs%calc_bes+inputs%calc_dcx+inputs%calc_halo).ge.1) then
                 if(inputs%verbose.ge.1) then
                     write(*,*) 'write neutrals:    ' , time(time_start)
                 endif

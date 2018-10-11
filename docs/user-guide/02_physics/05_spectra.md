@@ -108,7 +108,7 @@ where positive and negative sums refer to \(\sigma\) and \(\pi\) lines respectiv
 $$S_I = [1, 18, 16, 1681, 2304, 729, 1936, 5490, 1936, 729, 2304, 1681, 16, 18, 1] $$
 
 # Relevant Namelist Settings
-* `calc_nbi`: Calculate NBI spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
+* `calc_bes`: Calculate NBI spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
 * `calc_dcx`: Calculate DCX spectra (approximate calculations if neutrals are loaded, i.e., load_neutrals=1)
 * `calc_halo`: Calculate Halo spectra(approximate calculations if neutrals are loaded, i.e., load_neutrals=1) 
 * `calc_cold`: Calculate Cold D-alpha spectra

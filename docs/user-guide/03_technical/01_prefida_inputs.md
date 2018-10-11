@@ -39,7 +39,7 @@ A value of two will turn on additional functionality.
 
 |       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
 |:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
-| `calc_nbi`          | Int16   | 0    | NA         | NA    | Calculate NBI Spectra                    |
+| `calc_bes`          | Int16   | 0    | NA         | NA    | Calculate NBI Spectra                    |
 | `calc_dcx`          | Int16   | 0    | NA         | NA    | Calculate Direct Charge Exchange Spectra |
 | `calc_halo`         | Int16   | 0    | NA         | NA    | Calculate HALO spectra                   |
 | `calc_cold`         | Int16   | 0    | NA         | NA    | Calculate COLD spectra                   |

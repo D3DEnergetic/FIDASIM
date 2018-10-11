@@ -1136,7 +1136,7 @@ public subroutine write_spectra()
              <span class="s2">&quot;Ph/(s*nm*sr*m^2)&quot;</span><span class="p">,</span><span class="n">error</span> <span class="p">)</span>
     <span class="n">endif</span>
 
-    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
         <span class="c">!Write variables</span>
         <span class="k">call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/full&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">),</span> <span class="p">&amp;</span>
              <span class="n">spec</span><span class="p">%</span><span class="n">full</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>

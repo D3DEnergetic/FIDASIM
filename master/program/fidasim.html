@@ -5989,7 +5989,7 @@
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">load_neutrals</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        call </span><span class="n">read_neutrals</span><span class="p">()</span>
 
-        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">            if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">                write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;nbi:     &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
             <span class="n">endif</span>
@@ -6050,7 +6050,7 @@
             <span class="n">endif</span>
 
             <span class="c">!! ---------- WRITE NEUTRALS ---------- !!</span>
-            <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo</span><span class="p">).</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+            <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo</span><span class="p">).</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">                if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">                    write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;write neutrals:    &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
                 <span class="n">endif</span>

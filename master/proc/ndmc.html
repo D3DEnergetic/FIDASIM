@@ -1004,7 +1004,7 @@ public subroutine ndmc()
 <span class="k">                    call </span><span class="n">store_births</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span><span class="n">neut_type</span><span class="p">,</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">flux</span><span class="p">)</span>
                 <span class="n">endif</span>
 
-                <span class="k">if</span><span class="p">((</span><span class="n">photons</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="k">then</span>
+                <span class="k">if</span><span class="p">((</span><span class="n">photons</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">                    call </span><span class="n">store_bes_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vnbi</span><span class="p">,</span><span class="n">photons</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">,</span><span class="n">neut_type</span><span class="p">)</span>
                 <span class="n">endif</span>
             <span class="n">enddo</span> <span class="n">loop_along_track</span>
@@ -1044,7 +1044,7 @@ public subroutine ndmc()
 <span class="k">        call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">birth</span><span class="p">%</span><span class="n">dens</span><span class="p">)</span>
     <span class="n">endif</span>
     <span class="c">!! Combine spectra</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">spec</span><span class="p">%</span><span class="n">full</span><span class="p">)</span>
         <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">spec</span><span class="p">%</span><span class="n">half</span><span class="p">)</span>
         <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">spec</span><span class="p">%</span><span class="n">third</span><span class="p">)</span>

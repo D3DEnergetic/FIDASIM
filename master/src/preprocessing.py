@@ -167,7 +167,7 @@ def check_inputs(inputs):
               'calc_fida': zero_int,
               'calc_pnpa': zero_int,
               'calc_pfida': zero_int,
-              'calc_nbi': zero_int,
+              'calc_bes': zero_int,
               'calc_dcx': zero_int,
               'calc_halo': zero_int,
               'calc_cold': zero_int,
@@ -1113,7 +1113,7 @@ def write_namelist(filename, inputs):
         f.write("distribution_file = '" + inputs['distribution_file'] + "'    !! File containing fast-ion distribution\n\n")
 
         f.write("!! Simulation Switches\n")
-        f.write("calc_nbi = {:d}    !! Calculate NBI Spectra\n".format(inputs['calc_nbi']))
+        f.write("calc_bes = {:d}    !! Calculate NBI Spectra\n".format(inputs['calc_bes']))
         f.write("calc_dcx = {:d}    !! Calculate Direct CX Spectra\n".format(inputs['calc_dcx']))
         f.write("calc_halo = {:d}    !! Calculate Halo Spectra\n".format(inputs['calc_halo']))
         f.write("calc_cold = {:d}    !! Calculate Cold D-alpha Spectra\n".format(inputs['calc_cold']))

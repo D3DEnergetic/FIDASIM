@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.1% of total for procedures.">247 statements</a>
+    title=" 2.1% of total for procedures.">249 statements</a>
      </li> 
      
      
@@ -481,7 +481,7 @@ public subroutine read_inputs()
     <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">distribution_file</span><span class="p">,</span> <span class="n">equilibrium_file</span>
     <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">geometry_file</span><span class="p">,</span> <span class="n">neutrals_file</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">pathlen</span><span class="p">,</span> <span class="n">calc_neutron</span>
-    <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_brems</span><span class="p">,</span> <span class="n">calc_nbi</span><span class="p">,</span> <span class="n">calc_dcx</span><span class="p">,</span> <span class="n">calc_halo</span><span class="p">,</span> <span class="n">calc_cold</span>
+    <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_brems</span><span class="p">,</span> <span class="n">calc_nbi</span><span class="p">,</span> <span class="n">calc_dcx</span><span class="p">,</span> <span class="n">calc_halo</span><span class="p">,</span> <span class="n">calc_cold</span><span class="p">,</span> <span class="n">calc_bes</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_fida</span><span class="p">,</span> <span class="n">calc_pfida</span><span class="p">,</span> <span class="n">calc_npa</span><span class="p">,</span> <span class="n">calc_pnpa</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_birth</span><span class="p">,</span><span class="n">calc_fida_wght</span><span class="p">,</span><span class="n">calc_npa_wght</span>
     <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">load_neutrals</span><span class="p">,</span><span class="n">verbose</span><span class="p">,</span><span class="n">no_flr</span><span class="p">,</span><span class="n">split</span>
@@ -498,7 +498,7 @@ public subroutine read_inputs()
 
     <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">fidasim_inputs</span><span class="o">/</span> <span class="n">result_dir</span><span class="p">,</span> <span class="n">tables_file</span><span class="p">,</span> <span class="n">distribution_file</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">geometry_file</span><span class="p">,</span> <span class="n">equilibrium_file</span><span class="p">,</span> <span class="n">neutrals_file</span><span class="p">,</span> <span class="n">shot</span><span class="p">,</span> <span class="nb">time</span><span class="p">,</span> <span class="n">runid</span><span class="p">,</span> <span class="p">&amp;</span>
-        <span class="n">calc_brems</span><span class="p">,</span> <span class="n">calc_nbi</span><span class="p">,</span><span class="n">calc_dcx</span><span class="p">,</span><span class="n">calc_halo</span><span class="p">,</span> <span class="n">calc_cold</span><span class="p">,</span> <span class="n">calc_fida</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="n">calc_brems</span><span class="p">,</span> <span class="n">calc_nbi</span><span class="p">,</span><span class="n">calc_dcx</span><span class="p">,</span><span class="n">calc_halo</span><span class="p">,</span> <span class="n">calc_cold</span><span class="p">,</span> <span class="n">calc_fida</span><span class="p">,</span> <span class="n">calc_bes</span><span class="p">,&amp;</span>
         <span class="n">calc_pfida</span><span class="p">,</span> <span class="n">calc_npa</span><span class="p">,</span> <span class="n">calc_pnpa</span><span class="p">,</span><span class="n">calc_birth</span><span class="p">,</span> <span class="n">no_flr</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">calc_fida_wght</span><span class="p">,</span> <span class="n">calc_npa_wght</span><span class="p">,</span> <span class="n">load_neutrals</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">calc_neutron</span><span class="p">,</span> <span class="n">n_fida</span><span class="p">,</span> <span class="n">n_pfida</span><span class="p">,</span> <span class="n">n_npa</span><span class="p">,</span> <span class="n">n_pnpa</span><span class="p">,</span> <span class="n">n_nbi</span><span class="p">,</span> <span class="n">n_halo</span><span class="p">,</span> <span class="n">n_dcx</span><span class="p">,</span> <span class="n">n_birth</span><span class="p">,</span> <span class="p">&amp;</span>
@@ -528,6 +528,7 @@ public subroutine read_inputs()
     <span class="n">runid</span><span class="o">=</span><span class="s2">&quot;0&quot;</span>
     <span class="n">calc_brems</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">calc_nbi</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">calc_bes</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">calc_dcx</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">calc_halo</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">calc_cold</span><span class="o">=</span><span class="mi">0</span>
@@ -585,6 +586,9 @@ public subroutine read_inputs()
     <span class="k">read</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="n">NML</span><span class="o">=</span><span class="n">fidasim_inputs</span><span class="p">)</span>
     <span class="k">close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
 
+    <span class="c">!!TODO remove before release</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">calc_nbi</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="n">calc_bes</span><span class="o">=</span><span class="mi">1</span>
+
     <span class="c">!!General Information</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">shot_number</span><span class="o">=</span><span class="n">shot</span>
     <span class="n">inputs</span><span class="p">%</span><span class="nb">time</span><span class="o">=</span><span class="nb">time</span>
@@ -599,7 +603,7 @@ public subroutine read_inputs()
     <span class="n">inputs</span><span class="p">%</span><span class="n">neutrals_file</span><span class="o">=</span><span class="n">neutrals_file</span>
 
     <span class="c">!!Simulation Switches</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">calc_brems</span><span class="o">+</span><span class="n">calc_nbi</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">calc_halo</span><span class="o">+</span><span class="p">&amp;</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">calc_brems</span><span class="o">+</span><span class="n">calc_bes</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">calc_halo</span><span class="o">+</span><span class="p">&amp;</span>
         <span class="n">calc_cold</span><span class="o">+</span><span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_pfida</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_spec</span><span class="o">=</span><span class="mi">1</span>
     <span class="k">else</span>
@@ -607,7 +611,7 @@ public subroutine read_inputs()
     <span class="n">endif</span>
 
     <span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">calc_nbi</span><span class="o">+</span><span class="n">calc_birth</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="p">&amp;</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">calc_bes</span><span class="o">+</span><span class="n">calc_birth</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="p">&amp;</span>
         <span class="n">calc_halo</span><span class="o">+</span><span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_npa</span><span class="o">+</span><span class="p">&amp;</span>
         <span class="n">calc_fida_wght</span><span class="o">+</span><span class="n">calc_npa_wght</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi_dens</span><span class="o">=</span><span class="mi">1</span>
@@ -633,7 +637,7 @@ public subroutine read_inputs()
     <span class="n">endif</span>
 
     <span class="n">inputs</span><span class="p">%</span><span class="n">calc_brems</span><span class="o">=</span><span class="n">calc_brems</span>
-    <span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi</span><span class="o">=</span><span class="n">calc_nbi</span>
+    <span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="o">=</span><span class="n">calc_bes</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx</span><span class="o">=</span><span class="n">calc_dcx</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo</span><span class="o">=</span><span class="n">calc_halo</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">calc_cold</span><span class="o">=</span><span class="n">calc_cold</span>

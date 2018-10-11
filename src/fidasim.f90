@@ -544,6 +544,8 @@ type NeutralBeam
         !+ NBI velocity [cm/s]
     real(Float64), dimension(3)   :: current_fractions
         !+ Fractions of full, half, and third energy neutrals
+    real(Float64), dimension(:), allocatable :: power_split
+        !+ Fraction of total beam power for each beamlet
     type(Beamlet), dimension(:), allocatable :: beamlet
         !+ Array of beamlets comprising the neutral beam
 end type NeutralBeam
@@ -1133,7 +1135,7 @@ type(FastIonParticles), save    :: particles
     !+ Variable containing a MC fast-ion distribution
 type(Equilibrium), save         :: equil
     !+ Variable containing the plasma parameters and fields
-type(NeutralBeam), dimension(:), allocatable, save :: nbi
+type(NeutralBeam), save         :: nbi
     !+ Variable containing the neutral beam geometry and settings
 type(AtomicTables), save        :: tables
     !+ Variable containing the atomic tables
@@ -2231,7 +2233,7 @@ subroutine read_beam
     real(Float64), dimension(:,:), allocatable :: awidy, awidz, aoffy, aoffz, adist
     real(Float64) :: dis
     logical :: path_valid
-    integer :: error,nb,na
+    integer :: error,nb,na,i
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -2258,6 +2260,7 @@ subroutine read_beam
     endif
     nb = nbi%nbeamlet
     allocate(nbi%beamlet(nb))
+    allocate(nbi%power_split(nb))
 
     !! allocate temporary storage arrays
     allocate(uvw_src(3,nb),uvw_axis(3,nb),divy(3,nb),divz(3,nb))
@@ -2270,11 +2273,12 @@ subroutine read_beam
     call h5ltread_dataset_double_f(gid, "/nbi/axis", uvw_axis, dims, error)
     call h5ltread_dataset_double_f(gid, "/nbi/divy", divy, dims, error)
     call h5ltread_dataset_double_f(gid, "/nbi/divz", divz, dims, error)
-    call h5ltread_dataset_int_scalar_f(gid, "/nbi/shape", sshape, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/focy", focy, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/focz", focz, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/widy", widy, error)
-    call h5ltread_dataset_double_scalar_f(gid, "/nbi/widz", widz, error)
+    call h5ltread_dataset_int_f(gid, "/nbi/shape", sshape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nbi/focy", focy, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nbi/focz", focz, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nbi/widy", widy, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nbi/widz", widz, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nbi/power_split", nbi%power_split, dims(2:2), error)
 
     !!Read in aperture definitions
     !! Check for naperture for compatibility with old runs
@@ -2282,10 +2286,10 @@ subroutine read_beam
     naperture = 0
     call h5ltpath_valid_f(gid, "/nbi/naperture", .True., path_valid, error)
     if(path_valid) then
-        call h5ltread_dataset_int_scalar_f(gid,"/nbi/naperture",naperture, error)
+        call h5ltread_dataset_int_f(gid,"/nbi/naperture",naperture, error)
     endif
     if(any(naperture.gt.0)) then
-        na = max(naperture)
+        na = maxval(naperture,1)
         allocate(ashape(na,nb), adist(na,nb), &
                  awidy(na,nb), awidz(na,nb),  &
                  aoffy(na,nb), aoffz(na,nb)   )
@@ -2332,7 +2336,7 @@ subroutine read_beam
         nbi%beamlet(i)%widz = widz(i)
 
         nbi%beamlet(i)%naperture = naperture(i)
-        if naperture(i).gt.0 then
+        if (naperture(i).gt.0) then
             na = naperture(i)
             allocate(nbi%beamlet(i)%ashape(na))
             allocate(nbi%beamlet(i)%adist(na))

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.8% of total for procedures.">99 statements</a>
+    title=" 0.9% of total for procedures.">102 statements</a>
      </li> 
      
      
@@ -738,8 +738,12 @@ public subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
 
     <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">phi_exit</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="n">inter</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">return</span>
-<span class="k">    if</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">inter</span><span class="p">))</span> <span class="k">then</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="n">inter</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;CIRCLE_GRID_INTERSECT: Circle intersects grid more than 2 times: &quot;,i2)&#39;</span><span class="p">)</span> <span class="nb">count</span><span class="p">(</span><span class="n">inter</span><span class="p">)</span>
+        <span class="k">return</span>
+<span class="k">    </span><span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nb">any</span><span class="p">(</span><span class="n">inter</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">phi_enter</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span><span class="n">inter</span><span class="p">)</span>
         <span class="n">phi_exit</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span><span class="n">inter</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">r0_ing</span><span class="p">.</span><span class="nb">and</span><span class="p">.</span><span class="nb">any</span><span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="n">inter</span><span class="p">,</span><span class="mi">1</span><span class="p">).</span><span class="n">ge</span><span class="p">.</span><span class="mi">2</span><span class="p">))</span> <span class="k">then</span>

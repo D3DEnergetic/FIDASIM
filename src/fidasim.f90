@@ -2416,10 +2416,7 @@ subroutine read_chords
         allocate(dlength(inter_grid%nr, &
                          inter_grid%nz, &
                          inter_grid%nphi) )
-        print*,'** Read Chords **'
-        print*,'nchan = ',spec_chords%nchan
         inter_grid_chan_loop: do i=1,spec_chords%nchan
-            print*,'chan = ',i
             spec_chords%los(i)%lens = lenses(:,i)
             spec_chords%los(i)%axis = axes(:,i)
             spec_chords%los(i)%sigma_pi = sigma_pi(i)
@@ -2430,15 +2427,13 @@ subroutine read_chords
             v0 = v0/norm2(v0)
             call line_basis(r0,v0,basis)
 
-            !!! This is definitely not working, need to figure out later
-            !call inter_grid_intersect(r0,v0,length,r_enter,r_exit)
-            !if(length.le.0.d0) then
-            !    if(inputs%verbose.ge.1) then
-            !        WRITE(*,'("Channel ",i5," missed the interpolation grid")') i
-            !    endif
-            !    cycle inter_grid_chan_loop
-            !endif
-            !!! End
+            call inter_grid_intersect(r0,v0,length,r_enter,r_exit)
+            if(length.le.0.d0) then
+                if(inputs%verbose.ge.1) then
+                    WRITE(*,'("Channel ",i5," missed the interpolation grid")') i
+                endif
+                cycle inter_grid_chan_loop
+            endif
 
             if(spot_size(i).le.0.d0) then
                 nc = 1
@@ -2459,13 +2454,8 @@ subroutine read_chords
                 r0(3) = spot_size(i)*sqrt_rho*sin(theta)
                 r0 = matmul(basis,r0) + lenses(:,i)
 
-                !TODO: This must be fixed
-                !call inter_grid_intersect(r0, v0, length, r_enter, r_exit)
-                !call track_cylindrical(r_enter, v0, tracks, ntrack)
-                print*,'r0 = ',r0
-                print*,'v0 = ' , v0
-                call track_cylindrical(r0, v0, tracks, ntrack)
-                !TODO: End
+                call inter_grid_intersect(r0, v0, length, r_enter, r_exit)
+                call track_cylindrical(r_enter, v0, tracks, ntrack)
                 inter_grid_track_loop: do j=1, ntrack
                     ind = tracks(j)%ind
                     !inds can repeat so add rather than assign
@@ -2475,7 +2465,6 @@ subroutine read_chords
                     !$OMP END ATOMIC
                 enddo inter_grid_track_loop
             enddo
-            !!! write to hdf5 dlength index 1
             !$OMP END PARALLEL DO
             do kk=1,inter_grid%nphi
                 do jj=1,inter_grid%nz
@@ -2874,7 +2863,6 @@ subroutine read_equilibrium
     allocate(p_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     allocate(f_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     allocate(denn3d(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
-    allocate(inter_grid%rc(inter_grid%nr),inter_grid%zc(inter_grid%nz),inter_grid%phic(inter_grid%nphi))
 
     dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
 
@@ -2901,47 +2889,6 @@ subroutine read_equilibrium
     !!! I copied this from the beam_grid code, but I don't know it works for the cylindrical case
     inter_grid%ntrack = inter_grid%nr+inter_grid%nz+inter_grid%nphi
     inter_grid%ngrid  = inter_grid%nr*inter_grid%nz*inter_grid%nphi
-    !!! End
-    !!! Start of beam grid stuff
-    !!! At the moment I'm going to hard code this for center call in
-    !!! read_chords. However, the axisymmetric case should be treated
-    !!! differently because it is undesirable to use the entire tokamak for the
-    !!! trackin thing. This code will force the center to be at pi
-    rmin = inter_grid%r(1)
-    zmin = inter_grid%z(1)
-    phimin = inter_grid%phi(1)
-    do i=1, inter_grid%nr
-        inter_grid%rc(i) = rmin + (i-0.5)*inter_grid%dr
-    enddo
-    do i=1, inter_grid%nz
-        inter_grid%zc(i) = zmin + (i-0.5)*inter_grid%dz
-    enddo
-    do i=1, inter_grid%nphi
-        inter_grid%phic(i) = phimin + (i-0.5)*inter_grid%dphi
-    enddo
-
-    !beam_grid%dr(1) = abs(beam_grid%xc(2)-beam_grid%xc(1))
-    !beam_grid%dr(2) = abs(beam_grid%yc(2)-beam_grid%yc(1))
-    !beam_grid%dr(3) = abs(beam_grid%zc(2)-beam_grid%zc(1))
-
-    inter_grid%lhs(1) = abs(inter_grid%rc(inter_grid%nr) - inter_grid%rc(1)) + inter_grid%dr
-    inter_grid%lhs(2) = abs(inter_grid%zc(inter_grid%nz) - inter_grid%zc(1)) + inter_grid%dz
-    inter_grid%lhs(3) = abs(inter_grid%phic(inter_grid%nphi) - inter_grid%phic(1)) + inter_grid%dphi
-
-    !beam_grid%volume = beam_grid%lwh(1)*beam_grid%lwh(2)*beam_grid%lwh(3)
-
-    inter_grid%center(1) = (minval(inter_grid%rc) - 0.5*inter_grid%dr) + 0.5*inter_grid%lhs(1)
-    inter_grid%center(2) = (minval(inter_grid%zc) - 0.5*inter_grid%dz) + 0.5*inter_grid%lhs(2)
-    inter_grid%center(3) = (minval(inter_grid%phic) - 0.5*inter_grid%dphi) + 0.5*inter_grid%lhs(3)
-
-    !beam_grid%drmin  = minval(beam_grid%dr)
-    !beam_grid%dv     = beam_grid%dr(1)*beam_grid%dr(2)*beam_grid%dr(3)
-    !beam_grid%ntrack = beam_grid%nx+beam_grid%ny+beam_grid%nz
-    !beam_grid%ngrid  = beam_grid%nx*beam_grid%ny*beam_grid%nz
-
-    !beam_grid%dims(1) = beam_grid%nx
-    !beam_grid%dims(2) = beam_grid%ny
-    !beam_grid%dims(3) = beam_grid%nz
     !!! End
 
     if(inputs%verbose.ge.1) then
@@ -6093,7 +6040,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
 
 end subroutine grid_intersect
 
-subroutine inter_grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lhs_in)
+subroutine inter_grid_intersect(r0, v0, length, r_enter, r_exit)
     !+ Calculates a particles intersection length with the [[libfida:inter_grid]]
     real(Float64), dimension(3), intent(in)           :: r0
         !+ Initial position of particle [cm]
@@ -6105,88 +6052,95 @@ subroutine inter_grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lhs_
         !+ Point where particle enters [[libfida:inter_grid]]
     real(Float64), dimension(3), intent(out)          :: r_exit
         !+ Point where particle exits [[libfida:inter_grid]]
-    real(Float64), dimension(3), intent(in), optional :: center_in
-        !+ Alternative grid center
-    real(Float64), dimension(3), intent(in), optional :: lhs_in
-        !+ Alternative grid [length,height,arc length]
 
-    real(Float64), dimension(3,6) :: ipnts
-    real(Float64), dimension(3) :: vi
-    real(Float64), dimension(3) :: center
-    real(Float64), dimension(3) :: lhs
-    integer, dimension(6) :: side_inter
-    integer, dimension(2) :: ind
-    integer :: i, j, nunique, ind1, ind2
+    real(Float64), dimension(6)            :: dt_arr
+    real(Float64), dimension(6,3)          :: p_arr
+    real(Float64)                          :: rmin,rmax,zmin,zmax,phimin,phimax,t
+    real(Float64), dimension(3)            :: nz, n0, p
+    real(Float64), dimension(3)            :: vertex111, vertex111_uvw
+    real(Float64), dimension(3)            :: vertex112, vertex112_uvw
+    real(Float64), dimension(3)            :: vertex211, vertex211_uvw
+    real(Float64), dimension(3)            :: vertex121, vertex121_uvw
+    real(Float64), dimension(3)            :: vertex122, vertex122_uvw
+    real(Float64), dimension(3)            :: vertex212, vertex212_uvw
 
-    if (present(center_in)) then
-        center = center_in
-    else
-        center = inter_grid%center
-    endif
+    integer, dimension(1) :: minpos, maxpos
+    integer :: min_ind, max_ind
 
-    if (present(lhs_in)) then
-        lhs = lhs_in
-    else
-        lhs = inter_grid%lhs
-    endif
-    print*,'*** lhs = ',lhs
+    nz(1) = 0.d0
+    nz(2) = 0.d0
+    nz(3) = 1.d0
 
-    side_inter = 0
-    ipnts = 0.d0
-    do i=1,6
-        j = int(ceiling(i/2.0))
-        if (j.eq.1) ind = [2,3]
-        if (j.eq.2) ind = [1,3]
-        if (j.eq.3) ind = [1,2]
-        if (abs(v0(j)).gt.0.d0) then
-            ipnts(:,i) = r0 + v0*( ( (center(j) + &
-                         (mod(i,2) - 0.5)*lhs(j)) - r0(j))/v0(j) )
-            if ((abs(ipnts(ind(1),i) - center(ind(1))).le.(0.5*lhs(ind(1)))).and. &
-                (abs(ipnts(ind(2),i) - center(ind(2))).le.(0.5*lhs(ind(2))))) then
-                side_inter(i) = 1
-            endif
-        endif
-    enddo
+    rmin = inter_grid%r(1) ; rmax = inter_grid%r(inter_grid%nr)
+    zmin = inter_grid%z(1) ; zmax = inter_grid%z(inter_grid%nz)
+    phimin = inter_grid%phi(1) ; phimax = inter_grid%phi(inter_grid%nphi)
 
-    length = 0.d0
-    r_enter = r0
-    r_exit  = r0
-    ind1=0
-    ind2=0
-    if (sum(side_inter).ge.2) then
-        ! Find first intersection side
-        i=1
-        do while (i.le.6)
-            if(side_inter(i).eq.1) exit
-            i=i+1
-        enddo
-        ind1=i
-        !Find number of unique points
-        nunique = 0
-        do i=ind1+1,6
-            if (side_inter(i).ne.1) cycle
-            if (sqrt( sum( ( ipnts(:,i)-ipnts(:,ind1) )**2 ) ).gt.0.001) then
-                ind2=i
-                nunique = 2
-                exit
-            endif
-        enddo
+    vertex111(1) = rmin
+    vertex111(2) = zmin
+    vertex111(3) = phimin
+    call cyl_to_uvw(vertex111,vertex111_uvw)
 
-        if(nunique.eq.2) then
-            vi = ipnts(:,ind2) - ipnts(:,ind1)
-            if (dot_product(v0,vi).gt.0.0) then
-                r_enter = ipnts(:,ind1)
-                r_exit  = ipnts(:,ind2)
-            else
-                r_enter = ipnts(:,ind2)
-                r_exit  = ipnts(:,ind1)
-            endif
-            length = sqrt(sum((r_exit - r_enter)**2))
-        endif
-    endif
-    print*,'r_enter = ', r_enter
-    print*,'r_exit = ', r_exit
-    print*,'length = ', length
+    vertex112(1) = rmin
+    vertex112(2) = zmin
+    vertex112(3) = phimax
+    call cyl_to_uvw(vertex112,vertex112_uvw)
+
+    vertex211(1) = rmax
+    vertex211(2) = zmin
+    vertex211(3) = phimin
+    call cyl_to_uvw(vertex211,vertex211_uvw)
+
+    vertex121(1) = rmin
+    vertex121(2) = zmax
+    vertex121(3) = phimin
+    call cyl_to_uvw(vertex121,vertex121_uvw)
+
+    vertex122(1) = rmin
+    vertex122(2) = zmax
+    vertex122(3) = phimax
+    call cyl_to_uvw(vertex122,vertex122_uvw)
+
+    vertex212(1) = rmax
+    vertex212(2) = zmin
+    vertex212(3) = phimax
+    call cyl_to_uvw(vertex212,vertex212_uvw)
+
+    !!! Inner and outer circles of the inter_grid
+    call line_circle_intersect(r0, v0, vertex111_uvw, p, t)
+    dt_arr(1) = t
+    p_arr(1,:) = p
+    call line_circle_intersect(r0, v0, vertex211_uvw, p, t)
+    dt_arr(2) = t
+    p_arr(2,:) = p
+
+    !!! Bottom and top planes
+    call line_plane_intersect(r0, v0, vertex111_uvw, nz, p, t)
+    dt_arr(3) = t
+    p_arr(3,:) = p
+    call line_plane_intersect(r0, v0, vertex121_uvw, nz, p, t)
+    dt_arr(4) = t
+    p_arr(4,:) = p
+
+    !!! First and second vertical planes
+    call rz_normal_vector(vertex111_uvw, vertex211_uvw, vertex121_uvw, n0)
+    call line_plane_intersect(r0, v0, vertex111_uvw, n0, p, t)
+    dt_arr(5) = t
+    p_arr(5,:) = p
+
+    call rz_normal_vector(vertex112_uvw, vertex212_uvw, vertex122_uvw, n0)
+    call line_plane_intersect(r0, v0, vertex112_uvw, n0, p, t)
+    dt_arr(6) = t
+    p_arr(6,:) = p
+
+    minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
+    min_ind = minpos(1)
+    r_enter = p_arr(min_ind,:)
+
+    maxpos = maxloc(dt_arr)
+    max_ind = maxpos(1)
+    r_exit = p_arr(max_ind,:)
+
+    length = sqrt(sum((r_exit - r_enter)**2))
 
 end subroutine inter_grid_intersect
 
@@ -6546,10 +6500,8 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         !+ Array of [[ParticleTrack]] type
     integer(Int32), intent(out)                      :: ntrack
         !+ Number of cells that a particle crosses
-    !!! Might need to change something here
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
-    !!! End
 
     integer :: cc, i, ii, mind,ncross
     integer, dimension(3) :: ind
@@ -6573,17 +6525,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer, dimension(3) :: gdims
     integer, dimension(1) :: minpos
 
-    !!! vn, ri are fine
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
 
     if(dot_product(vn,vn).eq.0.0) then
         return
     endif
 
-    print*,''
-    print*,'* Track cylindrical *'
-
-    !!! gdims is fine
     gdims(1) = inter_grid%nr
     gdims(2) = inter_grid%nz
     gdims(3) = inter_grid%nphi
@@ -6592,7 +6539,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     nz(2) = 0.d0
     nz(3) = 1.d0
 
-    !!! Convert vn into cylindrical coordinates
     x = ri(1)
     y = ri(2)
     z = ri(3)
@@ -6615,13 +6561,10 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     dr(3) = inter_grid%dphi*sgn(3)
 
     !! define actual cell
-    !!! Convert ri to cylindrical coordinates and get the index
     ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
     ri_cyl(2) = ri(3)
     ri_cyl(3) = atan2(ri(2), ri(1))
     call get_inter_grid_indices(ri_cyl,ind)
-    !!! End
-    !ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
 
     !!! I need to better handle the case when the particle never hits a surface
     !!! Make this more efficient later
@@ -6661,7 +6604,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         v_plane_cyl(3) = inter_grid%phi(ind(3))
         call cyl_to_uvw(v_plane_cyl,v_plane)
     endif
-    !!! End
 
     redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
     redge_cyl(2) = v_plane_cyl(2)
@@ -6673,21 +6615,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     call cyl_to_uvw(tedge_cyl,tedge)
     call rz_normal_vector(v_plane, redge, tedge, n0)
     !!! End
-    print*,'ri_cyl = ',ri_cyl
-    print*,'vn_cyl = ', vn_cyl
-    print*,'sgn = ', sgn
-    print*,'ind = ',ind
-    print*,''
-    print*,'arc_cyl = ', arc_cyl
-    print*,'arc = ', arc
-    print*,'h_plane_cyl = ',h_plane_cyl
-    print*,'h_plane = ',h_plane
-    print*,'v_plane_cyl = ',v_plane_cyl
-    print*,'v_plane = ',v_plane
-    print*,'redge = ',redge
-    print*,'tedge = ',tedge
-    print*,'n0 = ',n0
-    print*,''
 
     inv_50 = 1.0/50.0
     cc=1
@@ -6696,16 +6623,13 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     tracks%flux = 0.d0
     ncross = 0
     call in_plasma(ri,in_plasma1,machine_coords=.True.)
-    !print*,'ntrack = ', inter_grid%ntrack
     track_loop: do i=1,inter_grid%ntrack
         if(cc.gt.inter_grid%ntrack) exit track_loop
 
-        !!! I will need to change this to cyl_inter% ... at some point, along with some changes in read_chords
         if((spec_chords%cyl_inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
             .and.(.not.los_inter))then
             los_inter = .True.
         endif
-        !!! End
 
         call line_circle_intersect(ri, vn, arc, p, t)
         dt_arr(1) = t
@@ -6717,11 +6641,8 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
         mind = minpos(1)
         dT = dt_arr(mind)
-        print*,'dt_arr = ',dt_arr
-        print*,'mind = ',mind
-        print*,'dT = ', dT
         ri_tmp = ri + dT*vn
-        print*,'ri_tmp = ',ri_tmp
+
         call in_plasma(ri_tmp,in_plasma2,machine_coords=.True.)
         if(in_plasma1.neqv.in_plasma2) then
             dt1 = 0.0
@@ -6749,10 +6670,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
         ri = ri + dT*vn
         ind(mind) = ind(mind) + sgn(mind)
-        print*,'ri_adv = ', ri
-        print*,'ind_adv = ', ind
-        print*,'loop i = ', i
-        print*,'******************************************************************************************'
 
         if (ind(mind).gt.gdims(mind)) exit track_loop
         if (ind(mind).lt.1) exit track_loop
@@ -6760,7 +6677,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
-        !!! Need to optiimize this somehow
+        !!! Need to optimize this somehow
         if(mind.eq.1) then
             arc_cyl(mind) = arc_cyl(mind) + dr(mind)
             call cyl_to_uvw(arc_cyl,arc)
@@ -6783,32 +6700,14 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             call rz_normal_vector(v_plane, redge, tedge, n0)
         endif
         !!! End
-        !if (i.eq.3) stop
-        print*,'ri = ', ri
         ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
         ri_cyl(2) = ri(3)
         ri_cyl(3) = atan2(ri(2), ri(1))
-        print*,'ri_cyl = ',ri_cyl
-        print*,'vn_cyl = ', vn_cyl
-        print*,'sgn = ', sgn
-        print*,'ind = ',ind
-        print*,''
-        print*,'arc_cyl = ', arc_cyl
-        print*,'arc = ', arc
-        print*,'h_plane_cyl = ',h_plane_cyl
-        print*,'h_plane = ',h_plane
-        print*,'v_plane_cyl = ',v_plane_cyl
-        print*,'v_plane = ',v_plane
-        print*,'redge = ',redge
-        print*,'tedge = ',tedge
-        print*,'n0 = ',n0
-        print*,''
     enddo track_loop
     ntrack = cc-1
     if(present(los_intersect)) then
         los_intersect = los_inter
     endif
-    print*,'** End of track **'
 
 end subroutine track_cylindrical
 
@@ -7524,7 +7423,8 @@ subroutine get_plasma_inter_grid(plasma, pos, ind)
         vrot_uvw(2) = plasma%vr*s + plasma%vt*c
         vrot_uvw(3) = plasma%vz
         !!! Change
-        plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
+        !plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
+        plasma%vrot = vrot_uvw
         !!! End
         plasma%pos = xyz
         plasma%uvw = uvw
@@ -8999,10 +8899,8 @@ subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf)
     !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:inter_grid]] index
     integer, dimension(3), intent(in) :: ind
         !+ [[libfida:inter_grid]] index
-    !!! The fields are outputed here
     type(LocalEMFields), intent(out)       :: fields
         !+ Electromagnetic fields at the guiding center
-    !!! End
     real(Float64), intent(out)             :: eb
         !+ Energy of the fast ion
     real(Float64), intent(out)             :: ptch
@@ -10168,16 +10066,11 @@ subroutine pfida_f
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
-            !!! Let's make sure that things are all in machine coords for fields
             call mc_fastion_inter_grid(ind, fields, eb, ptch, denf)
-            !!! End
             if(denf.eq.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
-            !!! Let's make sure that things are all in machine coords for fields
-            !!! Probably in beam grid coords
             call gyro_correction(fields, eb, ptch, ri, vi)
-            !!! End
 
             !! Find the particles path through the interpolation grid
             call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)

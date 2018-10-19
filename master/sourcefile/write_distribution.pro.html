@@ -382,7 +382,7 @@
 <a name="ln-136"></a>                <span class="s s-Atom">phi_desc</span><span class="p">,</span> <span class="s s-Atom">phi_unit</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-137"></a>                <span class="s s-Atom">r2d_desc</span><span class="p">,</span> <span class="s s-Atom">r2d_unit</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-138"></a>                <span class="s s-Atom">z2d_desc</span><span class="p">,</span> <span class="s s-Atom">z2d_unit</span><span class="p">]</span>
-<a name="ln-139"></a>        
+<a name="ln-139"></a>
 <a name="ln-140"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
 <a name="ln-141"></a>
 <a name="ln-142"></a>        <span class="s s-Atom">np_desc</span> <span class="o">=</span> <span class="p">{</span><span class="s s-Atom">attribute</span><span class="p">,</span><span class="nn">obj</span><span class="p">:</span><span class="s s-Atom">&#39;/nparticle&#39;</span><span class="p">,</span> <span class="err">$</span>
@@ -464,19 +464,23 @@
 <a name="ln-218"></a>                <span class="s s-Atom">np_desc</span><span class="p">,</span> <span class="s s-Atom">nc_desc</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-219"></a>                <span class="s s-Atom">r_desc</span><span class="p">,</span> <span class="s s-Atom">r_unit</span><span class="p">,</span> <span class="err">$</span>
 <a name="ln-220"></a>                <span class="s s-Atom">z_desc</span><span class="p">,</span> <span class="s s-Atom">z_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-221"></a>                <span class="s s-Atom">phi_desc</span><span class="p">,</span> <span class="s s-Atom">phi_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-222"></a>                <span class="s s-Atom">w_desc</span><span class="p">,</span> <span class="s s-Atom">w_unit</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-223"></a>                <span class="s s-Atom">c_desc</span><span class="p">,</span> <span class="s s-Atom">type_atts</span><span class="p">]</span> 
-<a name="ln-224"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-225"></a>
-<a name="ln-226"></a>    <span class="s s-Atom">write_hdf5</span><span class="p">,</span> <span class="s s-Atom">distri</span><span class="p">,</span> <span class="s s-Atom">filename</span><span class="o">=</span><span class="s s-Atom">filename</span><span class="p">,</span><span class="s s-Atom">atts</span><span class="o">=</span><span class="s s-Atom">atts</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">clobber</span><span class="p">,</span> <span class="s s-Atom">compress</span><span class="o">=</span><span class="mi">4</span>
-<a name="ln-227"></a>   
-<a name="ln-228"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">filename</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-229"></a>        <span class="s s-Atom">success</span><span class="p">,</span> <span class="s s-Atom">&#39;Distribution file created: &#39;</span><span class="o">+</span><span class="s s-Atom">filename</span>
-<a name="ln-230"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-231"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Distribution file creation failed.&#39;</span>
-<a name="ln-232"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-233"></a><span class="nv">END</span>
+<a name="ln-221"></a>                <span class="s s-Atom">w_desc</span><span class="p">,</span> <span class="s s-Atom">w_unit</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-222"></a>                <span class="s s-Atom">c_desc</span><span class="p">,</span> <span class="s s-Atom">type_atts</span><span class="p">]</span>
+<a name="ln-223"></a>
+<a name="ln-224"></a>        <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s s-Atom">&#39;phi&#39;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nf">tag_names</span><span class="p">(</span><span class="s s-Atom">distri</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-225"></a>        <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-226"></a>            <span class="s s-Atom">atts</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">atts</span><span class="p">,</span> <span class="s s-Atom">phi_desc</span><span class="p">,</span> <span class="s s-Atom">phi_unit</span><span class="p">]</span>
+<a name="ln-227"></a>        <span class="s s-Atom">endif</span>
+<a name="ln-228"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-229"></a>
+<a name="ln-230"></a>    <span class="s s-Atom">write_hdf5</span><span class="p">,</span> <span class="s s-Atom">distri</span><span class="p">,</span> <span class="s s-Atom">filename</span><span class="o">=</span><span class="s s-Atom">filename</span><span class="p">,</span><span class="s s-Atom">atts</span><span class="o">=</span><span class="s s-Atom">atts</span><span class="p">,</span> <span class="o">/</span><span class="s s-Atom">clobber</span><span class="p">,</span> <span class="s s-Atom">compress</span><span class="o">=</span><span class="mi">4</span>
+<a name="ln-231"></a>
+<a name="ln-232"></a>    <span class="s s-Atom">if</span> <span class="nf">file_test</span><span class="p">(</span><span class="s s-Atom">filename</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-233"></a>        <span class="s s-Atom">success</span><span class="p">,</span> <span class="s s-Atom">&#39;Distribution file created: &#39;</span><span class="o">+</span><span class="s s-Atom">filename</span>
+<a name="ln-234"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-235"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Distribution file creation failed.&#39;</span>
+<a name="ln-236"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-237"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

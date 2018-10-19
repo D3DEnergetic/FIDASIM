@@ -136,7 +136,7 @@ PRO write_distribution, filename, distri
                 phi_desc, phi_unit, $
                 r2d_desc, r2d_unit, $
                 z2d_desc, z2d_unit]
-        
+
     endif else begin
 
         np_desc = {attribute,obj:'/nparticle', $
@@ -218,13 +218,17 @@ PRO write_distribution, filename, distri
                 np_desc, nc_desc, $
                 r_desc, r_unit, $
                 z_desc, z_unit, $
-                phi_desc, phi_unit, $
                 w_desc, w_unit, $
-                c_desc, type_atts] 
+                c_desc, type_atts]
+
+        w = where('phi' eq strlowcase(tag_names(distri)),nw)
+        if nw ne 0 then begin
+            atts = [atts, phi_desc, phi_unit]
+        endif
     endelse
 
     write_hdf5, distri, filename=filename,atts=atts, /clobber, compress=4
-   
+
     if file_test(filename) then begin
         success, 'Distribution file created: '+filename
     endif else begin

@@ -304,7 +304,10 @@ type, extends( Profiles ) :: LocalProfiles
     !+ Plasma parameters at given position
     logical :: in_plasma = .False.
         !+ Indicates whether plasma parameters are valid/known
-    logical :: machine_coords = .False.
+    !!! coords = 0, 1, 2 
+    !!! beam, machine, cylindrical
+    !logical :: coords = .False.
+    integer :: coords = 0
         !+ Indicates whether vectors are in machine coordinates
     real(Float64), dimension(3) :: pos = 0.d0
         !+ Position in beam grid coordinates
@@ -312,6 +315,8 @@ type, extends( Profiles ) :: LocalProfiles
         !+ Position in machine coordinates
     real(Float64), dimension(3) :: vrot = 0.d0
         !+ Plasma rotation in beam grid coordinates
+    real(Float64), dimension(3) :: vrot_uvw = 0.d0
+        !+ Plasma rotation in machine coordinates
     type(InterpolCoeffs3D) :: b
         !+ Cylindrical Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalProfiles
@@ -354,7 +359,8 @@ type, extends( EMFields ) :: LocalEMFields
     !+ Electro-magnetic fields at given position
     logical       :: in_plasma = .False.
         !+ Indicates whether fields are valid/known
-    logical :: machine_coords = .False.
+        !!! comment
+    integer :: coords = 0
         !+ Indicates whether vectors are in machine coordinates
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
@@ -694,6 +700,10 @@ type LineOfSight
         !+ Lens location in beam grid coordinates
     real(Float64), dimension(3) :: axis = 0.d0
         !+ Optical axis in beam grid coordinates
+    real(Float64), dimension(3) :: lens_uvw = 0.d0
+        !+ Lens location in machine coordinates
+    real(Float64), dimension(3) :: axis_uvw = 0.d0
+        !+ Optical axis in machine coordinates
 end type LineOfSight
 
 type LOSElement
@@ -2411,12 +2421,21 @@ subroutine read_chords
     !!Close HDF5 interface
     call h5close_f(error)
 
+    !!! Need to insert something like the following:
+    !!! Find boundaries of beam grid, and fabricate a cylindrical grid tracking
+    ! scheme if nphi = 1
+    ! else
+    ! use the interpolation grid that was given and track.
+    ! end if
+
+    !!! For the moment I will stick with this
     if(inter_grid%nphi.gt.1) then
-        allocate(tracks(inter_grid%ntrack))
+        allocate(tracks(inter_grid%ntrack))         !!! Is this right?
         allocate(dlength(inter_grid%nr, &
                          inter_grid%nz, &
                          inter_grid%nphi) )
         inter_grid_chan_loop: do i=1,spec_chords%nchan
+        ! read in once
             spec_chords%los(i)%lens = lenses(:,i)
             spec_chords%los(i)%axis = axes(:,i)
             spec_chords%los(i)%sigma_pi = sigma_pi(i)
@@ -2886,7 +2905,7 @@ subroutine read_equilibrium
     endif
     inter_grid%dv = inter_grid%dr*inter_grid%dphi*inter_grid%dz
 
-    !!! I copied this from the beam_grid code, but I don't know it works for the cylindrical case
+    !!! Still need to double check that this definition is correct
     inter_grid%ntrack = inter_grid%nr+inter_grid%nz+inter_grid%nphi
     inter_grid%ngrid  = inter_grid%nr*inter_grid%nz*inter_grid%nphi
     !!! End
@@ -3255,7 +3274,7 @@ subroutine read_mc(fid, error)
             zp = particles%fast_ion(i)%z
             uvw = [xp,yp,zp]
         endif
-        call in_plasma(uvw,inp,machine_coords=.True.)
+        call in_plasma(uvw,inp,input_coords=1)
         if(.not.inp) cycle particle_loop
 
         if(particles%axisym) then
@@ -6357,28 +6376,38 @@ subroutine get_position(ind, pos)
 
 end subroutine get_position
 
-subroutine get_inter_grid_position(ind, pos, machine_coords)
+subroutine get_inter_grid_position(ind, pos, output_coords)
     !+ Get position `pos` given [[libfida:inter_grid]] indices `ind`
     integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:inter_grid]] indices
     real(Float64), dimension(3), intent(out) :: pos
         !+ Position [cm]
-    logical, intent(in), optional            :: machine_coords
+    integer, intent(in), optional            :: output_coords
         !+ Indicator for `pos` to be in machine coordinates
 
-    real(Float64), dimension(3) :: pos_temp
-    logical :: mc
-    if(present(machine_coords)) mc = machine_coords
-
-    pos_temp(1) = inter_grid%r(ind(1))
-    pos_temp(2) = inter_grid%z(ind(2))
-    pos_temp(3) = inter_grid%phi(ind(3))
-
-    if(mc) then
-        call cyl_to_uvw(pos_temp, pos)
+    real(Float64), dimension(3) :: pos_temp1, pos_temp2
+    integer :: ocs
+    if(present(output_coords)) then
+        ocs = output_coords
     else
-        pos = pos_temp
+        !!! coords start from 1
+        ocs = 0
     endif
+
+    pos_temp1(1) = inter_grid%r(ind(1))
+    pos_temp1(2) = inter_grid%z(ind(2))
+    pos_temp1(3) = inter_grid%phi(ind(3))
+
+    if(ocs.eq.0) then
+        call cyl_to_uvw(pos_temp1, pos_temp2)
+        call uvw_to_xyz(pos_temp2, pos)
+    endif
+   !if(ocs.eq.1) then
+   !    call cyl_to_uvw(pos_temp1, pos)
+   !endif
+   !if(ocs.eq.2) then
+   !    pos = pos_temp1
+   !endif
 
 end subroutine get_inter_grid_position
 
@@ -6622,7 +6651,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     tracks%time = 0.d0
     tracks%flux = 0.d0
     ncross = 0
-    call in_plasma(ri,in_plasma1,machine_coords=.True.)
+    call in_plasma(ri,in_plasma1,input_coords=1)
     track_loop: do i=1,inter_grid%ntrack
         if(cc.gt.inter_grid%ntrack) exit track_loop
 
@@ -6643,13 +6672,13 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
 
-        call in_plasma(ri_tmp,in_plasma2,machine_coords=.True.)
+        call in_plasma(ri_tmp,in_plasma2,input_coords=1)
         if(in_plasma1.neqv.in_plasma2) then
             dt1 = 0.0
             track_fine: do ii=1,50
                 dt1 = dt1 + dT*inv_50
                 ri_tmp = ri + vn*dt1
-                call in_plasma(ri_tmp,in_plasma_tmp,machine_coords=.True.)
+                call in_plasma(ri_tmp,in_plasma_tmp,input_coords=1)
                 if(in_plasma2.eqv.in_plasma_tmp) exit track_fine
             enddo track_fine
             tracks(cc)%pos = ri + 0.5*dt1*vn
@@ -6896,6 +6925,10 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,zmin,dz,nz,phimin,dphi,nphi,rout,zout
     real(Float64) :: phi
     integer :: i, j, k, err_status
 
+    !!! This might need to change
+    !phi = modulo(phiout,2*pi)
+    phi = modulo(phiout,2*pi)
+
     err_status = 1
 
     rp = max(rout,rmin)
@@ -6998,6 +7031,7 @@ subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
         c%j = b%j
         c%k = 1
     else
+        !!! This could be problematic. Let's try easier fix first
         phimin = phi(1)
         dphi = abs(phi(2)-phi(1))
         call cyl_interpol3D_coeff(rmin, dr, sr, zmin, dz, sz, phimin, dphi, sphi, rout, zout, phiout, c, err_status)
@@ -7262,15 +7296,15 @@ end subroutine interpol3D_2D_arr
 !=============================================================================
 !-------------------------Profiles and Fields Routines------------------------
 !=============================================================================
-subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
+subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
     !+ Indicator subroutine to determine if a position is in a region where
     !+ the plasma parameter and fields are valid/known
     real(Float64), dimension(3), intent(in) :: xyz
         !+ Position in beam coordinates
     logical, intent(out)                    :: inp
         !+ Indicates whether plasma parameters and fields are valid/known
-    logical, intent(in), optional           :: machine_coords
-        !+ Indicates that xyz is in machine coordinates
+    integer, intent(in), optional           :: input_coords
+        !+ Indicates the coordinate system that xyz is in
     type(InterpolCoeffs3D), intent(out), optional      :: coeffs
         !+ Linear Interpolation coefficients used in calculation
     real(Float64), dimension(3), intent(out), optional :: uvw_out
@@ -7278,26 +7312,34 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
 
     real(Float64), dimension(3) :: uvw
     type(InterpolCoeffs3D) :: b
-    real(Float64) :: R, W, mask
-    real(Float64) :: phi
-    logical :: mc
-    integer :: i, j, k, k2, err
+    real(Float64) :: R, phi, W, mask
+    integer :: i, j, k, k2, err, ics
 
     err = 1
-    mc = .False.
-    if(present(machine_coords)) mc = machine_coords
-
-    if(mc) then
-        uvw = xyz
+    if(present(input_coords)) then
+        ics = input_coords
     else
+        !!! coords start from 1
+        ics = 0
+    endif
+
+    if(ics.eq.0) then
         !! Convert to machine coordinates
         call xyz_to_uvw(xyz,uvw)
     endif
+    if(ics.eq.1) then
+        uvw = xyz
+    endif
+    !!! Need something here for cylindrical coordinates
+    !!!call in_plasma(xyz,inp,0,coeffs)
 
+    !call in_plasma(xyz,inp,0,coeffs)
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
     phi = atan2(uvw(2),uvw(1))
+    phi = modulo(phi,2*pi)
     !! Interpolate mask value
+    !!! Confident fine
     call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phi, b, err)
 
     inp = .False.
@@ -7325,7 +7367,7 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
 
 end subroutine in_plasma
 
-subroutine get_plasma(plasma, pos, ind)
+subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
     !+ Gets plasma parameters at position `pos` or [[libfida:beam_grid]] indices `ind`
     type(LocalProfiles), intent(out)                   :: plasma
         !+ Plasma parameters at `pos`/`ind`
@@ -7333,19 +7375,57 @@ subroutine get_plasma(plasma, pos, ind)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
+    integer(Int32), intent(in), optional               :: input_coords
+    !!! coment
+        !+ [[libfida:beam_grid]] indices
+    integer(Int32), intent(in), optional               :: output_coords
+    !!! coment
+        !+ [[libfida:beam_grid]] indices
 
     logical :: inp
     type(InterpolCoeffs3D) :: coeffs
-    real(Float64), dimension(3) :: xyz, uvw, vrot_uvw
+    real(Float64), dimension(3) :: xyz, uvw, cyl, vrot_uvw
     real(Float64) :: phi, s, c
-    integer :: i, j, k, k2
+    integer :: i, j, k, k2, ics, ocs
 
     plasma%in_plasma = .False.
+    !!!call get_plasma(plasma,ind=ind,input_coords=2)
 
-    if(present(ind)) call get_position(ind,xyz)
-    if(present(pos)) xyz = pos
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        !!! coords start from 1
+        ics = 0
+    endif
+    if(present(output_coords)) then
+        ocs = output_coords
+    else
+        !!! coords start from 1
+        ocs = 0
+    endif
 
-    call in_plasma(xyz,inp,.False.,coeffs,uvw)
+    if(present(ind)) then
+        if(ics.eq.0) then
+            call get_position(ind,xyz)
+        endif
+        if(ics.eq.2) then
+            call get_inter_grid_position(ind,xyz,output_coords=0)
+        endif
+    endif
+
+    if(present(pos)) then
+        if(ics.eq.0) then
+            xyz = pos
+            call xyz_to_uvw(xyz, uvw)
+        endif
+        if(ics.eq.1) then
+            uvw = pos
+            call uvw_to_xyz(uvw, xyz)
+        endif
+    endif
+
+    !!! I'm not inputting coordinates in right here
+    call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
         phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
@@ -7366,8 +7446,20 @@ subroutine get_plasma(plasma, pos, ind)
         vrot_uvw(1) = plasma%vr*c - plasma%vt*s
         vrot_uvw(2) = plasma%vr*s + plasma%vt*c
         vrot_uvw(3) = plasma%vz
-        plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
-        plasma%pos = xyz
+        if(ocs.eq.0) then
+            plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
+            plasma%pos = xyz
+        endif
+        if(ocs.eq.1) then
+            plasma%vrot = vrot_uvw
+            plasma%pos = uvw
+        endif
+        !!! add something for ocs eq 3
+        !TODO
+        !if(cs.eq.2) then
+            !plasma%vrot = vrot_uvw
+            !plasma%pos = uvw
+        !endif
         plasma%uvw = uvw
         plasma%in_plasma = .True.
         plasma%b = coeffs
@@ -7375,64 +7467,64 @@ subroutine get_plasma(plasma, pos, ind)
 
 end subroutine get_plasma
 
-subroutine get_plasma_inter_grid(plasma, pos, ind)
-    !+ Gets plasma parameters at position `pos` or [[libfida:inter_grid]] indices `ind`
-    type(LocalProfiles), intent(out)                   :: plasma
-        !+ Plasma parameters at `pos`/`ind`
-    real(Float64), dimension(3), intent(in), optional  :: pos
-        !+ Position in machine coordinates grid coordinates
-    integer(Int32), dimension(3), intent(in), optional :: ind
-        !+ [[libfida:inter_grid]] indices
+!subroutine get_plasma_inter_grid(plasma, pos, ind)
+!    !+ Gets plasma parameters at position `pos` or [[libfida:inter_grid]] indices `ind`
+!   type(LocalProfiles), intent(out)                   :: plasma
+!       !+ Plasma parameters at `pos`/`ind`
+!   real(Float64), dimension(3), intent(in), optional  :: pos
+!       !+ Position in machine coordinates grid coordinates
+!   integer(Int32), dimension(3), intent(in), optional :: ind
+!       !+ [[libfida:inter_grid]] indices
 
-    logical :: inp, mc
-    type(InterpolCoeffs3D) :: coeffs
-    real(Float64), dimension(3) :: xyz, uvw, vrot_uvw
-    real(Float64) :: phi, s, c
-    integer :: i, j, k, k2
+!   logical :: inp, mc
+!   type(InterpolCoeffs3D) :: coeffs
+!   real(Float64), dimension(3) :: xyz, uvw, vrot_uvw
+!   real(Float64) :: phi, s, c
+!   integer :: i, j, k, k2
 
-    plasma%in_plasma = .False.
-    mc = .False.
+!   plasma%in_plasma = .False.
+!   mc = .False.
 
-    if(present(ind)) then
-        call get_inter_grid_position(ind,xyz, machine_coords=.True.)
-        mc = .True.
-    endif
-    !!! This may need to be converted to machine coordinates if pos is defined in cylindrical coords
-    if(present(pos)) xyz = pos
-    !!! End
+!   if(present(ind)) then
+!       call get_inter_grid_position(ind,xyz,output_coords=1)
+!       ics = 1
+!   endif
+!   !!! This may need to be converted to machine coordinates if pos is defined in cylindrical coords
+!   if(present(pos)) xyz = pos
+!   !!! End
 
-    call in_plasma(xyz,inp,mc,coeffs,uvw)
-    if(inp) then
-        phi = atan2(uvw(2),uvw(1))
-        i = coeffs%i
-        j = coeffs%j
-        k = coeffs%k
-        if(inter_grid%nphi .eq. 1) then
-            k2 = min(k+1,inter_grid%nphi)
-        else
-            k2 = k+1
-        endif
+!   call in_plasma(xyz,inp,input_coords=ics,coeffs,uvw)
+!   if(inp) then
+!       phi = atan2(uvw(2),uvw(1))
+!       i = coeffs%i
+!       j = coeffs%j
+!       k = coeffs%k
+!       if(inter_grid%nphi .eq. 1) then
+!           k2 = min(k+1,inter_grid%nphi)
+!       else
+!           k2 = k+1
+!       endif
 
-        plasma = coeffs%b111*equil%plasma(i,j,k)    + coeffs%b121*equil%plasma(i,j+1,k) +   &
-                 coeffs%b112*equil%plasma(i,j,k2)   + coeffs%b122*equil%plasma(i,j+1,k2) +  &
-                 coeffs%b211*equil%plasma(i+1,j,k)  + coeffs%b221*equil%plasma(i+1,j+1,k) + &
-                 coeffs%b212*equil%plasma(i+1,j,k2) + coeffs%b222*equil%plasma(i+1,j+1,k2)
+!       plasma = coeffs%b111*equil%plasma(i,j,k)    + coeffs%b121*equil%plasma(i,j+1,k) +   &
+!                coeffs%b112*equil%plasma(i,j,k2)   + coeffs%b122*equil%plasma(i,j+1,k2) +  &
+!                coeffs%b211*equil%plasma(i+1,j,k)  + coeffs%b221*equil%plasma(i+1,j+1,k) + &
+!                coeffs%b212*equil%plasma(i+1,j,k2) + coeffs%b222*equil%plasma(i+1,j+1,k2)
 
-        s = sin(phi) ; c = cos(phi)
-        vrot_uvw(1) = plasma%vr*c - plasma%vt*s
-        vrot_uvw(2) = plasma%vr*s + plasma%vt*c
-        vrot_uvw(3) = plasma%vz
-        !!! Change
-        !plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
-        plasma%vrot = vrot_uvw
-        !!! End
-        plasma%pos = xyz
-        plasma%uvw = uvw
-        plasma%in_plasma = .True.
-        plasma%b = coeffs
-    endif
-
-end subroutine get_plasma_inter_grid
+!       s = sin(phi) ; c = cos(phi)
+!       vrot_uvw(1) = plasma%vr*c - plasma%vt*s
+!       vrot_uvw(2) = plasma%vr*s + plasma%vt*c
+!       vrot_uvw(3) = plasma%vz
+!       !!! Change
+!       !plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
+!       plasma%vrot_uvw = vrot_uvw
+!       !!! End
+!       plasma%pos = xyz
+!       plasma%uvw = uvw
+!       plasma%in_plasma = .True.
+!       plasma%b = coeffs
+!   endif
+!
+!end subroutine get_plasma_inter_grid
 
 subroutine calc_perp_vectors(b, a, c)
   !+ Calculates normalized vectors that are perpendicular to b
@@ -7464,7 +7556,7 @@ subroutine calc_perp_vectors(b, a, c)
 
 end subroutine calc_perp_vectors
 
-subroutine get_fields(fields, pos, ind, machine_coords)
+subroutine get_fields(fields, pos, ind, input_coords, output_coords)
     !+ Gets electro-magnetic fields at position `pos` or [[libfida:beam_grid]] indices `ind`
     type(LocalEMFields),intent(out)                    :: fields
         !+ Electro-magnetic fields at `pos`/`ind`
@@ -7472,26 +7564,47 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
-    logical, intent(in), optional :: machine_coords
-        !+ Indicates that pos is machine coordinates
+    integer(Int32), intent(in), optional               :: input_coords
+    !!! coment
+        !+ [[libfida:beam_grid]] indices
+    integer(Int32), intent(in), optional               :: output_coords
 
-    logical :: inp, mc
+    logical :: inp
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(3) :: uvw_bfield, uvw_efield
     real(Float64), dimension(3) :: xyz_bfield, xyz_efield
     real(Float64) :: phi, s, c
     type(InterpolCoeffs3D) :: coeffs
-    integer :: i, j, k, k2
+    integer :: i, j, k, k2, mc, ocs, ics
+    !!!call get_fields(fields,pos=rg,input_coords=1)
 
     fields%in_plasma = .False.
 
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        !!! coords start from 1
+        ics = 0
+    endif
+    if(present(output_coords)) then
+        ocs = output_coords
+    else
+        !!! coords start from 1
+        ocs = 0
+    endif
     if(present(ind)) call get_position(ind,xyz)
-    if(present(pos)) xyz = pos
+    if(present(pos)) then
+        if(ics.eq.0) then
+            xyz = pos
+            call xyz_to_uvw(xyz, uvw)
+        endif
+        if(ics.eq.1) then
+            uvw = pos
+            call uvw_to_xyz(uvw, xyz)
+        endif
+    endif
 
-    mc = .False.
-    if(present(machine_coords)) mc = machine_coords
-
-    call in_plasma(xyz,inp,mc,coeffs,uvw)
+    call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
         phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
@@ -7519,14 +7632,19 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         uvw_efield(2) = s*fields%er + c*fields%et
         uvw_efield(3) = fields%ez
 
-        if(mc) then
-            xyz_bfield = uvw_bfield
-            xyz_efield = uvw_efield
-        else
+        if(ocs.eq.0) then
             !Represent fields in beam grid coordinates
             xyz_bfield = matmul(beam_grid%inv_basis,uvw_bfield)
             xyz_efield = matmul(beam_grid%inv_basis,uvw_efield)
+            fields%pos = xyz
         endif
+        if(ocs.eq.1) then
+            xyz_bfield = uvw_bfield
+            xyz_efield = uvw_efield
+            fields%pos = uvw
+        endif
+        !!! come back
+        !if(ocs.eq.3) then
 
         !Calculate field directions and magnitudes
         fields%b_abs = norm2(xyz_bfield)
@@ -7538,10 +7656,9 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         call calc_perp_vectors(fields%b_norm,fields%a_norm,fields%c_norm)
         !!! End
 
-        fields%pos = xyz
         fields%uvw = uvw
         fields%in_plasma = .True.
-        fields%machine_coords = mc
+        fields%coords = ocs
         fields%b = coeffs
     endif
 
@@ -8759,10 +8876,11 @@ subroutine gyro_step(vi, fields, r_gyro)
         uvw = fields%uvw
         R = sqrt(uvw(1)**2 + uvw(2)**2)
         phi = atan2(uvw(2),uvw(1))
-        if(fields%machine_coords) then
-            rg_uvw = r_gyro
-        else
+        if(fields%coords.eq.0) then
             rg_uvw = matmul(beam_grid%basis,r_gyro)
+        endif
+        if(fields%coords.eq.1) then
+            rg_uvw = r_gyro
         endif
         rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
         b_rtz(1) = fields%br/fields%b_abs
@@ -8922,7 +9040,7 @@ subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf)
     denf=0.d0
 
     call cyl_to_uvw(rg_cyl, rg)
-    call get_fields(fields,pos=rg,machine_coords=.True.)
+    call get_fields(fields,pos=rg,input_coords=1)
     if(.not.fields%in_plasma) return
 
     call get_distribution(fbeam,denf,pos=rg, coeffs=fields%b)
@@ -10033,7 +10151,9 @@ subroutine pfida_f
     do ic=1,inter_grid%ngrid
         call ind2sub(inter_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        call get_plasma_inter_grid(plasma,ind=ind)
+        !!! Look for probable error error!!!!!
+        call get_plasma(plasma,ind=ind,input_coords=2)
+        !if(ic.eq.4) stop
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
@@ -10078,7 +10198,8 @@ subroutine pfida_f
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_plasma_inter_grid(plasma, pos = ri)
+            call get_plasma(plasma, pos = ri, input_coords=1)
+                !!! assumes beam
             call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
@@ -10087,8 +10208,9 @@ subroutine pfida_f
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
-                call get_plasma_inter_grid(plasma,pos=tracks(jj)%pos)
+                call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
+                !!! assumes beam
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k), passive=.True.)

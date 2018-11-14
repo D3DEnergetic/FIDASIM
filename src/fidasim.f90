@@ -10111,7 +10111,7 @@ subroutine neutron_f
 
     ngamma = 20
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
-    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel)
+    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)
     z_loop: do iz = istart, fbm%nz, istep
         r_loop: do ir=1, fbm%nr
             phi_loop: do iphi = 1, fbm%nphi

@@ -6925,10 +6925,6 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,zmin,dz,nz,phimin,dphi,nphi,rout,zout
     real(Float64) :: phi
     integer :: i, j, k, err_status
 
-    !!! This might need to change
-    !phi = modulo(phiout,2*pi)
-    phi = modulo(phiout,2*pi)
-
     err_status = 1
 
     rp = max(rout,rmin)
@@ -7031,7 +7027,6 @@ subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
         c%j = b%j
         c%k = 1
     else
-        !!! This could be problematic. Let's try easier fix first
         phimin = phi(1)
         dphi = abs(phi(2)-phi(1))
         call cyl_interpol3D_coeff(rmin, dr, sr, zmin, dz, sz, phimin, dphi, sphi, rout, zout, phiout, c, err_status)
@@ -7312,7 +7307,8 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
 
     real(Float64), dimension(3) :: uvw
     type(InterpolCoeffs3D) :: b
-    real(Float64) :: R, phi, W, mask
+    real(Float64) :: R, W, mask
+    real(Float64) :: phi, phip
     integer :: i, j, k, k2, err, ics
 
     err = 1
@@ -7337,10 +7333,10 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
     phi = atan2(uvw(2),uvw(1))
-    phi = modulo(phi,2*pi)
+    phip = modulo(phi,2*pi)
     !! Interpolate mask value
     !!! Confident fine
-    call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phi, b, err)
+    call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phip, b, err)
 
     inp = .False.
     if(err.eq.0) then
@@ -7356,7 +7352,8 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
                b%b121*equil%mask(i,j+1,k)   + b%b122*equil%mask(i,j+1,k2) + &
                b%b211*equil%mask(i+1,j,k)   + b%b212*equil%mask(i+1,j,k2) + &
                b%b221*equil%mask(i+1,j+1,k) + b%b222*equil%mask(i+1,j+1,k2)
-        if(mask.ge.0.5) then
+
+        if((mask.ge.0.5).and.(err.eq.0)) then
             inp = .True.
         endif
     endif
@@ -10151,9 +10148,7 @@ subroutine pfida_f
     do ic=1,inter_grid%ngrid
         call ind2sub(inter_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        !!! Look for probable error error!!!!!
         call get_plasma(plasma,ind=ind,input_coords=2)
-        !if(ic.eq.4) stop
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
@@ -10177,6 +10172,7 @@ subroutine pfida_f
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
+    print*,'ncell = ',ncell
 
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &

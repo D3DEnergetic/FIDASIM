@@ -1589,7 +1589,7 @@ public subroutine neutron_f()
 
     <span class="n">ngamma</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="c">!$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&amp;</span>
-    <span class="c">!$OMP&amp; ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel)</span>
+    <span class="c">!$OMP&amp; ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)</span>
     <span class="n">z_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">iz</span> <span class="o">=</span> <span class="n">istart</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="n">istep</span>
         <span class="n">r_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">ir</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nr</span>
             <span class="n">phi_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">iphi</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fbm</span><span class="p">%</span><span class="n">nphi</span>

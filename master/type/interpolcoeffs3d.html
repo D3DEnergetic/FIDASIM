@@ -422,7 +422,7 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>i</strong></td><td> =</td><td>0</td><td><p>Index of R before <code>xout</code></p></td>
+  <td><strong>i</strong></td><td> =</td><td>0</td><td><p>Index of R before <code>rout</code></p></td>
   
 </tr>
 
@@ -436,7 +436,7 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>j</strong></td><td> =</td><td>0</td><td><p>Index of Phi before <code>yout</code></p></td>
+  <td><strong>j</strong></td><td> =</td><td>0</td><td><p>Index of Z before <code>zout</code></p></td>
   
 </tr>
 
@@ -450,7 +450,7 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>k</strong></td><td> =</td><td>0</td><td><p>Index of Z before <code>zout</code></p></td>
+  <td><strong>k</strong></td><td> =</td><td>0</td><td><p>Index of Phi before <code>phiout</code></p></td>
   
 </tr>
 
@@ -585,11 +585,11 @@
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">InterpolCoeffs3D</span>
     <span class="c">!+ 3D Cylindrical Interpolation Coefficients and indices</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c">!+ Index of R before `xout`</span>
+        <span class="c">!+ Index of R before `rout`</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="c">!+ Index of Phi before `yout`</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c">!+ Index of Z before `zout`</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c">!+ Index of Phi before `phiout`</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b111</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Coefficient for z(i,j,k) term</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b121</span> <span class="o">=</span> <span class="mf">0.d0</span>

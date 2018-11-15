@@ -201,6 +201,7 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi
     endfor
     flux = fluxgrid
     mask = in_vessel(100*g.lim[0,*],100*g.lim[1,*],grid.r2d,grid.z2d)
+    mask=rebin(mask,grid.nr,grid.nz,grid.nphi)
 
     equil={time:time,data_source:file_expand_path(filename), mask:mask, $
            br:b_r,bt:b_t,bz:b_z,er:e_r,et:e_t,ez:e_z}

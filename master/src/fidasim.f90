@@ -142,11 +142,11 @@ end type InterpolCoeffs2D
 type InterpolCoeffs3D
     !+ 3D Cylindrical Interpolation Coefficients and indices
     integer :: i = 0
-        !+ Index of R before `xout`
+        !+ Index of R before `rout`
     integer :: j = 0
-        !+ Index of Phi before `yout`
-    integer :: k = 0
         !+ Index of Z before `zout`
+    integer :: k = 0
+        !+ Index of Phi before `phiout`
     real(Float64) :: b111 = 0.d0
         !+ Coefficient for z(i,j,k) term
     real(Float64) :: b121 = 0.d0
@@ -6290,37 +6290,40 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,zmin,dz,nz,phimin,dphi,nphi,rout,zout
     real(Float64) :: phi
     integer :: i, j, k, err_status
 
-    phi = modulo(phi,2*pi)
-
     err_status = 1
+
     rp = max(rout,rmin)
     zp = max(zout,zmin)
+    phi = modulo(phiout,2*pi)
     phip = max(phi,phimin)
     i = floor((rp-rmin)/dr)+1
     j = floor((zp-zmin)/dz)+1
     k = floor((phip-phimin)/dphi)+1
 
     if (nphi .eq. 1) then
-        call interpol2D_coeff(rmin, dr, nr, zmin, dz, nz, rout, zout, b, err_status)
-        c%b111 = b%b11
-        c%b121 = b%b12
-        c%b221 = b%b22
-        c%b211 = b%b21
-        c%b212 = 0
-        c%b222 = 0
-        c%b122 = 0
-        c%b112 = 0
-        c%i = b%i
-        c%j = b%j
-        c%k = 1
+        if (((i.gt.0).and.(i.le.(nr-1))).and.((j.gt.0).and.(j.le.(nz-1)))) then
+            call interpol2D_coeff(rmin, dr, nr, zmin, dz, nz, rout, zout, b, err_status)
+            c%b111 = b%b11
+            c%b121 = b%b12
+            c%b221 = b%b22
+            c%b211 = b%b21
+            c%b212 = 0
+            c%b222 = 0
+            c%b122 = 0
+            c%b112 = 0
+            c%i = b%i
+            c%j = b%j
+            c%k = 1
+            err_status = 0
+        endif
     else
-        if ((((i.gt.0).and.(i.le.(nr-1))).and.((k.gt.0).and.(k.le.(nphi-1)))).and.((j.gt.0).and.(j.le.(nz-1)))) then
+        if ((((i.gt.0).and.(i.le.(nr-1))).and.((j.gt.0).and.(j.le.(nz-1)))).and.((k.gt.0).and.(k.le.(nphi-1)))) then
             r1 = rmin + (i-1)*dr
             r2 = r1 + dr
-            phi1 = phimin + (k-1)*dphi
-            phi2 = phi1 + dphi
             z1 = zmin + (j-1)*dz
             z2 = z1 + dz
+            phi1 = phimin + (k-1)*dphi
+            phi2 = phi1 + dphi
             dV = ((r2**2 - r1**2) * (phi2 - phi1) * (z2 - z1))
 
             !! Both volume elements have a factor of 1/2 that cancels out
@@ -6670,7 +6673,8 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
 
     real(Float64), dimension(3) :: uvw
     type(InterpolCoeffs3D) :: b
-    real(Float64) :: R, phi, W, mask
+    real(Float64) :: R, W, mask
+    real(Float64) :: phi, phip
     logical :: mc
     integer :: i, j, k, k2, err
 
@@ -6688,8 +6692,9 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
     phi = atan2(uvw(2),uvw(1))
+    phip = modulo(phi,2*pi)
     !! Interpolate mask value
-    call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phi, b, err)
+    call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phip, b, err)
 
     inp = .False.
     if(err.eq.0) then
@@ -6705,10 +6710,11 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
                b%b121*equil%mask(i,j+1,k)   + b%b122*equil%mask(i,j+1,k2) + &
                b%b211*equil%mask(i+1,j,k)   + b%b212*equil%mask(i+1,j,k2) + &
                b%b221*equil%mask(i+1,j+1,k) + b%b222*equil%mask(i+1,j+1,k2)
-        if((mask.ge.0.5).and.(err.eq.0)) then
+        if(mask.ge.0.5) then
             inp = .True.
         endif
     endif
+
 
     if(present(coeffs)) coeffs = b
     if(present(uvw_out)) uvw_out = uvw
@@ -10105,7 +10111,7 @@ subroutine neutron_f
 
     ngamma = 20
     !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
-    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel)
+    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)
     z_loop: do iz = istart, fbm%nz, istep
         r_loop: do ir=1, fbm%nr
             phi_loop: do iphi = 1, fbm%nphi

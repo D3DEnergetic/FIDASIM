@@ -6655,6 +6655,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     track_loop: do i=1,inter_grid%ntrack
         if(cc.gt.inter_grid%ntrack) exit track_loop
 
+    !!!inter = spec_chords%inter(ind(1),ind(2),ind(3))
         if((spec_chords%cyl_inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
             .and.(.not.los_inter))then
             los_inter = .True.
@@ -8514,36 +8515,56 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
 
 endsubroutine spectrum
 
-subroutine store_photons(pos, vi, photons, spectra)
+subroutine store_photons(pos, vi, photons, spectra, passive)
     !+ Store photons in `spectra`
     real(Float64), dimension(3), intent(in)      :: pos
+    !!! Might need to change this comment
         !+ Position of neutral in beam grid coordinates
     real(Float64), dimension(3), intent(in)      :: vi
         !+ Velocitiy of neutral [cm/s]
     real(Float64), intent(in)                    :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     real(Float64), dimension(:,:), intent(inout) :: spectra
+    logical, intent(in), optional                :: passive
+        !+ Indicates whether photon is passive FIDA
 
     real(Float64), dimension(n_stark) :: lambda, intensity
     real(Float64) :: dlength, sigma_pi
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
-    real(Float64), dimension(3) :: vp
+    real(Float64), dimension(3) :: pos_xyz, lens_xyz, cyl, vp
     type(LOSInters) :: inter
     integer :: ichan,i,j,bin,nchan
+    logical :: pas = .False.
 
-    call get_indices(pos,ind)
-    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    if(present(passive)) pas = passive
+    if(pas) then
+        cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        cyl(2) = pos(3)
+        cyl(3) = modulo(atan2(pos(2), pos(1)),2*pi)
+        call get_inter_grid_indices(cyl,ind)
+        inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
+        call uvw_to_xyz(pos, pos_xyz)
+    else
+        call get_indices(pos,ind)
+        inter = spec_chords%inter(ind(1),ind(2),ind(3))
+        pos_xyz = pos
+    endif
     nchan = inter%nchan
     if(nchan.eq.0) return
 
-    call get_fields(fields,pos=pos)
+    call get_fields(fields,pos=pos_xyz)
 
     loop_over_channels: do j=1,nchan
         ichan = inter%los_elem(j)%id
         dlength = inter%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
-        vp = pos - spec_chords%los(ichan)%lens
+        if(pas) then
+            call uvw_to_xyz(spec_chords%los(ichan)%lens,lens_xyz)
+        else
+            lens_xyz = spec_chords%los(ichan)%lens
+        endif
+        vp = pos_xyz - lens_xyz
         call spectrum(vp,vi,fields,sigma_pi,photons, &
                       dlength,lambda,intensity)
 
@@ -8613,7 +8634,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     if(present(passive)) pas = passive
 
     if(pas) then
-        call store_photons(pos, vi, photons, spec%pfida(:,:,iclass))
+        call store_photons(pos, vi, photons, spec%pfida(:,:,iclass),passive=pas)
     else
         call store_photons(pos, vi, photons, spec%fida(:,:,iclass))
     endif
@@ -10172,7 +10193,6 @@ subroutine pfida_f
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
-    print*,'ncell = ',ncell
 
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &

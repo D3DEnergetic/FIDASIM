@@ -2477,6 +2477,7 @@ subroutine read_chords
                 call track_cylindrical(r_enter, v0, tracks, ntrack)
                 inter_grid_track_loop: do j=1, ntrack
                     ind = tracks(j)%ind
+                    print*,'track_ind = ',ind
                     !inds can repeat so add rather than assign
                     !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
@@ -2489,6 +2490,7 @@ subroutine read_chords
                 do jj=1,inter_grid%nz
                     rloop: do ii=1, inter_grid%nr
                         if(dlength(ii,jj,kk).ne.0.d0) then
+                            print*,'ii,jj,kk = ', ii,jj,kk
                             dl = dlength(ii,jj,kk)
                             nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
                             if(nc.eq.1) then
@@ -2502,6 +2504,7 @@ subroutine read_chords
                                 call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
                             endif
                             spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
+                            print*,'s_c%nchan = ',spec_chords%cyl_inter(ii,jj,kk)%nchan
                         endif
                     enddo rloop
                 enddo
@@ -6538,7 +6541,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64) :: dT, dt1, inv_50, t
     real(Float64) :: x, y, z, r
     real(Float64), dimension(3) :: dt_arr, dr !! Need to make this rzphi
-    !real(Float64), dimension(3) :: vn, inv_vn
     real(Float64), dimension(3) :: vn, vn_cyl
     real(Float64), dimension(3) :: ri, ri_cyl, ri_tmp
     real(Float64), dimension(3) :: p, n0, nz
@@ -6549,7 +6551,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(3) :: redge, tedge
     real(Float64), dimension(3) :: redge_cyl, tedge_cyl
     integer :: ir, iz, iphi
-    !real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
     integer, dimension(3) :: sgn
     integer, dimension(3) :: gdims
     integer, dimension(1) :: minpos
@@ -6563,10 +6564,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(1) = inter_grid%nr
     gdims(2) = inter_grid%nz
     gdims(3) = inter_grid%nphi
-
-    nz(1) = 0.d0
-    nz(2) = 0.d0
-    nz(3) = 1.d0
 
     x = ri(1)
     y = ri(2)
@@ -6584,6 +6581,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             sgn(i) =-1
         end if
     enddo
+    !!! Need to be careful when the particle is on the surface
 
     dr(1) = inter_grid%dr*sgn(1)
     dr(2) = inter_grid%dz*sgn(2)
@@ -6592,47 +6590,46 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !! define actual cell
     ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
     ri_cyl(2) = ri(3)
-    ri_cyl(3) = atan2(ri(2), ri(1))
+    ri_cyl(3) = modulo(atan2(ri(2), ri(1)),2*pi)
     call get_inter_grid_indices(ri_cyl,ind)
 
-    !!! I need to better handle the case when the particle never hits a surface
-    !!! Make this more efficient later
-    if(sgn(1).gt.1.0d-15) then
-        arc_cyl(1) = inter_grid%r(ind(1)+1)
-        arc_cyl(2) = inter_grid%z(ind(2))
-        arc_cyl(3) = inter_grid%phi(ind(3))
-        call cyl_to_uvw(arc_cyl,arc)
+    !!! Define surface to be the min vertex
+    arc_cyl(1) = inter_grid%r(ind(1))
+    arc_cyl(2) = inter_grid%z(ind(2))
+    arc_cyl(3) = inter_grid%phi(ind(3))
+    h_plane_cyl = arc_cyl
+    v_plane_cyl = arc_cyl
+
+    !!! If the vp_cyl>0 choose max vertex
+    if(sgn(1).gt.0.d0) arc_cyl(1) = inter_grid%r(ind(1)+1)
+    if(sgn(2).gt.0.d0) h_plane_cyl(2) = inter_grid%z(ind(2)+1)
+    if(sgn(3).gt.0.d0) v_plane_cyl(3) = inter_grid%phi(ind(3)+1)
+
+    !!! If on the surface, move below next surface. Needed for other sgn?
+    if((sgn(1).lt.0.d0).and.(arc_cyl(1).eq.ri_cyl(1))) then
+        arc_cyl(1) = inter_grid%r(ind(1)-1)
+        h_plane_cyl(1) = inter_grid%r(ind(1)-1)
+        v_plane_cyl(1) = inter_grid%r(ind(1)-1)
     endif
-    if(sgn(1).le.0.d0) then
-        arc_cyl(1) = inter_grid%r(ind(1))
-        arc_cyl(2) = inter_grid%z(ind(2))
-        arc_cyl(3) = inter_grid%phi(ind(3))
-        call cyl_to_uvw(arc_cyl,arc)
+    if((sgn(2).lt.0.d0).and.(h_plane_cyl(2).eq.ri_cyl(2))) then
+        arc_cyl(2) = inter_grid%z(ind(2)-1)
+        h_plane_cyl(2) = inter_grid%z(ind(2)-1)
+        v_plane_cyl(2) = inter_grid%z(ind(2)-1)
     endif
-    if(sgn(2).gt.1.0d-15) then
-        h_plane_cyl(1) = inter_grid%r(ind(1))
-        h_plane_cyl(2) = inter_grid%z(ind(2)+1)
-        h_plane_cyl(3) = inter_grid%phi(ind(3))
-        call cyl_to_uvw(h_plane_cyl,h_plane)
+    if((sgn(3).lt.0.d0).and.(v_plane_cyl(3).eq.ri_cyl(3))) then
+        arc_cyl(3) = inter_grid%phi(ind(3)-1)
+        h_plane_cyl(3) = inter_grid%phi(ind(3)-1)
+        v_plane_cyl(3) = inter_grid%phi(ind(3)-1)
     endif
-    if(sgn(2).le.0.d0) then
-        h_plane_cyl(1) = inter_grid%r(ind(1))
-        h_plane_cyl(2) = inter_grid%z(ind(2))
-        h_plane_cyl(3) = inter_grid%phi(ind(3))
-        call cyl_to_uvw(h_plane_cyl,h_plane)
-    endif
-    if(sgn(3).gt.1.0d-15) then
-        v_plane_cyl(1) = inter_grid%r(ind(1))
-        v_plane_cyl(2) = inter_grid%z(ind(2))
-        v_plane_cyl(3) = inter_grid%phi(ind(3)+1)
-        call cyl_to_uvw(v_plane_cyl,v_plane)
-    endif
-    if(sgn(3).le.0.d0) then
-        v_plane_cyl(1) = inter_grid%r(ind(1))
-        v_plane_cyl(2) = inter_grid%z(ind(2))
-        v_plane_cyl(3) = inter_grid%phi(ind(3))
-        call cyl_to_uvw(v_plane_cyl,v_plane)
-    endif
+
+    call cyl_to_uvw(arc_cyl,arc)
+    call cyl_to_uvw(h_plane_cyl,h_plane)
+    call cyl_to_uvw(v_plane_cyl,v_plane)
+
+    !!! Normal vectors
+    nz(1) = 0.d0
+    nz(2) = 0.d0
+    nz(3) = 1.d0
 
     redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
     redge_cyl(2) = v_plane_cyl(2)
@@ -6643,7 +6640,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     tedge_cyl(3) = v_plane_cyl(3)
     call cyl_to_uvw(tedge_cyl,tedge)
     call rz_normal_vector(v_plane, redge, tedge, n0)
-    !!! End
 
     inv_50 = 1.0/50.0
     cc=1
@@ -6668,6 +6664,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call line_plane_intersect(ri, vn, v_plane, n0, p, t)
         dt_arr(3) = t
 
+        !minpos = minloc(dt_arr)
         minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
         mind = minpos(1)
         dT = dt_arr(mind)
@@ -6708,31 +6705,22 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             exit track_loop
         endif
         !!! Need to optimize this somehow
-        if(mind.eq.1) then
-            arc_cyl(mind) = arc_cyl(mind) + dr(mind)
-            call cyl_to_uvw(arc_cyl,arc)
-        endif
-        if(mind.eq.2) then
-            h_plane_cyl(mind) = h_plane_cyl(mind) + dr(mind)
-            call cyl_to_uvw(h_plane_cyl,h_plane)
-        endif
-        if(mind.eq.3) then
-            v_plane_cyl(mind) = v_plane_cyl(mind) + dr(mind)
-            call cyl_to_uvw(v_plane_cyl,v_plane)
-            redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
-            redge_cyl(2) = v_plane_cyl(2)
-            redge_cyl(3) = v_plane_cyl(3)
-            call cyl_to_uvw(redge_cyl,redge)
-            tedge_cyl(1) = v_plane_cyl(1)
-            tedge_cyl(2) = v_plane_cyl(2) + inter_grid%dz
-            tedge_cyl(3) = v_plane_cyl(3)
-            call cyl_to_uvw(tedge_cyl,tedge)
-            call rz_normal_vector(v_plane, redge, tedge, n0)
-        endif
+        arc_cyl(mind) = arc_cyl(mind) + dr(mind)
+        call cyl_to_uvw(arc_cyl,arc)
+        h_plane_cyl(mind) = h_plane_cyl(mind) + dr(mind)
+        call cyl_to_uvw(h_plane_cyl,h_plane)
+        v_plane_cyl(mind) = v_plane_cyl(mind) + dr(mind)
+        call cyl_to_uvw(v_plane_cyl,v_plane)
+        redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
+        redge_cyl(2) = v_plane_cyl(2)
+        redge_cyl(3) = v_plane_cyl(3)
+        call cyl_to_uvw(redge_cyl,redge)
+        tedge_cyl(1) = v_plane_cyl(1)
+        tedge_cyl(2) = v_plane_cyl(2) + inter_grid%dz
+        tedge_cyl(3) = v_plane_cyl(3)
+        call cyl_to_uvw(tedge_cyl,tedge)
+        call rz_normal_vector(v_plane, redge, tedge, n0)
         !!! End
-        ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
-        ri_cyl(2) = ri(3)
-        ri_cyl(3) = atan2(ri(2), ri(1))
     enddo track_loop
     ntrack = cc-1
     if(present(los_intersect)) then
@@ -8537,6 +8525,7 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
     integer :: ichan,i,j,bin,nchan
     logical :: pas = .False.
 
+    !!! In the passive case, both pos and vi are in machine coords
     if(present(passive)) pas = passive
     if(pas) then
         cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
@@ -8551,9 +8540,12 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
         pos_xyz = pos
     endif
     nchan = inter%nchan
+    !!! Remember to switch this back at the end
+    print*,'nchan = ', nchan
     if(nchan.eq.0) return
-
     call get_fields(fields,pos=pos_xyz)
+    print*,'fieldsb = ',fields%b
+
 
     loop_over_channels: do j=1,nchan
         ichan = inter%los_elem(j)%id
@@ -8564,7 +8556,11 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
         else
             lens_xyz = spec_chords%los(ichan)%lens
         endif
+        !!! I think vp was supposed to be in beam coordinates, is the logic
+        !!! above fine?
         vp = pos_xyz - lens_xyz
+        !!! Luke's original code used vi, which I think was in mc. Is 
+        !!! this still fine for me?
         call spectrum(vp,vi,fields,sigma_pi,photons, &
                       dlength,lambda,intensity)
 
@@ -8634,7 +8630,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     if(present(passive)) pas = passive
 
     if(pas) then
-        call store_photons(pos, vi, photons, spec%pfida(:,:,iclass),passive=pas)
+        call store_photons(pos, vi, photons, spec%pfida(:,:,iclass), passive=.True.)
     else
         call store_photons(pos, vi, photons, spec%fida(:,:,iclass))
     endif
@@ -8895,7 +8891,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         R = sqrt(uvw(1)**2 + uvw(2)**2)
         phi = atan2(uvw(2),uvw(1))
         if(fields%coords.eq.0) then
-            rg_uvw = matmul(beam_grid%basis,r_gyro)
+            call xyz_to_uvw(r_gyro,rg_uvw)
         endif
         if(fields%coords.eq.1) then
             rg_uvw = r_gyro
@@ -9058,7 +9054,7 @@ subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf)
     denf=0.d0
 
     call cyl_to_uvw(rg_cyl, rg)
-    call get_fields(fields,pos=rg,input_coords=1)
+    call get_fields(fields,pos=rg,input_coords=1,output_coords=1)
     if(.not.fields%in_plasma) return
 
     call get_distribution(fbeam,denf,pos=rg, coeffs=fields%b)
@@ -10165,6 +10161,7 @@ subroutine pfida_f
     integer(Int32), dimension(inter_grid%nr,inter_grid%nz,inter_grid%nphi) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
+    !!! I can change papprox to something else now?
     papprox=0.d0
     do ic=1,inter_grid%ngrid
         call ind2sub(inter_grid%dims,ic,ind)
@@ -10209,6 +10206,7 @@ subroutine pfida_f
             call gyro_correction(fields, eb, ptch, ri, vi)
 
             !! Find the particles path through the interpolation grid
+            !!! I assumed that vi is in mc
             call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ntrack.eq.0) cycle loop_over_fast_ions
@@ -10229,6 +10227,10 @@ subroutine pfida_f
                 !!! assumes beam
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
 
+                !!! Is vi in mc or bgc?
+                !!! Also I think tracks(jj)%pos is in mc
+                !!! I think photons is nonzero
+                print*,'ph = ',photons
                 call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k), passive=.True.)
             enddo loop_along_track
         enddo loop_over_fast_ions

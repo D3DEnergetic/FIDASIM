@@ -259,19 +259,9 @@ type InterpolationGrid
     real(Float64), dimension(:,:), allocatable :: z2d
         !+ 2D Z grid [cm]
     integer(Int32) :: ntrack
-        !+ Maximum number of cell for particle tracking
+        !+ Maximum number of cells for particle tracking
     integer(Int32) :: ngrid
         !+ Number of cells
-    real(Float64), dimension(3)   :: center
-        !+ Center of interpolation grid in beam coordinates
-    real(Float64), dimension(3)   :: lhs
-        !+ Grid [length(r) height(z), arc length(phi)]
-    real(Float64), dimension(:), allocatable :: rc
-        !+ r positions of cell centers
-    real(Float64), dimension(:), allocatable :: zc
-        !+ z positions of cell centers
-    real(Float64), dimension(:), allocatable :: phic
-        !+ phi positions of cell centers
 end type InterpolationGrid
 
 type Profiles
@@ -304,19 +294,18 @@ type, extends( Profiles ) :: LocalProfiles
     !+ Plasma parameters at given position
     logical :: in_plasma = .False.
         !+ Indicates whether plasma parameters are valid/known
-    !!! coords = 0, 1, 2 
-    !!! beam, machine, cylindrical
-    !logical :: coords = .False.
     integer :: coords = 0
-        !+ Indicates whether vectors are in machine coordinates
+        !+ Indicates coordinate system of vectors. Machine (0), beam grid (1) and cyl (2)
     real(Float64), dimension(3) :: pos = 0.d0
         !+ Position in beam grid coordinates
     real(Float64), dimension(3) :: uvw = 0.d0
         !+ Position in machine coordinates
     real(Float64), dimension(3) :: vrot = 0.d0
         !+ Plasma rotation in beam grid coordinates
+!!! This was not used anywhere
     real(Float64), dimension(3) :: vrot_uvw = 0.d0
         !+ Plasma rotation in machine coordinates
+!!! End
     type(InterpolCoeffs3D) :: b
         !+ Cylindrical Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalProfiles
@@ -359,9 +348,8 @@ type, extends( EMFields ) :: LocalEMFields
     !+ Electro-magnetic fields at given position
     logical       :: in_plasma = .False.
         !+ Indicates whether fields are valid/known
-        !!! comment
     integer :: coords = 0
-        !+ Indicates whether vectors are in machine coordinates
+        !+ Indicates coordinate system of vectors. Machine (0), beam grid (1) and cyl (2)
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
     real(Float64) :: e_abs = 0.d0
@@ -700,10 +688,12 @@ type LineOfSight
         !+ Lens location in beam grid coordinates
     real(Float64), dimension(3) :: axis = 0.d0
         !+ Optical axis in beam grid coordinates
+!!! Try using uvw with store photons.
     real(Float64), dimension(3) :: lens_uvw = 0.d0
         !+ Lens location in machine coordinates
     real(Float64), dimension(3) :: axis_uvw = 0.d0
         !+ Optical axis in machine coordinates
+!!! End
 end type LineOfSight
 
 type LOSElement
@@ -2356,7 +2346,6 @@ subroutine read_chords
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(2) :: randomu
     real(Float64) :: theta, sqrt_rho, dl
-    !type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
 
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
@@ -2422,20 +2411,20 @@ subroutine read_chords
     call h5close_f(error)
 
     !!! Need to insert something like the following:
-    !!! Find boundaries of beam grid, and fabricate a cylindrical grid tracking
-    ! scheme if nphi = 1
+    !!! Find boundaries of beam grid, and fabricate a cylindrical grid tracking 
+    !!! scheme if nphi = 1
     ! else
     ! use the interpolation grid that was given and track.
     ! end if
 
     !!! For the moment I will stick with this
     if(inter_grid%nphi.gt.1) then
-        allocate(tracks(inter_grid%ntrack))         !!! Is this right?
+        allocate(tracks(inter_grid%ntrack))
         allocate(dlength(inter_grid%nr, &
                          inter_grid%nz, &
                          inter_grid%nphi) )
         inter_grid_chan_loop: do i=1,spec_chords%nchan
-        ! read in once
+        !!! perhaps save the uvw stuff here
             spec_chords%los(i)%lens = lenses(:,i)
             spec_chords%los(i)%axis = axes(:,i)
             spec_chords%los(i)%sigma_pi = sigma_pi(i)
@@ -2477,7 +2466,6 @@ subroutine read_chords
                 call track_cylindrical(r_enter, v0, tracks, ntrack)
                 inter_grid_track_loop: do j=1, ntrack
                     ind = tracks(j)%ind
-                    print*,'track_ind = ',ind
                     !inds can repeat so add rather than assign
                     !$OMP ATOMIC UPDATE
                     dlength(ind(1),ind(2),ind(3)) = &
@@ -2490,7 +2478,6 @@ subroutine read_chords
                 do jj=1,inter_grid%nz
                     rloop: do ii=1, inter_grid%nr
                         if(dlength(ii,jj,kk).ne.0.d0) then
-                            print*,'ii,jj,kk = ', ii,jj,kk
                             dl = dlength(ii,jj,kk)
                             nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
                             if(nc.eq.1) then
@@ -2504,7 +2491,6 @@ subroutine read_chords
                                 call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
                             endif
                             spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
-                            print*,'s_c%nchan = ',spec_chords%cyl_inter(ii,jj,kk)%nchan
                         endif
                     enddo rloop
                 enddo
@@ -5457,7 +5443,7 @@ subroutine line_circle_intersect(l0, l, p0, p, t)
     !+ Calculates the intersection of a line and a circle
     real(Float64), dimension(3), intent(in)  :: l0
         !+ Point on line
-    real(Float64), dimension(3), intent(in)  :: l 
+    real(Float64), dimension(3), intent(in)  :: l
         !+ Ray of line
     real(Float64), dimension(3), intent(in)  :: p0
         !+ Point on circle
@@ -5472,10 +5458,8 @@ subroutine line_circle_intersect(l0, l, p0, p, t)
     real(Float64)               :: radicand, npos
 
     r = sqrt(p0(1) * p0(1) + p0(2) * p0(2))
-    x0 = l0(1)
-    y0 = l0(2)
-    vx = l(1)
-    vy = l(2)            
+    x0 = l0(1) ; y0 = l0(2)
+    vx = l(1)  ; vy = l(2)
 
     if((vx.eq.0.d0).and.(vy.eq.0.d0)) then
         t = 0.d0        ! Parallel to plane made by the arc's tangent line
@@ -5491,7 +5475,7 @@ subroutine line_circle_intersect(l0, l, p0, p, t)
             if(npos.gt.0) then
                 t = minval(times, mask=times.gt.0)
             else
-                ! What if t=0, i.e., particle on surface?
+                !!! What if t=0, i.e., particle on surface?
                 t = maxval(times, mask=times.le.0)
             endif
         endif
@@ -5956,18 +5940,16 @@ subroutine uvw_to_xyz(uvw,xyz)
 
 end subroutine uvw_to_xyz
 
-
 subroutine cyl_to_uvw(pos, uvw)
     !+ Convert  cylindrical coordinate `pos` to machine coordinate `uvw`
     real(Float64), dimension(3), intent(in)  :: pos
     real(Float64), dimension(3), intent(out) :: uvw
-            
+
     uvw(1) = pos(1) * cos(pos(3))
     uvw(2) = pos(1) * sin(pos(3))
     uvw(3) = pos(2)
 
 end subroutine cyl_to_uvw
-
 
 subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
     !+ Calculates a particles intersection length with the [[libfida:beam_grid]]
@@ -6089,45 +6071,30 @@ subroutine inter_grid_intersect(r0, v0, length, r_enter, r_exit)
     integer, dimension(1) :: minpos, maxpos
     integer :: min_ind, max_ind
 
-    nz(1) = 0.d0
-    nz(2) = 0.d0
-    nz(3) = 1.d0
-
+    nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
     rmin = inter_grid%r(1) ; rmax = inter_grid%r(inter_grid%nr)
     zmin = inter_grid%z(1) ; zmax = inter_grid%z(inter_grid%nz)
     phimin = inter_grid%phi(1) ; phimax = inter_grid%phi(inter_grid%nphi)
 
-    vertex111(1) = rmin
-    vertex111(2) = zmin
-    vertex111(3) = phimin
-    call cyl_to_uvw(vertex111,vertex111_uvw)
+    !! Define vertices of the interpolation grid
+    vertex111(1) = rmin   ; vertex111(2) = zmin   ; vertex111(3) = phimin
+    vertex112 = vertex111 ; vertex211 = vertex111 ; vertex121 = vertex111
+    vertex122 = vertex111 ; vertex212 = vertex111
 
-    vertex112(1) = rmin
-    vertex112(2) = zmin
     vertex112(3) = phimax
-    call cyl_to_uvw(vertex112,vertex112_uvw)
-
     vertex211(1) = rmax
-    vertex211(2) = zmin
-    vertex211(3) = phimin
-    call cyl_to_uvw(vertex211,vertex211_uvw)
-
-    vertex121(1) = rmin
     vertex121(2) = zmax
-    vertex121(3) = phimin
+    vertex122(2) = zmax   ; vertex122(3) = phimax
+    vertex212(1) = rmax   ; vertex212(3) = phimax
+
+    call cyl_to_uvw(vertex111,vertex111_uvw)
+    call cyl_to_uvw(vertex112,vertex112_uvw)
+    call cyl_to_uvw(vertex211,vertex211_uvw)
     call cyl_to_uvw(vertex121,vertex121_uvw)
-
-    vertex122(1) = rmin
-    vertex122(2) = zmax
-    vertex122(3) = phimax
     call cyl_to_uvw(vertex122,vertex122_uvw)
-
-    vertex212(1) = rmax
-    vertex212(2) = zmin
-    vertex212(3) = phimax
     call cyl_to_uvw(vertex212,vertex212_uvw)
 
-    !!! Inner and outer circles of the inter_grid
+    !! Inner and outer circles of the interpolation grid
     call line_circle_intersect(r0, v0, vertex111_uvw, p, t)
     dt_arr(1) = t
     p_arr(1,:) = p
@@ -6135,7 +6102,7 @@ subroutine inter_grid_intersect(r0, v0, length, r_enter, r_exit)
     dt_arr(2) = t
     p_arr(2,:) = p
 
-    !!! Bottom and top planes
+    !! Bottom and top horizontal planes
     call line_plane_intersect(r0, v0, vertex111_uvw, nz, p, t)
     dt_arr(3) = t
     p_arr(3,:) = p
@@ -6143,22 +6110,22 @@ subroutine inter_grid_intersect(r0, v0, length, r_enter, r_exit)
     dt_arr(4) = t
     p_arr(4,:) = p
 
-    !!! First and second vertical planes
+    !! First and second vertical planes
     call rz_normal_vector(vertex111_uvw, vertex211_uvw, vertex121_uvw, n0)
     call line_plane_intersect(r0, v0, vertex111_uvw, n0, p, t)
     dt_arr(5) = t
     p_arr(5,:) = p
-
     call rz_normal_vector(vertex112_uvw, vertex212_uvw, vertex122_uvw, n0)
     call line_plane_intersect(r0, v0, vertex112_uvw, n0, p, t)
     dt_arr(6) = t
     p_arr(6,:) = p
 
+    !! Outputs
     minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
     min_ind = minpos(1)
     r_enter = p_arr(min_ind,:)
 
-    maxpos = maxloc(dt_arr)
+    maxpos = maxloc(dt_arr, mask=dt_arr.gt.1.0d-15)
     max_ind = maxpos(1)
     r_exit = p_arr(max_ind,:)
 
@@ -6393,7 +6360,6 @@ subroutine get_inter_grid_position(ind, pos, output_coords)
     if(present(output_coords)) then
         ocs = output_coords
     else
-        !!! coords start from 1
         ocs = 0
     endif
 
@@ -6405,12 +6371,12 @@ subroutine get_inter_grid_position(ind, pos, output_coords)
         call cyl_to_uvw(pos_temp1, pos_temp2)
         call uvw_to_xyz(pos_temp2, pos)
     endif
-   !if(ocs.eq.1) then
-   !    call cyl_to_uvw(pos_temp1, pos)
-   !endif
-   !if(ocs.eq.2) then
-   !    pos = pos_temp1
-   !endif
+    if(ocs.eq.1) then
+        call cyl_to_uvw(pos_temp1, pos)
+    endif
+    if(ocs.eq.2) then
+        pos = pos_temp1
+    endif
 
 end subroutine get_inter_grid_position
 
@@ -6565,47 +6531,43 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(2) = inter_grid%nz
     gdims(3) = inter_grid%nphi
 
-    x = ri(1)
-    y = ri(2)
-    z = ri(3)
+    x = ri(1) ; y = ri(2) ; z = ri(3)
     r = sqrt(x*x + y*y)
 
     vn_cyl(1) = x / r * vn(1) + y / r * vn(2)
     vn_cyl(2) = vn(3)
     vn_cyl(3) = -y / (r*r) * vn(1) + x / (r*r) * vn(2)
+
     do i=1,3
-        ! sgn is in rzphi
+        !! sgn is in R-Z-Phi coordinates
         if (vn_cyl(i).gt.1.0d-15) then
             sgn(i) = 1
         else if (vn_cyl(i).lt.-1.0d-15) then
             sgn(i) =-1
         end if
     enddo
-    !!! Need to be careful when the particle is on the surface
 
     dr(1) = inter_grid%dr*sgn(1)
     dr(2) = inter_grid%dz*sgn(2)
     dr(3) = inter_grid%dphi*sgn(3)
 
-    !! define actual cell
+    !! Define actual cell
     ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
     ri_cyl(2) = ri(3)
     ri_cyl(3) = modulo(atan2(ri(2), ri(1)),2*pi)
     call get_inter_grid_indices(ri_cyl,ind)
 
-    !!! Define surface to be the min vertex
     arc_cyl(1) = inter_grid%r(ind(1))
     arc_cyl(2) = inter_grid%z(ind(2))
     arc_cyl(3) = inter_grid%phi(ind(3))
     h_plane_cyl = arc_cyl
     v_plane_cyl = arc_cyl
 
-    !!! If the vp_cyl>0 choose max vertex
+    !! Define surfaces to intersect
     if(sgn(1).gt.0.d0) arc_cyl(1) = inter_grid%r(ind(1)+1)
     if(sgn(2).gt.0.d0) h_plane_cyl(2) = inter_grid%z(ind(2)+1)
     if(sgn(3).gt.0.d0) v_plane_cyl(3) = inter_grid%phi(ind(3)+1)
-
-    !!! If on the surface, move below next surface. Needed for other sgn?
+    ! Special case of the particle being on the surace handled below
     if((sgn(1).lt.0.d0).and.(arc_cyl(1).eq.ri_cyl(1))) then
         arc_cyl(1) = inter_grid%r(ind(1)-1)
         h_plane_cyl(1) = inter_grid%r(ind(1)-1)
@@ -6621,16 +6583,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         h_plane_cyl(3) = inter_grid%phi(ind(3)-1)
         v_plane_cyl(3) = inter_grid%phi(ind(3)-1)
     endif
-
     call cyl_to_uvw(arc_cyl,arc)
     call cyl_to_uvw(h_plane_cyl,h_plane)
     call cyl_to_uvw(v_plane_cyl,v_plane)
 
-    !!! Normal vectors
-    nz(1) = 0.d0
-    nz(2) = 0.d0
-    nz(3) = 1.d0
-
+    !! Normal vectors
+    nz(1) = 0.d0; nz(2) = 0.d0 ; nz(3) = 1.d0
     redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
     redge_cyl(2) = v_plane_cyl(2)
     redge_cyl(3) = v_plane_cyl(3)
@@ -6641,6 +6599,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     call cyl_to_uvw(tedge_cyl,tedge)
     call rz_normal_vector(v_plane, redge, tedge, n0)
 
+    !! Track the particle
     inv_50 = 1.0/50.0
     cc=1
     los_inter = .False.
@@ -6651,7 +6610,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     track_loop: do i=1,inter_grid%ntrack
         if(cc.gt.inter_grid%ntrack) exit track_loop
 
-    !!!inter = spec_chords%inter(ind(1),ind(2),ind(3))
         if((spec_chords%cyl_inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
             .and.(.not.los_inter))then
             los_inter = .True.
@@ -6664,7 +6622,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call line_plane_intersect(ri, vn, v_plane, n0, p, t)
         dt_arr(3) = t
 
-        !minpos = minloc(dt_arr)
         minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
         mind = minpos(1)
         dT = dt_arr(mind)
@@ -6704,12 +6661,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             cc = cc - 1 !dont include last segment
             exit track_loop
         endif
-        !!! Need to optimize this somehow
+        !! Particle advancement and n0 update
         arc_cyl(mind) = arc_cyl(mind) + dr(mind)
-        call cyl_to_uvw(arc_cyl,arc)
         h_plane_cyl(mind) = h_plane_cyl(mind) + dr(mind)
-        call cyl_to_uvw(h_plane_cyl,h_plane)
         v_plane_cyl(mind) = v_plane_cyl(mind) + dr(mind)
+        call cyl_to_uvw(arc_cyl,arc)
+        call cyl_to_uvw(h_plane_cyl,h_plane)
         call cyl_to_uvw(v_plane_cyl,v_plane)
         redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
         redge_cyl(2) = v_plane_cyl(2)
@@ -6720,7 +6677,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         tedge_cyl(3) = v_plane_cyl(3)
         call cyl_to_uvw(tedge_cyl,tedge)
         call rz_normal_vector(v_plane, redge, tedge, n0)
-        !!! End
     enddo track_loop
     ntrack = cc-1
     if(present(los_intersect)) then
@@ -7288,7 +7244,7 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
     logical, intent(out)                    :: inp
         !+ Indicates whether plasma parameters and fields are valid/known
     integer, intent(in), optional           :: input_coords
-        !+ Indicates the coordinate system that xyz is in
+        !+ Indicates coordinate system of xyz. Machine (0), beam grid (1) and cyl (2)
     type(InterpolCoeffs3D), intent(out), optional      :: coeffs
         !+ Linear Interpolation coefficients used in calculation
     real(Float64), dimension(3), intent(out), optional :: uvw_out
@@ -7297,35 +7253,32 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
     real(Float64), dimension(3) :: uvw
     type(InterpolCoeffs3D) :: b
     real(Float64) :: R, W, mask
-    real(Float64) :: phi, phip
+    real(Float64) :: phi
     integer :: i, j, k, k2, err, ics
 
     err = 1
+
     if(present(input_coords)) then
         ics = input_coords
     else
-        !!! coords start from 1
         ics = 0
     endif
 
     if(ics.eq.0) then
-        !! Convert to machine coordinates
         call xyz_to_uvw(xyz,uvw)
     endif
     if(ics.eq.1) then
         uvw = xyz
     endif
-    !!! Need something here for cylindrical coordinates
-    !!!call in_plasma(xyz,inp,0,coeffs)
+    if(ics.eq.2) then
+        call cyl_to_uvw(xyz,uvw)
+    endif
 
-    !call in_plasma(xyz,inp,0,coeffs)
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
-    phi = atan2(uvw(2),uvw(1))
-    phip = modulo(phi,2*pi)
+    phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
     !! Interpolate mask value
-    !!! Confident fine
-    call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phip, b, err)
+    call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phi, b, err)
 
     inp = .False.
     if(err.eq.0) then
@@ -7362,11 +7315,9 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     integer(Int32), intent(in), optional               :: input_coords
-    !!! coment
-        !+ [[libfida:beam_grid]] indices
+        !+ Indicates coordinate system of inputs. Machine (0), beam grid (1) and cyl (2)
     integer(Int32), intent(in), optional               :: output_coords
-    !!! coment
-        !+ [[libfida:beam_grid]] indices
+        !+ Indicates coordinate system of outputs. Machine (0), beam grid (1) and cyl (2)
 
     logical :: inp
     type(InterpolCoeffs3D) :: coeffs
@@ -7375,18 +7326,15 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
     integer :: i, j, k, k2, ics, ocs
 
     plasma%in_plasma = .False.
-    !!!call get_plasma(plasma,ind=ind,input_coords=2)
 
     if(present(input_coords)) then
         ics = input_coords
     else
-        !!! coords start from 1
         ics = 0
     endif
     if(present(output_coords)) then
         ocs = output_coords
     else
-        !!! coords start from 1
         ocs = 0
     endif
 
@@ -7410,7 +7358,6 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
         endif
     endif
 
-    !!! I'm not inputting coordinates in right here
     call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
         phi = atan2(uvw(2),uvw(1))
@@ -7440,77 +7387,12 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
             plasma%vrot = vrot_uvw
             plasma%pos = uvw
         endif
-        !!! add something for ocs eq 3
-        !TODO
-        !if(cs.eq.2) then
-            !plasma%vrot = vrot_uvw
-            !plasma%pos = uvw
-        !endif
         plasma%uvw = uvw
         plasma%in_plasma = .True.
         plasma%b = coeffs
     endif
 
 end subroutine get_plasma
-
-!subroutine get_plasma_inter_grid(plasma, pos, ind)
-!    !+ Gets plasma parameters at position `pos` or [[libfida:inter_grid]] indices `ind`
-!   type(LocalProfiles), intent(out)                   :: plasma
-!       !+ Plasma parameters at `pos`/`ind`
-!   real(Float64), dimension(3), intent(in), optional  :: pos
-!       !+ Position in machine coordinates grid coordinates
-!   integer(Int32), dimension(3), intent(in), optional :: ind
-!       !+ [[libfida:inter_grid]] indices
-
-!   logical :: inp, mc
-!   type(InterpolCoeffs3D) :: coeffs
-!   real(Float64), dimension(3) :: xyz, uvw, vrot_uvw
-!   real(Float64) :: phi, s, c
-!   integer :: i, j, k, k2
-
-!   plasma%in_plasma = .False.
-!   mc = .False.
-
-!   if(present(ind)) then
-!       call get_inter_grid_position(ind,xyz,output_coords=1)
-!       ics = 1
-!   endif
-!   !!! This may need to be converted to machine coordinates if pos is defined in cylindrical coords
-!   if(present(pos)) xyz = pos
-!   !!! End
-
-!   call in_plasma(xyz,inp,input_coords=ics,coeffs,uvw)
-!   if(inp) then
-!       phi = atan2(uvw(2),uvw(1))
-!       i = coeffs%i
-!       j = coeffs%j
-!       k = coeffs%k
-!       if(inter_grid%nphi .eq. 1) then
-!           k2 = min(k+1,inter_grid%nphi)
-!       else
-!           k2 = k+1
-!       endif
-
-!       plasma = coeffs%b111*equil%plasma(i,j,k)    + coeffs%b121*equil%plasma(i,j+1,k) +   &
-!                coeffs%b112*equil%plasma(i,j,k2)   + coeffs%b122*equil%plasma(i,j+1,k2) +  &
-!                coeffs%b211*equil%plasma(i+1,j,k)  + coeffs%b221*equil%plasma(i+1,j+1,k) + &
-!                coeffs%b212*equil%plasma(i+1,j,k2) + coeffs%b222*equil%plasma(i+1,j+1,k2)
-
-!       s = sin(phi) ; c = cos(phi)
-!       vrot_uvw(1) = plasma%vr*c - plasma%vt*s
-!       vrot_uvw(2) = plasma%vr*s + plasma%vt*c
-!       vrot_uvw(3) = plasma%vz
-!       !!! Change
-!       !plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
-!       plasma%vrot_uvw = vrot_uvw
-!       !!! End
-!       plasma%pos = xyz
-!       plasma%uvw = uvw
-!       plasma%in_plasma = .True.
-!       plasma%b = coeffs
-!   endif
-!
-!end subroutine get_plasma_inter_grid
 
 subroutine calc_perp_vectors(b, a, c)
   !+ Calculates normalized vectors that are perpendicular to b
@@ -7551,9 +7433,9 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     integer(Int32), intent(in), optional               :: input_coords
-    !!! coment
-        !+ [[libfida:beam_grid]] indices
+        !+ Indicates coordinate system of inputs. Machine (0), beam grid (1) and cyl (2)
     integer(Int32), intent(in), optional               :: output_coords
+        !+ Indicates coordinate system of outputs. Machine (0), beam grid (1) and cyl (2)
 
     logical :: inp
     real(Float64), dimension(3) :: xyz, uvw
@@ -7562,20 +7444,17 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
     real(Float64) :: phi, s, c
     type(InterpolCoeffs3D) :: coeffs
     integer :: i, j, k, k2, mc, ocs, ics
-    !!!call get_fields(fields,pos=rg,input_coords=1)
 
     fields%in_plasma = .False.
 
     if(present(input_coords)) then
         ics = input_coords
     else
-        !!! coords start from 1
         ics = 0
     endif
     if(present(output_coords)) then
         ocs = output_coords
     else
-        !!! coords start from 1
         ocs = 0
     endif
     if(present(ind)) call get_position(ind,xyz)
@@ -7629,8 +7508,6 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
             xyz_efield = uvw_efield
             fields%pos = uvw
         endif
-        !!! come back
-        !if(ocs.eq.3) then
 
         !Calculate field directions and magnitudes
         fields%b_abs = norm2(xyz_bfield)
@@ -7638,9 +7515,7 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
         if(fields%b_abs.gt.0.d0) fields%b_norm = xyz_bfield/fields%b_abs
         if(fields%e_abs.gt.0.d0) fields%e_norm = xyz_efield/fields%e_abs
 
-        !!! Is there something here maybe?
         call calc_perp_vectors(fields%b_norm,fields%a_norm,fields%c_norm)
-        !!! End
 
         fields%uvw = uvw
         fields%in_plasma = .True.
@@ -8506,8 +8381,7 @@ endsubroutine spectrum
 subroutine store_photons(pos, vi, photons, spectra, passive)
     !+ Store photons in `spectra`
     real(Float64), dimension(3), intent(in)      :: pos
-    !!! Might need to change this comment
-        !+ Position of neutral in beam grid coordinates
+        !+ Position of neutral
     real(Float64), dimension(3), intent(in)      :: vi
         !+ Velocitiy of neutral [cm/s]
     real(Float64), intent(in)                    :: photons
@@ -8525,8 +8399,8 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
     integer :: ichan,i,j,bin,nchan
     logical :: pas = .False.
 
-    !!! In the passive case, both pos and vi are in machine coords
     if(present(passive)) pas = passive
+
     if(pas) then
         cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
         cyl(2) = pos(3)
@@ -8539,13 +8413,11 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
         inter = spec_chords%inter(ind(1),ind(2),ind(3))
         pos_xyz = pos
     endif
-    nchan = inter%nchan
-    !!! Remember to switch this back at the end
-    print*,'nchan = ', nchan
-    if(nchan.eq.0) return
-    call get_fields(fields,pos=pos_xyz)
-    print*,'fieldsb = ',fields%b
 
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
+    call get_fields(fields,pos=pos_xyz)
 
     loop_over_channels: do j=1,nchan
         ichan = inter%los_elem(j)%id
@@ -8556,11 +8428,7 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
         else
             lens_xyz = spec_chords%los(ichan)%lens
         endif
-        !!! I think vp was supposed to be in beam coordinates, is the logic
-        !!! above fine?
         vp = pos_xyz - lens_xyz
-        !!! Luke's original code used vi, which I think was in mc. Is 
-        !!! this still fine for me?
         call spectrum(vp,vi,fields,sigma_pi,photons, &
                       dlength,lambda,intensity)
 
@@ -10139,10 +10007,8 @@ subroutine pfida_f
     integer, dimension(3) :: ind      !! new actual cell
     logical :: los_intersect
     !! Determination of the CX probability
-    !!! There could be some issue here with things not being machine coords
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
-    !!! End
     real(Float64), dimension(nlevs) :: rates !! CX rates
 
     !! Collisiional radiative model along track
@@ -10170,11 +10036,11 @@ subroutine pfida_f
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
-    max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
-        papprox = 0.0
-    endwhere
+    !!! TODO: Remove this once we have a 3D interpolation grid
+    !max_papprox = maxval(papprox)
+    !where (papprox.lt.(max_papprox*1.d-3))
+    !    papprox = 0.0
+    !endwhere
 
     ncell = 0
     do ic=1,inter_grid%ngrid
@@ -10206,14 +10072,12 @@ subroutine pfida_f
             call gyro_correction(fields, eb, ptch, ri, vi)
 
             !! Find the particles path through the interpolation grid
-            !!! I assumed that vi is in mc
             call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
             call get_plasma(plasma, pos = ri, input_coords=1)
-                !!! assumes beam
             call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
@@ -10224,13 +10088,8 @@ subroutine pfida_f
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
-                !!! assumes beam
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
 
-                !!! Is vi in mc or bgc?
-                !!! Also I think tracks(jj)%pos is in mc
-                !!! I think photons is nonzero
-                print*,'ph = ',photons
                 call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k), passive=.True.)
             enddo loop_along_track
         enddo loop_over_fast_ions

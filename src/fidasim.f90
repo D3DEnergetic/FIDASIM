@@ -2680,6 +2680,7 @@ subroutine read_npa
     allocate(d_shape(npa_chords%nchan))
     allocate(npa_chords%radius(npa_chords%nchan))
     allocate(npa_chords%det(npa_chords%nchan))
+    !!! I wonder if this might need to change for the weight calculations
     allocate(npa_chords%phit(beam_grid%nx, &
                              beam_grid%ny, &
                              beam_grid%nz, &
@@ -8895,7 +8896,7 @@ subroutine mc_fastion(ind,fields,eb,ptch,denf)
 
 end subroutine mc_fastion
 
-subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf)
+subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf,output_coords)
     !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:inter_grid]] index
     integer, dimension(3), intent(in) :: ind
         !+ [[libfida:inter_grid]] index
@@ -8907,11 +8908,20 @@ subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf)
         !+ Pitch of the fast ion
     real(Float64), intent(out)             :: denf
         !+ Fast-ion density at guiding center
+    integer, intent(in), optional            :: output_coords
+        !+ Indicator for `fields` coordinate system
 
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
     real(Float64), dimension(3) :: rg, rg_cyl
     real(Float64), dimension(3) :: randomu3
     integer, dimension(2,1) :: ep_ind
+    integer :: ocs
+
+    if(present(output_coords)) then
+        ocs = output_coords
+    else
+        ocs = 0
+    endif
 
     call randu(randomu3)
     rg_cyl(1) = inter_grid%r(ind(1)) + inter_grid%dr / 2.d0 + inter_grid%dr * (randomu3(1) - 0.5)
@@ -8922,7 +8932,7 @@ subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf)
     denf=0.d0
 
     call cyl_to_uvw(rg_cyl, rg)
-    call get_fields(fields,pos=rg,input_coords=1,output_coords=1)
+    call get_fields(fields,pos=rg,input_coords=1,output_coords=ocs)
     if(.not.fields%in_plasma) return
 
     call get_distribution(fbeam,denf,pos=rg, coeffs=fields%b)
@@ -10065,7 +10075,7 @@ subroutine pfida_f
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
-            call mc_fastion_inter_grid(ind, fields, eb, ptch, denf)
+            call mc_fastion_inter_grid(ind, fields, eb, ptch, denf, output_coords=1)
             if(denf.eq.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
@@ -10429,9 +10439,9 @@ subroutine pnpa_f
     !+ Calculate Passive NPA flux using a fast-ion distribution function F(E,p,r,z)
     integer :: i,j,k,det,ic
     integer(Int64) :: iion
-    real(Float64), dimension(3) :: rg,ri,rf,vi
+    real(Float64), dimension(3) :: rg,ri,rf,vi,ri_uvw
     integer, dimension(3) :: ind,pind
-    real(Float64) :: denf
+    real(Float64) :: denf,r
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
@@ -10441,17 +10451,18 @@ subroutine pnpa_f
     real(Float64) :: flux, theta, dtheta, eb, ptch,max_papprox
 
     integer :: inpa,ichan,nrange,ir,npart,ncell
-    integer, dimension(beam_grid%ngrid) :: cell_ind
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer, dimension(inter_grid%ngrid) :: cell_ind
+    real(Float64), dimension(inter_grid%nr,inter_grid%nz,inter_grid%nphi) :: papprox
+    integer(Int32), dimension(inter_grid%nr,inter_grid%nz,inter_grid%nphi) :: nlaunch
 
     papprox=0.d0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
+    do ic=1,inter_grid%ngrid
+        call ind2sub(inter_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        call get_plasma(plasma,ind=ind)
+        !!! Check that this is working correctly with 2
+        call get_plasma(plasma,ind=ind,input_coords=2)
         if(.not.plasma%in_plasma) cycle
-        papprox(i,j,k)=sum(plasma%denn)*plasma%denf
+        papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
     !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
@@ -10460,8 +10471,8 @@ subroutine pnpa_f
     endwhere
 
     ncell = 0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
+    do ic=1,inter_grid%ngrid
+        call ind2sub(inter_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
@@ -10469,22 +10480,25 @@ subroutine pnpa_f
         endif
     enddo
 
-    call get_nlaunch(inputs%n_pnpa, papprox, nlaunch)
+    !!! Should probably also double check this
+    call get_nlaunch_inter_grid(inputs%n_pnpa, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i12)') sum(nlaunch)
     endif
 
     !! Loop over all cells that can contribute to NPA signal
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
-    !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
+    !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw)
     loop_over_cells: do ic = istart, ncell, istep
-        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+        call ind2sub(inter_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
-            call mc_fastion(ind, fields, eb, ptch, denf)
+            !!! This will output quantities in bgc
+            call mc_fastion_inter_grid(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
 
+            !!! Quantities are probable output in bgc
             call gyro_surface(fields, eb, ptch, gs)
 
             detector_loop: do ichan=1,npa_chords%nchan
@@ -10504,10 +10518,12 @@ subroutine pnpa_f
                         cycle gyro_range_loop
                     endif
 
+                    !!! I don't think pind is used for anything
                     !! Get beam grid indices at ri
                     call get_indices(ri,pind)
 
                     !! Calculate CX probability with beam and halo neutrals
+                    !call get_plasma(plasma, pos=ri, input_coords=1)
                     call get_plasma(plasma, pos=ri)
                     call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
                     if(sum(rates).le.0.) cycle gyro_range_loop
@@ -10516,10 +10532,13 @@ subroutine pnpa_f
                     states=rates*denf
 
                     !! Attenuate states as the particle move through plasma
+                    !!! ri, rf and vi in bgc
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
-                    flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
+                    call xyz_to_uvw(ri,ri_uvw)
+                    r = sqrt(ri_uvw(1)*ri_uvw(1)+ri_uvw(2)*ri_uvw(2))
+                    flux = (dtheta/(2*pi))*sum(states)*r*inter_grid%dv/nlaunch(i,j,k)
                     call store_npa(det,ri,rf,vi,flux,passive=.True.)
                 enddo gyro_range_loop
             enddo detector_loop

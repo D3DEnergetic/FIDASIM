@@ -10229,7 +10229,7 @@ subroutine pfida_mc
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     integer :: ntrack
-    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+    type(ParticleTrack), dimension(inter_grid%ntrack) :: tracks
     logical :: los_intersect
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux
@@ -10286,7 +10286,7 @@ subroutine pfida_mc
             endif
 
             !! Track particle through grid
-            call track(ri, vi, tracks, ntrack, los_intersect)
+            call track_cylindrical(uvw, uvw_vi, tracks, ntrack, los_intersect)
             if(.not.los_intersect) cycle gamma_loop
             if(ntrack.eq.0) cycle gamma_loop
 
@@ -10300,11 +10300,11 @@ subroutine pfida_mc
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
-                call get_plasma(plasma,pos=tracks(jj)%pos)
+                call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
                 call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class,passive=.True.)
+                call store_fida_photons(tracks(jj)%pos, uvw_vi, photons, fast_ion%class,passive=.True.)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions

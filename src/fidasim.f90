@@ -10013,6 +10013,7 @@ subroutine pfida_f
     integer(Int64) :: iion
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64), dimension(3) :: xyz_vi
     real(Float64) :: denf !! fast-ion density
     integer, dimension(3) :: ind      !! new actual cell
     logical :: los_intersect
@@ -10068,7 +10069,7 @@ subroutine pfida_f
     endif
 
     !! Loop over all cells that have neutrals
-    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,xyz_vi,ri,fields, &
     !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch,los_intersect)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(inter_grid%dims,cell_ind(ic),ind)
@@ -10080,6 +10081,7 @@ subroutine pfida_f
 
             !! Correct for gyro motion and get particle position and velocity
             call gyro_correction(fields, eb, ptch, ri, vi)
+            xyz_vi = matmul(beam_grid%inv_basis,vi)
 
             !! Find the particles path through the interpolation grid
             call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)
@@ -10087,8 +10089,8 @@ subroutine pfida_f
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_plasma(plasma, pos = ri, input_coords=1)
-            call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
+            call get_plasma(plasma, pos=ri, input_coords=1)
+            call bt_cx_rates(plasma, plasma%denn, xyz_vi, beam_ion, rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
             !! Weight CX rates by ion source density
@@ -10098,9 +10100,9 @@ subroutine pfida_f
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
-                call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma,beam_ion, xyz_vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k), passive=.True.)
+                call store_fida_photons(tracks(jj)%pos, xyz_vi, photons/nlaunch(i,j,k), passive=.True.)
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -10223,6 +10225,7 @@ subroutine pfida_mc
     real(Float64) :: phi
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64), dimension(3) :: xyz_vi
     !! Determination of the CX probability
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
     real(Float64), dimension(nlevs) :: rates    !! CX rates
@@ -10233,7 +10236,6 @@ subroutine pfida_mc
     logical :: los_intersect
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux
-    real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
@@ -10247,7 +10249,7 @@ subroutine pfida_mc
     endif
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
+    !$OMP& randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -10264,35 +10266,32 @@ subroutine pfida_mc
             c = cos(phi)
 
             !! Calculate position in machine coordinates
-            uvw(1) = fast_ion%r*c
-            uvw(2) = fast_ion%r*s
-            uvw(3) = fast_ion%z
-
-            !! Convert to beam grid coordinates
-            call uvw_to_xyz(uvw, ri)
+            ri(1) = fast_ion%r*c
+            ri(2) = fast_ion%r*s
+            ri(3) = fast_ion%z
 
             if(inputs%dist_type.eq.2) then
                 !! Get electomagnetic fields
-                call get_fields(fields, pos=ri)
+                call get_fields(fields, pos=ri, input_coords=1, output_coords=1)
 
                 !! Correct for gyro motion and get particle position and velocity
                 call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, ri, vi)
             else !! Full Orbit
                 !! Calculate velocity vector
-                uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
-                uvw_vi(2) = s*fast_ion%vr + c*fast_ion%vt
-                uvw_vi(3) = fast_ion%vz
-                vi = matmul(beam_grid%inv_basis,uvw_vi)
+                vi(1) = c*fast_ion%vr - s*fast_ion%vt
+                vi(2) = s*fast_ion%vr + c*fast_ion%vt
+                vi(3) = fast_ion%vz
             endif
+            xyz_vi = matmul(beam_grid%inv_basis,vi)
 
             !! Track particle through grid
-            call track_cylindrical(uvw, uvw_vi, tracks, ntrack, los_intersect)
+            call track_cylindrical(ri, vi, tracks, ntrack, los_intersect)
             if(.not.los_intersect) cycle gamma_loop
             if(ntrack.eq.0) cycle gamma_loop
 
             !! Calculate CX probability
-            call get_plasma(plasma, pos=ri)
-            call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
+            call get_plasma(plasma, pos=ri, input_coords=1)
+            call bt_cx_rates(plasma, plasma%denn, xyz_vi, beam_ion, rates)
             if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
@@ -10302,9 +10301,9 @@ subroutine pfida_mc
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
-                call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma,beam_ion, xyz_vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, uvw_vi, photons, fast_ion%class,passive=.True.)
+                call store_fida_photons(tracks(jj)%pos, xyz_vi, photons, fast_ion%class,passive=.True.)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions

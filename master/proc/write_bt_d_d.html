@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.1% of total for procedures.">132 statements</a>
+    title=" 1.1% of total for procedures.">130 statements</a>
      </li> 
      
      
@@ -1370,8 +1370,6 @@ public subroutine write_bt_D_D(id, namelist_file)
     <span class="c">!$OMP END PARALLEL DO</span>
 
 <span class="cp">#ifdef _MPI</span>
-    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">ebarr</span><span class="p">)</span>
-    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">tarr</span><span class="p">)</span>
     <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">fusion</span><span class="p">)</span>
 <span class="cp">#endif</span>
 

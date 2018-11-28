@@ -6122,11 +6122,11 @@ subroutine inter_grid_intersect(r0, v0, length, r_enter, r_exit)
     p_arr(6,:) = p
 
     !! Outputs
-    minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
+    minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
     min_ind = minpos(1)
     r_enter = p_arr(min_ind,:)
 
-    maxpos = maxloc(dt_arr, mask=dt_arr.gt.1.0d-15)
+    maxpos = maxloc(dt_arr, mask=dt_arr.gt.0.d0)
     max_ind = maxpos(1)
     r_exit = p_arr(max_ind,:)
 
@@ -6532,18 +6532,17 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(2) = inter_grid%nz
     gdims(3) = inter_grid%nphi
 
-    x = ri(1) ; y = ri(2) ; z = ri(3)
-    r = sqrt(x*x + y*y)
+    r = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
 
-    vn_cyl(1) = x / r * vn(1) + y / r * vn(2)
+    vn_cyl(1) = (ri(1)/r)*vn(1) + (ri(2)/r)*vn(2)
     vn_cyl(2) = vn(3)
-    vn_cyl(3) = -y / (r*r) * vn(1) + x / (r*r) * vn(2)
+    vn_cyl(3) = -(ri(2)/(r*r))*vn(1) + (ri(1)/(r*r))*vn(2)
 
     do i=1,3
         !! sgn is in R-Z-Phi coordinates
-        if (vn_cyl(i).gt.1.0d-15) then
+        if (vn_cyl(i).gt.0.d0) then
             sgn(i) = 1
-        else if (vn_cyl(i).lt.-1.0d-15) then
+        else if (vn_cyl(i).lt.0.d0) then
             sgn(i) =-1
         end if
     enddo
@@ -6589,7 +6588,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     call cyl_to_uvw(v_plane_cyl,v_plane)
 
     !! Normal vectors
-    nz(1) = 0.d0; nz(2) = 0.d0 ; nz(3) = 1.d0
+    nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
     redge_cyl(1) = v_plane_cyl(1) + inter_grid%dr
     redge_cyl(2) = v_plane_cyl(2)
     redge_cyl(3) = v_plane_cyl(3)
@@ -6623,7 +6622,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         call line_plane_intersect(ri, vn, v_plane, n0, p, t)
         dt_arr(3) = t
 
-        minpos = minloc(dt_arr, mask=dt_arr.gt.1.0d-15)
+        minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
         mind = minpos(1)
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
@@ -6941,7 +6940,7 @@ subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
     real(Float64), intent(in)               :: phiout
         !+ Phi value to interpolate
     type(InterpolCoeffs3D), intent(out)     :: c
-        !+ Cylindrical Interpolation Coefficients
+        !+ Interpolation Coefficients
     integer, intent(out), optional          :: err
         !+ Error code
 
@@ -7124,14 +7123,16 @@ subroutine interpol3D_arr(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
     integer, intent(out), optional          :: err
         !+ Error code
     type(InterpolCoeffs3D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed Interpolation Coefficients
 
     type(InterpolCoeffs3D) :: b
     integer :: i, j, k, k2, err_status
     integer :: nphi
 
     err_status = 1
+
     nphi = size(phi)
+
     if(present(coeffs)) then
         b = coeffs
         if(nphi .eq. 1) then
@@ -7191,14 +7192,16 @@ subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs
     integer, intent(out), optional          :: err
         !+ Error code
     type(InterpolCoeffs3D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed Interpolation Coefficients
 
     type(InterpolCoeffs3D) :: b
     integer :: i, j, k, k2, err_status
     integer :: nphi
 
     err_status = 1
+
     nphi = size(phi)
+
     if(present(coeffs)) then
         b = coeffs
         if(nphi .eq. 1) then
@@ -7247,7 +7250,7 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
     integer, intent(in), optional           :: input_coords
         !+ Indicates coordinate system of xyz. Machine (0), beam grid (1) and cyl (2)
     type(InterpolCoeffs3D), intent(out), optional      :: coeffs
-        !+ Linear Interpolation coefficients used in calculation
+        !+ Interpolation coefficients used in calculation
     real(Float64), dimension(3), intent(out), optional :: uvw_out
         !+ Position in machine coordinates
 
@@ -7361,7 +7364,7 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
 
     call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
-        phi = atan2(uvw(2),uvw(1))
+        phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
         i = coeffs%i
         j = coeffs%j
         k = coeffs%k
@@ -7453,12 +7456,15 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
     else
         ics = 0
     endif
+
     if(present(output_coords)) then
         ocs = output_coords
     else
         ocs = 0
     endif
+
     if(present(ind)) call get_position(ind,xyz)
+
     if(present(pos)) then
         if(ics.eq.0) then
             xyz = pos
@@ -7472,7 +7478,6 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
 
     call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
-        phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
         j = coeffs%j
         k = coeffs%k
@@ -7487,7 +7492,7 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
                  coeffs%b211*equil%fields(i+1,j,k)  + coeffs%b221*equil%fields(i+1,j+1,k) + &
                  coeffs%b212*equil%fields(i+1,j,k2) + coeffs%b222*equil%fields(i+1,j+1,k2)
 
-        phi = atan2(uvw(2),uvw(1))
+        phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
         s = sin(phi) ; c = cos(phi)
 
         !Convert cylindrical coordinates to uvw
@@ -7537,7 +7542,7 @@ subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     type(InterpolCoeffs3D), intent(in), optional       :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed interpolation coefficients
 
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64) :: R, Z, Phi
@@ -7576,7 +7581,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     type(InterpolCoeffs3D), intent(in), optional       :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed interpolation coefficients
 
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam
@@ -8757,8 +8762,8 @@ subroutine gyro_step(vi, fields, r_gyro)
         !! Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251.
         !! Appendix A: Last equation
         uvw = fields%uvw
-        R = sqrt(uvw(1)**2 + uvw(2)**2)
-        phi = atan2(uvw(2),uvw(1))
+        R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
+        phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
         if(fields%coords.eq.0) then
             call xyz_to_uvw(r_gyro,rg_uvw)
         endif
@@ -8795,7 +8800,7 @@ subroutine gyro_step(vi, fields, r_gyro)
 
 end subroutine gyro_step
 
-subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
+subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     !+ Calculates gyro correction for Guiding Center MC distribution calculation
     type(LocalEMFields), intent(in)          :: fields
         !+ Electromagnetic fields at guiding center
@@ -8807,24 +8812,24 @@ subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
         !+ Particle position
     real(Float64), dimension(3), intent(out) :: vp
         !+ Particle velocity
-    real(Float64), intent(in), optional      :: phi_in
+    real(Float64), intent(in), optional      :: theta_in
         !+ Gyro-angle
     real(Float64), dimension(3) :: vi_norm, r_step
     real(Float64), dimension(1) :: randomu
-    real(Float64) :: vabs, phi
+    real(Float64) :: vabs, theta
 
     vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
 
-    if(present(phi_in)) then
-        phi = phi_in
+    if(present(theta_in)) then
+        theta = theta_in
     else
         !! Sample gyroangle
         call randu(randomu)
-        phi = 2*pi*randomu(1)
+        theta = 2*pi*randomu(1)
     endif
 
     !! Calculate velocity vector
-    call pitch_to_vec(pitch, phi, fields, vi_norm)
+    call pitch_to_vec(pitch, theta, fields, vi_norm)
     vp = vabs*vi_norm
 
     !! Move to particle location
@@ -8909,7 +8914,7 @@ subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf,output_coords)
     real(Float64), intent(out)             :: denf
         !+ Fast-ion density at guiding center
     integer, intent(in), optional            :: output_coords
-        !+ Indicator for `fields` coordinate system
+        !+ Indicates coordinate system of `fields`. Machine (0), beam grid (1) and cyl (2)
 
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
     real(Float64), dimension(3) :: rg, rg_cyl
@@ -8923,19 +8928,20 @@ subroutine mc_fastion_inter_grid(ind,fields,eb,ptch,denf,output_coords)
         ocs = 0
     endif
 
-    call randu(randomu3)
-    rg_cyl(1) = inter_grid%r(ind(1)) + inter_grid%dr / 2.d0 + inter_grid%dr * (randomu3(1) - 0.5)
-    rg_cyl(2) = inter_grid%z(ind(2)) + inter_grid%dz / 2.d0 + inter_grid%dz * (randomu3(2) - 0.5)
-    !!! Not sure how to handle the axisymmetric case here
-    rg_cyl(3) = inter_grid%phi(ind(3)) + inter_grid%dphi / 2.d0 + inter_grid%dphi * (randomu3(3) - 0.5)
-    !!! End
     denf=0.d0
 
+    call randu(randomu3)
+    rg_cyl(1) = (inter_grid%r(ind(1))+inter_grid%dr/2.d0)+(inter_grid%dr*(randomu3(1)-0.5))
+    rg_cyl(2) = (inter_grid%z(ind(2))+inter_grid%dz/2.d0)+(inter_grid%dz*(randomu3(2)-0.5))
+    !!! Not sure how to handle the axisymmetric case here
+    rg_cyl(3) = (inter_grid%phi(ind(3))+inter_grid%dphi/2.d0)+(inter_grid%dphi*(randomu3(3)-0.5))
+    !!! End
     call cyl_to_uvw(rg_cyl, rg)
+
     call get_fields(fields,pos=rg,input_coords=1,output_coords=ocs)
     if(.not.fields%in_plasma) return
 
-    call get_distribution(fbeam,denf,pos=rg, coeffs=fields%b)
+    call get_distribution(fbeam,denf,coeffs=fields%b)
     call randind(fbeam,ep_ind)
     call randu(randomu3)
     eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
@@ -10439,7 +10445,7 @@ subroutine pnpa_f
     integer :: i,j,k,det,ic
     integer(Int64) :: iion
     real(Float64), dimension(3) :: rg,ri,rf,vi,ri_uvw
-    integer, dimension(3) :: ind,pind
+    integer, dimension(3) :: ind
     real(Float64) :: denf,r
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
@@ -10487,17 +10493,15 @@ subroutine pnpa_f
 
     !! Loop over all cells that can contribute to NPA signal
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
-    !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw)
+    !$OMP& vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(inter_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
-            !!! This will output quantities in bgc
             call mc_fastion_inter_grid(ind, fields, eb, ptch, denf)
             if(denf.eq.0.0) cycle loop_over_fast_ions
 
-            !!! Quantities are probable output in bgc
             call gyro_surface(fields, eb, ptch, gs)
 
             detector_loop: do ichan=1,npa_chords%nchan
@@ -10517,12 +10521,7 @@ subroutine pnpa_f
                         cycle gyro_range_loop
                     endif
 
-                    !!! I don't think pind is used for anything
-                    !! Get beam grid indices at ri
-                    call get_indices(ri,pind)
-
                     !! Calculate CX probability with beam and halo neutrals
-                    !call get_plasma(plasma, pos=ri, input_coords=1)
                     call get_plasma(plasma, pos=ri)
                     call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
                     if(sum(rates).le.0.) cycle gyro_range_loop
@@ -10531,13 +10530,10 @@ subroutine pnpa_f
                     states=rates*denf
 
                     !! Attenuate states as the particle move through plasma
-                    !!! ri, rf and vi in bgc
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
-                    call xyz_to_uvw(ri,ri_uvw)
-                    r = sqrt(ri_uvw(1)*ri_uvw(1)+ri_uvw(2)*ri_uvw(2))
-                    flux = (dtheta/(2*pi))*sum(states)*r*inter_grid%dv/nlaunch(i,j,k)
+                    flux = (dtheta/(2*pi))*sum(states)*inter_grid%r(i)*inter_grid%dv/nlaunch(i,j,k)
                     call store_npa(det,ri,rf,vi,flux,passive=.True.)
                 enddo gyro_range_loop
             enddo detector_loop

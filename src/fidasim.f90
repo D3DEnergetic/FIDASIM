@@ -10259,15 +10259,16 @@ subroutine pfida_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        !!!if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
-            if(particles%axisym) then
-                !! Pick random toroidal angle
-                call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-            else
-                phi = fast_ion%phi
-            endif
+         !!!if(particles%axisym) then
+         !!!    !! Pick random toroidal angle
+         !!!    call randu(randomu)
+         !!!    phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+         !!!else
+         !!!    phi = fast_ion%phi
+         !!!endif
+            phi = fast_ion%phi
             s = sin(phi)
             c = cos(phi)
 
@@ -10301,7 +10302,8 @@ subroutine pfida_mc
             if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            states=rates*fast_ion%weight/ngamma
+            !!! This is just a quick check, should consider this again
+            states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack

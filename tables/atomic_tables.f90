@@ -4806,6 +4806,7 @@ subroutine write_bb_H_H(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
+    call parallel_sum(ebarr)
     call parallel_sum(cx)
     call parallel_sum(excit)
     call parallel_sum(ioniz)
@@ -4956,6 +4957,7 @@ subroutine write_bb_H_e(id, namelist_file, n_max, m_max)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
+    call parallel_sum(ebarr)
     call parallel_sum(excit)
     call parallel_sum(ioniz)
 #endif
@@ -5120,6 +5122,7 @@ subroutine write_bb_H_Aq(id, namelist_file, n_max, m_max)
         enddo
 
 #ifdef _MPI
+        call parallel_sum(ebarr)
         call parallel_sum(cx)
         call parallel_sum(excit)
         call parallel_sum(ioniz)
@@ -5263,6 +5266,7 @@ subroutine write_bb_D_D(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
+    call parallel_sum(ebarr)
     call parallel_sum(fusion)
 #endif
 
@@ -5382,6 +5386,7 @@ subroutine write_bb_D_T(id, namelist_file)
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
+    call parallel_sum(ebarr)
     call parallel_sum(fusion)
 #endif
 

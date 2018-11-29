@@ -814,7 +814,7 @@ type NPAResults
         !+ Number of particles that hit a detector
     integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
-    integer(Int32) :: nenergy = 100
+    integer(Int32) :: nenergy = 122
         !+ Number of energy values
     type(NPAParticle), dimension(:), allocatable :: part
         !+ Array of NPA particles
@@ -10742,15 +10742,16 @@ subroutine pnpa_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        !!!if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
-            if(particles%axisym) then
-                !! Pick random toroidal angle
-                call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-            else
-                phi = fast_ion%phi
-            endif
+         !!!if(particles%axisym) then
+         !!!    !! Pick random toroidal angle
+         !!!    call randu(randomu)
+         !!!    phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+         !!!else
+         !!!    phi = fast_ion%phi
+         !!!endif
+            phi = fast_ion%phi
             s = sin(phi)
             c = cos(phi)
 
@@ -10759,6 +10760,7 @@ subroutine pnpa_mc
             uvw(2) = fast_ion%r*s
             uvw(3) = fast_ion%z
 
+            !!! Need to come back to inputs dist eq 2
             if(inputs%dist_type.eq.2) then
                 !! Convert to beam grid coordinates
                 call uvw_to_xyz(uvw, rg)
@@ -10796,13 +10798,15 @@ subroutine pnpa_mc
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        states=rates*fast_ion%weight/ngamma
+                        !!!states=rates*fast_ion%weight/ngamma
+                        states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
 
                         !! Store NPA Flux
-                        flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
+                        !!!flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
+                        flux = (dtheta/(2*pi))*sum(states)*fast_ion%r*inter_grid%dv
                         spread_loop: do it=1,25
                             theta = gyrange(1,ir) + (it-0.5)*dtheta/25
                             call gyro_trajectory(gs, theta, ri, vi)
@@ -10832,7 +10836,7 @@ subroutine pnpa_mc
                 if(det.eq.0) cycle gamma_loop
 
                 !! Get beam grid indices at ri
-                call get_indices(ri,ind)
+                !!!call get_indices(ri,ind)
 
                 !! Calculate CX probability with beam and halo neutrals
                 call get_plasma(plasma, pos=ri)
@@ -10840,13 +10844,15 @@ subroutine pnpa_mc
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                states=rates*fast_ion%weight/ngamma
+                !!!states=rates*fast_ion%weight/ngamma
+                states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
 
                 !! Store NPA Flux
-                flux = sum(states)*beam_grid%dv
+                !!!flux = sum(states)*beam_grid%dv
+                flux = sum(states)*fast_ion%r*inter_grid%dv
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class,passive=.True.)
             endif
         enddo gamma_loop

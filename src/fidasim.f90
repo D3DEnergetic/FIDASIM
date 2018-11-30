@@ -53,17 +53,21 @@ integer, parameter :: thermal_ion = 2
     !+ Identifier for a thermal ion
 
 !! Physical units
-real(Float64), parameter :: e_amu = 5.485799093287202d-4
+real(Float64), parameter :: e_amu = 5.48579909070d-4
     !+ Atomic mass of an electron [amu]
-real(Float64), parameter :: H_1_amu = 1.00782504d0
-    !+ Atomic mass of Hydrogen-1 [amu]
-real(Float64), parameter :: H_2_amu = 2.0141017778d0
-    !+ Atomic mass of Hydrogen-2 [amu]
+real(Float64), parameter :: H1_amu = 1.007276466879d0
+    !+ Atomic mass of Hydrogen-1 (protium) [amu]
+real(Float64), parameter :: H2_amu = 2.013553212745d0
+    !+ Atomic mass of Hydrogen-2 (deuterium) [amu]
+real(Float64), parameter :: H3_amu = 3.01550071632d0
+    !+ Atomic mass of Hydrogen-3 (tritium) [amu]
+real(Float64), parameter :: He3_amu = 3.01602931914d0
+    !+ Atomic mass of Helium-3 [amu]
 real(Float64), parameter :: B5_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
 real(Float64), parameter :: C6_amu = 12.011d0
     !+ Atomic mass of Carbon [amu]
-real(Float64), parameter :: mass_u    = 1.6605402d-27
+real(Float64), parameter :: mass_u    = 1.660539040d-27
     !+ Atomic mass unit [kg]
 real(Float64), parameter :: e0        = 1.60217733d-19
     !+ Electron charge [C]
@@ -8649,6 +8653,7 @@ subroutine dcx
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    real(Float64) :: bens_factor
 
     halo_iter_dens(dcx_type) = 0.d0
     papprox=0.d0
@@ -8685,7 +8690,7 @@ subroutine dcx
        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma)
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,bens_factor)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8704,14 +8709,16 @@ subroutine dcx
             call get_plasma(plasma,pos=tracks(1)%pos)
 
             !! Weight CX rates by ion source density
-            states = rates*(plasma%denp - plasma%denf)
+            !states = rates*(plasma%denp - plasma%denf)
+            states = rates*plasma%denp
+            bens_factor = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
 
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
                 if(.not.plasma%in_plasma) exit loop_along_track
                 call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
                 call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
-
+                photons = photons*bens_factor
                 if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
                   call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
                 endif
@@ -8763,6 +8770,7 @@ subroutine halo
     real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
     integer :: prev_type  ! previous iteration
     integer :: cur_type  ! current iteration
+    real(Float64) :: bens_factor
 
 
     prev_type = fida_type
@@ -8826,7 +8834,7 @@ subroutine halo
 
         local_iter_dens = halo_iter_dens(cur_type)
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice) &
+        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice,bens_factor) &
         !$OMP& reduction(+: local_iter_dens )
         loop_over_cells: do ic=istart,ncell,istep
 #ifdef _OMP
@@ -8854,6 +8862,7 @@ subroutine halo
 
                 !! Weight CX rates by ion source density
                 states = rates*plasma%denp
+                bens_factor = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
 
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -8866,6 +8875,8 @@ subroutine halo
                         dens_cur(:,tind(1),tind(2),tind(3),cur_slice) + denn/nlaunch(i,j,k)
                     local_iter_dens = &
                         local_iter_dens + sum(denn)/nlaunch(i,j,k)
+
+                    photons=photons*bens_factor
                     if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
                       call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                     endif

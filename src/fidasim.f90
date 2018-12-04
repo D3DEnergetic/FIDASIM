@@ -10153,12 +10153,12 @@ subroutine neutron_f
 
                             !! Get neutron production rate
                             call get_neutron_rate(plasma, erel, rate)
-                            rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate*factor
                             endif
 
+                            rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
                             !! Store neutrons
                             call store_neutrons(rate)
                         enddo gyro_loop

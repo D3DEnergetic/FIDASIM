@@ -10164,10 +10164,9 @@ subroutine neutron_f
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
                                 !!! Double check factor
-                                neutron%emis(ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
-                                                                 / factor &
-                                                                 * fbm%f(ie,ip,ir,iz,iphi) &
-                                                                 * fbm%dE * fbm%dp / ngamma
+                                neutron%emis(ir,iz,iphi) = neutron%emis(ir,iz,iphi) &
+                                                                 + rate * fbm%f(ie,ip,ir,iz,iphi) &
+                                                                 * factor
                             endif
 
                             rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
@@ -10183,7 +10182,10 @@ subroutine neutron_f
 
 #ifdef _MPI
     call parallel_sum(neutron%rate)
-    if(inputs%calc_neutron.ge.2) call parallel_sum(neutron%weight)
+    if(inputs%calc_neutron.ge.2) then
+        call parallel_sum(neutron%weight)
+        call parallel_sum(neutron%emis)
+    endif
 #endif
 
     if(inputs%verbose.ge.1) then

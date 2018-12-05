@@ -4664,7 +4664,7 @@ subroutine write_neutrons
         dim5 = shape(neutron%weight)
         call h5ltmake_compressed_dataset_double_f(fid, "/weight", 5, dim5, neutron%weight, error)
         dim3 = shape(neutron%emis)
-        call h5ltmake_compressed_dataset_double_f(fid, "/emis", 3, dim3, neutron%emis, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/emissivity", 3, dim3, neutron%emis, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim5(1:1), fbm%energy, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim5(2:2), fbm%pitch, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim5(3:3), fbm%r, error)
@@ -4682,9 +4682,9 @@ subroutine write_neutrons
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
              "Neutron Weight Function: weight(E,p,R,Z,Phi), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","neutrons*cm^3*dE*dp/fast-ion*s", error)
-        call h5ltset_attribute_string_f(fid,"/emis", "description", &
+        call h5ltset_attribute_string_f(fid,"/emissivity", "description", &
              "Neutron Emissivity: emissivity(R,Z,Phi), rate = sum(emissivity)", error)
-        call h5ltset_attribute_string_f(fid,"/emis", "units","neutrons*cm^3/fast-ion*s", error)
+        call h5ltset_attribute_string_f(fid,"/emissivity", "units","neutrons*cm^3/fast-ion*s", error)
 
         call h5ltset_attribute_string_f(fid,"/energy","description", &
              "Energy array", error)

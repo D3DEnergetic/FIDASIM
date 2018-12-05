@@ -4682,6 +4682,9 @@ subroutine write_neutrons
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
              "Neutron Weight Function: weight(E,p,R,Z,Phi), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","neutrons*cm^3*dE*dp/fast-ion*s", error)
+        call h5ltset_attribute_string_f(fid,"/emis", "description", &
+             "Neutron Emissivity: emissivity(R,Z,Phi), rate = sum(emissivity)", error)
+        call h5ltset_attribute_string_f(fid,"/emis", "units","neutrons*cm^3/fast-ion*s", error)
 
         call h5ltset_attribute_string_f(fid,"/energy","description", &
              "Energy array", error)
@@ -10163,10 +10166,11 @@ subroutine neutron_f
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
-                                !!! Double check factor
+                                !$OMP CRITICAL(neutron_emis)
                                 neutron%emis(ir,iz,iphi) = neutron%emis(ir,iz,iphi) &
                                                                  + rate * fbm%f(ie,ip,ir,iz,iphi) &
                                                                  * factor
+                                !$OMP END CRITICAL(neutron_emis)
                             endif
 
                             rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor

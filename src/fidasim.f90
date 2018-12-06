@@ -6299,20 +6299,36 @@ subroutine get_indices(pos, ind)
 
 end subroutine get_indices
 
-subroutine get_inter_grid_indices(pos, ind)
+subroutine get_inter_grid_indices(pos, ind, input_coords)
     !+ Find closests [[libfida:inter_grid]] indices `ind` to position `pos`
     real(Float64),  dimension(3), intent(in)  :: pos
         !+ Position [cm]
     integer(Int32), dimension(3), intent(out) :: ind
         !+ Closest indices to position
+    integer, intent(in), optional             :: input_coords
+        !+ Indicates coordinate system of `pos`. Machine (0), beam grid (1) and cyl (2)
 
     real(Float64),  dimension(3) :: mini, differentials, loc
     integer(Int32), dimension(3) :: maxind
-    integer :: i
+    integer :: i, ics
 
-    loc(1) = pos(1)
-    loc(2) = pos(2)
-    loc(3) = modulo(pos(3),2*pi)
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        ics = 2
+    endif
+
+    if(ics.eq.1) then
+        loc(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        loc(2) = pos(3)
+        loc(3) = modulo(atan2(pos(2),pos(1)),2*pi)
+    endif
+
+    if(ics.eq.2) then
+        loc(1) = pos(1)
+        loc(2) = pos(2)
+        loc(3) = modulo(pos(3),2*pi)
+    endif
 
     maxind(1) = inter_grid%nr
     maxind(2) = inter_grid%nz
@@ -10044,7 +10060,6 @@ subroutine pfida_f
     integer(Int32), dimension(inter_grid%nr,inter_grid%nz,inter_grid%nphi) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
-    !!! I can change papprox to something else now?
     papprox=0.d0
     do ic=1,inter_grid%ngrid
         call ind2sub(inter_grid%dims,ic,ind)
@@ -10053,11 +10068,11 @@ subroutine pfida_f
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
-    !!! TODO: Remove this once we have a 3D interpolation grid
-    !max_papprox = maxval(papprox)
-    !where (papprox.lt.(max_papprox*1.d-3))
-    !    papprox = 0.0
-    !endwhere
+    !! TODO: Remove this once we have a 3D interpolation grid
+    max_papprox = maxval(papprox)
+    where (papprox.lt.(max_papprox*1.d-3))
+        papprox = 0.0
+    endwhere
 
     ncell = 0
     do ic=1,inter_grid%ngrid
@@ -10237,13 +10252,14 @@ subroutine pfida_mc
     real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ntrack
+    integer :: ntrack, ir
     type(ParticleTrack), dimension(inter_grid%ntrack) :: tracks
     logical :: los_intersect
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
+    integer(Int32), dimension(1) :: minpos
 
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
@@ -10254,21 +10270,21 @@ subroutine pfida_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi)
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c,ir,&
+    !$OMP& randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi,minpos)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         !!!if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
-         !!!if(particles%axisym) then
-         !!!    !! Pick random toroidal angle
-         !!!    call randu(randomu)
-         !!!    phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-         !!!else
-         !!!    phi = fast_ion%phi
-         !!!endif
-            phi = fast_ion%phi
+         if(particles%axisym) then
+             !! Pick random toroidal angle
+             !!! I'm going to have to figure out this one
+             call randu(randomu)
+             phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+         else
+             phi = fast_ion%phi
+         endif
             s = sin(phi)
             c = cos(phi)
 
@@ -10302,8 +10318,11 @@ subroutine pfida_mc
             if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            !!! This is just a quick check, should consider this again
-            states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
+            minpos = minloc(abs(inter_grid%r - particles%fast_ion(iion)%r))
+            ir = minpos(1)
+            states=rates * fast_ion%weight * beam_grid%dv &
+                   / (((inter_grid%r(ir)+inter_grid%dr)**2 - inter_grid%r(ir)**2) &
+                   * inter_grid%dphi*inter_grid%dz) / ngamma
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
@@ -10466,7 +10485,6 @@ subroutine pnpa_f
     do ic=1,inter_grid%ngrid
         call ind2sub(inter_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        !!! Check that this is working correctly with 2
         call get_plasma(plasma,ind=ind,input_coords=2)
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
@@ -10535,6 +10553,9 @@ subroutine pnpa_f
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
+                 !!!flux = (dtheta/(2*pi))*sum(states) &
+                 !!!       *((inter_grid%r(i)+inter_grid%dr)**2-inter_grid%r(i)**2) &
+                 !!!       *inter_grid%dphi*inter_grid%dz/nlaunch(i,j,k)
                     flux = (dtheta/(2*pi))*sum(states)*inter_grid%r(i)*inter_grid%dv/nlaunch(i,j,k)
                     call store_npa(det,ri,rf,vi,flux,passive=.True.)
                 enddo gyro_range_loop
@@ -10727,6 +10748,8 @@ subroutine pnpa_mc
     real(Float64), dimension(2,4) :: gyrange
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
+    integer(Int32) :: i
+    integer(Int32), dimension(1) :: minpos
 
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
@@ -10737,21 +10760,20 @@ subroutine pnpa_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
-    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
+    !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma,i, &
+    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta,minpos)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        !!!if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
-         !!!if(particles%axisym) then
-         !!!    !! Pick random toroidal angle
-         !!!    call randu(randomu)
-         !!!    phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-         !!!else
-         !!!    phi = fast_ion%phi
-         !!!endif
-            phi = fast_ion%phi
+         if(particles%axisym) then
+             !! Pick random toroidal angle
+             !!! I'm going to have to figure out this one
+             call randu(randomu)
+             phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+         else
+             phi = fast_ion%phi
+         endif
             s = sin(phi)
             c = cos(phi)
 
@@ -10762,11 +10784,8 @@ subroutine pnpa_mc
 
             !!! Need to come back to inputs dist eq 2
             if(inputs%dist_type.eq.2) then
-                !! Convert to beam grid coordinates
-                call uvw_to_xyz(uvw, rg)
-
                 !! Get electomagnetic fields
-                call get_fields(fields, pos=rg)
+                call get_fields(fields, pos=uvw, input_coords=1)
 
                 !! Correct for gyro motion and get position and velocity
                 call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, gs)
@@ -10789,24 +10808,25 @@ subroutine pnpa_mc
                             cycle gyro_range_loop
                         endif
 
-                        !! Get beam grid indices at ri
-                        call get_indices(ri,ind)
-
                         !! Calculate CX probability with beam and halo neutrals
                         call get_plasma(plasma, pos=ri)
                         call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        !!!states=rates*fast_ion%weight/ngamma
-                        states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
+                        minpos = minloc(abs(inter_grid%r - particles%fast_ion(iion)%r))
+                        i = minpos(1)
+                        states=rates * fast_ion%weight * beam_grid%dv &
+                               / (((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
+                               * inter_grid%dphi*inter_grid%dz) / ngamma
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
 
                         !! Store NPA Flux
-                        !!!flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
-                        flux = (dtheta/(2*pi))*sum(states)*fast_ion%r*inter_grid%dv
+                        flux = (dtheta/(2*pi))*sum(states) &
+                               * ((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
+                               * inter_grid%dphi*inter_grid%dz
                         spread_loop: do it=1,25
                             theta = gyrange(1,ir) + (it-0.5)*dtheta/25
                             call gyro_trajectory(gs, theta, ri, vi)
@@ -10835,24 +10855,24 @@ subroutine pnpa_mc
                 call hit_npa_detector(ri, vi ,det, rf)
                 if(det.eq.0) cycle gamma_loop
 
-                !! Get beam grid indices at ri
-                !!!call get_indices(ri,ind)
-
                 !! Calculate CX probability with beam and halo neutrals
                 call get_plasma(plasma, pos=ri)
                 call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                !!!states=rates*fast_ion%weight/ngamma
-                states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
+                minpos = minloc(abs(inter_grid%r - particles%fast_ion(iion)%r))
+                i = minpos(1)
+                states=rates * fast_ion%weight * beam_grid%dv &
+                       / (((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
+                       * inter_grid%dphi*inter_grid%dz) / ngamma
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
 
                 !! Store NPA Flux
-                !!!flux = sum(states)*beam_grid%dv
-                flux = sum(states)*fast_ion%r*inter_grid%dv
+                flux = sum(states)*((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
+                       * inter_grid%dphi*inter_grid%dz
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class,passive=.True.)
             endif
         enddo gamma_loop

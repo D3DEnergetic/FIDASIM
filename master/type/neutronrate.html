@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 0.8% of total for derived types.</p>Including implementation: 4 statements,  0.8% of total for derived types.">4 statements</a>
+    title="<p> 1.1% of total for derived types.</p>Including implementation: 5 statements,  1.1% of total for derived types.">5 statements</a>
      </li> 
      
      
@@ -180,6 +180,8 @@
       <a class="list-group-item" href="../type/neutronrate.html#variable-rate">rate</a>
       
       <a class="list-group-item" href="../type/neutronrate.html#variable-weight%7E4">weight</a>
+      
+      <a class="list-group-item" href="../type/neutronrate.html#variable-emis">emis</a>
       
     </div>
   </div>
@@ -240,6 +242,8 @@
       <a class="list-group-item" href="../type/neutronrate.html#variable-rate">rate</a>
       
       <a class="list-group-item" href="../type/neutronrate.html#variable-weight%7E4">weight</a>
+      
+      <a class="list-group-item" href="../type/neutronrate.html#variable-emis">emis</a>
       
     </div>
   </div>
@@ -317,6 +321,20 @@
   
 </tr>
 
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-emis"></span>real(kind=Float64),</td>
+  
+  <td>public,</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>emis</strong></td><td></td><td></td><td><p>Neutron emissivity: emis(R,Z,Phi)</p></td>
+  
+</tr>
+
 </tbody>
 </table>
 
@@ -339,6 +357,8 @@
         <span class="c">!+ Neutron rate: rate(orbit_type) [neutrons/sec]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">weight</span>
         <span class="c">!+ Neutron rate weight: weight(E,p,R,Z,Phi)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">emis</span>
+        <span class="c">!+ Neutron emissivity: emis(R,Z,Phi)</span>
 <span class="k">end type </span><span class="n">NeutronRate</span>
 </pre></div>
 

@@ -860,6 +860,16 @@ type SimulationInputs
         !+ Number of halo mc markers
     integer(Int64) :: n_birth
         !+ Number of birth particles per [[SimulationInputs:n_nbi]]
+    integer(Int64) :: n_min_dcx
+        !+ Minimum number of launch particles in a cell for dcx
+    integer(Int64) :: n_min_halo
+        !+ Minimum number of launch particles in a cell for halo
+    real(Float64) :: n_min_frac_dcx
+        !+ Minimum fraction of launch particles used for floor cell value in dcx calc
+    real(Float64) :: n_min_frac_halo
+        !+ Minimum fraction of launch particles used for floor cell value in halo calc
+    real(Float64) :: papprox_floor
+        !+ Proportion of max value in papprox which is floored to zero (no particles launched)
 
     !! Simulation switches
     integer(Int32) :: calc_spec
@@ -1708,11 +1718,12 @@ subroutine read_inputs
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
     integer            :: load_neutrals,verbose,no_flr,split
-    integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
+    integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth,n_min_dcx,n_min_halo
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
     real(Float64)      :: ai,ab,pinj,einj,current_fractions(3)
+    real(Float64)      :: n_min_frac_dcx,n_min_frac_halo, papprox_floor
     integer(Int32)     :: impurity_charge
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
@@ -1725,6 +1736,7 @@ subroutine read_inputs
         calc_pfida, calc_npa, calc_pnpa,calc_birth, no_flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
+        n_min_dcx, n_min_halo, n_min_frac_dcx, n_min_frac_halo, papprox_floor, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
@@ -1774,6 +1786,11 @@ subroutine read_inputs
     n_halo=0
     n_dcx=0
     n_birth=0
+    n_min_dcx=5
+    n_min_halo=5
+    n_min_frac_dcx=0.
+    n_min_frac_halo=0.
+    papprox_floor=1.d-3
     ab=0
     pinj=0
     einj=0
@@ -1863,7 +1880,11 @@ subroutine read_inputs
     inputs%n_halo=max(10,n_halo)
     inputs%n_dcx=max(10,n_dcx)
     inputs%n_birth= max(1,nint(n_birth/real(n_nbi)))
-
+    inputs%n_min_dcx=max(5,n_min_dcx)
+    inputs%n_min_halo=max(5,n_min_halo)
+    inputs%n_min_frac_dcx=max(0.,n_min_frac_dcx)
+    inputs%n_min_frac_halo=max(0.,n_min_frac_halo)
+    inputs%papprox_floor=max(0.,papprox_floor)
     !!Plasma Settings
     inputs%ai=ai
     inputs%impurity_charge=impurity_charge
@@ -7317,7 +7338,7 @@ end subroutine store_fw_photons
 !=============================================================================
 !---------------------------Monte Carlo Routines------------------------------
 !=============================================================================
-subroutine get_nlaunch(nr_markers,papprox, nlaunch)
+subroutine get_nlaunch(nr_markers, papprox, nlaunch, in_nmin, min_fraction)
     !+ Sets the number of MC markers launched from each [[libfida:beam_grid]] cell
     integer(Int64), intent(in)                    :: nr_markers
         !+ Approximate total number of markers to launch
@@ -7325,6 +7346,10 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
         !+ [[libfida:beam_grid]] cell weights
     integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
         !+ Number of mc markers to launch for each cell: nlaunch(x,y,z)
+    integer(Int64), intent(in), optional      :: in_nmin
+        !+ Optional number of launch particles to use as floor number of launches per cell
+    real(Float64), intent(in), optional      :: min_fraction
+        !+ Optional fraction of launch particles to use as floor number of launches per cell
 
     logical, dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: mask
     real(Float64), dimension(beam_grid%ngrid) :: cdf
@@ -7332,16 +7357,32 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
     integer  :: nmin = 5
     integer, dimension(1) :: randomi
     type(rng_type) :: r
+    real(Float64) :: fraction = 0.05
+    integer(Int64) :: nmin_frac
 
-    !! Fill in minimum number of markers per cell
+    !! If optional floor minimum is present, use this instead of hard coded value of 5
+    if(present(in_nmin)) nmin = in_nmin
+
     nlaunch = 0
     mask = papprox.gt.0.0
+    nc = count(mask)
+
+    !! Set number of launch particles at the floor value as optional fraction of total launch particles
+    !! Still use a hard floor value incase the fractional floor is small
+    if(present(min_fraction)) then
+       fraction = min_fraction
+       nmin_frac = int(nr_markers*fraction/nc)
+       if(inputs%verbose.ge.1) write(*,'(T6, "Launch ",i10, " markers from ", i10, " cells. Min frac/cell:", f5.2, ", min floor:",i5)'), nr_markers, nc, fraction, nmin
+       nmin = max(nmin_frac, nmin)
+       if(inputs%verbose.ge.1) write(*,'(T6, "Using min per cell:",i5)'), nmin
+    endif
+
+    !! Fill in minimum number of markers per cell
     where(mask)
         nlaunch = nmin
     endwhere
 
     !! If there are any left over distribute according to papprox
-    nc = count(mask)
     if(nr_markers.gt.(nmin*nc)) then
         nm = nr_markers - nmin*nc
 
@@ -8024,7 +8065,7 @@ subroutine dcx
     enddo
     !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*inputs%papprox_floor))
         papprox = 0.0
     endwhere
 
@@ -8038,7 +8079,7 @@ subroutine dcx
         endif
     enddo
 
-    call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
+    call get_nlaunch(inputs%n_dcx,papprox,nlaunch,in_nmin=inputs%n_min_dcx,min_fraction=inputs%n_min_frac_dcx)
 
     if(inputs%verbose.ge.1) then
        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
@@ -8163,7 +8204,7 @@ subroutine halo
         enddo
         !! TODO: Remove this once we have a 3D interpolation grid
         max_papprox = maxval(papprox)
-        where (papprox.lt.(max_papprox*1.d-3))
+        where (papprox.lt.(max_papprox*inputs%papprox_floor))
             papprox = 0.0
         endwhere
 
@@ -8178,7 +8219,7 @@ subroutine halo
             endif
         enddo
 
-        call get_nlaunch(n_halo, papprox, nlaunch)
+        call get_nlaunch(n_halo, papprox, nlaunch,in_nmin=inputs%n_min_halo,min_fraction=inputs%n_min_frac_halo)
 
         if(inputs%verbose.ge.1) then
             write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
@@ -8538,7 +8579,7 @@ subroutine fida_f
     enddo
     !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*inputs%papprox_floor))
         papprox = 0.0
     endwhere
 
@@ -8641,7 +8682,7 @@ subroutine pfida_f
     enddo
     !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*inputs%papprox_floor))
         papprox = 0.0
     endwhere
 
@@ -8927,7 +8968,7 @@ subroutine npa_f
     enddo
     !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*inputs%papprox_floor))
         papprox = 0.0
     endwhere
 
@@ -9040,7 +9081,7 @@ subroutine pnpa_f
     enddo
     !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*inputs%papprox_floor))
         papprox = 0.0
     endwhere
 
@@ -9686,7 +9727,7 @@ subroutine fida_weights_mc
     enddo
     !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*inputs%papprox_floor))
         papprox = 0.0
     endwhere
 

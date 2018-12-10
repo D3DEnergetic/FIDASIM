@@ -9994,7 +9994,7 @@ subroutine fida_f
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, fields, eb, ptch, denf)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
             call gyro_correction(fields, eb, ptch, ri, vi)
@@ -10068,7 +10068,6 @@ subroutine pfida_f
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -10098,7 +10097,7 @@ subroutine pfida_f
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
             call mc_fastion_inter_grid(ind, fields, eb, ptch, denf, output_coords=1)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
             call gyro_correction(fields, eb, ptch, ri, vi)
@@ -10275,7 +10274,6 @@ subroutine pfida_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        !!!if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
          if(particles%axisym) then
              !! Pick random toroidal angle
@@ -10318,11 +10316,7 @@ subroutine pfida_mc
             if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            minpos = minloc(abs(inter_grid%r - particles%fast_ion(iion)%r))
-            ir = minpos(1)
-            states=rates * fast_ion%weight * beam_grid%dv &
-                   / (((inter_grid%r(ir)+inter_grid%dr)**2 - inter_grid%r(ir)**2) &
-                   * inter_grid%dphi*inter_grid%dz) / ngamma
+            states=rates * fast_ion%weight * beam_grid%dv / (fast_ion%r * inter_grid%dv) / ngamma
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
@@ -10406,7 +10400,7 @@ subroutine npa_f
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             call gyro_surface(fields, eb, ptch, gs)
 
@@ -10489,7 +10483,6 @@ subroutine pnpa_f
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
@@ -10505,7 +10498,6 @@ subroutine pnpa_f
         endif
     enddo
 
-    !!! Should probably also double check this
     call get_nlaunch_inter_grid(inputs%n_pnpa, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i12)') sum(nlaunch)
@@ -10520,12 +10512,14 @@ subroutine pnpa_f
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion_inter_grid(ind, fields, eb, ptch, denf)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             call gyro_surface(fields, eb, ptch, gs)
 
             detector_loop: do ichan=1,npa_chords%nchan
+                print*,'Chord = ', ichan
                 call npa_gyro_range(ichan, gs, gyrange, nrange)
+                print*,'nrange = ',nrange
                 if(nrange.eq.0) cycle detector_loop
                 gyro_range_loop: do ir=1,nrange
                     dtheta = gyrange(2,ir)
@@ -10553,9 +10547,6 @@ subroutine pnpa_f
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
-                 !!!flux = (dtheta/(2*pi))*sum(states) &
-                 !!!       *((inter_grid%r(i)+inter_grid%dr)**2-inter_grid%r(i)**2) &
-                 !!!       *inter_grid%dphi*inter_grid%dz/nlaunch(i,j,k)
                     flux = (dtheta/(2*pi))*sum(states)*inter_grid%r(i)*inter_grid%dv/nlaunch(i,j,k)
                     call store_npa(det,ri,rf,vi,flux,passive=.True.)
                 enddo gyro_range_loop
@@ -10814,19 +10805,13 @@ subroutine pnpa_mc
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        minpos = minloc(abs(inter_grid%r - particles%fast_ion(iion)%r))
-                        i = minpos(1)
-                        states=rates * fast_ion%weight * beam_grid%dv &
-                               / (((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
-                               * inter_grid%dphi*inter_grid%dz) / ngamma
+                        states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
 
                         !! Store NPA Flux
-                        flux = (dtheta/(2*pi))*sum(states) &
-                               * ((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
-                               * inter_grid%dphi*inter_grid%dz
+                        flux = (dtheta/(2*pi))*sum(states)*(fast_ion%r*inter_grid%dv)
                         spread_loop: do it=1,25
                             theta = gyrange(1,ir) + (it-0.5)*dtheta/25
                             call gyro_trajectory(gs, theta, ri, vi)
@@ -10861,18 +10846,13 @@ subroutine pnpa_mc
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                minpos = minloc(abs(inter_grid%r - particles%fast_ion(iion)%r))
-                i = minpos(1)
-                states=rates * fast_ion%weight * beam_grid%dv &
-                       / (((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
-                       * inter_grid%dphi*inter_grid%dz) / ngamma
+                states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*inter_grid%dv)/ngamma
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
 
                 !! Store NPA Flux
-                flux = sum(states)*((inter_grid%r(i)+inter_grid%dr)**2 - inter_grid%r(i)**2) &
-                       * inter_grid%dphi*inter_grid%dz
+                flux = sum(states)*(fast_ion%r*inter_grid%dv)
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class,passive=.True.)
             endif
         enddo gamma_loop

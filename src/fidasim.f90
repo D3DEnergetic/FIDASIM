@@ -10366,14 +10366,13 @@ subroutine pfida_mc
     real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ntrack, ir
     type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
+    integer :: ntrack 
     logical :: los_intersect
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
-    integer(Int32), dimension(1) :: minpos
 
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
@@ -10384,19 +10383,20 @@ subroutine pfida_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c,ir,&
-    !$OMP& randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi,minpos)
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c,&
+    !$OMP& randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
-         if(particles%axisym) then
-             !! Pick random toroidal angle
-             call randu(randomu)
-             phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-         else
-             phi = fast_ion%phi
-         endif
+            if(particles%axisym) then
+                !! Pick random toroidal angle
+                call randu(randomu)
+             !!!phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = pass_grid%phi(1)+pass_grid%nphi*pass_grid%dphi*randomu(1)
+            else
+                phi = fast_ion%phi
+            endif
             s = sin(phi)
             c = cos(phi)
 
@@ -10851,8 +10851,6 @@ subroutine pnpa_mc
     real(Float64), dimension(2,4) :: gyrange
     real(Float64) :: s,c
     real(Float64), dimension(1) :: randomu
-    integer(Int32) :: i
-    integer(Int32), dimension(1) :: minpos
 
     ngamma = 1
     if(particles%axisym.or.(inputs%dist_type.eq.2)) then
@@ -10863,19 +10861,20 @@ subroutine pnpa_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma,i, &
-    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta,minpos)
+    !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
+    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
-         if(particles%axisym) then
-             !! Pick random toroidal angle
-             call randu(randomu)
-             phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
-         else
-             phi = fast_ion%phi
-         endif
+            if(particles%axisym) then
+                !! Pick random toroidal angle
+                call randu(randomu)
+            !!!phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = pass_grid%phi(1)+pass_grid%nphi*pass_grid%dphi*randomu(1)
+            else
+                phi = fast_ion%phi
+            endif
             s = sin(phi)
             c = cos(phi)
 

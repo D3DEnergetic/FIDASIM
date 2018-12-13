@@ -10392,7 +10392,6 @@ subroutine pfida_mc
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-             !!!phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
                 phi = pass_grid%phi(1)+pass_grid%nphi*pass_grid%dphi*randomu(1)
             else
                 phi = fast_ion%phi
@@ -10430,7 +10429,13 @@ subroutine pfida_mc
             if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            states=rates * fast_ion%weight * beam_grid%dv / (fast_ion%r * pass_grid%dv) / ngamma
+            if(particles%axisym) then
+                states=rates*fast_ion%weight/(fast_ion%delta_phi/(2*pi)) &
+                       *(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
+                       *beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+            else
+                states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+            endif
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
@@ -10869,7 +10874,6 @@ subroutine pnpa_mc
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-            !!!phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
                 phi = pass_grid%phi(1)+pass_grid%nphi*pass_grid%dphi*randomu(1)
             else
                 phi = fast_ion%phi
@@ -10913,7 +10917,13 @@ subroutine pnpa_mc
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                        if(particles%axisym) then
+                            states=rates*fast_ion%weight/(fast_ion%delta_phi/(2*pi)) &
+                                   *(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
+                                   *beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                        else
+                            states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                        endif
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
@@ -10954,7 +10964,13 @@ subroutine pnpa_mc
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                if(particles%axisym) then
+                    states=rates*fast_ion%weight/(fast_ion%delta_phi/(2*pi)) &
+                           *(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
+                           *beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                else
+                    states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                endif
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)

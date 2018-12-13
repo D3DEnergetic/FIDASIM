@@ -6639,7 +6639,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     real(Float64) :: dT, dt1, inv_50, t
-    real(Float64) :: x, y, z, r
+    real(Float64) :: s, c, phi
     real(Float64), dimension(3) :: dt_arr, dr !! Need to make this rzphi
     real(Float64), dimension(3) :: vn, vn_cyl
     real(Float64), dimension(3) :: ri, ri_cyl, ri_tmp
@@ -6665,11 +6665,11 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(2) = pass_grid%nz
     gdims(3) = pass_grid%nphi
 
-    r = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
-
-    vn_cyl(1) = (ri(1)/r)*vn(1) + (ri(2)/r)*vn(2)
+    phi = modulo(atan2(rin(2),rin(1)),2*pi)
+    s = sin(phi) ; c = cos(phi)
+    vn_cyl(1) = c*vn(1) + s*vn(2)
+    vn_cyl(3) = -s*vn(1) + c*vn(2)
     vn_cyl(2) = vn(3)
-    vn_cyl(3) = -(ri(2)/(r*r))*vn(1) + (ri(1)/(r*r))*vn(2)
 
     do i=1,3
         !! sgn is in R-Z-Phi coordinates
@@ -10667,14 +10667,13 @@ subroutine pnpa_f
     enddo loop_over_cells
     !$OMP END PARALLEL DO
 
-    npart = pnpa%npart
 #ifdef _MPI
-    call parallel_sum(npart)
+    call parallel_sum(pnpa%npart)
     call parallel_sum(pnpa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') npart
+        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') pnpa%npart
     endif
 
 end subroutine pnpa_f
@@ -10968,14 +10967,13 @@ subroutine pnpa_mc
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
-    npart = pnpa%npart
 #ifdef _MPI
-    call parallel_sum(npart)
+    call parallel_sum(pnpa%npart)
     call parallel_sum(pnpa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') npart
+        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') pnpa%npart
     endif
 
 end subroutine pnpa_mc

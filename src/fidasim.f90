@@ -254,10 +254,6 @@ type InterpolationGrid
         !+ Z values [cm]
     real(Float64), dimension(:),   allocatable :: phi
         !+ Angular values [rad]
-    real(Float64), dimension(:,:), allocatable :: r2d
-        !+ 2D R grid [cm]
-    real(Float64), dimension(:,:), allocatable :: z2d
-        !+ 2D Z grid [cm]
     integer(Int32) :: ntrack
         !+ Maximum number of cells for particle tracking
     integer(Int32) :: ngrid
@@ -2976,8 +2972,6 @@ subroutine read_equilibrium
     inter_grid%dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
 
     allocate(inter_grid%r(inter_grid%nr),inter_grid%z(inter_grid%nz),inter_grid%phi(inter_grid%nphi))
-    allocate(inter_grid%r2d(inter_grid%nr,inter_grid%nz))
-    allocate(inter_grid%z2d(inter_grid%nr,inter_grid%nz))
     allocate(p_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     allocate(f_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     allocate(denn3d(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
@@ -2991,8 +2985,6 @@ subroutine read_equilibrium
     else
         inter_grid%phi=0.d0
     endif
-    call h5ltread_dataset_double_f(gid, "/plasma/r2d", inter_grid%r2d, dims, error)
-    call h5ltread_dataset_double_f(gid, "/plasma/z2d", inter_grid%z2d, dims, error)
 
     inter_grid%dr = abs(inter_grid%r(2)-inter_grid%r(1))
     inter_grid%dz = abs(inter_grid%z(2)-inter_grid%z(1))

@@ -2247,6 +2247,94 @@ subroutine make_pass_grid
     integer :: nr, nz, nphi
     integer(Int32) :: i, j, k, n
     logical :: inp
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!! New code for all of RZ space possibl 
+!!!!pass_grid_chan_loop: do i=1,spec_chords%nchan
+!!!!    r0 = lenses(:,i)spec_chords%los(i)%lens_uvw
+!!!!    v0 = axes(:,i)  spec_chords%los(i)%axis_uvw
+!!!!    v0 = v0/norm2(v0)
+!!!!    call line_basis(r0,v0,basis)
+
+!!!!    call pass_grid_intersect(r0,v0,length,r_enter,r_exit)
+!!!!enddo pass_grid_chan_loop
+
+!!!!!!! Need to insert stuff from below above
+!!!!real(Float64), intent(out)                        :: length
+!!!!    !+ Intersection length [cm]
+!!!!real(Float64), dimension(3), intent(out)          :: r_enter
+!!!!    !+ Point where particle enters [[libfida:pass_grid]]
+!!!!real(Float64), dimension(3), intent(out)          :: r_exit
+!!!!    !+ Point where particle exits [[libfida:pass_grid]]
+
+!!!!real(Float64), dimension(6)            :: dt_arr
+!!!!real(Float64), dimension(6,3)          :: p_arr
+!!!!real(Float64)                          :: rmin,rmax,zmin,zmax,phimin,phimax,t
+!!!!real(Float64), dimension(3)            :: nz, n0, p
+!!!!real(Float64), dimension(3)            :: vertex111, vertex111_uvw
+!!!!real(Float64), dimension(3)            :: vertex112, vertex112_uvw
+!!!!real(Float64), dimension(3)            :: vertex211, vertex211_uvw
+!!!!real(Float64), dimension(3)            :: vertex121, vertex121_uvw
+!!!!real(Float64), dimension(3)            :: vertex122, vertex122_uvw
+!!!!real(Float64), dimension(3)            :: vertex212, vertex212_uvw
+
+!!!!integer, dimension(1) :: minpos, maxpos
+!!!!integer :: min_ind, max_ind
+
+!!!!nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
+!!!!rmin = pass_grid%r(1) ; rmax = pass_grid%r(pass_grid%nr)
+!!!!zmin = pass_grid%z(1) ; zmax = pass_grid%z(pass_grid%nz)
+!!!!phimin = pass_grid%phi(1) ; phimax = pass_grid%phi(pass_grid%nphi)
+
+!!!!!! Define vertices of the interpolation grid
+!!!!vertex111(1) = rmin   ; vertex111(2) = zmin   ; vertex111(3) = phimin
+!!!!vertex112 = vertex111 ; vertex211 = vertex111 ; vertex121 = vertex111
+!!!!vertex122 = vertex111 ; vertex212 = vertex111
+
+!!!!vertex112(3) = phimax
+!!!!vertex211(1) = rmax
+!!!!vertex121(2) = zmax
+!!!!vertex122(2) = zmax   ; vertex122(3) = phimax
+!!!!vertex212(1) = rmax   ; vertex212(3) = phimax
+
+!!!!call cyl_to_uvw(vertex111,vertex111_uvw)
+!!!!call cyl_to_uvw(vertex112,vertex112_uvw)
+!!!!call cyl_to_uvw(vertex211,vertex211_uvw)
+!!!!call cyl_to_uvw(vertex121,vertex121_uvw)
+!!!!call cyl_to_uvw(vertex122,vertex122_uvw)
+!!!!call cyl_to_uvw(vertex212,vertex212_uvw)
+
+!!!!!! Bottom and top horizontal planes
+!!!!call line_plane_intersect(r0, v0, vertex111_uvw, nz, p, t)
+!!!!dt_arr(3) = t
+!!!!p_arr(3,:) = p
+!!!!call line_plane_intersect(r0, v0, vertex121_uvw, nz, p, t)
+!!!!dt_arr(4) = t
+!!!!p_arr(4,:) = p
+
+!!!!!! First and second vertical planes
+!!!!call rz_normal_vector(vertex111_uvw, vertex211_uvw, vertex121_uvw, n0)
+!!!!call line_plane_intersect(r0, v0, vertex111_uvw, n0, p, t)
+!!!!dt_arr(5) = t
+!!!!p_arr(5,:) = p
+!!!!call rz_normal_vector(vertex112_uvw, vertex212_uvw, vertex122_uvw, n0)
+!!!!call line_plane_intersect(r0, v0, vertex112_uvw, n0, p, t)
+!!!!dt_arr(6) = t
+!!!!p_arr(6,:) = p
+
+!!!!!! Outputs
+!!!!minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
+!!!!min_ind = minpos(1)
+!!!!r_enter = p_arr(min_ind,:)
+
+!!!!maxpos = maxloc(dt_arr, mask=dt_arr.gt.0.d0)
+!!!!max_ind = maxpos(1)
+!!!!r_exit = p_arr(max_ind,:)
+
+!!!!length = sqrt(sum((r_exit - r_enter)**2))
+
+!!!!subroutine pass_grid_intersect
+    !!! END
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     xmin = beam_grid%xmin ; xmax = beam_grid%xmax
     ymin = beam_grid%ymin ; ymax = beam_grid%ymax
@@ -2455,6 +2543,7 @@ subroutine read_chords
     type(LOSElement), dimension(:), allocatable :: los_elem
     type(ParticleTrack), dimension(:), allocatable :: tracks
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
+    real(Float64) :: r_enter_cyl(3), r_exit_cyl(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(2) :: randomu
@@ -2539,13 +2628,23 @@ subroutine read_chords
             v0 = v0/norm2(v0)
             call line_basis(r0,v0,basis)
 
+            print*,'chord = ',i
             call pass_grid_intersect(r0,v0,length,r_enter,r_exit)
+            print*,'r_enter = ',r_enter
+         !!!call uvw_to_cyl(r_enter,r_enter_cyl)
+         !!!print*,'r_enter_cyl = ',r_enter_cyl
+            print*,'r_exit = ',r_exit
+         !!!call uvw_to_cyl(r_exit,r_exit_cyl)
+         !!!print*,'r_exit_cyl = ',r_exit_cyl
+            print*,'length = ',length
             if(length.le.0.d0) then
                 if(inputs%verbose.ge.1) then
                     WRITE(*,'("Channel ",i5," missed the passive neutral grid")') i
                 endif
                 cycle pass_grid_chan_loop
             endif
+            if(i.eq.3) stop
+            cycle pass_grid_chan_loop
 
             if(spot_size(i).le.0.d0) then
                 nc = 1
@@ -6171,15 +6270,18 @@ subroutine pass_grid_intersect(r0, v0, length, r_enter, r_exit)
     real(Float64), dimension(6,3)          :: p_arr
     real(Float64)                          :: rmin,rmax,zmin,zmax,phimin,phimax,t
     real(Float64), dimension(3)            :: nz, n0, p
+    real(Float64), dimension(3)            :: cyl_enter, cyl_exit
     real(Float64), dimension(3)            :: vertex111, vertex111_uvw
     real(Float64), dimension(3)            :: vertex112, vertex112_uvw
     real(Float64), dimension(3)            :: vertex211, vertex211_uvw
     real(Float64), dimension(3)            :: vertex121, vertex121_uvw
     real(Float64), dimension(3)            :: vertex122, vertex122_uvw
     real(Float64), dimension(3)            :: vertex212, vertex212_uvw
+    real(Float64)                          :: min_time, max_time
 
     integer, dimension(1) :: minpos, maxpos
-    integer :: min_ind, max_ind
+    integer :: min_ind, max_ind, npos, cnt
+    logical :: outside
 
     nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
     rmin = pass_grid%r(1) ; rmax = pass_grid%r(pass_grid%nr)
@@ -6231,15 +6333,63 @@ subroutine pass_grid_intersect(r0, v0, length, r_enter, r_exit)
     p_arr(6,:) = p
 
     !! Outputs
-    minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
-    min_ind = minpos(1)
-    r_enter = p_arr(min_ind,:)
+    cnt = 1
+    npos = count(dt_arr.gt.0.d0)
+    r_enter=0.d0
+    do while(outside)
+        minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
+        min_ind = minpos(1)
+        r_enter = p_arr(min_ind,:)
+        call uvw_to_cyl(r_enter,cyl_enter)
+        if((cyl_enter(1).lt.pass_grid%r(1)).or.(cyl_enter(1).gt.pass_grid%r(pass_grid%nr))) then
+            dt_arr(min_ind)=0.d0
+            outside = .True.
+        endif
+        if((cyl_enter(2).lt.pass_grid%z(1)).or.(cyl_enter(2).gt.pass_grid%z(pass_grid%nz))) then
+            dt_arr(min_ind)=0.d0
+            outside = .True.
+        endif
+        if((cyl_enter(3).lt.pass_grid%phi(1)).or.(cyl_enter(3).gt.pass_grid%phi(pass_grid%nphi))) then
+            dt_arr(min_ind)=0.d0
+            outside = .True.
+        endif
 
-    maxpos = maxloc(dt_arr, mask=dt_arr.gt.0.d0)
-    max_ind = maxpos(1)
-    r_exit = p_arr(max_ind,:)
+        if(cnt.le.npos) then
+            cnt = cnt + 1
+        else
+            exit
+        endif
+    enddo
 
-    length = sqrt(sum((r_exit - r_enter)**2))
+    cnt = 1
+    npos = count(dt_arr.gt.0.d0)
+    r_exit=0.d0
+    do while(outside)
+        maxpos = maxloc(dt_arr, mask=dt_arr.gt.0.d0)
+        max_ind = maxpos(1)
+        r_exit = p_arr(max_ind,:)
+        call uvw_to_cyl(r_exit,cyl_exit)
+        if((cyl_exit(1).lt.pass_grid%r(1)).or.(cyl_exit(1).gt.pass_grid%r(pass_grid%nr))) then
+            dt_arr(max_ind)=0.d0
+            outside = .True.
+        endif
+        if((cyl_exit(2).lt.pass_grid%z(1)).or.(cyl_exit(2).gt.pass_grid%z(pass_grid%nz))) then
+            dt_arr(max_ind)=0.d0
+            outside = .True.
+        endif
+        if((cyl_exit(3).lt.pass_grid%phi(1)).or.(cyl_exit(3).gt.pass_grid%phi(pass_grid%nphi))) then
+            dt_arr(max_ind)=0.d0
+            outside = .True.
+        endif
+
+        if(cnt.le.npos) then
+            cnt = cnt + 1
+        else
+            exit
+        endif
+    enddo
+
+    length = sqrt(sum((r_exit-r_enter)**2))
 
 end subroutine pass_grid_intersect
 

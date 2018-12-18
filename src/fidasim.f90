@@ -862,6 +862,8 @@ type NeutronRate
         !+ Neutron rate: rate(orbit_type) [neutrons/sec]
     real(Float64), dimension(:,:,:,:,:), allocatable :: weight
         !+ Neutron rate weight: weight(E,p,R,Z,Phi)
+    real(Float64), dimension(:,:,:), allocatable :: emis
+        !+ Neutron emissivity: emis(R,Z,Phi)
 end type NeutronRate
 
 type NeutralDensity
@@ -4622,6 +4624,7 @@ subroutine write_neutrons
     !+ Writes [[libfida:neutron]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(1) :: dim1
+    integer(HSIZE_T), dimension(3) :: dim3
     integer(HSIZE_T), dimension(5) :: dim5
     integer :: error
 
@@ -4660,6 +4663,8 @@ subroutine write_neutrons
         call h5ltmake_dataset_int_f(fid,"/nz",0,dim1,[fbm%nz], error)
         dim5 = shape(neutron%weight)
         call h5ltmake_compressed_dataset_double_f(fid, "/weight", 5, dim5, neutron%weight, error)
+        dim3 = shape(neutron%emis)
+        call h5ltmake_compressed_dataset_double_f(fid, "/emissivity", 3, dim3, neutron%emis, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/energy", 1, dim5(1:1), fbm%energy, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/pitch", 1, dim5(2:2), fbm%pitch, error)
         call h5ltmake_compressed_dataset_double_f(fid,"/r", 1, dim5(3:3), fbm%r, error)
@@ -4677,6 +4682,9 @@ subroutine write_neutrons
         call h5ltset_attribute_string_f(fid,"/weight", "description", &
              "Neutron Weight Function: weight(E,p,R,Z,Phi), rate = sum(f*weight)", error)
         call h5ltset_attribute_string_f(fid,"/weight", "units","neutrons*cm^3*dE*dp/fast-ion*s", error)
+        call h5ltset_attribute_string_f(fid,"/emissivity", "description", &
+             "Neutron Emissivity: emissivity(R,Z,Phi), rate = sum(emissivity)", error)
+        call h5ltset_attribute_string_f(fid,"/emissivity", "units","neutrons*cm^3/fast-ion*s", error)
 
         call h5ltset_attribute_string_f(fid,"/energy","description", &
              "Energy array", error)
@@ -10107,6 +10115,8 @@ subroutine neutron_f
     if(inputs%calc_neutron.ge.2) then
         allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
         neutron%weight = 0.d0
+        allocate(neutron%emis(fbm%nr,fbm%nz,fbm%nphi))
+        neutron%emis = 0.d0
     endif
 
     ngamma = 20
@@ -10155,7 +10165,12 @@ subroutine neutron_f
                             call get_neutron_rate(plasma, erel, rate)
                             if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
-                                                                 + rate*factor
+                                                                 + rate * factor
+                                !$OMP CRITICAL(neutron_emis)
+                                neutron%emis(ir,iz,iphi) = neutron%emis(ir,iz,iphi) &
+                                                                 + rate * fbm%f(ie,ip,ir,iz,iphi) &
+                                                                 * factor
+                                !$OMP END CRITICAL(neutron_emis)
                             endif
 
                             rate = rate*fbm%f(ie,ip,ir,iz,iphi)*factor
@@ -10171,7 +10186,10 @@ subroutine neutron_f
 
 #ifdef _MPI
     call parallel_sum(neutron%rate)
-    if(inputs%calc_neutron.ge.2) call parallel_sum(neutron%weight)
+    if(inputs%calc_neutron.ge.2) then
+        call parallel_sum(neutron%weight)
+        call parallel_sum(neutron%emis)
+    endif
 #endif
 
     if(inputs%verbose.ge.1) then

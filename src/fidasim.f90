@@ -2323,7 +2323,6 @@ subroutine make_pass_grid
     !!Collect all LOS info
     allocate(r0_arr(3,  spec_nchan+npa_nchan), v0_arr(3,  spec_nchan+npa_nchan))
 
-!!! Double check that this works
     r0_arr(:,1:spec_nchan) = lenses
     v0_arr(:,1:spec_nchan) = axes
     r0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = d_cent
@@ -2355,12 +2354,6 @@ subroutine make_pass_grid
         r0 = r0_arr(:,i)
         v0 = v0_arr(:,i)
         v0 = v0/norm2(v0)
-        if(i.le.3) then
-         !!!print*,''
-         !!!print*,'Chan = ',i
-         !!!print*,'r0 = ',r0
-         !!!print*,'v0 = ',v0
-        endif
 
         !! Calculate intersection with inner and outer cylinders of inter_grid
         call line_circle_intersect(r0, v0, vertex111_uvw, p_arr(1,:), dt_arr(1))
@@ -2434,28 +2427,17 @@ subroutine make_pass_grid
                 cycle los_loop
             endif
         enddo exit_loop
-        if(i.le.3) then
-         !!!print*,'p_enter = ',p_enter
-         !!!print*,'p_exit  = ',p_exit 
-        endif
 
         phi(1,i) = modulo(cyl_enter(3),2*pi)    !! Phi enter
         phi(2,i) = modulo(cyl_exit(3),2*pi)     !! Phi exit
-        if(i.le.3) then
-         !!!print*,'phi_enter = ',phi(1,i)
-         !!!print*,'phi_exit = ',phi(2,i)
-        endif
     enddo los_loop
 
     phimin = minval(phi(:,:),mask=phi(:,:).ge.0.d0)
     phimax = maxval(phi(:,:),mask=phi(:,:).ge.0.d0)
     if(abs(phimax-phimin).lt.0.001) then
-        phimax = phimax + 0.1
-        phimin = phimin - 0.1
+        phimax = modulo((phimax + 0.4),2*pi)
+        phimin = modulo((phimin - 0.4),2*pi)
     endif
- !!!print*,''
- !!!print*,'phimin = ',phimin
- !!!print*,'phimax = ',phimax
 
     pass_grid%dphi = 0.1
     pass_grid%nphi = int(ceiling((phimax-phimin)/pass_grid%dphi))
@@ -2620,13 +2602,11 @@ subroutine read_chords
     call h5ltpath_valid_f(fid, "/spec", .True., path_valid, error)
     if(.not.path_valid) then
         if(inputs%verbose.ge.1) then
-            !!! This write statement could be redundant
             write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
             write(*,'(a)') 'Continuing without spectral diagnostics'
         endif
         inputs%calc_spec = 0
         inputs%calc_fida = 0
-        !!! Maybe take out or leave for insurance
         inputs%calc_pfida = 0
         inputs%calc_bes = 0
         inputs%calc_dcx = 0
@@ -2930,7 +2910,6 @@ subroutine read_npa
     allocate(d_shape(npa_chords%nchan))
     allocate(npa_chords%radius(npa_chords%nchan))
     allocate(npa_chords%det(npa_chords%nchan))
-    !!! I wonder if this might need to change for the weight calculations
     allocate(npa_chords%phit(beam_grid%nx, &
                              beam_grid%ny, &
                              beam_grid%nz, &

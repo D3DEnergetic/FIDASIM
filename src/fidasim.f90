@@ -7193,7 +7193,7 @@ subroutine bb_cx_rates(denn, vi, vn, rates)
             ebi=1
             c%b1=1.0 ; c%b2=0.0
         else
-            ebi=neb
+            ebi=neb-1
             c%b1=0.0 ; c%b2=1.0
         endif
     endif

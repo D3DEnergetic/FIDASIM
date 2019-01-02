@@ -53,21 +53,17 @@ integer, parameter :: thermal_ion = 2
     !+ Identifier for a thermal ion
 
 !! Physical units
-real(Float64), parameter :: e_amu = 5.48579909070d-4
+real(Float64), parameter :: e_amu = 5.485799093287202d-4
     !+ Atomic mass of an electron [amu]
-real(Float64), parameter :: H1_amu = 1.007276466879d0
-    !+ Atomic mass of Hydrogen-1 (protium) [amu]
-real(Float64), parameter :: H2_amu = 2.013553212745d0
-    !+ Atomic mass of Hydrogen-2 (deuterium) [amu]
-real(Float64), parameter :: H3_amu = 3.01550071632d0
-    !+ Atomic mass of Hydrogen-3 (tritium) [amu]
-real(Float64), parameter :: He3_amu = 3.01602931914d0
-    !+ Atomic mass of Helium-3 [amu]
+real(Float64), parameter :: H_1_amu = 1.00782504d0
+    !+ Atomic mass of Hydrogen-1 [amu]
+real(Float64), parameter :: H_2_amu = 2.0141017778d0
+    !+ Atomic mass of Hydrogen-2 [amu]
 real(Float64), parameter :: B5_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
 real(Float64), parameter :: C6_amu = 12.011d0
     !+ Atomic mass of Carbon [amu]
-real(Float64), parameter :: mass_u    = 1.660539040d-27
+real(Float64), parameter :: mass_u    = 1.6605402d-27
     !+ Atomic mass unit [kg]
 real(Float64), parameter :: e0        = 1.60217733d-19
     !+ Electron charge [C]
@@ -936,10 +932,6 @@ type SimulationInputs
         !+ FIDASIM output/input file containing beam neutral density.
         !+ Used when [[SimulationInputs:load_neutrals]] is set.
 
-    !! Random Number Generator Settings
-    integer :: seed
-        !+ Random number generator seed
-
     !! Monte Carlo settings
     integer(Int64) :: n_fida
         !+ Number of Active FIDA mc markers
@@ -1069,7 +1061,7 @@ type GyroSurface
         !+ Particle speed
     real(Float64) :: omega = 0.d0
         !+ Ion gyro-frequency
-    real(Float64), dimension(3)   :: axes = 0.d0
+    real(Float64), dimension(3)   :: axes
         !+ Semi-axes of the hyperboloid, i.e. a, b, c coefficients
     real(Float64), dimension(3)   :: center = 0.d0
         !+ Center of the gyrosurface
@@ -1827,7 +1819,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron, seed
+    integer            :: pathlen, calc_neutron
     integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
@@ -1846,7 +1838,7 @@ subroutine read_inputs
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_nbi,calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
-        calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, no_flr, split, &
+        calc_pfida, calc_npa, calc_pnpa,calc_birth, no_flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
@@ -1873,7 +1865,6 @@ subroutine read_inputs
     shot=0
     time=0
     runid="0"
-    seed = -1
     calc_brems=0
     calc_nbi=0
     calc_bes=0
@@ -1949,10 +1940,6 @@ subroutine read_inputs
     inputs%equilibrium_file=equilibrium_file
     inputs%distribution_file=distribution_file
     inputs%neutrals_file=neutrals_file
-
-    !! RNG seed
-    inputs%seed = seed
-    if(inputs%seed.lt.0) inputs%seed = rng_seed()
 
     !!Simulation Switches
     if((calc_brems+calc_bes+calc_dcx+calc_halo+&
@@ -3264,7 +3251,7 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(5) :: dims
-    real(Float64) :: denp_tot
+    real(Float64) :: dummy(1), denp_tot
     integer :: ir
     logical :: path_valid
 
@@ -3332,20 +3319,30 @@ subroutine read_f(fid, error)
         fbm%dphi = abs(fbm%phi(2)-fbm%phi(1))
     endif
 
-    fbm%emin = minval(fbm%energy,1)
-    fbm%emax = maxval(fbm%energy,1)
+    dummy = minval(fbm%energy)
+    fbm%emin = dummy(1)
+    dummy = maxval(fbm%energy)
+    fbm%emax = dummy(1)
     fbm%e_range = fbm%emax - fbm%emin
-    fbm%pmin = minval(fbm%pitch,1)
-    fbm%pmax = maxval(fbm%pitch,1)
+    dummy = minval(fbm%pitch)
+    fbm%pmin = dummy(1)
+    dummy = maxval(fbm%pitch)
+    fbm%pmax = dummy(1)
     fbm%p_range = fbm%pmax - fbm%pmin
-    fbm%rmin = minval(fbm%r,1)
-    fbm%rmax = maxval(fbm%r,1)
+    dummy = minval(fbm%r)
+    fbm%rmin = dummy(1)
+    dummy = maxval(fbm%r)
+    fbm%rmax = dummy(1)
     fbm%r_range = fbm%rmax - fbm%rmin
-    fbm%zmin = minval(fbm%z,1)
-    fbm%zmax = maxval(fbm%z,1)
+    dummy = minval(fbm%z)
+    fbm%zmin = dummy(1)
+    dummy = maxval(fbm%z)
+    fbm%zmax = dummy(1)
     fbm%z_range = fbm%zmax - fbm%zmin
-    fbm%phimin = minval(fbm%phi,1)
-    fbm%phimax = maxval(fbm%phi,1)
+    dummy = minval(fbm%phi)
+    fbm%phimin = dummy(1)
+    dummy = maxval(fbm%phi)
+    fbm%phimax = dummy(1)
     fbm%phi_range = fbm%phimax - fbm%phimin
 
     denp_tot = 0.0
@@ -3401,6 +3398,7 @@ subroutine read_mc(fid, error)
     integer(Int32) :: i,j,ii,ir,iz,iphi,nphi
     real(Float64) :: phi,phi_enter,phi_exit,delta_phi,xp,yp,zp
     real(Float64), dimension(3) :: uvw,xyz,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
+    integer(Int32), dimension(1) :: minpos
     real(Float64), dimension(:), allocatable :: weight
     type(LocalEMFields) :: fields
     integer :: cnt,num
@@ -3473,13 +3471,14 @@ subroutine read_mc(fid, error)
     cnt=0
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
-    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,fields,uvw,phi,ri,vi, &
+    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,minpos,fields,uvw,phi,ri,vi, &
     !$OMP& delta_phi,phi_enter,phi_exit,C_xyz,xyz,xp,yp,zp,dum,inp)
     particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
         endif
 
+        particles%fast_ion(i)%phi = modulo(particles%fast_ion(i)%phi, 2*pi)
         if(particles%axisym) then
             uvw = [particles%fast_ion(i)%r, 0.d0 , particles%fast_ion(i)%z]
         else
@@ -3515,9 +3514,12 @@ subroutine read_mc(fid, error)
             particles%fast_ion(i)%weight = weight(i)/beam_grid%dv
         endif
 
-        ir = minloc(abs(inter_grid%r - particles%fast_ion(i)%r),1)
-        iphi = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi),1)
-        iz = minloc(abs(inter_grid%z - particles%fast_ion(i)%z),1)
+        minpos = minloc(abs(inter_grid%r - particles%fast_ion(i)%r))
+        ir = minpos(1)
+        minpos = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi))
+        iphi = minpos(1)
+        minpos = minloc(abs(inter_grid%z - particles%fast_ion(i)%z))
+        iz = minpos(1)
 
         !$OMP ATOMIC UPDATE
         equil%plasma(ir,iz,iphi)%denf = equil%plasma(ir,iz,iphi)%denf + weight(i) / &
@@ -3537,7 +3539,7 @@ subroutine read_mc(fid, error)
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') dist_type_name
-        write(*,'(T2,"Number of mc particles: ",i10)') particles%nparticle
+        write(*,'(T2,"Number of mc particles: ",i9)') particles%nparticle
         write(*,'(T2,"Number of orbit classes: ",i6)') particles%nclass
         write(*,*) ''
     endif
@@ -3943,7 +3945,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
 
     integer(HSIZE_T), dimension(1) :: dim1
     integer(HSIZE_T), dimension(3) :: dim3
-    logical :: path_valid, err
+    logical :: path_valid
     integer :: i, j, error
     real(Float64) :: emin, emax, tmin, tmax, rmin
 
@@ -3951,33 +3953,6 @@ subroutine read_nuclear_rates(fid, grp, rates)
     if(.not.path_valid) then
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_NUCLEAR_RATES: Unknown nuclear interaction: ', trim(grp)
-            write(*,'(a)') 'Continuing without neutron calculation'
-        endif
-        inputs%calc_neutron=0
-        return
-    endif
-
-    dim1 = [2]
-    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", rates%bt_amu, dim1, error)
-
-    if(abs(inputs%ab-rates%bt_amu(1)).gt.0.2) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
-                rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
-        endif
-        err = .True.
-    endif
-
-    if(abs(inputs%ai-rates%bt_amu(2)).gt.0.2) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
-                 rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
-        endif
-        err = .True.
-    endif
-
-    if(err) then
-        if(inputs%verbose.ge.0) then
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
@@ -4001,6 +3976,23 @@ subroutine read_nuclear_rates(fid, grp, rates)
     allocate(rates%log_rate(rates%nenergy, &
                             rates%ntemp,   &
                             rates%nbranch))
+
+    dim1 = [2]
+    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", rates%bt_amu, dim1, error)
+
+    if(abs(inputs%ab-rates%bt_amu(1)).gt.0.2) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
+                rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
+        endif
+    endif
+
+    if(abs(inputs%ai-rates%bt_amu(2)).gt.0.2) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
+                 rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
+        endif
+    endif
 
     dim3 = [rates%nenergy, rates%ntemp, rates%nbranch]
     call h5ltread_dataset_double_f(fid, grp//"/fusion", rates%log_rate, dim3, error)
@@ -4077,9 +4069,7 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    if(inputs%calc_neutron.ge.1) then
-        call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
-    endif
+    call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
 
     !!Close file
     call h5fclose_f(fid, error)
@@ -4386,7 +4376,7 @@ subroutine write_neutrals
     call h5ltset_attribute_string_f(fid,"/nlevel","description", &
          "Number of atomic energy levels", error)
 
-    if(inputs%calc_nbi_dens.ge.1) then
+    if(inputs%calc_bes.ge.1) then
         call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
              neut%full, error)
         call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
@@ -4405,7 +4395,7 @@ subroutine write_neutrals
         call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
     endif
 
-    if(inputs%calc_dcx_dens.ge.1) then
+    if(inputs%calc_dcx.ge.1) then
         call h5ltmake_compressed_dataset_double_f(fid, "/dcxdens", 4, dims, &
              neut%dcx, error)
 
@@ -4414,7 +4404,7 @@ subroutine write_neutrals
         call h5ltset_attribute_string_f(fid,"/dcxdens","units","neutrals*cm^-3",error)
     endif
 
-    if(inputs%calc_halo_dens.ge.1) then
+    if(inputs%calc_halo.ge.1) then
         call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
              neut%halo, error)
 
@@ -5927,7 +5917,7 @@ subroutine gyro_range(b, gs, gyrange, nrange)
         !+ Number of ranges. `1 <= nrange <= 4`
 
     integer :: nb, i, j, ninter
-    logical :: in_gs
+    logical :: in_gs, bin_gs
     logical, dimension(8) :: cross = .False.
     real(Float64) :: t_p, th1, th2, dth
     real(Float64), dimension(2) :: u_cur, t_i
@@ -5936,14 +5926,13 @@ subroutine gyro_range(b, gs, gyrange, nrange)
     real(Float64), dimension(3,50) :: bedge
 
     nrange = 0
-    gyrange = 0.d0
-
     call line_plane_intersect(gs%center, gs%basis(:,3), b%origin, b%basis(:,3), rc, t_p)
     if(t_p.eq.0.0) return
 
     call boundary_edge(b, bedge, nb)
     p_pre = bedge(:,1)
     in_gs = in_gyro_surface(gs, p_pre)
+    bin_gs = .False.
 
     ninter = 0
     u = 0.d0
@@ -5966,7 +5955,8 @@ subroutine gyro_range(b, gs, gyrange, nrange)
         p_pre = p_cur
     enddo boundary_loop
 
-    if(ninter.eq.0) then
+    gyrange = 0.d0
+    if((ninter.eq.0).and.(.not.bin_gs)) then
         if(in_boundary(b, rc)) then
             nrange = 1
             gyrange(:,1) = [0.d0,2*pi]
@@ -5987,14 +5977,6 @@ subroutine gyro_range(b, gs, gyrange, nrange)
                 gyrange(:,nrange) = [th2, -dth]
             endif
         endif
-        !! OpenMP with multiple threads is duplicating gyro-ranges for some markers
-        !! causing double counting and I don't know why.
-        !! It should be very unlikely for multiple gyro-ranges to occur so for
-        !! now I'm including this cludge to force only one gyro-range when using
-        !! OpenMP.
-#ifdef _OMP
-        if(nrange.eq.1) exit
-#endif
     enddo
 
 end subroutine gyro_range
@@ -6661,6 +6643,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
     integer, dimension(3) :: sgn
     integer, dimension(3) :: gdims
+    integer, dimension(1) :: minpos
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
 
@@ -6701,7 +6684,8 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             los_inter = .True.
         endif
         dt_arr = abs(( (ri_cell + 0.5*dr) - ri)*inv_vn)
-        mind = minloc(dt_arr,1)
+        minpos = minloc(dt_arr)
+        mind = minpos(1)
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
         call in_plasma(ri_tmp,in_plasma2)
@@ -7129,7 +7113,8 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,zmin,dz,nz,phimin,dphi,nphi,rout,zout
 
     rp = max(rout,rmin)
     zp = max(zout,zmin)
-    phip = max(phiout,phimin)
+    phi = modulo(phiout,2*pi)
+    phip = max(phi,phimin)
     i = floor((rp-rmin)/dr)+1
     j = floor((zp-zmin)/dz)+1
     k = floor((phip-phimin)/dphi)+1
@@ -7841,12 +7826,15 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam
     integer(Int32), dimension(2) :: epi
+    integer(Int32), dimension(1) :: dummy
     real(Float64) :: R, Phi, Z
     real(Float64) :: dE, dp
     integer :: err
 
-    epi(1) = minloc(abs(fbm%energy - energy),1)
-    epi(2) = minloc(abs(fbm%pitch - pitch),1)
+    dummy = minloc(abs(fbm%energy - energy))
+    epi(1) = dummy(1)
+    dummy = minloc(abs(fbm%pitch - pitch))
+    epi(2) = dummy(1)
     dE = abs(fbm%energy(epi(1)) - energy)
     dp = abs(fbm%pitch(epi(2)) - pitch)
 
@@ -8086,7 +8074,7 @@ subroutine bb_cx_rates(denn, vi, vn, rates)
             ebi=1
             c%b1=1.0 ; c%b2=0.0
         else
-            ebi=neb-1
+            ebi=neb
             c%b1=0.0 ; c%b2=1.0
         endif
     endif
@@ -8544,8 +8532,6 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
     real(Float64) :: photons, vabs, dt, dstep, dis,max_dis
     real(Float64), dimension(3) :: r0
     real(Float64), dimension(nlevs) :: dens
-    logical :: inp
-    integer :: ncross
 
     if(present(dstep_in)) then
         dstep=dstep_in
@@ -8561,20 +8547,12 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
     call get_plasma(plasma,pos=ri)
     r0 = ri
     dis = 0.d0
-    ncross = 0
-    inp = plasma%in_plasma
     do while (dis.le.max_dis)
         call colrad(plasma,beam_ion,vi,dt,states,dens,photons)
         r0 = r0 + vi*dt
         dis = dis + dstep
         call get_plasma(plasma,pos=r0)
-        if(inp.neqv.plasma%in_plasma) then
-            ncross = ncross + 1
-            inp = plasma%in_plasma
-        endif
     enddo
-
-    if(ncross.gt.1) states = 0.0
 
 end subroutine attenuate
 
@@ -9468,9 +9446,9 @@ subroutine ndmc
     logical :: err
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') inputs%n_nbi
+        write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi
         if(inputs%calc_birth.ge.1) then
-            write(*,'(T6,"# of birth markers: 3 x",i10)') int(inputs%n_nbi*inputs%n_birth)
+            write(*,'(T6,"# of birth markers: 3 x",i9)') int(inputs%n_nbi*inputs%n_birth)
         endif
     endif
 
@@ -9670,7 +9648,6 @@ subroutine dcx
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-    real(Float64) :: fi_correction
 
     halo_iter_dens(dcx_type) = 0.d0
     papprox=0.d0
@@ -9704,10 +9681,10 @@ subroutine dcx
     call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
 
     if(inputs%verbose.ge.1) then
-       write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
+       write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -9726,8 +9703,7 @@ subroutine dcx
             call get_plasma(plasma,pos=tracks(1)%pos)
 
             !! Weight CX rates by ion source density
-            states = rates*plasma%denp
-            fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
+            states = rates*(plasma%denp - plasma%denf)
 
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -9736,8 +9712,7 @@ subroutine dcx
                 call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
                 if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
-                    photons = fi_correction*photons !! Correct for including fast-ions in states
-                    call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
+                  call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
                 endif
             enddo loop_along_track
         enddo loop_over_dcx
@@ -9787,7 +9762,6 @@ subroutine halo
     real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
     integer :: prev_type  ! previous iteration
     integer :: cur_type  ! current iteration
-    real(Float64) :: fi_correction
 
 
     prev_type = fida_type
@@ -9846,12 +9820,12 @@ subroutine halo
         call get_nlaunch(n_halo, papprox, nlaunch)
 
         if(inputs%verbose.ge.1) then
-            write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
+            write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
 
         local_iter_dens = halo_iter_dens(cur_type)
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice,fi_correction) &
+        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice) &
         !$OMP& reduction(+: local_iter_dens )
         loop_over_cells: do ic=istart,ncell,istep
 #ifdef _OMP
@@ -9879,7 +9853,6 @@ subroutine halo
 
                 !! Weight CX rates by ion source density
                 states = rates*plasma%denp
-                fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
 
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -9893,9 +9866,9 @@ subroutine halo
                     local_iter_dens = &
                         local_iter_dens + sum(denn)/nlaunch(i,j,k)
                     if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
-                        photons = fi_correction*photons !! Correct for including fast-ions in states
-                        call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
+                      call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                     endif
+
                 enddo loop_along_track
             enddo loop_over_halos
         enddo loop_over_cells
@@ -10219,7 +10192,7 @@ subroutine fida_f
 
     call get_nlaunch(inputs%n_fida, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
+        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -10322,7 +10295,7 @@ subroutine pfida_f
 
     call get_nlaunch_pass_grid(inputs%n_pfida, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
+        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -10401,7 +10374,7 @@ subroutine fida_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
@@ -10502,7 +10475,7 @@ subroutine pfida_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c,&
@@ -10830,7 +10803,7 @@ subroutine npa_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it, &
@@ -10984,7 +10957,7 @@ subroutine pnpa_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
@@ -11238,7 +11211,7 @@ subroutine neutron_mc
     real(Float64)  :: phi, s, c
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') particles%nparticle
+        write(*,'(T6,"# of markers: ",i9)') particles%nparticle
     endif
 
     rate=0.0
@@ -11434,7 +11407,7 @@ subroutine fida_weights_mc
 
     call get_nlaunch(10*inputs%n_fida,papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
+        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -11988,23 +11961,19 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
     !! ----------------------------------------------------------
+    seed = -1  !!If negative than random seed is used
     allocate(rng(max_threads))
 #ifdef _OMP
     do i=1,max_threads
-        if(inputs%seed.lt.0) then
-            call rng_init(rng(i), inputs%seed)
+        if(seed.lt.0) then
+            call rng_init(rng(i), seed)
         else
-            call rng_init(rng(i), inputs%seed + i)
+            call rng_init(rng(i), seed + i)
         endif
     enddo
 #else
-    call rng_init(rng(1), inputs%seed)
+    call rng_init(rng(1), seed)
 #endif
-    if(inputs%verbose.ge.1) then
-        write(*,'(a)') "---- Random Number Generator settings ----"
-        write(*,'(T2,"RNG Seed: ",i10)') inputs%seed
-        write(*,*) ''
-    endif
 
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------
@@ -12186,15 +12155,17 @@ program fidasim
             endif
 
             !! ---------- WRITE NEUTRALS ---------- !!
-            if(inputs%verbose.ge.1) then
-                write(*,*) 'write neutrals:    ' , time(time_start)
-            endif
+            if((inputs%calc_bes+inputs%calc_dcx+inputs%calc_halo).ge.1) then
+                if(inputs%verbose.ge.1) then
+                    write(*,*) 'write neutrals:    ' , time(time_start)
+                endif
 #ifdef _MPI
-            if(my_rank().eq.0) call write_neutrals()
+                if(my_rank().eq.0) call write_neutrals()
 #else
-            call write_neutrals()
+                call write_neutrals()
 #endif
-            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            endif
         endif
     endif
 

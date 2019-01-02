@@ -30,6 +30,8 @@ PRO check_grid, grid
     nz = grid.nz
     zero_int = {dims:0,type:'INT'}
     schema = {nr:zero_int, nz:zero_int, $
+              r2d:{dims:[nr,nz], type:'DOUBLE'}, $
+              z2d:{dims:[nr,nz], type:'DOUBLE'}, $
               r:{dims:[nr], type:'DOUBLE'}, $
               z:{dims:[nz], type:'DOUBLE'} }
 
@@ -47,6 +49,18 @@ PRO check_grid, grid
     w = where((indgen(nz) eq sort(grid.z)) ne 1, nw)
     if nw ne 0 then begin
         error,'z is not in ascending order'
+        err_status = 1
+    endif
+
+    w = where((grid.r eq grid.r2d[*,0]) ne 1, nw)
+    if nw ne 0 then begin
+        error,'r2d is defined incorrectly. Expected r == r2d[*,0]'
+        err_status = 1
+    endif
+
+    w = where((grid.z eq grid.z2d[0,*]) ne 1, nw)
+    if nw ne 0 then begin
+        error,'z2d is defined incorrectly. Expected z == z2d[0,*]'
         err_status = 1
     endif
 

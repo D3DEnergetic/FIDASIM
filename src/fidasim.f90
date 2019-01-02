@@ -2235,10 +2235,10 @@ subroutine make_pass_grid
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid_spec, path_valid_npa
 
-    real(Float64), dimension(4)                :: dt_arr, dt_arr_dum
-    real(Float64), dimension(4,3)              :: p_arr
     real(Float64), dimension(:,:), allocatable :: a_cent, d_cent, phi
     real(Float64), dimension(:,:), allocatable :: lenses, axes, r0_arr, v0_arr
+    real(Float64), dimension(4,3) :: p_arr
+    real(Float64), dimension(4) :: dt_arr, dt_arr_dum
     real(Float64), dimension(3) :: vertex111, vertex111_uvw, vertex111_cyl
     real(Float64), dimension(3) :: vertex221, vertex221_uvw, vertex221_cyl
     real(Float64), dimension(3) :: n0, nz, cyl_enter, cyl_exit
@@ -2580,7 +2580,6 @@ subroutine read_chords
     type(LOSElement), dimension(:), allocatable :: los_elem
     type(ParticleTrack), dimension(:), allocatable :: tracks
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
-    real(Float64) :: r_enter_cyl(3), r_exit_cyl(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(2) :: randomu
@@ -3065,7 +3064,7 @@ subroutine read_equilibrium
 
     integer :: impc, ic, ir, iz, iphi, it, ind(3), i
     type(LocalProfiles) :: plasma
-    real(Float64) :: photons, rmin, zmin, phimin
+    real(Float64) :: photons
     real(Float64), dimension(nlevs) :: rates, denn, rates_avg
     real(Float64), dimension(3) :: vi, random3
     integer :: error
@@ -5657,8 +5656,8 @@ subroutine line_circle_intersect(l0, l, p0, p, t)
 
     real(Float64), dimension(2) :: times
     logical, dimension(2) :: mask
-    real(Float64)               :: r, vx, vy, x0, y0
-    real(Float64)               :: radicand, npos
+    real(Float64) :: r, vx, vy, x0, y0
+    real(Float64) :: radicand, npos
 
     r = sqrt(p0(1) * p0(1) + p0(2) * p0(2))
     x0 = l0(1) ; y0 = l0(2)
@@ -6156,8 +6155,8 @@ end subroutine cyl_to_uvw
 
 subroutine uvw_to_cyl(uvw, cyl)
     !+ Convert machine coordinate `uvw` to cylindrical coordinate `cyl`
-    real(Float64), dimension(3), intent(in)   :: uvw
-    real(Float64), dimension(3), intent(out)  :: cyl
+    real(Float64), dimension(3), intent(in)  :: uvw
+    real(Float64), dimension(3), intent(out) :: cyl
 
     cyl(1) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     cyl(2) = uvw(3)
@@ -6185,26 +6184,24 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
         !+ Calculates a particles intersection length with the [[libfida:pass_grid]]
 
     real(Float64), dimension(3,6) :: ipnts
+    real(Float64), dimension(6,3) :: p_arr
+    real(Float64), dimension(3,3) :: basis
+    real(Float64), dimension(6) :: dt_arr, dt_arr_dum
+    real(Float64), dimension(3) :: nz, p, p0, p_dum, cyl_enter, cyl_exit
+    real(Float64), dimension(3) :: vertex111, vertex111_uvw, vertex112, vertex112_uvw
+    real(Float64), dimension(3) :: vertex211, vertex211_uvw, vertex121, vertex121_uvw
+    real(Float64), dimension(3) :: vertex122, vertex122_uvw, vertex212, vertex212_uvw
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: center
     real(Float64), dimension(3) :: lwh
     integer, dimension(6) :: side_inter
     integer, dimension(2) :: ind
-    integer :: i, j, nunique, ind1, ind2
-    logical :: pas = .False.
-
-!!! Recycle variables here
-    real(Float64), dimension(6)   :: dt_arr, dt_arr_dum
-    real(Float64), dimension(6,3) :: p_arr
-    real(Float64), dimension(3,3) :: basis
-    real(Float64), dimension(3)   :: nz, p, p0, p_dum, cyl_enter, cyl_exit
-    real(Float64), dimension(3)   :: vertex111, vertex111_uvw, vertex112, vertex112_uvw
-    real(Float64), dimension(3)   :: vertex211, vertex211_uvw, vertex121, vertex121_uvw
-    real(Float64), dimension(3)   :: vertex122, vertex122_uvw, vertex212, vertex212_uvw
-    real(Float64)         :: rmin,rmax,zmin,zmax,phimin,phimax,t,min_time, max_time
     integer, dimension(1) :: minpos, maxpos
-    integer               :: min_ind, max_ind, npos, cnt
-    logical               :: outside
+    real(Float64) :: rmin,rmax,zmin,zmax,phimin,phimax,t,min_time, max_time
+    integer :: i, j, nunique, ind1, ind2
+    integer :: min_ind, max_ind, npos, cnt
+    logical :: outside
+    logical :: pas = .False.
 
     if(present(passive)) pas = passive
 
@@ -6760,25 +6757,25 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
 
-    integer :: cc, i, ii, mind,ncross
-    integer, dimension(3) :: ind
-    logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
-    real(Float64) :: dT, dt1, inv_50, t
-    real(Float64) :: s, c, phi
-    real(Float64), dimension(3)   :: dt_arr, dr !! Need to make this rzphi
-    real(Float64), dimension(3)   :: vn, vn_cyl
-    real(Float64), dimension(3)   :: ri, ri_cyl, ri_tmp
-    real(Float64), dimension(3)   :: p, nz
     real(Float64), dimension(3,3) :: basis
-    real(Float64), dimension(3)   :: v_plane_cyl, v_plane
-    real(Float64), dimension(3)   :: h_plane_cyl, h_plane
-    real(Float64), dimension(3)   :: arc_cyl, arc
-    real(Float64), dimension(3)   :: redge, tedge
-    real(Float64), dimension(3)   :: redge_cyl, tedge_cyl
-    integer :: ir, iz, iphi
+    real(Float64), dimension(3) :: dt_arr, dr !! Need to make this rzphi
+    real(Float64), dimension(3) :: vn, vn_cyl
+    real(Float64), dimension(3) :: ri, ri_cyl, ri_tmp
+    real(Float64), dimension(3) :: p, nz
+    real(Float64), dimension(3) :: v_plane_cyl, v_plane
+    real(Float64), dimension(3) :: h_plane_cyl, h_plane
+    real(Float64), dimension(3) :: arc_cyl, arc
+    real(Float64), dimension(3) :: redge, tedge
+    real(Float64), dimension(3) :: redge_cyl, tedge_cyl
     integer, dimension(3) :: sgn
     integer, dimension(3) :: gdims
     integer, dimension(1) :: minpos
+    integer, dimension(3) :: ind
+    real(Float64) :: dT, dt1, inv_50, t
+    real(Float64) :: s, c, phi
+    integer :: cc, i, ii, mind,ncross
+    logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
+    integer :: ir, iz, iphi
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
 
@@ -8937,10 +8934,10 @@ subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
 
     logical, dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: mask
     real(Float64), dimension(pass_grid%ngrid) :: cdf
-    integer  :: c, i, j, k, nc, nm, ind(3)
-    integer  :: nmin = 5
     integer, dimension(1) :: randomi
     type(rng_type) :: r
+    integer :: c, i, j, k, nc, nm, ind(3)
+    integer :: nmin = 5
 
     !! Fill in minimum number of markers per cell
     nlaunch = 0
@@ -9158,7 +9155,7 @@ end subroutine mc_fastion
 
 subroutine mc_fastion_pass_grid(ind,fields,eb,ptch,denf,output_coords)
     !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:pass_grid]] index
-    integer, dimension(3), intent(in) :: ind
+    integer, dimension(3), intent(in)      :: ind
         !+ [[libfida:pass_grid]] index
     type(LocalEMFields), intent(out)       :: fields
         !+ Electromagnetic fields at the guiding center
@@ -9168,7 +9165,7 @@ subroutine mc_fastion_pass_grid(ind,fields,eb,ptch,denf,output_coords)
         !+ Pitch of the fast ion
     real(Float64), intent(out)             :: denf
         !+ Fast-ion density at guiding center
-    integer, intent(in), optional            :: output_coords
+    integer, intent(in), optional          :: output_coords
         !+ Indicates coordinate system of `fields`. Beam grid (0), machine (1) and cyl (2)
 
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam

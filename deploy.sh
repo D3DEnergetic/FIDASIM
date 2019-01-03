@@ -29,7 +29,7 @@ chmod 600 travis_key
 eval `ssh-agent -s`
 ssh-add travis_key
 
-git clone --branch=gh-pages $REPO gh-pages
+git clone --branch=gh-pages --depth 1 $REPO gh-pages
 
 if [[ $TRAVIS_BRANCH = release-* ]]; then
     cd gh-pages

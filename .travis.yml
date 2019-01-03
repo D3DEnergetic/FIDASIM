@@ -39,7 +39,7 @@ install:
 script:
   - travis_wait 60 make
   - ./fidasim
-  - travis_wait make docs CHECK_LINKS=n
+  - travis_wait 60 make docs CHECK_LINKS=n
 
 after_success:
   - cd $TRAVIS_BUILD_DIR

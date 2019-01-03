@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.2% of total for procedures.">139 statements</a>
+    title=" 1.2% of total for procedures.">142 statements</a>
      </li> 
      
      
@@ -1012,6 +1012,7 @@ public subroutine halo()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">max_papprox</span><span class="p">,</span><span class="n">dcx_dens</span><span class="p">,</span> <span class="n">halo_iteration_dens</span><span class="p">,</span><span class="n">seed_dcx</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">prev_type</span>  <span class="c">! previous iteration</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">cur_type</span>  <span class="c">! current iteration</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fi_correction</span>
 
 
     <span class="n">prev_type</span> <span class="o">=</span> <span class="n">fida_type</span>
@@ -1075,7 +1076,7 @@ public subroutine halo()
 
         <span class="n">local_iter_dens</span> <span class="o">=</span> <span class="n">halo_iter_dens</span><span class="p">(</span><span class="n">cur_type</span><span class="p">)</span>
         <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &amp;</span>
-        <span class="c">!$OMP&amp; ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice) &amp;</span>
+        <span class="c">!$OMP&amp; ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice,fi_correction) &amp;</span>
         <span class="c">!$OMP&amp; reduction(+: local_iter_dens )</span>
         <span class="n">loop_over_cells</span><span class="p">:</span> <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">ncell</span><span class="p">,</span><span class="n">istep</span>
 <span class="cp">#ifdef _OMP</span>
@@ -1103,6 +1104,7 @@ public subroutine halo()
 
                 <span class="c">!! Weight CX rates by ion source density</span>
                 <span class="n">states</span> <span class="o">=</span> <span class="n">rates</span><span class="o">*</span><span class="n">plasma</span><span class="p">%</span><span class="n">denp</span>
+                <span class="n">fi_correction</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">plasma</span><span class="p">%</span><span class="n">denp</span> <span class="o">-</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denf</span><span class="p">)</span><span class="o">/</span><span class="n">plasma</span><span class="p">%</span><span class="n">denp</span><span class="p">,</span><span class="mf">0.d0</span><span class="p">)</span>
 
                 <span class="n">loop_along_track</span><span class="p">:</span> <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ntrack</span>
                     <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">)</span>
@@ -1116,9 +1118,9 @@ public subroutine halo()
                     <span class="n">local_iter_dens</span> <span class="o">=</span> <span class="p">&amp;</span>
                         <span class="n">local_iter_dens</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">denn</span><span class="p">)</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span>
                     <span class="k">if</span><span class="p">((</span><span class="n">photons</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">                      call </span><span class="n">store_bes_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">photons</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">),</span><span class="n">halo_type</span><span class="p">)</span>
+<span class="k">                        </span><span class="n">photons</span> <span class="o">=</span> <span class="n">fi_correction</span><span class="o">*</span><span class="n">photons</span> <span class="c">!! Correct for including fast-ions in states</span>
+                        <span class="k">call </span><span class="n">store_bes_photons</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">jj</span><span class="p">)%</span><span class="n">pos</span><span class="p">,</span><span class="n">vihalo</span><span class="p">,</span><span class="n">photons</span><span class="o">/</span><span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">),</span><span class="n">halo_type</span><span class="p">)</span>
                     <span class="n">endif</span>
-
                 <span class="n">enddo</span> <span class="n">loop_along_track</span>
             <span class="n">enddo</span> <span class="n">loop_over_halos</span>
         <span class="n">enddo</span> <span class="n">loop_over_cells</span>
@@ -1187,7 +1189,7 @@ public subroutine halo()
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

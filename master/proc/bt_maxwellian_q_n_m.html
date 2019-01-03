@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.7% of total for procedures.">83 statements</a>
+    title=" 0.7% of total for procedures.">81 statements</a>
      </li> 
      
      
@@ -766,14 +766,14 @@ public function fqnm(a, b, c, d)
         <span class="c">!+Calculate de-excitation reaction rate</span>
 
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">dxc</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n_vr</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n_vr</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vr_max</span><span class="p">,</span> <span class="n">dvr</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vr</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fr</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n_vz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz_max</span><span class="p">,</span> <span class="n">dvz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">62</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">62</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fz</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vr</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vr</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vr</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fr</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n_vz</span> <span class="o">=</span> <span class="mi">60</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz_max</span><span class="p">,</span><span class="n">dvz</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vz</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vz</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">n_vz</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fz</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">T_per_amu</span><span class="p">,</span> <span class="n">eb_per_amu</span><span class="p">,</span> <span class="n">ared</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">sig_eff</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">zb</span><span class="p">,</span> <span class="n">u2_to_erel</span><span class="p">,</span> <span class="n">u2</span><span class="p">,</span> <span class="n">erel</span><span class="p">,</span> <span class="n">dE</span><span class="p">,</span> <span class="n">factor</span><span class="p">,</span> <span class="n">En</span><span class="p">,</span> <span class="n">Em</span><span class="p">,</span> <span class="n">v_therm</span>
 
@@ -785,14 +785,12 @@ public function fqnm(a, b, c, d)
 <span class="k">        </span><span class="n">dxc</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
     <span class="n">endif</span>
 
-    <span class="n">n_vr</span> <span class="o">=</span> <span class="mi">32</span>
     <span class="n">vr_max</span> <span class="o">=</span> <span class="mf">4.d0</span>
     <span class="n">dvr</span> <span class="o">=</span> <span class="n">vr_max</span><span class="o">/</span><span class="p">(</span><span class="n">n_vr</span> <span class="o">-</span> <span class="mf">1.d0</span><span class="p">)</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vr</span>
         <span class="n">vr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dvr</span>
     <span class="n">enddo</span>
 
-    <span class="n">n_vz</span> <span class="o">=</span> <span class="mi">62</span>
     <span class="n">vz_max</span> <span class="o">=</span> <span class="mf">4.d0</span>
     <span class="n">dvz</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">vz_max</span><span class="o">/</span><span class="p">(</span><span class="n">n_vz</span> <span class="o">-</span> <span class="mf">1.d0</span><span class="p">)</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">n_vz</span>
@@ -855,7 +853,7 @@ public function fqnm(a, b, c, d)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

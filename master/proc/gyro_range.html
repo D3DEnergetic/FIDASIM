@@ -700,7 +700,7 @@ public subroutine gyro_range(b, gs, gyrange, nrange)
         <span class="c">!+ Number of ranges. `1 &lt;= nrange &lt;= 4`</span>
 
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nb</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ninter</span>
-    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">in_gs</span><span class="p">,</span> <span class="n">bin_gs</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">in_gs</span>
     <span class="kt">logical</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cross</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">t_p</span><span class="p">,</span> <span class="n">th1</span><span class="p">,</span> <span class="n">th2</span><span class="p">,</span> <span class="n">dth</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">u_cur</span><span class="p">,</span> <span class="n">t_i</span>
@@ -709,13 +709,14 @@ public subroutine gyro_range(b, gs, gyrange, nrange)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">50</span><span class="p">)</span> <span class="kd">::</span> <span class="n">bedge</span>
 
     <span class="n">nrange</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">gyrange</span> <span class="o">=</span> <span class="mf">0.d0</span>
+
     <span class="k">call </span><span class="n">line_plane_intersect</span><span class="p">(</span><span class="n">gs</span><span class="p">%</span><span class="n">center</span><span class="p">,</span> <span class="n">gs</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span> <span class="n">b</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span> <span class="n">b</span><span class="p">%</span><span class="n">basis</span><span class="p">(:,</span><span class="mi">3</span><span class="p">),</span> <span class="n">rc</span><span class="p">,</span> <span class="n">t_p</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">t_p</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">return</span>
 
 <span class="k">    call </span><span class="n">boundary_edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">bedge</span><span class="p">,</span> <span class="n">nb</span><span class="p">)</span>
     <span class="n">p_pre</span> <span class="o">=</span> <span class="n">bedge</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">in_gs</span> <span class="o">=</span> <span class="n">in_gyro_surface</span><span class="p">(</span><span class="n">gs</span><span class="p">,</span> <span class="n">p_pre</span><span class="p">)</span>
-    <span class="n">bin_gs</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
 
     <span class="n">ninter</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">u</span> <span class="o">=</span> <span class="mf">0.d0</span>
@@ -738,8 +739,7 @@ public subroutine gyro_range(b, gs, gyrange, nrange)
         <span class="n">p_pre</span> <span class="o">=</span> <span class="n">p_cur</span>
     <span class="n">enddo</span> <span class="n">boundary_loop</span>
 
-    <span class="n">gyrange</span> <span class="o">=</span> <span class="mf">0.d0</span>
-    <span class="k">if</span><span class="p">((</span><span class="n">ninter</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(.</span><span class="nb">not</span><span class="p">.</span><span class="n">bin_gs</span><span class="p">))</span> <span class="k">then</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ninter</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        if</span><span class="p">(</span><span class="n">in_boundary</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">rc</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">            </span><span class="n">nrange</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">gyrange</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.d0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">]</span>
@@ -760,6 +760,14 @@ public subroutine gyro_range(b, gs, gyrange, nrange)
 <span class="k">                </span><span class="n">gyrange</span><span class="p">(:,</span><span class="n">nrange</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">th2</span><span class="p">,</span> <span class="o">-</span><span class="n">dth</span><span class="p">]</span>
             <span class="n">endif</span>
         <span class="n">endif</span>
+        <span class="c">!! OpenMP with multiple threads is duplicating gyro-ranges for some markers</span>
+        <span class="c">!! causing double counting and I don&#39;t know why.</span>
+        <span class="c">!! It should be very unlikely for multiple gyro-ranges to occur so for</span>
+        <span class="c">!! now I&#39;m including this cludge to force only one gyro-range when using</span>
+        <span class="c">!! OpenMP.</span>
+<span class="cp">#ifdef _OMP</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">nrange</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">exit</span>
+<span class="cp">#endif</span>
     <span class="n">enddo</span>
 
 <span class="k">end subroutine </span><span class="n">gyro_range</span>
@@ -778,7 +786,7 @@ public subroutine gyro_range(b, gs, gyrange, nrange)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

@@ -53,17 +53,21 @@ integer, parameter :: thermal_ion = 2
     !+ Identifier for a thermal ion
 
 !! Physical units
-real(Float64), parameter :: e_amu = 5.485799093287202d-4
+real(Float64), parameter :: e_amu = 5.48579909070d-4
     !+ Atomic mass of an electron [amu]
-real(Float64), parameter :: H_1_amu = 1.00782504d0
-    !+ Atomic mass of Hydrogen-1 [amu]
-real(Float64), parameter :: H_2_amu = 2.0141017778d0
-    !+ Atomic mass of Hydrogen-2 [amu]
+real(Float64), parameter :: H1_amu = 1.007276466879d0
+    !+ Atomic mass of Hydrogen-1 (protium) [amu]
+real(Float64), parameter :: H2_amu = 2.013553212745d0
+    !+ Atomic mass of Hydrogen-2 (deuterium) [amu]
+real(Float64), parameter :: H3_amu = 3.01550071632d0
+    !+ Atomic mass of Hydrogen-3 (tritium) [amu]
+real(Float64), parameter :: He3_amu = 3.01602931914d0
+    !+ Atomic mass of Helium-3 [amu]
 real(Float64), parameter :: B5_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
 real(Float64), parameter :: C6_amu = 12.011d0
     !+ Atomic mass of Carbon [amu]
-real(Float64), parameter :: mass_u    = 1.6605402d-27
+real(Float64), parameter :: mass_u    = 1.660539040d-27
     !+ Atomic mass unit [kg]
 real(Float64), parameter :: e0        = 1.60217733d-19
     !+ Electron charge [C]
@@ -1053,7 +1057,7 @@ type GyroSurface
         !+ Particle speed
     real(Float64) :: omega = 0.d0
         !+ Ion gyro-frequency
-    real(Float64), dimension(3)   :: axes
+    real(Float64), dimension(3)   :: axes = 0.d0
         !+ Semi-axes of the hyperboloid, i.e. a, b, c coefficients
     real(Float64), dimension(3)   :: center = 0.d0
         !+ Center of the gyrosurface
@@ -5524,7 +5528,7 @@ subroutine gyro_range(b, gs, gyrange, nrange)
         !+ Number of ranges. `1 <= nrange <= 4`
 
     integer :: nb, i, j, ninter
-    logical :: in_gs, bin_gs
+    logical :: in_gs
     logical, dimension(8) :: cross = .False.
     real(Float64) :: t_p, th1, th2, dth
     real(Float64), dimension(2) :: u_cur, t_i
@@ -5533,13 +5537,14 @@ subroutine gyro_range(b, gs, gyrange, nrange)
     real(Float64), dimension(3,50) :: bedge
 
     nrange = 0
+    gyrange = 0.d0
+
     call line_plane_intersect(gs%center, gs%basis(:,3), b%origin, b%basis(:,3), rc, t_p)
     if(t_p.eq.0.0) return
 
     call boundary_edge(b, bedge, nb)
     p_pre = bedge(:,1)
     in_gs = in_gyro_surface(gs, p_pre)
-    bin_gs = .False.
 
     ninter = 0
     u = 0.d0
@@ -5562,8 +5567,7 @@ subroutine gyro_range(b, gs, gyrange, nrange)
         p_pre = p_cur
     enddo boundary_loop
 
-    gyrange = 0.d0
-    if((ninter.eq.0).and.(.not.bin_gs)) then
+    if(ninter.eq.0) then
         if(in_boundary(b, rc)) then
             nrange = 1
             gyrange(:,1) = [0.d0,2*pi]
@@ -5584,6 +5588,14 @@ subroutine gyro_range(b, gs, gyrange, nrange)
                 gyrange(:,nrange) = [th2, -dth]
             endif
         endif
+        !! OpenMP with multiple threads is duplicating gyro-ranges for some markers
+        !! causing double counting and I don't know why.
+        !! It should be very unlikely for multiple gyro-ranges to occur so for
+        !! now I'm including this cludge to force only one gyro-range when using
+        !! OpenMP.
+#ifdef _OMP
+        if(nrange.eq.1) exit
+#endif
     enddo
 
 end subroutine gyro_range
@@ -7193,7 +7205,7 @@ subroutine bb_cx_rates(denn, vi, vn, rates)
             ebi=1
             c%b1=1.0 ; c%b2=0.0
         else
-            ebi=neb
+            ebi=neb-1
             c%b1=0.0 ; c%b2=1.0
         endif
     endif
@@ -8657,6 +8669,7 @@ subroutine dcx
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    real(Float64) :: fi_correction
 
     halo_iter_dens(dcx_type) = 0.d0
     papprox=0.d0
@@ -8693,7 +8706,7 @@ subroutine dcx
        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
     endif
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma)
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -8712,7 +8725,8 @@ subroutine dcx
             call get_plasma(plasma,pos=tracks(1)%pos)
 
             !! Weight CX rates by ion source density
-            states = rates*(plasma%denp - plasma%denf)
+            states = rates*plasma%denp
+            fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
 
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -8721,7 +8735,8 @@ subroutine dcx
                 call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
 
                 if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
-                  call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
+                    photons = fi_correction*photons !! Correct for including fast-ions in states
+                    call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
                 endif
             enddo loop_along_track
         enddo loop_over_dcx
@@ -8771,6 +8786,7 @@ subroutine halo
     real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
     integer :: prev_type  ! previous iteration
     integer :: cur_type  ! current iteration
+    real(Float64) :: fi_correction
 
 
     prev_type = fida_type
@@ -8834,7 +8850,7 @@ subroutine halo
 
         local_iter_dens = halo_iter_dens(cur_type)
         !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice) &
+        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice,fi_correction) &
         !$OMP& reduction(+: local_iter_dens )
         loop_over_cells: do ic=istart,ncell,istep
 #ifdef _OMP
@@ -8862,6 +8878,7 @@ subroutine halo
 
                 !! Weight CX rates by ion source density
                 states = rates*plasma%denp
+                fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
 
                 loop_along_track: do jj=1,ntrack
                     call get_plasma(plasma,pos=tracks(jj)%pos)
@@ -8875,9 +8892,9 @@ subroutine halo
                     local_iter_dens = &
                         local_iter_dens + sum(denn)/nlaunch(i,j,k)
                     if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
-                      call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
+                        photons = fi_correction*photons !! Correct for including fast-ions in states
+                        call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
                     endif
-
                 enddo loop_along_track
             enddo loop_over_halos
         enddo loop_over_cells

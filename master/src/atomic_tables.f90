@@ -46,15 +46,15 @@ integer, parameter, private   :: Float64 = 8
     !+ Defines a 64 bit floating point real
 
 real(Float64), parameter :: PI = 3.14159265d0
-real(Float64), parameter :: e_amu = 5.485799093287202d-4
+real(Float64), parameter :: e_amu = 5.48579909070d-4
     !+ Atomic mass of an electron [amu]
-real(Float64), parameter :: H1_amu = 1.00782504d0
+real(Float64), parameter :: H1_amu = 1.007276466879d0
     !+ Atomic mass of Hydrogen-1 (protium) [amu]
-real(Float64), parameter :: H2_amu = 2.0141017778d0
+real(Float64), parameter :: H2_amu = 2.013553212745d0
     !+ Atomic mass of Hydrogen-2 (deuterium) [amu]
-real(Float64), parameter :: H3_amu = 3.0160492d0
+real(Float64), parameter :: H3_amu = 3.01550071632d0
     !+ Atomic mass of Hydrogen-3 (tritium) [amu]
-real(Float64), parameter :: He3_amu = 3.0160293d0
+real(Float64), parameter :: He3_amu = 3.01602931914d0
     !+ Atomic mass of Helium-3 [amu]
 real(Float64), parameter :: B_amu = 10.81d0
     !+ Atomic mass of Boron [amu]
@@ -858,7 +858,7 @@ function p_cx_3_5_adas(Erel) result(sigma)
     real(Float64), parameter :: n = 3.0
     real(Float64) :: ee, fac, l, p
 
-    ee = max(Erel * 1.d3 * n**2.0, 1.d3) !keV to eV
+    ee = max(min(Erel * 1.d3,5.5d5) * n**2.0, 1.d3) !keV to eV
     fac = 1.d0
 
     l = log10(ee)
@@ -4242,27 +4242,25 @@ subroutine bt_maxwellian_eb(fn, T, eb, am, ab, rate)
     real(Float64), intent(out) :: rate
         !+Reaction Rate [\(cm^3/s\)]
 
-    integer :: n_vr
+    integer, parameter :: n_vr = 30
     real(Float64) :: vr_max, dvr
-    real(Float64), dimension(32) :: vr
-    real(Float64), dimension(32) :: fr
-    integer :: n_vz
+    real(Float64), dimension(n_vr) :: vr
+    real(Float64), dimension(n_vr) :: fr
+    integer, parameter :: n_vz = 60
     real(Float64) :: vz_max,dvz
-    real(Float64), dimension(62) :: vz
-    real(Float64), dimension(62) :: fz
+    real(Float64), dimension(n_vz) :: vz
+    real(Float64), dimension(n_vz) :: fz
     real(Float64) :: T_per_amu, eb_per_amu, ared, sig, sig_eff
     real(Float64) :: zb, u2_to_erel, u2, erel, v_therm, dE
 
     integer :: i, j
 
-    n_vr = 32
     vr_max = 4.d0
     dvr = vr_max/(n_vr - 1.d0)
     do i=1,n_vr
         vr(i) = (i-1)*dvr
     enddo
 
-    n_vz = 62
     vz_max = 4.d0
     dvz = 2.0*vz_max/(n_vz - 1.d0)
     do i=1,n_vz
@@ -4320,27 +4318,25 @@ subroutine bt_maxwellian_n(fn, T, eb, am, ab, n, rate)
         !+Reaction Rate [\(cm^3/s\)]
 
     logical :: dxc
-    integer :: n_vr
+    integer, parameter :: n_vr = 30
     real(Float64) :: vr_max, dvr
-    real(Float64), dimension(32) :: vr
-    real(Float64), dimension(32) :: fr
-    integer :: n_vz
+    real(Float64), dimension(n_vr) :: vr
+    real(Float64), dimension(n_vr) :: fr
+    integer, parameter :: n_vz = 60
     real(Float64) :: vz_max,dvz
-    real(Float64), dimension(62) :: vz
-    real(Float64), dimension(62) :: fz
+    real(Float64), dimension(n_vz) :: vz
+    real(Float64), dimension(n_vz) :: fz
     real(Float64) :: T_per_amu, eb_per_amu, ared, sig, sig_eff
     real(Float64) :: zb, u2_to_erel, u2, erel, v_therm, dE
 
     integer :: i, j
 
-    n_vr = 32
     vr_max = 4.d0
     dvr = vr_max/(n_vr - 1.d0)
     do i=1,n_vr
         vr(i) = (i-1)*dvr
     enddo
 
-    n_vz = 62
     vz_max = 4.d0
     dvz = 2.0*vz_max/(n_vz - 1.d0)
     do i=1,n_vz
@@ -4406,27 +4402,25 @@ subroutine bt_maxwellian_q_n(fqn, q, T, eb, am, ab, n, rate)
     real(Float64), intent(out) :: rate
         !+Reaction Rate [\(cm^3/s\)]
 
-    integer :: n_vr
+    integer, parameter :: n_vr = 30
     real(Float64) :: vr_max, dvr
-    real(Float64), dimension(32) :: vr
-    real(Float64), dimension(32) :: fr
-    integer :: n_vz
-    real(Float64) :: vz_max, dvz
-    real(Float64), dimension(62) :: vz
-    real(Float64), dimension(62) :: fz
+    real(Float64), dimension(n_vr) :: vr
+    real(Float64), dimension(n_vr) :: fr
+    integer, parameter :: n_vz = 60
+    real(Float64) :: vz_max,dvz
+    real(Float64), dimension(n_vz) :: vz
+    real(Float64), dimension(n_vz) :: fz
     real(Float64) :: T_per_amu, eb_per_amu, ared, sig, sig_eff
     real(Float64) :: zb, u2_to_erel, u2, erel, v_therm, dE
 
     integer :: i, j
 
-    n_vr = 32
     vr_max = 4.d0
     dvr = vr_max/(n_vr - 1.d0)
     do i=1,n_vr
         vr(i) = (i-1)*dvr
     enddo
 
-    n_vz = 62
     vz_max = 4.d0
     dvz = 2.0*vz_max/(n_vz - 1.d0)
     do i=1,n_vz
@@ -4495,14 +4489,14 @@ subroutine bt_maxwellian_n_m(fnm, T, eb, am, ab, n, m, rate, deexcit)
         !+Calculate de-excitation reaction rate
 
     logical :: dxc
-    integer :: n_vr
+    integer, parameter :: n_vr = 30
     real(Float64) :: vr_max, dvr
-    real(Float64), dimension(32) :: vr
-    real(Float64), dimension(32) :: fr
-    integer :: n_vz
-    real(Float64) :: vz_max, dvz
-    real(Float64), dimension(62) :: vz
-    real(Float64), dimension(62) :: fz
+    real(Float64), dimension(n_vr) :: vr
+    real(Float64), dimension(n_vr) :: fr
+    integer, parameter :: n_vz = 60
+    real(Float64) :: vz_max,dvz
+    real(Float64), dimension(n_vz) :: vz
+    real(Float64), dimension(n_vz) :: fz
     real(Float64) :: T_per_amu, eb_per_amu, ared, sig, sig_eff
     real(Float64) :: zb, u2_to_erel, u2, erel, dE, factor, En, Em, v_therm
 
@@ -4514,14 +4508,12 @@ subroutine bt_maxwellian_n_m(fnm, T, eb, am, ab, n, m, rate, deexcit)
         dxc = .False.
     endif
 
-    n_vr = 32
     vr_max = 4.d0
     dvr = vr_max/(n_vr - 1.d0)
     do i=1,n_vr
         vr(i) = (i-1)*dvr
     enddo
 
-    n_vz = 62
     vz_max = 4.d0
     dvz = 2.0*vz_max/(n_vz - 1.d0)
     do i=1,n_vz
@@ -4603,14 +4595,14 @@ subroutine bt_maxwellian_q_n_m(fqnm, q, T, eb, am, ab, n, m, rate, deexcit)
         !+Calculate de-excitation reaction rate
 
     logical :: dxc
-    integer :: n_vr
+    integer, parameter :: n_vr = 30
     real(Float64) :: vr_max, dvr
-    real(Float64), dimension(32) :: vr
-    real(Float64), dimension(32) :: fr
-    integer :: n_vz
-    real(Float64) :: vz_max, dvz
-    real(Float64), dimension(62) :: vz
-    real(Float64), dimension(62) :: fz
+    real(Float64), dimension(n_vr) :: vr
+    real(Float64), dimension(n_vr) :: fr
+    integer, parameter :: n_vz = 60
+    real(Float64) :: vz_max,dvz
+    real(Float64), dimension(n_vz) :: vz
+    real(Float64), dimension(n_vz) :: fz
     real(Float64) :: T_per_amu, eb_per_amu, ared, sig, sig_eff
     real(Float64) :: zb, u2_to_erel, u2, erel, dE, factor, En, Em, v_therm
 
@@ -4622,14 +4614,12 @@ subroutine bt_maxwellian_q_n_m(fqnm, q, T, eb, am, ab, n, m, rate, deexcit)
         dxc = .False.
     endif
 
-    n_vr = 32
     vr_max = 4.d0
     dvr = vr_max/(n_vr - 1.d0)
     do i=1,n_vr
         vr(i) = (i-1)*dvr
     enddo
 
-    n_vz = 62
     vz_max = 4.d0
     dvz = 2.0*vz_max/(n_vz - 1.d0)
     do i=1,n_vz

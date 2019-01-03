@@ -516,7 +516,7 @@ from the <script type="math/tex">n=3</script> state to the <script type="math/te
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mf">3.0</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ee</span><span class="p">,</span> <span class="n">fac</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">p</span>
 
-    <span class="n">ee</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">Erel</span> <span class="o">*</span> <span class="mf">1.d3</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.d3</span><span class="p">)</span> <span class="c">!keV to eV</span>
+    <span class="n">ee</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">Erel</span> <span class="o">*</span> <span class="mf">1.d3</span><span class="p">,</span><span class="mf">5.5d5</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span><span class="o">**</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.d3</span><span class="p">)</span> <span class="c">!keV to eV</span>
     <span class="n">fac</span> <span class="o">=</span> <span class="mf">1.d0</span>
 
     <span class="n">l</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">ee</span><span class="p">)</span>
@@ -543,7 +543,7 @@ from the <script type="math/tex">n=3</script> state to the <script type="math/te
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

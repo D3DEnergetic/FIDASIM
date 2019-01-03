@@ -2243,6 +2243,13 @@ subroutine make_pass_grid
     real(Float64), dimension(3) :: vertex221, vertex221_uvw, vertex221_cyl
     real(Float64), dimension(3) :: n0, nz, cyl_enter, cyl_exit
     real(Float64), dimension(3) :: r0, v0, p_dum, p, p0, p_enter, p_exit 
+    real(Float64), dimension(3) :: vertex112, vertex112_uvw, vertex112_cyl
+    real(Float64), dimension(3) :: vertex121, vertex121_uvw, vertex121_cyl
+    real(Float64), dimension(3) :: vertex211, vertex211_uvw, vertex211_cyl
+    real(Float64), dimension(3) :: vertex212, vertex212_uvw, vertex212_cyl
+    real(Float64), dimension(3) :: vertex222, vertex222_uvw, vertex222_cyl
+    real(Float64), dimension(3) :: vertex122, vertex122_uvw, vertex122_cyl
+    real(Float64) :: xmin, ymin, xmax, ymax, beam_grid_phimin, beam_grid_phimax
     real(Float64) :: rmin, zmin, phimin, rmax, zmax, phimax, t
     integer, dimension(1) :: minpos, maxpos
     integer :: min_ind, max_ind, npos, cnt, spec_nchan, npa_nchan, i, n, error
@@ -2435,10 +2442,47 @@ subroutine make_pass_grid
     !!! Need to run this by Luke
     phimin = minval(phi(:,:),mask=phi(:,:).ge.0.d0)
     phimax = maxval(phi(:,:),mask=phi(:,:).ge.0.d0)
-    if(abs(phimax-phimin).lt.0.001) then
-        phimax = modulo((phimax + 0.4),2*pi)
-        phimin = modulo((phimin - 0.4),2*pi)
-    endif
+
+    !! Use the beam grid limits if the LOS created grid is too narrow in phi
+    xmin = beam_grid%xmin ; xmax = beam_grid%xmax
+    ymin = beam_grid%ymin ; ymax = beam_grid%ymax
+    zmin = beam_grid%zmin ; zmax = beam_grid%zmax
+
+    !! Define vertices in beam grid coordinates
+    vertex111(1) = xmin   ; vertex111(2) = ymin   ; vertex111(3) = zmin
+    vertex222(1) = xmax   ; vertex222(2) = ymax   ; vertex222(3) = zmax
+
+    vertex112 = vertex111 ; vertex211 = vertex111 ; vertex121 = vertex111
+    vertex112(3) = zmax   ; vertex211(1) = xmax   ; vertex121(2) = ymax
+
+    vertex122 = vertex222 ; vertex221 = vertex222 ; vertex212 = vertex222
+    vertex122(1) = xmin   ; vertex221(3) = zmin   ; vertex212(2) = ymin
+
+    call xyz_to_uvw(vertex111,vertex111_uvw)
+    call xyz_to_uvw(vertex112,vertex112_uvw)
+    call xyz_to_uvw(vertex121,vertex121_uvw)
+    call xyz_to_uvw(vertex211,vertex211_uvw)
+    call xyz_to_uvw(vertex212,vertex212_uvw)
+    call xyz_to_uvw(vertex222,vertex222_uvw)
+    call xyz_to_uvw(vertex122,vertex122_uvw)
+    call xyz_to_uvw(vertex221,vertex221_uvw)
+
+    call uvw_to_cyl(vertex111_uvw,vertex111_cyl)
+    call uvw_to_cyl(vertex112_uvw,vertex112_cyl)
+    call uvw_to_cyl(vertex121_uvw,vertex121_cyl)
+    call uvw_to_cyl(vertex211_uvw,vertex211_cyl)
+    call uvw_to_cyl(vertex212_uvw,vertex212_cyl)
+    call uvw_to_cyl(vertex222_uvw,vertex222_cyl)
+    call uvw_to_cyl(vertex122_uvw,vertex122_cyl)
+    call uvw_to_cyl(vertex221_uvw,vertex221_cyl)
+    
+    beam_grid_phimin = min(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
+                          ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
+    beam_grid_phimax = max(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
+                          ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
+
+    if(beam_grid_phimin.lt.phimin) phimin = beam_grid_phimin
+    if(beam_grid_phimax.gt.phimax) phimax = beam_grid_phimax
 
     pass_grid%dphi = 0.1
     pass_grid%nphi = int(ceiling((phimax-phimin)/pass_grid%dphi))

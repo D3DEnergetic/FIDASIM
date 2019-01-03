@@ -129,7 +129,7 @@ def main():
 
 ### Test this
     # Read hdf5 files
-    if (f90 and args.geometry) or plot_all:
+    if f90 and (args.geometry or plot_all):
         try:
             nml_file = os.path.join(args.directory, args.runid+'_inputs.dat')
             nml = f90nml.read(nml_file)['fidasim_inputs']

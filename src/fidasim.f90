@@ -6245,7 +6245,9 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
     integer :: i, j, nunique, ind1, ind2
     integer :: min_ind, max_ind, npos, cnt
     logical :: outside
-    logical :: pas = .False.
+    logical :: pas 
+
+    pas = .False.
 
     if(present(passive)) pas = passive
 

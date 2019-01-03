@@ -1053,7 +1053,7 @@ type GyroSurface
         !+ Particle speed
     real(Float64) :: omega = 0.d0
         !+ Ion gyro-frequency
-    real(Float64), dimension(3)   :: axes
+    real(Float64), dimension(3)   :: axes = 0.d0
         !+ Semi-axes of the hyperboloid, i.e. a, b, c coefficients
     real(Float64), dimension(3)   :: center = 0.d0
         !+ Center of the gyrosurface
@@ -5524,7 +5524,7 @@ subroutine gyro_range(b, gs, gyrange, nrange)
         !+ Number of ranges. `1 <= nrange <= 4`
 
     integer :: nb, i, j, ninter
-    logical :: in_gs, bin_gs
+    logical :: in_gs
     logical, dimension(8) :: cross = .False.
     real(Float64) :: t_p, th1, th2, dth
     real(Float64), dimension(2) :: u_cur, t_i
@@ -5533,13 +5533,14 @@ subroutine gyro_range(b, gs, gyrange, nrange)
     real(Float64), dimension(3,50) :: bedge
 
     nrange = 0
+    gyrange = 0.d0
+
     call line_plane_intersect(gs%center, gs%basis(:,3), b%origin, b%basis(:,3), rc, t_p)
     if(t_p.eq.0.0) return
 
     call boundary_edge(b, bedge, nb)
     p_pre = bedge(:,1)
     in_gs = in_gyro_surface(gs, p_pre)
-    bin_gs = .False.
 
     ninter = 0
     u = 0.d0
@@ -5562,8 +5563,7 @@ subroutine gyro_range(b, gs, gyrange, nrange)
         p_pre = p_cur
     enddo boundary_loop
 
-    gyrange = 0.d0
-    if((ninter.eq.0).and.(.not.bin_gs)) then
+    if(ninter.eq.0) then
         if(in_boundary(b, rc)) then
             nrange = 1
             gyrange(:,1) = [0.d0,2*pi]
@@ -5584,6 +5584,14 @@ subroutine gyro_range(b, gs, gyrange, nrange)
                 gyrange(:,nrange) = [th2, -dth]
             endif
         endif
+        !! OpenMP with multiple threads is duplicating gyro-ranges for some markers
+        !! causing double counting and I don't know why.
+        !! It should be very unlikely for multiple gyro-ranges to occur so for
+        !! now I'm including this cludge to force only one gyro-range when using
+        !! OpenMP.
+#ifdef _OMP
+        if(nrange.eq.1) exit
+#endif
     enddo
 
 end subroutine gyro_range

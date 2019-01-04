@@ -2783,7 +2783,7 @@ subroutine read_chords
             endif
         enddo
     endif
-    if(inputs%calc_pfida.eq.0) then
+    if((inputs%calc_spec+inputs%calc_fida_wght-inputs%calc_pfida).ge.1) then
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )

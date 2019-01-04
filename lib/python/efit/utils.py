@@ -4,7 +4,7 @@
 import numpy as np
 import scipy.interpolate
 from scipy.integrate import cumtrapz
-import matplotlib._cntr as cntr
+from skimage.measure import find_contours
 
 def fluxmap(g):
     npts = g['nw']
@@ -25,9 +25,9 @@ def fluxmap(g):
     # Find r,theta of psi before boundary
     psi_i = g['ssimag'] + psi_eqdsk[-1]*dpsi # unnormalized
     R,Z = np.meshgrid(g['r'],g['z'])
-    psi_contour = [p for p in cntr.Cntr(R,Z,g['psirz']).trace(psi_i) if p.ndim == 2 and (p[0,0] == p[-1,0])][0]
-    x_c = psi_contour[:,0] - g['rmaxis']
-    y_c = psi_contour[:,1] - g['zmaxis']
+    psi_v = [p for p in find_contours(g['psirz'], psi_i) if (p[0,0] == p[-1,0])][0]
+    x_c = np.interp(psi_v[:,1], range(0,len(g['r'])), g['r']) - g['rmaxis']
+    y_c = np.interp(psi_v[:,0], range(0,len(g['z'])), g['z']) - g['zmaxis']
     r_c = np.sqrt(x_c**2 + y_c**2)
     theta_c = np.arctan2(y_c,x_c)
     theta_c = np.where(theta_c < 0, theta_c + 2*np.pi, theta_c)

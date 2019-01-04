@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.3% of total for procedures.">37 statements</a>
+    title=" 0.3% of total for procedures.">34 statements</a>
      </li> 
      
      
@@ -820,15 +820,12 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">uvw</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">fbeam</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">epi</span>
-    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dummy</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">R</span><span class="p">,</span> <span class="n">Phi</span><span class="p">,</span> <span class="n">Z</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dE</span><span class="p">,</span> <span class="n">dp</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">err</span>
 
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">))</span>
-    <span class="n">epi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span> <span class="o">-</span> <span class="n">pitch</span><span class="p">))</span>
-    <span class="n">epi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">epi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span> <span class="o">-</span> <span class="n">energy</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">epi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">minloc</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span> <span class="o">-</span> <span class="n">pitch</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">dE</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="n">epi</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">energy</span><span class="p">)</span>
     <span class="n">dp</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">(</span><span class="n">epi</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="o">-</span> <span class="n">pitch</span><span class="p">)</span>
 

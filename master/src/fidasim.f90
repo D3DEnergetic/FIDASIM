@@ -2907,7 +2907,7 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(5) :: dims
-    real(Float64) :: dummy(1), denp_tot
+    real(Float64) :: denp_tot
     integer :: ir
     logical :: path_valid
 
@@ -2975,30 +2975,20 @@ subroutine read_f(fid, error)
         fbm%dphi = abs(fbm%phi(2)-fbm%phi(1))
     endif
 
-    dummy = minval(fbm%energy)
-    fbm%emin = dummy(1)
-    dummy = maxval(fbm%energy)
-    fbm%emax = dummy(1)
+    fbm%emin = minval(fbm%energy,1)
+    fbm%emax = maxval(fbm%energy,1)
     fbm%e_range = fbm%emax - fbm%emin
-    dummy = minval(fbm%pitch)
-    fbm%pmin = dummy(1)
-    dummy = maxval(fbm%pitch)
-    fbm%pmax = dummy(1)
+    fbm%pmin = minval(fbm%pitch,1)
+    fbm%pmax = maxval(fbm%pitch,1)
     fbm%p_range = fbm%pmax - fbm%pmin
-    dummy = minval(fbm%r)
-    fbm%rmin = dummy(1)
-    dummy = maxval(fbm%r)
-    fbm%rmax = dummy(1)
+    fbm%rmin = minval(fbm%r,1)
+    fbm%rmax = maxval(fbm%r,1)
     fbm%r_range = fbm%rmax - fbm%rmin
-    dummy = minval(fbm%z)
-    fbm%zmin = dummy(1)
-    dummy = maxval(fbm%z)
-    fbm%zmax = dummy(1)
+    fbm%zmin = minval(fbm%z,1)
+    fbm%zmax = maxval(fbm%z,1)
     fbm%z_range = fbm%zmax - fbm%zmin
-    dummy = minval(fbm%phi)
-    fbm%phimin = dummy(1)
-    dummy = maxval(fbm%phi)
-    fbm%phimax = dummy(1)
+    fbm%phimin = minval(fbm%phi,1)
+    fbm%phimax = maxval(fbm%phi,1)
     fbm%phi_range = fbm%phimax - fbm%phimin
 
     denp_tot = 0.0
@@ -3054,7 +3044,6 @@ subroutine read_mc(fid, error)
     integer(Int32) :: i,j,ii,ir,iz,iphi,nphi
     real(Float64) :: phi,phi_enter,phi_exit,delta_phi,xp,yp,zp
     real(Float64), dimension(3) :: uvw,xyz,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
-    integer(Int32), dimension(1) :: minpos
     real(Float64), dimension(:), allocatable :: weight
     type(LocalEMFields) :: fields
     integer :: cnt,num
@@ -3127,7 +3116,7 @@ subroutine read_mc(fid, error)
     cnt=0
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
-    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,minpos,fields,uvw,phi,ri,vi, &
+    !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,fields,uvw,phi,ri,vi, &
     !$OMP& delta_phi,phi_enter,phi_exit,C_xyz,xyz,xp,yp,zp,dum,inp)
     particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
@@ -3170,12 +3159,9 @@ subroutine read_mc(fid, error)
             particles%fast_ion(i)%weight = weight(i)/beam_grid%dv
         endif
 
-        minpos = minloc(abs(inter_grid%r - particles%fast_ion(i)%r))
-        ir = minpos(1)
-        minpos = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi))
-        iphi = minpos(1)
-        minpos = minloc(abs(inter_grid%z - particles%fast_ion(i)%z))
-        iz = minpos(1)
+        ir = minloc(abs(inter_grid%r - particles%fast_ion(i)%r),1)
+        iphi = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi),1)
+        iz = minloc(abs(inter_grid%z - particles%fast_ion(i)%z),1)
 
         !$OMP ATOMIC UPDATE
         equil%plasma(ir,iz,iphi)%denf = equil%plasma(ir,iz,iphi)%denf + weight(i) / &
@@ -6037,7 +6023,6 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
     integer, dimension(3) :: sgn
     integer, dimension(3) :: gdims
-    integer, dimension(1) :: minpos
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
 
@@ -6078,8 +6063,7 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
             los_inter = .True.
         endif
         dt_arr = abs(( (ri_cell + 0.5*dr) - ri)*inv_vn)
-        minpos = minloc(dt_arr)
-        mind = minpos(1)
+        mind = minloc(dt_arr,1)
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
         call in_plasma(ri_tmp,in_plasma2)
@@ -6957,15 +6941,12 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam
     integer(Int32), dimension(2) :: epi
-    integer(Int32), dimension(1) :: dummy
     real(Float64) :: R, Phi, Z
     real(Float64) :: dE, dp
     integer :: err
 
-    dummy = minloc(abs(fbm%energy - energy))
-    epi(1) = dummy(1)
-    dummy = minloc(abs(fbm%pitch - pitch))
-    epi(2) = dummy(1)
+    epi(1) = minloc(abs(fbm%energy - energy),1)
+    epi(2) = minloc(abs(fbm%pitch - pitch),1)
     dE = abs(fbm%energy(epi(1)) - energy)
     dp = abs(fbm%pitch(epi(2)) - pitch)
 

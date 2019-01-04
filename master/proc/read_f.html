@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.0% of total for procedures.">125 statements</a>
+    title=" 1.0% of total for procedures.">115 statements</a>
      </li> 
      
      
@@ -554,7 +554,7 @@ public subroutine read_f(fid, error)
         <span class="c">!+ Error code</span>
 
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">denp_tot</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">denp_tot</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ir</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">path_valid</span>
 
@@ -622,30 +622,20 @@ public subroutine read_f(fid, error)
 <span class="k">        </span><span class="n">fbm</span><span class="p">%</span><span class="n">dphi</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">fbm</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">endif</span>
 
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">emin</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">emax</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">emin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">emax</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">e_range</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">emax</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">emin</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">pmin</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">pmax</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">pmin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">pmax</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">p_range</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">pmax</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">pmin</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">rmin</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">rmax</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">rmin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">rmax</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">r</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">r_range</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">rmax</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">rmin</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">zmin</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">z</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">zmax</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">zmin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">z</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">zmax</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">z</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">z_range</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">zmax</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">zmin</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">phi</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">phimin</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">dummy</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">phi</span><span class="p">)</span>
-    <span class="n">fbm</span><span class="p">%</span><span class="n">phimax</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">phimin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">phi</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">fbm</span><span class="p">%</span><span class="n">phimax</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">phi</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">fbm</span><span class="p">%</span><span class="n">phi_range</span> <span class="o">=</span> <span class="n">fbm</span><span class="p">%</span><span class="n">phimax</span> <span class="o">-</span> <span class="n">fbm</span><span class="p">%</span><span class="n">phimin</span>
 
     <span class="n">denp_tot</span> <span class="o">=</span> <span class="mf">0.0</span>

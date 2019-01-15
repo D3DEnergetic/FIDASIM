@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">28 statements</a>
+    title=" 0.3% of total for procedures.">37 statements</a>
      </li> 
      
      
@@ -996,6 +996,8 @@ public subroutine attenuate(ri, rf, vi, states, dstep_in)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">photons</span><span class="p">,</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dstep</span><span class="p">,</span> <span class="n">dis</span><span class="p">,</span><span class="n">max_dis</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r0</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dens</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">inp</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ncross</span>
 
     <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">dstep_in</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">dstep</span><span class="o">=</span><span class="n">dstep_in</span>
@@ -1011,12 +1013,20 @@ public subroutine attenuate(ri, rf, vi, states, dstep_in)
     <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
     <span class="n">r0</span> <span class="o">=</span> <span class="n">ri</span>
     <span class="n">dis</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="n">ncross</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">plasma</span><span class="p">%</span><span class="n">in_plasma</span>
     <span class="k">do while</span> <span class="p">(</span><span class="n">dis</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="n">max_dis</span><span class="p">)</span>
         <span class="k">call </span><span class="n">colrad</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">beam_ion</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="n">states</span><span class="p">,</span><span class="n">dens</span><span class="p">,</span><span class="n">photons</span><span class="p">)</span>
         <span class="n">r0</span> <span class="o">=</span> <span class="n">r0</span> <span class="o">+</span> <span class="n">vi</span><span class="o">*</span><span class="n">dt</span>
         <span class="n">dis</span> <span class="o">=</span> <span class="n">dis</span> <span class="o">+</span> <span class="n">dstep</span>
         <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">r0</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">inp</span><span class="p">.</span><span class="n">neqv</span><span class="p">.</span><span class="n">plasma</span><span class="p">%</span><span class="n">in_plasma</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">ncross</span> <span class="o">=</span> <span class="n">ncross</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">inp</span> <span class="o">=</span> <span class="n">plasma</span><span class="p">%</span><span class="n">in_plasma</span>
+        <span class="n">endif</span>
     <span class="n">enddo</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">ncross</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="n">states</span> <span class="o">=</span> <span class="mf">0.0</span>
 
 <span class="k">end subroutine </span><span class="n">attenuate</span>
 </pre></div>

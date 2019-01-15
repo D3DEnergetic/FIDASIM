@@ -7644,6 +7644,8 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
     real(Float64) :: photons, vabs, dt, dstep, dis,max_dis
     real(Float64), dimension(3) :: r0
     real(Float64), dimension(nlevs) :: dens
+    logical :: inp
+    integer :: ncross
 
     if(present(dstep_in)) then
         dstep=dstep_in
@@ -7659,12 +7661,20 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
     call get_plasma(plasma,pos=ri)
     r0 = ri
     dis = 0.d0
+    ncross = 0
+    inp = plasma%in_plasma
     do while (dis.le.max_dis)
         call colrad(plasma,beam_ion,vi,dt,states,dens,photons)
         r0 = r0 + vi*dt
         dis = dis + dstep
         call get_plasma(plasma,pos=r0)
+        if(inp.neqv.plasma%in_plasma) then
+            ncross = ncross + 1
+            inp = plasma%in_plasma
+        endif
     enddo
+
+    if(ncross.gt.1) states = 0.0
 
 end subroutine attenuate
 

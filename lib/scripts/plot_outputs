@@ -252,7 +252,21 @@ def plt_npa(file_paths, flux=False, pflux=False, plot_all=False,
         # Create plots
         for i in range(len(file_paths)):
             for d in range(len(data_set[i])):
-                ax[mod_i].plot(energy_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
+                if(args.poly):
+                    x = energy_set[i]
+                    y = data_set[i][d].value[ch_i2,:]
+                    e = np.std(y)
+                    ax[mod_i].errorbar(x, y, e, linestyle='None', marker='.',elinewidth=1,capsize=2,
+                                       alpha=0.1)
+
+                    # Fit a polynomial of degree N
+                    z = np.polyfit(energy_set[i], data_set[i][d].value[ch_i2,:], args.degree)
+                    f = np.poly1d(z)
+                    energy_set_new = np.linspace(energy_set[i][0], energy_set[i][-1], 50)
+                    data_set_new = f(energy_set_new)
+                    ax[mod_i].plot(energy_set_new, data_set_new,label=label_set[i][d],c=colors[i])
+                else:
+                    ax[mod_i].plot(energy_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
 
         # Override axes limits if the user requested it
         if len(xlim)==2:
@@ -369,6 +383,15 @@ def main():
     parser.add_argument('-nl', '--nlog',
                         default = False, action='store_true',
                         help='Set the flux axis to a log scale')
+    parser.add_argument('-py', '--poly', type=int,
+                        default = [], nargs='+',
+                        help='Fit a polynomial function to the data')
+    parser.add_argument('-py', '--poly', type=int,
+                        default = False, action='store_true',
+                        help='Fit a polynomial function to the data')
+    parser.add_argument('-de', '--degree', type=int,
+                        default = 4,
+                        help='Specifies the degree of polynomial fit')
 
     args = parser.parse_args()
 

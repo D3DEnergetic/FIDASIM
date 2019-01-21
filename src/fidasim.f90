@@ -710,6 +710,8 @@ type SpectralChords
         !+ Number of channels
     integer :: ncell = 0
         !+ Number of beam_grid cells with intersections
+    integer :: cyl_ncell = 0
+        !+ Number of pass_grid cells with intersections
     type(LineOfSight), dimension(:), allocatable :: los
         !+ Line of sight array
     real(Float64), dimension(:), allocatable     :: radius
@@ -720,6 +722,8 @@ type SpectralChords
         !+ Array of LOS intersections with [[libfida:pass_grid]]
     integer, dimension(:), allocatable :: cell
         !+ Linear indices of beam_grid that have intersections
+    integer, dimension(:), allocatable :: cyl_cell
+        !+ Linear indices of pass_grid that have intersections
 end type SpectralChords
 
 type BoundedPlane
@@ -2770,8 +2774,8 @@ subroutine read_chords
             enddo
         enddo pass_grid_chan_loop
 
-        spec_chords%ncell = count(spec_chords%cyl_inter%nchan.gt.0)
-        allocate(spec_chords%cell(spec_chords%ncell))
+        spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
+        allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
 
         nc = 0
         do ic=1,pass_grid%ngrid
@@ -2779,9 +2783,10 @@ subroutine read_chords
             ii = ind(1) ; jj = ind(2) ; kk = ind(3)
             if(spec_chords%cyl_inter(ii,jj,kk)%nchan.gt.0) then
                 nc = nc + 1
-                spec_chords%cell(nc) = ic
+                spec_chords%cyl_cell(nc) = ic
             endif
         enddo
+        deallocate(dlength, tracks)
     endif
     if((inputs%calc_spec+inputs%calc_fida_wght-inputs%calc_pfida).ge.1) then
         allocate(dlength(beam_grid%nx, &

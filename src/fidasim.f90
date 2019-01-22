@@ -1962,6 +1962,7 @@ subroutine read_inputs
     if((calc_brems+calc_bes+calc_dcx+calc_halo+&
         calc_cold+calc_fida+calc_pfida).gt.0) then
         inputs%calc_spec=1
+        if(calc_pfida.gt.0) inputs%calc_spec=2  !Needed for read_chords
     else
         inputs%calc_spec=0
     endif
@@ -2788,7 +2789,7 @@ subroutine read_chords
         enddo
         deallocate(dlength, tracks)
     endif
-    if((inputs%calc_spec+inputs%calc_fida_wght-inputs%calc_pfida).ge.1) then
+    if((inputs%calc_spec+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )

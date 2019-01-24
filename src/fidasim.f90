@@ -3554,15 +3554,14 @@ subroutine read_mc(fid, error)
                 delta_phi = 2*pi
             endif
             particles%fast_ion(i)%phi_enter = phi_enter
-            particles%fast_ion(i)%delta_phi = delta_phi
-            particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
         else
+            delta_phi = 2*pi
             call uvw_to_xyz(uvw,xyz)
             particles%fast_ion(i)%cross_grid = in_grid(xyz)
             particles%fast_ion(i)%phi_enter = particles%fast_ion(i)%phi
-            particles%fast_ion(i)%delta_phi = 2*pi
-            particles%fast_ion(i)%weight = weight(i)/beam_grid%dv
         endif
+        particles%fast_ion(i)%delta_phi = delta_phi
+        particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
 
         ir = minloc(abs(inter_grid%r - particles%fast_ion(i)%r),1)
         iphi = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi),1)
@@ -11170,9 +11169,9 @@ subroutine neutron_f
     integer :: ir, iphi, iz, ie, ip, igamma, ngamma
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: eb,pitch,r,z
+    real(Float64) :: eb,pitch
     real(Float64) :: erel, rate
-    real(Float64), dimension(3) :: rg, ri
+    real(Float64), dimension(3) :: ri
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square, factor
@@ -11186,11 +11185,12 @@ subroutine neutron_f
     endif
 
     ngamma = 20
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
+    rate = 0
+    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,pitch,eb,&
     !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)
-    z_loop: do iz = istart, fbm%nz, istep
-        r_loop: do ir=1, fbm%nr
-            phi_loop: do iphi = 1, fbm%nphi
+    phi_loop: do iphi = 1, fbm%nphi
+        z_loop: do iz = istart, fbm%nz, istep
+            r_loop: do ir=1, fbm%nr
                 !! Calculate position
                 if(fbm%nphi.eq.1) then
                     s = 0.d0
@@ -11204,11 +11204,9 @@ subroutine neutron_f
                 uvw(2) = fbm%r(ir)*s
                 uvw(3) = fbm%z(iz)
 
-                call uvw_to_xyz(uvw, rg)
-
                 !! Get fields
-                call get_fields(fields,pos=rg)
-                if(.not.fields%in_plasma) cycle phi_loop
+                call get_fields(fields,pos=uvw,input_coords=1)
+                if(.not.fields%in_plasma) cycle r_loop
 
                 factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi/ngamma
                 !! Loop over energy/pitch/gamma
@@ -11245,9 +11243,9 @@ subroutine neutron_f
                         enddo gyro_loop
                     enddo energy_loop
                 enddo pitch_loop
-            enddo phi_loop
-        enddo r_loop
-    enddo z_loop
+            enddo r_loop
+        enddo z_loop
+    enddo phi_loop
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
@@ -11280,7 +11278,7 @@ subroutine neutron_mc
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: eb, rate
-    real(Float64), dimension(3) :: ri, rg
+    real(Float64), dimension(3) :: ri
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square
@@ -11292,7 +11290,7 @@ subroutine neutron_mc
 
     rate=0.0
     ngamma = 20
-    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg,s,c, &
+    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,s,c, &
     !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
@@ -11300,20 +11298,21 @@ subroutine neutron_mc
 
         !! Calculate position in machine coordinates
         if(particles%axisym) then
-            phi = 0.d0
+            s = 0.d0
+            c = 1.d0
         else
             phi = fast_ion%phi
+            s = sin(phi)
+            c = cos(phi)
         endif
-        s = sin(phi) ; c = cos(phi)
+
         uvw(1) = fast_ion%r*c
         uvw(2) = fast_ion%r*s
         uvw(3) = fast_ion%z
 
         if(inputs%dist_type.eq.2) then
-            call uvw_to_xyz(uvw, rg)
-
             !! Get electomagnetic fields
-            call get_fields(fields, pos=rg)
+            call get_fields(fields, pos=uvw, input_coords=1)
             if(.not.fields%in_plasma) cycle loop_over_fast_ions
 
             gyro_loop: do igamma=1,ngamma
@@ -11330,16 +11329,14 @@ subroutine neutron_mc
 
                 !! Get neutron production rate
                 call get_neutron_rate(plasma, eb, rate)
-                rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv/ngamma
+                rate = rate*fast_ion%weight/(fast_ion%delta_phi/(2*pi))*beam_grid%dv/ngamma
 
                 !! Store neutrons
                 call store_neutrons(rate, fast_ion%class)
             enddo gyro_loop
         else
-            call uvw_to_xyz(uvw, ri)
-
             !! Get plasma parameters
-            call get_plasma(plasma,pos=ri)
+            call get_plasma(plasma,pos=uvw,input_coords=1)
             if(.not.plasma%in_plasma) cycle loop_over_fast_ions
 
             !! Calculate effective beam energy
@@ -11352,7 +11349,7 @@ subroutine neutron_mc
 
             !! Get neutron production rate
             call get_neutron_rate(plasma, eb, rate)
-            rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv
+            rate = rate*fast_ion%weight/(fast_ion%delta_phi/(2*pi))*beam_grid%dv
 
             !! Store neutrons
             call store_neutrons(rate, fast_ion%class)

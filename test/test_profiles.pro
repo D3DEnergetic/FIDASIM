@@ -21,7 +21,7 @@ FUNCTION test_profiles,filename,grid,flux
     dene = interpol(prof.dene*1.0d-6,rho,flux) ;;cm^-3
     ti = interpol(prof.ti*1.0d-3,rho,flux) ;;keV
     te = interpol(prof.te*1.0d-3,rho,flux) ;;keV
-    zeff = interpol(prof.zeff*1.0d0,rho,flux)
+    zeff = dene*0.d0 + 1.5
     vt = grid.r2d*interpol(prof.omega*1.0d0,rho,flux) ;;cm/s
     vr = 0.d0*vt ;;cm/s
     vz = 0.d0*vt ;;cm/s
@@ -33,8 +33,8 @@ FUNCTION test_profiles,filename,grid,flux
     w=where(flux le max_flux) ;where we have profiles
     mask[w] = 1
 
-    nz = n_elements(dene[0,*])
-    nr = n_elements(dene[*,0])
+    nr = n_elements(grid.nr)
+    nz = n_elements(grid.nz)
     dene=rebin(dene,nr,nz,grid.nphi)
     denn=rebin(denn,nr,nz,grid.nphi)
     mask=rebin(mask,nr,nz,grid.nphi)

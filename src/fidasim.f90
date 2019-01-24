@@ -291,7 +291,7 @@ type, extends( Profiles ) :: LocalProfiles
     logical :: in_plasma = .False.
         !+ Indicates whether plasma parameters are valid/known
     integer :: coords = 0
-        !+ Indicates coordinate system of vectors. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of vectors. Beam grid (0), machine (1) and cylindrical (2)
     real(Float64), dimension(3) :: pos = 0.d0
         !+ Position in beam grid coordinates
     real(Float64), dimension(3) :: uvw = 0.d0
@@ -343,7 +343,7 @@ type, extends( EMFields ) :: LocalEMFields
     logical       :: in_plasma = .False.
         !+ Indicates whether fields are valid/known
     integer :: coords = 0
-        !+ Indicates coordinate system of vectors. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of vectors. Beam grid (0), machine (1) and cylindrical (2)
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
     real(Float64) :: e_abs = 0.d0
@@ -987,6 +987,8 @@ type SimulationInputs
         !+ Calculate Active FIDA: 0 = off, 1=on
     integer(Int32) :: calc_pfida
         !+ Calculate Passive FIDA: 0 = off, 1=on
+    integer(Int32) :: tot_spectra
+        !+ Total number of spectral switches on
     integer(Int32) :: load_neutrals
         !+ Load neutrals from file: 0 = off, 1=on
     integer(Int32) :: calc_npa
@@ -1962,9 +1964,11 @@ subroutine read_inputs
     if((calc_brems+calc_bes+calc_dcx+calc_halo+&
         calc_cold+calc_fida+calc_pfida).gt.0) then
         inputs%calc_spec=1
-        if(calc_pfida.gt.0) inputs%calc_spec=2  !Needed for read_chords
+        inputs%tot_spectra=calc_brems+calc_bes+calc_dcx+calc_halo+&
+                           calc_cold+calc_fida+calc_pfida
     else
         inputs%calc_spec=0
+        inputs%tot_spectra=0
     endif
 
     inputs%calc_beam = 0
@@ -2234,7 +2238,7 @@ subroutine make_beam_grid
 
 end subroutine make_beam_grid
 
-subroutine make_pass_grid
+subroutine make_passive_grid
     !+ Makes [[libfida:pass_grid] from user defined inputs
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(2) :: dims
@@ -2262,8 +2266,6 @@ subroutine make_pass_grid
 
     spec_nchan = 0
     npa_nchan = 0
-    allocate(lenses(3, spec_nchan), axes(3, spec_nchan), &
-             a_cent(3,  npa_nchan), d_cent(3,  npa_nchan))
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -2286,7 +2288,6 @@ subroutine make_pass_grid
         call h5gopen_f(fid, "/spec", gid, error)
         call h5ltread_dataset_int_scalar_f(gid, "/spec/nchan", spec_nchan, error)
 
-        deallocate(lenses, axes)
         allocate(lenses(3, spec_nchan), axes(3, spec_nchan))
 
         !! Read in lenses and axes info
@@ -2314,7 +2315,6 @@ subroutine make_pass_grid
 
         call h5ltread_dataset_int_scalar_f(gid, "/npa/nchan", npa_nchan, error)
 
-        deallocate(a_cent, d_cent)
         allocate(a_cent(3,  npa_nchan), d_cent(3,  npa_nchan))
 
         !! Read in a_cent and d_cent info
@@ -2335,10 +2335,18 @@ subroutine make_pass_grid
     !!Collect all LOS info
     allocate(r0_arr(3,  spec_nchan+npa_nchan), v0_arr(3,  spec_nchan+npa_nchan))
 
-    r0_arr(:,1:spec_nchan) = lenses
-    v0_arr(:,1:spec_nchan) = axes
-    r0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = d_cent
-    v0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = a_cent - d_cent
+    if((inputs%calc_pfida.gt.0).and.(inputs%calc_pnpa.gt.0)) then
+        r0_arr(:,1:spec_nchan) = lenses
+        v0_arr(:,1:spec_nchan) = axes
+        r0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = d_cent
+        v0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = a_cent - d_cent
+    else if(inputs%calc_pfida.gt.0) then
+        r0_arr(:,1:spec_nchan) = lenses
+        v0_arr(:,1:spec_nchan) = axes
+    else !pnpa on case
+        r0_arr(:,1:npa_nchan) = d_cent
+        v0_arr(:,1:npa_nchan) = a_cent - d_cent
+    endif
 
     pass_grid%dr = inter_grid%dr
     pass_grid%dz = inter_grid%dz
@@ -2368,8 +2376,8 @@ subroutine make_pass_grid
         v0 = v0/norm2(v0)
 
         !! Calculate intersection with inner and outer cylinders of inter_grid
-        call line_circle_intersect(r0, v0, vertex111_uvw, p_arr(1,:), dt_arr(1))
-        call line_circle_intersect(r0, v0, vertex221_uvw, p_arr(2,:), dt_arr(2))
+        call line_cylinder_intersect(r0, v0, vertex111_uvw, p_arr(1,:), dt_arr(1))
+        call line_cylinder_intersect(r0, v0, vertex221_uvw, p_arr(2,:), dt_arr(2))
         !!Correction for when the LOS cuts into the plasma, but never intersect
         !!the inner cylinder
         if(dt_arr(1).eq.0.d0) then
@@ -2378,7 +2386,7 @@ subroutine make_pass_grid
             p_dum(1) = p_dum(1)*0.999
             call cyl_to_uvw(p_dum,p0)
             !!Store quantities in the memory allocated for the inner cylinder
-            call line_circle_intersect(p0, v0, vertex221_uvw, p_arr(1,:), t)
+            call line_cylinder_intersect(p0, v0, vertex221_uvw, p_arr(1,:), t)
             dt_arr(1) = t + dt_arr(2)   
         endif
 
@@ -2520,7 +2528,7 @@ subroutine make_pass_grid
 
     deallocate(lenses, axes, a_cent, d_cent)
 
-end subroutine make_pass_grid
+end subroutine make_passive_grid
 
 subroutine read_beam
     !+ Reads neutral beam geometry and stores the quantities in [[libfida:nbi]]
@@ -2655,6 +2663,7 @@ subroutine read_chords
             write(*,'(a)') 'Continuing without spectral diagnostics'
         endif
         inputs%calc_spec = 0
+        inputs%tot_spectra=0
         inputs%calc_fida = 0
         inputs%calc_pfida = 0
         inputs%calc_bes = 0
@@ -2789,7 +2798,7 @@ subroutine read_chords
         enddo
         deallocate(dlength, tracks)
     endif
-    if((inputs%calc_spec+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
+    if((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
         allocate(dlength(beam_grid%nx, &
                          beam_grid%ny, &
                          beam_grid%nz) )
@@ -5690,7 +5699,7 @@ subroutine line_plane_intersect(l0, l, p0, n, p, t)
 
 end subroutine line_plane_intersect
 
-subroutine line_circle_intersect(l0, l, p0, p, t)
+subroutine line_cylinder_intersect(l0, l, p0, p, t)
     !+ Calculates the intersection of a line and a circle
     real(Float64), dimension(3), intent(in)  :: l0
         !+ Point on line
@@ -5733,7 +5742,7 @@ subroutine line_circle_intersect(l0, l, p0, p, t)
 
     p = l0 + l * t
 
-end subroutine line_circle_intersect
+end subroutine line_cylinder_intersect
 
 function in_boundary(bplane, p) result(in_b)
     !+ Indicator function for determining if a point on a plane is within the plane boundary
@@ -6281,8 +6290,8 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
         call cyl_to_uvw(vertex212,vertex212_uvw)
 
         !! Calculate intersection with inner and outer cylinders of inter_grid
-        call line_circle_intersect(r0, v0, vertex111_uvw, p_arr(1,:), dt_arr(1))
-        call line_circle_intersect(r0, v0, vertex211_uvw, p_arr(2,:), dt_arr(2))
+        call line_cylinder_intersect(r0, v0, vertex111_uvw, p_arr(1,:), dt_arr(1))
+        call line_cylinder_intersect(r0, v0, vertex211_uvw, p_arr(2,:), dt_arr(2))
         !! Correction for when the LOS is parallel to 2 planes on the inner cylinder
         if(dt_arr(1).eq.0.d0) then
             !!Remove p_arr(2,:) from the surface of the outer cylinder
@@ -6290,7 +6299,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
             p_dum(1) = p_dum(1)*0.999
             call cyl_to_uvw(p_dum,p0)
             !!Store quantities in the memory allocated for the inner cylinder
-            call line_circle_intersect(p0, v0, vertex211_uvw, p_arr(1,:), t)
+            call line_cylinder_intersect(p0, v0, vertex211_uvw, p_arr(1,:), t)
             dt_arr(1) = t + dt_arr(2)
         endif
 
@@ -6602,14 +6611,14 @@ subroutine get_indices(pos, ind)
 
 end subroutine get_indices
 
-subroutine get_pass_grid_indices(pos, ind, input_coords)
+subroutine get_passive_grid_indices(pos, ind, input_coords)
     !+ Find closest [[libfida:pass_grid]] indices `ind` to position `pos`
     real(Float64),  dimension(3), intent(in)  :: pos
         !+ Position [cm]
     integer(Int32), dimension(3), intent(out) :: ind
         !+ Closest indices to position
     integer, intent(in), optional             :: input_coords
-        !+ Indicates coordinate system of `pos`. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of `pos`. Beam grid (0), machine (1) and cylindrical (2)
 
     real(Float64),  dimension(3) :: mini, differentials, loc
     integer(Int32), dimension(3) :: maxind
@@ -6651,7 +6660,7 @@ subroutine get_pass_grid_indices(pos, ind, input_coords)
         if (ind(i).lt.1) ind(i)=1
     enddo
 
-end subroutine get_pass_grid_indices
+end subroutine get_passive_grid_indices
 
 subroutine get_position(ind, pos, input_coords)
     !+ Get position `pos` given indices `ind`
@@ -6660,7 +6669,7 @@ subroutine get_position(ind, pos, input_coords)
     real(Float64), dimension(3), intent(out) :: pos
         !+ Position in [[libfida:beam_grid]] coordinates [cm]
     integer, intent(in), optional            :: input_coords
-        !+ Indicates coordinate system of `ind`. Beam grid (0) and cyl (2)
+        !+ Indicates coordinate system of `ind`. Beam grid (0) and cylindrical (2)
 
     real(Float64), dimension(3) :: pos_temp1, pos_temp2
     integer :: ics, ocs
@@ -6861,7 +6870,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
     ri_cyl(2) = ri(3)
     ri_cyl(3) = modulo(atan2(ri(2), ri(1)),2*pi)
-    call get_pass_grid_indices(ri_cyl,ind)
+    call get_passive_grid_indices(ri_cyl,ind)
 
     arc_cyl(1) = pass_grid%r(ind(1))
     arc_cyl(2) = pass_grid%z(ind(2))
@@ -6921,7 +6930,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
             los_inter = .True.
         endif
 
-        call line_circle_intersect(ri, vn, arc, p, dt_arr(1))
+        call line_cylinder_intersect(ri, vn, arc, p, dt_arr(1))
         call line_plane_intersect(ri, vn, h_plane, nz, p, dt_arr(2))
         call line_plane_intersect(ri, vn, v_plane, -basis(:,3), p, dt_arr(3))
 
@@ -7551,7 +7560,7 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
     logical, intent(out)                    :: inp
         !+ Indicates whether plasma parameters and fields are valid/known
     integer, intent(in), optional           :: input_coords
-        !+ Indicates coordinate system of xyz. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of xyz. Beam grid (0), machine (1) and cylindrical (2)
     type(InterpolCoeffs3D), intent(out), optional      :: coeffs
         !+ Interpolation coefficients used in calculation
     real(Float64), dimension(3), intent(out), optional :: uvw_out
@@ -7622,9 +7631,9 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     integer(Int32), intent(in), optional               :: input_coords
-        !+ Indicates coordinate system of inputs. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of inputs. Beam grid (0), machine (1) and cylindrical (2)
     integer(Int32), intent(in), optional               :: output_coords
-        !+ Indicates coordinate system of outputs. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of outputs. Beam grid (0), machine (1) and cylindrical (2)
 
     logical :: inp
     type(InterpolCoeffs3D) :: coeffs
@@ -7740,9 +7749,9 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     integer(Int32), intent(in), optional               :: input_coords
-        !+ Indicates coordinate system of inputs. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of inputs. Beam grid (0), machine (1) and cylindrical (2)
     integer(Int32), intent(in), optional               :: output_coords
-        !+ Indicates coordinate system of outputs. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of outputs. Beam grid (0), machine (1) and cylindrical (2)
 
     logical :: inp
     real(Float64), dimension(3) :: xyz, uvw
@@ -8714,7 +8723,7 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
         cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
         cyl(2) = pos(3)
         cyl(3) = modulo(atan2(pos(2), pos(1)),2*pi)
-        call get_pass_grid_indices(cyl,ind)
+        call get_passive_grid_indices(cyl,ind)
         inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
         call uvw_to_xyz(pos, pos_xyz)
     else
@@ -9217,7 +9226,7 @@ subroutine mc_fastion_pass_grid(ind,fields,eb,ptch,denf,output_coords)
     real(Float64), intent(out)             :: denf
         !+ Fast-ion density at guiding center
     integer, intent(in), optional          :: output_coords
-        !+ Indicates coordinate system of `fields`. Beam grid (0), machine (1) and cyl (2)
+        !+ Indicates coordinate system of `fields`. Beam grid (0), machine (1) and cylindrical (2)
 
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
     real(Float64), dimension(3) :: rg, rg_cyl
@@ -10842,13 +10851,14 @@ subroutine pnpa_f
     enddo loop_over_cells
     !$OMP END PARALLEL DO
 
+    npart = pnpa%npart
 #ifdef _MPI
-    call parallel_sum(pnpa%npart)
+    call parallel_sum(npart)
     call parallel_sum(pnpa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') pnpa%npart
+        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') npart
     endif
 
 end subroutine pnpa_f
@@ -11153,13 +11163,14 @@ subroutine pnpa_mc
     enddo loop_over_fast_ions
     !$OMP END PARALLEL DO
 
+    npart = pnpa%npart
 #ifdef _MPI
-    call parallel_sum(pnpa%npart)
+    call parallel_sum(npart)
     call parallel_sum(pnpa%flux)
 #endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') pnpa%npart
+        write(*,'(T4,"Number of Passive NPA particles that hit a detector: ",i8)') npart
     endif
 
 end subroutine pnpa_mc
@@ -12066,7 +12077,7 @@ program fidasim
         if(inter_grid%nphi.gt.1) then
             pass_grid = inter_grid
         else
-            call make_pass_grid()
+            call make_passive_grid()
         endif
     endif
     call read_distribution()

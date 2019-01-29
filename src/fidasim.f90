@@ -2244,25 +2244,22 @@ subroutine make_passive_grid
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid_spec, path_valid_npa
 
-    real(Float64), dimension(:,:), allocatable :: a_cent, d_cent, phi
+    real(Float64), dimension(:,:), allocatable :: a_cent, d_cent
     real(Float64), dimension(:,:), allocatable :: lenses, axes, r0_arr, v0_arr
-    real(Float64), dimension(4,3) :: p_arr
-    real(Float64), dimension(4) :: dt_arr, dt_arr_dum
     real(Float64), dimension(3) :: vertex111, vertex111_uvw, vertex111_cyl
     real(Float64), dimension(3) :: vertex221, vertex221_uvw, vertex221_cyl
-    real(Float64), dimension(3) :: n0, nz, cyl_enter, cyl_exit
-    real(Float64), dimension(3) :: r0, v0, p_dum, p, p0, p_enter, p_exit 
     real(Float64), dimension(3) :: vertex112, vertex112_uvw, vertex112_cyl
     real(Float64), dimension(3) :: vertex121, vertex121_uvw, vertex121_cyl
     real(Float64), dimension(3) :: vertex211, vertex211_uvw, vertex211_cyl
     real(Float64), dimension(3) :: vertex212, vertex212_uvw, vertex212_cyl
     real(Float64), dimension(3) :: vertex222, vertex222_uvw, vertex222_cyl
     real(Float64), dimension(3) :: vertex122, vertex122_uvw, vertex122_cyl
-    real(Float64) :: xmin, ymin, xmax, ymax, beam_grid_phimin, beam_grid_phimax
-    real(Float64) :: rmin, zmin, phimin, rmax, zmax, phimax, t
-    integer, dimension(1) :: minpos, maxpos
-    integer :: min_ind, max_ind, npos, cnt, spec_nchan, npa_nchan, i, n, error
-    logical :: outside
+    real(Float64), dimension(3) :: r0, v0, r0_cyl
+    real(Float64), dimension(2) :: phi_dum
+    real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax
+    real(Float64) :: rmin, rmax, phimax, phimin
+    integer :: spec_nchan, npa_nchan, i, error
+    logical :: inp1, inp2
 
     spec_nchan = 0
     npa_nchan = 0
@@ -2343,11 +2340,12 @@ subroutine make_passive_grid
     else if(inputs%calc_pfida.gt.0) then
         r0_arr(:,1:spec_nchan) = lenses
         v0_arr(:,1:spec_nchan) = axes
-    else !pnpa on case
+    else !pnpa>=1 case
         r0_arr(:,1:npa_nchan) = d_cent
         v0_arr(:,1:npa_nchan) = a_cent - d_cent
     endif
 
+    !! The remainder of the code will make the passive neutral grid
     pass_grid%dr = inter_grid%dr
     pass_grid%dz = inter_grid%dz
     pass_grid%nr = inter_grid%nr
@@ -2355,113 +2353,13 @@ subroutine make_passive_grid
     allocate(pass_grid%r(pass_grid%nr), pass_grid%z(pass_grid%nz))
     pass_grid%r = inter_grid%r
     pass_grid%z = inter_grid%z
+    pass_grid%da = pass_grid%dr*pass_grid%dz
 
-    !! The remainder of the code will make pass_grid
-    allocate(phi(2, (spec_nchan+npa_nchan))) !!(phi_enter, phi_exit) per LOS
-    phi(:,:) = -1.d0    !! Initialize phi to be defined outside of domain [0,2*pi)
-
-    !! Define vertices of the interpolation grid
-    rmin = pass_grid%r(1) ; rmax = pass_grid%r(pass_grid%nr)
-    zmin = pass_grid%z(1) ; zmax = pass_grid%z(pass_grid%nz)
-    vertex111(1) = rmin ; vertex111(2) = zmin ; vertex111(3) = 0.d0
-    vertex221(1) = rmax ; vertex221(2) = zmax ; vertex221(3) = 0.d0
-    call cyl_to_uvw(vertex111,vertex111_uvw)
-    call cyl_to_uvw(vertex221,vertex221_uvw)
-
-    nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
-
-    los_loop: do i=1,(spec_nchan+npa_nchan)
-        r0 = r0_arr(:,i)
-        v0 = v0_arr(:,i)
-        v0 = v0/norm2(v0)
-
-        !! Calculate intersection with inner and outer cylinders of inter_grid
-        call line_cylinder_intersect(r0, v0, vertex111_uvw, p_arr(1,:), dt_arr(1))
-        call line_cylinder_intersect(r0, v0, vertex221_uvw, p_arr(2,:), dt_arr(2))
-        !!Correction for when the LOS cuts into the plasma, but never intersect
-        !!the inner cylinder
-        if(dt_arr(1).eq.0.d0) then
-            !!Remove p_arr(2,:) from the surface of the outer cylinder
-            call uvw_to_cyl(p_arr(2,:),p_dum)
-            p_dum(1) = p_dum(1)*0.999
-            call cyl_to_uvw(p_dum,p0)
-            !!Store quantities in the memory allocated for the inner cylinder
-            call line_cylinder_intersect(p0, v0, vertex221_uvw, p_arr(1,:), t)
-            dt_arr(1) = t + dt_arr(2)   
-        endif
-
-        !! Calculate intersection with bottom and top horizontal planes of inter_grid
-        call line_plane_intersect(r0, v0, vertex111_uvw, nz, p_arr(3,:), dt_arr(3))
-        call line_plane_intersect(r0, v0, vertex221_uvw, nz, p_arr(4,:), dt_arr(4))
-
-        !!Find the points that lie on the R-Z inter_grid
-        cnt = 1
-        npos = count(dt_arr.gt.0.d0)
-        outside = .True.
-        dt_arr_dum = dt_arr
-        enter_loop: do while(outside)
-            outside = .False.
-            minpos = minloc(dt_arr_dum, mask=dt_arr_dum.gt.0.d0)
-            min_ind = minpos(1)
-            p_enter = p_arr(min_ind,:)
-            call uvw_to_cyl(p_enter,cyl_enter)
-            if((cyl_enter(1).lt.pass_grid%r(1)).or.(cyl_enter(1).gt.pass_grid%r(pass_grid%nr))) then
-                dt_arr_dum(min_ind)=0.d0
-                outside = .True.
-            endif
-            if((cyl_enter(2).lt.pass_grid%z(1)).or.(cyl_enter(2).gt.pass_grid%z(pass_grid%nz))) then
-                dt_arr_dum(min_ind)=0.d0
-                outside = .True.
-            endif
-
-            if(cnt.lt.npos) then
-                cnt = cnt + 1
-            else
-                phi(:,i) = -1.d0
-                cycle los_loop  !!Stop if LOS never intersects R-Z inter_grid
-            endif
-        enddo enter_loop
-
-        cnt = 1
-        outside = .True.
-        dt_arr_dum = dt_arr
-        exit_loop: do while(outside)
-            outside = .False.
-            maxpos = maxloc(dt_arr_dum, mask=dt_arr_dum.gt.0.d0)
-            max_ind = maxpos(1)
-            p_exit = p_arr(max_ind,:)
-            call uvw_to_cyl(p_exit,cyl_exit)
-            if((cyl_exit(1).lt.pass_grid%r(1)).or.(cyl_exit(1).gt.pass_grid%r(pass_grid%nr))) then
-                dt_arr_dum(max_ind)=0.d0
-                outside = .True.
-            endif
-            if((cyl_exit(2).lt.pass_grid%z(1)).or.(cyl_exit(2).gt.pass_grid%z(pass_grid%nz))) then
-                dt_arr_dum(max_ind)=0.d0
-                outside = .True.
-            endif
-
-            if(cnt.lt.npos) then
-                cnt = cnt + 1
-            else
-                phi(2,i) = -1.d0
-                cycle los_loop
-            endif
-        enddo exit_loop
-
-        phi(1,i) = modulo(cyl_enter(3),2*pi)    !! Phi enter
-        phi(2,i) = modulo(cyl_exit(3),2*pi)     !! Phi exit
-    enddo los_loop
-
-    !!! Need to run this by Luke
-    phimin = minval(phi(:,:),mask=phi(:,:).ge.0.d0)
-    phimax = maxval(phi(:,:),mask=phi(:,:).ge.0.d0)
-
-    !! Use the beam grid limits if the LOS created grid is too narrow in phi
+    !! Start by finding the limits of the beam grid vertices to define the phi information
     xmin = beam_grid%xmin ; xmax = beam_grid%xmax
     ymin = beam_grid%ymin ; ymax = beam_grid%ymax
     zmin = beam_grid%zmin ; zmax = beam_grid%zmax
 
-    !! Define vertices in beam grid coordinates
     vertex111(1) = xmin   ; vertex111(2) = ymin   ; vertex111(3) = zmin
     vertex222(1) = xmax   ; vertex222(2) = ymax   ; vertex222(3) = zmax
 
@@ -2489,22 +2387,54 @@ subroutine make_passive_grid
     call uvw_to_cyl(vertex122_uvw,vertex122_cyl)
     call uvw_to_cyl(vertex221_uvw,vertex221_cyl)
     
-    beam_grid_phimin = min(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
-                          ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
-    beam_grid_phimax = max(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
-                          ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
+    phimin = min(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
+                ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
+    phimax = max(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
+                ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
 
-    if(beam_grid_phimin.lt.phimin) phimin = beam_grid_phimin
-    if(beam_grid_phimax.gt.phimax) phimax = beam_grid_phimax
+    !! Update phi with LOS limits
+    track_loop: do i=1,(spec_nchan+npa_nchan)
+        r0 = r0_arr(:,i)
+        v0 = v0_arr(:,i)
+        v0 = 2.d0*v0/norm2(v0)
+        phi_dum = -1.d0 !Initialize phi_dum outside of domain
+        call in_plasma(r0, inp2)
+        if (inp2) cycle track_loop
+        inp2 = .True. ; inp1 = .False.
+        do while (inp2) !Loop until los 'particle' is outside the plasma
+            do while (.not.inp1) !Loop until los 'particle' is inside the plasma
+                call uvw_to_cyl(r0, r0_cyl)
+                if ((r0_cyl(1).gt.600.d0).or.(abs(r0_cyl(2)).gt.600.d0)) exit !Never intersects
+                call in_plasma(r0, inp1)
+                if (inp1) phi_dum(1) = r0_cyl(3)
+                r0 = r0 + v0  !dt=1
+            enddo
+
+            call in_plasma(r0, inp2)
+            if (.not.inp2) then
+                call uvw_to_cyl(r0, r0_cyl)
+                phi_dum(2) = r0_cyl(3)
+            endif
+            r0 = r0 + v0  !dt=1
+        enddo
+
+        if((minval(phi_dum).lt.phimin).and.(minval(phi_dum).ge.0.d0)) phimin = minval(phi_dum)
+        if((maxval(phi_dum).gt.phimax).and.(maxval(phi_dum).ge.0.d0)) phimax = maxval(phi_dum)
+    enddo track_loop
 
     pass_grid%dphi = 0.1
     pass_grid%nphi = int(ceiling((phimax-phimin)/pass_grid%dphi))
+
+    if (pass_grid%nphi.gt.20) then !! Avoid large memory allocation
+        pass_grid%nphi = 20
+        pass_grid%dphi = (phimax-phimin)/pass_grid%nphi
+    endif
+
     allocate(pass_grid%phi(pass_grid%nphi))
     do i=1, pass_grid%nphi
         pass_grid%phi(i) = phimin + (i-1)*pass_grid%dphi
     enddo
 
-    pass_grid%da = pass_grid%dr*pass_grid%dz
     pass_grid%dv = pass_grid%dr*pass_grid%dphi*pass_grid%dz
     pass_grid%dims = [pass_grid%nr, pass_grid%nz, pass_grid%nphi]
 
@@ -2526,7 +2456,8 @@ subroutine make_passive_grid
         write(*,*) ''
     endif
 
-    deallocate(lenses, axes, a_cent, d_cent)
+    if(inputs%calc_pnpa.gt.0) deallocate(a_cent, d_cent)
+    if(inputs%calc_pfida.gt.0) deallocate(lenses, axes)
 
 end subroutine make_passive_grid
 
@@ -2725,7 +2656,7 @@ subroutine read_chords
             call grid_intersect(r0,v0,length,r_enter,r_exit,passive=.True.)
             if(length.le.0.d0) then
                 if(inputs%verbose.ge.1) then
-                    WRITE(*,'("Channel ",i5," missed the passive neutral grid")') i
+                    WRITE(*,'("Channel ",i5," missed the passive neutral grid or starts inside the plasma")') i
                 endif
                 cycle pass_grid_chan_loop
             endif
@@ -6242,138 +6173,65 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
         !+ Calculates a particles intersection length with the [[libfida:pass_grid]]
 
     real(Float64), dimension(3,6) :: ipnts
-    real(Float64), dimension(6,3) :: p_arr
-    real(Float64), dimension(3,3) :: basis
-    real(Float64), dimension(6) :: dt_arr, dt_arr_dum
-    real(Float64), dimension(3) :: nz, p, p0, p_dum, cyl_enter, cyl_exit
-    real(Float64), dimension(3) :: vertex111, vertex111_uvw, vertex112, vertex112_uvw
-    real(Float64), dimension(3) :: vertex211, vertex211_uvw, vertex121, vertex121_uvw
-    real(Float64), dimension(3) :: vertex122, vertex122_uvw, vertex212, vertex212_uvw
-    real(Float64), dimension(3) :: vi
+    real(Float64), dimension(3) :: r, v, r0_cyl, vi
     real(Float64), dimension(3) :: center
     real(Float64), dimension(3) :: lwh
     integer, dimension(6) :: side_inter
     integer, dimension(2) :: ind
-    integer, dimension(1) :: minpos, maxpos
-    real(Float64) :: rmin,rmax,zmin,zmax,phimin,phimax,t,min_time, max_time
+    real(Float64) :: rmin,rmax,zmin,zmax,phimin,phimax
     integer :: i, j, nunique, ind1, ind2
-    integer :: min_ind, max_ind, npos, cnt
-    logical :: outside
+    logical :: inp, in_grid1, in_grid2
     logical :: pas 
 
+    r = r0 ; v = v0
     pas = .False.
 
     if(present(passive)) pas = passive
 
     if(pas) then
-        nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
         rmin = pass_grid%r(1) ; rmax = pass_grid%r(pass_grid%nr)
         zmin = pass_grid%z(1) ; zmax = pass_grid%z(pass_grid%nz)
         phimin = pass_grid%phi(1) ; phimax = pass_grid%phi(pass_grid%nphi)
 
-        !! Define vertices of the interpolation grid
-        vertex111(1) = rmin   ; vertex111(2) = zmin   ; vertex111(3) = phimin
-        vertex112 = vertex111 ; vertex211 = vertex111 ; vertex121 = vertex111
-        vertex122 = vertex111 ; vertex212 = vertex111
-
-        vertex112(3) = phimax
-        vertex211(1) = rmax
-        vertex121(2) = zmax
-        vertex122(2) = zmax   ; vertex122(3) = phimax
-        vertex212(1) = rmax   ; vertex212(3) = phimax
-
-        call cyl_to_uvw(vertex111,vertex111_uvw)
-        call cyl_to_uvw(vertex112,vertex112_uvw)
-        call cyl_to_uvw(vertex211,vertex211_uvw)
-        call cyl_to_uvw(vertex121,vertex121_uvw)
-        call cyl_to_uvw(vertex122,vertex122_uvw)
-        call cyl_to_uvw(vertex212,vertex212_uvw)
-
-        !! Calculate intersection with inner and outer cylinders of inter_grid
-        call line_cylinder_intersect(r0, v0, vertex111_uvw, p_arr(1,:), dt_arr(1))
-        call line_cylinder_intersect(r0, v0, vertex211_uvw, p_arr(2,:), dt_arr(2))
-        !! Correction for when the LOS is parallel to 2 planes on the inner cylinder
-        if(dt_arr(1).eq.0.d0) then
-            !!Remove p_arr(2,:) from the surface of the outer cylinder
-            call uvw_to_cyl(p_arr(2,:),p_dum)
-            p_dum(1) = p_dum(1)*0.999
-            call cyl_to_uvw(p_dum,p0)
-            !!Store quantities in the memory allocated for the inner cylinder
-            call line_cylinder_intersect(p0, v0, vertex211_uvw, p_arr(1,:), t)
-            dt_arr(1) = t + dt_arr(2)
+        v = 2.d0*v/norm2(v)
+        call in_plasma(r, inp) !Weird case where los head is inside the plasma
+        if (inp) then
+            length = 0.d0
+            return
         endif
+        in_grid2 = .True. ; in_grid1 = .False.
+        do while (in_grid2) !Loop until los 'particle' is outside the plasma
+            do while (.not.in_grid1) !Loop until los 'particle' is inside the plasma
+                call uvw_to_cyl(r, r0_cyl)
+                if ((r0_cyl(1).gt.600.d0).or.(abs(r0_cyl(2)).gt.600.d0)) then !Never intersects
+                    length = 0.d0
+                    return
+                endif
 
-        !! Bottom and top horizontal planes
-        call line_plane_intersect(r0, v0, vertex111_uvw, nz, p_arr(3,:), dt_arr(3))
-        call line_plane_intersect(r0, v0, vertex121_uvw, nz, p_arr(4,:), dt_arr(4))
+                !Check if inside the grid
+                if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
+                ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
+                ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
+                    in_grid1 = .False.
+                else
+                    in_grid1 = .True.
+                    r_enter = r
+                endif
+                r = r + v  !dt=1
+            enddo
 
-        !! First and second vertical planes
-        call plane_basis(vertex111_uvw, vertex211_uvw, vertex121_uvw, basis)
-        call line_plane_intersect(r0, v0, vertex111_uvw, -basis(:,3), p_arr(5,:), dt_arr(5))
-        call plane_basis(vertex112_uvw, vertex212_uvw, vertex122_uvw, basis)
-        call line_plane_intersect(r0, v0, vertex112_uvw, -basis(:,3), p_arr(6,:), dt_arr(6))
-
-        !! Outputs
-        cnt = 1
-        npos = count(dt_arr.gt.0.d0)
-        outside = .True.
-        dt_arr_dum = dt_arr
-        enter_loop: do while(outside)
-            outside = .False.
-            minpos = minloc(dt_arr_dum, mask=dt_arr_dum.gt.0.d0)
-            min_ind = minpos(1)
-            r_enter = p_arr(min_ind,:)
-            call uvw_to_cyl(r_enter,cyl_enter)
-            if((cyl_enter(1).lt.pass_grid%r(1)).or.(cyl_enter(1).gt.pass_grid%r(pass_grid%nr))) then
-                dt_arr_dum(min_ind)=0.d0
-                outside = .True.
-            endif
-            if((cyl_enter(2).lt.pass_grid%z(1)).or.(cyl_enter(2).gt.pass_grid%z(pass_grid%nz))) then
-                dt_arr_dum(min_ind)=0.d0
-                outside = .True.
-            endif
-            if((cyl_enter(3).lt.pass_grid%phi(1)).or.(cyl_enter(3).gt.pass_grid%phi(pass_grid%nphi))) then
-                dt_arr_dum(min_ind)=0.d0
-                outside = .True.
-            endif
-
-            if(cnt.lt.npos) then
-                cnt = cnt + 1
+            !Check if outside the grid
+            call uvw_to_cyl(r, r0_cyl)
+            if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
+            ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
+            ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
+                in_grid2 = .False.
+                r_exit = r
             else
-                length = 0.d0
-                return  !!Stop if LOS never intersects R-Z inter_grid
+                in_grid2 = .True.
             endif
-        enddo enter_loop
-
-        cnt = 1
-        outside = .True.
-        dt_arr_dum = dt_arr
-        exit_loop: do while(outside)
-            maxpos = maxloc(dt_arr_dum, mask=dt_arr_dum.gt.0.d0)
-            max_ind = maxpos(1)
-            r_exit = p_arr(max_ind,:)
-            call uvw_to_cyl(r_exit,cyl_exit)
-            outside = .False.
-            if((cyl_exit(1).lt.pass_grid%r(1)).or.(cyl_exit(1).gt.pass_grid%r(pass_grid%nr))) then
-                dt_arr_dum(max_ind)=0.d0
-                outside = .True.
-            endif
-            if((cyl_exit(2).lt.pass_grid%z(1)).or.(cyl_exit(2).gt.pass_grid%z(pass_grid%nz))) then
-                dt_arr_dum(max_ind)=0.d0
-                outside = .True.
-            endif
-            if((cyl_exit(3).lt.pass_grid%phi(1)).or.(cyl_exit(3).gt.pass_grid%phi(pass_grid%nphi))) then
-                dt_arr_dum(max_ind)=0.d0
-                outside = .True.
-            endif
-
-            if(cnt.lt.npos) then
-                cnt = cnt + 1
-            else
-                length = 0.d0
-                return  !!Stop if LOS never intersects R-Z inter_grid
-            endif
-        enddo exit_loop
+            r = r + v  !dt=1
+        enddo
 
         length = sqrt(sum((r_exit-r_enter)**2))
     else

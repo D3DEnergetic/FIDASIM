@@ -2246,14 +2246,14 @@ subroutine make_passive_grid
 
     real(Float64), dimension(:,:), allocatable :: a_cent, d_cent
     real(Float64), dimension(:,:), allocatable :: lenses, axes, r0_arr, v0_arr
-    real(Float64), dimension(3) :: vertex111, vertex111_uvw, vertex111_cyl
-    real(Float64), dimension(3) :: vertex221, vertex221_uvw, vertex221_cyl
-    real(Float64), dimension(3) :: vertex112, vertex112_uvw, vertex112_cyl
-    real(Float64), dimension(3) :: vertex121, vertex121_uvw, vertex121_cyl
-    real(Float64), dimension(3) :: vertex211, vertex211_uvw, vertex211_cyl
-    real(Float64), dimension(3) :: vertex212, vertex212_uvw, vertex212_cyl
-    real(Float64), dimension(3) :: vertex222, vertex222_uvw, vertex222_cyl
-    real(Float64), dimension(3) :: vertex122, vertex122_uvw, vertex122_cyl
+    real(Float64), dimension(3) :: vertex111, vertex111_cyl
+    real(Float64), dimension(3) :: vertex221, vertex221_cyl
+    real(Float64), dimension(3) :: vertex112, vertex112_cyl
+    real(Float64), dimension(3) :: vertex121, vertex121_cyl
+    real(Float64), dimension(3) :: vertex211, vertex211_cyl
+    real(Float64), dimension(3) :: vertex212, vertex212_cyl
+    real(Float64), dimension(3) :: vertex222, vertex222_cyl
+    real(Float64), dimension(3) :: vertex122, vertex122_cyl
     real(Float64), dimension(3) :: r0, v0, r0_cyl
     real(Float64), dimension(2) :: phi_dum
     real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax
@@ -2369,24 +2369,15 @@ subroutine make_passive_grid
     vertex122 = vertex222 ; vertex221 = vertex222 ; vertex212 = vertex222
     vertex122(1) = xmin   ; vertex221(3) = zmin   ; vertex212(2) = ymin
 
-    call xyz_to_uvw(vertex111,vertex111_uvw)
-    call xyz_to_uvw(vertex112,vertex112_uvw)
-    call xyz_to_uvw(vertex121,vertex121_uvw)
-    call xyz_to_uvw(vertex211,vertex211_uvw)
-    call xyz_to_uvw(vertex212,vertex212_uvw)
-    call xyz_to_uvw(vertex222,vertex222_uvw)
-    call xyz_to_uvw(vertex122,vertex122_uvw)
-    call xyz_to_uvw(vertex221,vertex221_uvw)
+    call xyz_to_cyl(vertex111,vertex111_cyl)
+    call xyz_to_cyl(vertex112,vertex112_cyl)
+    call xyz_to_cyl(vertex121,vertex121_cyl)
+    call xyz_to_cyl(vertex211,vertex211_cyl)
+    call xyz_to_cyl(vertex212,vertex212_cyl)
+    call xyz_to_cyl(vertex222,vertex222_cyl)
+    call xyz_to_cyl(vertex122,vertex122_cyl)
+    call xyz_to_cyl(vertex221,vertex221_cyl)
 
-    call uvw_to_cyl(vertex111_uvw,vertex111_cyl)
-    call uvw_to_cyl(vertex112_uvw,vertex112_cyl)
-    call uvw_to_cyl(vertex121_uvw,vertex121_cyl)
-    call uvw_to_cyl(vertex211_uvw,vertex211_cyl)
-    call uvw_to_cyl(vertex212_uvw,vertex212_cyl)
-    call uvw_to_cyl(vertex222_uvw,vertex222_cyl)
-    call uvw_to_cyl(vertex122_uvw,vertex122_cyl)
-    call uvw_to_cyl(vertex221_uvw,vertex221_cyl)
-    
     phimin = min(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
                 ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
     phimax = max(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
@@ -6116,6 +6107,18 @@ subroutine xyz_to_uvw(xyz, uvw)
 
 end subroutine xyz_to_uvw
 
+subroutine xyz_to_cyl(xyz, cyl)
+    !+ Convert beam coordinate `xyz` to cylindrical coordinate `cyl`
+    real(Float64), dimension(3), intent(in)  :: xyz
+    real(Float64), dimension(3), intent(out) :: cyl 
+
+    real(Float64), dimension(3) :: uvw
+
+    call xyz_to_uvw(xyz, uvw)
+    call uvw_to_cyl(uvw, cyl)
+
+end subroutine xyz_to_cyl
+
 subroutine uvw_to_xyz(uvw,xyz)
     !+ Convert machine coordinate `uvw` to beam coordinate `xyz`
     real(Float64), dimension(3), intent(in)  :: uvw
@@ -6141,6 +6144,18 @@ subroutine cyl_to_uvw(cyl, uvw)
     uvw(3) = cyl(2)
 
 end subroutine cyl_to_uvw
+
+subroutine cyl_to_xyz(cyl, xyz)
+    !+ Convert cylindrical coordinate `cyl` to beam coordinate `xyz`
+    real(Float64), dimension(3), intent(in)  :: cyl
+    real(Float64), dimension(3), intent(out) :: xyz
+
+    real(Float64), dimension(3) :: uvw
+
+    call cyl_to_uvw(cyl, uvw)
+    call uvw_to_xyz(uvw, xyz)
+
+end subroutine cyl_to_xyz
 
 subroutine uvw_to_cyl(uvw, cyl)
     !+ Convert machine coordinate `uvw` to cylindrical coordinate `cyl`
@@ -6548,8 +6563,7 @@ subroutine get_position(ind, pos, input_coords)
         pos_temp1(1) = inter_grid%r(ind(1))
         pos_temp1(2) = inter_grid%z(ind(2))
         pos_temp1(3) = inter_grid%phi(ind(3))
-        call cyl_to_uvw(pos_temp1, pos_temp2)
-        call uvw_to_xyz(pos_temp2, pos)
+        call cyl_to_xyz(pos_temp1,pos)
     endif
 
 end subroutine get_position

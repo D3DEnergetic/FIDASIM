@@ -33,7 +33,8 @@ def to_plot_f(file_path):
 def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
         cold=False, dcx=False, full=False, half=False, halo=False,
         third=False, plot_all=False, log=False,
-        ac=False, lc=[], rc=[], xlim=[], ylim=[]):
+        ac=False, lc=[], rc=[], xlim=[], ylim=[],
+        poly=False,degree=4,err_bar=True):
 
     if len(lc) == 0 and len(rc) == 0 and not ac:
         print('** ERROR: Spectra channel arguments were NOT defined. **')
@@ -70,6 +71,7 @@ def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
                             label[k])
         data_set.append(data)
         label_set.append(l)
+    colors = plt.cm.brg(np.linspace(0,1,len(file_paths)))
 
     # Define the list of channels to plot
     if ac:
@@ -135,7 +137,23 @@ def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
         # Create plots
         for i in range(len(file_paths)):
             for d in range(len(data_set[i])):
-                ax[mod_i].plot(lamb_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
+                if(poly):
+                    x = lamb_set[i]
+                    y = data_set[i][d].value[ch_i2,:]
+                    if (err_bar):
+                        e = np.std(y)
+                        ax[mod_i].errorbar(x, y, e, linestyle='None', marker='.',
+                                           elinewidth=1,capsize=2,alpha=0.01)
+
+                    # Fit a polynomial of degree `args.degree`
+                    z = np.polyfit(lamb_set[i], data_set[i][d].value[ch_i2,:],
+                                   degree)
+                    f = np.poly1d(z)
+                    lamb_set_new = np.linspace(lamb_set[i][0], lamb_set[i][-1], 50)
+                    data_set_new = f(lamb_set_new)
+                    ax[mod_i].plot(lamb_set_new, data_set_new,label=label_set[i][d],c=colors[i])
+                else:
+                    ax[mod_i].plot(lamb_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
 
         # Override axes limits if the user requested it
         if len(xlim)==2:
@@ -151,7 +169,8 @@ def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
     return
 
 def plt_npa(file_paths, flux=False, pflux=False, plot_all=False,
-        ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[]):
+        ac=False, lc=[], rc=[], log=False, xlim=[], ylim=[],
+        poly=False,degree=4,err_bar=True):
 
     if len(lc) == 0 and len(rc) == 0 and not ac:
         print('** ERROR: NPA channel arguments were NOT defined. **')
@@ -187,6 +206,7 @@ def plt_npa(file_paths, flux=False, pflux=False, plot_all=False,
                             label[k])
         data_set.append(data)
         label_set.append(l)
+    colors = plt.cm.brg(np.linspace(0,1,len(file_paths)))
 
     # Define the list of channels to plot
     if ac:
@@ -252,15 +272,16 @@ def plt_npa(file_paths, flux=False, pflux=False, plot_all=False,
         # Create plots
         for i in range(len(file_paths)):
             for d in range(len(data_set[i])):
-                if(args.poly):
+                if(poly):
                     x = energy_set[i]
                     y = data_set[i][d].value[ch_i2,:]
-                    e = np.std(y)
-                    ax[mod_i].errorbar(x, y, e, linestyle='None', marker='.',elinewidth=1,capsize=2,
-                                       alpha=0.1)
+                    if (err_bar):
+                        e = np.std(y)
+                        ax[mod_i].errorbar(x, y, e, linestyle='None', marker='.',
+                                           elinewidth=1,capsize=2,alpha=0.1)
 
-                    # Fit a polynomial of degree N
-                    z = np.polyfit(energy_set[i], data_set[i][d].value[ch_i2,:], args.degree)
+                    # Fit a polynomial of degree `args.degree`
+                    z = np.polyfit(energy_set[i], data_set[i][d].value[ch_i2,:], degree)
                     f = np.poly1d(z)
                     energy_set_new = np.linspace(energy_set[i][0], energy_set[i][-1], 50)
                     data_set_new = f(energy_set_new)
@@ -383,15 +404,15 @@ def main():
     parser.add_argument('-nl', '--nlog',
                         default = False, action='store_true',
                         help='Set the flux axis to a log scale')
-    parser.add_argument('-py', '--poly', type=int,
-                        default = [], nargs='+',
-                        help='Fit a polynomial function to the data')
-    parser.add_argument('-py', '--poly', type=int,
+    parser.add_argument('-py', '--poly',
                         default = False, action='store_true',
                         help='Fit a polynomial function to the data')
     parser.add_argument('-de', '--degree', type=int,
                         default = 4,
                         help='Specifies the degree of polynomial fit')
+    parser.add_argument('-eb', '--errorbar',
+                        default = True, action='store_false',
+                        help='Removes standard deviation of raw data from the polynomial plot')
 
     args = parser.parse_args()
 
@@ -426,10 +447,19 @@ def main():
             raise SystemExit
 
     if len(to_plot[0])>0:
-        plt_spectra(to_plot[0], fida=args.fida, pfida=args.pfida, brems=args.brems, cold=args.cold, dcx=args.dcx, full=args.full, half=args.half, halo=args.halo, third=args.third, plot_all=args.spectra, log=args.slog, ac=args.allschan, lc=args.listschan, rc=args.rangeschan, xlim=args.sxlim, ylim=args.sylim)
+        plt_spectra(to_plot[0], fida=args.fida, pfida=args.pfida, brems=args.brems,
+                    cold=args.cold, dcx=args.dcx, full=args.full, half=args.half, 
+                    halo=args.halo, third=args.third, plot_all=args.spectra, 
+                    log=args.slog, ac=args.allschan, lc=args.listschan, 
+                    rc=args.rangeschan, xlim=args.sxlim, ylim=args.sylim, 
+                    poly=args.poly, degree=args.degree, err_bar=args.errorbar)
 
     if len(to_plot[1])>0:
-        plt_npa(to_plot[1], flux=args.npaflux, pflux=args.pnpaflux, plot_all=args.flux, log=args.nlog, ac=args.allnchan, lc=args.listnchan, rc=args.rangenchan, xlim=args.nxlim, ylim=args.nylim)
+        plt_npa(to_plot[1], flux=args.npaflux, pflux=args.pnpaflux, 
+                plot_all=args.flux, log=args.nlog, ac=args.allnchan, 
+                lc=args.listnchan, rc=args.rangenchan, xlim=args.nxlim, 
+                ylim=args.nylim, poly=args.poly, degree=args.degree, 
+                err_bar=args.errorbar)
 
     if len(to_plot[2])>0:
         num_neutron_f = len(to_plot[2])

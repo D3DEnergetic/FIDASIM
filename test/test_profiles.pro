@@ -33,8 +33,8 @@ FUNCTION test_profiles,filename,grid,flux
     w=where(flux le max_flux) ;where we have profiles
     mask[w] = 1
 
-    nr = n_elements(grid.nr)
-    nz = n_elements(grid.nz)
+    nr = n_elements(dene[0,*])
+    nz = n_elements(dene[*,0])
     dene=rebin(dene,nr,nz,grid.nphi)
     denn=rebin(denn,nr,nz,grid.nphi)
     mask=rebin(mask,nr,nz,grid.nphi)

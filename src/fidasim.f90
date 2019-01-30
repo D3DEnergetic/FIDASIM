@@ -5631,15 +5631,15 @@ subroutine line_plane_intersect(l0, l, p0, n, p, t)
 end subroutine line_plane_intersect
 
 subroutine line_cylinder_intersect(l0, l, p0, p, t)
-    !+ Calculates the intersection of a line and a circle
+    !+ Calculates the intersection of a line and a cylinder
     real(Float64), dimension(3), intent(in)  :: l0
         !+ Point on line
     real(Float64), dimension(3), intent(in)  :: l
         !+ Ray of line
     real(Float64), dimension(3), intent(in)  :: p0
-        !+ Point on circle
+        !+ Point on cylinder
     real(Float64), dimension(3), intent(out) :: p
-        !+ Line-circle intersect point
+        !+ Line-cylinder intersect point
     real(Float64), intent(out)               :: t
         !+ "time" to intersect
 
@@ -5653,11 +5653,11 @@ subroutine line_cylinder_intersect(l0, l, p0, p, t)
     vx = l(1)  ; vy = l(2)
 
     if((vx.eq.0.d0).and.(vy.eq.0.d0)) then
-        t = 0.d0        ! Trivial, parallel to a plane tangent to the circle
+        t = 0.d0        ! Trivial, parallel to a plane tangent to the cylinder
     else
         radicand = r**2 * (vx**2 + vy**2) - (vy * x0 - vx * y0)**2
         if(radicand.lt.0) then
-            t = 0.d0    ! Less trivial, but still parallel to a plane tangent to the circle
+            t = 0.d0    ! Less trivial, but still parallel to a plane tangent to the cylinder
         else
             times(1) = (- vx * x0 - vy * y0 - sqrt(radicand)) / (vx**2 + vy**2)
             times(2) = (- vx * x0 - vy * y0 + sqrt(radicand)) / (vx**2 + vy**2)

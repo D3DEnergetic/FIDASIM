@@ -5653,11 +5653,11 @@ subroutine line_cylinder_intersect(l0, l, p0, p, t)
     vx = l(1)  ; vy = l(2)
 
     if((vx.eq.0.d0).and.(vy.eq.0.d0)) then
-        t = 0.d0        ! Trivial, parallel to a plane tangent to the cylinder
+        t = 0.d0        ! Parallel to a plane tangent to the cylinder
     else
         radicand = r**2 * (vx**2 + vy**2) - (vy * x0 - vx * y0)**2
         if(radicand.lt.0) then
-            t = 0.d0    ! Less trivial, but still parallel to a plane tangent to the cylinder
+            t = 0.d0    ! Parallel to a plane tangent to the cylinder
         else
             times(1) = (- vx * x0 - vy * y0 - sqrt(radicand)) / (vx**2 + vy**2)
             times(2) = (- vx * x0 - vy * y0 + sqrt(radicand)) / (vx**2 + vy**2)

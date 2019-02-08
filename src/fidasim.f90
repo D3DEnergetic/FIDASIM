@@ -446,7 +446,7 @@ end type FastIonDistribution
 
 type FastIon
     !+ Defines a fast-ion
-    logical        :: cross_grid = .False.
+    logical        :: beam_grid_cross_grid = .False.
         !+ Indicates whether the fast-ion crosses the [[libfida:beam_grid]]
     real(Float64)  :: r = 0.d0
         !+ Radial position of fast-ion [cm]
@@ -454,7 +454,7 @@ type FastIon
         !+ Angular position of fast-ion [rad]
     real(Float64)  :: z = 0.d0
         !+ Vertical position of fast-ion [cm]
-    real(Float64)  :: phi_enter = 0.d0
+    real(Float64)  :: beam_grid_phi_enter = 0.d0
         !+ Torodial/phi position where fast-ion enters the [[libfida:beam_grid]] [radians]
     real(Float64)  :: delta_phi = 2*pi
         !+ Angle subtended by the [[libfida:beam_grid]] at (r,z)
@@ -1231,20 +1231,20 @@ subroutine fast_ion_assign(p1, p2)
     type(FastIon), intent(in)  :: p2
     type(FastIon), intent(out) :: p1
 
-    p1%cross_grid = p2%cross_grid
-    p1%r          = p2%r
-    p1%z          = p2%z
-    p1%phi        = p2%phi
-    p1%phi_enter  = p2%phi_enter
-    p1%delta_phi  = p2%delta_phi
-    p1%energy     = p2%energy
-    p1%pitch      = p2%pitch
-    p1%vabs       = p2%vabs
-    p1%vr         = p2%vr
-    p1%vt         = p2%vt
-    p1%vz         = p2%vz
-    p1%weight     = p2%weight
-    p1%class      = p2%class
+    p1%beam_grid_cross_grid = p2%beam_grid_cross_grid
+    p1%r                    = p2%r
+    p1%z                    = p2%z
+    p1%phi                  = p2%phi
+    p1%beam_grid_phi_enter  = p2%beam_grid_phi_enter
+    p1%delta_phi            = p2%delta_phi
+    p1%energy               = p2%energy
+    p1%pitch                = p2%pitch
+    p1%vabs                 = p2%vabs
+    p1%vr                   = p2%vr
+    p1%vt                   = p2%vt
+    p1%vz                   = p2%vz
+    p1%weight               = p2%weight
+    p1%class                = p2%class
 
 end subroutine fast_ion_assign
 
@@ -3379,7 +3379,7 @@ subroutine read_mc(fid, error)
 
     integer(HSIZE_T), dimension(1) :: dims
     integer(Int32) :: i,j,ii,ir,iz,iphi,nphi
-    real(Float64) :: phi,phi_enter,phi_exit,delta_phi,xp,yp,zp
+    real(Float64) :: phi,beam_grid_phi_enter,beam_grid_phi_exit,delta_phi,xp,yp,zp
     real(Float64), dimension(3) :: uvw,xyz,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
     real(Float64), dimension(:), allocatable :: weight
     type(LocalEMFields) :: fields
@@ -3454,7 +3454,7 @@ subroutine read_mc(fid, error)
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
     !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,fields,uvw,phi,ri,vi, &
-    !$OMP& delta_phi,phi_enter,phi_exit,C_xyz,xyz,xp,yp,zp,dum,inp)
+    !$OMP& delta_phi,beam_grid_phi_enter,beam_grid_phi_exit,C_xyz,xyz,xp,yp,zp,dum,inp)
     particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
@@ -3472,27 +3472,27 @@ subroutine read_mc(fid, error)
         if(.not.inp) cycle particle_loop
 
         if(particles%axisym) then
-            phi_enter = 0.0
-            phi_exit = 0.0
+            beam_grid_phi_enter = 0.0
+            beam_grid_phi_exit = 0.0
             dum = [0.d0, 0.d0, particles%fast_ion(i)%z]
             call uvw_to_xyz(dum, C_xyz)
-            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(i)%r,phi_enter,phi_exit)
-            delta_phi = phi_exit-phi_enter
+            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(i)%r,beam_grid_phi_enter,beam_grid_phi_exit)
+            delta_phi = beam_grid_phi_exit-beam_grid_phi_enter
             if(delta_phi.gt.0) then
-                particles%fast_ion(i)%cross_grid = .True.
+                particles%fast_ion(i)%beam_grid_cross_grid = .True.
             else
-                particles%fast_ion(i)%cross_grid = .False.
+                particles%fast_ion(i)%beam_grid_cross_grid = .False.
                 delta_phi = 2*pi
             endif
-            particles%fast_ion(i)%phi_enter = phi_enter
+            particles%fast_ion(i)%beam_grid_phi_enter = beam_grid_phi_enter
         else
             delta_phi = 2*pi
             call uvw_to_xyz(uvw,xyz)
-            particles%fast_ion(i)%cross_grid = in_grid(xyz)
-            particles%fast_ion(i)%phi_enter = particles%fast_ion(i)%phi
+            particles%fast_ion(i)%beam_grid_cross_grid = in_grid(xyz)
+            particles%fast_ion(i)%beam_grid_phi_enter = particles%fast_ion(i)%phi
         endif
         particles%fast_ion(i)%delta_phi = delta_phi
-        particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
+        particles%fast_ion(i)%weight = weight(i)
 
         ir = minloc(abs(inter_grid%r - particles%fast_ion(i)%r),1)
         iphi = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi),1)
@@ -3506,7 +3506,7 @@ subroutine read_mc(fid, error)
     enddo particle_loop
     !$OMP END PARALLEL DO
 
-    num = count(particles%fast_ion%cross_grid)
+    num = count(particles%fast_ion%beam_grid_cross_grid)
     if(num.le.0) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: No mc particles in beam grid'
@@ -6338,7 +6338,7 @@ function in_grid(xyz) result(ing)
 
 end function
 
-subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
+subroutine circle_grid_intersect(r0, e1, e2, radius, beam_grid_phi_enter, beam_grid_phi_exit)
     !+ Calculates the intersection arclength of a circle with the [[libfida:beam_grid]]
     real(Float64), dimension(3), intent(in) :: r0
         !+ Position of center enter of the circle in beam grid coordinates [cm]
@@ -6348,9 +6348,9 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
         !+ Unit vector pointing towards (R, pi/2) (r,phi) position of the circle in beam grid coordinates
     real(Float64), intent(in)               :: radius
         !+ Radius of circle [cm]
-    real(Float64), intent(out)              :: phi_enter
+    real(Float64), intent(out)              :: beam_grid_phi_enter
         !+ Phi value where the circle entered the [[libfida:beam_grid]] [rad]
-    real(Float64), intent(out)              :: phi_exit
+    real(Float64), intent(out)              :: beam_grid_phi_exit
         !+ Phi value where the circle exits the [[libfida:beam_grid]] [rad]
 
     real(Float64), dimension(3) :: i1_p,i1_n,i2_p,i2_n
@@ -6413,32 +6413,32 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
         endif
     enddo
 
-    phi_enter = 0.d0
-    phi_exit = 0.d0
+    beam_grid_phi_enter = 0.d0
+    beam_grid_phi_exit = 0.d0
     if (count(inter).gt.2) then
         write(*,'("CIRCLE_GRID_INTERSECT: Circle intersects grid more than 2 times: ",i2)') count(inter)
         return
     endif
 
     if(any(inter)) then
-        phi_enter = minval(phi,inter)
-        phi_exit = maxval(phi,inter)
+        beam_grid_phi_enter = minval(phi,inter)
+        beam_grid_phi_exit = maxval(phi,inter)
         if(r0_ing.and.any(count(inter,1).ge.2)) then
-            if((phi_exit - phi_enter) .lt. pi) then
-                tmp = phi_enter
-                phi_enter = phi_exit
-                phi_exit = tmp + 2*pi
+            if((beam_grid_phi_exit - beam_grid_phi_enter) .lt. pi) then
+                tmp = beam_grid_phi_enter
+                beam_grid_phi_enter = beam_grid_phi_exit
+                beam_grid_phi_exit = tmp + 2*pi
             endif
         else
-            if((phi_exit - phi_enter) .gt. pi) then
-                tmp = phi_enter
-                phi_enter = phi_exit
-                phi_exit = tmp + 2*pi
+            if((beam_grid_phi_exit - beam_grid_phi_enter) .gt. pi) then
+                tmp = beam_grid_phi_enter
+                beam_grid_phi_enter = beam_grid_phi_exit
+                beam_grid_phi_exit = tmp + 2*pi
             endif
         endif
-        if(approx_eq(phi_exit-phi_enter,pi,tol).and.r0_ing) then
-            phi_enter = 0.0
-            phi_exit = 2*pi
+        if(approx_eq(beam_grid_phi_exit-beam_grid_phi_enter,pi,tol).and.r0_ing) then
+            beam_grid_phi_enter = 0.0
+            beam_grid_phi_exit = 2*pi
         endif
     else
         if(r0_ing) then
@@ -6449,8 +6449,8 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
             d(3) = norm2(r0 - i2_n)/radius
             d(4) = norm2(r0 - i2_p)/radius
             if(all(d.ge.1.0)) then
-                phi_enter = 0.d0
-                phi_exit = 2.d0*pi
+                beam_grid_phi_enter = 0.d0
+                beam_grid_phi_exit = 2.d0*pi
             endif
         endif
     endif
@@ -10338,12 +10338,12 @@ subroutine fida_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        if(.not.fast_ion%beam_grid_cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = fast_ion%beam_grid_phi_enter + fast_ion%delta_phi*randomu(1)
             else
                 phi = fast_ion%phi
             endif
@@ -10382,7 +10382,7 @@ subroutine fida_mc
             if(sum(rates).le.0.)cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            states=rates*fast_ion%weight/ngamma
+            states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
@@ -10481,11 +10481,11 @@ subroutine pfida_mc
 
             !! Weight CX rates by ion source density
             if(particles%axisym) then
-                states=rates*fast_ion%weight/(fast_ion%delta_phi/(2*pi)) &
-                       *(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
-                       *beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                states=rates*fast_ion%weight*(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
+                       /(fast_ion%r*pass_grid%dv)/ngamma
+
             else
-                states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                states=rates*fast_ion%weight/(fast_ion%r*pass_grid%dv)/ngamma
             endif
 
             !! Calculate the spectra produced in each cell along the path
@@ -10768,12 +10768,12 @@ subroutine npa_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        if(.not.fast_ion%beam_grid_cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = fast_ion%beam_grid_phi_enter + fast_ion%delta_phi*randomu(1)
             else
                 phi = fast_ion%phi
             endif
@@ -10821,7 +10821,7 @@ subroutine npa_mc
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        states=rates*fast_ion%weight/ngamma
+                        states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
@@ -10864,7 +10864,7 @@ subroutine npa_mc
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                states=rates*fast_ion%weight/ngamma
+                states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
@@ -10970,11 +10970,10 @@ subroutine pnpa_mc
 
                         !! Weight CX rates by ion source density
                         if(particles%axisym) then
-                            states=rates*fast_ion%weight/(fast_ion%delta_phi/(2*pi)) &
-                                   *(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
-                                   *beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                            states=rates*fast_ion%weight*(pass_grid%nphi*pass_grid%dphi/(2*pi)) &
+                                   /(fast_ion%r*pass_grid%dv)/ngamma
                         else
-                            states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                            states=rates*fast_ion%weight/(fast_ion%r*pass_grid%dv)/ngamma
                         endif
 
                         !! Attenuate states as the particle move through plasma
@@ -11017,11 +11016,10 @@ subroutine pnpa_mc
 
                 !! Weight CX rates by ion source density
                 if(particles%axisym) then
-                    states=rates*fast_ion%weight/(fast_ion%delta_phi/(2*pi)) &
-                           *(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
-                           *beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                    states=rates*fast_ion%weight*(pass_grid%nphi*pass_grid%dphi/(2*pi)) &
+                           /(fast_ion%r*pass_grid%dv)/ngamma
                 else
-                    states=rates*fast_ion%weight*beam_grid%dv/(fast_ion%r*pass_grid%dv)/ngamma
+                    states=rates*fast_ion%weight/(fast_ion%r*pass_grid%dv)/ngamma
                 endif
 
                 !! Attenuate states as the particle moves though plasma
@@ -11165,16 +11163,25 @@ subroutine neutron_mc
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square
-    real(Float64)  :: phi, s, c
+    real(Float64)  :: phi, s, c, factor, delta_phi
 
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') particles%nparticle
     endif
 
+    !! Correct neutron rate when equilibrium is 3D and MC distribution is 4D
+    if(particles%axisym.and.(inter_grid%nphi.gt.1)) then
+        delta_phi = inter_grid%phi(inter_grid%nphi)-inter_grid%phi(1)
+        delta_phi = delta_phi + delta_phi/(inter_grid%nphi-1)/2 !Add half a cell
+        factor = delta_phi/(2*pi) * 2 !Riemann sum below assumes coord's are at midpoint of cell
+    else
+        factor = 1
+    endif
+
     rate=0.0
     ngamma = 20
     !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,s,c, &
-    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi)
+    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi,factor)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions
@@ -11212,7 +11219,7 @@ subroutine neutron_mc
 
                 !! Get neutron production rate
                 call get_neutron_rate(plasma, eb, rate)
-                rate = rate*fast_ion%weight/(fast_ion%delta_phi/(2*pi))*beam_grid%dv/ngamma
+                rate = rate*fast_ion%weight/ngamma*factor
 
                 !! Store neutrons
                 call store_neutrons(rate, fast_ion%class)
@@ -11232,7 +11239,7 @@ subroutine neutron_mc
 
             !! Get neutron production rate
             call get_neutron_rate(plasma, eb, rate)
-            rate = rate*fast_ion%weight/(fast_ion%delta_phi/(2*pi))*beam_grid%dv
+            rate = rate*fast_ion%weight*factor
 
             !! Store neutrons
             call store_neutrons(rate, fast_ion%class)

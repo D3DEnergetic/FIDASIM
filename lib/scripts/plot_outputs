@@ -6,6 +6,8 @@ import glob
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import savgol_filter
+from scipy.stats import binned_statistic
 from matplotlib.ticker import (FormatStrFormatter, AutoMinorLocator,
         LogLocator, AutoLocator)
 
@@ -33,8 +35,7 @@ def to_plot_f(file_path):
 def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
         cold=False, dcx=False, full=False, half=False, halo=False,
         third=False, plot_all=False, log=False,
-        ac=False, lc=[], rc=[], xlim=[], ylim=[],
-        poly=False,degree=4,err_bar=True):
+        ac=False, lc=[], rc=[], xlim=[], ylim=[], smooth=False):
 
     if len(lc) == 0 and len(rc) == 0 and not ac:
         print('** ERROR: Spectra channel arguments were NOT defined. **')
@@ -120,8 +121,7 @@ def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
         ax[mod_i].xaxis.set_major_locator(majorLocatorx)
         ax[mod_i].xaxis.set_minor_locator(minorLocatorx)
         ax[mod_i].xaxis.set_major_formatter(majorFormatter)
-        ax[mod_i].tick_params(axis='x', which='both', labelsize=10, direction='in',
-                top=1)
+        ax[mod_i].tick_params(axis='x', which='both', labelsize=10, direction='in', top=1)
         # Handle y axis ticks
         if log==1:
             ax[mod_i].set_yscale('log')
@@ -131,29 +131,19 @@ def plt_spectra(file_paths, fida=False, pfida=False, brems=False,
         else:
             minorLocatory = AutoMinorLocator(5)
             ax[mod_i].yaxis.set_minor_locator(minorLocatory)
-        ax[mod_i].tick_params(axis='y', which='both', labelsize=10, direction='in',
-                right=1)
+        ax[mod_i].tick_params(axis='y', which='both', labelsize=10, direction='in', right=1)
 
         # Create plots
         for i in range(len(file_paths)):
             for d in range(len(data_set[i])):
-                if(poly):
-                    x = lamb_set[i]
-                    y = data_set[i][d].value[ch_i2,:]
-                    if (err_bar):
-                        e = np.std(y)
-                        ax[mod_i].errorbar(x, y, e, linestyle='None', marker='.',
-                                           elinewidth=1,capsize=2,alpha=0.01)
-
-                    # Fit a polynomial of degree `args.degree`
-                    z = np.polyfit(lamb_set[i], data_set[i][d].value[ch_i2,:],
-                                   degree)
-                    f = np.poly1d(z)
-                    lamb_set_new = np.linspace(lamb_set[i][0], lamb_set[i][-1], 50)
-                    data_set_new = f(lamb_set_new)
-                    ax[mod_i].plot(lamb_set_new, data_set_new,label=label_set[i][d],c=colors[i])
+                radiance = data_set[i][d].value[ch_i2,:]
+                lamb = lamb_set[i]
+                labels = label_set[i][d]
+                if(smooth):
+                    radiance_hat = savgol_filter(radiance, 51, 2)
+                    ax[mod_i].plot(lamb, radiance_hat, label=labels, c=colors[i])
                 else:
-                    ax[mod_i].plot(lamb_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
+                    ax[mod_i].plot(lamb, radiance, label=labels, c=colors[i])
 
         # Override axes limits if the user requested it
         if len(xlim)==2:
@@ -272,22 +262,30 @@ def plt_npa(file_paths, flux=False, pflux=False, plot_all=False,
         # Create plots
         for i in range(len(file_paths)):
             for d in range(len(data_set[i])):
+                flux = data_set[i][d].value[ch_i2,:]
+                energy = energy_set[i]
+                labels = label_set[i][d]
                 if(poly):
-                    x = energy_set[i]
-                    y = data_set[i][d].value[ch_i2,:]
-                    if (err_bar):
-                        e = np.std(y)
-                        ax[mod_i].errorbar(x, y, e, linestyle='None', marker='.',
-                                           elinewidth=1,capsize=2,alpha=0.1)
-
                     # Fit a polynomial of degree `args.degree`
-                    z = np.polyfit(energy_set[i], data_set[i][d].value[ch_i2,:], degree)
+                    e = np.std(flux)
+                    ax[mod_i].errorbar(energy, flux, e, linestyle='None', marker='.',elinewidth=1,
+                                       capsize=2,alpha=0.1)
+                    # First, rebin data
+                    Emin = np.min(energy)
+                    Emax = np.max(energy)
+                    dE = (Emax-Emin)*0.03
+                    nE = int((1 - Emin/Emax)/0.03)
+                    bins = np.linspace(Emin, Emax+dE, nE)
+                    flux = binned_statistic(energy, flux, bins=bins)[0]
+                    energy = [(a + b) /2 for a,b in zip(bins[:-1], bins[1:])]
+
+                    # Apply polynomial fit
+                    z = np.polyfit(energy, flux, degree)
                     f = np.poly1d(z)
-                    energy_set_new = np.linspace(energy_set[i][0], energy_set[i][-1], 50)
-                    data_set_new = f(energy_set_new)
-                    ax[mod_i].plot(energy_set_new, data_set_new,label=label_set[i][d],c=colors[i])
+                    flux = f(energy)
+                    ax[mod_i].plot(energy, flux, label=labels, c=colors[i])
                 else:
-                    ax[mod_i].plot(energy_set[i], data_set[i][d].value[ch_i2,:],label=label_set[i][d])
+                    ax[mod_i].plot(energy, flux, label=labels, c=colors[i])
 
         # Override axes limits if the user requested it
         if len(xlim)==2:
@@ -322,13 +320,13 @@ def get_neutron_rate(file_paths, N=1):
 def main():
     parser = argparse.ArgumentParser(description="Plots FIDASIM outputs")
     parser.add_argument('-d', '--directory', type=str,
-                        help='Folder path where your file(s) are located')
+                        help='Folder path where your file(s) are located (e.g. plot_outputs -d /sample/directory/ -f -pf -ls 1 3)')
     parser.add_argument('-r','--runids',
                         nargs='+',
-                        help = 'Run ID')
+                        help = 'Run ID (e.g. plot_outputs -d /sample/directory/ -r test -f -pf -ls 1 3)')
     parser.add_argument('-p', '--path', type=str,
                         nargs='+',
-                        help='Full file path of file(s)')
+                        help='Full file path of file(s) (e.g. plot_outputs -p /sample/directory/test_spectra.h5 -f -pf -ls 1 3)')
     parser.add_argument('-f', '--fida',
                         default = False, action='store_true',
                         help='On switch for active FIDA emission')
@@ -397,22 +395,23 @@ def main():
                         help='Range of NPA channels')
     parser.add_argument('-nx', '--nxlim', type=float,
                         default = [], nargs='+',
-                        help='Set the wavelength axis limits')
+                        help='Set the energy axis limits')
     parser.add_argument('-ny', '--nylim', type=float,
                         default = [], nargs='+',
                         help='Set the flux axis limits')
     parser.add_argument('-nl', '--nlog',
                         default = False, action='store_true',
                         help='Set the flux axis to a log scale')
+    parser.add_argument('-sm', '--smooth',
+                        default = False, action='store_true',
+                        help='Apply a Savitzky-Golay filter to spectra for data smoothing')
     parser.add_argument('-py', '--poly',
                         default = False, action='store_true',
-                        help='Fit a polynomial function to the data')
+                        help='Fit a polynomial of degree 4 to NPA data (-de changes degree)')
     parser.add_argument('-de', '--degree', type=int,
                         default = 4,
-                        help='Specifies the degree of polynomial fit')
-    parser.add_argument('-eb', '--errorbar',
-                        default = True, action='store_false',
-                        help='Removes standard deviation of raw data from the polynomial plot')
+                        help='Set the degree of NPA polynomial fit')
+
 
     args = parser.parse_args()
 
@@ -451,15 +450,14 @@ def main():
                     cold=args.cold, dcx=args.dcx, full=args.full, half=args.half, 
                     halo=args.halo, third=args.third, plot_all=args.spectra, 
                     log=args.slog, ac=args.allschan, lc=args.listschan, 
-                    rc=args.rangeschan, xlim=args.sxlim, ylim=args.sylim, 
-                    poly=args.poly, degree=args.degree, err_bar=args.errorbar)
+                    rc=args.rangeschan, xlim=args.sxlim, ylim=args.sylim,
+                    smooth=args.smooth)
 
     if len(to_plot[1])>0:
         plt_npa(to_plot[1], flux=args.npaflux, pflux=args.pnpaflux, 
                 plot_all=args.flux, log=args.nlog, ac=args.allnchan, 
                 lc=args.listnchan, rc=args.rangenchan, xlim=args.nxlim, 
-                ylim=args.nylim, poly=args.poly, degree=args.degree, 
-                err_bar=args.errorbar)
+                ylim=args.nylim, poly=args.poly, degree=args.degree)
 
     if len(to_plot[2])>0:
         num_neutron_f = len(to_plot[2])

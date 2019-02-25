@@ -61,7 +61,7 @@ FUNCTION grid_fbm,r2d,z2d,fbm,fdens,rout,zout
     return, {denf:denf, fbm:fbm_grid}
 END
 
-FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_range
+FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_range,species=species
     ;+#read_nubeam
     ;+Reads NUBEAM fast-ion distribution function
     ;+***
@@ -76,6 +76,8 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     ;+    **e_range**: Energy range to consider
     ;+
     ;+    **p_range**: Pitch range to consider
+    ;+
+    ;+    **species**: Fast-ion species number. Defaults to 1
     ;+
     ;+##Return Value
     ;+Distribution structure
@@ -94,8 +96,11 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
         goto,GET_OUT
     endif
 
-    vars = read_ncdf(filename,vars=["TIME","R2D","Z2D","E_D_NBI","A_D_NBI", $
-                                    "F_D_NBI","RSURF","ZSURF","BMVOL"])
+    if not keyword_set(species) then species = 1
+
+    sstr = string((read_ncdf(filename,vars=["SPECIES_"+strcompress(species,/r)])).(1))
+    vars = read_ncdf(filename,vars=["TIME","R2D","Z2D","E_"+sstr,"A_"+sstr, $
+                                    "F_"+sstr,"RSURF","ZSURF","BMVOL"])
     ngrid=n_elements(vars.r2d)
 
     ;;-------------Convert eV-> keV
@@ -104,9 +109,12 @@ FUNCTION read_nubeam,filename,grid,btipsign=btipsign,e_range=e_range,p_range=p_r
     z2d = vars.z2d
     rsurf = vars.rsurf
     zsurf = vars.zsurf
-    pitch = vars.a_d_nbi
-    energy=vars.e_d_nbi*1.0d-3          ;; fidasim needs energy in kev
-    fbm=vars.f_d_nbi*1.0d3              ;; now, this needs to be corrected
+    index = where(tag_names(vars) EQ "A_"+sstr)
+    pitch = vars.(index[0])
+    index = where(tag_names(vars) EQ "E_"+sstr)
+    energy=vars.(index[0])*1.0d-3          ;; fidasim needs energy in kev
+    index = where(tag_names(vars) EQ "F_"+sstr)
+    fbm=vars.(index[0])*1.0d3              ;; now, this needs to be corrected
     ;; as we now calculate with fast-ions/omega/keV/cm^3
     ;;------------Convert d_omega --> pitch
     ;; Fast-ion distribution is given as a function of cm^3, energy

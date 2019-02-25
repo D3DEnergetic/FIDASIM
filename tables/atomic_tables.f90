@@ -432,7 +432,7 @@ function p_cx_1_3_adas(Erel) result(sigma)
         a(5)*l**4.0   + a(6)*l**5.0 + a(7)*l**6.0 + &
         a(8)*l**7.0   + a(9)*l**8.0 + a(10)*l**9.0
 
-    sigma = fac*(10.d0**p)
+    sigma = max(fac*(10.d0**p),1.d-300)
 
 end function p_cx_1_3_adas
 
@@ -471,7 +471,7 @@ function p_cx_1_4_adas(Erel) result(sigma)
         a(5)*l**4.0   + a(6)*l**5.0 + a(7)*l**6.0 + &
         a(8)*l**7.0   + a(9)*l**8.0 + a(10)*l**9.0
 
-    sigma = fac*(10.d0**p)
+    sigma = max(fac*(10.d0**p),1.d-300)
 
 end function p_cx_1_4_adas
 
@@ -613,7 +613,7 @@ function p_cx_2_3_adas(Erel) result(sigma)
 
     real(Float64) :: ee, l, sigma2s, sigma2p
 
-    ee = max(Erel * 1.d3 * n**2.d0, 1.d3)
+    ee = min(max(Erel * 1.d3 * n**2.d0, 1.d3), 4.d6)
 
     l = log10(ee)
 
@@ -2770,13 +2770,21 @@ function C6_cx_1_adas(eb) result(sigma)
                                                    1.617519888d1, -1.638152470d0, &
                                                    6.768953863d-2 ]
 
-    real(Float64) :: e, l, p
+    real(Float64) :: e, l, p, m
 
     e = max(eb*1.d3,1.5d3)
-    l = log10(e)
-
-    p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
-        A(5)*l**4 + A(6)*l**5 + A(7)*l**6
+    if(eb.le.500) then
+        l = log10(e)
+        p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
+            A(5)*l**4 + A(6)*l**5 + A(7)*l**6
+    else
+        l = log10(500*1.d3)
+        p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
+            A(5)*l**4 + A(6)*l**5 + A(7)*l**6
+        m = A(2) + 2*A(3)*l + 3*A(4)*l**2 + &
+            4*A(5)*l**3 + 5*A(6)*l**4 + 6*A(7)*l**5
+        p = p + m*(log10(e) - l)
+    endif
     sigma = 10.d0**p
 
 end function C6_cx_1_adas
@@ -2801,14 +2809,25 @@ function C6_cx_2_adas(eb) result(sigma)
                                                     2.764972254d4, -3.522105245d3, &
                                                     2.921934171d2, -1.425552507d1, &
                                                     3.106007048d-1 ]
-    real(Float64) :: e, l, p
+    real(Float64) :: e, l, p, m
 
     e = max(eb*1.d3,1.5d3)*2.0**2
-    l = log10(e)
+    if(eb.le.700) then
+        l = log10(e)
 
-    p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
-        A(5)*l**4 + A(6)*l**5 + A(7)*l**6 +     &
-        A(8)*l**7 + A(9)*l**8 + A(10)*l**9 + A(11)*l**10
+        p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
+            A(5)*l**4 + A(6)*l**5 + A(7)*l**6 +     &
+            A(8)*l**7 + A(9)*l**8 + A(10)*l**9 + A(11)*l**10
+    else
+        l = log10(700*1.d3*2.0**2)
+        p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
+            A(5)*l**4 + A(6)*l**5 + A(7)*l**6 +     &
+            A(8)*l**7 + A(9)*l**8 + A(10)*l**9 + A(11)*l**10
+        m = A(2) + 2*A(3)*l + 3*A(4)*l**2 + &
+            4*A(5)*l**3 + 5*A(6)*l**4 + 6*A(7)*l**5 +     &
+            7*A(8)*l**6 + 8*A(9)*l**7 + 9*A(10)*l**8 + 10*A(11)*l**9
+        p = p + m*(log10(e) - l)
+    endif
     sigma = 10.d0**p
 
 end function C6_cx_2_adas
@@ -2833,14 +2852,25 @@ function C6_cx_3_adas(eb) result(sigma)
                                                     2.777765778d4, -3.537459450d3, &
                                                     2.933884362d2, -1.430994136d1, &
                                                     3.117002878d-1 ]
-    real(Float64) :: e, l, p
+    real(Float64) :: e, l, p, m
 
     e = max(eb*1.d3,1.5d3)*3.0**2
-    l = log10(e)
+    if(eb.le.300) then
+        l = log10(e)
 
-    p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
-        A(5)*l**4 + A(6)*l**5 + A(7)*l**6 +     &
-        A(8)*l**7 + A(9)*l**8 + A(10)*l**9 + A(11)*l**10
+        p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
+            A(5)*l**4 + A(6)*l**5 + A(7)*l**6 +     &
+            A(8)*l**7 + A(9)*l**8 + A(10)*l**9 + A(11)*l**10
+    else
+        l = log10(300*1.d3*3.0**2)
+        p = A(1) + A(2)*l + A(3)*l**2 + A(4)*l**3 + &
+            A(5)*l**4 + A(6)*l**5 + A(7)*l**6 +     &
+            A(8)*l**7 + A(9)*l**8 + A(10)*l**9 + A(11)*l**10
+        m = A(2) + 2*A(3)*l + 3*A(4)*l**2 + &
+            4*A(5)*l**3 + 5*A(6)*l**4 + 6*A(7)*l**5 +     &
+            7*A(8)*l**6 + 8*A(9)*l**7 + 9*A(10)*l**8 + 10*A(11)*l**9
+        p = p + m*(log10(e) - l)
+    endif
     sigma = 10.d0**p
 
 end function C6_cx_3_adas
@@ -5468,7 +5498,7 @@ subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
 
     integer :: ie, it, ia, n, m, error, cnt
     real(Float64) :: rate
-    integer, parameter :: n_bt_amu = 4
+    integer, parameter :: n_bt_amu = 9
     real(Float64), dimension(2,n_bt_amu) :: a
     logical :: exis
 
@@ -5503,8 +5533,13 @@ subroutine write_bt_H_H(id, namelist_file, n_max, m_max)
     excit = 0.d0
     a(:,1) = [H1_amu, H1_amu]
     a(:,2) = [H1_amu, H2_amu]
-    a(:,3) = [H2_amu, H1_amu]
-    a(:,4) = [H2_amu, H2_amu]
+    a(:,3) = [H1_amu, H3_amu]
+    a(:,4) = [H2_amu, H1_amu]
+    a(:,5) = [H2_amu, H2_amu]
+    a(:,6) = [H2_amu, H3_amu]
+    a(:,7) = [H3_amu, H1_amu]
+    a(:,8) = [H3_amu, H2_amu]
+    a(:,9) = [H3_amu, H3_amu]
 
     dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
     do ie=1, nenergy
@@ -5702,7 +5737,7 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
 
     integer :: ie, it, ia, n, m, error, cnt
     real(Float64) :: rate
-    integer, parameter :: n_bt_amu = 2
+    integer, parameter :: n_bt_amu = 3
     real(Float64), dimension(2,n_bt_amu) :: a
     logical :: exis
 
@@ -5734,6 +5769,7 @@ subroutine write_bt_H_e(id, namelist_file, n_max, m_max)
     excit = 0.d0
     a(:,1) = [H1_amu, e_amu]
     a(:,2) = [H2_amu, e_amu]
+    a(:,3) = [H3_amu, e_amu]
 
     dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
     do ie=1, nenergy
@@ -5922,7 +5958,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
 
     integer :: iq, ie, it, ia, n, m, error, cnt
     real(Float64) :: rate
-    integer, parameter :: n_bt_amu = 2
+    integer, parameter :: n_bt_amu = 3
     real(Float64), dimension(2,n_bt_amu) :: a
 
     character(len=10) :: aname
@@ -5974,6 +6010,7 @@ subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
         excit = 0.d0
         a(:,1) = [H1_amu, mass]
         a(:,2) = [H2_amu, mass]
+        a(:,3) = [H3_amu, mass]
 
         dlogE = (log10(emax) - log10(emin))/(nenergy - 1)
         do ie=1, nenergy

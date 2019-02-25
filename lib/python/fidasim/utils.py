@@ -900,7 +900,7 @@ def extract_transp_plasma(filename, intime, grid, flux,
 
     return plasma
 
-def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1):
+def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
     """
     #+#read_nubeam
     #+Reads NUBEAM fast-ion distribution function
@@ -917,6 +917,8 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1):
     #+
     #+    **p_range**: Pitch range to consider
     #+
+    #+    **species**: Fast-ion species number. Defaults to 1
+    #+
     #+##Return Value
     #+Distribution structure
     #+
@@ -926,7 +928,9 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1):
     #+```
     """
 
-    var = read_ncdf(filename, vars=["TIME","R2D","Z2D","E_D_NBI","A_D_NBI","F_D_NBI","RSURF","ZSURF","BMVOL"])
+    species_var = "SPECIES_{}".format(species)
+    sstr = read_ncdf(filename,vars=[species_var])[species_var].tostring().decode('UTF-8')
+    var = read_ncdf(filename, vars=["TIME","R2D","Z2D","E_"+sstr,"A_"+sstr,"F_"+sstr,"RSURF","ZSURF","BMVOL"])
 
     ngrid = len(var["R2D"])
 
@@ -940,9 +944,9 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1):
     rsurf = var["RSURF"].T
     zsurf = var["ZSURF"].T
     bmvol = var["BMVOL"]
-    pitch = var["A_D_NBI"]
-    energy = var["E_D_NBI"]*1e-3
-    fbm = var["F_D_NBI"].T*1e3
+    pitch = var["A_"+sstr]
+    energy = var["E_"+sstr]*1e-3
+    fbm = var["F_"+sstr].T*1e3
     fbm = np.where(fbm > 0.0, 0.5*fbm, 0.0) #0.5 to convert to pitch instead of solid angle d_omega/4pi
 
     if btipsign < 0:

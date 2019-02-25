@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.6% of total for procedures.">189 statements</a>
+    title=" 1.6% of total for procedures.">190 statements</a>
      </li> 
      
      
@@ -1332,7 +1332,7 @@ public subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
 
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">iq</span><span class="p">,</span> <span class="n">ie</span><span class="p">,</span> <span class="n">it</span><span class="p">,</span> <span class="n">ia</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">cnt</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rate</span>
-    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n_bt_amu</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">n_bt_amu</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">)</span> <span class="kd">::</span> <span class="n">a</span>
 
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="kd">::</span> <span class="n">aname</span>
@@ -1384,6 +1384,7 @@ public subroutine write_bt_H_Aq(id, namelist_file, n_max, m_max)
         <span class="n">excit</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="n">a</span><span class="p">(:,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">H1_amu</span><span class="p">,</span> <span class="n">mass</span><span class="p">]</span>
         <span class="n">a</span><span class="p">(:,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">H2_amu</span><span class="p">,</span> <span class="n">mass</span><span class="p">]</span>
+        <span class="n">a</span><span class="p">(:,</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="p">[</span><span class="n">H3_amu</span><span class="p">,</span> <span class="n">mass</span><span class="p">]</span>
 
         <span class="n">dlogE</span> <span class="o">=</span> <span class="p">(</span><span class="n">log10</span><span class="p">(</span><span class="n">emax</span><span class="p">)</span> <span class="o">-</span> <span class="n">log10</span><span class="p">(</span><span class="n">emin</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">nenergy</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">do </span><span class="n">ie</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nenergy</span>

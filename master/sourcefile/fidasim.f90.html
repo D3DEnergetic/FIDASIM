@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="58.1% of total for source files.">7784 statements</a>
+    title="58.1% of total for source files.">7782 statements</a>
      </li> 
      
      
@@ -4426,7 +4426,7 @@
 <a name="ln-4018"></a>    <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/nlevel&quot;</span><span class="p">,</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
 <a name="ln-4019"></a>         <span class="s2">&quot;Number of atomic energy levels&quot;</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 <a name="ln-4020"></a>
-<a name="ln-4021"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-4021"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_nbi_dens</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-4022"></a><span class="k">        call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/fdens&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="p">&amp;</span>
 <a name="ln-4023"></a>             <span class="n">neut</span><span class="p">%</span><span class="n">full</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 <a name="ln-4024"></a>        <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/fdens&quot;</span><span class="p">,</span><span class="s2">&quot;units&quot;</span><span class="p">,</span><span class="s2">&quot;neutrals*cm^-3&quot;</span><span class="p">,</span><span class="n">error</span><span class="p">)</span>
@@ -4445,7 +4445,7 @@
 <a name="ln-4037"></a>        <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/tdens&quot;</span><span class="p">,</span><span class="s2">&quot;units&quot;</span><span class="p">,</span><span class="s2">&quot;neutrals*cm^-3&quot;</span><span class="p">,</span><span class="n">error</span><span class="p">)</span>
 <a name="ln-4038"></a>    <span class="n">endif</span>
 <a name="ln-4039"></a>
-<a name="ln-4040"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-4040"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx_dens</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-4041"></a><span class="k">        call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/dcxdens&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="p">&amp;</span>
 <a name="ln-4042"></a>             <span class="n">neut</span><span class="p">%</span><span class="n">dcx</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 <a name="ln-4043"></a>
@@ -4454,7 +4454,7 @@
 <a name="ln-4046"></a>        <span class="k">call </span><span class="n">h5ltset_attribute_string_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span><span class="s2">&quot;/dcxdens&quot;</span><span class="p">,</span><span class="s2">&quot;units&quot;</span><span class="p">,</span><span class="s2">&quot;neutrals*cm^-3&quot;</span><span class="p">,</span><span class="n">error</span><span class="p">)</span>
 <a name="ln-4047"></a>    <span class="n">endif</span>
 <a name="ln-4048"></a>
-<a name="ln-4049"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-4049"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo_dens</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
 <a name="ln-4050"></a><span class="k">        call </span><span class="n">h5ltmake_compressed_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/halodens&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="p">&amp;</span>
 <a name="ln-4051"></a>             <span class="n">neut</span><span class="p">%</span><span class="n">halo</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 <a name="ln-4052"></a>
@@ -11572,163 +11572,161 @@
 <a name="ln-11164"></a>            <span class="n">endif</span>
 <a name="ln-11165"></a>
 <a name="ln-11166"></a>            <span class="c">!! ---------- WRITE NEUTRALS ---------- !!</span>
-<a name="ln-11167"></a>            <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_bes</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_halo</span><span class="p">).</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11168"></a><span class="k">                if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11169"></a><span class="k">                    write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;write neutrals:    &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11170"></a>                <span class="n">endif</span>
-<a name="ln-11171"></a><span class="cp">#ifdef _MPI</span>
-<a name="ln-11172"></a>                <span class="k">if</span><span class="p">(</span><span class="n">my_rank</span><span class="p">().</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">call </span><span class="n">write_neutrals</span><span class="p">()</span>
-<a name="ln-11173"></a><span class="cp">#else</span>
-<a name="ln-11174"></a>                <span class="k">call </span><span class="n">write_neutrals</span><span class="p">()</span>
-<a name="ln-11175"></a><span class="cp">#endif</span>
-<a name="ln-11176"></a>                <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11177"></a>            <span class="n">endif</span>
-<a name="ln-11178"></a>        <span class="n">endif</span>
-<a name="ln-11179"></a>    <span class="n">endif</span>
-<a name="ln-11180"></a>
+<a name="ln-11167"></a>            <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11168"></a><span class="k">                write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;write neutrals:    &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11169"></a>            <span class="n">endif</span>
+<a name="ln-11170"></a><span class="cp">#ifdef _MPI</span>
+<a name="ln-11171"></a>            <span class="k">if</span><span class="p">(</span><span class="n">my_rank</span><span class="p">().</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">call </span><span class="n">write_neutrals</span><span class="p">()</span>
+<a name="ln-11172"></a><span class="cp">#else</span>
+<a name="ln-11173"></a>            <span class="k">call </span><span class="n">write_neutrals</span><span class="p">()</span>
+<a name="ln-11174"></a><span class="cp">#endif</span>
+<a name="ln-11175"></a>            <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11176"></a>        <span class="n">endif</span>
+<a name="ln-11177"></a>    <span class="n">endif</span>
+<a name="ln-11178"></a>
+<a name="ln-11179"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
+<a name="ln-11180"></a>    <span class="c">!!------------------------------ COLD D-ALPHA ----------------------------</span>
 <a name="ln-11181"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11182"></a>    <span class="c">!!------------------------------ COLD D-ALPHA ----------------------------</span>
-<a name="ln-11183"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11184"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_cold</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11185"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11186"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;cold:    &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11187"></a>        <span class="n">endif</span>
-<a name="ln-11188"></a>        <span class="k">call </span><span class="n">cold_spec</span><span class="p">()</span>
-<a name="ln-11189"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11190"></a>    <span class="n">endif</span>
-<a name="ln-11191"></a>
+<a name="ln-11182"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_cold</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11183"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11184"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;cold:    &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11185"></a>        <span class="n">endif</span>
+<a name="ln-11186"></a>        <span class="k">call </span><span class="n">cold_spec</span><span class="p">()</span>
+<a name="ln-11187"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11188"></a>    <span class="n">endif</span>
+<a name="ln-11189"></a>
+<a name="ln-11190"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
+<a name="ln-11191"></a>    <span class="c">!!----------------------------- BREMSSTRAHLUNG ---------------------------</span>
 <a name="ln-11192"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11193"></a>    <span class="c">!!----------------------------- BREMSSTRAHLUNG ---------------------------</span>
-<a name="ln-11194"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11195"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_brems</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11196"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11197"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;bremsstrahlung:    &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11198"></a>        <span class="n">endif</span>
-<a name="ln-11199"></a>        <span class="k">call </span><span class="n">bremsstrahlung</span><span class="p">()</span>
-<a name="ln-11200"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11201"></a>    <span class="n">endif</span>
-<a name="ln-11202"></a>
+<a name="ln-11193"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_brems</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11194"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11195"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;bremsstrahlung:    &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11196"></a>        <span class="n">endif</span>
+<a name="ln-11197"></a>        <span class="k">call </span><span class="n">bremsstrahlung</span><span class="p">()</span>
+<a name="ln-11198"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11199"></a>    <span class="n">endif</span>
+<a name="ln-11200"></a>
+<a name="ln-11201"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
+<a name="ln-11202"></a>    <span class="c">!! --------------------- CALCULATE the FIDA RADIATION --------------------</span>
 <a name="ln-11203"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11204"></a>    <span class="c">!! --------------------- CALCULATE the FIDA RADIATION --------------------</span>
-<a name="ln-11205"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11206"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-11207"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11208"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;fida:    &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11209"></a>        <span class="n">endif</span>
-<a name="ln-11210"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11211"></a><span class="k">            call </span><span class="n">fida_f</span><span class="p">()</span>
-<a name="ln-11212"></a>        <span class="k">else</span>
-<a name="ln-11213"></a><span class="k">            call </span><span class="n">fida_mc</span><span class="p">()</span>
-<a name="ln-11214"></a>        <span class="n">endif</span>
-<a name="ln-11215"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11216"></a>    <span class="n">endif</span>
-<a name="ln-11217"></a>
-<a name="ln-11218"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-11219"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11220"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;pfida:   &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11221"></a>        <span class="n">endif</span>
-<a name="ln-11222"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11223"></a><span class="k">            call </span><span class="n">pfida_f</span><span class="p">()</span>
-<a name="ln-11224"></a>        <span class="k">else</span>
-<a name="ln-11225"></a><span class="k">            call </span><span class="n">pfida_mc</span><span class="p">()</span>
-<a name="ln-11226"></a>        <span class="n">endif</span>
-<a name="ln-11227"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11228"></a>    <span class="n">endif</span>
-<a name="ln-11229"></a>
-<a name="ln-11230"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_spec</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11231"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11232"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;write spectra:    &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11233"></a>        <span class="n">endif</span>
-<a name="ln-11234"></a><span class="cp">#ifdef _MPI</span>
-<a name="ln-11235"></a>        <span class="k">if</span><span class="p">(</span><span class="n">my_rank</span><span class="p">().</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">call </span><span class="n">write_spectra</span><span class="p">()</span>
-<a name="ln-11236"></a><span class="cp">#else</span>
-<a name="ln-11237"></a>        <span class="k">call </span><span class="n">write_spectra</span><span class="p">()</span>
-<a name="ln-11238"></a><span class="cp">#endif</span>
-<a name="ln-11239"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11240"></a>    <span class="n">endif</span>
-<a name="ln-11241"></a>
+<a name="ln-11204"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-11205"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11206"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;fida:    &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11207"></a>        <span class="n">endif</span>
+<a name="ln-11208"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11209"></a><span class="k">            call </span><span class="n">fida_f</span><span class="p">()</span>
+<a name="ln-11210"></a>        <span class="k">else</span>
+<a name="ln-11211"></a><span class="k">            call </span><span class="n">fida_mc</span><span class="p">()</span>
+<a name="ln-11212"></a>        <span class="n">endif</span>
+<a name="ln-11213"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11214"></a>    <span class="n">endif</span>
+<a name="ln-11215"></a>
+<a name="ln-11216"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-11217"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11218"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;pfida:   &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11219"></a>        <span class="n">endif</span>
+<a name="ln-11220"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11221"></a><span class="k">            call </span><span class="n">pfida_f</span><span class="p">()</span>
+<a name="ln-11222"></a>        <span class="k">else</span>
+<a name="ln-11223"></a><span class="k">            call </span><span class="n">pfida_mc</span><span class="p">()</span>
+<a name="ln-11224"></a>        <span class="n">endif</span>
+<a name="ln-11225"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11226"></a>    <span class="n">endif</span>
+<a name="ln-11227"></a>
+<a name="ln-11228"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_spec</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11229"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11230"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;write spectra:    &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11231"></a>        <span class="n">endif</span>
+<a name="ln-11232"></a><span class="cp">#ifdef _MPI</span>
+<a name="ln-11233"></a>        <span class="k">if</span><span class="p">(</span><span class="n">my_rank</span><span class="p">().</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">call </span><span class="n">write_spectra</span><span class="p">()</span>
+<a name="ln-11234"></a><span class="cp">#else</span>
+<a name="ln-11235"></a>        <span class="k">call </span><span class="n">write_spectra</span><span class="p">()</span>
+<a name="ln-11236"></a><span class="cp">#endif</span>
+<a name="ln-11237"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11238"></a>    <span class="n">endif</span>
+<a name="ln-11239"></a>
+<a name="ln-11240"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
+<a name="ln-11241"></a>    <span class="c">!! ----------------------- CALCULATE the NPA FLUX ------------------------</span>
 <a name="ln-11242"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11243"></a>    <span class="c">!! ----------------------- CALCULATE the NPA FLUX ------------------------</span>
-<a name="ln-11244"></a>    <span class="c">!! -----------------------------------------------------------------------</span>
-<a name="ln-11245"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-11246"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11247"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;npa:     &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11248"></a>        <span class="n">endif</span>
-<a name="ln-11249"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11250"></a><span class="k">            call </span><span class="n">npa_f</span><span class="p">()</span>
-<a name="ln-11251"></a>        <span class="k">else</span>
-<a name="ln-11252"></a><span class="k">            call </span><span class="n">npa_mc</span><span class="p">()</span>
-<a name="ln-11253"></a>        <span class="n">endif</span>
-<a name="ln-11254"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11255"></a>    <span class="n">endif</span>
-<a name="ln-11256"></a>
-<a name="ln-11257"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
-<a name="ln-11258"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11259"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;pnpa:     &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11260"></a>        <span class="n">endif</span>
-<a name="ln-11261"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11262"></a><span class="k">            call </span><span class="n">pnpa_f</span><span class="p">()</span>
-<a name="ln-11263"></a>        <span class="k">else</span>
-<a name="ln-11264"></a><span class="k">            call </span><span class="n">pnpa_mc</span><span class="p">()</span>
-<a name="ln-11265"></a>        <span class="n">endif</span>
-<a name="ln-11266"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11267"></a>    <span class="n">endif</span>
-<a name="ln-11268"></a>
-<a name="ln-11269"></a>    <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">).</span><span class="nb">or</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="k">then</span>
-<a name="ln-11270"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11271"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;write npa:    &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11272"></a>        <span class="n">endif</span>
-<a name="ln-11273"></a>        <span class="k">call </span><span class="n">write_npa</span><span class="p">()</span>
-<a name="ln-11274"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11275"></a>    <span class="n">endif</span>
-<a name="ln-11276"></a>
+<a name="ln-11243"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-11244"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11245"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;npa:     &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11246"></a>        <span class="n">endif</span>
+<a name="ln-11247"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11248"></a><span class="k">            call </span><span class="n">npa_f</span><span class="p">()</span>
+<a name="ln-11249"></a>        <span class="k">else</span>
+<a name="ln-11250"></a><span class="k">            call </span><span class="n">npa_mc</span><span class="p">()</span>
+<a name="ln-11251"></a>        <span class="n">endif</span>
+<a name="ln-11252"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11253"></a>    <span class="n">endif</span>
+<a name="ln-11254"></a>
+<a name="ln-11255"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span><span class="k">then</span>
+<a name="ln-11256"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11257"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;pnpa:     &#39;</span> <span class="p">,</span><span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11258"></a>        <span class="n">endif</span>
+<a name="ln-11259"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11260"></a><span class="k">            call </span><span class="n">pnpa_f</span><span class="p">()</span>
+<a name="ln-11261"></a>        <span class="k">else</span>
+<a name="ln-11262"></a><span class="k">            call </span><span class="n">pnpa_mc</span><span class="p">()</span>
+<a name="ln-11263"></a>        <span class="n">endif</span>
+<a name="ln-11264"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11265"></a>    <span class="n">endif</span>
+<a name="ln-11266"></a>
+<a name="ln-11267"></a>    <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">).</span><span class="nb">or</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">))</span> <span class="k">then</span>
+<a name="ln-11268"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11269"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;write npa:    &#39;</span> <span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11270"></a>        <span class="n">endif</span>
+<a name="ln-11271"></a>        <span class="k">call </span><span class="n">write_npa</span><span class="p">()</span>
+<a name="ln-11272"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11273"></a>    <span class="n">endif</span>
+<a name="ln-11274"></a>
+<a name="ln-11275"></a>    <span class="c">!! -------------------------------------------------------------------</span>
+<a name="ln-11276"></a>    <span class="c">!! ------------------- Calculation of neutron flux -------------------</span>
 <a name="ln-11277"></a>    <span class="c">!! -------------------------------------------------------------------</span>
-<a name="ln-11278"></a>    <span class="c">!! ------------------- Calculation of neutron flux -------------------</span>
-<a name="ln-11279"></a>    <span class="c">!! -------------------------------------------------------------------</span>
-<a name="ln-11280"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_neutron</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11281"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11282"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;neutron rate:    &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11283"></a>        <span class="n">endif</span>
-<a name="ln-11284"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11285"></a><span class="k">            call </span><span class="n">neutron_f</span><span class="p">()</span>
-<a name="ln-11286"></a>        <span class="k">else</span>
-<a name="ln-11287"></a><span class="k">            call </span><span class="n">neutron_mc</span><span class="p">()</span>
-<a name="ln-11288"></a>        <span class="n">endif</span>
-<a name="ln-11289"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11290"></a>    <span class="n">endif</span>
-<a name="ln-11291"></a>
+<a name="ln-11278"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_neutron</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11279"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11280"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;neutron rate:    &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11281"></a>        <span class="n">endif</span>
+<a name="ln-11282"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11283"></a><span class="k">            call </span><span class="n">neutron_f</span><span class="p">()</span>
+<a name="ln-11284"></a>        <span class="k">else</span>
+<a name="ln-11285"></a><span class="k">            call </span><span class="n">neutron_mc</span><span class="p">()</span>
+<a name="ln-11286"></a>        <span class="n">endif</span>
+<a name="ln-11287"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11288"></a>    <span class="n">endif</span>
+<a name="ln-11289"></a>
+<a name="ln-11290"></a>    <span class="c">!! -------------------------------------------------------------------</span>
+<a name="ln-11291"></a>    <span class="c">!! ----------- Calculation of weight functions -----------------------</span>
 <a name="ln-11292"></a>    <span class="c">!! -------------------------------------------------------------------</span>
-<a name="ln-11293"></a>    <span class="c">!! ----------- Calculation of weight functions -----------------------</span>
-<a name="ln-11294"></a>    <span class="c">!! -------------------------------------------------------------------</span>
-<a name="ln-11295"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida_wght</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11296"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11297"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;fida weight function:    &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11298"></a>        <span class="n">endif</span>
-<a name="ln-11299"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida_wght</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11300"></a><span class="k">            call </span><span class="n">fida_weights_los</span><span class="p">()</span>
-<a name="ln-11301"></a>        <span class="k">else</span>
-<a name="ln-11302"></a><span class="k">            call </span><span class="n">fida_weights_mc</span><span class="p">()</span>
-<a name="ln-11303"></a>        <span class="n">endif</span>
-<a name="ln-11304"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11305"></a>    <span class="n">endif</span>
-<a name="ln-11306"></a>
-<a name="ln-11307"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa_wght</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11308"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11309"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;npa weight function:    &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11310"></a>        <span class="n">endif</span>
-<a name="ln-11311"></a>        <span class="k">call </span><span class="n">npa_weights</span><span class="p">()</span>
-<a name="ln-11312"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
-<a name="ln-11313"></a>    <span class="n">endif</span>
-<a name="ln-11314"></a>
-<a name="ln-11315"></a><span class="cp">#ifdef _MPI</span>
-<a name="ln-11316"></a>    <span class="k">call </span><span class="n">cleanup_mpi</span><span class="p">()</span>
-<a name="ln-11317"></a><span class="cp">#endif</span>
-<a name="ln-11318"></a>
-<a name="ln-11319"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<a name="ln-11320"></a><span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;END: hour:minute:second &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
-<a name="ln-11321"></a>    <span class="n">endif</span>
-<a name="ln-11322"></a>
-<a name="ln-11323"></a><span class="k">end program </span><span class="n">fidasim</span>
+<a name="ln-11293"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida_wght</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11294"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11295"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;fida weight function:    &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11296"></a>        <span class="n">endif</span>
+<a name="ln-11297"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida_wght</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11298"></a><span class="k">            call </span><span class="n">fida_weights_los</span><span class="p">()</span>
+<a name="ln-11299"></a>        <span class="k">else</span>
+<a name="ln-11300"></a><span class="k">            call </span><span class="n">fida_weights_mc</span><span class="p">()</span>
+<a name="ln-11301"></a>        <span class="n">endif</span>
+<a name="ln-11302"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11303"></a>    <span class="n">endif</span>
+<a name="ln-11304"></a>
+<a name="ln-11305"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa_wght</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11306"></a><span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11307"></a><span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;npa weight function:    &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11308"></a>        <span class="n">endif</span>
+<a name="ln-11309"></a>        <span class="k">call </span><span class="n">npa_weights</span><span class="p">()</span>
+<a name="ln-11310"></a>        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(30X,a)&#39;</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+<a name="ln-11311"></a>    <span class="n">endif</span>
+<a name="ln-11312"></a>
+<a name="ln-11313"></a><span class="cp">#ifdef _MPI</span>
+<a name="ln-11314"></a>    <span class="k">call </span><span class="n">cleanup_mpi</span><span class="p">()</span>
+<a name="ln-11315"></a><span class="cp">#endif</span>
+<a name="ln-11316"></a>
+<a name="ln-11317"></a>    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-11318"></a><span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;END: hour:minute:second &#39;</span><span class="p">,</span> <span class="nb">time</span><span class="p">(</span><span class="n">time_start</span><span class="p">)</span>
+<a name="ln-11319"></a>    <span class="n">endif</span>
+<a name="ln-11320"></a>
+<a name="ln-11321"></a><span class="k">end program </span><span class="n">fidasim</span>
 </pre></div>
 
     </section>

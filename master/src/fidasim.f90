@@ -4018,7 +4018,7 @@ subroutine write_neutrals
     call h5ltset_attribute_string_f(fid,"/nlevel","description", &
          "Number of atomic energy levels", error)
 
-    if(inputs%calc_bes.ge.1) then
+    if(inputs%calc_nbi_dens.ge.1) then
         call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
              neut%full, error)
         call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
@@ -4037,7 +4037,7 @@ subroutine write_neutrals
         call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
     endif
 
-    if(inputs%calc_dcx.ge.1) then
+    if(inputs%calc_dcx_dens.ge.1) then
         call h5ltmake_compressed_dataset_double_f(fid, "/dcxdens", 4, dims, &
              neut%dcx, error)
 
@@ -4046,7 +4046,7 @@ subroutine write_neutrals
         call h5ltset_attribute_string_f(fid,"/dcxdens","units","neutrals*cm^-3",error)
     endif
 
-    if(inputs%calc_halo.ge.1) then
+    if(inputs%calc_halo_dens.ge.1) then
         call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
              neut%halo, error)
 
@@ -11164,17 +11164,15 @@ program fidasim
             endif
 
             !! ---------- WRITE NEUTRALS ---------- !!
-            if((inputs%calc_bes+inputs%calc_dcx+inputs%calc_halo).ge.1) then
-                if(inputs%verbose.ge.1) then
-                    write(*,*) 'write neutrals:    ' , time(time_start)
-                endif
-#ifdef _MPI
-                if(my_rank().eq.0) call write_neutrals()
-#else
-                call write_neutrals()
-#endif
-                if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
+            if(inputs%verbose.ge.1) then
+                write(*,*) 'write neutrals:    ' , time(time_start)
             endif
+#ifdef _MPI
+            if(my_rank().eq.0) call write_neutrals()
+#else
+            call write_neutrals()
+#endif
+            if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
         endif
     endif
 

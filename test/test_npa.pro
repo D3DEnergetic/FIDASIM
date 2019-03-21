@@ -28,12 +28,12 @@ FUNCTION test_npa
     
     ;; Chords
     nchan = 3L
-    ulens = dblarr(nchan)
-    vlens = [-170.d0,-170.d0,-170.d0]
+    ulens = [170.d0,170.d0,170.d0]
+    vlens = dblarr(nchan)
     wlens = replicate(100.d0,nchan)
     lens = transpose([[ulens],[vlens],[wlens]])
-    ulos = dblarr(nchan)
-    vlos = [-200.d0,-170.d0,-140.d0]
+    ulos = [200.d0,170.d0,140.d0]
+    vlos = dblarr(nchan)
     wlos = dblarr(nchan)
     radius = sqrt(ulos^2.d0 + vlos^2.d0)
     id = ["c1","c2","c3"]

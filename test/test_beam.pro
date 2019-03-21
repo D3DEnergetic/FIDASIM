@@ -1,7 +1,7 @@
 FUNCTION test_beam,beta
 
-    uvw_src = [0.d0,-530.d0 - 2.d0*cos(beta),2.d0*sin(beta)]
-    uvw_pos = [0.d0,-530.d0,0.d0]
+    uvw_src = [530.d0+2.d0*cos(beta), 0.d0, 2.d0*sin(beta)]
+    uvw_pos = [530.d0, 0.d0, 0.d0]
     uvw_axis = uvw_pos - uvw_src
     uvw_axis = uvw_axis/sqrt(total(uvw_axis*uvw_axis))
 

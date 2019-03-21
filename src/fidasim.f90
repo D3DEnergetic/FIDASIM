@@ -3123,7 +3123,6 @@ subroutine read_mc(fid, error)
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
         endif
 
-     !!!particles%fast_ion(i)%phi = modulo(particles%fast_ion(i)%phi, 2*pi)
         if(particles%axisym) then
             uvw = [particles%fast_ion(i)%r, 0.d0 , particles%fast_ion(i)%z]
         else
@@ -6298,8 +6297,6 @@ subroutine cyl_interpol3D_coeff(rmin,dr,nr,zmin,dz,nz,phimin,dphi,nphi,rout,zout
 
     rp = max(rout,rmin)
     zp = max(zout,zmin)
- !!!phi = modulo(phiout,2*pi)
- !!!phip = max(phi,phimin)
     phip = max(phiout,phimin)
     i = floor((rp-rmin)/dr)+1
     j = floor((zp-zmin)/dz)+1
@@ -6697,7 +6694,6 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
     phi = atan2(uvw(2),uvw(1))
- !!!phip = modulo(phi,2*pi)
     !! Interpolate mask value
     call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phi, b, err)
 

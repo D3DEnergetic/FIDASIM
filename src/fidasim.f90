@@ -6164,7 +6164,7 @@ subroutine uvw_to_cyl(uvw, cyl)
 
     cyl(1) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     cyl(2) = uvw(3)
-    cyl(3) = modulo(atan2(uvw(2),uvw(1)),2*pi)
+    cyl(3) = atan2(uvw(2),uvw(1))
 
 end subroutine uvw_to_cyl
 
@@ -6506,13 +6506,13 @@ subroutine get_passive_grid_indices(pos, ind, input_coords)
     if(ics.eq.1) then
         loc(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
         loc(2) = pos(3)
-        loc(3) = modulo(atan2(pos(2),pos(1)),2*pi)
+        loc(3) = atan2(pos(2),pos(1))
     endif
 
     if(ics.eq.2) then
         loc(1) = pos(1)
         loc(2) = pos(2)
-        loc(3) = modulo(pos(3),2*pi)
+        loc(3) = pos(3)
     endif
 
     maxind(1) = pass_grid%nr
@@ -6719,7 +6719,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     gdims(2) = pass_grid%nz
     gdims(3) = pass_grid%nphi
 
-    phi = modulo(atan2(rin(2),rin(1)),2*pi)
+    phi = atan2(rin(2),rin(1))
     s = sin(phi) ; c = cos(phi)
     vn_cyl(1) = c*vn(1) + s*vn(2)
     vn_cyl(3) = -s*vn(1) + c*vn(2)
@@ -6741,7 +6741,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !! Define actual cell
     ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
     ri_cyl(2) = ri(3)
-    ri_cyl(3) = modulo(atan2(ri(2), ri(1)),2*pi)
+    ri_cyl(3) = atan2(ri(2), ri(1))
     call get_passive_grid_indices(ri_cyl,ind)
 
     arc_cyl(1) = pass_grid%r(ind(1))
@@ -7464,7 +7464,7 @@ subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
 
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     W = uvw(3)
-    phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
+    phi = atan2(uvw(2),uvw(1))
     !! Interpolate mask value
     call interpol_coeff(inter_grid%r, inter_grid%z, inter_grid%phi, R, W, phi, b, err)
 
@@ -7548,7 +7548,7 @@ subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
 
     call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
-        phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
+        phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
         j = coeffs%j
         k = coeffs%k
@@ -7676,7 +7676,7 @@ subroutine get_fields(fields, pos, ind, input_coords, output_coords)
                  coeffs%b211*equil%fields(i+1,j,k)  + coeffs%b221*equil%fields(i+1,j+1,k) + &
                  coeffs%b212*equil%fields(i+1,j,k2) + coeffs%b222*equil%fields(i+1,j+1,k2)
 
-        phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
+        phi = atan2(uvw(2),uvw(1))
         s = sin(phi) ; c = cos(phi)
 
         !Convert cylindrical coordinates to uvw
@@ -8594,7 +8594,7 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
     if(pas) then
         cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
         cyl(2) = pos(3)
-        cyl(3) = modulo(atan2(pos(2), pos(1)),2*pi)
+        cyl(3) = atan2(pos(2), pos(1))
         call get_passive_grid_indices(cyl,ind)
         inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
         call uvw_to_xyz(pos, pos_xyz)
@@ -8947,7 +8947,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         !! Appendix A: Last equation
         uvw = fields%uvw
         R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-        phi = modulo(atan2(uvw(2),uvw(1)),2*pi)
+        phi = atan2(uvw(2),uvw(1))
         if(fields%coords.eq.0) then
             call xyz_to_uvw(r_gyro,rg_uvw)
         endif

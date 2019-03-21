@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.4% of total for procedures.">43 statements</a>
+    title=" 0.4% of total for procedures.">42 statements</a>
      </li> 
      
      
@@ -1524,7 +1524,7 @@ public subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">uvw</span>
     <span class="k">type</span><span class="p">(</span><span class="n">InterpolCoeffs3D</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">R</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">mask</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi</span><span class="p">,</span> <span class="n">phip</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">mc</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">k2</span><span class="p">,</span> <span class="n">err</span>
 
@@ -1542,9 +1542,8 @@ public subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
     <span class="n">R</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
     <span class="n">W</span> <span class="o">=</span> <span class="n">uvw</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">phi</span> <span class="o">=</span> <span class="n">atan2</span><span class="p">(</span><span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-    <span class="n">phip</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
     <span class="c">!! Interpolate mask value</span>
-    <span class="k">call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">phip</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">interpol_coeff</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span><span class="p">,</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
     <span class="n">inp</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
     <span class="k">if</span><span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>

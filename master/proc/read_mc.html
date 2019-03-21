@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.0% of total for procedures.">125 statements</a>
+    title=" 1.0% of total for procedures.">124 statements</a>
      </li> 
      
      
@@ -899,7 +899,6 @@ public subroutine read_mc(fid, error)
 <span class="k">            WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(f7.2,&quot;% completed&quot;,a,$)&#39;</span><span class="p">)</span> <span class="n">cnt</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="nb">char</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
         <span class="n">endif</span>
 
-        <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">phi</span> <span class="o">=</span> <span class="nb">modulo</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">phi</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">            </span><span class="n">uvw</span> <span class="o">=</span> <span class="p">[</span><span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">r</span><span class="p">,</span> <span class="mf">0.d0</span> <span class="p">,</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">z</span><span class="p">]</span>
         <span class="k">else</span>

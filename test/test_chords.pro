@@ -1,12 +1,12 @@
 FUNCTION test_chords
     
     ;; Chords
-    ulens = dblarr(3)
-    vlens = [-170.d0,-170.d0,-170.d0]
+    ulens = [170.d0,170.d0,170.d0]
+    vlens = dblarr(3)
     wlens = replicate(100.d0,3)
     lens = transpose([[ulens],[vlens],[wlens]])
-    ulos = dblarr(3)
-    vlos = [-200.d0,-170.d0,-140.d0]
+    ulos = [200.d0,170.d0,140.d0]
+    vlos = dblarr(3)
     wlos = dblarr(3)
     los = transpose([[ulos],[vlos],[wlos]])
     axis = los - lens

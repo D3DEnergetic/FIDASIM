@@ -20,16 +20,21 @@ FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100, phimin=4*!dpi/3, phimax=5*!dpi/3, nphi=5)
+    ;+IDL> grid = rz_grid(100.d0,240.d0,70,-100.d0,100.d0,100,phimin=-!dpi/6,phimax=!dpi/6,nphi=5)
     ;+```
 
     if not keyword_set(phimin) then phimin = 0.0 ;rad
     if not keyword_set(phimax) then phimax = 0.0 ;rad
     if not keyword_set(nphi) then nphi = 1
 
-    dr = double(rmax-rmin)/nr
-    dz = double(zmax-zmin)/nz
-    dphi = double(phimax-phimin)/(nphi)
+    dr = double(abs(rmax-rmin))/(nr-1)
+    dz = double(abs(zmax-zmin))/(nz-1)
+    if nphi eq 1 then begin
+        dphi = 0.0
+    endif else begin
+        dphi = double(abs(phimax-phimin))/(nphi-1)
+    endelse
+
     r = rmin + dr*dindgen(nr)
     z = zmin + dz*dindgen(nz)
     phi = phimin + dphi*dindgen(nphi)
@@ -37,8 +42,7 @@ FUNCTION rz_grid,rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi
     r2d = r # replicate(1,nz)
     z2d = replicate(1,nr) # z
 
-
     grid = {r2d:r2d,z2d:z2d,r:r,z:z,phi:phi,nr:nr,nz:nz,nphi:nphi}
-    
+
     return, grid
 END

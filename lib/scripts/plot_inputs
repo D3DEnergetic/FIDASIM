@@ -243,8 +243,8 @@ def main():
             origin = np.array([0, 0, 0])
             ry = geo['nbi/awidy'].value
             rz = geo['nbi/awidz'].value
-            not_axis = np.array([1, 0, 0])
-            if (axis == not_axis).all():
+            not_axis = np.array([1, 0, 0])   #Create new axes coordinate system
+            if (np.cross(axis,not_axis)==0).all():
                 not_axis = np.array([0, 1, 0])
             n1 = np.cross(axis, not_axis)
             n1 /= norm(n1)

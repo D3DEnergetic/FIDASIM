@@ -28,10 +28,10 @@ PRO run_tests,result_dir,runid = runid
                    calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,calc_pfida:1,calc_pnpa:2,$
                    result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}
 
-   basic_bgrid = {nx:50,ny:60,nz:70,$
-                  xmin:-50.d0,xmax:50.d0,$
-                  ymin:-230.d0,ymax:-110.d0,$
-                  zmin:-70.d0,zmax:70.d0,$
+   basic_bgrid = {nx:70,ny:50,nz:100,$
+                  xmin:100.d0,xmax:240.d0,$
+                  ymin:-50.d0,ymax:50.d0,$
+                  zmin:-100.d0,zmax:100.d0,$
                   alpha:0.d0,beta:0.d0,gamma:0.d0,$
                   origin:[0.d0,0.d0,0.d0]}
 

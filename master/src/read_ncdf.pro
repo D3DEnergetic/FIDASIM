@@ -41,7 +41,7 @@ FUNCTION read_ncdf,file,vars=vars
                 ncdf_varget,ncid,name,tmp
             endif else begin
                 var_info=ncdf_varinq(ncid,i)
-                name=var_info.name
+                name=strjoin(strsplit(var_info.name,".",/extract),"_")
                 ncdf_varget,ncid,i,tmp
             endelse
             if total(strmatch(reserved,name,/FOLD_CASE)) gt 0 then name+='_'

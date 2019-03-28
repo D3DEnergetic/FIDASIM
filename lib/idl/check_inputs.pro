@@ -110,6 +110,7 @@ PRO check_inputs, inputs
                                   'load_neutrals', 0, $
                                   'no_flr',0, $
                                   'verbose', 1, $
+                                  'seed', -1, $
                                   'neutrals_file',neutrals_file)
 
     GET_OUT:

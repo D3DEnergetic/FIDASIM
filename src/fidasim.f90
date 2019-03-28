@@ -928,6 +928,10 @@ type SimulationInputs
         !+ FIDASIM output/input file containing beam neutral density.
         !+ Used when [[SimulationInputs:load_neutrals]] is set.
 
+    !! Random Number Generator Settings
+    integer :: seed
+        !+ Random number generator seed
+
     !! Monte Carlo settings
     integer(Int64) :: n_fida
         !+ Number of Active FIDA mc markers
@@ -1813,7 +1817,7 @@ subroutine read_inputs
     character(charlim) :: runid,result_dir, tables_file
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
-    integer            :: pathlen, calc_neutron
+    integer            :: pathlen, calc_neutron, seed
     integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
@@ -1859,6 +1863,7 @@ subroutine read_inputs
     shot=0
     time=0
     runid="0"
+    seed = -1
     calc_brems=0
     calc_nbi=0
     calc_bes=0
@@ -1934,6 +1939,10 @@ subroutine read_inputs
     inputs%equilibrium_file=equilibrium_file
     inputs%distribution_file=distribution_file
     inputs%neutrals_file=neutrals_file
+
+    !! RNG seed
+    inputs%seed = seed
+    if(inputs%seed.lt.0) inputs%seed = rng_seed()
 
     !!Simulation Switches
     if((calc_brems+calc_bes+calc_dcx+calc_halo+&
@@ -3180,7 +3189,7 @@ subroutine read_mc(fid, error)
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"Distribution type: ",a)') dist_type_name
-        write(*,'(T2,"Number of mc particles: ",i9)') particles%nparticle
+        write(*,'(T2,"Number of mc particles: ",i10)') particles%nparticle
         write(*,'(T2,"Number of orbit classes: ",i6)') particles%nclass
         write(*,*) ''
     endif
@@ -8455,9 +8464,9 @@ subroutine ndmc
     logical :: err
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') inputs%n_nbi
+        write(*,'(T6,"# of markers: ",i10)') inputs%n_nbi
         if(inputs%calc_birth.ge.1) then
-            write(*,'(T6,"# of birth markers: 3 x",i9)') int(inputs%n_nbi*inputs%n_birth)
+            write(*,'(T6,"# of birth markers: 3 x",i10)') int(inputs%n_nbi*inputs%n_birth)
         endif
     endif
 
@@ -8691,7 +8700,7 @@ subroutine dcx
     call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
 
     if(inputs%verbose.ge.1) then
-       write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
+       write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
     !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
@@ -8833,7 +8842,7 @@ subroutine halo
         call get_nlaunch(n_halo, papprox, nlaunch)
 
         if(inputs%verbose.ge.1) then
-            write(*,'(T6,"# of markers: ",i9," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
+            write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
 
         local_iter_dens = halo_iter_dens(cur_type)
@@ -9206,7 +9215,7 @@ subroutine fida_f
 
     call get_nlaunch(inputs%n_fida, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
+        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -9309,7 +9318,7 @@ subroutine pfida_f
 
     call get_nlaunch(inputs%n_pfida, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
+        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -9387,7 +9396,7 @@ subroutine fida_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
@@ -9488,7 +9497,7 @@ subroutine pfida_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
@@ -9819,7 +9828,7 @@ subroutine npa_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it, &
@@ -9973,7 +9982,7 @@ subroutine pnpa_mc
     endif
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') int(particles%nparticle*ngamma,Int64)
+        write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
     !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
@@ -10226,7 +10235,7 @@ subroutine neutron_mc
     real(Float64)  :: phi, s, c
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') particles%nparticle
+        write(*,'(T6,"# of markers: ",i10)') particles%nparticle
     endif
 
     rate=0.0
@@ -10422,7 +10431,7 @@ subroutine fida_weights_mc
 
     call get_nlaunch(10*inputs%n_fida,papprox, nlaunch)
     if(inputs%verbose.ge.1) then
-        write(*,'(T6,"# of markers: ",i9)') sum(nlaunch)
+        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
@@ -10976,19 +10985,23 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------ INITIALIZE THE RANDOM NUMBER GENERATOR  -----------
     !! ----------------------------------------------------------
-    seed = -1  !!If negative than random seed is used
     allocate(rng(max_threads))
 #ifdef _OMP
     do i=1,max_threads
-        if(seed.lt.0) then
-            call rng_init(rng(i), seed)
+        if(inputs%seed.lt.0) then
+            call rng_init(rng(i), inputs%seed)
         else
-            call rng_init(rng(i), seed + i)
+            call rng_init(rng(i), inputs%seed + i)
         endif
     enddo
 #else
-    call rng_init(rng(1), seed)
+    call rng_init(rng(1), inputs%seed)
 #endif
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- Random Number Generator settings ----"
+        write(*,'(T2,"RNG Seed: ",i10)') inputs%seed
+        write(*,*) ''
+    endif
 
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------

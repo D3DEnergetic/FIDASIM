@@ -1015,7 +1015,7 @@ public subroutine dcx()
     <span class="k">call </span><span class="n">get_nlaunch</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">n_dcx</span><span class="p">,</span><span class="n">papprox</span><span class="p">,</span><span class="n">nlaunch</span><span class="p">)</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">       write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i9)&#39;</span><span class="p">)</span> <span class="nb">sum</span><span class="p">(</span><span class="n">nlaunch</span><span class="p">)</span>
+<span class="k">       write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i10)&#39;</span><span class="p">)</span> <span class="nb">sum</span><span class="p">(</span><span class="n">nlaunch</span><span class="p">)</span>
     <span class="n">endif</span>
     <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &amp;</span>
     <span class="c">!$OMP&amp; ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)</span>

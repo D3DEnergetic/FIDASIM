@@ -1071,7 +1071,7 @@ public subroutine halo()
         <span class="k">call </span><span class="n">get_nlaunch</span><span class="p">(</span><span class="n">n_halo</span><span class="p">,</span> <span class="n">papprox</span><span class="p">,</span> <span class="n">nlaunch</span><span class="p">)</span>
 
         <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i9,&quot; --- Seed/DCX: &quot;,f5.3)&#39;</span><span class="p">)</span> <span class="nb">sum</span><span class="p">(</span><span class="n">nlaunch</span><span class="p">),</span> <span class="n">seed_dcx</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i10,&quot; --- Seed/DCX: &quot;,f5.3)&#39;</span><span class="p">)</span> <span class="nb">sum</span><span class="p">(</span><span class="n">nlaunch</span><span class="p">),</span> <span class="n">seed_dcx</span>
         <span class="n">endif</span>
 
         <span class="n">local_iter_dens</span> <span class="o">=</span> <span class="n">halo_iter_dens</span><span class="p">(</span><span class="n">cur_type</span><span class="p">)</span>

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p>11.8% of total for derived types.</p>Including implementation: 56 statements, 11.8% of total for derived types.">56 statements</a>
+    title="<p>12.0% of total for derived types.</p>Including implementation: 57 statements, 12.0% of total for derived types.">57 statements</a>
      </li> 
      
      
@@ -194,6 +194,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-distribution_file">distribution_file</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-neutrals_file">neutrals_file</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-seed">seed</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-n_fida">n_fida</a>
       
@@ -358,6 +360,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-distribution_file">distribution_file</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-neutrals_file">neutrals_file</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-seed">seed</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-n_fida">n_fida</a>
       
@@ -621,6 +625,20 @@
   <td></td><td>::</td>
   <td><strong>neutrals_file</strong></td><td> =</td><td>''</td><td><p>FIDASIM output/input file containing beam neutral density.
  Used when <a href="../type/simulationinputs.html#variable-load_neutrals">load_neutrals</a> is set.</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-seed"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>seed</strong></td><td></td><td></td><td><p>Random number generator seed</p></td>
   
 </tr>
 
@@ -1291,6 +1309,10 @@
     <span class="kt">character</span><span class="p">(</span><span class="n">charlim</span><span class="p">)</span> <span class="kd">::</span> <span class="n">neutrals_file</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="c">!+ FIDASIM output/input file containing beam neutral density.</span>
         <span class="c">!+ Used when [[SimulationInputs:load_neutrals]] is set.</span>
+
+    <span class="c">!! Random Number Generator Settings</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">seed</span>
+        <span class="c">!+ Random number generator seed</span>
 
     <span class="c">!! Monte Carlo settings</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">n_fida</span>

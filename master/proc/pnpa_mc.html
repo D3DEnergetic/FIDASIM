@@ -1308,7 +1308,7 @@ public subroutine pnpa_mc()
     <span class="n">endif</span>
 
     <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i9)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="o">*</span><span class="n">ngamma</span><span class="p">,</span><span class="n">Int64</span><span class="p">)</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i10)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="o">*</span><span class="n">ngamma</span><span class="p">,</span><span class="n">Int64</span><span class="p">)</span>
     <span class="n">endif</span>
 
     <span class="c">!$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &amp;</span>

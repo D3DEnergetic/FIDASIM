@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.4% of total for procedures.">52 statements</a>
+    title=" 0.5% of total for procedures.">54 statements</a>
      </li> 
      
      
@@ -760,7 +760,9 @@ public subroutine read_tables()
     <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy2</span><span class="p">)</span>
 
     <span class="c">!!Read nuclear Deuterium-Deuterium rates</span>
-    <span class="k">call </span><span class="n">read_nuclear_rates</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/rates/D_D&quot;</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_neutron</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        call </span><span class="n">read_nuclear_rates</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/rates/D_D&quot;</span><span class="p">,</span> <span class="n">tables</span><span class="p">%</span><span class="n">D_D</span><span class="p">)</span>
+    <span class="n">endif</span>
 
     <span class="c">!!Close file</span>
     <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>

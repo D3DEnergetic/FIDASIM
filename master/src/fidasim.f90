@@ -3595,7 +3595,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
 
     integer(HSIZE_T), dimension(1) :: dim1
     integer(HSIZE_T), dimension(3) :: dim3
-    logical :: path_valid
+    logical :: path_valid, err
     integer :: i, j, error
     real(Float64) :: emin, emax, tmin, tmax, rmin
 
@@ -3603,6 +3603,33 @@ subroutine read_nuclear_rates(fid, grp, rates)
     if(.not.path_valid) then
         if(inputs%verbose.ge.0) then
             write(*,'(a,a)') 'READ_NUCLEAR_RATES: Unknown nuclear interaction: ', trim(grp)
+            write(*,'(a)') 'Continuing without neutron calculation'
+        endif
+        inputs%calc_neutron=0
+        return
+    endif
+
+    dim1 = [2]
+    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", rates%bt_amu, dim1, error)
+
+    if(abs(inputs%ab-rates%bt_amu(1)).gt.0.2) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
+                rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
+        endif
+        err = .True.
+    endif
+
+    if(abs(inputs%ai-rates%bt_amu(2)).gt.0.2) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
+                 rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
+        endif
+        err = .True.
+    endif
+
+    if(err) then
+        if(inputs%verbose.ge.0) then
             write(*,'(a)') 'Continuing without neutron calculation'
         endif
         inputs%calc_neutron=0
@@ -3626,23 +3653,6 @@ subroutine read_nuclear_rates(fid, grp, rates)
     allocate(rates%log_rate(rates%nenergy, &
                             rates%ntemp,   &
                             rates%nbranch))
-
-    dim1 = [2]
-    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", rates%bt_amu, dim1, error)
-
-    if(abs(inputs%ab-rates%bt_amu(1)).gt.0.2) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected beam species mass. Expected ',&
-                rates%bt_amu(1),' amu got ', inputs%ab, ' amu'
-        endif
-    endif
-
-    if(abs(inputs%ai-rates%bt_amu(2)).gt.0.2) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a,f6.3,a,f6.3,a)') 'READ_NUCLEAR_RATES: Unexpected thermal species mass. Expected ',&
-                 rates%bt_amu(2),' amu got ', inputs%ai, ' amu'
-        endif
-    endif
 
     dim3 = [rates%nenergy, rates%ntemp, rates%nbranch]
     call h5ltread_dataset_double_f(fid, grp//"/fusion", rates%log_rate, dim3, error)
@@ -3719,7 +3729,9 @@ subroutine read_tables
     deallocate(dummy2)
 
     !!Read nuclear Deuterium-Deuterium rates
-    call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
+    if(inputs%calc_neutron.ge.1) then
+        call read_nuclear_rates(fid, "/rates/D_D", tables%D_D)
+    endif
 
     !!Close file
     call h5fclose_f(fid, error)

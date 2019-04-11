@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.1% of total for procedures.">252 statements</a>
+    title=" 2.0% of total for procedures.">254 statements</a>
      </li> 
      
      
@@ -624,8 +624,11 @@ public subroutine read_inputs()
     <span class="k">if</span><span class="p">((</span><span class="n">calc_brems</span><span class="o">+</span><span class="n">calc_bes</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">calc_halo</span><span class="o">+</span><span class="p">&amp;</span>
         <span class="n">calc_cold</span><span class="o">+</span><span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_pfida</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_spec</span><span class="o">=</span><span class="mi">1</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">tot_spectra</span><span class="o">=</span><span class="n">calc_brems</span><span class="o">+</span><span class="n">calc_bes</span><span class="o">+</span><span class="n">calc_dcx</span><span class="o">+</span><span class="n">calc_halo</span><span class="o">+</span><span class="p">&amp;</span>
+                           <span class="n">calc_cold</span><span class="o">+</span><span class="n">calc_fida</span><span class="o">+</span><span class="n">calc_pfida</span>
     <span class="k">else</span>
 <span class="k">        </span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_spec</span><span class="o">=</span><span class="mi">0</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">tot_spectra</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">endif</span>
 
     <span class="n">inputs</span><span class="p">%</span><span class="n">calc_beam</span> <span class="o">=</span> <span class="mi">0</span>

@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
+public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     
     
    
@@ -311,12 +311,12 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
   
 <tr>
   
-  <td><span class="anchor" id="variable-phi_in"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-theta_in"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td>optional</td>
   
   <td></td><td>::</td>
-  <td><strong>phi_in</strong></td><td><p>Gyro-angle</p></td>
+  <td><strong>theta_in</strong></td><td><p>Gyro-angle</p></td>
   
 </tr>
 
@@ -392,15 +392,28 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
 <!-- proc~cross_product -->
 <g id="proc~~gyro_correction~~CallsGraph_node5" class="node"><title>proc~cross_product</title>
 <g id="a_proc~~gyro_correction~~CallsGraph_node5"><a xlink:href=".././proc/cross_product.html" xlink:title="cross_product">
-<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-66 234,-66 234,-42 314,-42 314,-66"/>
-<text text-anchor="middle" x="274" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="314,-87 234,-87 234,-63 314,-63 314,-87"/>
+<text text-anchor="middle" x="274" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
 </a>
 </g>
 </g>
 <!-- proc~gyro_step&#45;&gt;proc~cross_product -->
 <g id="proc~~gyro_correction~~CallsGraph_edge4" class="edge"><title>proc~gyro_step&#45;&gt;proc~cross_product</title>
-<path fill="none" stroke="#000000" d="M191.164,-54C201.098,-54 212.498,-54 223.571,-54"/>
-<polygon fill="#000000" stroke="#000000" points="223.597,-57.5001 233.597,-54 223.597,-50.5001 223.597,-57.5001"/>
+<path fill="none" stroke="#000000" d="M191.164,-59.5175C201.098,-61.3969 212.498,-63.5536 223.571,-65.6485"/>
+<polygon fill="#000000" stroke="#000000" points="223.121,-69.1254 233.597,-67.5454 224.422,-62.2474 223.121,-69.1254"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~gyro_correction~~CallsGraph_node6" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~gyro_correction~~CallsGraph_node6"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="308,-45 240,-45 240,-21 308,-21 308,-45"/>
+<text text-anchor="middle" x="274" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~gyro_step&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~gyro_correction~~CallsGraph_edge5" class="edge"><title>proc~gyro_step&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M191.164,-48.4825C202.923,-46.2579 216.735,-43.6448 229.628,-41.2055"/>
+<polygon fill="#000000" stroke="#000000" points="230.54,-44.5951 239.715,-39.2971 229.239,-37.7171 230.54,-44.5951"/>
 </g>
 </g>
 </svg>
@@ -733,7 +746,7 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">phi_in</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">gyro_correction</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">pitch</span><span class="p">,</span> <span class="n">rp</span><span class="p">,</span> <span class="n">vp</span><span class="p">,</span> <span class="n">theta_in</span><span class="p">)</span>
     <span class="c">!+ Calculates gyro correction for Guiding Center MC distribution calculation</span>
     <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>          <span class="kd">::</span> <span class="n">fields</span>
         <span class="c">!+ Electromagnetic fields at guiding center</span>
@@ -745,24 +758,24 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
         <span class="c">!+ Particle position</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vp</span>
         <span class="c">!+ Particle velocity</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>      <span class="kd">::</span> <span class="n">phi_in</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>      <span class="kd">::</span> <span class="n">theta_in</span>
         <span class="c">!+ Gyro-angle</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vi_norm</span><span class="p">,</span> <span class="n">r_step</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">phi</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">theta</span>
 
     <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="p">))</span>
 
-    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">phi_in</span><span class="p">))</span> <span class="k">then</span>
-<span class="k">        </span><span class="n">phi</span> <span class="o">=</span> <span class="n">phi_in</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">theta_in</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta_in</span>
     <span class="k">else</span>
         <span class="c">!! Sample gyroangle</span>
         <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
-        <span class="n">phi</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">endif</span>
 
     <span class="c">!! Calculate velocity vector</span>
-    <span class="k">call </span><span class="n">pitch_to_vec</span><span class="p">(</span><span class="n">pitch</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">vi_norm</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">pitch_to_vec</span><span class="p">(</span><span class="n">pitch</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">vi_norm</span><span class="p">)</span>
     <span class="n">vp</span> <span class="o">=</span> <span class="n">vabs</span><span class="o">*</span><span class="n">vi_norm</span>
 
     <span class="c">!! Move to particle location</span>

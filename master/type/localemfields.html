@@ -209,7 +209,7 @@
       
       <a class="list-group-item" href="../type/localemfields.html#variable-in_plasma%7E2">in_plasma</a>
       
-      <a class="list-group-item" href="../type/localemfields.html#variable-machine_coords%7E2">machine_coords</a>
+      <a class="list-group-item" href="../type/localemfields.html#variable-coords%7E2">coords</a>
       
       <a class="list-group-item" href="../type/localemfields.html#variable-b_abs">b_abs</a>
       
@@ -403,7 +403,7 @@
       
       <a class="list-group-item" href="../type/localemfields.html#variable-in_plasma%7E2">in_plasma</a>
       
-      <a class="list-group-item" href="../type/localemfields.html#variable-machine_coords%7E2">machine_coords</a>
+      <a class="list-group-item" href="../type/localemfields.html#variable-coords%7E2">coords</a>
       
       <a class="list-group-item" href="../type/localemfields.html#variable-b_abs">b_abs</a>
       
@@ -701,11 +701,11 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-machine_coords%7E2"></span>logical,</td>
+  <td><span class="anchor" id="variable-coords%7E2"></span>integer,</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>machine_coords</strong></td><td> =</td><td>.False.</td><td><p>Indicates whether vectors are in machine coordinates</p></td>
+  <td><strong>coords</strong></td><td> =</td><td>0</td><td><p>Indicates coordinate system of vectors. Beam grid (0), machine (1) and cylindrical (2)</p></td>
   
 </tr>
 
@@ -855,8 +855,8 @@
     <span class="c">!+ Electro-magnetic fields at given position</span>
     <span class="kt">logical</span>       <span class="kd">::</span> <span class="n">in_plasma</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
         <span class="c">!+ Indicates whether fields are valid/known</span>
-    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">machine_coords</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
-        <span class="c">!+ Indicates whether vectors are in machine coordinates</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">coords</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c">!+ Indicates coordinate system of vectors. Beam grid (0), machine (1) and cylindrical (2)</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b_abs</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Magnitude of magnetic field</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">e_abs</span> <span class="o">=</span> <span class="mf">0.d0</span>

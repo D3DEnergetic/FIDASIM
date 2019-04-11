@@ -232,16 +232,16 @@ type InterpolationGrid
     !+ Defines a 3D R-Z-phi grid for interpolating plasma parameters and fields
     integer(Int32) :: nr
         !+ Number of Radii
-    integer(Int32) :: nphi
-        !+ Number of phi values
     integer(Int32) :: nz
         !+ Number of Z values
+    integer(Int32) :: nphi
+        !+ Number of phi values
     real(Float64)  :: dr
         !+ Radial spacing [cm]
-    real(Float64)  :: dphi
-        !+ Angular spacing [rad]
     real(Float64)  :: dz
         !+ Vertical spacing [cm]
+    real(Float64)  :: dphi
+        !+ Angular spacing [rad]
     real(Float64)  :: da
         !+ Grid element area [\(cm^2\)]
     real(Float64)  :: dv
@@ -250,14 +250,14 @@ type InterpolationGrid
         !+ Dimension of the interpolation grid
     real(Float64), dimension(:),   allocatable :: r
         !+ Radii values [cm]
-    real(Float64), dimension(:),   allocatable :: phi
-        !+ Angular values [rad]
     real(Float64), dimension(:),   allocatable :: z
         !+ Z values [cm]
-    real(Float64), dimension(:,:), allocatable :: r2d
-        !+ 2D R grid [cm]
-    real(Float64), dimension(:,:), allocatable :: z2d
-        !+ 2D Z grid [cm]
+    real(Float64), dimension(:),   allocatable :: phi
+        !+ Angular values [rad]
+    integer(Int32) :: ntrack
+        !+ Maximum number of cells for particle tracking
+    integer(Int32) :: ngrid
+        !+ Number of cells
 end type InterpolationGrid
 
 type Profiles
@@ -290,14 +290,16 @@ type, extends( Profiles ) :: LocalProfiles
     !+ Plasma parameters at given position
     logical :: in_plasma = .False.
         !+ Indicates whether plasma parameters are valid/known
-    logical :: machine_coords = .False.
-        !+ Indicates whether vectors are in machine coordinates
+    integer :: coords = 0
+        !+ Indicates coordinate system of vectors. Beam grid (0), machine (1) and cylindrical (2)
     real(Float64), dimension(3) :: pos = 0.d0
         !+ Position in beam grid coordinates
     real(Float64), dimension(3) :: uvw = 0.d0
         !+ Position in machine coordinates
     real(Float64), dimension(3) :: vrot = 0.d0
         !+ Plasma rotation in beam grid coordinates
+    real(Float64), dimension(3) :: vrot_uvw = 0.d0
+        !+ Plasma rotation in machine coordinates
     type(InterpolCoeffs3D) :: b
         !+ Cylindrical Interpolation Coefficients and indicies for interpolation at `pos`
 end type LocalProfiles
@@ -340,8 +342,8 @@ type, extends( EMFields ) :: LocalEMFields
     !+ Electro-magnetic fields at given position
     logical       :: in_plasma = .False.
         !+ Indicates whether fields are valid/known
-    logical :: machine_coords = .False.
-        !+ Indicates whether vectors are in machine coordinates
+    integer :: coords = 0
+        !+ Indicates coordinate system of vectors. Beam grid (0), machine (1) and cylindrical (2)
     real(Float64) :: b_abs = 0.d0
         !+ Magnitude of magnetic field
     real(Float64) :: e_abs = 0.d0
@@ -444,7 +446,7 @@ end type FastIonDistribution
 
 type FastIon
     !+ Defines a fast-ion
-    logical        :: cross_grid = .False.
+    logical        :: beam_grid_cross_grid = .False.
         !+ Indicates whether the fast-ion crosses the [[libfida:beam_grid]]
     real(Float64)  :: r = 0.d0
         !+ Radial position of fast-ion [cm]
@@ -452,7 +454,7 @@ type FastIon
         !+ Angular position of fast-ion [rad]
     real(Float64)  :: z = 0.d0
         !+ Vertical position of fast-ion [cm]
-    real(Float64)  :: phi_enter = 0.d0
+    real(Float64)  :: beam_grid_phi_enter = 0.d0
         !+ Torodial/phi position where fast-ion enters the [[libfida:beam_grid]] [radians]
     real(Float64)  :: delta_phi = 2*pi
         !+ Angle subtended by the [[libfida:beam_grid]] at (r,z)
@@ -680,6 +682,10 @@ type LineOfSight
         !+ Lens location in beam grid coordinates
     real(Float64), dimension(3) :: axis = 0.d0
         !+ Optical axis in beam grid coordinates
+    real(Float64), dimension(3) :: lens_uvw = 0.d0
+        !+ Lens location in machine coordinates
+    real(Float64), dimension(3) :: axis_uvw = 0.d0
+        !+ Optical axis in machine coordinates
 end type LineOfSight
 
 type LOSElement
@@ -704,14 +710,20 @@ type SpectralChords
         !+ Number of channels
     integer :: ncell = 0
         !+ Number of beam_grid cells with intersections
+    integer :: cyl_ncell = 0
+        !+ Number of pass_grid cells with intersections
     type(LineOfSight), dimension(:), allocatable :: los
         !+ Line of sight array
     real(Float64), dimension(:), allocatable     :: radius
         !+ Radius of each line of sight
     type(LOSInters), dimension(:,:,:), allocatable :: inter
         !+ Array of LOS intersections with [[libfida:beam_grid]]
+    type(LOSInters), dimension(:,:,:), allocatable :: cyl_inter
+        !+ Array of LOS intersections with [[libfida:pass_grid]]
     integer, dimension(:), allocatable :: cell
         !+ Linear indices of beam_grid that have intersections
+    integer, dimension(:), allocatable :: cyl_cell
+        !+ Linear indices of pass_grid that have intersections
 end type SpectralChords
 
 type BoundedPlane
@@ -798,7 +810,7 @@ type NPAResults
         !+ Number of particles that hit a detector
     integer(Int32) :: nmax = 1000000
         !+ Maximum allowed number of particles grows if necessary
-    integer(Int32) :: nenergy = 100
+    integer(Int32) :: nenergy = 122
         !+ Number of energy values
     type(NPAParticle), dimension(:), allocatable :: part
         !+ Array of NPA particles
@@ -975,6 +987,8 @@ type SimulationInputs
         !+ Calculate Active FIDA: 0 = off, 1=on
     integer(Int32) :: calc_pfida
         !+ Calculate Passive FIDA: 0 = off, 1=on
+    integer(Int32) :: tot_spectra
+        !+ Total number of spectral switches on
     integer(Int32) :: load_neutrals
         !+ Load neutrals from file: 0 = off, 1=on
     integer(Int32) :: calc_npa
@@ -1123,6 +1137,8 @@ type(BeamGrid), save            :: beam_grid
     !+ Variable containing beam grid definition
 type(InterpolationGrid), save   :: inter_grid
     !+ Variable containing interpolation grid definition
+type(InterpolationGrid), save   :: pass_grid
+    !+ Variable containing passive neutral grid definition
 type(FastIonDistribution), save :: fbm
     !+ Variable containing the fast-ion distribution function
 type(FastIonParticles), save    :: particles
@@ -1215,20 +1231,20 @@ subroutine fast_ion_assign(p1, p2)
     type(FastIon), intent(in)  :: p2
     type(FastIon), intent(out) :: p1
 
-    p1%cross_grid = p2%cross_grid
-    p1%r          = p2%r
-    p1%z          = p2%z
-    p1%phi        = p2%phi
-    p1%phi_enter  = p2%phi_enter
-    p1%delta_phi  = p2%delta_phi
-    p1%energy     = p2%energy
-    p1%pitch      = p2%pitch
-    p1%vabs       = p2%vabs
-    p1%vr         = p2%vr
-    p1%vt         = p2%vt
-    p1%vz         = p2%vz
-    p1%weight     = p2%weight
-    p1%class      = p2%class
+    p1%beam_grid_cross_grid = p2%beam_grid_cross_grid
+    p1%r                    = p2%r
+    p1%z                    = p2%z
+    p1%phi                  = p2%phi
+    p1%beam_grid_phi_enter  = p2%beam_grid_phi_enter
+    p1%delta_phi            = p2%delta_phi
+    p1%energy               = p2%energy
+    p1%pitch                = p2%pitch
+    p1%vabs                 = p2%vabs
+    p1%vr                   = p2%vr
+    p1%vt                   = p2%vt
+    p1%vz                   = p2%vz
+    p1%weight               = p2%weight
+    p1%class                = p2%class
 
 end subroutine fast_ion_assign
 
@@ -1948,8 +1964,11 @@ subroutine read_inputs
     if((calc_brems+calc_bes+calc_dcx+calc_halo+&
         calc_cold+calc_fida+calc_pfida).gt.0) then
         inputs%calc_spec=1
+        inputs%tot_spectra=calc_brems+calc_bes+calc_dcx+calc_halo+&
+                           calc_cold+calc_fida+calc_pfida
     else
         inputs%calc_spec=0
+        inputs%tot_spectra=0
     endif
 
     inputs%calc_beam = 0
@@ -2219,6 +2238,220 @@ subroutine make_beam_grid
 
 end subroutine make_beam_grid
 
+subroutine make_passive_grid
+    !+ Makes [[libfida:pass_grid] from user defined inputs
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(2) :: dims
+    logical :: path_valid_spec, path_valid_npa
+
+    real(Float64), dimension(:,:), allocatable :: a_cent, d_cent
+    real(Float64), dimension(:,:), allocatable :: lenses, axes, r0_arr, v0_arr
+    real(Float64), dimension(3) :: vertex111, vertex111_cyl
+    real(Float64), dimension(3) :: vertex221, vertex221_cyl
+    real(Float64), dimension(3) :: vertex112, vertex112_cyl
+    real(Float64), dimension(3) :: vertex121, vertex121_cyl
+    real(Float64), dimension(3) :: vertex211, vertex211_cyl
+    real(Float64), dimension(3) :: vertex212, vertex212_cyl
+    real(Float64), dimension(3) :: vertex222, vertex222_cyl
+    real(Float64), dimension(3) :: vertex122, vertex122_cyl
+    real(Float64), dimension(3) :: r0, v0, r0_cyl
+    real(Float64), dimension(2) :: phi_dum
+    real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax
+    real(Float64) :: rmin, rmax, phimax, phimin
+    integer :: spec_nchan, npa_nchan, i, error
+    logical :: inp1, inp2
+
+    spec_nchan = 0
+    npa_nchan = 0
+
+    !!Initialize HDF5 interface
+    call h5open_f(error)
+
+    !!Open HDF5 file
+    call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, fid, error)
+
+    !!If SPEC group exists, read FIDA LOS info 
+    call h5ltpath_valid_f(fid, "/spec", .True., path_valid_spec, error)
+    if(.not.path_valid_spec) then
+        if(inputs%verbose.ge.1) then
+            write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
+            write(*,'(a)') 'Passive FIDA calculations will not be performed'
+        endif
+        inputs%calc_pfida = 0
+    endif
+
+    if(inputs%calc_pfida.gt.0) then
+        !!Open SPEC group
+        call h5gopen_f(fid, "/spec", gid, error)
+        call h5ltread_dataset_int_scalar_f(gid, "/spec/nchan", spec_nchan, error)
+
+        allocate(lenses(3, spec_nchan), axes(3, spec_nchan))
+
+        !! Read in lenses and axes info
+        dims = [3,spec_nchan]
+        call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
+        call h5ltread_dataset_double_f(gid, "/spec/axis", axes, dims, error)
+
+        !!Close SPEC group
+        call h5gclose_f(gid, error)
+    endif
+
+    !!If NPA group exists, read NPA LOS info 
+    call h5ltpath_valid_f(fid, "/npa", .True., path_valid_npa, error)
+    if(.not.path_valid_npa) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'NPA geometry is not in the geometry file'
+            write(*,'(a)') 'Passive NPA calculations will not be performed'
+        endif
+        inputs%calc_pnpa = 0
+    endif
+
+    if(inputs%calc_pnpa.gt.0) then
+        !!Open NPA group
+        call h5gopen_f(fid, "/npa", gid, error)
+
+        call h5ltread_dataset_int_scalar_f(gid, "/npa/nchan", npa_nchan, error)
+
+        allocate(a_cent(3,  npa_nchan), d_cent(3,  npa_nchan))
+
+        !! Read in a_cent and d_cent info
+        dims = [3,spec_nchan]
+        call h5ltread_dataset_double_f(gid, "/npa/a_cent",  a_cent, dims, error)
+        call h5ltread_dataset_double_f(gid, "/npa/d_cent",  d_cent, dims, error)
+
+        !!Close NPA group
+        call h5gclose_f(gid, error)
+    endif
+
+    !!Close file id
+    call h5fclose_f(fid, error)
+
+    !!Close HDF5 interface
+    call h5close_f(error)
+
+    !!Collect all LOS info
+    allocate(r0_arr(3,  spec_nchan+npa_nchan), v0_arr(3,  spec_nchan+npa_nchan))
+
+    if((inputs%calc_pfida.gt.0).and.(inputs%calc_pnpa.gt.0)) then
+        r0_arr(:,1:spec_nchan) = lenses
+        v0_arr(:,1:spec_nchan) = axes
+        r0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = d_cent
+        v0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = a_cent - d_cent
+    else if(inputs%calc_pfida.gt.0) then
+        r0_arr(:,1:spec_nchan) = lenses
+        v0_arr(:,1:spec_nchan) = axes
+    else !pnpa>=1 case
+        r0_arr(:,1:npa_nchan) = d_cent
+        v0_arr(:,1:npa_nchan) = a_cent - d_cent
+    endif
+
+    !! The remainder of the code will make the passive neutral grid
+    pass_grid%dr = inter_grid%dr
+    pass_grid%dz = inter_grid%dz
+    pass_grid%nr = inter_grid%nr
+    pass_grid%nz = inter_grid%nz
+    allocate(pass_grid%r(pass_grid%nr), pass_grid%z(pass_grid%nz))
+    pass_grid%r = inter_grid%r
+    pass_grid%z = inter_grid%z
+    pass_grid%da = pass_grid%dr*pass_grid%dz
+
+    !! Start by finding the limits of the beam grid vertices to define the phi information
+    xmin = beam_grid%xmin ; xmax = beam_grid%xmax
+    ymin = beam_grid%ymin ; ymax = beam_grid%ymax
+    zmin = beam_grid%zmin ; zmax = beam_grid%zmax
+
+    vertex111(1) = xmin   ; vertex111(2) = ymin   ; vertex111(3) = zmin
+    vertex222(1) = xmax   ; vertex222(2) = ymax   ; vertex222(3) = zmax
+
+    vertex112 = vertex111 ; vertex211 = vertex111 ; vertex121 = vertex111
+    vertex112(3) = zmax   ; vertex211(1) = xmax   ; vertex121(2) = ymax
+
+    vertex122 = vertex222 ; vertex221 = vertex222 ; vertex212 = vertex222
+    vertex122(1) = xmin   ; vertex221(3) = zmin   ; vertex212(2) = ymin
+
+    call xyz_to_cyl(vertex111,vertex111_cyl)
+    call xyz_to_cyl(vertex112,vertex112_cyl)
+    call xyz_to_cyl(vertex121,vertex121_cyl)
+    call xyz_to_cyl(vertex211,vertex211_cyl)
+    call xyz_to_cyl(vertex212,vertex212_cyl)
+    call xyz_to_cyl(vertex222,vertex222_cyl)
+    call xyz_to_cyl(vertex122,vertex122_cyl)
+    call xyz_to_cyl(vertex221,vertex221_cyl)
+
+    phimin = min(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
+                ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
+    phimax = max(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
+                ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
+
+    !! Update phi with LOS limits
+    track_loop: do i=1,(spec_nchan+npa_nchan)
+        r0 = r0_arr(:,i)
+        v0 = v0_arr(:,i)
+        v0 = 2.d0*v0/norm2(v0)
+        phi_dum = -1.d0 !Initialize phi_dum outside of domain
+        call in_plasma(r0, inp2)
+        if (inp2) cycle track_loop
+        inp2 = .True. ; inp1 = .False.
+        do while (inp2) !Loop until los 'particle' is outside the plasma
+            do while (.not.inp1) !Loop until los 'particle' is inside the plasma
+                call uvw_to_cyl(r0, r0_cyl)
+                if ((r0_cyl(1).gt.600.d0).or.(abs(r0_cyl(2)).gt.600.d0)) exit !Never intersects
+                call in_plasma(r0, inp1)
+                if (inp1) phi_dum(1) = r0_cyl(3)
+                r0 = r0 + v0  !dt=1
+            enddo
+
+            call in_plasma(r0, inp2)
+            if (.not.inp2) then
+                call uvw_to_cyl(r0, r0_cyl)
+                phi_dum(2) = r0_cyl(3)
+            endif
+            r0 = r0 + v0  !dt=1
+        enddo
+
+        if((minval(phi_dum).lt.phimin).and.(minval(phi_dum).ge.0.d0)) phimin = minval(phi_dum)
+        if((maxval(phi_dum).gt.phimax).and.(maxval(phi_dum).ge.0.d0)) phimax = maxval(phi_dum)
+    enddo track_loop
+
+    pass_grid%dphi = 0.1
+    pass_grid%nphi = int(ceiling((phimax-phimin)/pass_grid%dphi))
+
+    if (pass_grid%nphi.gt.20) then !! Avoid large memory allocation
+        pass_grid%nphi = 20
+        pass_grid%dphi = (phimax-phimin)/pass_grid%nphi
+    endif
+
+    allocate(pass_grid%phi(pass_grid%nphi))
+    do i=1, pass_grid%nphi
+        pass_grid%phi(i) = phimin + (i-1)*pass_grid%dphi
+    enddo
+
+    pass_grid%dv = pass_grid%dr*pass_grid%dphi*pass_grid%dz
+    pass_grid%dims = [pass_grid%nr, pass_grid%nz, pass_grid%nphi]
+
+    pass_grid%ntrack = pass_grid%nr+pass_grid%nz+pass_grid%nphi
+    pass_grid%ngrid  = pass_grid%nr*pass_grid%nz*pass_grid%nphi
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- Passive neutral grid settings ----"
+        write(*,'(T2,"Nr: ", i3)') pass_grid%nr
+        write(*,'(T2,"Nz: ", i3)') pass_grid%nz
+        write(*,'(T2,"Nphi: ", i3)') pass_grid%nphi
+        write(*,'(T2,"R  range = [",f6.2,",",f6.2,"]")') &
+              pass_grid%r(1),pass_grid%r(pass_grid%nr)
+        write(*,'(T2,"Z  range = [",f7.2,",",f6.2,"]")') &
+              pass_grid%z(1),pass_grid%z(pass_grid%nz)
+        write(*,'(T2,"Phi  range = [",f5.2,",",f5.2,"]")') &
+              pass_grid%phi(1),pass_grid%phi(pass_grid%nphi)
+        write(*,'(T2,"dA: ", f5.2," [cm^3]")') pass_grid%da
+        write(*,*) ''
+    endif
+
+    if(inputs%calc_pnpa.gt.0) deallocate(a_cent, d_cent)
+    if(inputs%calc_pfida.gt.0) deallocate(lenses, axes)
+
+end subroutine make_passive_grid
+
 subroutine read_beam
     !+ Reads neutral beam geometry and stores the quantities in [[libfida:nbi]]
     integer(HID_T) :: fid, gid
@@ -2324,12 +2557,12 @@ subroutine read_chords
     real(Float64), dimension(:,:,:), allocatable :: dlength
     real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
     type(LOSElement), dimension(:), allocatable :: los_elem
+    type(ParticleTrack), dimension(:), allocatable :: tracks
     real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
     real(Float64) :: xyz_lens(3), xyz_axis(3), length
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(2) :: randomu
     real(Float64) :: theta, sqrt_rho, dl
-    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     character(len=20) :: system = ''
 
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
@@ -2352,6 +2585,7 @@ subroutine read_chords
             write(*,'(a)') 'Continuing without spectral diagnostics'
         endif
         inputs%calc_spec = 0
+        inputs%tot_spectra=0
         inputs%calc_fida = 0
         inputs%calc_pfida = 0
         inputs%calc_bes = 0
@@ -2377,9 +2611,6 @@ subroutine read_chords
     allocate(sigma_pi(spec_chords%nchan))
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
-    allocate(dlength(beam_grid%nx, &
-                     beam_grid%ny, &
-                     beam_grid%nz) )
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
@@ -2397,93 +2628,191 @@ subroutine read_chords
     !!Close HDF5 interface
     call h5close_f(error)
 
-    chan_loop: do i=1,spec_chords%nchan
-        call uvw_to_xyz(lenses(:,i),xyz_lens)
-        xyz_axis = matmul(beam_grid%inv_basis,axes(:,i))
-        spec_chords%los(i)%lens = xyz_lens
-        spec_chords%los(i)%axis = xyz_axis
-        spec_chords%los(i)%sigma_pi = sigma_pi(i)
-        spec_chords%los(i)%spot_size = spot_size(i)
+    if(inputs%calc_pfida.gt.0) then
+        allocate(tracks(pass_grid%ntrack))
+        allocate(dlength(pass_grid%nr, &
+                         pass_grid%nz, &
+                         pass_grid%nphi) )
+        pass_grid_chan_loop: do i=1,spec_chords%nchan
+            spec_chords%los(i)%lens_uvw = lenses(:,i)
+            spec_chords%los(i)%axis_uvw = axes(:,i)
+            spec_chords%los(i)%sigma_pi = sigma_pi(i)
+            spec_chords%los(i)%spot_size = spot_size(i)
 
-        r0 = xyz_lens
-        v0 = xyz_axis
-        v0 = v0/norm2(v0)
-        call line_basis(r0,v0,basis)
+            r0 = lenses(:,i)
+            v0 = axes(:,i)
+            v0 = v0/norm2(v0)
+            call line_basis(r0,v0,basis)
 
-        call grid_intersect(r0,v0,length,r_enter,r_exit)
-        if(length.le.0.d0) then
-            if(inputs%verbose.ge.1) then
-                WRITE(*,'("Channel ",i5," missed the beam grid")') i
+            call grid_intersect(r0,v0,length,r_enter,r_exit,passive=.True.)
+            if(length.le.0.d0) then
+                if(inputs%verbose.ge.1) then
+                    WRITE(*,'("Channel ",i5," missed the passive neutral grid or starts inside the plasma")') i
+                endif
+                cycle pass_grid_chan_loop
             endif
-            cycle chan_loop
-        endif
 
-        if(spot_size(i).le.0.d0) then
-            nc = 1
-        else
-            nc = 100
-        endif
+            if(spot_size(i).le.0.d0) then
+                nc = 1
+            else
+                nc = 100
+            endif
 
-        dlength = 0.d0
-        !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-        !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
-        do ic=1,nc
-            ! Uniformally sample within spot size
-            call randu(randomu)
-            sqrt_rho = sqrt(randomu(1))
-            theta = 2*pi*randomu(2)
-            r0(1) = 0.d0
-            r0(2) = spot_size(i)*sqrt_rho*cos(theta)
-            r0(3) = spot_size(i)*sqrt_rho*sin(theta)
-            r0 = matmul(basis,r0) + xyz_lens
+            dlength = 0.d0
+            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
+            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            do ic=1,nc
+                ! Uniformally sample within spot size
+                call randu(randomu)
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                r0(1) = 0.d0
+                r0(2) = spot_size(i)*sqrt_rho*cos(theta)
+                r0(3) = spot_size(i)*sqrt_rho*sin(theta)
+                r0 = matmul(basis,r0) + lenses(:,i)
 
-            call grid_intersect(r0, v0, length, r_enter, r_exit)
-            call track(r_enter, v0, tracks, ntrack)
-            track_loop: do j=1, ntrack
-                ind = tracks(j)%ind
-                !inds can repeat so add rather than assign
-                !$OMP ATOMIC UPDATE
-                dlength(ind(1),ind(2),ind(3)) = &
-                dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                !$OMP END ATOMIC
-            enddo track_loop
-        enddo
-        !$OMP END PARALLEL DO
-        do kk=1,beam_grid%nz
-            do jj=1,beam_grid%ny
-                xloop: do ii=1, beam_grid%nx
-                    if(dlength(ii,jj,kk).ne.0.d0) then
-                        dl = dlength(ii,jj,kk)
-                        nc = spec_chords%inter(ii,jj,kk)%nchan + 1
-                        if(nc.eq.1) then
-                            allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
-                            spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
-                        else
-                            allocate(los_elem(nc))
-                            los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
-                            los_elem(nc) = LOSElement(i, dl)
-                            deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
-                            call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
-                        endif
-                        spec_chords%inter(ii,jj,kk)%nchan = nc
-                    endif
-                enddo xloop
+                call grid_intersect(r0,v0,length,r_enter,r_exit,passive=.True.)
+                call track_cylindrical(r_enter, v0, tracks, ntrack)
+                pass_grid_track_loop: do j=1, ntrack
+                    ind = tracks(j)%ind
+                    !inds can repeat so add rather than assign
+                    !$OMP ATOMIC UPDATE
+                    dlength(ind(1),ind(2),ind(3)) = &
+                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                    !$OMP END ATOMIC
+                enddo pass_grid_track_loop
             enddo
+            !$OMP END PARALLEL DO
+            do kk=1,pass_grid%nphi
+                do jj=1,pass_grid%nz
+                    rloop: do ii=1, pass_grid%nr
+                        if(dlength(ii,jj,kk).ne.0.d0) then
+                            dl = dlength(ii,jj,kk)
+                            nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
+                            if(nc.eq.1) then
+                                allocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc))
+                                spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
+                            else
+                                allocate(los_elem(nc))
+                                los_elem(1:(nc-1)) = spec_chords%cyl_inter(ii,jj,kk)%los_elem
+                                los_elem(nc) = LOSElement(i, dl)
+                                deallocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem)
+                                call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
+                            endif
+                            spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
+                        endif
+                    enddo rloop
+                enddo
+            enddo
+        enddo pass_grid_chan_loop
+
+        spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
+        allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
+
+        nc = 0
+        do ic=1,pass_grid%ngrid
+            call ind2sub(pass_grid%dims,ic,ind)
+            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+            if(spec_chords%cyl_inter(ii,jj,kk)%nchan.gt.0) then
+                nc = nc + 1
+                spec_chords%cyl_cell(nc) = ic
+            endif
         enddo
-    enddo chan_loop
+        deallocate(dlength, tracks)
+    endif
+    if((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
+        allocate(dlength(beam_grid%nx, &
+                         beam_grid%ny, &
+                         beam_grid%nz) )
+        allocate(tracks(beam_grid%ntrack))
+        chan_loop: do i=1,spec_chords%nchan
+            call uvw_to_xyz(lenses(:,i),xyz_lens)
+            xyz_axis = matmul(beam_grid%inv_basis,axes(:,i))
+            spec_chords%los(i)%lens = xyz_lens
+            spec_chords%los(i)%axis = xyz_axis
+            spec_chords%los(i)%sigma_pi = sigma_pi(i)
+            spec_chords%los(i)%spot_size = spot_size(i)
 
-    spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
-    allocate(spec_chords%cell(spec_chords%ncell))
+            r0 = xyz_lens
+            v0 = xyz_axis
+            v0 = v0/norm2(v0)
+            call line_basis(r0,v0,basis)
 
-    nc = 0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
-        ii = ind(1) ; jj = ind(2) ; kk = ind(3)
-        if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
-            nc = nc + 1
-            spec_chords%cell(nc) = ic
-        endif
-    enddo
+            call grid_intersect(r0,v0,length,r_enter,r_exit)
+            if(length.le.0.d0) then
+                if(inputs%verbose.ge.1) then
+                    WRITE(*,'("Channel ",i5," missed the beam grid")') i
+                endif
+                cycle chan_loop
+            endif
+
+            if(spot_size(i).le.0.d0) then
+                nc = 1
+            else
+                nc = 100
+            endif
+
+            dlength = 0.d0
+            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
+            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            do ic=1,nc
+                ! Uniformally sample within spot size
+                call randu(randomu)
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                r0(1) = 0.d0
+                r0(2) = spot_size(i)*sqrt_rho*cos(theta)
+                r0(3) = spot_size(i)*sqrt_rho*sin(theta)
+                r0 = matmul(basis,r0) + xyz_lens
+
+                call grid_intersect(r0, v0, length, r_enter, r_exit)
+                call track(r_enter, v0, tracks, ntrack)
+                track_loop: do j=1, ntrack
+                    ind = tracks(j)%ind
+                    !inds can repeat so add rather than assign
+                    !$OMP ATOMIC UPDATE
+                    dlength(ind(1),ind(2),ind(3)) = &
+                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                    !$OMP END ATOMIC
+                enddo track_loop
+            enddo
+            !$OMP END PARALLEL DO
+            do kk=1,beam_grid%nz
+                do jj=1,beam_grid%ny
+                    xloop: do ii=1, beam_grid%nx
+                        if(dlength(ii,jj,kk).ne.0.d0) then
+                            dl = dlength(ii,jj,kk)
+                            nc = spec_chords%inter(ii,jj,kk)%nchan + 1
+                            if(nc.eq.1) then
+                                allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
+                                spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
+                            else
+                                allocate(los_elem(nc))
+                                los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
+                                los_elem(nc) = LOSElement(i, dl)
+                                deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
+                                call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
+                            endif
+                            spec_chords%inter(ii,jj,kk)%nchan = nc
+                        endif
+                    enddo xloop
+                enddo
+            enddo
+        enddo chan_loop
+
+        spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
+        allocate(spec_chords%cell(spec_chords%ncell))
+
+        nc = 0
+        do ic=1,beam_grid%ngrid
+            call ind2sub(beam_grid%dims,ic,ind)
+            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+            if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
+                nc = nc + 1
+                spec_chords%cell(nc) = ic
+            endif
+        enddo
+    endif
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"FIDA/BES System: ",a)') trim(adjustl(system))
@@ -2714,7 +3043,7 @@ subroutine read_equilibrium
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(3) :: dims
 
-    integer :: impc, ic, ir, iz, iphi, it, ind(3)
+    integer :: impc, ic, ir, iz, iphi, it, ind(3), i
     type(LocalProfiles) :: plasma
     real(Float64) :: photons
     real(Float64), dimension(nlevs) :: rates, denn, rates_avg
@@ -2748,8 +3077,6 @@ subroutine read_equilibrium
     inter_grid%dims = [inter_grid%nr, inter_grid%nz, inter_grid%nphi]
 
     allocate(inter_grid%r(inter_grid%nr),inter_grid%z(inter_grid%nz),inter_grid%phi(inter_grid%nphi))
-    allocate(inter_grid%r2d(inter_grid%nr,inter_grid%nz))
-    allocate(inter_grid%z2d(inter_grid%nr,inter_grid%nz))
     allocate(p_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     allocate(f_mask(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
     allocate(denn3d(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
@@ -2763,8 +3090,6 @@ subroutine read_equilibrium
     else
         inter_grid%phi=0.d0
     endif
-    call h5ltread_dataset_double_f(gid, "/plasma/r2d", inter_grid%r2d, dims, error)
-    call h5ltread_dataset_double_f(gid, "/plasma/z2d", inter_grid%z2d, dims, error)
 
     inter_grid%dr = abs(inter_grid%r(2)-inter_grid%r(1))
     inter_grid%dz = abs(inter_grid%z(2)-inter_grid%z(1))
@@ -2775,6 +3100,9 @@ subroutine read_equilibrium
         inter_grid%dphi = abs(inter_grid%phi(2)-inter_grid%phi(1))
     endif
     inter_grid%dv = inter_grid%dr*inter_grid%dphi*inter_grid%dz
+
+    inter_grid%ntrack = inter_grid%nr+inter_grid%nz+inter_grid%nphi
+    inter_grid%ngrid  = inter_grid%nr*inter_grid%nz*inter_grid%nphi
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- Interpolation grid settings ----'
@@ -3051,7 +3379,7 @@ subroutine read_mc(fid, error)
 
     integer(HSIZE_T), dimension(1) :: dims
     integer(Int32) :: i,j,ii,ir,iz,iphi,nphi
-    real(Float64) :: phi,phi_enter,phi_exit,delta_phi,xp,yp,zp
+    real(Float64) :: phi,beam_grid_phi_enter,beam_grid_phi_exit,delta_phi,xp,yp,zp
     real(Float64), dimension(3) :: uvw,xyz,ri,vi,e1_xyz,e2_xyz,C_xyz,dum
     real(Float64), dimension(:), allocatable :: weight
     type(LocalEMFields) :: fields
@@ -3126,7 +3454,7 @@ subroutine read_mc(fid, error)
     e1_xyz = matmul(beam_grid%inv_basis,[1.0,0.0,0.0])
     e2_xyz = matmul(beam_grid%inv_basis,[0.0,1.0,0.0])
     !$OMP PARALLEL DO schedule(guided) private(i,ii,j,ir,iz,iphi,fields,uvw,phi,ri,vi, &
-    !$OMP& delta_phi,phi_enter,phi_exit,C_xyz,xyz,xp,yp,zp,dum,inp)
+    !$OMP& delta_phi,beam_grid_phi_enter,beam_grid_phi_exit,C_xyz,xyz,xp,yp,zp,dum,inp)
     particle_loop: do i=1,particles%nparticle
         if(inputs%verbose.ge.2) then
             WRITE(*,'(f7.2,"% completed",a,$)') cnt/real(particles%nparticle)*100,char(13)
@@ -3140,32 +3468,31 @@ subroutine read_mc(fid, error)
             zp = particles%fast_ion(i)%z
             uvw = [xp,yp,zp]
         endif
-        call in_plasma(uvw,inp,machine_coords=.True.)
+        call in_plasma(uvw,inp,input_coords=1)
         if(.not.inp) cycle particle_loop
 
         if(particles%axisym) then
-            phi_enter = 0.0
-            phi_exit = 0.0
+            beam_grid_phi_enter = 0.0
+            beam_grid_phi_exit = 0.0
             dum = [0.d0, 0.d0, particles%fast_ion(i)%z]
             call uvw_to_xyz(dum, C_xyz)
-            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(i)%r,phi_enter,phi_exit)
-            delta_phi = phi_exit-phi_enter
+            call circle_grid_intersect(C_xyz,e1_xyz,e2_xyz,particles%fast_ion(i)%r,beam_grid_phi_enter,beam_grid_phi_exit)
+            delta_phi = beam_grid_phi_exit-beam_grid_phi_enter
             if(delta_phi.gt.0) then
-                particles%fast_ion(i)%cross_grid = .True.
+                particles%fast_ion(i)%beam_grid_cross_grid = .True.
             else
-                particles%fast_ion(i)%cross_grid = .False.
+                particles%fast_ion(i)%beam_grid_cross_grid = .False.
                 delta_phi = 2*pi
             endif
-            particles%fast_ion(i)%phi_enter = phi_enter
-            particles%fast_ion(i)%delta_phi = delta_phi
-            particles%fast_ion(i)%weight = weight(i)*(delta_phi/(2*pi))/beam_grid%dv
+            particles%fast_ion(i)%beam_grid_phi_enter = beam_grid_phi_enter
         else
+            delta_phi = 2*pi
             call uvw_to_xyz(uvw,xyz)
-            particles%fast_ion(i)%cross_grid = in_grid(xyz)
-            particles%fast_ion(i)%phi_enter = particles%fast_ion(i)%phi
-            particles%fast_ion(i)%delta_phi = 2*pi
-            particles%fast_ion(i)%weight = weight(i)/beam_grid%dv
+            particles%fast_ion(i)%beam_grid_cross_grid = in_grid(xyz)
+            particles%fast_ion(i)%beam_grid_phi_enter = particles%fast_ion(i)%phi
         endif
+        particles%fast_ion(i)%delta_phi = delta_phi
+        particles%fast_ion(i)%weight = weight(i)
 
         ir = minloc(abs(inter_grid%r - particles%fast_ion(i)%r),1)
         iphi = minloc(abs(inter_grid%phi - particles%fast_ion(i)%phi),1)
@@ -3179,7 +3506,7 @@ subroutine read_mc(fid, error)
     enddo particle_loop
     !$OMP END PARALLEL DO
 
-    num = count(particles%fast_ion%cross_grid)
+    num = count(particles%fast_ion%beam_grid_cross_grid)
     if(num.le.0) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'READ_MC: No mc particles in beam grid'
@@ -5294,6 +5621,51 @@ subroutine line_plane_intersect(l0, l, p0, n, p, t)
 
 end subroutine line_plane_intersect
 
+subroutine line_cylinder_intersect(l0, l, p0, p, t)
+    !+ Calculates the intersection of a line and a cylinder
+    real(Float64), dimension(3), intent(in)  :: l0
+        !+ Point on line
+    real(Float64), dimension(3), intent(in)  :: l
+        !+ Ray of line
+    real(Float64), dimension(3), intent(in)  :: p0
+        !+ Point on cylinder
+    real(Float64), dimension(3), intent(out) :: p
+        !+ Line-cylinder intersect point
+    real(Float64), intent(out)               :: t
+        !+ "time" to intersect
+
+    real(Float64), dimension(2) :: times
+    logical, dimension(2) :: mask
+    real(Float64) :: r, vx, vy, x0, y0
+    real(Float64) :: radicand, npos
+
+    r = sqrt(p0(1) * p0(1) + p0(2) * p0(2))
+    x0 = l0(1) ; y0 = l0(2)
+    vx = l(1)  ; vy = l(2)
+
+    if((vx.eq.0.d0).and.(vy.eq.0.d0)) then
+        t = 0.d0        ! Parallel to a plane tangent to the cylinder
+    else
+        radicand = r**2 * (vx**2 + vy**2) - (vy * x0 - vx * y0)**2
+        if(radicand.lt.0) then
+            t = 0.d0    ! Parallel to a plane tangent to the cylinder
+        else
+            times(1) = (- vx * x0 - vy * y0 - sqrt(radicand)) / (vx**2 + vy**2)
+            times(2) = (- vx * x0 - vy * y0 + sqrt(radicand)) / (vx**2 + vy**2)
+            mask = times.gt.0
+            npos = count(mask)
+            if(npos.gt.0) then
+                t = minval(times, mask=times.gt.0)
+            else
+                t = maxval(times, mask=times.le.0)
+            endif
+        endif
+    endif
+
+    p = l0 + l * t
+
+end subroutine line_cylinder_intersect
+
 function in_boundary(bplane, p) result(in_b)
     !+ Indicator function for determining if a point on a plane is within the plane boundary
     type(BoundedPlane), intent(in)          :: bplane
@@ -5735,6 +6107,18 @@ subroutine xyz_to_uvw(xyz, uvw)
 
 end subroutine xyz_to_uvw
 
+subroutine xyz_to_cyl(xyz, cyl)
+    !+ Convert beam coordinate `xyz` to cylindrical coordinate `cyl`
+    real(Float64), dimension(3), intent(in)  :: xyz
+    real(Float64), dimension(3), intent(out) :: cyl 
+
+    real(Float64), dimension(3) :: uvw
+
+    call xyz_to_uvw(xyz, uvw)
+    call uvw_to_cyl(uvw, cyl)
+
+end subroutine xyz_to_cyl
+
 subroutine uvw_to_xyz(uvw,xyz)
     !+ Convert machine coordinate `uvw` to beam coordinate `xyz`
     real(Float64), dimension(3), intent(in)  :: uvw
@@ -5750,7 +6134,41 @@ subroutine uvw_to_xyz(uvw,xyz)
 
 end subroutine uvw_to_xyz
 
-subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
+subroutine cyl_to_uvw(cyl, uvw)
+    !+ Convert cylindrical coordinate `cyl` to machine coordinate `uvw`
+    real(Float64), dimension(3), intent(in)  :: cyl
+    real(Float64), dimension(3), intent(out) :: uvw
+
+    uvw(1) = cyl(1) * cos(cyl(3))
+    uvw(2) = cyl(1) * sin(cyl(3))
+    uvw(3) = cyl(2)
+
+end subroutine cyl_to_uvw
+
+subroutine cyl_to_xyz(cyl, xyz)
+    !+ Convert cylindrical coordinate `cyl` to beam coordinate `xyz`
+    real(Float64), dimension(3), intent(in)  :: cyl
+    real(Float64), dimension(3), intent(out) :: xyz
+
+    real(Float64), dimension(3) :: uvw
+
+    call cyl_to_uvw(cyl, uvw)
+    call uvw_to_xyz(uvw, xyz)
+
+end subroutine cyl_to_xyz
+
+subroutine uvw_to_cyl(uvw, cyl)
+    !+ Convert machine coordinate `uvw` to cylindrical coordinate `cyl`
+    real(Float64), dimension(3), intent(in)  :: uvw
+    real(Float64), dimension(3), intent(out) :: cyl
+
+    cyl(1) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
+    cyl(2) = uvw(3)
+    cyl(3) = atan2(uvw(2),uvw(1))
+
+end subroutine uvw_to_cyl
+
+subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, passive)
     !+ Calculates a particles intersection length with the [[libfida:beam_grid]]
     real(Float64), dimension(3), intent(in)           :: r0
         !+ Initial position of particle [cm]
@@ -5759,85 +6177,143 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in)
     real(Float64), intent(out)                        :: length
         !+ Intersection length [cm]
     real(Float64), dimension(3), intent(out)          :: r_enter
-        !+ Point where particle enters [[libfida:beam_grid]]
+        !+ Point where particle enters
     real(Float64), dimension(3), intent(out)          :: r_exit
-        !+ Point where particle exits [[libfida:beam_grid]]
+        !+ Point where particle exits
     real(Float64), dimension(3), intent(in), optional :: center_in
         !+ Alternative grid center
     real(Float64), dimension(3), intent(in), optional :: lwh_in
         !+ Alternative grid [length,width,height]
+    logical, intent(in), optional                     :: passive
+        !+ Calculates a particles intersection length with the [[libfida:pass_grid]]
 
     real(Float64), dimension(3,6) :: ipnts
-    real(Float64), dimension(3) :: vi
+    real(Float64), dimension(3) :: r, v, r0_cyl, vi
     real(Float64), dimension(3) :: center
     real(Float64), dimension(3) :: lwh
     integer, dimension(6) :: side_inter
     integer, dimension(2) :: ind
+    real(Float64) :: rmin,rmax,zmin,zmax,phimin,phimax
     integer :: i, j, nunique, ind1, ind2
+    logical :: inp, in_grid1, in_grid2
+    logical :: pas 
 
-    if (present(center_in)) then
-        center = center_in
-    else
-        center = beam_grid%center
-    endif
+    r = r0 ; v = v0
+    pas = .False.
 
-    if (present(lwh_in)) then
-        lwh = lwh_in
-    else
-        lwh = beam_grid%lwh
-    endif
+    if(present(passive)) pas = passive
 
-    side_inter = 0
-    ipnts = 0.d0
-    do i=1,6
-        j = int(ceiling(i/2.0))
-        if (j.eq.1) ind = [2,3]
-        if (j.eq.2) ind = [1,3]
-        if (j.eq.3) ind = [1,2]
-        if (abs(v0(j)).gt.0.d0) then
-            ipnts(:,i) = r0 + v0*( ( (center(j) + &
-                         (mod(i,2) - 0.5)*lwh(j)) - r0(j))/v0(j) )
-            if ((abs(ipnts(ind(1),i) - center(ind(1))).le.(0.5*lwh(ind(1)))).and. &
-                (abs(ipnts(ind(2),i) - center(ind(2))).le.(0.5*lwh(ind(2))))) then
-                side_inter(i) = 1
-            endif
+    if(pas) then
+        rmin = pass_grid%r(1) ; rmax = pass_grid%r(pass_grid%nr)
+        zmin = pass_grid%z(1) ; zmax = pass_grid%z(pass_grid%nz)
+        phimin = pass_grid%phi(1) ; phimax = pass_grid%phi(pass_grid%nphi)
+
+        v = 2.d0*v/norm2(v)
+        call in_plasma(r, inp) !Weird case where los head is inside the plasma
+        if (inp) then
+            length = 0.d0
+            return
         endif
-    enddo
+        in_grid2 = .True. ; in_grid1 = .False.
+        do while (in_grid2) !Loop until los 'particle' is outside the plasma
+            do while (.not.in_grid1) !Loop until los 'particle' is inside the plasma
+                call uvw_to_cyl(r, r0_cyl)
+                if ((r0_cyl(1).gt.600.d0).or.(abs(r0_cyl(2)).gt.600.d0)) then !Never intersects
+                    length = 0.d0
+                    return
+                endif
 
-    length = 0.d0
-    r_enter = r0
-    r_exit  = r0
-    ind1=0
-    ind2=0
-    if (sum(side_inter).ge.2) then
-        ! Find first intersection side
-        i=1
-        do while (i.le.6)
-            if(side_inter(i).eq.1) exit
-            i=i+1
-        enddo
-        ind1=i
-        !Find number of unique points
-        nunique = 0
-        do i=ind1+1,6
-            if (side_inter(i).ne.1) cycle
-            if (sqrt( sum( ( ipnts(:,i)-ipnts(:,ind1) )**2 ) ).gt.0.001) then
-                ind2=i
-                nunique = 2
-                exit
-            endif
-        enddo
+                !Check if inside the grid
+                if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
+                ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
+                ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
+                    in_grid1 = .False.
+                else
+                    in_grid1 = .True.
+                    r_enter = r
+                endif
+                r = r + v  !dt=1
+            enddo
 
-        if(nunique.eq.2) then
-            vi = ipnts(:,ind2) - ipnts(:,ind1)
-            if (dot_product(v0,vi).gt.0.0) then
-                r_enter = ipnts(:,ind1)
-                r_exit  = ipnts(:,ind2)
+            !Check if outside the grid
+            call uvw_to_cyl(r, r0_cyl)
+            if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
+            ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
+            ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
+                in_grid2 = .False.
+                r_exit = r
             else
-                r_enter = ipnts(:,ind2)
-                r_exit  = ipnts(:,ind1)
+                in_grid2 = .True.
             endif
-            length = sqrt(sum((r_exit - r_enter)**2))
+            r = r + v  !dt=1
+        enddo
+
+        length = sqrt(sum((r_exit-r_enter)**2))
+    else
+        if (present(center_in)) then
+            center = center_in
+        else
+            center = beam_grid%center
+        endif
+
+        if (present(lwh_in)) then
+            lwh = lwh_in
+        else
+            lwh = beam_grid%lwh
+        endif
+
+        side_inter = 0
+        ipnts = 0.d0
+        do i=1,6
+            j = int(ceiling(i/2.0))
+            if (j.eq.1) ind = [2,3]
+            if (j.eq.2) ind = [1,3]
+            if (j.eq.3) ind = [1,2]
+            if (abs(v0(j)).gt.0.d0) then
+                ipnts(:,i) = r0 + v0*( ( (center(j) + &
+                             (mod(i,2) - 0.5)*lwh(j)) - r0(j))/v0(j) )
+                if ((abs(ipnts(ind(1),i) - center(ind(1))).le.(0.5*lwh(ind(1)))).and. &
+                    (abs(ipnts(ind(2),i) - center(ind(2))).le.(0.5*lwh(ind(2))))) then
+                    side_inter(i) = 1
+                endif
+            endif
+        enddo
+
+        length = 0.d0
+        r_enter = r0
+        r_exit  = r0
+        ind1=0
+        ind2=0
+        if (sum(side_inter).ge.2) then
+            ! Find first intersection side
+            i=1
+            do while (i.le.6)
+                if(side_inter(i).eq.1) exit
+                i=i+1
+            enddo
+            ind1=i
+            !Find number of unique points
+            nunique = 0
+            do i=ind1+1,6
+                if (side_inter(i).ne.1) cycle
+                if (sqrt( sum( ( ipnts(:,i)-ipnts(:,ind1) )**2 ) ).gt.0.001) then
+                    ind2=i
+                    nunique = 2
+                    exit
+                endif
+            enddo
+
+            if(nunique.eq.2) then
+                vi = ipnts(:,ind2) - ipnts(:,ind1)
+                if (dot_product(v0,vi).gt.0.0) then
+                    r_enter = ipnts(:,ind1)
+                    r_exit  = ipnts(:,ind2)
+                else
+                    r_enter = ipnts(:,ind2)
+                    r_exit  = ipnts(:,ind1)
+                endif
+                length = sqrt(sum((r_exit - r_enter)**2))
+            endif
         endif
     endif
 
@@ -5862,7 +6338,7 @@ function in_grid(xyz) result(ing)
 
 end function
 
-subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
+subroutine circle_grid_intersect(r0, e1, e2, radius, beam_grid_phi_enter, beam_grid_phi_exit)
     !+ Calculates the intersection arclength of a circle with the [[libfida:beam_grid]]
     real(Float64), dimension(3), intent(in) :: r0
         !+ Position of center enter of the circle in beam grid coordinates [cm]
@@ -5872,9 +6348,9 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
         !+ Unit vector pointing towards (R, pi/2) (r,phi) position of the circle in beam grid coordinates
     real(Float64), intent(in)               :: radius
         !+ Radius of circle [cm]
-    real(Float64), intent(out)              :: phi_enter
+    real(Float64), intent(out)              :: beam_grid_phi_enter
         !+ Phi value where the circle entered the [[libfida:beam_grid]] [rad]
-    real(Float64), intent(out)              :: phi_exit
+    real(Float64), intent(out)              :: beam_grid_phi_exit
         !+ Phi value where the circle exits the [[libfida:beam_grid]] [rad]
 
     real(Float64), dimension(3) :: i1_p,i1_n,i2_p,i2_n
@@ -5937,32 +6413,32 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
         endif
     enddo
 
-    phi_enter = 0.d0
-    phi_exit = 0.d0
+    beam_grid_phi_enter = 0.d0
+    beam_grid_phi_exit = 0.d0
     if (count(inter).gt.2) then
         write(*,'("CIRCLE_GRID_INTERSECT: Circle intersects grid more than 2 times: ",i2)') count(inter)
         return
     endif
 
     if(any(inter)) then
-        phi_enter = minval(phi,inter)
-        phi_exit = maxval(phi,inter)
+        beam_grid_phi_enter = minval(phi,inter)
+        beam_grid_phi_exit = maxval(phi,inter)
         if(r0_ing.and.any(count(inter,1).ge.2)) then
-            if((phi_exit - phi_enter) .lt. pi) then
-                tmp = phi_enter
-                phi_enter = phi_exit
-                phi_exit = tmp + 2*pi
+            if((beam_grid_phi_exit - beam_grid_phi_enter) .lt. pi) then
+                tmp = beam_grid_phi_enter
+                beam_grid_phi_enter = beam_grid_phi_exit
+                beam_grid_phi_exit = tmp + 2*pi
             endif
         else
-            if((phi_exit - phi_enter) .gt. pi) then
-                tmp = phi_enter
-                phi_enter = phi_exit
-                phi_exit = tmp + 2*pi
+            if((beam_grid_phi_exit - beam_grid_phi_enter) .gt. pi) then
+                tmp = beam_grid_phi_enter
+                beam_grid_phi_enter = beam_grid_phi_exit
+                beam_grid_phi_exit = tmp + 2*pi
             endif
         endif
-        if(approx_eq(phi_exit-phi_enter,pi,tol).and.r0_ing) then
-            phi_enter = 0.0
-            phi_exit = 2*pi
+        if(approx_eq(beam_grid_phi_exit-beam_grid_phi_enter,pi,tol).and.r0_ing) then
+            beam_grid_phi_enter = 0.0
+            beam_grid_phi_exit = 2*pi
         endif
     else
         if(r0_ing) then
@@ -5973,8 +6449,8 @@ subroutine circle_grid_intersect(r0, e1, e2, radius, phi_enter, phi_exit)
             d(3) = norm2(r0 - i2_n)/radius
             d(4) = norm2(r0 - i2_p)/radius
             if(all(d.ge.1.0)) then
-                phi_enter = 0.d0
-                phi_exit = 2.d0*pi
+                beam_grid_phi_enter = 0.d0
+                beam_grid_phi_exit = 2.d0*pi
             endif
         endif
     endif
@@ -6008,16 +6484,87 @@ subroutine get_indices(pos, ind)
 
 end subroutine get_indices
 
-subroutine get_position(ind, pos)
-    !+ Get position `pos` given [[libfida:beam_grid]] indices `ind`
-    integer(Int32), dimension(3), intent(in) :: ind
-        !+ [[libfida:beam_grid]] indices
-    real(Float64), dimension(3), intent(out) :: pos
+subroutine get_passive_grid_indices(pos, ind, input_coords)
+    !+ Find closest [[libfida:pass_grid]] indices `ind` to position `pos`
+    real(Float64),  dimension(3), intent(in)  :: pos
         !+ Position [cm]
+    integer(Int32), dimension(3), intent(out) :: ind
+        !+ Closest indices to position
+    integer, intent(in), optional             :: input_coords
+        !+ Indicates coordinate system of `pos`. Beam grid (0), machine (1) and cylindrical (2)
 
-    pos(1) = beam_grid%xc(ind(1))
-    pos(2) = beam_grid%yc(ind(2))
-    pos(3) = beam_grid%zc(ind(3))
+    real(Float64),  dimension(3) :: mini, differentials, loc
+    integer(Int32), dimension(3) :: maxind
+    integer :: i, ics
+
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        ics = 2
+    endif
+
+    if(ics.eq.1) then
+        loc(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        loc(2) = pos(3)
+        loc(3) = atan2(pos(2),pos(1))
+    endif
+
+    if(ics.eq.2) then
+        loc(1) = pos(1)
+        loc(2) = pos(2)
+        loc(3) = pos(3)
+    endif
+
+    maxind(1) = pass_grid%nr
+    maxind(2) = pass_grid%nz
+    maxind(3) = pass_grid%nphi
+
+    mini(1) = minval(pass_grid%r)
+    mini(2) = minval(pass_grid%z)
+    mini(3) = minval(pass_grid%phi)
+
+    differentials(1) = pass_grid%dr
+    differentials(2) = pass_grid%dz
+    differentials(3) = pass_grid%dphi
+
+    do i=1,3
+        ind(i) = floor((loc(i)-mini(i))/differentials(i)) + 1
+        if (ind(i).gt.maxind(i)) ind(i)=maxind(i)
+        if (ind(i).lt.1) ind(i)=1
+    enddo
+
+end subroutine get_passive_grid_indices
+
+subroutine get_position(ind, pos, input_coords)
+    !+ Get position `pos` given indices `ind`
+    integer(Int32), dimension(3), intent(in) :: ind
+        !+ Indices
+    real(Float64), dimension(3), intent(out) :: pos
+        !+ Position in [[libfida:beam_grid]] coordinates [cm]
+    integer, intent(in), optional            :: input_coords
+        !+ Indicates coordinate system of `ind`. Beam grid (0) and cylindrical (2)
+
+    real(Float64), dimension(3) :: pos_temp1, pos_temp2
+    integer :: ics, ocs
+
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        ics = 0
+    endif
+
+    if(ics.eq.0) then
+        pos(1) = beam_grid%xc(ind(1))
+        pos(2) = beam_grid%yc(ind(2))
+        pos(3) = beam_grid%zc(ind(3))
+    endif
+
+    if(ics.eq.2) then
+        pos_temp1(1) = inter_grid%r(ind(1))
+        pos_temp1(2) = inter_grid%z(ind(2))
+        pos_temp1(3) = inter_grid%phi(ind(3))
+        call cyl_to_xyz(pos_temp1,pos)
+    endif
 
 end subroutine get_position
 
@@ -6128,6 +6675,199 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     endif
 
 end subroutine track
+
+subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
+    !+ Computes the path of a neutral through the [[libfida:pass_grid]]
+    real(Float64), dimension(3), intent(in)          :: rin
+        !+ Initial position of particle
+    real(Float64), dimension(3), intent(in)          :: vin
+        !+ Initial velocity of particle
+    type(ParticleTrack), dimension(:), intent(inout) :: tracks
+        !+ Array of [[ParticleTrack]] type
+    integer(Int32), intent(out)                      :: ntrack
+        !+ Number of cells that a particle crosses
+    logical, intent(out), optional                   :: los_intersect
+        !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
+
+    real(Float64), dimension(3,3) :: basis
+    real(Float64), dimension(3) :: dt_arr, dr !! Need to make this rzphi
+    real(Float64), dimension(3) :: vn, vn_cyl
+    real(Float64), dimension(3) :: ri, ri_cyl, ri_tmp
+    real(Float64), dimension(3) :: p, nz
+    real(Float64), dimension(3) :: v_plane_cyl, v_plane
+    real(Float64), dimension(3) :: h_plane_cyl, h_plane
+    real(Float64), dimension(3) :: arc_cyl, arc
+    real(Float64), dimension(3) :: redge, tedge
+    real(Float64), dimension(3) :: redge_cyl, tedge_cyl
+    integer, dimension(3) :: sgn
+    integer, dimension(3) :: gdims
+    integer, dimension(1) :: minpos
+    integer, dimension(3) :: ind
+    real(Float64) :: dT, dt1, inv_50, t
+    real(Float64) :: s, c, phi
+    integer :: cc, i, ii, mind,ncross
+    logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
+    integer :: ir, iz, iphi
+
+    vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
+
+    if(dot_product(vn,vn).eq.0.0) then
+        return
+    endif
+
+    gdims(1) = pass_grid%nr
+    gdims(2) = pass_grid%nz
+    gdims(3) = pass_grid%nphi
+
+    phi = atan2(rin(2),rin(1))
+    s = sin(phi) ; c = cos(phi)
+    vn_cyl(1) = c*vn(1) + s*vn(2)
+    vn_cyl(3) = -s*vn(1) + c*vn(2)
+    vn_cyl(2) = vn(3)
+
+    do i=1,3
+        !! sgn is in R-Z-Phi coordinates
+        if (vn_cyl(i).gt.0.d0) then
+            sgn(i) = 1
+        else if (vn_cyl(i).lt.0.d0) then
+            sgn(i) =-1
+        end if
+    enddo
+
+    dr(1) = pass_grid%dr*sgn(1)
+    dr(2) = pass_grid%dz*sgn(2)
+    dr(3) = pass_grid%dphi*sgn(3)
+
+    !! Define actual cell
+    ri_cyl(1) = sqrt(ri(1)*ri(1) + ri(2)*ri(2))
+    ri_cyl(2) = ri(3)
+    ri_cyl(3) = atan2(ri(2), ri(1))
+    call get_passive_grid_indices(ri_cyl,ind)
+
+    arc_cyl(1) = pass_grid%r(ind(1))
+    arc_cyl(2) = pass_grid%z(ind(2))
+    arc_cyl(3) = pass_grid%phi(ind(3))
+    h_plane_cyl = arc_cyl
+    v_plane_cyl = arc_cyl
+
+    !! Define surfaces to intersect
+    if(sgn(1).gt.0.d0) arc_cyl(1) = pass_grid%r(ind(1)+1)
+    if(sgn(2).gt.0.d0) h_plane_cyl(2) = pass_grid%z(ind(2)+1)
+    if(sgn(3).gt.0.d0) v_plane_cyl(3) = pass_grid%phi(ind(3)+1)
+    ! Special case of the particle being on the surace handled below
+    if((sgn(1).lt.0.d0).and.(arc_cyl(1).eq.ri_cyl(1))) then
+        arc_cyl(1) = pass_grid%r(ind(1)-1)
+        h_plane_cyl(1) = pass_grid%r(ind(1)-1)
+        v_plane_cyl(1) = pass_grid%r(ind(1)-1)
+    endif
+    if((sgn(2).lt.0.d0).and.(h_plane_cyl(2).eq.ri_cyl(2))) then
+        arc_cyl(2) = pass_grid%z(ind(2)-1)
+        h_plane_cyl(2) = pass_grid%z(ind(2)-1)
+        v_plane_cyl(2) = pass_grid%z(ind(2)-1)
+    endif
+    if((sgn(3).lt.0.d0).and.(v_plane_cyl(3).eq.ri_cyl(3))) then
+        arc_cyl(3) = pass_grid%phi(ind(3)-1)
+        h_plane_cyl(3) = pass_grid%phi(ind(3)-1)
+        v_plane_cyl(3) = pass_grid%phi(ind(3)-1)
+    endif
+    call cyl_to_uvw(arc_cyl,arc)
+    call cyl_to_uvw(h_plane_cyl,h_plane)
+    call cyl_to_uvw(v_plane_cyl,v_plane)
+
+    !! Normal vectors
+    nz(1) = 0.d0 ; nz(2) = 0.d0 ; nz(3) = 1.d0
+    redge_cyl(1) = v_plane_cyl(1) + pass_grid%dr
+    redge_cyl(2) = v_plane_cyl(2)
+    redge_cyl(3) = v_plane_cyl(3)
+    call cyl_to_uvw(redge_cyl,redge)
+    tedge_cyl(1) = v_plane_cyl(1)
+    tedge_cyl(2) = v_plane_cyl(2) + pass_grid%dz
+    tedge_cyl(3) = v_plane_cyl(3)
+    call cyl_to_uvw(tedge_cyl,tedge)
+    call plane_basis(v_plane, redge, tedge, basis)
+
+    !! Track the particle
+    inv_50 = 1.0/50.0
+    cc=1
+    los_inter = .False.
+    tracks%time = 0.d0
+    tracks%flux = 0.d0
+    ncross = 0
+    call in_plasma(ri,in_plasma1,input_coords=1)
+    track_loop: do i=1,pass_grid%ntrack
+        if(cc.gt.pass_grid%ntrack) exit track_loop
+
+        if((spec_chords%cyl_inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
+            .and.(.not.los_inter))then
+            los_inter = .True.
+        endif
+
+        call line_cylinder_intersect(ri, vn, arc, p, dt_arr(1))
+        call line_plane_intersect(ri, vn, h_plane, nz, p, dt_arr(2))
+        call line_plane_intersect(ri, vn, v_plane, -basis(:,3), p, dt_arr(3))
+
+        minpos = minloc(dt_arr, mask=dt_arr.gt.0.d0)
+        mind = minpos(1)
+        dT = dt_arr(mind)
+        ri_tmp = ri + dT*vn
+
+        call in_plasma(ri_tmp,in_plasma2,input_coords=1)
+        if(in_plasma1.neqv.in_plasma2) then
+            dt1 = 0.0
+            track_fine: do ii=1,50
+                dt1 = dt1 + dT*inv_50
+                ri_tmp = ri + vn*dt1
+                call in_plasma(ri_tmp,in_plasma_tmp,input_coords=1)
+                if(in_plasma2.eqv.in_plasma_tmp) exit track_fine
+            enddo track_fine
+            tracks(cc)%pos = ri + 0.5*dt1*vn
+            tracks(cc+1)%pos = ri + 0.5*(dt1 + dT)*vn
+            tracks(cc)%time = dt1
+            tracks(cc+1)%time = dT - dt1
+            tracks(cc)%ind = ind
+            tracks(cc+1)%ind = ind
+            cc = cc + 2
+            ncross = ncross + 1
+        else
+            tracks(cc)%pos = ri + 0.5*dT*vn
+            tracks(cc)%time = dT
+            tracks(cc)%ind = ind
+            cc = cc + 1
+        endif
+        in_plasma1 = in_plasma2
+
+        ri = ri + dT*vn
+        ind(mind) = ind(mind) + sgn(mind)
+
+        if (ind(mind).gt.gdims(mind)) exit track_loop
+        if (ind(mind).lt.1) exit track_loop
+        if (ncross.ge.2) then
+            cc = cc - 1 !dont include last segment
+            exit track_loop
+        endif
+        !! Particle advancement and basis update
+        arc_cyl(mind) = arc_cyl(mind) + dr(mind)
+        h_plane_cyl(mind) = h_plane_cyl(mind) + dr(mind)
+        v_plane_cyl(mind) = v_plane_cyl(mind) + dr(mind)
+        call cyl_to_uvw(arc_cyl,arc)
+        call cyl_to_uvw(h_plane_cyl,h_plane)
+        call cyl_to_uvw(v_plane_cyl,v_plane)
+        redge_cyl(1) = v_plane_cyl(1) + pass_grid%dr
+        redge_cyl(2) = v_plane_cyl(2)
+        redge_cyl(3) = v_plane_cyl(3)
+        call cyl_to_uvw(redge_cyl,redge)
+        tedge_cyl(1) = v_plane_cyl(1)
+        tedge_cyl(2) = v_plane_cyl(2) + pass_grid%dz
+        tedge_cyl(3) = v_plane_cyl(3)
+        call cyl_to_uvw(tedge_cyl,tedge)
+        call plane_basis(v_plane, redge, tedge, basis)
+    enddo track_loop
+    ntrack = cc-1
+    if(present(los_intersect)) then
+        los_intersect = los_inter
+    endif
+
+end subroutine track_cylindrical
 
 !============================================================================
 !---------------------------Interpolation Routines---------------------------
@@ -6384,7 +7124,7 @@ subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
     real(Float64), intent(in)               :: phiout
         !+ Phi value to interpolate
     type(InterpolCoeffs3D), intent(out)     :: c
-        !+ Cylindrical Interpolation Coefficients
+        !+ Interpolation Coefficients
     integer, intent(out), optional          :: err
         !+ Error code
 
@@ -6567,14 +7307,16 @@ subroutine interpol3D_arr(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
     integer, intent(out), optional          :: err
         !+ Error code
     type(InterpolCoeffs3D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed Interpolation Coefficients
 
     type(InterpolCoeffs3D) :: b
     integer :: i, j, k, k2, err_status
     integer :: nphi
 
     err_status = 1
+
     nphi = size(phi)
+
     if(present(coeffs)) then
         b = coeffs
         if(nphi .eq. 1) then
@@ -6634,14 +7376,16 @@ subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs
     integer, intent(out), optional          :: err
         !+ Error code
     type(InterpolCoeffs3D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed Interpolation Coefficients
 
     type(InterpolCoeffs3D) :: b
     integer :: i, j, k, k2, err_status
     integer :: nphi
 
     err_status = 1
+
     nphi = size(phi)
+
     if(present(coeffs)) then
         b = coeffs
         if(nphi .eq. 1) then
@@ -6680,17 +7424,17 @@ end subroutine interpol3D_2D_arr
 !=============================================================================
 !-------------------------Profiles and Fields Routines------------------------
 !=============================================================================
-subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
+subroutine in_plasma(xyz, inp, input_coords, coeffs, uvw_out)
     !+ Indicator subroutine to determine if a position is in a region where
     !+ the plasma parameter and fields are valid/known
     real(Float64), dimension(3), intent(in) :: xyz
         !+ Position in beam coordinates
     logical, intent(out)                    :: inp
         !+ Indicates whether plasma parameters and fields are valid/known
-    logical, intent(in), optional           :: machine_coords
-        !+ Indicates that xyz is in machine coordinates
+    integer, intent(in), optional           :: input_coords
+        !+ Indicates coordinate system of xyz. Beam grid (0), machine (1) and cylindrical (2)
     type(InterpolCoeffs3D), intent(out), optional      :: coeffs
-        !+ Linear Interpolation coefficients used in calculation
+        !+ Interpolation coefficients used in calculation
     real(Float64), dimension(3), intent(out), optional :: uvw_out
         !+ Position in machine coordinates
 
@@ -6698,18 +7442,24 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
     type(InterpolCoeffs3D) :: b
     real(Float64) :: R, W, mask
     real(Float64) :: phi
-    logical :: mc
-    integer :: i, j, k, k2, err
+    integer :: i, j, k, k2, err, ics
 
     err = 1
-    mc = .False.
-    if(present(machine_coords)) mc = machine_coords
 
-    if(mc) then
-        uvw = xyz
+    if(present(input_coords)) then
+        ics = input_coords
     else
-        !! Convert to machine coordinates
+        ics = 0
+    endif
+
+    if(ics.eq.0) then
         call xyz_to_uvw(xyz,uvw)
+    endif
+    if(ics.eq.1) then
+        uvw = xyz
+    endif
+    if(ics.eq.2) then
+        call cyl_to_uvw(xyz,uvw)
     endif
 
     R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
@@ -6732,7 +7482,8 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
                b%b121*equil%mask(i,j+1,k)   + b%b122*equil%mask(i,j+1,k2) + &
                b%b211*equil%mask(i+1,j,k)   + b%b212*equil%mask(i+1,j,k2) + &
                b%b221*equil%mask(i+1,j+1,k) + b%b222*equil%mask(i+1,j+1,k2)
-        if(mask.ge.0.5) then
+
+        if((mask.ge.0.5).and.(err.eq.0)) then
             inp = .True.
         endif
     endif
@@ -6743,7 +7494,7 @@ subroutine in_plasma(xyz, inp, machine_coords, coeffs, uvw_out)
 
 end subroutine in_plasma
 
-subroutine get_plasma(plasma, pos, ind)
+subroutine get_plasma(plasma, pos, ind, input_coords, output_coords)
     !+ Gets plasma parameters at position `pos` or [[libfida:beam_grid]] indices `ind`
     type(LocalProfiles), intent(out)                   :: plasma
         !+ Plasma parameters at `pos`/`ind`
@@ -6751,19 +7502,51 @@ subroutine get_plasma(plasma, pos, ind)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
+    integer(Int32), intent(in), optional               :: input_coords
+        !+ Indicates coordinate system of inputs. Beam grid (0), machine (1) and cylindrical (2)
+    integer(Int32), intent(in), optional               :: output_coords
+        !+ Indicates coordinate system of outputs. Beam grid (0), machine (1) and cylindrical (2)
 
     logical :: inp
     type(InterpolCoeffs3D) :: coeffs
-    real(Float64), dimension(3) :: xyz, uvw, vrot_uvw
+    real(Float64), dimension(3) :: xyz, uvw, cyl, vrot_uvw
     real(Float64) :: phi, s, c
-    integer :: i, j, k, k2
+    integer :: i, j, k, k2, ics, ocs
 
     plasma%in_plasma = .False.
 
-    if(present(ind)) call get_position(ind,xyz)
-    if(present(pos)) xyz = pos
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        ics = 0
+    endif
+    if(present(output_coords)) then
+        ocs = output_coords
+    else
+        ocs = 0
+    endif
 
-    call in_plasma(xyz,inp,.False.,coeffs,uvw)
+    if(present(ind)) then
+        if(ics.eq.0) then
+            call get_position(ind,xyz)
+        endif
+        if(ics.eq.2) then
+            call get_position(ind,xyz,input_coords=2)
+        endif
+    endif
+
+    if(present(pos)) then
+        if(ics.eq.0) then
+            xyz = pos
+            call xyz_to_uvw(xyz, uvw)
+        endif
+        if(ics.eq.1) then
+            uvw = pos
+            call uvw_to_xyz(uvw, xyz)
+        endif
+    endif
+
+    call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
         phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
@@ -6784,8 +7567,14 @@ subroutine get_plasma(plasma, pos, ind)
         vrot_uvw(1) = plasma%vr*c - plasma%vt*s
         vrot_uvw(2) = plasma%vr*s + plasma%vt*c
         vrot_uvw(3) = plasma%vz
-        plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
-        plasma%pos = xyz
+        if(ocs.eq.0) then
+            plasma%vrot = matmul(beam_grid%inv_basis,vrot_uvw)
+            plasma%pos = xyz
+        endif
+        if(ocs.eq.1) then
+            plasma%vrot = vrot_uvw
+            plasma%pos = uvw
+        endif
         plasma%uvw = uvw
         plasma%in_plasma = .True.
         plasma%b = coeffs
@@ -6823,7 +7612,7 @@ subroutine calc_perp_vectors(b, a, c)
 
 end subroutine calc_perp_vectors
 
-subroutine get_fields(fields, pos, ind, machine_coords)
+subroutine get_fields(fields, pos, ind, input_coords, output_coords)
     !+ Gets electro-magnetic fields at position `pos` or [[libfida:beam_grid]] indices `ind`
     type(LocalEMFields),intent(out)                    :: fields
         !+ Electro-magnetic fields at `pos`/`ind`
@@ -6831,28 +7620,48 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         !+ Position in beam grid coordinates
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
-    logical, intent(in), optional :: machine_coords
-        !+ Indicates that pos is machine coordinates
+    integer(Int32), intent(in), optional               :: input_coords
+        !+ Indicates coordinate system of inputs. Beam grid (0), machine (1) and cylindrical (2)
+    integer(Int32), intent(in), optional               :: output_coords
+        !+ Indicates coordinate system of outputs. Beam grid (0), machine (1) and cylindrical (2)
 
-    logical :: inp, mc
+    logical :: inp
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(3) :: uvw_bfield, uvw_efield
     real(Float64), dimension(3) :: xyz_bfield, xyz_efield
     real(Float64) :: phi, s, c
     type(InterpolCoeffs3D) :: coeffs
-    integer :: i, j, k, k2
+    integer :: i, j, k, k2, mc, ocs, ics
 
     fields%in_plasma = .False.
 
+    if(present(input_coords)) then
+        ics = input_coords
+    else
+        ics = 0
+    endif
+
+    if(present(output_coords)) then
+        ocs = output_coords
+    else
+        ocs = 0
+    endif
+
     if(present(ind)) call get_position(ind,xyz)
-    if(present(pos)) xyz = pos
 
-    mc = .False.
-    if(present(machine_coords)) mc = machine_coords
+    if(present(pos)) then
+        if(ics.eq.0) then
+            xyz = pos
+            call xyz_to_uvw(xyz, uvw)
+        endif
+        if(ics.eq.1) then
+            uvw = pos
+            call uvw_to_xyz(uvw, xyz)
+        endif
+    endif
 
-    call in_plasma(xyz,inp,mc,coeffs,uvw)
+    call in_plasma(xyz,inp,0,coeffs)
     if(inp) then
-        phi = atan2(uvw(2),uvw(1))
         i = coeffs%i
         j = coeffs%j
         k = coeffs%k
@@ -6878,13 +7687,16 @@ subroutine get_fields(fields, pos, ind, machine_coords)
         uvw_efield(2) = s*fields%er + c*fields%et
         uvw_efield(3) = fields%ez
 
-        if(mc) then
-            xyz_bfield = uvw_bfield
-            xyz_efield = uvw_efield
-        else
+        if(ocs.eq.0) then
             !Represent fields in beam grid coordinates
             xyz_bfield = matmul(beam_grid%inv_basis,uvw_bfield)
             xyz_efield = matmul(beam_grid%inv_basis,uvw_efield)
+            fields%pos = xyz
+        endif
+        if(ocs.eq.1) then
+            xyz_bfield = uvw_bfield
+            xyz_efield = uvw_efield
+            fields%pos = uvw
         endif
 
         !Calculate field directions and magnitudes
@@ -6895,10 +7707,9 @@ subroutine get_fields(fields, pos, ind, machine_coords)
 
         call calc_perp_vectors(fields%b_norm,fields%a_norm,fields%c_norm)
 
-        fields%pos = xyz
         fields%uvw = uvw
         fields%in_plasma = .True.
-        fields%machine_coords = mc
+        fields%coords = ocs
         fields%b = coeffs
     endif
 
@@ -6915,7 +7726,7 @@ subroutine get_distribution(fbeam, denf, pos, ind, coeffs)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     type(InterpolCoeffs3D), intent(in), optional       :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed interpolation coefficients
 
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64) :: R, Z, Phi
@@ -6954,7 +7765,7 @@ subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     integer(Int32), dimension(3), intent(in), optional :: ind
         !+ [[libfida:beam_grid]] indices
     type(InterpolCoeffs3D), intent(in), optional       :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
+        !+ Precomputed interpolation coefficients
 
     real(Float64), dimension(3) :: xyz, uvw
     real(Float64), dimension(fbm%nenergy,fbm%npitch)  :: fbeam
@@ -7757,36 +8568,57 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
 
 endsubroutine spectrum
 
-subroutine store_photons(pos, vi, photons, spectra)
+subroutine store_photons(pos, vi, photons, spectra, passive)
     !+ Store photons in `spectra`
     real(Float64), dimension(3), intent(in)      :: pos
-        !+ Position of neutral in beam grid coordinates
+        !+ Position of neutral
     real(Float64), dimension(3), intent(in)      :: vi
         !+ Velocitiy of neutral [cm/s]
     real(Float64), intent(in)                    :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
     real(Float64), dimension(:,:), intent(inout) :: spectra
+    logical, intent(in), optional                :: passive
+        !+ Indicates whether photon is passive FIDA
 
     real(Float64), dimension(n_stark) :: lambda, intensity
     real(Float64) :: dlength, sigma_pi
     type(LocalEMFields) :: fields
     integer(Int32), dimension(3) :: ind
-    real(Float64), dimension(3) :: vp
+    real(Float64), dimension(3) :: pos_xyz, lens_xyz, cyl, vp
     type(LOSInters) :: inter
     integer :: ichan,i,j,bin,nchan
+    logical :: pas = .False.
 
-    call get_indices(pos,ind)
-    inter = spec_chords%inter(ind(1),ind(2),ind(3))
+    if(present(passive)) pas = passive
+
+    if(pas) then
+        cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        cyl(2) = pos(3)
+        cyl(3) = atan2(pos(2), pos(1))
+        call get_passive_grid_indices(cyl,ind)
+        inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
+        call uvw_to_xyz(pos, pos_xyz)
+    else
+        call get_indices(pos,ind)
+        inter = spec_chords%inter(ind(1),ind(2),ind(3))
+        pos_xyz = pos
+    endif
+
     nchan = inter%nchan
     if(nchan.eq.0) return
 
-    call get_fields(fields,pos=pos)
+    call get_fields(fields,pos=pos_xyz)
 
     loop_over_channels: do j=1,nchan
         ichan = inter%los_elem(j)%id
         dlength = inter%los_elem(j)%length
         sigma_pi = spec_chords%los(ichan)%sigma_pi
-        vp = pos - spec_chords%los(ichan)%lens
+        if(pas) then
+            call uvw_to_xyz(spec_chords%los(ichan)%lens_uvw,lens_xyz)
+        else
+            lens_xyz = spec_chords%los(ichan)%lens
+        endif
+        vp = pos_xyz - lens_xyz
         call spectrum(vp,vi,fields,sigma_pi,photons, &
                       dlength,lambda,intensity)
 
@@ -7856,7 +8688,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     if(present(passive)) pas = passive
 
     if(pas) then
-        call store_photons(pos, vi, photons, spec%pfida(:,:,iclass))
+        call store_photons(pos, vi, photons, spec%pfida(:,:,iclass), passive=.True.)
     else
         call store_photons(pos, vi, photons, spec%fida(:,:,iclass))
     endif
@@ -8023,6 +8855,48 @@ subroutine get_nlaunch(nr_markers,papprox, nlaunch)
 
 end subroutine get_nlaunch
 
+subroutine get_nlaunch_pass_grid(nr_markers,papprox, nlaunch)
+    !+ Sets the number of MC markers launched from each [[libfida:pass_grid]] cell
+    integer(Int64), intent(in)                    :: nr_markers
+        !+ Approximate total number of markers to launch
+    real(Float64), dimension(:,:,:), intent(in)   :: papprox
+        !+ [[libfida:pass_grid]] cell weights
+    integer(Int32), dimension(:,:,:), intent(out) :: nlaunch
+        !+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)
+
+    logical, dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: mask
+    real(Float64), dimension(pass_grid%ngrid) :: cdf
+    integer, dimension(1) :: randomi
+    type(rng_type) :: r
+    integer :: c, i, j, k, nc, nm, ind(3)
+    integer :: nmin = 5
+
+    !! Fill in minimum number of markers per cell
+    nlaunch = 0
+    mask = papprox.gt.0.0
+    where(mask)
+        nlaunch = nmin
+    endwhere
+
+    !! If there are any left over distribute according to papprox
+    nc = count(mask)
+    if(nr_markers.gt.(nmin*nc)) then
+        nm = nr_markers - nmin*nc
+
+        !! precalculate cdf to save time
+        call cumsum(reshape(papprox,[pass_grid%ngrid]), cdf)
+        !! use the same seed for all processes
+        call rng_init(r, 932117)
+        do c=1, nm
+            call randind_cdf(r, cdf, randomi)
+            call ind2sub(pass_grid%dims, randomi(1), ind)
+            i = ind(1) ; j = ind(2) ; k = ind(3)
+            nlaunch(i,j,k) = nlaunch(i,j,k) + 1
+        enddo
+    endif
+
+end subroutine get_nlaunch_pass_grid
+
 subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
     !+ Calculates velocity vector from pitch, gyroangle and fields
     real(Float64), intent(in)                :: pitch
@@ -8072,12 +8946,13 @@ subroutine gyro_step(vi, fields, r_gyro)
         !! Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251.
         !! Appendix A: Last equation
         uvw = fields%uvw
-        R = sqrt(uvw(1)**2 + uvw(2)**2)
+        R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
         phi = atan2(uvw(2),uvw(1))
-        if(fields%machine_coords) then
+        if(fields%coords.eq.0) then
+            call xyz_to_uvw(r_gyro,rg_uvw)
+        endif
+        if(fields%coords.eq.1) then
             rg_uvw = r_gyro
-        else
-            rg_uvw = matmul(beam_grid%basis,r_gyro)
         endif
         rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
         b_rtz(1) = fields%br/fields%b_abs
@@ -8109,7 +8984,7 @@ subroutine gyro_step(vi, fields, r_gyro)
 
 end subroutine gyro_step
 
-subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
+subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     !+ Calculates gyro correction for Guiding Center MC distribution calculation
     type(LocalEMFields), intent(in)          :: fields
         !+ Electromagnetic fields at guiding center
@@ -8121,24 +8996,24 @@ subroutine gyro_correction(fields, energy, pitch, rp, vp, phi_in)
         !+ Particle position
     real(Float64), dimension(3), intent(out) :: vp
         !+ Particle velocity
-    real(Float64), intent(in), optional      :: phi_in
+    real(Float64), intent(in), optional      :: theta_in
         !+ Gyro-angle
     real(Float64), dimension(3) :: vi_norm, r_step
     real(Float64), dimension(1) :: randomu
-    real(Float64) :: vabs, phi
+    real(Float64) :: vabs, theta
 
     vabs  = sqrt(energy/(v2_to_E_per_amu*inputs%ab))
 
-    if(present(phi_in)) then
-        phi = phi_in
+    if(present(theta_in)) then
+        theta = theta_in
     else
         !! Sample gyroangle
         call randu(randomu)
-        phi = 2*pi*randomu(1)
+        theta = 2*pi*randomu(1)
     endif
 
     !! Calculate velocity vector
-    call pitch_to_vec(pitch, phi, fields, vi_norm)
+    call pitch_to_vec(pitch, theta, fields, vi_norm)
     vp = vabs*vi_norm
 
     !! Move to particle location
@@ -8209,6 +9084,52 @@ subroutine mc_fastion(ind,fields,eb,ptch,denf)
     ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
 
 end subroutine mc_fastion
+
+subroutine mc_fastion_pass_grid(ind,fields,eb,ptch,denf,output_coords)
+    !+ Samples a Guiding Center Fast-ion distribution function at a given [[libfida:pass_grid]] index
+    integer, dimension(3), intent(in)      :: ind
+        !+ [[libfida:pass_grid]] index
+    type(LocalEMFields), intent(out)       :: fields
+        !+ Electromagnetic fields at the guiding center
+    real(Float64), intent(out)             :: eb
+        !+ Energy of the fast ion
+    real(Float64), intent(out)             :: ptch
+        !+ Pitch of the fast ion
+    real(Float64), intent(out)             :: denf
+        !+ Fast-ion density at guiding center
+    integer, intent(in), optional          :: output_coords
+        !+ Indicates coordinate system of `fields`. Beam grid (0), machine (1) and cylindrical (2)
+
+    real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
+    real(Float64), dimension(3) :: rg, rg_cyl
+    real(Float64), dimension(3) :: randomu3
+    integer, dimension(2,1) :: ep_ind
+    integer :: ocs
+
+    if(present(output_coords)) then
+        ocs = output_coords
+    else
+        ocs = 0
+    endif
+
+    denf=0.d0
+
+    call randu(randomu3)
+    rg_cyl(1) = (pass_grid%r(ind(1))+pass_grid%dr/2.d0)+(pass_grid%dr*(randomu3(1)-0.5))
+    rg_cyl(2) = (pass_grid%z(ind(2))+pass_grid%dz/2.d0)+(pass_grid%dz*(randomu3(2)-0.5))
+    rg_cyl(3) = (pass_grid%phi(ind(3))+pass_grid%dphi/2.d0)+(pass_grid%dphi*(randomu3(3)-0.5))
+    call cyl_to_uvw(rg_cyl, rg)
+
+    call get_fields(fields,pos=rg,input_coords=1,output_coords=ocs)
+    if(.not.fields%in_plasma) return
+
+    call get_distribution(fbeam,denf,coeffs=fields%b)
+    call randind(fbeam,ep_ind)
+    call randu(randomu3)
+    eb = fbm%energy(ep_ind(1,1)) + fbm%dE*(randomu3(1)-0.5)
+    ptch = fbm%pitch(ep_ind(2,1)) + fbm%dp*(randomu3(2)-0.5)
+
+end subroutine mc_fastion_pass_grid
 
 subroutine mc_halo(ind,vhalo,ri,plasma_in)
     !+ Sample thermal Maxwellian distribution at [[libfida:beam_grid]] indices `ind`
@@ -9239,7 +10160,7 @@ subroutine fida_f
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
             call mc_fastion(ind, fields, eb, ptch, denf)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
             call gyro_correction(fields, eb, ptch, ri, vi)
@@ -9280,6 +10201,7 @@ subroutine pfida_f
     integer(Int64) :: iion
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64), dimension(3) :: xyz_vi
     real(Float64) :: denf !! fast-ion density
     integer, dimension(3) :: ind      !! new actual cell
     logical :: los_intersect
@@ -9291,7 +10213,7 @@ subroutine pfida_f
     !! Collisiional radiative model along track
     integer :: ntrack
     integer :: jj      !! counter along track
-    type(ParticleTrack),dimension(beam_grid%ntrack) :: tracks
+    type(ParticleTrack),dimension(pass_grid%ntrack) :: tracks
 
     real(Float64) :: photons !! photon flux
     real(Float64), dimension(nlevs) :: states  !! Density of n-states
@@ -9299,28 +10221,27 @@ subroutine pfida_f
 
     !! Number of particles to launch
     real(Float64) :: max_papprox, eb, ptch
-    integer, dimension(beam_grid%ngrid) :: cell_ind
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer, dimension(pass_grid%ngrid) :: cell_ind
+    real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
+    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     !! Estimate how many particles to launch in each cell
     papprox=0.d0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
+    do ic=1,pass_grid%ngrid
+        call ind2sub(pass_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        call get_plasma(plasma,ind=ind)
+        call get_plasma(plasma,ind=ind,input_coords=2)
         if(.not.plasma%in_plasma) cycle
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
     endwhere
 
     ncell = 0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
+    do ic=1,pass_grid%ngrid
+        call ind2sub(pass_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
@@ -9328,33 +10249,34 @@ subroutine pfida_f
         endif
     enddo
 
-    call get_nlaunch(inputs%n_pfida, papprox, nlaunch)
+    call get_nlaunch_pass_grid(inputs%n_pfida, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
 
     !! Loop over all cells that have neutrals
-    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,ri,fields, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,xyz_vi,ri,fields, &
     !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch,los_intersect)
     loop_over_cells: do ic = istart, ncell, istep
-        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+        call ind2sub(pass_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for velocity and position
-            call mc_fastion(ind, fields, eb, ptch, denf)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            call mc_fastion_pass_grid(ind, fields, eb, ptch, denf, output_coords=1)
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
             call gyro_correction(fields, eb, ptch, ri, vi)
+            xyz_vi = matmul(beam_grid%inv_basis,vi)
 
-            !! Find the particles path through the beam grid
-            call track(ri, vi, tracks, ntrack,los_intersect)
+            !! Find the particles path through the interpolation grid
+            call track_cylindrical(ri, vi, tracks, ntrack,los_intersect)
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_plasma(plasma, pos = ri)
-            call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
+            call get_plasma(plasma, pos=ri, input_coords=1)
+            call bt_cx_rates(plasma, plasma%denn, xyz_vi, beam_ion, rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
             !! Weight CX rates by ion source density
@@ -9362,11 +10284,11 @@ subroutine pfida_f
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
-                call get_plasma(plasma,pos=tracks(jj)%pos)
+                call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
-                call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma,beam_ion, xyz_vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k), passive=.True.)
+                call store_fida_photons(tracks(jj)%pos, xyz_vi, photons/nlaunch(i,j,k), passive=.True.)
             enddo loop_along_track
         enddo loop_over_fast_ions
     enddo loop_over_cells
@@ -9416,12 +10338,12 @@ subroutine fida_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        if(.not.fast_ion%beam_grid_cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = fast_ion%beam_grid_phi_enter + fast_ion%delta_phi*randomu(1)
             else
                 phi = fast_ion%phi
             endif
@@ -9460,7 +10382,7 @@ subroutine fida_mc
             if(sum(rates).le.0.)cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            states=rates*fast_ion%weight/ngamma
+            states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
@@ -9489,17 +10411,17 @@ subroutine pfida_mc
     real(Float64) :: phi
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
+    real(Float64), dimension(3) :: xyz_vi
     !! Determination of the CX probability
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
     real(Float64), dimension(nlevs) :: rates    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ntrack
-    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
+    type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
+    integer :: ntrack 
     logical :: los_intersect
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux
-    real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
@@ -9512,17 +10434,16 @@ subroutine pfida_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c, &
-    !$OMP& randomu,plasma,fields,uvw,uvw_vi,ntrack,jj,rates,denn,los_intersect,states,photons)
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c,&
+    !$OMP& randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = pass_grid%phi(1)+pass_grid%nphi*pass_grid%dphi*randomu(1)
             else
                 phi = fast_ion%phi
             endif
@@ -9530,47 +10451,50 @@ subroutine pfida_mc
             c = cos(phi)
 
             !! Calculate position in machine coordinates
-            uvw(1) = fast_ion%r*c
-            uvw(2) = fast_ion%r*s
-            uvw(3) = fast_ion%z
-
-            !! Convert to beam grid coordinates
-            call uvw_to_xyz(uvw, ri)
+            ri(1) = fast_ion%r*c
+            ri(2) = fast_ion%r*s
+            ri(3) = fast_ion%z
 
             if(inputs%dist_type.eq.2) then
                 !! Get electomagnetic fields
-                call get_fields(fields, pos=ri)
+                call get_fields(fields, pos=ri, input_coords=1, output_coords=1)
 
                 !! Correct for gyro motion and get particle position and velocity
                 call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, ri, vi)
             else !! Full Orbit
                 !! Calculate velocity vector
-                uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
-                uvw_vi(2) = s*fast_ion%vr + c*fast_ion%vt
-                uvw_vi(3) = fast_ion%vz
-                vi = matmul(beam_grid%inv_basis,uvw_vi)
+                vi(1) = c*fast_ion%vr - s*fast_ion%vt
+                vi(2) = s*fast_ion%vr + c*fast_ion%vt
+                vi(3) = fast_ion%vz
             endif
+            xyz_vi = matmul(beam_grid%inv_basis,vi)
 
             !! Track particle through grid
-            call track(ri, vi, tracks, ntrack, los_intersect)
+            call track_cylindrical(ri, vi, tracks, ntrack, los_intersect)
             if(.not.los_intersect) cycle gamma_loop
             if(ntrack.eq.0) cycle gamma_loop
 
             !! Calculate CX probability
-            call get_plasma(plasma, pos=ri)
-            call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
+            call get_plasma(plasma, pos=ri, input_coords=1)
+            call bt_cx_rates(plasma, plasma%denn, xyz_vi, beam_ion, rates)
             if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
-            states=rates*fast_ion%weight/ngamma
+            if(particles%axisym) then
+                states=rates*fast_ion%weight*(pass_grid%nphi*pass_grid%dphi/(2*pi))  &
+                       /(fast_ion%r*pass_grid%dv)/ngamma
+
+            else
+                states=rates*fast_ion%weight/(fast_ion%r*pass_grid%dv)/ngamma
+            endif
 
             !! Calculate the spectra produced in each cell along the path
             loop_along_track: do jj=1,ntrack
-                call get_plasma(plasma,pos=tracks(jj)%pos)
+                call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
-                call colrad(plasma,beam_ion, vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma,beam_ion, xyz_vi, tracks(jj)%time, states, denn, photons)
 
-                call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class,passive=.True.)
+                call store_fida_photons(tracks(jj)%pos, xyz_vi, photons, fast_ion%class,passive=.True.)
             enddo loop_along_track
         enddo gamma_loop
     enddo loop_over_fast_ions
@@ -9646,7 +10570,7 @@ subroutine npa_f
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
             call mc_fastion(ind, fields, eb, ptch, denf)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             call gyro_surface(fields, eb, ptch, gs)
 
@@ -9705,9 +10629,9 @@ subroutine pnpa_f
     !+ Calculate Passive NPA flux using a fast-ion distribution function F(E,p,r,z)
     integer :: i,j,k,det,ic
     integer(Int64) :: iion
-    real(Float64), dimension(3) :: rg,ri,rf,vi
-    integer, dimension(3) :: ind,pind
-    real(Float64) :: denf
+    real(Float64), dimension(3) :: rg,ri,rf,vi,ri_uvw
+    integer, dimension(3) :: ind
+    real(Float64) :: denf,r
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
@@ -9717,27 +10641,26 @@ subroutine pnpa_f
     real(Float64) :: flux, theta, dtheta, eb, ptch,max_papprox
 
     integer :: inpa,ichan,nrange,ir,npart,ncell
-    integer, dimension(beam_grid%ngrid) :: cell_ind
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    integer, dimension(pass_grid%ngrid) :: cell_ind
+    real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
+    integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
 
     papprox=0.d0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
+    do ic=1,pass_grid%ngrid
+        call ind2sub(pass_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
-        call get_plasma(plasma,ind=ind)
+        call get_plasma(plasma,ind=ind,input_coords=2)
         if(.not.plasma%in_plasma) cycle
-        papprox(i,j,k)=sum(plasma%denn)*plasma%denf
+        papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
     max_papprox = maxval(papprox)
     where (papprox.lt.(max_papprox*1.d-3))
         papprox = 0.0
     endwhere
 
     ncell = 0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
+    do ic=1,pass_grid%ngrid
+        call ind2sub(pass_grid%dims,ic,ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         if(papprox(i,j,k).gt.0.0) then
             ncell = ncell + 1
@@ -9745,21 +10668,21 @@ subroutine pnpa_f
         endif
     enddo
 
-    call get_nlaunch(inputs%n_pnpa, papprox, nlaunch)
+    call get_nlaunch_pass_grid(inputs%n_pnpa, papprox, nlaunch)
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i12)') sum(nlaunch)
     endif
 
     !! Loop over all cells that can contribute to NPA signal
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
-    !$OMP& pind,vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta)
+    !$OMP& vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw)
     loop_over_cells: do ic = istart, ncell, istep
-        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+        call ind2sub(pass_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
         loop_over_fast_ions: do iion=1, nlaunch(i, j, k)
             !! Sample fast ion distribution for energy and pitch
-            call mc_fastion(ind, fields, eb, ptch, denf)
-            if(denf.eq.0.0) cycle loop_over_fast_ions
+            call mc_fastion_pass_grid(ind, fields, eb, ptch, denf)
+            if(denf.le.0.0) cycle loop_over_fast_ions
 
             call gyro_surface(fields, eb, ptch, gs)
 
@@ -9780,9 +10703,6 @@ subroutine pnpa_f
                         cycle gyro_range_loop
                     endif
 
-                    !! Get beam grid indices at ri
-                    call get_indices(ri,pind)
-
                     !! Calculate CX probability with beam and halo neutrals
                     call get_plasma(plasma, pos=ri)
                     call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
@@ -9795,7 +10715,7 @@ subroutine pnpa_f
                     call attenuate(ri,rf,vi,states)
 
                     !! Store NPA Flux
-                    flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv/nlaunch(i,j,k)
+                    flux = (dtheta/(2*pi))*sum(states)*pass_grid%r(i)*pass_grid%dv/nlaunch(i,j,k)
                     call store_npa(det,ri,rf,vi,flux,passive=.True.)
                 enddo gyro_range_loop
             enddo detector_loop
@@ -9848,12 +10768,12 @@ subroutine npa_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
+        if(.not.fast_ion%beam_grid_cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = fast_ion%beam_grid_phi_enter + fast_ion%delta_phi*randomu(1)
             else
                 phi = fast_ion%phi
             endif
@@ -9901,7 +10821,7 @@ subroutine npa_mc
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        states=rates*fast_ion%weight/ngamma
+                        states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
@@ -9944,7 +10864,7 @@ subroutine npa_mc
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                states=rates*fast_ion%weight/ngamma
+                states=rates*fast_ion%weight*(fast_ion%delta_phi/(2*pi))/beam_grid%dv/ngamma
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
@@ -10002,12 +10922,11 @@ subroutine pnpa_mc
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
-        if(.not.fast_ion%cross_grid) cycle loop_over_fast_ions
         gamma_loop: do igamma=1,ngamma
             if(particles%axisym) then
                 !! Pick random toroidal angle
                 call randu(randomu)
-                phi = fast_ion%phi_enter + fast_ion%delta_phi*randomu(1)
+                phi = pass_grid%phi(1)+pass_grid%nphi*pass_grid%dphi*randomu(1)
             else
                 phi = fast_ion%phi
             endif
@@ -10020,11 +10939,8 @@ subroutine pnpa_mc
             uvw(3) = fast_ion%z
 
             if(inputs%dist_type.eq.2) then
-                !! Convert to beam grid coordinates
-                call uvw_to_xyz(uvw, rg)
-
                 !! Get electomagnetic fields
-                call get_fields(fields, pos=rg)
+                call get_fields(fields, pos=uvw, input_coords=1)
 
                 !! Correct for gyro motion and get position and velocity
                 call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, gs)
@@ -10047,22 +10963,24 @@ subroutine pnpa_mc
                             cycle gyro_range_loop
                         endif
 
-                        !! Get beam grid indices at ri
-                        call get_indices(ri,ind)
-
                         !! Calculate CX probability with beam and halo neutrals
                         call get_plasma(plasma, pos=ri)
                         call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
-                        states=rates*fast_ion%weight/ngamma
+                        if(particles%axisym) then
+                            states=rates*fast_ion%weight*(pass_grid%nphi*pass_grid%dphi/(2*pi)) &
+                                   /(fast_ion%r*pass_grid%dv)/ngamma
+                        else
+                            states=rates*fast_ion%weight/(fast_ion%r*pass_grid%dv)/ngamma
+                        endif
 
                         !! Attenuate states as the particle move through plasma
                         call attenuate(ri,rf,vi,states)
 
                         !! Store NPA Flux
-                        flux = (dtheta/(2*pi))*sum(states)*beam_grid%dv
+                        flux = (dtheta/(2*pi))*sum(states)*(fast_ion%r*pass_grid%dv)
                         spread_loop: do it=1,25
                             theta = gyrange(1,ir) + (it-0.5)*dtheta/25
                             call gyro_trajectory(gs, theta, ri, vi)
@@ -10091,22 +11009,24 @@ subroutine pnpa_mc
                 call hit_npa_detector(ri, vi ,det, rf)
                 if(det.eq.0) cycle gamma_loop
 
-                !! Get beam grid indices at ri
-                call get_indices(ri,ind)
-
                 !! Calculate CX probability with beam and halo neutrals
                 call get_plasma(plasma, pos=ri)
                 call bt_cx_rates(plasma, plasma%denn, vi, beam_ion, rates)
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
-                states=rates*fast_ion%weight/ngamma
+                if(particles%axisym) then
+                    states=rates*fast_ion%weight*(pass_grid%nphi*pass_grid%dphi/(2*pi)) &
+                           /(fast_ion%r*pass_grid%dv)/ngamma
+                else
+                    states=rates*fast_ion%weight/(fast_ion%r*pass_grid%dv)/ngamma
+                endif
 
                 !! Attenuate states as the particle moves though plasma
                 call attenuate(ri,rf,vi,states)
 
                 !! Store NPA Flux
-                flux = sum(states)*beam_grid%dv
+                flux = sum(states)*(fast_ion%r*pass_grid%dv)
                 call store_npa(det,ri,rf,vi,flux,fast_ion%class,passive=.True.)
             endif
         enddo gamma_loop
@@ -10130,9 +11050,9 @@ subroutine neutron_f
     integer :: ir, iphi, iz, ie, ip, igamma, ngamma
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
-    real(Float64) :: eb,pitch,r,z
+    real(Float64) :: eb,pitch
     real(Float64) :: erel, rate
-    real(Float64), dimension(3) :: rg, ri
+    real(Float64), dimension(3) :: ri
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square, factor
@@ -10146,11 +11066,12 @@ subroutine neutron_f
     endif
 
     ngamma = 20
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,rg,pitch,eb,&
+    rate = 0
+    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,pitch,eb,&
     !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,uvw,uvw_vi,vnet_square,rate,erel,s,c)
-    z_loop: do iz = istart, fbm%nz, istep
-        r_loop: do ir=1, fbm%nr
-            phi_loop: do iphi = 1, fbm%nphi
+    phi_loop: do iphi = 1, fbm%nphi
+        z_loop: do iz = istart, fbm%nz, istep
+            r_loop: do ir=1, fbm%nr
                 !! Calculate position
                 if(fbm%nphi.eq.1) then
                     s = 0.d0
@@ -10164,11 +11085,9 @@ subroutine neutron_f
                 uvw(2) = fbm%r(ir)*s
                 uvw(3) = fbm%z(iz)
 
-                call uvw_to_xyz(uvw, rg)
-
                 !! Get fields
-                call get_fields(fields,pos=rg)
-                if(.not.fields%in_plasma) cycle phi_loop
+                call get_fields(fields,pos=uvw,input_coords=1)
+                if(.not.fields%in_plasma) cycle r_loop
 
                 factor = fbm%r(ir)*fbm%dE*fbm%dp*fbm%dr*fbm%dz*fbm%dphi/ngamma
                 !! Loop over energy/pitch/gamma
@@ -10205,9 +11124,9 @@ subroutine neutron_f
                         enddo gyro_loop
                     enddo energy_loop
                 enddo pitch_loop
-            enddo phi_loop
-        enddo r_loop
-    enddo z_loop
+            enddo r_loop
+        enddo z_loop
+    enddo phi_loop
     !$OMP END PARALLEL DO
 
 #ifdef _MPI
@@ -10240,40 +11159,50 @@ subroutine neutron_mc
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: eb, rate
-    real(Float64), dimension(3) :: ri, rg
+    real(Float64), dimension(3) :: ri
     real(Float64), dimension(3) :: vi
     real(Float64), dimension(3) :: uvw, uvw_vi
     real(Float64)  :: vnet_square
-    real(Float64)  :: phi, s, c
+    real(Float64)  :: phi, s, c, factor, delta_phi
 
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') particles%nparticle
     endif
 
+    !! Correct neutron rate when equilibrium is 3D and MC distribution is 4D
+    if(particles%axisym.and.(inter_grid%nphi.gt.1)) then
+        delta_phi = inter_grid%phi(inter_grid%nphi)-inter_grid%phi(1)
+        delta_phi = delta_phi + delta_phi/(inter_grid%nphi-1)/2 !Add half a cell
+        factor = delta_phi/(2*pi) * 2 !Riemann sum below assumes coord's are at midpoint of cell
+    else
+        factor = 1
+    endif
+
     rate=0.0
     ngamma = 20
-    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,rg,s,c, &
-    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi)
+    !$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,s,c, &
+    !$OMP& plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi,factor)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0.d0) cycle loop_over_fast_ions
 
         !! Calculate position in machine coordinates
         if(particles%axisym) then
-            phi = 0.d0
+            s = 0.d0
+            c = 1.d0
         else
             phi = fast_ion%phi
+            s = sin(phi)
+            c = cos(phi)
         endif
-        s = sin(phi) ; c = cos(phi)
+
         uvw(1) = fast_ion%r*c
         uvw(2) = fast_ion%r*s
         uvw(3) = fast_ion%z
 
         if(inputs%dist_type.eq.2) then
-            call uvw_to_xyz(uvw, rg)
-
             !! Get electomagnetic fields
-            call get_fields(fields, pos=rg)
+            call get_fields(fields, pos=uvw, input_coords=1)
             if(.not.fields%in_plasma) cycle loop_over_fast_ions
 
             gyro_loop: do igamma=1,ngamma
@@ -10290,16 +11219,14 @@ subroutine neutron_mc
 
                 !! Get neutron production rate
                 call get_neutron_rate(plasma, eb, rate)
-                rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv/ngamma
+                rate = rate*fast_ion%weight/ngamma*factor
 
                 !! Store neutrons
                 call store_neutrons(rate, fast_ion%class)
             enddo gyro_loop
         else
-            call uvw_to_xyz(uvw, ri)
-
             !! Get plasma parameters
-            call get_plasma(plasma,pos=ri)
+            call get_plasma(plasma,pos=uvw,input_coords=1)
             if(.not.plasma%in_plasma) cycle loop_over_fast_ions
 
             !! Calculate effective beam energy
@@ -10312,7 +11239,7 @@ subroutine neutron_mc
 
             !! Get neutron production rate
             call get_neutron_rate(plasma, eb, rate)
-            rate = rate*fast_ion%weight*(2*pi/fast_ion%delta_phi)*beam_grid%dv
+            rate = rate*fast_ion%weight*factor
 
             !! Store neutrons
             call store_neutrons(rate, fast_ion%class)
@@ -11024,9 +11951,18 @@ program fidasim
     if(inputs%calc_beam.ge.1) then
         call read_beam()
     endif
+
+    if(inputs%calc_pfida+inputs%calc_pnpa.gt.0) then
+        if(inter_grid%nphi.gt.1) then
+            pass_grid = inter_grid
+        else
+            call make_passive_grid()
+        endif
+    endif
     call read_distribution()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
         call read_chords()
     endif

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p> 3.4% of total for derived types.</p>Including implementation: 16 statements,  3.4% of total for derived types.">16 statements</a>
+    title="<p> 3.3% of total for derived types.</p>Including implementation: 16 statements,  3.3% of total for derived types.">16 statements</a>
      </li> 
      
      
@@ -177,7 +177,7 @@
   <div id="vars-0" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../type/fastion.html#variable-cross_grid">cross_grid</a>
+      <a class="list-group-item" href="../type/fastion.html#variable-beam_grid_cross_grid">beam_grid_cross_grid</a>
       
       <a class="list-group-item" href="../type/fastion.html#variable-r%7E3">r</a>
       
@@ -185,7 +185,7 @@
       
       <a class="list-group-item" href="../type/fastion.html#variable-z%7E3">z</a>
       
-      <a class="list-group-item" href="../type/fastion.html#variable-phi_enter">phi_enter</a>
+      <a class="list-group-item" href="../type/fastion.html#variable-beam_grid_phi_enter">beam_grid_phi_enter</a>
       
       <a class="list-group-item" href="../type/fastion.html#variable-delta_phi">delta_phi</a>
       
@@ -334,7 +334,7 @@
   <div id="vars-1" class="panel-collapse collapse">
     <div class="list-group">
       
-      <a class="list-group-item" href="../type/fastion.html#variable-cross_grid">cross_grid</a>
+      <a class="list-group-item" href="../type/fastion.html#variable-beam_grid_cross_grid">beam_grid_cross_grid</a>
       
       <a class="list-group-item" href="../type/fastion.html#variable-r%7E3">r</a>
       
@@ -342,7 +342,7 @@
       
       <a class="list-group-item" href="../type/fastion.html#variable-z%7E3">z</a>
       
-      <a class="list-group-item" href="../type/fastion.html#variable-phi_enter">phi_enter</a>
+      <a class="list-group-item" href="../type/fastion.html#variable-beam_grid_phi_enter">beam_grid_phi_enter</a>
       
       <a class="list-group-item" href="../type/fastion.html#variable-delta_phi">delta_phi</a>
       
@@ -416,11 +416,11 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-cross_grid"></span>logical,</td>
+  <td><span class="anchor" id="variable-beam_grid_cross_grid"></span>logical,</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>cross_grid</strong></td><td> =</td><td>.False.</td><td><p>Indicates whether the fast-ion crosses the <a href="../module/libfida.html#variable-beam_grid">beam_grid</a></p></td>
+  <td><strong>beam_grid_cross_grid</strong></td><td> =</td><td>.False.</td><td><p>Indicates whether the fast-ion crosses the <a href="../module/libfida.html#variable-beam_grid">beam_grid</a></p></td>
   
 </tr>
 
@@ -472,11 +472,11 @@
   
 <tr>
   
-  <td><span class="anchor" id="variable-phi_enter"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-beam_grid_phi_enter"></span>real(kind=Float64),</td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>phi_enter</strong></td><td> =</td><td>0.d0</td><td><p>Torodial/phi position where fast-ion enters the <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> [radians]</p></td>
+  <td><strong>beam_grid_phi_enter</strong></td><td> =</td><td>0.d0</td><td><p>Torodial/phi position where fast-ion enters the <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> [radians]</p></td>
   
 </tr>
 
@@ -624,7 +624,7 @@
     <h3><span class="anchor" id="src"></span>Source Code</h3>
     <div class="highlight"><pre><span></span><span class="k">type </span><span class="n">FastIon</span>
     <span class="c">!+ Defines a fast-ion</span>
-    <span class="kt">logical</span>        <span class="kd">::</span> <span class="n">cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+    <span class="kt">logical</span>        <span class="kd">::</span> <span class="n">beam_grid_cross_grid</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
         <span class="c">!+ Indicates whether the fast-ion crosses the [[libfida:beam_grid]]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">r</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Radial position of fast-ion [cm]</span>
@@ -632,7 +632,7 @@
         <span class="c">!+ Angular position of fast-ion [rad]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">z</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Vertical position of fast-ion [cm]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">phi_enter</span> <span class="o">=</span> <span class="mf">0.d0</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">beam_grid_phi_enter</span> <span class="o">=</span> <span class="mf">0.d0</span>
         <span class="c">!+ Torodial/phi position where fast-ion enters the [[libfida:beam_grid]] [radians]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">delta_phi</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span>
         <span class="c">!+ Angle subtended by the [[libfida:beam_grid]] at (r,z)</span>

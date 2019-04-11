@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>get_nlaunch_pass_grid &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>2.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>get_nlaunch_pass_grid
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.2% of total for procedures.">30 statements</a>
+     </li> 
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+    
+     <li><a href='../module/libfida.html'>libfida</a></li>
+    
+  
+     <li class="active">get_nlaunch_pass_grid</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/get_nlaunch_pass_grid.html#src">get_nlaunch_pass_grid</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine get_nlaunch_pass_grid(nr_markers, papprox, nlaunch)
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Sets the number of MC markers launched from each <a href="../module/libfida.html#variable-pass_grid">pass_grid</a> cell</p>
+    
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nr_markers%7E2"></span>integer(kind=Int64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>nr_markers</strong></td><td><p>Approximate total number of markers to launch</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-papprox%7E2"></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>papprox</strong></td><td><p><a href="../module/libfida.html#variable-pass_grid">pass_grid</a> cell weights</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nlaunch%7E2"></span>integer(kind=Int32),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>nlaunch</strong></td><td><p>Number of mc markers to launch for each cell: nlaunch(r,z,phi)</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+    <br>
+    
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~get_nlaunch_pass_grid~~CallsGraph Pages: 1 -->
+<svg id="procget_nlaunch_pass_gridCallsGraph" width="332pt" height="95pt"
+ viewBox="0.00 0.00 332.00 95.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 91)">
+<title>proc~~get_nlaunch_pass_grid~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-91 328,-91 328,4 -4,4"/>
+<!-- proc~get_nlaunch_pass_grid -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_node1" class="node"><title>proc~get_nlaunch_pass_grid</title>
+<polygon fill="none" stroke="black" points="124,-45 7.10543e-15,-45 7.10543e-15,-21 124,-21 124,-45"/>
+<text text-anchor="middle" x="62" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_nlaunch_pass_grid</text>
+</g>
+<!-- proc~rng_init -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_node2" class="node"><title>proc~rng_init</title>
+<g id="a_proc~~get_nlaunch_pass_grid~~CallsGraph_node2"><a xlink:href=".././proc/rng_init.html" xlink:title="rng_init">
+<polygon fill="#d9534f" stroke="#d9534f" points="222,-66 168,-66 168,-42 222,-42 222,-66"/>
+<text text-anchor="middle" x="195" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_init</text>
+</a>
+</g>
+</g>
+<!-- proc~get_nlaunch_pass_grid&#45;&gt;proc~rng_init -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_edge1" class="edge"><title>proc~get_nlaunch_pass_grid&#45;&gt;proc~rng_init</title>
+<path fill="none" stroke="#000000" d="M124.281,-42.8237C135.768,-44.6651 147.428,-46.5343 157.842,-48.2036"/>
+<polygon fill="#000000" stroke="#000000" points="157.359,-51.6708 167.787,-49.7979 158.467,-44.7591 157.359,-51.6708"/>
+</g>
+<!-- interface~randind_cdf -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_node3" class="node"><title>interface~randind_cdf</title>
+<g id="a_proc~~get_nlaunch_pass_grid~~CallsGraph_node3"><a xlink:href=".././interface/randind_cdf.html" xlink:title="randind_cdf">
+<polygon fill="#a7506f" stroke="#a7506f" points="229.5,-24 160.5,-24 160.5,-0 229.5,-0 229.5,-24"/>
+<text text-anchor="middle" x="195" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randind_cdf</text>
+</a>
+</g>
+</g>
+<!-- proc~get_nlaunch_pass_grid&#45;&gt;interface~randind_cdf -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_edge2" class="edge"><title>proc~get_nlaunch_pass_grid&#45;&gt;interface~randind_cdf</title>
+<path fill="none" stroke="#000000" d="M124.281,-23.1763C133.086,-21.7648 141.994,-20.3368 150.364,-18.9951"/>
+<polygon fill="#000000" stroke="#000000" points="150.943,-22.447 160.263,-17.4082 149.835,-15.5353 150.943,-22.447"/>
+</g>
+<!-- proc~rng_seed -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_node4" class="node"><title>proc~rng_seed</title>
+<g id="a_proc~~get_nlaunch_pass_grid~~CallsGraph_node4"><a xlink:href=".././proc/rng_seed.html" xlink:title="rng_seed">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="324,-87 266,-87 266,-63 324,-63 324,-87"/>
+<text text-anchor="middle" x="295" y="-72.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">rng_seed</text>
+</a>
+</g>
+</g>
+<!-- proc~rng_init&#45;&gt;proc~rng_seed -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_edge3" class="edge"><title>proc~rng_init&#45;&gt;proc~rng_seed</title>
+<path fill="none" stroke="#000000" d="M222.005,-59.5725C232.338,-61.7866 244.435,-64.3789 255.731,-66.7996"/>
+<polygon fill="#000000" stroke="#000000" points="255.296,-70.2857 265.807,-68.9587 256.763,-63.441 255.296,-70.2857"/>
+</g>
+<!-- proc~my_rank -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_node5" class="node"><title>proc~my_rank</title>
+<g id="a_proc~~get_nlaunch_pass_grid~~CallsGraph_node5"><a xlink:href=".././proc/my_rank.html" xlink:title="my_rank">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="322,-45 268,-45 268,-21 322,-21 322,-45"/>
+<text text-anchor="middle" x="295" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">my_rank</text>
+</a>
+</g>
+</g>
+<!-- proc~rng_init&#45;&gt;proc~my_rank -->
+<g id="proc~~get_nlaunch_pass_grid~~CallsGraph_edge4" class="edge"><title>proc~rng_init&#45;&gt;proc~my_rank</title>
+<path fill="none" stroke="#000000" d="M222.005,-48.4275C232.969,-46.078 245.92,-43.3028 257.794,-40.7585"/>
+<polygon fill="#000000" stroke="#000000" points="258.829,-44.1162 267.874,-38.5985 257.362,-37.2716 258.829,-44.1162"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+     
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~get_nlaunch_pass_grid~~CalledByGraph Pages: 1 -->
+<svg id="procget_nlaunch_pass_gridCalledByGraph" width="312pt" height="74pt"
+ viewBox="0.00 0.00 312.00 74.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 70)">
+<title>proc~~get_nlaunch_pass_grid~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-70 308,-70 308,4 -4,4"/>
+<!-- proc~get_nlaunch_pass_grid -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_node1" class="node"><title>proc~get_nlaunch_pass_grid</title>
+<polygon fill="none" stroke="black" points="304,-45 180,-45 180,-21 304,-21 304,-45"/>
+<text text-anchor="middle" x="242" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50">get_nlaunch_pass_grid</text>
+</g>
+<!-- proc~pnpa_f -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_node2" class="node"><title>proc~pnpa_f</title>
+<g id="a_proc~~get_nlaunch_pass_grid~~CalledByGraph_node2"><a xlink:href=".././proc/pnpa_f.html" xlink:title="pnpa_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-66 90,-66 90,-42 144,-42 144,-66"/>
+<text text-anchor="middle" x="117" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pnpa_f</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_f&#45;&gt;proc~get_nlaunch_pass_grid -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_edge1" class="edge"><title>proc~pnpa_f&#45;&gt;proc~get_nlaunch_pass_grid</title>
+<path fill="none" stroke="#000000" d="M144.085,-49.5464C151.801,-48.229 160.646,-46.719 169.784,-45.1588"/>
+<polygon fill="#000000" stroke="#000000" points="170.508,-48.586 179.776,-43.4529 169.329,-41.6859 170.508,-48.586"/>
+</g>
+<!-- proc~pfida_f -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_node3" class="node"><title>proc~pfida_f</title>
+<g id="a_proc~~get_nlaunch_pass_grid~~CalledByGraph_node3"><a xlink:href=".././proc/pfida_f.html" xlink:title="pfida_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="144,-24 90,-24 90,-0 144,-0 144,-24"/>
+<text text-anchor="middle" x="117" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">pfida_f</text>
+</a>
+</g>
+</g>
+<!-- proc~pfida_f&#45;&gt;proc~get_nlaunch_pass_grid -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_edge2" class="edge"><title>proc~pfida_f&#45;&gt;proc~get_nlaunch_pass_grid</title>
+<path fill="none" stroke="#000000" d="M144.085,-16.4536C151.801,-17.771 160.646,-19.281 169.784,-20.8412"/>
+<polygon fill="#000000" stroke="#000000" points="169.329,-24.3141 179.776,-22.5471 170.508,-17.414 169.329,-24.3141"/>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_node4" class="node"><title>program~fidasim</title>
+<g id="a_proc~~get_nlaunch_pass_grid~~CalledByGraph_node4"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-45 0,-45 0,-21 54,-21 54,-45"/>
+<text text-anchor="middle" x="27" y="-30.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~pnpa_f -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_edge3" class="edge"><title>program~fidasim&#45;&gt;proc~pnpa_f</title>
+<path fill="none" stroke="#000000" d="M54.4029,-39.3007C62.481,-41.2284 71.5067,-43.3823 80.1046,-45.4341"/>
+<polygon fill="#000000" stroke="#000000" points="79.3797,-48.8593 89.919,-47.7761 81.0046,-42.0505 79.3797,-48.8593"/>
+</g>
+<!-- program~fidasim&#45;&gt;proc~pfida_f -->
+<g id="proc~~get_nlaunch_pass_grid~~CalledByGraph_edge4" class="edge"><title>program~fidasim&#45;&gt;proc~pfida_f</title>
+<path fill="none" stroke="#000000" d="M54.4029,-26.6993C62.481,-24.7716 71.5067,-22.6177 80.1046,-20.5659"/>
+<polygon fill="#000000" stroke="#000000" points="81.0046,-23.9495 89.919,-18.2239 79.3797,-17.1407 81.0046,-23.9495"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/get_nlaunch_pass_grid.html#src">get_nlaunch_pass_grid</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">get_nlaunch_pass_grid</span><span class="p">(</span><span class="n">nr_markers</span><span class="p">,</span><span class="n">papprox</span><span class="p">,</span> <span class="n">nlaunch</span><span class="p">)</span>
+    <span class="c">!+ Sets the number of MC markers launched from each [[libfida:pass_grid]] cell</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                    <span class="kd">::</span> <span class="n">nr_markers</span>
+        <span class="c">!+ Approximate total number of markers to launch</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">papprox</span>
+        <span class="c">!+ [[libfida:pass_grid]] cell weights</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nlaunch</span>
+        <span class="c">!+ Number of mc markers to launch for each cell: nlaunch(r,z,phi)</span>
+
+    <span class="kt">logical</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">)</span> <span class="kd">::</span> <span class="n">mask</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cdf</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomi</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">rng_type</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">c</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">nm</span><span class="p">,</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">nmin</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="c">!! Fill in minimum number of markers per cell</span>
+    <span class="n">nlaunch</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">papprox</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.0</span>
+    <span class="k">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">nlaunch</span> <span class="o">=</span> <span class="n">nmin</span>
+    <span class="n">endwhere</span>
+
+    <span class="c">!! If there are any left over distribute according to papprox</span>
+    <span class="n">nc</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">nr_markers</span><span class="p">.</span><span class="n">gt</span><span class="p">.(</span><span class="n">nmin</span><span class="o">*</span><span class="n">nc</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">nm</span> <span class="o">=</span> <span class="n">nr_markers</span> <span class="o">-</span> <span class="n">nmin</span><span class="o">*</span><span class="n">nc</span>
+
+        <span class="c">!! precalculate cdf to save time</span>
+        <span class="k">call </span><span class="n">cumsum</span><span class="p">(</span><span class="nb">reshape</span><span class="p">(</span><span class="n">papprox</span><span class="p">,[</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">]),</span> <span class="n">cdf</span><span class="p">)</span>
+        <span class="c">!! use the same seed for all processes</span>
+        <span class="k">call </span><span class="n">rng_init</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="mi">932117</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nm</span>
+            <span class="k">call </span><span class="n">randind_cdf</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">cdf</span><span class="p">,</span> <span class="n">randomi</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span> <span class="n">randomi</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">ind</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">nlaunch</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">enddo</span>
+    <span class="n">endif</span>
+
+<span class="k">end subroutine </span><span class="n">get_nlaunch_pass_grid</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

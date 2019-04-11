@@ -282,7 +282,7 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
   
 <tr>
   
-  <td><span class="anchor" id="variable-pos%7E9"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-pos%7E10"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td>optional</td>
   
@@ -297,7 +297,7 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
   
 <tr>
   
-  <td><span class="anchor" id="variable-ind%7E8"></span>integer(kind=Int32),</td>
+  <td><span class="anchor" id="variable-ind%7E9"></span>integer(kind=Int32),</td>
   <td>intent(in),</td>
   <td>optional</td>
   
@@ -317,7 +317,7 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
   <td>optional</td>
   
   <td></td><td>::</td>
-  <td><strong>coeffs</strong></td><td><p>Precomputed Linear Interpolation Coefficients</p></td>
+  <td><strong>coeffs</strong></td><td><p>Precomputed interpolation coefficients</p></td>
   
 </tr>
 
@@ -815,7 +815,7 @@ public subroutine get_ep_denf(energy, pitch, denf, pos, ind, coeffs)
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">ind</span>
         <span class="c">!+ [[libfida:beam_grid]] indices</span>
     <span class="k">type</span><span class="p">(</span><span class="n">InterpolCoeffs3D</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>       <span class="kd">::</span> <span class="n">coeffs</span>
-        <span class="c">!+ Precomputed Linear Interpolation Coefficients</span>
+        <span class="c">!+ Precomputed interpolation coefficients</span>
 
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">uvw</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">fbm</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span><span class="n">fbm</span><span class="p">%</span><span class="n">npitch</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">fbeam</span>

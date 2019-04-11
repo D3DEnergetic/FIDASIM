@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>make_passive_grid &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>2.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>make_passive_grid
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 1.3% of total for procedures.">170 statements</a>
+     </li> 
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+    
+     <li><a href='../module/libfida.html'>libfida</a></li>
+    
+  
+     <li class="active">make_passive_grid</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/make_passive_grid.html#src">make_passive_grid</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine make_passive_grid()
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Makes [[libfida:pass_grid] from user defined inputs</p>
+    
+
+    <h3>Arguments</h3>
+    
+    <em>None</em>
+    <br>
+    
+    
+    
+    <br>
+    
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~make_passive_grid~~CallsGraph Pages: 1 -->
+<svg id="procmake_passive_gridCallsGraph" width="641pt" height="344pt"
+ viewBox="0.00 0.00 641.00 344.27" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~make_passive_grid~~CallsGraph" class="graph" transform="scale(0.712222 0.712222) rotate(0) translate(4 479.38)">
+<title>proc~~make_passive_grid~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-479.38 896,-479.38 896,4 -4,4"/>
+<!-- proc~make_passive_grid -->
+<g id="proc~~make_passive_grid~~CallsGraph_node1" class="node"><title>proc~make_passive_grid</title>
+<polygon fill="none" stroke="black" points="105.5,-255 0.5,-255 0.5,-231 105.5,-231 105.5,-255"/>
+<text text-anchor="middle" x="53" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50">make_passive_grid</text>
+</g>
+<!-- proc~uvw_to_cyl -->
+<g id="proc~~make_passive_grid~~CallsGraph_node2" class="node"><title>proc~uvw_to_cyl</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node2"><a xlink:href=".././proc/uvw_to_cyl.html" xlink:title="uvw_to_cyl">
+<polygon fill="#d9534f" stroke="#d9534f" points="424.5,-401 359.5,-401 359.5,-377 424.5,-377 424.5,-401"/>
+<text text-anchor="middle" x="392" y="-386.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_cyl</text>
+</a>
+</g>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;proc~uvw_to_cyl -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge1" class="edge"><title>proc~make_passive_grid&#45;&gt;proc~uvw_to_cyl</title>
+<path fill="none" stroke="#000000" d="M54.7008,-255.1C57.5966,-292.493 72.0596,-406.475 142,-453 198.988,-490.908 230.541,-472.993 296,-453 324.863,-444.185 352.891,-423.33 370.93,-407.808"/>
+<polygon fill="#000000" stroke="#000000" points="373.321,-410.366 378.483,-401.114 368.678,-405.128 373.321,-410.366"/>
+</g>
+<!-- h5close_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node3" class="node"><title>h5close_f</title>
+<polygon fill="#777777" stroke="#777777" points="248,-444 190,-444 190,-420 248,-420 248,-444"/>
+<text text-anchor="middle" x="219" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5close_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5close_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge2" class="edge"><title>proc~make_passive_grid&#45;&gt;h5close_f</title>
+<path fill="none" stroke="#000000" d="M56.8317,-255.299C64.6402,-286.382 89.4704,-368.614 142,-411 152.676,-419.614 166.639,-424.702 179.68,-427.705"/>
+<polygon fill="#000000" stroke="#000000" points="179.376,-431.211 189.861,-429.693 180.717,-424.341 179.376,-431.211"/>
+</g>
+<!-- h5gopen_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node4" class="node"><title>h5gopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="251,-402 187,-402 187,-378 251,-378 251,-402"/>
+<text text-anchor="middle" x="219" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gopen_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5gopen_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge3" class="edge"><title>proc~make_passive_grid&#45;&gt;h5gopen_f</title>
+<path fill="none" stroke="#000000" d="M59.0287,-255.158C70.1042,-280.4 99.0786,-338.658 142,-369 152.217,-376.223 164.827,-380.965 176.819,-384.077"/>
+<polygon fill="#000000" stroke="#000000" points="176.152,-387.515 186.68,-386.327 177.709,-380.69 176.152,-387.515"/>
+</g>
+<!-- h5ltpath_valid_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node5" class="node"><title>h5ltpath_valid_f</title>
+<polygon fill="#777777" stroke="#777777" points="263,-360 175,-360 175,-336 263,-336 263,-360"/>
+<text text-anchor="middle" x="219" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltpath_valid_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5ltpath_valid_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge4" class="edge"><title>proc~make_passive_grid&#45;&gt;h5ltpath_valid_f</title>
+<path fill="none" stroke="#000000" d="M63.4263,-255.245C78.191,-273.581 108.563,-308.038 142,-327 149.111,-331.033 157.04,-334.326 165.019,-337.007"/>
+<polygon fill="#000000" stroke="#000000" points="164.137,-340.397 174.724,-339.981 166.188,-333.705 164.137,-340.397"/>
+</g>
+<!-- h5gclose_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node6" class="node"><title>h5gclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="251,-318 187,-318 187,-294 251,-294 251,-318"/>
+<text text-anchor="middle" x="219" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5gclose_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5gclose_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge7" class="edge"><title>proc~make_passive_grid&#45;&gt;h5gclose_f</title>
+<path fill="none" stroke="#000000" d="M76.6799,-255.185C94.1744,-264.248 119.164,-276.471 142,-285 153.208,-289.186 165.621,-292.961 177.11,-296.119"/>
+<polygon fill="#000000" stroke="#000000" points="176.352,-299.539 186.915,-298.729 178.152,-292.774 176.352,-299.539"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="proc~~make_passive_grid~~CallsGraph_node7" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node7"><a xlink:href=".././proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="249.5,-234 188.5,-234 188.5,-210 249.5,-210 249.5,-234"/>
+<text text-anchor="middle" x="219" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;proc~in_plasma -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge6" class="edge"><title>proc~make_passive_grid&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M105.891,-236.355C129.278,-233.361 156.459,-229.88 178.2,-227.096"/>
+<polygon fill="#000000" stroke="#000000" points="178.921,-230.533 188.396,-225.791 178.032,-223.589 178.921,-230.533"/>
+</g>
+<!-- proc~xyz_to_cyl -->
+<g id="proc~~make_passive_grid~~CallsGraph_node8" class="node"><title>proc~xyz_to_cyl</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node8"><a xlink:href=".././proc/xyz_to_cyl.html" xlink:title="xyz_to_cyl">
+<polygon fill="#d9534f" stroke="#d9534f" points="250,-276 188,-276 188,-252 250,-252 250,-276"/>
+<text text-anchor="middle" x="219" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_cyl</text>
+</a>
+</g>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;proc~xyz_to_cyl -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge10" class="edge"><title>proc~make_passive_grid&#45;&gt;proc~xyz_to_cyl</title>
+<path fill="none" stroke="#000000" d="M105.891,-249.645C129.116,-252.619 156.085,-256.072 177.75,-258.846"/>
+<polygon fill="#000000" stroke="#000000" points="177.556,-262.35 187.92,-260.148 178.445,-255.406 177.556,-262.35"/>
+</g>
+<!-- proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node9" class="node"><title>proc~h5ltread_dataset_int_scalar_f</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node9"><a xlink:href=".././proc/h5ltread_dataset_int_scalar_f.html" xlink:title="h5ltread_dataset_int_scalar_f">
+<polygon fill="#d9534f" stroke="#d9534f" points="296,-192 142,-192 142,-168 296,-168 296,-192"/>
+<text text-anchor="middle" x="219" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_scalar_f</text>
+</a>
+</g>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;proc~h5ltread_dataset_int_scalar_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge5" class="edge"><title>proc~make_passive_grid&#45;&gt;proc~h5ltread_dataset_int_scalar_f</title>
+<path fill="none" stroke="#000000" d="M76.6799,-230.815C94.1744,-221.752 119.164,-209.529 142,-201 147.586,-198.914 153.472,-196.929 159.394,-195.072"/>
+<polygon fill="#000000" stroke="#000000" points="160.782,-198.31 169.347,-192.073 158.762,-191.607 160.782,-198.31"/>
+</g>
+<!-- h5open_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node10" class="node"><title>h5open_f</title>
+<polygon fill="#777777" stroke="#777777" points="248,-150 190,-150 190,-126 248,-126 248,-150"/>
+<text text-anchor="middle" x="219" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5open_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5open_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge8" class="edge"><title>proc~make_passive_grid&#45;&gt;h5open_f</title>
+<path fill="none" stroke="#000000" d="M63.4263,-230.755C78.191,-212.419 108.563,-177.962 142,-159 153.651,-152.393 167.498,-147.769 180.16,-144.577"/>
+<polygon fill="#000000" stroke="#000000" points="181.036,-147.967 189.996,-142.313 179.466,-141.145 181.036,-147.967"/>
+</g>
+<!-- h5ltread_dataset_double_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node11" class="node"><title>h5ltread_dataset_double_f</title>
+<polygon fill="#777777" stroke="#777777" points="289,-108 149,-108 149,-84 289,-84 289,-108"/>
+<text text-anchor="middle" x="219" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_double_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5ltread_dataset_double_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge9" class="edge"><title>proc~make_passive_grid&#45;&gt;h5ltread_dataset_double_f</title>
+<path fill="none" stroke="#000000" d="M59.0287,-230.842C70.1042,-205.6 99.0786,-147.342 142,-117 144.358,-115.333 146.843,-113.798 149.419,-112.385"/>
+<polygon fill="#000000" stroke="#000000" points="150.974,-115.521 158.471,-108.035 147.941,-109.212 150.974,-115.521"/>
+</g>
+<!-- h5fclose_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node12" class="node"><title>h5fclose_f</title>
+<polygon fill="#777777" stroke="#777777" points="249.5,-66 188.5,-66 188.5,-42 249.5,-42 249.5,-66"/>
+<text text-anchor="middle" x="219" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fclose_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5fclose_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge11" class="edge"><title>proc~make_passive_grid&#45;&gt;h5fclose_f</title>
+<path fill="none" stroke="#000000" d="M56.8317,-230.701C64.6402,-199.618 89.4704,-117.386 142,-75 152.339,-66.657 165.763,-61.6217 178.446,-58.5851"/>
+<polygon fill="#000000" stroke="#000000" points="179.289,-61.9852 188.385,-56.5534 177.887,-55.1271 179.289,-61.9852"/>
+</g>
+<!-- h5fopen_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node13" class="node"><title>h5fopen_f</title>
+<polygon fill="#777777" stroke="#777777" points="249.5,-24 188.5,-24 188.5,-0 249.5,-0 249.5,-24"/>
+<text text-anchor="middle" x="219" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5fopen_f</text>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;h5fopen_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge12" class="edge"><title>proc~make_passive_grid&#45;&gt;h5fopen_f</title>
+<path fill="none" stroke="#000000" d="M55.3978,-230.923C60.2075,-195.035 79.3914,-88.1099 142,-33 152.054,-24.1504 165.524,-18.9979 178.331,-16.009"/>
+<polygon fill="#000000" stroke="#000000" points="179.238,-19.3982 188.382,-14.0466 177.896,-12.5279 179.238,-19.3982"/>
+</g>
+<!-- proc~cyl_to_uvw -->
+<g id="proc~~make_passive_grid~~CallsGraph_node14" class="node"><title>proc~cyl_to_uvw</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node14"><a xlink:href=".././proc/cyl_to_uvw.html" xlink:title="cyl_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="424.5,-192 359.5,-192 359.5,-168 424.5,-168 424.5,-192"/>
+<text text-anchor="middle" x="392" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~cyl_to_uvw -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge14" class="edge"><title>proc~in_plasma&#45;&gt;proc~cyl_to_uvw</title>
+<path fill="none" stroke="#000000" d="M249.786,-214.684C277.296,-207.927 318.437,-197.822 349.227,-190.26"/>
+<polygon fill="#000000" stroke="#000000" points="350.36,-193.586 359.237,-187.801 348.691,-186.788 350.36,-193.586"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_node16" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node16"><a xlink:href=".././interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="430.5,-234 353.5,-234 353.5,-210 430.5,-210 430.5,-234"/>
+<text text-anchor="middle" x="392" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge13" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M249.786,-222C275.55,-222 313.27,-222 343.246,-222"/>
+<polygon fill="#000000" stroke="#000000" points="343.493,-225.5 353.493,-222 343.493,-218.5 343.493,-225.5"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~make_passive_grid~~CallsGraph_node17" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node17"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="426,-276 358,-276 358,-252 426,-252 426,-276"/>
+<text text-anchor="middle" x="392" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge15" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M249.786,-229.316C276.867,-235.967 317.155,-245.863 347.776,-253.384"/>
+<polygon fill="#000000" stroke="#000000" points="347.211,-256.849 357.757,-255.835 348.88,-250.051 347.211,-256.849"/>
+</g>
+<!-- proc~xyz_to_cyl&#45;&gt;proc~uvw_to_cyl -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge16" class="edge"><title>proc~xyz_to_cyl&#45;&gt;proc~uvw_to_cyl</title>
+<path fill="none" stroke="#000000" d="M250.07,-268.289C264.715,-271.348 282.113,-276.484 296,-285 330.967,-306.443 360.896,-344.434 377.378,-368.083"/>
+<polygon fill="#000000" stroke="#000000" points="374.697,-370.364 383.211,-376.67 380.487,-366.431 374.697,-370.364"/>
+</g>
+<!-- proc~xyz_to_cyl&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge17" class="edge"><title>proc~xyz_to_cyl&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M250.178,-264C277.195,-264 317.127,-264 347.575,-264"/>
+<polygon fill="#000000" stroke="#000000" points="347.913,-267.5 357.913,-264 347.913,-260.5 347.913,-267.5"/>
+</g>
+<!-- h5ltread_dataset_int_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_node15" class="node"><title>h5ltread_dataset_int_f</title>
+<polygon fill="#777777" stroke="#777777" points="451.5,-150 332.5,-150 332.5,-126 451.5,-126 451.5,-150"/>
+<text text-anchor="middle" x="392" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">h5ltread_dataset_int_f</text>
+</g>
+<!-- proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge18" class="edge"><title>proc~h5ltread_dataset_int_scalar_f&#45;&gt;h5ltread_dataset_int_f</title>
+<path fill="none" stroke="#000000" d="M269.002,-167.964C288.678,-163.132 311.53,-157.519 332.1,-152.467"/>
+<polygon fill="#000000" stroke="#000000" points="333.115,-155.822 341.991,-150.037 331.445,-149.024 333.115,-155.822"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_node18" class="node"><title>proc~cyl_interpol3d_coeff</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node18"><a xlink:href=".././proc/cyl_interpol3d_coeff.html" xlink:title="cyl_interpol3D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="763.5,-176 654.5,-176 654.5,-152 763.5,-152 763.5,-176"/>
+<text text-anchor="middle" x="709" y="-161.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge19" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M429.882,-209.931C437.295,-207.211 444.966,-204.18 452,-201 468.679,-193.461 470.472,-186.271 488,-181 539.052,-165.648 599.609,-161.963 644.253,-161.798"/>
+<polygon fill="#000000" stroke="#000000" points="644.376,-165.298 654.384,-161.819 644.391,-158.298 644.376,-165.298"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_node19" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node19"><a xlink:href=".././proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="754.5,-274 663.5,-274 663.5,-250 754.5,-250 754.5,-274"/>
+<text text-anchor="middle" x="709" y="-259.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge20" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M430.683,-226.785C485.986,-233.808 589.452,-246.946 653.175,-255.038"/>
+<polygon fill="#000000" stroke="#000000" points="653.071,-258.553 663.432,-256.341 653.953,-251.609 653.071,-258.553"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~make_passive_grid~~CallsGraph_node20" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node20"><a xlink:href=".././proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="764,-325 654,-325 654,-301 764,-301 764,-325"/>
+<text text-anchor="middle" x="709" y="-310.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge21" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M430.622,-231.021C438.219,-233.997 445.775,-237.902 452,-243 476.06,-262.703 461.293,-287.067 488,-303 534.65,-330.83 597.281,-330.85 643.787,-325.356"/>
+<polygon fill="#000000" stroke="#000000" points="644.283,-328.821 653.751,-324.067 643.384,-321.879 644.283,-328.821"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_node21" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node21"><a xlink:href=".././proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="891.5,-196 800.5,-196 800.5,-172 891.5,-172 891.5,-196"/>
+<text text-anchor="middle" x="846" y="-181.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge22" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M430.665,-211.978C438.096,-209.088 445.574,-205.471 452,-201 472.46,-186.765 465.914,-169.553 488,-158 596.855,-101.06 644.508,-114.481 764,-143 783.298,-147.606 803.201,-157.595 818.449,-166.56"/>
+<polygon fill="#000000" stroke="#000000" points="816.934,-169.735 827.295,-171.952 820.578,-163.758 816.934,-169.735"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~make_passive_grid~~CallsGraph_node22" class="node"><title>proc~cyl_interpol3d_coeff_arr</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node22"><a xlink:href=".././proc/cyl_interpol3d_coeff_arr.html" xlink:title="cyl_interpol3D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="617.5,-214 488.5,-214 488.5,-190 617.5,-190 617.5,-214"/>
+<text text-anchor="middle" x="553" y="-199.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge23" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M430.681,-217.26C444.978,-215.462 461.798,-213.346 478.284,-211.272"/>
+<polygon fill="#000000" stroke="#000000" points="478.996,-214.711 488.481,-209.99 478.122,-207.765 478.996,-214.711"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~make_passive_grid~~CallsGraph_node23" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~make_passive_grid~~CallsGraph_node23"><a xlink:href=".././proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="608,-294 498,-294 498,-270 608,-270 608,-294"/>
+<text text-anchor="middle" x="553" y="-279.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge24" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M427.381,-234.042C435.473,-236.93 444.054,-240.037 452,-243 471.981,-250.45 494.08,-259.033 512.411,-266.246"/>
+<polygon fill="#000000" stroke="#000000" points="511.309,-269.574 521.895,-269.989 513.878,-263.062 511.309,-269.574"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge25" class="edge"><title>proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M763.743,-171.962C772.411,-173.246 781.394,-174.577 790.089,-175.865"/>
+<polygon fill="#000000" stroke="#000000" points="789.721,-179.349 800.126,-177.352 790.747,-172.424 789.721,-179.349"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge26" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M736.275,-300.963C745.529,-296.08 755.688,-289.946 764,-283 791.734,-259.825 816.942,-226.104 831.627,-204.613"/>
+<polygon fill="#000000" stroke="#000000" points="834.594,-206.473 837.253,-196.217 828.779,-202.576 834.594,-206.473"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge28" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" d="M602.727,-189.977C617.545,-186.32 633.986,-182.263 649.385,-178.463"/>
+<polygon fill="#000000" stroke="#000000" points="650.456,-181.804 659.326,-176.01 648.779,-175.008 650.456,-181.804"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge27" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M617.502,-198.072C669.024,-194.885 740.914,-190.438 790.004,-187.402"/>
+<polygon fill="#000000" stroke="#000000" points="790.353,-190.887 800.118,-186.776 789.921,-183.9 790.353,-190.887"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~make_passive_grid~~CallsGraph_edge29" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M608.295,-274.949C622.929,-273.048 638.766,-270.991 653.417,-269.089"/>
+<polygon fill="#000000" stroke="#000000" points="653.875,-272.559 663.34,-267.8 652.973,-265.617 653.875,-272.559"/>
+</g>
+</g>
+</svg>
+</div><script>var panprocmake_passive_gridCallsGraph = svgPanZoom('#procmake_passive_gridCallsGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+     
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~make_passive_grid~~CalledByGraph Pages: 1 -->
+<svg id="procmake_passive_gridCalledByGraph" width="204pt" height="32pt"
+ viewBox="0.00 0.00 204.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~make_passive_grid~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~make_passive_grid~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 200,-28 200,4 -4,4"/>
+<!-- proc~make_passive_grid -->
+<g id="proc~~make_passive_grid~~CalledByGraph_node1" class="node"><title>proc~make_passive_grid</title>
+<polygon fill="none" stroke="black" points="195.5,-24 90.5,-24 90.5,-0 195.5,-0 195.5,-24"/>
+<text text-anchor="middle" x="143" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">make_passive_grid</text>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~make_passive_grid~~CalledByGraph_node2" class="node"><title>program~fidasim</title>
+<g id="a_proc~~make_passive_grid~~CalledByGraph_node2"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~make_passive_grid -->
+<g id="proc~~make_passive_grid~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~make_passive_grid</title>
+<path fill="none" stroke="#000000" d="M54.1539,-12C62.071,-12 71.1241,-12 80.3409,-12"/>
+<polygon fill="#000000" stroke="#000000" points="80.3602,-15.5001 90.3602,-12 80.3601,-8.5001 80.3602,-15.5001"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/make_passive_grid.html#src">make_passive_grid</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">make_passive_grid</span>
+    <span class="c">!+ Makes [[libfida:pass_grid] from user defined inputs</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fid</span><span class="p">,</span> <span class="n">gid</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">path_valid_spec</span><span class="p">,</span> <span class="n">path_valid_npa</span>
+
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">a_cent</span><span class="p">,</span> <span class="n">d_cent</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">lenses</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">r0_arr</span><span class="p">,</span> <span class="n">v0_arr</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex111</span><span class="p">,</span> <span class="n">vertex111_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex221</span><span class="p">,</span> <span class="n">vertex221_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex112</span><span class="p">,</span> <span class="n">vertex112_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex121</span><span class="p">,</span> <span class="n">vertex121_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex211</span><span class="p">,</span> <span class="n">vertex211_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex212</span><span class="p">,</span> <span class="n">vertex212_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex222</span><span class="p">,</span> <span class="n">vertex222_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vertex122</span><span class="p">,</span> <span class="n">vertex122_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">r0_cyl</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi_dum</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">zmin</span><span class="p">,</span> <span class="n">zmax</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rmin</span><span class="p">,</span> <span class="n">rmax</span><span class="p">,</span> <span class="n">phimax</span><span class="p">,</span> <span class="n">phimin</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">spec_nchan</span><span class="p">,</span> <span class="n">npa_nchan</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">error</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">inp1</span><span class="p">,</span> <span class="n">inp2</span>
+
+    <span class="n">spec_nchan</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">npa_nchan</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c">!!Initialize HDF5 interface</span>
+    <span class="k">call </span><span class="n">h5open_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Open HDF5 file</span>
+    <span class="k">call </span><span class="n">h5fopen_f</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">geometry_file</span><span class="p">,</span> <span class="n">H5F_ACC_RDONLY_F</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!If SPEC group exists, read FIDA LOS info </span>
+    <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/spec&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid_spec</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">path_valid_spec</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;FIDA/BES geometry is not in the geometry file&#39;</span>
+            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;Passive FIDA calculations will not be performed&#39;</span>
+        <span class="n">endif</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+        <span class="c">!!Open SPEC group</span>
+        <span class="k">call </span><span class="n">h5gopen_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/spec&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/spec/nchan&quot;</span><span class="p">,</span> <span class="n">spec_nchan</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+        <span class="k">allocate</span><span class="p">(</span><span class="n">lenses</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">spec_nchan</span><span class="p">),</span> <span class="n">axes</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">spec_nchan</span><span class="p">))</span>
+
+        <span class="c">!! Read in lenses and axes info</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="n">spec_nchan</span><span class="p">]</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/spec/lens&quot;</span><span class="p">,</span> <span class="n">lenses</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/spec/axis&quot;</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+        <span class="c">!!Close SPEC group</span>
+        <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="c">!!If NPA group exists, read NPA LOS info </span>
+    <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/npa&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid_npa</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">path_valid_npa</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;NPA geometry is not in the geometry file&#39;</span>
+            <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s1">&#39;Passive NPA calculations will not be performed&#39;</span>
+        <span class="n">endif</span>
+        <span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+        <span class="c">!!Open NPA group</span>
+        <span class="k">call </span><span class="n">h5gopen_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/npa&quot;</span><span class="p">,</span> <span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/nchan&quot;</span><span class="p">,</span> <span class="n">npa_nchan</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+        <span class="k">allocate</span><span class="p">(</span><span class="n">a_cent</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>  <span class="n">npa_nchan</span><span class="p">),</span> <span class="n">d_cent</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>  <span class="n">npa_nchan</span><span class="p">))</span>
+
+        <span class="c">!! Read in a_cent and d_cent info</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="n">spec_nchan</span><span class="p">]</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/a_cent&quot;</span><span class="p">,</span>  <span class="n">a_cent</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="s2">&quot;/npa/d_cent&quot;</span><span class="p">,</span>  <span class="n">d_cent</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+        <span class="c">!!Close NPA group</span>
+        <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="c">!!Close file id</span>
+    <span class="k">call </span><span class="n">h5fclose_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Close HDF5 interface</span>
+    <span class="k">call </span><span class="n">h5close_f</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+    <span class="c">!!Collect all LOS info</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">r0_arr</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>  <span class="n">spec_nchan</span><span class="o">+</span><span class="n">npa_nchan</span><span class="p">),</span> <span class="n">v0_arr</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>  <span class="n">spec_nchan</span><span class="o">+</span><span class="n">npa_nchan</span><span class="p">))</span>
+
+    <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">r0_arr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">:</span><span class="n">spec_nchan</span><span class="p">)</span> <span class="o">=</span> <span class="n">lenses</span>
+        <span class="n">v0_arr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">:</span><span class="n">spec_nchan</span><span class="p">)</span> <span class="o">=</span> <span class="n">axes</span>
+        <span class="n">r0_arr</span><span class="p">(:,(</span><span class="mi">1</span><span class="o">+</span><span class="n">spec_nchan</span><span class="p">):(</span><span class="n">spec_nchan</span><span class="o">+</span><span class="n">npa_nchan</span><span class="p">))</span> <span class="o">=</span> <span class="n">d_cent</span>
+        <span class="n">v0_arr</span><span class="p">(:,(</span><span class="mi">1</span><span class="o">+</span><span class="n">spec_nchan</span><span class="p">):(</span><span class="n">spec_nchan</span><span class="o">+</span><span class="n">npa_nchan</span><span class="p">))</span> <span class="o">=</span> <span class="n">a_cent</span> <span class="o">-</span> <span class="n">d_cent</span>
+    <span class="k">else if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">r0_arr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">:</span><span class="n">spec_nchan</span><span class="p">)</span> <span class="o">=</span> <span class="n">lenses</span>
+        <span class="n">v0_arr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">:</span><span class="n">spec_nchan</span><span class="p">)</span> <span class="o">=</span> <span class="n">axes</span>
+    <span class="k">else</span> <span class="c">!pnpa&gt;=1 case</span>
+        <span class="n">r0_arr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">:</span><span class="n">npa_nchan</span><span class="p">)</span> <span class="o">=</span> <span class="n">d_cent</span>
+        <span class="n">v0_arr</span><span class="p">(:,</span><span class="mi">1</span><span class="p">:</span><span class="n">npa_nchan</span><span class="p">)</span> <span class="o">=</span> <span class="n">a_cent</span> <span class="o">-</span> <span class="n">d_cent</span>
+    <span class="n">endif</span>
+
+    <span class="c">!! The remainder of the code will make the passive neutral grid</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dr</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">dr</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dz</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">dz</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nr</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">nz</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">),</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">))</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">r</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">r</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">z</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">da</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">dr</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dz</span>
+
+    <span class="c">!! Start by finding the limits of the beam grid vertices to define the phi information</span>
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">xmin</span> <span class="p">;</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">xmax</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">ymin</span> <span class="p">;</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">ymax</span>
+    <span class="n">zmin</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">zmin</span> <span class="p">;</span> <span class="n">zmax</span> <span class="o">=</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">zmax</span>
+
+    <span class="n">vertex111</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">xmin</span>   <span class="p">;</span> <span class="n">vertex111</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ymin</span>   <span class="p">;</span> <span class="n">vertex111</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">zmin</span>
+    <span class="n">vertex222</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">xmax</span>   <span class="p">;</span> <span class="n">vertex222</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ymax</span>   <span class="p">;</span> <span class="n">vertex222</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">zmax</span>
+
+    <span class="n">vertex112</span> <span class="o">=</span> <span class="n">vertex111</span> <span class="p">;</span> <span class="n">vertex211</span> <span class="o">=</span> <span class="n">vertex111</span> <span class="p">;</span> <span class="n">vertex121</span> <span class="o">=</span> <span class="n">vertex111</span>
+    <span class="n">vertex112</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">zmax</span>   <span class="p">;</span> <span class="n">vertex211</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">xmax</span>   <span class="p">;</span> <span class="n">vertex121</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ymax</span>
+
+    <span class="n">vertex122</span> <span class="o">=</span> <span class="n">vertex222</span> <span class="p">;</span> <span class="n">vertex221</span> <span class="o">=</span> <span class="n">vertex222</span> <span class="p">;</span> <span class="n">vertex212</span> <span class="o">=</span> <span class="n">vertex222</span>
+    <span class="n">vertex122</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">xmin</span>   <span class="p">;</span> <span class="n">vertex221</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">zmin</span>   <span class="p">;</span> <span class="n">vertex212</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">ymin</span>
+
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex111</span><span class="p">,</span><span class="n">vertex111_cyl</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex112</span><span class="p">,</span><span class="n">vertex112_cyl</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex121</span><span class="p">,</span><span class="n">vertex121_cyl</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex211</span><span class="p">,</span><span class="n">vertex211_cyl</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex212</span><span class="p">,</span><span class="n">vertex212_cyl</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex222</span><span class="p">,</span><span class="n">vertex222_cyl</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex122</span><span class="p">,</span><span class="n">vertex122_cyl</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">xyz_to_cyl</span><span class="p">(</span><span class="n">vertex221</span><span class="p">,</span><span class="n">vertex221_cyl</span><span class="p">)</span>
+
+    <span class="n">phimin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">vertex111_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex112_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex121_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex211_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="p">&amp;</span>
+                <span class="p">,</span><span class="n">vertex212_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex222_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex122_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex221_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">phimax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">vertex111_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex112_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex121_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex211_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="p">&amp;</span>
+                <span class="p">,</span><span class="n">vertex212_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex222_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex122_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="n">vertex221_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+    <span class="c">!! Update phi with LOS limits</span>
+    <span class="n">track_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,(</span><span class="n">spec_nchan</span><span class="o">+</span><span class="n">npa_nchan</span><span class="p">)</span>
+        <span class="n">r0</span> <span class="o">=</span> <span class="n">r0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="n">v0_arr</span><span class="p">(:,</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="mf">2.d0</span><span class="o">*</span><span class="n">v0</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">v0</span><span class="p">)</span>
+        <span class="n">phi_dum</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.d0</span> <span class="c">!Initialize phi_dum outside of domain</span>
+        <span class="k">call </span><span class="n">in_plasma</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">inp2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">inp2</span><span class="p">)</span> <span class="k">cycle </span><span class="n">track_loop</span>
+        <span class="n">inp2</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span> <span class="p">;</span> <span class="n">inp1</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+        <span class="k">do while</span> <span class="p">(</span><span class="n">inp2</span><span class="p">)</span> <span class="c">!Loop until los &#39;particle&#39; is outside the plasma</span>
+            <span class="k">do while</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">inp1</span><span class="p">)</span> <span class="c">!Loop until los &#39;particle&#39; is inside the plasma</span>
+                <span class="k">call </span><span class="n">uvw_to_cyl</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">r0_cyl</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">r0_cyl</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">60</span><span class="mf">0.d0</span><span class="p">).</span><span class="nb">or</span><span class="p">.(</span><span class="nb">abs</span><span class="p">(</span><span class="n">r0_cyl</span><span class="p">(</span><span class="mi">2</span><span class="p">)).</span><span class="n">gt</span><span class="p">.</span><span class="mi">60</span><span class="mf">0.d0</span><span class="p">))</span> <span class="k">exit</span> <span class="c">!Never intersects</span>
+                <span class="k">call </span><span class="n">in_plasma</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">inp1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">inp1</span><span class="p">)</span> <span class="n">phi_dum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">r0_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">r0</span> <span class="o">=</span> <span class="n">r0</span> <span class="o">+</span> <span class="n">v0</span>  <span class="c">!dt=1</span>
+            <span class="n">enddo</span>
+
+            <span class="k">call </span><span class="n">in_plasma</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">inp2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">inp2</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                call </span><span class="n">uvw_to_cyl</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">r0_cyl</span><span class="p">)</span>
+                <span class="n">phi_dum</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">r0_cyl</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="n">endif</span>
+            <span class="n">r0</span> <span class="o">=</span> <span class="n">r0</span> <span class="o">+</span> <span class="n">v0</span>  <span class="c">!dt=1</span>
+        <span class="n">enddo</span>
+
+        <span class="k">if</span><span class="p">((</span><span class="nb">minval</span><span class="p">(</span><span class="n">phi_dum</span><span class="p">).</span><span class="n">lt</span><span class="p">.</span><span class="n">phimin</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="nb">minval</span><span class="p">(</span><span class="n">phi_dum</span><span class="p">).</span><span class="n">ge</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">))</span> <span class="n">phimin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">phi_dum</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">((</span><span class="nb">maxval</span><span class="p">(</span><span class="n">phi_dum</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="n">phimax</span><span class="p">).</span><span class="nb">and</span><span class="p">.(</span><span class="nb">maxval</span><span class="p">(</span><span class="n">phi_dum</span><span class="p">).</span><span class="n">ge</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">))</span> <span class="n">phimax</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">phi_dum</span><span class="p">)</span>
+    <span class="n">enddo</span> <span class="n">track_loop</span>
+
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">ceiling</span><span class="p">((</span><span class="n">phimax</span><span class="o">-</span><span class="n">phimin</span><span class="p">)</span><span class="o">/</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">20</span><span class="p">)</span> <span class="k">then</span> <span class="c">!! Avoid large memory allocation</span>
+        <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span> <span class="o">=</span> <span class="p">(</span><span class="n">phimax</span><span class="o">-</span><span class="n">phimin</span><span class="p">)</span><span class="o">/</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
+    <span class="n">endif</span>
+
+    <span class="k">allocate</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">))</span>
+    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
+        <span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="n">phimin</span> <span class="o">+</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span>
+    <span class="n">enddo</span>
+
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">dr</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dz</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">]</span>
+
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">ntrack</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="o">+</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="o">+</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">ngrid</span>  <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(a)&#39;</span><span class="p">)</span> <span class="s2">&quot;---- Passive neutral grid settings ----&quot;</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Nr: &quot;, i3)&#39;</span><span class="p">)</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Nz: &quot;, i3)&#39;</span><span class="p">)</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Nphi: &quot;, i3)&#39;</span><span class="p">)</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;R  range = [&quot;,f6.2,&quot;,&quot;,f6.2,&quot;]&quot;)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
+              <span class="n">pass_grid</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">r</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">)</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Z  range = [&quot;,f7.2,&quot;,&quot;,f6.2,&quot;]&quot;)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
+              <span class="n">pass_grid</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">z</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;Phi  range = [&quot;,f5.2,&quot;,&quot;,f5.2,&quot;]&quot;)&#39;</span><span class="p">)</span> <span class="p">&amp;</span>
+              <span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">)</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T2,&quot;dA: &quot;, f5.2,&quot; [cm^3]&quot;)&#39;</span><span class="p">)</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">da</span>
+        <span class="k">write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">deallocate</span><span class="p">(</span><span class="n">a_cent</span><span class="p">,</span> <span class="n">d_cent</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">deallocate</span><span class="p">(</span><span class="n">lenses</span><span class="p">,</span> <span class="n">axes</span><span class="p">)</span>
+
+<span class="k">end subroutine </span><span class="n">make_passive_grid</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

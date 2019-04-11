@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">18 statements</a>
+    title=" 0.1% of total for procedures.">18 statements</a>
      </li> 
      
      
@@ -426,20 +426,20 @@ public subroutine fast_ion_assign(p1, p2)
     <span class="k">type</span><span class="p">(</span><span class="n">FastIon</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">p2</span>
     <span class="k">type</span><span class="p">(</span><span class="n">FastIon</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">p1</span>
 
-    <span class="n">p1</span><span class="p">%</span><span class="n">cross_grid</span> <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">cross_grid</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">r</span>          <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">r</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">z</span>          <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">z</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">phi</span>        <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">phi</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">phi_enter</span>  <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">phi_enter</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">delta_phi</span>  <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">delta_phi</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">energy</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">energy</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">pitch</span>      <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">pitch</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">vabs</span>       <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vabs</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">vr</span>         <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vr</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">vt</span>         <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vt</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">vz</span>         <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vz</span>
-    <span class="n">p1</span><span class="p">%</span><span class="n">weight</span>     <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">weight</span>
-    <span class="n">p1</span><span class="p">%</span><span class="k">class</span>      <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="k">class</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">beam_grid_cross_grid</span> <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">beam_grid_cross_grid</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">r</span>                    <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">r</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">z</span>                    <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">z</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">phi</span>                  <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">phi</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">beam_grid_phi_enter</span>  <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">beam_grid_phi_enter</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">delta_phi</span>            <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">delta_phi</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">energy</span>               <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">energy</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">pitch</span>                <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">pitch</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">vabs</span>                 <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vabs</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">vr</span>                   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vr</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">vt</span>                   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vt</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">vz</span>                   <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">vz</span>
+    <span class="n">p1</span><span class="p">%</span><span class="n">weight</span>               <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="n">weight</span>
+    <span class="n">p1</span><span class="p">%</span><span class="k">class</span>                <span class="o">=</span> <span class="n">p2</span><span class="p">%</span><span class="k">class</span>
 
 <span class="k">end subroutine </span><span class="n">fast_ion_assign</span>
 </pre></div>

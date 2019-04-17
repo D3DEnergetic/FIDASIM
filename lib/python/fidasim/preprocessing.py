@@ -273,6 +273,7 @@ def check_grid(grid):
 
     nr = grid['nr']
     nz = grid['nz']
+    nphi = grid['nphi']
 
     zero_int = {'dims': 0,
                 'type': [int, np.int32, np.int64]}
@@ -516,6 +517,7 @@ def check_plasma(inputs, grid, plasma):
 
     nr = grid['nr']
     nz = grid['nz']
+    nphi = grid['nphi']
 
     zero_string = {'dims': 0,
                    'type': [str]}
@@ -523,22 +525,22 @@ def check_plasma(inputs, grid, plasma):
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
 
-    nrnz_double = {'dims': [nr, nz],
-                   'type': [float, np.float64]}
+    nrnznphi_double = {'dims': [nr, nz, nphi],
+                       'type': [float, np.float64]}
 
-    nrnz_int = {'dims': [nr, nz],
-                'type': [int, np.int32, np.int64]}
+    nrnznphi_int = {'dims': [nr, nz, nphi],
+                    'type': [int, np.int32, np.int64]}
 
     schema = {'time': zero_double,
-              'vr': nrnz_double,
-              'vt': nrnz_double,
-              'vz': nrnz_double,
-              'dene': nrnz_double,
-              'denn': nrnz_double,
-              'ti': nrnz_double,
-              'te': nrnz_double,
-              'zeff': nrnz_double,
-              'mask': nrnz_int,
+              'vr': nrnznphi_double,
+              'vt': nrnznphi_double,
+              'vz': nrnznphi_double,
+              'dene': nrnznphi_double,
+              'denn': nrnznphi_double,
+              'ti': nrnznphi_double,
+              'te': nrnznphi_double,
+              'zeff': nrnznphi_double,
+              'mask': nrnznphi_int,
               'data_source': zero_string}
 
     err = check_dict_schema(schema, plasma, desc="plasma parameters")
@@ -605,6 +607,7 @@ def check_fields(inputs, grid, fields):
 
     nr = grid['nr']
     nz = grid['nz']
+    nphi = grid['nphi']
 
     zero_string = {'dims': 0,
                    'type': [str]}
@@ -612,20 +615,20 @@ def check_fields(inputs, grid, fields):
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
 
-    nrnz_double = {'dims': [nr, nz],
-                   'type': [float, np.float64]}
+    nrnznphi_double = {'dims': [nr, nz, nphi],
+                       'type': [float, np.float64]}
 
-    nrnz_int = {'dims': [nr, nz],
-                'type': [int, np.int32, np.int64]}
+    nrnznphi_int = {'dims': [nr, nz, nphi],
+                    'type': [int, np.int32, np.int64]}
 
     schema = {'time': zero_double,
-              'br': nrnz_double,
-              'bt': nrnz_double,
-              'bz': nrnz_double,
-              'er': nrnz_double,
-              'et': nrnz_double,
-              'ez': nrnz_double,
-              'mask': nrnz_int,
+              'br': nrnznphi_double,
+              'bt': nrnznphi_double,
+              'bz': nrnznphi_double,
+              'er': nrnznphi_double,
+              'et': nrnznphi_double,
+              'ez': nrnznphi_double,
+              'mask': nrnznphi_int,
               'data_source': zero_string}
 
     err = check_dict_schema(schema, fields, desc="electromagnetic fields")
@@ -696,6 +699,7 @@ def check_distribution(inputs, grid, dist):
         nen = dist['nenergy']
         nr = grid['nr']
         nz = grid['nz']
+        nphi = grid['nphi']
 
         zero_string = {'dims': 0,
                        'type': [str]}
@@ -706,8 +710,8 @@ def check_distribution(inputs, grid, dist):
         zero_double = {'dims': 0,
                        'type': [float, np.float64]}
 
-        nrnz_double = {'dims': [nr, nz],
-                       'type': [float, np.float64]}
+        nrnznphi_double = {'dims': [nr, nz, nphi],
+                           'type': [float, np.float64]}
 
         schema = {'type': zero_int,
                   'nenergy': zero_int,
@@ -716,8 +720,8 @@ def check_distribution(inputs, grid, dist):
                              'type': [float, np.float64]},
                   'pitch': {'dims': [npitch],
                             'type': [float, np.float64]},
-                  'denf': nrnz_double,
-                  'f': {'dims': [nen, npitch, nr, nz],
+                  'denf': nrnznphi_double,
+                  'f': {'dims': [nen, npitch, nr, nz, nphi],
                         'type': [float, np.float64]},
                   'time': zero_double,
                   'data_source': zero_string}
@@ -877,7 +881,7 @@ def check_spec(inputs, chords):
                     'type': [float, np.float64]}
 
     nchan_string = {'dims': [nchan],
-                    'type': [np.bytes_]}
+                    'type': [np.bytes_, str]}
 
     three_nchan_float = {'dims': [3, nchan],
                          'type': [float, np.float64]}
@@ -909,9 +913,9 @@ def check_spec(inputs, chords):
     rc = np.array([inputs['xmin'], inputs['ymin'], inputs['zmin']], dtype=float) + 0.5 * dr
 
     for i in range(nchan):
-        if np.abs(np.sum(uvw_axis[:, i] ** 2.) - 1.) > 1e-5:
-            error('Invalid optical axis for chord "' + chords['id'][i] + '". Expected norm(axis) == 1')
-            print(np.sum(uvw_axis[:, i] ** 2.) - 1.)
+        if not np.isclose(np.linalg.norm(uvw_axis[:, i]), 1, rtol=1e-03):
+            error('Invalid optical axis for chord "' + str(chords['id'][i]) + '". Expected norm(axis) == 1')
+            print(np.sum(uvw_axis[:, i] ** 2.))
 
         # Check if viewing chord intersects beam grid
         length, r_enter, r_exit = aabb_intersect(rc, dr, xyz_lens[:, i], xyz_axis[:, i])

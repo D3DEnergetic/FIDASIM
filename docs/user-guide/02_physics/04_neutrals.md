@@ -152,7 +152,6 @@ After a few iterations the halo density converges and the calculation ends.
 * `current_fractions`: Current fractions
 * `load_neutrals`: Load neutrals from file
 * `neutrals_file`: Optional neutrals file
-* `dump_dcx`: Optionally dump DCX density and spectra
 * `n_nbi`: Number of NBI MC particles
 * `n_halo`: Number of HALO MC particles
 * `n_dcx`: Number of DCX MC particles

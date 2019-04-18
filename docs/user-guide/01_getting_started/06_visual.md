@@ -4,6 +4,8 @@ title: Visualization
 
 [TOC]
 
+---
+
 ##Visualization: Inputs
 
 Visualizing your inputs can be done by executing `plot_inputs` found in `lib/scripts/`

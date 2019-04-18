@@ -62,9 +62,7 @@ and the 3D grid with,
 >>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi)
 ```
 The output 2D grid structure will have Phi = 0.0 and nphi = 1, but the 3D grid structure will have values based on what the user input.
-**FIDASIM creates a third grid for passive calculations.
-  By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the entire plasma volume.
-  If the interpolation grid is 3D, then the passive neutral grid is the interpolation grid.
+**FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive:html#Passive-Neutral-Grid).
 
 The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
 To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.

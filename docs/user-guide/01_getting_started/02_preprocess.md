@@ -77,6 +77,8 @@ or in Python
 >>> bgrid = beam_grid(nbi,rstart)
 ```
 
+**FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive:html#Passive-Neutral-Grid).
+
 #Reading GEQDSK files
 Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine [read_geqdsk.pro](|url|/sourcefile/read_geqdsk.pro.html) to calculate the [fields structure](../03_technical/01_prefida_inputs.html#fields-structure) from EFITs GEQDSK file.
@@ -154,5 +156,3 @@ or in Python
 >>> from fidasim.utils import read_nubeam
 >>> f = read_nubeam(nubeam_distribution_file, grid, btipsign=-1)
 ```
-
-**FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive:html#Passive-Neutral-Grid).

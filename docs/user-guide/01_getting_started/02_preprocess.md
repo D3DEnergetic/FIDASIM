@@ -40,6 +40,7 @@ Most devices may have already setup helper routines to make running FIDASIM and 
 Click [here](./05_devices.html) to find out if someone has done your work for you.
 
 #Making Grids
+
 PREFIDA uses two types of grids**: the [Interpolation Grid](../03_technical/01_prefida_inputs.html#interpolation-grid-structure) and the [Beam Grid](../03_technical/01_prefida_inputs.html#beam-grid-settings). 
 By default, axisymmetry is assumed and the Interpolation Grid is a 2D grid in the R-Z plane that is used for interpolating the [plasma parameters](../03_technical/01_prefida_inputs.html#plasma-structure) and the [electromagnetic fields](../03_technical/01_prefida_inputs.html#fields-structure).
 A 3D cylindrical grid in R, Z and Phi can be created if the user inputs phi variable information. 
@@ -62,6 +63,7 @@ and the 3D grid with,
 >>> grid = rz_grid(rmin,rmax,nr,zmin,zmax,nz,phimin=phimin,phimax=phimax,nphi=nphi)
 ```
 The output 2D grid structure will have Phi = 0.0 and nphi = 1, but the 3D grid structure will have values based on what the user input.
+
 **FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive:html#Passive-Neutral-Grid).
 
 The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 

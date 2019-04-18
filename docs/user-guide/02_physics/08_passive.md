@@ -35,7 +35,7 @@ FIDASIM can calculate passive signals for the following diagnostics
 
 By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the entire plasma volume.
 If the interpolation grid is 3D, then the passive neutral grid is the interpolation grid.
-FIDASIM writes the passive [neutral grid information](../01_getting_started/03_running:html##Running-Interactively). in the output file.
+FIDASIM writes the passive [neutral grid information](../01_getting_started/03_running:html##Running-Interactively) in the output file.
 
 # Relevant Namelist Settings
 

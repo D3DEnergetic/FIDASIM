@@ -8,7 +8,7 @@ Therefore, FIDASIM is improved to predict passive signals for a given edge-cold 
 
 ---
 
-#Introduction
+# Introduction
 
 Active diagnostic signals are produced from charge exchange with injected neutrals, and passive signals are produced from charge exchange with cold neutrals.
 Passive signals must be treated to get valid active FIDA data.
@@ -17,21 +17,21 @@ For example, passive-FIDA (p-FIDA) signals of comparable magnitude with active s
 ![NSTX-U](|media|/nstxu.png){: width="400"}
 {: style="text-align: center"}
 
-#Time evolution of cold neutrals
+# Time evolution of cold neutrals
 
 FIDASIM accepts 2D and 3D cold neutral density input (TRANSP output variable is `dn0wd`).
 FIDASIM will assume that all neutrals are in the ground state.
 Using local plasma parameters, the neutrals are time evolved by solving the collisional radiative model until equilibrium is achieved.
 Then, the neutrals are distributed throughout the interpolation grid for subsequent passive calculations.
 
-#Types of Passive Signals
+# Types of Passive Signals
 
 FIDASIM can calculate passive signals for the following diagnostics
 
 * Fast-ion D-\(\alpha\) (FIDA)
 * Neutral Particle Analyzer (NPA)
 
-#Passive Neutral Grid
+# Passive Neutral Grid
 
 By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the entire plasma volume.
 If the interpolation grid is 3D, then the passive neutral grid is the interpolation grid.

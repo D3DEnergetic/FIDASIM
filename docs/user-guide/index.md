@@ -26,8 +26,11 @@ Originally, FIDASIM was written in the IDL programming language and was prohibit
 As a part of his [thesis](http://www.iaea.org/inis/collection/NCLCollectionStore/_Public/46/051/46051941.pdf) Ben Geiger wrote a version of FIDASIM written in Fortran 90.
 This prototype version was parallelized using OpenMP and was orders of magnitude faster but was not as easy to use as the IDL version and was difficult to port to different devices. 
 
-Most recently, [Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geiger's Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
+[Luke Stagner](http://github.com/lstagner) as a part of his thesis has rewritten Ben Geiger's Fortran 90 version to be compatible with any axisymmetric fusion device as well as additional functionality.
 Luke has also put special effort on making FIDASIM user friendly; the result of which you are currently reading and should be eternally grateful. 
+Currently, he is the FIDASIM expert.
+
+Most recently, the primary responsibility for FIDASIM support has been transferred to UC Irvine PhD student [Alvin Garcia](http://github.com/alvin-garcia). Alvin helped introduce passive signals, incorporated 3D geometry capabilities and created 'out-of-the-box' visualization tools.
 
 ##Capabilities
 Currently, FIDASIM has routines for calculating:

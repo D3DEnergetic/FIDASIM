@@ -8,3 +8,4 @@ Welcome the the FIDASIM Getting Started guide. Click the section that catches yo
 3. [Running FIDASIM](./03_running.html)
 4. [Reading Outputs](./04_reading.html)
 5. [Devices using FIDASIM](./05_devices.html)
+6. [Visualization](./06_visual.html)

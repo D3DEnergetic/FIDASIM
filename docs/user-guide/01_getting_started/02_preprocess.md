@@ -63,7 +63,7 @@ and the 3D grid with,
 ```
 The output 2D grid structure will have Phi = 0.0 and nphi = 1, but the 3D grid structure will have values based on what the user input.
 **FIDASIM creates a third grid for passive calculations.
-  By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the maximum amount of plasma that any diagnostic line of sight may intersect.
+  By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the entire plasma volume.
   If the interpolation grid is 3D, then the passive neutral grid is the interpolation grid.
 
 The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
@@ -156,31 +156,3 @@ or in Python
 >>> from fidasim.utils import read_nubeam
 >>> f = read_nubeam(nubeam_distribution_file, grid, btipsign=-1)
 ```
-
-#Visualization: Inputs
-
-Visualizing your inputs can be done by executing `plot_inputs` found in `lib/scripts/`
-
-Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
-Below are brief descriptions and examples of what the script can currently handle:
-
-To plot all of your inputs, simply indicate the directory and run ID.
-```
-plot_inputs /p/fida/lstagner/TEST/ test_1a
-```
-
-To plot only the beam and diagnostic geometry, append the optional argument -g
-```
-plot_inputs /p/fida/lstagner/TEST/ test_1a -g
-```
-In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.
-
-If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.
-
-If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
-For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command
-```
-plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz 170
-```
-
-There are many more possible lineouts that can be viewed, so run `plot_inputs -h` to look at the help documentation.

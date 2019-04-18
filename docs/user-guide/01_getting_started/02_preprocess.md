@@ -64,8 +64,6 @@ and the 3D grid with,
 ```
 The output 2D grid structure will have Phi = 0.0 and nphi = 1, but the 3D grid structure will have values based on what the user input.
 
-**FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive:html#Passive-Neutral-Grid).
-
 The beam grid is a 3D grid used for most of the calculations in FIDASIM. It represents the 3D volume where the neutral beam lives and interacts with the plasma. 
 To maximize the resolution of this grid it is useful to align the beam grid with the beam centerline.
 The routine `beam_grid`([IDL](|url|/sourcefile/beam_grid.pro.html),[Python](|url|/sourcefile/utils.py.html#beam_grid)) calculates from the [neutral beam geometry](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure) the optimal [beam grid settings](../03_technical/01_prefida_inputs.html#beam-grid-settings) that would align the grid with the beam sightline.
@@ -156,3 +154,5 @@ or in Python
 >>> from fidasim.utils import read_nubeam
 >>> f = read_nubeam(nubeam_distribution_file, grid, btipsign=-1)
 ```
+
+**FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive:html#Passive-Neutral-Grid).

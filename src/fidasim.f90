@@ -3174,73 +3174,6 @@ subroutine read_neutron_collimator
                 WRITE(*,'("Channel ",i3," centerline missed the beam grid")') ichan
             endif
         endif
-
-        if(inputs%calc_neutron.ge.3) then
-            hw = nc_chords%det(ichan)%detector%hw
-            hh = nc_chords%det(ichan)%detector%hh
-            nd = size(xd)
-            do i=1,nd
-                xd(i) = -hw + 2*hw*(i-0.5)/real(nd)
-                yd(i) = -hh + 2*hh*(i-0.5)/real(nd)
-            enddo
-            dx = abs(xd(2) - xd(1))
-            dy = abs(yd(2) - yd(1))
-            basis = nc_chords%det(ichan)%detector%basis
-            inv_basis = nc_chords%det(ichan)%detector%inv_basis
-            eff_rds = 0.d0
-            probs = 0.d0
-            ! For each grid point find the probability of hitting the detector given an isotropic source
-            !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind)
-            do ic=istart,beam_grid%ngrid,istep
-                call ind2sub(beam_grid%dims,ic,ind)
-                i = ind(1) ; j = ind(2) ; k = ind(3)
-                r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
-                r0_d = matmul(inv_basis,r0-xyz_d_cent)
-                do id = 1, nd*nd
-                    call ind2sub([nd,nd],id,ind_d)
-                    ix = ind_d(1) ; iy = ind_d(2)
-                    rd_d = [xd(ix),yd(iy),0.d0]
-                    rd = matmul(basis,rd_d) + xyz_d_cent
-                    v0 = rd - r0
-                    d_index = 0
-                    call hit_nc_detector(r0,v0,d_index,det=ichan)
-                    if(d_index.ne.0) then
-                        r = norm2(rd_d - r0_d)**2
-                        dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
-                        eff_rds(:,ic) = eff_rds(:,ic) + dprob*rd
-                        probs(ic) = probs(ic) + dprob
-                    endif
-                enddo
-            enddo
-            !$OMP END PARALLEL DO
-#ifdef _MPI
-            call parallel_sum(eff_rds)
-            call parallel_sum(probs)
-#endif
-            do ic = 1, beam_grid%ngrid
-                if(probs(ic).gt.0.0) then
-                    call ind2sub(beam_grid%dims, ic, ind)
-                    i = ind(1) ; j = ind(2) ; k = ind(3)
-                    r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
-                    eff_rd = eff_rds(:,ic)/probs(ic)
-                    call get_fields(fields,pos=r0)
-                    v0 = (eff_rd - r0)/norm2(eff_rd - r0)
-                    nc_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
-                    nc_chords%phit(i,j,k,ichan)%p = probs(ic)
-                    nc_chords%phit(i,j,k,ichan)%dir = v0
-                    nc_chords%phit(i,j,k,ichan)%eff_rd = eff_rd
-                    nc_chords%hit(i,j,k) = .True.
-                endif
-            enddo
-            total_prob = sum(probs)
-            if(total_prob.le.0.d0) then
-                if(inputs%verbose.ge.0) then
-                    WRITE(*,'("Channel ",i3," missed the beam grid")') ichan
-                endif
-                cycle chan_loop
-            endif
-        endif
     enddo chan_loop
 
     if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
@@ -12248,6 +12181,10 @@ program fidasim
 
     if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
+    endif
+
+    if(inputs%calc_neutron.ge.3) then
+        call read_neutron_collimator()
     endif
 
     !! ----------------------------------------------------------

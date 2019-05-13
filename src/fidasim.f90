@@ -3037,6 +3037,217 @@ subroutine read_npa
 
 end subroutine read_npa
 
+subroutine read_nc
+    !+ Reads the NC geometry and stores the quantities in [[libfida:nc_chords]]
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(2) :: dims
+    logical :: path_valid
+
+    real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
+    real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
+    real(Float64), dimension(beam_grid%ngrid) :: probs
+    real(Float64), dimension(3,beam_grid%ngrid) :: eff_rds
+    integer, dimension(:), allocatable :: a_shape, d_shape
+    character(len=20) :: system = ''
+
+    real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
+    real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
+    real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
+    real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0, r0_d, v0
+    real(Float64), dimension(3,3) :: basis, inv_basis
+    real(Float64), dimension(50) :: xd, yd
+    type(LocalEMFields) :: fields
+    real(Float64) :: length,total_prob, hh, hw, dprob, dx, dy, r, pitch
+    integer :: ichan,ic,i,j,k,id,ix,iy,d_index,nd,ind_d(2),ind(3)
+    integer :: error
+
+    !!Initialize HDF5 interface
+    call h5open_f(error)
+
+    !!Open HDF5 file
+    call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
+
+    !!Check if NC group exists
+    call h5ltpath_valid_f(fid, "/nc", .True., path_valid, error)
+    if(.not.path_valid) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'NC geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without NC diagnostics'
+        endif
+        inputs%calc_neutron = 0
+        call h5fclose_f(fid, error)
+        call h5close_f(error)
+        return
+    endif
+
+    !!Open NC group
+    call h5gopen_f(fid, "/nc", gid, error)
+
+    call h5ltread_dataset_string_f(gid, "/nc/system", system, error)
+    call h5ltread_dataset_int_scalar_f(gid, "/nc/nchan", nc_chords%nchan, error)
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- NC settings ----"
+        write(*,'(T2,"NC System: ", a)') trim(adjustl(system))
+        write(*,'(T2,"Number of channels: ",i3)') nc_chords%nchan
+    endif
+
+    allocate(a_tedge(3, nc_chords%nchan))
+    allocate(a_redge(3, nc_chords%nchan))
+    allocate(a_cent(3,  nc_chords%nchan))
+    allocate(a_shape(nc_chords%nchan))
+    allocate(d_tedge(3, nc_chords%nchan))
+    allocate(d_redge(3, nc_chords%nchan))
+    allocate(d_cent(3,  nc_chords%nchan))
+    allocate(d_shape(nc_chords%nchan))
+    allocate(nc_chords%radius(nc_chords%nchan))
+    allocate(nc_chords%det(nc_chords%nchan))
+    allocate(nc_chords%phit(beam_grid%nx, &
+                             beam_grid%ny, &
+                             beam_grid%nz, &
+                             nc_chords%nchan) )
+    allocate(nc_chords%hit(beam_grid%nx, &
+                            beam_grid%ny, &
+                            beam_grid%nz) )
+    nc_chords%hit = .False.
+
+    dims = [3,spec_chords%nchan]
+    call h5ltread_dataset_double_f(gid,"/nc/radius", nc_chords%radius, dims(2:2), error)
+    call h5ltread_dataset_int_f(gid, "/nc/a_shape", a_shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_tedge", a_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_redge", a_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/a_cent",  a_cent, dims, error)
+
+    call h5ltread_dataset_int_f(gid, "/nc/d_shape", d_shape, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_tedge", d_tedge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_redge", d_redge, dims, error)
+    call h5ltread_dataset_double_f(gid, "/nc/d_cent",  d_cent, dims, error)
+
+    !!Close NC group
+    call h5gclose_f(gid, error)
+
+    !!Close file id
+    call h5fclose_f(fid, error)
+
+    !!Close HDF5 interface
+    call h5close_f(error)
+
+    ! Define detector/aperture shape
+    nc_chords%det%detector%shape = d_shape
+    nc_chords%det%aperture%shape = a_shape
+
+    chan_loop: do ichan=1,nc_chords%nchan
+        ! Convert to beam grid coordinates
+        call uvw_to_xyz(a_cent(:,ichan), xyz_a_cent)
+        call uvw_to_xyz(a_redge(:,ichan),xyz_a_redge)
+        call uvw_to_xyz(a_tedge(:,ichan),xyz_a_tedge)
+        call uvw_to_xyz(d_cent(:,ichan), xyz_d_cent)
+        call uvw_to_xyz(d_redge(:,ichan),xyz_d_redge)
+        call uvw_to_xyz(d_tedge(:,ichan),xyz_d_tedge)
+
+        ! Define detector/aperture hh/hw
+        nc_chords%det(ichan)%detector%hw = norm2(xyz_d_redge - xyz_d_cent)
+        nc_chords%det(ichan)%aperture%hw = norm2(xyz_a_redge - xyz_a_cent)
+
+        nc_chords%det(ichan)%detector%hh = norm2(xyz_d_tedge - xyz_d_cent)
+        nc_chords%det(ichan)%aperture%hh = norm2(xyz_a_tedge - xyz_a_cent)
+
+        ! Define detector/aperture origin
+        nc_chords%det(ichan)%detector%origin = xyz_d_cent
+        nc_chords%det(ichan)%aperture%origin = xyz_a_cent
+
+        ! Define detector/aperture basis
+        call plane_basis(xyz_d_cent, xyz_d_redge, xyz_d_tedge, &
+             nc_chords%det(ichan)%detector%basis, &
+             nc_chords%det(ichan)%detector%inv_basis)
+        call plane_basis(xyz_a_cent, xyz_a_redge, xyz_a_tedge, &
+             nc_chords%det(ichan)%aperture%basis, &
+             nc_chords%det(ichan)%aperture%inv_basis)
+
+        v0 = xyz_a_cent - xyz_d_cent
+        v0 = v0/norm2(v0)
+        call grid_intersect(xyz_d_cent,v0,length,r0,r0_d)
+        if(length.le.0.0) then
+            if(inputs%verbose.ge.0) then
+                WRITE(*,'("Channel ",i3," centerline missed the beam grid")') ichan
+            endif
+        endif
+
+        if(inputs%calc_neutron.ge.3) then
+            hw = nc_chords%det(ichan)%detector%hw
+            hh = nc_chords%det(ichan)%detector%hh
+            nd = size(xd)
+            do i=1,nd
+                xd(i) = -hw + 2*hw*(i-0.5)/real(nd)
+                yd(i) = -hh + 2*hh*(i-0.5)/real(nd)
+            enddo
+            dx = abs(xd(2) - xd(1))
+            dy = abs(yd(2) - yd(1))
+            basis = nc_chords%det(ichan)%detector%basis
+            inv_basis = nc_chords%det(ichan)%detector%inv_basis
+            eff_rds = 0.d0
+            probs = 0.d0
+            ! For each grid point find the probability of hitting the detector given an isotropic source
+            !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
+            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind)
+            do ic=istart,beam_grid%ngrid,istep
+                call ind2sub(beam_grid%dims,ic,ind)
+                i = ind(1) ; j = ind(2) ; k = ind(3)
+                r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
+                r0_d = matmul(inv_basis,r0-xyz_d_cent)
+                do id = 1, nd*nd
+                    call ind2sub([nd,nd],id,ind_d)
+                    ix = ind_d(1) ; iy = ind_d(2)
+                    rd_d = [xd(ix),yd(iy),0.d0]
+                    rd = matmul(basis,rd_d) + xyz_d_cent
+                    v0 = rd - r0
+                    d_index = 0
+                    call hit_nc_detector(r0,v0,d_index,det=ichan)
+                    if(d_index.ne.0) then
+                        r = norm2(rd_d - r0_d)**2
+                        dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
+                        eff_rds(:,ic) = eff_rds(:,ic) + dprob*rd
+                        probs(ic) = probs(ic) + dprob
+                    endif
+                enddo
+            enddo
+            !$OMP END PARALLEL DO
+#ifdef _MPI
+            call parallel_sum(eff_rds)
+            call parallel_sum(probs)
+#endif
+            do ic = 1, beam_grid%ngrid
+                if(probs(ic).gt.0.0) then
+                    call ind2sub(beam_grid%dims, ic, ind)
+                    i = ind(1) ; j = ind(2) ; k = ind(3)
+                    r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
+                    eff_rd = eff_rds(:,ic)/probs(ic)
+                    call get_fields(fields,pos=r0)
+                    v0 = (eff_rd - r0)/norm2(eff_rd - r0)
+                    nc_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
+                    nc_chords%phit(i,j,k,ichan)%p = probs(ic)
+                    nc_chords%phit(i,j,k,ichan)%dir = v0
+                    nc_chords%phit(i,j,k,ichan)%eff_rd = eff_rd
+                    nc_chords%hit(i,j,k) = .True.
+                endif
+            enddo
+            total_prob = sum(probs)
+            if(total_prob.le.0.d0) then
+                if(inputs%verbose.ge.0) then
+                    WRITE(*,'("Channel ",i3," missed the beam grid")') ichan
+                endif
+                cycle chan_loop
+            endif
+        endif
+    enddo chan_loop
+
+    if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
+
+    deallocate(a_shape,a_cent,a_redge,a_tedge)
+    deallocate(d_shape,d_cent,d_redge,d_tedge)
+
+end subroutine read_nc
+
 subroutine read_equilibrium
     !+ Reads in the interpolation grid, plasma parameters, and fields
     !+ and stores the quantities in [[libfida:inter_grid]] and [[libfida:equil]]

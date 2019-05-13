@@ -1157,6 +1157,8 @@ type(SpectralChords), save      :: spec_chords
     !+ Variable containing the spectral system definition
 type(NPAChords), save           :: npa_chords
     !+ Variable containing the NPA system definition
+type(NPAChords), save           :: nc_chords
+    !+ Variable containing the Neutron Collimator system definition
 type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
 type(BirthProfile), save        :: birth
@@ -3037,8 +3039,8 @@ subroutine read_npa
 
 end subroutine read_npa
 
-subroutine read_nc
-    !+ Reads the NC geometry and stores the quantities in [[libfida:nc_chords]]
+subroutine read_neutron_collimator
+    !+ Reads the Neutron Collimator geometry and stores the quantities in [[libfida:nc_chords]]
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid
@@ -3067,12 +3069,12 @@ subroutine read_nc
     !!Open HDF5 file
     call h5fopen_f(inputs%geometry_file, H5F_ACC_RDWR_F, fid, error)
 
-    !!Check if NC group exists
+    !!Check if Neutron Collimator group exists
     call h5ltpath_valid_f(fid, "/nc", .True., path_valid, error)
     if(.not.path_valid) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'NC geometry is not in the geometry file'
-            write(*,'(a)') 'Continuing without NC diagnostics'
+            write(*,'(a)') 'Neutron Collimator geometry is not in the geometry file'
+            write(*,'(a)') 'Continuing without Neutron Collimator diagnostics'
         endif
         inputs%calc_neutron = 0
         call h5fclose_f(fid, error)
@@ -3080,15 +3082,15 @@ subroutine read_nc
         return
     endif
 
-    !!Open NC group
+    !!Open Neutron Collimator group
     call h5gopen_f(fid, "/nc", gid, error)
 
     call h5ltread_dataset_string_f(gid, "/nc/system", system, error)
     call h5ltread_dataset_int_scalar_f(gid, "/nc/nchan", nc_chords%nchan, error)
 
     if(inputs%verbose.ge.1) then
-        write(*,'(a)') "---- NC settings ----"
-        write(*,'(T2,"NC System: ", a)') trim(adjustl(system))
+        write(*,'(a)') "---- Neutron Collimator settings ----"
+        write(*,'(T2,"Neutron Collimator System: ", a)') trim(adjustl(system))
         write(*,'(T2,"Number of channels: ",i3)') nc_chords%nchan
     endif
 
@@ -3123,7 +3125,7 @@ subroutine read_nc
     call h5ltread_dataset_double_f(gid, "/nc/d_redge", d_redge, dims, error)
     call h5ltread_dataset_double_f(gid, "/nc/d_cent",  d_cent, dims, error)
 
-    !!Close NC group
+    !!Close Neutron Collimator group
     call h5gclose_f(gid, error)
 
     !!Close file id
@@ -3246,7 +3248,7 @@ subroutine read_nc
     deallocate(a_shape,a_cent,a_redge,a_tedge)
     deallocate(d_shape,d_cent,d_redge,d_tedge)
 
-end subroutine read_nc
+end subroutine read_neutron_collimator
 
 subroutine read_equilibrium
     !+ Reads in the interpolation grid, plasma parameters, and fields

@@ -880,6 +880,8 @@ type NeutronRate
         !+ Neutron rate weight: weight(E,p,R,Z,Phi)
     real(Float64), dimension(:,:,:), allocatable :: emis
         !+ Neutron emissivity: emis(R,Z,Phi)
+    real(Float64), dimension(:), allocatable :: flux
+        !+ Neutron flux: flux(orbit_type) [neutrons/sec]
 end type NeutronRate
 
 type NeutralDensity
@@ -5123,6 +5125,7 @@ subroutine write_neutrons
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
     !Write variables
+    !!!pay attention to nclass for flux
     if(particles%nclass.gt.1) then
         dim1(1) = 1
         call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
@@ -5180,6 +5183,23 @@ subroutine write_neutrons
         call h5ltset_attribute_string_f(fid,"/z","description", &
              "Z array", error)
         call h5ltset_attribute_string_f(fid,"/z", "units","cm", error)
+    endif
+
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neutron.ge.3)) then
+        if(particles%nclass.gt.1) then
+            dim1(1) = 1
+            call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
+            dim1(1) = particles%nclass
+            call h5ltmake_compressed_dataset_double_f(fid, "/flux", 1, dim1, neutron%flux, error)
+            call h5ltset_attribute_string_f(fid,"/flux","description", &
+                 "Neutron flux: flux(orbit_class)", error)
+        else
+            dim1(1) = 1
+            call h5ltmake_dataset_double_f(fid, "/flux", 0, dim1, neutron%flux, error)
+            call h5ltset_attribute_string_f(fid,"/flux","description", &
+                 "Neutron flux", error)
+        endif
+        call h5ltset_attribute_string_f(fid,"/flux","units","neutrons/s",error )
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -8922,9 +8942,15 @@ subroutine store_neutrons(rate, orbit_class)
         iclass = 1
     endif
 
-    !$OMP ATOMIC UPDATE
-    neutron%rate(iclass)= neutron%rate(iclass) + rate
-    !$OMP END ATOMIC
+    if (inputs%calc_neutron.ge.3) then
+        !$OMP ATOMIC UPDATE
+        neutron%flux(iclass)= neutron%flux(iclass) + rate
+        !$OMP END ATOMIC
+    else
+        !$OMP ATOMIC UPDATE
+        neutron%rate(iclass)= neutron%rate(iclass) + rate
+        !$OMP END ATOMIC
+    endif
 
 end subroutine store_neutrons
 
@@ -12053,6 +12079,97 @@ subroutine npa_weights
 
 end subroutine npa_weights
 
+subroutine neutron_spec_f
+    !+ Calculate neutron collimator flux using a fast-ion distribution function F(E,p,r,z,phi)
+    integer :: ir, iphi, iz, ie, ip, igamma, ngamma, ichan
+    type(LocalProfiles) :: plasma
+    type(LocalEMFields) :: fields
+    real(Float64), dimension(:,:), allocatable :: d_cent, a_cent, v0_arr
+    real(Float64) :: eb, pitch
+    real(Float64) :: erel, flux
+    real(Float64), dimension(3) :: ri
+    real(Float64), dimension(3) :: vi
+    real(Float64), dimension(3) :: r0, axis
+    integer, dimension(3) :: ind
+    real(Float64)  :: vnet_square, factor
+    real(Float64)  :: s, c
+    logical :: inp1, inp2
+
+    ngamma = 20
+    flux = 0
+    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,pitch,eb,&
+    !$OMP& ir,iphi,iz,ie,ip,igamma,plasma,factor,r0,vnet_square,flux,erel,s,c)
+    !!!Is there a check that can skip over a certain channel?
+    track_loop: do ichan=1, nc_chords%nchan
+        !!!Double check coord system
+        r0 = nc_chords%det(ichan)%detector%origin
+        axis = nc_chords%det(ichan)%aperture%origin - r0
+        axis = axis/norm2(axis)
+
+        inp2 = .True. ; inp1 = .False.
+        inp2_loop: do while (inp2) !Loop until 'particle' is outside the plasma
+            do while (inp1) !Loop until 'particle' is inside the plasma
+                call in_plasma(r0, inp1)
+                r0 = r0 + 2.d0*axis  !!!need to consider once inside, conditional
+            enddo
+
+            call get_passive_grid_indices(r0, ind)
+
+            !! Get fields
+            call get_fields(fields,pos=r0)
+            inp2 = fields%in_plasma
+
+            factor = fbm%r(ind(1))*fbm%dE*fbm%dp*fbm%dr*fbm%dphi/ngamma
+            !! Loop over energy/pitch/gamma
+            pitch_loop: do ip = 1, fbm%npitch
+                pitch = fbm%pitch(ip)
+                energy_loop: do ie =1, fbm%nenergy
+                    eb = fbm%energy(ie)
+                    gyro_loop: do igamma=1, ngamma
+                        call gyro_correction(fields,eb,pitch,ri,vi)
+
+                        !! Get plasma parameters at particle position
+                        call get_plasma(plasma,pos=ri)
+                        if(.not.plasma%in_plasma) cycle gyro_loop
+
+                        !! Calculate effective beam energy
+                        vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
+                        erel = v2_to_E_per_amu*inputs%ab*vnet_square ![kev]
+
+                        !! Get neutron production flux
+                        call get_neutron_rate(plasma, erel, flux)
+                        flux = flux*fbm%f(ie,ip,ind(1),ind(2),ind(3))*factor
+
+                        !! Store neutrons
+                        call store_neutrons(flux)
+                    enddo gyro_loop
+                enddo energy_loop
+            enddo pitch_loop
+
+            r0 = r0 + 2.d0*axis
+        enddo inp2_loop
+    enddo track_loop
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    call parallel_sum(neutron%flux)
+#endif
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(T4,A,ES14.5," [neutrons/s]")') 'Flux:   ',sum(neutron%flux)
+        write(*,'(30X,a)') ''
+        write(*,*) 'write neutrons:    ' , time(time_start)
+    endif
+
+#ifdef _MPI
+    if(my_rank().eq.0) call write_neutrons()
+#else
+    call write_neutrons()
+#endif
+
+
+end subroutine neutron_spec_f
+
 end module libfida
 
 !=============================================================================
@@ -12164,7 +12281,7 @@ program fidasim
         call read_beam()
     endif
 
-    if(inputs%calc_pfida+inputs%calc_pnpa.gt.0) then
+    if((inputs%calc_pfida+inputs%calc_pnpa.gt.0).or.(inputs%calc_neutron.ge.3)) then
         if(inter_grid%nphi.gt.1) then
             pass_grid = inter_grid
         else
@@ -12469,6 +12586,7 @@ program fidasim
         endif
         if(inputs%dist_type.eq.1) then
             call neutron_f()
+            if(inputs%calc_neutron.ge.3) call neutron_spec_f
         else
             call neutron_mc()
         endif

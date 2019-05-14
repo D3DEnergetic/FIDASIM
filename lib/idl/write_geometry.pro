@@ -1,4 +1,4 @@
-PRO write_geometry, filename, nbi, spec=spec, npa=npa
+PRO write_geometry, filename, nbi, spec=spec, npa=npa, nc=nc
     ;+#write_geometry
     ;+Write geometry values to a HDF5 file
     ;+***
@@ -12,9 +12,11 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     ;+
     ;+     **npa**: Optional, NPA geometry structure
     ;+
+    ;+     **nc**: Optional, Neutron Collimator geometry structure
+    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> write_geometry, filename, nbi, spec=spec, npa=npa
+    ;+IDL> write_geometry, filename, nbi, spec=spec, npa=npa, nc=nc
     ;+```
     info,'Writing geometry file...'
 
@@ -318,6 +320,100 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
                 npa_aredge_desc, npa_aredge_unit, $
                 npa_radius_desc, npa_radius_unit ]
 
+    ;;NC attributes
+    nc_desc = {attribute,obj:'/nc', $
+                name:'description', $
+                data:'Neutron Collimator Geometry'}
+
+    nc_cs = {attribute,obj:'/nc', $
+              name:'coordinate_system', $
+              data:'Right-handed cartesian'}
+
+    nc_ds_desc = {attribute,obj:'/nc/data_source', $
+                   name:'description', $
+                   data:'Source of the Neutron Collimator geometry'}
+    
+    nc_nchan_desc = {attribute,obj:'/nc/nchan', $
+                      name:'description', $
+                      data:'Number of channels'}
+
+    nc_system_desc = {attribute,obj:'/nc/system', $
+                       name:'description', $
+                       data:'Names of the different Neutron Collimator systems'}
+
+    nc_id_desc = {attribute,obj:'/nc/id', $
+                   name:'description', $
+                   data:'Line of sight ID'}
+
+    nc_dshape_desc = {attribute,obj:'/nc/d_shape', $
+                       name:'description', $
+                       data:'Shape of the detector: 1="rectangular", 2="circular"'}
+
+    nc_dcent_desc = {attribute,obj:'/nc/d_cent', $
+                      name:'description', $
+                      data:'Center of the detector'}
+    nc_dcent_unit = {attribute,obj:'/nc/d_cent', $
+                      name:'units', $
+                      data:'cm'}
+
+    nc_dtedge_desc = {attribute,obj:'/nc/d_tedge', $
+                       name:'description', $
+                       data:'Center of the detectors top edge'}
+    nc_dtedge_unit = {attribute,obj:'/nc/d_tedge', $
+                       name:'units', $
+                       data:'cm'}
+
+    nc_dredge_desc = {attribute,obj:'/nc/d_redge', $
+                       name:'description', $
+                       data:'Center of the detectors right edge'}
+    nc_dredge_unit = {attribute,obj:'/nc/d_redge', $
+                       name:'units', $
+                       data:'cm'}
+
+    nc_ashape_desc = {attribute,obj:'/nc/a_shape', $
+                       name:'description', $
+                       data:'Shape of the aperture: 1="rectangular", 2="circular"'}
+
+    nc_acent_desc = {attribute,obj:'/nc/a_cent', $
+                      name:'description', $
+                      data:'Center of the aperture'}
+    nc_acent_unit = {attribute,obj:'/nc/a_cent', $
+                      name:'units', $
+                      data:'cm'}
+
+    nc_atedge_desc = {attribute,obj:'/nc/a_tedge', $
+                       name:'description', $
+                       data:'Center of the apertures top edge'}
+    nc_atedge_unit = {attribute,obj:'/nc/a_tedge', $
+                       name:'units', $
+                       data:'cm'}
+
+    nc_aredge_desc = {attribute,obj:'/nc/a_redge', $
+                       name:'description', $
+                       data:'Center of the apertures right edge'}
+    nc_aredge_unit = {attribute,obj:'/nc/a_redge', $
+                       name:'units', $
+                       data:'cm'}
+
+    nc_radius_desc = {attribute,obj:'/nc/radius', $
+                       name:'description', $
+                       data:'Line of sight radius at midplane or tangency point' }
+    nc_radius_unit = {attribute,obj:'/nc/radius', $
+                       name:'units', $
+                       data:'cm'}
+
+    nc_atts = [nc_desc, nc_cs, nc_ds_desc, $ 
+                nc_nchan_desc, nc_system_desc, $
+                nc_id_desc, $
+                nc_dshape_desc, nc_ashape_desc, $
+                nc_dcent_desc, nc_dcent_unit, $
+                nc_acent_desc, nc_acent_unit, $
+                nc_dtedge_desc, nc_dtedge_unit, $
+                nc_atedge_desc, nc_atedge_unit, $
+                nc_dredge_desc, nc_dredge_unit, $
+                nc_aredge_desc, nc_aredge_unit, $
+                nc_radius_desc, nc_radius_unit ]
+
     atts = [root_atts, nbi_atts]
     geom = {nbi:nbi}
 
@@ -331,6 +427,11 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
         atts = [atts,npa_atts]
     endif
 
+    if keyword_set(nc) then begin
+        geom = create_struct(geom, "nc", nc)
+        atts = [atts,nc_atts]
+    endif
+
     write_hdf5, geom, filename=filename, atts=atts, /clobber
 
     if file_test(filename) then begin
@@ -340,4 +441,3 @@ PRO write_geometry, filename, nbi, spec=spec, npa=npa
     endelse
 
 END
-

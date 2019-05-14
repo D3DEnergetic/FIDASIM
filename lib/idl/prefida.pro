@@ -1,4 +1,4 @@
-PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa
+PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa,nc=nc
     ;+#prefida
     ;+Checks FIDASIM inputs and writes FIDASIM input files
     ;+***
@@ -20,9 +20,11 @@ PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa
     ;+
     ;+     **npa**: Optional, NPA geometry structure
     ;+
+    ;+     **nc**: Optional, Neutron Collimator geometry structure
+    ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa
+    ;+IDL> prefida, inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa, nc=nc
     ;+```
     COMPILE_OPT DEFINT32
 
@@ -59,11 +61,16 @@ PRO prefida,inputs,grid,nbi,plasma,fields,fbm,spec=spec,npa=npa
         check_npa, inputs, npa
     endif
 
+    ;;CHECK NEUTRON COLLIMATOR
+    if keyword_set(nc) then begin
+        check_neutron_collimator, inputs, nc
+    endif
+
     ;;WRITE FIDASIM INPUT FILES
     write_namelist, inputs.input_file, inputs
 
     ;;WRITE GEOMETRY FILE
-    write_geometry, inputs.geometry_file, nbi, spec=spec, npa=npa
+    write_geometry, inputs.geometry_file, nbi, spec=spec, npa=npa, nc=nc
 
     ;;WRITE EQUILIBRIUM FILE
     write_equilibrium, inputs.equilibrium_file, plasma, fields

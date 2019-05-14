@@ -49,10 +49,11 @@ PRO run_tests,result_dir,runid = runid
 
    spec = test_chords()
    npa = test_npa()
+   neutron_collimator = test_neutron_collimator()
 
    pfile = test_dir+'test_profiles.cdf'
    plasma = test_profiles(pfile,grid,rho)
 
-   prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
+   prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa, nc=neutron_collimator
 
 end

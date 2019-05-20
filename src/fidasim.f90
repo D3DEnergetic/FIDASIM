@@ -320,20 +320,20 @@ type EMFields
         !+ Vertical electric field [V/m]
     real(Float64) :: dbr_dr = 0.d0
         !+ Radial derivative of the radial magnetic field [T/m]
-    real(Float64) :: dbr_dphi = 0.d0
+    real(Float64) :: dbr_dt = 0.d0
         !+ Angular derivative of the radial magnetic field [T/m]
     real(Float64) :: dbr_dz = 0.d0
         !+ Vertical derivative of the radial magnetic field [T/m]
     real(Float64) :: dbt_dr = 0.d0
         !+ Radial derivative of the torodial magnetic field [T/m]
-    real(Float64) :: dbt_dphi = 0.d0
+    real(Float64) :: dbt_dt = 0.d0
         !+ Angular derivative of the torodial magnetic field [T/m]
     real(Float64) :: dbt_dz = 0.d0
         !+ Vertical derivative of the torodial magnetic field [T/m]
     real(Float64) :: dbz_dr = 0.d0
-        !+ Radial derivative of the radial magnetic field [T/m]
-    real(Float64) :: dbz_dphi = 0.d0
-        !+ Angular derivative of the radial magnetic field [T/m]
+        !+ Radial derivative of the vertical magnetic field [T/m]
+    real(Float64) :: dbz_dt = 0.d0
+        !+ Angular derivative of the vertical magnetic field [T/m]
     real(Float64) :: dbz_dz = 0.d0
         !+ Vertical derivative of the vertical magnetic field [T/m]
 end type EMFields
@@ -3209,11 +3209,11 @@ subroutine read_equilibrium
 
     !!Calculate B field derivatives
     call deriv(inter_grid%r, inter_grid%z, inter_grid%phi, equil%fields%br, &
-        equil%fields%dbr_dr, equil%fields%dbr_dz, equil%fields%dbr_dphi)
+        equil%fields%dbr_dr, equil%fields%dbr_dz, equil%fields%dbr_dt)
     call deriv(inter_grid%r, inter_grid%z, inter_grid%phi, equil%fields%bt, &
-        equil%fields%dbt_dr, equil%fields%dbt_dz, equil%fields%dbt_dphi)
+        equil%fields%dbt_dr, equil%fields%dbt_dz, equil%fields%dbt_dt)
     call deriv(inter_grid%r, inter_grid%z, inter_grid%phi, equil%fields%bz, &
-        equil%fields%dbz_dr, equil%fields%dbz_dz, equil%fields%dbz_dphi)
+        equil%fields%dbz_dr, equil%fields%dbz_dz, equil%fields%dbz_dt)
 
     !!Close FIELDS group
     call h5gclose_f(gid, error)
@@ -9020,17 +9020,16 @@ subroutine gyro_step(vi, fields, r_gyro)
         if(fields%coords.eq.1) then
             rg_uvw = r_gyro
         endif
-        rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
         b_rtz(1) = fields%br/fields%b_abs
         b_rtz(2) = fields%bt/fields%b_abs
         b_rtz(3) = fields%bz/fields%b_abs
-        cuvrxb(1) = -fields%dbt_dz/fields%b_abs
+        cuvrxb(1) = (fields%dbz_dt - fields%dbt_dz)/fields%b_abs
         cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
-        cuvrxb(3) = fields%dbt_dr/fields%b_abs
+        cuvrxb(3) = (fields%dbt_dr - fields%dbr_dt)/fields%b_abs
         term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
         grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
                     fields%b_abs
-        grad_B(2) = (fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi + fields%bz*fields%dbz_dphi)/&
+        grad_B(2) = (fields%br*fields%dbr_dt + fields%bt * fields%dbt_dt + fields%bz*fields%dbz_dt)/&
                     fields%b_abs
         grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
                     fields%b_abs

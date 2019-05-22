@@ -8984,67 +8984,60 @@ subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 end subroutine pitch_to_vec
 
 subroutine gyro_step(vi, fields, r_gyro)
-    !+ Calculates gyro-step
+    !+ Calculates second order gyro-step correction
     !+
-    !+###References
-    !+* Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. "Self-consistent equilibrium model of low aspect-ratio toroidal plasma with energetic beam ions." Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251. Appendix A: Last equation
+    !+ Reference:
+    !+ Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. "Self-consistent equilibrium model of low aspect-
+    !+ ratio toroidal plasma with energetic beam ions." Physics of Plasmas (1994-present) 10.8 (2003):
+    !+ 3240-3251. Appendix A: Last equation
     real(Float64), dimension(3), intent(in)  :: vi
         !+ Ion velocity
     type(LocalEMFields), intent(in)          :: fields
         !+ Electro-magnetic fields
     real(Float64), dimension(3), intent(out) :: r_gyro
-        !+ Gyro-step
         !+ Gyro-radius vector from particle position to guiding center
 
-    real(Float64), dimension(3) :: vxB, rg_uvw, uvw, cuvrxb, b_rtz, grad_B, rg_rtz
-    real(Float64) :: one_over_omega, phi, R, rg_r, vpar, term1, term2
+    real(Float64), dimension(3) :: vxB, uvw, curl_b, b_rzt, grad_B, rg_cyl
+    real(Float64) :: one_over_omega, phi, R, rg_r, vpar, term1, term2, inv_rg_r
 
+    r_gyro = 0.d0
     if(inputs%no_flr.eq.0) then
+        uvw = fields%uvw
         one_over_omega=inputs%ab*mass_u/(fields%b_abs*e0)
         vxB = cross_product(vi,fields%b_norm)
         vpar =  dot_product(vi,fields%b_norm)
         r_gyro = vxB*one_over_omega !points towards gyrocenter
 
-        !! Second order correction approximation derived from
-        !! Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng.
-        !! "Self-consistent equilibrium model of low aspect-ratio
-        !! toroidal plasma with energetic beam ions."
-        !! Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251.
-        !! Appendix A: Last equation
-        uvw = fields%uvw
-        R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-        phi = atan2(uvw(2),uvw(1))
-        if(fields%coords.eq.0) then
-            call xyz_to_uvw(r_gyro,rg_uvw)
-        endif
-        if(fields%coords.eq.1) then
-            rg_uvw = r_gyro
-        endif
-        b_rtz(1) = fields%br/fields%b_abs
-        b_rtz(2) = fields%bt/fields%b_abs
-        b_rtz(3) = fields%bz/fields%b_abs
-        cuvrxb(1) = (fields%dbz_dphi - fields%dbt_dz)/fields%b_abs
-        cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
-        cuvrxb(3) = (fields%dbt_dr - fields%dbr_dphi)/fields%b_abs
-        term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
+        if(fields%coords.eq.0) call xyz_to_cyl(r_gyro,rg_cyl)
+        if(fields%coords.eq.1) call uvw_to_cyl(r_gyro, rg_cyl)
+
+        inv_rg_r = 1/rg_cyl(1)
+        b_rzt(1) = fields%br/fields%b_abs
+        b_rzt(2) = fields%bz/fields%b_abs
+        b_rzt(3) = fields%bt/fields%b_abs
+        curl_b(1) = (inv_rg_r*fields%dbz_dphi - fields%dbt_dz)/fields%b_abs
+        curl_b(2) = (inv_rg_r*fields%bt + fields%dbt_dr - inv_rg_r*fields%dbr_dphi)/fields%b_abs
+        curl_b(3) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
+        term1 = vpar*one_over_omega*dot_product(b_rzt,curl_b)
+
         grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
                     fields%b_abs
-        grad_B(2) = (fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi + fields%bz*fields%dbz_dphi)/&
+        grad_B(2) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
                     fields%b_abs
-        grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
-                    fields%b_abs
-        rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
-        rg_rtz(2) = -rg_uvw(1)*sin(phi) + rg_uvw(2)*cos(phi)
-        rg_rtz(3) = rg_uvw(3)
-        term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
-        r_gyro = r_gyro * (1.0 - term1 - term2)
+        grad_B(3) = inv_rg_r*(fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi +&
+                    fields%bz*fields%dbz_dphi)/fields%b_abs
+        term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_cyl,grad_B)
+        rg_cyl = rg_cyl * (1.0 - term1 - term2)
+
         if (1.0 - term1 - term2 .le. 0.0) then
             write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
                           1.0-term1-term2
             stop
         endif
-    else
-        r_gyro = 0.d0
+
+        if(fields%coords.eq.0) call cyl_to_xyz(rg_cyl, r_gyro)
+        if(fields%coords.eq.1) call cyl_to_uvw(rg_cyl, r_gyro)
+
     endif
 
 end subroutine gyro_step

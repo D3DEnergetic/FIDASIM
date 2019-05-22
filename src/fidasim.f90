@@ -8997,7 +8997,7 @@ subroutine gyro_step(vi, fields, r_gyro)
     real(Float64), dimension(3), intent(out) :: r_gyro
         !+ Gyro-radius vector from particle position to guiding center
 
-    real(Float64), dimension(3) :: vxB, uvw, curl_b, b_rzt, grad_B, rg_cyl
+    real(Float64), dimension(3) :: vxB, uvw, curl_B, B_rzt, grad_B, rg_cyl
     real(Float64) :: one_over_omega, phi, R, rg_r, vpar, term1, term2, inv_rg_r
 
     r_gyro = 0.d0
@@ -9012,13 +9012,13 @@ subroutine gyro_step(vi, fields, r_gyro)
         if(fields%coords.eq.1) call uvw_to_cyl(r_gyro, rg_cyl)
 
         inv_rg_r = 1/rg_cyl(1)
-        b_rzt(1) = fields%br/fields%b_abs
-        b_rzt(2) = fields%bz/fields%b_abs
-        b_rzt(3) = fields%bt/fields%b_abs
-        curl_b(1) = (inv_rg_r*fields%dbz_dphi - fields%dbt_dz)/fields%b_abs
-        curl_b(2) = (inv_rg_r*fields%bt + fields%dbt_dr - inv_rg_r*fields%dbr_dphi)/fields%b_abs
-        curl_b(3) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
-        term1 = vpar*one_over_omega*dot_product(b_rzt,curl_b)
+        B_rzt(1) = fields%br/fields%b_abs
+        B_rzt(2) = fields%bz/fields%b_abs
+        B_rzt(3) = fields%bt/fields%b_abs
+        curl_B(1) = (inv_rg_r*fields%dbz_dphi - fields%dbt_dz)/fields%b_abs
+        curl_B(2) = (inv_rg_r*fields%bt + fields%dbt_dr - inv_rg_r*fields%dbr_dphi)/fields%b_abs
+        curl_B(3) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
+        term1 = vpar*one_over_omega*dot_product(B_rzt,curl_B)
 
         grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
                     fields%b_abs

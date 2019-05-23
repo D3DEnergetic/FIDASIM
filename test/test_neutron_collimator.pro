@@ -28,11 +28,11 @@ FUNCTION test_neutron_collimator
     
     ;; Chords
     nchan = 3L
-    ulens = [175.d0, 210.d0, 245.d0]
+    ulens = [135.d0, 170.d0, 205.d0]
     vlens = dblarr(nchan)
     wlens = replicate(-100.d0,nchan)
     lens = transpose([[ulens],[vlens],[wlens]])
-    ulos = [175.d0, 210.d0, 245.d0]
+    ulos = [135.d0, 170.d0, 205.d0]
     vlos = dblarr(nchan)
     wlos = dblarr(nchan)
     radius = sqrt(ulos^2.d0 + vlos^2.d0)

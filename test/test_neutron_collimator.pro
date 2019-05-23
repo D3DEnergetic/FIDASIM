@@ -28,15 +28,15 @@ FUNCTION test_neutron_collimator
     
     ;; Chords
     nchan = 3L
-    ulens = [170.d0,170.d0,170.d0]
+    ulens = [175.d0, 210.d0, 245.d0]
     vlens = dblarr(nchan)
-    wlens = replicate(100.d0,nchan)
+    wlens = replicate(-100.d0,nchan)
     lens = transpose([[ulens],[vlens],[wlens]])
-    ulos = [200.d0,170.d0,140.d0]
+    ulos = [175.d0, 210.d0, 245.d0]
     vlos = dblarr(nchan)
     wlos = dblarr(nchan)
     radius = sqrt(ulos^2.d0 + vlos^2.d0)
-    id = ["c1","c2","c3"]
+    id = "c" + indgen(nchan, /string)
 
     a_cent  = dblarr(3,nchan)
     a_redge = dblarr(3,nchan)
@@ -53,7 +53,7 @@ FUNCTION test_neutron_collimator
     dr = [-50.d0, 3.d0, 0.d0]
     dt = [-50.d0, 0.d0, 3.d0]
     
-    for i=0,2 do begin
+    for i=0,nchan-1 do begin
         r0 = [ulens[i],vlens[i],wlens[i]]
         rf = [ulos[i],vlos[i],wlos[i]]
         R = line_to_rotmat(r0,rf)
@@ -67,7 +67,7 @@ FUNCTION test_neutron_collimator
         d_tedge[*,i] = transpose(R##transpose(dt)) + r0
     endfor
 
-    nc_chords = {nchan:3L,system:"NC",data_source:"test_neutron_collimator.pro", id:id, $
+    nc_chords = {nchan:nchan,system:"NC",data_source:"test_neutron_collimator.pro", id:id, $
                   a_shape:replicate(2,nchan),d_shape:replicate(2,nchan), $
                   a_cent:a_cent,a_redge:a_redge,a_tedge:a_tedge, $
                   d_cent:d_cent,d_redge:d_redge,d_tedge:d_tedge, radius:radius}

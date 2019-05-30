@@ -3076,9 +3076,8 @@ subroutine read_neutron_collimator
     if(.not.path_valid) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') 'Neutron Collimator geometry is not in the geometry file'
-            write(*,'(a)') 'Continuing without Neutron Collimator diagnostics'
+            write(*,'(a)') 'Continuing without Neutron signals'
         endif
-        !!!Could be problematic
         inputs%calc_neutron = 0
         call h5fclose_f(fid, error)
         call h5close_f(error)
@@ -5129,7 +5128,6 @@ subroutine write_neutrons
     call h5fcreate_f(filename, H5F_ACC_TRUNC_F, fid, error)
 
     !Write variables
-    !!!pay attention to nclass for flux
     if(particles%nclass.gt.1) then
         dim1(1) = 1
         call h5ltmake_dataset_int_f(fid,"/nclass", 0, dim1, [particles%nclass], error)
@@ -12077,49 +12075,56 @@ subroutine neutron_spec_f
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
     real(Float64) :: eb, pitch
-    real(Float64) :: erel, flux
+    real(Float64) :: erel, flux, d, domega
     real(Float64), dimension(3) :: ri
     real(Float64), dimension(3) :: vi
-    real(Float64), dimension(3) :: r0, axis, r_gyro
+    real(Float64), dimension(3) :: rn, vn, r_gyro
     integer, dimension(3) :: ind
     real(Float64)  :: vnet_square, factor
-    real(Float64) :: fbm_denf, step
-    logical :: inp1, inp2
+    real(Float64) :: fbm_denf
+    integer :: ntrack
+    integer :: i      !! counter along track
+    type(ParticleTrack),dimension(pass_grid%ntrack) :: tracks
 
     ngamma = 20
     flux = 0
-    step = 8.d0
-    !$OMP PARALLEL DO schedule(guided) private(fields,vi,ri,pitch,eb,ind,&
-    !$OMP& ie,ip,ichan,igamma,plasma,factor,r0,vnet_square,flux,erel,inp1,inp2,axis,fbm_denf,r_gyro)
-    !!!Is there a check that can skip over a certain channel?
-    track_loop: do ichan=1, nc_chords%nchan
-        !!!Double check coord system
-        r0 = nc_chords%det(ichan)%detector%origin
-        axis = nc_chords%det(ichan)%aperture%origin - r0
-        axis = axis/norm2(axis)
+    !$OMP PARALLEL DO schedule(guided) private(fields,vn,vi,ri,pitch,eb,ind,domega,ntrack,i,&
+    !$OMP& ie,ip,ichan,igamma,plasma,factor,rn,vnet_square,flux,erel,d,fbm_denf,r_gyro,tracks)
+    channel_loop: do ichan=1, nc_chords%nchan
 
-        inp2 = .True. ; inp1 = .False.
-        inp2_loop: do while (inp2) !Loop until 'particle' is outside the plasma
-            do while (.not.inp1) !Loop until 'particle' is inside the plasma
-                call in_plasma(r0, inp1)
-                r0 = r0 + step*axis  !!!need to consider once inside, conditional
-            enddo
+        rn = nc_chords%det(ichan)%detector%origin
+        vn = nc_chords%det(ichan)%aperture%origin-rn
+        vn = vn/norm2(vn)
 
-            !!!Check input_coords
+        call track_cylindrical(rn, vn, tracks, ntrack)
+        if(ntrack.eq.0) cycle channel_loop
+
+        !! Calculate the flux produced in each cell along the path
+        loop_along_track: do i=1,ntrack
+            rn = tracks(i)%pos
+
             !! Get fields
-            call get_fields(fields,pos=r0)
-            inp2 = fields%in_plasma
+            call get_fields(fields,pos=rn)
+            if(.not.fields%in_plasma) cycle loop_along_track
 
-            !!!Not sure about this
-            factor = beam_grid%dv/ngamma
+            !! Calculate solid angle in the large distance limit
+            d = norm2(nc_chords%det(ichan)%detector%origin-rn)
+            if (nc_chords%det(ichan)%detector%shape.eq.1) then
+                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                         (pi * d**2) !the 4s cancelled out
+            else
+                domega = nc_chords%det(ichan)%detector%hh*nc_chords%det(ichan)%detector%hw /&
+                         (4 * d**2) !the pis cancelled out
+            endif
 
+            call get_indices(rn, ind)
+            factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
             !! Loop over energy/pitch/gamma
             pitch_loop: do ip = 1, fbm%npitch
                 pitch = fbm%pitch(ip)
                 energy_loop: do ie =1, fbm%nenergy
                     eb = fbm%energy(ie)
                     gyro_loop: do igamma=1, ngamma
-
                         call gyro_correction(fields,eb,pitch,ri,vi)
 
                         !!Correct for gyro orbit
@@ -12130,7 +12135,7 @@ subroutine neutron_spec_f
                             !get dist at guiding center
                             call get_ep_denf(eb,pitch,fbm_denf,pos=(ri+r_gyro))
                         endif
-                        if (fbm_denf.ne.fbm_denf) cycle energy_loop
+                        if (fbm_denf.ne.fbm_denf) cycle gyro_loop
 
                         !! Get plasma parameters at particle position
                         call get_plasma(plasma,pos=ri)
@@ -12149,10 +12154,8 @@ subroutine neutron_spec_f
                     enddo gyro_loop
                 enddo energy_loop
             enddo pitch_loop
-
-            r0 = r0 + step*axis
-        enddo inp2_loop
-    enddo track_loop
+        enddo loop_along_track
+    enddo channel_loop
     !$OMP END PARALLEL DO
 
 #ifdef _MPI

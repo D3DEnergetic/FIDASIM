@@ -12147,7 +12147,8 @@ subroutine neutron_spec_f
 
                         !! Get neutron production flux
                         call get_neutron_rate(plasma, erel, flux)
-                        flux = flux*fbm_denf*factor
+                        flux = flux*2*fbm_denf*factor
+                        !Factor of 2 above is to convert fbm to ions/(cm^3 dE (domega/4pi))
 
                         !! Store neutrons
                         call store_neutrons(flux, neutron_collimator=.True.,channel=ichan)

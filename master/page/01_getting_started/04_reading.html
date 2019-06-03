@@ -154,49 +154,49 @@
 </div>
 <h2 id="using-hdf5-tools">Using HDF5 tools</h2>
 <p>The HDF5 installation provides <a href="https://www.hdfgroup.org/products/hdf5_tools/index.html#cmd">several useful tools</a> for inspecting HDF5 files.</p>
-<div class="codehilite"><pre><span></span>lstagner@computer:~/TEST$ h5ls test_geometry.h5
-nbi                      Group
-npa                      Group
-spec                     Group
-lstagner@computer:~/TEST$ h5ls test_geometry.h5/nbi
-adist                    Dataset {1}
-aoffy                    Dataset {1}
-aoffz                    Dataset {1}
-ashape                   Dataset {1}
-awidy                    Dataset {1}
-awidz                    Dataset {1}
-axis                     Dataset {3}
-data_source              Dataset {SCALAR}
-divy                     Dataset {3}
-divz                     Dataset {3}
-focy                     Dataset {SCALAR}
-focz                     Dataset {SCALAR}
-name                     Dataset {SCALAR}
-naperture                Dataset {SCALAR}
-shape                    Dataset {SCALAR}
-src                      Dataset {3}
-widy                     Dataset {SCALAR}
-widz                     Dataset {SCALAR}
-lstagner@computer:~/TEST$ h5ls -v test_geometry.h5/nbi/src
-Opened &quot;test_geometry.h5&quot; with sec2 driver.
-src                      Dataset {3/3}
-    Attribute: description scalar
-        Type:      47-byte null-terminated ASCII string
-        Data:  &quot;Position of the center of the beam source grid&quot;
-    Attribute: units scalar
-        Type:      3-byte null-terminated ASCII string
-        Data:  &quot;cm&quot;
-    Location:  1:5024
-    Links:     1
-    Chunks:    {3} 24 bytes
-    Storage:   24 logical bytes, 20 allocated bytes, 120.00% utilization
-    Filter-0:  shuffle-2 OPT {8}
-    Filter-1:  deflate-1 OPT {9}
-    Type:      native double
-lstagner@computer:~/TEST$ h5ls -d test_geometry.h5/nbi/src
-src                      Dataset {3}
-    Data:
-        (0) 0, -532, 0
+<div class="codehilite"><pre><span></span><span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="n">test_geometry</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
+<span class="n">nbi</span><span class="w">                      </span><span class="k">Group</span><span class="w"></span>
+<span class="n">npa</span><span class="w">                      </span><span class="k">Group</span><span class="w"></span>
+<span class="n">spec</span><span class="w">                     </span><span class="k">Group</span><span class="w"></span>
+<span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="n">test_geometry</span><span class="p">.</span><span class="n">h5</span><span class="o">/</span><span class="n">nbi</span><span class="w"></span>
+<span class="n">adist</span><span class="w">                    </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">1</span><span class="err">}</span><span class="w"></span>
+<span class="n">aoffy</span><span class="w">                    </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">1</span><span class="err">}</span><span class="w"></span>
+<span class="n">aoffz</span><span class="w">                    </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">1</span><span class="err">}</span><span class="w"></span>
+<span class="n">ashape</span><span class="w">                   </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">1</span><span class="err">}</span><span class="w"></span>
+<span class="n">awidy</span><span class="w">                    </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">1</span><span class="err">}</span><span class="w"></span>
+<span class="n">awidz</span><span class="w">                    </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">1</span><span class="err">}</span><span class="w"></span>
+<span class="n">axis</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">data_source</span><span class="w">              </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">divy</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">divz</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">focy</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">focz</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">name</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">naperture</span><span class="w">                </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">shape</span><span class="w">                    </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">src</span><span class="w">                      </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">widy</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">widz</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="o">-</span><span class="n">v</span><span class="w"> </span><span class="n">test_geometry</span><span class="p">.</span><span class="n">h5</span><span class="o">/</span><span class="n">nbi</span><span class="o">/</span><span class="n">src</span><span class="w"></span>
+<span class="n">Opened</span><span class="w"> </span><span class="ss">&quot;test_geometry.h5&quot;</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">sec2</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="w"></span>
+<span class="n">src</span><span class="w">                      </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="o">/</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Attribute</span><span class="p">:</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="n">scalar</span><span class="w"></span>
+<span class="w">        </span><span class="nl">Type</span><span class="p">:</span><span class="w">      </span><span class="mi">47</span><span class="o">-</span><span class="n">byte</span><span class="w"> </span><span class="k">null</span><span class="o">-</span><span class="n">terminated</span><span class="w"> </span><span class="nf">ASCII</span><span class="w"> </span><span class="n">string</span><span class="w"></span>
+<span class="w">        </span><span class="k">Data</span><span class="err">:</span><span class="w">  </span><span class="ss">&quot;Position of the center of the beam source grid&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Attribute</span><span class="p">:</span><span class="w"> </span><span class="n">units</span><span class="w"> </span><span class="n">scalar</span><span class="w"></span>
+<span class="w">        </span><span class="nl">Type</span><span class="p">:</span><span class="w">      </span><span class="mi">3</span><span class="o">-</span><span class="n">byte</span><span class="w"> </span><span class="k">null</span><span class="o">-</span><span class="n">terminated</span><span class="w"> </span><span class="nf">ASCII</span><span class="w"> </span><span class="n">string</span><span class="w"></span>
+<span class="w">        </span><span class="k">Data</span><span class="err">:</span><span class="w">  </span><span class="ss">&quot;cm&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Location</span><span class="p">:</span><span class="w">  </span><span class="mi">1</span><span class="err">:</span><span class="mi">5024</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Links</span><span class="p">:</span><span class="w">     </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Chunks</span><span class="p">:</span><span class="w">    </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="n">bytes</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Storage</span><span class="p">:</span><span class="w">   </span><span class="mi">24</span><span class="w"> </span><span class="n">logical</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="n">allocated</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mf">120.00</span><span class="o">%</span><span class="w"> </span><span class="n">utilization</span><span class="w"></span>
+<span class="w">    </span><span class="k">Filter</span><span class="o">-</span><span class="mi">0</span><span class="err">:</span><span class="w">  </span><span class="n">shuffle</span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="n">OPT</span><span class="w"> </span><span class="err">{</span><span class="mi">8</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">Filter</span><span class="o">-</span><span class="mi">1</span><span class="err">:</span><span class="w">  </span><span class="n">deflate</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="n">OPT</span><span class="w"> </span><span class="err">{</span><span class="mi">9</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Type</span><span class="p">:</span><span class="w">      </span><span class="n">native</span><span class="w"> </span><span class="k">double</span><span class="w"></span>
+<span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">test_geometry</span><span class="p">.</span><span class="n">h5</span><span class="o">/</span><span class="n">nbi</span><span class="o">/</span><span class="n">src</span><span class="w"></span>
+<span class="n">src</span><span class="w">                      </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">Data</span><span class="err">:</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">532</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
 </pre></div>
 
 
@@ -325,7 +325,7 @@ Let's start with the easiest method first.
 Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
 Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
 Furthermore, it will also print out the neutron rate.</p>
-<div class="codehilite"><pre><span></span>plot_outputs -d /p/fida/lstagner/TEST/ -s -as -n -an
+<div class="codehilite"><pre><span></span><span class="n">plot_outputs</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="o">-</span><span class="n">s</span> <span class="o">-</span><span class="k">as</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">an</span>
 </pre></div>
 
 
@@ -335,7 +335,7 @@ What if your files are scattered around in different folders?
 What if you are only interested in the active FIDA emission?
 What if you only want to view channels 1 and 3?
 The example below does this for two different files located in different folders.</p>
-<div class="codehilite"><pre><span></span>plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls 1 3
+<div class="codehilite"><pre><span></span><span class="n">plot_outputs</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_1a_spectra</span><span class="p">.</span><span class="n">h5</span> <span class="o">/</span><span class="n">different_path</span><span class="o">/</span><span class="n">test_2a_spectra</span><span class="p">.</span><span class="n">h5</span> <span class="o">-</span><span class="n">f</span> <span class="o">-</span><span class="n">ls</span> <span class="mi">1</span> <span class="mi">3</span>
 </pre></div>
 
 

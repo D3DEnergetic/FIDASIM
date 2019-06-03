@@ -418,7 +418,7 @@ sqrt(torodial flux) (rho) mapped onto the interpolation grid</p>
 <a name="ln-163"></a><span class="s s-Atom">        z = g.z</span>
 <a name="ln-164"></a><span class="s s-Atom">        dz = abs(z[1]-z[0])</span>
 <a name="ln-165"></a><span class="s s-Atom">        fluxgrid = interpolate(g.psirz,(grid.r2d/100-r[0])/dr,(grid.z2d/100 -z[0])/dz,cubic=-0.5)</span>
-<a name="ln-166"></a><span class="s s-Atom">        fluxgrid = sqrt((fluxgrid - g.ssimag)/g.ssibry)</span>
+<a name="ln-166"></a><span class="s s-Atom">        fluxgrid = sqrt((fluxgrid - g.ssimag)/(g.ssibry - g.ssimag))</span>
 <a name="ln-167"></a><span class="s s-Atom">    end</span>
 <a name="ln-168"></a>
 <a name="ln-169"></a><span class="s s-Atom">    calculate_bfield,bp,br,bphi,bz1,g</span>

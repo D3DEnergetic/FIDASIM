@@ -713,7 +713,7 @@ def read_geqdsk(filename, grid, psi=False):
 
     if psi:
         fluxgrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
-        fluxgrid = np.sqrt((fluxgrid - g["ssimag"])/g["ssibry"])
+        fluxgrid = np.sqrt((fluxgrid - g["ssimag"])/(g["ssibry"] - g["ssimag"]))
     else:
         fluxgrid=efit.rho_rz(g,r_pts,z_pts,norm=True).reshape(dims)
 

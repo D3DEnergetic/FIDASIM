@@ -163,7 +163,7 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi
         z = g.z
         dz = abs(z[1]-z[0])
         fluxgrid = interpolate(g.psirz,(grid.r2d/100-r[0])/dr,(grid.z2d/100 -z[0])/dz,cubic=-0.5)
-        fluxgrid = sqrt((fluxgrid - g.ssimag)/g.ssibry)
+        fluxgrid = sqrt((fluxgrid - g.ssimag)/(g.ssibry - g.ssimag))
     end
 
     calculate_bfield,bp,br,bphi,bz1,g

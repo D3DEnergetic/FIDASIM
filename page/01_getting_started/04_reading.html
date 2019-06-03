@@ -153,42 +153,42 @@
 </div>
 <h2 id="using-hdf5-tools">Using HDF5 tools</h2>
 <p>The HDF5 installation provides <a href="https://www.hdfgroup.org/products/hdf5_tools/index.html#cmd">several useful tools</a> for inspecting HDF5 files.</p>
-<div class="codehilite"><pre><span></span>lstagner@computer:~/TEST$ h5ls test_1a_geometry.h5
-nbi                      Group
-npa                      Group
-spec                     Group
-lstagner@computer:~/TEST$ h5ls test_1a_geometry.h5/nbi
-axis                     Dataset {3}
-data_source              Dataset {SCALAR}
-divy                     Dataset {3}
-divz                     Dataset {3}
-focy                     Dataset {SCALAR}
-focz                     Dataset {SCALAR}
-name                     Dataset {SCALAR}
-shape                    Dataset {SCALAR}
-src                      Dataset {3}
-widy                     Dataset {SCALAR}
-widz                     Dataset {SCALAR}
-lstagner@computer:~/TEST$ h5ls -v test_1a_geometry.h5/nbi/src
-Opened &quot;test_1a_geometry.h5&quot; with sec2 driver.
-src                      Dataset {3/3}
-    Attribute: description scalar
-        Type:      47-byte null-terminated ASCII string
-        Data:  &quot;Position of the center of the beam source grid&quot;
-    Attribute: units scalar
-        Type:      3-byte null-terminated ASCII string
-        Data:  &quot;cm&quot;
-    Location:  1:5024
-    Links:     1
-    Chunks:    {3} 24 bytes
-    Storage:   24 logical bytes, 19 allocated bytes, 126.32% utilization
-    Filter-0:  shuffle-2 OPT {8}
-    Filter-1:  deflate-1 OPT {9}
-    Type:      native double
-lstagner@computer:~/TEST$ h5ls -d test_1a_geometry.h5/nbi/src
-src                      Dataset {3}
-    Data:
-        (0) 0, -502, 0
+<div class="codehilite"><pre><span></span><span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="n">test_1a_geometry</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
+<span class="n">nbi</span><span class="w">                      </span><span class="k">Group</span><span class="w"></span>
+<span class="n">npa</span><span class="w">                      </span><span class="k">Group</span><span class="w"></span>
+<span class="n">spec</span><span class="w">                     </span><span class="k">Group</span><span class="w"></span>
+<span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="n">test_1a_geometry</span><span class="p">.</span><span class="n">h5</span><span class="o">/</span><span class="n">nbi</span><span class="w"></span>
+<span class="n">axis</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">data_source</span><span class="w">              </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">divy</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">divz</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">focy</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">focz</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">name</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">shape</span><span class="w">                    </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">src</span><span class="w">                      </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="n">widy</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">widz</span><span class="w">                     </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="n">SCALAR</span><span class="err">}</span><span class="w"></span>
+<span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="o">-</span><span class="n">v</span><span class="w"> </span><span class="n">test_1a_geometry</span><span class="p">.</span><span class="n">h5</span><span class="o">/</span><span class="n">nbi</span><span class="o">/</span><span class="n">src</span><span class="w"></span>
+<span class="n">Opened</span><span class="w"> </span><span class="ss">&quot;test_1a_geometry.h5&quot;</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">sec2</span><span class="w"> </span><span class="n">driver</span><span class="p">.</span><span class="w"></span>
+<span class="n">src</span><span class="w">                      </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="o">/</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Attribute</span><span class="p">:</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="n">scalar</span><span class="w"></span>
+<span class="w">        </span><span class="nl">Type</span><span class="p">:</span><span class="w">      </span><span class="mi">47</span><span class="o">-</span><span class="n">byte</span><span class="w"> </span><span class="k">null</span><span class="o">-</span><span class="n">terminated</span><span class="w"> </span><span class="nf">ASCII</span><span class="w"> </span><span class="n">string</span><span class="w"></span>
+<span class="w">        </span><span class="k">Data</span><span class="err">:</span><span class="w">  </span><span class="ss">&quot;Position of the center of the beam source grid&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Attribute</span><span class="p">:</span><span class="w"> </span><span class="n">units</span><span class="w"> </span><span class="n">scalar</span><span class="w"></span>
+<span class="w">        </span><span class="nl">Type</span><span class="p">:</span><span class="w">      </span><span class="mi">3</span><span class="o">-</span><span class="n">byte</span><span class="w"> </span><span class="k">null</span><span class="o">-</span><span class="n">terminated</span><span class="w"> </span><span class="nf">ASCII</span><span class="w"> </span><span class="n">string</span><span class="w"></span>
+<span class="w">        </span><span class="k">Data</span><span class="err">:</span><span class="w">  </span><span class="ss">&quot;cm&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Location</span><span class="p">:</span><span class="w">  </span><span class="mi">1</span><span class="err">:</span><span class="mi">5024</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Links</span><span class="p">:</span><span class="w">     </span><span class="mi">1</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Chunks</span><span class="p">:</span><span class="w">    </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"> </span><span class="mi">24</span><span class="w"> </span><span class="n">bytes</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Storage</span><span class="p">:</span><span class="w">   </span><span class="mi">24</span><span class="w"> </span><span class="n">logical</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">19</span><span class="w"> </span><span class="n">allocated</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="mf">126.32</span><span class="o">%</span><span class="w"> </span><span class="n">utilization</span><span class="w"></span>
+<span class="w">    </span><span class="k">Filter</span><span class="o">-</span><span class="mi">0</span><span class="err">:</span><span class="w">  </span><span class="n">shuffle</span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="n">OPT</span><span class="w"> </span><span class="err">{</span><span class="mi">8</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">Filter</span><span class="o">-</span><span class="mi">1</span><span class="err">:</span><span class="w">  </span><span class="n">deflate</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="n">OPT</span><span class="w"> </span><span class="err">{</span><span class="mi">9</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="nl">Type</span><span class="p">:</span><span class="w">      </span><span class="n">native</span><span class="w"> </span><span class="k">double</span><span class="w"></span>
+<span class="n">lstagner</span><span class="nv">@computer</span><span class="err">:</span><span class="o">~/</span><span class="n">TEST</span><span class="err">$</span><span class="w"> </span><span class="n">h5ls</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="n">test_1a_geometry</span><span class="p">.</span><span class="n">h5</span><span class="o">/</span><span class="n">nbi</span><span class="o">/</span><span class="n">src</span><span class="w"></span>
+<span class="n">src</span><span class="w">                      </span><span class="n">Dataset</span><span class="w"> </span><span class="err">{</span><span class="mi">3</span><span class="err">}</span><span class="w"></span>
+<span class="w">    </span><span class="k">Data</span><span class="err">:</span><span class="w"></span>
+<span class="w">        </span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">502</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="w"></span>
 </pre></div>
 
 
@@ -406,7 +406,7 @@ IDL<span class="o">&gt;</span> <span class="nb">help</span>,f.nbi.src
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

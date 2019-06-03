@@ -3,6 +3,7 @@ FUNCTION read_spiral_header, file
     openr,lun,file,/get_lun
 
     npart = 0
+    weight = 0.0
     gc = 0
     err = 0
     nheader = 0
@@ -12,6 +13,9 @@ FUNCTION read_spiral_header, file
     while strmid(line,0,1) eq ';' do begin
         nheader = nheader + 1
         header = header + line + string(10B)
+        if stregex(line,"particle weight",/fold_case) ne -1 then begin
+            weight = float(stregex(line,"[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?",/extract))
+        endif
         if stregex(line,"number",/fold_case) ne -1 then begin
             npart = long(stregex(line,"[0-9]+",/extract))
         endif
@@ -35,7 +39,7 @@ FUNCTION read_spiral_header, file
         error,'Number of particles le 0',/halt
     endif
 
-    return, {nheader:nheader, npart:npart, header:header}
+    return, {nheader:nheader, npart:npart, header:header,weight:weight}
 
 END
 
@@ -85,11 +89,6 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, p_range=p_
         error, 'Nonexistent file: '+file,/halt
     endif
 
-    if not keyword_set(ntotal) and not keyword_set(particle_weight) then begin
-        print, 'WARNING: ntotal is not set. Setting arbitrarily to 1e19'
-        ntotal = 1.d19
-    endif
-
     if not keyword_set(time) then begin
         print, 'WARNING: Time is not set for SPIRAL distribution. Setting to 0.0 [s]'
         time = 0.d0
@@ -98,6 +97,7 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, p_range=p_
     header = read_spiral_header(file)
     npart = header.npart
     nhead = header.nheader
+    pweight = header.weight
 
     openr,unit,file, /get_lun
 
@@ -135,10 +135,18 @@ FUNCTION read_spiral,file, time=time, ntotal=ntotal, e_range=e_range, p_range=p_
     energy = energy[0:npart-1]
     pitch = pitch[0:npart-1]
     orbit_class = replicate(1,npart)
-    if not keyword_set(particle_weight) then begin
-        weight = replicate(Ntotal/float(npart), npart)
+    if pweight ne 0.0 then begin
+        weight = replicate(pweight,npart)
     endif else begin
-        weight = replicate(particle_weight, npart)
+        if not keyword_set(particle_weight) then begin
+            if not keyword_set(ntotal) then begin
+                print, 'WARNING: ntotal is not set. Setting arbitrarily to 1e19'
+                ntotal = 1.d19
+            endif
+            weight = replicate(Ntotal/float(npart), npart)
+        endif else begin
+            weight = replicate(particle_weight, npart)
+        endelse
     endelse
 
     if not keyword_set(e_range) then begin

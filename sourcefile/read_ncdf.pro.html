@@ -291,7 +291,7 @@
 <a name="ln-41"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s s-Atom">tmp</span>
 <a name="ln-42"></a>            <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
 <a name="ln-43"></a>                <span class="s s-Atom">var_info</span><span class="o">=</span><span class="nf">ncdf_varinq</span><span class="p">(</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">)</span>
-<a name="ln-44"></a>                <span class="s s-Atom">name</span><span class="o">=</span><span class="s s-Atom">var_info</span><span class="p">.</span><span class="s s-Atom">name</span>
+<a name="ln-44"></a>                <span class="s s-Atom">name</span><span class="o">=</span><span class="nf">strjoin</span><span class="p">(</span><span class="nf">strsplit</span><span class="p">(</span><span class="s s-Atom">var_info</span><span class="p">.</span><span class="s s-Atom">name</span><span class="p">,</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">extract</span><span class="p">),</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
 <a name="ln-45"></a>                <span class="s s-Atom">ncdf_varget</span><span class="p">,</span><span class="s s-Atom">ncid</span><span class="p">,</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">tmp</span>
 <a name="ln-46"></a>            <span class="s s-Atom">endelse</span>
 <a name="ln-47"></a>            <span class="s s-Atom">if</span> <span class="nf">total</span><span class="p">(</span><span class="nf">strmatch</span><span class="p">(</span><span class="s s-Atom">reserved</span><span class="p">,</span><span class="s s-Atom">name</span><span class="p">,</span><span class="o">/</span><span class="nv">FOLD_CASE</span><span class="p">))</span> <span class="s s-Atom">gt</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">name+=&#39;_&#39;</span>
@@ -313,7 +313,7 @@
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

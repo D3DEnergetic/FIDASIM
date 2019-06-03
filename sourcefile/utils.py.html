@@ -1254,7 +1254,7 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-703"></a>
 <a name="ln-704"></a>    <span class="k">if</span> <span class="n">psi</span><span class="p">:</span>
 <a name="ln-705"></a>        <span class="n">fluxgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">psirz_itp</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">)])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<a name="ln-706"></a>        <span class="n">fluxgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">fluxgrid</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssimag&quot;</span><span class="p">])</span><span class="o">/</span><span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssibry&quot;</span><span class="p">])</span>
+<a name="ln-706"></a>        <span class="n">fluxgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">fluxgrid</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssimag&quot;</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssibry&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssimag&quot;</span><span class="p">]))</span>
 <a name="ln-707"></a>    <span class="k">else</span><span class="p">:</span>
 <a name="ln-708"></a>        <span class="n">fluxgrid</span><span class="o">=</span><span class="n">efit</span><span class="o">.</span><span class="n">rho_rz</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
 <a name="ln-709"></a>
@@ -1714,7 +1714,7 @@ Falls back to reading VERSION file when git is not available</p>
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

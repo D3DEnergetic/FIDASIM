@@ -216,7 +216,7 @@ The routine <code>beam_grid</code>(<a href="../../sourcefile/beam_grid.pro.html"
 <h1 id="reading-geqdsk-files">Reading GEQDSK files</h1>
 <p>Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine <a href="../../sourcefile/read_geqdsk.pro.html">read_geqdsk.pro</a> to calculate the <a href="../03_technical/01_prefida_inputs.html#fields-structure">fields structure</a> from EFITs GEQDSK file.</p>
-<div class="codehilite"><pre><span></span>IDL&gt; fields = read_geqdsk(&#39;g159243.00300&#39;,grid,flux=flux,btipsign=btipsign)
+<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s1">&#39;g159243.00300&#39;</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span><span class="n">btipsign</span><span class="o">=</span><span class="n">btipsign</span><span class="p">)</span>
 </pre></div>
 
 
@@ -231,14 +231,14 @@ To make things easy we provide the IDL routine <a href="../../sourcefile/read_ge
 <p>It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. </p>
 <p>The python script, <code>extract_transp_geqdsk</code>, can be used to extract the MHD equilibrium from TRANSP's <code>.DATA* files</code>.
 For example:</p>
-<div class="codehilite"><pre><span></span>extract_transp_geqdsk /p/transparch/result/NSTX/14 159243H06 
+<div class="codehilite"><pre><span></span><span class="n">extract_transp_geqdsk</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">transparch</span><span class="o">/</span><span class="k">result</span><span class="o">/</span><span class="n">NSTX</span><span class="o">/</span><span class="mi">14</span> <span class="mi">159243</span><span class="n">H06</span> 
 </pre></div>
 
 
 <p>will create a GEQDSK file for every <code>.DATA*</code> file in the <code>159243H06</code> TRANSP run.
 Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
 <p>The IDL routine <a href="../../sourcefile/extract_transp_plasma.pro.html">extract_transp_plasma.pro</a> or the equivalent Python function creates the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma structure</a> at a given time. </p>
-<div class="codehilite"><pre><span></span>IDL&gt; plasma = extract_transp_plasma(&quot;159243H06.CDF&quot;,1.02,grid,flux)
+<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="ss">&quot;159243H06.CDF&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">.</span><span class="mi">02</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">flux</span><span class="p">)</span>
 </pre></div>
 
 
@@ -251,7 +251,7 @@ Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
 <p>where <code>grid</code> is the interpolation grid and <code>flux</code> is the torodial flux.</p>
 <h1 id="translating-nubeam-neutral-beam-geometry">Translating NUBEAM Neutral Beam Geometry</h1>
 <p>The IDL routine <a href="../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> can be used to translate the NUBEAM neutral beam geometry definition into the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">correct format</a>.</p>
-<div class="codehilite"><pre><span></span>IDL&gt; nbi = nubeam_geometry(nubeam)
+<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">nbi</span> <span class="o">=</span> <span class="n">nubeam_geometry</span><span class="p">(</span><span class="n">nubeam</span><span class="p">)</span>
 </pre></div>
 
 
@@ -264,7 +264,7 @@ Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
 <p>where <code>nubeam</code> is a structure/dictionary containing the NUBEAM geometry variables taken from the TRANSP namelist.</p>
 <h1 id="extracting-the-fast-ion-distribution-function-from-transpnubeam">Extracting the Fast-ion Distribution Function from TRANSP/NUBEAM</h1>
 <p>The python script, <code>extract_transp_fbm</code>, provides a easy way to extract the fast-ion distribution. For example: </p>
-<div class="codehilite"><pre><span></span>extract_transp_fbm /p/transparch/result/NSTX/14 159243H06
+<div class="codehilite"><pre><span></span><span class="n">extract_transp_fbm</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">transparch</span><span class="o">/</span><span class="k">result</span><span class="o">/</span><span class="n">NSTX</span><span class="o">/</span><span class="mi">14</span> <span class="mi">159243</span><span class="n">H06</span>
 </pre></div>
 
 
@@ -278,9 +278,9 @@ We provide routines for:</p>
 <li><a href="../../sourcefile/read_mc_nubeam.pro.html">read_mc_nubeam.pro</a>: Monte Carlo TRANSP/NUBEAM Guiding Center distribution</li>
 <li><a href="../../sourcefile/read_spiral.pro.html">read_spiral.pro</a>: SPIRAL Guiding Center distribution</li>
 </ul>
-<div class="codehilite"><pre><span></span>IDL&gt; f = read_nubeam(nubeam_distribution_file,grid,btipsign = -1) 
-IDL&gt; mcf = read_mc_nubeam(mc_nubeam_distribution_file,Ntotal=1e19,btipsign=-1)
-IDL&gt; s = read_spiral(spiral_file,Ntotal=1e19,btipsign=-1)
+<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">read_nubeam</span><span class="p">(</span><span class="n">nubeam_distribution_file</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">btipsign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> 
+<span class="n">IDL</span><span class="o">&gt;</span> <span class="n">mcf</span> <span class="o">=</span> <span class="n">read_mc_nubeam</span><span class="p">(</span><span class="n">mc_nubeam_distribution_file</span><span class="p">,</span><span class="n">Ntotal</span><span class="o">=</span><span class="mi">1</span><span class="n">e19</span><span class="p">,</span><span class="n">btipsign</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">IDL</span><span class="o">&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="n">read_spiral</span><span class="p">(</span><span class="n">spiral_file</span><span class="p">,</span><span class="n">Ntotal</span><span class="o">=</span><span class="mi">1</span><span class="n">e19</span><span class="p">,</span><span class="n">btipsign</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 
 
@@ -407,7 +407,7 @@ IDL&gt; s = read_spiral(spiral_file,Ntotal=1e19,btipsign=-1)
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2018 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 3.2% of total for modules and submodules.">438 statements</a>
+    title=" 3.5% of total for modules and submodules.">482 statements</a>
      </li> 
      
      
@@ -205,6 +205,8 @@
       <a class="list-group-item" href="../module/hdf5_utils.html#proc-h5ltread_dataset_int_scalar_f">h5ltread_dataset_int_scalar_f</a>
       
       <a class="list-group-item" href="../module/hdf5_utils.html#proc-h5ltread_dataset_double_scalar_f">h5ltread_dataset_double_scalar_f</a>
+      
+      <a class="list-group-item" href="../module/hdf5_utils.html#proc-chunk_size">chunk_size</a>
       
       <a class="list-group-item" href="../module/hdf5_utils.html#proc-h5ltmake_compressed_dataset_double_f_1">h5ltmake_compressed_dataset_double_f_1</a>
       
@@ -564,6 +566,8 @@
       
       <a class="list-group-item" href="../module/hdf5_utils.html#proc-h5ltread_dataset_double_scalar_f">h5ltread_dataset_double_scalar_f</a>
       
+      <a class="list-group-item" href="../module/hdf5_utils.html#proc-chunk_size">chunk_size</a>
+      
       <a class="list-group-item" href="../module/hdf5_utils.html#proc-h5ltmake_compressed_dataset_double_f_1">h5ltmake_compressed_dataset_double_f_1</a>
       
       <a class="list-group-item" href="../module/hdf5_utils.html#proc-h5ltmake_compressed_dataset_double_f_2">h5ltmake_compressed_dataset_double_f_2</a>
@@ -731,7 +735,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_1.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -862,7 +866,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_2.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -993,7 +997,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_3.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -1124,7 +1128,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_4.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -1255,7 +1259,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_5.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -1386,7 +1390,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_6.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -1517,7 +1521,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_7.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -2709,7 +2713,7 @@ public subroutine <a href='../proc/h5ltread_dataset_double_scalar_f.html'>h5ltre
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(inout)</td>
   <td></td>
   
@@ -2730,6 +2734,87 @@ public subroutine <a href='../proc/h5ltread_dataset_double_scalar_f.html'>h5ltre
   
   <td></td><td>::</td>
   <td><strong>error</strong></td><td><p>HDF5 error code</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-chunk_size"></span><h3>
+public subroutine <a href='../proc/chunk_size.html'>chunk_size</a>(elsize, dims, cdims)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>elsize</strong></td><td><p>Size of elements in bytes</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=HSIZE_T),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(*)</td><td>::</td>
+  <td><strong>dims</strong></td><td><p>Dimensions of dataset</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=HSIZE_T),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>cdims</strong></td><td><p>Maximum allowed chunk size/dims</p></td>
   
 </tr>
 
@@ -2843,7 +2928,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_1.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -2977,7 +3062,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_2.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -3111,7 +3196,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_3.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -3245,7 +3330,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_4.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -3379,7 +3464,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_5.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -3513,7 +3598,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_6.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -3647,7 +3732,7 @@ public subroutine <a href='../proc/h5ltmake_compressed_dataset_double_f_7.html'>
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=double),</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   

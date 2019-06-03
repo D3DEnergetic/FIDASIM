@@ -266,7 +266,7 @@ public subroutine h5ltread_dataset_double_scalar_f(loc_id, dset_name, x, error)
   
 <tr>
   
-  <td><span class="anchor" id="variable-x%7E12"></span>real(kind=double),</td>
+  <td><span class="anchor" id="variable-x%7E12"></span>real(kind=Float64),</td>
   <td>intent(inout)</td>
   <td></td>
   
@@ -646,13 +646,13 @@ public subroutine h5ltread_dataset_double_scalar_f(loc_id, dset_name, x, error)
         <span class="c">!+ HDF5 file or group identifier</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dset_name</span>
         <span class="c">!+ Name of the dataset to create</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">x</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">x</span>
         <span class="c">!+ Data to be written to the dataset</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>         <span class="kd">::</span> <span class="n">error</span>
         <span class="c">!+ HDF5 error code</span>
 
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dims</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dummy</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dummy</span>
 
     <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">loc_id</span><span class="p">,</span> <span class="n">dset_name</span><span class="p">,</span> <span class="n">dummy</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">dummy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>

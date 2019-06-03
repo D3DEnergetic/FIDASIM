@@ -19,18 +19,26 @@ PRO check_fields, inp, grid, fields
 
     nr = grid.nr
     nz = grid.nz
+    w = where("nphi" eq strlowcase(TAG_NAMES(grid)),nw)
+    if nw eq 0 then begin
+        info,'"nphi" is missing from the fields, assuming axisymmetry'
+        nphi = 1
+    endif else begin
+        nphi = grid.nphi
+    endelse
+
     zero_string = {dims:0, type:'STRING'}
     zero_double = {dims:0, type:'DOUBLE'}
-    nrnz_double = {dims:[nr,nz], type:'DOUBLE'}
-    nrnz_int = {dims:[nr,nz], type:'INT'}
+    nrnznphi_double = {dims:[nr,nz,nphi], type:'DOUBLE'}
+    nrnznphi_int = {dims:[nr,nz,nphi], type:'INT'}
     schema = {time:zero_double, $
-              br:nrnz_double, $
-              bt:nrnz_double, $
-              bz:nrnz_double, $
-              er:nrnz_double, $
-              et:nrnz_double, $
-              ez:nrnz_double, $
-              mask:nrnz_int, $
+              br:nrnznphi_double, $
+              bt:nrnznphi_double, $
+              bz:nrnznphi_double, $
+              er:nrnznphi_double, $
+              et:nrnznphi_double, $
+              ez:nrnznphi_double, $
+              mask:nrnznphi_int, $
               data_source:zero_string}
 
     check_struct_schema,schema,fields,err_status, desc = "electromagnetic fields"
@@ -57,4 +65,3 @@ PRO check_fields, inp, grid, fields
         success,'Electromagnetic fields are valid'
     endelse
 END
-

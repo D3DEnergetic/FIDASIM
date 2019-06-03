@@ -26,14 +26,23 @@ PRO check_grid, grid
         goto, GET_OUT
     endif
 
+    w = where("nphi" eq strlowcase(TAG_NAMES(grid)),nw)
+    if nw eq 0 then begin
+        info,'"nphi" is missing from the interpolation grid, assuming axisymmetry'
+        nphi = 1
+    endif else begin
+        nphi = grid.nphi
+    endelse
+
     nr = grid.nr
     nz = grid.nz
     zero_int = {dims:0,type:'INT'}
-    schema = {nr:zero_int, nz:zero_int, $
+    schema = {nr:zero_int, nz:zero_int, nphi:zero_int, $
               r2d:{dims:[nr,nz], type:'DOUBLE'}, $
               z2d:{dims:[nr,nz], type:'DOUBLE'}, $
               r:{dims:[nr], type:'DOUBLE'}, $
-              z:{dims:[nz], type:'DOUBLE'} }
+              z:{dims:[nz], type:'DOUBLE'}, $
+              phi:{dims:[nphi], type:'DOUBLE'} }
 
     check_struct_schema, schema, grid, err_status, desc="interpolation grid"
     if err_status eq 1 then begin
@@ -49,6 +58,12 @@ PRO check_grid, grid
     w = where((indgen(nz) eq sort(grid.z)) ne 1, nw)
     if nw ne 0 then begin
         error,'z is not in ascending order'
+        err_status = 1
+    endif
+
+    w = where((indgen(nphi) eq sort(phi)) ne 1, nw)
+    if nw ne 0 then begin
+        error,'phi is not in ascending order'
         err_status = 1
     endif
 
@@ -72,4 +87,3 @@ PRO check_grid, grid
     endelse
 
 END
-

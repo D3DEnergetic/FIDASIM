@@ -271,9 +271,14 @@ def check_grid(grid):
         error('"nz" is missing from the interpolation grid')
         error('Invalid interpolation grid. Exiting...', halt=True)
 
+    if 'nphi' not in grid:
+        info('"nphi" is missing from the interpolation grid, assuming axisymmetry')
+        nphi =1
+    else:
+        nphi = grid['nphi']
+
     nr = grid['nr']
     nz = grid['nz']
-    nphi = grid['nphi']
 
     zero_int = {'dims': 0,
                 'type': [int, np.int32, np.int64]}
@@ -283,11 +288,14 @@ def check_grid(grid):
 
     schema = {'nr': zero_int,
               'nz': zero_int,
+              'nphi': zero_int,
               'r2d': nrnz_doub,
               'z2d': nrnz_doub,
               'r': {'dims': [nr],
                     'type': [float, np.float64]},
               'z': {'dims': [nz],
+                    'type': [float, np.float64]},
+              'phi': {'dims': [nphi],
                     'type': [float, np.float64]}}
 
     err = check_dict_schema(schema, grid, desc="interpolation grid")
@@ -517,7 +525,11 @@ def check_plasma(inputs, grid, plasma):
 
     nr = grid['nr']
     nz = grid['nz']
-    nphi = grid['nphi']
+    if 'nphi' not in grid:
+        info('"nphi" is missing from the plasma, assuming axisymmetry')
+        nphi =1
+    else:
+        nphi = grid['nphi']
 
     zero_string = {'dims': 0,
                    'type': [str]}
@@ -607,7 +619,11 @@ def check_fields(inputs, grid, fields):
 
     nr = grid['nr']
     nz = grid['nz']
-    nphi = grid['nphi']
+    if 'nphi' not in grid:
+        info('"nphi" is missing from the fields, assuming axisymmetry')
+        nphi =1
+    else:
+        nphi = grid['nphi']
 
     zero_string = {'dims': 0,
                    'type': [str]}
@@ -699,7 +715,11 @@ def check_distribution(inputs, grid, dist):
         nen = dist['nenergy']
         nr = grid['nr']
         nz = grid['nz']
-        nphi = grid['nphi']
+        if 'nphi' not in grid:
+            info('"nphi" is missing from the fast-ion distribution, assuming axisymmetry')
+            nphi =1
+        else:
+            nphi = grid['nphi']
 
         zero_string = {'dims': 0,
                        'type': [str]}

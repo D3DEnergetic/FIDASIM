@@ -108,7 +108,7 @@ def test_npa():
 
     return npa_chords
 
-def test_profiles(filename, grid, flux):
+def test_profiles(filename, grid, rhogrid):
     prof = fs.utils.read_ncdf(filename)
 
     rho = prof["rho"]
@@ -118,25 +118,25 @@ def test_profiles(filename, grid, flux):
     zeff_rho = prof["zeff"]*1e0
     omega_rho = prof["omega"]*1e0
 
-    dene = interp1d(rho, dene_rho,fill_value='extrapolate')(flux)
+    dene = interp1d(rho, dene_rho,fill_value='extrapolate')(rhogrid)
     dene = np.where(dene > 0.0, dene, 0.0).astype('float64')
 
-    ti = interp1d(rho, ti_rho,fill_value='extrapolate')(flux)
+    ti = interp1d(rho, ti_rho,fill_value='extrapolate')(rhogrid)
     ti = np.where(ti > 0.0, ti, 0.0).astype('float64')
 
-    te = interp1d(rho, te_rho,fill_value='extrapolate')(flux)
+    te = interp1d(rho, te_rho,fill_value='extrapolate')(rhogrid)
     ti = np.where(te > 0.0, te, 0.0).astype('float64')
 
-    zeff = interp1d(rho, zeff_rho,fill_value='extrapolate')(flux)
+    zeff = interp1d(rho, zeff_rho,fill_value='extrapolate')(rhogrid)
     zeff = np.where(te > 1.0, te, 1.0).astype('float64')
 
-    vt = grid["r2d"]*interp1d(rho, omega_rho,fill_value='extrapolate')(flux)
+    vt = grid["r2d"]*interp1d(rho, omega_rho,fill_value='extrapolate')(rhogrid)
     vr = 0*vt
     vz = 0*vt
     denn = zeff*0 + 1e8
-    max_flux = np.max(np.abs(rho))
+    max_rho = np.max(np.abs(rho))
 
-    mask = np.where(flux <= max_flux, 1, 0)
+    mask = np.where(rhogrid <= max_rho, 1, 0)
 
     profiles = {"time":1.0, "data_source":filename, "mask":mask,
                 "te":te, "ti":ti, "vr":vr, "vt":vt, "vz":vz,
@@ -191,10 +191,10 @@ def run_test(args):
 
     grid = fs.utils.rz_grid(100.0, 240.0, 70, -100.0, 100.0, 100)
 
-    equil, flux, btipsign = fs.utils.read_geqdsk(test_dir+'/g000001.01000', grid)
+    equil, rho, btipsign = fs.utils.read_geqdsk(test_dir+'/g000001.01000', grid)
     fbm = fs.utils.read_nubeam(test_dir+'/test_fi_1.cdf', grid, btipsign = btipsign)
 
-    plasma = test_profiles(test_dir+'/test_profiles.cdf',grid,flux)
+    plasma = test_profiles(test_dir+'/test_profiles.cdf',grid,rho)
 
     fs.prefida(inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa)
 

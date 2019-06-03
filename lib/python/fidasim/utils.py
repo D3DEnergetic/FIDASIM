@@ -711,7 +711,7 @@ def read_geqdsk(filename, grid, poloidal=False):
     fpol_itp = interp1d(psi_arr, fpol, 'cubic', fill_value=fpol[-1],bounds_error=False)
     psirz_itp = interp2d(r, z, g["psirz"], 'cubic')
 
-    if psi:
+    if poloidal:
         rhogrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
         rhogrid = np.sqrt((rhogrid - g["ssimag"])/(g["ssibry"] - g["ssimag"]))
     else:

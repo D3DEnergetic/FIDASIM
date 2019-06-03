@@ -123,7 +123,7 @@ PRO calculate_bfield,bp,br,bt,bz,g
     return
 end
 
-FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi
+FUNCTION read_geqdsk,filename,grid,rho=rho,g=g,btipsign=btipsign, poloidal = poloidal
     ;+#read_geqdsk
     ;+Reads an EFIT GEQDSK file
     ;+***
@@ -133,21 +133,21 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi
     ;+    **grid**: Interpolation grid
     ;+
     ;+##Keyword Arguments
-    ;+    **flux**: Set this keyword to a named variable to receive the normalized
-    ;+              sqrt(torodial flux) (rho) mapped onto the interpolation grid
+    ;+    **rho**: Set this keyword to a named variable to receive the
+    ;+              sqrt(normalized torodial flux) (rho) mapped onto the interpolation grid
     ;+
     ;+    **g**: Set this keyword to a named variable to recieve the geqdsk structure
     ;+
     ;+    **btipsign**: Set this keyword to a named variable to recieve the bt-ip sign
     ;+
-    ;+    **psi**: Return normalized poloidal flux instead of normalized toroidal flux
+    ;+    **poloidal**: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))
     ;+
     ;+##Return Value
     ;+Electronmagnetic fields structure
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> fields = read_geqdsk("./g133223.00200",grid,flux=flux)
+    ;+IDL> fields = read_geqdsk("./g133223.00200",grid,rho=rho)
     ;+```
 
     equil={err:1}
@@ -155,15 +155,15 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi
     g=readg(filename)
     btipsign = signum(g.bcentr*g.cpasma)
     time = double(g.time)
-    if not keyword_set(psi) then begin
-        fluxgrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))
+    if not keyword_set(poloidal) then begin
+        rhogrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))
     endif else begin
         r = g.r
         dr = abs(r[1]-r[0])
         z = g.z
         dz = abs(z[1]-z[0])
-        fluxgrid = interpolate(g.psirz,(grid.r2d/100-r[0])/dr,(grid.z2d/100 -z[0])/dz,cubic=-0.5)
-        fluxgrid = sqrt((fluxgrid - g.ssimag)/(g.ssibry - g.ssimag))
+        rhogrid = interpolate(g.psirz,(grid.r2d/100-r[0])/dr,(grid.z2d/100 -z[0])/dz,cubic=-0.5)
+        rhogrid = sqrt((rhogrid - g.ssimag)/(g.ssibry - g.ssimag))
     end
 
     calculate_bfield,bp,br,bphi,bz1,g
@@ -199,7 +199,7 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi
             e_z[i,j,*]  =interpolate(ez1,[rgrid],[zgrid])
             b_z[i,j,*]  =interpolate(bz1,[rgrid],[zgrid])
     endfor
-    flux = fluxgrid
+    rho = rhogrid
     mask = in_vessel(100*g.lim[0,*],100*g.lim[1,*],grid.r2d,grid.z2d)
     mask=rebin(mask,grid.nr,grid.nz,grid.nphi)
 

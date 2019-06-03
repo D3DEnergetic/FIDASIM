@@ -674,7 +674,7 @@ def write_data(h5_obj, dic, desc=dict(), units=dict(), name=''):
         if key in units:
             ds.attrs['units'] = units[key]
 
-def read_geqdsk(filename, grid, psi=False):
+def read_geqdsk(filename, grid, poloidal=False):
     """
     #+#read_geqdsk
     #+Reads an EFIT GEQDSK file
@@ -685,14 +685,14 @@ def read_geqdsk(filename, grid, psi=False):
     #+    **grid**: Interpolation grid
     #+
     #+##Keyword Arguments
-    #+    **psi**: Return normalized poloidal flux instead of normalized toroidal flux
+    #+    **poloidal**: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))
     #+
     #+##Return Value
-    #+Electronmagnetic fields structure, flux, btipsign
+    #+Electronmagnetic fields structure, rho, btipsign
     #+
     #+##Example Usage
     #+```python
-    #+>>> fields, flux, btipsign = read_geqdsk("./g133223.00200",grid)
+    #+>>> fields, rho, btipsign = read_geqdsk("./g133223.00200",grid)
     #+```
     """
     dims = grid['r2d'].shape
@@ -712,10 +712,10 @@ def read_geqdsk(filename, grid, psi=False):
     psirz_itp = interp2d(r, z, g["psirz"], 'cubic')
 
     if psi:
-        fluxgrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
-        fluxgrid = np.sqrt((fluxgrid - g["ssimag"])/(g["ssibry"] - g["ssimag"]))
+        rhogrid = np.array([psirz_itp(rr,zz) for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
+        rhogrid = np.sqrt((rhogrid - g["ssimag"])/(g["ssibry"] - g["ssimag"]))
     else:
-        fluxgrid=efit.rho_rz(g,r_pts,z_pts,norm=True).reshape(dims)
+        rhogrid=efit.rho_rz(g,r_pts,z_pts,norm=True).reshape(dims)
 
     br = np.array([psirz_itp(rr,zz,dy=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
     bz = np.array([-psirz_itp(rr,zz,dx=1)/rr for (rr,zz) in zip(r_pts,z_pts)]).reshape(dims)
@@ -730,7 +730,7 @@ def read_geqdsk(filename, grid, psi=False):
     equil = {"time":0.0,"data_source":os.path.abspath(filename), "mask":mask,
              "br":br,"bt":bt,"bz":bz,"er":er,"et":et,"ez":ez}
 
-    return equil, fluxgrid, btipsign
+    return equil, rhogrid, btipsign
 
 def read_ncdf(filename, vars=None):
     '''
@@ -779,7 +779,7 @@ def read_ncdf(filename, vars=None):
 
     return d
 
-def extract_transp_plasma(filename, intime, grid, flux,
+def extract_transp_plasma(filename, intime, grid, rhogrid,
                           dn0out=None, scrapeoff=None,rho_scrapeoff=0.1):
     '''
     #+#extract_transp_plasma
@@ -792,7 +792,7 @@ def extract_transp_plasma(filename, intime, grid, flux,
     #+
     #+    **grid**: Interpolation grid
     #+
-    #+    **flux**: Normalized square root of torodial flux("rho") mapped onto the interpolation grid
+    #+    **rhogrid**: sqrt(normalized torodial flux) mapped onto the interpolation grid
     #+
     #+##Keyword Arguments
     #+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist
@@ -803,7 +803,7 @@ def extract_transp_plasma(filename, intime, grid, flux,
     #+
     #+##Example Usage
     #+```python
-    #+>>> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, flux)
+    #+>>> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, rho)
     #+```
     '''
 
@@ -861,36 +861,36 @@ def extract_transp_plasma(filename, intime, grid, flux,
                 "omega":transp_omega}
 
     # Interpolate onto r-z grid
-    dims = flux.shape
+    dims = rhogrid.shape
     f_dene = interp1d(rho,transp_ne,fill_value='extrapolate')
-    dene = f_dene(flux)
+    dene = f_dene(rhogrid)
     dene = np.where(dene > 0.0, dene, 0.0).astype('float64')
 
     f_denn = interp1d(rho,np.log(transp_nn),fill_value=np.nan,bounds_error=False)
-    log_denn = f_denn(flux)
+    log_denn = f_denn(rhogrid)
     denn = np.where(~np.isnan(log_denn), np.exp(log_denn), 0.0).astype('float64')
 
     f_te = interp1d(rho,transp_te,fill_value='extrapolate')
-    te = f_te(flux)
+    te = f_te(rhogrid)
     te = np.where(te > 0, te, 0.0).astype('float64')
 
     f_ti = interp1d(rho,transp_ti,fill_value='extrapolate')
-    ti = f_ti(flux)
+    ti = f_ti(rhogrid)
     ti = np.where(ti > 0, ti, 0.0).astype('float64')
 
     f_zeff = interp1d(rho,transp_zeff, fill_value=1.0, bounds_error=False)
-    zeff = f_zeff(flux)
+    zeff = f_zeff(rhogrid)
     zeff = np.where(zeff > 1, zeff, 1.0).astype('float64')
 
     f_omega = interp1d(rho,transp_omega,fill_value='extrapolate')
-    vt = grid['r2d']*f_omega(flux).astype('float64')
+    vt = grid['r2d']*f_omega(rhogrid).astype('float64')
     vr = np.zeros(dims,dtype='float64')
     vz = np.zeros(dims,dtype='float64')
 
-    max_flux = max(abs(rho))
+    max_rho = max(abs(rho))
 
     mask = np.zeros(dims,dtype='int')
-    w = np.where(flux <= max_flux) #where we have profiles
+    w = np.where(rhogrid <= max_rho) #where we have profiles
     mask[w] = 1
 
     # SAVE IN PROFILES STRUCTURE

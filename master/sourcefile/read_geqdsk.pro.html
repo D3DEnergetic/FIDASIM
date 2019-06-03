@@ -199,15 +199,15 @@
 <p><strong>filename</strong>: GEQDSK file</p>
 <p><strong>grid</strong>: Interpolation grid</p>
 <h2 id="keyword-arguments">Keyword Arguments</h2>
-<p><strong>flux</strong>: Set this keyword to a named variable to receive the normalized
-sqrt(torodial flux) (rho) mapped onto the interpolation grid</p>
+<p><strong>rho</strong>: Set this keyword to a named variable to receive the
+sqrt(normalized torodial flux) (rho) mapped onto the interpolation grid</p>
 <p><strong>g</strong>: Set this keyword to a named variable to recieve the geqdsk structure</p>
 <p><strong>btipsign</strong>: Set this keyword to a named variable to recieve the bt-ip sign</p>
-<p><strong>psi</strong>: Return normalized poloidal flux instead of normalized toroidal flux</p>
+<p><strong>poloidal</strong>: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))</p>
 <h2 id="return-value">Return Value</h2>
 <p>Electronmagnetic fields structure</p>
 <h2 id="example-usage">Example Usage</h2>
-<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> fields <span class="o">=</span> read_geqdsk(<span class="s2">&quot;./g133223.00200&quot;</span>,grid,flux<span class="o">=</span>flux)
+<div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> fields <span class="o">=</span> read_geqdsk(<span class="s2">&quot;./g133223.00200&quot;</span>,grid,rho<span class="o">=</span>rho)
 </pre></div>
       <br>
     
@@ -378,7 +378,7 @@ sqrt(torodial flux) (rho) mapped onto the interpolation grid</p>
 <a name="ln-123"></a><span class="s s-Atom">    return</span>
 <a name="ln-124"></a><span class="s s-Atom">end</span>
 <a name="ln-125"></a>
-<a name="ln-126"></a><span class="s s-Atom">FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign,psi = psi</span>
+<a name="ln-126"></a><span class="s s-Atom">FUNCTION read_geqdsk,filename,grid,rho=rho,g=g,btipsign=btipsign, poloidal = poloidal</span>
 <a name="ln-127"></a><span class="s s-Atom">    ;+#read_geqdsk</span>
 <a name="ln-128"></a><span class="s s-Atom">    ;+Reads an EFIT GEQDSK file</span>
 <a name="ln-129"></a><span class="s s-Atom">    ;+***</span>
@@ -388,21 +388,21 @@ sqrt(torodial flux) (rho) mapped onto the interpolation grid</p>
 <a name="ln-133"></a><span class="s s-Atom">    ;+    **grid**: Interpolation grid</span>
 <a name="ln-134"></a><span class="s s-Atom">    ;+</span>
 <a name="ln-135"></a><span class="s s-Atom">    ;+##Keyword Arguments</span>
-<a name="ln-136"></a><span class="s s-Atom">    ;+    **flux**: Set this keyword to a named variable to receive the normalized</span>
-<a name="ln-137"></a><span class="s s-Atom">    ;+              sqrt(torodial flux) (rho) mapped onto the interpolation grid</span>
+<a name="ln-136"></a><span class="s s-Atom">    ;+    **rho**: Set this keyword to a named variable to receive the</span>
+<a name="ln-137"></a><span class="s s-Atom">    ;+              sqrt(normalized torodial flux) (rho) mapped onto the interpolation grid</span>
 <a name="ln-138"></a><span class="s s-Atom">    ;+</span>
 <a name="ln-139"></a><span class="s s-Atom">    ;+    **g**: Set this keyword to a named variable to recieve the geqdsk structure</span>
 <a name="ln-140"></a><span class="s s-Atom">    ;+</span>
 <a name="ln-141"></a><span class="s s-Atom">    ;+    **btipsign**: Set this keyword to a named variable to recieve the bt-ip sign</span>
 <a name="ln-142"></a><span class="s s-Atom">    ;+</span>
-<a name="ln-143"></a><span class="s s-Atom">    ;+    **psi**: Return normalized poloidal flux instead of normalized toroidal flux</span>
+<a name="ln-143"></a><span class="s s-Atom">    ;+    **poloidal**: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))</span>
 <a name="ln-144"></a><span class="s s-Atom">    ;+</span>
 <a name="ln-145"></a><span class="s s-Atom">    ;+##Return Value</span>
 <a name="ln-146"></a><span class="s s-Atom">    ;+Electronmagnetic fields structure</span>
 <a name="ln-147"></a><span class="s s-Atom">    ;+</span>
 <a name="ln-148"></a><span class="s s-Atom">    ;+##Example Usage</span>
 <a name="ln-149"></a><span class="s s-Atom">    ;+```idl</span>
-<a name="ln-150"></a><span class="s s-Atom">    ;+IDL&gt; fields = read_geqdsk(&quot;./g133223.00200&quot;,grid,flux=flux)</span>
+<a name="ln-150"></a><span class="s s-Atom">    ;+IDL&gt; fields = read_geqdsk(&quot;./g133223.00200&quot;,grid,rho=rho)</span>
 <a name="ln-151"></a><span class="s s-Atom">    ;+```</span>
 <a name="ln-152"></a>
 <a name="ln-153"></a><span class="s s-Atom">    equil={err:1}</span>
@@ -410,15 +410,15 @@ sqrt(torodial flux) (rho) mapped onto the interpolation grid</p>
 <a name="ln-155"></a><span class="s s-Atom">    g=readg(filename)</span>
 <a name="ln-156"></a><span class="s s-Atom">    btipsign = signum(g.bcentr*g.cpasma)</span>
 <a name="ln-157"></a><span class="s s-Atom">    time = double(g.time)</span>
-<a name="ln-158"></a><span class="s s-Atom">    if not keyword_set(psi) then begin</span>
-<a name="ln-159"></a><span class="s s-Atom">        fluxgrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))</span>
+<a name="ln-158"></a><span class="s s-Atom">    if not keyword_set(poloidal) then begin</span>
+<a name="ln-159"></a><span class="s s-Atom">        rhogrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))</span>
 <a name="ln-160"></a><span class="s s-Atom">    endif else begin</span>
 <a name="ln-161"></a><span class="s s-Atom">        r = g.r</span>
 <a name="ln-162"></a><span class="s s-Atom">        dr = abs(r[1]-r[0])</span>
 <a name="ln-163"></a><span class="s s-Atom">        z = g.z</span>
 <a name="ln-164"></a><span class="s s-Atom">        dz = abs(z[1]-z[0])</span>
-<a name="ln-165"></a><span class="s s-Atom">        fluxgrid = interpolate(g.psirz,(grid.r2d/100-r[0])/dr,(grid.z2d/100 -z[0])/dz,cubic=-0.5)</span>
-<a name="ln-166"></a><span class="s s-Atom">        fluxgrid = sqrt((fluxgrid - g.ssimag)/(g.ssibry - g.ssimag))</span>
+<a name="ln-165"></a><span class="s s-Atom">        rhogrid = interpolate(g.psirz,(grid.r2d/100-r[0])/dr,(grid.z2d/100 -z[0])/dz,cubic=-0.5)</span>
+<a name="ln-166"></a><span class="s s-Atom">        rhogrid = sqrt((rhogrid - g.ssimag)/(g.ssibry - g.ssimag))</span>
 <a name="ln-167"></a><span class="s s-Atom">    end</span>
 <a name="ln-168"></a>
 <a name="ln-169"></a><span class="s s-Atom">    calculate_bfield,bp,br,bphi,bz1,g</span>
@@ -454,7 +454,7 @@ sqrt(torodial flux) (rho) mapped onto the interpolation grid</p>
 <a name="ln-199"></a>            <span class="s s-Atom">e_z</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">j</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span>  <span class="o">=</span><span class="nf">interpolate</span><span class="p">(</span><span class="s s-Atom">ez1</span><span class="p">,[</span><span class="s s-Atom">rgrid</span><span class="p">],[</span><span class="s s-Atom">zgrid</span><span class="p">])</span>
 <a name="ln-200"></a>            <span class="s s-Atom">b_z</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">,</span><span class="s s-Atom">j</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">]</span>  <span class="o">=</span><span class="nf">interpolate</span><span class="p">(</span><span class="s s-Atom">bz1</span><span class="p">,[</span><span class="s s-Atom">rgrid</span><span class="p">],[</span><span class="s s-Atom">zgrid</span><span class="p">])</span>
 <a name="ln-201"></a>    <span class="s s-Atom">endfor</span>
-<a name="ln-202"></a>    <span class="s s-Atom">flux</span> <span class="o">=</span> <span class="s s-Atom">fluxgrid</span>
+<a name="ln-202"></a>    <span class="s s-Atom">rho</span> <span class="o">=</span> <span class="s s-Atom">rhogrid</span>
 <a name="ln-203"></a>    <span class="s s-Atom">mask</span> <span class="o">=</span> <span class="nf">in_vessel</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">lim</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">],</span><span class="mi">100</span><span class="o">*</span><span class="s s-Atom">g</span><span class="p">.</span><span class="s s-Atom">lim</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">],</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">r2d</span><span class="p">,</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">z2d</span><span class="p">)</span>
 <a name="ln-204"></a>    <span class="s s-Atom">mask</span><span class="o">=</span><span class="nf">rebin</span><span class="p">(</span><span class="s s-Atom">mask</span><span class="p">,</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nphi</span><span class="p">)</span>
 <a name="ln-205"></a>

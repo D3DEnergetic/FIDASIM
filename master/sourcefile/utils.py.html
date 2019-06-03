@@ -419,11 +419,11 @@ Falls back to reading VERSION file when git is not available</p>
 <p><strong>filename</strong>: GEQDSK file</p>
 <p><strong>grid</strong>: Interpolation grid</p>
 <h2 id="keyword-arguments_5">Keyword Arguments</h2>
-<p><strong>psi</strong>: Return normalized poloidal flux instead of normalized toroidal flux</p>
+<p><strong>poloidal</strong>: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))</p>
 <h2 id="return-value_3">Return Value</h2>
-<p>Electronmagnetic fields structure, flux, btipsign</p>
+<p>Electronmagnetic fields structure, rho, btipsign</p>
 <h2 id="example-usage_15">Example Usage</h2>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">btipsign</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s2">&quot;./g133223.00200&quot;</span><span class="p">,</span><span class="n">grid</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">btipsign</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s2">&quot;./g133223.00200&quot;</span><span class="p">,</span><span class="n">grid</span><span class="p">)</span>
 </pre></div>
 
 
@@ -448,13 +448,13 @@ Falls back to reading VERSION file when git is not available</p>
 <p><strong>filename</strong>: TRANSP output file e.g. [TRANSP_RUNID].CDF</p>
 <p><strong>intime</strong>: Time of interest [s]</p>
 <p><strong>grid</strong>: Interpolation grid</p>
-<p><strong>flux</strong>: Normalized square root of torodial flux("rho") mapped onto the interpolation grid</p>
+<p><strong>rhogrid</strong>: sqrt(normalized torodial flux) mapped onto the interpolation grid</p>
 <h2 id="keyword-arguments_7">Keyword Arguments</h2>
 <p><strong>dn0out</strong>: Wall Neutral density value <code>dn0out</code> variable in transp namelist</p>
 <p><strong>scrapeoff</strong>: scrapeoff decay length</p>
 <p><strong>rho_scrapeoff</strong>: scrapeoff length, default = 0.1</p>
 <h2 id="example-usage_17">Example Usage</h2>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="s2">&quot;./142332H01.CDF&quot;</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="s2">&quot;./142332H01.CDF&quot;</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">rho</span><span class="p">)</span>
 </pre></div>
 
 
@@ -1230,7 +1230,7 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-674"></a>        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">units</span><span class="p">:</span>
 <a name="ln-675"></a>            <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 <a name="ln-676"></a>
-<a name="ln-677"></a><span class="k">def</span> <span class="nf">read_geqdsk</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">psi</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<a name="ln-677"></a><span class="k">def</span> <span class="nf">read_geqdsk</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">poloidal</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
 <a name="ln-678"></a>    <span class="sd">&quot;&quot;&quot;</span>
 <a name="ln-679"></a><span class="sd">    #+#read_geqdsk</span>
 <a name="ln-680"></a><span class="sd">    #+Reads an EFIT GEQDSK file</span>
@@ -1241,14 +1241,14 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-685"></a><span class="sd">    #+    **grid**: Interpolation grid</span>
 <a name="ln-686"></a><span class="sd">    #+</span>
 <a name="ln-687"></a><span class="sd">    #+##Keyword Arguments</span>
-<a name="ln-688"></a><span class="sd">    #+    **psi**: Return normalized poloidal flux instead of normalized toroidal flux</span>
+<a name="ln-688"></a><span class="sd">    #+    **poloidal**: Return rho_p (sqrt(normalized poloidal flux)) instead of rho (sqrt(normalized toroidal flux))</span>
 <a name="ln-689"></a><span class="sd">    #+</span>
 <a name="ln-690"></a><span class="sd">    #+##Return Value</span>
-<a name="ln-691"></a><span class="sd">    #+Electronmagnetic fields structure, flux, btipsign</span>
+<a name="ln-691"></a><span class="sd">    #+Electronmagnetic fields structure, rho, btipsign</span>
 <a name="ln-692"></a><span class="sd">    #+</span>
 <a name="ln-693"></a><span class="sd">    #+##Example Usage</span>
 <a name="ln-694"></a><span class="sd">    #+```python</span>
-<a name="ln-695"></a><span class="sd">    #+&gt;&gt;&gt; fields, flux, btipsign = read_geqdsk(&quot;./g133223.00200&quot;,grid)</span>
+<a name="ln-695"></a><span class="sd">    #+&gt;&gt;&gt; fields, rho, btipsign = read_geqdsk(&quot;./g133223.00200&quot;,grid)</span>
 <a name="ln-696"></a><span class="sd">    #+```</span>
 <a name="ln-697"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a name="ln-698"></a>    <span class="n">dims</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[</span><span class="s1">&#39;r2d&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
@@ -1268,10 +1268,10 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-712"></a>    <span class="n">psirz_itp</span> <span class="o">=</span> <span class="n">interp2d</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;psirz&quot;</span><span class="p">],</span> <span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
 <a name="ln-713"></a>
 <a name="ln-714"></a>    <span class="k">if</span> <span class="n">psi</span><span class="p">:</span>
-<a name="ln-715"></a>        <span class="n">fluxgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">psirz_itp</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">)])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-<a name="ln-716"></a>        <span class="n">fluxgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">fluxgrid</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssimag&quot;</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssibry&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssimag&quot;</span><span class="p">]))</span>
+<a name="ln-715"></a>        <span class="n">rhogrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">psirz_itp</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">)])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+<a name="ln-716"></a>        <span class="n">rhogrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">rhogrid</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssimag&quot;</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssibry&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;ssimag&quot;</span><span class="p">]))</span>
 <a name="ln-717"></a>    <span class="k">else</span><span class="p">:</span>
-<a name="ln-718"></a>        <span class="n">fluxgrid</span><span class="o">=</span><span class="n">efit</span><span class="o">.</span><span class="n">rho_rz</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+<a name="ln-718"></a>        <span class="n">rhogrid</span><span class="o">=</span><span class="n">efit</span><span class="o">.</span><span class="n">rho_rz</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">,</span><span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
 <a name="ln-719"></a>
 <a name="ln-720"></a>    <span class="n">br</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">psirz_itp</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">,</span><span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">rr</span> <span class="k">for</span> <span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">)])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
 <a name="ln-721"></a>    <span class="n">bz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">psirz_itp</span><span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">,</span><span class="n">dx</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">rr</span> <span class="k">for</span> <span class="p">(</span><span class="n">rr</span><span class="p">,</span><span class="n">zz</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">r_pts</span><span class="p">,</span><span class="n">z_pts</span><span class="p">)])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
@@ -1286,7 +1286,7 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-730"></a>    <span class="n">equil</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;time&quot;</span><span class="p">:</span><span class="mf">0.0</span><span class="p">,</span><span class="s2">&quot;data_source&quot;</span><span class="p">:</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="s2">&quot;mask&quot;</span><span class="p">:</span><span class="n">mask</span><span class="p">,</span>
 <a name="ln-731"></a>             <span class="s2">&quot;br&quot;</span><span class="p">:</span><span class="n">br</span><span class="p">,</span><span class="s2">&quot;bt&quot;</span><span class="p">:</span><span class="n">bt</span><span class="p">,</span><span class="s2">&quot;bz&quot;</span><span class="p">:</span><span class="n">bz</span><span class="p">,</span><span class="s2">&quot;er&quot;</span><span class="p">:</span><span class="n">er</span><span class="p">,</span><span class="s2">&quot;et&quot;</span><span class="p">:</span><span class="n">et</span><span class="p">,</span><span class="s2">&quot;ez&quot;</span><span class="p">:</span><span class="n">ez</span><span class="p">}</span>
 <a name="ln-732"></a>
-<a name="ln-733"></a>    <span class="k">return</span> <span class="n">equil</span><span class="p">,</span> <span class="n">fluxgrid</span><span class="p">,</span> <span class="n">btipsign</span>
+<a name="ln-733"></a>    <span class="k">return</span> <span class="n">equil</span><span class="p">,</span> <span class="n">rhogrid</span><span class="p">,</span> <span class="n">btipsign</span>
 <a name="ln-734"></a>
 <a name="ln-735"></a><span class="k">def</span> <span class="nf">read_ncdf</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 <a name="ln-736"></a>    <span class="sd">&#39;&#39;&#39;</span>
@@ -1335,7 +1335,7 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-779"></a>
 <a name="ln-780"></a>    <span class="k">return</span> <span class="n">d</span>
 <a name="ln-781"></a>
-<a name="ln-782"></a><span class="k">def</span> <span class="nf">extract_transp_plasma</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">intime</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span>
+<a name="ln-782"></a><span class="k">def</span> <span class="nf">extract_transp_plasma</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">intime</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">rhogrid</span><span class="p">,</span>
 <a name="ln-783"></a>                          <span class="n">dn0out</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">scrapeoff</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">rho_scrapeoff</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
 <a name="ln-784"></a>    <span class="sd">&#39;&#39;&#39;</span>
 <a name="ln-785"></a><span class="sd">    #+#extract_transp_plasma</span>
@@ -1348,7 +1348,7 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-792"></a><span class="sd">    #+</span>
 <a name="ln-793"></a><span class="sd">    #+    **grid**: Interpolation grid</span>
 <a name="ln-794"></a><span class="sd">    #+</span>
-<a name="ln-795"></a><span class="sd">    #+    **flux**: Normalized square root of torodial flux(&quot;rho&quot;) mapped onto the interpolation grid</span>
+<a name="ln-795"></a><span class="sd">    #+    **rhogrid**: sqrt(normalized torodial flux) mapped onto the interpolation grid</span>
 <a name="ln-796"></a><span class="sd">    #+</span>
 <a name="ln-797"></a><span class="sd">    #+##Keyword Arguments</span>
 <a name="ln-798"></a><span class="sd">    #+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist</span>
@@ -1359,7 +1359,7 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-803"></a><span class="sd">    #+</span>
 <a name="ln-804"></a><span class="sd">    #+##Example Usage</span>
 <a name="ln-805"></a><span class="sd">    #+```python</span>
-<a name="ln-806"></a><span class="sd">    #+&gt;&gt;&gt; plasma = extract_transp_plasma(&quot;./142332H01.CDF&quot;, 1.2, grid, flux)</span>
+<a name="ln-806"></a><span class="sd">    #+&gt;&gt;&gt; plasma = extract_transp_plasma(&quot;./142332H01.CDF&quot;, 1.2, grid, rho)</span>
 <a name="ln-807"></a><span class="sd">    #+```</span>
 <a name="ln-808"></a><span class="sd">    &#39;&#39;&#39;</span>
 <a name="ln-809"></a>
@@ -1417,36 +1417,36 @@ Falls back to reading VERSION file when git is not available</p>
 <a name="ln-861"></a>                <span class="s2">&quot;omega&quot;</span><span class="p">:</span><span class="n">transp_omega</span><span class="p">}</span>
 <a name="ln-862"></a>
 <a name="ln-863"></a>    <span class="c1"># Interpolate onto r-z grid</span>
-<a name="ln-864"></a>    <span class="n">dims</span> <span class="o">=</span> <span class="n">flux</span><span class="o">.</span><span class="n">shape</span>
+<a name="ln-864"></a>    <span class="n">dims</span> <span class="o">=</span> <span class="n">rhogrid</span><span class="o">.</span><span class="n">shape</span>
 <a name="ln-865"></a>    <span class="n">f_dene</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">transp_ne</span><span class="p">,</span><span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
-<a name="ln-866"></a>    <span class="n">dene</span> <span class="o">=</span> <span class="n">f_dene</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span>
+<a name="ln-866"></a>    <span class="n">dene</span> <span class="o">=</span> <span class="n">f_dene</span><span class="p">(</span><span class="n">rhogrid</span><span class="p">)</span>
 <a name="ln-867"></a>    <span class="n">dene</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dene</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dene</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-868"></a>
 <a name="ln-869"></a>    <span class="n">f_denn</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">transp_nn</span><span class="p">),</span><span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span><span class="n">bounds_error</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<a name="ln-870"></a>    <span class="n">log_denn</span> <span class="o">=</span> <span class="n">f_denn</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span>
+<a name="ln-870"></a>    <span class="n">log_denn</span> <span class="o">=</span> <span class="n">f_denn</span><span class="p">(</span><span class="n">rhogrid</span><span class="p">)</span>
 <a name="ln-871"></a>    <span class="n">denn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">log_denn</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_denn</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-872"></a>
 <a name="ln-873"></a>    <span class="n">f_te</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">transp_te</span><span class="p">,</span><span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
-<a name="ln-874"></a>    <span class="n">te</span> <span class="o">=</span> <span class="n">f_te</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span>
+<a name="ln-874"></a>    <span class="n">te</span> <span class="o">=</span> <span class="n">f_te</span><span class="p">(</span><span class="n">rhogrid</span><span class="p">)</span>
 <a name="ln-875"></a>    <span class="n">te</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">te</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">te</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-876"></a>
 <a name="ln-877"></a>    <span class="n">f_ti</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">transp_ti</span><span class="p">,</span><span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
-<a name="ln-878"></a>    <span class="n">ti</span> <span class="o">=</span> <span class="n">f_ti</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span>
+<a name="ln-878"></a>    <span class="n">ti</span> <span class="o">=</span> <span class="n">f_ti</span><span class="p">(</span><span class="n">rhogrid</span><span class="p">)</span>
 <a name="ln-879"></a>    <span class="n">ti</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ti</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-880"></a>
 <a name="ln-881"></a>    <span class="n">f_zeff</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">transp_zeff</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">bounds_error</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
-<a name="ln-882"></a>    <span class="n">zeff</span> <span class="o">=</span> <span class="n">f_zeff</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span>
+<a name="ln-882"></a>    <span class="n">zeff</span> <span class="o">=</span> <span class="n">f_zeff</span><span class="p">(</span><span class="n">rhogrid</span><span class="p">)</span>
 <a name="ln-883"></a>    <span class="n">zeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">zeff</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="n">zeff</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-884"></a>
 <a name="ln-885"></a>    <span class="n">f_omega</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">rho</span><span class="p">,</span><span class="n">transp_omega</span><span class="p">,</span><span class="n">fill_value</span><span class="o">=</span><span class="s1">&#39;extrapolate&#39;</span><span class="p">)</span>
-<a name="ln-886"></a>    <span class="n">vt</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[</span><span class="s1">&#39;r2d&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">f_omega</span><span class="p">(</span><span class="n">flux</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+<a name="ln-886"></a>    <span class="n">vt</span> <span class="o">=</span> <span class="n">grid</span><span class="p">[</span><span class="s1">&#39;r2d&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">f_omega</span><span class="p">(</span><span class="n">rhogrid</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-887"></a>    <span class="n">vr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-888"></a>    <span class="n">vz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <a name="ln-889"></a>
-<a name="ln-890"></a>    <span class="n">max_flux</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">rho</span><span class="p">))</span>
+<a name="ln-890"></a>    <span class="n">max_rho</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">rho</span><span class="p">))</span>
 <a name="ln-891"></a>
 <a name="ln-892"></a>    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">)</span>
-<a name="ln-893"></a>    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">flux</span> <span class="o">&lt;=</span> <span class="n">max_flux</span><span class="p">)</span> <span class="c1">#where we have profiles</span>
+<a name="ln-893"></a>    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">rhogrid</span> <span class="o">&lt;=</span> <span class="n">max_rho</span><span class="p">)</span> <span class="c1">#where we have profiles</span>
 <a name="ln-894"></a>    <span class="n">mask</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-895"></a>
 <a name="ln-896"></a>    <span class="c1"># SAVE IN PROFILES STRUCTURE</span>

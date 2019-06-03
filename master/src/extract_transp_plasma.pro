@@ -1,4 +1,4 @@
-FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
+FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
             doplot=doplot, profiles=profiles, dn0out=dn0out, $
             scrapeoff=scrapeoff, rho_scrapeoff=rho_scrapeoff,$
             sne=sne, ste=ste, sti=sti, simp=simp, srot=srot, snn=snn
@@ -12,7 +12,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+
     ;+    **grid**: Interpolation grid
     ;+
-    ;+    **flux**: Normalized square root of torodial flux("rho") mapped onto the interpolation grid
+    ;+    **rhogrid**: sqrt(normalized torodial flux) mapped onto the interpolation grid
     ;+
     ;+##Keyword Arguments
     ;+    **doplot**: Plot profiles
@@ -29,7 +29,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
     ;+
     ;+##Example Usage
     ;+```idl
-    ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, flux)
+    ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, rho)
     ;+```
 
     var_list = ["X","TRFLX","TFLUX","TIME","NE","TE","TI","ZEFFI","OMEGA","DN0WD"]
@@ -145,19 +145,19 @@ FUNCTION extract_transp_plasma,filename, intime, grid, flux, $
                 omega:transp_omega}
 
     ;; Interpolate onto r-z grid
-    dene=interpol(transp_ne,rho,flux) > 0.0
-    denn=(10.d0^interpol(alog10(transp_nn),rho,flux)) > 0.0
-    te=interpol(transp_te,rho,flux) > 0.0
-    ti=interpol(transp_ti,rho,flux) > 0.0
-    zeff=interpol(transp_zeff,rho,flux) > 1.0
-    vt = double(grid.r2d*interpol(transp_omega,rho,flux))
+    dene=interpol(transp_ne,rho,rhogrid) > 0.0
+    denn=(10.d0^interpol(alog10(transp_nn),rho,rhogrid)) > 0.0
+    te=interpol(transp_te,rho,rhogrid) > 0.0
+    ti=interpol(transp_ti,rho,rhogrid) > 0.0
+    zeff=interpol(transp_zeff,rho,rhogrid) > 1.0
+    vt = double(grid.r2d*interpol(transp_omega,rho,rhogrid))
     vr = double(replicate(0.0,grid.nr,grid.nz))
     vz = double(replicate(0.0,grid.nr,grid.nz))
-    max_flux = max(abs(rho))
+    max_rho = max(abs(rho))
 
-    s = size(flux,/dim)
+    s = size(rhogrid,/dim)
     mask = intarr(s[0],s[1])
-    w=where(flux le max_flux) ;where we have profiles
+    w=where(rhogrid le max_rho) ;where we have profiles
     mask[w] = 1
 
 

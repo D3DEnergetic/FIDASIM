@@ -230,17 +230,17 @@ The routine <code>beam_grid</code>(<a href="../../sourcefile/beam_grid.pro.html"
 <h1 id="reading-geqdsk-files">Reading GEQDSK files</h1>
 <p>Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine <a href="../../sourcefile/read_geqdsk.pro.html">read_geqdsk.pro</a> to calculate the <a href="../03_technical/01_prefida_inputs.html#fields-structure">fields structure</a> from EFITs GEQDSK file.</p>
-<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s1">&#39;g159243.00300&#39;</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">flux</span><span class="o">=</span><span class="n">flux</span><span class="p">,</span><span class="n">btipsign</span><span class="o">=</span><span class="n">btipsign</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">fields</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s1">&#39;g159243.00300&#39;</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">rho</span><span class="o">=</span><span class="n">rho</span><span class="p">,</span><span class="n">btipsign</span><span class="o">=</span><span class="n">btipsign</span><span class="p">)</span>
 </pre></div>
 
 
 <p>or in Python</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">read_geqdsk</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span><span class="p">,</span> <span class="n">flux</span><span class="p">,</span> <span class="n">btipsign</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s1">&#39;g159243.00300&#39;</span><span class="p">,</span><span class="n">grid</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">fields</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">btipsign</span> <span class="o">=</span> <span class="n">read_geqdsk</span><span class="p">(</span><span class="s1">&#39;g159243.00300&#39;</span><span class="p">,</span><span class="n">grid</span><span class="p">)</span>
 </pre></div>
 
 
-<p>where <code>grid</code> is the interpolation grid, <code>flux</code> keyword is a named variable that recieves the torodial flux upon executation, and <code>btipsign</code> is a named variable that recieves the Bt-Ip sign (-1 for anti-parallel, 1 for parallel).</p>
+<p>where <code>grid</code> is the interpolation grid, <code>rho</code> keyword is a named variable that recieves the sqrt(normalized torodial flux) upon executation, and <code>btipsign</code> is a named variable that recieves the Bt-Ip sign (-1 for anti-parallel, 1 for parallel).</p>
 <h1 id="extracting-geqdsk-file-and-plasma-parameters-from-transp">Extracting GEQDSK file and Plasma Parameters from TRANSP</h1>
 <p>It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. </p>
 <p>The python script, <code>extract_transp_geqdsk</code>, can be used to extract the MHD equilibrium from TRANSP's <code>.DATA* files</code>.
@@ -252,17 +252,17 @@ For example:</p>
 <p>will create a GEQDSK file for every <code>.DATA*</code> file in the <code>159243H06</code> TRANSP run.
 Run <code>extract_transp_geqdsk -h</code> for the full documentation.</p>
 <p>The IDL routine <a href="../../sourcefile/extract_transp_plasma.pro.html">extract_transp_plasma.pro</a> or the equivalent Python function creates the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma structure</a> at a given time. </p>
-<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="ss">&quot;159243H06.CDF&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">.</span><span class="mi">02</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">flux</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="ss">&quot;159243H06.CDF&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">.</span><span class="mi">02</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">rho</span><span class="p">)</span>
 </pre></div>
 
 
 <p>or in Python</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">fidasim.utils</span> <span class="kn">import</span> <span class="n">extract_transp_plasma</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="s2">&quot;159243H06.CDF&quot;</span><span class="p">,</span><span class="mf">1.02</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">flux</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plasma</span> <span class="o">=</span> <span class="n">extract_transp_plasma</span><span class="p">(</span><span class="s2">&quot;159243H06.CDF&quot;</span><span class="p">,</span><span class="mf">1.02</span><span class="p">,</span><span class="n">grid</span><span class="p">,</span><span class="n">rho</span><span class="p">)</span>
 </pre></div>
 
 
-<p>where <code>grid</code> is the interpolation grid and <code>flux</code> is the torodial flux.</p>
+<p>where <code>grid</code> is the interpolation grid and <code>rho</code> is the sqrt(normalized torodial flux).</p>
 <h1 id="translating-nubeam-neutral-beam-geometry">Translating NUBEAM Neutral Beam Geometry</h1>
 <p>The IDL routine <a href="../../sourcefile/nubeam_geometry.pro.html">nubeam_geometry.pro</a> can be used to translate the NUBEAM neutral beam geometry definition into the <a href="../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure">correct format</a>.</p>
 <div class="codehilite"><pre><span></span><span class="n">IDL</span><span class="o">&gt;</span> <span class="n">nbi</span> <span class="o">=</span> <span class="n">nubeam_geometry</span><span class="p">(</span><span class="n">nubeam</span><span class="p">)</span>
@@ -309,12 +309,12 @@ We provide routines for:</p>
 <p>Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
 Below are brief descriptions and examples of what the script can currently handle:</p>
 <p>To plot all of your inputs, simply indicate the directory and run ID.</p>
-<div class="codehilite"><pre><span></span><span class="n">plot_inputs</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="n">test_1a</span>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a
 </pre></div>
 
 
 <p>To plot only the beam and diagnostic geometry, append the optional argument -g</p>
-<div class="codehilite"><pre><span></span><span class="n">plot_inputs</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="n">test_1a</span> <span class="o">-</span><span class="k">g</span>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -g
 </pre></div>
 
 
@@ -322,7 +322,7 @@ Below are brief descriptions and examples of what the script can currently handl
 <p>If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.</p>
 <p>If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
 For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command</p>
-<div class="codehilite"><pre><span></span><span class="n">plot_inputs</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="n">test_1a</span> <span class="o">-</span><span class="n">p</span> <span class="o">-</span><span class="n">rz</span> <span class="mi">170</span>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz <span class="m">170</span>
 </pre></div>
 
 

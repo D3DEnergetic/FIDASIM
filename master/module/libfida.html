@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="59.7% of total for modules and submodules.">8227 statements</a>
+    title="59.8% of total for modules and submodules.">8274 statements</a>
      </li> 
      
      
@@ -667,6 +667,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-colrad">colrad</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-attenuate">attenuate</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-doppler_stark">doppler_stark</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-spectrum">spectrum</a>
       
@@ -1589,6 +1591,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-colrad">colrad</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-attenuate">attenuate</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-doppler_stark">doppler_stark</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-spectrum">spectrum</a>
       
@@ -24755,6 +24759,110 @@ public subroutine <a href='../proc/attenuate.html'>attenuate</a>(ri, rf, vi, sta
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-doppler_stark"></span><h3>
+public subroutine <a href='../proc/doppler_stark.html'>doppler_stark</a>(vecp, vi, fields, lambda)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Calculates doppler shift and stark split wavelengths</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vecp</strong></td><td><p>Vector directing towards optical head</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vi</strong></td><td><p>Particle velocity</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fields</strong></td><td><p>Electro-magnetic fields</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(n_stark)</td><td>::</td>
+  <td><strong>lambda</strong></td><td><p>Wavelengths [nm]</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-spectrum"></span><h3>
 public subroutine <a href='../proc/spectrum.html'>spectrum</a>(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intensity)
     
@@ -24771,7 +24879,7 @@ public subroutine <a href='../proc/spectrum.html'>spectrum</a>(vecp, vi, fields,
 
 
 
-<p>Calculates doppler shift and stark splitting</p>
+<p>Calculates doppler shift, stark splitting, and intensities</p>
     
     <h4>Arguments</h4>
     

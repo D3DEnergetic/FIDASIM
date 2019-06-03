@@ -215,7 +215,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
 
 
     
-    <p>Calculates doppler shift and stark splitting</p>
+    <p>Calculates doppler shift, stark splitting, and intensities</p>
     
 
     <h3>Arguments</h3>
@@ -236,7 +236,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
   
 <tr>
   
-  <td><span class="anchor" id="variable-vecp"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-vecp%7E2"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -251,7 +251,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
   
 <tr>
   
-  <td><span class="anchor" id="variable-vi%7E6"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-vi%7E7"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
@@ -266,7 +266,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
   
 <tr>
   
-  <td><span class="anchor" id="variable-fields%7E5"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
+  <td><span class="anchor" id="variable-fields%7E6"></span>type(<a href='../type/localemfields.html'>LocalEMFields</a>),</td>
   <td>intent(in)</td>
   <td></td>
   
@@ -326,7 +326,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
   
 <tr>
   
-  <td><span class="anchor" id="variable-lambda"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-lambda%7E2"></span>real(kind=Float64),</td>
   <td>intent(out),</td>
   <td></td>
   
@@ -662,7 +662,7 @@ public subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda,
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">spectrum</span><span class="p">(</span><span class="n">vecp</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">sigma_pi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">dlength</span><span class="p">,</span> <span class="n">lambda</span><span class="p">,</span> <span class="n">intensity</span><span class="p">)</span>
-    <span class="c">!+ Calculates doppler shift and stark splitting</span>
+    <span class="c">!+ Calculates doppler shift, stark splitting, and intensities</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>        <span class="kd">::</span> <span class="n">vecp</span>
         <span class="c">!+ Vector directing towards optical head</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>        <span class="kd">::</span> <span class="n">vi</span>

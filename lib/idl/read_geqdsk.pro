@@ -123,7 +123,7 @@ PRO calculate_bfield,bp,br,bt,bz,g
     return
 end
 
-FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign
+FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign, psi=psi
     ;+#read_geqdsk
     ;+Reads an EFIT GEQDSK file
     ;+***
@@ -133,12 +133,14 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign
     ;+    **grid**: Interpolation grid
     ;+
     ;+##Keyword Arguments
-    ;+    **flux**: Set this keyword to a named variable to receive the normalized
-    ;+              sqrt(torodial flux) (rho) mapped onto the interpolation grid
+    ;+    **flux**: Set this keyword to a named variable to receive
+    ;+              sqrt(normalized torodial flux) (rho) mapped onto the interpolation grid
     ;+
     ;+    **g**: Set this keyword to a named variable to recieve the geqdsk structure
     ;+
     ;+    **btipsign**: Set this keyword to a named variable to recieve the bt-ip sign
+    ;+
+    ;+    **psi**: Return sqrt(normalized poloidal flux) instead of sqrt(normalized toroidal flux)
     ;+
     ;+##Return Value
     ;+Electronmagnetic fields structure
@@ -153,7 +155,17 @@ FUNCTION read_geqdsk,filename,grid,flux=flux,g=g,btipsign=btipsign
     g=readg(filename)
     btipsign = signum(g.bcentr*g.cpasma)
     time = double(g.time)
-    fluxgrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))
+
+    if not keyword_set(psi) then begin
+        fluxgrid=double(rho_rz(g,grid.r2d/100.,grid.z2d/100.,/do_linear,/norm))
+    endif else begin
+        r = g.r
+        dr = abs(r[1]-r[0])
+        z = g.z
+        dz = abs(z[1]-z[0])
+        fluxgrid = interpolate(g.psirz,(grid.r2d/100-r[0])/dr,(grid.z2d/100 -z[0])/dz,cubic=-0.5)
+        fluxgrid = sqrt((fluxgrid - g.ssimag)/(g.ssibry - g.ssimag))
+    end
 
     calculate_bfield,bp,br,bphi,bz1,g
 

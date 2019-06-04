@@ -84,14 +84,14 @@ Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine [read_geqdsk.pro](|url|/sourcefile/read_geqdsk.pro.html) to calculate the [fields structure](../03_technical/01_prefida_inputs.html#fields-structure) from EFITs GEQDSK file.
 
 ```
-IDL> fields = read_geqdsk('g159243.00300',grid,flux=flux,btipsign=btipsign)
+IDL> fields = read_geqdsk('g159243.00300',grid,rho=rho,btipsign=btipsign)
 ```
 or in Python
 ```python
 >>> from fidasim.utils import read_geqdsk
->>> fields, flux, btipsign = read_geqdsk('g159243.00300',grid)
+>>> fields, rho, btipsign = read_geqdsk('g159243.00300',grid)
 ```
-where `grid` is the interpolation grid, `flux` keyword is a named variable that recieves the torodial flux upon executation, and `btipsign` is a named variable that recieves the Bt-Ip sign (-1 for anti-parallel, 1 for parallel).
+where `grid` is the interpolation grid, `rho` keyword is a named variable that recieves the sqrt(normalized torodial flux) upon executation, and `btipsign` is a named variable that recieves the Bt-Ip sign (-1 for anti-parallel, 1 for parallel).
 
 #Extracting GEQDSK file and Plasma Parameters from TRANSP
 It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs. 
@@ -109,14 +109,14 @@ Run `extract_transp_geqdsk -h` for the full documentation.
 The IDL routine [extract_transp_plasma.pro](|url|/sourcefile/extract_transp_plasma.pro.html) or the equivalent Python function creates the [plasma structure](../03_technical/01_prefida_inputs.html#plasma-structure) at a given time. 
 
 ```
-IDL> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,flux)
+IDL> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,rho)
 ```
 or in Python
 ```python
 >>> from fidasim.utils import extract_transp_plasma
->>> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,flux)
+>>> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,rho)
 ```
-where `grid` is the interpolation grid and `flux` is the torodial flux.
+where `grid` is the interpolation grid and `rho` is the sqrt(normalized torodial flux).
 
 #Translating NUBEAM Neutral Beam Geometry
 The IDL routine [nubeam_geometry.pro](|url|/sourcefile/nubeam_geometry.pro.html) can be used to translate the NUBEAM neutral beam geometry definition into the [correct format](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure).
@@ -156,3 +156,31 @@ or in Python
 >>> from fidasim.utils import read_nubeam
 >>> f = read_nubeam(nubeam_distribution_file, grid, btipsign=-1)
 ```
+
+#Visualization: Inputs
+
+Visualizing your inputs can be done by executing `plot_inputs` found in `lib/scripts/`
+
+Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
+Below are brief descriptions and examples of what the script can currently handle:
+
+To plot all of your inputs, simply indicate the directory and run ID.
+```bash
+plot_inputs /p/fida/lstagner/TEST/ test_1a
+```
+
+To plot only the beam and diagnostic geometry, append the optional argument -g
+```bash
+plot_inputs /p/fida/lstagner/TEST/ test_1a -g
+```
+In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.
+
+If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.
+
+If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
+For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command
+```bash
+plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz 170
+```
+
+There are many more possible lineouts that can be viewed, so run `plot_inputs -h` to look at the help documentation.

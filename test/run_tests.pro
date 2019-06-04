@@ -41,7 +41,7 @@ PRO run_tests,result_dir,runid = runid
 
    nbi = test_beam(0.d0)
    grid = rz_grid(100.d0,240.d0, 70, -100.d0,100.d0, 100)
-   equil = read_geqdsk(test_dir+'g000001.01000',grid,flux=flux,g=g)
+   equil = read_geqdsk(test_dir+'g000001.01000',grid,rho=rho,g=g)
 
    equil = create_struct(equil,"geqdsk",g)
 
@@ -51,7 +51,7 @@ PRO run_tests,result_dir,runid = runid
    npa = test_npa()
 
    pfile = test_dir+'test_profiles.cdf'
-   plasma = test_profiles(pfile,grid,flux)
+   plasma = test_profiles(pfile,grid,rho)
 
    prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
 

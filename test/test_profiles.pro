@@ -1,4 +1,4 @@
-FUNCTION test_profiles,filename,grid,flux
+FUNCTION test_profiles,filename,grid,rhogrid
 
     ;; profiles structure
     ;;** Structure <83e8518>, 7 tags, length=5768, data length=5764, refs=1:
@@ -18,19 +18,19 @@ FUNCTION test_profiles,filename,grid,flux
     prof = read_ncdf(filename)
 
     rho = double(prof.rho)
-    dene = interpol(prof.dene*1.0d-6,rho,flux) ;;cm^-3
-    ti = interpol(prof.ti*1.0d-3,rho,flux) ;;keV
-    te = interpol(prof.te*1.0d-3,rho,flux) ;;keV
+    dene = interpol(prof.dene*1.0d-6,rho,rhogrid) ;;cm^-3
+    ti = interpol(prof.ti*1.0d-3,rho,rhogrid) ;;keV
+    te = interpol(prof.te*1.0d-3,rho,rhogrid) ;;keV
     zeff = dene*0.d0 + 1.5
-    vt = grid.r2d*interpol(prof.omega*1.0d0,rho,flux) ;;cm/s
+    vt = grid.r2d*interpol(prof.omega*1.0d0,rho,rhogrid) ;;cm/s
     vr = 0.d0*vt ;;cm/s
     vz = 0.d0*vt ;;cm/s
     denn = zeff*0 + 1.0d8
-    max_flux = max(abs(rho))
+    max_rho = max(abs(rho))
 
-    s = size(flux,/dim)
+    s = size(rhogrid,/dim)
     mask = intarr(s[0],s[1])
-    w=where(flux le max_flux) ;where we have profiles
+    w=where(rhogrid le max_rho) ;where we have profiles
     mask[w] = 1
 
     nr = n_elements(dene[*,0])

@@ -4801,17 +4801,8 @@ subroutine write_spectra
         lambda_arr(i) = (i-0.5)*inputs%dlambda + inputs%lambdamin
     enddo
 
-    factor = 1.d0/(inputs%dlambda)/(4.d0*pi)*1.d4
     !! convert [Ph/(s*wavel_bin*cm^2*all_directions)] to [Ph/(s*nm*sr*m^2)]!
-    spec%brems = factor*spec%brems
-    spec%full  = factor*spec%full
-    spec%half  = factor*spec%half
-    spec%third = factor*spec%third
-    spec%dcx   = factor*spec%dcx
-    spec%halo  = factor*spec%halo
-    spec%cold  = factor*spec%cold
-    spec%fida  = factor*spec%fida
-    spec%pfida = factor*spec%pfida
+    factor = 1.d0/(inputs%dlambda)/(4.d0*pi)*1.d4
 
     !! write to file
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_spectra.h5"
@@ -4847,6 +4838,7 @@ subroutine write_spectra
     call h5ltset_attribute_string_f(fid,"/radius","units","cm", error)
 
     if(inputs%calc_brems.ge.1) then
+        spec%brems = factor*spec%brems
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/brems", 2, &
              dims(1:2), spec%brems, error)
@@ -4858,6 +4850,9 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_bes.ge.1) then
+        spec%full  = factor*spec%full
+        spec%half  = factor*spec%half
+        spec%third = factor*spec%third
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
              spec%full, error)
@@ -4878,6 +4873,7 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_dcx.ge.1) then
+        spec%dcx   = factor*spec%dcx
         call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 2, dims(1:2), &
              spec%dcx, error)
         call h5ltset_attribute_string_f(fid,"/dcx","description", &
@@ -4886,6 +4882,7 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_halo.ge.1) then
+        spec%halo  = factor*spec%halo
         call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
              spec%halo, error)
         call h5ltset_attribute_string_f(fid,"/halo","description", &
@@ -4894,6 +4891,7 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_cold.ge.1) then
+        spec%cold  = factor*spec%cold
         call h5ltmake_compressed_dataset_double_f(fid, "/cold", 2, dims(1:2), &
              spec%cold, error)
         call h5ltset_attribute_string_f(fid,"/cold","description", &
@@ -4902,6 +4900,7 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_fida.ge.1) then
+        spec%fida  = factor*spec%fida
         !Write variables
         if(particles%nclass.le.1) then
             call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
@@ -4921,6 +4920,7 @@ subroutine write_spectra
     endif
 
     if(inputs%calc_pfida.ge.1) then
+        spec%pfida = factor*spec%pfida
         !Write variables
         if(particles%nclass.le.1) then
             call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 2, &
@@ -6581,17 +6581,25 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     logical, intent(out), optional                   :: los_intersect
         !+ Indicator whether particle intersects a LOS in [[libfida:spec_chords]]
 
-    integer :: cc, i, ii, mind,ncross
+    integer :: cc, i, j, ii, mind,ncross, id
     integer, dimension(3) :: ind
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     real(Float64) :: dT, dt1, inv_50
     real(Float64), dimension(3) :: dt_arr, dr
-    real(Float64), dimension(3) :: vn, inv_vn
+    real(Float64), dimension(3) :: vn, inv_vn, vp
     real(Float64), dimension(3) :: ri, ri_tmp, ri_cell
+    type(LocalEMFields) :: fields
+    type(LOSInters) :: inter
+    real(Float64), dimension(n_stark) :: lambda
     integer, dimension(3) :: sgn
     integer, dimension(3) :: gdims
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
+
+    los_inter=.False.
+    if(.not.present(los_intersect)) then
+        los_inter = .True. !avoids computation if not needed
+    endif
 
     if(dot_product(vin,vin).eq.0.0) then
         return
@@ -6617,22 +6625,30 @@ subroutine track(rin, vin, tracks, ntrack, los_intersect)
     inv_vn = 1/vn
     inv_50 = 1.0/50.0
     cc=1
-    los_inter = .False.
     tracks%time = 0.d0
     tracks%flux = 0.d0
     ncross = 0
     call in_plasma(ri,in_plasma1)
     track_loop: do i=1,beam_grid%ntrack
         if(cc.gt.beam_grid%ntrack) exit track_loop
-
-        if((spec_chords%inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
-            .and.(.not.los_inter))then
-            los_inter = .True.
-        endif
         dt_arr = abs(( (ri_cell + 0.5*dr) - ri)*inv_vn)
         mind = minloc(dt_arr,1)
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
+
+        !! Check if velocity intersects LOS and produces wavelength in the right region
+        inter = spec_chords%inter(ind(1),ind(2),ind(3))
+        if((.not.los_inter).and.(inter%nchan.ne.0))then
+            call get_fields(fields, pos=ri_tmp)
+            chan_loop: do j=1,inter%nchan
+                id = inter%los_elem(j)%id
+                vp = ri_tmp - spec_chords%los(id)%lens
+                call doppler_stark(vp, vn, fields, lambda)
+                los_inter = any((lambda.ge.inputs%lambdamin).and.(lambda.le.inputs%lambdamax))
+                if(los_inter) exit chan_loop
+            enddo chan_loop
+        endif
+
         call in_plasma(ri_tmp,in_plasma2)
         if(in_plasma1.neqv.in_plasma2) then
             dt1 = 0.0
@@ -6691,7 +6707,7 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(3) :: dt_arr, dr !! Need to make this rzphi
-    real(Float64), dimension(3) :: vn, vn_cyl
+    real(Float64), dimension(3) :: vn, vn_cyl, vp
     real(Float64), dimension(3) :: ri, ri_cyl, ri_tmp
     real(Float64), dimension(3) :: p, nz
     real(Float64), dimension(3) :: v_plane_cyl, v_plane
@@ -6705,11 +6721,19 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     integer, dimension(3) :: ind
     real(Float64) :: dT, dt1, inv_50, t
     real(Float64) :: s, c, phi
-    integer :: cc, i, ii, mind,ncross
+    integer :: cc, i, j, ii, mind, ncross, id
+    type(LocalEMFields) :: fields
+    type(LOSInters) :: inter
+    real(Float64), dimension(n_stark) :: lambda
     logical :: in_plasma1, in_plasma2, in_plasma_tmp, los_inter
     integer :: ir, iz, iphi
 
     vn = vin ;  ri = rin ; sgn = 0 ; ntrack = 0
+
+    los_inter=.False.
+    if(.not.present(los_intersect)) then
+        los_inter = .True. !avoids computation if not needed
+    endif
 
     if(dot_product(vn,vn).eq.0.0) then
         return
@@ -6789,18 +6813,12 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
     !! Track the particle
     inv_50 = 1.0/50.0
     cc=1
-    los_inter = .False.
     tracks%time = 0.d0
     tracks%flux = 0.d0
     ncross = 0
     call in_plasma(ri,in_plasma1,input_coords=1)
     track_loop: do i=1,pass_grid%ntrack
         if(cc.gt.pass_grid%ntrack) exit track_loop
-
-        if((spec_chords%cyl_inter(ind(1),ind(2),ind(3))%nchan.ne.0) &
-            .and.(.not.los_inter))then
-            los_inter = .True.
-        endif
 
         call line_cylinder_intersect(ri, vn, arc, p, dt_arr(1))
         call line_plane_intersect(ri, vn, h_plane, nz, p, dt_arr(2))
@@ -6810,6 +6828,19 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
         mind = minpos(1)
         dT = dt_arr(mind)
         ri_tmp = ri + dT*vn
+
+        !! Check if velocity intersects LOS and produces wavelength in the right region
+        inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
+        if((.not.los_inter).and.(inter%nchan.ne.0))then
+            call get_fields(fields, pos=ri_tmp, input_coords=1)
+            chan_loop: do j=1,inter%nchan
+                id = inter%los_elem(j)%id
+                vp = ri_tmp - spec_chords%los(id)%lens_uvw
+                call doppler_stark(vp, vn, fields, lambda)
+                los_inter = any((lambda.ge.inputs%lambdamin).and.(lambda.le.inputs%lambdamax))
+                if(los_inter) exit chan_loop
+            enddo chan_loop
+        endif
 
         call in_plasma(ri_tmp,in_plasma2,input_coords=1)
         if(in_plasma1.neqv.in_plasma2) then
@@ -8507,8 +8538,43 @@ subroutine attenuate(ri, rf, vi, states, dstep_in)
 
 end subroutine attenuate
 
+subroutine doppler_stark(vecp, vi, fields, lambda)
+    !+ Calculates doppler shift and stark split wavelengths
+    real(Float64), dimension(3), intent(in)        :: vecp
+        !+ Vector directing towards optical head
+    real(Float64), dimension(3), intent(in)        :: vi
+        !+ Particle velocity
+    type(LocalEMFields), intent(in)                :: fields
+        !+ Electro-magnetic fields
+    real(Float64), dimension(n_stark), intent(out) :: lambda
+        !+ Wavelengths [nm]
+
+    real(Float64), dimension(3) :: vp, vn
+    real(Float64), dimension(3) :: bfield, efield
+    real(Float64) :: E, lambda_shifted
+
+    !! vector directing towards the optical head
+    vp=vecp/norm2(vecp)
+
+    !! Calculate Doppler shift
+    vn=vi*0.01d0 ! [m/s]
+    lambda_shifted = lambda0*(1.d0 + dot_product(vn,vp)/c0)
+
+    !! Calculate Stark Splitting
+    !! Calculate E-field
+    bfield = fields%b_norm*fields%b_abs
+    efield = fields%e_norm*fields%e_abs
+    efield(1) = efield(1) +  vn(2)*bfield(3) - vn(3)*bfield(2)
+    efield(2) = efield(2) - (vn(1)*bfield(3) - vn(3)*bfield(1))
+    efield(3) = efield(3) +  vn(1)*bfield(2) - vn(2)*bfield(1)
+    E = norm2(efield)
+
+    !! Stark Splitting
+    lambda =  lambda_shifted + E * stark_wavel ![nm]
+end
+
 subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intensity)
-    !+ Calculates doppler shift and stark splitting
+    !+ Calculates doppler shift, stark splitting, and intensities
     real(Float64), dimension(3), intent(in)        :: vecp
         !+ Vector directing towards optical head
     real(Float64), dimension(3), intent(in)        :: vi
@@ -11996,24 +12062,38 @@ program fidasim
     endif
 
     if(inputs%calc_spec.ge.1) then
-        allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%full(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%half(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%third(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%dcx(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%halo(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%cold(inputs%nlambda,spec_chords%nchan))
-        allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
-        allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))
-        spec%brems = 0.d0
-        spec%full = 0.d0
-        spec%half = 0.d0
-        spec%third = 0.d0
-        spec%dcx = 0.d0
-        spec%halo = 0.d0
-        spec%cold = 0.d0
-        spec%fida = 0.d0
-        spec%pfida = 0.d0
+        if(inputs%calc_brems.ge.1) then
+            allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
+            spec%brems = 0.d0
+        endif
+        if(inputs%calc_bes.ge.1) then
+            allocate(spec%full(inputs%nlambda,spec_chords%nchan))
+            allocate(spec%half(inputs%nlambda,spec_chords%nchan))
+            allocate(spec%third(inputs%nlambda,spec_chords%nchan))
+            spec%full = 0.d0
+            spec%half = 0.d0
+            spec%third = 0.d0
+        endif
+        if(inputs%calc_dcx.ge.1) then
+            allocate(spec%dcx(inputs%nlambda,spec_chords%nchan))
+            spec%dcx = 0.d0
+        endif
+        if(inputs%calc_halo.ge.1) then
+            allocate(spec%halo(inputs%nlambda,spec_chords%nchan))
+            spec%halo = 0.d0
+        endif
+        if(inputs%calc_cold.ge.1) then
+            allocate(spec%cold(inputs%nlambda,spec_chords%nchan))
+            spec%cold = 0.d0
+        endif
+        if(inputs%calc_fida.ge.1) then
+            allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
+            spec%fida = 0.d0
+        endif
+        if(inputs%calc_pfida.ge.1) then
+            allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))
+            spec%pfida = 0.d0
+        endif
     endif
 
     if(inputs%calc_npa.ge.1)then

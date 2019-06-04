@@ -8,3 +8,4 @@ title: Physics
 * [Spectroscopy](./05_spectra.html)
 * [Neutral Particle Analyzer](./06_npa.html)
 * [Phase-space Sensitivities](./07_weights.html)
+* [Cold Neutrals and Passive Signals](./08_passive.html)

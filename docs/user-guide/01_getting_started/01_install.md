@@ -80,6 +80,7 @@ export CXX=g++     #use 'icpc' for Intel C++ compiler
 
 #For using helper routines
 export PATH=$FIDASIM_DIR/deps/hdf5/bin:$FIDASIM_DIR/lib/scripts:$PATH
+export PATH=$FIDASIM_DIR/deps/efit:$FIDASIM_DIR/test:$PATH
 export IDL_PATH="+$FIDASIM_DIR:$IDL_PATH:<IDL_DEFAULT>"
 export PYTHONPATH=$FIDASIM_DIR/lib/python:$PYTHONPATH
 
@@ -129,7 +130,13 @@ where you won't get angry emails for using up all the CPU's
 Now would be a good time to get more coffee... or maybe a nap.
 
 ##Run a test case
-From within IDL
+From the command line
+```bash
+run_tests.py, "/place/where/you/want/the/output"
+```
+** Note: This requires python **
+
+Or from within IDL
 ```idl
 IDL> run_tests, "/place/where/you/want/the/output"
 ```
@@ -199,6 +206,15 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  Beam: test_beam
  Power:    1.70 [MW]
  Voltage:  72.50 [keV]
+
+---- Passive neutral grid settings ----
+ Nr:  70
+ Nz: 100
+ Nphi:  10
+ R  range = [100.00,238.00]
+ Z  range = [-100.00, 98.00]
+ Phi  range = [ 4.25, 5.15]
+ dA:  4.00 [cm^3]
  
 ---- Fast-ion distribution settings ----
  Distribution type: Fast-ion Density Function F(energy,pitch,R,Z,Phi)

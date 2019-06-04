@@ -158,8 +158,6 @@ The `grid` structure contains the definition of the 2D/3D cylindrical grid that 
 | `r`                 | Float64 | 1    | [`nr`]      | cm    | Array of radii                           |
 | `z`                 | Float64 | 1    | [`nz`]      | cm    | Array of z values                        |
 | `phi`               | Float64 | 1    | [`nphi`]    | rad   | Array of phi values (Optional)           |
-| `r2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of radii `r = r2d(r,z)`         |
-| `z2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of z values `z = z2d(r,z)`      |
 
 
 #Neutral Beam Geometry Structure

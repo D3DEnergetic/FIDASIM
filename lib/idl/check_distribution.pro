@@ -45,7 +45,13 @@ PRO check_distribution, inp, grid, dist
             nen = dist.nenergy
             nr = grid.nr
             nz = grid.nz
-            nphi = grid.nphi
+            w = where("nphi" eq strlowcase(TAG_NAMES(grid)),nw)
+            if nw eq 0 then begin
+                info,'"nphi" is missing from the fast-ion distribution, assuming axisymmetry'
+                nphi = 1
+            endif else begin
+                nphi = grid.nphi
+            endelse
             zero_string = {dims:0, type:'STRING'}
             zero_int = {dims:0, type:'INT'}
             zero_double = {dims:0, type:'DOUBLE'}

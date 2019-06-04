@@ -293,124 +293,130 @@
 <a name="ln-45"></a>            <span class="s s-Atom">nen</span> <span class="o">=</span> <span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">nenergy</span>
 <a name="ln-46"></a>            <span class="s s-Atom">nr</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nr</span>
 <a name="ln-47"></a>            <span class="s s-Atom">nz</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nz</span>
-<a name="ln-48"></a>            <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nphi</span>
-<a name="ln-49"></a>            <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
-<a name="ln-50"></a>            <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-51"></a>            <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-52"></a>            <span class="s s-Atom">nrnznphi_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-53"></a>            <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-54"></a>                      <span class="nn">nenergy</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-55"></a>                      <span class="nn">npitch</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-56"></a>                      <span class="nn">energy</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nen</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span><span class="err">$</span>
-<a name="ln-57"></a>                      <span class="nn">pitch</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">np</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
-<a name="ln-58"></a>                      <span class="nn">denf</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span> 
-<a name="ln-59"></a>                      <span class="nn">f</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nen</span><span class="p">,</span><span class="s s-Atom">np</span><span class="p">,</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
-<a name="ln-60"></a>                      <span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-61"></a>                      <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
-<a name="ln-62"></a>
-<a name="ln-63"></a>            <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;fast-ion distribution&quot;</span>
-<a name="ln-64"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-65"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-66"></a>            <span class="s s-Atom">endif</span>
-<a name="ln-67"></a>            <span class="s s-Atom">dist</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">)</span>
-<a name="ln-68"></a>        <span class="nv">END</span>
-<a name="ln-69"></a>        <span class="mi">2</span><span class="s s-Atom">:</span> <span class="nv">BEGIN</span>
-<a name="ln-70"></a>            <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;Using Guiding Center Monte Carlo fast-ion distribution&#39;</span>
-<a name="ln-71"></a>            <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nparticle&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_names</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-72"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-73"></a>                <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nparticle&quot; is missing from the fast-ion distribution&#39;</span>
-<a name="ln-74"></a>                <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-75"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-76"></a>            <span class="s s-Atom">endif</span>
-<a name="ln-77"></a>
-<a name="ln-78"></a>            <span class="s s-Atom">npart</span> <span class="o">=</span> <span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">nparticle</span>
-<a name="ln-79"></a>            <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-80"></a>            <span class="s s-Atom">zero_long</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;LONG&#39;</span><span class="p">}</span>
-<a name="ln-81"></a>            <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
-<a name="ln-82"></a>            <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-83"></a>            <span class="s s-Atom">npart_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-84"></a>            <span class="s s-Atom">npart_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-85"></a>            <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-86"></a>                      <span class="nn">nparticle</span><span class="p">:</span><span class="s s-Atom">zero_long</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-87"></a>                      <span class="nn">nclass</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-88"></a>                      <span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-89"></a>                      <span class="nn">energy</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-90"></a>                      <span class="nn">pitch</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-91"></a>                      <span class="nn">r</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-92"></a>                      <span class="nn">z</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-93"></a>                      <span class="nn">weight</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-94"></a>                      <span class="nn">class</span><span class="p">:</span><span class="s s-Atom">npart_int</span><span class="p">,</span><span class="err">$</span> 
-<a name="ln-95"></a>                      <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
-<a name="ln-96"></a>
-<a name="ln-97"></a>            <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;fast-ion distribution&quot;</span>
-<a name="ln-98"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-99"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-100"></a>            <span class="s s-Atom">endif</span>
-<a name="ln-101"></a>            <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number of MC particles: &#39;</span><span class="p">,</span><span class="s s-Atom">npart</span>
-<a name="ln-102"></a>        <span class="nv">END</span>
-<a name="ln-103"></a>        <span class="mi">3</span><span class="s s-Atom">:</span> <span class="nv">BEGIN</span>
-<a name="ln-104"></a>            <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;Using Full Orbit Monte Carlo fast-ion distribution&#39;</span>
-<a name="ln-105"></a>            <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nparticle&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_names</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-106"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-107"></a>                <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nparticle&quot; is missing from the fast-ion distribution&#39;</span>
-<a name="ln-108"></a>                <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-109"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-110"></a>            <span class="s s-Atom">endif</span>
-<a name="ln-111"></a>
-<a name="ln-112"></a>            <span class="s s-Atom">npart</span> <span class="o">=</span> <span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">nparticle</span>
-<a name="ln-113"></a>            <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-114"></a>            <span class="s s-Atom">zero_long</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;LONG&#39;</span><span class="p">}</span>
-<a name="ln-115"></a>            <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
-<a name="ln-116"></a>            <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-117"></a>            <span class="s s-Atom">npart_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-118"></a>            <span class="s s-Atom">npart_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-119"></a>            <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-120"></a>                      <span class="nn">nparticle</span><span class="p">:</span><span class="s s-Atom">zero_long</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-121"></a>                      <span class="nn">nclass</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-122"></a>                      <span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-123"></a>                      <span class="nn">vr</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-124"></a>                      <span class="nn">vt</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-125"></a>                      <span class="nn">vz</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-126"></a>                      <span class="nn">r</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-127"></a>                      <span class="nn">z</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-128"></a>                      <span class="nn">weight</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-129"></a>                      <span class="nn">class</span><span class="p">:</span><span class="s s-Atom">npart_int</span><span class="p">,</span> <span class="err">$</span> 
-<a name="ln-130"></a>                      <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
-<a name="ln-131"></a>
-<a name="ln-132"></a>            <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;fast-ion distribution&quot;</span>
-<a name="ln-133"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-134"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-135"></a>            <span class="s s-Atom">endif</span>
-<a name="ln-136"></a>            <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number of MC particles: &#39;</span><span class="p">,</span><span class="s s-Atom">npart</span>
-<a name="ln-137"></a>        <span class="nv">END</span>
-<a name="ln-138"></a>        <span class="nv">ELSE</span><span class="s s-Atom">:</span> <span class="nv">BEGIN</span>
-<a name="ln-139"></a>            <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid distribution type. Expected &#39;</span><span class="o">+</span> <span class="err">$</span>
-<a name="ln-140"></a>                  <span class="s s-Atom">&#39;1 (Guiding Center Density Function), &#39;</span><span class="o">+</span> <span class="err">$</span>
-<a name="ln-141"></a>                  <span class="s s-Atom">&#39;2 (Guiding Center Monte Carlo), or &#39;</span><span class="o">+</span> <span class="err">$</span>
-<a name="ln-142"></a>                  <span class="s s-Atom">&#39;3 (Full Orbit Monte Carlo)&#39;</span>
-<a name="ln-143"></a>            <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-144"></a>            <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-145"></a>            <span class="nv">END</span>
-<a name="ln-146"></a>        <span class="nv">ENDCASE</span>
-<a name="ln-147"></a>
-<a name="ln-148"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">data_source</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-149"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
-<a name="ln-150"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-151"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-152"></a> 
-<a name="ln-153"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">time</span> <span class="o">-</span> <span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">0.02</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-154"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Distribution time and input time do not match&#39;</span>
-<a name="ln-155"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Input time: &#39;</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span>
-<a name="ln-156"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Distribution time: &#39;</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">time</span>
+<a name="ln-48"></a>            <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nphi&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_NAMES</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-49"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-50"></a>                <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nphi&quot; is missing from the fast-ion distribution, assuming axisymmetry&#39;</span>
+<a name="ln-51"></a>                <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-52"></a>            <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-53"></a>                <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nphi</span>
+<a name="ln-54"></a>            <span class="s s-Atom">endelse</span>
+<a name="ln-55"></a>            <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
+<a name="ln-56"></a>            <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-57"></a>            <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-58"></a>            <span class="s s-Atom">nrnznphi_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-59"></a>            <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-60"></a>                      <span class="nn">nenergy</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-61"></a>                      <span class="nn">npitch</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-62"></a>                      <span class="nn">energy</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nen</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span><span class="err">$</span>
+<a name="ln-63"></a>                      <span class="nn">pitch</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">np</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
+<a name="ln-64"></a>                      <span class="nn">denf</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span> 
+<a name="ln-65"></a>                      <span class="nn">f</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nen</span><span class="p">,</span><span class="s s-Atom">np</span><span class="p">,</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
+<a name="ln-66"></a>                      <span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-67"></a>                      <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
+<a name="ln-68"></a>
+<a name="ln-69"></a>            <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;fast-ion distribution&quot;</span>
+<a name="ln-70"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-71"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-72"></a>            <span class="s s-Atom">endif</span>
+<a name="ln-73"></a>            <span class="s s-Atom">dist</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">)</span>
+<a name="ln-74"></a>        <span class="nv">END</span>
+<a name="ln-75"></a>        <span class="mi">2</span><span class="s s-Atom">:</span> <span class="nv">BEGIN</span>
+<a name="ln-76"></a>            <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;Using Guiding Center Monte Carlo fast-ion distribution&#39;</span>
+<a name="ln-77"></a>            <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nparticle&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_names</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-78"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-79"></a>                <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nparticle&quot; is missing from the fast-ion distribution&#39;</span>
+<a name="ln-80"></a>                <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-81"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-82"></a>            <span class="s s-Atom">endif</span>
+<a name="ln-83"></a>
+<a name="ln-84"></a>            <span class="s s-Atom">npart</span> <span class="o">=</span> <span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">nparticle</span>
+<a name="ln-85"></a>            <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-86"></a>            <span class="s s-Atom">zero_long</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;LONG&#39;</span><span class="p">}</span>
+<a name="ln-87"></a>            <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
+<a name="ln-88"></a>            <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-89"></a>            <span class="s s-Atom">npart_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-90"></a>            <span class="s s-Atom">npart_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-91"></a>            <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-92"></a>                      <span class="nn">nparticle</span><span class="p">:</span><span class="s s-Atom">zero_long</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-93"></a>                      <span class="nn">nclass</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-94"></a>                      <span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-95"></a>                      <span class="nn">energy</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-96"></a>                      <span class="nn">pitch</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-97"></a>                      <span class="nn">r</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-98"></a>                      <span class="nn">z</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-99"></a>                      <span class="nn">weight</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-100"></a>                      <span class="nn">class</span><span class="p">:</span><span class="s s-Atom">npart_int</span><span class="p">,</span><span class="err">$</span> 
+<a name="ln-101"></a>                      <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
+<a name="ln-102"></a>
+<a name="ln-103"></a>            <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;fast-ion distribution&quot;</span>
+<a name="ln-104"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-105"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-106"></a>            <span class="s s-Atom">endif</span>
+<a name="ln-107"></a>            <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number of MC particles: &#39;</span><span class="p">,</span><span class="s s-Atom">npart</span>
+<a name="ln-108"></a>        <span class="nv">END</span>
+<a name="ln-109"></a>        <span class="mi">3</span><span class="s s-Atom">:</span> <span class="nv">BEGIN</span>
+<a name="ln-110"></a>            <span class="s s-Atom">print</span><span class="p">,</span> <span class="s s-Atom">&#39;Using Full Orbit Monte Carlo fast-ion distribution&#39;</span>
+<a name="ln-111"></a>            <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nparticle&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_names</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-112"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-113"></a>                <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nparticle&quot; is missing from the fast-ion distribution&#39;</span>
+<a name="ln-114"></a>                <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-115"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-116"></a>            <span class="s s-Atom">endif</span>
+<a name="ln-117"></a>
+<a name="ln-118"></a>            <span class="s s-Atom">npart</span> <span class="o">=</span> <span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">nparticle</span>
+<a name="ln-119"></a>            <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-120"></a>            <span class="s s-Atom">zero_long</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;LONG&#39;</span><span class="p">}</span>
+<a name="ln-121"></a>            <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
+<a name="ln-122"></a>            <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-123"></a>            <span class="s s-Atom">npart_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-124"></a>            <span class="s s-Atom">npart_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">npart</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-125"></a>            <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-126"></a>                      <span class="nn">nparticle</span><span class="p">:</span><span class="s s-Atom">zero_long</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-127"></a>                      <span class="nn">nclass</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-128"></a>                      <span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-129"></a>                      <span class="nn">vr</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-130"></a>                      <span class="nn">vt</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-131"></a>                      <span class="nn">vz</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-132"></a>                      <span class="nn">r</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-133"></a>                      <span class="nn">z</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-134"></a>                      <span class="nn">weight</span><span class="p">:</span><span class="s s-Atom">npart_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-135"></a>                      <span class="nn">class</span><span class="p">:</span><span class="s s-Atom">npart_int</span><span class="p">,</span> <span class="err">$</span> 
+<a name="ln-136"></a>                      <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
+<a name="ln-137"></a>
+<a name="ln-138"></a>            <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;fast-ion distribution&quot;</span>
+<a name="ln-139"></a>            <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-140"></a>                <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-141"></a>            <span class="s s-Atom">endif</span>
+<a name="ln-142"></a>            <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Number of MC particles: &#39;</span><span class="p">,</span><span class="s s-Atom">npart</span>
+<a name="ln-143"></a>        <span class="nv">END</span>
+<a name="ln-144"></a>        <span class="nv">ELSE</span><span class="s s-Atom">:</span> <span class="nv">BEGIN</span>
+<a name="ln-145"></a>            <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid distribution type. Expected &#39;</span><span class="o">+</span> <span class="err">$</span>
+<a name="ln-146"></a>                  <span class="s s-Atom">&#39;1 (Guiding Center Density Function), &#39;</span><span class="o">+</span> <span class="err">$</span>
+<a name="ln-147"></a>                  <span class="s s-Atom">&#39;2 (Guiding Center Monte Carlo), or &#39;</span><span class="o">+</span> <span class="err">$</span>
+<a name="ln-148"></a>                  <span class="s s-Atom">&#39;3 (Full Orbit Monte Carlo)&#39;</span>
+<a name="ln-149"></a>            <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-150"></a>            <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-151"></a>            <span class="nv">END</span>
+<a name="ln-152"></a>        <span class="nv">ENDCASE</span>
+<a name="ln-153"></a>
+<a name="ln-154"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">data_source</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-155"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
+<a name="ln-156"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
 <a name="ln-157"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-158"></a>
-<a name="ln-159"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-160"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-161"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid fast-ion distribution. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-162"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-163"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Fast-ion distribution is valid&#39;</span>
-<a name="ln-164"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-165"></a><span class="nv">END</span>
+<a name="ln-158"></a> 
+<a name="ln-159"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">time</span> <span class="o">-</span> <span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">0.02</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-160"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Distribution time and input time do not match&#39;</span>
+<a name="ln-161"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Input time: &#39;</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span>
+<a name="ln-162"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Distribution time: &#39;</span><span class="p">,</span><span class="s s-Atom">dist</span><span class="p">.</span><span class="s s-Atom">time</span>
+<a name="ln-163"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-164"></a>
+<a name="ln-165"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
+<a name="ln-166"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-167"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid fast-ion distribution. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
+<a name="ln-168"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-169"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Fast-ion distribution is valid&#39;</span>
+<a name="ln-170"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-171"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

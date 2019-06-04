@@ -267,44 +267,52 @@
 <a name="ln-19"></a>
 <a name="ln-20"></a>    <span class="s s-Atom">nr</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nr</span>
 <a name="ln-21"></a>    <span class="s s-Atom">nz</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nz</span>
-<a name="ln-22"></a>    <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
-<a name="ln-23"></a>    <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-24"></a>    <span class="s s-Atom">nrnz_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
-<a name="ln-25"></a>    <span class="s s-Atom">nrnz_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-26"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-27"></a>              <span class="nn">br</span><span class="p">:</span><span class="s s-Atom">nrnz_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-28"></a>              <span class="nn">bt</span><span class="p">:</span><span class="s s-Atom">nrnz_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-29"></a>              <span class="nn">bz</span><span class="p">:</span><span class="s s-Atom">nrnz_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-30"></a>              <span class="nn">er</span><span class="p">:</span><span class="s s-Atom">nrnz_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-31"></a>              <span class="nn">et</span><span class="p">:</span><span class="s s-Atom">nrnz_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-32"></a>              <span class="nn">ez</span><span class="p">:</span><span class="s s-Atom">nrnz_double</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-33"></a>              <span class="nn">mask</span><span class="p">:</span><span class="s s-Atom">nrnz_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-34"></a>              <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
-<a name="ln-35"></a>
-<a name="ln-36"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">fields</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc</span> <span class="o">=</span> <span class="s2">&quot;electromagnetic fields&quot;</span>
-<a name="ln-37"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-38"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-39"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-40"></a>
-<a name="ln-41"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">fields</span><span class="p">.</span><span class="s s-Atom">data_source</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-42"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
-<a name="ln-43"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-44"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-45"></a> 
-<a name="ln-46"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">fields</span><span class="p">.</span><span class="s s-Atom">time</span> <span class="o">-</span> <span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">0.02</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-47"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Electromagnetic fields time and input time do not match&#39;</span>
-<a name="ln-48"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Input time: &#39;</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span>
-<a name="ln-49"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Electromagnetic fields time: &#39;</span><span class="p">,</span><span class="s s-Atom">fields</span><span class="p">.</span><span class="s s-Atom">time</span>
-<a name="ln-50"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-51"></a>
-<a name="ln-52"></a>    <span class="s s-Atom">fields</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">fields</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">)</span>
-<a name="ln-53"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-54"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-55"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid electromagnetic fields. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-56"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-57"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Electromagnetic fields are valid&#39;</span>
-<a name="ln-58"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-59"></a><span class="nv">END</span>
+<a name="ln-22"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nphi&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_NAMES</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-23"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-24"></a>        <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nphi&quot; is missing from the fields, assuming axisymmetry&#39;</span>
+<a name="ln-25"></a>        <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-26"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-27"></a>        <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nphi</span>
+<a name="ln-28"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-29"></a>
+<a name="ln-30"></a>    <span class="s s-Atom">zero_string</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;STRING&#39;</span><span class="p">}</span>
+<a name="ln-31"></a>    <span class="s s-Atom">zero_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-32"></a>    <span class="s s-Atom">nrnznphi_double</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span>
+<a name="ln-33"></a>    <span class="s s-Atom">nrnznphi_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">,</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-34"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">time</span><span class="p">:</span><span class="s s-Atom">zero_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-35"></a>              <span class="nn">br</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-36"></a>              <span class="nn">bt</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-37"></a>              <span class="nn">bz</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-38"></a>              <span class="nn">er</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-39"></a>              <span class="nn">et</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-40"></a>              <span class="nn">ez</span><span class="p">:</span><span class="s s-Atom">nrnznphi_double</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-41"></a>              <span class="nn">mask</span><span class="p">:</span><span class="s s-Atom">nrnznphi_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-42"></a>              <span class="s s-Atom">data_source:zero_string</span><span class="p">}</span>
+<a name="ln-43"></a>
+<a name="ln-44"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span><span class="s s-Atom">schema</span><span class="p">,</span><span class="s s-Atom">fields</span><span class="p">,</span><span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc</span> <span class="o">=</span> <span class="s2">&quot;electromagnetic fields&quot;</span>
+<a name="ln-45"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-46"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-47"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-48"></a>
+<a name="ln-49"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">fields</span><span class="p">.</span><span class="s s-Atom">data_source</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-50"></a>        <span class="s s-Atom">error</span><span class="p">,</span> <span class="s s-Atom">&#39;Invalid data source. An empty string is not a data source.&#39;</span>
+<a name="ln-51"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-52"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-53"></a> 
+<a name="ln-54"></a>    <span class="s s-Atom">if</span> <span class="nf">abs</span><span class="p">(</span><span class="s s-Atom">fields</span><span class="p">.</span><span class="s s-Atom">time</span> <span class="o">-</span> <span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mf">0.02</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-55"></a>        <span class="s s-Atom">warn</span><span class="p">,</span><span class="s s-Atom">&#39;Electromagnetic fields time and input time do not match&#39;</span>
+<a name="ln-56"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Input time: &#39;</span><span class="p">,</span><span class="s s-Atom">inp</span><span class="p">.</span><span class="s s-Atom">time</span>
+<a name="ln-57"></a>        <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;Electromagnetic fields time: &#39;</span><span class="p">,</span><span class="s s-Atom">fields</span><span class="p">.</span><span class="s s-Atom">time</span>
+<a name="ln-58"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-59"></a>
+<a name="ln-60"></a>    <span class="s s-Atom">fields</span> <span class="o">=</span> <span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">fields</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">)</span>
+<a name="ln-61"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
+<a name="ln-62"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-63"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid electromagnetic fields. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
+<a name="ln-64"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-65"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Electromagnetic fields are valid&#39;</span>
+<a name="ln-66"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-67"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

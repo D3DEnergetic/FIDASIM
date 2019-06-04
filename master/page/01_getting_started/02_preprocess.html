@@ -188,7 +188,7 @@ PREFIDA(<a href="../../sourcefile/prefida.pro.html">IDL</a>,<a href="../../sourc
 <p>Most devices may have already setup helper routines to make running FIDASIM and Prefida easy. 
 Click <a href="./05_devices.html">here</a> to find out if someone has done your work for you.</p>
 <h1 id="making-grids">Making Grids</h1>
-<p>PREFIDA uses two types of grids: the <a href="../03_technical/01_prefida_inputs.html#interpolation-grid-structure">Interpolation Grid</a> and the <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">Beam Grid</a>. 
+<p>PREFIDA uses two types of grids**: the <a href="../03_technical/01_prefida_inputs.html#interpolation-grid-structure">Interpolation Grid</a> and the <a href="../03_technical/01_prefida_inputs.html#beam-grid-settings">Beam Grid</a>. 
 By default, axisymmetry is assumed and the Interpolation Grid is a 2D grid in the R-Z plane that is used for interpolating the <a href="../03_technical/01_prefida_inputs.html#plasma-structure">plasma parameters</a> and the <a href="../03_technical/01_prefida_inputs.html#fields-structure">electromagnetic fields</a>.
 A 3D cylindrical grid in R, Z and Phi can be created if the user inputs phi variable information. 
 The routine <code>rz_grid</code>(<a href="../../sourcefile/rz_grid.pro.html">IDL</a>,<a href="../../sourcefile/utils.py.html#rz_grid">Python</a>) accomplishes the task and creates the <code>grid</code> structure. For example, the command below will create a 2D grid,</p>
@@ -227,6 +227,7 @@ The routine <code>beam_grid</code>(<a href="../../sourcefile/beam_grid.pro.html"
 </pre></div>
 
 
+<p>**FIDASIM creates a third grid for <a href="../02_physics/08_passive:html#Passive-Neutral-Grid">passive calculations</a>.</p>
 <h1 id="reading-geqdsk-files">Reading GEQDSK files</h1>
 <p>Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine <a href="../../sourcefile/read_geqdsk.pro.html">read_geqdsk.pro</a> to calculate the <a href="../03_technical/01_prefida_inputs.html#fields-structure">fields structure</a> from EFITs GEQDSK file.</p>
@@ -368,6 +369,11 @@ For example, if you are interested in seeing what the plasma lineout looks like 
             
             </li>
             
+            <li role="presentation">
+            <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
+            
+            </li>
+            
             </ul>
             
             </li>
@@ -409,6 +415,11 @@ For example, if you are interested in seeing what the plasma lineout looks like 
             
             <li role="presentation">
             <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/08_passive.html'>Cold Neutrals and Passive Signals</a>
             
             </li>
             

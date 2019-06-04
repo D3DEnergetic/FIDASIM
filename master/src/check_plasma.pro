@@ -18,20 +18,28 @@ PRO check_plasma, inp, grid, plasma
 
     nr = grid.nr
     nz = grid.nz
+    w = where("nphi" eq strlowcase(TAG_NAMES(grid)),nw)
+    if nw eq 0 then begin
+        info,'"nphi" is missing from the plasma, assuming axisymmetry'
+        nphi = 1
+    endif else begin
+        nphi = grid.nphi
+    endelse
+
     zero_string = {dims:0, type:'STRING'}
     zero_double = {dims:0, type:'DOUBLE'}
-    nrnz_double = {dims:[nr,nz], type:'DOUBLE'}
-    nrnz_int    = {dims:[nr,nz], type:'INT'}
+    nrnznphi_double = {dims:[nr,nz,nphi], type:'DOUBLE'}
+    nrnznphi_int    = {dims:[nr,nz,nphi], type:'INT'}
     schema = {time:zero_double, $
-              vr:nrnz_double, $
-              vt:nrnz_double, $
-              vz:nrnz_double, $
-              dene:nrnz_double, $
-              denn:nrnz_double, $
-	      ti:nrnz_double, $
-              te:nrnz_double, $
-              zeff:nrnz_double, $
-              mask:nrnz_int, $
+              vr:nrnznphi_double, $
+              vt:nrnznphi_double, $
+              vz:nrnznphi_double, $
+              dene:nrnznphi_double, $
+              denn:nrnznphi_double, $
+	      ti:nrnznphi_double, $
+              te:nrnznphi_double, $
+              zeff:nrnznphi_double, $
+              mask:nrnznphi_int, $
               data_source:zero_string}
 
     check_struct_schema,schema,plasma,err_status,desc = "plasma parameters"
@@ -74,4 +82,3 @@ PRO check_plasma, inp, grid, plasma
         success,'Plasma parameters are valid'
     endelse
 END
-

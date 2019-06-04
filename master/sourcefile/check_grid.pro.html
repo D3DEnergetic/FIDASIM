@@ -272,52 +272,67 @@
 <a name="ln-26"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
 <a name="ln-27"></a>    <span class="s s-Atom">endif</span>
 <a name="ln-28"></a>
-<a name="ln-29"></a>    <span class="s s-Atom">nr</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nr</span>
-<a name="ln-30"></a>    <span class="s s-Atom">nz</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nz</span>
-<a name="ln-31"></a>    <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
-<a name="ln-32"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">nr</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="nn">nz</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
-<a name="ln-33"></a>              <span class="s s-Atom">r2d:</span><span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
-<a name="ln-34"></a>              <span class="s s-Atom">z2d:</span><span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
-<a name="ln-35"></a>              <span class="nn">r</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
-<a name="ln-36"></a>              <span class="nn">z</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span> <span class="p">}</span>
-<a name="ln-37"></a>
-<a name="ln-38"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span> <span class="s s-Atom">schema</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;interpolation grid&quot;</span>
-<a name="ln-39"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-40"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
-<a name="ln-41"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-42"></a>
-<a name="ln-43"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="nf">indgen</span><span class="p">(</span><span class="s s-Atom">nr</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="nf">sort</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">r</span><span class="p">))</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-44"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-45"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;r is not in ascending order&#39;</span>
-<a name="ln-46"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-47"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-48"></a>
-<a name="ln-49"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="nf">indgen</span><span class="p">(</span><span class="s s-Atom">nz</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="nf">sort</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">z</span><span class="p">))</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-50"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-51"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;z is not in ascending order&#39;</span>
-<a name="ln-52"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-53"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-54"></a>
-<a name="ln-55"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">r</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">r2d</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-56"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-57"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;r2d is defined incorrectly. Expected r == r2d[*,0]&#39;</span>
-<a name="ln-58"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-59"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-60"></a>
-<a name="ln-61"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">z</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">z2d</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">])</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
-<a name="ln-62"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-63"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;z2d is defined incorrectly. Expected z == z2d[0,*]&#39;</span>
-<a name="ln-64"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
-<a name="ln-65"></a>    <span class="s s-Atom">endif</span>
-<a name="ln-66"></a>
-<a name="ln-67"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
-<a name="ln-68"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
-<a name="ln-69"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid interpolation grid. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
-<a name="ln-70"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
-<a name="ln-71"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Interpolation grid is valid&#39;</span>
-<a name="ln-72"></a>    <span class="s s-Atom">endelse</span>
-<a name="ln-73"></a>
-<a name="ln-74"></a><span class="nv">END</span>
+<a name="ln-29"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="s2">&quot;nphi&quot;</span> <span class="s s-Atom">eq</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="nv">TAG_NAMES</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">)),</span><span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-30"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-31"></a>        <span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;&quot;nphi&quot; is missing from the interpolation grid, assuming axisymmetry&#39;</span>
+<a name="ln-32"></a>        <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-33"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-34"></a>        <span class="s s-Atom">nphi</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nphi</span>
+<a name="ln-35"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-36"></a>
+<a name="ln-37"></a>    <span class="s s-Atom">nr</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nr</span>
+<a name="ln-38"></a>    <span class="s s-Atom">nz</span> <span class="o">=</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">nz</span>
+<a name="ln-39"></a>    <span class="s s-Atom">zero_int</span> <span class="o">=</span> <span class="p">{</span><span class="nn">dims</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;INT&#39;</span><span class="p">}</span>
+<a name="ln-40"></a>    <span class="s s-Atom">schema</span> <span class="o">=</span> <span class="p">{</span><span class="nn">nr</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="nn">nz</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="nn">nphi</span><span class="p">:</span><span class="s s-Atom">zero_int</span><span class="p">,</span> <span class="err">$</span>
+<a name="ln-41"></a>              <span class="s s-Atom">r2d:</span><span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
+<a name="ln-42"></a>              <span class="s s-Atom">z2d:</span><span class="p">{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">,</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
+<a name="ln-43"></a>              <span class="nn">r</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nr</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
+<a name="ln-44"></a>              <span class="nn">z</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nz</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">},</span> <span class="err">$</span>
+<a name="ln-45"></a>              <span class="nn">phi</span><span class="p">:{</span><span class="nn">dims</span><span class="p">:[</span><span class="s s-Atom">nphi</span><span class="p">],</span> <span class="nn">type</span><span class="p">:</span><span class="s s-Atom">&#39;DOUBLE&#39;</span><span class="p">}</span> <span class="p">}</span>
+<a name="ln-46"></a>
+<a name="ln-47"></a>    <span class="s s-Atom">check_struct_schema</span><span class="p">,</span> <span class="s s-Atom">schema</span><span class="p">,</span> <span class="s s-Atom">grid</span><span class="p">,</span> <span class="s s-Atom">err_status</span><span class="p">,</span> <span class="s s-Atom">desc=</span><span class="s2">&quot;interpolation grid&quot;</span>
+<a name="ln-48"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-49"></a>        <span class="s s-Atom">goto</span><span class="p">,</span> <span class="nv">GET_OUT</span>
+<a name="ln-50"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-51"></a>
+<a name="ln-52"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="nf">indgen</span><span class="p">(</span><span class="s s-Atom">nr</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="nf">sort</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">r</span><span class="p">))</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-53"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-54"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;r is not in ascending order&#39;</span>
+<a name="ln-55"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-56"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-57"></a>
+<a name="ln-58"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="nf">indgen</span><span class="p">(</span><span class="s s-Atom">nz</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="nf">sort</span><span class="p">(</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">z</span><span class="p">))</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-59"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-60"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;z is not in ascending order&#39;</span>
+<a name="ln-61"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-62"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-63"></a>
+<a name="ln-64"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="nf">indgen</span><span class="p">(</span><span class="s s-Atom">nphi</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="nf">sort</span><span class="p">(</span><span class="s s-Atom">phi</span><span class="p">))</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-65"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-66"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;phi is not in ascending order&#39;</span>
+<a name="ln-67"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-68"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-69"></a>
+<a name="ln-70"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">r</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">r2d</span><span class="p">[</span><span class="s s-Atom">*</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-71"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-72"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;r2d is defined incorrectly. Expected r == r2d[*,0]&#39;</span>
+<a name="ln-73"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-74"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-75"></a>
+<a name="ln-76"></a>    <span class="s s-Atom">w</span> <span class="o">=</span> <span class="nf">where</span><span class="p">((</span><span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">z</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">grid</span><span class="p">.</span><span class="s s-Atom">z2d</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">*</span><span class="p">])</span> <span class="s s-Atom">ne</span> <span class="mi">1</span><span class="p">,</span> <span class="s s-Atom">nw</span><span class="p">)</span>
+<a name="ln-77"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">nw</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-78"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;z2d is defined incorrectly. Expected z == z2d[0,*]&#39;</span>
+<a name="ln-79"></a>        <span class="s s-Atom">err_status</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-80"></a>    <span class="s s-Atom">endif</span>
+<a name="ln-81"></a>
+<a name="ln-82"></a>    <span class="nv">GET_OUT</span><span class="s s-Atom">:</span>
+<a name="ln-83"></a>    <span class="s s-Atom">if</span> <span class="s s-Atom">err_status</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-84"></a>        <span class="s s-Atom">error</span><span class="p">,</span><span class="s s-Atom">&#39;Invalid interpolation grid. Exiting...&#39;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">halt</span>
+<a name="ln-85"></a>    <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-86"></a>        <span class="s s-Atom">success</span><span class="p">,</span><span class="s s-Atom">&#39;Interpolation grid is valid&#39;</span>
+<a name="ln-87"></a>    <span class="s s-Atom">endelse</span>
+<a name="ln-88"></a>
+<a name="ln-89"></a><span class="nv">END</span>
 </pre></div>
 
     </section>

@@ -10,7 +10,7 @@
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
 
-    <title>Physics &ndash; FIDASIM</title>
+    <title>Visualization &ndash; FIDASIM</title>
 
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/pygments.css" rel="stylesheet">
@@ -113,7 +113,7 @@
     <div class="container">
     
   <div class="row">
-    <h1>Physics</h1>
+    <h1>Visualization</h1>
     <div class="row">
     <div class="col-lg-12">
     <div class="well well-sm" style="min-height: 40px;">
@@ -122,32 +122,15 @@
          
 <!--
         
-        <li><i class="fa fa-sitemap"></i> Subsections:</li>
-        
-        <li><a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a></li>
-        
-        <li><a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a></li>
-        
-        <li><a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a></li>
-        
-        <li><a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a></li>
-        
-        <li><a href='../../page/02_physics/05_spectra.html'>Spectra</a></li>
-        
-        <li><a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a></li>
-        
-        <li><a href='../../page/02_physics/07_weights.html'>Weight Functions</a></li>
-        
-        <li><a href='../../page/02_physics/08_passive.html'>Cold Neutrals and Passive Signals</a></li>
-        
-        
 -->
       </ul>
         <ol class="breadcrumb in-well">
       
          <li><a href='../../page/index.html'>User Guide</a></li>
       
-         <li class="active">Physics</li>
+         <li><a href='../../page/01_getting_started/index.html'>Getting Started</a></li>
+      
+         <li class="active">Visualization</li>
       </ol>
     </div>
     </div>
@@ -156,17 +139,62 @@
   
   <div class="row">
     <div class="col-md-9 col-md-push-3" id='text'>
-      <h1 id="physics">Physics</h1>
+      <h1 id="visualizing-inputs-and-outputs">Visualizing Inputs and Outputs</h1>
+<div class="toc">
 <ul>
-<li><a href="./01_plasma.html">Plasma Parameters, Fields, and Distributions</a></li>
-<li><a href="./02_atomic_tables.html">Atomic Tables</a></li>
-<li><a href="./03_colrad.html">Collisional Radiative Model</a></li>
-<li><a href="./04_neutrals.html">Neutral Beam and Halo</a></li>
-<li><a href="./05_spectra.html">Spectroscopy</a></li>
-<li><a href="./06_npa.html">Neutral Particle Analyzer</a></li>
-<li><a href="./07_weights.html">Phase-space Sensitivities</a></li>
-<li><a href="./08_passive.html">Cold Neutrals and Passive Signals</a></li>
+<li><a href="#visualizing-inputs-and-outputs">Visualizing Inputs and Outputs</a><ul>
+<li><a href="#visualization-inputs">Visualization: Inputs</a></li>
+<li><a href="#visualization-outputs">Visualization: Outputs</a></li>
 </ul>
+</li>
+</ul>
+</div>
+<hr>
+<h2 id="visualization-inputs">Visualization: Inputs</h2>
+<p>Visualizing your inputs can be done by executing <code>plot_inputs</code> found in <code>lib/scripts/</code></p>
+<p>Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
+Below are brief descriptions and examples of what the script can currently handle:</p>
+<p>To plot all of your inputs, simply indicate the directory and run ID.</p>
+<div class="codehilite"><pre><span></span><span class="n">plot_inputs</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="n">test_1a</span>
+</pre></div>
+
+
+<p>To plot only the beam and diagnostic geometry, append the optional argument -g</p>
+<div class="codehilite"><pre><span></span><span class="n">plot_inputs</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="n">test_1a</span> <span class="o">-</span><span class="k">g</span>
+</pre></div>
+
+
+<p>In a similar fashion, append -p, -f and/or -d to plot the plasma, fields and/or distribution function inputs, respectively.</p>
+<p>If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.</p>
+<p>If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
+For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command</p>
+<div class="codehilite"><pre><span></span><span class="n">plot_inputs</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="n">test_1a</span> <span class="o">-</span><span class="n">p</span> <span class="o">-</span><span class="n">rz</span> <span class="mi">170</span>
+</pre></div>
+
+
+<p>There are many more possible lineouts that can be viewed, so run <code>plot_inputs -h</code> to look at the help documentation.</p>
+<h2 id="visualization-outputs">Visualization: Outputs</h2>
+<p>Visualizing your outputs can be done by executing <code>plot_outputs</code> found in <code>lib/scripts/</code></p>
+<p>Plotting data from your spectra or npa files, and printing the neutron rate can be done in various ways.
+Let's start with the easiest method first.
+Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
+Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
+Furthermore, it will also print out the neutron rate.</p>
+<div class="codehilite"><pre><span></span><span class="n">plot_outputs</span> <span class="o">-</span><span class="n">d</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span> <span class="o">-</span><span class="n">s</span> <span class="o">-</span><span class="k">as</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">an</span>
+</pre></div>
+
+
+<p>If you are interested in only one shot, e.g. test_1a, add <code>-r test_1a</code> to your command.</p>
+<p>Let's now consider a more specific example.
+What if your files are scattered around in different folders?
+What if you are only interested in the active FIDA emission?
+What if you only want to view channels 1 and 3?
+The example below does this for two different files located in different folders.</p>
+<div class="codehilite"><pre><span></span><span class="n">plot_outputs</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_1a_spectra</span><span class="p">.</span><span class="n">h5</span> <span class="o">/</span><span class="n">different_path</span><span class="o">/</span><span class="n">test_2a_spectra</span><span class="p">.</span><span class="n">h5</span> <span class="o">-</span><span class="n">f</span> <span class="o">-</span><span class="n">ls</span> <span class="mi">1</span> <span class="mi">3</span>
+</pre></div>
+
+
+<p>Now that you have a grasp on how the script works, take a look at the help documentation <code>plot_outputs -h</code> to see what else the code is capable of.</p>
     </div>
     
     <div class="col-md-3 col-md-pull-9">
@@ -208,7 +236,7 @@
             
             </li>
             
-            <li role="presentation">
+            <li role="presentation" class="disabled">
             <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
             
             </li>
@@ -217,7 +245,7 @@
             
             </li>
             
-            <li role="presentation" class="disabled">
+            <li role="presentation">
             <a href='../../page/02_physics/index.html'>Physics</a>
             
             <ul class="nav nav-stacked nav-pills">

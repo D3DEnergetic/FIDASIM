@@ -10,7 +10,7 @@
     <meta name="author" content="Luke Stagner" >
     <link rel="icon" href="../../favicon.png">
 
-    <title>Physics &ndash; FIDASIM</title>
+    <title>Cold Neutrals and Passive Signals &ndash; FIDASIM</title>
 
     <link href="../../css/bootstrap.min.css" rel="stylesheet">
     <link href="../../css/pygments.css" rel="stylesheet">
@@ -113,7 +113,7 @@
     <div class="container">
     
   <div class="row">
-    <h1>Physics</h1>
+    <h1>Cold Neutrals and Passive Signals</h1>
     <div class="row">
     <div class="col-lg-12">
     <div class="well well-sm" style="min-height: 40px;">
@@ -122,32 +122,15 @@
          
 <!--
         
-        <li><i class="fa fa-sitemap"></i> Subsections:</li>
-        
-        <li><a href='../../page/02_physics/01_plasma.html'>Plasma Parameters, Fields, and Distributions</a></li>
-        
-        <li><a href='../../page/02_physics/02_atomic_tables.html'>Atomic Tables</a></li>
-        
-        <li><a href='../../page/02_physics/03_colrad.html'>Collisional Radiative Model</a></li>
-        
-        <li><a href='../../page/02_physics/04_neutrals.html'>Neutral Beam and Halo</a></li>
-        
-        <li><a href='../../page/02_physics/05_spectra.html'>Spectra</a></li>
-        
-        <li><a href='../../page/02_physics/06_npa.html'>Neutral Particle Analyzer</a></li>
-        
-        <li><a href='../../page/02_physics/07_weights.html'>Weight Functions</a></li>
-        
-        <li><a href='../../page/02_physics/08_passive.html'>Cold Neutrals and Passive Signals</a></li>
-        
-        
 -->
       </ul>
         <ol class="breadcrumb in-well">
       
          <li><a href='../../page/index.html'>User Guide</a></li>
       
-         <li class="active">Physics</li>
+         <li><a href='../../page/02_physics/index.html'>Physics</a></li>
+      
+         <li class="active">Cold Neutrals and Passive Signals</li>
       </ol>
     </div>
     </div>
@@ -156,16 +139,56 @@
   
   <div class="row">
     <div class="col-md-9 col-md-push-3" id='text'>
-      <h1 id="physics">Physics</h1>
+      <p>Originally, FIDASIM assumed axisymmetry and included active signals produced only by charge exchange (CX) with injected neutrals.
+However, passive signals produced by CX with cold neutrals can also be important.
+Therefore, FIDASIM is improved to predict passive signals for a given edge-cold neutral population.</p>
+<div class="toc">
 <ul>
-<li><a href="./01_plasma.html">Plasma Parameters, Fields, and Distributions</a></li>
-<li><a href="./02_atomic_tables.html">Atomic Tables</a></li>
-<li><a href="./03_colrad.html">Collisional Radiative Model</a></li>
-<li><a href="./04_neutrals.html">Neutral Beam and Halo</a></li>
-<li><a href="./05_spectra.html">Spectroscopy</a></li>
-<li><a href="./06_npa.html">Neutral Particle Analyzer</a></li>
-<li><a href="./07_weights.html">Phase-space Sensitivities</a></li>
-<li><a href="./08_passive.html">Cold Neutrals and Passive Signals</a></li>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#time-evolution-of-cold-neutrals">Time evolution of cold neutrals</a></li>
+<li><a href="#types-of-passive-signals">Types of Passive Signals</a></li>
+<li><a href="#passive-neutral-grid">Passive Neutral Grid</a></li>
+<li><a href="#relevant-namelist-settings">Relevant Namelist Settings</a></li>
+<li><a href="#fortran-references">Fortran References</a></li>
+</ul>
+</div>
+<hr>
+<h1 id="introduction">Introduction</h1>
+<p>Active diagnostic signals are produced from charge exchange with injected neutrals, and passive signals are produced from charge exchange with cold neutrals.
+Passive signals must be treated to get valid active FIDA data.
+For example, passive-FIDA (p-FIDA) signals of comparable magnitude with active signals were experimentally measured on NSTX-U.</p>
+<p style="text-align: center"><img alt="NSTX-U" src="../../media/nstxu.png" width="400"></p>
+<h1 id="time-evolution-of-cold-neutrals">Time evolution of cold neutrals</h1>
+<p>FIDASIM accepts 2D and 3D cold neutral density input (TRANSP output variable is <code>dn0wd</code>).
+FIDASIM will assume that all neutrals are in the ground state.
+Using local plasma parameters, the neutrals are time evolved by solving the collisional radiative model until equilibrium is achieved.
+Then, the neutrals are distributed throughout the interpolation grid for subsequent passive calculations.</p>
+<h1 id="types-of-passive-signals">Types of Passive Signals</h1>
+<p>FIDASIM can calculate passive signals for the following diagnostics</p>
+<ul>
+<li>Fast-ion D-<script type="math/tex">\alpha</script> (FIDA)</li>
+<li>Neutral Particle Analyzer (NPA)</li>
+</ul>
+<h1 id="passive-neutral-grid">Passive Neutral Grid</h1>
+<p>By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the entire plasma volume.
+If the interpolation grid is 3D, then the passive neutral grid is the interpolation grid.
+FIDASIM writes the passive <a href="../01_getting_started/03_running:html##Running-Interactively">neutral grid information</a> in the output file.</p>
+<h1 id="relevant-namelist-settings">Relevant Namelist Settings</h1>
+<ul>
+<li><code>calc_pfida</code>: Calculate pFIDA spectra</li>
+<li><code>n_pfida</code>: Number of Monte Carlo particles used in passive FIDA spectra calculation</li>
+<li><code>nlambda</code>: Number of wavelength bins</li>
+<li><code>lambdamin</code>: Minimum wavelength [nm]</li>
+<li><code>lambdamax</code>: Maximum wavelength [nm]</li>
+</ul>
+<h1 id="fortran-references">Fortran References</h1>
+<ul>
+<li><a href="../../proc/read_chords.html">read_chords</a>: Reads FIDA geometry</li>
+<li><a href="../../proc/pfida_f.html">pfida_f</a>: Calculates FIDA light using a distribution function</li>
+<li><a href="../../proc/pfida_mc.html">pfida_mc</a>: Calculates FIDA light using a Monte Carlo fast-ion distribution</li>
+<li><a href="../../proc/read_npa.html">read_npa</a>: Reads NPA geometry and calculates NPA geometric factor</li>
+<li><a href="../../proc/pnpa_f.html">pnpa_f</a>: Calculates passive MC-NPA routine using a distribution function</li>
+<li><a href="../../proc/pnpa_mc.html">pnpa_mc</a>: Calculates passive NPA flux using a Monte Carlo fast-ion distribution</li>
 </ul>
     </div>
     
@@ -217,7 +240,7 @@
             
             </li>
             
-            <li role="presentation" class="disabled">
+            <li role="presentation">
             <a href='../../page/02_physics/index.html'>Physics</a>
             
             <ul class="nav nav-stacked nav-pills">
@@ -257,7 +280,7 @@
             
             </li>
             
-            <li role="presentation">
+            <li role="presentation" class="disabled">
             <a href='../../page/02_physics/08_passive.html'>Cold Neutrals and Passive Signals</a>
             
             </li>

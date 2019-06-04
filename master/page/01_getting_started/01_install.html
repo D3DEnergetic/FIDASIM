@@ -229,6 +229,7 @@ To use the release version run the command</p>
 
 <span class="c1">#For using helper routines</span>
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$FIDASIM_DIR</span>/deps/hdf5/bin:<span class="nv">$FIDASIM_DIR</span>/lib/scripts:<span class="nv">$PATH</span>
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$FIDASIM_DIR</span>/deps/efit:<span class="nv">$FIDASIM_DIR</span>/test:<span class="nv">$PATH</span>
 <span class="nb">export</span> <span class="nv">IDL_PATH</span><span class="o">=</span><span class="s2">&quot;+</span><span class="nv">$FIDASIM_DIR</span><span class="s2">:</span><span class="nv">$IDL_PATH</span><span class="s2">:&lt;IDL_DEFAULT&gt;&quot;</span>
 <span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$FIDASIM_DIR</span>/lib/python:<span class="nv">$PYTHONPATH</span>
 
@@ -276,7 +277,13 @@ In that case edit the file <code>tables/table_settings.dat</code> before running
 where you won't get angry emails for using up all the CPU's</p></div>
 <p>Now would be a good time to get more coffee... or maybe a nap.</p>
 <h2 id="run-a-test-case">Run a test case</h2>
-<p>From within IDL</p>
+<p>From the command line</p>
+<div class="codehilite"><pre><span></span>run_tests.py, <span class="s2">&quot;/place/where/you/want/the/output&quot;</span>
+</pre></div>
+
+
+<p><strong> Note: This requires python </strong></p>
+<p>Or from within IDL</p>
 <div class="codehilite"><pre><span></span>IDL<span class="o">&gt;</span> run_tests, <span class="s2">&quot;/place/where/you/want/the/output&quot;</span>
 </pre></div>
 
@@ -343,6 +350,15 @@ Think of as good practice for when the <a href="https://www.youtube.com/watch?v=
  <span class="nv">Beam</span>: <span class="nv">test_beam</span>
  <span class="nv">Power</span>:    <span class="mi">1</span>.<span class="mi">70</span> [<span class="nv">MW</span>]
  <span class="nv">Voltage</span>:  <span class="mi">72</span>.<span class="mi">50</span> [<span class="nv">keV</span>]
+
+<span class="o">----</span> <span class="nv">Passive</span> <span class="nv">neutral</span> <span class="nv">grid</span> <span class="nv">settings</span> <span class="o">----</span>
+ <span class="nv">Nr</span>:  <span class="mi">70</span>
+ <span class="nv">Nz</span>: <span class="mi">100</span>
+ <span class="nv">Nphi</span>:  <span class="mi">10</span>
+ <span class="nv">R</span>  <span class="nv">range</span> <span class="o">=</span> [<span class="mi">100</span>.<span class="mi">00</span>,<span class="mi">238</span>.<span class="mi">00</span>]
+ <span class="nv">Z</span>  <span class="nv">range</span> <span class="o">=</span> [<span class="o">-</span><span class="mi">100</span>.<span class="mi">00</span>, <span class="mi">98</span>.<span class="mi">00</span>]
+ <span class="nv">Phi</span>  <span class="nv">range</span> <span class="o">=</span> [ <span class="mi">4</span>.<span class="mi">25</span>, <span class="mi">5</span>.<span class="mi">15</span>]
+ <span class="nv">dA</span>:  <span class="mi">4</span>.<span class="mi">00</span> [<span class="nv">cm</span><span class="o">^</span><span class="mi">3</span>]
 
 <span class="o">----</span> <span class="nv">Fast</span><span class="o">-</span><span class="nv">ion</span> <span class="nv">distribution</span> <span class="nv">settings</span> <span class="o">----</span>
  <span class="nv">Distribution</span> <span class="nv">type</span>: <span class="nv">Fast</span><span class="o">-</span><span class="nv">ion</span> <span class="nv">Density</span> <span class="nv">Function</span> <span class="nv">F</span><span class="ss">(</span><span class="nv">energy</span>,<span class="nv">pitch</span>,<span class="nv">R</span>,<span class="nv">Z</span>,<span class="nv">Phi</span><span class="ss">)</span>
@@ -514,6 +530,11 @@ Think of as good practice for when the <a href="https://www.youtube.com/watch?v=
             
             </li>
             
+            <li role="presentation">
+            <a href='../../page/01_getting_started/06_visual.html'>Visualization</a>
+            
+            </li>
+            
             </ul>
             
             </li>
@@ -555,6 +576,11 @@ Think of as good practice for when the <a href="https://www.youtube.com/watch?v=
             
             <li role="presentation">
             <a href='../../page/02_physics/07_weights.html'>Weight Functions</a>
+            
+            </li>
+            
+            <li role="presentation">
+            <a href='../../page/02_physics/08_passive.html'>Cold Neutrals and Passive Signals</a>
             
             </li>
             

@@ -5143,7 +5143,7 @@ subroutine write_neutrons
     endif
     call h5ltset_attribute_string_f(fid,"/rate","units","neutrons/s",error )
 
-    if((inputs%dist_type.eq.1).and.(inputs%calc_neutron.eq.2)) then
+    if((inputs%dist_type.eq.1).and.(inputs%calc_neutron.ge.2)) then
         dim1(1) = 1
         call h5ltmake_dataset_int_f(fid,"/nenergy",0,dim1,[fbm%nenergy], error)
         call h5ltmake_dataset_int_f(fid,"/npitch",0,dim1,[fbm%npitch], error)
@@ -11311,7 +11311,7 @@ subroutine neutron_f
     real(Float64)  :: vnet_square, factor
     real(Float64)  :: s, c
 
-    if(inputs%calc_neutron.eq.2) then
+    if(inputs%calc_neutron.ge.2) then
         allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
         neutron%weight = 0.d0
         allocate(neutron%emis(fbm%nr,fbm%nz,fbm%nphi))
@@ -11361,7 +11361,7 @@ subroutine neutron_f
 
                             !! Get neutron production rate
                             call get_neutron_rate(plasma, erel, rate)
-                            if(inputs%calc_neutron.eq.2) then
+                            if(inputs%calc_neutron.ge.2) then
                                 neutron%weight(ie,ip,ir,iz,iphi) = neutron%weight(ie,ip,ir,iz,iphi) &
                                                                  + rate * factor
                                 !$OMP CRITICAL(neutron_emis)
@@ -11384,7 +11384,7 @@ subroutine neutron_f
 
 #ifdef _MPI
     call parallel_sum(neutron%rate)
-    if(inputs%calc_neutron.eq.2) then
+    if(inputs%calc_neutron.ge.2) then
         call parallel_sum(neutron%weight)
         call parallel_sum(neutron%emis)
     endif
@@ -12118,7 +12118,8 @@ subroutine neutron_spec_f
             endif
 
             call get_indices(rn, ind)
-            factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
+         !!!factor = domega*fbm%r(ind(1))*fbm%dr*fbm%dz*fbm%dphi/ngamma
+            factor = domega*beam_grid%dv/ngamma
             !! Loop over energy/pitch/gamma
             pitch_loop: do ip = 1, fbm%npitch
                 pitch = fbm%pitch(ip)

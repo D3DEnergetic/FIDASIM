@@ -9011,7 +9011,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         if(fields%coords.eq.0) call xyz_to_cyl(r_gyro,rg_cyl)
         if(fields%coords.eq.1) call uvw_to_cyl(r_gyro, rg_cyl)
 
-        inv_rg_r = 1/rg_cyl(1)
+        inv_rg_r = 1/sqrt(fields%uvw(1)**2 + fields%uvw(2)**2)
         B_rzt(1) = fields%br/fields%b_abs
         B_rzt(2) = fields%bz/fields%b_abs
         B_rzt(3) = fields%bt/fields%b_abs

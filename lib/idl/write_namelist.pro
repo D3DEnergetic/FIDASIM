@@ -50,7 +50,7 @@ PRO write_namelist, filename, inputs
     printf,55,''
     printf,55,'!! Debugging Switches'
     printf,55,f='("seed = ",i9,  "    !! RNG Seed. If seed is negative a random seed is used")',inputs.seed
-    printf,55,f='("no_flr = ",i2,"    !! Turn off Finite Larmor Radius effects")',inputs.no_flr
+    printf,55,f='("flr = ",i2,"    !! Turn on Finite Larmor Radius effects")',inputs.flr
     printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from neutrals file")',inputs.load_neutrals
     printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"
     printf,55,f='("verbose = ",i2,"    !! Verbose")',inputs.verbose

@@ -235,7 +235,7 @@ def check_inputs(inputs):
     inputs['geometry_file'] = geometry_file
     inputs['distribution_file'] = distribution_file
     inputs['load_neutrals'] = 0
-    inputs['no_flr'] = 0
+    inputs['flr'] = 1
     inputs['seed'] = -1
     inputs['verbose'] = 1
     inputs['neutrals_file'] = neutrals_file
@@ -1154,7 +1154,7 @@ def write_namelist(filename, inputs):
 
         f.write("!! Debugging Switches\n")
         f.write("seed = {:d}    !! RNG Seed. If seed is negative a random seed is used\n".format(inputs['seed']))
-        f.write("no_flr = {:d}    !! Turn off Finite Larmor Radius effects\n".format(inputs['no_flr']))
+        f.write("flr = {:d}    !! Turn on Finite Larmor Radius corrections\n".format(inputs['flr']))
         f.write("load_neutrals = {:d}    !! Load neutrals from neutrals file\n".format(inputs['load_neutrals']))
         f.write("neutrals_file = '" + inputs['neutrals_file'] + "'    !! File containing the neutral density\n")
         f.write("verbose = {:d}    !! Verbose\n\n".format(inputs['verbose']))

@@ -1003,8 +1003,8 @@ type SimulationInputs
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
-    integer(Int32) :: no_flr
-        !+ Turns off Finite Larmor Radius effects: 0=off, 1=on
+    integer(Int32) :: flr
+        !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
         !+ Split signals by fast ion class: 0=off, 1=on
     integer(Int32) :: verbose
@@ -1834,10 +1834,10 @@ subroutine read_inputs
     character(charlim) :: distribution_file, equilibrium_file
     character(charlim) :: geometry_file, neutrals_file
     integer            :: pathlen, calc_neutron, seed
-    integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold, calc_bes
+    integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer            :: load_neutrals,verbose,no_flr,split
+    integer            :: load_neutrals,verbose,flr,split
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1848,11 +1848,12 @@ subroutine read_inputs
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
     real(Float64)      :: alpha,beta,gamma,origin(3)
     logical            :: exis, error
+    integer            :: calc_nbi, no_flr !TODO Remove before release
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
-        calc_brems, calc_nbi,calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
-        calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, no_flr, split, &
+        calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
+        calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
@@ -1860,7 +1861,8 @@ subroutine read_inputs
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
-        nlambda_wght,lambdamin_wght,lambdamax_wght
+        nlambda_wght,lambdamin_wght,lambdamax_wght, &
+        calc_nbi, no_flr !TODO remove before release
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -1881,7 +1883,6 @@ subroutine read_inputs
     runid="0"
     seed = -1
     calc_brems=0
-    calc_nbi=0
     calc_bes=0
     calc_dcx=0
     calc_halo=0
@@ -1891,7 +1892,7 @@ subroutine read_inputs
     calc_npa=0
     calc_pnpa=0
     calc_birth=0
-    no_flr=0
+    flr=2
     split=1
     calc_fida_wght=0
     calc_npa_wght=0
@@ -1935,6 +1936,9 @@ subroutine read_inputs
     nlambda_wght=0
     lambdamin_wght=0
     lambdamax_wght=0
+    !TODO remove before release
+    calc_nbi = 0
+    no_flr = 0
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
@@ -1942,6 +1946,7 @@ subroutine read_inputs
 
     !!TODO remove before release
     if (calc_nbi.gt.0) calc_bes=1
+    if (no_flr.ge.1) flr = 0
 
     !!General Information
     inputs%shot_number=shot
@@ -2012,7 +2017,7 @@ subroutine read_inputs
     inputs%calc_neutron=calc_neutron
     inputs%load_neutrals=load_neutrals
     inputs%verbose=verbose
-    inputs%no_flr = no_flr
+    inputs%flr = flr
     inputs%split = split
 
     !!Monte Carlo Settings
@@ -2270,7 +2275,7 @@ subroutine make_passive_grid
     !!Open HDF5 file
     call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, fid, error)
 
-    !!If SPEC group exists, read FIDA LOS info 
+    !!If SPEC group exists, read FIDA LOS info
     call h5ltpath_valid_f(fid, "/spec", .True., path_valid_spec, error)
     if(.not.path_valid_spec) then
         if(inputs%verbose.ge.1) then
@@ -2296,7 +2301,7 @@ subroutine make_passive_grid
         call h5gclose_f(gid, error)
     endif
 
-    !!If NPA group exists, read NPA LOS info 
+    !!If NPA group exists, read NPA LOS info
     call h5ltpath_valid_f(fid, "/npa", .True., path_valid_npa, error)
     if(.not.path_valid_npa) then
         if(inputs%verbose.ge.0) then
@@ -6110,7 +6115,7 @@ end subroutine xyz_to_uvw
 subroutine xyz_to_cyl(xyz, cyl)
     !+ Convert beam coordinate `xyz` to cylindrical coordinate `cyl`
     real(Float64), dimension(3), intent(in)  :: xyz
-    real(Float64), dimension(3), intent(out) :: cyl 
+    real(Float64), dimension(3), intent(out) :: cyl
 
     real(Float64), dimension(3) :: uvw
 
@@ -6196,7 +6201,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
     real(Float64) :: rmin,rmax,zmin,zmax,phimin,phimax
     integer :: i, j, nunique, ind1, ind2
     logical :: inp, in_grid1, in_grid2
-    logical :: pas 
+    logical :: pas
 
     r = r0 ; v = v0
     pas = .False.
@@ -8987,7 +8992,9 @@ subroutine gyro_step(vi, fields, r_gyro)
     !+ Calculates gyro-step
     !+
     !+###References
-    !+* Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. "Self-consistent equilibrium model of low aspect-ratio toroidal plasma with energetic beam ions." Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251. Appendix A: Last equation
+    !+ Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng. "Self-consistent equilibrium model of low aspect-
+    !+ ratio toroidal plasma with energetic beam ions." Physics of Plasmas (1994-present) 10.8 (2003):
+    !+ 3240-3251. Appendix A: Last equation
     real(Float64), dimension(3), intent(in)  :: vi
         !+ Ion velocity
     type(LocalEMFields), intent(in)          :: fields
@@ -8997,50 +9004,52 @@ subroutine gyro_step(vi, fields, r_gyro)
         !+ Gyro-radius vector from particle position to guiding center
 
     real(Float64), dimension(3) :: vxB, rg_uvw, uvw, cuvrxb, b_rtz, grad_B, rg_rtz
-    real(Float64) :: one_over_omega, phi, R, rg_r, vpar, term1, term2
+    real(Float64) :: one_over_omega, phi, R, vpar, term1, term2
 
-    if(inputs%no_flr.eq.0) then
+    if(inputs%flr.ge.1) then
+        uvw = fields%uvw
+        R = sqrt(uvw(1)**2 + uvw(2)**2)
+        phi = atan2(uvw(2),uvw(1))
         one_over_omega=inputs%ab*mass_u/(fields%b_abs*e0)
         vxB = cross_product(vi,fields%b_norm)
         vpar =  dot_product(vi,fields%b_norm)
-        r_gyro = vxB*one_over_omega !points towards gyrocenter
+        r_gyro = vxB*one_over_omega !points towards gyrocenter, in beam coordinates
 
-        !! Second order correction approximation derived from
-        !! Belova, E. V., N. N. Gorelenkov, and C. Z. Cheng.
-        !! "Self-consistent equilibrium model of low aspect-ratio
-        !! toroidal plasma with energetic beam ions."
-        !! Physics of Plasmas (1994-present) 10.8 (2003): 3240-3251.
-        !! Appendix A: Last equation
-        uvw = fields%uvw
-        R = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
-        phi = atan2(uvw(2),uvw(1))
-        if(fields%coords.eq.0) then
-            call xyz_to_uvw(r_gyro,rg_uvw)
+        if(inputs%flr.ge.2) then
+            !! convert the r_gyro vector to machine coordiantes
+            if(fields%coords.eq.0) then
+                rg_uvw=  matmul(beam_grid%basis, r_gyro)
+            endif
+            if(fields%coords.eq.1) then
+                rg_uvw = r_gyro
+            endif
+
+            b_rtz(1) = fields%br/fields%b_abs
+            b_rtz(2) = fields%bt/fields%b_abs
+            b_rtz(3) = fields%bz/fields%b_abs
+            cuvrxb(1) = (1./R*fields%dbz_dphi-fields%dbt_dz)/fields%b_abs
+            cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
+            cuvrxb(3) = (1.0/R*fields%bt + fields%dbt_dr - 1.0/R*fields%dbr_dphi)/fields%b_abs
+            term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
+            grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
+                        fields%b_abs
+            grad_B(2) = 1.0/R*(fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi + fields%bz*fields%dbz_dphi)/&
+                        fields%b_abs
+            grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
+                        fields%b_abs
+            !convert rg_uvw vector to cylindrical coordiantes
+            rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
+            rg_rtz(2) = -rg_uvw(1)*sin(phi) + rg_uvw(2)*cos(phi)
+            rg_rtz(3) = rg_uvw(3)
+            term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
+        else
+            term1 = 0.0
+            term2 = 0.0
         endif
-        if(fields%coords.eq.1) then
-            rg_uvw = r_gyro
-        endif
-        rg_r = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
-        b_rtz(1) = fields%br/fields%b_abs
-        b_rtz(2) = fields%bt/fields%b_abs
-        b_rtz(3) = fields%bz/fields%b_abs
-        cuvrxb(1) = -fields%dbt_dz/fields%b_abs
-        cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
-        cuvrxb(3) = fields%dbt_dr/fields%b_abs
-        term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
-        grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
-                    fields%b_abs
-        grad_B(2) = (fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi + fields%bz*fields%dbz_dphi)/&
-                    fields%b_abs
-        grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
-                    fields%b_abs
-        rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
-        rg_rtz(2) = -rg_uvw(1)*sin(phi) + rg_uvw(2)*cos(phi)
-        rg_rtz(3) = rg_uvw(3)
-        term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
+
         r_gyro = r_gyro * (1.0 - term1 - term2)
-        if (1.0 - term1 - term2 .le. 0.0) then
-            write(*,*) 'GYRO_STEP: Gyro correction results in negative distances: ', &
+        if ((1.0 - term1 - term2 .le. 0.0) .or. (1.0 - term1 - term2 .ge. 2.0) ) then
+            write(*,*) 'GYRO_STEP: Gyro correction results in negative distances or too large shift: ', &
                           1.0-term1-term2
             stop
         endif
@@ -10484,7 +10493,7 @@ subroutine pfida_mc
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
-    integer :: ntrack 
+    integer :: ntrack
     logical :: los_intersect
     integer :: jj      !! counter along track
     real(Float64) :: photons !! photon flux

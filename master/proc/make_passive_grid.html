@@ -785,7 +785,7 @@ public subroutine make_passive_grid()
     <span class="c">!!Open HDF5 file</span>
     <span class="k">call </span><span class="n">h5fopen_f</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">geometry_file</span><span class="p">,</span> <span class="n">H5F_ACC_RDONLY_F</span><span class="p">,</span> <span class="n">fid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
-    <span class="c">!!If SPEC group exists, read FIDA LOS info </span>
+    <span class="c">!!If SPEC group exists, read FIDA LOS info</span>
     <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/spec&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid_spec</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">path_valid_spec</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
@@ -811,7 +811,7 @@ public subroutine make_passive_grid()
         <span class="k">call </span><span class="n">h5gclose_f</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="n">endif</span>
 
-    <span class="c">!!If NPA group exists, read NPA LOS info </span>
+    <span class="c">!!If NPA group exists, read NPA LOS info</span>
     <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="s2">&quot;/npa&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid_npa</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">path_valid_npa</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>

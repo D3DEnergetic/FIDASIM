@@ -1003,8 +1003,8 @@ type SimulationInputs
         !+ Calculate birth profile: 0 = off, 1=on
     integer(Int32) :: calc_neutron
         !+ Calculate neutron flux: 0 = off, 1=on, 2=on++
-    integer(Int32) :: no_flr
-        !+ Turns off Finite Larmor Radius effects: 0=off, 1=on
+    integer(Int32) :: flr
+        !+ FLR correction: 0=off, 1=1st order(vxb/omega), 2=2nd order correction
     integer(Int32) :: split
         !+ Split signals by fast ion class: 0=off, 1=on
     integer(Int32) :: verbose
@@ -1837,7 +1837,7 @@ subroutine read_inputs
     integer            :: calc_brems, calc_nbi, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer            :: load_neutrals,verbose,no_flr,split
+    integer            :: load_neutrals,verbose,flr,split
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1852,7 +1852,7 @@ subroutine read_inputs
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_nbi,calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
-        calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, no_flr, split, &
+        calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
@@ -1891,7 +1891,7 @@ subroutine read_inputs
     calc_npa=0
     calc_pnpa=0
     calc_birth=0
-    no_flr=0
+    flr=1
     split=1
     calc_fida_wght=0
     calc_npa_wght=0
@@ -2012,7 +2012,7 @@ subroutine read_inputs
     inputs%calc_neutron=calc_neutron
     inputs%load_neutrals=load_neutrals
     inputs%verbose=verbose
-    inputs%no_flr = no_flr
+    inputs%flr = flr
     inputs%split = split
 
     !!Monte Carlo Settings
@@ -9001,7 +9001,7 @@ subroutine gyro_step(vi, fields, r_gyro)
     real(Float64), dimension(3) :: vxB, rg_uvw, uvw, cuvrxb, b_rtz, grad_B, rg_rtz
     real(Float64) :: one_over_omega, phi, R, vpar, term1, term2
 
-    if(inputs%no_flr.lt.2) then
+    if(inputs%flr.ge.1) then
 	uvw = fields%uvw
         R = sqrt(uvw(1)**2 + uvw(2)**2)
         phi = atan2(uvw(2),uvw(1))
@@ -9010,36 +9010,40 @@ subroutine gyro_step(vi, fields, r_gyro)
         vpar =  dot_product(vi,fields%b_norm)
         r_gyro = vxB*one_over_omega !points towards gyrocenter, in beam coordinates
 
-	!! conver the r_gyro vector to machine coordiantes
-        if(fields%coords.eq.0) then
-	    rg_uvw=  matmul(beam_grid%basis, r_gyro)
+	if(inputs%flr.eq.2) then
+	   !! conver the r_gyro vector to machine coordiantes
+           if(fields%coords.eq.0) then
+	      rg_uvw=  matmul(beam_grid%basis, r_gyro)
+           endif
+           if(fields%coords.eq.1) then
+               rg_uvw = r_gyro
+           endif
+         
+           b_rtz(1) = fields%br/fields%b_abs
+           b_rtz(2) = fields%bt/fields%b_abs
+           b_rtz(3) = fields%bz/fields%b_abs
+           cuvrxb(1) = (1./R*fields%dbz_dphi-fields%dbt_dz)/fields%b_abs	
+           cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
+           cuvrxb(3) = (1.0/R*fields%bt + fields%dbt_dr - 1.0/R*fields%dbr_dphi)/fields%b_abs	
+           term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
+           grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
+                       fields%b_abs
+           grad_B(2) = 1.0/R*(fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi + fields%bz*fields%dbz_dphi)/&
+                       fields%b_abs
+           grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
+                       fields%b_abs
+	   !convert rg_uvw vector to cylindrical coordiantes
+           rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
+           rg_rtz(2) = -rg_uvw(1)*sin(phi) + rg_uvw(2)*cos(phi)
+           rg_rtz(3) = rg_uvw(3)
+           term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
         endif
-        if(fields%coords.eq.1) then
-            rg_uvw = r_gyro
-        endif
-
-        b_rtz(1) = fields%br/fields%b_abs
-        b_rtz(2) = fields%bt/fields%b_abs
-        b_rtz(3) = fields%bz/fields%b_abs
-        cuvrxb(1) = (1./R*fields%dbz_dphi-fields%dbt_dz)/fields%b_abs	
-        cuvrxb(2) = (fields%dbr_dz - fields%dbz_dr)/fields%b_abs
-        cuvrxb(3) = (1.0/R*fields%bt + fields%dbt_dr - 1.0/R*fields%dbr_dphi)/fields%b_abs	
-        term1 = vpar*one_over_omega*dot_product(b_rtz,cuvrxb)
-        grad_B(1) = (fields%br*fields%dbr_dr + fields%bt * fields%dbt_dr + fields%bz*fields%dbz_dr)/&
-                    fields%b_abs
-        grad_B(2) = 1.0/R*(fields%br*fields%dbr_dphi + fields%bt * fields%dbt_dphi + fields%bz*fields%dbz_dphi)/&
-                    fields%b_abs
-        grad_B(3) = (fields%br*fields%dbr_dz + fields%bt * fields%dbt_dz + fields%bz*fields%dbz_dz)/&
-                    fields%b_abs
-	!convert rg_uvw vector to cylindrical coordiantes
-        rg_rtz(1) = rg_uvw(1)*cos(phi) + rg_uvw(2)*sin(phi)
-        rg_rtz(2) = -rg_uvw(1)*sin(phi) + rg_uvw(2)*cos(phi)
-        rg_rtz(3) = rg_uvw(3)
-        term2 = -1.0 / (2.0 * fields%b_abs)*dot_product(rg_rtz,grad_B)
-        if(inputs%no_flr.eq.1) then
+	
+	if(inputs%flr.eq.1) then
 	   term1=0.0
 	   term2=0.0  
         endif
+	
         r_gyro = r_gyro * (1.0 - term1 - term2)
         if ((1.0 - term1 - term2 .le. 0.0) .or. (1.0 - term1 - term2 .ge. 2.0) ) then
             write(*,*) 'GYRO_STEP: Gyro correction results in negative distances or too large shift: ', &

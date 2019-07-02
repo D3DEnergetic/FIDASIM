@@ -235,7 +235,7 @@ def check_inputs(inputs):
     inputs['geometry_file'] = geometry_file
     inputs['distribution_file'] = distribution_file
     inputs['load_neutrals'] = 0
-    inputs['flr'] = 1
+    inputs['flr'] = 2
     inputs['seed'] = -1
     inputs['verbose'] = 1
     inputs['neutrals_file'] = neutrals_file

@@ -3931,6 +3931,7 @@ subroutine read_nuclear_rates(fid, grp, rates)
     integer :: i, j, error
     real(Float64) :: emin, emax, tmin, tmax, rmin
 
+    err = .False.
     call h5ltpath_valid_f(fid, grp, .True., path_valid, error)
     if(.not.path_valid) then
         if(inputs%verbose.ge.0) then

@@ -2462,6 +2462,14 @@ subroutine make_grids
 
     call make_beam_grid()
 
+    if(inputs%calc_pfida+inputs%calc_pnpa.gt.0) then
+        if(inter_grid%nphi.gt.1) then
+            pass_grid = inter_grid
+        else
+            call make_passive_grid()
+        endif
+    endif
+
 end subroutine make_grids
 
 subroutine read_beam
@@ -12035,13 +12043,6 @@ program fidasim
         call read_beam()
     endif
 
-    if(inputs%calc_pfida+inputs%calc_pnpa.gt.0) then
-        if(inter_grid%nphi.gt.1) then
-            pass_grid = inter_grid
-        else
-            call make_passive_grid()
-        endif
-    endif
     call read_distribution()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))

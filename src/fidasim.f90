@@ -2457,6 +2457,13 @@ subroutine make_passive_grid
 
 end subroutine make_passive_grid
 
+subroutine make_grids
+    !+ Makes [[libfida:beam_grid] and [[libfida:beam_grid] from user defined inputs
+
+    call make_beam_grid()
+
+end subroutine make_grids
+
 subroutine read_beam
     !+ Reads neutral beam geometry and stores the quantities in [[libfida:nbi]]
     integer(HID_T) :: fid, gid
@@ -12023,7 +12030,7 @@ program fidasim
     !! ----------------------------------------------------------
     call read_tables()
     call read_equilibrium()
-    call make_beam_grid()
+    call make_grids()
     if(inputs%calc_beam.ge.1) then
         call read_beam()
     endif

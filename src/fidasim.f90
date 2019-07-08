@@ -6170,7 +6170,7 @@ subroutine uvw_to_cyl(uvw, cyl)
 
     cyl(1) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     cyl(2) = uvw(3)
-    cyl(3) = atan2(uvw(2),uvw(1))
+    cyl(3) = modulo(atan2(uvw(2),uvw(1)), 2*pi)
 
 end subroutine uvw_to_cyl
 
@@ -6224,7 +6224,7 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
         do while (in_grid2) !Loop until los 'particle' is outside the plasma
             do while (.not.in_grid1) !Loop until los 'particle' is inside the plasma
                 call uvw_to_cyl(r, r0_cyl)
-                if ((r0_cyl(1).gt.600.d0).or.(abs(r0_cyl(2)).gt.600.d0)) then !Never intersects
+                if ((r0_cyl(1).gt.1.d9).or.(abs(r0_cyl(2)).gt.1.d9)) then !Never intersects
                     length = 0.d0
                     return
                 endif

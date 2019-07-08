@@ -2506,25 +2506,16 @@ subroutine read_chords
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid
 
-    real(Float64), dimension(:,:), allocatable :: lenses
-    real(Float64), dimension(:,:), allocatable :: axes
-    real(Float64), dimension(:,:,:), allocatable :: dlength
-    real(Float64), dimension(:), allocatable :: spot_size, sigma_pi
-    type(LOSElement), dimension(:), allocatable :: los_elem
-    type(ParticleTrack), dimension(:), allocatable :: tracks
-    real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
-    real(Float64) :: xyz_lens(3), xyz_axis(3), length
-    real(Float64), dimension(3,3) :: basis
-    real(Float64), dimension(2) :: randomu
-    real(Float64) :: theta, sqrt_rho, dl
+    real(Float64) :: xyz_lens(3), xyz_axis(3)
     character(len=20) :: system = ''
 
-    integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
+    integer :: i
     integer :: error
 
     if(inputs%verbose.ge.1) then
         write(*,'(a)') '---- FIDA/BES settings ----'
     endif
+
     !!Initialize HDF5 interface
     call h5open_f(error)
 
@@ -2559,18 +2550,14 @@ subroutine read_chords
     call h5ltread_dataset_string_f(gid, "/spec/system", system, error)
     call h5ltread_dataset_int_scalar_f(gid, "/spec/nchan", spec_chords%nchan, error)
 
-    allocate(lenses(3, spec_chords%nchan))
-    allocate(axes(3, spec_chords%nchan))
-    allocate(spot_size(spec_chords%nchan))
-    allocate(sigma_pi(spec_chords%nchan))
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
 
     dims = [3,spec_chords%nchan]
-    call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
-    call h5ltread_dataset_double_f(gid, "/spec/axis", axes, dims, error)
-    call h5ltread_dataset_double_f(gid, "/spec/spot_size", spot_size, dims(2:2), error)
-    call h5ltread_dataset_double_f(gid, "/spec/sigma_pi", sigma_pi, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/spec/lens", spec_chords%los%lens_uvw, dims, error)
+    call h5ltread_dataset_double_f(gid, "/spec/axis", spec_chords%los%axis_uvw, dims, error)
+    call h5ltread_dataset_double_f(gid, "/spec/spot_size", spec_chords%los%spot_size, dims(2:2), error)
+    call h5ltread_dataset_double_f(gid, "/spec/sigma_pi", spec_chords%los%sigma_pi, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/spec/radius", spec_chords%radius, dims(2:2), error)
 
     !!Close SPEC group
@@ -2582,199 +2569,17 @@ subroutine read_chords
     !!Close HDF5 interface
     call h5close_f(error)
 
-    if(inputs%calc_pfida.gt.0) then
-        allocate(tracks(pass_grid%ntrack))
-        allocate(dlength(pass_grid%nr, &
-                         pass_grid%nz, &
-                         pass_grid%nphi) )
-        pass_grid_chan_loop: do i=1,spec_chords%nchan
-            spec_chords%los(i)%lens_uvw = lenses(:,i)
-            spec_chords%los(i)%axis_uvw = axes(:,i)
-            spec_chords%los(i)%sigma_pi = sigma_pi(i)
-            spec_chords%los(i)%spot_size = spot_size(i)
-
-            r0 = lenses(:,i)
-            v0 = axes(:,i)
-            v0 = v0/norm2(v0)
-            call line_basis(r0,v0,basis)
-
-            call grid_intersect(r0,v0,length,r_enter,r_exit,passive=.True.)
-            if(length.le.0.d0) then
-                if(inputs%verbose.ge.1) then
-                    WRITE(*,'("Channel ",i5," missed the passive neutral grid or starts inside the plasma")') i
-                endif
-                cycle pass_grid_chan_loop
-            endif
-
-            if(spot_size(i).le.0.d0) then
-                nc = 1
-            else
-                nc = 100
-            endif
-
-            dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
-            do ic=1,nc
-                ! Uniformally sample within spot size
-                call randu(randomu)
-                sqrt_rho = sqrt(randomu(1))
-                theta = 2*pi*randomu(2)
-                r0(1) = 0.d0
-                r0(2) = spot_size(i)*sqrt_rho*cos(theta)
-                r0(3) = spot_size(i)*sqrt_rho*sin(theta)
-                r0 = matmul(basis,r0) + lenses(:,i)
-
-                call grid_intersect(r0,v0,length,r_enter,r_exit,passive=.True.)
-                call track_cylindrical(r_enter, v0, tracks, ntrack)
-                pass_grid_track_loop: do j=1, ntrack
-                    ind = tracks(j)%ind
-                    !inds can repeat so add rather than assign
-                    !$OMP ATOMIC UPDATE
-                    dlength(ind(1),ind(2),ind(3)) = &
-                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
-                enddo pass_grid_track_loop
-            enddo
-            !$OMP END PARALLEL DO
-            do kk=1,pass_grid%nphi
-                do jj=1,pass_grid%nz
-                    rloop: do ii=1, pass_grid%nr
-                        if(dlength(ii,jj,kk).ne.0.d0) then
-                            dl = dlength(ii,jj,kk)
-                            nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
-                            if(nc.eq.1) then
-                                allocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc))
-                                spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
-                            else
-                                allocate(los_elem(nc))
-                                los_elem(1:(nc-1)) = spec_chords%cyl_inter(ii,jj,kk)%los_elem
-                                los_elem(nc) = LOSElement(i, dl)
-                                deallocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem)
-                                call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
-                            endif
-                            spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
-                        endif
-                    enddo rloop
-                enddo
-            enddo
-        enddo pass_grid_chan_loop
-
-        spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
-        allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
-
-        nc = 0
-        do ic=1,pass_grid%ngrid
-            call ind2sub(pass_grid%dims,ic,ind)
-            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
-            if(spec_chords%cyl_inter(ii,jj,kk)%nchan.gt.0) then
-                nc = nc + 1
-                spec_chords%cyl_cell(nc) = ic
-            endif
-        enddo
-        deallocate(dlength, tracks)
-    endif
-    if((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
-        allocate(dlength(beam_grid%nx, &
-                         beam_grid%ny, &
-                         beam_grid%nz) )
-        allocate(tracks(beam_grid%ntrack))
-        chan_loop: do i=1,spec_chords%nchan
-            call uvw_to_xyz(lenses(:,i),xyz_lens)
-            xyz_axis = matmul(beam_grid%inv_basis,axes(:,i))
-            spec_chords%los(i)%lens = xyz_lens
-            spec_chords%los(i)%axis = xyz_axis
-            spec_chords%los(i)%sigma_pi = sigma_pi(i)
-            spec_chords%los(i)%spot_size = spot_size(i)
-
-            r0 = xyz_lens
-            v0 = xyz_axis
-            v0 = v0/norm2(v0)
-            call line_basis(r0,v0,basis)
-
-            call grid_intersect(r0,v0,length,r_enter,r_exit)
-            if(length.le.0.d0) then
-                if(inputs%verbose.ge.1) then
-                    WRITE(*,'("Channel ",i5," missed the beam grid")') i
-                endif
-                cycle chan_loop
-            endif
-
-            if(spot_size(i).le.0.d0) then
-                nc = 1
-            else
-                nc = 100
-            endif
-
-            dlength = 0.d0
-            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
-            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
-            do ic=1,nc
-                ! Uniformally sample within spot size
-                call randu(randomu)
-                sqrt_rho = sqrt(randomu(1))
-                theta = 2*pi*randomu(2)
-                r0(1) = 0.d0
-                r0(2) = spot_size(i)*sqrt_rho*cos(theta)
-                r0(3) = spot_size(i)*sqrt_rho*sin(theta)
-                r0 = matmul(basis,r0) + xyz_lens
-
-                call grid_intersect(r0, v0, length, r_enter, r_exit)
-                call track(r_enter, v0, tracks, ntrack)
-                track_loop: do j=1, ntrack
-                    ind = tracks(j)%ind
-                    !inds can repeat so add rather than assign
-                    !$OMP ATOMIC UPDATE
-                    dlength(ind(1),ind(2),ind(3)) = &
-                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
-                    !$OMP END ATOMIC
-                enddo track_loop
-            enddo
-            !$OMP END PARALLEL DO
-            do kk=1,beam_grid%nz
-                do jj=1,beam_grid%ny
-                    xloop: do ii=1, beam_grid%nx
-                        if(dlength(ii,jj,kk).ne.0.d0) then
-                            dl = dlength(ii,jj,kk)
-                            nc = spec_chords%inter(ii,jj,kk)%nchan + 1
-                            if(nc.eq.1) then
-                                allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
-                                spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
-                            else
-                                allocate(los_elem(nc))
-                                los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
-                                los_elem(nc) = LOSElement(i, dl)
-                                deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
-                                call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
-                            endif
-                            spec_chords%inter(ii,jj,kk)%nchan = nc
-                        endif
-                    enddo xloop
-                enddo
-            enddo
-        enddo chan_loop
-
-        spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
-        allocate(spec_chords%cell(spec_chords%ncell))
-
-        nc = 0
-        do ic=1,beam_grid%ngrid
-            call ind2sub(beam_grid%dims,ic,ind)
-            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
-            if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
-                nc = nc + 1
-                spec_chords%cell(nc) = ic
-            endif
-        enddo
-    endif
+    chan_loop: do i=1,spec_chords%nchan
+        call uvw_to_xyz(spec_chords%los(i)%lens_uvw, xyz_lens)
+        xyz_axis = matmul(beam_grid%inv_basis, spec_chords%los(i)%axis_uvw)
+        spec_chords%los(i)%lens = xyz_lens
+        spec_chords%los(i)%axis = xyz_axis
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"FIDA/BES System: ",a)') trim(adjustl(system))
         write(*,'(T2,"Number of channels: ",i5)') spec_chords%nchan
         write(*,*) ''
     endif
-
-    deallocate(lenses,axes,spot_size,sigma_pi)
 
 end subroutine read_chords
 

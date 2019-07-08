@@ -2506,6 +2506,8 @@ subroutine read_chords
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid
 
+    real(Float64), dimension(:,:), allocatable :: lenses
+    real(Float64), dimension(:,:), allocatable :: axes
     real(Float64) :: xyz_lens(3), xyz_axis(3)
     character(len=20) :: system = ''
 
@@ -2550,12 +2552,14 @@ subroutine read_chords
     call h5ltread_dataset_string_f(gid, "/spec/system", system, error)
     call h5ltread_dataset_int_scalar_f(gid, "/spec/nchan", spec_chords%nchan, error)
 
+    allocate(lenses(3, spec_chords%nchan))
+    allocate(axes(3, spec_chords%nchan))
     allocate(spec_chords%los(spec_chords%nchan))
     allocate(spec_chords%radius(spec_chords%nchan))
 
     dims = [3,spec_chords%nchan]
-    call h5ltread_dataset_double_f(gid, "/spec/lens", spec_chords%los%lens_uvw, dims, error)
-    call h5ltread_dataset_double_f(gid, "/spec/axis", spec_chords%los%axis_uvw, dims, error)
+    call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
+    call h5ltread_dataset_double_f(gid, "/spec/axis", axes, dims, error)
     call h5ltread_dataset_double_f(gid, "/spec/spot_size", spec_chords%los%spot_size, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/spec/sigma_pi", spec_chords%los%sigma_pi, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/spec/radius", spec_chords%radius, dims(2:2), error)
@@ -2574,12 +2578,17 @@ subroutine read_chords
         xyz_axis = matmul(beam_grid%inv_basis, spec_chords%los(i)%axis_uvw)
         spec_chords%los(i)%lens = xyz_lens
         spec_chords%los(i)%axis = xyz_axis
+        spec_chords%los(i)%lens_uvw = lenses(:,i)
+        spec_chords%los(i)%axis_uvw = axes(:,i)
+    enddo chan_loop
 
     if(inputs%verbose.ge.1) then
         write(*,'(T2,"FIDA/BES System: ",a)') trim(adjustl(system))
         write(*,'(T2,"Number of channels: ",i5)') spec_chords%nchan
         write(*,*) ''
     endif
+
+    deallocate(lenses,axes)
 
 end subroutine read_chords
 

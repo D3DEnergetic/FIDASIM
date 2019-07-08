@@ -2591,20 +2591,13 @@ subroutine read_npa
 
     real(Float64), dimension(:,:), allocatable :: a_tedge,a_redge,a_cent
     real(Float64), dimension(:,:), allocatable :: d_tedge,d_redge,d_cent
-    real(Float64), dimension(beam_grid%ngrid) :: probs
-    real(Float64), dimension(3,beam_grid%ngrid) :: eff_rds
-    integer, dimension(:), allocatable :: a_shape, d_shape
     character(len=20) :: system = ''
 
-    real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
     real(Float64), dimension(3) :: xyz_a_tedge,xyz_a_redge,xyz_a_cent
     real(Float64), dimension(3) :: xyz_d_tedge,xyz_d_redge,xyz_d_cent
-    real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0, r0_d, v0
     real(Float64), dimension(3,3) :: basis, inv_basis
-    real(Float64), dimension(50) :: xd, yd
-    type(LocalEMFields) :: fields
-    real(Float64) :: length,total_prob, hh, hw, dprob, dx, dy, r, pitch
-    integer :: ichan,ic,i,j,k,id,ix,iy,d_index,nd,ind_d(2),ind(3)
+    real(Float64) :: hh, hw
+    integer :: ichan
     integer :: error
 
     !!Initialize HDF5 interface
@@ -2643,30 +2636,20 @@ subroutine read_npa
     allocate(a_tedge(3, npa_chords%nchan))
     allocate(a_redge(3, npa_chords%nchan))
     allocate(a_cent(3,  npa_chords%nchan))
-    allocate(a_shape(npa_chords%nchan))
     allocate(d_tedge(3, npa_chords%nchan))
     allocate(d_redge(3, npa_chords%nchan))
     allocate(d_cent(3,  npa_chords%nchan))
-    allocate(d_shape(npa_chords%nchan))
     allocate(npa_chords%radius(npa_chords%nchan))
     allocate(npa_chords%det(npa_chords%nchan))
-    allocate(npa_chords%phit(beam_grid%nx, &
-                             beam_grid%ny, &
-                             beam_grid%nz, &
-                             npa_chords%nchan) )
-    allocate(npa_chords%hit(beam_grid%nx, &
-                            beam_grid%ny, &
-                            beam_grid%nz) )
-    npa_chords%hit = .False.
 
     dims = [3,spec_chords%nchan]
     call h5ltread_dataset_double_f(gid,"/npa/radius", npa_chords%radius, dims(2:2), error)
-    call h5ltread_dataset_int_f(gid, "/npa/a_shape", a_shape, dims(2:2), error)
+    call h5ltread_dataset_int_f(gid, "/npa/a_shape", npa_chords%det%aperture%shape, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/npa/a_tedge", a_tedge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/a_redge", a_redge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/a_cent",  a_cent, dims, error)
 
-    call h5ltread_dataset_int_f(gid, "/npa/d_shape", d_shape, dims(2:2), error)
+    call h5ltread_dataset_int_f(gid, "/npa/d_shape", npa_chords%det%detector%shape, dims(2:2), error)
     call h5ltread_dataset_double_f(gid, "/npa/d_tedge", d_tedge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/d_redge", d_redge, dims, error)
     call h5ltread_dataset_double_f(gid, "/npa/d_cent",  d_cent, dims, error)
@@ -2679,10 +2662,6 @@ subroutine read_npa
 
     !!Close HDF5 interface
     call h5close_f(error)
-
-    ! Define detector/aperture shape
-    npa_chords%det%detector%shape = d_shape
-    npa_chords%det%aperture%shape = a_shape
 
     chan_loop: do ichan=1,npa_chords%nchan
         ! Convert to beam grid coordinates
@@ -2711,88 +2690,12 @@ subroutine read_npa
         call plane_basis(xyz_a_cent, xyz_a_redge, xyz_a_tedge, &
              npa_chords%det(ichan)%aperture%basis, &
              npa_chords%det(ichan)%aperture%inv_basis)
-
-        v0 = xyz_a_cent - xyz_d_cent
-        v0 = v0/norm2(v0)
-        call grid_intersect(xyz_d_cent,v0,length,r0,r0_d)
-        if(length.le.0.0) then
-            if(inputs%verbose.ge.0) then
-                WRITE(*,'("Channel ",i3," centerline missed the beam grid")') ichan
-            endif
-        endif
-
-        if(inputs%calc_npa_wght.ge.1) then
-            hw = npa_chords%det(ichan)%detector%hw
-            hh = npa_chords%det(ichan)%detector%hh
-            nd = size(xd)
-            do i=1,nd
-                xd(i) = -hw + 2*hw*(i-0.5)/real(nd)
-                yd(i) = -hh + 2*hh*(i-0.5)/real(nd)
-            enddo
-            dx = abs(xd(2) - xd(1))
-            dy = abs(yd(2) - yd(1))
-            basis = npa_chords%det(ichan)%detector%basis
-            inv_basis = npa_chords%det(ichan)%detector%inv_basis
-            eff_rds = 0.d0
-            probs = 0.d0
-            ! For each grid point find the probability of hitting the detector given an isotropic source
-            !$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &
-            !$OMP& rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind)
-            do ic=istart,beam_grid%ngrid,istep
-                call ind2sub(beam_grid%dims,ic,ind)
-                i = ind(1) ; j = ind(2) ; k = ind(3)
-                r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
-                r0_d = matmul(inv_basis,r0-xyz_d_cent)
-                do id = 1, nd*nd
-                    call ind2sub([nd,nd],id,ind_d)
-                    ix = ind_d(1) ; iy = ind_d(2)
-                    rd_d = [xd(ix),yd(iy),0.d0]
-                    rd = matmul(basis,rd_d) + xyz_d_cent
-                    v0 = rd - r0
-                    d_index = 0
-                    call hit_npa_detector(r0,v0,d_index,det=ichan)
-                    if(d_index.ne.0) then
-                        r = norm2(rd_d - r0_d)**2
-                        dprob = (dx*dy) * inv_4pi * r0_d(3)/(r*sqrt(r))
-                        eff_rds(:,ic) = eff_rds(:,ic) + dprob*rd
-                        probs(ic) = probs(ic) + dprob
-                    endif
-                enddo
-            enddo
-            !$OMP END PARALLEL DO
-#ifdef _MPI
-            call parallel_sum(eff_rds)
-            call parallel_sum(probs)
-#endif
-            do ic = 1, beam_grid%ngrid
-                if(probs(ic).gt.0.0) then
-                    call ind2sub(beam_grid%dims, ic, ind)
-                    i = ind(1) ; j = ind(2) ; k = ind(3)
-                    r0 = [beam_grid%xc(i),beam_grid%yc(j),beam_grid%zc(k)]
-                    eff_rd = eff_rds(:,ic)/probs(ic)
-                    call get_fields(fields,pos=r0)
-                    v0 = (eff_rd - r0)/norm2(eff_rd - r0)
-                    npa_chords%phit(i,j,k,ichan)%pitch = dot_product(fields%b_norm,v0)
-                    npa_chords%phit(i,j,k,ichan)%p = probs(ic)
-                    npa_chords%phit(i,j,k,ichan)%dir = v0
-                    npa_chords%phit(i,j,k,ichan)%eff_rd = eff_rd
-                    npa_chords%hit(i,j,k) = .True.
-                endif
-            enddo
-            total_prob = sum(probs)
-            if(total_prob.le.0.d0) then
-                if(inputs%verbose.ge.0) then
-                    WRITE(*,'("Channel ",i3," missed the beam grid")') ichan
-                endif
-                cycle chan_loop
-            endif
-        endif
     enddo chan_loop
 
     if(inputs%verbose.ge.1) write(*,'(50X,a)') ""
 
-    deallocate(a_shape,a_cent,a_redge,a_tedge)
-    deallocate(d_shape,d_cent,d_redge,d_tedge)
+    deallocate(a_cent,a_redge,a_tedge)
+    deallocate(d_cent,d_redge,d_tedge)
 
 end subroutine read_npa
 

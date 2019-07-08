@@ -2266,74 +2266,8 @@ subroutine make_passive_grid
     integer :: spec_nchan, npa_nchan, i, error
     logical :: inp1, inp2
 
-    spec_nchan = 0
-    npa_nchan = 0
-
-    !!Initialize HDF5 interface
-    call h5open_f(error)
-
-    !!Open HDF5 file
-    call h5fopen_f(inputs%geometry_file, H5F_ACC_RDONLY_F, fid, error)
-
-    !!If SPEC group exists, read FIDA LOS info
-    call h5ltpath_valid_f(fid, "/spec", .True., path_valid_spec, error)
-    if(.not.path_valid_spec) then
-        if(inputs%verbose.ge.1) then
-            write(*,'(a)') 'FIDA/BES geometry is not in the geometry file'
-            write(*,'(a)') 'Passive FIDA calculations will not be performed'
-        endif
-        inputs%calc_pfida = 0
-    endif
-
-    if(inputs%calc_pfida.gt.0) then
-        !!Open SPEC group
-        call h5gopen_f(fid, "/spec", gid, error)
-        call h5ltread_dataset_int_scalar_f(gid, "/spec/nchan", spec_nchan, error)
-
-        allocate(lenses(3, spec_nchan), axes(3, spec_nchan))
-
-        !! Read in lenses and axes info
-        dims = [3,spec_nchan]
-        call h5ltread_dataset_double_f(gid, "/spec/lens", lenses, dims, error)
-        call h5ltread_dataset_double_f(gid, "/spec/axis", axes, dims, error)
-
-        !!Close SPEC group
-        call h5gclose_f(gid, error)
-    endif
-
-    !!If NPA group exists, read NPA LOS info
-    call h5ltpath_valid_f(fid, "/npa", .True., path_valid_npa, error)
-    if(.not.path_valid_npa) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'NPA geometry is not in the geometry file'
-            write(*,'(a)') 'Passive NPA calculations will not be performed'
-        endif
-        inputs%calc_pnpa = 0
-    endif
-
-    if(inputs%calc_pnpa.gt.0) then
-        !!Open NPA group
-        call h5gopen_f(fid, "/npa", gid, error)
-
-        call h5ltread_dataset_int_scalar_f(gid, "/npa/nchan", npa_nchan, error)
-
-        allocate(a_cent(3,  npa_nchan), d_cent(3,  npa_nchan))
-
-        !! Read in a_cent and d_cent info
-        dims = [3,spec_nchan]
-        call h5ltread_dataset_double_f(gid, "/npa/a_cent",  a_cent, dims, error)
-        call h5ltread_dataset_double_f(gid, "/npa/d_cent",  d_cent, dims, error)
-
-        !!Close NPA group
-        call h5gclose_f(gid, error)
-    endif
-
-    !!Close file id
-    call h5fclose_f(fid, error)
-
-    !!Close HDF5 interface
-    call h5close_f(error)
-
+    !!! Need to insert spec_nchan, npa_nchan and at some point nc_nchan
+    !!! Also insert the info that r0_arr and v0_arr needs
     !!Collect all LOS info
     allocate(r0_arr(3,  spec_nchan+npa_nchan), v0_arr(3,  spec_nchan+npa_nchan))
 
@@ -12038,6 +11972,8 @@ program fidasim
     !! ----------------------------------------------------------
     call read_tables()
     call read_equilibrium()
+    !!! Need to insert reads for spec and npa chords bc in make_grids,
+    !make_passive_grid requires the los info of various sources
     call make_grids()
     if(inputs%calc_beam.ge.1) then
         call read_beam()

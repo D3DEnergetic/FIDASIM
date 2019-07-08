@@ -11972,14 +11972,6 @@ program fidasim
     !! ----------------------------------------------------------
     call read_tables()
     call read_equilibrium()
-    !!! Need to insert reads for spec and npa chords bc in make_grids,
-    !make_passive_grid requires the los info of various sources
-    call make_grids()
-    if(inputs%calc_beam.ge.1) then
-        call read_beam()
-    endif
-
-    call read_distribution()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
@@ -11990,6 +11982,14 @@ program fidasim
     if((inputs%calc_npa.ge.1).or.(inputs%calc_npa_wght.ge.1).or.(inputs%calc_pnpa.ge.1)) then
         call read_npa()
     endif
+
+    call make_grids()
+
+    if(inputs%calc_beam.ge.1) then
+        call read_beam()
+    endif
+
+    call read_distribution()
 
     !! ----------------------------------------------------------
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------

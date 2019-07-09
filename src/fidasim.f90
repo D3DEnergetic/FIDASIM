@@ -2396,8 +2396,21 @@ subroutine make_passive_grid
 end subroutine make_passive_grid
 
 subroutine make_grids
-    !+ Makes [[libfida:beam_grid] and [[libfida:beam_grid] from user defined inputs
+    !+ Makes [[libfida:beam_grid] and [[libfida:beam_grid] from user defined inputs,
+    !+ and stores the quantities in [[libfida:spec_chords]]
+    real(Float64), dimension(:,:,:), allocatable :: dlength
+    type(LOSElement), dimension(:), allocatable :: los_elem
+    type(ParticleTrack), dimension(:), allocatable :: tracks
+    real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
+    real(Float64), dimension(3,3) :: basis
+    real(Float64), dimension(2) :: randomu
+    real(Float64) :: theta, sqrt_rho, dl, length
+    character(len=20) :: system = ''
 
+    integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
+    integer :: error
+
+    !! Grids
     call make_beam_grid()
 
     if(inputs%calc_pfida+inputs%calc_pnpa.gt.0) then
@@ -2407,6 +2420,184 @@ subroutine make_grids
             call make_passive_grid()
         endif
     endif
+
+    !! Line-of-sight passive neutral grid intersection calculations
+    if(inputs%calc_pfida.gt.0) then
+        allocate(tracks(pass_grid%ntrack))
+        allocate(dlength(pass_grid%nr, &
+                         pass_grid%nz, &
+                         pass_grid%nphi) )
+        pass_grid_chan_loop: do i=1,spec_chords%nchan
+            r0 = spec_chords%los(i)%lens_uvw
+            v0 = spec_chords%los(i)%axis_uvw
+            v0 = v0/norm2(v0)
+            call line_basis(r0,v0,basis)
+
+            call grid_intersect(r0,v0,length,r_enter,r_exit,passive=.True.)
+            if(length.le.0.d0) then
+                if(inputs%verbose.ge.1) then
+                    WRITE(*,'("Channel ",i5," missed the passive neutral grid or starts inside the plasma")') i
+                endif
+                cycle pass_grid_chan_loop
+            endif
+
+            if(spec_chords%los(i)%spot_size.le.0.d0) then
+                nc = 1
+            else
+                nc = 100
+            endif
+
+            dlength = 0.d0
+            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
+            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            do ic=1,nc
+                ! Uniformally sample within spot size
+                call randu(randomu)
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                r0(1) = 0.d0
+                r0(2) = spec_chords%los(i)%spot_size*sqrt_rho*cos(theta)
+                r0(3) = spec_chords%los(i)%spot_size*sqrt_rho*sin(theta)
+                r0 = matmul(basis,r0) + spec_chords%los(i)%lens_uvw
+
+                call grid_intersect(r0,v0,length,r_enter,r_exit,passive=.True.)
+                call track_cylindrical(r_enter, v0, tracks, ntrack)
+                pass_grid_track_loop: do j=1, ntrack
+                    ind = tracks(j)%ind
+                    !inds can repeat so add rather than assign
+                    !$OMP ATOMIC UPDATE
+                    dlength(ind(1),ind(2),ind(3)) = &
+                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                    !$OMP END ATOMIC
+                enddo pass_grid_track_loop
+            enddo
+            !$OMP END PARALLEL DO
+            do kk=1,pass_grid%nphi
+                do jj=1,pass_grid%nz
+                    rloop: do ii=1, pass_grid%nr
+                        if(dlength(ii,jj,kk).ne.0.d0) then
+                            dl = dlength(ii,jj,kk)
+                            nc = spec_chords%cyl_inter(ii,jj,kk)%nchan + 1
+                            if(nc.eq.1) then
+                                allocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc))
+                                spec_chords%cyl_inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
+                            else
+                                allocate(los_elem(nc))
+                                los_elem(1:(nc-1)) = spec_chords%cyl_inter(ii,jj,kk)%los_elem
+                                los_elem(nc) = LOSElement(i, dl)
+                                deallocate(spec_chords%cyl_inter(ii,jj,kk)%los_elem)
+                                call move_alloc(los_elem, spec_chords%cyl_inter(ii,jj,kk)%los_elem)
+                            endif
+                            spec_chords%cyl_inter(ii,jj,kk)%nchan = nc
+                        endif
+                    enddo rloop
+                enddo
+            enddo
+        enddo pass_grid_chan_loop
+
+        spec_chords%cyl_ncell = count(spec_chords%cyl_inter%nchan.gt.0)
+        allocate(spec_chords%cyl_cell(spec_chords%cyl_ncell))
+
+        nc = 0
+        do ic=1,pass_grid%ngrid
+            call ind2sub(pass_grid%dims,ic,ind)
+            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+            if(spec_chords%cyl_inter(ii,jj,kk)%nchan.gt.0) then
+                nc = nc + 1
+                spec_chords%cyl_cell(nc) = ic
+            endif
+        enddo
+        deallocate(dlength, tracks)
+    endif
+
+    !! Line-of-sight beam grid intersection calculations
+    if((inputs%tot_spectra+inputs%calc_fida_wght-inputs%calc_pfida).gt.0) then
+        allocate(dlength(beam_grid%nx, &
+                         beam_grid%ny, &
+                         beam_grid%nz) )
+        allocate(tracks(beam_grid%ntrack))
+        chan_loop: do i=1,spec_chords%nchan
+            r0 = spec_chords%los(i)%lens
+            v0 = spec_chords%los(i)%axis
+            v0 = v0/norm2(v0)
+            call line_basis(r0,v0,basis)
+
+            call grid_intersect(r0,v0,length,r_enter,r_exit)
+            if(length.le.0.d0) then
+                if(inputs%verbose.ge.1) then
+                    WRITE(*,'("Channel ",i5," missed the beam grid")') i
+                endif
+                cycle chan_loop
+            endif
+
+            if(spec_chords%los(i)%spot_size.le.0.d0) then
+                nc = 1
+            else
+                nc = 100
+            endif
+
+            dlength = 0.d0
+            !$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &
+            !$OMP& length, r_enter, r_exit, j, tracks, ntrack, ind)
+            do ic=1,nc
+                ! Uniformally sample within spot size
+                call randu(randomu)
+                sqrt_rho = sqrt(randomu(1))
+                theta = 2*pi*randomu(2)
+                r0(1) = 0.d0
+                r0(2) = spec_chords%los(i)%spot_size*sqrt_rho*cos(theta)
+                r0(3) = spec_chords%los(i)%spot_size*sqrt_rho*sin(theta)
+                r0 = matmul(basis,r0) + spec_chords%los(i)%lens
+
+                call grid_intersect(r0, v0, length, r_enter, r_exit)
+                call track(r_enter, v0, tracks, ntrack)
+                track_loop: do j=1, ntrack
+                    ind = tracks(j)%ind
+                    !inds can repeat so add rather than assign
+                    !$OMP ATOMIC UPDATE
+                    dlength(ind(1),ind(2),ind(3)) = &
+                    dlength(ind(1),ind(2),ind(3)) + tracks(j)%time/real(nc) !time == distance
+                    !$OMP END ATOMIC
+                enddo track_loop
+            enddo
+            !$OMP END PARALLEL DO
+            do kk=1,beam_grid%nz
+                do jj=1,beam_grid%ny
+                    xloop: do ii=1, beam_grid%nx
+                        if(dlength(ii,jj,kk).ne.0.d0) then
+                            dl = dlength(ii,jj,kk)
+                            nc = spec_chords%inter(ii,jj,kk)%nchan + 1
+                            if(nc.eq.1) then
+                                allocate(spec_chords%inter(ii,jj,kk)%los_elem(nc))
+                                spec_chords%inter(ii,jj,kk)%los_elem(nc) = LOSElement(i, dl)
+                            else
+                                allocate(los_elem(nc))
+                                los_elem(1:(nc-1)) = spec_chords%inter(ii,jj,kk)%los_elem
+                                los_elem(nc) = LOSElement(i, dl)
+                                deallocate(spec_chords%inter(ii,jj,kk)%los_elem)
+                                call move_alloc(los_elem, spec_chords%inter(ii,jj,kk)%los_elem)
+                            endif
+                            spec_chords%inter(ii,jj,kk)%nchan = nc
+                        endif
+                    enddo xloop
+                enddo
+            enddo
+        enddo chan_loop
+
+        spec_chords%ncell = count(spec_chords%inter%nchan.gt.0)
+        allocate(spec_chords%cell(spec_chords%ncell))
+
+        nc = 0
+        do ic=1,beam_grid%ngrid
+            call ind2sub(beam_grid%dims,ic,ind)
+            ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+            if(spec_chords%inter(ii,jj,kk)%nchan.gt.0) then
+                nc = nc + 1
+                spec_chords%cell(nc) = ic
+            endif
+        enddo
+    endif
+    !!! Need to insert below everything that was removed from read_npa and
 
 end subroutine make_grids
 

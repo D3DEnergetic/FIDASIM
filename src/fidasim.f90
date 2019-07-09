@@ -2249,8 +2249,7 @@ subroutine make_passive_grid
     integer(HSIZE_T), dimension(2) :: dims
     logical :: path_valid_spec, path_valid_npa
 
-    real(Float64), dimension(:,:), allocatable :: a_cent, d_cent
-    real(Float64), dimension(:,:), allocatable :: lenses, axes, r0_arr, v0_arr
+    real(Float64), dimension(:,:), allocatable :: r0_arr, v0_arr
     real(Float64), dimension(3) :: vertex111, vertex111_cyl
     real(Float64), dimension(3) :: vertex221, vertex221_cyl
     real(Float64), dimension(3) :: vertex112, vertex112_cyl
@@ -2263,25 +2262,33 @@ subroutine make_passive_grid
     real(Float64), dimension(2) :: phi_dum
     real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax
     real(Float64) :: rmin, rmax, phimax, phimin
-    integer :: spec_nchan, npa_nchan, i, error
+    integer :: i, error
     logical :: inp1, inp2
 
-    !!! Need to insert spec_nchan, npa_nchan and at some point nc_nchan
-    !!! Also insert the info that r0_arr and v0_arr needs
     !!Collect all LOS info
-    allocate(r0_arr(3,  spec_nchan+npa_nchan), v0_arr(3,  spec_nchan+npa_nchan))
+    allocate(r0_arr(3,  spec_chords%nchan+npa_chords%nchan), v0_arr(3,  spec_chords%nchan+npa_chords%nchan))
 
     if((inputs%calc_pfida.gt.0).and.(inputs%calc_pnpa.gt.0)) then
-        r0_arr(:,1:spec_nchan) = lenses
-        v0_arr(:,1:spec_nchan) = axes
-        r0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = d_cent
-        v0_arr(:,(1+spec_nchan):(spec_nchan+npa_nchan)) = a_cent - d_cent
+        do i=1,(spec_chords%nchan)
+            r0_arr(:,i) = spec_chords%los(i)%lens_uvw
+            v0_arr(:,i) = spec_chords%los(i)%axis_uvw
+        enddo
+        do i=1,(npa_chords%nchan)
+            r0_arr(:,(i+spec_chords%nchan)) = npa_chords%det(i)%detector%origin
+            v0_arr(:,(i+spec_chords%nchan)) = npa_chords%det(i)%aperture%origin - &
+                                              npa_chords%det(i)%detector%origin
+        enddo
     else if(inputs%calc_pfida.gt.0) then
-        r0_arr(:,1:spec_nchan) = lenses
-        v0_arr(:,1:spec_nchan) = axes
+        do i=1,(spec_chords%nchan)
+            r0_arr(:,i) = spec_chords%los(i)%lens_uvw
+            v0_arr(:,i) = spec_chords%los(i)%axis_uvw
+        enddo
     else !pnpa>=1 case
-        r0_arr(:,1:npa_nchan) = d_cent
-        v0_arr(:,1:npa_nchan) = a_cent - d_cent
+        do i=1,(npa_chords%nchan)
+            r0_arr(:,i) = npa_chords%det(i)%detector%origin
+            v0_arr(:,i) = npa_chords%det(i)%aperture%origin - &
+                          npa_chords%det(i)%detector%origin
+        enddo
     endif
 
     !! The remainder of the code will make the passive neutral grid
@@ -2323,7 +2330,7 @@ subroutine make_passive_grid
                 ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
 
     !! Update phi with LOS limits
-    track_loop: do i=1,(spec_nchan+npa_nchan)
+    track_loop: do i=1,(spec_chords%nchan+npa_chords%nchan)
         r0 = r0_arr(:,i)
         v0 = v0_arr(:,i)
         v0 = 2.d0*v0/norm2(v0)
@@ -2385,9 +2392,6 @@ subroutine make_passive_grid
         write(*,'(T2,"dA: ", f5.2," [cm^3]")') pass_grid%da
         write(*,*) ''
     endif
-
-    if(inputs%calc_pnpa.gt.0) deallocate(a_cent, d_cent)
-    if(inputs%calc_pfida.gt.0) deallocate(lenses, axes)
 
 end subroutine make_passive_grid
 

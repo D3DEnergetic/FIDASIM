@@ -2395,9 +2395,9 @@ subroutine make_passive_grid
 
 end subroutine make_passive_grid
 
-subroutine make_grids
-    !+ Makes [[libfida:beam_grid] and [[libfida:pass_grid] from user defined inputs,
-    !+ and stores the quantities in [[libfida:spec_chords]] and [[libfida:npa_chords]]
+subroutine make_diagnostic_grids
+    !+ Makes [[libfida:pass_grid] from user defined inputs, and stores the quantities in
+    !+ [[libfida:spec_chords]] and [[libfida:npa_chords]]
     real(Float64), dimension(:,:,:), allocatable :: dlength
     type(LOSElement), dimension(:), allocatable :: los_elem
     type(ParticleTrack), dimension(:), allocatable :: tracks
@@ -2418,9 +2418,6 @@ subroutine make_grids
     integer :: i, j, ic, nc, ntrack, ind(3), ii, jj, kk
     integer :: error
 
-    !! Grids
-    call make_beam_grid()
-
     if(inputs%calc_pfida+inputs%calc_pnpa.gt.0) then
         if(inter_grid%nphi.gt.1) then
             pass_grid = inter_grid
@@ -2430,6 +2427,7 @@ subroutine make_grids
     endif
 
     !! Spectral line-of-sight passive neutral grid intersection calculations
+    allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
     if(inputs%calc_pfida.gt.0) then
         allocate(tracks(pass_grid%ntrack))
         allocate(dlength(pass_grid%nr, &
@@ -2694,7 +2692,7 @@ subroutine make_grids
         endif
     enddo npa_chan_loop
 
-end subroutine make_grids
+end subroutine make_diagnostic_grids
 
 subroutine read_beam
     !+ Reads neutral beam geometry and stores the quantities in [[libfida:nbi]]
@@ -2864,8 +2862,8 @@ subroutine read_chords
     call h5close_f(error)
 
     chan_loop: do i=1,spec_chords%nchan
-        call uvw_to_xyz(spec_chords%los(i)%lens_uvw, xyz_lens)
-        xyz_axis = matmul(beam_grid%inv_basis, spec_chords%los(i)%axis_uvw)
+        call uvw_to_xyz(lenses(:,i), xyz_lens)
+        xyz_axis = matmul(beam_grid%inv_basis, axes(:,i))
         spec_chords%los(i)%lens = xyz_lens
         spec_chords%los(i)%axis = xyz_axis
         spec_chords%los(i)%lens_uvw = lenses(:,i)
@@ -11979,9 +11977,11 @@ program fidasim
     !! ----------------------------------------------------------
     call read_tables()
     call read_equilibrium()
+    call make_beam_grid()
+    if(inputs%calc_beam.ge.1) call read_beam()
+    call read_distribution()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    allocate(spec_chords%cyl_inter(pass_grid%nr,pass_grid%nz,pass_grid%nphi))
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
         call read_chords()
     endif
@@ -11990,13 +11990,7 @@ program fidasim
         call read_npa()
     endif
 
-    call make_grids()
-
-    if(inputs%calc_beam.ge.1) then
-        call read_beam()
-    endif
-
-    call read_distribution()
+    call make_diagnostic_grids()
 
     !! ----------------------------------------------------------
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------

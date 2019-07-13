@@ -1705,7 +1705,7 @@ public subroutine neutron_mc()
     <span class="n">rate</span><span class="o">=</span><span class="mf">0.0</span>
     <span class="n">ngamma</span> <span class="o">=</span> <span class="mi">20</span>
     <span class="c">!$OMP PARALLEL DO schedule(guided) private(iion,fast_ion,vi,ri,s,c, &amp;</span>
-    <span class="c">!$OMP&amp; plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi,factor)</span>
+    <span class="c">!$OMP&amp; plasma,fields,uvw,uvw_vi,vnet_square,rate,eb,igamma,phi)</span>
     <span class="n">loop_over_fast_ions</span><span class="p">:</span> <span class="k">do </span><span class="n">iion</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">,</span><span class="n">istep</span>
         <span class="n">fast_ion</span> <span class="o">=</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">iion</span><span class="p">)</span>
         <span class="k">if</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_fast_ions</span>

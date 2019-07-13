@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>make_diagnostic_grids &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>2.0.0-dev</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>make_diagnostic_grids
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 2.0% of total for procedures.">252 statements</a>
+     </li> 
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+    
+     <li><a href='../module/libfida.html'>libfida</a></li>
+    
+  
+     <li class="active">make_diagnostic_grids</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/make_diagnostic_grids.html#src">make_diagnostic_grids</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine make_diagnostic_grids()
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Makes [[libfida:pass_grid] from user defined inputs, and stores the quantities in
+ <a href="../module/libfida.html#variable-spec_chords">spec_chords</a> and <a href="../module/libfida.html#variable-npa_chords">npa_chords</a></p>
+    
+
+    <h3>Arguments</h3>
+    
+    <em>None</em>
+    <br>
+    
+    
+    
+    <br>
+    
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~make_diagnostic_grids~~CallsGraph Pages: 1 -->
+<svg id="procmake_diagnostic_gridsCallsGraph" width="641pt" height="548pt"
+ viewBox="0.00 0.00 641.00 547.51" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~make_diagnostic_grids~~CallsGraph" class="graph" transform="scale(0.566254 0.566254) rotate(0) translate(4 962.903)">
+<title>proc~~make_diagnostic_grids~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-962.903 1128,-962.903 1128,4 -4,4"/>
+<!-- proc~make_diagnostic_grids -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node1" class="node"><title>proc~make_diagnostic_grids</title>
+<polygon fill="none" stroke="black" points="122,-547 -7.10543e-15,-547 -7.10543e-15,-523 122,-523 122,-547"/>
+<text text-anchor="middle" x="61" y="-532.6" font-family="Helvetica,sans-Serif" font-size="10.50">make_diagnostic_grids</text>
+</g>
+<!-- proc~get_fields -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node2" class="node"><title>proc~get_fields</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node2"><a xlink:href=".././proc/get_fields.html" xlink:title="get_fields">
+<polygon fill="#d9534f" stroke="#d9534f" points="396,-848 338,-848 338,-824 396,-824 396,-848"/>
+<text text-anchor="middle" x="367" y="-833.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~get_fields -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge1" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M64.8984,-547.469C73.4304,-581.678 101.481,-678.225 158,-735 206.315,-783.534 282.606,-812.235 328.131,-825.983"/>
+<polygon fill="#000000" stroke="#000000" points="327.326,-829.394 337.906,-828.848 329.294,-822.677 327.326,-829.394"/>
+</g>
+<!-- proc~track_cylindrical -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node3" class="node"><title>proc~track_cylindrical</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node3"><a xlink:href=".././proc/track_cylindrical.html" xlink:title="track_cylindrical">
+<polygon fill="#d9534f" stroke="#d9534f" points="255,-848 167,-848 167,-824 255,-824 255,-848"/>
+<text text-anchor="middle" x="211" y="-833.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track_cylindrical</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge2" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~track_cylindrical</title>
+<path fill="none" stroke="#000000" d="M64.4265,-547.07C72.5337,-585.295 101.419,-706.048 158,-789 165.213,-799.574 175.277,-809.394 184.633,-817.294"/>
+<polygon fill="#000000" stroke="#000000" points="182.603,-820.153 192.582,-823.713 187,-814.707 182.603,-820.153"/>
+</g>
+<!-- proc~hit_npa_detector -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node4" class="node"><title>proc~hit_npa_detector</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node4"><a xlink:href=".././proc/hit_npa_detector.html" xlink:title="hit_npa_detector">
+<polygon fill="#d9534f" stroke="#d9534f" points="257.5,-526 164.5,-526 164.5,-502 257.5,-502 257.5,-526"/>
+<text text-anchor="middle" x="211" y="-511.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hit_npa_detector</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~hit_npa_detector -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge3" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M122.197,-526.458C132.871,-524.944 143.942,-523.373 154.479,-521.878"/>
+<polygon fill="#000000" stroke="#000000" points="154.978,-525.342 164.387,-520.472 153.995,-518.412 154.978,-525.342"/>
+</g>
+<!-- proc~ind2sub -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node5" class="node"><title>proc~ind2sub</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node5"><a xlink:href=".././proc/ind2sub.html" xlink:title="ind2sub">
+<polygon fill="#d9534f" stroke="#d9534f" points="238,-484 184,-484 184,-460 238,-460 238,-484"/>
+<text text-anchor="middle" x="211" y="-469.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ind2sub</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~ind2sub -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge4" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~ind2sub</title>
+<path fill="none" stroke="#000000" d="M89.2214,-522.843C108.392,-514.343 134.691,-502.803 158,-493 163.217,-490.806 168.745,-488.526 174.175,-486.312"/>
+<polygon fill="#000000" stroke="#000000" points="175.8,-489.43 183.753,-482.43 173.171,-482.942 175.8,-489.43"/>
+</g>
+<!-- proc~grid_intersect -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node6" class="node"><title>proc~grid_intersect</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node6"><a xlink:href=".././proc/grid_intersect.html" xlink:title="grid_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="405.5,-608 328.5,-608 328.5,-584 405.5,-584 405.5,-608"/>
+<text text-anchor="middle" x="367" y="-593.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">grid_intersect</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~grid_intersect -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge5" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~grid_intersect</title>
+<path fill="none" stroke="#000000" d="M84.1539,-547.143C103.156,-556.951 131.572,-570.203 158,-577 211.694,-590.811 275.444,-594.902 318.086,-595.957"/>
+<polygon fill="#000000" stroke="#000000" points="318.118,-599.458 328.186,-596.16 318.259,-592.46 318.118,-599.458"/>
+</g>
+<!-- proc~track -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node7" class="node"><title>proc~track</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node7"><a xlink:href=".././proc/track.html" xlink:title="track">
+<polygon fill="#d9534f" stroke="#d9534f" points="238,-726 184,-726 184,-702 238,-702 238,-726"/>
+<text text-anchor="middle" x="211" y="-711.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">track</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~track -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge6" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~track</title>
+<path fill="none" stroke="#000000" d="M71.9405,-547.023C96.8858,-577.193 162.345,-656.364 193.31,-693.814"/>
+<polygon fill="#000000" stroke="#000000" points="190.642,-696.08 199.711,-701.556 196.037,-691.619 190.642,-696.08"/>
+</g>
+<!-- interface~randu -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node8" class="node"><title>interface~randu</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node8"><a xlink:href=".././interface/randu.html" xlink:title="randu">
+<polygon fill="#a7506f" stroke="#a7506f" points="238,-442 184,-442 184,-418 238,-418 238,-442"/>
+<text text-anchor="middle" x="211" y="-427.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;interface~randu -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge7" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M73.3809,-522.707C90.3773,-504.926 124.043,-471.881 158,-451 163.101,-447.864 168.751,-445.022 174.394,-442.515"/>
+<polygon fill="#000000" stroke="#000000" points="175.889,-445.684 183.783,-438.618 173.206,-439.219 175.889,-445.684"/>
+</g>
+<!-- interface~parallel_sum -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node9" class="node"><title>interface~parallel_sum</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node9"><a xlink:href=".././interface/parallel_sum.html" xlink:title="parallel_sum">
+<polygon fill="#a7506f" stroke="#a7506f" points="247.5,-255 174.5,-255 174.5,-231 247.5,-231 247.5,-255"/>
+<text text-anchor="middle" x="211" y="-240.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;interface~parallel_sum -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge8" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;interface~parallel_sum</title>
+<path fill="none" stroke="#000000" d="M68.171,-522.825C90.8787,-478.023 169.983,-321.953 199.118,-264.47"/>
+<polygon fill="#000000" stroke="#000000" points="202.404,-265.729 203.803,-255.227 196.16,-262.564 202.404,-265.729"/>
+</g>
+<!-- proc~line_basis -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node10" class="node"><title>proc~line_basis</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node10"><a xlink:href=".././proc/line_basis.html" xlink:title="line_basis">
+<polygon fill="#d9534f" stroke="#d9534f" points="241,-108 181,-108 181,-84 241,-84 241,-108"/>
+<text text-anchor="middle" x="211" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_basis</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~line_basis -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge9" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~line_basis</title>
+<path fill="none" stroke="#000000" d="M65.2619,-522.927C76.6989,-480.941 116.536,-337.558 158,-222 171.417,-184.608 189.598,-142.075 200.525,-117.222"/>
+<polygon fill="#000000" stroke="#000000" points="203.753,-118.577 204.598,-108.016 197.351,-115.745 203.753,-118.577"/>
+</g>
+<!-- proc~make_passive_grid -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node11" class="node"><title>proc~make_passive_grid</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node11"><a xlink:href=".././proc/make_passive_grid.html" xlink:title="make_passive_grid">
+<polygon fill="#d9534f" stroke="#d9534f" points="263.5,-568 158.5,-568 158.5,-544 263.5,-544 263.5,-568"/>
+<text text-anchor="middle" x="211" y="-553.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">make_passive_grid</text>
+</a>
+</g>
+</g>
+<!-- proc~make_diagnostic_grids&#45;&gt;proc~make_passive_grid -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge10" class="edge"><title>proc~make_diagnostic_grids&#45;&gt;proc~make_passive_grid</title>
+<path fill="none" stroke="#000000" d="M122.197,-543.542C130.825,-544.766 139.713,-546.027 148.368,-547.255"/>
+<polygon fill="#000000" stroke="#000000" points="148,-550.738 158.393,-548.677 148.984,-543.807 148,-550.738"/>
+</g>
+<!-- proc~calc_perp_vectors -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node17" class="node"><title>proc~calc_perp_vectors</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node17"><a xlink:href=".././proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
+<polygon fill="#d9534f" stroke="#d9534f" points="570,-848 470,-848 470,-824 570,-824 570,-848"/>
+<text text-anchor="middle" x="520" y="-833.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge11" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
+<path fill="none" stroke="#000000" d="M396.048,-836C413.866,-836 437.614,-836 459.486,-836"/>
+<polygon fill="#000000" stroke="#000000" points="459.706,-839.5 469.706,-836 459.705,-832.5 459.706,-839.5"/>
+</g>
+<!-- proc~uvw_to_xyz -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node19" class="node"><title>proc~uvw_to_xyz</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node19"><a xlink:href=".././proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="554,-806 486,-806 486,-782 554,-782 554,-806"/>
+<text text-anchor="middle" x="520" y="-791.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge12" class="edge"><title>proc~get_fields&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M396.048,-828.199C418.486,-821.958 450.327,-813.101 475.984,-805.965"/>
+<polygon fill="#000000" stroke="#000000" points="477.141,-809.276 485.838,-803.224 475.265,-802.532 477.141,-809.276"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node26" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node26"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="679,-675 611,-675 611,-651 679,-651 679,-675"/>
+<text text-anchor="middle" x="645" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge14" class="edge"><title>proc~get_fields&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M396.132,-826.71C408.303,-822.036 422.387,-815.713 434,-808 452.589,-795.654 452.584,-786.952 470,-773 526.378,-727.837 544.122,-721.274 606,-684 608.147,-682.707 610.377,-681.395 612.633,-680.092"/>
+<polygon fill="#000000" stroke="#000000" points="614.36,-683.136 621.337,-675.162 610.911,-677.045 614.36,-683.136"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node30" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node30"><a xlink:href=".././proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="550.5,-696 489.5,-696 489.5,-672 550.5,-672 550.5,-696"/>
+<text text-anchor="middle" x="520" y="-681.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge13" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M396.209,-830.316C409.121,-826.466 423.785,-820.162 434,-810 464.543,-779.617 443.626,-754.065 470,-720 475.18,-713.31 481.92,-707.279 488.735,-702.152"/>
+<polygon fill="#000000" stroke="#000000" points="491.112,-704.761 497.297,-696.158 487.097,-699.026 491.112,-704.761"/>
+</g>
+<!-- proc~track_cylindrical&#45;&gt;proc~get_fields -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge15" class="edge"><title>proc~track_cylindrical&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M255.307,-836C277.938,-836 305.404,-836 327.315,-836"/>
+<polygon fill="#000000" stroke="#000000" points="327.58,-839.5 337.58,-836 327.58,-832.5 327.58,-839.5"/>
+</g>
+<!-- proc~plane_basis -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node13" class="node"><title>proc~plane_basis</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node13"><a xlink:href=".././proc/plane_basis.html" xlink:title="plane_basis">
+<polygon fill="#d9534f" stroke="#d9534f" points="402,-890 332,-890 332,-866 402,-866 402,-890"/>
+<text text-anchor="middle" x="367" y="-875.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">plane_basis</text>
+</a>
+</g>
+</g>
+<!-- proc~track_cylindrical&#45;&gt;proc~plane_basis -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge18" class="edge"><title>proc~track_cylindrical&#45;&gt;proc~plane_basis</title>
+<path fill="none" stroke="#000000" d="M255.307,-847.811C276.103,-853.483 300.982,-860.268 321.882,-865.968"/>
+<polygon fill="#000000" stroke="#000000" points="321.218,-869.414 331.787,-868.669 323.06,-862.661 321.218,-869.414"/>
+</g>
+<!-- proc~cyl_to_uvw -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node14" class="node"><title>proc~cyl_to_uvw</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node14"><a xlink:href=".././proc/cyl_to_uvw.html" xlink:title="cyl_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="677.5,-881 612.5,-881 612.5,-857 677.5,-857 677.5,-881"/>
+<text text-anchor="middle" x="645" y="-866.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~track_cylindrical&#45;&gt;proc~cyl_to_uvw -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge19" class="edge"><title>proc~track_cylindrical&#45;&gt;proc~cyl_to_uvw</title>
+<path fill="none" stroke="#000000" d="M217.627,-848.06C229.21,-871.249 258.187,-921.487 300,-941 409.43,-992.067 555.26,-921.142 615.806,-886.327"/>
+<polygon fill="#000000" stroke="#000000" points="617.914,-889.148 624.772,-881.073 614.375,-883.109 617.914,-889.148"/>
+</g>
+<!-- proc~get_passive_grid_indices -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node18" class="node"><title>proc~get_passive_grid_indices</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node18"><a xlink:href=".././proc/get_passive_grid_indices.html" xlink:title="get_passive_grid_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="433.5,-932 300.5,-932 300.5,-908 433.5,-908 433.5,-932"/>
+<text text-anchor="middle" x="367" y="-917.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_passive_grid_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~track_cylindrical&#45;&gt;proc~get_passive_grid_indices -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge17" class="edge"><title>proc~track_cylindrical&#45;&gt;proc~get_passive_grid_indices</title>
+<path fill="none" stroke="#000000" d="M226.043,-848.2C242.701,-862.143 271.781,-884.854 300,-899 303.809,-900.91 307.829,-902.693 311.927,-904.348"/>
+<polygon fill="#000000" stroke="#000000" points="310.979,-907.731 321.571,-907.978 313.445,-901.18 310.979,-907.731"/>
+</g>
+<!-- proc~track_cylindrical&#45;&gt;proc~in_plasma -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge20" class="edge"><title>proc~track_cylindrical&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M255.092,-825.407C317.567,-809.926 426.688,-782.372 434,-777 458.147,-759.26 449.571,-741.919 470,-720 476.104,-713.451 483.542,-707.29 490.76,-701.978"/>
+<polygon fill="#000000" stroke="#000000" points="492.868,-704.774 499.038,-696.162 488.844,-699.047 492.868,-704.774"/>
+</g>
+<!-- proc~doppler_stark -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node32" class="node"><title>proc~doppler_stark</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node32"><a xlink:href=".././proc/doppler_stark.html" xlink:title="doppler_stark">
+<polygon fill="#d9534f" stroke="#d9534f" points="406,-768 328,-768 328,-744 406,-744 406,-768"/>
+<text text-anchor="middle" x="367" y="-753.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">doppler_stark</text>
+</a>
+</g>
+</g>
+<!-- proc~track_cylindrical&#45;&gt;proc~doppler_stark -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge16" class="edge"><title>proc~track_cylindrical&#45;&gt;proc~doppler_stark</title>
+<path fill="none" stroke="#000000" d="M229.673,-823.878C247.077,-812.251 274.658,-794.645 300,-782 307.128,-778.443 314.868,-775.024 322.456,-771.899"/>
+<polygon fill="#000000" stroke="#000000" points="323.942,-775.075 331.927,-768.111 321.343,-768.575 323.942,-775.075"/>
+</g>
+<!-- proc~line_plane_intersect -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node12" class="node"><title>proc~line_plane_intersect</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node12"><a xlink:href=".././proc/line_plane_intersect.html" xlink:title="line_plane_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="421,-486 313,-486 313,-462 421,-462 421,-486"/>
+<text text-anchor="middle" x="367" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_plane_intersect</text>
+</a>
+</g>
+</g>
+<!-- proc~hit_npa_detector&#45;&gt;proc~line_plane_intersect -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge22" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~line_plane_intersect</title>
+<path fill="none" stroke="#000000" d="M257.788,-502.107C274.094,-497.872 292.647,-493.053 309.729,-488.616"/>
+<polygon fill="#000000" stroke="#000000" points="310.79,-491.956 319.589,-486.055 309.031,-485.181 310.79,-491.956"/>
+</g>
+<!-- proc~in_boundary -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node34" class="node"><title>proc~in_boundary</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node34"><a xlink:href=".././proc/in_boundary.html" xlink:title="in_boundary">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="403,-444 331,-444 331,-420 403,-420 403,-444"/>
+<text text-anchor="middle" x="367" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_boundary</text>
+</a>
+</g>
+</g>
+<!-- proc~hit_npa_detector&#45;&gt;proc~in_boundary -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge21" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~in_boundary</title>
+<path fill="none" stroke="#000000" d="M248.082,-501.939C253.636,-499.382 259.135,-496.407 264,-493 283.592,-479.281 279.903,-465.967 300,-453 306.391,-448.877 313.652,-445.509 320.964,-442.775"/>
+<polygon fill="#000000" stroke="#000000" points="322.532,-445.94 330.89,-439.429 320.296,-439.307 322.532,-445.94"/>
+</g>
+<!-- proc~grid_intersect&#45;&gt;proc~in_plasma -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge24" class="edge"><title>proc~grid_intersect&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M403.354,-608.015C413.492,-611.967 424.395,-616.719 434,-622 456.625,-634.441 480.181,-652.047 496.741,-665.32"/>
+<polygon fill="#000000" stroke="#000000" points="494.756,-668.217 504.721,-671.816 499.175,-662.789 494.756,-668.217"/>
+</g>
+<!-- proc~uvw_to_cyl -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node33" class="node"><title>proc~uvw_to_cyl</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node33"><a xlink:href=".././proc/uvw_to_cyl.html" xlink:title="uvw_to_cyl">
+<polygon fill="#d9534f" stroke="#d9534f" points="552.5,-568 487.5,-568 487.5,-544 552.5,-544 552.5,-568"/>
+<text text-anchor="middle" x="520" y="-553.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_cyl</text>
+</a>
+</g>
+</g>
+<!-- proc~grid_intersect&#45;&gt;proc~uvw_to_cyl -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge23" class="edge"><title>proc~grid_intersect&#45;&gt;proc~uvw_to_cyl</title>
+<path fill="none" stroke="#000000" d="M405.714,-586.009C427.531,-580.23 455.019,-572.949 477.454,-567.005"/>
+<polygon fill="#000000" stroke="#000000" points="478.598,-570.323 487.368,-564.379 476.806,-563.557 478.598,-570.323"/>
+</g>
+<!-- proc~track&#45;&gt;proc~get_fields -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge26" class="edge"><title>proc~track&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M227.329,-726.144C254.426,-747.61 310.93,-792.373 342.814,-817.632"/>
+<polygon fill="#000000" stroke="#000000" points="340.721,-820.439 350.733,-823.905 345.068,-814.952 340.721,-820.439"/>
+</g>
+<!-- proc~get_indices -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node15" class="node"><title>proc~get_indices</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node15"><a xlink:href=".././proc/get_indices.html" xlink:title="get_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="400.5,-726 333.5,-726 333.5,-702 400.5,-702 400.5,-726"/>
+<text text-anchor="middle" x="367" y="-711.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~track&#45;&gt;proc~get_indices -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge25" class="edge"><title>proc~track&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="#000000" d="M238.124,-714C261.408,-714 295.928,-714 323.234,-714"/>
+<polygon fill="#000000" stroke="#000000" points="323.308,-717.5 333.308,-714 323.308,-710.5 323.308,-717.5"/>
+</g>
+<!-- proc~track&#45;&gt;proc~in_plasma -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge28" class="edge"><title>proc~track&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M238.317,-706.311C255.673,-701.591 278.996,-695.91 300,-693 362.288,-684.371 435.416,-683.132 479.434,-683.338"/>
+<polygon fill="#000000" stroke="#000000" points="479.413,-686.838 489.438,-683.412 479.465,-679.838 479.413,-686.838"/>
+</g>
+<!-- proc~track&#45;&gt;proc~doppler_stark -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge27" class="edge"><title>proc~track&#45;&gt;proc~doppler_stark</title>
+<path fill="none" stroke="#000000" d="M238.124,-721.125C259.963,-727.081 291.684,-735.732 318.069,-742.928"/>
+<polygon fill="#000000" stroke="#000000" points="317.319,-746.351 327.888,-745.606 319.161,-739.598 317.319,-746.351"/>
+</g>
+<!-- proc~parallel_sum_d4 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node20" class="node"><title>proc~parallel_sum_d4</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node20"><a xlink:href=".././proc/parallel_sum_d4.html" xlink:title="parallel_sum_d4">
+<polygon fill="#d9534f" stroke="#d9534f" points="412.5,-402 321.5,-402 321.5,-378 412.5,-378 412.5,-402"/>
+<text text-anchor="middle" x="367" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d4</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d4 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge32" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d4</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M217.123,-255.027C228.377,-280.022 257.67,-337.838 300,-369 303.695,-371.72 307.754,-374.096 311.988,-376.169"/>
+<polygon fill="#000000" stroke="#000000" points="310.891,-379.507 321.46,-380.243 313.656,-373.077 310.891,-379.507"/>
+</g>
+<!-- proc~parallel_sum_d5 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node21" class="node"><title>proc~parallel_sum_d5</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node21"><a xlink:href=".././proc/parallel_sum_d5.html" xlink:title="parallel_sum_d5">
+<polygon fill="#d9534f" stroke="#d9534f" points="412.5,-360 321.5,-360 321.5,-336 412.5,-336 412.5,-360"/>
+<text text-anchor="middle" x="367" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d5</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d5 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge33" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d5</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.519,-255.085C236.405,-273.212 266.934,-307.399 300,-327 303.827,-329.269 307.927,-331.32 312.14,-333.17"/>
+<polygon fill="#000000" stroke="#000000" points="310.899,-336.443 321.484,-336.903 313.496,-329.943 310.899,-336.443"/>
+</g>
+<!-- proc~parallel_sum_d2 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node22" class="node"><title>proc~parallel_sum_d2</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node22"><a xlink:href=".././proc/parallel_sum_d2.html" xlink:title="parallel_sum_d2">
+<polygon fill="#d9534f" stroke="#d9534f" points="412.5,-318 321.5,-318 321.5,-294 412.5,-294 412.5,-318"/>
+<text text-anchor="middle" x="367" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d2</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d2 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge34" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d2</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M235.143,-255.121C252.669,-264.034 277.489,-276.096 300,-285 305.032,-286.99 310.334,-288.93 315.656,-290.775"/>
+<polygon fill="#000000" stroke="#000000" points="314.608,-294.115 325.202,-293.984 316.839,-287.48 314.608,-294.115"/>
+</g>
+<!-- proc~parallel_sum_d3 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node23" class="node"><title>proc~parallel_sum_d3</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node23"><a xlink:href=".././proc/parallel_sum_d3.html" xlink:title="parallel_sum_d3">
+<polygon fill="#d9534f" stroke="#d9534f" points="412.5,-276 321.5,-276 321.5,-252 412.5,-252 412.5,-276"/>
+<text text-anchor="middle" x="367" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d3</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d3 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge35" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d3</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M247.718,-247.871C266.578,-250.443 290.131,-253.654 311.243,-256.533"/>
+<polygon fill="#000000" stroke="#000000" points="310.998,-260.032 321.379,-257.915 311.944,-253.096 310.998,-260.032"/>
+</g>
+<!-- proc~parallel_sum_d0 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node24" class="node"><title>proc~parallel_sum_d0</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node24"><a xlink:href=".././proc/parallel_sum_d0.html" xlink:title="parallel_sum_d0">
+<polygon fill="#d9534f" stroke="#d9534f" points="412.5,-234 321.5,-234 321.5,-210 412.5,-210 412.5,-234"/>
+<text text-anchor="middle" x="367" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d0</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d0 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge36" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d0</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M247.718,-238.129C266.578,-235.557 290.131,-232.346 311.243,-229.467"/>
+<polygon fill="#000000" stroke="#000000" points="311.944,-232.904 321.379,-228.085 310.998,-225.968 311.944,-232.904"/>
+</g>
+<!-- proc~parallel_sum_d1 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node25" class="node"><title>proc~parallel_sum_d1</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node25"><a xlink:href=".././proc/parallel_sum_d1.html" xlink:title="parallel_sum_d1">
+<polygon fill="#d9534f" stroke="#d9534f" points="412.5,-192 321.5,-192 321.5,-168 412.5,-168 412.5,-192"/>
+<text text-anchor="middle" x="367" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d1</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d1 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge37" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d1</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M235.143,-230.879C252.669,-221.966 277.489,-209.904 300,-201 305.032,-199.01 310.334,-197.07 315.656,-195.225"/>
+<polygon fill="#000000" stroke="#000000" points="316.839,-198.52 325.202,-192.016 314.608,-191.885 316.839,-198.52"/>
+</g>
+<!-- proc~parallel_sum_i1 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node27" class="node"><title>proc~parallel_sum_i1</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node27"><a xlink:href=".././proc/parallel_sum_i1.html" xlink:title="parallel_sum_i1">
+<polygon fill="#d9534f" stroke="#d9534f" points="411,-150 323,-150 323,-126 411,-126 411,-150"/>
+<text text-anchor="middle" x="367" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i1</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i1 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge29" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i1</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M221.519,-230.915C236.405,-212.788 266.934,-178.601 300,-159 304.176,-156.524 308.677,-154.307 313.296,-152.329"/>
+<polygon fill="#000000" stroke="#000000" points="314.829,-155.488 322.876,-148.596 312.288,-148.965 314.829,-155.488"/>
+</g>
+<!-- proc~parallel_sum_i0 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node28" class="node"><title>proc~parallel_sum_i0</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node28"><a xlink:href=".././proc/parallel_sum_i0.html" xlink:title="parallel_sum_i0">
+<polygon fill="#d9534f" stroke="#d9534f" points="411,-108 323,-108 323,-84 411,-84 411,-108"/>
+<text text-anchor="middle" x="367" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i0</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i0 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge30" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i0</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M217.123,-230.973C228.377,-205.978 257.67,-148.162 300,-117 304.131,-113.959 308.717,-111.349 313.493,-109.109"/>
+<polygon fill="#000000" stroke="#000000" points="314.936,-112.3 322.84,-105.246 312.262,-105.831 314.936,-112.3"/>
+</g>
+<!-- proc~parallel_sum_i2 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node29" class="node"><title>proc~parallel_sum_i2</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node29"><a xlink:href=".././proc/parallel_sum_i2.html" xlink:title="parallel_sum_i2">
+<polygon fill="#d9534f" stroke="#d9534f" points="411,-66 323,-66 323,-42 411,-42 411,-66"/>
+<text text-anchor="middle" x="367" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i2</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i2 -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge31" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i2</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M216.938,-230.829C231.266,-196.036 273.517,-97.2234 300,-75 303.985,-71.6558 308.508,-68.8422 313.274,-66.4753"/>
+<polygon fill="#000000" stroke="#000000" points="314.848,-69.6089 322.66,-62.4522 312.09,-63.175 314.848,-69.6089"/>
+</g>
+<!-- proc~tb_zyx -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node16" class="node"><title>proc~tb_zyx</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node16"><a xlink:href=".././proc/tb_zyx.html" xlink:title="tb_zyx">
+<polygon fill="#d9534f" stroke="#d9534f" points="394,-24 340,-24 340,-0 394,-0 394,-24"/>
+<text text-anchor="middle" x="367" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">tb_zyx</text>
+</a>
+</g>
+</g>
+<!-- proc~line_basis&#45;&gt;proc~tb_zyx -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge38" class="edge"><title>proc~line_basis&#45;&gt;proc~tb_zyx</title>
+<path fill="none" stroke="#000000" d="M226.043,-83.7997C242.701,-69.8573 271.781,-47.1462 300,-33 309.433,-28.2715 320.153,-24.3172 330.171,-21.162"/>
+<polygon fill="#000000" stroke="#000000" points="331.293,-24.4798 339.88,-18.274 329.297,-17.7703 331.293,-24.4798"/>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;proc~in_plasma -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge40" class="edge"><title>proc~make_passive_grid&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M226.384,-568.08C243.129,-581.623 272.067,-603.455 300,-617 359.577,-645.89 434.314,-665.545 479.278,-675.755"/>
+<polygon fill="#000000" stroke="#000000" points="478.701,-679.212 489.223,-677.969 480.222,-672.38 478.701,-679.212"/>
+</g>
+<!-- proc~xyz_to_cyl -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node31" class="node"><title>proc~xyz_to_cyl</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node31"><a xlink:href=".././proc/xyz_to_cyl.html" xlink:title="xyz_to_cyl">
+<polygon fill="#d9534f" stroke="#d9534f" points="398,-528 336,-528 336,-504 398,-504 398,-528"/>
+<text text-anchor="middle" x="367" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_cyl</text>
+</a>
+</g>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;proc~xyz_to_cyl -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge41" class="edge"><title>proc~make_passive_grid&#45;&gt;proc~xyz_to_cyl</title>
+<path fill="none" stroke="#000000" d="M258.205,-543.999C279.828,-538.382 305.331,-531.758 326.1,-526.364"/>
+<polygon fill="#000000" stroke="#000000" points="327.08,-529.725 335.879,-523.824 325.32,-522.95 327.08,-529.725"/>
+</g>
+<!-- proc~make_passive_grid&#45;&gt;proc~uvw_to_cyl -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge39" class="edge"><title>proc~make_passive_grid&#45;&gt;proc~uvw_to_cyl</title>
+<path fill="none" stroke="#000000" d="M263.731,-556C323.772,-556 421.621,-556 477.112,-556"/>
+<polygon fill="#000000" stroke="#000000" points="477.292,-559.5 487.292,-556 477.292,-552.5 477.292,-559.5"/>
+</g>
+<!-- proc~cross_product -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node35" class="node"><title>proc~cross_product</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node35"><a xlink:href=".././proc/cross_product.html" xlink:title="cross_product">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="560,-890 480,-890 480,-866 560,-866 560,-890"/>
+<text text-anchor="middle" x="520" y="-875.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cross_product</text>
+</a>
+</g>
+</g>
+<!-- proc~plane_basis&#45;&gt;proc~cross_product -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge42" class="edge"><title>proc~plane_basis&#45;&gt;proc~cross_product</title>
+<path fill="none" stroke="#000000" d="M402.264,-878C422.17,-878 447.593,-878 469.629,-878"/>
+<polygon fill="#000000" stroke="#000000" points="469.808,-881.5 479.808,-878 469.808,-874.5 469.808,-881.5"/>
+</g>
+<!-- mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node37" class="node"><title>mpi_allreduce</title>
+<polygon fill="#777777" stroke="#777777" points="559.5,-234 480.5,-234 480.5,-210 559.5,-210 559.5,-234"/>
+<text text-anchor="middle" x="520" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_allreduce</text>
+</g>
+<!-- proc~parallel_sum_d4&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge43" class="edge"><title>proc~parallel_sum_d4&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M412.538,-380.818C420.209,-377.893 427.722,-374.049 434,-369 475.486,-335.637 500.739,-276.195 512.017,-244.069"/>
+<polygon fill="#000000" stroke="#000000" points="515.433,-244.892 515.31,-234.298 508.8,-242.657 515.433,-244.892"/>
+</g>
+<!-- proc~parallel_sum_d5&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge44" class="edge"><title>proc~parallel_sum_d5&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M412.617,-337.735C420.114,-334.931 427.546,-331.408 434,-327 466.343,-304.912 492.659,-266.962 507.049,-243.242"/>
+<polygon fill="#000000" stroke="#000000" points="510.241,-244.72 512.302,-234.328 504.21,-241.166 510.241,-244.72"/>
+</g>
+<!-- proc~parallel_sum_d2&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge45" class="edge"><title>proc~parallel_sum_d2&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M412.827,-293.949C420.07,-291.379 427.363,-288.396 434,-285 457.394,-273.03 481.186,-254.764 497.626,-240.977"/>
+<polygon fill="#000000" stroke="#000000" points="500.187,-243.392 505.512,-234.232 495.637,-238.072 500.187,-243.392"/>
+</g>
+<!-- proc~parallel_sum_d3&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge46" class="edge"><title>proc~parallel_sum_d3&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M411.271,-251.964C429.824,-246.804 451.573,-240.754 470.654,-235.447"/>
+<polygon fill="#000000" stroke="#000000" points="471.661,-238.8 480.357,-232.748 469.785,-232.056 471.661,-238.8"/>
+</g>
+<!-- proc~parallel_sum_d0&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge47" class="edge"><title>proc~parallel_sum_d0&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M412.896,-222C430.93,-222 451.768,-222 470.178,-222"/>
+<polygon fill="#000000" stroke="#000000" points="470.409,-225.5 480.409,-222 470.408,-218.5 470.409,-225.5"/>
+</g>
+<!-- proc~parallel_sum_d1&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge48" class="edge"><title>proc~parallel_sum_d1&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M411.271,-192.036C429.824,-197.196 451.573,-203.246 470.654,-208.553"/>
+<polygon fill="#000000" stroke="#000000" points="469.785,-211.944 480.357,-211.252 471.661,-205.2 469.785,-211.944"/>
+</g>
+<!-- proc~parallel_sum_i1&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge49" class="edge"><title>proc~parallel_sum_i1&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M411.076,-149.437C418.889,-152.143 426.828,-155.33 434,-159 457.394,-170.97 481.186,-189.236 497.626,-203.023"/>
+<polygon fill="#000000" stroke="#000000" points="495.637,-205.928 505.512,-209.768 500.187,-200.608 495.637,-205.928"/>
+</g>
+<!-- proc~parallel_sum_i0&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge50" class="edge"><title>proc~parallel_sum_i0&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M411.233,-105.756C419.196,-108.639 427.148,-112.321 434,-117 466.343,-139.088 492.659,-177.038 507.049,-200.758"/>
+<polygon fill="#000000" stroke="#000000" points="504.21,-202.834 512.302,-209.672 510.241,-199.28 504.21,-202.834"/>
+</g>
+<!-- proc~parallel_sum_i2&#45;&gt;mpi_allreduce -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge51" class="edge"><title>proc~parallel_sum_i2&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M411.163,-62.6679C419.308,-65.6519 427.347,-69.6498 434,-75 475.486,-108.363 500.739,-167.805 512.017,-199.931"/>
+<polygon fill="#000000" stroke="#000000" points="508.8,-201.343 515.31,-209.702 515.433,-199.108 508.8,-201.343"/>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~cyl_to_uvw -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge53" class="edge"><title>proc~in_plasma&#45;&gt;proc~cyl_to_uvw</title>
+<path fill="none" stroke="#000000" d="M529.07,-696.138C549.654,-727.097 604.299,-809.287 630.117,-848.12"/>
+<polygon fill="#000000" stroke="#000000" points="627.287,-850.185 635.739,-856.574 633.117,-846.309 627.287,-850.185"/>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge54" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M550.775,-678.916C565.73,-676.363 584.132,-673.221 600.624,-670.406"/>
+<polygon fill="#000000" stroke="#000000" points="601.33,-673.836 610.598,-668.703 600.151,-666.936 601.33,-673.836"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node36" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node36"><a xlink:href=".././interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="683.5,-717 606.5,-717 606.5,-693 683.5,-693 683.5,-717"/>
+<text text-anchor="middle" x="645" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge52" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M550.775,-689.084C564.292,-691.391 580.626,-694.18 595.82,-696.774"/>
+<polygon fill="#000000" stroke="#000000" points="595.662,-700.298 606.108,-698.531 596.84,-693.398 595.662,-700.298"/>
+</g>
+<!-- proc~xyz_to_cyl&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge56" class="edge"><title>proc~xyz_to_cyl&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M398.131,-510.791C440.179,-505.19 517.22,-501.155 570,-535 608.296,-559.557 629.035,-611.463 638.171,-641.079"/>
+<polygon fill="#000000" stroke="#000000" points="634.871,-642.264 641.023,-650.89 641.592,-640.31 634.871,-642.264"/>
+</g>
+<!-- proc~xyz_to_cyl&#45;&gt;proc~uvw_to_cyl -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge55" class="edge"><title>proc~xyz_to_cyl&#45;&gt;proc~uvw_to_cyl</title>
+<path fill="none" stroke="#000000" d="M398.194,-523.998C420.887,-530.01 452.246,-538.317 477.327,-544.961"/>
+<polygon fill="#000000" stroke="#000000" points="476.734,-548.424 487.297,-547.602 478.526,-541.658 476.734,-548.424"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node38" class="node"><title>proc~cyl_interpol3d_coeff</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node38"><a xlink:href=".././proc/cyl_interpol3d_coeff.html" xlink:title="cyl_interpol3D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="995.5,-818 886.5,-818 886.5,-794 995.5,-794 995.5,-818"/>
+<text text-anchor="middle" x="941" y="-803.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge57" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M652.77,-717.083C664,-735.803 688.406,-771.292 720,-787 768.51,-811.118 830.5,-814.399 876.307,-812.498"/>
+<polygon fill="#000000" stroke="#000000" points="876.6,-815.988 886.409,-811.985 876.245,-808.997 876.6,-815.988"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node39" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node39"><a xlink:href=".././proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="986.5,-639 895.5,-639 895.5,-615 986.5,-615 986.5,-639"/>
+<text text-anchor="middle" x="941" y="-624.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge58" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M669.479,-692.949C683.778,-686.012 702.588,-677.589 720,-672 775.099,-654.312 840.267,-642.007 885.303,-634.789"/>
+<polygon fill="#000000" stroke="#000000" points="886.111,-638.205 895.446,-633.195 885.024,-631.29 886.111,-638.205"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node40" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node40"><a xlink:href=".././proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="996,-738 886,-738 886,-714 996,-714 996,-738"/>
+<text text-anchor="middle" x="941" y="-723.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge59" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M683.534,-707.681C731.944,-711.139 816.895,-717.207 875.69,-721.406"/>
+<polygon fill="#000000" stroke="#000000" points="875.76,-724.92 885.984,-722.142 876.259,-717.938 875.76,-724.92"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node41" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node41"><a xlink:href=".././proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="1123.5,-758 1032.5,-758 1032.5,-734 1123.5,-734 1123.5,-758"/>
+<text text-anchor="middle" x="1078" y="-743.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge60" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M683.704,-699.353C748.576,-690.878 885.033,-678.515 996,-705 1015.3,-709.606 1035.2,-719.595 1050.45,-728.56"/>
+<polygon fill="#000000" stroke="#000000" points="1048.93,-731.735 1059.29,-733.952 1052.58,-725.758 1048.93,-731.735"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node42" class="node"><title>proc~cyl_interpol3d_coeff_arr</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node42"><a xlink:href=".././proc/cyl_interpol3d_coeff_arr.html" xlink:title="cyl_interpol3D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="849.5,-778 720.5,-778 720.5,-754 849.5,-754 849.5,-778"/>
+<text text-anchor="middle" x="785" y="-763.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge61" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M671.595,-717C685.805,-723.602 703.827,-731.875 720,-739 728.259,-742.638 737.158,-746.457 745.618,-750.039"/>
+<polygon fill="#000000" stroke="#000000" points="744.351,-753.303 754.925,-753.961 747.069,-746.852 744.351,-753.303"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_node43" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~make_diagnostic_grids~~CallsGraph_node43"><a xlink:href=".././proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="840,-620 730,-620 730,-596 840,-596 840,-620"/>
+<text text-anchor="middle" x="785" y="-605.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge62" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M671.576,-692.924C675.951,-690.297 680.279,-687.302 684,-684 704.481,-665.825 698.474,-650.926 720,-634 724.59,-630.391 729.749,-627.214 735.095,-624.436"/>
+<polygon fill="#000000" stroke="#000000" points="736.656,-627.569 744.2,-620.13 733.663,-621.241 736.656,-627.569"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge63" class="edge"><title>proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M969.319,-793.858C989.813,-784.75 1018.08,-772.188 1040.51,-762.22"/>
+<polygon fill="#000000" stroke="#000000" points="1042,-765.384 1049.72,-758.124 1039.16,-758.987 1042,-765.384"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge64" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M996.132,-734.02C1004.78,-735.301 1013.73,-736.627 1022.39,-737.909"/>
+<polygon fill="#000000" stroke="#000000" points="1021.98,-741.386 1032.38,-739.39 1023,-734.462 1021.98,-741.386"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge66" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" d="M832.205,-778.001C848.425,-782.214 866.827,-786.994 883.777,-791.397"/>
+<polygon fill="#000000" stroke="#000000" points="883.003,-794.812 893.562,-793.938 884.763,-788.036 883.003,-794.812"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge65" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M849.502,-761.636C901.024,-758.095 972.914,-753.154 1022,-749.78"/>
+<polygon fill="#000000" stroke="#000000" points="1022.38,-753.262 1032.12,-749.085 1021.9,-746.279 1022.38,-753.262"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~make_diagnostic_grids~~CallsGraph_edge67" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M840.295,-614.699C854.789,-616.487 870.462,-618.421 884.994,-620.214"/>
+<polygon fill="#000000" stroke="#000000" points="884.987,-623.739 895.34,-621.49 885.844,-616.792 884.987,-623.739"/>
+</g>
+</g>
+</svg>
+</div><script>var panprocmake_diagnostic_gridsCallsGraph = svgPanZoom('#procmake_diagnostic_gridsCallsGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+     
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~make_diagnostic_grids~~CalledByGraph Pages: 1 -->
+<svg id="procmake_diagnostic_gridsCalledByGraph" width="220pt" height="32pt"
+ viewBox="0.00 0.00 220.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~make_diagnostic_grids~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~make_diagnostic_grids~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 216,-28 216,4 -4,4"/>
+<!-- proc~make_diagnostic_grids -->
+<g id="proc~~make_diagnostic_grids~~CalledByGraph_node1" class="node"><title>proc~make_diagnostic_grids</title>
+<polygon fill="none" stroke="black" points="212,-24 90,-24 90,-0 212,-0 212,-24"/>
+<text text-anchor="middle" x="151" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">make_diagnostic_grids</text>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~make_diagnostic_grids~~CalledByGraph_node2" class="node"><title>program~fidasim</title>
+<g id="a_proc~~make_diagnostic_grids~~CalledByGraph_node2"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~make_diagnostic_grids -->
+<g id="proc~~make_diagnostic_grids~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~make_diagnostic_grids</title>
+<path fill="none" stroke="#000000" d="M54.1721,-12C61.8026,-12 70.5266,-12 79.5327,-12"/>
+<polygon fill="#000000" stroke="#000000" points="79.7777,-15.5001 89.7777,-12 79.7776,-8.5001 79.7777,-15.5001"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/make_diagnostic_grids.html#src">make_diagnostic_grids</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">make_diagnostic_grids</span>
+    <span class="c">!+ Makes [[libfida:pass_grid] from user defined inputs, and stores the quantities in</span>
+    <span class="c">!+ [[libfida:spec_chords]] and [[libfida:npa_chords]]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dlength</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LOSElement</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">los_elem</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">ParticleTrack</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">tracks</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">r0</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">v0</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">r_enter</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">r_exit</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">basis</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">theta</span><span class="p">,</span> <span class="n">sqrt_rho</span><span class="p">,</span> <span class="n">dl</span><span class="p">,</span> <span class="n">length</span>
+    <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span> <span class="kd">::</span> <span class="nb">system</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">)</span> <span class="kd">::</span> <span class="n">probs</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eff_rds</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">inv_4pi</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.d0</span><span class="o">*</span><span class="n">pi</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">eff_rd</span><span class="p">,</span> <span class="n">rd</span><span class="p">,</span> <span class="n">rd_d</span><span class="p">,</span> <span class="n">r0_d</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">inv_basis</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="kd">::</span> <span class="n">xd</span><span class="p">,</span> <span class="n">yd</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">total_prob</span><span class="p">,</span> <span class="n">hh</span><span class="p">,</span> <span class="n">hw</span><span class="p">,</span> <span class="n">dprob</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">pitch</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ichan</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">id</span><span class="p">,</span><span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">,</span><span class="n">d_index</span><span class="p">,</span><span class="n">nd</span><span class="p">,</span><span class="n">ind_d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">ic</span><span class="p">,</span> <span class="n">nc</span><span class="p">,</span> <span class="n">ntrack</span><span class="p">,</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="n">kk</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">error</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pnpa</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        if</span><span class="p">(</span><span class="n">inter_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">pass_grid</span> <span class="o">=</span> <span class="n">inter_grid</span>
+        <span class="k">else</span>
+<span class="k">            call </span><span class="n">make_passive_grid</span><span class="p">()</span>
+        <span class="n">endif</span>
+    <span class="n">endif</span>
+
+    <span class="c">!! Spectral line-of-sight passive neutral grid intersection calculations</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">))</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        allocate</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">ntrack</span><span class="p">))</span>
+        <span class="k">allocate</span><span class="p">(</span><span class="n">dlength</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span><span class="p">,</span> <span class="p">&amp;</span>
+                         <span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="p">&amp;</span>
+                         <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">)</span> <span class="p">)</span>
+        <span class="n">pass_grid_chan_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span>
+            <span class="n">r0</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">lens_uvw</span>
+            <span class="n">v0</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">axis_uvw</span>
+            <span class="n">v0</span> <span class="o">=</span> <span class="n">v0</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">v0</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">line_basis</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">basis</span><span class="p">)</span>
+
+            <span class="k">call </span><span class="n">grid_intersect</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">r_enter</span><span class="p">,</span><span class="n">r_exit</span><span class="p">,</span><span class="n">passive</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">length</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;Channel &quot;,i5,&quot; missed the passive neutral grid or starts inside the plasma&quot;)&#39;</span><span class="p">)</span> <span class="n">i</span>
+                <span class="n">endif</span>
+                <span class="k">cycle </span><span class="n">pass_grid_chan_loop</span>
+            <span class="n">endif</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">spot_size</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">nc</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">nc</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="n">endif</span>
+
+            <span class="n">dlength</span> <span class="o">=</span> <span class="mf">0.d0</span>
+            <span class="c">!$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &amp;</span>
+            <span class="c">!$OMP&amp; length, r_enter, r_exit, j, tracks, ntrack, ind)</span>
+            <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nc</span>
+                <span class="c">! Uniformally sample within spot size</span>
+                <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+                <span class="n">sqrt_rho</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">theta</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">randomu</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">r0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.d0</span>
+                <span class="n">r0</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">spot_size</span><span class="o">*</span><span class="n">sqrt_rho</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+                <span class="n">r0</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">spot_size</span><span class="o">*</span><span class="n">sqrt_rho</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+                <span class="n">r0</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="n">r0</span><span class="p">)</span> <span class="o">+</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">lens_uvw</span>
+
+                <span class="k">call </span><span class="n">grid_intersect</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">r_enter</span><span class="p">,</span><span class="n">r_exit</span><span class="p">,</span><span class="n">passive</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
+                <span class="k">call </span><span class="n">track_cylindrical</span><span class="p">(</span><span class="n">r_enter</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">tracks</span><span class="p">,</span> <span class="n">ntrack</span><span class="p">)</span>
+                <span class="n">pass_grid_track_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntrack</span>
+                    <span class="n">ind</span> <span class="o">=</span> <span class="n">tracks</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">ind</span>
+                    <span class="c">!inds can repeat so add rather than assign</span>
+                    <span class="c">!$OMP ATOMIC UPDATE</span>
+                    <span class="n">dlength</span><span class="p">(</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">=</span> <span class="p">&amp;</span>
+                    <span class="n">dlength</span><span class="p">(</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="n">tracks</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="nb">time</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="c">!time == distance</span>
+                    <span class="c">!$OMP END ATOMIC</span>
+                <span class="n">enddo</span> <span class="n">pass_grid_track_loop</span>
+            <span class="n">enddo</span>
+            <span class="c">!$OMP END PARALLEL DO</span>
+            <span class="k">do </span><span class="n">kk</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
+                <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nz</span>
+                    <span class="n">rloop</span><span class="p">:</span> <span class="k">do </span><span class="n">ii</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nr</span>
+                        <span class="k">if</span><span class="p">(</span><span class="n">dlength</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                            </span><span class="n">dl</span> <span class="o">=</span> <span class="n">dlength</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)</span>
+                            <span class="n">nc</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">nchan</span> <span class="o">+</span> <span class="mi">1</span>
+                            <span class="k">if</span><span class="p">(</span><span class="n">nc</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                                allocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">))</span>
+                                <span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="o">=</span> <span class="n">LOSElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dl</span><span class="p">)</span>
+                            <span class="k">else</span>
+<span class="k">                                allocate</span><span class="p">(</span><span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">))</span>
+                                <span class="n">los_elem</span><span class="p">(</span><span class="mi">1</span><span class="p">:(</span><span class="n">nc</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span>
+                                <span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="o">=</span> <span class="n">LOSElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dl</span><span class="p">)</span>
+                                <span class="k">deallocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">)</span>
+                                <span class="k">call </span><span class="nb">move_alloc</span><span class="p">(</span><span class="n">los_elem</span><span class="p">,</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">)</span>
+                            <span class="n">endif</span>
+                            <span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nc</span>
+                        <span class="n">endif</span>
+                    <span class="n">enddo</span> <span class="n">rloop</span>
+                <span class="n">enddo</span>
+            <span class="n">enddo</span>
+        <span class="n">enddo</span> <span class="n">pass_grid_chan_loop</span>
+
+        <span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_ncell</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">%</span><span class="n">nchan</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">allocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_cell</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_ncell</span><span class="p">))</span>
+
+        <span class="n">nc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">ngrid</span>
+            <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">ic</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span>
+            <span class="n">ii</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">jj</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">kk</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">nchan</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">nc</span> <span class="o">=</span> <span class="n">nc</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">spec_chords</span><span class="p">%</span><span class="n">cyl_cell</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="o">=</span> <span class="n">ic</span>
+            <span class="n">endif</span>
+        <span class="n">enddo</span>
+        <span class="k">deallocate</span><span class="p">(</span><span class="n">dlength</span><span class="p">,</span> <span class="n">tracks</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="c">!! Spectral line-of-sight beam grid intersection calculations</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">inputs</span><span class="p">%</span><span class="n">tot_spectra</span><span class="o">+</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_fida_wght</span><span class="o">-</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_pfida</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        allocate</span><span class="p">(</span><span class="n">dlength</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span> <span class="p">&amp;</span>
+                         <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span> <span class="p">&amp;</span>
+                         <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span> <span class="p">)</span>
+        <span class="k">allocate</span><span class="p">(</span><span class="n">tracks</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ntrack</span><span class="p">))</span>
+        <span class="n">spec_chan_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span>
+            <span class="n">r0</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">lens</span>
+            <span class="n">v0</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">axis</span>
+            <span class="n">v0</span> <span class="o">=</span> <span class="n">v0</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">v0</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">line_basis</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">basis</span><span class="p">)</span>
+
+            <span class="k">call </span><span class="n">grid_intersect</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">r_enter</span><span class="p">,</span><span class="n">r_exit</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">length</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;Channel &quot;,i5,&quot; missed the beam grid&quot;)&#39;</span><span class="p">)</span> <span class="n">i</span>
+                <span class="n">endif</span>
+                <span class="k">cycle </span><span class="n">spec_chan_loop</span>
+            <span class="n">endif</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">spot_size</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">nc</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">nc</span> <span class="o">=</span> <span class="mi">100</span>
+            <span class="n">endif</span>
+
+            <span class="n">dlength</span> <span class="o">=</span> <span class="mf">0.d0</span>
+            <span class="c">!$OMP PARALLEL DO schedule(guided) private(ic,randomu,sqrt_rho,theta,r0, &amp;</span>
+            <span class="c">!$OMP&amp; length, r_enter, r_exit, j, tracks, ntrack, ind)</span>
+            <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nc</span>
+                <span class="c">! Uniformally sample within spot size</span>
+                <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+                <span class="n">sqrt_rho</span> <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">theta</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">*</span><span class="n">randomu</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">r0</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.d0</span>
+                <span class="n">r0</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">spot_size</span><span class="o">*</span><span class="n">sqrt_rho</span><span class="o">*</span><span class="nb">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+                <span class="n">r0</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">spot_size</span><span class="o">*</span><span class="n">sqrt_rho</span><span class="o">*</span><span class="nb">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+                <span class="n">r0</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="n">r0</span><span class="p">)</span> <span class="o">+</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">los</span><span class="p">(</span><span class="n">i</span><span class="p">)%</span><span class="n">lens</span>
+
+                <span class="k">call </span><span class="n">grid_intersect</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">r_enter</span><span class="p">,</span> <span class="n">r_exit</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">track</span><span class="p">(</span><span class="n">r_enter</span><span class="p">,</span> <span class="n">v0</span><span class="p">,</span> <span class="n">tracks</span><span class="p">,</span> <span class="n">ntrack</span><span class="p">)</span>
+                <span class="n">track_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ntrack</span>
+                    <span class="n">ind</span> <span class="o">=</span> <span class="n">tracks</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="n">ind</span>
+                    <span class="c">!inds can repeat so add rather than assign</span>
+                    <span class="c">!$OMP ATOMIC UPDATE</span>
+                    <span class="n">dlength</span><span class="p">(</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">=</span> <span class="p">&amp;</span>
+                    <span class="n">dlength</span><span class="p">(</span><span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="n">tracks</span><span class="p">(</span><span class="n">j</span><span class="p">)%</span><span class="nb">time</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="c">!time == distance</span>
+                    <span class="c">!$OMP END ATOMIC</span>
+                <span class="n">enddo</span> <span class="n">track_loop</span>
+            <span class="n">enddo</span>
+            <span class="c">!$OMP END PARALLEL DO</span>
+            <span class="k">do </span><span class="n">kk</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span>
+                <span class="k">do </span><span class="n">jj</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span>
+                    <span class="n">xloop</span><span class="p">:</span> <span class="k">do </span><span class="n">ii</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span>
+                        <span class="k">if</span><span class="p">(</span><span class="n">dlength</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">).</span><span class="n">ne</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                            </span><span class="n">dl</span> <span class="o">=</span> <span class="n">dlength</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)</span>
+                            <span class="n">nc</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">nchan</span> <span class="o">+</span> <span class="mi">1</span>
+                            <span class="k">if</span><span class="p">(</span><span class="n">nc</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                                allocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">))</span>
+                                <span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="o">=</span> <span class="n">LOSElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dl</span><span class="p">)</span>
+                            <span class="k">else</span>
+<span class="k">                                allocate</span><span class="p">(</span><span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">))</span>
+                                <span class="n">los_elem</span><span class="p">(</span><span class="mi">1</span><span class="p">:(</span><span class="n">nc</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">=</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span>
+                                <span class="n">los_elem</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="o">=</span> <span class="n">LOSElement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dl</span><span class="p">)</span>
+                                <span class="k">deallocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">)</span>
+                                <span class="k">call </span><span class="nb">move_alloc</span><span class="p">(</span><span class="n">los_elem</span><span class="p">,</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">los_elem</span><span class="p">)</span>
+                            <span class="n">endif</span>
+                            <span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">nchan</span> <span class="o">=</span> <span class="n">nc</span>
+                        <span class="n">endif</span>
+                    <span class="n">enddo</span> <span class="n">xloop</span>
+                <span class="n">enddo</span>
+            <span class="n">enddo</span>
+        <span class="n">enddo</span> <span class="n">spec_chan_loop</span>
+
+        <span class="n">spec_chords</span><span class="p">%</span><span class="n">ncell</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">%</span><span class="n">nchan</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">allocate</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">ncell</span><span class="p">))</span>
+
+        <span class="n">nc</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span>
+            <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">ic</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span>
+            <span class="n">ii</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">jj</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">kk</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">inter</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span><span class="n">jj</span><span class="p">,</span><span class="n">kk</span><span class="p">)%</span><span class="n">nchan</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                </span><span class="n">nc</span> <span class="o">=</span> <span class="n">nc</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">spec_chords</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span> <span class="o">=</span> <span class="n">ic</span>
+            <span class="n">endif</span>
+        <span class="n">enddo</span>
+    <span class="n">endif</span>
+
+    <span class="c">!! NPA probability calculations</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">,</span> <span class="p">&amp;</span>
+                             <span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">allocate</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">hit</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span> <span class="p">&amp;</span>
+                            <span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span> <span class="p">&amp;</span>
+                            <span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">npa_chords</span><span class="p">%</span><span class="n">hit</span> <span class="o">=</span> <span class="p">.</span><span class="n">False</span><span class="p">.</span>
+
+    <span class="n">npa_chan_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">ichan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">aperture</span><span class="p">%</span><span class="n">origin</span> <span class="o">-</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="n">v0</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">v0</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">grid_intersect</span><span class="p">(</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">length</span><span class="p">,</span><span class="n">r0</span><span class="p">,</span><span class="n">r0_d</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">length</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;Channel &quot;,i3,&quot; centerline missed the beam grid&quot;)&#39;</span><span class="p">)</span> <span class="n">ichan</span>
+            <span class="n">endif</span>
+        <span class="n">endif</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">calc_npa_wght</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            </span><span class="n">hw</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">hw</span>
+            <span class="n">hh</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">hh</span>
+            <span class="n">nd</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">xd</span><span class="p">)</span>
+            <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nd</span>
+                <span class="n">xd</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">hw</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">hw</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+                <span class="n">yd</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">=</span> <span class="o">-</span><span class="n">hh</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">hh</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+            <span class="n">enddo</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xd</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">xd</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">yd</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">yd</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">basis</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">basis</span>
+            <span class="n">inv_basis</span> <span class="o">=</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">inv_basis</span>
+            <span class="n">eff_rds</span> <span class="o">=</span> <span class="mf">0.d0</span>
+            <span class="n">probs</span> <span class="o">=</span> <span class="mf">0.d0</span>
+            <span class="c">! For each grid point find the probability of hitting the detector given an isotropic source</span>
+            <span class="c">!$OMP PARALLEL DO schedule(guided) private(ic,i,j,k,ix,iy,total_prob,eff_rd,r0,r0_d, &amp;</span>
+            <span class="c">!$OMP&amp; rd_d,rd,d_index,v0,dprob,r,fields,id,ind_d,ind)</span>
+            <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">,</span><span class="n">istep</span>
+                <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">ic</span><span class="p">,</span><span class="n">ind</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">r0</span> <span class="o">=</span> <span class="p">[</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="n">j</span><span class="p">),</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+                <span class="n">r0_d</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">inv_basis</span><span class="p">,</span><span class="n">r0</span><span class="o">-</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span><span class="p">)</span>
+                <span class="k">do </span><span class="n">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nd</span><span class="o">*</span><span class="n">nd</span>
+                    <span class="k">call </span><span class="n">ind2sub</span><span class="p">([</span><span class="n">nd</span><span class="p">,</span><span class="n">nd</span><span class="p">],</span><span class="n">id</span><span class="p">,</span><span class="n">ind_d</span><span class="p">)</span>
+                    <span class="n">ix</span> <span class="o">=</span> <span class="n">ind_d</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">iy</span> <span class="o">=</span> <span class="n">ind_d</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">rd_d</span> <span class="o">=</span> <span class="p">[</span><span class="n">xd</span><span class="p">(</span><span class="n">ix</span><span class="p">),</span><span class="n">yd</span><span class="p">(</span><span class="n">iy</span><span class="p">),</span><span class="mf">0.d0</span><span class="p">]</span>
+                    <span class="n">rd</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span><span class="n">rd_d</span><span class="p">)</span> <span class="o">+</span> <span class="n">npa_chords</span><span class="p">%</span><span class="n">det</span><span class="p">(</span><span class="n">ichan</span><span class="p">)%</span><span class="n">detector</span><span class="p">%</span><span class="n">origin</span>
+                    <span class="n">v0</span> <span class="o">=</span> <span class="n">rd</span> <span class="o">-</span> <span class="n">r0</span>
+                    <span class="n">d_index</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">call </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">r0</span><span class="p">,</span><span class="n">v0</span><span class="p">,</span><span class="n">d_index</span><span class="p">,</span><span class="n">det</span><span class="o">=</span><span class="n">ichan</span><span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">d_index</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                        </span><span class="n">r</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">rd_d</span> <span class="o">-</span> <span class="n">r0_d</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+                        <span class="n">dprob</span> <span class="o">=</span> <span class="p">(</span><span class="n">dx</span><span class="o">*</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="n">inv_4pi</span> <span class="o">*</span> <span class="n">r0_d</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="nb">sqrt</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+                        <span class="n">eff_rds</span><span class="p">(:,</span><span class="n">ic</span><span class="p">)</span> <span class="o">=</span> <span class="n">eff_rds</span><span class="p">(:,</span><span class="n">ic</span><span class="p">)</span> <span class="o">+</span> <span class="n">dprob</span><span class="o">*</span><span class="n">rd</span>
+                        <span class="n">probs</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span> <span class="o">=</span> <span class="n">probs</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span> <span class="o">+</span> <span class="n">dprob</span>
+                    <span class="n">endif</span>
+                <span class="n">enddo</span>
+            <span class="n">enddo</span>
+            <span class="c">!$OMP END PARALLEL DO</span>
+<span class="cp">#ifdef _MPI</span>
+            <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">eff_rds</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
+<span class="cp">#endif</span>
+            <span class="k">do </span><span class="n">ic</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">probs</span><span class="p">(</span><span class="n">ic</span><span class="p">).</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span> <span class="n">ic</span><span class="p">,</span> <span class="n">ind</span><span class="p">)</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                    <span class="n">r0</span> <span class="o">=</span> <span class="p">[</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">i</span><span class="p">),</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="n">j</span><span class="p">),</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+                    <span class="n">eff_rd</span> <span class="o">=</span> <span class="n">eff_rds</span><span class="p">(:,</span><span class="n">ic</span><span class="p">)</span><span class="o">/</span><span class="n">probs</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+                    <span class="k">call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span><span class="n">pos</span><span class="o">=</span><span class="n">r0</span><span class="p">)</span>
+                    <span class="n">v0</span> <span class="o">=</span> <span class="p">(</span><span class="n">eff_rd</span> <span class="o">-</span> <span class="n">r0</span><span class="p">)</span><span class="o">/</span><span class="nb">norm2</span><span class="p">(</span><span class="n">eff_rd</span> <span class="o">-</span> <span class="n">r0</span><span class="p">)</span>
+                    <span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">)%</span><span class="n">pitch</span> <span class="o">=</span> <span class="nb">dot_product</span><span class="p">(</span><span class="n">fields</span><span class="p">%</span><span class="n">b_norm</span><span class="p">,</span><span class="n">v0</span><span class="p">)</span>
+                    <span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">)%</span><span class="n">p</span> <span class="o">=</span> <span class="n">probs</span><span class="p">(</span><span class="n">ic</span><span class="p">)</span>
+                    <span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">)%</span><span class="n">dir</span> <span class="o">=</span> <span class="n">v0</span>
+                    <span class="n">npa_chords</span><span class="p">%</span><span class="n">phit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">ichan</span><span class="p">)%</span><span class="n">eff_rd</span> <span class="o">=</span> <span class="n">eff_rd</span>
+                    <span class="n">npa_chords</span><span class="p">%</span><span class="n">hit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="p">.</span><span class="n">True</span><span class="p">.</span>
+                <span class="n">endif</span>
+            <span class="n">enddo</span>
+            <span class="n">total_prob</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">probs</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">total_prob</span><span class="p">.</span><span class="n">le</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    WRITE</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(&quot;Channel &quot;,i3,&quot; missed the beam grid&quot;)&#39;</span><span class="p">)</span> <span class="n">ichan</span>
+                <span class="n">endif</span>
+                <span class="k">cycle </span><span class="n">npa_chan_loop</span>
+            <span class="n">endif</span>
+        <span class="n">endif</span>
+    <span class="n">enddo</span> <span class="n">npa_chan_loop</span>
+
+<span class="k">end subroutine </span><span class="n">make_diagnostic_grids</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

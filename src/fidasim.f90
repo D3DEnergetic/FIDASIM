@@ -2400,7 +2400,9 @@ subroutine make_passive_grid
     ! Otherwise the domain is set to -pi to pi
     ! Note: 'size' comparison is for the case where all x points are above or below the line y=0
     phi_pos = .False.
-    if (all(xarr.le.0).or.(all(x_yle.le.0).and.(size(xarr).ne.size(x_ygt))).or.(all(x_ygt.le.0).and.(size(xarr).ne.size(x_yle)))) then
+    if (all(xarr.le.0).or.(all(x_yle.le.0).and.&
+       (size(xarr).ne.size(x_ygt))).or.(all(x_ygt.le.0).and.&
+       (size(xarr).ne.size(x_yle)))) then
         phi_pos = .True.
     endif
 

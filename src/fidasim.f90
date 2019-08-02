@@ -2245,53 +2245,176 @@ end subroutine make_beam_grid
 
 subroutine make_passive_grid
     !+ Makes [[libfida:pass_grid] from user defined inputs
-    integer(HID_T) :: fid, gid
-    integer(HSIZE_T), dimension(2) :: dims
-    logical :: path_valid_spec, path_valid_npa
+    real(Float64), dimension(3,spec_chords%nchan+npa_chords%nchan) :: r0_arr, v0_arr
+    real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan) :: xy_enter, xy_exit
+    logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan))   :: yle, ygt
+    logical, dimension(spec_chords%nchan+npa_chords%nchan)         :: skip
+    real(Float64), dimension(:), allocatable  :: xarr_chords, yarr_chords
+    real(Float64), dimension(:), allocatable  :: xarr, yarr, x_yle, x_ygt, phi_arr
+    real(Float64), dimension(3,8) :: vertices_xyz, vertices_uvw
+    real(Float64), dimension(3,3) :: xyz_axis
+    real(Float64), dimension(3)   :: r0, vi
+    real(Float64), dimension(8)   :: xarr_beam_grid, yarr_beam_grid
+    real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax, max_length, phimax, phimin
+    real(Float64) :: dlength = 3.0 !cm
+    integer :: i, iin, iout, dim_le, dim_gt, dim
+    logical :: inp, phi_pos
 
-    real(Float64), dimension(:,:), allocatable :: r0_arr, v0_arr
-    real(Float64), dimension(3) :: vertex111, vertex111_cyl
-    real(Float64), dimension(3) :: vertex221, vertex221_cyl
-    real(Float64), dimension(3) :: vertex112, vertex112_cyl
-    real(Float64), dimension(3) :: vertex121, vertex121_cyl
-    real(Float64), dimension(3) :: vertex211, vertex211_cyl
-    real(Float64), dimension(3) :: vertex212, vertex212_cyl
-    real(Float64), dimension(3) :: vertex222, vertex222_cyl
-    real(Float64), dimension(3) :: vertex122, vertex122_cyl
-    real(Float64), dimension(3) :: r0, v0, r0_cyl
-    real(Float64), dimension(2) :: phi_dum
-    real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax
-    real(Float64) :: rmin, rmax, phimax, phimin
-    integer :: i, error
-    logical :: inp1, inp2
+    !! Get beam grid boundaries
+    ! Convert vertices_xyz to vertices_uvw
+    ! Note: vertices_xyz has the following coordinate definitions:
+    ! 111 = 1, 222 = 2, 112 = 3, 211 = 4, 121 = 5, 212 = 6, 122 = 7, 221 = 8
+    xmin = beam_grid%xmin ; xmax = beam_grid%xmax
+    ymin = beam_grid%ymin ; ymax = beam_grid%ymax
+    zmin = beam_grid%zmin ; zmax = beam_grid%zmax
 
-    !!Collect all LOS info
-    allocate(r0_arr(3,  spec_chords%nchan+npa_chords%nchan), v0_arr(3,  spec_chords%nchan+npa_chords%nchan))
+    !Initialize minimum and maximum vertices
+    vertices_xyz(1,1) = xmin   ; vertices_xyz(2,1) = ymin   ; vertices_xyz(3,1) = zmin
+    vertices_xyz(1,2) = xmax   ; vertices_xyz(2,2) = ymax   ; vertices_xyz(3,2) = zmax
 
+    !Initialize
+    vertices_xyz(:,3) = vertices_xyz(:,1)
+    vertices_xyz(:,4) = vertices_xyz(:,1)
+    vertices_xyz(:,5) = vertices_xyz(:,1)
+    !Update
+    vertices_xyz(3,3) = zmax
+    vertices_xyz(1,4) = xmax
+    vertices_xyz(2,5) = ymax
+    !Initialize
+    vertices_xyz(:,7) = vertices_xyz(:,2)
+    vertices_xyz(:,8) = vertices_xyz(:,2)
+    vertices_xyz(:,6) = vertices_xyz(:,2)
+    !Update
+    vertices_xyz(1,7) = xmin
+    vertices_xyz(3,8) = zmin
+    vertices_xyz(2,6) = ymin
+
+    do i=1, 8
+        call xyz_to_uvw(vertices_xyz(:,i),vertices_uvw(:,i))
+        xarr_beam_grid(i) = vertices_uvw(1,i)
+        yarr_beam_grid(i) = vertices_uvw(2,i)
+    enddo
+
+    !! Next consider passive diagnostic extrema relative to the plasma
     if((inputs%calc_pfida.gt.0).and.(inputs%calc_pnpa.gt.0)) then
         do i=1,(spec_chords%nchan)
             r0_arr(:,i) = spec_chords%los(i)%lens_uvw
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
-        do i=1,(npa_chords%nchan)
-            r0_arr(:,(i+spec_chords%nchan)) = npa_chords%det(i)%detector%origin
-            v0_arr(:,(i+spec_chords%nchan)) = npa_chords%det(i)%aperture%origin - &
-                                              npa_chords%det(i)%detector%origin
+        do i=1, npa_chords%nchan
+            call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i+spec_chords%nchan))
+            xyz_axis = npa_chords%det(i)%detector%basis
+            v0_arr(:,i+spec_chords%nchan) = matmul(beam_grid%basis, xyz_axis(:,3))
         enddo
     else if(inputs%calc_pfida.gt.0) then
-        do i=1,(spec_chords%nchan)
+        do i=1, spec_chords%nchan
             r0_arr(:,i) = spec_chords%los(i)%lens_uvw
             v0_arr(:,i) = spec_chords%los(i)%axis_uvw
         enddo
     else !pnpa>=1 case
-        do i=1,(npa_chords%nchan)
-            r0_arr(:,i) = npa_chords%det(i)%detector%origin
-            v0_arr(:,i) = npa_chords%det(i)%aperture%origin - &
-                          npa_chords%det(i)%detector%origin
+        do i=1, npa_chords%nchan
+            call xyz_to_uvw(npa_chords%det(i)%detector%origin, r0_arr(:,i))
+            xyz_axis = npa_chords%det(i)%detector%basis
+            v0_arr(:,i) = matmul(beam_grid%basis, xyz_axis(:,3))
         enddo
     endif
 
-    !! The remainder of the code will make the passive neutral grid
+    skip = .False.
+    loop_over_channels: do i=1, spec_chords%nchan+npa_chords%nchan
+        r0 = r0_arr(:,i)
+        vi = v0_arr(:,i)
+        vi = vi/norm2(vi)
+
+        ! Find the position that the los first intersects the plasma
+        call in_plasma(r0, inp, input_coords=1)
+        max_length=0.0
+        do while (.not.inp)
+            r0 = r0 + vi*dlength ! move dlength
+            call in_plasma(r0, inp, input_coords=1)
+            max_length = max_length + dlength
+            if(max_length.gt.1d3) then
+                skip(i) = .True. !used below to skip los that do not intersect the plasma
+                cycle loop_over_channels
+            endif
+        enddo
+        xy_enter(1,i) = r0(1)
+        xy_enter(2,i) = r0(2)
+
+        ! Find the position that the los intersects upon exiting the plasma
+        do while (inp)
+            r0 = r0 + vi*dlength
+            call in_plasma(r0, inp, input_coords=1)
+        enddo
+        xy_exit(1,i) = r0(1)
+        xy_exit(2,i) = r0(2)
+    enddo loop_over_channels
+
+    ! Define x and y chord arrays
+    dim = 2*count(.not.skip) ! 2 because each los has enter and exit values
+    allocate(xarr_chords(dim), yarr_chords(dim))
+    iin = 1 ; iout = 2
+    do i=1, spec_chords%nchan+npa_chords%nchan
+        if (.not.skip(i)) then
+            xarr_chords(iin) = xy_enter(1,i) ; yarr_chords(iin) = xy_enter(2,i)
+            xarr_chords(iout) = xy_exit(1,i) ; yarr_chords(iout) = xy_exit(2,i)
+            iin = iin + 2
+            iout = iout + 2
+        endif
+    enddo
+
+    !! Aggregate beam grid and chord extrema
+    allocate(xarr(8+dim), yarr(8+dim))
+    xarr(1:8) = xarr_beam_grid ; xarr(9:8+dim) = xarr_chords
+    yarr(1:8) = yarr_beam_grid ; yarr(9:8+dim) = yarr_chords
+
+
+    !! To find phimin and phimax, begin by seperating points by the line y=0
+    ! Get x points below the line y=0
+    yle = yarr.le.0
+    dim_le = count(yle)
+    allocate(x_yle(dim_le))
+    dim = 0
+    do i=1, size(xarr)
+        if (yle(i)) then
+            dim = dim + 1
+            x_yle(dim) = xarr(i)
+        endif
+    enddo
+    ! Get x points above the line y=0
+    ygt = yarr.gt.0
+    dim_gt = count(ygt)
+    allocate(x_ygt(dim_gt))
+    dim = 0
+    do i=1, size(xarr)
+        if (ygt(i)) then
+            dim = dim + 1
+            x_ygt(dim) = xarr(i)
+        endif
+    enddo
+
+    !! Find the extrema
+    ! The domain should be between 0 and 2 pi under any of the following conditions
+    ! -All x points are left of the line x=0
+    ! -All x points are left of the line x=0 and below the line y=0
+    ! -All x points are left of the line x=0 and above the line y=0
+    ! Otherwise the domain is set to -pi to pi
+    ! Note: 'size' comparison is for the case where all x points are above or below the line y=0
+    phi_pos = .False.
+    if (all(xarr.le.0).or.(all(x_yle.le.0).and.(size(xarr).ne.size(x_ygt))).or.(all(x_ygt.le.0).and.(size(xarr).ne.size(x_yle)))) then
+        phi_pos = .True.
+    endif
+
+    phi_arr = atan2(yarr, xarr)
+    if (phi_pos) then
+        phi_arr = modulo(phi_arr, 2*pi)
+        phimin = minval(phi_arr) ; phimax = maxval(phi_arr)
+    else
+        phimin = minval(phi_arr) ; phimax = maxval(phi_arr)
+    endif
+
+    deallocate(x_yle, x_ygt)
+
+    !! Store the passive neutral grid
     pass_grid%dr = inter_grid%dr
     pass_grid%dz = inter_grid%dz
     pass_grid%nr = inter_grid%nr
@@ -2300,64 +2423,6 @@ subroutine make_passive_grid
     pass_grid%r = inter_grid%r
     pass_grid%z = inter_grid%z
     pass_grid%da = pass_grid%dr*pass_grid%dz
-
-    !! Start by finding the limits of the beam grid vertices to define the phi information
-    xmin = beam_grid%xmin ; xmax = beam_grid%xmax
-    ymin = beam_grid%ymin ; ymax = beam_grid%ymax
-    zmin = beam_grid%zmin ; zmax = beam_grid%zmax
-
-    vertex111(1) = xmin   ; vertex111(2) = ymin   ; vertex111(3) = zmin
-    vertex222(1) = xmax   ; vertex222(2) = ymax   ; vertex222(3) = zmax
-
-    vertex112 = vertex111 ; vertex211 = vertex111 ; vertex121 = vertex111
-    vertex112(3) = zmax   ; vertex211(1) = xmax   ; vertex121(2) = ymax
-
-    vertex122 = vertex222 ; vertex221 = vertex222 ; vertex212 = vertex222
-    vertex122(1) = xmin   ; vertex221(3) = zmin   ; vertex212(2) = ymin
-
-    call xyz_to_cyl(vertex111,vertex111_cyl)
-    call xyz_to_cyl(vertex112,vertex112_cyl)
-    call xyz_to_cyl(vertex121,vertex121_cyl)
-    call xyz_to_cyl(vertex211,vertex211_cyl)
-    call xyz_to_cyl(vertex212,vertex212_cyl)
-    call xyz_to_cyl(vertex222,vertex222_cyl)
-    call xyz_to_cyl(vertex122,vertex122_cyl)
-    call xyz_to_cyl(vertex221,vertex221_cyl)
-
-    phimin = min(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
-                ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
-    phimax = max(vertex111_cyl(3),vertex112_cyl(3),vertex121_cyl(3),vertex211_cyl(3) &
-                ,vertex212_cyl(3),vertex222_cyl(3),vertex122_cyl(3),vertex221_cyl(3))
-
-    !! Update phi with LOS limits
-    track_loop: do i=1,(spec_chords%nchan+npa_chords%nchan)
-        r0 = r0_arr(:,i)
-        v0 = v0_arr(:,i)
-        v0 = 2.d0*v0/norm2(v0)
-        phi_dum = -1.d0 !Initialize phi_dum outside of domain
-        call in_plasma(r0, inp2)
-        if (inp2) cycle track_loop
-        inp2 = .True. ; inp1 = .False.
-        do while (inp2) !Loop until los 'particle' is outside the plasma
-            do while (.not.inp1) !Loop until los 'particle' is inside the plasma
-                call uvw_to_cyl(r0, r0_cyl)
-                if ((r0_cyl(1).gt.600.d0).or.(abs(r0_cyl(2)).gt.600.d0)) exit !Never intersects
-                call in_plasma(r0, inp1)
-                if (inp1) phi_dum(1) = r0_cyl(3)
-                r0 = r0 + v0  !dt=1
-            enddo
-
-            call in_plasma(r0, inp2)
-            if (.not.inp2) then
-                call uvw_to_cyl(r0, r0_cyl)
-                phi_dum(2) = r0_cyl(3)
-            endif
-            r0 = r0 + v0  !dt=1
-        enddo
-
-        if((minval(phi_dum).lt.phimin).and.(minval(phi_dum).ge.0.d0)) phimin = minval(phi_dum)
-        if((maxval(phi_dum).gt.phimax).and.(maxval(phi_dum).ge.0.d0)) phimax = maxval(phi_dum)
-    enddo track_loop
 
     pass_grid%dphi = 0.1
     pass_grid%nphi = int(ceiling((phimax-phimin)/pass_grid%dphi))
@@ -6124,7 +6189,7 @@ subroutine uvw_to_cyl(uvw, cyl)
 
     cyl(1) = sqrt(uvw(1)*uvw(1) + uvw(2)*uvw(2))
     cyl(2) = uvw(3)
-    cyl(3) = modulo(atan2(uvw(2),uvw(1)), 2*pi)
+    cyl(3) = atan2(uvw(2),uvw(1))
 
 end subroutine uvw_to_cyl
 

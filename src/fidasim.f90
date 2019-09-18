@@ -6215,65 +6215,40 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
         !+ Calculates a particles intersection length with the [[libfida:pass_grid]]
 
     real(Float64), dimension(3,6) :: ipnts
-    real(Float64), dimension(3) :: r, v, r0_cyl, vi
+    real(Float64), dimension(3) :: ri, vi
     real(Float64), dimension(3) :: center
     real(Float64), dimension(3) :: lwh
     integer, dimension(6) :: side_inter
     integer, dimension(2) :: ind
-    real(Float64) :: rmin,rmax,zmin,zmax,phimin,phimax
     integer :: i, j, nunique, ind1, ind2
-    logical :: inp, in_grid1, in_grid2
-    logical :: pas
+    real(Float64) :: dlength, max_length
+    logical :: inp, pas
 
-    r = r0 ; v = v0
     pas = .False.
-
     if(present(passive)) pas = passive
 
     if(pas) then
-        rmin = pass_grid%r(1) ; rmax = pass_grid%r(pass_grid%nr)
-        zmin = pass_grid%z(1) ; zmax = pass_grid%z(pass_grid%nz)
-        phimin = pass_grid%phi(1) ; phimax = pass_grid%phi(pass_grid%nphi)
+        ri = r0 ; vi = v0
+        dlength = 0.3 !cm
 
-        v = 2.d0*v/norm2(v)
-        call in_plasma(r, inp) !Weird case where los head is inside the plasma
-        if (inp) then
-            length = 0.d0
-            return
-        endif
-        in_grid2 = .True. ; in_grid1 = .False.
-        do while (in_grid2) !Loop until los 'particle' is outside the plasma
-            do while (.not.in_grid1) !Loop until los 'particle' is inside the plasma
-                call uvw_to_cyl(r, r0_cyl)
-                if ((r0_cyl(1).gt.1.d9).or.(abs(r0_cyl(2)).gt.1.d9)) then !Never intersects
-                    length = 0.d0
-                    return
-                endif
-
-                !Check if inside the grid
-                if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
-                ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
-                ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
-                    in_grid1 = .False.
-                else
-                    in_grid1 = .True.
-                    r_enter = r
-                endif
-                r = r + v  !dt=1
-            enddo
-
-            !Check if outside the grid
-            call uvw_to_cyl(r, r0_cyl)
-            if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
-            ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
-            ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
-                in_grid2 = .False.
-                r_exit = r
-            else
-                in_grid2 = .True.
+        call in_plasma(ri, inp, input_coords=1)
+        max_length=0.0
+        do while (.not.inp)
+            ri = ri + vi*dlength ! move dlength
+            call in_plasma(ri, inp, input_coords=1)
+            max_length = max_length + dlength
+            if(max_length.gt.1d3) then
+                length = 0.d0
+                return
             endif
-            r = r + v  !dt=1
         enddo
+        r_enter = ri
+
+        do while (inp)
+            ri = ri + vi*dlength
+            call in_plasma(ri, inp, input_coords=1)
+        enddo
+        r_exit = ri
 
         length = sqrt(sum((r_exit-r_enter)**2))
     else

@@ -6222,20 +6222,25 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
     integer, dimension(2) :: ind
     integer :: i, j, nunique, ind1, ind2
     real(Float64) :: dlength, max_length
-    logical :: inp, pas
+    logical :: ing, pas
 
     pas = .False.
     if(present(passive)) pas = passive
 
     if(pas) then
-        ri = r0 ; vi = v0
-        dlength = 0.3 !cm
+        ing = in_passive_grid(r0)
+        if (ing) then
+            length = 0.d0
+            return
+        endif
 
-        call in_plasma(ri, inp, input_coords=1)
+        ri = r0 ; vi = v0
+        dlength = 2.0 !cm
         max_length=0.0
-        do while (.not.inp)
+
+        do while (.not.ing)
             ri = ri + vi*dlength ! move dlength
-            call in_plasma(ri, inp, input_coords=1)
+            ing = in_passive_grid(ri)
             max_length = max_length + dlength
             if(max_length.gt.1d3) then
                 length = 0.d0
@@ -6244,9 +6249,9 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
         enddo
         r_enter = ri
 
-        do while (inp)
+        do while (ing)
             ri = ri + vi*dlength
-            call in_plasma(ri, inp, input_coords=1)
+            ing =  in_passive_grid(ri)
         enddo
         r_exit = ri
 
@@ -6333,6 +6338,33 @@ function in_grid(xyz) result(ing)
     if((approx_ge(xyz(1),beam_grid%xmin,tol).and.approx_le(xyz(1),beam_grid%xmax,tol)).and. &
        (approx_ge(xyz(2),beam_grid%ymin,tol).and.approx_le(xyz(2),beam_grid%ymax,tol)).and. &
        (approx_ge(xyz(3),beam_grid%zmin,tol).and.approx_le(xyz(3),beam_grid%zmax,tol))) then
+        ing = .True.
+    else
+        ing = .False.
+    endif
+
+end function
+
+function in_passive_grid(uvw) result(ing)
+    !+ Determines if a position `pos` is in the [[libfida:pass_grid]]
+    real(Float64), dimension(3), intent(in) :: uvw
+        !+ Position in machine coordinates [cm]
+    logical :: ing
+        !+ Indicates whether the position is in the passive neutral grid
+
+    real(Float64), dimension(3) :: cyl
+    real(Float64) :: phimin, phimax
+    real(Float64) :: tol = 1.0d-10
+
+    phimin = minval(pass_grid%phi)
+    phimax = maxval(pass_grid%phi)
+
+    call uvw_to_cyl(uvw, cyl)
+
+    if((approx_ge(cyl(1),minval(pass_grid%r),tol).and.approx_le(cyl(1),maxval(pass_grid%r),tol)).and. &
+       (approx_ge(cyl(2),minval(pass_grid%z),tol).and.approx_le(cyl(2),maxval(pass_grid%z),tol)).and. &
+       ((approx_ge(cyl(3),phimin,tol).and.approx_le(cyl(3),phimax,tol)).or. &
+       (approx_ge(modulo(cyl(3),2*pi),phimin,tol).and.approx_le(modulo(cyl(3),2*pi),phimax,tol)))) then
         ing = .True.
     else
         ing = .False.

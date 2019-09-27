@@ -6215,65 +6215,45 @@ subroutine grid_intersect(r0, v0, length, r_enter, r_exit, center_in, lwh_in, pa
         !+ Calculates a particles intersection length with the [[libfida:pass_grid]]
 
     real(Float64), dimension(3,6) :: ipnts
-    real(Float64), dimension(3) :: r, v, r0_cyl, vi
+    real(Float64), dimension(3) :: ri, vi
     real(Float64), dimension(3) :: center
     real(Float64), dimension(3) :: lwh
     integer, dimension(6) :: side_inter
     integer, dimension(2) :: ind
-    real(Float64) :: rmin,rmax,zmin,zmax,phimin,phimax
     integer :: i, j, nunique, ind1, ind2
-    logical :: inp, in_grid1, in_grid2
-    logical :: pas
+    real(Float64) :: dlength, max_length
+    logical :: ing, pas
 
-    r = r0 ; v = v0
     pas = .False.
-
     if(present(passive)) pas = passive
 
     if(pas) then
-        rmin = pass_grid%r(1) ; rmax = pass_grid%r(pass_grid%nr)
-        zmin = pass_grid%z(1) ; zmax = pass_grid%z(pass_grid%nz)
-        phimin = pass_grid%phi(1) ; phimax = pass_grid%phi(pass_grid%nphi)
-
-        v = 2.d0*v/norm2(v)
-        call in_plasma(r, inp) !Weird case where los head is inside the plasma
-        if (inp) then
+        ing = in_passive_grid(r0)
+        if (ing) then
             length = 0.d0
             return
         endif
-        in_grid2 = .True. ; in_grid1 = .False.
-        do while (in_grid2) !Loop until los 'particle' is outside the plasma
-            do while (.not.in_grid1) !Loop until los 'particle' is inside the plasma
-                call uvw_to_cyl(r, r0_cyl)
-                if ((r0_cyl(1).gt.1.d9).or.(abs(r0_cyl(2)).gt.1.d9)) then !Never intersects
-                    length = 0.d0
-                    return
-                endif
 
-                !Check if inside the grid
-                if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
-                ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
-                ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
-                    in_grid1 = .False.
-                else
-                    in_grid1 = .True.
-                    r_enter = r
-                endif
-                r = r + v  !dt=1
-            enddo
+        ri = r0 ; vi = v0
+        dlength = 2.0 !cm
+        max_length=0.0
 
-            !Check if outside the grid
-            call uvw_to_cyl(r, r0_cyl)
-            if((((r0_cyl(1).lt.rmin).or.(r0_cyl(1).gt.rmax)).or. &
-            ((r0_cyl(2).lt.zmin).or.(r0_cyl(2).gt.zmax))).or. &
-            ((r0_cyl(3).lt.phimin).or.(r0_cyl(3).gt.phimax))) then
-                in_grid2 = .False.
-                r_exit = r
-            else
-                in_grid2 = .True.
+        do while (.not.ing)
+            ri = ri + vi*dlength ! move dlength
+            ing = in_passive_grid(ri)
+            max_length = max_length + dlength
+            if(max_length.gt.1d3) then
+                length = 0.d0
+                return
             endif
-            r = r + v  !dt=1
         enddo
+        r_enter = ri
+
+        do while (ing)
+            ri = ri + vi*dlength
+            ing =  in_passive_grid(ri)
+        enddo
+        r_exit = ri
 
         length = sqrt(sum((r_exit-r_enter)**2))
     else
@@ -6358,6 +6338,33 @@ function in_grid(xyz) result(ing)
     if((approx_ge(xyz(1),beam_grid%xmin,tol).and.approx_le(xyz(1),beam_grid%xmax,tol)).and. &
        (approx_ge(xyz(2),beam_grid%ymin,tol).and.approx_le(xyz(2),beam_grid%ymax,tol)).and. &
        (approx_ge(xyz(3),beam_grid%zmin,tol).and.approx_le(xyz(3),beam_grid%zmax,tol))) then
+        ing = .True.
+    else
+        ing = .False.
+    endif
+
+end function
+
+function in_passive_grid(uvw) result(ing)
+    !+ Determines if a position `pos` is in the [[libfida:pass_grid]]
+    real(Float64), dimension(3), intent(in) :: uvw
+        !+ Position in machine coordinates [cm]
+    logical :: ing
+        !+ Indicates whether the position is in the passive neutral grid
+
+    real(Float64), dimension(3) :: cyl
+    real(Float64) :: phimin, phimax
+    real(Float64) :: tol = 1.0d-10
+
+    phimin = minval(pass_grid%phi)
+    phimax = maxval(pass_grid%phi)
+
+    call uvw_to_cyl(uvw, cyl)
+
+    if((approx_ge(cyl(1),minval(pass_grid%r),tol).and.approx_le(cyl(1),maxval(pass_grid%r),tol)).and. &
+       (approx_ge(cyl(2),minval(pass_grid%z),tol).and.approx_le(cyl(2),maxval(pass_grid%z),tol)).and. &
+       ((approx_ge(cyl(3),phimin,tol).and.approx_le(cyl(3),phimax,tol)).or. &
+       (approx_ge(modulo(cyl(3),2*pi),phimin,tol).and.approx_le(modulo(cyl(3),2*pi),phimax,tol)))) then
         ing = .True.
     else
         ing = .False.

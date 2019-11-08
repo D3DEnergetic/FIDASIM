@@ -537,11 +537,18 @@ def check_plasma(inputs, grid, plasma):
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
 
-    nrnznphi_double = {'dims': [nr, nz, nphi],
-                       'type': [float, np.float64]}
+    if nphi>1:
+        nrnznphi_double = {'dims': [nr, nz, nphi],
+                           'type': [float, np.float64, np.float64]}
 
-    nrnznphi_int = {'dims': [nr, nz, nphi],
-                    'type': [int, np.int32, np.int64]}
+        nrnznphi_int = {'dims': [nr, nz, nphi],
+                        'type': [np.int64]}
+    else:
+        nrnznphi_double = {'dims': [nr, nz],
+                           'type': [float, np.float64]}
+
+        nrnznphi_int = {'dims': [nr, nz],
+                        'type': [np.int64]}
 
     schema = {'time': zero_double,
               'vr': nrnznphi_double,
@@ -631,11 +638,18 @@ def check_fields(inputs, grid, fields):
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
 
-    nrnznphi_double = {'dims': [nr, nz, nphi],
-                       'type': [float, np.float64]}
+    if nphi>1:
+        nrnznphi_double = {'dims': [nr, nz, nphi],
+                           'type': [float, np.float64, np.float64]}
 
-    nrnznphi_int = {'dims': [nr, nz, nphi],
-                    'type': [int, np.int32, np.int64]}
+        nrnznphi_int = {'dims': [nr, nz, nphi],
+                        'type': [int, np.int32, np.int64]}
+    else:
+        nrnznphi_double = {'dims': [nr, nz],
+                           'type': [float, np.float64]}
+
+        nrnznphi_int = {'dims': [nr, nz],
+                        'type': [int, np.int32]}
 
     schema = {'time': zero_double,
               'br': nrnznphi_double,
@@ -730,8 +744,12 @@ def check_distribution(inputs, grid, dist):
         zero_double = {'dims': 0,
                        'type': [float, np.float64]}
 
-        nrnznphi_double = {'dims': [nr, nz, nphi],
-                           'type': [float, np.float64]}
+        if nphi>1:
+            nrnznphi_double = {'dims': [nr, nz, nphi],
+                               'type': [float, np.float64, np.float64]}
+        else:
+            nrnznphi_double = {'dims': [nr, nz],
+                               'type': [float, np.float64]}
 
         schema = {'type': zero_int,
                   'nenergy': zero_int,
@@ -741,10 +759,14 @@ def check_distribution(inputs, grid, dist):
                   'pitch': {'dims': [npitch],
                             'type': [float, np.float64]},
                   'denf': nrnznphi_double,
-                  'f': {'dims': [nen, npitch, nr, nz, nphi],
-                        'type': [float, np.float64]},
                   'time': zero_double,
                   'data_source': zero_string}
+        if nphi>1:
+            schema['f'] = {'dims': [nen, npitch, nr, nz, nphi],
+                           'type': [float, np.float64]}
+        else:
+            schema['f'] = {'dims': [nen, npitch, nr, nz],
+                           'type': [float, np.float64]}
 
         err = check_dict_schema(schema, dist, desc="fast-ion distribution")
         if err:

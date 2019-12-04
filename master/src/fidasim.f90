@@ -2363,7 +2363,7 @@ subroutine make_passive_grid
     enddo
 
     !! Aggregate beam grid and chord extrema
-    allocate(xarr(8+dim), yarr(8+dim))
+    allocate(xarr(8+dim), yarr(8+dim),phi_arr(8+dim))
     xarr(1:8) = xarr_beam_grid ; xarr(9:8+dim) = xarr_chords
     yarr(1:8) = yarr_beam_grid ; yarr(9:8+dim) = yarr_chords
 

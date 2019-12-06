@@ -2249,13 +2249,13 @@ subroutine make_passive_grid
     real(Float64), dimension(2,spec_chords%nchan+npa_chords%nchan) :: xy_enter, xy_exit
     logical, dimension(8+2*(spec_chords%nchan+npa_chords%nchan))   :: yle, ygt
     logical, dimension(spec_chords%nchan+npa_chords%nchan)         :: skip
-    real(Float64), dimension(:), allocatable  :: xarr_chords, yarr_chords
-    real(Float64), dimension(:), allocatable  :: xarr, yarr, x_yle, x_ygt, phi_arr
+    real(Float64), dimension(:), allocatable  :: xarr, yarr
     real(Float64), dimension(3,8) :: vertices_xyz, vertices_uvw
+    real(Float64), dimension(2,3) :: extrema
     real(Float64), dimension(3,3) :: xyz_axis
     real(Float64), dimension(3)   :: r0, vi
     real(Float64), dimension(8)   :: xarr_beam_grid, yarr_beam_grid
-    real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax, max_length, phimax, phimin
+    real(Float64) :: xmin, ymin, xmax, ymax, zmin, zmax, max_length
     real(Float64) :: dlength = 3.0 !cm
     integer :: i, iin, iout, dim_le, dim_gt, dim
     logical :: inp, phi_pos
@@ -2319,102 +2319,7 @@ subroutine make_passive_grid
         enddo
     endif
 
-    skip = .False.
-    loop_over_channels: do i=1, spec_chords%nchan+npa_chords%nchan
-        r0 = r0_arr(:,i)
-        vi = v0_arr(:,i)
-        vi = vi/norm2(vi)
-
-        ! Find the position that the los first intersects the plasma
-        call in_plasma(r0, inp, input_coords=1)
-        max_length=0.0
-        do while (.not.inp)
-            r0 = r0 + vi*dlength ! move dlength
-            call in_plasma(r0, inp, input_coords=1)
-            max_length = max_length + dlength
-            if(max_length.gt.1d3) then
-                skip(i) = .True. !used below to skip los that do not intersect the plasma
-                cycle loop_over_channels
-            endif
-        enddo
-        xy_enter(1,i) = r0(1)
-        xy_enter(2,i) = r0(2)
-
-        ! Find the position that the los intersects upon exiting the plasma
-        do while (inp)
-            r0 = r0 + vi*dlength
-            call in_plasma(r0, inp, input_coords=1)
-        enddo
-        xy_exit(1,i) = r0(1)
-        xy_exit(2,i) = r0(2)
-    enddo loop_over_channels
-
-    ! Define x and y chord arrays
-    dim = 2*count(.not.skip) ! 2 because each los has enter and exit values
-    allocate(xarr_chords(dim), yarr_chords(dim))
-    iin = 1 ; iout = 2
-    do i=1, spec_chords%nchan+npa_chords%nchan
-        if (.not.skip(i)) then
-            xarr_chords(iin) = xy_enter(1,i) ; yarr_chords(iin) = xy_enter(2,i)
-            xarr_chords(iout) = xy_exit(1,i) ; yarr_chords(iout) = xy_exit(2,i)
-            iin = iin + 2
-            iout = iout + 2
-        endif
-    enddo
-
-    !! Aggregate beam grid and chord extrema
-    allocate(xarr(8+dim), yarr(8+dim),phi_arr(8+dim))
-    xarr(1:8) = xarr_beam_grid ; xarr(9:8+dim) = xarr_chords
-    yarr(1:8) = yarr_beam_grid ; yarr(9:8+dim) = yarr_chords
-
-
-    !! To find phimin and phimax, begin by seperating points by the line y=0
-    ! Get x points below the line y=0
-    yle = yarr.le.0
-    dim_le = count(yle)
-    allocate(x_yle(dim_le))
-    dim = 0
-    do i=1, size(xarr)
-        if (yle(i)) then
-            dim = dim + 1
-            x_yle(dim) = xarr(i)
-        endif
-    enddo
-    ! Get x points above the line y=0
-    ygt = yarr.gt.0
-    dim_gt = count(ygt)
-    allocate(x_ygt(dim_gt))
-    dim = 0
-    do i=1, size(xarr)
-        if (ygt(i)) then
-            dim = dim + 1
-            x_ygt(dim) = xarr(i)
-        endif
-    enddo
-
-    !! Find the extrema
-    ! The domain should be between 0 and 2 pi under any of the following conditions
-    ! -All x points are left of the line x=0
-    ! -All x points are left of the line x=0 and below the line y=0
-    ! -All x points are left of the line x=0 and above the line y=0
-    ! Otherwise the domain is set to -pi to pi
-    ! Note: 'size' comparison is for the case where all x points are above or below the line y=0
-    phi_pos = .False.
-    if (all(xarr.le.0).or.(all(x_yle.le.0).and.&
-       (size(xarr).ne.size(x_ygt))).or.(all(x_ygt.le.0).and.&
-       (size(xarr).ne.size(x_yle)))) then
-        phi_pos = .True.
-    endif
-
-    phi_arr = atan2(yarr, xarr)
-    if (phi_pos) then
-        phi_arr = modulo(phi_arr, 2*pi)
-        phimin = minval(phi_arr) ; phimax = maxval(phi_arr)
-    else
-        phimin = minval(phi_arr) ; phimax = maxval(phi_arr)
-    endif
-
-    deallocate(x_yle, x_ygt)
+    call get_plasma_extrema(r0_arr,v0_arr,extrema,xarr_beam_grid,yarr_beam_grid)
 
     !! Store the passive neutral grid
     pass_grid%dr = inter_grid%dr
@@ -2427,16 +2332,16 @@ subroutine make_passive_grid
     pass_grid%da = pass_grid%dr*pass_grid%dz
 
     pass_grid%dphi = 0.1
-    pass_grid%nphi = int(ceiling((phimax-phimin)/pass_grid%dphi))
+    pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
 
     if (pass_grid%nphi.gt.20) then !! Avoid large memory allocation
         pass_grid%nphi = 20
-        pass_grid%dphi = (phimax-phimin)/pass_grid%nphi
+        pass_grid%dphi = (extrema(2,3)-extrema(1,3))/pass_grid%nphi
     endif
 
     allocate(pass_grid%phi(pass_grid%nphi))
     do i=1, pass_grid%nphi
-        pass_grid%phi(i) = phimin + (i-1)*pass_grid%dphi
+        pass_grid%phi(i) = extrema(1,3) + (i-1)*pass_grid%dphi
     enddo
 
     pass_grid%dv = pass_grid%dr*pass_grid%dphi*pass_grid%dz
@@ -2468,17 +2373,17 @@ subroutine make_diagnostic_grids
     real(Float64), dimension(:,:,:), allocatable :: dlength
     type(LOSElement), dimension(:), allocatable :: los_elem
     type(ParticleTrack), dimension(:), allocatable :: tracks
-    real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3)
+    real(Float64) :: r0(3), v0(3), r_enter(3), r_exit(3), r0_cyl(3), ri(3)
     real(Float64), dimension(3,3) :: basis
     real(Float64), dimension(2) :: randomu
     real(Float64) :: theta, sqrt_rho, dl, length
     character(len=20) :: system = ''
-    real(Float64), dimension(beam_grid%ngrid) :: probs
-    real(Float64), dimension(3,beam_grid%ngrid) :: eff_rds
+    real(Float64), dimension(:), allocatable :: probs
+    real(Float64), dimension(:,:), allocatable :: eff_rds
     real(Float64), parameter :: inv_4pi = (4.d0*pi)**(-1)
     real(Float64), dimension(3) :: eff_rd, rd, rd_d, r0_d
     real(Float64), dimension(3,3) :: inv_basis
-    real(Float64), dimension(50) :: xd, yd
+    real(Float64), dimension(:),allocatable :: xd, yd
     type(LocalEMFields) :: fields
     real(Float64) :: total_prob, hh, hw, dprob, dx, dy, r, pitch
     integer :: ichan,k,id,ix,iy,d_index,nd,ind_d(2)
@@ -2672,6 +2577,9 @@ subroutine make_diagnostic_grids
     endif
 
     !! NPA probability calculations
+    allocate(xd(50),yd(50))
+    allocate(probs(beam_grid%ngrid))
+    allocate(eff_rds(3,beam_grid%ngrid))
     allocate(npa_chords%phit(beam_grid%nx, &
                              beam_grid%ny, &
                              beam_grid%nz, &
@@ -2758,6 +2666,7 @@ subroutine make_diagnostic_grids
             endif
         endif
     enddo npa_chan_loop
+    deallocate(probs,eff_rds,xd,yd)
 
 end subroutine make_diagnostic_grids
 
@@ -6568,6 +6477,128 @@ subroutine get_passive_grid_indices(pos, ind, input_coords)
     enddo
 
 end subroutine get_passive_grid_indices
+
+subroutine get_plasma_extrema(r0, v0, extrema, x0, y0)
+    !+ Returns extrema points where line(s) parametrized by `r0` and `v0` intersect the plasma boudnary
+    real(Float64), dimension(:,:), intent(in)            :: r0, v0
+    !+ Arrays the define line(s) in machine coordinates
+    real(Float64), dimension(2,3), intent(out)           :: extrema
+    !+ Minimum and maximumm R, Z, and Phi points
+    real(Float64), dimension(:), intent(in), optional  :: x0, y0
+    !+ Additional x and y points to consider
+
+    real(Float64), dimension(:,:), allocatable :: xy_in, xy_out
+    real(Float64), dimension(:,:), allocatable :: cyl_in, cyl_out
+    real(Float64), dimension(:), allocatable  :: x, y, xlo, xhi
+    real(Float64), dimension(:), allocatable  :: r, z, phi
+    logical, dimension(:), allocatable :: skip
+
+    real(Float64), dimension(3) :: ri, vi
+    real(Float64) :: max_length, dlength
+    integer :: i, iin, iout, ilo, ihi, dlo, dhi, dim, nlines, d
+    logical :: inp
+
+    nlines = size(r0(1,:))
+    allocate(xy_in(2,nlines), xy_out(2,nlines))
+    allocate(cyl_in(3,nlines), cyl_out(3,nlines))
+    allocate(skip(nlines))
+
+    dlength = 3.0 !cm
+    skip = .False.
+
+    loop_over_channels: do i=1, nlines
+        ri = r0(:,i)
+        vi = v0(:,i)
+        vi = vi/norm2(vi)
+
+        ! Find the position that the los first intersects the plasma
+        call in_plasma(ri, inp, input_coords=1)
+        max_length=0.0
+        do while (.not.inp)
+            ri = ri + vi*dlength ! move dlength
+            call in_plasma(ri, inp, input_coords=1)
+            max_length = max_length + dlength
+            if(max_length.gt.1d9) then
+                skip(i) = .True. !used below to skip los that do not intersect the plasma
+                cycle loop_over_channels
+            endif
+        enddo
+
+        xy_in(1,i) = ri(1) ; xy_in(2,i) = ri(2)
+        call uvw_to_cyl(ri, cyl_in(:,i))
+
+        ! Find the position that the los intersects upon exiting the plasma
+        do while (inp)
+            ri = ri + vi*dlength
+            call in_plasma(ri, inp, input_coords=1)
+        enddo
+
+        xy_out(1,i) = ri(1) ; xy_out(2,i) = ri(2)
+        call uvw_to_cyl(ri, cyl_out(:,i))
+
+    enddo loop_over_channels
+
+    dim = 2*count(.not.skip) ! 2 for enter and exit
+
+    d = 0
+    if (present(x0).and.present(y0)) then
+        d = size(x0)
+        if (size(x0).ne.size(y0)) then
+            if(inputs%verbose.ge.0) then
+                write(*,'("GET_PLASMA_EXTREMA: Sizes of X and Y input arrays are not identical")')
+                stop
+            endif
+        endif
+    endif
+
+    allocate(x(dim+d), y(dim+d), r(dim), z(dim), phi(dim))
+
+    iin = 1 ; iout = 2
+    do i=1, nlines
+        if (.not.skip(i)) then
+            x(iin) = xy_in(1,i)  ; x(iout) = xy_out(1,i)
+            y(iin) = xy_in(2,i)  ; y(iout) = xy_out(2,i)
+            r(iin) = cyl_in(1,i) ; r(iout) = cyl_out(1,i)
+            z(iin) = cyl_in(2,i) ; z(iout) = cyl_out(2,i)
+            iin = iin + 2 ; iout = iout + 2
+        endif
+    enddo
+
+    extrema(1,1) = minval(r) ; extrema(2,1) = maxval(r)
+    extrema(1,2) = minval(z) ; extrema(2,2) = maxval(z)
+
+    ! Append extra x and y points
+    if(d.gt.0) then
+        x(dim+1:dim+d) = x0
+        y(dim+1:dim+d) = y0
+    endif
+
+    !! Domain is between 0 and 2 pi if all x points are left of the line x=0
+    !! Else domain is between -pi and pi
+    dlo = count(y.le.0) ; dhi = count(y.gt.0)
+    allocate(xlo(dlo), xhi(dhi))
+
+    ilo = 0 ; ihi = 0
+    do i=1, size(x)
+        if (y(i).le.0.d10) then
+            ilo = ilo + 1
+            xlo(ilo) = x(i)
+        else
+            ihi = ihi + 1
+            xhi(ihi) = x(i)
+        endif
+    enddo
+
+    phi = atan2(y, x)
+    if (all(x.le.0) & !none in quadrant 1 and 4
+        .or.(all(xlo.le.0).and.(size(x).ne.size(xhi))) & !quadrant 3
+        .or.(all(xhi.le.0).and.(size(x).ne.size(xlo)))) then !quadrant 2
+        phi = modulo(phi, 2*pi)
+    endif
+
+    extrema(1,3) = minval(phi) ; extrema(2,3) = maxval(phi)
+
+end subroutine get_plasma_extrema
 
 subroutine get_position(ind, pos, input_coords)
     !+ Get position `pos` given indices `ind`

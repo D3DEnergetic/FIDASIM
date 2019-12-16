@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="59.9% of total for modules and submodules.">8296 statements</a>
+    title="60.0% of total for modules and submodules.">8325 statements</a>
      </li> 
      
      
@@ -611,6 +611,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-get_indices">get_indices</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_passive_grid_indices">get_passive_grid_indices</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_plasma_extrema">get_plasma_extrema</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_position">get_position</a>
       
@@ -1539,6 +1541,8 @@
       <a class="list-group-item" href="../module/libfida.html#proc-get_indices">get_indices</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_passive_grid_indices">get_passive_grid_indices</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-get_plasma_extrema">get_plasma_extrema</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-get_position">get_position</a>
       
@@ -20827,6 +20831,125 @@ public subroutine <a href='../proc/get_passive_grid_indices.html'>get_passive_gr
   
   <td></td><td>::</td>
   <td><strong>input_coords</strong></td><td><p>Indicates coordinate system of <code>pos</code>. Beam grid (0), machine (1) and cylindrical (2)</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-get_plasma_extrema"></span><h3>
+public subroutine <a href='../proc/get_plasma_extrema.html'>get_plasma_extrema</a>(r0, v0, extrema, x0, y0)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Returns extrema points where line(s) parametrized by <code>r0</code> and <code>v0</code> intersect the plasma boudnary</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>r0</strong></td><td><p>Arrays the define line(s) in machine coordinates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>v0</strong></td><td><p>Arrays the define line(s) in machine coordinates</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(2,3)</td><td>::</td>
+  <td><strong>extrema</strong></td><td><p>Minimum and maximumm R, Z, and Phi points</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>x0</strong></td><td><p>Additional x and y points to consider</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>y0</strong></td><td><p>Additional x and y points to consider</p></td>
   
 </tr>
 

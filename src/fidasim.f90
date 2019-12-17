@@ -9238,6 +9238,7 @@ subroutine mc_fastion_pass_grid(ind,fields,eb,ptch,denf,output_coords)
     real(Float64), dimension(fbm%nenergy,fbm%npitch) :: fbeam
     real(Float64), dimension(3) :: rg, rg_cyl
     real(Float64), dimension(3) :: randomu3
+    real(Float64) :: rmin, rmax, zmin, phimin
     integer, dimension(2,1) :: ep_ind
     integer :: ocs
 
@@ -9250,9 +9251,15 @@ subroutine mc_fastion_pass_grid(ind,fields,eb,ptch,denf,output_coords)
     denf=0.d0
 
     call randu(randomu3)
-    rg_cyl(1) = (pass_grid%r(ind(1))+pass_grid%dr/2.d0)+(pass_grid%dr*(randomu3(1)-0.5))
-    rg_cyl(2) = (pass_grid%z(ind(2))+pass_grid%dz/2.d0)+(pass_grid%dz*(randomu3(2)-0.5))
-    rg_cyl(3) = (pass_grid%phi(ind(3))+pass_grid%dphi/2.d0)+(pass_grid%dphi*(randomu3(3)-0.5))
+    rmin = pass_grid%r(ind(1))
+    rmax = rmin + pass_grid%dr
+    zmin = pass_grid%z(ind(2))
+    phimin = pass_grid%phi(ind(3))
+
+    ! Sample uniformally in annulus
+    rg_cyl(1) = sqrt(randomu3(1)*(rmax**2 - rmin**2) + rmin**2)
+    rg_cyl(2) = zmin + randomu3(2)*pass_grid%dz
+    rg_cyl(3) = phimin + randomu3(3)*pass_grid%dphi
     call cyl_to_uvw(rg_cyl, rg)
 
     call get_fields(fields,pos=rg,input_coords=1,output_coords=ocs)

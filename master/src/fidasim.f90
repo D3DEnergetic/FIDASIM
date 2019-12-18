@@ -2331,13 +2331,8 @@ subroutine make_passive_grid
     pass_grid%z = inter_grid%z
     pass_grid%da = pass_grid%dr*pass_grid%dz
 
-    pass_grid%dphi = 0.1
+    pass_grid%dphi = 2*pi/100 !TODO: make this user input
     pass_grid%nphi = int(ceiling((extrema(2,3)-extrema(1,3))/pass_grid%dphi))
-
-    if (pass_grid%nphi.gt.20) then !! Avoid large memory allocation
-        pass_grid%nphi = 20
-        pass_grid%dphi = (extrema(2,3)-extrema(1,3))/pass_grid%nphi
-    endif
 
     allocate(pass_grid%phi(pass_grid%nphi))
     do i=1, pass_grid%nphi

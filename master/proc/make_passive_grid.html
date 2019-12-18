@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.8% of total for procedures.">101 statements</a>
+    title=" 0.8% of total for procedures.">97 statements</a>
      </li> 
      
      
@@ -728,13 +728,8 @@ public subroutine make_passive_grid()
     <span class="n">pass_grid</span><span class="p">%</span><span class="n">z</span> <span class="o">=</span> <span class="n">inter_grid</span><span class="p">%</span><span class="n">z</span>
     <span class="n">pass_grid</span><span class="p">%</span><span class="n">da</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">dr</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dz</span>
 
-    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="o">/</span><span class="mi">100</span> <span class="c">!TODO: make this user input</span>
     <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">ceiling</span><span class="p">((</span><span class="n">extrema</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="n">extrema</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="p">))</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">20</span><span class="p">)</span> <span class="k">then</span> <span class="c">!! Avoid large memory allocation</span>
-        <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span> <span class="o">=</span> <span class="mi">20</span>
-        <span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span> <span class="o">=</span> <span class="p">(</span><span class="n">extrema</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">-</span><span class="n">extrema</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span><span class="o">/</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>
-    <span class="n">endif</span>
 
     <span class="k">allocate</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="p">))</span>
     <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span>

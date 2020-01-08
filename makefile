@@ -162,10 +162,6 @@ src:
 tables: src
 	@cd $(TABLES_DIR); make
 
-.PHONY: atomic_tables
-atomic_tables:
-	@cd $(TABLES_DIR); make atomic_tables
-
 .PHONY: docs
 docs:
 	ford $(FORD_FLAGS) $(DOCS_DIR)/fidasim.md
@@ -190,3 +186,46 @@ clean_tables:
 
 clean_docs:
 	-rm -rf $(DOCS_DIR)/html
+
+help:
+	@echo ""
+	@echo "Makefile Targets:"
+	@echo "    fidasim"
+	@echo "        Builds fidasim executable (Default Target)"
+	@echo "    docs"
+	@echo "        Builds FIDASIM documentation website in $(DOCS_DIR)/html"
+	@echo "    clean"
+	@echo "        Deletes object and module files in the src and tables directories and deletes the fidasim executable"
+	@echo "    clean_all"
+	@echo "        Cleans src, tables, deps, and docs directories"
+	@echo "    clean_src"
+	@echo "        Cleans src directory"
+	@echo "    clean_tables"
+	@echo "        Cleans the tables directory"
+	@echo "    clean_deps"
+	@echo "        Cleans deps directory including HDF5 build"
+	@echo "    clean_docs"
+	@echo "        Deletes FIDASIM documentation website directory"
+	@echo ""
+	@echo "Compiling Options:"
+	@echo "    USE_MPI = (y|n)"
+	@echo "        Turns on MPI parallelization and turns off OpenMP"
+	@echo "        Default: n"
+	@echo "    USE_OPENMP = (y|n)"
+	@echo "        Turns on OpenMP"
+	@echo "        Default: y"
+	@echo "    ARCH = (<TARGET>|n)"
+	@echo "        Compile code optimized for <TARGET> e.g. ARCH=haswell/CORE-AVX2/native"
+	@echo "        Options differ depending on compiler"
+	@echo "        Generated code may not run on different architectures"
+	@echo "        Default: n"
+	@echo "    DEBUG = (y|n)"
+	@echo "        Turns off all optimizations and OpenMP"
+	@echo "        Turns on bounds checking and floating point exceptions"
+	@echo "        Default: n"
+	@echo "    PROFILE = (y|n)"
+	@echo "        Turns on gprof profiling and turns off OpenMP"
+	@echo "        Default: n"
+	@echo "    CHECK_LINKS = (y|n)"
+	@echo "        Checks whether documentation website hyperlinks are active using linkchecker"
+	@echo "        Default: y"

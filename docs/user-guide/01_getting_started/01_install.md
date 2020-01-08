@@ -87,7 +87,7 @@ export PYTHONPATH=$FIDASIM_DIR/lib/python:$PYTHONPATH
 ulimit -s unlimited #Omit this if you like segfaults
 ```
 replacing `/path/to/fidasim/install/directory` with the real directory. To set the environmental variables in the current shell run
-```
+```bash
 source ~/.bashrc
 ```
 
@@ -96,10 +96,11 @@ Once you are in the source directory (and have all the dependencies installed) r
 ```bash
 make
 ```
+This will build the fidasim executable using the default compiler options. Run `make help` to view all the available options.
 Once running, go get a coffee since it will take a while because HDF5 is being built as well.
 
 Once make has completed check if FIDASIM compiled correctly.
-```bash
+```
 user@computer:~/FIDASIM-{!../VERSION!}$ ./fidasim
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
@@ -111,7 +112,7 @@ Version: v2.0.0-dev
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
 ```
-Good job! You installed FIDASIM! But wait there's more.
+Good job! You installed FIDASIM! But wait theres more.
 
 ##Generating Atomic Tables
 Calculating reaction rates on the fly is time consuming so we need to pre-compute them to save time.
@@ -157,9 +158,9 @@ It should print out the following.
 [lstagner@dawson061]% /u/lstagner/FIDASIM/fidasim /p/fida/lstagner/TEST/test_1a_inputs.dat
    ____ ____ ___   ___    ____ ____ __  ___
   / __//  _// _ \ / _ |  / __//  _//  |/  /
- / _/ _/ / / // // __ | _\ \ _/ / / /|_/ / 
-/_/  /___//____//_/ |_|/___//___//_/  /_/  
-                                           
+ / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
+/_/  /___//____//_/ |_|/___//___//_/  /_/
+
 Version: v2.0.0-dev
 
 FIDASIM is released as open source code under the MIT Licence.
@@ -169,28 +170,28 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  Shot:        1
  Time: 1000 [ms]
  Runid: test
- 
+
 ---- Input files ----
  Tables file: /p/fida/FIDASIM/tables/atomic_tables.h5
  Geometry file: /p/fida/lstagner/TEST/test_geometry.h5
  Equilibrium file: /p/fida/lstagner/TEST/test_equilibrium.h5
  Distribution file: /p/fida/lstagner/TEST/test_distribution.h5
- 
+
 ---- OpenMP settings ----
  Number of threads: 16
- 
+
 ---- Atomic tables settings ----
  Maximum n/m:  6
  Beam/Fast-ion mass:  2.014 [amu]
  Thermal/Bulk-ion mass:  2.014 [amu]
  Impurity mass: 12.011 [amu]
- 
+
 ---- Interpolation grid settings ----
  Nr:  70
  Nz: 100
  Nphi:   1
  dA:  4.00 [cm^2]
- 
+
 ---- Beam grid settings ----
  Nx:  50
  Ny:  60
@@ -201,7 +202,7 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  gamma:  0.00 [rad]
  origin: [   0.00,   0.00,   0.00] [cm]
  Number of cells in plasma:   184494
- 
+
 ---- Neutral beam settings ----
  Beam: test_beam
  Power:    1.70 [MW]
@@ -215,7 +216,7 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  Z  range = [-100.00, 98.00]
  Phi  range = [ 4.25, 5.15]
  dA:  4.00 [cm^3]
- 
+
 ---- Fast-ion distribution settings ----
  Distribution type: Fast-ion Density Function F(energy,pitch,R,Z,Phi)
  Nenergy =  75
@@ -229,23 +230,23 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  Z  range = [-100.00, 98.00]
  Phi  range = [ 0.00, 0.00]
  Ntotal =  1.214E+19
- 
+
 ---- FIDA/BES settings ----
  FIDA/BES System: SPECTRAL
  Number of channels:     3
- 
+
 ---- NPA settings ----
  NPA System: NPA
  Number of channels:   3
-                                                  
- nbi:     19:06:28 --- elapsed: 0:00:23 
+
+ nbi:     19:06:28 --- elapsed: 0:00:23
      # of markers:     50000
    birth profile written to: /p/fida/lstagner/TEST/test_birth.h5
-                              
- dcx:     19:06:42 --- elapsed: 0:00:37 
+
+ dcx:     19:06:42 --- elapsed: 0:00:37
      # of markers:    500000
-                              
- halo:    19:07:13 --- elapsed: 0:01:08 
+
+ halo:    19:07:13 --- elapsed: 0:01:08
      # of markers:    527175 --- Seed/DCX: 1.000
      # of markers:    672040 --- Seed/DCX: 0.600
      # of markers:    792640 --- Seed/DCX: 0.366
@@ -256,41 +257,41 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
      # of markers:    921060 --- Seed/DCX: 0.033
      # of markers:    921935 --- Seed/DCX: 0.020
      # of markers:    922180 --- Seed/DCX: 0.013
-                              
- write neutrals:    19:14:31 --- elapsed: 0:08:26 
+
+ write neutrals:    19:14:31 --- elapsed: 0:08:26
    neutral density written to: /p/fida/lstagner/TEST/test_neutrals.h5
-                              
- cold:    19:14:35 --- elapsed: 0:08:30 
-                              
- bremsstrahlung:    19:14:36 --- elapsed: 0:08:31 
-                              
- fida:    19:14:36 --- elapsed: 0:08:31 
+
+ cold:    19:14:35 --- elapsed: 0:08:30
+
+ bremsstrahlung:    19:14:36 --- elapsed: 0:08:31
+
+ fida:    19:14:36 --- elapsed: 0:08:31
      # of markers:   5000000
-                              
- pfida:   19:15:19 --- elapsed: 0:09:14 
+
+ pfida:   19:15:19 --- elapsed: 0:09:14
      # of markers:  50000000
-                              
- write spectra:    19:20:47 --- elapsed: 0:14:42 
+
+ write spectra:    19:20:47 --- elapsed: 0:14:42
    Spectra written to: /p/fida/lstagner/TEST/test_spectra.h5
-                              
- npa:     19:20:47 --- elapsed: 0:14:42 
+
+ npa:     19:20:47 --- elapsed: 0:14:42
      # of markers:      5000000
    Number of Active NPA particles that hit a detector:    40733
-                              
- pnpa:     19:21:21 --- elapsed: 0:15:16 
+
+ pnpa:     19:21:21 --- elapsed: 0:15:16
      # of markers:     50000000
    Number of Passive NPA particles that hit a detector:   116510
-                              
- write npa:    19:26:47 --- elapsed: 0:20:42 
+
+ write npa:    19:26:47 --- elapsed: 0:20:42
    NPA data written to: /p/fida/lstagner/TEST/test_npa.h5
-                              
- neutron rate:    19:26:47 --- elapsed: 0:20:42 
+
+ neutron rate:    19:26:47 --- elapsed: 0:20:42
    Rate:      5.97592E+14 [neutrons/s]
-                              
- write neutrons:    19:28:16 --- elapsed: 0:22:11 
+
+ write neutrons:    19:28:16 --- elapsed: 0:22:11
    Neutrons written to: /p/fida/lstagner/TEST/test_neutrons.h5
-                              
- fida weight function:    19:28:25 --- elapsed: 0:22:20 
+
+ fida weight function:    19:28:25 --- elapsed: 0:22:20
   Number of Channels:     3
   Nlambda: 1000
   Nenergy:  50
@@ -298,50 +299,50 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
   Ngyro: 100
   Maximum Energy:  100.00
   LOS averaged: True
- 
+
    Channel:     1
    Radius:  200.00
    Mean Fast-ion Density:    5.00757E+11
- 
+
    Channel:     2
    Radius:  170.00
    Mean Fast-ion Density:    5.00757E+11
- 
+
    Channel:     3
    Radius:  140.00
    Mean Fast-ion Density:    5.00757E+11
- 
- write fida weights:    19:28:41 --- elapsed: 0:22:36 
+
+ write fida weights:    19:28:41 --- elapsed: 0:22:36
    FIDA weights written to: /p/fida/lstagner/TEST/test_fida_weights.h5
-                              
- npa weight function:    19:28:48 --- elapsed: 0:22:43 
+
+ npa weight function:    19:28:48 --- elapsed: 0:22:43
   Number of Channels:   3
   Nenergy:  50
   Npitch:  50
   Maximum energy:  100.00
- 
+
    Channel:   1
    Radius:    200.000
    Flux:      0.00000E+00
    Weight:    3.48351E+03
- 
+
    Channel:   2
    Radius:    170.000
    Flux:      0.00000E+00
    Weight:    1.41572E+03
- 
+
    Channel:   3
    Radius:    140.000
    Flux:      0.00000E+00
    Weight:    8.38209E+02
- 
- write npa weights:    19:33:50 --- elapsed: 0:27:45 
+
+ write npa weights:    19:33:50 --- elapsed: 0:27:45
    NPA weights written to: /p/fida/lstagner/TEST/test_npa_weights.h5
-                              
- END: hour:minute:second 19:33:50 --- elapsed: 0:27:45 
+
+ END: hour:minute:second 19:33:50 --- elapsed: 0:27:45
 ```
 
 Congratulations! You followed the instructions.
 
 ##Now what
-Most likely you won't be satisfied by just running a test case. Click [here](./02_preprocess.html) to learn how to make the input files used by FIDASIM.
+Most likely you wont be satisfied by just running a test case. Click [here](./02_preprocess.html) to learn how to make the input files used by FIDASIM.

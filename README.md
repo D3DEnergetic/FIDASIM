@@ -27,7 +27,7 @@ If you would like to add code to FIDASIM please follow these guidelines
 3. Add inline documentation as you go. Follow existing documentation format.
 4. Be as general as possible. This makes it easier to add new features down the line.
 
-## Makefile Options
+## Common Makefile Options
 FIDASIM has a few different makefile options
 ```
 make DEBUG=y #Turns off all optimizations and OpenMP. Turns on bounds checking and floating point exceptions. Default: n
@@ -40,6 +40,7 @@ make USE_MPI=y #Turns on MPI parallelization. Default: n
 
 make ARCH=<TARGET> #Compile code optimized for <TARGET> e.g. ARCH=haswell/CORE-AVX2/native. Options differ depending on compiler. Generated code may not run on different architectures. Default: n
 ```
+Run `make help` for all the available options
 
 ## Profiling
 You can profile FIDASIM by building with the `PROFILE=y` build option.

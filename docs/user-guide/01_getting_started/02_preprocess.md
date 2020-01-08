@@ -18,7 +18,7 @@ or using Python
 >>> import preprocessing
 >>> preprocessing.prefida(inputs, grid, nbi, plasma, fields, dist, spec=spec, npa=npa)
 ```
-where arguments are defined as follows. Click the argument's description for extreme detail.
+where arguments are defined as follows. Click the argument description for extreme detail.
 
 * `inputs`: [General Settings](../03_technical/01_prefida_inputs.html#general-settings)
 * `grid`: [Interpolation grid](../03_technical/01_prefida_inputs.html#interpolation-grid-structure)
@@ -83,7 +83,7 @@ or in Python
 Most tokamaks use EFIT to reconstruct the MHD equilibrium.
 To make things easy we provide the IDL routine [read_geqdsk.pro](|url|/sourcefile/read_geqdsk.pro.html) to calculate the [fields structure](../03_technical/01_prefida_inputs.html#fields-structure) from EFITs GEQDSK file.
 
-```
+```idl
 IDL> fields = read_geqdsk('g159243.00300',grid,rho=rho,btipsign=btipsign)
 ```
 or in Python
@@ -99,7 +99,7 @@ It is convenient to grab FIDASIM inputs from previously calculated TRANSP runs.
 
 The python script, `extract_transp_geqdsk`, can be used to extract the MHD equilibrium from TRANSP's `.DATA* files`.
 For example:
-```
+```bash
 extract_transp_geqdsk /p/transparch/result/NSTX/14 159243H06 
 ```
 will create a GEQDSK file for every `.DATA*` file in the `159243H06` TRANSP run.
@@ -108,7 +108,7 @@ Run `extract_transp_geqdsk -h` for the full documentation.
 
 The IDL routine [extract_transp_plasma.pro](|url|/sourcefile/extract_transp_plasma.pro.html) or the equivalent Python function creates the [plasma structure](../03_technical/01_prefida_inputs.html#plasma-structure) at a given time. 
 
-```
+```idl
 IDL> plasma = extract_transp_plasma("159243H06.CDF",1.02,grid,rho)
 ```
 or in Python
@@ -120,7 +120,7 @@ where `grid` is the interpolation grid and `rho` is the sqrt(normalized torodial
 
 #Translating NUBEAM Neutral Beam Geometry
 The IDL routine [nubeam_geometry.pro](|url|/sourcefile/nubeam_geometry.pro.html) can be used to translate the NUBEAM neutral beam geometry definition into the [correct format](../03_technical/01_prefida_inputs.html#neutral-beam-geometry-structure).
-```
+```idl
 IDL> nbi = nubeam_geometry(nubeam)
 ```
 or in Python
@@ -132,7 +132,7 @@ where `nubeam` is a structure/dictionary containing the NUBEAM geometry variable
 
 #Extracting the Fast-ion Distribution Function from TRANSP/NUBEAM
 The python script, `extract_transp_fbm`, provides a easy way to extract the fast-ion distribution. For example:
-```
+```bash
 extract_transp_fbm /p/transparch/result/NSTX/14 159243H06
 ```
 extracts a distribution function for every `.DATA*` file in the `159243H06` TRANSP run.
@@ -146,7 +146,7 @@ We provide routines for:
 * [read_mc_nubeam.pro](|url|/sourcefile/read_mc_nubeam.pro.html): Monte Carlo TRANSP/NUBEAM Guiding Center distribution
 * [read_spiral.pro](|url|/sourcefile/read_spiral.pro.html): SPIRAL Guiding Center distribution
 
-```
+```idl
 IDL> f = read_nubeam(nubeam_distribution_file,grid,btipsign = -1) 
 IDL> mcf = read_mc_nubeam(mc_nubeam_distribution_file,Ntotal=1e19,btipsign=-1)
 IDL> s = read_spiral(spiral_file,Ntotal=1e19,btipsign=-1)

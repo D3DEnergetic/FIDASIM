@@ -6,7 +6,7 @@ title: Reading Outputs
 
 ##Using HDF5 tools
 The HDF5 installation provides [several useful tools](https://www.hdfgroup.org/products/hdf5_tools/index.html#cmd) for inspecting HDF5 files.
-```
+```bash
 lstagner@computer:~/TEST$ h5ls test_geometry.h5
 nbi                      Group
 npa                      Group

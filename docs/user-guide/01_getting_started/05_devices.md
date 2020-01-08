@@ -7,7 +7,7 @@ It it also being used in charge exchange recombination spectroscopy to validate 
 The routines for running a DIII-D FIDASIM run are available [here](https://github.com/D3DEnergetic/d3d-fidasim)
 
 A FIDASIM module containing the DIII-D specific routines is available on the Iris cluster.
-```
+```bash
 module load fidasim
 fidasim
 ```

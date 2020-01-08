@@ -19,11 +19,11 @@ or for the tcsh shell run
 limit stacksize unlimited
 ```
 
-# Execution Hangs
-By default FIDASIM will use all the threads available. 
+# Execution Hangs when using OpenMP
+By default FIDASIM will use all the threads available when using OpenMP.
 If another process is hogging a core it will cause FIDASIM to stall.
 To prevent this use the `num_threads` optional argument as shown below
 
-```
+```bash
 fidasim ./test_inputs.dat 8
 ```

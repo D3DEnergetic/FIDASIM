@@ -155,12 +155,12 @@
 <p>Depending on what you wish to plot, your inputs, geometry, equilibrium and/or distribution files will need to be located in the same folder.
 Below are brief descriptions and examples of what the script can currently handle:</p>
 <p>To plot all of your inputs, simply indicate the directory and run ID.</p>
-<div class="codehilite"><pre><span></span><span class="err">plot_inputs /p/fida/lstagner/TEST/ test_1a</span>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a
 </pre></div>
 
 
 <p>To plot only the beam and diagnostic geometry, append the optional argument -g</p>
-<div class="codehilite"><pre><span></span><span class="err">plot_inputs /p/fida/lstagner/TEST/ test_1a -g</span>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -g
 </pre></div>
 
 
@@ -168,7 +168,7 @@ Below are brief descriptions and examples of what the script can currently handl
 <p>If you are plotting many FIDA or NPA line of sights, then it might be beneficial for you to append -l to remove the legend from the 3D plot.</p>
 <p>If you wish to plot lineouts on your figures, simply indicate the value and dimension you want to cut through.
 For example, if you are interested in seeing what the plasma lineout looks like at R = 170 cm along the z axis, execute the following command</p>
-<div class="codehilite"><pre><span></span><span class="err">plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz 170</span>
+<div class="codehilite"><pre><span></span>plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz <span class="m">170</span>
 </pre></div>
 
 
@@ -180,7 +180,7 @@ Let's start with the easiest method first.
 Assuming all of your output files are located in the same folder, the following command will search that folder for all run IDs present.
 Then, it will plot all of the spectra and npa data for each run ID on every FIDA and NPA channel.
 Furthermore, it will also print out the neutron rate.</p>
-<div class="codehilite"><pre><span></span><span class="err">plot_outputs -d /p/fida/lstagner/TEST/ -s -as -n -an</span>
+<div class="codehilite"><pre><span></span>plot_outputs -d /p/fida/lstagner/TEST/ -s -as -n -an
 </pre></div>
 
 
@@ -190,7 +190,7 @@ What if your files are scattered around in different folders?
 What if you are only interested in the active FIDA emission?
 What if you only want to view channels 1 and 3?
 The example below does this for two different files located in different folders.</p>
-<div class="codehilite"><pre><span></span><span class="err">plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls 1 3</span>
+<div class="codehilite"><pre><span></span>plot_outputs -p /p/fida/lstagner/TEST/test_1a_spectra.h5 /different_path/test_2a_spectra.h5 -f -ls <span class="m">1</span> <span class="m">3</span>
 </pre></div>
 
 
@@ -324,7 +324,7 @@ The example below does this for two different files located in different folders
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

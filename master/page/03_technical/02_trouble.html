@@ -144,7 +144,7 @@ Please try these solutions before <a href="https://github.com/D3DEnergetic/FIDAS
 <div class="toc">
 <ul>
 <li><a href="#segfaults">Segfaults</a></li>
-<li><a href="#execution-hangs">Execution Hangs</a></li>
+<li><a href="#execution-hangs-when-using-openmp">Execution Hangs when using OpenMP</a></li>
 </ul>
 </div>
 <hr>
@@ -160,11 +160,11 @@ Please try these solutions before <a href="https://github.com/D3DEnergetic/FIDAS
 </pre></div>
 
 
-<h1 id="execution-hangs">Execution Hangs</h1>
-<p>By default FIDASIM will use all the threads available. 
+<h1 id="execution-hangs-when-using-openmp">Execution Hangs when using OpenMP</h1>
+<p>By default FIDASIM will use all the threads available when using OpenMP.
 If another process is hogging a core it will cause FIDASIM to stall.
 To prevent this use the <code>num_threads</code> optional argument as shown below</p>
-<div class="codehilite"><pre><span></span><span class="err">fidasim ./test_inputs.dat 8</span>
+<div class="codehilite"><pre><span></span>fidasim ./test_inputs.dat <span class="m">8</span>
 </pre></div>
     </div>
     
@@ -295,7 +295,7 @@ To prevent this use the <code>num_threads</code> optional argument as shown belo
     <footer>
       <div class="container">
       <div class="row">
-        <div class="col-xs-6 col-md-4"><p>&copy; 2019 
+        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
                                           </p></div>
         <div class="col-xs-6 col-md-4 col-md-push-4">
           <p class="text-right">

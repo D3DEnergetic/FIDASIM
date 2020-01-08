@@ -33,9 +33,12 @@ git clone --branch=gh-pages $REPO gh-pages
 
 if [[ $TRAVIS_BRANCH = release-* ]]; then
     cd gh-pages
+    rm -rf $TRAVIS_BRANCH
+    mkdir $TRAVIS_BRANCH
     rm -rf css favicon.png fonts index.html interface \
        js lists media module page proc program search.html \
        sourcefile src tipuesearch type
+    cp -r "$TRAVIS_BUILD_DIR"/docs/html/* $TRAVIS_BRANCH
     cp -r "$TRAVIS_BUILD_DIR"/docs/html/* .
     git add -A
     git commit -m "Development Documentation updated by travis job $TRAVIS_JOB_NUMBER for commits $TRAVIS_COMMIT_RANGE"

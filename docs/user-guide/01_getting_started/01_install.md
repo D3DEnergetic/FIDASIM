@@ -118,12 +118,14 @@ Good job! You installed FIDASIM! But wait theres more.
 Calculating reaction rates on the fly is time consuming so we need to pre-compute them to save time.
 The following code snippit will generate the atomic tables using the default settings.
 The default settings should be appropriate for most use cases, however, it may be necessary to generate custom atomic tables.
-In that case edit the file `tables/table_settings.dat` before running the following command
-
+In that case edit the file `tables/table_settings.dat` before running the following command if FIDASIM was compiled with OpenMP (the default build)
 ```bash
 ./tables/generate_tables ./tables/default_settings.dat [num_threads]
 ```
-
+or if FIDASIM was built with MPI
+```bash
+mpirun -np num_processes ./tables/generate_tables ./tables/default_settings.dat
+```
 @warning
 This is computationally expensive so make sure you run this on a computer
 where you won't get angry emails for using up all the CPU's

@@ -40,12 +40,12 @@ The following settings will give a reasonable runtime.
 ##Running Interactively
 
 For OpenMP parallelized FIDASIM run with 16 threads run
-```
+```bash
 [lstagner@dawson061]% ./fidasim /p/fida/lstagner/TEST/test_inputs.dat 16
 ```
 
 For MPI parallelized FIDASIM run with 16 processes run
-```
+```bash
 [lstagner@dawson061]% mpirun -np 16 ./fidasim /p/fida/lstagner/TEST/test_inputs.dat
 ```
 

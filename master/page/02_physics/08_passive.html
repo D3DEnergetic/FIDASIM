@@ -147,7 +147,7 @@ Therefore, FIDASIM is improved to predict passive signals for a given edge-cold 
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#time-evolution-of-cold-neutrals">Time evolution of cold neutrals</a></li>
 <li><a href="#types-of-passive-signals">Types of Passive Signals</a></li>
-<li><a href="#passive-neutral-grid">Passive Neutral Grid</a></li>
+<li><a href="#passive-grid">Passive Grid</a></li>
 <li><a href="#relevant-namelist-settings">Relevant Namelist Settings</a></li>
 <li><a href="#fortran-references">Fortran References</a></li>
 </ul>
@@ -169,10 +169,10 @@ Then, the neutrals are distributed throughout the interpolation grid for subsequ
 <li>Fast-ion D-<script type="math/tex">\alpha</script> (FIDA)</li>
 <li>Neutral Particle Analyzer (NPA)</li>
 </ul>
-<h1 id="passive-neutral-grid">Passive Neutral Grid</h1>
-<p>By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the entire plasma volume.
-If the interpolation grid is 3D, then the passive neutral grid is the interpolation grid.
-FIDASIM writes the passive <a href="../01_getting_started/03_running:html##Running-Interactively">neutral grid information</a> in the output file.</p>
+<h1 id="passive-grid">Passive Grid</h1>
+<p>By default, FIDASIM will define the passive grid to encompass the beam grid and the entire viewable plasma volume.
+If the interpolation grid is 3D, then the passive grid is the interpolation grid.
+FIDASIM writes the passive grid settings are printed to the <a href="../01_getting_started/03_running.html#running-interactively">standard output</a></p>
 <h1 id="relevant-namelist-settings">Relevant Namelist Settings</h1>
 <ul>
 <li><code>calc_pfida</code>: Calculate pFIDA spectra</li>
@@ -183,6 +183,7 @@ FIDASIM writes the passive <a href="../01_getting_started/03_running:html##Runni
 </ul>
 <h1 id="fortran-references">Fortran References</h1>
 <ul>
+<li><a href="../../proc/make_passive_grid.html">make_passive_grid</a>: Creates passive grid from input geometries</li>
 <li><a href="../../proc/read_chords.html">read_chords</a>: Reads FIDA geometry</li>
 <li><a href="../../proc/pfida_f.html">pfida_f</a>: Calculates FIDA light using a distribution function</li>
 <li><a href="../../proc/pfida_mc.html">pfida_mc</a>: Calculates FIDA light using a Monte Carlo fast-ion distribution</li>

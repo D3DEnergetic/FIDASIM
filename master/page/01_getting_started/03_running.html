@@ -143,9 +143,10 @@
 <div class="toc">
 <ul>
 <li><a href="#running-fidasim">Running FIDASIM</a><ul>
-<li><a href="#recommended-hardware">Recommended Hardware</a></li>
+<li><a href="#recommended-hardware-for-openmp-parallelized-fidasim">Recommended Hardware for OpenMP Parallelized FIDASIM</a></li>
+<li><a href="#recommended-hardware-for-mpi-parallelized-fidasim">Recommended Hardware for MPI Parallelized FIDASIM</a></li>
 <li><a href="#running-interactively">Running Interactively</a></li>
-<li><a href="#submitting-to-a-clusters-job-schedular-using-submit_fidasim">Submitting to a clusters job schedular using submit_fidasim</a></li>
+<li><a href="#submitting-to-a-cluster-job-schedular">Submitting to a cluster job schedular</a></li>
 </ul>
 </li>
 </ul>
@@ -165,204 +166,33 @@
 
 
 <p>Actually having FIDASIM produce something takes a bit of thought</p>
-<h2 id="recommended-hardware">Recommended Hardware</h2>
+<h2 id="recommended-hardware-for-openmp-parallelized-fidasim">Recommended Hardware for OpenMP Parallelized FIDASIM</h2>
 <p>The following settings will give a reasonable runtime.</p>
 <ul>
 <li>32 threads on a shared memory node (All calculations are done on a single node)</li>
-<li>At least 2 GB of memory</li>
+<li>At least 2 GB of memory (amount of memory varies depending on user settings and inputs)</li>
 </ul>
 <p></p><div class="alert alert-warning" role="alert"><h4>Warning</h4><p>By default FIDASIM will use all the threads available. If another process is hogging a core it will cause FIDASIM to stall. To prevent this use the <code>num_threads</code> optional argument</p></div>
+<h2 id="recommended-hardware-for-mpi-parallelized-fidasim">Recommended Hardware for MPI Parallelized FIDASIM</h2>
+<p>The following settings will give a reasonable runtime.</p>
+<ul>
+<li>32 processes</li>
+<li>At least 2 GB of memory per process (amount of memory varies depending on user settings and inputs)</li>
+</ul>
 <h2 id="running-interactively">Running Interactively</h2>
-<div class="codehilite"><pre><span></span><span class="o">[</span><span class="n">lstagner@dawson061</span><span class="o">]%</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="n">fidasim</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_inputs</span><span class="p">.</span><span class="n">dat</span><span class="w"> </span><span class="mi">16</span><span class="w"></span>
-<span class="w">   </span><span class="n">____</span><span class="w"> </span><span class="n">____</span><span class="w"> </span><span class="n">___</span><span class="w">   </span><span class="n">___</span><span class="w">    </span><span class="n">____</span><span class="w"> </span><span class="n">____</span><span class="w"> </span><span class="n">__</span><span class="w">  </span><span class="n">___</span><span class="w"></span>
-<span class="w">  </span><span class="o">/</span><span class="w"> </span><span class="n">__</span><span class="o">//</span><span class="w">  </span><span class="n">_</span><span class="o">//</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="err">\</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">|</span><span class="w">  </span><span class="o">/</span><span class="w"> </span><span class="n">__</span><span class="o">//</span><span class="w">  </span><span class="n">_</span><span class="o">//</span><span class="w">  </span><span class="o">|/</span><span class="w">  </span><span class="o">/</span><span class="w"></span>
-<span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">_</span><span class="o">/</span><span class="w"> </span><span class="n">_</span><span class="o">/</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">__</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">_</span><span class="err">\</span><span class="w"> </span><span class="err">\</span><span class="w"> </span><span class="n">_</span><span class="o">/</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="o">/|</span><span class="n">_</span><span class="o">/</span><span class="w"> </span><span class="o">/</span><span class="w"></span>
-<span class="o">/</span><span class="n">_</span><span class="o">/</span><span class="w">  </span><span class="o">/</span><span class="n">___</span><span class="o">//</span><span class="n">____</span><span class="o">//</span><span class="n">_</span><span class="o">/</span><span class="w"> </span><span class="o">|</span><span class="n">_</span><span class="o">|/</span><span class="n">___</span><span class="o">//</span><span class="n">___</span><span class="o">//</span><span class="n">_</span><span class="o">/</span><span class="w">  </span><span class="o">/</span><span class="n">_</span><span class="o">/</span><span class="w"></span>
-
-<span class="nl">Version</span><span class="p">:</span><span class="w"> </span><span class="n">v2</span><span class="mf">.0.0</span><span class="o">-</span><span class="n">dev</span><span class="w"></span>
-
-<span class="n">FIDASIM</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">released</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="k">open</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="k">under</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">MIT</span><span class="w"> </span><span class="n">Licence</span><span class="p">.</span><span class="w"></span>
-<span class="k">For</span><span class="w"> </span><span class="n">more</span><span class="w"> </span><span class="n">information</span><span class="w"> </span><span class="n">visit</span><span class="w"> </span><span class="nl">http</span><span class="p">:</span><span class="o">//</span><span class="n">d3denergetic</span><span class="p">.</span><span class="n">github</span><span class="p">.</span><span class="n">io</span><span class="o">/</span><span class="n">FIDASIM</span><span class="o">/</span><span class="w"></span>
-
-<span class="c1">---- Shot settings ----</span>
-<span class="w"> </span><span class="nl">Shot</span><span class="p">:</span><span class="w">        </span><span class="mi">1</span><span class="w"></span>
-<span class="w"> </span><span class="nc">Time</span><span class="err">:</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">[</span><span class="n">ms</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Runid</span><span class="p">:</span><span class="w"> </span><span class="n">test</span><span class="w"></span>
-
-<span class="c1">---- Input files ----</span>
-<span class="w"> </span><span class="n">Tables</span><span class="w"> </span><span class="k">file</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">FIDASIM</span><span class="o">/</span><span class="n">tables</span><span class="o">/</span><span class="n">atomic_tables</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-<span class="w"> </span><span class="n">Geometry</span><span class="w"> </span><span class="k">file</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_geometry</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-<span class="w"> </span><span class="n">Equilibrium</span><span class="w"> </span><span class="k">file</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_equilibrium</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-<span class="w"> </span><span class="n">Distribution</span><span class="w"> </span><span class="k">file</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_distribution</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="c1">---- OpenMP settings ----</span>
-<span class="w"> </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">threads</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="w"></span>
-
-<span class="c1">---- Atomic tables settings ----</span>
-<span class="w"> </span><span class="n">Maximum</span><span class="w"> </span><span class="n">n</span><span class="o">/</span><span class="nl">m</span><span class="p">:</span><span class="w">  </span><span class="mi">6</span><span class="w"></span>
-<span class="w"> </span><span class="n">Beam</span><span class="o">/</span><span class="n">Fast</span><span class="o">-</span><span class="n">ion</span><span class="w"> </span><span class="nl">mass</span><span class="p">:</span><span class="w">  </span><span class="mf">2.014</span><span class="w"> </span><span class="o">[</span><span class="n">amu</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Thermal</span><span class="o">/</span><span class="k">Bulk</span><span class="o">-</span><span class="n">ion</span><span class="w"> </span><span class="nl">mass</span><span class="p">:</span><span class="w">  </span><span class="mf">2.014</span><span class="w"> </span><span class="o">[</span><span class="n">amu</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Impurity</span><span class="w"> </span><span class="nl">mass</span><span class="p">:</span><span class="w"> </span><span class="mf">12.011</span><span class="w"> </span><span class="o">[</span><span class="n">amu</span><span class="o">]</span><span class="w"></span>
-
-<span class="c1">---- Interpolation grid settings ----</span>
-<span class="w"> </span><span class="nl">Nr</span><span class="p">:</span><span class="w">  </span><span class="mi">70</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Nz</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Nphi</span><span class="p">:</span><span class="w">   </span><span class="mi">1</span><span class="w"></span>
-<span class="w"> </span><span class="nl">dA</span><span class="p">:</span><span class="w">  </span><span class="mf">4.00</span><span class="w"> </span><span class="o">[</span><span class="n">cm^2</span><span class="o">]</span><span class="w"></span>
-
-<span class="c1">---- Beam grid settings ----</span>
-<span class="w"> </span><span class="nl">Nx</span><span class="p">:</span><span class="w">  </span><span class="mi">50</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Ny</span><span class="p">:</span><span class="w">  </span><span class="mi">60</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Nz</span><span class="p">:</span><span class="w">  </span><span class="mi">70</span><span class="w"></span>
-<span class="w"> </span><span class="nl">dV</span><span class="p">:</span><span class="w">  </span><span class="mf">8.00</span><span class="w"> </span><span class="o">[</span><span class="n">cm^3</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="nl">alpha</span><span class="p">:</span><span class="w">  </span><span class="mf">0.00</span><span class="w"> </span><span class="o">[</span><span class="n">rad</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="nl">beta</span><span class="p">:</span><span class="w">   </span><span class="mf">0.00</span><span class="w"> </span><span class="o">[</span><span class="n">rad</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="nl">gamma</span><span class="p">:</span><span class="w">  </span><span class="mf">0.00</span><span class="w"> </span><span class="o">[</span><span class="n">rad</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="nl">origin</span><span class="p">:</span><span class="w"> </span><span class="o">[</span><span class="n">   0.00,   0.00,   0.00</span><span class="o">]</span><span class="w"> </span><span class="o">[</span><span class="n">cm</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">cells</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nl">plasma</span><span class="p">:</span><span class="w">   </span><span class="mi">184494</span><span class="w"></span>
-
-<span class="c1">---- Neutral beam settings ----</span>
-<span class="w"> </span><span class="nl">Beam</span><span class="p">:</span><span class="w"> </span><span class="n">test_beam</span><span class="w"></span>
-<span class="w"> </span><span class="nf">Power</span><span class="err">:</span><span class="w">    </span><span class="mf">1.70</span><span class="w"> </span><span class="o">[</span><span class="n">MW</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Voltage</span><span class="p">:</span><span class="w">  </span><span class="mf">72.50</span><span class="w"> </span><span class="o">[</span><span class="n">keV</span><span class="o">]</span><span class="w"></span>
-
-<span class="c1">---- Passive neutral grid settings ----</span>
-<span class="w"> </span><span class="nl">Nr</span><span class="p">:</span><span class="w">  </span><span class="mi">70</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Nz</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
-<span class="w"> </span><span class="nl">Nphi</span><span class="p">:</span><span class="w">  </span><span class="mi">10</span><span class="w"></span>
-<span class="w"> </span><span class="n">R</span><span class="w">  </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">100.00,238.00</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Z</span><span class="w">  </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">-100.00, 98.00</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Phi</span><span class="w">  </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n"> 4.25, 5.15</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="nl">dA</span><span class="p">:</span><span class="w">  </span><span class="mf">4.00</span><span class="w"> </span><span class="o">[</span><span class="n">cm^3</span><span class="o">]</span><span class="w"></span>
-
-<span class="c1">---- Fast-ion distribution settings ----</span>
-<span class="w"> </span><span class="n">Distribution</span><span class="w"> </span><span class="nl">type</span><span class="p">:</span><span class="w"> </span><span class="n">Fast</span><span class="o">-</span><span class="n">ion</span><span class="w"> </span><span class="n">Density</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">F</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span><span class="n">pitch</span><span class="p">,</span><span class="n">R</span><span class="p">,</span><span class="n">Z</span><span class="p">,</span><span class="n">Phi</span><span class="p">)</span><span class="w"></span>
-<span class="w"> </span><span class="n">Nenergy</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mi">75</span><span class="w"></span>
-<span class="w"> </span><span class="n">Npitch</span><span class="w">  </span><span class="o">=</span><span class="w">  </span><span class="mi">50</span><span class="w"></span>
-<span class="w"> </span><span class="n">Nr</span><span class="w">  </span><span class="o">=</span><span class="w">  </span><span class="mi">70</span><span class="w"></span>
-<span class="w"> </span><span class="n">Nz</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
-<span class="w"> </span><span class="n">Nphi</span><span class="w">  </span><span class="o">=</span><span class="w">   </span><span class="mi">1</span><span class="w"></span>
-<span class="w"> </span><span class="n">Energy</span><span class="w"> </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n"> 0.81,120.87</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Pitch</span><span class="w">  </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">-0.98, 0.98</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">R</span><span class="w">  </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">100.00,238.00</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Z</span><span class="w">  </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n">-100.00, 98.00</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Phi</span><span class="w">  </span><span class="k">range</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">[</span><span class="n"> 0.00, 0.00</span><span class="o">]</span><span class="w"></span>
-<span class="w"> </span><span class="n">Ntotal</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="mf">1.214E+19</span><span class="w"></span>
-
-<span class="c1">---- FIDA/BES settings ----</span>
-<span class="w"> </span><span class="n">FIDA</span><span class="o">/</span><span class="n">BES</span><span class="w"> </span><span class="k">System</span><span class="err">:</span><span class="w"> </span><span class="n">SPECTRAL</span><span class="w"></span>
-<span class="w"> </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">channels</span><span class="p">:</span><span class="w">     </span><span class="mi">3</span><span class="w"></span>
-
-<span class="c1">---- NPA settings ----</span>
-<span class="w"> </span><span class="n">NPA</span><span class="w"> </span><span class="k">System</span><span class="err">:</span><span class="w"> </span><span class="n">NPA</span><span class="w"></span>
-<span class="w"> </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">channels</span><span class="p">:</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
-
-<span class="w"> </span><span class="nl">nbi</span><span class="p">:</span><span class="w">     </span><span class="mi">19</span><span class="err">:</span><span class="mi">06</span><span class="err">:</span><span class="mi">28</span><span class="w"> </span><span class="c1">--- elapsed: 0:00:23</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">     </span><span class="mi">50000</span><span class="w"></span>
-<span class="w">   </span><span class="n">birth</span><span class="w"> </span><span class="n">profile</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="k">to</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_birth</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="w"> </span><span class="nl">dcx</span><span class="p">:</span><span class="w">     </span><span class="mi">19</span><span class="err">:</span><span class="mi">06</span><span class="err">:</span><span class="mi">42</span><span class="w"> </span><span class="c1">--- elapsed: 0:00:37</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">500000</span><span class="w"></span>
-
-<span class="w"> </span><span class="nl">halo</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">07</span><span class="err">:</span><span class="mi">13</span><span class="w"> </span><span class="c1">--- elapsed: 0:01:08</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">527175</span><span class="w"> </span><span class="c1">--- Seed/DCX: 1.000</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">672040</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.600</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">792640</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.366</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">873160</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.225</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">900615</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.139</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">913130</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.086</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">919085</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.053</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">921060</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.033</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">921935</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.020</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">    </span><span class="mi">922180</span><span class="w"> </span><span class="c1">--- Seed/DCX: 0.013</span>
-
-<span class="w"> </span><span class="k">write</span><span class="w"> </span><span class="nl">neutrals</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">14</span><span class="err">:</span><span class="mi">31</span><span class="w"> </span><span class="c1">--- elapsed: 0:08:26</span>
-<span class="w">   </span><span class="n">neutral</span><span class="w"> </span><span class="n">density</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="k">to</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_neutrals</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="w"> </span><span class="nl">cold</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">14</span><span class="err">:</span><span class="mi">35</span><span class="w"> </span><span class="c1">--- elapsed: 0:08:30</span>
-
-<span class="w"> </span><span class="nl">bremsstrahlung</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">14</span><span class="err">:</span><span class="mi">36</span><span class="w"> </span><span class="c1">--- elapsed: 0:08:31</span>
-
-<span class="w"> </span><span class="nl">fida</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">14</span><span class="err">:</span><span class="mi">36</span><span class="w"> </span><span class="c1">--- elapsed: 0:08:31</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">   </span><span class="mi">5000000</span><span class="w"></span>
-
-<span class="w"> </span><span class="nl">pfida</span><span class="p">:</span><span class="w">   </span><span class="mi">19</span><span class="err">:</span><span class="mi">15</span><span class="err">:</span><span class="mi">19</span><span class="w"> </span><span class="c1">--- elapsed: 0:09:14</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">  </span><span class="mi">50000000</span><span class="w"></span>
-
-<span class="w"> </span><span class="k">write</span><span class="w"> </span><span class="nl">spectra</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">20</span><span class="err">:</span><span class="mi">47</span><span class="w"> </span><span class="c1">--- elapsed: 0:14:42</span>
-<span class="w">   </span><span class="n">Spectra</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="k">to</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_spectra</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="w"> </span><span class="nl">npa</span><span class="p">:</span><span class="w">     </span><span class="mi">19</span><span class="err">:</span><span class="mi">20</span><span class="err">:</span><span class="mi">47</span><span class="w"> </span><span class="c1">--- elapsed: 0:14:42</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">      </span><span class="mi">5000000</span><span class="w"></span>
-<span class="w">   </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">Active</span><span class="w"> </span><span class="n">NPA</span><span class="w"> </span><span class="n">particles</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">hit</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="nl">detector</span><span class="p">:</span><span class="w">    </span><span class="mi">40733</span><span class="w"></span>
-
-<span class="w"> </span><span class="nl">pnpa</span><span class="p">:</span><span class="w">     </span><span class="mi">19</span><span class="err">:</span><span class="mi">21</span><span class="err">:</span><span class="mi">21</span><span class="w"> </span><span class="c1">--- elapsed: 0:15:16</span>
-<span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">markers</span><span class="p">:</span><span class="w">     </span><span class="mi">50000000</span><span class="w"></span>
-<span class="w">   </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">Passive</span><span class="w"> </span><span class="n">NPA</span><span class="w"> </span><span class="n">particles</span><span class="w"> </span><span class="n">that</span><span class="w"> </span><span class="n">hit</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="nl">detector</span><span class="p">:</span><span class="w">   </span><span class="mi">116510</span><span class="w"></span>
-
-<span class="w"> </span><span class="k">write</span><span class="w"> </span><span class="nl">npa</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">26</span><span class="err">:</span><span class="mi">47</span><span class="w"> </span><span class="c1">--- elapsed: 0:20:42</span>
-<span class="w">   </span><span class="n">NPA</span><span class="w"> </span><span class="k">data</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="k">to</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_npa</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="w"> </span><span class="n">neutron</span><span class="w"> </span><span class="nl">rate</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">26</span><span class="err">:</span><span class="mi">47</span><span class="w"> </span><span class="c1">--- elapsed: 0:20:42</span>
-<span class="w">   </span><span class="nl">Rate</span><span class="p">:</span><span class="w">      </span><span class="mf">5.97592E+14</span><span class="w"> </span><span class="o">[</span><span class="n">neutrons/s</span><span class="o">]</span><span class="w"></span>
-
-<span class="w"> </span><span class="k">write</span><span class="w"> </span><span class="nl">neutrons</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">28</span><span class="err">:</span><span class="mi">16</span><span class="w"> </span><span class="c1">--- elapsed: 0:22:11</span>
-<span class="w">   </span><span class="n">Neutrons</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="k">to</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_neutrons</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="w"> </span><span class="n">fida</span><span class="w"> </span><span class="n">weight</span><span class="w"> </span><span class="k">function</span><span class="err">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">28</span><span class="err">:</span><span class="mi">25</span><span class="w"> </span><span class="c1">--- elapsed: 0:22:20</span>
-<span class="w">  </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">Channels</span><span class="p">:</span><span class="w">     </span><span class="mi">3</span><span class="w"></span>
-<span class="w">  </span><span class="nl">Nlambda</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
-<span class="w">  </span><span class="nl">Nenergy</span><span class="p">:</span><span class="w">  </span><span class="mi">50</span><span class="w"></span>
-<span class="w">  </span><span class="nl">Npitch</span><span class="p">:</span><span class="w">  </span><span class="mi">50</span><span class="w"></span>
-<span class="w">  </span><span class="nl">Ngyro</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
-<span class="w">  </span><span class="n">Maximum</span><span class="w"> </span><span class="nl">Energy</span><span class="p">:</span><span class="w">  </span><span class="mf">100.00</span><span class="w"></span>
-<span class="w">  </span><span class="n">LOS</span><span class="w"> </span><span class="nl">averaged</span><span class="p">:</span><span class="w"> </span><span class="k">True</span><span class="w"></span>
-
-<span class="w">   </span><span class="nl">Channel</span><span class="p">:</span><span class="w">     </span><span class="mi">1</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Radius</span><span class="p">:</span><span class="w">  </span><span class="mf">200.00</span><span class="w"></span>
-<span class="w">   </span><span class="n">Mean</span><span class="w"> </span><span class="n">Fast</span><span class="o">-</span><span class="n">ion</span><span class="w"> </span><span class="nl">Density</span><span class="p">:</span><span class="w">    </span><span class="mf">5.00757E+11</span><span class="w"></span>
-
-<span class="w">   </span><span class="nl">Channel</span><span class="p">:</span><span class="w">     </span><span class="mi">2</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Radius</span><span class="p">:</span><span class="w">  </span><span class="mf">170.00</span><span class="w"></span>
-<span class="w">   </span><span class="n">Mean</span><span class="w"> </span><span class="n">Fast</span><span class="o">-</span><span class="n">ion</span><span class="w"> </span><span class="nl">Density</span><span class="p">:</span><span class="w">    </span><span class="mf">5.00757E+11</span><span class="w"></span>
-
-<span class="w">   </span><span class="nl">Channel</span><span class="p">:</span><span class="w">     </span><span class="mi">3</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Radius</span><span class="p">:</span><span class="w">  </span><span class="mf">140.00</span><span class="w"></span>
-<span class="w">   </span><span class="n">Mean</span><span class="w"> </span><span class="n">Fast</span><span class="o">-</span><span class="n">ion</span><span class="w"> </span><span class="nl">Density</span><span class="p">:</span><span class="w">    </span><span class="mf">5.00757E+11</span><span class="w"></span>
-
-<span class="w"> </span><span class="k">write</span><span class="w"> </span><span class="n">fida</span><span class="w"> </span><span class="nl">weights</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">28</span><span class="err">:</span><span class="mi">41</span><span class="w"> </span><span class="c1">--- elapsed: 0:22:36</span>
-<span class="w">   </span><span class="n">FIDA</span><span class="w"> </span><span class="n">weights</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="k">to</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_fida_weights</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="w"> </span><span class="n">npa</span><span class="w"> </span><span class="n">weight</span><span class="w"> </span><span class="k">function</span><span class="err">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">28</span><span class="err">:</span><span class="mi">48</span><span class="w"> </span><span class="c1">--- elapsed: 0:22:43</span>
-<span class="w">  </span><span class="n">Number</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nl">Channels</span><span class="p">:</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
-<span class="w">  </span><span class="nl">Nenergy</span><span class="p">:</span><span class="w">  </span><span class="mi">50</span><span class="w"></span>
-<span class="w">  </span><span class="nl">Npitch</span><span class="p">:</span><span class="w">  </span><span class="mi">50</span><span class="w"></span>
-<span class="w">  </span><span class="n">Maximum</span><span class="w"> </span><span class="nl">energy</span><span class="p">:</span><span class="w">  </span><span class="mf">100.00</span><span class="w"></span>
-
-<span class="w">   </span><span class="nl">Channel</span><span class="p">:</span><span class="w">   </span><span class="mi">1</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Radius</span><span class="p">:</span><span class="w">    </span><span class="mf">200.000</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Flux</span><span class="p">:</span><span class="w">      </span><span class="mf">0.00000E+00</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Weight</span><span class="p">:</span><span class="w">    </span><span class="mf">3.48351E+03</span><span class="w"></span>
-
-<span class="w">   </span><span class="nl">Channel</span><span class="p">:</span><span class="w">   </span><span class="mi">2</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Radius</span><span class="p">:</span><span class="w">    </span><span class="mf">170.000</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Flux</span><span class="p">:</span><span class="w">      </span><span class="mf">0.00000E+00</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Weight</span><span class="p">:</span><span class="w">    </span><span class="mf">1.41572E+03</span><span class="w"></span>
-
-<span class="w">   </span><span class="nl">Channel</span><span class="p">:</span><span class="w">   </span><span class="mi">3</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Radius</span><span class="p">:</span><span class="w">    </span><span class="mf">140.000</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Flux</span><span class="p">:</span><span class="w">      </span><span class="mf">0.00000E+00</span><span class="w"></span>
-<span class="w">   </span><span class="nl">Weight</span><span class="p">:</span><span class="w">    </span><span class="mf">8.38209E+02</span><span class="w"></span>
-
-<span class="w"> </span><span class="k">write</span><span class="w"> </span><span class="n">npa</span><span class="w"> </span><span class="nl">weights</span><span class="p">:</span><span class="w">    </span><span class="mi">19</span><span class="err">:</span><span class="mi">33</span><span class="err">:</span><span class="mi">50</span><span class="w"> </span><span class="c1">--- elapsed: 0:27:45</span>
-<span class="w">   </span><span class="n">NPA</span><span class="w"> </span><span class="n">weights</span><span class="w"> </span><span class="n">written</span><span class="w"> </span><span class="k">to</span><span class="err">:</span><span class="w"> </span><span class="o">/</span><span class="n">p</span><span class="o">/</span><span class="n">fida</span><span class="o">/</span><span class="n">lstagner</span><span class="o">/</span><span class="n">TEST</span><span class="o">/</span><span class="n">test_npa_weights</span><span class="p">.</span><span class="n">h5</span><span class="w"></span>
-
-<span class="w"> </span><span class="k">END</span><span class="err">:</span><span class="w"> </span><span class="k">hour</span><span class="err">:</span><span class="k">minute</span><span class="err">:</span><span class="k">second</span><span class="w"> </span><span class="mi">19</span><span class="err">:</span><span class="mi">33</span><span class="err">:</span><span class="mi">50</span><span class="w"> </span><span class="c1">--- elapsed: 0:27:45</span>
+<p>For OpenMP parallelized FIDASIM run with 16 threads run</p>
+<div class="codehilite"><pre><span></span><span class="err">[lstagner@dawson061]% ./fidasim /p/fida/lstagner/TEST/test_inputs.dat 16</span>
 </pre></div>
 
 
-<h2 id="submitting-to-a-clusters-job-schedular-using-submit_fidasim">Submitting to a clusters job schedular using <code>submit_fidasim</code></h2>
-<p><code>submit_fidasim</code> is a python routine that schedules a FIDASIM job on a cluster. For example</p>
+<p>For MPI parallelized FIDASIM run with 16 processes run</p>
+<div class="codehilite"><pre><span></span><span class="err">[lstagner@dawson061]% mpirun -np 16 ./fidasim /p/fida/lstagner/TEST/test_inputs.dat</span>
+</pre></div>
+
+
+<h2 id="submitting-to-a-cluster-job-schedular">Submitting to a cluster job schedular</h2>
+<p>The recommended way of running FIDASIM is through a job schedular such as Slurm or PBS. </p>
+<p>FIDASIM provides <code>submit_fidasim</code>: a python script that schedules a FIDASIM job on a cluster. For example</p>
 <div class="codehilite"><pre><span></span>lstagner@computer:~$ submit_fidasim /u/lstagner/TEST
 </pre></div>
 
@@ -373,7 +203,7 @@
 
 
 <p>will submit just the <code>test</code> FIDASIM run.
-Slurm and PBS resource managers are supported. Run <code>submit_fidasim -h</code> for the full documentation.</p>
+Slurm and PBS resource managers are supported. <code>submit_fidasim</code> works for both OpenMP and MPI. Run <code>submit_fidasim -h</code> for the full documentation.</p>
     </div>
     
     <div class="col-md-3 col-md-pull-9">

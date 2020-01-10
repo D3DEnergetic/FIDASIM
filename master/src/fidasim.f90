@@ -2346,7 +2346,7 @@ subroutine make_passive_grid
     pass_grid%ngrid  = pass_grid%nr*pass_grid%nz*pass_grid%nphi
 
     if(inputs%verbose.ge.1) then
-        write(*,'(a)') "---- Passive neutral grid settings ----"
+        write(*,'(a)') "---- Passive grid settings ----"
         write(*,'(T2,"Nr: ", i3)') pass_grid%nr
         write(*,'(T2,"Nz: ", i3)') pass_grid%nz
         write(*,'(T2,"Nphi: ", i3)') pass_grid%nphi

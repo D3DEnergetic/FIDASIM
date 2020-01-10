@@ -77,7 +77,7 @@ or in Python
 >>> bgrid = beam_grid(nbi,rstart)
 ```
 
-**FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive:html#Passive-Neutral-Grid).
+FIDASIM creates a third grid for [passive calculations](../02_physics/08_passive.html#passive-grid).
 
 #Reading GEQDSK files
 Most tokamaks use EFIT to reconstruct the MHD equilibrium.

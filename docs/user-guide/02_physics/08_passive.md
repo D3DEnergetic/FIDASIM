@@ -31,11 +31,11 @@ FIDASIM can calculate passive signals for the following diagnostics
 * Fast-ion D-\(\alpha\) (FIDA)
 * Neutral Particle Analyzer (NPA)
 
-# Passive Neutral Grid
+# Passive Grid
 
-By default, FIDASIM will define the passive neutral grid to encompass the beam grid and the entire plasma volume.
-If the interpolation grid is 3D, then the passive neutral grid is the interpolation grid.
-FIDASIM writes the passive [neutral grid information](../01_getting_started/03_running:html##Running-Interactively) in the output file.
+By default, FIDASIM will define the passive grid to encompass the beam grid and the entire viewable plasma volume.
+If the interpolation grid is 3D, then the passive grid is the interpolation grid.
+FIDASIM writes the passive grid settings are printed to the [standard output](../01_getting_started/03_running.html#running-interactively)
 
 # Relevant Namelist Settings
 
@@ -47,6 +47,7 @@ FIDASIM writes the passive [neutral grid information](../01_getting_started/03_r
 
 # Fortran References
 
+* [[make_passive_grid]]: Creates passive grid from input geometries
 * [[read_chords]]: Reads FIDA geometry
 * [[pfida_f]]: Calculates FIDA light using a distribution function
 * [[pfida_mc]]: Calculates FIDA light using a Monte Carlo fast-ion distribution

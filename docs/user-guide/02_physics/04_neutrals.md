@@ -165,5 +165,4 @@ After a few iterations the halo density converges and the calculation ends.
 * [[ndmc]]: Calculates neutral beam density
 * [[dcx]]: Calculates DCX contribution
 * [[halo]]: Calculates Halo contribution
-* [[write_dcx]]: Writes DCX neutrals to file
 * [[write_neutrals]]: Writes neutrals to file

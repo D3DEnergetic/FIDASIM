@@ -210,7 +210,7 @@ For more information visit http://d3denergetic.github.io/FIDASIM/
  Power:    1.70 [MW]
  Voltage:  72.50 [keV]
 
----- Passive neutral grid settings ----
+---- Passive grid settings ----
  Nr:  70
  Nz: 100
  Nphi:  10

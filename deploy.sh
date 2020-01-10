@@ -41,7 +41,7 @@ if [[ $TRAVIS_BRANCH = release-* ]]; then
     cp -r "$TRAVIS_BUILD_DIR"/docs/html/* $TRAVIS_BRANCH
     cp -r "$TRAVIS_BUILD_DIR"/docs/html/* .
     git add -A
-    git commit -m "Development Documentation updated by travis job $TRAVIS_JOB_NUMBER for commits $TRAVIS_COMMIT_RANGE"
+    git commit -m "$TRAVIS_BRANCH documentation updated by travis job $TRAVIS_JOB_NUMBER for commits $TRAVIS_COMMIT_RANGE"
     git push $SSH_REPO gh-pages
 fi
 

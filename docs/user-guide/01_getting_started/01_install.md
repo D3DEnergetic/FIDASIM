@@ -107,7 +107,7 @@ user@computer:~/FIDASIM-{!../VERSION!}$ ./fidasim
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
 /_/  /___//____//_/ |_|/___//___//_/  /_/
 
-Version: v2.0.0-dev
+Version: {!../VERSION!}
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/
@@ -163,7 +163,7 @@ It should print out the following.
  / _/ _/ / / // // __ | _\ \ _/ / / /|_/ /
 /_/  /___//____//_/ |_|/___//___//_/  /_/
 
-Version: v2.0.0
+Version: {!../VERSION!}
 
 FIDASIM is released as open source code under the MIT Licence.
 For more information visit http://d3denergetic.github.io/FIDASIM/

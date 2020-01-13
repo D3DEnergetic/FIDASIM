@@ -1332,7 +1332,7 @@ public subroutine pfida_f()
 <span class="k">        </span><span class="n">papprox</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">)</span><span class="o">*</span><span class="n">plasma</span><span class="p">%</span><span class="n">denf</span>
     <span class="n">enddo</span>
     <span class="n">max_papprox</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">papprox</span><span class="p">)</span>
-    <span class="k">where</span> <span class="p">(</span><span class="n">papprox</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">max_papprox</span><span class="o">*</span><span class="mf">1.d-3</span><span class="p">))</span>
+    <span class="k">where</span> <span class="p">(</span><span class="n">papprox</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">max_papprox</span><span class="o">*</span><span class="mf">1.d-6</span><span class="p">))</span>
         <span class="n">papprox</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">endwhere</span>
 

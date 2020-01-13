@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.0% of total for procedures.">125 statements</a>
+    title=" 0.9% of total for procedures.">121 statements</a>
      </li> 
      
      
@@ -1943,7 +1943,7 @@ public subroutine fida_weights_mc()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu3</span>
 
     <span class="c">!! Number of particles to launch</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fbm_denf</span><span class="p">,</span><span class="n">phase_area</span><span class="p">,</span> <span class="n">max_papprox</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fbm_denf</span><span class="p">,</span><span class="n">phase_area</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cell_ind</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span> <span class="kd">::</span> <span class="n">papprox</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nx</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ny</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">nz</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nlaunch</span>
@@ -1998,11 +1998,6 @@ public subroutine fida_weights_mc()
                         <span class="nb">sum</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">dcx</span><span class="p">(:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">))</span> <span class="o">+</span> <span class="p">&amp;</span>
                         <span class="nb">sum</span><span class="p">(</span><span class="n">neut</span><span class="p">%</span><span class="n">halo</span><span class="p">(:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)))</span>
     <span class="n">enddo</span>
-    <span class="c">!! TODO: Remove this once we have a 3D interpolation grid</span>
-    <span class="n">max_papprox</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">papprox</span><span class="p">)</span>
-    <span class="k">where</span> <span class="p">(</span><span class="n">papprox</span><span class="p">.</span><span class="n">lt</span><span class="p">.(</span><span class="n">max_papprox</span><span class="o">*</span><span class="mf">1.d-3</span><span class="p">))</span>
-        <span class="n">papprox</span> <span class="o">=</span> <span class="mf">0.0</span>
-    <span class="n">endwhere</span>
 
     <span class="n">ncell</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">do </span><span class="n">ic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">ngrid</span>

@@ -1848,7 +1848,6 @@ subroutine read_inputs
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
     real(Float64)      :: alpha,beta,gamma,origin(3)
     logical            :: exis, error
-    integer            :: calc_nbi, no_flr !TODO Remove before release
 
     NAMELIST /fidasim_inputs/ result_dir, tables_file, distribution_file, &
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
@@ -1861,8 +1860,7 @@ subroutine read_inputs
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
         nlambda, lambdamin,lambdamax,emax_wght, &
-        nlambda_wght,lambdamin_wght,lambdamax_wght, &
-        calc_nbi, no_flr !TODO remove before release
+        nlambda_wght,lambdamin_wght,lambdamax_wght
 
     inquire(file=namelist_file,exist=exis)
     if(.not.exis) then
@@ -1936,17 +1934,10 @@ subroutine read_inputs
     nlambda_wght=0
     lambdamin_wght=0
     lambdamax_wght=0
-    !TODO remove before release
-    calc_nbi = 0
-    no_flr = 0
 
     open(13,file=namelist_file)
     read(13,NML=fidasim_inputs)
     close(13)
-
-    !!TODO remove before release
-    if (calc_nbi.gt.0) calc_bes=1
-    if (no_flr.ge.1) flr = 0
 
     !!General Information
     inputs%shot_number=shot
@@ -9732,7 +9723,7 @@ subroutine dcx
     integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
     integer :: jj       !! counter along track
-    real(Float64):: max_papprox,tot_denn, photons  !! photon flux
+    real(Float64):: tot_denn, photons  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -9751,11 +9742,6 @@ subroutine dcx
                    sum(neut%third(:,i,j,k))
         papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
-    max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
-        papprox = 0.0
-    endwhere
 
     ncell = 0
     do ic=1,beam_grid%ngrid
@@ -9850,7 +9836,7 @@ subroutine halo
 #endif
     !! Halo iteration
     integer(Int64) :: hh, n_halo !! counters
-    real(Float64) :: max_papprox,dcx_dens, halo_iteration_dens,seed_dcx
+    real(Float64) :: dcx_dens, halo_iteration_dens,seed_dcx
     integer :: prev_type  ! previous iteration
     integer :: cur_type  ! current iteration
     real(Float64) :: fi_correction
@@ -9892,11 +9878,6 @@ subroutine halo
             tot_denn = sum(dens_prev(:,i,j,k))
             papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
         enddo
-        !! TODO: Remove this once we have a 3D interpolation grid
-        max_papprox = maxval(papprox)
-        where (papprox.lt.(max_papprox*1.d-3))
-            papprox = 0.0
-        endwhere
 
         cell_ind = 0
         ncell = 0
@@ -10248,7 +10229,7 @@ subroutine fida_f
     real(Float64), dimension(nlevs) :: denn
 
     !! Number of particles to launch
-    real(Float64) :: max_papprox, eb, ptch
+    real(Float64) :: eb, ptch
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -10267,11 +10248,6 @@ subroutine fida_f
                           sum(neut%halo(:,i,j,k)))* &
                           plasma%denf
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
-    max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
-        papprox = 0.0
-    endwhere
 
     ncell = 0
     do ic=1,beam_grid%ngrid
@@ -10372,7 +10348,7 @@ subroutine pfida_f
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*1.d-6))
         papprox = 0.0
     endwhere
 
@@ -10657,7 +10633,7 @@ subroutine npa_f
     integer, dimension(5) :: neut_types=[1,2,3,4,5]
     real(Float64), dimension(nlevs) :: rates
     real(Float64), dimension(nlevs) :: states
-    real(Float64) :: flux, theta, dtheta, eb, ptch, max_papprox
+    real(Float64) :: flux, theta, dtheta, eb, ptch
 
     integer :: inpa,ichan,nrange,ir,npart,ncell
     integer, dimension(beam_grid%ngrid) :: cell_ind
@@ -10677,11 +10653,6 @@ subroutine npa_f
                         sum(neut%halo(:,i,j,k)))* &
                         plasma%denf
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
-    max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
-        papprox = 0.0
-    endwhere
 
     ncell = 0
     do ic=1,beam_grid%ngrid
@@ -10791,7 +10762,7 @@ subroutine pnpa_f
         papprox(i,j,k) = sum(plasma%denn)*plasma%denf
     enddo
     max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
+    where (papprox.lt.(max_papprox*1.d-6))
         papprox = 0.0
     endwhere
 
@@ -11434,7 +11405,7 @@ subroutine fida_weights_mc
     real(Float64), dimension(3) :: randomu3
 
     !! Number of particles to launch
-    real(Float64) :: fbm_denf,phase_area, max_papprox
+    real(Float64) :: fbm_denf,phase_area
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
     integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
@@ -11489,11 +11460,6 @@ subroutine fida_weights_mc
                         sum(neut%dcx(:,i,j,k)) + &
                         sum(neut%halo(:,i,j,k)))
     enddo
-    !! TODO: Remove this once we have a 3D interpolation grid
-    max_papprox = maxval(papprox)
-    where (papprox.lt.(max_papprox*1.d-3))
-        papprox = 0.0
-    endwhere
 
     ncell = 0
     do ic=1,beam_grid%ngrid

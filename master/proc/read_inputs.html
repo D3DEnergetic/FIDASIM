@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 2.0% of total for procedures.">257 statements</a>
+    title=" 2.0% of total for procedures.">252 statements</a>
      </li> 
      
      
@@ -508,7 +508,6 @@ public subroutine read_inputs()
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">xmin</span><span class="p">,</span><span class="n">xmax</span><span class="p">,</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">,</span><span class="n">zmin</span><span class="p">,</span><span class="n">zmax</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">alpha</span><span class="p">,</span><span class="n">beta</span><span class="p">,</span><span class="nb">gamma</span><span class="p">,</span><span class="n">origin</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="kt">logical</span>            <span class="kd">::</span> <span class="n">exis</span><span class="p">,</span> <span class="n">error</span>
-    <span class="kt">integer</span>            <span class="kd">::</span> <span class="n">calc_nbi</span><span class="p">,</span> <span class="n">no_flr</span> <span class="c">!TODO Remove before release</span>
 
     <span class="k">NAMELIST</span> <span class="o">/</span><span class="n">fidasim_inputs</span><span class="o">/</span> <span class="n">result_dir</span><span class="p">,</span> <span class="n">tables_file</span><span class="p">,</span> <span class="n">distribution_file</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">geometry_file</span><span class="p">,</span> <span class="n">equilibrium_file</span><span class="p">,</span> <span class="n">neutrals_file</span><span class="p">,</span> <span class="n">shot</span><span class="p">,</span> <span class="nb">time</span><span class="p">,</span> <span class="n">runid</span><span class="p">,</span> <span class="p">&amp;</span>
@@ -521,8 +520,7 @@ public subroutine read_inputs()
         <span class="n">origin</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="nb">gamma</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">ne_wght</span><span class="p">,</span> <span class="n">np_wght</span><span class="p">,</span> <span class="n">nphi_wght</span><span class="p">,</span> <span class="p">&amp;</span>
         <span class="n">nlambda</span><span class="p">,</span> <span class="n">lambdamin</span><span class="p">,</span><span class="n">lambdamax</span><span class="p">,</span><span class="n">emax_wght</span><span class="p">,</span> <span class="p">&amp;</span>
-        <span class="n">nlambda_wght</span><span class="p">,</span><span class="n">lambdamin_wght</span><span class="p">,</span><span class="n">lambdamax_wght</span><span class="p">,</span> <span class="p">&amp;</span>
-        <span class="n">calc_nbi</span><span class="p">,</span> <span class="n">no_flr</span> <span class="c">!TODO remove before release</span>
+        <span class="n">nlambda_wght</span><span class="p">,</span><span class="n">lambdamin_wght</span><span class="p">,</span><span class="n">lambdamax_wght</span>
 
     <span class="k">inquire</span><span class="p">(</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">,</span><span class="n">exist</span><span class="o">=</span><span class="n">exis</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">exis</span><span class="p">)</span> <span class="k">then</span>
@@ -596,17 +594,10 @@ public subroutine read_inputs()
     <span class="n">nlambda_wght</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">lambdamin_wght</span><span class="o">=</span><span class="mi">0</span>
     <span class="n">lambdamax_wght</span><span class="o">=</span><span class="mi">0</span>
-    <span class="c">!TODO remove before release</span>
-    <span class="n">calc_nbi</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">no_flr</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">open</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="k">file</span><span class="o">=</span><span class="n">namelist_file</span><span class="p">)</span>
     <span class="k">read</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="n">NML</span><span class="o">=</span><span class="n">fidasim_inputs</span><span class="p">)</span>
     <span class="k">close</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
-
-    <span class="c">!!TODO remove before release</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">calc_nbi</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="n">calc_bes</span><span class="o">=</span><span class="mi">1</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">no_flr</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="n">flr</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c">!!General Information</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">shot_number</span><span class="o">=</span><span class="n">shot</span>

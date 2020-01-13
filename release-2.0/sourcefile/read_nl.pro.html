@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>read_nl.pro &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>2.0.0-pre</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>read_nl.pro
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/read_nl.pro"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+  
+     <li class="active">read_nl.pro</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/read_nl.pro.html#src">read_nl.pro</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      <hr>
+<hr>
+<p>If the input string variable is equal to one of IDL's reserved
+words, replace it with a similar name with an underscore
+at the end.</p>
+      <br>
+    
+      
+      <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/read_nl.pro.html#src">read_nl.pro</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="p">;</span><span class="mi">9</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">2016</span>
+<a name="ln-2"></a><span class="p">;</span><span class="s s-Atom">************************************************************************</span>
+<a name="ln-3"></a><span class="p">;</span><span class="o">+</span>
+<a name="ln-4"></a><span class="p">;</span> <span class="nv">NAME</span><span class="s s-Atom">:</span>
+<a name="ln-5"></a><span class="p">;</span>	<span class="nv">READ_NL</span>
+<a name="ln-6"></a><span class="p">;</span>
+<a name="ln-7"></a><span class="p">;</span> <span class="nv">PURPOSE</span><span class="s s-Atom">:</span>
+<a name="ln-8"></a><span class="p">;</span>    	<span class="nv">Reads</span> <span class="nv">Fortran</span> <span class="s s-Atom">style</span> <span class="s s-Atom">namelists</span><span class="p">,</span> <span class="s s-Atom">returns</span> <span class="s s-Atom">data</span> <span class="s s-Atom">as</span> <span class="s s-Atom">a</span> <span class="s s-Atom">structure</span><span class="p">.</span>
+<a name="ln-9"></a><span class="p">;</span>
+<a name="ln-10"></a><span class="p">;</span> <span class="nv">CATEGORY</span><span class="s s-Atom">:</span>
+<a name="ln-11"></a><span class="p">;</span>	<span class="nv">I</span><span class="o">/</span><span class="nv">O</span>
+<a name="ln-12"></a><span class="p">;</span>
+<a name="ln-13"></a><span class="p">;</span> <span class="nv">CALLING</span> <span class="nv">SEQUENCE</span><span class="s s-Atom">:</span>
+<a name="ln-14"></a><span class="p">;</span>	<span class="s s-Atom">result</span> <span class="o">=</span> <span class="nf">read_nl</span><span class="p">(</span><span class="s s-Atom">filename</span><span class="p">)</span>
+<a name="ln-15"></a><span class="p">;</span>
+<a name="ln-16"></a><span class="p">;</span> <span class="nv">INPUTS</span><span class="s s-Atom">:</span>
+<a name="ln-17"></a><span class="p">;</span>	<span class="s s-Atom">filename</span> <span class="o">-</span> <span class="s s-Atom">the</span> <span class="s s-Atom">name</span> <span class="s s-Atom">of</span> <span class="s s-Atom">a</span> <span class="nv">Fortran</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">file</span><span class="p">.</span>
+<a name="ln-18"></a><span class="p">;</span>
+<a name="ln-19"></a><span class="p">;</span> <span class="nv">KEYWORD</span> <span class="nv">PARAMETERS</span><span class="s s-Atom">:</span>
+<a name="ln-20"></a><span class="p">;</span>	<span class="nv">DBL</span>	 <span class="o">-</span> <span class="s s-Atom">returns</span> <span class="s s-Atom">double</span> <span class="s s-Atom">precision</span> <span class="s s-Atom">floating</span> <span class="s s-Atom">point</span><span class="p">.</span> <span class="nv">Default</span> <span class="o">is</span>
+<a name="ln-21"></a><span class="p">;</span>	<span class="s s-Atom">float</span><span class="p">.</span>
+<a name="ln-22"></a><span class="p">;</span>       <span class="nv">MODEL</span> <span class="o">-</span> <span class="s s-Atom">if</span> <span class="s s-Atom">a</span>
+<a name="ln-23"></a><span class="p">;</span>   <span class="s s-Atom">structure</span> <span class="o">is</span> <span class="s s-Atom">passed</span> <span class="s s-Atom">in</span> <span class="s s-Atom">with</span> <span class="s s-Atom">the</span> <span class="s s-Atom">keyword</span> <span class="s2">&quot;model&quot;</span> <span class="s s-Atom">that</span> <span class="o">is</span> <span class="s s-Atom">the</span>
+<a name="ln-24"></a><span class="p">;</span>   <span class="s s-Atom">structure</span> <span class="s s-Atom">used</span> <span class="s s-Atom">as</span> <span class="s s-Atom">the</span> <span class="s s-Atom">starting</span> <span class="s s-Atom">point</span> <span class="s s-Atom">for</span> <span class="s s-Atom">the</span> <span class="s s-Atom">structure</span> <span class="s s-Atom">which</span> <span class="s s-Atom">will</span>
+<a name="ln-25"></a><span class="p">;</span>   <span class="s s-Atom">be</span> <span class="s s-Atom">returned</span> <span class="s s-Atom">by</span> <span class="s s-Atom">this</span> <span class="s s-Atom">function</span><span class="p">.</span>  <span class="nv">Data</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">file</span> <span class="s s-Atom">are</span> <span class="s s-Atom">added</span> <span class="s s-Atom">to</span>
+<a name="ln-26"></a><span class="p">;</span>   <span class="s s-Atom">this</span> <span class="s s-Atom">structure</span> <span class="s s-Atom">or</span> <span class="s s-Atom">used</span> <span class="s s-Atom">to</span> <span class="s s-Atom">overwrite</span> <span class="s s-Atom">data</span> <span class="s s-Atom">already</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span>
+<a name="ln-27"></a><span class="p">;</span>   <span class="s s-Atom">structure</span><span class="p">.</span>   <span class="nv">This</span> <span class="s s-Atom">model</span> <span class="s s-Atom">can</span> <span class="s s-Atom">be</span> <span class="s s-Atom">used</span> <span class="s s-Atom">to</span> <span class="s s-Atom">define</span> <span class="s s-Atom">an</span> <span class="s s-Atom">array</span><span class="p">.</span>  <span class="nv">Then</span><span class="p">,</span>
+<a name="ln-28"></a><span class="p">;</span>   <span class="s s-Atom">entries</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">that</span> <span class="s s-Atom">only</span> <span class="s s-Atom">modify</span> <span class="s s-Atom">certain</span> <span class="s s-Atom">array</span> <span class="s s-Atom">elements</span>
+<a name="ln-29"></a><span class="p">;</span>   <span class="s s-Atom">can</span> <span class="s s-Atom">exist</span> <span class="s s-Atom">without</span> <span class="s s-Atom">the</span> <span class="s s-Atom">array</span> <span class="s s-Atom">having</span> <span class="s s-Atom">been</span> <span class="s s-Atom">previously</span> <span class="s s-Atom">defined</span> <span class="s s-Atom">at</span> <span class="s s-Atom">its</span>
+<a name="ln-30"></a><span class="p">;</span>   <span class="s s-Atom">full</span> <span class="s s-Atom">size</span> <span class="s s-Atom">somewhere</span> <span class="s s-Atom">else</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span><span class="p">.</span>
+<a name="ln-31"></a><span class="p">;</span>        <span class="nv">ERROR</span> <span class="o">-</span> <span class="s s-Atom">returned</span> <span class="s s-Atom">equal</span> <span class="s s-Atom">to</span> <span class="mi">0</span> <span class="s s-Atom">unless</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">cannot</span> <span class="s s-Atom">be</span> <span class="s s-Atom">opened</span>
+<a name="ln-32"></a><span class="p">;</span>                <span class="s s-Atom">in</span> <span class="s s-Atom">which</span> <span class="s s-Atom">case</span> <span class="mi">1</span> <span class="o">is</span> <span class="s s-Atom">returned</span><span class="p">.</span>
+<a name="ln-33"></a><span class="p">;</span>
+<a name="ln-34"></a><span class="p">;</span> <span class="nv">OUTPUTS</span><span class="s s-Atom">:</span>
+<a name="ln-35"></a><span class="p">;</span>	<span class="nv">An</span> <span class="nv">IDL</span> <span class="s s-Atom">structure</span><span class="p">.</span>  <span class="nv">The</span> <span class="nv">HEADER</span> <span class="s s-Atom">tagname</span> <span class="s s-Atom">includes</span> <span class="nf">lines</span> <span class="p">(</span><span class="s s-Atom">usually</span> 
+<a name="ln-36"></a><span class="p">;</span>	<span class="s s-Atom">description</span><span class="p">)</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">before</span> <span class="s s-Atom">the</span> <span class="s s-Atom">first</span> <span class="s s-Atom">namelist</span><span class="p">.</span>  <span class="nv">Each</span> <span class="s s-Atom">namelist</span> 
+<a name="ln-37"></a><span class="p">;</span>	<span class="o">is</span> <span class="s s-Atom">a</span> <span class="s s-Atom">sub</span><span class="o">-</span><span class="s s-Atom">structure</span><span class="p">.</span>  <span class="nv">The</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">name</span> <span class="s s-Atom">and</span> <span class="s s-Atom">variable</span> <span class="s s-Atom">names</span> <span class="s s-Atom">appear</span> 
+<a name="ln-38"></a><span class="p">;</span>	<span class="s s-Atom">as</span> <span class="s s-Atom">the</span> <span class="s s-Atom">tagnames</span><span class="p">.</span>  <span class="nv">If</span> <span class="s s-Atom">the</span> <span class="s s-Atom">number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">varilabes</span> <span class="s s-Atom">of</span> <span class="s s-Atom">one</span> <span class="s s-Atom">namelist</span> 
+<a name="ln-39"></a><span class="p">;</span>	<span class="s s-Atom">exceeds</span> <span class="s s-Atom">maximum</span> <span class="nf">tags</span> <span class="p">(</span><span class="mi">251</span><span class="p">)</span> <span class="s s-Atom">allowed</span> <span class="s s-Atom">in</span> <span class="s s-Atom">an</span> <span class="nv">IDL</span> <span class="s s-Atom">structure</span><span class="p">,</span> <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span>
+<a name="ln-40"></a><span class="p">;</span>	<span class="s s-Atom">will</span> <span class="s s-Atom">be</span> <span class="s s-Atom">split</span> <span class="s s-Atom">into</span> <span class="s s-Atom">two</span> <span class="s s-Atom">sub</span><span class="o">-</span><span class="nf">structures</span> <span class="p">(</span><span class="s s-Atom">the</span> <span class="s s-Atom">second</span> <span class="s s-Atom">has</span> <span class="k">_</span><span class="s s-Atom">ext</span> <span class="s s-Atom">attached</span>
+<a name="ln-41"></a><span class="p">;</span>	<span class="s s-Atom">to</span> <span class="s s-Atom">the</span> <span class="s s-Atom">tagname</span><span class="p">).</span>
+<a name="ln-42"></a><span class="p">;</span>
+<a name="ln-43"></a><span class="p">;</span> <span class="nv">COMMON</span> <span class="nv">BLOCKS</span><span class="s s-Atom">:</span>
+<a name="ln-44"></a><span class="p">;</span>	<span class="nv">None</span><span class="p">.</span>
+<a name="ln-45"></a><span class="p">;</span>
+<a name="ln-46"></a><span class="p">;</span> <span class="nv">SIDE</span> <span class="nv">EFFECTS</span><span class="s s-Atom">:</span>
+<a name="ln-47"></a><span class="p">;</span>
+<a name="ln-48"></a><span class="p">;</span> <span class="nv">RESTRICTIONS</span><span class="s s-Atom">:</span>
+<a name="ln-49"></a><span class="p">;</span>
+<a name="ln-50"></a><span class="p">;</span> <span class="nv">PROCEDURE</span><span class="s s-Atom">:</span>
+<a name="ln-51"></a><span class="p">;</span>
+<a name="ln-52"></a><span class="p">;</span> <span class="nv">EXAMPLE</span><span class="s s-Atom">:</span>
+<a name="ln-53"></a><span class="p">;</span>
+<a name="ln-54"></a><span class="p">;</span> <span class="nv">HISTORY</span><span class="s s-Atom">:</span>
+<a name="ln-55"></a><span class="p">;</span>   <span class="mi">02</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">96</span> <span class="nv">B</span><span class="p">.</span><span class="nv">Rice</span> <span class="o">-</span> <span class="s s-Atom">created</span>
+<a name="ln-56"></a><span class="p">;</span>   <span class="s s-Atom">??</span> 		<span class="o">-</span> <span class="s s-Atom">change</span> <span class="s s-Atom">the</span> <span class="s s-Atom">line</span> <span class="s s-Atom">b</span><span class="o">=</span><span class="nf">strarr</span><span class="p">(</span><span class="mi">8000</span><span class="p">)</span> <span class="s s-Atom">to</span> <span class="s s-Atom">handle</span> <span class="s s-Atom">larger</span> <span class="s s-Atom">files</span>
+<a name="ln-57"></a><span class="p">;</span>    		<span class="o">-</span> <span class="s s-Atom">each</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">structure</span> <span class="o">is</span> <span class="s s-Atom">limited</span> <span class="s s-Atom">to</span> <span class="mi">251</span> <span class="s s-Atom">tag</span> <span class="s s-Atom">names</span><span class="p">,</span> 
+<a name="ln-58"></a><span class="p">;</span>		  <span class="s s-Atom">additional</span> <span class="s s-Atom">names</span> <span class="s s-Atom">will</span> <span class="s s-Atom">be</span> <span class="s s-Atom">put</span> <span class="s s-Atom">in</span> <span class="s s-Atom">a</span> <span class="s s-Atom">separate</span> <span class="k">_</span><span class="s s-Atom">ext</span> <span class="s s-Atom">namelist</span> 
+<a name="ln-59"></a><span class="p">;</span>    		<span class="o">-</span> <span class="s s-Atom">quotes</span> <span class="s s-Atom">are</span> <span class="s s-Atom">left</span> <span class="s s-Atom">on</span> <span class="s s-Atom">strings</span> <span class="s s-Atom">to</span> <span class="s s-Atom">distinguish</span> <span class="s s-Atom">from</span> <span class="s s-Atom">boolean</span> 
+<a name="ln-60"></a><span class="p">;</span>		  <span class="s s-Atom">variables</span>
+<a name="ln-61"></a><span class="p">;</span>   <span class="mi">08</span><span class="o">-</span><span class="mi">25</span><span class="o">-</span><span class="mi">98</span>    <span class="o">-</span> <span class="nv">IDL</span> <span class="mf">5.1</span> <span class="s s-Atom">allows</span> <span class="s s-Atom">more</span> <span class="s s-Atom">than</span> <span class="mi">128</span> <span class="s s-Atom">tag</span> <span class="s s-Atom">names</span><span class="p">,</span> <span class="s s-Atom">so</span> <span class="s s-Atom">code</span> <span class="s s-Atom">has</span> <span class="s s-Atom">been</span> 
+<a name="ln-62"></a><span class="p">;</span>                 <span class="s s-Atom">modified</span> <span class="s s-Atom">to</span> <span class="s s-Atom">take</span> <span class="s s-Atom">advantage</span> <span class="s s-Atom">of</span> <span class="s s-Atom">this</span><span class="p">.</span>  <span class="nv">Tag_name</span> <span class="s s-Atom">limit</span> <span class="s s-Atom">has</span>
+<a name="ln-63"></a><span class="p">;</span>                 <span class="s s-Atom">been</span> <span class="s s-Atom">increased</span> <span class="s s-Atom">to</span> <span class="mi">251</span>
+<a name="ln-64"></a><span class="p">;</span>   <span class="mi">10</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">97</span>    <span class="o">-</span> <span class="s s-Atom">changed</span> <span class="s s-Atom">reading</span> <span class="s s-Atom">of</span> <span class="s s-Atom">strings</span> <span class="s s-Atom">to</span> <span class="s s-Atom">preserve</span> <span class="s s-Atom">white</span> <span class="s s-Atom">space</span>
+<a name="ln-65"></a><span class="p">;</span>               <span class="o">-</span> <span class="s s-Atom">also</span><span class="p">,</span> <span class="s s-Atom">embedded</span> <span class="s s-Atom">commas</span> <span class="s s-Atom">and</span> <span class="s s-Atom">double</span> <span class="s s-Atom">quotes</span> <span class="s s-Atom">&#39;&#39;</span> <span class="s s-Atom">are</span> <span class="s s-Atom">preserved</span>  
+<a name="ln-66"></a><span class="p">;</span>   <span class="mi">05</span><span class="o">-</span><span class="mi">31</span><span class="o">-</span><span class="mi">99</span> <span class="nv">QP</span> <span class="o">-</span> <span class="s s-Atom">fixed</span> <span class="s s-Atom">a</span> <span class="s s-Atom">bug</span> <span class="s s-Atom">that</span> <span class="s s-Atom">caused</span> <span class="s s-Atom">infinite</span> <span class="s s-Atom">looping</span> <span class="s s-Atom">when</span> <span class="s s-Atom">parameters</span>
+<a name="ln-67"></a><span class="p">;</span>	          <span class="s s-Atom">are</span> <span class="s s-Atom">separated</span> <span class="s s-Atom">by</span> <span class="s s-Atom">&#39;,&#39;</span> <span class="s s-Atom">instead</span> <span class="s s-Atom">of</span> <span class="s s-Atom">&#39; &#39;</span><span class="p">.</span>
+<a name="ln-68"></a><span class="p">;</span>   <span class="mi">09</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">00</span>  <span class="nv">JRF</span> <span class="s s-Atom">expand</span> <span class="s s-Atom">the</span> <span class="s s-Atom">capability</span> <span class="s s-Atom">to</span> <span class="s s-Atom">specify</span> <span class="s s-Atom">values</span> <span class="s s-Atom">for</span> <span class="s s-Atom">certain</span>
+<a name="ln-69"></a><span class="p">;</span>   <span class="s s-Atom">elements</span> <span class="s s-Atom">of</span> <span class="s s-Atom">an</span> <span class="s s-Atom">array</span><span class="p">.</span>  <span class="nv">First</span><span class="p">,</span> <span class="s s-Atom">the</span> <span class="s s-Atom">format</span> <span class="nf">y</span><span class="p">(</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">is</span> <span class="s s-Atom">allowed</span><span class="p">;</span>
+<a name="ln-70"></a><span class="p">;</span>   <span class="s s-Atom">i</span><span class="p">.</span><span class="s s-Atom">e</span><span class="p">.</span> <span class="s s-Atom">there</span> <span class="s s-Atom">can</span> <span class="s s-Atom">be</span> <span class="s s-Atom">spaces</span> <span class="s s-Atom">within</span> <span class="s s-Atom">the</span> <span class="s s-Atom">parentheses</span><span class="p">.</span>  <span class="nv">Second</span><span class="p">,</span> <span class="s s-Atom">if</span> <span class="s s-Atom">a</span>
+<a name="ln-71"></a><span class="p">;</span>   <span class="s s-Atom">structure</span> <span class="o">is</span> <span class="s s-Atom">passed</span> <span class="s s-Atom">in</span> <span class="s s-Atom">with</span> <span class="s s-Atom">the</span> <span class="s s-Atom">keyword</span> <span class="s2">&quot;model&quot;</span> <span class="s s-Atom">that</span> <span class="o">is</span> <span class="s s-Atom">the</span>
+<a name="ln-72"></a><span class="p">;</span>   <span class="s s-Atom">structure</span> <span class="s s-Atom">used</span> <span class="s s-Atom">initially</span><span class="p">.</span>  <span class="nv">Data</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">file</span> <span class="s s-Atom">are</span> <span class="s s-Atom">added</span> <span class="s s-Atom">to</span>
+<a name="ln-73"></a><span class="p">;</span>   <span class="s s-Atom">this</span> <span class="s s-Atom">structure</span> <span class="s s-Atom">or</span> <span class="s s-Atom">used</span> <span class="s s-Atom">to</span> <span class="s s-Atom">overwrite</span> <span class="s s-Atom">data</span> <span class="s s-Atom">already</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span>
+<a name="ln-74"></a><span class="p">;</span>   <span class="s s-Atom">structure</span><span class="p">.</span>   <span class="nv">This</span> <span class="s s-Atom">model</span> <span class="s s-Atom">can</span> <span class="s s-Atom">be</span> <span class="s s-Atom">used</span> <span class="s s-Atom">to</span> <span class="s s-Atom">define</span> <span class="s s-Atom">an</span> <span class="s s-Atom">array</span><span class="p">.</span>  <span class="nv">Then</span><span class="p">,</span>
+<a name="ln-75"></a><span class="p">;</span>   <span class="s s-Atom">entries</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">that</span> <span class="s s-Atom">only</span> <span class="s s-Atom">modify</span> <span class="s s-Atom">certain</span> <span class="s s-Atom">array</span> <span class="s s-Atom">elements</span>
+<a name="ln-76"></a><span class="p">;</span>   <span class="s s-Atom">can</span> <span class="s s-Atom">exist</span> <span class="s s-Atom">without</span> <span class="s s-Atom">the</span> <span class="s s-Atom">array</span> <span class="s s-Atom">having</span> <span class="s s-Atom">been</span> <span class="s s-Atom">previously</span> <span class="s s-Atom">defined</span> <span class="s s-Atom">at</span> <span class="s s-Atom">its</span>
+<a name="ln-77"></a><span class="p">;</span>   <span class="s s-Atom">full</span> <span class="s s-Atom">size</span> <span class="s s-Atom">somewhere</span> <span class="s s-Atom">else</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span><span class="p">.</span>
+<a name="ln-78"></a><span class="p">;</span>   <span class="nv">Finally</span><span class="p">,</span> <span class="s s-Atom">the</span> <span class="s s-Atom">array</span> <span class="s s-Atom">can</span> <span class="s s-Atom">be</span> <span class="s s-Atom">multidimensional</span><span class="p">.</span>  <span class="nv">This</span> <span class="o">is</span>
+<a name="ln-79"></a><span class="p">;</span>   <span class="s s-Atom">only</span> <span class="s s-Atom">possible</span> <span class="s s-Atom">if</span> <span class="s s-Atom">the</span> <span class="s s-Atom">array</span> <span class="o">is</span> <span class="s s-Atom">previously</span> <span class="s s-Atom">defined</span> <span class="s s-Atom">multidimensional</span>
+<a name="ln-80"></a><span class="p">;</span>   <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">model</span><span class="p">.</span>  <span class="nv">Up</span> <span class="s s-Atom">to</span> <span class="mi">3</span> <span class="s s-Atom">dimensions</span> <span class="s s-Atom">are</span> <span class="s s-Atom">allowed</span><span class="p">.</span>  <span class="nv">The</span> <span class="s s-Atom">format</span><span class="p">,</span> <span class="s s-Atom">for</span>
+<a name="ln-81"></a><span class="p">;</span>   <span class="s s-Atom">example</span><span class="p">,</span> <span class="nf">y</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="s s-Atom">can</span> <span class="s s-Atom">be</span> <span class="s s-Atom">used</span><span class="p">.</span>
+<a name="ln-82"></a><span class="p">;</span>
+<a name="ln-83"></a><span class="p">;</span>   <span class="nv">Also</span><span class="p">,</span> <span class="s s-Atom">a</span> <span class="s s-Atom">bug</span> <span class="s s-Atom">was</span> <span class="nn">fixed</span><span class="p">:</span> <span class="s s-Atom">the</span> <span class="s s-Atom">array</span> <span class="s s-Atom">element</span> <span class="s s-Atom">number</span> <span class="s s-Atom">should</span> <span class="s s-Atom">match</span>
+<a name="ln-84"></a><span class="p">;</span>                           <span class="nv">Fortran</span> <span class="s s-Atom">style</span> <span class="s s-Atom">with</span> <span class="s s-Atom">element</span> <span class="s s-Atom">numbers</span>
+<a name="ln-85"></a><span class="p">;</span>                           <span class="s s-Atom">starting</span> <span class="s s-Atom">at</span> <span class="mf">1.</span>  <span class="nv">Previously</span><span class="p">,</span> <span class="s s-Atom">if</span> <span class="s s-Atom">element</span> <span class="s2">&quot;1&quot;</span>
+<a name="ln-86"></a><span class="p">;</span>                           <span class="s s-Atom">was</span> <span class="s s-Atom">specified</span><span class="p">,</span> <span class="s s-Atom">the</span> <span class="s s-Atom">second</span> <span class="s s-Atom">element</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span>
+<a name="ln-87"></a><span class="p">;</span>                           <span class="s s-Atom">array</span> <span class="s s-Atom">was</span> <span class="s s-Atom">modified</span><span class="p">.</span>
+<a name="ln-88"></a><span class="p">;</span>
+<a name="ln-89"></a><span class="p">;</span>   <span class="nv">Also</span><span class="p">,</span> <span class="s s-Atom">an</span> <span class="s s-Atom">empty</span> <span class="s s-Atom">namelist</span> <span class="o">is</span> <span class="s s-Atom">handled</span><span class="p">.</span>
+<a name="ln-90"></a><span class="p">;</span>   <span class="nv">Also</span><span class="p">,</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">beginning</span> <span class="s s-Atom">with</span> <span class="s s-Atom">an</span> <span class="s s-Atom">exclamation</span> <span class="nf">point</span> <span class="p">(!)</span>  <span class="s s-Atom">are</span>
+<a name="ln-91"></a><span class="p">;</span>    <span class="s s-Atom">ignored</span><span class="p">.</span>  <span class="nv">These</span> <span class="s s-Atom">are</span> <span class="s s-Atom">comment</span> <span class="s s-Atom">lines</span><span class="p">.</span>
+<a name="ln-92"></a><span class="p">;</span>   <span class="mi">08</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">02</span> <span class="nv">QP</span> <span class="o">-</span> <span class="nv">F90</span> <span class="s s-Atom">on</span> <span class="nv">HP</span> <span class="s s-Atom">generates</span> <span class="s s-Atom">namelist</span> <span class="nf">using</span> <span class="p">(</span><span class="s s-Atom">&amp;name</span><span class="p">,</span><span class="s s-Atom">/</span><span class="p">)</span> <span class="s s-Atom">instead</span> <span class="s s-Atom">of</span>
+<a name="ln-93"></a><span class="p">;</span>                 <span class="s s-Atom">the</span> <span class="nf">old</span> <span class="p">(</span><span class="err">$</span><span class="s s-Atom">name</span><span class="p">,</span><span class="err">$</span><span class="s s-Atom">end</span><span class="p">),</span> <span class="s s-Atom">also</span> <span class="s s-Atom">strings</span> <span class="s s-Atom">are</span> <span class="o">not</span> <span class="s s-Atom">in</span> <span class="s s-Atom">quotes</span><span class="p">;</span> 
+<a name="ln-94"></a><span class="p">;</span>		  <span class="nv">Modified</span> <span class="s s-Atom">to</span> <span class="s s-Atom">read</span> <span class="s s-Atom">both</span> <span class="s s-Atom">the</span> <span class="s s-Atom">old</span> <span class="s s-Atom">and</span> <span class="s s-Atom">new</span> <span class="s s-Atom">format</span><span class="p">.</span>
+<a name="ln-95"></a><span class="p">;</span>   <span class="mi">08</span><span class="o">-</span><span class="mi">23</span><span class="o">-</span><span class="mi">02</span> <span class="nv">QP</span> <span class="o">-</span> <span class="nv">For</span> <span class="nv">F90</span> <span class="s s-Atom">namelist</span><span class="p">,</span> <span class="s s-Atom">get</span> <span class="s s-Atom">rid</span> <span class="s s-Atom">of</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">after</span> <span class="s s-Atom">the</span> <span class="s s-Atom">last</span> <span class="s s-Atom">/</span><span class="p">,</span>
+<a name="ln-96"></a><span class="p">;</span>		  <span class="s s-Atom">the</span> <span class="s s-Atom">old</span> <span class="s s-Atom">style</span> <span class="s s-Atom">did</span> <span class="s s-Atom">it</span> <span class="s s-Atom">naturally</span> <span class="s s-Atom">with</span> <span class="s s-Atom">splitting</span> <span class="s s-Atom">around</span> <span class="err">$</span><span class="p">.</span>
+<a name="ln-97"></a><span class="p">;</span>   <span class="mi">08</span><span class="o">-</span><span class="mi">26</span><span class="o">-</span><span class="mi">02</span> <span class="nv">QP</span> <span class="o">-</span> <span class="s s-Atom">convert</span> <span class="s s-Atom">array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="s s-Atom">to</span> <span class="s s-Atom">scalar</span> <span class="s s-Atom">after</span> <span class="nf">str_sep</span><span class="p">(</span><span class="s s-Atom">sd</span><span class="p">,...).</span> <span class="nv">In</span> <span class="nv">IDL5</span><span class="mf">.5</span><span class="p">,</span>
+<a name="ln-98"></a><span class="p">;</span>		  <span class="s s-Atom">struct</span><span class="p">.</span><span class="s s-Atom">array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">is</span> <span class="o">not</span> <span class="s s-Atom">treated</span> <span class="s s-Atom">as</span> <span class="s s-Atom">scalar</span> <span class="s s-Atom">as</span> <span class="s s-Atom">in</span> <span class="mf">5.4</span> <span class="s s-Atom">thus</span>
+<a name="ln-99"></a><span class="p">;</span>		  <span class="s s-Atom">needs</span> <span class="s s-Atom">be</span> <span class="s s-Atom">subscripted</span> <span class="s s-Atom">to</span> <span class="s s-Atom">be</span> <span class="s s-Atom">used</span> <span class="s s-Atom">as</span> <span class="s s-Atom">a</span> <span class="s s-Atom">scalar</span><span class="p">.</span>
+<a name="ln-100"></a><span class="p">;</span>   <span class="mi">03</span><span class="o">-</span><span class="mi">18</span><span class="o">-</span><span class="mi">03</span> <span class="nv">QP</span> <span class="o">-</span> <span class="s s-Atom">fixed</span> <span class="s s-Atom">a</span> <span class="s s-Atom">bug</span> <span class="s s-Atom">that</span> <span class="s s-Atom">removed</span> <span class="s s-Atom">one</span> <span class="s s-Atom">char</span> <span class="s s-Atom">from</span> <span class="s s-Atom">the</span> <span class="s s-Atom">last</span> <span class="s s-Atom">var</span> <span class="s s-Atom">instead</span>
+<a name="ln-101"></a><span class="p">;</span>		  <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">intended</span> <span class="s s-Atom">last</span> <span class="s s-Atom">&#39;/&#39;</span><span class="p">.</span>
+<a name="ln-102"></a><span class="p">;</span>   <span class="mi">06</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">03</span> <span class="nv">QP</span> <span class="o">-</span> <span class="s s-Atom">made</span> <span class="s s-Atom">it</span> <span class="s s-Atom">compatiable</span> <span class="s s-Atom">with</span> <span class="nv">Linux</span> <span class="nv">F90</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">where</span> <span class="s s-Atom">all</span> <span class="s s-Atom">vars</span>
+<a name="ln-103"></a><span class="p">;</span>	          <span class="s s-Atom">in</span> <span class="s s-Atom">one</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">are</span> <span class="s s-Atom">concatenated</span> <span class="s s-Atom">into</span> <span class="s s-Atom">one</span> <span class="s s-Atom">line</span><span class="p">.</span>
+<a name="ln-104"></a><span class="p">;</span>   <span class="mi">06</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">03</span> <span class="nv">QP</span> <span class="o">-</span> <span class="s s-Atom">fixed</span> <span class="s s-Atom">bugs</span> <span class="s s-Atom">introduced</span> <span class="s s-Atom">last</span> <span class="s s-Atom">time</span>
+<a name="ln-105"></a><span class="p">;</span>   <span class="mi">10</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">04</span> <span class="nv">QP</span> <span class="o">-</span> <span class="s s-Atom">fixed</span> <span class="s s-Atom">a</span> <span class="s s-Atom">bug</span> <span class="s s-Atom">that</span> <span class="s s-Atom">read</span> <span class="mi">1</span><span class="s s-Atom">e</span><span class="o">-</span><span class="mi">8</span> <span class="s s-Atom">as</span> <span class="mi">1</span> <span class="p">(</span><span class="s s-Atom">checked</span> <span class="s s-Atom">&#39;.&#39;</span> <span class="s s-Atom">only</span> <span class="s s-Atom">for</span> <span class="s s-Atom">float</span><span class="p">)</span>
+<a name="ln-106"></a><span class="p">;</span>                 <span class="s s-Atom">now</span> <span class="s s-Atom">check</span> <span class="s s-Atom">both</span> <span class="s s-Atom">&#39;.&#39;</span> <span class="s s-Atom">and</span> <span class="s s-Atom">&#39;e&#39;/&#39;E&#39;</span>
+<a name="ln-107"></a><span class="p">;</span>   <span class="mi">06</span><span class="o">-</span><span class="mi">17</span><span class="o">-</span><span class="mi">05</span> <span class="nv">QP</span> <span class="o">-</span> <span class="s s-Atom">for</span> <span class="s s-Atom">tag</span> <span class="s s-Atom">name</span> <span class="s s-Atom">with</span> <span class="s s-Atom">parentheses</span><span class="p">,</span> <span class="s s-Atom">if</span> <span class="s s-Atom">it</span> <span class="o">is</span> <span class="s s-Atom">in</span> <span class="s s-Atom">form</span> <span class="s s-Atom">of</span> <span class="nf">name</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+<a name="ln-108"></a><span class="p">;</span>		  <span class="s s-Atom">strip</span> <span class="nf">out</span> <span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s s-Atom">otherwise</span><span class="p">,</span> <span class="s s-Atom">encode</span> <span class="s s-Atom">using</span>
+<a name="ln-109"></a><span class="p">;</span>		  <span class="s s-Atom">create_struct_h</span>
+<a name="ln-110"></a><span class="p">;</span>   <span class="mi">02</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">06</span> <span class="nv">JRF</span> <span class="o">-</span> <span class="nv">In</span> <span class="s s-Atom">new</span> <span class="s s-Atom">format</span> <span class="s s-Atom">namelists</span> <span class="s s-Atom">which</span> <span class="s s-Atom">end</span> <span class="s s-Atom">with</span> <span class="s s-Atom">a</span> <span class="s s-Atom">/</span><span class="p">,</span>
+<a name="ln-111"></a><span class="p">;</span>                 <span class="s s-Atom">allow</span> <span class="s s-Atom">for</span> <span class="s s-Atom">the</span> <span class="s s-Atom">possibility</span> <span class="s s-Atom">that</span> <span class="s s-Atom">there</span> <span class="s s-Atom">are</span> <span class="s s-Atom">characters</span>
+<a name="ln-112"></a><span class="p">;</span>                 <span class="s s-Atom">following</span> <span class="s s-Atom">the</span> <span class="s s-Atom">/.</span>  <span class="nv">Apparently</span><span class="p">,</span> <span class="s s-Atom">some</span> <span class="s s-Atom">compilers</span> <span class="s s-Atom">allow</span>
+<a name="ln-113"></a><span class="p">;</span>                 <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">name</span> <span class="s s-Atom">to</span> <span class="s s-Atom">be</span> <span class="s s-Atom">there</span><span class="p">.</span>
+<a name="ln-114"></a><span class="p">;</span>                 <span class="nv">Comment</span> <span class="s s-Atom">out</span> <span class="s s-Atom">the</span> <span class="s s-Atom">debug</span> <span class="nn">printout</span><span class="p">:</span> 
+<a name="ln-115"></a><span class="p">;</span>                 <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;converting &#39;</span><span class="p">,</span><span class="s s-Atom">origparam</span><span class="p">,</span><span class="s s-Atom">&#39; to &#39;</span><span class="p">,</span><span class="s s-Atom">param</span>
+<a name="ln-116"></a><span class="p">;</span>   <span class="mi">02</span><span class="o">-</span><span class="mi">14</span><span class="o">-</span><span class="mi">06</span> <span class="nv">JRF</span> <span class="o">-</span>  <span class="nv">Handle</span> <span class="s s-Atom">the</span> <span class="s s-Atom">case</span> <span class="s s-Atom">where</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">isn&#39;t empty but</span>
+<a name="ln-117"></a><span class="s s-Atom">;                  there is no namelist in the file. Also, fix a bug</span>
+<a name="ln-118"></a><span class="s s-Atom">;                  that occurred when a namelist entry like &quot;name = 1&quot; </span>
+<a name="ln-119"></a><span class="s s-Atom">;                  was encountered when the output structure already had a</span>
+<a name="ln-120"></a><span class="s s-Atom">;                  tag &quot;name&quot; and that tag was an array.  The namelist </span>
+<a name="ln-121"></a><span class="s s-Atom">;                  entry should assign the value to the first element</span>
+<a name="ln-122"></a><span class="s s-Atom">;                  of the array.  However, because of the way IDL</span>
+<a name="ln-123"></a><span class="s s-Atom">;                  treats assignment to an array in a structure, all</span>
+<a name="ln-124"></a><span class="s s-Atom">;                  elements of the array were being altered.</span>
+<a name="ln-125"></a><span class="s s-Atom">;   08-4-06 JRF - Remove the conversion of the file text to lower</span>
+<a name="ln-126"></a><span class="s s-Atom">;                  case that was being done at the initial file read.</span>
+<a name="ln-127"></a><span class="s s-Atom">;                  This conversion was changing strings.  Then, when</span>
+<a name="ln-128"></a><span class="s s-Atom">;                  determining if a value is boolean, do the</span>
+<a name="ln-129"></a><span class="s s-Atom">;                  comparison in lower case so that, for instance,</span>
+<a name="ln-130"></a><span class="s s-Atom">;                  both t and T are allowed.</span>
+<a name="ln-131"></a><span class="s s-Atom">;   02-9-07 JRF - Merge the versions of this file from the PCS and</span>
+<a name="ln-132"></a><span class="s s-Atom">;                 hydra. This was done by adding the 08-4-06 change to </span>
+<a name="ln-133"></a><span class="s s-Atom">;                 the PCS version.</span>
+<a name="ln-134"></a><span class="s s-Atom">;                 Added the ERROR keyword to return a flag if the file </span>
+<a name="ln-135"></a><span class="s s-Atom">;                 cannot be opened.</span>
+<a name="ln-136"></a><span class="s s-Atom">;   10-8-07 JRF - 1. Add the comment_character keyword which works as follows:</span>
+<a name="ln-137"></a><span class="s s-Atom">;                 By default, any lines beginning with an</span>
+<a name="ln-138"></a><span class="s s-Atom">;                 exclamation point are ignored (this default behavior</span>
+<a name="ln-139"></a><span class="s s-Atom">;                 is retained for backward compatibility). In</span>
+<a name="ln-140"></a><span class="s s-Atom">;                 addition, the comment_character keyword can be set</span>
+<a name="ln-141"></a><span class="s s-Atom">;                 equal to a string with a single character.  This</span>
+<a name="ln-142"></a><span class="s s-Atom">;                 character is treated as a comment character. The</span>
+<a name="ln-143"></a><span class="s s-Atom">;                 portions of a line following this</span>
+<a name="ln-144"></a><span class="s s-Atom">;                 character are ignored. However, if the comment</span>
+<a name="ln-145"></a><span class="s s-Atom">;                 character is between quotes or apostrophes then it</span>
+<a name="ln-146"></a><span class="s s-Atom">;                 is ignored.</span>
+<a name="ln-147"></a><span class="s s-Atom">;                 2. If the keyword print_tokens is set, some</span>
+<a name="ln-148"></a><span class="s s-Atom">;                 debugging information is printed.  As the code</span>
+<a name="ln-149"></a><span class="s s-Atom">;                 processes the characters in the namelist file it</span>
+<a name="ln-150"></a><span class="s s-Atom">;                 splits the characters into strings separated by</span>
+<a name="ln-151"></a><span class="s s-Atom">;                 equals signs.  This keyword causes the individual</span>
+<a name="ln-152"></a><span class="s s-Atom">;                 strings to be printed as each one is processed.</span>
+<a name="ln-153"></a><span class="s s-Atom">;                 When the code chokes on some unexpected new format,</span>
+<a name="ln-154"></a><span class="s s-Atom">;                 this keyword allows the problem string to be identified.</span>
+<a name="ln-155"></a><span class="s s-Atom">;</span>
+<a name="ln-156"></a><span class="s s-Atom">;                 Fix a bunch of bugs:</span>
+<a name="ln-157"></a><span class="s s-Atom">;                 1.  The &quot;header&quot; was always being returned as a null </span>
+<a name="ln-158"></a><span class="s s-Atom">;                 string.  Now, the header will be a string array</span>
+<a name="ln-159"></a><span class="s s-Atom">;                 containing the lines in the namelist file that</span>
+<a name="ln-160"></a><span class="s s-Atom">;                 precede the first line that begins a namelist.</span>
+<a name="ln-161"></a><span class="s s-Atom">;                 2.  The length of each namelist was being limited to </span>
+<a name="ln-162"></a><span class="s s-Atom">;                 100000 characters.  There wasn&#39;t</span> <span class="s s-Atom">any</span> <span class="s s-Atom">fundamental</span>
+<a name="ln-163"></a><span class="p">;</span>                 <span class="s s-Atom">reason</span> <span class="s s-Atom">for</span> <span class="s s-Atom">this</span> <span class="s s-Atom">and</span> <span class="s s-Atom">this</span> <span class="s s-Atom">limitation</span> <span class="s s-Atom">was</span> <span class="s s-Atom">removed</span><span class="p">.</span>
+<a name="ln-164"></a><span class="p">;</span>                 <span class="mf">3.</span>  <span class="nv">The</span> <span class="s s-Atom">code</span> <span class="s s-Atom">that</span> <span class="s s-Atom">determined</span> <span class="s s-Atom">whether</span> <span class="s s-Atom">a</span> <span class="s s-Atom">namelist</span>
+<a name="ln-165"></a><span class="p">;</span>                 <span class="s s-Atom">contained</span> <span class="s s-Atom">more</span> <span class="s s-Atom">than</span> <span class="mi">250</span> <span class="s s-Atom">variables</span> <span class="s s-Atom">was</span> <span class="s s-Atom">confused</span> <span class="s s-Atom">by</span>
+<a name="ln-166"></a><span class="p">;</span>                 <span class="s s-Atom">multiple</span> <span class="s s-Atom">references</span> <span class="s s-Atom">to</span> <span class="s s-Atom">the</span> <span class="s s-Atom">same</span> <span class="s s-Atom">variable</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span>
+<a name="ln-167"></a><span class="p">;</span>                 <span class="s s-Atom">namelist</span> <span class="s s-Atom">file</span><span class="p">.</span>  <span class="nv">This</span> <span class="s s-Atom">was</span> <span class="s s-Atom">corrected</span><span class="p">.</span>
+<a name="ln-168"></a><span class="p">;</span>
+<a name="ln-169"></a><span class="p">;</span>                 <span class="nv">Add</span> <span class="s s-Atom">some</span> <span class="s s-Atom">comments</span> <span class="s s-Atom">to</span> <span class="s s-Atom">the</span> <span class="s s-Atom">code</span><span class="p">.</span>
+<a name="ln-170"></a><span class="p">;</span>   <span class="mi">4</span><span class="o">-</span><span class="mi">15</span><span class="o">-</span><span class="mi">08</span> <span class="nv">JRF</span> <span class="o">-</span> <span class="nv">In</span> <span class="s s-Atom">the</span> <span class="s s-Atom">function</span> <span class="s s-Atom">quoted_reverse_find</span><span class="p">,</span> <span class="s s-Atom">replaced</span> <span class="s s-Atom">the</span>
+<a name="ln-171"></a><span class="p">;</span>                 <span class="s s-Atom">function</span> <span class="s s-Atom">rstrpos</span> <span class="s s-Atom">with</span> <span class="nf">strpos</span><span class="p">(...,</span><span class="o">/</span><span class="s s-Atom">reverse_search</span><span class="p">).</span>
+<a name="ln-172"></a><span class="p">;</span>                 <span class="nv">The</span> <span class="s s-Atom">function</span> <span class="s s-Atom">rstrpos</span> <span class="s s-Atom">seemed</span> <span class="s s-Atom">to</span> <span class="s s-Atom">be</span> <span class="s s-Atom">choking</span> <span class="s s-Atom">on</span> <span class="s s-Atom">long</span>
+<a name="ln-173"></a><span class="p">;</span>                 <span class="nf">strings</span> <span class="p">(</span><span class="s s-Atom">e</span><span class="p">.</span><span class="s s-Atom">g</span><span class="p">.</span> <span class="s s-Atom">the</span> <span class="s s-Atom">problem</span> <span class="s s-Atom">occurred</span> <span class="s s-Atom">on</span> <span class="s s-Atom">a</span> <span class="s s-Atom">string</span> <span class="s s-Atom">with</span>
+<a name="ln-174"></a><span class="p">;</span>                 <span class="s s-Atom">more</span> <span class="s s-Atom">than</span> <span class="mi">203000</span> <span class="s s-Atom">characters</span><span class="p">).</span>  <span class="nv">The</span> <span class="nv">IDL</span> <span class="s s-Atom">documentation</span> 
+<a name="ln-175"></a><span class="p">;</span>                 <span class="s s-Atom">says</span> <span class="s s-Atom">that</span> <span class="s s-Atom">rstrpos</span> <span class="o">is</span> <span class="s s-Atom">obsolete</span> <span class="s s-Atom">anyway</span><span class="p">.</span>
+<a name="ln-176"></a><span class="p">;</span>   <span class="mi">4</span><span class="o">-</span><span class="mi">21</span><span class="o">-</span><span class="mi">09</span> <span class="nv">JRF</span> <span class="o">-</span> <span class="nv">Define</span> <span class="s s-Atom">n_line</span> <span class="s s-Atom">as</span> <span class="s s-Atom">a</span> <span class="s s-Atom">long</span> <span class="s s-Atom">so</span> <span class="s s-Atom">that</span> <span class="s s-Atom">the</span> <span class="s s-Atom">number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">lines</span>
+<a name="ln-177"></a><span class="p">;</span>                 <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">can</span> <span class="s s-Atom">be</span> <span class="s s-Atom">larger</span> <span class="s s-Atom">than</span> <span class="s s-Atom">the</span> <span class="s s-Atom">largest</span> <span class="s s-Atom">positive</span> 
+<a name="ln-178"></a><span class="p">;</span>                 <span class="s s-Atom">value</span> <span class="s s-Atom">an</span> <span class="s s-Atom">integer</span> <span class="s s-Atom">variable</span> <span class="s s-Atom">can</span> <span class="s s-Atom">hold</span><span class="p">.</span>
+<a name="ln-179"></a><span class="p">;</span>   <span class="mi">9</span><span class="o">-</span><span class="mi">02</span><span class="o">-</span><span class="mi">09</span> <span class="nv">JRF</span> <span class="o">-</span> <span class="nv">Added</span> <span class="s s-Atom">the</span> <span class="s s-Atom">keyword</span> <span class="s s-Atom">line_count_estimate</span><span class="p">.</span> <span class="nv">This</span> <span class="s s-Atom">value</span> <span class="s s-Atom">can</span>
+<a name="ln-180"></a><span class="p">;</span>                 <span class="s s-Atom">be</span> <span class="s s-Atom">an</span> <span class="s s-Atom">estimate</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">that</span> <span class="s s-Atom">are</span> <span class="s s-Atom">in</span>
+<a name="ln-181"></a><span class="p">;</span>                 <span class="s s-Atom">the</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">file</span> <span class="s s-Atom">that</span> <span class="s s-Atom">needs</span> <span class="s s-Atom">to</span> <span class="s s-Atom">be</span> <span class="s s-Atom">read</span><span class="p">.</span> <span class="nv">The</span> <span class="s s-Atom">value</span>
+<a name="ln-182"></a><span class="p">;</span>                 <span class="o">is</span> <span class="s s-Atom">used</span> <span class="s s-Atom">to</span> <span class="s s-Atom">initialize</span> <span class="s s-Atom">an</span> <span class="s s-Atom">array</span> <span class="s s-Atom">of</span> <span class="s s-Atom">strings</span> <span class="s s-Atom">that</span> <span class="s s-Atom">will</span>
+<a name="ln-183"></a><span class="p">;</span>                 <span class="s s-Atom">hold</span> <span class="s s-Atom">each</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span><span class="p">.</span> <span class="nv">If</span> <span class="s s-Atom">this</span> <span class="s s-Atom">keyword</span>
+<a name="ln-184"></a><span class="p">;</span>                 <span class="o">is</span> <span class="o">not</span> <span class="s s-Atom">specified</span><span class="p">,</span> <span class="s s-Atom">the</span> <span class="s s-Atom">default</span> <span class="s s-Atom">value</span> <span class="o">is</span> <span class="mf">8000.</span> <span class="nv">If</span> <span class="s s-Atom">the</span>
+<a name="ln-185"></a><span class="p">;</span>                 <span class="s s-Atom">file</span> <span class="s s-Atom">contains</span> <span class="s s-Atom">significantly</span> <span class="s s-Atom">more</span> <span class="s s-Atom">than</span> <span class="mi">8000</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">the</span>
+<a name="ln-186"></a><span class="p">;</span>                 <span class="s s-Atom">process</span> <span class="s s-Atom">of</span> <span class="s s-Atom">reading</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">goes</span> <span class="s s-Atom">very</span> <span class="s s-Atom">slowly</span><span class="p">.</span> <span class="nv">The</span>
+<a name="ln-187"></a><span class="p">;</span>                 <span class="s s-Atom">file</span> <span class="s s-Atom">will</span> <span class="s s-Atom">be</span> <span class="s s-Atom">read</span> <span class="s s-Atom">much</span> <span class="s s-Atom">more</span> <span class="s s-Atom">quickly</span> <span class="s s-Atom">if</span> <span class="s s-Atom">the</span> <span class="s s-Atom">initial</span>
+<a name="ln-188"></a><span class="p">;</span>                 <span class="s s-Atom">array</span> <span class="s s-Atom">of</span> <span class="s s-Atom">strings</span> <span class="o">is</span>  <span class="s s-Atom">close</span> <span class="s s-Atom">to</span> <span class="s s-Atom">or</span> <span class="s s-Atom">larger</span> <span class="s s-Atom">than</span> <span class="o">is</span>
+<a name="ln-189"></a><span class="p">;</span>                 <span class="s s-Atom">necessary</span> <span class="s s-Atom">to</span> <span class="s s-Atom">hold</span>
+<a name="ln-190"></a><span class="p">;</span>                 <span class="s s-Atom">the</span> <span class="s s-Atom">file</span><span class="p">.</span> <span class="nv">So</span><span class="p">,</span> <span class="s s-Atom">if</span> <span class="s s-Atom">it</span> <span class="o">is</span> <span class="s s-Atom">expected</span> <span class="s s-Atom">that</span> <span class="s s-Atom">the</span> <span class="s s-Atom">input</span>
+<a name="ln-191"></a><span class="p">;</span>                 <span class="s s-Atom">namelist</span> <span class="s s-Atom">file</span> <span class="s s-Atom">will</span> <span class="s s-Atom">have</span> <span class="s s-Atom">significantly</span> <span class="s s-Atom">more</span> <span class="s s-Atom">than</span> <span class="mi">8000</span>
+<a name="ln-192"></a><span class="p">;</span>                 <span class="s s-Atom">lines</span><span class="p">,</span> <span class="s s-Atom">use</span> <span class="s s-Atom">this</span> <span class="s s-Atom">keyword</span><span class="p">.</span>
+<a name="ln-193"></a><span class="p">;</span>   <span class="mi">2</span><span class="o">-</span><span class="mi">21</span><span class="o">-</span><span class="mi">12</span> <span class="nv">JRF</span> <span class="o">-</span> <span class="nv">In</span> <span class="s s-Atom">a</span> <span class="s s-Atom">case</span> <span class="s s-Atom">where</span> <span class="s s-Atom">the</span> <span class="s s-Atom">input</span> <span class="o">is</span> <span class="s s-Atom">a</span> <span class="s s-Atom">string</span> <span class="s s-Atom">variable</span><span class="p">,</span>
+<a name="ln-194"></a><span class="p">;</span>                 <span class="s s-Atom">allow</span> <span class="s s-Atom">for</span> <span class="s s-Atom">a</span> <span class="s s-Atom">repeat</span> <span class="nf">count</span> <span class="p">(</span><span class="s s-Atom">e</span><span class="p">.</span><span class="s s-Atom">g</span><span class="p">.</span> <span class="mi">6</span><span class="s s-Atom">*&#39;test&#39;</span><span class="p">).</span>
+<a name="ln-195"></a><span class="p">;</span>   <span class="mi">6</span><span class="o">-</span><span class="mi">16</span><span class="o">-</span><span class="mi">15</span> <span class="nv">JRF</span> <span class="o">-</span> <span class="nv">Fix</span> <span class="s s-Atom">a</span> <span class="s s-Atom">couple</span> <span class="s s-Atom">of</span> <span class="s s-Atom">issues</span> <span class="s s-Atom">that</span> <span class="s s-Atom">were</span> <span class="s s-Atom">revealed</span> <span class="s s-Atom">by</span> <span class="s s-Atom">quirks</span>
+<a name="ln-196"></a><span class="p">;</span>                 <span class="s s-Atom">in</span> <span class="s s-Atom">a</span> <span class="s s-Atom">particular</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">file</span><span class="p">.</span>
+<a name="ln-197"></a><span class="p">;</span>                 <span class="mf">1.</span> <span class="nv">Handle</span> <span class="s s-Atom">the</span> <span class="s s-Atom">case</span> <span class="s s-Atom">where</span> <span class="s s-Atom">the</span> <span class="s s-Atom">last</span> <span class="s s-Atom">character</span> <span class="s s-Atom">in</span> <span class="s s-Atom">a</span>
+<a name="ln-198"></a><span class="p">;</span>                    <span class="s s-Atom">line</span> <span class="s s-Atom">of</span> <span class="s s-Atom">values</span> <span class="o">is</span> <span class="o">not</span> <span class="s s-Atom">a</span> <span class="s s-Atom">comma</span> <span class="s s-Atom">or</span> <span class="s s-Atom">a</span> <span class="s s-Atom">space</span> <span class="s s-Atom">and</span> <span class="s s-Atom">the</span>
+<a name="ln-199"></a><span class="p">;</span>                    <span class="s s-Atom">next</span> <span class="s s-Atom">line</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">begins</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s s-Atom">first</span> <span class="s s-Atom">column</span><span class="p">.</span>
+<a name="ln-200"></a><span class="p">;</span>                 <span class="mf">2.</span> <span class="nv">Handle</span> <span class="s s-Atom">the</span> <span class="s s-Atom">case</span> <span class="s s-Atom">where</span> <span class="s s-Atom">there</span> <span class="s s-Atom">are</span> <span class="s s-Atom">tab</span> <span class="s s-Atom">characters</span>
+<a name="ln-201"></a><span class="p">;</span>                    <span class="s s-Atom">following</span> <span class="s s-Atom">the</span> <span class="s s-Atom">name</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">first</span> <span class="s s-Atom">namelist</span><span class="p">.</span> <span class="p">(</span><span class="nv">Now</span>
+<a name="ln-202"></a><span class="p">;</span>                    <span class="s s-Atom">tab</span> <span class="s s-Atom">characters</span> <span class="s s-Atom">will</span> <span class="s s-Atom">be</span> <span class="s s-Atom">removed</span> <span class="s s-Atom">from</span> <span class="s s-Atom">all</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">of</span>
+<a name="ln-203"></a><span class="p">;</span>                    <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">before</span> <span class="nf">processing</span> <span class="p">(</span><span class="s s-Atom">except</span> <span class="s s-Atom">for</span> <span class="s s-Atom">the</span>
+<a name="ln-204"></a><span class="p">;</span>                    <span class="s s-Atom">header</span><span class="p">),</span> <span class="s s-Atom">replaced</span> <span class="s s-Atom">by</span> <span class="s s-Atom">a</span> <span class="s s-Atom">space</span> <span class="s s-Atom">if</span> <span class="s s-Atom">necessary</span><span class="p">.</span>
+<a name="ln-205"></a><span class="p">;</span>   <span class="mi">9</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">16</span> <span class="nv">JRF</span> <span class="o">-</span> <span class="nv">IDL</span> <span class="s s-Atom">gets</span> <span class="s s-Atom">very</span> <span class="s s-Atom">unhappy</span> <span class="s s-Atom">if</span> <span class="s s-Atom">an</span> <span class="s s-Atom">attempt</span> <span class="o">is</span> <span class="s s-Atom">made</span> <span class="s s-Atom">to</span>
+<a name="ln-206"></a><span class="p">;</span>                 <span class="s s-Atom">assign</span> <span class="s s-Atom">a</span> <span class="s s-Atom">tag</span> <span class="s s-Atom">name</span> <span class="s s-Atom">in</span> <span class="s s-Atom">a</span> <span class="s s-Atom">structure</span> <span class="s s-Atom">to</span> <span class="s s-Atom">one</span> <span class="s s-Atom">of</span> <span class="nv">IDL</span><span class="s s-Atom">&#39;s</span>
+<a name="ln-207"></a><span class="s s-Atom">;                 reserved words (e.g.&#39;ne&#39;). Similarly to what is done</span>
+<a name="ln-208"></a><span class="s s-Atom">;                 in read_nc.pro, if a tag name needs to be equal to</span>
+<a name="ln-209"></a><span class="s s-Atom">;                 one of the reserved words, add one an</span>
+<a name="ln-210"></a><span class="s s-Atom">;                 underscore to the end of the tag in order to avoid</span>
+<a name="ln-211"></a><span class="s s-Atom">;                 conflict with the reserved word and with any other</span>
+<a name="ln-212"></a><span class="s s-Atom">;                 tags in the structure.</span>
+<a name="ln-213"></a><span class="s s-Atom">;                </span>
+<a name="ln-214"></a><span class="s s-Atom">;</span>
+<a name="ln-215"></a><span class="s s-Atom">;-</span>
+<a name="ln-216"></a><span class="s s-Atom">;************************************************************************</span>
+<a name="ln-217"></a><span class="s s-Atom">;If the input string variable is equal to one of IDL&#39;s</span> <span class="s s-Atom">reserved</span>
+<a name="ln-218"></a><span class="p">;</span><span class="s s-Atom">words</span><span class="p">,</span> <span class="s s-Atom">replace</span> <span class="s s-Atom">it</span> <span class="s s-Atom">with</span> <span class="s s-Atom">a</span> <span class="s s-Atom">similar</span> <span class="s s-Atom">name</span> <span class="s s-Atom">with</span> <span class="s s-Atom">an</span> <span class="s s-Atom">underscore</span>
+<a name="ln-219"></a><span class="p">;</span><span class="s s-Atom">at</span> <span class="s s-Atom">the</span> <span class="s s-Atom">end</span><span class="p">.</span>
+<a name="ln-220"></a><span class="p">;</span>
+<a name="ln-221"></a><span class="s s-Atom">function</span> <span class="s s-Atom">replace_reserved</span><span class="p">,</span><span class="s s-Atom">name</span>
+<a name="ln-222"></a>   <span class="s s-Atom">new_name</span> <span class="o">=</span> <span class="s s-Atom">name</span>
+<a name="ln-223"></a>   <span class="s s-Atom">switch</span> <span class="nf">strupcase</span><span class="p">(</span><span class="s s-Atom">name</span><span class="p">)</span> <span class="s s-Atom">of</span>
+<a name="ln-224"></a>      <span class="s s-Atom">&#39;AND&#39;:</span>
+<a name="ln-225"></a>      <span class="s s-Atom">&#39;BEGIN&#39;:</span>
+<a name="ln-226"></a>      <span class="s s-Atom">&#39;BREAK&#39;:</span>
+<a name="ln-227"></a>      <span class="s s-Atom">&#39;CASE&#39;:</span>
+<a name="ln-228"></a>      <span class="s s-Atom">&#39;COMMON&#39;:</span>
+<a name="ln-229"></a>      <span class="s s-Atom">&#39;COMPILE_OPT&#39;:</span>
+<a name="ln-230"></a>      <span class="s s-Atom">&#39;CONTINUE&#39;:</span>
+<a name="ln-231"></a>      <span class="s s-Atom">&#39;DO&#39;:</span>
+<a name="ln-232"></a>      <span class="s s-Atom">&#39;ELSE&#39;:</span>
+<a name="ln-233"></a>      <span class="s s-Atom">&#39;END&#39;:</span>
+<a name="ln-234"></a>      <span class="s s-Atom">&#39;ENDCASE&#39;:</span>
+<a name="ln-235"></a>      <span class="s s-Atom">&#39;ENDELSE&#39;:</span>
+<a name="ln-236"></a>      <span class="s s-Atom">&#39;ENDFOR&#39;:</span>
+<a name="ln-237"></a>      <span class="s s-Atom">&#39;ENDIF&#39;:</span>
+<a name="ln-238"></a>      <span class="s s-Atom">&#39;ENDREP&#39;:</span>
+<a name="ln-239"></a>      <span class="s s-Atom">&#39;ENDSWITCH&#39;:</span>
+<a name="ln-240"></a>      <span class="s s-Atom">&#39;ENDWHILE&#39;:</span>
+<a name="ln-241"></a>      <span class="s s-Atom">&#39;EQ&#39;:</span>
+<a name="ln-242"></a>      <span class="s s-Atom">&#39;FOR&#39;:</span>
+<a name="ln-243"></a>      <span class="s s-Atom">&#39;FORWARD_FUNCTION&#39;:</span>
+<a name="ln-244"></a>      <span class="s s-Atom">&#39;FUNCTION&#39;:</span>
+<a name="ln-245"></a>      <span class="s s-Atom">&#39;GE&#39;:</span>
+<a name="ln-246"></a>      <span class="s s-Atom">&#39;GOTO&#39;:</span>
+<a name="ln-247"></a>      <span class="s s-Atom">&#39;GT&#39;:</span>
+<a name="ln-248"></a>      <span class="s s-Atom">&#39;IF&#39;:</span>
+<a name="ln-249"></a>      <span class="s s-Atom">&#39;INHERITS&#39;:</span>
+<a name="ln-250"></a>      <span class="s s-Atom">&#39;LE&#39;:</span>
+<a name="ln-251"></a>      <span class="s s-Atom">&#39;LT&#39;:</span>
+<a name="ln-252"></a>      <span class="s s-Atom">&#39;MOD&#39;:</span>
+<a name="ln-253"></a>      <span class="s s-Atom">&#39;NE&#39;:</span>
+<a name="ln-254"></a>      <span class="s s-Atom">&#39;NOT&#39;:</span>
+<a name="ln-255"></a>      <span class="s s-Atom">&#39;OF&#39;:</span>
+<a name="ln-256"></a>      <span class="s s-Atom">&#39;ON_IOERROR&#39;:</span>
+<a name="ln-257"></a>      <span class="s s-Atom">&#39;OR&#39;:</span>
+<a name="ln-258"></a>      <span class="s s-Atom">&#39;PRO&#39;:</span>
+<a name="ln-259"></a>      <span class="s s-Atom">&#39;REPEAT&#39;:</span>
+<a name="ln-260"></a>      <span class="s s-Atom">&#39;SWITCH&#39;:</span>
+<a name="ln-261"></a>      <span class="s s-Atom">&#39;THEN&#39;:</span>
+<a name="ln-262"></a>      <span class="s s-Atom">&#39;UNTIL&#39;:</span>
+<a name="ln-263"></a>      <span class="s s-Atom">&#39;WHILE&#39;:</span>
+<a name="ln-264"></a>      <span class="s s-Atom">&#39;XOR&#39;:</span> <span class="s s-Atom">begin</span>
+<a name="ln-265"></a>         <span class="s s-Atom">new_name</span> <span class="o">=</span> <span class="s s-Atom">name</span> <span class="o">+</span> <span class="s s-Atom">&#39;_&#39;</span>
+<a name="ln-266"></a>         <span class="s s-Atom">break</span>
+<a name="ln-267"></a>      <span class="s s-Atom">end</span>
+<a name="ln-268"></a>   <span class="s s-Atom">endswitch</span>
+<a name="ln-269"></a>   <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">new_name</span>
+<a name="ln-270"></a><span class="s s-Atom">end</span>
+<a name="ln-271"></a>
+<a name="ln-272"></a><span class="nv">PRO</span> <span class="s s-Atom">nl_remove_comments</span><span class="p">,</span><span class="s s-Atom">input</span><span class="p">,</span><span class="s s-Atom">comment_character</span><span class="p">,</span><span class="s s-Atom">output</span>
+<a name="ln-273"></a><span class="p">;</span>
+<a name="ln-274"></a><span class="p">;</span> <span class="nv">From</span> <span class="s s-Atom">the</span> <span class="s s-Atom">string</span> <span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="s s-Atom">remove</span> <span class="s s-Atom">all</span> <span class="s s-Atom">characters</span> <span class="s s-Atom">that</span> <span class="s s-Atom">follow</span> <span class="s s-Atom">the</span> <span class="s s-Atom">first</span> 
+<a name="ln-275"></a><span class="p">;</span> <span class="s s-Atom">instance</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">character</span> <span class="s s-Atom">specified</span> <span class="s s-Atom">by</span> <span class="s s-Atom">comment_character</span><span class="p">.</span>  <span class="nv">However</span><span class="p">,</span> <span class="s s-Atom">any</span>
+<a name="ln-276"></a><span class="p">;</span> <span class="s s-Atom">instances</span> <span class="s s-Atom">of</span> <span class="s s-Atom">comment_character</span> <span class="s s-Atom">between</span> <span class="s s-Atom">quotes</span> <span class="s s-Atom">or</span> <span class="s s-Atom">apostrophes</span> <span class="s s-Atom">are</span> <span class="s s-Atom">ignored</span><span class="p">.</span>
+<a name="ln-277"></a>
+<a name="ln-278"></a>   <span class="s s-Atom">start</span> <span class="o">=</span>  <span class="mi">0</span>
+<a name="ln-279"></a>   <span class="s s-Atom">length</span> <span class="o">=</span>  <span class="nf">strlen</span><span class="p">(</span><span class="s s-Atom">input</span><span class="p">)</span>
+<a name="ln-280"></a>   <span class="s s-Atom">quote_started</span> <span class="o">=</span>  <span class="mi">0</span>
+<a name="ln-281"></a>   <span class="s s-Atom">apostrophe_started</span> <span class="o">=</span>  <span class="mi">0</span>
+<a name="ln-282"></a>
+<a name="ln-283"></a>   <span class="nv">WHILE</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="nv">DO</span> <span class="nv">BEGIN</span>
+<a name="ln-284"></a>      <span class="nv">IF</span><span class="p">(</span><span class="s s-Atom">start</span> <span class="nv">EQ</span> <span class="s s-Atom">length</span><span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-285"></a>         <span class="s s-Atom">output</span> <span class="o">=</span>  <span class="s s-Atom">input</span>
+<a name="ln-286"></a>         <span class="s s-Atom">return</span>
+<a name="ln-287"></a>      <span class="nv">ENDIF</span>
+<a name="ln-288"></a>
+<a name="ln-289"></a>      <span class="s s-Atom">a</span> <span class="o">=</span>  <span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">input</span><span class="p">,</span><span class="s s-Atom">start</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-290"></a>      <span class="nv">IF</span><span class="p">(</span> <span class="p">(</span><span class="s s-Atom">a</span> <span class="nv">EQ</span> <span class="s s-Atom">comment_character</span><span class="p">)</span> <span class="nv">AND</span> <span class="p">(</span><span class="s s-Atom">quote_started</span> <span class="nv">EQ</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">AND</span> <span class="err">$</span>
+<a name="ln-291"></a>          <span class="p">(</span><span class="s s-Atom">apostrophe_started</span> <span class="nv">EQ</span> <span class="mi">0</span><span class="p">))</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-292"></a>         <span class="s s-Atom">output</span> <span class="o">=</span>  <span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">input</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">start</span><span class="p">)</span>
+<a name="ln-293"></a>         <span class="s s-Atom">return</span>
+<a name="ln-294"></a>      <span class="nv">ENDIF</span> <span class="nv">ELSE</span> <span class="nv">IF</span><span class="p">(</span><span class="s s-Atom">a</span> <span class="nv">EQ</span> <span class="s s-Atom">&#39;&quot;&#39;</span><span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-295"></a>         <span class="nv">IF</span><span class="p">(</span><span class="s s-Atom">quote_started</span> <span class="nv">EQ</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-296"></a>            <span class="s s-Atom">quote_started</span> <span class="o">=</span>  <span class="mi">1</span>
+<a name="ln-297"></a>         <span class="nv">ENDIF</span> <span class="nv">ELSE</span> <span class="nv">BEGIN</span>
+<a name="ln-298"></a>            <span class="s s-Atom">quote_started</span> <span class="o">=</span>  <span class="mi">0</span>
+<a name="ln-299"></a>         <span class="nv">ENDELSE</span>
+<a name="ln-300"></a>      <span class="nv">ENDIF</span> <span class="nv">ELSE</span> <span class="nv">IF</span><span class="p">(</span><span class="s s-Atom">a</span> <span class="nv">EQ</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-301"></a>         <span class="nv">IF</span><span class="p">(</span><span class="s s-Atom">apostrophe_started</span> <span class="nv">EQ</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-302"></a>            <span class="s s-Atom">apostrophe_started</span> <span class="o">=</span>  <span class="mi">1</span>
+<a name="ln-303"></a>         <span class="nv">ENDIF</span> <span class="nv">ELSE</span> <span class="nv">BEGIN</span>
+<a name="ln-304"></a>            <span class="s s-Atom">apostrophe_started</span> <span class="o">=</span>  <span class="mi">0</span>
+<a name="ln-305"></a>         <span class="nv">ENDELSE</span>
+<a name="ln-306"></a>      <span class="nv">ENDIF</span>
+<a name="ln-307"></a>      <span class="s s-Atom">start</span> <span class="o">=</span>  <span class="s s-Atom">start</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-308"></a>   <span class="nv">ENDWHILE</span>
+<a name="ln-309"></a>
+<a name="ln-310"></a>   <span class="s s-Atom">return</span>
+<a name="ln-311"></a><span class="nv">END</span>
+<a name="ln-312"></a>
+<a name="ln-313"></a><span class="nv">FUNCTION</span> <span class="s s-Atom">quoted_reverse_find</span><span class="p">,</span><span class="s s-Atom">string</span><span class="p">,</span><span class="s s-Atom">target</span>
+<a name="ln-314"></a><span class="p">;</span> <span class="nv">This</span> <span class="s s-Atom">function</span> <span class="s s-Atom">calls</span> <span class="s s-Atom">rstrpos</span><span class="p">,</span> <span class="s s-Atom">but</span><span class="p">,</span> <span class="s s-Atom">if</span> <span class="s s-Atom">the</span> <span class="s s-Atom">string</span> <span class="s s-Atom">searched</span> <span class="s s-Atom">for</span>
+<a name="ln-315"></a><span class="p">;</span> <span class="o">is</span> <span class="s s-Atom">located</span> <span class="s s-Atom">between</span> <span class="s s-Atom">a</span> <span class="s s-Atom">pair</span> <span class="s s-Atom">of</span> <span class="s s-Atom">parentheses</span><span class="p">,</span> <span class="s s-Atom">it</span> <span class="o">is</span> <span class="s s-Atom">ignored</span> <span class="s s-Atom">and</span> <span class="s s-Atom">the</span>
+<a name="ln-316"></a><span class="p">;</span> <span class="s s-Atom">next</span> <span class="s s-Atom">target</span> <span class="s s-Atom">string</span> <span class="o">is</span> <span class="s s-Atom">located</span><span class="p">.</span>  <span class="nv">We</span> <span class="s s-Atom">assume</span> <span class="s s-Atom">here</span> <span class="s s-Atom">that</span> <span class="s s-Atom">there</span> <span class="o">is</span> <span class="s s-Atom">only</span>
+<a name="ln-317"></a><span class="p">;</span> <span class="s s-Atom">one</span> <span class="s s-Atom">pair</span> <span class="s s-Atom">of</span> <span class="s s-Atom">parentheses</span> <span class="s s-Atom">at</span> <span class="s s-Atom">most</span><span class="p">.</span>
+<a name="ln-318"></a><span class="p">;</span>
+<a name="ln-319"></a>   <span class="s s-Atom">length</span> <span class="o">=</span>  <span class="nf">strlen</span><span class="p">(</span><span class="s s-Atom">string</span><span class="p">)</span>
+<a name="ln-320"></a>   <span class="s s-Atom">i</span> <span class="o">=</span>  <span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">string</span><span class="p">,</span><span class="s s-Atom">target</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">reverse_search</span><span class="p">)</span>
+<a name="ln-321"></a>   <span class="s s-Atom">k1</span> <span class="o">=</span>  <span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">string</span><span class="p">,</span><span class="s2">&quot;)&quot;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">reverse_search</span><span class="p">)</span>
+<a name="ln-322"></a>   <span class="s s-Atom">k2</span> <span class="o">=</span>  <span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">string</span><span class="p">,</span><span class="s2">&quot;(&quot;</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">reverse_search</span><span class="p">)</span>
+<a name="ln-323"></a>   <span class="nv">IF</span><span class="p">(</span> <span class="p">(</span><span class="s s-Atom">k1</span> <span class="nv">NE</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="nv">AND</span> <span class="p">(</span><span class="s s-Atom">k2</span> <span class="nv">NE</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-324"></a>      <span class="nv">IF</span><span class="p">(</span> <span class="p">(</span><span class="s s-Atom">i</span> <span class="nv">GT</span> <span class="s s-Atom">k2</span><span class="p">)</span> <span class="nv">AND</span> <span class="p">(</span><span class="s s-Atom">i</span> <span class="nv">LT</span> <span class="s s-Atom">k1</span><span class="p">)</span> <span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-325"></a>         <span class="s s-Atom">substring</span> <span class="o">=</span>  <span class="nf">strmid</span><span class="p">(</span><span class="s s-Atom">string</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s s-Atom">k2</span><span class="p">)</span>
+<a name="ln-326"></a>         <span class="s s-Atom">i</span> <span class="o">=</span>  <span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">substring</span><span class="p">,</span><span class="s s-Atom">target</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">reverse_search</span><span class="p">)</span>
+<a name="ln-327"></a>      <span class="nv">ENDIF</span>
+<a name="ln-328"></a>   <span class="nv">ENDIF</span>
+<a name="ln-329"></a>   <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">i</span>
+<a name="ln-330"></a><span class="nv">END</span>
+<a name="ln-331"></a>
+<a name="ln-332"></a>
+<a name="ln-333"></a><span class="s s-Atom">function</span> <span class="s s-Atom">read_nl</span><span class="p">,</span><span class="s s-Atom">fname</span><span class="p">,</span><span class="s s-Atom">dbl</span><span class="o">=</span><span class="s s-Atom">dbl</span><span class="p">,</span><span class="s s-Atom">debug</span><span class="o">=</span><span class="s s-Atom">debug</span><span class="p">,</span><span class="s s-Atom">model</span><span class="o">=</span><span class="s s-Atom">model</span><span class="p">,</span><span class="s s-Atom">error</span> <span class="o">=</span> <span class="s s-Atom">error_out</span><span class="p">,</span><span class="err">$</span>
+<a name="ln-334"></a>                 <span class="s s-Atom">comment_character</span><span class="o">=</span> <span class="s s-Atom">comment_character_in</span><span class="p">,</span><span class="err">$</span>
+<a name="ln-335"></a>                 <span class="s s-Atom">print_tokens</span><span class="o">=</span> <span class="s s-Atom">print_tokens</span><span class="p">,</span><span class="err">$</span>
+<a name="ln-336"></a>                 <span class="s s-Atom">line_count_estimate</span> <span class="o">=</span> <span class="s s-Atom">line_count_estimate</span>
+<a name="ln-337"></a>
+<a name="ln-338"></a>  <span class="s s-Atom">dbl</span><span class="o">=</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">dbl</span><span class="p">)</span>
+<a name="ln-339"></a>  <span class="s s-Atom">x=&#39;&#39;</span>
+<a name="ln-340"></a>  <span class="s s-Atom">error_out</span> <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-341"></a>
+<a name="ln-342"></a>  <span class="nf">if</span> <span class="p">(</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">debug</span><span class="p">))</span> <span class="s s-Atom">then</span> <span class="s s-Atom">error</span><span class="o">=</span><span class="mi">0</span> <span class="s s-Atom">else</span> <span class="s s-Atom">catch</span><span class="p">,</span><span class="s s-Atom">error</span>
+<a name="ln-343"></a>  <span class="nf">if</span> <span class="p">(</span><span class="s s-Atom">error</span> <span class="s s-Atom">ne</span> <span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-344"></a>    <span class="s s-Atom">message</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">info</span><span class="p">,</span><span class="s s-Atom">&#39;Error reading namelist file: &#39;</span><span class="o">+</span><span class="s s-Atom">fname</span>
+<a name="ln-345"></a>    <span class="s s-Atom">message</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">info</span><span class="p">,!</span><span class="nv">ERROR_STATE</span><span class="p">.</span><span class="s s-Atom">msg</span>
+<a name="ln-346"></a>    <span class="s s-Atom">message</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">info</span><span class="p">,!</span><span class="nv">ERROR_STATE</span><span class="p">.</span><span class="s s-Atom">sys_msg</span>
+<a name="ln-347"></a>    <span class="nf">if</span> <span class="p">(</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">lun</span><span class="p">)</span> <span class="s s-Atom">gt</span> <span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">free_lun</span><span class="p">,</span><span class="s s-Atom">lun</span>
+<a name="ln-348"></a>    <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">x</span>
+<a name="ln-349"></a>  <span class="s s-Atom">endif</span>
+<a name="ln-350"></a>
+<a name="ln-351"></a>   <span class="s s-Atom">k</span><span class="o">=</span><span class="nf">file_search</span><span class="p">(</span><span class="s s-Atom">fname</span><span class="p">,</span><span class="s s-Atom">count</span><span class="o">=</span><span class="s s-Atom">count</span><span class="p">)</span>
+<a name="ln-352"></a>   <span class="s s-Atom">if</span> <span class="s s-Atom">count</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-353"></a>     <span class="nf">if</span> <span class="p">(</span><span class="nf">keyword_set</span><span class="p">(</span><span class="s s-Atom">debug</span><span class="p">))</span> <span class="s s-Atom">then</span> <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;File not found: &#39;</span><span class="o">+</span><span class="s s-Atom">fname</span>
+<a name="ln-354"></a>     <span class="s s-Atom">error_out</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-355"></a>     <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">x</span>
+<a name="ln-356"></a>   <span class="s s-Atom">endif</span>
+<a name="ln-357"></a>
+<a name="ln-358"></a>   <span class="s s-Atom">openr</span><span class="p">,</span><span class="s s-Atom">lun</span><span class="p">,</span><span class="s s-Atom">fname</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">get_lun</span> 
+<a name="ln-359"></a>
+<a name="ln-360"></a><span class="p">;</span>
+<a name="ln-361"></a><span class="p">;</span> <span class="nv">Read</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span> <span class="s s-Atom">and</span> <span class="s s-Atom">create</span> <span class="s s-Atom">a</span> <span class="s s-Atom">string</span> <span class="s s-Atom">array</span> <span class="s s-Atom">with</span> <span class="s s-Atom">one</span> <span class="s s-Atom">element</span> <span class="s s-Atom">per</span> <span class="s s-Atom">line</span> <span class="s s-Atom">in</span> 
+<a name="ln-362"></a><span class="p">;</span> <span class="s s-Atom">the</span> <span class="s s-Atom">file</span><span class="p">.</span>  <span class="nv">The</span> <span class="s s-Atom">initial</span> <span class="s s-Atom">array</span> <span class="s s-Atom">size</span> <span class="s s-Atom">of</span> <span class="s s-Atom">nmax</span> <span class="o">is</span> <span class="s s-Atom">just</span> <span class="s s-Atom">an</span> <span class="s s-Atom">initial</span>
+<a name="ln-363"></a><span class="p">;</span> <span class="s s-Atom">allocation</span><span class="p">.</span>  <span class="nv">If</span> <span class="s s-Atom">file</span> <span class="o">is</span> <span class="s s-Atom">longer</span> <span class="s s-Atom">than</span> <span class="s s-Atom">this</span> <span class="s s-Atom">number</span> <span class="s s-Atom">of</span> <span class="s s-Atom">lines</span><span class="p">,</span> <span class="s s-Atom">the</span> <span class="s s-Atom">array</span>
+<a name="ln-364"></a><span class="p">;</span> <span class="s s-Atom">will</span> <span class="s s-Atom">be</span> <span class="s s-Atom">extended</span><span class="p">.</span>
+<a name="ln-365"></a><span class="p">;</span>
+<a name="ln-366"></a>   <span class="nf">if</span><span class="p">(</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">line_count_estimate</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-367"></a>      <span class="s s-Atom">nmax</span> <span class="o">=</span> <span class="s s-Atom">line_count_estimate</span>
+<a name="ln-368"></a>   <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-369"></a>      <span class="s s-Atom">nmax</span> <span class="o">=</span> <span class="mi">8000</span>               <span class="p">;</span><span class="s s-Atom">assume</span> <span class="o">&lt;</span> <span class="mi">8000</span> <span class="s s-Atom">lines</span>
+<a name="ln-370"></a>   <span class="s s-Atom">endelse</span>
+<a name="ln-371"></a>   <span class="s s-Atom">b</span><span class="o">=</span><span class="nf">strarr</span><span class="p">(</span><span class="s s-Atom">nmax</span><span class="p">)</span>
+<a name="ln-372"></a>   <span class="s s-Atom">n_line</span> <span class="o">=</span> <span class="nf">long</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<a name="ln-373"></a>   <span class="s s-Atom">oneline=&#39;&#39;</span>
+<a name="ln-374"></a><span class="p">;</span>
+<a name="ln-375"></a><span class="p">;</span> <span class="nv">By</span> <span class="s s-Atom">default</span><span class="p">,</span> <span class="s s-Atom">ignore</span> <span class="s s-Atom">any</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">beginning</span> <span class="s s-Atom">with</span> <span class="s s-Atom">an</span> <span class="s s-Atom">exclamation</span> <span class="s s-Atom">point</span>
+<a name="ln-376"></a><span class="p">;</span> <span class="p">(</span><span class="s s-Atom">this</span> <span class="s s-Atom">default</span> <span class="s s-Atom">behavior</span> <span class="o">is</span> <span class="s s-Atom">retained</span> <span class="s s-Atom">for</span> <span class="s s-Atom">backward</span> <span class="s s-Atom">compatibility</span><span class="p">).</span>
+<a name="ln-377"></a><span class="p">;</span> <span class="nv">In</span> <span class="s s-Atom">addition</span><span class="p">,</span> <span class="s s-Atom">if</span> <span class="s s-Atom">the</span> <span class="s s-Atom">comment_character</span> 
+<a name="ln-378"></a><span class="p">;</span> <span class="s s-Atom">keyword</span> <span class="o">is</span> <span class="s s-Atom">specified</span><span class="p">,</span> <span class="s s-Atom">ignore</span> <span class="s s-Atom">the</span> <span class="s s-Atom">portions</span>
+<a name="ln-379"></a><span class="p">;</span> <span class="s s-Atom">of</span> <span class="s s-Atom">a</span> <span class="s s-Atom">line</span> <span class="s s-Atom">following</span> <span class="s s-Atom">the</span> <span class="s s-Atom">specified</span> <span class="s s-Atom">comment</span> <span class="s s-Atom">character</span><span class="p">.</span>
+<a name="ln-380"></a><span class="p">;</span>
+<a name="ln-381"></a>   <span class="nf">while</span> <span class="p">(</span><span class="o">not</span><span class="p">(</span><span class="nf">eof</span><span class="p">(</span><span class="s s-Atom">lun</span><span class="p">)))</span> <span class="s s-Atom">do</span> <span class="s s-Atom">begin</span>
+<a name="ln-382"></a>     <span class="s s-Atom">readf</span><span class="p">,</span><span class="s s-Atom">lun</span><span class="p">,</span><span class="s s-Atom">oneline</span>
+<a name="ln-383"></a>
+<a name="ln-384"></a>     <span class="nv">IF</span><span class="p">(</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">comment_character_in</span><span class="p">)</span> <span class="nv">NE</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">THEN</span> <span class="nv">BEGIN</span>
+<a name="ln-385"></a>        <span class="nv">FOR</span> <span class="s s-Atom">i</span><span class="o">=</span> <span class="mi">0</span><span class="p">,</span><span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">comment_character_in</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="nv">DO</span> <span class="s s-Atom">begin</span>
+<a name="ln-386"></a>           <span class="s s-Atom">nl_remove_comments</span><span class="p">,</span><span class="s s-Atom">oneline</span><span class="p">,</span><span class="s s-Atom">comment_character_in</span><span class="p">[</span><span class="s s-Atom">i</span><span class="p">],</span><span class="s s-Atom">oneline</span>
+<a name="ln-387"></a>        <span class="nv">ENDFOR</span>
+<a name="ln-388"></a>     <span class="nv">ENDIF</span>
+<a name="ln-389"></a>
+<a name="ln-390"></a>     <span class="nv">IF</span><span class="p">(</span><span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">oneline</span><span class="p">,</span><span class="s2">&quot;!&quot;</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="mi">0</span><span class="p">)</span>  <span class="nv">THEN</span> <span class="s s-Atom">begin</span>
+<a name="ln-391"></a>        <span class="nf">if</span> <span class="p">(</span><span class="s s-Atom">n_line</span> <span class="s s-Atom">lt</span> <span class="s s-Atom">nmax</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="err">$</span>
+<a name="ln-392"></a>         <span class="s s-Atom">b</span><span class="p">[</span><span class="s s-Atom">n_line</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">oneline</span> <span class="s s-Atom">else</span> <span class="s s-Atom">b</span> <span class="o">=</span> <span class="p">[</span><span class="s s-Atom">b</span><span class="p">,</span> <span class="s s-Atom">oneline</span><span class="p">]</span>
+<a name="ln-393"></a>        <span class="s s-Atom">n_line</span> <span class="o">=</span> <span class="s s-Atom">n_line</span><span class="o">+</span><span class="mi">1</span>
+<a name="ln-394"></a>     <span class="nv">ENDIF</span>
+<a name="ln-395"></a>   <span class="s s-Atom">endwhile</span>
+<a name="ln-396"></a>   <span class="s s-Atom">free_lun</span><span class="p">,</span><span class="s s-Atom">lun</span>
+<a name="ln-397"></a>   <span class="nf">if</span> <span class="p">(</span><span class="s s-Atom">n_line</span> <span class="s s-Atom">eq</span> <span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">message</span><span class="p">,</span><span class="s s-Atom">&#39;empty namelist file&#39;</span>
+<a name="ln-398"></a><span class="p">;</span>   <span class="s s-Atom">b</span> <span class="o">=</span> <span class="nf">strlowcase</span><span class="p">(</span><span class="s s-Atom">b</span><span class="p">[</span><span class="mi">0</span><span class="s s-Atom">:n_line</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<a name="ln-399"></a>
+<a name="ln-400"></a><span class="p">;</span> <span class="nv">Find</span> <span class="s s-Atom">the</span> <span class="s s-Atom">first</span> <span class="s s-Atom">line</span> <span class="s s-Atom">that</span> <span class="s s-Atom">starts</span> <span class="s s-Atom">a</span> <span class="s s-Atom">namelist</span><span class="p">.</span>  <span class="nv">Any</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">prior</span> <span class="s s-Atom">to</span> <span class="s s-Atom">this</span> 
+<a name="ln-401"></a><span class="p">;</span> <span class="s s-Atom">line</span> <span class="s s-Atom">are</span> <span class="s s-Atom">returned</span> <span class="s s-Atom">as</span> <span class="s s-Atom">the</span> <span class="s s-Atom">header</span><span class="p">.</span>
+<a name="ln-402"></a>
+<a name="ln-403"></a>   <span class="s s-Atom">istart</span> <span class="o">=</span> <span class="nf">min</span><span class="p">(</span><span class="nf">where</span><span class="p">(</span><span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">b</span><span class="p">,</span><span class="s s-Atom">&#39;$&#39;</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<a name="ln-404"></a>   <span class="s s-Atom">if</span> <span class="s s-Atom">istart</span> <span class="s s-Atom">eq</span> <span class="o">-</span><span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>	<span class="p">;</span><span class="s s-Atom">f90</span> <span class="s s-Atom">namelist</span>
+<a name="ln-405"></a>      <span class="s s-Atom">istart</span> <span class="o">=</span> <span class="nf">min</span><span class="p">(</span><span class="nf">where</span><span class="p">(</span><span class="nf">strpos</span><span class="p">(</span><span class="s s-Atom">b</span><span class="p">,</span><span class="s s-Atom">&#39;&amp;&#39;</span><span class="p">)</span> <span class="s s-Atom">ne</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<a name="ln-406"></a>      <span class="nf">if</span><span class="p">(</span><span class="s s-Atom">istart</span> <span class="s s-Atom">ne</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span>
+<a name="ln-407"></a>         <span class="s s-Atom">index</span> <span class="o">=</span> <span class="nf">where</span><span class="p">(</span><span class="nf">strcompress</span><span class="p">(</span><span class="s s-Atom">b</span><span class="p">,</span><span class="o">/</span><span class="s s-Atom">remove</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="s s-Atom">&#39;/&#39;</span><span class="p">,</span><span class="s s-Atom">count</span><span class="p">)</span>
+<a name="ln-408"></a>         <span class="s s-Atom">if</span> <span class="s s-Atom">count</span> <span class="s s-Atom">ne</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">n_line</span> <span class="o">=</span> <span class="s s-Atom">index</span><span class="p">[</span><span class="s s-Atom">count</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">;</span><span class="s s-Atom">will</span> <span class="s s-Atom">rm</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">after</span> <span class="s s-Atom">last</span> <span class="o">/</span>
+<a name="ln-409"></a>      <span class="s s-Atom">endif</span>
+<a name="ln-410"></a>   <span class="s s-Atom">endif</span>
+<a name="ln-411"></a>   <span class="nf">if</span><span class="p">(</span><span class="s s-Atom">istart</span> <span class="s s-Atom">eq</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">message</span><span class="p">,</span><span class="s s-Atom">&#39;File does not contain a namelist.&#39;</span>
+<a name="ln-412"></a>
+<a name="ln-413"></a>   <span class="nv">IF</span><span class="p">(</span><span class="s s-Atom">istart</span> <span class="nv">GT</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">THEN</span> <span class="s s-Atom">header</span> <span class="o">=</span>  <span class="s s-Atom">b</span><span class="p">[</span><span class="mi">0</span><span class="s s-Atom">:istart</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="nv">ELSE</span> <span class="s s-Atom">header</span> <span class="o">=</span>  <span class="s s-Atom">&#39;&#39;</span>
+<a name="ln-414"></a><span class="p">;</span>
+<a name="ln-415"></a><span class="p">;</span> <span class="nv">Concatenate</span> <span class="s s-Atom">all</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">into</span> <span class="s s-Atom">a</span> <span class="s s-Atom">single</span> <span class="s s-Atom">string</span> <span class="s s-Atom">beginning</span> <span class="s s-Atom">with</span> <span class="s s-Atom">the</span>
+<a name="ln-416"></a><span class="p">;</span> <span class="s s-Atom">first</span> <span class="s s-Atom">line</span> <span class="s s-Atom">that</span> <span class="s s-Atom">starts</span> <span class="s s-Atom">a</span> <span class="s s-Atom">namelist</span><span class="p">.</span> <span class="nv">For</span> <span class="s s-Atom">economy</span> <span class="s s-Atom">of</span> <span class="s s-Atom">storage</span><span class="p">,</span> <span class="s s-Atom">compress</span>
+<a name="ln-417"></a><span class="p">;</span> <span class="s s-Atom">blocks</span> <span class="s s-Atom">of</span> <span class="s s-Atom">white</span> <span class="s s-Atom">space</span> <span class="s s-Atom">except</span> <span class="s s-Atom">in</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">that</span> <span class="s s-Atom">contain</span> <span class="s s-Atom">a</span> <span class="s s-Atom">string</span>
+<a name="ln-418"></a><span class="p">;</span> <span class="s s-Atom">variable</span><span class="p">.</span>
+<a name="ln-419"></a><span class="p">;</span>
+<a name="ln-420"></a><span class="p">;</span> <span class="nv">Treat</span> <span class="s s-Atom">the</span> <span class="s2">&quot;new line&quot;</span> <span class="s s-Atom">character</span> <span class="s s-Atom">at</span> <span class="s s-Atom">the</span> <span class="s s-Atom">end</span> <span class="s s-Atom">of</span> <span class="s s-Atom">every</span> <span class="s s-Atom">line</span> <span class="s s-Atom">as</span> <span class="s s-Atom">white</span>
+<a name="ln-421"></a><span class="p">;</span> <span class="s s-Atom">space</span> <span class="s s-Atom">by</span> <span class="s s-Atom">adding</span> <span class="s s-Atom">a</span> <span class="s s-Atom">space</span> <span class="s s-Atom">at</span> <span class="s s-Atom">the</span> <span class="s s-Atom">end</span> <span class="s s-Atom">of</span> <span class="s s-Atom">every</span> <span class="s s-Atom">line</span><span class="p">.</span> <span class="nv">The</span> <span class="s s-Atom">compression</span>
+<a name="ln-422"></a><span class="p">;</span> <span class="s s-Atom">operation</span> <span class="s s-Atom">will</span> <span class="s s-Atom">take</span> <span class="s s-Atom">out</span> <span class="s s-Atom">this</span> <span class="s s-Atom">space</span> <span class="s s-Atom">if</span> <span class="s s-Atom">it</span> <span class="o">is</span> <span class="o">not</span> <span class="s s-Atom">needed</span><span class="p">.</span> <span class="nv">However</span><span class="p">,</span>
+<a name="ln-423"></a><span class="p">;</span> <span class="s s-Atom">the</span> <span class="s s-Atom">space</span> <span class="s s-Atom">will</span> <span class="s s-Atom">be</span> <span class="s s-Atom">useful</span> <span class="s s-Atom">to</span> <span class="s s-Atom">make</span> <span class="s s-Atom">certain</span> <span class="s s-Atom">that</span> <span class="s s-Atom">lines</span> <span class="s s-Atom">that</span> <span class="s s-Atom">begin</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span>
+<a name="ln-424"></a><span class="p">;</span> <span class="s s-Atom">first</span> <span class="s s-Atom">column</span> <span class="s s-Atom">are</span> <span class="s s-Atom">separated</span> <span class="s s-Atom">from</span> <span class="s s-Atom">the</span> <span class="s s-Atom">previous</span> <span class="s s-Atom">line</span><span class="p">.</span> <span class="p">(</span><span class="nv">Without</span> <span class="s s-Atom">this</span><span class="p">,</span> <span class="s s-Atom">the</span>
+<a name="ln-425"></a><span class="p">;</span> <span class="s s-Atom">code</span> <span class="s s-Atom">that</span> <span class="s s-Atom">handles</span> <span class="s s-Atom">an</span> <span class="s s-Atom">array</span> <span class="s s-Atom">of</span> <span class="s s-Atom">strings</span> <span class="s s-Atom">can</span> <span class="s s-Atom">get</span> <span class="s s-Atom">into</span> <span class="s s-Atom">an</span> <span class="s s-Atom">infinite</span> <span class="s s-Atom">loop</span>
+<a name="ln-426"></a><span class="p">;</span> <span class="s s-Atom">if</span> <span class="s s-Atom">the</span> <span class="s s-Atom">line</span> <span class="s s-Atom">previous</span> <span class="s s-Atom">to</span> <span class="s s-Atom">the</span> <span class="s s-Atom">string</span> <span class="s s-Atom">array</span> <span class="s s-Atom">doesn&#39;t end in a comma and</span>
+<a name="ln-427"></a><span class="s s-Atom">; the next line begins in the first column.)</span>
+<a name="ln-428"></a><span class="s s-Atom">;</span>
+<a name="ln-429"></a><span class="s s-Atom">   s = strcompress(b(istart))</span>
+<a name="ln-430"></a><span class="s s-Atom">   for i=istart+1,n_line-1 DO BEGIN ;put all lines into one string</span>
+<a name="ln-431"></a><span class="s s-Atom">      IF (strpos(b[i],&quot;&#39;</span><span class="s2">&quot;) EQ -1) THEN s=s+strcompress(b(i) + &#39; &#39;)  $</span>
+<a name="ln-432"></a><span class="s2">      ELSE s = s+b(i) + &#39; &#39;</span>
+<a name="ln-433"></a><span class="s2">   endfor</span>
+<a name="ln-434"></a><span class="s2">;</span>
+<a name="ln-435"></a><span class="s2">; Separate the single string into an array of strings, one for each</span>
+<a name="ln-436"></a><span class="s2">; namelist.  In the process, the dollar sign or ampersand that begins</span>
+<a name="ln-437"></a><span class="s2">; the namelist is removed and the $end or / that ends the namelist is</span>
+<a name="ln-438"></a><span class="s2">; also removed. Determine the count of namelists.</span>
+<a name="ln-439"></a><span class="s2">;</span>
+<a name="ln-440"></a><span class="s2">   s=strtrim(s,2)               ;remove leading and trailing blanks</span>
+<a name="ln-441"></a><span class="s2">   s=str_sep(s,&#39;$&#39;)             ;separate into namelists</span>
+<a name="ln-442"></a><span class="s2">   if n_elements(s) eq 1 then begin</span>
+<a name="ln-443"></a><span class="s2">      s=str_sep(s,&#39;&amp;&#39;) 		;f90 namelist on HP</span>
+<a name="ln-444"></a><span class="s2">      newnl = 1</span>
+<a name="ln-445"></a><span class="s2">   endif else newnl = 0</span>
+<a name="ln-446"></a>
+<a name="ln-447"></a><span class="s2">   if not newnl then begin </span>
+<a name="ln-448"></a><span class="s2">      nl=(n_elements(s)-1)/2    ;number of lists</span>
+<a name="ln-449"></a><span class="s2">      w=indgen(nl)*2+1</span>
+<a name="ln-450"></a><span class="s2">      s=s(w)                    ;remove $end from string array</span>
+<a name="ln-451"></a><span class="s2">      s=strtrim(s,2)</span>
+<a name="ln-452"></a><span class="s2">   endif else begin 		;f90 namelist on HP</span>
+<a name="ln-453"></a><span class="s2">      nl=n_elements(s)-1	;number of lists</span>
+<a name="ln-454"></a><span class="s2">      s=s[1:nl]			;remove initial string which should be null</span>
+<a name="ln-455"></a><span class="s2">      s=strtrim(s,2)</span>
+<a name="ln-456"></a><span class="s2">      for i=0,nl-1 do begin	;remove / and any following characters </span>
+<a name="ln-457"></a><span class="s2">                                ;from the end of each namelist </span>
+<a name="ln-458"></a><span class="s2">                                ;string. Apparently some compilers</span>
+<a name="ln-459"></a><span class="s2">                                ;accept</span>
+<a name="ln-460"></a><span class="s2">                                ;the namelist name after the /.</span>
+<a name="ln-461"></a><span class="s2">        temp = strpos(s[i],&#39;/&#39;,/reverse_search)</span>
+<a name="ln-462"></a><span class="s2">        if(temp ne -1) then s[i] = strmid(s[i],0,temp) </span>
+<a name="ln-463"></a><span class="s2">     endfor</span>
+<a name="ln-464"></a><span class="s2">  end</span>
+<a name="ln-465"></a><span class="s2">;</span>
+<a name="ln-466"></a><span class="s2">; At this point, the variable s is a string array with one element per </span>
+<a name="ln-467"></a><span class="s2">; namelist.  Each string begins with the namelist name. Determine the</span>
+<a name="ln-468"></a><span class="s2">; names by finding the portion of each string that precedes the first space.</span>
+<a name="ln-469"></a><span class="s2">;</span>
+<a name="ln-470"></a><span class="s2">   k=strpos(s,&#39; &#39;)</span>
+<a name="ln-471"></a><span class="s2">   lst_nm=strarr(nl) </span>
+<a name="ln-472"></a><span class="s2">   for j=0,nl-1 do BEGIN</span>
+<a name="ln-473"></a><span class="s2">      IF(k[j] EQ -1) THEN BEGIN</span>
+<a name="ln-474"></a><span class="s2">         lst_nm[j] =  s[j]</span>
+<a name="ln-475"></a><span class="s2">         s[j] =  &quot;&quot;</span>
+<a name="ln-476"></a><span class="s2">      ENDIF ELSE BEGIN</span>
+<a name="ln-477"></a><span class="s2">         lst_nm[j]=strmid(s[j],0,k[j]) ;extract list name</span>
+<a name="ln-478"></a><span class="s2">         s[j]=strmid(s[j],k[j]) ;eliminate list name from string</span>
+<a name="ln-479"></a><span class="s2">      ENDELSE</span>
+<a name="ln-480"></a><span class="s2">   endfor</span>
+<a name="ln-481"></a><span class="s2">;</span>
+<a name="ln-482"></a><span class="s2">; Loop through each of the namelists.</span>
+<a name="ln-483"></a><span class="s2">;</span>
+<a name="ln-484"></a><span class="s2">   final_structure_created =  0</span>
+<a name="ln-485"></a><span class="s2">   for j=0,nl-1 do begin        ;namelist loop</span>
+<a name="ln-486"></a><span class="s2">;</span>
+<a name="ln-487"></a><span class="s2">; If a model structure was provided, look for a model for the namelist </span>
+<a name="ln-488"></a><span class="s2">; currently being processed.  If a model exists, use it as the</span>
+<a name="ln-489"></a><span class="s2">; structure that will be filled in here.  Otherwise, create a</span>
+<a name="ln-490"></a><span class="s2">; placeholder structure and set a flag indicating that a structure</span>
+<a name="ln-491"></a><span class="s2">; needs to be initialized when the first tag name is evaluated.</span>
+<a name="ln-492"></a><span class="s2">;</span>
+<a name="ln-493"></a><span class="s2">      IF(n_elements(model) GT 0) THEN BEGIN</span>
+<a name="ln-494"></a><span class="s2">         a =  where(strupcase(tag_names(model)) EQ strupcase(lst_nm[j]),count)</span>
+<a name="ln-495"></a><span class="s2">         IF(count EQ 1) THEN BEGIN</span>
+<a name="ln-496"></a><span class="s2">            new_structure =  0</span>
+<a name="ln-497"></a><span class="s2">            x1 =  model.(a(0))</span>
+<a name="ln-498"></a><span class="s2">         ENDIF ELSE BEGIN</span>
+<a name="ln-499"></a><span class="s2">            new_structure =  1</span>
+<a name="ln-500"></a><span class="s2">            x1 =  {empty_namelist:long(0)} ; default if namelist is empty</span>
+<a name="ln-501"></a><span class="s2">         ENDELSE</span>
+<a name="ln-502"></a><span class="s2">      ENDIF else BEGIN</span>
+<a name="ln-503"></a><span class="s2">         new_structure =  1</span>
+<a name="ln-504"></a><span class="s2">         x1 =  {empty_namelist:long(0)} ; default if namelist is empty</span>
+<a name="ln-505"></a><span class="s2">      ENDELSE</span>
+<a name="ln-506"></a><span class="s2">;</span>
+<a name="ln-507"></a><span class="s2">; Divide the single namelist string into an array of strings, breaking </span>
+<a name="ln-508"></a><span class="s2">; the string at each equals sign.</span>
+<a name="ln-509"></a><span class="s2">;</span>
+<a name="ln-510"></a><span class="s2">      s1=s[j]</span>
+<a name="ln-511"></a><span class="s2">      s_sep=str_sep(s1,&#39;=&#39;)</span>
+<a name="ln-512"></a><span class="s2">      s_sep=strtrim(s_sep,2)</span>
+<a name="ln-513"></a><span class="s2">      ns=n_elements(s_sep)-1</span>
+<a name="ln-514"></a><span class="s2">      k=0</span>
+<a name="ln-515"></a><span class="s2">;</span>
+<a name="ln-516"></a><span class="s2">; Each element in the new array should contain a variable name and a</span>
+<a name="ln-517"></a><span class="s2">; variable value.  Process each of the elements in the string array.</span>
+<a name="ln-518"></a><span class="s2">;</span>
+<a name="ln-519"></a><span class="s2">      for i=1,ns do BEGIN       ;loop to extract each variable in nl</span>
+<a name="ln-520"></a><span class="s2">         IF(keyword_set(print_tokens)) THEN print,&#39;&#39; ;for debugging</span>
+<a name="ln-521"></a><span class="s2">         IF(keyword_set(print_tokens)) THEN print,&#39;***previous token: &#39;,s_sep[i-1] ;for debugging</span>
+<a name="ln-522"></a><span class="s2">         IF(keyword_set(print_tokens)) THEN print,&#39;***current token: &#39;,s_sep[i] ;for debugging</span>
+<a name="ln-523"></a><span class="s2">         param=strtrim(strmid(s_sep[i-1],k,1000),2) ;get parameter name</span>
+<a name="ln-524"></a><span class="s2">         IF (i eq ns) then begin</span>
+<a name="ln-525"></a><span class="s2">	    k=quoted_reverse_find(s_sep[i],&#39;/&#39;)</span>
+<a name="ln-526"></a><span class="s2">	    if k ne -1 then begin</span>
+<a name="ln-527"></a><span class="s2">	    if quoted_reverse_find(s_sep[i],&#39; &#39;) gt k then begin ; Linux style</span>
+<a name="ln-528"></a><span class="s2">	     ; f90 linux namelist has one namelist on one line, ending / needs</span>
+<a name="ln-529"></a><span class="s2">	     ; be trimmed for the last namelistg</span>
+<a name="ln-530"></a><span class="s2">	       s_sep[i] = strmid(s_sep[i],0,k)</span>
+<a name="ln-531"></a><span class="s2">	       ;print,param+&quot;</span> <span class="o">=</span> <span class="s s-Atom">&#39;&quot;,s_sep[i]+&quot;&#39;</span><span class="s2">&quot;</span>
+<a name="ln-532"></a><span class="s2">	    endif</span>
+<a name="ln-533"></a><span class="s2">	    endif</span>
+<a name="ln-534"></a><span class="s2">	    s_sep[i]=s_sep[i]+&#39; &#39; ;bug fix, add end space	    </span>
+<a name="ln-535"></a><span class="s2">         ENDIF</span>
+<a name="ln-536"></a><span class="s2">;    print,j,i,k,&#39;   &#39;,param</span>
+<a name="ln-537"></a><span class="s2">       ; 20030605 - previously checked here if vars are separated by &#39; &#39; first, then &#39;,&#39;.</span>
+<a name="ln-538"></a><span class="s2">       ; Now check if vars are separated by &#39;,&#39; first then &#39; &#39;, which fixes</span>
+<a name="ln-539"></a><span class="s2">       ; the problem with Linux f90 nl where the var name would be extracted </span>
+<a name="ln-540"></a><span class="s2">       ; with leading &#39;,&#39; if the previous var is a string with ending spaces.</span>
+<a name="ln-541"></a><span class="s2">       ; 20030609 - either order fails for certain files. Now check both and </span>
+<a name="ln-542"></a><span class="s2">       ; take the last one as the separator.</span>
+<a name="ln-543"></a><span class="s2">         k1=quoted_reverse_find(s_sep[i],&#39;,&#39;) ; vars separated by &#39;,&#39;</span>
+<a name="ln-544"></a><span class="s2">         k2=quoted_reverse_find(s_sep[i],&#39; &#39;) ; vars separated by &#39; &#39;</span>
+<a name="ln-545"></a><span class="s2">         k=max([k1,k2]) ; whichever comes last should be the separator</span>
+<a name="ln-546"></a><span class="s2">         if k ne -1 and k eq k1 then k=k+1</span>
+<a name="ln-547"></a><span class="s2">         if k eq -1 then k=strlen(s_sep[i]) ;last value in string</span>
+<a name="ln-548"></a><span class="s2">         sd=strmid(s_sep[i],0,k) ;extract data</span>
+<a name="ln-549"></a><span class="s2">         IF(keyword_set(print_tokens)) THEN print,&#39;***data: &#39;,sd</span>
+<a name="ln-550"></a>
+<a name="ln-551"></a><span class="s2">         kk = 0</span>
+<a name="ln-552"></a><span class="s2">         q0 = -1</span>
+<a name="ln-553"></a><span class="s2">         q1=strpos(sd,&quot;</span><span class="s s-Atom">&#39;&quot;)</span>
+<a name="ln-554"></a><span class="s s-Atom">         q2=strpos(sd,&quot;&#39;</span><span class="s2">&quot;,q1+1)</span>
+<a name="ln-555"></a><span class="s2">         q2k = q2</span>
+<a name="ln-556"></a><span class="s2">         q3 = strpos(sd,&quot;</span><span class="s s-Atom">&#39;&quot;,q2+1) </span>
+<a name="ln-557"></a><span class="s s-Atom">         if (q1 ge 0) and (q2 ge 0) then begin </span>
+<a name="ln-558"></a><span class="s s-Atom">;This is a string</span>
+<a name="ln-559"></a><span class="s s-Atom">;</span>
+<a name="ln-560"></a><span class="s s-Atom">;            print,&#39;</span><span class="mi">1</span><span class="s s-Atom">:</span> <span class="s s-Atom">&#39;,&#39;q1</span><span class="p">,</span><span class="s s-Atom">q2</span><span class="p">,</span><span class="s s-Atom">q3=&#39;,q1,q2,q3</span>
+<a name="ln-561"></a><span class="s s-Atom">;            jcount = 0   ;used to debug an infinite loop problem</span>
+<a name="ln-562"></a><span class="s s-Atom">;</span>
+<a name="ln-563"></a><span class="s s-Atom">            REPEAT BEGIN</span>
+<a name="ln-564"></a><span class="s s-Atom">               WHILE q3 EQ q2k+1 DO BEGIN ;look for double quotes (JRF,huh?)</span>
+<a name="ln-565"></a><span class="s s-Atom">                  q2k = q3            </span>
+<a name="ln-566"></a><span class="s s-Atom">                  q3 = strpos(sd,&quot;&#39;</span><span class="s2">&quot;,q2k+1)</span>
+<a name="ln-567"></a><span class="s2">                  q2 = q3</span>
+<a name="ln-568"></a><span class="s2">               ENDWHILE</span>
+<a name="ln-569"></a><span class="s2">;               print,&#39;2: &#39;,&#39;jcount,q0,q1,q2,q3=&#39;,jcount,q0,q1,q2,q3</span>
+<a name="ln-570"></a><span class="s2">               if(q1 - q0 - 1 gt 0) then begin</span>
+<a name="ln-571"></a><span class="s2">;Allow for input of the form: 6*&#39;test&#39;,&#39;hello&#39;,3*&#39;goodbye&#39;</span>
+<a name="ln-572"></a><span class="s2">;</span>
+<a name="ln-573"></a><span class="s2">                  extra = strmid(sd,q0 + 1,q1 - q0 - 1)</span>
+<a name="ln-574"></a><span class="s2">                  if(strmid(extra,0,1) eq &#39;,&#39;) then strput,extra,&#39; &#39;,0</span>
+<a name="ln-575"></a><span class="s2">                  extra = strtrim(strcompress(extra,/remove_all),2)</span>
+<a name="ln-576"></a><span class="s2">                  temp = strlen(extra)</span>
+<a name="ln-577"></a><span class="s2">                  if( (temp gt 0) and $</span>
+<a name="ln-578"></a><span class="s2">                      (strmid(extra,temp - 1,1) eq &#39;*&#39;) ) then begin</span>
+<a name="ln-579"></a><span class="s2">                     temp = long(strmid(extra,0,temp - 1))</span>
+<a name="ln-580"></a><span class="s2">                     IF(kk EQ 0) then begin</span>
+<a name="ln-581"></a><span class="s2">                        sd1 = replicate(strmid(sd,q1,q2-q1+1),temp)</span>
+<a name="ln-582"></a><span class="s2">                     endif else begin</span>
+<a name="ln-583"></a><span class="s2">                        sd1 = [sd1,replicate(strmid(sd,q1,q2-q1+1),temp)]</span>
+<a name="ln-584"></a><span class="s2">                     endelse</span>
+<a name="ln-585"></a><span class="s2">                  endif else begin</span>
+<a name="ln-586"></a><span class="s2">                     IF(kk EQ 0) then begin</span>
+<a name="ln-587"></a><span class="s2">                        sd1 = strmid(sd,q1,q2-q1+1) </span>
+<a name="ln-588"></a><span class="s2">                     endif else begin</span>
+<a name="ln-589"></a><span class="s2">                        sd1 = [sd1,strmid(sd,q1,q2-q1+1)]</span>
+<a name="ln-590"></a><span class="s2">                     endelse</span>
+<a name="ln-591"></a><span class="s2">                  endelse</span>
+<a name="ln-592"></a><span class="s2">               endif else begin</span>
+<a name="ln-593"></a><span class="s2">                  IF kk EQ 0 THEN sd1 = strmid(sd,q1,q2-q1+1)  $</span>
+<a name="ln-594"></a><span class="s2">                  ELSE sd1 = [sd1,strmid(sd,q1,q2-q1+1)]</span>
+<a name="ln-595"></a><span class="s2">               endelse</span>
+<a name="ln-596"></a><span class="s2">               q0 = q2</span>
+<a name="ln-597"></a><span class="s2">               kk = 1</span>
+<a name="ln-598"></a><span class="s2">               q1=strpos(sd,&quot;</span><span class="s s-Atom">&#39;&quot;,q2+1)</span>
+<a name="ln-599"></a><span class="s s-Atom">               q2=strpos(sd,&quot;&#39;</span><span class="s2">&quot;,q1+1)</span>
+<a name="ln-600"></a><span class="s2">               q2k = q2</span>
+<a name="ln-601"></a><span class="s2">               q3 = strpos(sd,&quot;</span><span class="s s-Atom">&#39;&quot;,q2+1) ;look for double quotes</span>
+<a name="ln-602"></a><span class="s s-Atom">;               print,&#39;</span><span class="mi">3</span><span class="s s-Atom">:</span> <span class="s s-Atom">&#39;,&#39;jcount</span><span class="p">,</span><span class="s s-Atom">q0</span><span class="p">,</span><span class="s s-Atom">q1</span><span class="p">,</span><span class="s s-Atom">q2</span><span class="p">,</span><span class="s s-Atom">q3=&#39;,jcount,q0,q1,q2,q3</span>
+<a name="ln-603"></a><span class="s s-Atom">;               jcount = jcount + 1</span>
+<a name="ln-604"></a><span class="s s-Atom">;               if(jcount gt 50) then stop               </span>
+<a name="ln-605"></a><span class="s s-Atom">            ENDREP UNTIL q1 EQ -1</span>
+<a name="ln-606"></a><span class="s s-Atom">            sd = sd1</span>
+<a name="ln-607"></a><span class="s s-Atom">;            print,&#39;</span><span class="nn">sd</span><span class="p">:</span> <span class="s s-Atom">&#39;,sd</span>
+<a name="ln-608"></a><span class="s s-Atom">;            stop</span>
+<a name="ln-609"></a><span class="s s-Atom">         endif else BEGIN       ;must be float, integer, or boolean</span>
+<a name="ln-610"></a><span class="s s-Atom">            repeat begin        ;remove commas if present</span>
+<a name="ln-611"></a><span class="s s-Atom">               kk=0</span>
+<a name="ln-612"></a><span class="s s-Atom">               kk=strpos(sd,&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;,kk+1)</span>
+<a name="ln-613"></a><span class="s s-Atom">               if kk ne -1 then strput,sd,&#39;</span> <span class="s s-Atom">&#39;,kk</span>
+<a name="ln-614"></a><span class="s s-Atom">            endrep until kk eq -1</span>
+<a name="ln-615"></a>
+<a name="ln-616"></a><span class="s s-Atom">            sd=str_sep(strtrim(strcompress(sd),2),&#39;</span> <span class="s s-Atom">&#39;)</span>
+<a name="ln-617"></a><span class="s s-Atom">            if n_elements(sd) eq 1 then sd=sd[0] ; convert array[1] to scalar</span>
+<a name="ln-618"></a>
+<a name="ln-619"></a><span class="s s-Atom">            c1=strmid(sd[0],0,1)+strmid(sd[0],strlen(sd[0])-1,1) ;check 1st/last char</span>
+<a name="ln-620"></a><span class="s s-Atom">            if c1 ne &quot;..&quot; and strlowcase(c1) ne &quot;ff&quot; and strlowcase(c1) ne &quot;tt&quot; then begin</span>
+<a name="ln-621"></a><span class="s s-Atom">               if max(strpos(sd,&#39;*&#39;)) ne -1 then begin ;split * into array</span>
+<a name="ln-622"></a><span class="s s-Atom">                  for kk=0,n_elements(sd)-1 do begin  </span>
+<a name="ln-623"></a><span class="s s-Atom">                     y=str_sep(sd[kk],&#39;*&#39;)                      </span>
+<a name="ln-624"></a><span class="s s-Atom">                     if n_elements(y) eq 1 then begin</span>
+<a name="ln-625"></a><span class="s s-Atom">                        if dbl then s1=double(y) else s1=float(y)</span>
+<a name="ln-626"></a><span class="s s-Atom">                        if strpos(y[0],&#39;</span><span class="p">.</span><span class="s s-Atom">&#39;) eq -1 then s1=long(s1)</span>
+<a name="ln-627"></a><span class="s s-Atom">                     endif else begin</span>
+<a name="ln-628"></a><span class="s s-Atom">                        if dbl then y1=double(y[1]) else y1=float(y[1])</span>
+<a name="ln-629"></a><span class="s s-Atom">                        if strpos(y[1],&#39;</span><span class="p">.</span><span class="s s-Atom">&#39;) eq -1 then y1=long(y1)</span>
+<a name="ln-630"></a><span class="s s-Atom">                        s1=replicate(y1,y[0])</span>
+<a name="ln-631"></a><span class="s s-Atom">                     endelse</span>
+<a name="ln-632"></a><span class="s s-Atom">                     if kk eq 0 then s2=s1 else s2=[s2,s1]</span>
+<a name="ln-633"></a><span class="s s-Atom">                  endfor</span>
+<a name="ln-634"></a><span class="s s-Atom">                  sd=s2</span>
+<a name="ln-635"></a><span class="s s-Atom">               endif else begin</span>
+<a name="ln-636"></a><span class="s s-Atom">		  on_ioerror,STRING	; handle type conversion error</span>
+<a name="ln-637"></a><span class="s s-Atom">                  if max(strpos(sd,&#39;</span><span class="p">.</span><span class="s s-Atom">&#39;)) eq -1 and $</span>
+<a name="ln-638"></a><span class="s s-Atom">		     max(strpos(strlowcase(sd),&#39;e&#39;)) eq -1 then begin ;check for float</span>
+<a name="ln-639"></a><span class="s s-Atom">                     sd=long(sd) 	; convert to long</span>
+<a name="ln-640"></a><span class="s s-Atom">		     goto,NULL</span>
+<a name="ln-641"></a><span class="s s-Atom">                  endif else begin</span>
+<a name="ln-642"></a><span class="s s-Atom">                     if dbl then sd=double(sd) else sd=float(sd) ;convert to float</span>
+<a name="ln-643"></a><span class="s s-Atom">		     goto,NULL</span>
+<a name="ln-644"></a><span class="s s-Atom">                  endelse</span>
+<a name="ln-645"></a><span class="s s-Atom">                  STRING:sd=&quot;&#39;</span><span class="s2">&quot;+sd+&quot;</span><span class="s s-Atom">&#39;&quot; ; convert to string</span>
+<a name="ln-646"></a><span class="s s-Atom">                  NULL:on_ioerror,NULL</span>
+<a name="ln-647"></a><span class="s s-Atom">               endelse</span>
+<a name="ln-648"></a><span class="s s-Atom">            endif ;; will be .T or .F or T or F etc. </span>
+<a name="ln-649"></a><span class="s s-Atom">         endelse</span>
+<a name="ln-650"></a>
+<a name="ln-651"></a><span class="s s-Atom">	 ; if param is in form of name(1), strip out (1)  QP 17JUN05</span>
+<a name="ln-652"></a><span class="s s-Atom">	 if (pos = strpos(strcompress(param,/re),&#39;</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="s s-Atom">&#39;)) ge 0 then begin</span>
+<a name="ln-653"></a><span class="s s-Atom">	    origparam = param</span>
+<a name="ln-654"></a><span class="s s-Atom">	    param = strmid(param,0,pos)</span>
+<a name="ln-655"></a><span class="s s-Atom">;	    print,&#39;converting</span> <span class="s s-Atom">&#39;,origparam,&#39;</span> <span class="s s-Atom">to</span> <span class="s s-Atom">&#39;,param</span>
+<a name="ln-656"></a><span class="s s-Atom">	 endif</span>
+<a name="ln-657"></a><span class="s s-Atom">         IF(keyword_set(print_tokens)) THEN print,&#39;***</span><span class="nn">param</span><span class="p">:</span> <span class="s s-Atom">&#39;,param</span>
+<a name="ln-658"></a>
+<a name="ln-659"></a><span class="s s-Atom">	 skip = 0</span>
+<a name="ln-660"></a><span class="s s-Atom">         ;;; NEW CODE to handle subscripting into existing array for param=&quot;foo(x)&quot;</span>
+<a name="ln-661"></a><span class="s s-Atom">         if (strpos(param,&#39;</span><span class="p">(</span><span class="s s-Atom">&#39;) ge 0) then BEGIN</span>
+<a name="ln-662"></a><span class="s s-Atom">           subpieces = str_sep(param,&#39;</span><span class="p">(</span><span class="s s-Atom">&#39;)</span>
+<a name="ln-663"></a><span class="s s-Atom">           temp = replace_reserved(strtrim(subpieces[0],2))</span>
+<a name="ln-664"></a><span class="s s-Atom">           subindex = (where(tag_names(x1) eq $</span>
+<a name="ln-665"></a><span class="s s-Atom">                             strupcase(temp),subnindex))[0]</span>
+<a name="ln-666"></a><span class="s s-Atom">           if (subnindex eq 1) then BEGIN</span>
+<a name="ln-667"></a><span class="s s-Atom">	     skip = 1		; process here, skip in later part</span>
+<a name="ln-668"></a><span class="s s-Atom">;             print,&quot;new code&quot;</span>
+<a name="ln-669"></a><span class="s s-Atom">             subpieces =  str_sep(subpieces[1],&#39;</span><span class="p">)</span><span class="s s-Atom">&#39;)</span>
+<a name="ln-670"></a><span class="s s-Atom">             subpieces =  str_sep(subpieces[0],&#39;</span><span class="p">,</span><span class="s s-Atom">&#39;)</span>
+<a name="ln-671"></a><span class="s s-Atom">             subpieces =  strtrim(subpieces,2)</span>
+<a name="ln-672"></a><span class="s s-Atom">             subelements = long(subpieces) - 1</span>
+<a name="ln-673"></a><span class="s s-Atom">             subdata = x1.(subindex)</span>
+<a name="ln-674"></a><span class="s s-Atom">                                ; Need a test here to make certain</span>
+<a name="ln-675"></a><span class="s s-Atom">                                ; that the number of dimensions in the </span>
+<a name="ln-676"></a><span class="s s-Atom">                                ; array subdata matches the number of</span>
+<a name="ln-677"></a><span class="s s-Atom">                                ; elements in subelements.</span>
+<a name="ln-678"></a><span class="s s-Atom">             IF(n_elements(subelements) EQ 1) THEN $</span>
+<a name="ln-679"></a><span class="s s-Atom">              for subi=0,n_elements(sd)-1 do $</span>
+<a name="ln-680"></a><span class="s s-Atom">              subdata[subi+subelements[0]] = sd[subi]</span>
+<a name="ln-681"></a><span class="s s-Atom">             IF(n_elements(subelements) EQ 2) THEN $</span>
+<a name="ln-682"></a><span class="s s-Atom">              for subi=0,n_elements(sd)-1 do $</span>
+<a name="ln-683"></a><span class="s s-Atom">              subdata[subi+subelements[0],subelements[1]] = sd[subi]</span>
+<a name="ln-684"></a><span class="s s-Atom">             IF(n_elements(subelements) EQ 3) THEN $</span>
+<a name="ln-685"></a><span class="s s-Atom">              for subi=0,n_elements(sd)-1 do $</span>
+<a name="ln-686"></a><span class="s s-Atom">              subdata[subi+subelements[0],subelements[1],subelements[2]] = $</span>
+<a name="ln-687"></a><span class="s s-Atom">              sd[subi]</span>
+<a name="ln-688"></a><span class="s s-Atom">             x1.(subindex) = subdata</span>
+<a name="ln-689"></a><span class="s s-Atom">           endif ;else message,/info,&#39;</span><span class="nv">Attempt</span> <span class="s s-Atom">to</span> <span class="s s-Atom">subscript</span> <span class="s s-Atom">into</span> <span class="s s-Atom">non</span><span class="o">-</span><span class="s s-Atom">existent</span> <span class="nn">tag</span><span class="p">:</span> <span class="s s-Atom">&#39;+subpieces[0]</span>
+<a name="ln-690"></a><span class="s s-Atom">         endif</span>
+<a name="ln-691"></a><span class="s s-Atom">         ;;; END NEW CODE</span>
+<a name="ln-692"></a>
+<a name="ln-693"></a><span class="s s-Atom">	 if skip eq 0 then begin</span>
+<a name="ln-694"></a><span class="s s-Atom">           if (new_structure EQ 1) then begin ;make structure</span>
+<a name="ln-695"></a><span class="s s-Atom">;              print,&quot;old code 1&quot;</span>
+<a name="ln-696"></a><span class="s s-Atom">             if (strpos(param,&#39;</span><span class="p">(</span><span class="s s-Atom">&#39;) ge 0) then begin</span>
+<a name="ln-697"></a><span class="s s-Atom">                x1=create_struct_h(param,sd)</span>
+<a name="ln-698"></a><span class="s s-Atom">             endif else begin</span>
+<a name="ln-699"></a><span class="s s-Atom">                param = replace_reserved(param)</span>
+<a name="ln-700"></a><span class="s s-Atom">                x1=create_struct(param,sd)</span>
+<a name="ln-701"></a><span class="s s-Atom">             endelse</span>
+<a name="ln-702"></a><span class="s s-Atom">             new_structure =  0</span>
+<a name="ln-703"></a><span class="s s-Atom">           endif else begin</span>
+<a name="ln-704"></a><span class="s s-Atom">                                ;If param contains an &quot;(&quot; it won&#39;t</span>
+<a name="ln-705"></a>                                <span class="p">;</span><span class="s s-Atom">match</span> <span class="s s-Atom">any</span> <span class="s s-Atom">of</span> <span class="s s-Atom">the</span> <span class="s s-Atom">reserved</span> <span class="s s-Atom">words</span><span class="p">.</span>
+<a name="ln-706"></a>             <span class="s s-Atom">param</span> <span class="o">=</span> <span class="nf">replace_reserved</span><span class="p">(</span><span class="s s-Atom">param</span><span class="p">)</span>
+<a name="ln-707"></a>                                <span class="p">;</span><span class="nv">If</span> <span class="s s-Atom">param</span> <span class="s s-Atom">contains</span> <span class="s s-Atom">an</span> <span class="s2">&quot;(&quot;</span> <span class="s s-Atom">it</span> <span class="s s-Atom">won&#39;t</span>
+<a name="ln-708"></a><span class="s s-Atom">                                ;match any of the existing tags.</span>
+<a name="ln-709"></a><span class="s s-Atom">             w=where(strupcase(param) eq tag_names(x1))</span>
+<a name="ln-710"></a>
+<a name="ln-711"></a><span class="s s-Atom">             if w[0] eq -1 then begin </span>
+<a name="ln-712"></a><span class="s s-Atom">;                print,&quot;old code 2&quot;</span>
+<a name="ln-713"></a><span class="s s-Atom">               if (strpos(param,&#39;</span><span class="p">(</span><span class="s s-Atom">&#39;) ge 0) then begin</span>
+<a name="ln-714"></a><span class="s s-Atom">                                ;If param contains an &quot;(&quot; and a</span>
+<a name="ln-715"></a><span class="s s-Atom">                                ;corresponding tag does not already</span>
+<a name="ln-716"></a><span class="s s-Atom">                                ;exist (this would have been detected</span>
+<a name="ln-717"></a><span class="s s-Atom">                                ;above in the &quot;new code&quot;), then create</span>
+<a name="ln-718"></a><span class="s s-Atom">                                ;the  new structure element with a</span>
+<a name="ln-719"></a><span class="s s-Atom">                                ;unique hex encoded name because</span>
+<a name="ln-720"></a><span class="s s-Atom">                                ;there is no way to fill in an array</span>
+<a name="ln-721"></a><span class="s s-Atom">                                ;element in an array that doesn&#39;t</span>
+<a name="ln-722"></a>                                <span class="p">;</span><span class="s s-Atom">exist</span> <span class="s s-Atom">yet</span><span class="p">.</span>
+<a name="ln-723"></a>                  <span class="s s-Atom">x1</span><span class="o">=</span><span class="nf">create_struct_h</span><span class="p">(</span><span class="s s-Atom">x1</span><span class="p">,</span> <span class="s s-Atom">param</span><span class="p">,</span><span class="s s-Atom">sd</span><span class="p">)</span>
+<a name="ln-724"></a>               <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-725"></a>                                <span class="p">;</span><span class="s s-Atom">param</span> <span class="s s-Atom">was</span> <span class="s s-Atom">already</span> <span class="s s-Atom">compared</span> <span class="s s-Atom">to</span> <span class="s s-Atom">the</span>
+<a name="ln-726"></a>                                <span class="p">;</span><span class="s s-Atom">reserved</span> <span class="s s-Atom">words</span> <span class="s s-Atom">above</span><span class="p">.</span>
+<a name="ln-727"></a>                  <span class="s s-Atom">x1</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">x1</span><span class="p">,</span> <span class="s s-Atom">param</span><span class="p">,</span><span class="s s-Atom">sd</span><span class="p">)</span>
+<a name="ln-728"></a>               <span class="s s-Atom">endelse</span> 
+<a name="ln-729"></a>             <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>   <span class="p">;</span><span class="s s-Atom">overwrite</span> <span class="s s-Atom">duplicates</span>
+<a name="ln-730"></a><span class="p">;</span>                <span class="s s-Atom">print</span><span class="p">,</span><span class="s2">&quot;old code 3&quot;</span>
+<a name="ln-731"></a>                                <span class="p">;</span><span class="nv">We</span> <span class="s s-Atom">know</span> <span class="s s-Atom">at</span> <span class="s s-Atom">this</span> <span class="s s-Atom">point</span> <span class="s s-Atom">that</span> <span class="s s-Atom">there</span> <span class="o">is</span>
+<a name="ln-732"></a>                                <span class="p">;</span><span class="s s-Atom">no</span> <span class="s2">&quot;(&quot;</span> <span class="s s-Atom">within</span> <span class="s s-Atom">param</span> <span class="s s-Atom">because</span> <span class="s s-Atom">that</span>
+<a name="ln-733"></a>                                <span class="p">;</span><span class="s s-Atom">would</span> <span class="s s-Atom">have</span> <span class="s s-Atom">been</span> <span class="s s-Atom">handled</span> <span class="s s-Atom">in</span> <span class="s s-Atom">the</span> <span class="s2">&quot;new</span>
+<a name="ln-734"></a><span class="s2">                                ;code&quot;</span> <span class="s s-Atom">above</span><span class="p">.</span>
+<a name="ln-735"></a>               <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="s s-Atom">sd</span><span class="p">)</span> <span class="s s-Atom">eq</span> <span class="mi">1</span> <span class="s s-Atom">then</span> <span class="s s-Atom">x1</span><span class="p">.(</span><span class="s s-Atom">w</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="s s-Atom">else</span> <span class="s s-Atom">x1</span><span class="p">.(</span><span class="s s-Atom">w</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">=</span><span class="s s-Atom">sd</span>
+<a name="ln-736"></a>            <span class="s s-Atom">endelse</span>
+<a name="ln-737"></a>           <span class="s s-Atom">endelse</span>
+<a name="ln-738"></a>           
+<a name="ln-739"></a>           
+<a name="ln-740"></a>           <span class="s s-Atom">if</span> <span class="nf">n_elements</span><span class="p">(</span><span class="nf">tag_names</span><span class="p">(</span><span class="s s-Atom">x1</span><span class="p">))</span> <span class="s s-Atom">eq</span> <span class="mi">250</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span> <span class="p">;</span><span class="mi">250</span> <span class="s s-Atom">tag</span> <span class="s s-Atom">name</span> <span class="s s-Atom">limit</span><span class="p">,</span> <span class="s s-Atom">need</span> <span class="s s-Atom">to</span> <span class="s s-Atom">start</span> <span class="s s-Atom">another</span> <span class="s s-Atom">name</span>
+<a name="ln-741"></a>             <span class="s s-Atom">if</span> <span class="s s-Atom">final_structure_created</span> <span class="s s-Atom">eq</span> <span class="mi">0</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span> <span class="p">;</span><span class="s s-Atom">make</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">struct</span>
+<a name="ln-742"></a>               <span class="s s-Atom">x</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">&#39;header&#39;</span><span class="p">,</span><span class="s s-Atom">header</span><span class="p">,</span> <span class="s s-Atom">lst_nm</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">],</span><span class="s s-Atom">x1</span><span class="p">)</span>
+<a name="ln-743"></a>               <span class="s s-Atom">final_structure_created</span> <span class="o">=</span>  <span class="mi">1</span>
+<a name="ln-744"></a>             <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-745"></a>               <span class="s s-Atom">x</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">lst_nm</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">],</span><span class="s s-Atom">x1</span><span class="p">)</span>
+<a name="ln-746"></a>             <span class="s s-Atom">endelse</span>
+<a name="ln-747"></a>             <span class="s s-Atom">lst_nm</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">]</span><span class="o">=</span><span class="s s-Atom">lst_nm</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">]</span><span class="s s-Atom">+&#39;_ext&#39;</span>
+<a name="ln-748"></a>           <span class="s s-Atom">endif</span>
+<a name="ln-749"></a>         <span class="s s-Atom">endif</span> <span class="p">;</span> <span class="s s-Atom">skip</span><span class="o">==</span><span class="mi">0</span>
+<a name="ln-750"></a>
+<a name="ln-751"></a>
+<a name="ln-752"></a>      <span class="s s-Atom">endfor</span>                    <span class="p">;</span><span class="s s-Atom">i</span> <span class="s s-Atom">loop</span>
+<a name="ln-753"></a>
+<a name="ln-754"></a>     <span class="nf">if</span> <span class="p">(</span><span class="s s-Atom">final_structure_created</span> <span class="s s-Atom">eq</span> <span class="mi">0</span><span class="p">)</span> <span class="s s-Atom">then</span> <span class="s s-Atom">begin</span> <span class="p">;</span><span class="s s-Atom">make</span> <span class="s s-Atom">namelist</span> <span class="s s-Atom">struct</span>
+<a name="ln-755"></a>         <span class="s s-Atom">x</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">&#39;header&#39;</span><span class="p">,</span><span class="s s-Atom">header</span><span class="p">,</span> <span class="s s-Atom">lst_nm</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">],</span><span class="s s-Atom">x1</span><span class="p">)</span>
+<a name="ln-756"></a>         <span class="s s-Atom">final_structure_created</span> <span class="o">=</span>  <span class="mi">1</span>
+<a name="ln-757"></a>      <span class="s s-Atom">endif</span> <span class="s s-Atom">else</span> <span class="s s-Atom">begin</span>
+<a name="ln-758"></a>         <span class="s s-Atom">x</span><span class="o">=</span><span class="nf">create_struct</span><span class="p">(</span><span class="s s-Atom">x</span><span class="p">,</span> <span class="s s-Atom">lst_nm</span><span class="p">[</span><span class="s s-Atom">j</span><span class="p">],</span><span class="s s-Atom">x1</span><span class="p">)</span>
+<a name="ln-759"></a>      <span class="s s-Atom">endelse</span>
+<a name="ln-760"></a>
+<a name="ln-761"></a>   <span class="s s-Atom">endfor</span>                       <span class="p">;</span><span class="s s-Atom">j</span> <span class="s s-Atom">loop</span>
+<a name="ln-762"></a>
+<a name="ln-763"></a><span class="s s-Atom">jump1:</span>
+<a name="ln-764"></a>
+<a name="ln-765"></a><span class="p">;</span>   <span class="s s-Atom">print</span><span class="p">,</span><span class="s s-Atom">&#39;systime = &#39;</span><span class="p">,</span><span class="nf">systime</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="s s-Atom">stime</span>
+<a name="ln-766"></a>   <span class="s s-Atom">return</span><span class="p">,</span><span class="s s-Atom">x</span>
+<a name="ln-767"></a><span class="s s-Atom">end</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

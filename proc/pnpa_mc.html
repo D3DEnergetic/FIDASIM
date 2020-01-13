@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>pnpa_mc &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>2.0.0-pre</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>pnpa_mc
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.8% of total for procedures.">109 statements</a>
+     </li> 
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+    
+     <li><a href='../module/libfida.html'>libfida</a></li>
+    
+  
+     <li class="active">pnpa_mc</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/pnpa_mc.html#src">pnpa_mc</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine pnpa_mc()
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Calculate Passive NPA flux using a Monte Carlo fast-ion distribution</p>
+    
+
+    <h3>Arguments</h3>
+    
+    <em>None</em>
+    <br>
+    
+    
+    
+    <br>
+    
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~pnpa_mc~~CallsGraph Pages: 1 -->
+<svg id="procpnpa_mcCallsGraph" width="641pt" height="646pt"
+ viewBox="0.00 0.00 641.00 645.85" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~pnpa_mc~~CallsGraph" class="graph" transform="scale(0.60586 0.60586) rotate(0) translate(4 1062)">
+<title>proc~~pnpa_mc~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1062 1054,-1062 1054,4 -4,4"/>
+<!-- proc~pnpa_mc -->
+<g id="proc~~pnpa_mc~~CallsGraph_node1" class="node"><title>proc~pnpa_mc</title>
+<polygon fill="none" stroke="black" points="57.5,-693 0.5,-693 0.5,-669 57.5,-669 57.5,-693"/>
+<text text-anchor="middle" x="29" y="-678.6" font-family="Helvetica,sans-Serif" font-size="10.50">pnpa_mc</text>
+</g>
+<!-- proc~get_fields -->
+<g id="proc~~pnpa_mc~~CallsGraph_node2" class="node"><title>proc~get_fields</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node2"><a xlink:href=".././proc/get_fields.html" xlink:title="get_fields">
+<polygon fill="#d9534f" stroke="#d9534f" points="298,-954 240,-954 240,-930 298,-930 298,-954"/>
+<text text-anchor="middle" x="269" y="-939.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~get_fields -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge1" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M31.4008,-693.064C36.8328,-737.634 58.0101,-892.034 94,-923 131.163,-954.975 190.59,-954.195 229.461,-949.245"/>
+<polygon fill="#000000" stroke="#000000" points="230.439,-952.641 239.844,-947.762 229.449,-945.711 230.439,-952.641"/>
+</g>
+<!-- proc~npa_gyro_range -->
+<g id="proc~~pnpa_mc~~CallsGraph_node3" class="node"><title>proc~npa_gyro_range</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node3"><a xlink:href=".././proc/npa_gyro_range.html" xlink:title="npa_gyro_range">
+<polygon fill="#d9534f" stroke="#d9534f" points="185.5,-672 94.5,-672 94.5,-648 185.5,-648 185.5,-672"/>
+<text text-anchor="middle" x="140" y="-657.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">npa_gyro_range</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~npa_gyro_range -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge2" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~npa_gyro_range</title>
+<path fill="none" stroke="#000000" d="M57.5053,-675.701C65.6567,-674.13 74.886,-672.352 84.1295,-670.571"/>
+<polygon fill="#000000" stroke="#000000" points="84.9577,-673.976 94.115,-668.648 83.6334,-667.103 84.9577,-673.976"/>
+</g>
+<!-- proc~store_npa -->
+<g id="proc~~pnpa_mc~~CallsGraph_node4" class="node"><title>proc~store_npa</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node4"><a xlink:href=".././proc/store_npa.html" xlink:title="store_npa">
+<polygon fill="#d9534f" stroke="#d9534f" points="170.5,-914 109.5,-914 109.5,-890 170.5,-890 170.5,-914"/>
+<text text-anchor="middle" x="140" y="-899.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_npa</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~store_npa -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge3" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~store_npa</title>
+<path fill="none" stroke="#000000" d="M36.0156,-693.197C53.7699,-729.194 106.105,-835.306 128.567,-880.846"/>
+<polygon fill="#000000" stroke="#000000" points="125.441,-882.421 133.003,-889.841 131.719,-879.324 125.441,-882.421"/>
+</g>
+<!-- proc~hit_npa_detector -->
+<g id="proc~~pnpa_mc~~CallsGraph_node5" class="node"><title>proc~hit_npa_detector</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node5"><a xlink:href=".././proc/hit_npa_detector.html" xlink:title="hit_npa_detector">
+<polygon fill="#d9534f" stroke="#d9534f" points="315.5,-402 222.5,-402 222.5,-378 315.5,-378 315.5,-402"/>
+<text text-anchor="middle" x="269" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hit_npa_detector</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~hit_npa_detector -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge7" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~hit_npa_detector</title>
+<path fill="none" stroke="#000000" d="M46.5796,-668.866C59.1971,-659.945 77.1979,-647.881 94,-639 133.112,-618.327 157.687,-634.993 186,-601 235.149,-541.991 183.818,-498.632 222,-432 226.975,-423.318 234.363,-415.425 241.77,-408.885"/>
+<polygon fill="#000000" stroke="#000000" points="244.212,-411.408 249.702,-402.346 239.76,-406.007 244.212,-411.408"/>
+</g>
+<!-- proc~get_plasma -->
+<g id="proc~~pnpa_mc~~CallsGraph_node6" class="node"><title>proc~get_plasma</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node6"><a xlink:href=".././proc/get_plasma.html" xlink:title="get_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="303,-796 235,-796 235,-772 303,-772 303,-796"/>
+<text text-anchor="middle" x="269" y="-781.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~get_plasma -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge5" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~get_plasma</title>
+<path fill="none" stroke="#000000" d="M35.3699,-693.258C44.4161,-712.272 64.6287,-748.407 94,-765 134.145,-787.68 187.829,-790.149 224.899,-788.399"/>
+<polygon fill="#000000" stroke="#000000" points="225.114,-791.892 234.889,-787.806 224.699,-784.904 225.114,-791.892"/>
+</g>
+<!-- proc~bt_cx_rates -->
+<g id="proc~~pnpa_mc~~CallsGraph_node7" class="node"><title>proc~bt_cx_rates</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node7"><a xlink:href=".././proc/bt_cx_rates.html" xlink:title="bt_cx_rates">
+<polygon fill="#d9534f" stroke="#d9534f" points="174,-714 106,-714 106,-690 174,-690 174,-714"/>
+<text text-anchor="middle" x="140" y="-699.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">bt_cx_rates</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~bt_cx_rates -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge6" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~bt_cx_rates</title>
+<path fill="none" stroke="#000000" d="M57.5053,-686.299C69.0505,-688.523 82.758,-691.164 95.6056,-693.64"/>
+<polygon fill="#000000" stroke="#000000" points="95.1854,-697.123 105.667,-695.578 96.5098,-690.249 95.1854,-697.123"/>
+</g>
+<!-- proc~uvw_to_xyz -->
+<g id="proc~~pnpa_mc~~CallsGraph_node8" class="node"><title>proc~uvw_to_xyz</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node8"><a xlink:href=".././proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="745,-934 677,-934 677,-910 745,-910 745,-934"/>
+<text text-anchor="middle" x="711" y="-919.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge4" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M29.7286,-693.1C29.4176,-733.676 33.3067,-867.072 94,-951 147.199,-1024.56 177.215,-1058 268,-1058 268,-1058 268,-1058 425,-1058 532.868,-1058 643.277,-977.665 688.604,-940.481"/>
+<polygon fill="#000000" stroke="#000000" points="690.855,-943.161 696.295,-934.069 686.373,-937.784 690.855,-943.161"/>
+</g>
+<!-- interface~randu -->
+<g id="proc~~pnpa_mc~~CallsGraph_node9" class="node"><title>interface~randu</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node9"><a xlink:href=".././interface/randu.html" xlink:title="randu">
+<polygon fill="#a7506f" stroke="#a7506f" points="167,-592 113,-592 113,-568 167,-568 167,-592"/>
+<text text-anchor="middle" x="140" y="-577.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;interface~randu -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge8" class="edge"><title>proc~pnpa_mc&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M38.2522,-668.981C49.5232,-653.174 70.9765,-625.163 94,-606 97.7058,-602.916 101.825,-599.986 106.024,-597.281"/>
+<polygon fill="#000000" stroke="#000000" points="107.902,-600.236 114.648,-592.066 104.28,-594.246 107.902,-600.236"/>
+</g>
+<!-- proc~gyro_trajectory -->
+<g id="proc~~pnpa_mc~~CallsGraph_node10" class="node"><title>proc~gyro_trajectory</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node10"><a xlink:href=".././proc/gyro_trajectory.html" xlink:title="gyro_trajectory">
+<polygon fill="#d9534f" stroke="#d9534f" points="182,-550 98,-550 98,-526 182,-526 182,-550"/>
+<text text-anchor="middle" x="140" y="-535.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_trajectory</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~gyro_trajectory -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge9" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~gyro_trajectory</title>
+<path fill="none" stroke="#000000" d="M33.5373,-668.636C40.9884,-644.581 60.4357,-591.039 94,-559 95.2434,-557.813 96.566,-556.684 97.948,-555.61"/>
+<polygon fill="#000000" stroke="#000000" points="99.9494,-558.483 106.374,-550.058 96.098,-552.638 99.9494,-558.483"/>
+</g>
+<!-- proc~gyro_surface -->
+<g id="proc~~pnpa_mc~~CallsGraph_node11" class="node"><title>proc~gyro_surface</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node11"><a xlink:href=".././proc/gyro_surface.html" xlink:title="gyro_surface">
+<polygon fill="#d9534f" stroke="#d9534f" points="177.5,-508 102.5,-508 102.5,-484 177.5,-484 177.5,-508"/>
+<text text-anchor="middle" x="140" y="-493.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_surface</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~gyro_surface -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge10" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~gyro_surface</title>
+<path fill="none" stroke="#000000" d="M31.6374,-668.643C36.187,-638.866 51.5672,-562.265 94,-517 94.8955,-516.045 95.8431,-515.129 96.8335,-514.251"/>
+<polygon fill="#000000" stroke="#000000" points="99.0706,-516.952 105.109,-508.247 94.9598,-511.286 99.0706,-516.952"/>
+</g>
+<!-- proc~attenuate -->
+<g id="proc~~pnpa_mc~~CallsGraph_node12" class="node"><title>proc~attenuate</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node12"><a xlink:href=".././proc/attenuate.html" xlink:title="attenuate">
+<polygon fill="#d9534f" stroke="#d9534f" points="169,-756 111,-756 111,-732 169,-732 169,-756"/>
+<text text-anchor="middle" x="140" y="-741.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">attenuate</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;proc~attenuate -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge11" class="edge"><title>proc~pnpa_mc&#45;&gt;proc~attenuate</title>
+<path fill="none" stroke="#000000" d="M46.9654,-693.1C59.629,-701.892 77.5177,-713.809 94,-723 96.6989,-724.505 99.5243,-726 102.388,-727.459"/>
+<polygon fill="#000000" stroke="#000000" points="101.036,-730.695 111.555,-731.961 104.122,-724.411 101.036,-730.695"/>
+</g>
+<!-- interface~parallel_sum -->
+<g id="proc~~pnpa_mc~~CallsGraph_node13" class="node"><title>interface~parallel_sum</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node13"><a xlink:href=".././interface/parallel_sum.html" xlink:title="parallel_sum">
+<polygon fill="#a7506f" stroke="#a7506f" points="176.5,-213 103.5,-213 103.5,-189 176.5,-189 176.5,-213"/>
+<text text-anchor="middle" x="140" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum</text>
+</a>
+</g>
+</g>
+<!-- proc~pnpa_mc&#45;&gt;interface~parallel_sum -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge12" class="edge"><title>proc~pnpa_mc&#45;&gt;interface~parallel_sum</title>
+<path fill="none" stroke="#000000" d="M32.8039,-668.652C47.4098,-604.333 114.838,-307.399 133.943,-223.27"/>
+<polygon fill="#000000" stroke="#000000" points="137.413,-223.793 136.215,-213.266 130.587,-222.243 137.413,-223.793"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge14" class="edge"><title>proc~get_fields&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M298.205,-942.429C340.994,-942.927 424.86,-943.302 496,-940 555.18,-937.253 623.341,-930.981 666.534,-926.619"/>
+<polygon fill="#000000" stroke="#000000" points="667.097,-930.08 676.69,-925.582 666.386,-923.116 667.097,-930.08"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="proc~~pnpa_mc~~CallsGraph_node27" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node27"><a xlink:href=".././proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="454.5,-836 393.5,-836 393.5,-812 454.5,-812 454.5,-836"/>
+<text text-anchor="middle" x="424" y="-821.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge15" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M285.797,-929.816C312.596,-909.148 367.133,-867.087 398.782,-842.678"/>
+<polygon fill="#000000" stroke="#000000" points="401.278,-845.173 407.059,-836.294 397.003,-839.63 401.278,-845.173"/>
+</g>
+<!-- proc~calc_perp_vectors -->
+<g id="proc~~pnpa_mc~~CallsGraph_node30" class="node"><title>proc~calc_perp_vectors</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node30"><a xlink:href=".././proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
+<polygon fill="#d9534f" stroke="#d9534f" points="474,-1030 374,-1030 374,-1006 474,-1006 474,-1030"/>
+<text text-anchor="middle" x="424" y="-1015.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge13" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
+<path fill="none" stroke="#000000" d="M287.664,-954.176C303.895,-965.019 328.871,-980.847 352,-992 359.734,-995.729 368.15,-999.25 376.396,-1002.43"/>
+<polygon fill="#000000" stroke="#000000" points="375.353,-1005.77 385.946,-1005.99 377.799,-999.213 375.353,-1005.77"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_node32" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node32"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="605,-896 537,-896 537,-872 605,-872 605,-896"/>
+<text text-anchor="middle" x="571" y="-881.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge16" class="edge"><title>proc~get_fields&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M298.328,-941.394C341.627,-939.878 426.56,-934.573 496,-916 510.115,-912.225 525.024,-906.207 537.731,-900.404"/>
+<polygon fill="#000000" stroke="#000000" points="539.417,-903.479 546.97,-896.049 536.432,-897.147 539.417,-903.479"/>
+</g>
+<!-- proc~approx_eq -->
+<g id="proc~~pnpa_mc~~CallsGraph_node21" class="node"><title>proc~approx_eq</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node21"><a xlink:href=".././proc/approx_eq.html" xlink:title="approx_eq">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="301,-634 237,-634 237,-610 301,-610 301,-634"/>
+<text text-anchor="middle" x="269" y="-619.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">approx_eq</text>
+</a>
+</g>
+</g>
+<!-- proc~npa_gyro_range&#45;&gt;proc~approx_eq -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge17" class="edge"><title>proc~npa_gyro_range&#45;&gt;proc~approx_eq</title>
+<path fill="none" stroke="#000000" d="M181.184,-647.977C195.827,-643.595 212.391,-638.639 227.095,-634.239"/>
+<polygon fill="#000000" stroke="#000000" points="228.355,-637.516 236.932,-631.296 226.349,-630.809 228.355,-637.516"/>
+</g>
+<!-- proc~gyro_range -->
+<g id="proc~~pnpa_mc~~CallsGraph_node22" class="node"><title>proc~gyro_range</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node22"><a xlink:href=".././proc/gyro_range.html" xlink:title="gyro_range">
+<polygon fill="#d9534f" stroke="#d9534f" points="302.5,-465 235.5,-465 235.5,-441 302.5,-441 302.5,-465"/>
+<text text-anchor="middle" x="269" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_range</text>
+</a>
+</g>
+</g>
+<!-- proc~npa_gyro_range&#45;&gt;proc~gyro_range -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge18" class="edge"><title>proc~npa_gyro_range&#45;&gt;proc~gyro_range</title>
+<path fill="none" stroke="#000000" d="M168.222,-647.893C174.63,-644.121 181.032,-639.483 186,-634 229.218,-586.299 252.997,-511.983 262.715,-475.187"/>
+<polygon fill="#000000" stroke="#000000" points="266.119,-476.002 265.187,-465.448 259.334,-474.28 266.119,-476.002"/>
+</g>
+<!-- proc~store_npa&#45;&gt;proc~get_fields -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge19" class="edge"><title>proc~store_npa&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M170.776,-911.378C188.507,-916.963 211.179,-924.104 230.169,-930.085"/>
+<polygon fill="#000000" stroke="#000000" points="229.129,-933.427 239.718,-933.092 231.232,-926.75 229.129,-933.427"/>
+</g>
+<!-- proc~store_npa&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge20" class="edge"><title>proc~store_npa&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M170.826,-900.749C245.324,-897.623 439.792,-889.463 526.813,-885.812"/>
+<polygon fill="#000000" stroke="#000000" points="527.033,-889.306 536.877,-885.39 526.74,-882.312 527.033,-889.306"/>
+</g>
+<!-- proc~line_plane_intersect -->
+<g id="proc~~pnpa_mc~~CallsGraph_node20" class="node"><title>proc~line_plane_intersect</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node20"><a xlink:href=".././proc/line_plane_intersect.html" xlink:title="line_plane_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="478,-339 370,-339 370,-315 478,-315 478,-339"/>
+<text text-anchor="middle" x="424" y="-324.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_plane_intersect</text>
+</a>
+</g>
+</g>
+<!-- proc~hit_npa_detector&#45;&gt;proc~line_plane_intersect -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge22" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~line_plane_intersect</title>
+<path fill="none" stroke="#000000" d="M297.946,-377.782C303.955,-375.005 310.232,-371.989 316,-369 332.446,-360.476 334.996,-355.347 352,-348 356.674,-345.981 361.601,-344.083 366.592,-342.319"/>
+<polygon fill="#000000" stroke="#000000" points="367.847,-345.589 376.216,-339.092 365.622,-338.953 367.847,-345.589"/>
+</g>
+<!-- proc~in_boundary -->
+<g id="proc~~pnpa_mc~~CallsGraph_node26" class="node"><title>proc~in_boundary</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node26"><a xlink:href=".././proc/in_boundary.html" xlink:title="in_boundary">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="460,-381 388,-381 388,-357 460,-357 460,-381"/>
+<text text-anchor="middle" x="424" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_boundary</text>
+</a>
+</g>
+</g>
+<!-- proc~hit_npa_detector&#45;&gt;proc~in_boundary -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge21" class="edge"><title>proc~hit_npa_detector&#45;&gt;proc~in_boundary</title>
+<path fill="none" stroke="#000000" d="M315.905,-383.699C335.453,-381.016 358.193,-377.895 377.677,-375.221"/>
+<polygon fill="#000000" stroke="#000000" points="378.399,-378.655 387.83,-373.827 377.447,-371.72 378.399,-378.655"/>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge24" class="edge"><title>proc~get_plasma&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M303.31,-782.708C348.07,-781.886 429.669,-783.626 496,-803 550.959,-819.053 559.996,-835.111 610,-863 634.426,-876.623 661.751,-892.811 681.656,-904.781"/>
+<polygon fill="#000000" stroke="#000000" points="679.872,-907.792 690.243,-909.96 683.487,-901.798 679.872,-907.792"/>
+</g>
+<!-- proc~get_position -->
+<g id="proc~~pnpa_mc~~CallsGraph_node23" class="node"><title>proc~get_position</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node23"><a xlink:href=".././proc/get_position.html" xlink:title="get_position">
+<polygon fill="#d9534f" stroke="#d9534f" points="459,-756 389,-756 389,-732 459,-732 459,-756"/>
+<text text-anchor="middle" x="424" y="-741.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_position</text>
+</a>
+</g>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~get_position -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge23" class="edge"><title>proc~get_plasma&#45;&gt;proc~get_position</title>
+<path fill="none" stroke="#000000" d="M303.199,-775.321C325.346,-769.53 354.714,-761.853 378.829,-755.548"/>
+<polygon fill="#000000" stroke="#000000" points="380.017,-758.855 388.807,-752.939 378.247,-752.083 380.017,-758.855"/>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~in_plasma -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge25" class="edge"><title>proc~get_plasma&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M303.199,-792.679C326.836,-798.859 358.696,-807.189 383.619,-813.704"/>
+<polygon fill="#000000" stroke="#000000" points="382.926,-817.141 393.486,-816.284 384.696,-810.368 382.926,-817.141"/>
+</g>
+<!-- proc~get_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge26" class="edge"><title>proc~get_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M282.439,-796.222C297.558,-810.323 324.479,-833.094 352,-845 409.29,-869.785 481.594,-878.819 526.826,-882.112"/>
+<polygon fill="#000000" stroke="#000000" points="526.673,-885.609 536.884,-882.781 527.139,-878.625 526.673,-885.609"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_node16" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node16"><a xlink:href=".././interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="609.5,-717 532.5,-717 532.5,-693 609.5,-693 609.5,-717"/>
+<text text-anchor="middle" x="571" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+</a>
+</g>
+</g>
+<!-- proc~bt_cx_rates&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge27" class="edge"><title>proc~bt_cx_rates&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M174.306,-702.233C249.882,-702.761 434.581,-704.053 522.275,-704.666"/>
+<polygon fill="#000000" stroke="#000000" points="522.45,-708.167 532.475,-704.738 522.499,-701.168 522.45,-708.167"/>
+</g>
+<!-- proc~attenuate&#45;&gt;proc~get_plasma -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge29" class="edge"><title>proc~attenuate&#45;&gt;proc~get_plasma</title>
+<path fill="none" stroke="#000000" d="M169.185,-752.877C185.662,-758.067 206.791,-764.722 225.279,-770.544"/>
+<polygon fill="#000000" stroke="#000000" points="224.359,-773.924 234.948,-773.59 226.462,-767.247 224.359,-773.924"/>
+</g>
+<!-- proc~colrad -->
+<g id="proc~~pnpa_mc~~CallsGraph_node24" class="node"><title>proc~colrad</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node24"><a xlink:href=".././proc/colrad.html" xlink:title="colrad">
+<polygon fill="#d9534f" stroke="#d9534f" points="296,-676 242,-676 242,-652 296,-652 296,-676"/>
+<text text-anchor="middle" x="269" y="-661.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">colrad</text>
+</a>
+</g>
+</g>
+<!-- proc~attenuate&#45;&gt;proc~colrad -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge28" class="edge"><title>proc~attenuate&#45;&gt;proc~colrad</title>
+<path fill="none" stroke="#000000" d="M169.024,-731.914C174.742,-729.173 180.645,-726.139 186,-723 206.682,-710.878 228.655,-694.88 244.645,-682.602"/>
+<polygon fill="#000000" stroke="#000000" points="247.119,-685.112 252.866,-676.211 242.823,-679.585 247.119,-685.112"/>
+</g>
+<!-- proc~parallel_sum_d2 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node14" class="node"><title>proc~parallel_sum_d2</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node14"><a xlink:href=".././proc/parallel_sum_d2.html" xlink:title="parallel_sum_d2">
+<polygon fill="#d9534f" stroke="#d9534f" points="314.5,-360 223.5,-360 223.5,-336 314.5,-336 314.5,-360"/>
+<text text-anchor="middle" x="269" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d2</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d2 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge35" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d2</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M145.914,-213.02C156.461,-237.497 183.475,-293.627 222,-327 223.493,-328.293 225.079,-329.522 226.73,-330.686"/>
+<polygon fill="#000000" stroke="#000000" points="225.04,-333.755 235.397,-335.985 228.691,-327.783 225.04,-333.755"/>
+</g>
+<!-- proc~parallel_sum_d1 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node15" class="node"><title>proc~parallel_sum_d1</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node15"><a xlink:href=".././proc/parallel_sum_d1.html" xlink:title="parallel_sum_d1">
+<polygon fill="#d9534f" stroke="#d9534f" points="314.5,-318 223.5,-318 223.5,-294 314.5,-294 314.5,-318"/>
+<text text-anchor="middle" x="269" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d1</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d1 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge38" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d1</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M150.308,-213.244C164.282,-230.963 192.235,-263.933 222,-285 224.069,-286.464 226.257,-287.866 228.51,-289.199"/>
+<polygon fill="#000000" stroke="#000000" points="226.948,-292.334 237.411,-293.999 230.271,-286.172 226.948,-292.334"/>
+</g>
+<!-- proc~parallel_sum_i0 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node17" class="node"><title>proc~parallel_sum_i0</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node17"><a xlink:href=".././proc/parallel_sum_i0.html" xlink:title="parallel_sum_i0">
+<polygon fill="#d9534f" stroke="#d9534f" points="313,-276 225,-276 225,-252 313,-252 313,-276"/>
+<text text-anchor="middle" x="269" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i0</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i0 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge31" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i0</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M163.541,-213.073C179.707,-221.637 202.063,-233.288 222,-243 225.093,-244.507 228.317,-246.044 231.559,-247.568"/>
+<polygon fill="#000000" stroke="#000000" points="230.107,-250.753 240.652,-251.787 233.054,-244.403 230.107,-250.753"/>
+</g>
+<!-- proc~parallel_sum_i2 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node18" class="node"><title>proc~parallel_sum_i2</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node18"><a xlink:href=".././proc/parallel_sum_i2.html" xlink:title="parallel_sum_i2">
+<polygon fill="#d9534f" stroke="#d9534f" points="313,-234 225,-234 225,-210 313,-210 313,-234"/>
+<text text-anchor="middle" x="269" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i2</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i2 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge32" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i2</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M176.715,-206.906C188.524,-208.858 201.931,-211.075 214.763,-213.197"/>
+<polygon fill="#000000" stroke="#000000" points="214.453,-216.693 224.89,-214.872 215.595,-209.787 214.453,-216.693"/>
+</g>
+<!-- proc~parallel_sum_d4 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node19" class="node"><title>proc~parallel_sum_d4</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node19"><a xlink:href=".././proc/parallel_sum_d4.html" xlink:title="parallel_sum_d4">
+<polygon fill="#d9534f" stroke="#d9534f" points="314.5,-192 223.5,-192 223.5,-168 314.5,-168 314.5,-192"/>
+<text text-anchor="middle" x="269" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d4</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d4 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge33" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d4</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M176.715,-195.094C187.949,-193.237 200.628,-191.14 212.884,-189.114"/>
+<polygon fill="#000000" stroke="#000000" points="213.742,-192.519 223.037,-187.435 212.6,-185.613 213.742,-192.519"/>
+</g>
+<!-- proc~parallel_sum_d5 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node25" class="node"><title>proc~parallel_sum_d5</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node25"><a xlink:href=".././proc/parallel_sum_d5.html" xlink:title="parallel_sum_d5">
+<polygon fill="#d9534f" stroke="#d9534f" points="314.5,-150 223.5,-150 223.5,-126 314.5,-126 314.5,-150"/>
+<text text-anchor="middle" x="269" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d5</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d5 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge34" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d5</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M163.541,-188.927C179.707,-180.363 202.063,-168.712 222,-159 225.093,-157.493 228.317,-155.956 231.559,-154.432"/>
+<polygon fill="#000000" stroke="#000000" points="233.054,-157.597 240.652,-150.213 230.107,-151.247 233.054,-157.597"/>
+</g>
+<!-- proc~parallel_sum_d0 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node28" class="node"><title>proc~parallel_sum_d0</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node28"><a xlink:href=".././proc/parallel_sum_d0.html" xlink:title="parallel_sum_d0">
+<polygon fill="#d9534f" stroke="#d9534f" points="314.5,-108 223.5,-108 223.5,-84 314.5,-84 314.5,-108"/>
+<text text-anchor="middle" x="269" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d0</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d0 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge37" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d0</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M150.308,-188.756C164.282,-171.037 192.235,-138.067 222,-117 224.069,-115.536 226.257,-114.134 228.51,-112.801"/>
+<polygon fill="#000000" stroke="#000000" points="230.271,-115.828 237.411,-108.001 226.948,-109.666 230.271,-115.828"/>
+</g>
+<!-- proc~parallel_sum_d3 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node29" class="node"><title>proc~parallel_sum_d3</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node29"><a xlink:href=".././proc/parallel_sum_d3.html" xlink:title="parallel_sum_d3">
+<polygon fill="#d9534f" stroke="#d9534f" points="314.5,-66 223.5,-66 223.5,-42 314.5,-42 314.5,-66"/>
+<text text-anchor="middle" x="269" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d3</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d3 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge36" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d3</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M145.914,-188.98C156.461,-164.503 183.475,-108.373 222,-75 223.493,-73.7067 225.079,-72.4785 226.73,-71.3139"/>
+<polygon fill="#000000" stroke="#000000" points="228.691,-74.2173 235.397,-66.0151 225.04,-68.2449 228.691,-74.2173"/>
+</g>
+<!-- proc~parallel_sum_i1 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node31" class="node"><title>proc~parallel_sum_i1</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node31"><a xlink:href=".././proc/parallel_sum_i1.html" xlink:title="parallel_sum_i1">
+<polygon fill="#d9534f" stroke="#d9534f" points="313,-24 225,-24 225,-0 313,-0 313,-24"/>
+<text text-anchor="middle" x="269" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i1</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i1 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge30" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i1</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M143.827,-188.741C151.391,-158.456 174.805,-79.2148 222,-33 223.098,-31.9251 224.26,-30.8991 225.474,-29.9202"/>
+<polygon fill="#000000" stroke="#000000" points="227.735,-32.6172 234.072,-24.1269 223.823,-26.8119 227.735,-32.6172"/>
+</g>
+<!-- mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_node43" class="node"><title>mpi_allreduce</title>
+<polygon fill="#777777" stroke="#777777" points="463.5,-192 384.5,-192 384.5,-168 463.5,-168 463.5,-192"/>
+<text text-anchor="middle" x="424" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_allreduce</text>
+</g>
+<!-- proc~parallel_sum_d2&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge39" class="edge"><title>proc~parallel_sum_d2&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M302.43,-335.78C307.227,-333.256 311.921,-330.332 316,-327 360.118,-290.962 395.209,-232.681 412.075,-201.427"/>
+<polygon fill="#000000" stroke="#000000" points="415.324,-202.769 416.899,-192.292 409.134,-199.5 415.324,-202.769"/>
+</g>
+<!-- proc~parallel_sum_d1&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge40" class="edge"><title>proc~parallel_sum_d1&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M300.513,-293.891C305.854,-291.267 311.225,-288.282 316,-285 352.106,-260.187 386.991,-222.608 406.651,-199.779"/>
+<polygon fill="#000000" stroke="#000000" points="409.377,-201.976 413.179,-192.087 404.04,-197.446 409.377,-201.976"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_node35" class="node"><title>proc~cyl_interpol3d_coeff</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node35"><a xlink:href=".././proc/cyl_interpol3d_coeff.html" xlink:title="cyl_interpol3D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="921.5,-717 812.5,-717 812.5,-693 921.5,-693 921.5,-717"/>
+<text text-anchor="middle" x="867" y="-702.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge41" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M609.534,-705C658.017,-705 743.152,-705 801.956,-705"/>
+<polygon fill="#000000" stroke="#000000" points="802.25,-708.5 812.25,-705 802.25,-701.5 802.25,-708.5"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_node40" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node40"><a xlink:href=".././proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="912.5,-778 821.5,-778 821.5,-754 912.5,-754 912.5,-778"/>
+<text text-anchor="middle" x="867" y="-763.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge42" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M596.888,-717.183C601.425,-719.835 605.987,-722.811 610,-726 628.726,-740.879 624.151,-756.269 646,-766 698.386,-789.331 765,-785.295 811.132,-777.967"/>
+<polygon fill="#000000" stroke="#000000" points="811.956,-781.378 821.233,-776.259 810.789,-774.476 811.956,-781.378"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~pnpa_mc~~CallsGraph_node44" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node44"><a xlink:href=".././proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="922,-637 812,-637 812,-613 922,-613 922,-637"/>
+<text text-anchor="middle" x="867" y="-622.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge43" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M596.888,-692.817C601.425,-690.165 605.987,-687.189 610,-684 628.726,-669.121 624.591,-654.662 646,-644 694.334,-619.929 756.078,-616.593 801.844,-618.463"/>
+<polygon fill="#000000" stroke="#000000" points="801.779,-621.964 811.942,-618.97 802.13,-614.973 801.779,-621.964"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_node46" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node46"><a xlink:href=".././proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="1049.5,-657 958.5,-657 958.5,-633 1049.5,-633 1049.5,-657"/>
+<text text-anchor="middle" x="1004" y="-642.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge44" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M598.785,-692.876C602.838,-690.314 606.745,-687.353 610,-684 634.366,-658.896 616.698,-633.113 646,-614 748.809,-546.939 802.606,-575.504 922,-604 941.298,-608.606 961.201,-618.595 976.449,-627.56"/>
+<polygon fill="#000000" stroke="#000000" points="974.934,-630.735 985.295,-632.952 978.578,-624.758 974.934,-630.735"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~pnpa_mc~~CallsGraph_node47" class="node"><title>proc~cyl_interpol3d_coeff_arr</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node47"><a xlink:href=".././proc/cyl_interpol3d_coeff_arr.html" xlink:title="cyl_interpol3D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="775.5,-677 646.5,-677 646.5,-653 775.5,-653 775.5,-677"/>
+<text text-anchor="middle" x="711" y="-662.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge45" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M609.709,-694.07C624.777,-689.702 642.371,-684.603 658.578,-679.905"/>
+<polygon fill="#000000" stroke="#000000" points="659.825,-683.188 668.455,-677.042 657.876,-676.464 659.825,-683.188"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~pnpa_mc~~CallsGraph_node48" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node48"><a xlink:href=".././proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="766,-757 656,-757 656,-733 766,-733 766,-757"/>
+<text text-anchor="middle" x="711" y="-742.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge46" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M609.709,-715.93C624.777,-720.298 642.371,-725.397 658.578,-730.095"/>
+<polygon fill="#000000" stroke="#000000" points="657.876,-733.536 668.455,-732.958 659.825,-726.812 657.876,-733.536"/>
+</g>
+<!-- proc~parallel_sum_i0&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge47" class="edge"><title>proc~parallel_sum_i0&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M297.955,-251.8C303.964,-249.022 310.238,-246.001 316,-243 343.436,-228.71 373.734,-210.645 395.065,-197.527"/>
+<polygon fill="#000000" stroke="#000000" points="396.96,-200.471 403.624,-192.234 393.278,-194.517 396.96,-200.471"/>
+</g>
+<!-- proc~parallel_sum_i2&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge48" class="edge"><title>proc~parallel_sum_i2&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M313.026,-210.189C332.231,-204.917 354.943,-198.682 374.725,-193.252"/>
+<polygon fill="#000000" stroke="#000000" points="375.754,-196.599 384.47,-190.577 373.901,-189.849 375.754,-196.599"/>
+</g>
+<!-- proc~parallel_sum_d4&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge49" class="edge"><title>proc~parallel_sum_d4&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M314.665,-180C333.357,-180 355.134,-180 374.241,-180"/>
+<polygon fill="#000000" stroke="#000000" points="374.251,-183.5 384.251,-180 374.251,-176.5 374.251,-183.5"/>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~line_plane_intersect -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge52" class="edge"><title>proc~gyro_range&#45;&gt;proc~line_plane_intersect</title>
+<path fill="none" stroke="#000000" d="M285.644,-440.828C295.129,-432.963 307.08,-422.145 316,-411 336.152,-385.823 326.715,-368.016 352,-348 354.754,-345.82 357.73,-343.865 360.847,-342.114"/>
+<polygon fill="#000000" stroke="#000000" points="362.479,-345.212 369.946,-337.696 359.422,-338.916 362.479,-345.212"/>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~in_boundary -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge54" class="edge"><title>proc~gyro_range&#45;&gt;proc~in_boundary</title>
+<path fill="none" stroke="#000000" d="M282.609,-440.891C297.891,-426.82 324.968,-403.777 352,-390 360.071,-385.886 369.08,-382.446 377.898,-379.62"/>
+<polygon fill="#000000" stroke="#000000" points="379.133,-382.904 387.712,-376.688 377.128,-376.197 379.133,-382.904"/>
+</g>
+<!-- proc~boundary_edge -->
+<g id="proc~~pnpa_mc~~CallsGraph_node37" class="node"><title>proc~boundary_edge</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node37"><a xlink:href=".././proc/boundary_edge.html" xlink:title="boundary_edge">
+<polygon fill="#d9534f" stroke="#d9534f" points="468,-549 380,-549 380,-525 468,-525 468,-549"/>
+<text text-anchor="middle" x="424" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">boundary_edge</text>
+</a>
+</g>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~boundary_edge -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge50" class="edge"><title>proc~gyro_range&#45;&gt;proc~boundary_edge</title>
+<path fill="none" stroke="#000000" d="M282.609,-465.109C297.891,-479.18 324.968,-502.223 352,-516 357.712,-518.911 363.893,-521.485 370.144,-523.743"/>
+<polygon fill="#000000" stroke="#000000" points="369.373,-527.175 379.967,-527.033 371.596,-520.538 369.373,-527.175"/>
+</g>
+<!-- proc~line_gyro_surface_intersect -->
+<g id="proc~~pnpa_mc~~CallsGraph_node39" class="node"><title>proc~line_gyro_surface_intersect</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node39"><a xlink:href=".././proc/line_gyro_surface_intersect.html" xlink:title="line_gyro_surface_intersect">
+<polygon fill="#d9534f" stroke="#d9534f" points="496,-507 352,-507 352,-483 496,-483 496,-507"/>
+<text text-anchor="middle" x="424" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">line_gyro_surface_intersect</text>
+</a>
+</g>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~line_gyro_surface_intersect -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge51" class="edge"><title>proc~gyro_range&#45;&gt;proc~line_gyro_surface_intersect</title>
+<path fill="none" stroke="#000000" d="M302.822,-462.01C322.25,-467.343 347.33,-474.228 369.548,-480.327"/>
+<polygon fill="#000000" stroke="#000000" points="368.627,-483.703 379.196,-482.975 370.48,-476.953 368.627,-483.703"/>
+</g>
+<!-- proc~gyro_surface_coordinates -->
+<g id="proc~~pnpa_mc~~CallsGraph_node42" class="node"><title>proc~gyro_surface_coordinates</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node42"><a xlink:href=".././proc/gyro_surface_coordinates.html" xlink:title="gyro_surface_coordinates">
+<polygon fill="#d9534f" stroke="#d9534f" points="492,-465 356,-465 356,-441 492,-441 492,-465"/>
+<text text-anchor="middle" x="424" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">gyro_surface_coordinates</text>
+</a>
+</g>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~gyro_surface_coordinates -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge53" class="edge"><title>proc~gyro_range&#45;&gt;proc~gyro_surface_coordinates</title>
+<path fill="none" stroke="#000000" d="M302.822,-453C315.45,-453 330.465,-453 345.531,-453"/>
+<polygon fill="#000000" stroke="#000000" points="345.94,-456.5 355.94,-453 345.94,-449.5 345.94,-456.5"/>
+</g>
+<!-- proc~in_gyro_surface -->
+<g id="proc~~pnpa_mc~~CallsGraph_node45" class="node"><title>proc~in_gyro_surface</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node45"><a xlink:href=".././proc/in_gyro_surface.html" xlink:title="in_gyro_surface">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="468.5,-423 379.5,-423 379.5,-399 468.5,-399 468.5,-423"/>
+<text text-anchor="middle" x="424" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_gyro_surface</text>
+</a>
+</g>
+</g>
+<!-- proc~gyro_range&#45;&gt;proc~in_gyro_surface -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge55" class="edge"><title>proc~gyro_range&#45;&gt;proc~in_gyro_surface</title>
+<path fill="none" stroke="#000000" d="M302.822,-443.99C322.326,-438.636 347.527,-431.718 369.81,-425.601"/>
+<polygon fill="#000000" stroke="#000000" points="370.767,-428.968 379.483,-422.946 368.914,-422.218 370.767,-428.968"/>
+</g>
+<!-- proc~cyl_to_xyz -->
+<g id="proc~~pnpa_mc~~CallsGraph_node36" class="node"><title>proc~cyl_to_xyz</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node36"><a xlink:href=".././proc/cyl_to_xyz.html" xlink:title="cyl_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="602,-759 540,-759 540,-735 602,-735 602,-759"/>
+<text text-anchor="middle" x="571" y="-744.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_to_xyz</text>
+</a>
+</g>
+</g>
+<!-- proc~get_position&#45;&gt;proc~cyl_to_xyz -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge56" class="edge"><title>proc~get_position&#45;&gt;proc~cyl_to_xyz</title>
+<path fill="none" stroke="#000000" d="M459.363,-744.711C480.474,-745.148 507.615,-745.709 529.732,-746.167"/>
+<polygon fill="#000000" stroke="#000000" points="529.748,-749.668 539.818,-746.376 529.893,-742.669 529.748,-749.668"/>
+</g>
+<!-- proc~eigen -->
+<g id="proc~~pnpa_mc~~CallsGraph_node33" class="node"><title>proc~eigen</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node33"><a xlink:href=".././proc/eigen.html" xlink:title="eigen">
+<polygon fill="#d9534f" stroke="#d9534f" points="451,-633 397,-633 397,-609 451,-609 451,-633"/>
+<text text-anchor="middle" x="424" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">eigen</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~eigen -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge57" class="edge"><title>proc~colrad&#45;&gt;proc~eigen</title>
+<path fill="none" stroke="#000000" d="M296.302,-656.608C321.337,-649.572 359.213,-638.927 387.034,-631.108"/>
+<polygon fill="#000000" stroke="#000000" points="388.106,-634.442 396.786,-628.367 386.212,-627.704 388.106,-634.442"/>
+</g>
+<!-- proc~linsolve -->
+<g id="proc~~pnpa_mc~~CallsGraph_node34" class="node"><title>proc~linsolve</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node34"><a xlink:href=".././proc/linsolve.html" xlink:title="linsolve">
+<polygon fill="#d9534f" stroke="#d9534f" points="451,-591 397,-591 397,-567 451,-567 451,-591"/>
+<text text-anchor="middle" x="424" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">linsolve</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~linsolve -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge59" class="edge"><title>proc~colrad&#45;&gt;proc~linsolve</title>
+<path fill="none" stroke="#000000" d="M296.448,-654.351C303.165,-651.266 310.134,-647.469 316,-643 335.827,-627.896 331.161,-613.673 352,-600 362.391,-593.182 375.059,-588.519 386.803,-585.355"/>
+<polygon fill="#000000" stroke="#000000" points="387.904,-588.69 396.806,-582.945 386.264,-581.885 387.904,-588.69"/>
+</g>
+<!-- proc~get_rate_matrix -->
+<g id="proc~~pnpa_mc~~CallsGraph_node38" class="node"><title>proc~get_rate_matrix</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node38"><a xlink:href=".././proc/get_rate_matrix.html" xlink:title="get_rate_matrix">
+<polygon fill="#d9534f" stroke="#d9534f" points="468,-676 380,-676 380,-652 468,-652 468,-676"/>
+<text text-anchor="middle" x="424" y="-661.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_rate_matrix</text>
+</a>
+</g>
+</g>
+<!-- proc~colrad&#45;&gt;proc~get_rate_matrix -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge58" class="edge"><title>proc~colrad&#45;&gt;proc~get_rate_matrix</title>
+<path fill="none" stroke="#000000" d="M296.302,-664C316.427,-664 344.85,-664 369.677,-664"/>
+<polygon fill="#000000" stroke="#000000" points="369.703,-667.5 379.703,-664 369.703,-660.5 369.703,-667.5"/>
+</g>
+<!-- proc~parallel_sum_d5&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge60" class="edge"><title>proc~parallel_sum_d5&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M313.844,-150.036C332.793,-155.237 355.033,-161.342 374.477,-166.68"/>
+<polygon fill="#000000" stroke="#000000" points="373.788,-170.12 384.358,-169.392 375.641,-163.37 373.788,-170.12"/>
+</g>
+<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge61" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M440.737,-811.905C455.468,-800.356 477.867,-782.213 496,-765 513.109,-748.76 513.439,-740.558 532,-726 533.386,-724.913 534.836,-723.849 536.327,-722.813"/>
+<polygon fill="#000000" stroke="#000000" points="538.572,-725.534 545.144,-717.224 534.824,-719.622 538.572,-725.534"/>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge63" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M454.565,-834.232C467.391,-838.823 482.528,-844.449 496,-850 509.125,-855.408 523.338,-861.805 535.766,-867.582"/>
+<polygon fill="#000000" stroke="#000000" points="534.335,-870.776 544.875,-871.852 537.307,-864.438 534.335,-870.776"/>
+</g>
+<!-- proc~cyl_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_node41" class="node"><title>proc~cyl_to_uvw</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node41"><a xlink:href=".././proc/cyl_to_uvw.html" xlink:title="cyl_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="743.5,-837 678.5,-837 678.5,-813 743.5,-813 743.5,-837"/>
+<text text-anchor="middle" x="711" y="-822.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~cyl_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge62" class="edge"><title>proc~in_plasma&#45;&gt;proc~cyl_to_uvw</title>
+<path fill="none" stroke="#000000" d="M454.693,-824.104C505.561,-824.283 609.514,-824.647 667.864,-824.852"/>
+<polygon fill="#000000" stroke="#000000" points="668.193,-828.353 678.206,-824.888 668.218,-821.353 668.193,-828.353"/>
+</g>
+<!-- proc~parallel_sum_d0&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge64" class="edge"><title>proc~parallel_sum_d0&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M297.955,-108.2C303.964,-110.978 310.238,-113.999 316,-117 343.436,-131.29 373.734,-149.355 395.065,-162.473"/>
+<polygon fill="#000000" stroke="#000000" points="393.278,-165.483 403.624,-167.766 396.96,-159.529 393.278,-165.483"/>
+</g>
+<!-- proc~parallel_sum_d3&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge65" class="edge"><title>proc~parallel_sum_d3&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M300.513,-66.1092C305.854,-68.7329 311.225,-71.7183 316,-75 352.106,-99.8134 386.991,-137.392 406.651,-160.221"/>
+<polygon fill="#000000" stroke="#000000" points="404.04,-162.554 413.179,-167.913 409.377,-158.024 404.04,-162.554"/>
+</g>
+<!-- proc~parallel_sum_i1&#45;&gt;mpi_allreduce -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge66" class="edge"><title>proc~parallel_sum_i1&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M302.43,-24.2201C307.227,-26.7439 311.921,-29.6678 316,-33 360.118,-69.0379 395.209,-127.319 412.075,-158.573"/>
+<polygon fill="#000000" stroke="#000000" points="409.134,-160.5 416.899,-167.708 415.324,-157.231 409.134,-160.5"/>
+</g>
+<!-- proc~hqr2 -->
+<g id="proc~~pnpa_mc~~CallsGraph_node49" class="node"><title>proc~hqr2</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node49"><a xlink:href=".././proc/hqr2.html" xlink:title="hqr2">
+<polygon fill="#d9534f" stroke="#d9534f" points="598,-633 544,-633 544,-609 598,-609 598,-633"/>
+<text text-anchor="middle" x="571" y="-618.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqr2</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~hqr2 -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge69" class="edge"><title>proc~eigen&#45;&gt;proc~hqr2</title>
+<path fill="none" stroke="#000000" d="M451.258,-621C474.355,-621 508.198,-621 533.85,-621"/>
+<polygon fill="#000000" stroke="#000000" points="533.937,-624.5 543.937,-621 533.937,-617.5 533.937,-624.5"/>
+</g>
+<!-- proc~balback -->
+<g id="proc~~pnpa_mc~~CallsGraph_node52" class="node"><title>proc~balback</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node52"><a xlink:href=".././proc/balback.html" xlink:title="balback">
+<polygon fill="#d9534f" stroke="#d9534f" points="598,-591 544,-591 544,-567 598,-567 598,-591"/>
+<text text-anchor="middle" x="571" y="-576.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balback</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balback -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge68" class="edge"><title>proc~eigen&#45;&gt;proc~balback</title>
+<path fill="none" stroke="#000000" d="M451.258,-613.394C474.458,-606.674 508.499,-596.814 534.192,-589.372"/>
+<polygon fill="#000000" stroke="#000000" points="535.306,-592.693 543.937,-586.549 533.358,-585.97 535.306,-592.693"/>
+</g>
+<!-- proc~elmtrans -->
+<g id="proc~~pnpa_mc~~CallsGraph_node53" class="node"><title>proc~elmtrans</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node53"><a xlink:href=".././proc/elmtrans.html" xlink:title="elmtrans">
+<polygon fill="#d9534f" stroke="#d9534f" points="598,-549 544,-549 544,-525 598,-525 598,-549"/>
+<text text-anchor="middle" x="571" y="-534.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmtrans</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmtrans -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge71" class="edge"><title>proc~eigen&#45;&gt;proc~elmtrans</title>
+<path fill="none" stroke="#000000" d="M451.154,-616.994C465.271,-613.948 482.515,-608.737 496,-600 516.634,-586.632 512.937,-573.526 532,-558 533.366,-556.887 534.8,-555.803 536.277,-554.75"/>
+<polygon fill="#000000" stroke="#000000" points="538.534,-557.46 545.049,-549.105 534.746,-551.574 538.534,-557.46"/>
+</g>
+<!-- proc~elmhes -->
+<g id="proc~~pnpa_mc~~CallsGraph_node54" class="node"><title>proc~elmhes</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node54"><a xlink:href=".././proc/elmhes.html" xlink:title="elmhes">
+<polygon fill="#d9534f" stroke="#d9534f" points="598,-507 544,-507 544,-483 598,-483 598,-507"/>
+<text text-anchor="middle" x="571" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">elmhes</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~elmhes -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge67" class="edge"><title>proc~eigen&#45;&gt;proc~elmhes</title>
+<path fill="none" stroke="#000000" d="M451.278,-618.699C465.954,-616.182 483.704,-610.932 496,-600 526.355,-573.012 504.75,-546.12 532,-516 533.147,-514.732 534.39,-513.524 535.701,-512.374"/>
+<polygon fill="#000000" stroke="#000000" points="537.801,-515.175 543.79,-506.436 533.658,-509.533 537.801,-515.175"/>
+</g>
+<!-- proc~balance -->
+<g id="proc~~pnpa_mc~~CallsGraph_node56" class="node"><title>proc~balance</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node56"><a xlink:href=".././proc/balance.html" xlink:title="balance">
+<polygon fill="#d9534f" stroke="#d9534f" points="598,-675 544,-675 544,-651 598,-651 598,-675"/>
+<text text-anchor="middle" x="571" y="-660.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">balance</text>
+</a>
+</g>
+</g>
+<!-- proc~eigen&#45;&gt;proc~balance -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge70" class="edge"><title>proc~eigen&#45;&gt;proc~balance</title>
+<path fill="none" stroke="#000000" d="M451.258,-628.606C474.458,-635.326 508.499,-645.186 534.192,-652.628"/>
+<polygon fill="#000000" stroke="#000000" points="533.358,-656.03 543.937,-655.451 535.306,-649.307 533.358,-656.03"/>
+</g>
+<!-- proc~matinv -->
+<g id="proc~~pnpa_mc~~CallsGraph_node50" class="node"><title>proc~matinv</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node50"><a xlink:href=".././proc/matinv.html" xlink:title="matinv">
+<polygon fill="#d9534f" stroke="#d9534f" points="598,-381 544,-381 544,-357 598,-357 598,-381"/>
+<text text-anchor="middle" x="571" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">matinv</text>
+</a>
+</g>
+</g>
+<!-- proc~linsolve&#45;&gt;proc~matinv -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge72" class="edge"><title>proc~linsolve&#45;&gt;proc~matinv</title>
+<path fill="none" stroke="#000000" d="M451.067,-577.705C466.233,-575.563 484.557,-570.354 496,-558 547.892,-501.979 486.488,-451.317 532,-390 533.179,-388.411 534.516,-386.927 535.966,-385.544"/>
+<polygon fill="#000000" stroke="#000000" points="538.132,-388.293 543.95,-379.439 533.88,-382.733 538.132,-388.293"/>
+</g>
+<!-- dgetrf -->
+<g id="proc~~pnpa_mc~~CallsGraph_node51" class="node"><title>dgetrf</title>
+<polygon fill="#777777" stroke="#777777" points="598,-465 544,-465 544,-441 598,-441 598,-465"/>
+<text text-anchor="middle" x="571" y="-450.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgetrf</text>
+</g>
+<!-- proc~linsolve&#45;&gt;dgetrf -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge74" class="edge"><title>proc~linsolve&#45;&gt;dgetrf</title>
+<path fill="none" stroke="#000000" d="M451.278,-576.699C465.954,-574.182 483.704,-568.932 496,-558 526.355,-531.012 504.75,-504.12 532,-474 533.147,-472.732 534.39,-471.524 535.701,-470.374"/>
+<polygon fill="#000000" stroke="#000000" points="537.801,-473.175 543.79,-464.436 533.658,-467.533 537.801,-473.175"/>
+</g>
+<!-- dgetrs -->
+<g id="proc~~pnpa_mc~~CallsGraph_node55" class="node"><title>dgetrs</title>
+<polygon fill="#777777" stroke="#777777" points="598,-423 544,-423 544,-399 598,-399 598,-423"/>
+<text text-anchor="middle" x="571" y="-408.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">dgetrs</text>
+</g>
+<!-- proc~linsolve&#45;&gt;dgetrs -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge73" class="edge"><title>proc~linsolve&#45;&gt;dgetrs</title>
+<path fill="none" stroke="#000000" d="M451.121,-577.373C466.114,-575.101 484.239,-569.871 496,-558 536.991,-516.627 495.737,-477.574 532,-432 533.097,-430.621 534.311,-429.319 535.61,-428.091"/>
+<polygon fill="#000000" stroke="#000000" points="537.958,-430.703 543.783,-421.853 533.71,-425.139 537.958,-430.703"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge75" class="edge"><title>proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M895.319,-692.858C915.813,-683.75 944.077,-671.188 966.506,-661.22"/>
+<polygon fill="#000000" stroke="#000000" points="968.005,-664.384 975.721,-657.124 965.162,-657.987 968.005,-664.384"/>
+</g>
+<!-- proc~cyl_to_xyz&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge76" class="edge"><title>proc~cyl_to_xyz&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M593.662,-759.03C599.461,-762.953 605.391,-767.686 610,-773 633.702,-800.329 626.205,-815.721 646,-846 659.38,-866.466 677.565,-887.569 691.131,-902.328"/>
+<polygon fill="#000000" stroke="#000000" points="688.752,-904.908 698.133,-909.831 693.869,-900.132 688.752,-904.908"/>
+</g>
+<!-- proc~cyl_to_xyz&#45;&gt;proc~cyl_to_uvw -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge77" class="edge"><title>proc~cyl_to_xyz&#45;&gt;proc~cyl_to_uvw</title>
+<path fill="none" stroke="#000000" d="M589.85,-759.076C596.232,-763.43 603.461,-768.403 610,-773 626.146,-784.351 628.734,-789.44 646,-799 653.235,-803.006 661.217,-806.741 669.017,-810.059"/>
+<polygon fill="#000000" stroke="#000000" points="667.799,-813.343 678.38,-813.891 670.451,-806.864 667.799,-813.343"/>
+</g>
+<!-- proc~get_rate_matrix&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge78" class="edge"><title>proc~get_rate_matrix&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M467.721,-676.08C484.76,-680.898 504.455,-686.467 521.986,-691.424"/>
+<polygon fill="#000000" stroke="#000000" points="521.446,-694.908 532.021,-694.261 523.351,-688.172 521.446,-694.908"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge79" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M922.132,-633.02C930.779,-634.301 939.73,-635.627 948.388,-636.909"/>
+<polygon fill="#000000" stroke="#000000" points="947.976,-640.386 958.381,-638.39 949.002,-633.462 947.976,-640.386"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge81" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" d="M758.205,-677.001C774.425,-681.214 792.827,-685.994 809.777,-690.397"/>
+<polygon fill="#000000" stroke="#000000" points="809.003,-693.812 819.562,-692.938 810.763,-687.036 809.003,-693.812"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge80" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M775.502,-660.636C827.024,-657.095 898.914,-652.154 948.004,-648.78"/>
+<polygon fill="#000000" stroke="#000000" points="948.382,-652.262 958.118,-648.085 947.902,-645.279 948.382,-652.262"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge82" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M766.295,-752.404C780.929,-754.399 796.766,-756.559 811.417,-758.557"/>
+<polygon fill="#000000" stroke="#000000" points="810.959,-762.027 821.34,-759.91 811.905,-755.091 810.959,-762.027"/>
+</g>
+<!-- proc~hqrvec -->
+<g id="proc~~pnpa_mc~~CallsGraph_node58" class="node"><title>proc~hqrvec</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node58"><a xlink:href=".././proc/hqrvec.html" xlink:title="hqrvec">
+<polygon fill="#d9534f" stroke="#d9534f" points="738,-557 684,-557 684,-533 738,-533 738,-557"/>
+<text text-anchor="middle" x="711" y="-542.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">hqrvec</text>
+</a>
+</g>
+</g>
+<!-- proc~hqr2&#45;&gt;proc~hqrvec -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge83" class="edge"><title>proc~hqr2&#45;&gt;proc~hqrvec</title>
+<path fill="none" stroke="#000000" d="M595.289,-608.966C600.241,-606.177 605.37,-603.11 610,-600 627.055,-588.544 628.294,-581.422 646,-571 654.822,-565.808 664.875,-561.187 674.358,-557.335"/>
+<polygon fill="#000000" stroke="#000000" points="675.904,-560.489 683.959,-553.607 673.37,-553.964 675.904,-560.489"/>
+</g>
+<!-- proc~ludcmp -->
+<g id="proc~~pnpa_mc~~CallsGraph_node57" class="node"><title>proc~ludcmp</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node57"><a xlink:href=".././proc/ludcmp.html" xlink:title="ludcmp">
+<polygon fill="#d9534f" stroke="#d9534f" points="738,-381 684,-381 684,-357 738,-357 738,-381"/>
+<text text-anchor="middle" x="711" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ludcmp</text>
+</a>
+</g>
+</g>
+<!-- proc~matinv&#45;&gt;proc~ludcmp -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge84" class="edge"><title>proc~matinv&#45;&gt;proc~ludcmp</title>
+<path fill="none" stroke="#000000" d="M598.282,-369C619.672,-369 650.092,-369 673.789,-369"/>
+<polygon fill="#000000" stroke="#000000" points="673.816,-372.5 683.816,-369 673.816,-365.5 673.816,-372.5"/>
+</g>
+<!-- proc~outerprod -->
+<g id="proc~~pnpa_mc~~CallsGraph_node59" class="node"><title>proc~outerprod</title>
+<g id="a_proc~~pnpa_mc~~CallsGraph_node59"><a xlink:href=".././proc/outerprod.html" xlink:title="outerprod">
+<polygon fill="#d94e8f" stroke="#d94e8f" points="896.5,-381 837.5,-381 837.5,-357 896.5,-357 896.5,-381"/>
+<text text-anchor="middle" x="867" y="-366.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">outerprod</text>
+</a>
+</g>
+</g>
+<!-- proc~ludcmp&#45;&gt;proc~outerprod -->
+<g id="proc~~pnpa_mc~~CallsGraph_edge85" class="edge"><title>proc~ludcmp&#45;&gt;proc~outerprod</title>
+<path fill="none" stroke="#000000" d="M738.124,-369C762.55,-369 799.339,-369 827.196,-369"/>
+<polygon fill="#000000" stroke="#000000" points="827.391,-372.5 837.39,-369 827.39,-365.5 827.391,-372.5"/>
+</g>
+</g>
+</svg>
+</div><script>var panprocpnpa_mcCallsGraph = svgPanZoom('#procpnpa_mcCallsGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+     
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~pnpa_mc~~CalledByGraph Pages: 1 -->
+<svg id="procpnpa_mcCalledByGraph" width="156pt" height="32pt"
+ viewBox="0.00 0.00 156.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~pnpa_mc~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~pnpa_mc~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 152,-28 152,4 -4,4"/>
+<!-- proc~pnpa_mc -->
+<g id="proc~~pnpa_mc~~CalledByGraph_node1" class="node"><title>proc~pnpa_mc</title>
+<polygon fill="none" stroke="black" points="147.5,-24 90.5,-24 90.5,-0 147.5,-0 147.5,-24"/>
+<text text-anchor="middle" x="119" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">pnpa_mc</text>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~pnpa_mc~~CalledByGraph_node2" class="node"><title>program~fidasim</title>
+<g id="a_proc~~pnpa_mc~~CalledByGraph_node2"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~pnpa_mc -->
+<g id="proc~~pnpa_mc~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~pnpa_mc</title>
+<path fill="none" stroke="#000000" d="M54.0317,-12C62.2408,-12 71.4806,-12 80.3316,-12"/>
+<polygon fill="#000000" stroke="#000000" points="80.4582,-15.5001 90.4582,-12 80.4582,-8.5001 80.4582,-15.5001"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/pnpa_mc.html#src">pnpa_mc</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">pnpa_mc</span>
+    <span class="c">!+ Calculate Passive NPA flux using a Monte Carlo fast-ion distribution</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">iion</span><span class="p">,</span><span class="n">igamma</span><span class="p">,</span><span class="n">ngamma</span><span class="p">,</span><span class="n">npart</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">FastIon</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fast_ion</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">phi</span><span class="p">,</span><span class="n">theta</span><span class="p">,</span><span class="n">dtheta</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ri</span><span class="p">,</span> <span class="n">rf</span><span class="p">,</span> <span class="n">rg</span><span class="p">,</span> <span class="n">vi</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">det</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">ichan</span><span class="p">,</span><span class="n">ir</span><span class="p">,</span><span class="n">nrange</span><span class="p">,</span><span class="n">it</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LocalEMFields</span><span class="p">)</span> <span class="kd">::</span> <span class="n">fields</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">LocalProfiles</span><span class="p">)</span> <span class="kd">::</span> <span class="n">plasma</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">GyroSurface</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gs</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">)</span> <span class="kd">::</span> <span class="n">states</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">flux</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">uvw</span><span class="p">,</span> <span class="n">uvw_vi</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">gyrange</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">s</span><span class="p">,</span><span class="n">c</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
+
+    <span class="n">ngamma</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">.</span><span class="nb">or</span><span class="p">.(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">2</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">ngamma</span> <span class="o">=</span> <span class="nb">ceiling</span><span class="p">(</span><span class="nb">dble</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">n_pnpa</span><span class="p">)</span><span class="o">/</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T6,&quot;# of markers: &quot;,i10)&#39;</span><span class="p">)</span> <span class="nb">int</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="o">*</span><span class="n">ngamma</span><span class="p">,</span><span class="n">Int64</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="c">!$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &amp;</span>
+    <span class="c">!$OMP&amp; randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)</span>
+    <span class="n">loop_over_fast_ions</span><span class="p">:</span> <span class="k">do </span><span class="n">iion</span><span class="o">=</span><span class="n">istart</span><span class="p">,</span><span class="n">particles</span><span class="p">%</span><span class="n">nparticle</span><span class="p">,</span><span class="n">istep</span>
+        <span class="n">fast_ion</span> <span class="o">=</span> <span class="n">particles</span><span class="p">%</span><span class="n">fast_ion</span><span class="p">(</span><span class="n">iion</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vabs</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_fast_ions</span>
+        <span class="n">gamma_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">igamma</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">ngamma</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">)</span> <span class="k">then</span>
+                <span class="c">!! Pick random toroidal angle</span>
+                <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">randomu</span><span class="p">)</span>
+                <span class="n">phi</span> <span class="o">=</span> <span class="n">pass_grid</span><span class="p">%</span><span class="n">phi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="o">*</span><span class="n">randomu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span>
+<span class="k">                </span><span class="n">phi</span> <span class="o">=</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">phi</span>
+            <span class="n">endif</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="nb">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+
+            <span class="c">!! Calculate position in machine coordinates</span>
+            <span class="n">uvw</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">c</span>
+            <span class="n">uvw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">s</span>
+            <span class="n">uvw</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">z</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">dist_type</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="k">then</span>
+                <span class="c">!! Get electomagnetic fields</span>
+                <span class="k">call </span><span class="n">get_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">uvw</span><span class="p">,</span> <span class="n">input_coords</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+                <span class="c">!! Correct for gyro motion and get position and velocity</span>
+                <span class="k">call </span><span class="n">gyro_surface</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">energy</span><span class="p">,</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">pitch</span><span class="p">,</span> <span class="n">gs</span><span class="p">)</span>
+
+                <span class="n">detector_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">ichan</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">npa_chords</span><span class="p">%</span><span class="n">nchan</span>
+                    <span class="k">call </span><span class="n">npa_gyro_range</span><span class="p">(</span><span class="n">ichan</span><span class="p">,</span> <span class="n">gs</span><span class="p">,</span> <span class="n">gyrange</span><span class="p">,</span> <span class="n">nrange</span><span class="p">)</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">nrange</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">detector_loop</span>
+
+                    <span class="n">gyro_range_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">ir</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">nrange</span>
+                        <span class="n">dtheta</span> <span class="o">=</span> <span class="n">gyrange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">ir</span><span class="p">)</span>
+                        <span class="n">theta</span> <span class="o">=</span> <span class="n">gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ir</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">dtheta</span>
+                        <span class="k">call </span><span class="n">gyro_trajectory</span><span class="p">(</span><span class="n">gs</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vi</span><span class="p">)</span>
+
+                        <span class="c">!! Check if particle hits a NPA detector</span>
+                        <span class="k">call </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vi</span> <span class="p">,</span><span class="n">det</span><span class="p">,</span> <span class="n">rf</span><span class="p">,</span> <span class="n">det</span><span class="o">=</span><span class="n">ichan</span><span class="p">)</span>
+                        <span class="k">if</span><span class="p">(</span><span class="n">det</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">ichan</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                            if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="k">then</span>
+<span class="k">                                write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s2">&quot;PNPA_MC: Missed Detector &quot;</span><span class="p">,</span><span class="n">ichan</span>
+                            <span class="n">endif</span>
+                            <span class="k">cycle </span><span class="n">gyro_range_loop</span>
+                        <span class="n">endif</span>
+
+                        <span class="c">!! Calculate CX probability with beam and halo neutrals</span>
+                        <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
+                        <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">beam_ion</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+                        <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">rates</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">cycle </span><span class="n">gyro_range_loop</span>
+
+                        <span class="c">!! Weight CX rates by ion source density</span>
+                        <span class="k">if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                            </span><span class="n">states</span><span class="o">=</span><span class="n">rates</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">weight</span><span class="o">*</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span> <span class="p">&amp;</span>
+                                   <span class="o">/</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span><span class="p">)</span><span class="o">/</span><span class="n">ngamma</span>
+                        <span class="k">else</span>
+<span class="k">                            </span><span class="n">states</span><span class="o">=</span><span class="n">rates</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">weight</span><span class="o">/</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span><span class="p">)</span><span class="o">/</span><span class="n">ngamma</span>
+                        <span class="n">endif</span>
+
+                        <span class="c">!! Attenuate states as the particle move through plasma</span>
+                        <span class="k">call </span><span class="n">attenuate</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span><span class="n">rf</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">states</span><span class="p">)</span>
+
+                        <span class="c">!! Store NPA Flux</span>
+                        <span class="n">flux</span> <span class="o">=</span> <span class="p">(</span><span class="n">dtheta</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span><span class="o">*</span><span class="nb">sum</span><span class="p">(</span><span class="n">states</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span><span class="p">)</span>
+                        <span class="n">spread_loop</span><span class="p">:</span> <span class="k">do </span><span class="n">it</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="mi">25</span>
+                            <span class="n">theta</span> <span class="o">=</span> <span class="n">gyrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">ir</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">it</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">dtheta</span><span class="o">/</span><span class="mi">25</span>
+                            <span class="k">call </span><span class="n">gyro_trajectory</span><span class="p">(</span><span class="n">gs</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vi</span><span class="p">)</span>
+                            <span class="k">call </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vi</span> <span class="p">,</span><span class="n">det</span><span class="p">,</span> <span class="n">rf</span><span class="p">,</span> <span class="n">det</span><span class="o">=</span><span class="n">ichan</span><span class="p">)</span>
+                            <span class="k">if</span><span class="p">(</span><span class="n">det</span><span class="p">.</span><span class="n">ne</span><span class="p">.</span><span class="n">ichan</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                                if</span> <span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span><span class="k">then</span>
+<span class="k">                                    write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="o">*</span><span class="p">)</span> <span class="s2">&quot;PNPA_MC: Missed Detector &quot;</span><span class="p">,</span><span class="n">ichan</span>
+                                <span class="n">endif</span>
+                                <span class="k">cycle </span><span class="n">spread_loop</span>
+                            <span class="n">endif</span>
+                            <span class="k">call </span><span class="n">store_npa</span><span class="p">(</span><span class="n">det</span><span class="p">,</span><span class="n">ri</span><span class="p">,</span><span class="n">rf</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">flux</span><span class="o">/</span><span class="mi">25</span><span class="p">,</span><span class="n">fast_ion</span><span class="p">%</span><span class="k">class</span><span class="p">,</span> <span class="n">passive</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
+                        <span class="n">enddo</span> <span class="n">spread_loop</span>
+                    <span class="n">enddo</span> <span class="n">gyro_range_loop</span>
+                <span class="n">enddo</span> <span class="n">detector_loop</span>
+            <span class="k">else</span> <span class="c">!! Full Orbit</span>
+                <span class="c">!! Convert to beam grid coordinates</span>
+                <span class="k">call </span><span class="n">uvw_to_xyz</span><span class="p">(</span><span class="n">uvw</span><span class="p">,</span> <span class="n">ri</span><span class="p">)</span>
+
+                <span class="c">!! Calculate velocity vector</span>
+                <span class="n">uvw_vi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vr</span> <span class="o">-</span> <span class="n">s</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vt</span>
+                <span class="n">uvw_vi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">s</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vr</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">vt</span>
+                <span class="n">uvw_vi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="n">fast_ion</span><span class="p">%</span><span class="n">vz</span>
+                <span class="n">vi</span> <span class="o">=</span> <span class="nb">matmul</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">inv_basis</span><span class="p">,</span><span class="n">uvw_vi</span><span class="p">)</span>
+
+                <span class="c">!! Check if particle hits a NPA detector</span>
+                <span class="k">call </span><span class="n">hit_npa_detector</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vi</span> <span class="p">,</span><span class="n">det</span><span class="p">,</span> <span class="n">rf</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">det</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">0</span><span class="p">)</span> <span class="k">cycle </span><span class="n">gamma_loop</span>
+
+                <span class="c">!! Calculate CX probability with beam and halo neutrals</span>
+                <span class="k">call </span><span class="n">get_plasma</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">ri</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">bt_cx_rates</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">plasma</span><span class="p">%</span><span class="n">denn</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">beam_ion</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+                <span class="k">if</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">rates</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.</span><span class="p">)</span> <span class="k">cycle </span><span class="n">gamma_loop</span>
+
+                <span class="c">!! Weight CX rates by ion source density</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">particles</span><span class="p">%</span><span class="n">axisym</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">                    </span><span class="n">states</span><span class="o">=</span><span class="n">rates</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">weight</span><span class="o">*</span><span class="p">(</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">nphi</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dphi</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">pi</span><span class="p">))</span> <span class="p">&amp;</span>
+                           <span class="o">/</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span><span class="p">)</span><span class="o">/</span><span class="n">ngamma</span>
+                <span class="k">else</span>
+<span class="k">                    </span><span class="n">states</span><span class="o">=</span><span class="n">rates</span><span class="o">*</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">weight</span><span class="o">/</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span><span class="p">)</span><span class="o">/</span><span class="n">ngamma</span>
+                <span class="n">endif</span>
+
+                <span class="c">!! Attenuate states as the particle moves though plasma</span>
+                <span class="k">call </span><span class="n">attenuate</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span><span class="n">rf</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">states</span><span class="p">)</span>
+
+                <span class="c">!! Store NPA Flux</span>
+                <span class="n">flux</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">states</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">fast_ion</span><span class="p">%</span><span class="n">r</span><span class="o">*</span><span class="n">pass_grid</span><span class="p">%</span><span class="n">dv</span><span class="p">)</span>
+                <span class="k">call </span><span class="n">store_npa</span><span class="p">(</span><span class="n">det</span><span class="p">,</span><span class="n">ri</span><span class="p">,</span><span class="n">rf</span><span class="p">,</span><span class="n">vi</span><span class="p">,</span><span class="n">flux</span><span class="p">,</span><span class="n">fast_ion</span><span class="p">%</span><span class="k">class</span><span class="p">,</span><span class="n">passive</span><span class="o">=</span><span class="p">.</span><span class="n">True</span><span class="p">.)</span>
+            <span class="n">endif</span>
+        <span class="n">enddo</span> <span class="n">gamma_loop</span>
+    <span class="n">enddo</span> <span class="n">loop_over_fast_ions</span>
+    <span class="c">!$OMP END PARALLEL DO</span>
+
+    <span class="n">npart</span> <span class="o">=</span> <span class="n">pnpa</span><span class="p">%</span><span class="n">npart</span>
+<span class="cp">#ifdef _MPI</span>
+    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">npart</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">pnpa</span><span class="p">%</span><span class="n">flux</span><span class="p">)</span>
+<span class="cp">#endif</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">verbose</span><span class="p">.</span><span class="n">ge</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span><span class="s1">&#39;(T4,&quot;Number of Passive NPA particles that hit a detector: &quot;,i8)&#39;</span><span class="p">)</span> <span class="n">npart</span>
+    <span class="n">endif</span>
+
+<span class="k">end subroutine </span><span class="n">pnpa_mc</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

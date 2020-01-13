@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   
+   <meta name="description" content="">
+    
+    <meta name="author" content="Luke Stagner" >
+    <link rel="icon" href="../favicon.png">
+
+    <title>nbi_spec &ndash; FIDASIM</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/pygments.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/local.css" rel="stylesheet">
+    
+    <link  href="../tipuesearch/tipuesearch.css" rel="stylesheet">
+    
+    
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    <script src="../js/jquery-2.1.3.min.js"></script>
+    <script src="../js/svg-pan-zoom.min.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="../index.html">FIDASIM <small>2.0.0-pre</small></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+        
+            <li><a href='../page/index.html'>User Guide</a></li>
+      
+            <li class="dropdown hidden-xs visible-sm visible-md hidden-lg">
+              <a href="#" class="dropdown-toggle"
+              data-toggle="dropdown" role="button"
+              aria-haspopup="true"
+     aria-expanded="false">Contents <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          
+              
+            <li><a href="../lists/files.html">Source Files</a></li>
+        
+        
+        
+            <li><a href="../lists/modules.html">Modules</a></li>
+        
+            
+                                
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+        
+               
+            <li><a href="../lists/types.html">Derived Types</a></li>
+        
+        
+            <li><a href="../lists/programs.html">Programs</a></li>
+        
+            </ul>
+            </li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/files.html">Source Files</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/modules.html">Modules</a></li>
+
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/procedures.html">Procedures</a></li>
+
+                             
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/types.html">Derived Types</a></li>
+
+
+<li class="visible-xs hidden-sm visible-lg"><a href="../lists/programs.html">Programs</a></li>
+
+          </ul>
+        
+        <form action="../search.html" class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search" name="q" id="tipue_search_input" autocomplete="off" required>
+        </div>
+<!--
+        <button type="submit" class="btn btn-default">Submit</button>
+-->
+        </form>
+        
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+    
+  
+  <div class="row">
+    <h1>nbi_spec
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="well well-sm">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.4% of total for procedures.">54 statements</a>
+     </li> 
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/fidasim.f90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/fidasim.f90.html'>fidasim.f90</a></li>
+    
+     <li><a href='../module/libfida.html'>libfida</a></li>
+    
+  
+     <li class="active">nbi_spec</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/nbi_spec.html#src">nbi_spec</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine nbi_spec()
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Calculates approximate neutral beam emission (full, half, third)
+ from user supplied neutrals file</p>
+    
+
+    <h3>Arguments</h3>
+    
+    <em>None</em>
+    <br>
+    
+    
+    
+    <br>
+    
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Calls</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~nbi_spec~~CallsGraph Pages: 1 -->
+<svg id="procnbi_specCallsGraph" width="641pt" height="504pt"
+ viewBox="0.00 0.00 641.00 503.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~nbi_spec~~CallsGraph" class="graph" transform="scale(0.615163 0.615163) rotate(0) translate(4 814.898)">
+<title>proc~~nbi_spec~~CallsGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-814.898 1038,-814.898 1038,4 -4,4"/>
+<!-- proc~nbi_spec -->
+<g id="proc~~nbi_spec~~CallsGraph_node1" class="node"><title>proc~nbi_spec</title>
+<polygon fill="none" stroke="black" points="55.5,-422 0.5,-422 0.5,-398 55.5,-398 55.5,-422"/>
+<text text-anchor="middle" x="28" y="-407.6" font-family="Helvetica,sans-Serif" font-size="10.50">nbi_spec</text>
+</g>
+<!-- proc~store_photons -->
+<g id="proc~~nbi_spec~~CallsGraph_node2" class="node"><title>proc~store_photons</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node2"><a xlink:href=".././proc/store_photons.html" xlink:title="store_photons">
+<polygon fill="#d9534f" stroke="#d9534f" points="173.5,-507 92.5,-507 92.5,-483 173.5,-483 173.5,-507"/>
+<text text-anchor="middle" x="133" y="-492.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">store_photons</text>
+</a>
+</g>
+</g>
+<!-- proc~nbi_spec&#45;&gt;proc~store_photons -->
+<g id="proc~~nbi_spec~~CallsGraph_edge1" class="edge"><title>proc~nbi_spec&#45;&gt;proc~store_photons</title>
+<path fill="none" stroke="#000000" d="M43.7574,-422.178C60.8901,-436.317 89.3431,-459.798 109.297,-476.264"/>
+<polygon fill="#000000" stroke="#000000" points="107.329,-479.179 117.27,-482.844 111.785,-473.78 107.329,-479.179"/>
+</g>
+<!-- proc~mc_nbi_cell -->
+<g id="proc~~nbi_spec~~CallsGraph_node3" class="node"><title>proc~mc_nbi_cell</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node3"><a xlink:href=".././proc/mc_nbi_cell.html" xlink:title="mc_nbi_cell">
+<polygon fill="#d9534f" stroke="#d9534f" points="167.5,-402 98.5,-402 98.5,-378 167.5,-378 167.5,-402"/>
+<text text-anchor="middle" x="133" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mc_nbi_cell</text>
+</a>
+</g>
+</g>
+<!-- proc~nbi_spec&#45;&gt;proc~mc_nbi_cell -->
+<g id="proc~~nbi_spec~~CallsGraph_edge2" class="edge"><title>proc~nbi_spec&#45;&gt;proc~mc_nbi_cell</title>
+<path fill="none" stroke="#000000" d="M55.5251,-404.85C65.4736,-402.918 77.0629,-400.667 88.1658,-398.511"/>
+<polygon fill="#000000" stroke="#000000" points="89.0153,-401.912 98.1647,-396.57 87.6809,-395.04 89.0153,-401.912"/>
+</g>
+<!-- proc~ind2sub -->
+<g id="proc~~nbi_spec~~CallsGraph_node4" class="node"><title>proc~ind2sub</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node4"><a xlink:href=".././proc/ind2sub.html" xlink:title="ind2sub">
+<polygon fill="#d9534f" stroke="#d9534f" points="160,-360 106,-360 106,-336 160,-336 160,-360"/>
+<text text-anchor="middle" x="133" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">ind2sub</text>
+</a>
+</g>
+</g>
+<!-- proc~nbi_spec&#45;&gt;proc~ind2sub -->
+<g id="proc~~nbi_spec~~CallsGraph_edge3" class="edge"><title>proc~nbi_spec&#45;&gt;proc~ind2sub</title>
+<path fill="none" stroke="#000000" d="M46.6434,-397.884C59.1226,-389.472 76.3512,-378.173 92,-369 94.3302,-367.634 96.7573,-366.256 99.2131,-364.893"/>
+<polygon fill="#000000" stroke="#000000" points="100.983,-367.915 108.11,-360.076 97.6499,-361.759 100.983,-367.915"/>
+</g>
+<!-- proc~in_plasma -->
+<g id="proc~~nbi_spec~~CallsGraph_node5" class="node"><title>proc~in_plasma</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node5"><a xlink:href=".././proc/in_plasma.html" xlink:title="in_plasma">
+<polygon fill="#d9534f" stroke="#d9534f" points="460.5,-678 399.5,-678 399.5,-654 460.5,-654 460.5,-678"/>
+<text text-anchor="middle" x="430" y="-663.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">in_plasma</text>
+</a>
+</g>
+</g>
+<!-- proc~nbi_spec&#45;&gt;proc~in_plasma -->
+<g id="proc~~nbi_spec~~CallsGraph_edge4" class="edge"><title>proc~nbi_spec&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M34.6455,-422.275C44.4893,-442.929 66.2239,-485.37 92,-516 136.448,-568.818 148.267,-586.105 210,-617 268.182,-646.118 343.645,-658.098 389.087,-662.909"/>
+<polygon fill="#000000" stroke="#000000" points="388.841,-666.401 399.138,-663.907 389.533,-659.436 388.841,-666.401"/>
+</g>
+<!-- interface~randu -->
+<g id="proc~~nbi_spec~~CallsGraph_node6" class="node"><title>interface~randu</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node6"><a xlink:href=".././interface/randu.html" xlink:title="randu">
+<polygon fill="#a7506f" stroke="#a7506f" points="304,-402 250,-402 250,-378 304,-378 304,-402"/>
+<text text-anchor="middle" x="277" y="-387.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">randu</text>
+</a>
+</g>
+</g>
+<!-- proc~nbi_spec&#45;&gt;interface~randu -->
+<g id="proc~~nbi_spec~~CallsGraph_edge5" class="edge"><title>proc~nbi_spec&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M55.6681,-410.517C66.8859,-410.71 80.077,-410.905 92,-411 128.443,-411.289 137.743,-414.694 174,-411 196.107,-408.748 220.499,-403.818 239.885,-399.3"/>
+<polygon fill="#000000" stroke="#000000" points="240.901,-402.656 249.81,-396.922 239.27,-395.848 240.901,-402.656"/>
+</g>
+<!-- interface~parallel_sum -->
+<g id="proc~~nbi_spec~~CallsGraph_node7" class="node"><title>interface~parallel_sum</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node7"><a xlink:href=".././interface/parallel_sum.html" xlink:title="parallel_sum">
+<polygon fill="#a7506f" stroke="#a7506f" points="169.5,-213 96.5,-213 96.5,-189 169.5,-189 169.5,-213"/>
+<text text-anchor="middle" x="133" y="-198.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum</text>
+</a>
+</g>
+</g>
+<!-- proc~nbi_spec&#45;&gt;interface~parallel_sum -->
+<g id="proc~~nbi_spec~~CallsGraph_edge6" class="edge"><title>proc~nbi_spec&#45;&gt;interface~parallel_sum</title>
+<path fill="none" stroke="#000000" d="M34.9829,-397.86C51.8718,-363.59 100.075,-265.781 121.507,-222.292"/>
+<polygon fill="#000000" stroke="#000000" points="124.719,-223.691 126.001,-213.174 118.44,-220.596 124.719,-223.691"/>
+</g>
+<!-- proc~get_fields -->
+<g id="proc~~nbi_spec~~CallsGraph_node8" class="node"><title>proc~get_fields</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node8"><a xlink:href=".././proc/get_fields.html" xlink:title="get_fields">
+<polygon fill="#d9534f" stroke="#d9534f" points="306,-608 248,-608 248,-584 306,-584 306,-608"/>
+<text text-anchor="middle" x="277" y="-593.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_fields</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photons&#45;&gt;proc~get_fields -->
+<g id="proc~~nbi_spec~~CallsGraph_edge11" class="edge"><title>proc~store_photons&#45;&gt;proc~get_fields</title>
+<path fill="none" stroke="#000000" d="M143.616,-507.181C156.989,-523.427 182.657,-552.202 210,-570 218.67,-575.643 228.756,-580.383 238.396,-584.204"/>
+<polygon fill="#000000" stroke="#000000" points="237.225,-587.502 247.818,-587.718 239.671,-580.944 237.225,-587.502"/>
+</g>
+<!-- proc~get_passive_grid_indices -->
+<g id="proc~~nbi_spec~~CallsGraph_node13" class="node"><title>proc~get_passive_grid_indices</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node13"><a xlink:href=".././proc/get_passive_grid_indices.html" xlink:title="get_passive_grid_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="343.5,-528 210.5,-528 210.5,-504 343.5,-504 343.5,-528"/>
+<text text-anchor="middle" x="277" y="-513.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_passive_grid_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photons&#45;&gt;proc~get_passive_grid_indices -->
+<g id="proc~~nbi_spec~~CallsGraph_edge10" class="edge"><title>proc~store_photons&#45;&gt;proc~get_passive_grid_indices</title>
+<path fill="none" stroke="#000000" d="M173.555,-500.85C181.932,-502.089 191.041,-503.436 200.256,-504.798"/>
+<polygon fill="#000000" stroke="#000000" points="199.865,-508.279 210.269,-506.279 200.889,-501.354 199.865,-508.279"/>
+</g>
+<!-- proc~get_indices -->
+<g id="proc~~nbi_spec~~CallsGraph_node15" class="node"><title>proc~get_indices</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node15"><a xlink:href=".././proc/get_indices.html" xlink:title="get_indices">
+<polygon fill="#d9534f" stroke="#d9534f" points="310.5,-486 243.5,-486 243.5,-462 310.5,-462 310.5,-486"/>
+<text text-anchor="middle" x="277" y="-471.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">get_indices</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photons&#45;&gt;proc~get_indices -->
+<g id="proc~~nbi_spec~~CallsGraph_edge7" class="edge"><title>proc~store_photons&#45;&gt;proc~get_indices</title>
+<path fill="none" stroke="#000000" d="M173.555,-489.15C192.112,-486.406 214.26,-483.131 233.207,-480.329"/>
+<polygon fill="#000000" stroke="#000000" points="233.981,-483.752 243.361,-478.827 232.957,-476.828 233.981,-483.752"/>
+</g>
+<!-- proc~uvw_to_xyz -->
+<g id="proc~~nbi_spec~~CallsGraph_node16" class="node"><title>proc~uvw_to_xyz</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node16"><a xlink:href=".././proc/uvw_to_xyz.html" xlink:title="uvw_to_xyz">
+<polygon fill="#d9534f" stroke="#d9534f" points="464,-556 396,-556 396,-532 464,-532 464,-556"/>
+<text text-anchor="middle" x="430" y="-541.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">uvw_to_xyz</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photons&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~nbi_spec~~CallsGraph_edge8" class="edge"><title>proc~store_photons&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M150.499,-507.154C165.256,-517.256 187.906,-530.923 210,-537 269.208,-553.285 340.825,-551.816 385.659,-548.507"/>
+<polygon fill="#000000" stroke="#000000" points="385.942,-551.996 395.63,-547.708 385.382,-545.018 385.942,-551.996"/>
+</g>
+<!-- proc~spectrum -->
+<g id="proc~~nbi_spec~~CallsGraph_node17" class="node"><title>proc~spectrum</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node17"><a xlink:href=".././proc/spectrum.html" xlink:title="spectrum">
+<polygon fill="#d9534f" stroke="#d9534f" points="305.5,-444 248.5,-444 248.5,-420 305.5,-420 305.5,-444"/>
+<text text-anchor="middle" x="277" y="-429.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">spectrum</text>
+</a>
+</g>
+</g>
+<!-- proc~store_photons&#45;&gt;proc~spectrum -->
+<g id="proc~~nbi_spec~~CallsGraph_edge9" class="edge"><title>proc~store_photons&#45;&gt;proc~spectrum</title>
+<path fill="none" stroke="#000000" d="M153.462,-482.845C168.506,-473.799 190.06,-461.583 210,-453 219.099,-449.084 229.177,-445.513 238.661,-442.471"/>
+<polygon fill="#000000" stroke="#000000" points="239.745,-445.8 248.264,-439.501 237.676,-439.113 239.745,-445.8"/>
+</g>
+<!-- proc~mc_nbi_cell&#45;&gt;interface~randu -->
+<g id="proc~~nbi_spec~~CallsGraph_edge12" class="edge"><title>proc~mc_nbi_cell&#45;&gt;interface~randu</title>
+<path fill="none" stroke="#000000" d="M167.652,-390C189.317,-390 217.469,-390 239.646,-390"/>
+<polygon fill="#000000" stroke="#000000" points="239.683,-393.5 249.683,-390 239.683,-386.5 239.683,-393.5"/>
+</g>
+<!-- interface~interpol_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_node9" class="node"><title>interface~interpol_coeff</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node9"><a xlink:href=".././interface/interpol_coeff.html" xlink:title="interpol_coeff">
+<polygon fill="#a7506f" stroke="#a7506f" points="593.5,-721 516.5,-721 516.5,-697 593.5,-697 593.5,-721"/>
+<text text-anchor="middle" x="555" y="-706.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol_coeff</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;interface~interpol_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge13" class="edge"><title>proc~in_plasma&#45;&gt;interface~interpol_coeff</title>
+<path fill="none" stroke="#000000" d="M460.775,-676.409C475.377,-681.514 493.264,-687.767 509.452,-693.426"/>
+<polygon fill="#000000" stroke="#000000" points="508.672,-696.861 519.267,-696.858 510.982,-690.253 508.672,-696.861"/>
+</g>
+<!-- proc~cyl_to_uvw -->
+<g id="proc~~nbi_spec~~CallsGraph_node12" class="node"><title>proc~cyl_to_uvw</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node12"><a xlink:href=".././proc/cyl_to_uvw.html" xlink:title="cyl_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="587.5,-679 522.5,-679 522.5,-655 587.5,-655 587.5,-679"/>
+<text text-anchor="middle" x="555" y="-664.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~cyl_to_uvw -->
+<g id="proc~~nbi_spec~~CallsGraph_edge14" class="edge"><title>proc~in_plasma&#45;&gt;proc~cyl_to_uvw</title>
+<path fill="none" stroke="#000000" d="M460.775,-666.242C476.201,-666.367 495.294,-666.523 512.176,-666.66"/>
+<polygon fill="#000000" stroke="#000000" points="512.321,-670.161 522.349,-666.743 512.378,-663.161 512.321,-670.161"/>
+</g>
+<!-- proc~xyz_to_uvw -->
+<g id="proc~~nbi_spec~~CallsGraph_node24" class="node"><title>proc~xyz_to_uvw</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node24"><a xlink:href=".././proc/xyz_to_uvw.html" xlink:title="xyz_to_uvw">
+<polygon fill="#d9534f" stroke="#d9534f" points="589,-637 521,-637 521,-613 589,-613 589,-637"/>
+<text text-anchor="middle" x="555" y="-622.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">xyz_to_uvw</text>
+</a>
+</g>
+</g>
+<!-- proc~in_plasma&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~nbi_spec~~CallsGraph_edge15" class="edge"><title>proc~in_plasma&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M460.775,-656.075C475.871,-651.043 494.479,-644.84 511.09,-639.303"/>
+<polygon fill="#000000" stroke="#000000" points="512.218,-642.617 520.598,-636.134 510.004,-635.976 512.218,-642.617"/>
+</g>
+<!-- proc~parallel_sum_i0 -->
+<g id="proc~~nbi_spec~~CallsGraph_node10" class="node"><title>proc~parallel_sum_i0</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node10"><a xlink:href=".././proc/parallel_sum_i0.html" xlink:title="parallel_sum_i0">
+<polygon fill="#d9534f" stroke="#d9534f" points="321,-360 233,-360 233,-336 321,-336 321,-360"/>
+<text text-anchor="middle" x="277" y="-345.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i0</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i0 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge17" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i0</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M137.954,-213.025C146.784,-238.016 170.492,-295.825 210,-327 214.084,-330.223 218.673,-332.956 223.479,-335.273"/>
+<polygon fill="#000000" stroke="#000000" points="222.339,-338.59 232.914,-339.235 225.049,-332.136 222.339,-338.59"/>
+</g>
+<!-- proc~parallel_sum_i2 -->
+<g id="proc~~nbi_spec~~CallsGraph_node11" class="node"><title>proc~parallel_sum_i2</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node11"><a xlink:href=".././proc/parallel_sum_i2.html" xlink:title="parallel_sum_i2">
+<polygon fill="#d9534f" stroke="#d9534f" points="321,-318 233,-318 233,-294 321,-294 321,-318"/>
+<text text-anchor="middle" x="277" y="-303.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i2</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i2 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge18" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i2</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M141.834,-213.144C154.185,-231.348 179.899,-265.634 210,-285 214.252,-287.736 218.888,-290.139 223.666,-292.246"/>
+<polygon fill="#000000" stroke="#000000" points="222.383,-295.502 232.969,-295.94 224.967,-288.996 222.383,-295.502"/>
+</g>
+<!-- proc~parallel_sum_d4 -->
+<g id="proc~~nbi_spec~~CallsGraph_node14" class="node"><title>proc~parallel_sum_d4</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node14"><a xlink:href=".././proc/parallel_sum_d4.html" xlink:title="parallel_sum_d4">
+<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-276 231.5,-276 231.5,-252 322.5,-252 322.5,-276"/>
+<text text-anchor="middle" x="277" y="-261.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d4</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d4 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge19" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d4</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M153.462,-213.155C168.506,-222.201 190.06,-234.417 210,-243 214.459,-244.919 219.154,-246.756 223.898,-248.487"/>
+<polygon fill="#000000" stroke="#000000" points="223.053,-251.899 233.648,-251.888 225.358,-245.29 223.053,-251.899"/>
+</g>
+<!-- proc~parallel_sum_d5 -->
+<g id="proc~~nbi_spec~~CallsGraph_node18" class="node"><title>proc~parallel_sum_d5</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node18"><a xlink:href=".././proc/parallel_sum_d5.html" xlink:title="parallel_sum_d5">
+<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-234 231.5,-234 231.5,-210 322.5,-210 322.5,-234"/>
+<text text-anchor="middle" x="277" y="-219.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d5</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d5 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge20" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d5</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M169.833,-206.299C185.423,-208.605 204.041,-211.358 221.3,-213.911"/>
+<polygon fill="#000000" stroke="#000000" points="220.867,-217.384 231.271,-215.385 221.891,-210.46 220.867,-217.384"/>
+</g>
+<!-- proc~parallel_sum_d2 -->
+<g id="proc~~nbi_spec~~CallsGraph_node19" class="node"><title>proc~parallel_sum_d2</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node19"><a xlink:href=".././proc/parallel_sum_d2.html" xlink:title="parallel_sum_d2">
+<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-192 231.5,-192 231.5,-168 322.5,-168 322.5,-192"/>
+<text text-anchor="middle" x="277" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d2</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d2 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge21" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d2</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M169.833,-195.701C185.423,-193.395 204.041,-190.642 221.3,-188.089"/>
+<polygon fill="#000000" stroke="#000000" points="221.891,-191.54 231.271,-186.615 220.867,-184.616 221.891,-191.54"/>
+</g>
+<!-- proc~parallel_sum_d3 -->
+<g id="proc~~nbi_spec~~CallsGraph_node20" class="node"><title>proc~parallel_sum_d3</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node20"><a xlink:href=".././proc/parallel_sum_d3.html" xlink:title="parallel_sum_d3">
+<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-150 231.5,-150 231.5,-126 322.5,-126 322.5,-150"/>
+<text text-anchor="middle" x="277" y="-135.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d3</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d3 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge22" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d3</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M153.462,-188.845C168.506,-179.799 190.06,-167.583 210,-159 214.459,-157.081 219.154,-155.244 223.898,-153.513"/>
+<polygon fill="#000000" stroke="#000000" points="225.358,-156.71 233.648,-150.112 223.053,-150.101 225.358,-156.71"/>
+</g>
+<!-- proc~parallel_sum_d0 -->
+<g id="proc~~nbi_spec~~CallsGraph_node21" class="node"><title>proc~parallel_sum_d0</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node21"><a xlink:href=".././proc/parallel_sum_d0.html" xlink:title="parallel_sum_d0">
+<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-108 231.5,-108 231.5,-84 322.5,-84 322.5,-108"/>
+<text text-anchor="middle" x="277" y="-93.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d0</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d0 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge23" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d0</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M141.834,-188.856C154.185,-170.652 179.899,-136.366 210,-117 213.742,-114.593 217.78,-112.443 221.952,-110.526"/>
+<polygon fill="#000000" stroke="#000000" points="223.327,-113.745 231.234,-106.692 220.655,-107.275 223.327,-113.745"/>
+</g>
+<!-- proc~parallel_sum_d1 -->
+<g id="proc~~nbi_spec~~CallsGraph_node22" class="node"><title>proc~parallel_sum_d1</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node22"><a xlink:href=".././proc/parallel_sum_d1.html" xlink:title="parallel_sum_d1">
+<polygon fill="#d9534f" stroke="#d9534f" points="322.5,-66 231.5,-66 231.5,-42 322.5,-42 322.5,-66"/>
+<text text-anchor="middle" x="277" y="-51.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_d1</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_d1 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge24" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_d1</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M137.954,-188.975C146.784,-163.984 170.492,-106.175 210,-75 213.602,-72.1579 217.596,-69.6965 221.786,-67.5655"/>
+<polygon fill="#000000" stroke="#000000" points="223.462,-70.6515 231.194,-63.4084 220.632,-64.2487 223.462,-70.6515"/>
+</g>
+<!-- proc~parallel_sum_i1 -->
+<g id="proc~~nbi_spec~~CallsGraph_node23" class="node"><title>proc~parallel_sum_i1</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node23"><a xlink:href=".././proc/parallel_sum_i1.html" xlink:title="parallel_sum_i1">
+<polygon fill="#d9534f" stroke="#d9534f" points="321,-24 233,-24 233,-0 321,-0 321,-24"/>
+<text text-anchor="middle" x="277" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">parallel_sum_i1</text>
+</a>
+</g>
+</g>
+<!-- interface~parallel_sum&#45;&gt;proc~parallel_sum_i1 -->
+<g id="proc~~nbi_spec~~CallsGraph_edge16" class="edge"><title>interface~parallel_sum&#45;&gt;proc~parallel_sum_i1</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M136.009,-188.847C141.728,-158.109 160.967,-76.617 210,-33 213.942,-29.4936 218.471,-26.5722 223.271,-24.1384"/>
+<polygon fill="#000000" stroke="#000000" points="224.965,-27.2189 232.751,-20.0332 222.183,-20.7953 224.965,-27.2189"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~in_plasma -->
+<g id="proc~~nbi_spec~~CallsGraph_edge27" class="edge"><title>proc~get_fields&#45;&gt;proc~in_plasma</title>
+<path fill="none" stroke="#000000" d="M303.958,-608.033C328.699,-619.503 366.147,-636.863 393.614,-649.596"/>
+<polygon fill="#000000" stroke="#000000" points="392.331,-652.859 402.876,-653.889 395.275,-646.508 392.331,-652.859"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~uvw_to_xyz -->
+<g id="proc~~nbi_spec~~CallsGraph_edge26" class="edge"><title>proc~get_fields&#45;&gt;proc~uvw_to_xyz</title>
+<path fill="none" stroke="#000000" d="M306.048,-586.341C328.585,-578.58 360.609,-567.552 386.324,-558.696"/>
+<polygon fill="#000000" stroke="#000000" points="387.522,-561.986 395.838,-555.42 385.243,-555.367 387.522,-561.986"/>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~xyz_to_uvw -->
+<g id="proc~~nbi_spec~~CallsGraph_edge28" class="edge"><title>proc~get_fields&#45;&gt;proc~xyz_to_uvw</title>
+<path fill="none" stroke="#000000" d="M306.138,-599.068C326.619,-601.293 355.025,-604.362 380,-607 424.476,-611.699 475.362,-616.948 510.565,-620.56"/>
+<polygon fill="#000000" stroke="#000000" points="510.657,-624.087 520.962,-621.625 511.371,-617.124 510.657,-624.087"/>
+</g>
+<!-- proc~calc_perp_vectors -->
+<g id="proc~~nbi_spec~~CallsGraph_node30" class="node"><title>proc~calc_perp_vectors</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node30"><a xlink:href=".././proc/calc_perp_vectors.html" xlink:title="calc_perp_vectors">
+<polygon fill="#d9534f" stroke="#d9534f" points="480,-598 380,-598 380,-574 480,-574 480,-598"/>
+<text text-anchor="middle" x="430" y="-583.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">calc_perp_vectors</text>
+</a>
+</g>
+</g>
+<!-- proc~get_fields&#45;&gt;proc~calc_perp_vectors -->
+<g id="proc~~nbi_spec~~CallsGraph_edge25" class="edge"><title>proc~get_fields&#45;&gt;proc~calc_perp_vectors</title>
+<path fill="none" stroke="#000000" d="M306.048,-594.143C323.866,-592.963 347.614,-591.39 369.486,-589.941"/>
+<polygon fill="#000000" stroke="#000000" points="369.959,-593.418 379.706,-589.265 369.496,-586.433 369.959,-593.418"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_node25" class="node"><title>proc~cyl_interpol3d_coeff</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node25"><a xlink:href=".././proc/cyl_interpol3d_coeff.html" xlink:title="cyl_interpol3D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="905.5,-781 796.5,-781 796.5,-757 905.5,-757 905.5,-781"/>
+<text text-anchor="middle" x="851" y="-766.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge29" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M573.006,-721.154C587.434,-730.774 609.068,-743.615 630,-750 681.028,-765.564 741.588,-769.822 786.238,-770.466"/>
+<polygon fill="#000000" stroke="#000000" points="786.34,-773.967 796.371,-770.554 786.402,-766.967 786.34,-773.967"/>
+</g>
+<!-- proc~interpol1d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_node26" class="node"><title>proc~interpol1d_coeff</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node26"><a xlink:href=".././proc/interpol1d_coeff.html" xlink:title="interpol1D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="896.5,-641 805.5,-641 805.5,-617 896.5,-617 896.5,-641"/>
+<text text-anchor="middle" x="851" y="-626.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge30" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M593.534,-698.787C644.752,-684.85 736.872,-659.783 795.643,-643.791"/>
+<polygon fill="#000000" stroke="#000000" points="796.764,-647.113 805.494,-641.111 794.926,-640.359 796.764,-647.113"/>
+</g>
+<!-- proc~interpol2d_coeff_arr -->
+<g id="proc~~nbi_spec~~CallsGraph_node28" class="node"><title>proc~interpol2d_coeff_arr</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node28"><a xlink:href=".././proc/interpol2d_coeff_arr.html" xlink:title="interpol2D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="906,-701 796,-701 796,-677 906,-677 906,-701"/>
+<text text-anchor="middle" x="851" y="-686.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr -->
+<g id="proc~~nbi_spec~~CallsGraph_edge31" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M593.534,-706.447C641.944,-703.153 726.895,-697.374 785.69,-693.375"/>
+<polygon fill="#000000" stroke="#000000" points="786.245,-696.845 795.984,-692.675 785.769,-689.861 786.245,-696.845"/>
+</g>
+<!-- proc~interpol2d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_node29" class="node"><title>proc~interpol2d_coeff</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node29"><a xlink:href=".././proc/interpol2d_coeff.html" xlink:title="interpol2D_coeff">
+<polygon fill="#d9534f" stroke="#d9534f" points="1033.5,-761 942.5,-761 942.5,-737 1033.5,-737 1033.5,-761"/>
+<text text-anchor="middle" x="988" y="-746.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol2D_coeff</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge32" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M565.785,-721.147C578.712,-736.22 603.022,-761.353 630,-773 742.833,-821.713 786.458,-818.531 906,-790 925.298,-785.394 945.201,-775.405 960.449,-766.44"/>
+<polygon fill="#000000" stroke="#000000" points="962.578,-769.242 969.295,-761.048 958.934,-763.265 962.578,-769.242"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~nbi_spec~~CallsGraph_node31" class="node"><title>proc~cyl_interpol3d_coeff_arr</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node31"><a xlink:href=".././proc/cyl_interpol3d_coeff_arr.html" xlink:title="cyl_interpol3D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="759.5,-741 630.5,-741 630.5,-717 759.5,-717 759.5,-741"/>
+<text text-anchor="middle" x="695" y="-726.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">cyl_interpol3D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr -->
+<g id="proc~~nbi_spec~~CallsGraph_edge33" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~cyl_interpol3d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M593.709,-714.465C602.031,-715.671 611.124,-716.989 620.327,-718.323"/>
+<polygon fill="#000000" stroke="#000000" points="619.928,-721.801 630.327,-719.772 620.932,-714.874 619.928,-721.801"/>
+</g>
+<!-- proc~interpol1d_coeff_arr -->
+<g id="proc~~nbi_spec~~CallsGraph_node32" class="node"><title>proc~interpol1d_coeff_arr</title>
+<g id="a_proc~~nbi_spec~~CallsGraph_node32"><a xlink:href=".././proc/interpol1d_coeff_arr.html" xlink:title="interpol1D_coeff_arr">
+<polygon fill="#d9534f" stroke="#d9534f" points="750,-623 640,-623 640,-599 750,-599 750,-623"/>
+<text text-anchor="middle" x="695" y="-608.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">interpol1D_coeff_arr</text>
+</a>
+</g>
+</g>
+<!-- interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr -->
+<g id="proc~~nbi_spec~~CallsGraph_edge34" class="edge"><title>interface~interpol_coeff&#45;&gt;proc~interpol1d_coeff_arr</title>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M581.602,-696.953C585.974,-694.323 590.295,-691.319 594,-688 614.666,-669.488 608.27,-654.251 630,-637 634.573,-633.369 639.722,-630.179 645.061,-627.394"/>
+<polygon fill="#000000" stroke="#000000" points="646.623,-630.527 654.16,-623.081 643.625,-624.201 646.623,-630.527"/>
+</g>
+<!-- mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_node27" class="node"><title>mpi_allreduce</title>
+<polygon fill="#777777" stroke="#777777" points="469.5,-192 390.5,-192 390.5,-168 469.5,-168 469.5,-192"/>
+<text text-anchor="middle" x="430" y="-177.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">mpi_allreduce</text>
+</g>
+<!-- proc~parallel_sum_i0&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge35" class="edge"><title>proc~parallel_sum_i0&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M321.163,-339.332C329.308,-336.348 337.347,-332.35 344,-327 385.486,-293.637 410.739,-234.195 422.017,-202.069"/>
+<polygon fill="#000000" stroke="#000000" points="425.433,-202.892 425.31,-192.298 418.8,-200.657 425.433,-202.892"/>
+</g>
+<!-- proc~parallel_sum_i2&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge36" class="edge"><title>proc~parallel_sum_i2&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M321.233,-296.244C329.196,-293.361 337.148,-289.679 344,-285 376.343,-262.912 402.659,-224.962 417.049,-201.242"/>
+<polygon fill="#000000" stroke="#000000" points="420.241,-202.72 422.302,-192.328 414.21,-199.166 420.241,-202.72"/>
+</g>
+<!-- proc~parallel_sum_d4&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge37" class="edge"><title>proc~parallel_sum_d4&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M322.827,-251.949C330.07,-249.379 337.363,-246.396 344,-243 367.394,-231.03 391.186,-212.764 407.626,-198.977"/>
+<polygon fill="#000000" stroke="#000000" points="410.187,-201.392 415.512,-192.232 405.637,-196.072 410.187,-201.392"/>
+</g>
+<!-- proc~parallel_sum_d5&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge38" class="edge"><title>proc~parallel_sum_d5&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M321.271,-209.964C339.824,-204.804 361.573,-198.754 380.654,-193.447"/>
+<polygon fill="#000000" stroke="#000000" points="381.661,-196.8 390.357,-190.748 379.785,-190.056 381.661,-196.8"/>
+</g>
+<!-- proc~parallel_sum_d2&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge39" class="edge"><title>proc~parallel_sum_d2&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M322.896,-180C340.93,-180 361.768,-180 380.178,-180"/>
+<polygon fill="#000000" stroke="#000000" points="380.409,-183.5 390.409,-180 380.408,-176.5 380.409,-183.5"/>
+</g>
+<!-- proc~parallel_sum_d3&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge40" class="edge"><title>proc~parallel_sum_d3&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M321.271,-150.036C339.824,-155.196 361.573,-161.246 380.654,-166.553"/>
+<polygon fill="#000000" stroke="#000000" points="379.785,-169.944 390.357,-169.252 381.661,-163.2 379.785,-169.944"/>
+</g>
+<!-- proc~parallel_sum_d0&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge41" class="edge"><title>proc~parallel_sum_d0&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M322.827,-108.051C330.07,-110.621 337.363,-113.604 344,-117 367.394,-128.97 391.186,-147.236 407.626,-161.023"/>
+<polygon fill="#000000" stroke="#000000" points="405.637,-163.928 415.512,-167.768 410.187,-158.608 405.637,-163.928"/>
+</g>
+<!-- proc~parallel_sum_d1&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge42" class="edge"><title>proc~parallel_sum_d1&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M322.617,-64.2652C330.114,-67.069 337.546,-70.5922 344,-75 376.343,-97.0875 402.659,-135.038 417.049,-158.758"/>
+<polygon fill="#000000" stroke="#000000" points="414.21,-160.834 422.302,-167.672 420.241,-157.28 414.21,-160.834"/>
+</g>
+<!-- proc~parallel_sum_i1&#45;&gt;mpi_allreduce -->
+<g id="proc~~nbi_spec~~CallsGraph_edge43" class="edge"><title>proc~parallel_sum_i1&#45;&gt;mpi_allreduce</title>
+<path fill="none" stroke="#000000" d="M321.163,-20.6679C329.308,-23.6519 337.347,-27.6498 344,-33 385.486,-66.363 410.739,-125.805 422.017,-157.931"/>
+<polygon fill="#000000" stroke="#000000" points="418.8,-159.343 425.31,-167.702 425.433,-157.108 418.8,-159.343"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge44" class="edge"><title>proc~cyl_interpol3d_coeff&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M905.743,-761.038C914.411,-759.754 923.394,-758.423 932.089,-757.135"/>
+<polygon fill="#000000" stroke="#000000" points="932.747,-760.576 942.126,-755.648 931.721,-753.651 932.747,-760.576"/>
+</g>
+<!-- proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge45" class="edge"><title>proc~interpol2d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M879.319,-701.142C899.813,-710.25 928.077,-722.812 950.506,-732.78"/>
+<polygon fill="#000000" stroke="#000000" points="949.162,-736.013 959.721,-736.876 952.005,-729.616 949.162,-736.013"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge47" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~cyl_interpol3d_coeff</title>
+<path fill="none" stroke="#000000" d="M742.205,-741.001C758.425,-745.214 776.827,-749.994 793.777,-754.397"/>
+<polygon fill="#000000" stroke="#000000" points="793.003,-757.812 803.562,-756.938 794.763,-751.036 793.003,-757.812"/>
+</g>
+<!-- proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge46" class="edge"><title>proc~cyl_interpol3d_coeff_arr&#45;&gt;proc~interpol2d_coeff</title>
+<path fill="none" stroke="#000000" d="M759.502,-733.364C811.024,-736.905 882.914,-741.846 932.004,-745.22"/>
+<polygon fill="#000000" stroke="#000000" points="931.902,-748.721 942.118,-745.915 932.382,-741.738 931.902,-748.721"/>
+</g>
+<!-- proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff -->
+<g id="proc~~nbi_spec~~CallsGraph_edge48" class="edge"><title>proc~interpol1d_coeff_arr&#45;&gt;proc~interpol1d_coeff</title>
+<path fill="none" stroke="#000000" d="M750.295,-617.346C764.789,-619.04 780.462,-620.872 794.994,-622.571"/>
+<polygon fill="#000000" stroke="#000000" points="795.002,-626.095 805.34,-623.78 795.814,-619.143 795.002,-626.095"/>
+</g>
+</g>
+</svg>
+</div><script>var panprocnbi_specCallsGraph = svgPanZoom('#procnbi_specCallsGraph', {zoomEnabled: true,controlIconsEnabled: true, fit: true, center: true,}); </script><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+     
+    <div class="panel panel-default">
+      <div class="panel-heading">
+  <h3 class="panel-title">Called by</h3>
+      </div>
+      <div class="panel-body">
+  <div class="depgraph"><?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: proc~~nbi_spec~~CalledByGraph Pages: 1 -->
+<svg id="procnbi_specCalledByGraph" width="154pt" height="32pt"
+ viewBox="0.00 0.00 154.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="proc~~nbi_spec~~CalledByGraph" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>proc~~nbi_spec~~CalledByGraph</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 150,-28 150,4 -4,4"/>
+<!-- proc~nbi_spec -->
+<g id="proc~~nbi_spec~~CalledByGraph_node1" class="node"><title>proc~nbi_spec</title>
+<polygon fill="none" stroke="black" points="145.5,-24 90.5,-24 90.5,-0 145.5,-0 145.5,-24"/>
+<text text-anchor="middle" x="118" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">nbi_spec</text>
+</g>
+<!-- program~fidasim -->
+<g id="proc~~nbi_spec~~CalledByGraph_node2" class="node"><title>program~fidasim</title>
+<g id="a_proc~~nbi_spec~~CalledByGraph_node2"><a xlink:href=".././program/fidasim.html" xlink:title="fidasim">
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="54,-24 0,-24 0,-0 54,-0 54,-24"/>
+<text text-anchor="middle" x="27" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">fidasim</text>
+</a>
+</g>
+</g>
+<!-- program~fidasim&#45;&gt;proc~nbi_spec -->
+<g id="proc~~nbi_spec~~CalledByGraph_edge1" class="edge"><title>program~fidasim&#45;&gt;proc~nbi_spec</title>
+<path fill="none" stroke="#000000" d="M54.2216,-12C62.4031,-12 71.5824,-12 80.343,-12"/>
+<polygon fill="#000000" stroke="#000000" points="80.3499,-15.5001 90.3498,-12 80.3498,-8.5001 80.3499,-15.5001"/>
+</g>
+</g>
+</svg>
+</div><div><a type="button" class="graph-help" data-toggle="modal" href="#graph-help-text">Help</a></div><div class="modal fade" id="graph-help-text" tabindex="-1" role="dialog"><div class="modal-dialog modal-lg" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="-graph-help-label">Graph Key</h4></div><div class="modal-body">
+    <p>Nodes of different colours represent the following: </p>
+    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 2.36.0 (20140111.2315)
+ -->
+<!-- Title: Graph Key Pages: 1 -->
+<svg width="559pt" height="32pt"
+ viewBox="0.00 0.00 559.00 32.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 28)">
+<title>Graph Key</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-28 555,-28 555,4 -4,4"/>
+<!-- Subroutine -->
+<g id="node1" class="node"><title>Subroutine</title>
+<polygon fill="#d9534f" stroke="#d9534f" points="64,-24 0,-24 0,-0 64,-0 64,-24"/>
+<text text-anchor="middle" x="32" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Subroutine</text>
+</g>
+<!-- Function -->
+<g id="node2" class="node"><title>Function</title>
+<polygon fill="#d94e8f" stroke="#d94e8f" points="136,-24 82,-24 82,-0 136,-0 136,-24"/>
+<text text-anchor="middle" x="109" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Function</text>
+</g>
+<!-- Interface -->
+<g id="node3" class="node"><title>Interface</title>
+<polygon fill="#a7506f" stroke="#a7506f" points="209.25,-24 154.75,-24 154.75,-0 209.25,-0 209.25,-24"/>
+<text text-anchor="middle" x="182" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Interface</text>
+</g>
+<!-- Unknown Procedure Type -->
+<g id="node4" class="node"><title>Unknown Procedure Type</title>
+<polygon fill="#777777" stroke="#777777" points="364,-24 228,-24 228,-0 364,-0 364,-24"/>
+<text text-anchor="middle" x="296" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Unknown Procedure Type</text>
+</g>
+<!-- Program -->
+<g id="node5" class="node"><title>Program</title>
+<polygon fill="#f0ad4e" stroke="#f0ad4e" points="436,-24 382,-24 382,-0 436,-0 436,-24"/>
+<text text-anchor="middle" x="409" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50" fill="white">Program</text>
+</g>
+<!-- This Page&#39;s Entity -->
+<g id="node6" class="node"><title>This Page&#39;s Entity</title>
+<polygon fill="none" stroke="black" points="551.25,-24 454.75,-24 454.75,-0 551.25,-0 551.25,-24"/>
+<text text-anchor="middle" x="503" y="-9.6" font-family="Helvetica,sans-Serif" font-size="10.50">This Page&#39;s Entity</text>
+</g>
+</g>
+</svg>
+
+    
+    <p>Solid arrows point from a procedure to one which it calls. Dashed 
+    arrows point from an interface to procedures which implement that interface.
+    This could include the module procedures in a generic interface or the
+    implementation in a submodule of an interface in a parent module.
+    </p>
+    </div></div></div></div>
+      </div>
+    </div>
+     
+    <br>
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="panel panel-primary">
+  <div class="panel-heading text-left"><h3 class="panel-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/nbi_spec.html#src">nbi_spec</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    
+
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+
+
+    
+    
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">nbi_spec</span>
+    <span class="c">!+ Calculates approximate neutral beam emission (full, half, third)</span>
+    <span class="c">!+ from user supplied neutrals file</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">ic</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">it</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ri</span><span class="p">,</span> <span class="n">vnbi</span><span class="p">,</span> <span class="n">random3</span><span class="p">,</span> <span class="n">rc</span>
+    <span class="kt">integer</span><span class="p">,</span><span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ind</span>
+    <span class="c">!! Determination of the CX probability</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">nbif_photons</span><span class="p">,</span> <span class="n">nbih_photons</span><span class="p">,</span> <span class="n">nbit_photons</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f_wght</span><span class="p">,</span> <span class="n">h_wght</span><span class="p">,</span> <span class="n">t_wght</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">f_tot</span><span class="p">,</span> <span class="n">h_tot</span><span class="p">,</span> <span class="n">t_tot</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda</span><span class="p">,</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">nchan</span><span class="p">)</span> <span class="kd">::</span> <span class="n">full</span><span class="p">,</span> <span class="n">half</span><span class="p">,</span> <span class="n">third</span>
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">inp</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">10000</span>
+
+    <span class="c">!$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &amp;</span>
+    <span class="c">!$OMP&amp; nbif_photons, nbih_photons, nbit_photons, rc, ri,inp, vnbi,&amp;</span>
+    <span class="c">!$OMP&amp; random3,f_tot,h_tot,t_tot,full,half,third,f_wght,h_wght,t_wght)</span>
+    <span class="n">loop_over_cells</span><span class="p">:</span> <span class="k">do </span><span class="n">ic</span> <span class="o">=</span> <span class="n">istart</span><span class="p">,</span> <span class="n">spec_chords</span><span class="p">%</span><span class="n">ncell</span><span class="p">,</span> <span class="n">istep</span>
+        <span class="k">call </span><span class="n">ind2sub</span><span class="p">(</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">dims</span><span class="p">,</span><span class="n">spec_chords</span><span class="p">%</span><span class="n">cell</span><span class="p">(</span><span class="n">ic</span><span class="p">),</span><span class="n">ind</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">;</span> <span class="n">j</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">;</span> <span class="n">k</span> <span class="o">=</span> <span class="n">ind</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">nbif_photons</span> <span class="o">=</span> <span class="n">neut</span><span class="p">%</span><span class="n">full</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">einstein</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">nbih_photons</span> <span class="o">=</span> <span class="n">neut</span><span class="p">%</span><span class="n">half</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">einstein</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">nbit_photons</span> <span class="o">=</span> <span class="n">neut</span><span class="p">%</span><span class="n">third</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span><span class="o">*</span><span class="n">tables</span><span class="p">%</span><span class="n">einstein</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">((</span><span class="n">nbif_photons</span> <span class="o">+</span> <span class="n">nbih_photons</span> <span class="o">+</span> <span class="n">nbit_photons</span><span class="p">).</span><span class="n">le</span><span class="p">.</span><span class="mf">0.0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            cycle </span><span class="n">loop_over_cells</span>
+        <span class="n">endif</span>
+
+        <span class="n">rc</span> <span class="o">=</span> <span class="p">[</span><span class="n">beam_grid</span><span class="p">%</span><span class="n">xc</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">yc</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">zc</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span>
+
+        <span class="c">!Find a point in cell that is also in the plasma</span>
+        <span class="n">ri</span> <span class="o">=</span> <span class="n">rc</span>
+        <span class="k">call </span><span class="n">in_plasma</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">inp</span><span class="p">)</span>
+        <span class="k">do while</span> <span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">inp</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">randu</span><span class="p">(</span><span class="n">random3</span><span class="p">)</span>
+            <span class="n">ri</span> <span class="o">=</span> <span class="n">rc</span> <span class="o">+</span> <span class="n">beam_grid</span><span class="p">%</span><span class="n">dr</span><span class="o">*</span><span class="p">(</span><span class="n">random3</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">in_plasma</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span><span class="n">inp</span><span class="p">)</span>
+        <span class="n">enddo</span>
+
+        <span class="n">f_tot</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="p">;</span> <span class="n">h_tot</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="p">;</span> <span class="n">t_tot</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">full</span>  <span class="o">=</span> <span class="mf">0.0</span> <span class="p">;</span> <span class="n">half</span>  <span class="o">=</span> <span class="mf">0.0</span> <span class="p">;</span> <span class="n">third</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">do </span><span class="n">it</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span>
+            <span class="c">!! Full Spectra</span>
+            <span class="k">call </span><span class="n">mc_nbi_cell</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">nbif_type</span><span class="p">,</span> <span class="n">vnbi</span><span class="p">,</span> <span class="n">f_wght</span><span class="p">)</span>
+            <span class="n">f_tot</span> <span class="o">=</span> <span class="n">f_tot</span> <span class="o">+</span> <span class="n">f_wght</span>
+            <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vnbi</span><span class="p">,</span> <span class="n">f_wght</span><span class="o">*</span><span class="n">nbif_photons</span><span class="p">,</span> <span class="n">full</span><span class="p">)</span>
+
+            <span class="c">!! Half Spectra</span>
+            <span class="k">call </span><span class="n">mc_nbi_cell</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">nbih_type</span><span class="p">,</span> <span class="n">vnbi</span><span class="p">,</span> <span class="n">h_wght</span><span class="p">)</span>
+            <span class="n">h_tot</span> <span class="o">=</span> <span class="n">h_tot</span> <span class="o">+</span> <span class="n">h_wght</span>
+            <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vnbi</span><span class="p">,</span> <span class="n">h_wght</span><span class="o">*</span><span class="n">nbih_photons</span><span class="p">,</span> <span class="n">half</span><span class="p">)</span>
+
+            <span class="c">!! Third Spectra</span>
+            <span class="k">call </span><span class="n">mc_nbi_cell</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">nbit_type</span><span class="p">,</span> <span class="n">vnbi</span><span class="p">,</span> <span class="n">t_wght</span><span class="p">)</span>
+            <span class="n">t_tot</span> <span class="o">=</span> <span class="n">t_tot</span> <span class="o">+</span> <span class="n">t_wght</span>
+            <span class="k">call </span><span class="n">store_photons</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">vnbi</span><span class="p">,</span> <span class="n">t_wght</span><span class="o">*</span><span class="n">nbit_photons</span><span class="p">,</span> <span class="n">third</span><span class="p">)</span>
+        <span class="n">enddo</span>
+        <span class="c">!$OMP CRITICAL(nbi_spec_1)</span>
+        <span class="n">spec</span><span class="p">%</span><span class="n">full</span> <span class="o">=</span> <span class="n">spec</span><span class="p">%</span><span class="n">full</span> <span class="o">+</span> <span class="n">full</span><span class="o">/</span><span class="n">f_tot</span>
+        <span class="n">spec</span><span class="p">%</span><span class="n">half</span> <span class="o">=</span> <span class="n">spec</span><span class="p">%</span><span class="n">half</span> <span class="o">+</span> <span class="n">half</span><span class="o">/</span><span class="n">h_tot</span>
+        <span class="n">spec</span><span class="p">%</span><span class="n">third</span> <span class="o">=</span> <span class="n">spec</span><span class="p">%</span><span class="n">third</span> <span class="o">+</span> <span class="n">third</span><span class="o">/</span><span class="n">t_tot</span>
+        <span class="c">!$OMP END CRITICAL(nbi_spec_1)</span>
+    <span class="n">enddo</span> <span class="n">loop_over_cells</span>
+    <span class="c">!$OMP END PARALLEL DO</span>
+
+<span class="cp">#ifdef _MPI</span>
+    <span class="c">!! Combine Spectra</span>
+    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">spec</span><span class="p">%</span><span class="n">full</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">spec</span><span class="p">%</span><span class="n">half</span><span class="p">)</span>
+    <span class="k">call </span><span class="n">parallel_sum</span><span class="p">(</span><span class="n">spec</span><span class="p">%</span><span class="n">third</span><span class="p">)</span>
+<span class="cp">#endif</span>
+
+<span class="k">end subroutine </span><span class="n">nbi_spec</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+    
+    </div>
+  </div>
+
+
+    <hr>    
+    </div> <!-- /container -->
+    <footer>
+      <div class="container">
+      <div class="row">
+        <div class="col-xs-6 col-md-4"><p>&copy; 2020 
+                                          </p></div>
+        <div class="col-xs-6 col-md-4 col-md-push-4">
+          <p class="text-right">
+            Documentation generated by 
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+            
+          </p>
+        </div>
+        <div class="col-xs-12 col-md-4 col-md-pull-4"><p class="text-center"> FIDASIM was developed by Luke Stagner</p></div>
+      </div>
+      <br>
+      </div> <!-- /container -->    
+    </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+    <script src="../js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- MathJax JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+    <script src="../tipuesearch/tipuesearch_content.js"></script>
+    <script src="../tipuesearch/tipuesearch_set.js"></script>
+    <script src="../tipuesearch/tipuesearch.js"></script>
+    
+    
+  </body>
+</html>

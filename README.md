@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3237835.svg)](https://doi.org/10.5281/zenodo.3237835)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1341369.svg)](https://doi.org/10.5281/zenodo.1341369)
 [![Build Status](https://travis-ci.org/D3DEnergetic/FIDASIM.svg?branch=master)](https://travis-ci.org/D3DEnergetic/FIDASIM)
 
 ![FIDASIM](docs/media/fidasim-logo.png)

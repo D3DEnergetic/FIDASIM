@@ -4816,11 +4816,17 @@ subroutine write_spectra
 
     if(inputs%calc_dcx.ge.1) then
         spec%dcx   = factor*spec%dcx
+        spec%dcxStark   = factor*spec%dcxStark
         call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 2, dims(1:2), &
              spec%dcx, error)
         call h5ltset_attribute_string_f(fid,"/dcx","description", &
              "Direct Charge Exchange (DCX) emission: dcx(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
+        call h5ltmake_compressed_dataset_double_f(fid, "/dcxStark", 3, dimsStark(1:3), &
+             spec%dcxStark, error)
+        call h5ltset_attribute_string_f(fid,"/dcxStark","description", &
+             "Direct Charge Exchange (DCX) emission stark components: dcx(stark,lambda,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/dcxStark","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     if(inputs%calc_halo.ge.1) then
@@ -4834,11 +4840,17 @@ subroutine write_spectra
 
     if(inputs%calc_cold.ge.1) then
         spec%cold  = factor*spec%cold
+        spec%coldStark  = factor*spec%coldStark
         call h5ltmake_compressed_dataset_double_f(fid, "/cold", 2, dims(1:2), &
              spec%cold, error)
         call h5ltset_attribute_string_f(fid,"/cold","description", &
              "Cold D-alpha emission: cold(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/cold","units","Ph/(s*nm*sr*m^2)",error )
+        call h5ltmake_compressed_dataset_double_f(fid, "/coldStark", 3, dimsStark(1:3), &
+             spec%coldStark, error)
+        call h5ltset_attribute_string_f(fid,"/coldStark","description", &
+             "Cold D-alpha emission stark components: coldStark(lambda,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/coldStark","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     if(inputs%calc_fida.ge.1) then
@@ -8887,6 +8899,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
                call store_photons(pos,vi,photons,spec%third)
            case (dcx_type)
                call store_photons(pos,vi,photons,spec%dcx)
+               call store_stark_photons(pos,vi,photons,spec%dcxStark)
            case (halo_type)
                call store_photons(pos,vi,photons,spec%halo)
            case default
@@ -9919,6 +9932,7 @@ subroutine dcx
     call parallel_sum(neut%dcx)
     if(inputs%calc_dcx.ge.1) then
         call parallel_sum(spec%dcx)
+        call parallel_sum(spec%dcxStark)
     endif
     call parallel_sum(halo_iter_dens(dcx_type))
 #endif
@@ -10226,6 +10240,7 @@ subroutine dcx_spec
             call randn(random3)
             vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
             call store_photons(ri, vhalo, dcx_photons/n, spec%dcx)
+            call store_stark_photons(ri, vhalo, dcx_photons/n, spec%dcxStark)
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10233,6 +10248,7 @@ subroutine dcx_spec
 #ifdef _MPI
     !! Combine Spectra
     call parallel_sum(spec%dcx)
+    call parallel_sum(spec%dcxStark)
 #endif
 
 end subroutine dcx_spec
@@ -10311,6 +10327,7 @@ subroutine cold_spec
             call randn(random3)
             vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
             call store_photons(ri, vhalo, cold_photons/n, spec%cold)
+            call store_stark_photons(ri, vhalo, cold_photons/n, spec%coldStark)
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10318,6 +10335,7 @@ subroutine cold_spec
 #ifdef _MPI
     !! Combine Spectra
     call parallel_sum(spec%cold)
+    call parallel_sum(spec%coldStark)
 #endif
 
 end subroutine cold_spec
@@ -12227,6 +12245,8 @@ program fidasim
         if(inputs%calc_dcx.ge.1) then
             allocate(spec%dcx(inputs%nlambda,spec_chords%nchan))
             spec%dcx = 0.d0
+            allocate(spec%dcxStark(n_stark,inputs%nlambda,spec_chords%nchan))
+            spec%dcx = 0.d0
         endif
         if(inputs%calc_halo.ge.1) then
             allocate(spec%halo(inputs%nlambda,spec_chords%nchan))
@@ -12234,6 +12254,8 @@ program fidasim
         endif
         if(inputs%calc_cold.ge.1) then
             allocate(spec%cold(inputs%nlambda,spec_chords%nchan))
+            spec%cold = 0.d0
+            allocate(spec%coldStark(n_stark,inputs%nlambda,spec_chords%nchan))
             spec%cold = 0.d0
         endif
         if(inputs%calc_fida.ge.1) then

@@ -870,6 +870,22 @@ type Spectra
         !+ Active FIDA emission: fida(lambda,chan,orbit_type)
     real(Float64), dimension(:,:,:), allocatable :: pfida
         !+ Passive FIDA emission: pfida(lambda,chan,orbit_type)
+    real(Float64), dimension(:,:,:), allocatable   :: fullStark
+        !+ Full energy beam emission: full(15,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: halfStark
+        !+ Half energy beam emission: half(15,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: thirdStark
+        !+ Third energy beam emission: third(15,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: dcxStark
+        !+ Direct CX emission: dcx(15,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: haloStark
+        !+ Thermal halo emission: halo(15,lambda,chan)
+    real(Float64), dimension(:,:,:), allocatable   :: coldStark
+        !+ Cold D-alpha emission: cold(15,lambda,chan)
+    real(Float64), dimension(:,:,:,:), allocatable :: fidaStark
+        !+ Active FIDA emission stark components: fida(15,lambda,chan,orbit_type)
+    real(Float64), dimension(:,:,:,:), allocatable :: pfidaStark
+        !+ Passive FIDA emission: pfida(15,lambda,chan,orbit_type)
 end type Spectra
 
 type NeutronRate
@@ -4710,6 +4726,7 @@ subroutine write_spectra
     !+ Writes [[libfida:spectra]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(3) :: dims
+    integer(HSIZE_T), dimension(4) :: dimsStark
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
 
@@ -4739,6 +4756,7 @@ subroutine write_spectra
     d(1) = 1
     call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
     call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
+    call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [15], error)
     dims(1) = inputs%nlambda
     dims(2) = spec_chords%nchan
     dims(3) = particles%nclass
@@ -4746,6 +4764,8 @@ subroutine write_spectra
          lambda_arr, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
          spec_chords%radius, error)
+    dimsStark(1) = n_stark
+    dimsStark(2:4) = dims
 
     !Add attributes
     call h5ltset_attribute_string_f(fid,"/nchan", "description", &
@@ -4823,6 +4843,7 @@ subroutine write_spectra
 
     if(inputs%calc_fida.ge.1) then
         spec%fida  = factor*spec%fida
+        spec%fidaStark  = factor*spec%fidaStark
         !Write variables
         if(particles%nclass.le.1) then
             call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
@@ -4830,6 +4851,11 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fida","description", &
                  "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/fidaStark", 3, &
+                 dimsStark(1:3), spec%fidaStark(:,:,:,1), error)
+            !Add attributes
+            call h5ltset_attribute_string_f(fid,"/fidaStark","description", &
+                 "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan)", error)
         else
             call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
             call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
@@ -4837,6 +4863,12 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fida","description", &
                  "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/fidaStark", 4, &
+                 dimsStark, spec%fidaStark(:,:,:,:), error)
+            !Add attributes
+            call h5ltset_attribute_string_f(fid,"/fidaStark","description", &
+                 "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan,class)", &
+                 error)
        endif
         call h5ltset_attribute_string_f(fid,"/fida","units","Ph/(s*nm*sr*m^2)",error )
     endif
@@ -8751,6 +8783,75 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
 
 end subroutine store_photons
 
+subroutine store_stark_photons(pos, vi, photons, spectra, passive)
+    !+ Store photons in `spectra`
+    real(Float64), dimension(3), intent(in)      :: pos
+        !+ Position of neutral
+    real(Float64), dimension(3), intent(in)      :: vi
+        !+ Velocitiy of neutral [cm/s]
+    real(Float64), intent(in)                    :: photons
+        !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
+    real(Float64), dimension(:,:,:), intent(inout) :: spectra
+    logical, intent(in), optional                :: passive
+        !+ Indicates whether photon is passive FIDA
+
+    real(Float64), dimension(n_stark) :: lambda, intensity
+    real(Float64) :: dlength, sigma_pi
+    type(LocalEMFields) :: fields
+    integer(Int32), dimension(3) :: ind
+    real(Float64), dimension(3) :: pos_xyz, lens_xyz, cyl, vp
+    type(LOSInters) :: inter
+    integer :: ichan,i,j,bin,nchan
+    logical :: pas = .False.
+
+    if(present(passive)) pas = passive
+
+    if(pas) then
+        cyl(1) = sqrt(pos(1)*pos(1) + pos(2)*pos(2))
+        cyl(2) = pos(3)
+        cyl(3) = atan2(pos(2), pos(1))
+        call get_passive_grid_indices(cyl,ind)
+        inter = spec_chords%cyl_inter(ind(1),ind(2),ind(3))
+        call uvw_to_xyz(pos, pos_xyz)
+    else
+        call get_indices(pos,ind)
+        inter = spec_chords%inter(ind(1),ind(2),ind(3))
+        pos_xyz = pos
+    endif
+
+    nchan = inter%nchan
+    if(nchan.eq.0) return
+
+    call get_fields(fields,pos=pos_xyz)
+
+    loop_over_channels: do j=1,nchan
+        ichan = inter%los_elem(j)%id
+        dlength = inter%los_elem(j)%length
+        sigma_pi = spec_chords%los(ichan)%sigma_pi
+        if(pas) then
+            call uvw_to_xyz(spec_chords%los(ichan)%lens_uvw,lens_xyz)
+        else
+            lens_xyz = spec_chords%los(ichan)%lens
+        endif
+        vp = pos_xyz - lens_xyz
+        call spectrum(vp,vi,fields,sigma_pi,photons, &
+                      dlength,lambda,intensity)
+
+        loop_over_stark: do i=1,n_stark
+            bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
+            if (bin.lt.1) cycle loop_over_stark
+            if (bin.gt.inputs%nlambda) cycle loop_over_stark
+            !!! This is where summing over the stark components occurrs.
+            !!! What we need to add is simply a binned output for the stark
+            !!! component, i.e. spec_stark_components(istark,bin,ichan)
+            !$OMP ATOMIC UPDATE
+            spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
+            !$OMP END ATOMIC
+        enddo loop_over_stark
+    enddo loop_over_channels
+
+end subroutine store_stark_photons
+
 subroutine store_bes_photons(pos, vi, photons, neut_type)
     !+ Store BES photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
@@ -8808,6 +8909,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
         call store_photons(pos, vi, photons, spec%pfida(:,:,iclass), passive=.True.)
     else
         call store_photons(pos, vi, photons, spec%fida(:,:,iclass))
+        call store_stark_photons(pos, vi, photons, spec%fidaStark(:,:,:,iclass))
     endif
 
 end subroutine store_fida_photons
@@ -10304,6 +10406,7 @@ subroutine fida_f
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
+    call parallel_sum(spec%fidaStark)
 #endif
 
 end subroutine fida_f
@@ -12117,6 +12220,8 @@ program fidasim
         if(inputs%calc_fida.ge.1) then
             allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
             spec%fida = 0.d0
+            allocate(spec%fidaStark(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
+            spec%fidaStark = 0.d0
         endif
         if(inputs%calc_pfida.ge.1) then
             allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))

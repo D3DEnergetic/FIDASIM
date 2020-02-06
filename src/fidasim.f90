@@ -4831,11 +4831,17 @@ subroutine write_spectra
 
     if(inputs%calc_halo.ge.1) then
         spec%halo  = factor*spec%halo
+        spec%haloStark  = factor*spec%haloStark
         call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
              spec%halo, error)
         call h5ltset_attribute_string_f(fid,"/halo","description", &
              "Halo component of the beam emmision: halo(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
+        call h5ltmake_compressed_dataset_double_f(fid, "/haloStark", 3, dimsStark(1:3), &
+             spec%haloStark, error)
+        call h5ltset_attribute_string_f(fid,"/haloStark","description", &
+             "Halo component of the beam emmision stark components: halo(stark,lambda,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/haloStark","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     if(inputs%calc_cold.ge.1) then
@@ -8902,6 +8908,7 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
                call store_stark_photons(pos,vi,photons,spec%dcxStark)
            case (halo_type)
                call store_photons(pos,vi,photons,spec%halo)
+               call store_stark_photons(pos,vi,photons,spec%haloStark)
            case default
                if(inputs%verbose.ge.0) then
                    write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
@@ -10122,6 +10129,7 @@ subroutine halo
     !! Combine Spectra
     if(inputs%calc_halo.ge.1) then
         call parallel_sum(spec%halo)
+        call parallel_sum(spec%haloStark)
     endif
 #endif
 
@@ -10290,6 +10298,7 @@ subroutine halo_spec
             call randn(random3)
             vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
             call store_photons(ri, vhalo, halo_photons/n, spec%halo)
+            call store_stark_photons(ri, vhalo, halo_photons/n, spec%haloStark)
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10297,6 +10306,7 @@ subroutine halo_spec
 #ifdef _MPI
     !! Combine Spectra
     call parallel_sum(spec%halo)
+    call parallel_sum(spec%haloStark)
 #endif
 
 end subroutine halo_spec
@@ -12250,6 +12260,8 @@ program fidasim
         endif
         if(inputs%calc_halo.ge.1) then
             allocate(spec%halo(inputs%nlambda,spec_chords%nchan))
+            spec%halo = 0.d0
+            allocate(spec%haloStark(n_stark,inputs%nlambda,spec_chords%nchan))
             spec%halo = 0.d0
         endif
         if(inputs%calc_cold.ge.1) then

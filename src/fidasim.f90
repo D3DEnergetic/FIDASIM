@@ -871,21 +871,21 @@ type Spectra
     real(Float64), dimension(:,:,:), allocatable :: pfida
         !+ Passive FIDA emission: pfida(lambda,chan,orbit_type)
     real(Float64), dimension(:,:,:), allocatable   :: fullStark
-        !+ Full energy beam emission: full(15,lambda,chan)
+        !+ Full energy beam emission stark components: full(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: halfStark
-        !+ Half energy beam emission: half(15,lambda,chan)
+        !+ Half energy beam emission stark components: half(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: thirdStark
-        !+ Third energy beam emission: third(15,lambda,chan)
+        !+ Third energy beam emission stark components: third(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: dcxStark
-        !+ Direct CX emission: dcx(15,lambda,chan)
+        !+ Direct CX emission stark components: dcx(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: haloStark
-        !+ Thermal halo emission: halo(15,lambda,chan)
+        !+ Thermal halo emission stark components: halo(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: coldStark
-        !+ Cold D-alpha emission: cold(15,lambda,chan)
+        !+ Cold D-alpha emission stark components: cold(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:,:), allocatable :: fidaStark
-        !+ Active FIDA emission stark components: fida(15,lambda,chan,orbit_type)
+        !+ Active FIDA emission stark components: fida(n_stark,lambda,chan,orbit_type)
     real(Float64), dimension(:,:,:,:), allocatable :: pfidaStark
-        !+ Passive FIDA emission: pfida(15,lambda,chan,orbit_type)
+        !+ Passive FIDA emission stark components: pfida(n_stark,lambda,chan,orbit_type)
 end type Spectra
 
 type NeutronRate
@@ -1025,6 +1025,8 @@ type SimulationInputs
         !+ Split signals by fast ion class: 0=off, 1=on
     integer(Int32) :: verbose
         !+ Verbosity: <0 = off++, 0 = off, 1=on, 2=on++
+    integer(Int32) :: stark_components
+        !+ Output spectral stark components : 0=off, 1=on
 
     !! Neutral Beam Settings
     real(Float64)    :: ab
@@ -1853,7 +1855,7 @@ subroutine read_inputs
     integer            :: calc_brems, calc_dcx, calc_halo, calc_cold, calc_bes
     integer            :: calc_fida, calc_pfida, calc_npa, calc_pnpa
     integer            :: calc_birth,calc_fida_wght,calc_npa_wght
-    integer            :: load_neutrals,verbose,flr,split
+    integer            :: load_neutrals,verbose,flr,split,stark_components
     integer(Int64)     :: n_fida,n_pfida,n_npa,n_pnpa,n_nbi,n_halo,n_dcx,n_birth
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
@@ -1869,7 +1871,7 @@ subroutine read_inputs
         geometry_file, equilibrium_file, neutrals_file, shot, time, runid, &
         calc_brems, calc_dcx,calc_halo, calc_cold, calc_fida, calc_bes,&
         calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
-        calc_fida_wght, calc_npa_wght, load_neutrals, verbose, &
+        calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
         ab, pinj, einj, current_fractions, ai, impurity_charge, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
@@ -1907,6 +1909,7 @@ subroutine read_inputs
     calc_pnpa=0
     calc_birth=0
     flr=2
+    stark_components=0
     split=1
     calc_fida_wght=0
     calc_npa_wght=0
@@ -2025,6 +2028,7 @@ subroutine read_inputs
     inputs%load_neutrals=load_neutrals
     inputs%verbose=verbose
     inputs%flr = flr
+    inputs%stark_components = stark_components
     inputs%split = split
 
     !!Monte Carlo Settings
@@ -4726,7 +4730,6 @@ subroutine write_spectra
     !+ Writes [[libfida:spectra]] to a HDF5 file
     integer(HID_T) :: fid
     integer(HSIZE_T), dimension(3) :: dims
-    integer(HSIZE_T), dimension(4) :: dimsStark
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
 
@@ -4734,6 +4737,8 @@ subroutine write_spectra
     integer :: i
     real(Float64) :: factor
     real(Float64), dimension(:), allocatable :: lambda_arr
+
+    integer(HSIZE_T), dimension(4) :: dimStark
 
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
@@ -4756,7 +4761,7 @@ subroutine write_spectra
     d(1) = 1
     call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
     call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
-    call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [15], error)
+    call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [n_stark], error)
     dims(1) = inputs%nlambda
     dims(2) = spec_chords%nchan
     dims(3) = particles%nclass
@@ -4764,8 +4769,10 @@ subroutine write_spectra
          lambda_arr, error)
     call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
          spec_chords%radius, error)
-    dimsStark(1) = n_stark
-    dimsStark(2:4) = dims
+    if (inputs%stark_components.eq.1) then
+        dimStark(1) = n_stark
+        dimStark(2:4) = dims
+    endif
 
     !Add attributes
     call h5ltset_attribute_string_f(fid,"/nchan", "description", &
@@ -4795,9 +4802,6 @@ subroutine write_spectra
         spec%full  = factor*spec%full
         spec%half  = factor*spec%half
         spec%third = factor*spec%third
-        spec%fullStark  = factor*spec%fullStark
-        spec%halfStark  = factor*spec%halfStark
-        spec%thirdStark = factor*spec%thirdStark
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
              spec%full, error)
@@ -4805,12 +4809,6 @@ subroutine write_spectra
              spec%half, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(1:2),&
              spec%third, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/fullStark", 3, dimsStark(1:3), &
-             spec%fullStark, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/halfStark", 3, dimsStark(1:3), &
-             spec%halfStark, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/thirdStark", 3, dimsStark(1:3),&
-             spec%thirdStark, error)
         !Add attributes
         call h5ltset_attribute_string_f(fid,"/full","description", &
              "Full energy component of the beam emmision: full(lambda,chan)", error)
@@ -4821,59 +4819,86 @@ subroutine write_spectra
         call h5ltset_attribute_string_f(fid,"/third","description", &
              "Third energy component of the beam emmision: third(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/third","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltset_attribute_string_f(fid,"/fullStark","description", &
-             "Full energy component of the beam emmision stark components: full(stark,lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/fullStark","units","Ph/(s*nm*sr*m^2)",error )
+        if (inputs%stark_components.eq.1) then
+            spec%fullStark = factor*spec%fullStark
+            spec%halfStark = factor*spec%halfStark
+            spec%thirdStark = factor*spec%thirdStark
+            call h5ltmake_compressed_dataset_double_f(fid, "/fullStark", 3, dimStark(1:3), &
+                 spec%fullStark, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/halfStark", 3, dimStark(1:3), &
+                 spec%halfStark, error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/thirdStark", 3, dimStark(1:3),&
+                 spec%thirdStark, error)
+            call h5ltset_attribute_string_f(fid,"/fullStark","description", &
+                 "Full energy component of the beam emmision stark components: full(stark,lambda,chan)", &
+                 error)
+            call h5ltset_attribute_string_f(fid,"/fullStark","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltset_attribute_string_f(fid,"/halfStark","description", &
+                 "Half energy component of the beam emmision stark components: half(stark,lambda,chan)", &
+                 error)
+            call h5ltset_attribute_string_f(fid,"/halfStark","units","Ph/(s*nm*sr*m^2)",error )
+            call h5ltset_attribute_string_f(fid,"/thirdStark","description", &
+                 "Third energy component of the beam emmision stark components: third(stark,lambda,chan)", &
+                 error)
+            call h5ltset_attribute_string_f(fid,"/thirdStark","units","Ph/(s*nm*sr*m^2)",error )
+        endif
     endif
 
     if(inputs%calc_dcx.ge.1) then
-        spec%dcx   = factor*spec%dcx
-        spec%dcxStark   = factor*spec%dcxStark
+        spec%dcx = factor*spec%dcx
         call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 2, dims(1:2), &
              spec%dcx, error)
         call h5ltset_attribute_string_f(fid,"/dcx","description", &
              "Direct Charge Exchange (DCX) emission: dcx(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltmake_compressed_dataset_double_f(fid, "/dcxStark", 3, dimsStark(1:3), &
-             spec%dcxStark, error)
-        call h5ltset_attribute_string_f(fid,"/dcxStark","description", &
-             "Direct Charge Exchange (DCX) emission stark components: dcx(stark,lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/dcxStark","units","Ph/(s*nm*sr*m^2)",error )
+        if (inputs%stark_components.eq.1) then
+            spec%dcxStark = factor*spec%dcxStark
+            call h5ltmake_compressed_dataset_double_f(fid, "/dcxStark", 3, dimStark(1:3), &
+                 spec%dcxStark, error)
+            call h5ltset_attribute_string_f(fid,"/dcxStark","description", &
+                 "Direct Charge Exchange (DCX) emission stark components: dcx(stark,lambda,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/dcxStark","units","Ph/(s*nm*sr*m^2)",error )
+        endif
     endif
 
     if(inputs%calc_halo.ge.1) then
-        spec%halo  = factor*spec%halo
-        spec%haloStark  = factor*spec%haloStark
+        spec%halo = factor*spec%halo
         call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
              spec%halo, error)
         call h5ltset_attribute_string_f(fid,"/halo","description", &
              "Halo component of the beam emmision: halo(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltmake_compressed_dataset_double_f(fid, "/haloStark", 3, dimsStark(1:3), &
-             spec%haloStark, error)
-        call h5ltset_attribute_string_f(fid,"/haloStark","description", &
-             "Halo component of the beam emmision stark components: halo(stark,lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/haloStark","units","Ph/(s*nm*sr*m^2)",error )
+        if (inputs%stark_components.eq.1) then
+            spec%haloStark = factor*spec%haloStark
+            call h5ltmake_compressed_dataset_double_f(fid, "/haloStark", 3, dimStark(1:3), &
+                 spec%haloStark, error)
+            call h5ltset_attribute_string_f(fid,"/haloStark","description", &
+                 "Halo component of the beam emmision stark components: halo(stark,lambda,chan)", error)
+            call h5ltset_attribute_string_f(fid,"/haloStark","units","Ph/(s*nm*sr*m^2)",error )
+        endif
     endif
 
     if(inputs%calc_cold.ge.1) then
-        spec%cold  = factor*spec%cold
-        spec%coldStark  = factor*spec%coldStark
+        spec%cold = factor*spec%cold
         call h5ltmake_compressed_dataset_double_f(fid, "/cold", 2, dims(1:2), &
              spec%cold, error)
         call h5ltset_attribute_string_f(fid,"/cold","description", &
              "Cold D-alpha emission: cold(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/cold","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltmake_compressed_dataset_double_f(fid, "/coldStark", 3, dimsStark(1:3), &
-             spec%coldStark, error)
-        call h5ltset_attribute_string_f(fid,"/coldStark","description", &
-             "Cold D-alpha emission stark components: coldStark(lambda,chan)", error)
-        call h5ltset_attribute_string_f(fid,"/coldStark","units","Ph/(s*nm*sr*m^2)",error )
+        if (inputs%stark_components.eq.1) then
+            spec%coldStark = factor*spec%coldStark
+            call h5ltmake_compressed_dataset_double_f(fid, "/coldStark", 3, dimStark(1:3), &
+                 spec%coldStark, error)
+            call h5ltset_attribute_string_f(fid,"/coldStark","description", &
+                 "Cold D-alpha emission stark components: coldStark(stark,lambda,chan)", &
+                 error)
+            call h5ltset_attribute_string_f(fid,"/coldStark","units","Ph/(s*nm*sr*m^2)",error )
+        endif
     endif
 
     if(inputs%calc_fida.ge.1) then
-        spec%fida  = factor*spec%fida
-        spec%fidaStark  = factor*spec%fidaStark
+        spec%fida = factor*spec%fida
+        if (inputs%stark_components.eq.1) spec%fidaStark = factor*spec%fidaStark
         !Write variables
         if(particles%nclass.le.1) then
             call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
@@ -4881,11 +4906,14 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fida","description", &
                  "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/fidaStark", 3, &
-                 dimsStark(1:3), spec%fidaStark(:,:,:,1), error)
-            !Add attributes
-            call h5ltset_attribute_string_f(fid,"/fidaStark","description", &
-                 "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan)", error)
+            if (inputs%stark_components.eq.1) then
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidaStark", 3, &
+                     dimStark(1:3), spec%fidaStark(:,:,:,1), error)
+                !Add attributes
+                call h5ltset_attribute_string_f(fid,"/fidaStark","description", &
+                     "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan)", &
+                     error)
+            endif
         else
             call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
             call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
@@ -4893,20 +4921,24 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fida","description", &
                  "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/fidaStark", 4, &
-                 dimsStark, spec%fidaStark, error)
-            !Add attributes
-            call h5ltset_attribute_string_f(fid,"/fidaStark","description", &
-                 "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan,class)", &
-                 error)
+            if (inputs%stark_components.eq.1) then
+                call h5ltmake_compressed_dataset_double_f(fid, "/fidaStark", 4, &
+                     dimStark, spec%fidaStark, error)
+                !Add attributes
+                call h5ltset_attribute_string_f(fid,"/fidaStark","description", &
+                     "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan,class)", &
+                     error)
+            endif
        endif
         call h5ltset_attribute_string_f(fid,"/fida","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltset_attribute_string_f(fid,"/fidaStark","units","Ph/(s*nm*sr*m^2)",error )
+        if (inputs%stark_components.eq.1) then
+            call h5ltset_attribute_string_f(fid,"/fidaStark","units","Ph/(s*nm*sr*m^2)",error )
+        endif
     endif
 
     if(inputs%calc_pfida.ge.1) then
         spec%pfida = factor*spec%pfida
-        spec%pfidaStark = factor*spec%pfidaStark
+        if (inputs%stark_components.eq.1) spec%pfidaStark = factor*spec%pfidaStark
         !Write variables
         if(particles%nclass.le.1) then
             call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 2, &
@@ -4914,12 +4946,14 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/pfida","description", &
                  "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan)", error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/pfidaStark", 3, &
-                 dimsStark(1:3), spec%pfidaStark(:,:,:,1), error)
-            !Add attributes
-            call h5ltset_attribute_string_f(fid,"/pfidaStark","description", &
-                 "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan)", &
-                 error)
+            if (inputs%stark_components.eq.1) then
+                call h5ltmake_compressed_dataset_double_f(fid, "/pfidaStark", 3, &
+                     dimStark(1:3), spec%pfidaStark(:,:,:,1), error)
+                !Add attributes
+                call h5ltset_attribute_string_f(fid,"/pfidaStark","description", &
+                     "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan)", &
+                     error)
+            endif
         else
             if(inputs%calc_fida.le.0) then
                 call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
@@ -4929,15 +4963,19 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/pfida","description", &
                  "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan,class)", error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/pfidaStark", 4, &
-                 dimsStark, spec%pfidaStark, error)
-            !Add attributes
-            call h5ltset_attribute_string_f(fid,"/pfidaStark","description", &
-                 "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan,class)", &
-                 error)
+            if (inputs%stark_components.eq.1) then
+                call h5ltmake_compressed_dataset_double_f(fid, "/pfidaStark", 4, &
+                     dimStark, spec%pfidaStark, error)
+                !Add attributes
+                call h5ltset_attribute_string_f(fid,"/pfidaStark","description", &
+                     "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan,class)", &
+                     error)
+            endif
        endif
         call h5ltset_attribute_string_f(fid,"/pfida","units","Ph/(s*nm*sr*m^2)",error )
-        call h5ltset_attribute_string_f(fid,"/pfidaStark","units","Ph/(s*nm*sr*m^2)",error )
+        if (inputs%stark_components.eq.1) then
+            call h5ltset_attribute_string_f(fid,"/pfidaStark","units","Ph/(s*nm*sr*m^2)",error )
+        endif
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -8886,9 +8924,6 @@ subroutine store_stark_photons(pos, vi, photons, spectra, passive)
             bin=floor((lambda(i)-inputs%lambdamin)/inputs%dlambda) + 1
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
-            !!! This is where summing over the stark components occurrs.
-            !!! What we need to add is simply a binned output for the stark
-            !!! component, i.e. spec_stark_components(istark,bin,ichan)
             !$OMP ATOMIC UPDATE
             spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
             !$OMP END ATOMIC
@@ -8911,19 +8946,19 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     select case (neut_type)
            case (nbif_type)
                call store_photons(pos,vi,photons,spec%full)
-               call store_stark_photons(pos,vi,photons,spec%fullStark)
+               if (inputs%stark_components.eq.1) call store_stark_photons(pos,vi,photons,spec%fullStark)
            case (nbih_type)
                call store_photons(pos,vi,photons,spec%half)
-               call store_stark_photons(pos,vi,photons,spec%halfStark)
+               if (inputs%stark_components.eq.1) call store_stark_photons(pos,vi,photons,spec%halfStark)
            case (nbit_type)
                call store_photons(pos,vi,photons,spec%third)
-               call store_stark_photons(pos,vi,photons,spec%thirdStark)
+               if (inputs%stark_components.eq.1) call store_stark_photons(pos,vi,photons,spec%thirdStark)
            case (dcx_type)
                call store_photons(pos,vi,photons,spec%dcx)
-               call store_stark_photons(pos,vi,photons,spec%dcxStark)
+               if (inputs%stark_components.eq.1) call store_stark_photons(pos,vi,photons,spec%dcxStark)
            case (halo_type)
                call store_photons(pos,vi,photons,spec%halo)
-               call store_stark_photons(pos,vi,photons,spec%haloStark)
+               if (inputs%stark_components.eq.1) call store_stark_photons(pos,vi,photons,spec%haloStark)
            case default
                if(inputs%verbose.ge.0) then
                    write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
@@ -8957,10 +8992,14 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
 
     if(pas) then
         call store_photons(pos, vi, photons, spec%pfida(:,:,iclass), passive=.True.)
-        call store_stark_photons(pos, vi, photons, spec%pfidaStark(:,:,:,iclass), passive=.True.)
+        if (inputs%stark_components.eq.1) then
+            call store_stark_photons(pos, vi, photons, spec%pfidaStark(:,:,:,iclass), passive=.True.)
+        endif
     else
         call store_photons(pos, vi, photons, spec%fida(:,:,iclass))
-        call store_stark_photons(pos, vi, photons, spec%fidaStark(:,:,:,iclass))
+        if (inputs%stark_components.eq.1) then
+            call store_stark_photons(pos, vi, photons, spec%fidaStark(:,:,:,iclass))
+        endif
     endif
 
 end subroutine store_fida_photons
@@ -9765,9 +9804,11 @@ subroutine ndmc
         call parallel_sum(spec%full)
         call parallel_sum(spec%half)
         call parallel_sum(spec%third)
-        call parallel_sum(spec%fullStark)
-        call parallel_sum(spec%halfStark)
-        call parallel_sum(spec%thirdStark)
+        if (inputs%stark_components.eq.1) then
+            call parallel_sum(spec%fullStark)
+            call parallel_sum(spec%halfStark)
+            call parallel_sum(spec%thirdStark)
+        endif
     endif
 #endif
 
@@ -9957,7 +9998,7 @@ subroutine dcx
     call parallel_sum(neut%dcx)
     if(inputs%calc_dcx.ge.1) then
         call parallel_sum(spec%dcx)
-        call parallel_sum(spec%dcxStark)
+        if (inputs%stark_components.eq.1) call parallel_sum(spec%dcxStark)
     endif
     call parallel_sum(halo_iter_dens(dcx_type))
 #endif
@@ -10147,7 +10188,7 @@ subroutine halo
     !! Combine Spectra
     if(inputs%calc_halo.ge.1) then
         call parallel_sum(spec%halo)
-        call parallel_sum(spec%haloStark)
+        if (inputs%stark_components.eq.1) call parallel_sum(spec%haloStark)
     endif
 #endif
 
@@ -10204,27 +10245,35 @@ subroutine nbi_spec
             call mc_nbi_cell(ind, nbif_type, vnbi, f_wght)
             f_tot = f_tot + f_wght
             call store_photons(ri, vnbi, f_wght*nbif_photons, full)
-            call store_stark_photons(ri, vnbi, f_wght*nbif_photons, fullStark)
+            if (inputs%stark_components.eq.1) then
+                call store_stark_photons(ri, vnbi, f_wght*nbif_photons, fullStark)
+            endif
 
             !! Half Spectra
             call mc_nbi_cell(ind, nbih_type, vnbi, h_wght)
             h_tot = h_tot + h_wght
             call store_photons(ri, vnbi, h_wght*nbih_photons, half)
-            call store_stark_photons(ri, vnbi, h_wght*nbih_photons, halfStark)
+            if (inputs%stark_components.eq.1) then
+                call store_stark_photons(ri, vnbi, h_wght*nbih_photons, halfStark)
+            endif
 
             !! Third Spectra
             call mc_nbi_cell(ind, nbit_type, vnbi, t_wght)
             t_tot = t_tot + t_wght
             call store_photons(ri, vnbi, t_wght*nbit_photons, third)
-            call store_stark_photons(ri, vnbi, t_wght*nbit_photons, thirdstark)
+            if (inputs%stark_components.eq.1) then
+                call store_stark_photons(ri, vnbi, t_wght*nbit_photons, thirdStark)
+            endif
         enddo
         !$OMP CRITICAL(nbi_spec_1)
         spec%full = spec%full + full/f_tot
         spec%half = spec%half + half/h_tot
         spec%third = spec%third + third/t_tot
-        spec%fullStark = spec%fullStark + fullStark/f_tot
-        spec%halfStark = spec%halfStark + halfStark/h_tot
-        spec%thirdStark = spec%thirdStark + thirdStark/t_tot
+        if (inputs%stark_components.eq.1) then
+            spec%fullStark = spec%fullStark + fullStark/f_tot
+            spec%halfStark = spec%halfStark + halfStark/h_tot
+            spec%thirdStark = spec%thirdStark + thirdStark/t_tot
+        endif
         !$OMP END CRITICAL(nbi_spec_1)
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10234,9 +10283,11 @@ subroutine nbi_spec
     call parallel_sum(spec%full)
     call parallel_sum(spec%half)
     call parallel_sum(spec%third)
-    call parallel_sum(spec%fullStark)
-    call parallel_sum(spec%halfStark)
-    call parallel_sum(spec%thirdStark)
+    if (inputs%stark_components.eq.1) then
+        call parallel_sum(spec%fullStark)
+        call parallel_sum(spec%halfStark)
+        call parallel_sum(spec%thirdStark)
+    endif
 #endif
 
 end subroutine nbi_spec
@@ -10278,7 +10329,9 @@ subroutine dcx_spec
             call randn(random3)
             vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
             call store_photons(ri, vhalo, dcx_photons/n, spec%dcx)
-            call store_stark_photons(ri, vhalo, dcx_photons/n, spec%dcxStark)
+            if (inputs%stark_components.eq.1) then
+                call store_stark_photons(ri, vhalo, dcx_photons/n, spec%dcxStark)
+            endif
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10286,7 +10339,7 @@ subroutine dcx_spec
 #ifdef _MPI
     !! Combine Spectra
     call parallel_sum(spec%dcx)
-    call parallel_sum(spec%dcxStark)
+    if (inputs%stark_components.eq.1) call parallel_sum(spec%dcxStark)
 #endif
 
 end subroutine dcx_spec
@@ -10328,7 +10381,9 @@ subroutine halo_spec
             call randn(random3)
             vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
             call store_photons(ri, vhalo, halo_photons/n, spec%halo)
-            call store_stark_photons(ri, vhalo, halo_photons/n, spec%haloStark)
+            if (inputs%stark_components.eq.1) then
+                call store_stark_photons(ri, vhalo, halo_photons/n, spec%haloStark)
+            endif
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10336,7 +10391,7 @@ subroutine halo_spec
 #ifdef _MPI
     !! Combine Spectra
     call parallel_sum(spec%halo)
-    call parallel_sum(spec%haloStark)
+    if (inputs%stark_components.eq.1) call parallel_sum(spec%haloStark)
 #endif
 
 end subroutine halo_spec
@@ -10367,7 +10422,9 @@ subroutine cold_spec
             call randn(random3)
             vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
             call store_photons(ri, vhalo, cold_photons/n, spec%cold)
-            call store_stark_photons(ri, vhalo, cold_photons/n, spec%coldStark)
+            if (inputs%stark_components.eq.1) then
+                call store_stark_photons(ri, vhalo, cold_photons/n, spec%coldStark)
+            endif
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10375,7 +10432,7 @@ subroutine cold_spec
 #ifdef _MPI
     !! Combine Spectra
     call parallel_sum(spec%cold)
-    call parallel_sum(spec%coldStark)
+    if (inputs%stark_components.eq.1) call parallel_sum(spec%coldStark)
 #endif
 
 end subroutine cold_spec
@@ -10480,7 +10537,7 @@ subroutine fida_f
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
-    call parallel_sum(spec%fidaStark)
+    if (inputs%stark_components.eq.1) call parallel_sum(spec%fidaStark)
 #endif
 
 end subroutine fida_f
@@ -10586,7 +10643,7 @@ subroutine pfida_f
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
-    call parallel_sum(spec%pfidaStark)
+    if (inputs%stark_components.eq.1) call parallel_sum(spec%pfidaStark)
 #endif
 
 end subroutine pfida_f
@@ -10689,7 +10746,7 @@ subroutine fida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
-    call parallel_sum(spec%fidaStark)
+    if (inputs%stark_components.eq.1) call parallel_sum(spec%fidaStark)
 #endif
 
 end subroutine fida_mc
@@ -10794,7 +10851,7 @@ subroutine pfida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
-    call parallel_sum(spec%pfidaStark)
+    if (inputs%stark_components.eq.1) call parallel_sum(spec%pfidaStark)
 #endif
 
 end subroutine pfida_mc
@@ -12278,45 +12335,57 @@ program fidasim
             allocate(spec%full(inputs%nlambda,spec_chords%nchan))
             allocate(spec%half(inputs%nlambda,spec_chords%nchan))
             allocate(spec%third(inputs%nlambda,spec_chords%nchan))
-            allocate(spec%fullStark(n_stark,inputs%nlambda,spec_chords%nchan))
-            allocate(spec%halfStark(n_stark,inputs%nlambda,spec_chords%nchan))
-            allocate(spec%thirdStark(n_stark,inputs%nlambda,spec_chords%nchan))
             spec%full = 0.d0
             spec%half = 0.d0
             spec%third = 0.d0
-            spec%fullStark = 0.d0
-            spec%halfStark = 0.d0
-            spec%thirdStark = 0.d0
+            if (inputs%stark_components.eq.1) then
+                allocate(spec%fullStark(n_stark,inputs%nlambda,spec_chords%nchan))
+                allocate(spec%halfStark(n_stark,inputs%nlambda,spec_chords%nchan))
+                allocate(spec%thirdStark(n_stark,inputs%nlambda,spec_chords%nchan))
+                spec%fullStark = 0.d0
+                spec%halfStark = 0.d0
+                spec%thirdStark = 0.d0
+            endif
         endif
         if(inputs%calc_dcx.ge.1) then
             allocate(spec%dcx(inputs%nlambda,spec_chords%nchan))
             spec%dcx = 0.d0
-            allocate(spec%dcxStark(n_stark,inputs%nlambda,spec_chords%nchan))
-            spec%dcx = 0.d0
+            if (inputs%stark_components.eq.1) then
+                allocate(spec%dcxStark(n_stark,inputs%nlambda,spec_chords%nchan))
+                spec%dcxStark = 0.d0
+            endif
         endif
         if(inputs%calc_halo.ge.1) then
             allocate(spec%halo(inputs%nlambda,spec_chords%nchan))
             spec%halo = 0.d0
-            allocate(spec%haloStark(n_stark,inputs%nlambda,spec_chords%nchan))
-            spec%halo = 0.d0
+            if (inputs%stark_components.eq.1) then
+                allocate(spec%haloStark(n_stark,inputs%nlambda,spec_chords%nchan))
+                spec%haloStark = 0.d0
+            endif
         endif
         if(inputs%calc_cold.ge.1) then
             allocate(spec%cold(inputs%nlambda,spec_chords%nchan))
             spec%cold = 0.d0
-            allocate(spec%coldStark(n_stark,inputs%nlambda,spec_chords%nchan))
-            spec%cold = 0.d0
+            if (inputs%stark_components.eq.1) then
+                allocate(spec%coldStark(n_stark,inputs%nlambda,spec_chords%nchan))
+                spec%coldStark = 0.d0
+            endif
         endif
         if(inputs%calc_fida.ge.1) then
             allocate(spec%fida(inputs%nlambda,spec_chords%nchan,particles%nclass))
             spec%fida = 0.d0
-            allocate(spec%fidaStark(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
-            spec%fidaStark = 0.d0
+            if (inputs%stark_components.eq.1) then
+                allocate(spec%fidaStark(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
+                spec%fidaStark = 0.d0
+            endif
         endif
         if(inputs%calc_pfida.ge.1) then
             allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))
             spec%pfida = 0.d0
-            allocate(spec%pfidaStark(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
-            spec%pfidaStark = 0.d0
+            if (inputs%stark_components.eq.1) then
+                allocate(spec%pfidaStark(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
+                spec%pfidaStark = 0.d0
+            endif
         endif
     endif
 

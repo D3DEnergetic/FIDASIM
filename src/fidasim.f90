@@ -4795,6 +4795,9 @@ subroutine write_spectra
         spec%full  = factor*spec%full
         spec%half  = factor*spec%half
         spec%third = factor*spec%third
+        spec%fullStark  = factor*spec%fullStark
+        spec%halfStark  = factor*spec%halfStark
+        spec%thirdStark = factor*spec%thirdStark
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
              spec%full, error)
@@ -4802,6 +4805,12 @@ subroutine write_spectra
              spec%half, error)
         call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(1:2),&
              spec%third, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/fullStark", 3, dimsStark(1:3), &
+             spec%fullStark, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/halfStark", 3, dimsStark(1:3), &
+             spec%halfStark, error)
+        call h5ltmake_compressed_dataset_double_f(fid, "/thirdStark", 3, dimsStark(1:3),&
+             spec%thirdStark, error)
         !Add attributes
         call h5ltset_attribute_string_f(fid,"/full","description", &
              "Full energy component of the beam emmision: full(lambda,chan)", error)
@@ -4812,6 +4821,9 @@ subroutine write_spectra
         call h5ltset_attribute_string_f(fid,"/third","description", &
              "Third energy component of the beam emmision: third(lambda,chan)", error)
         call h5ltset_attribute_string_f(fid,"/third","units","Ph/(s*nm*sr*m^2)",error )
+        call h5ltset_attribute_string_f(fid,"/fullStark","description", &
+             "Full energy component of the beam emmision stark components: full(stark,lambda,chan)", error)
+        call h5ltset_attribute_string_f(fid,"/fullStark","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     if(inputs%calc_dcx.ge.1) then
@@ -8899,10 +8911,13 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
     select case (neut_type)
            case (nbif_type)
                call store_photons(pos,vi,photons,spec%full)
+               call store_stark_photons(pos,vi,photons,spec%fullStark)
            case (nbih_type)
                call store_photons(pos,vi,photons,spec%half)
+               call store_stark_photons(pos,vi,photons,spec%halfStark)
            case (nbit_type)
                call store_photons(pos,vi,photons,spec%third)
+               call store_stark_photons(pos,vi,photons,spec%thirdStark)
            case (dcx_type)
                call store_photons(pos,vi,photons,spec%dcx)
                call store_stark_photons(pos,vi,photons,spec%dcxStark)
@@ -9750,6 +9765,9 @@ subroutine ndmc
         call parallel_sum(spec%full)
         call parallel_sum(spec%half)
         call parallel_sum(spec%third)
+        call parallel_sum(spec%fullStark)
+        call parallel_sum(spec%halfStark)
+        call parallel_sum(spec%thirdStark)
     endif
 #endif
 
@@ -10148,12 +10166,14 @@ subroutine nbi_spec
     real(Float64) :: f_wght, h_wght, t_wght
     real(Float64) :: f_tot, h_tot, t_tot
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan) :: full, half, third
+    real(Float64), dimension(n_stark,inputs%nlambda,spec_chords%nchan) :: fullStark, halfStark, thirdStark
     logical :: inp
     integer :: n = 10000
 
     !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
     !$OMP& nbif_photons, nbih_photons, nbit_photons, rc, ri,inp, vnbi,&
-    !$OMP& random3,f_tot,h_tot,t_tot,full,half,third,f_wght,h_wght,t_wght)
+    !$OMP& random3,f_tot,h_tot,t_tot,full,half,third,f_wght,h_wght,t_wght,&
+    !$OMP& fullStark,halfStark,thirdStark)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -10178,26 +10198,33 @@ subroutine nbi_spec
 
         f_tot = 0.0 ; h_tot = 0.0 ; t_tot = 0.0
         full  = 0.0 ; half  = 0.0 ; third = 0.0
+        fullStark  = 0.0 ; halfStark  = 0.0 ; thirdStark = 0.0
         do it=1, n
             !! Full Spectra
             call mc_nbi_cell(ind, nbif_type, vnbi, f_wght)
             f_tot = f_tot + f_wght
             call store_photons(ri, vnbi, f_wght*nbif_photons, full)
+            call store_stark_photons(ri, vnbi, f_wght*nbif_photons, fullStark)
 
             !! Half Spectra
             call mc_nbi_cell(ind, nbih_type, vnbi, h_wght)
             h_tot = h_tot + h_wght
             call store_photons(ri, vnbi, h_wght*nbih_photons, half)
+            call store_stark_photons(ri, vnbi, h_wght*nbih_photons, halfStark)
 
             !! Third Spectra
             call mc_nbi_cell(ind, nbit_type, vnbi, t_wght)
             t_tot = t_tot + t_wght
             call store_photons(ri, vnbi, t_wght*nbit_photons, third)
+            call store_stark_photons(ri, vnbi, t_wght*nbit_photons, thirdstark)
         enddo
         !$OMP CRITICAL(nbi_spec_1)
         spec%full = spec%full + full/f_tot
         spec%half = spec%half + half/h_tot
         spec%third = spec%third + third/t_tot
+        spec%fullStark = spec%fullStark + fullStark/f_tot
+        spec%halfStark = spec%halfStark + halfStark/h_tot
+        spec%thirdStark = spec%thirdStark + thirdStark/t_tot
         !$OMP END CRITICAL(nbi_spec_1)
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10207,6 +10234,9 @@ subroutine nbi_spec
     call parallel_sum(spec%full)
     call parallel_sum(spec%half)
     call parallel_sum(spec%third)
+    call parallel_sum(spec%fullStark)
+    call parallel_sum(spec%halfStark)
+    call parallel_sum(spec%thirdStark)
 #endif
 
 end subroutine nbi_spec
@@ -12248,9 +12278,15 @@ program fidasim
             allocate(spec%full(inputs%nlambda,spec_chords%nchan))
             allocate(spec%half(inputs%nlambda,spec_chords%nchan))
             allocate(spec%third(inputs%nlambda,spec_chords%nchan))
+            allocate(spec%fullStark(n_stark,inputs%nlambda,spec_chords%nchan))
+            allocate(spec%halfStark(n_stark,inputs%nlambda,spec_chords%nchan))
+            allocate(spec%thirdStark(n_stark,inputs%nlambda,spec_chords%nchan))
             spec%full = 0.d0
             spec%half = 0.d0
             spec%third = 0.d0
+            spec%fullStark = 0.d0
+            spec%halfStark = 0.d0
+            spec%thirdStark = 0.d0
         endif
         if(inputs%calc_dcx.ge.1) then
             allocate(spec%dcx(inputs%nlambda,spec_chords%nchan))

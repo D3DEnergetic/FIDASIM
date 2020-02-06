@@ -174,6 +174,7 @@ def check_inputs(inputs):
               'calc_brems': zero_int,
               'calc_birth': zero_int,
               'calc_fida_wght': zero_int,
+              'stark_components': zero_int,
               'calc_npa_wght': zero_int,
               'calc_neutron': zero_int}
 
@@ -1173,8 +1174,9 @@ def write_namelist(filename, inputs):
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
+        f.write("stark_components = {:d}    !! Output stark components\n".format(inputs['stark_components']))
 
-        f.write("!! Debugging Switches\n")
+        f.write("\n!! Debugging Switches\n")
         f.write("seed = {:d}    !! RNG Seed. If seed is negative a random seed is used\n".format(inputs['seed']))
         f.write("flr = {:d}    !! Turn on Finite Larmor Radius corrections\n".format(inputs['flr']))
         f.write("load_neutrals = {:d}    !! Load neutrals from neutrals file\n".format(inputs['load_neutrals']))

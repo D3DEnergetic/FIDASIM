@@ -4864,17 +4864,19 @@ subroutine write_spectra
             call h5ltset_attribute_string_f(fid,"/fida","description", &
                  "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
             call h5ltmake_compressed_dataset_double_f(fid, "/fidaStark", 4, &
-                 dimsStark, spec%fidaStark(:,:,:,:), error)
+                 dimsStark, spec%fidaStark, error)
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/fidaStark","description", &
                  "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan,class)", &
                  error)
        endif
         call h5ltset_attribute_string_f(fid,"/fida","units","Ph/(s*nm*sr*m^2)",error )
+        call h5ltset_attribute_string_f(fid,"/fidaStark","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     if(inputs%calc_pfida.ge.1) then
         spec%pfida = factor*spec%pfida
+        spec%pfidaStark = factor*spec%pfidaStark
         !Write variables
         if(particles%nclass.le.1) then
             call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 2, &
@@ -4882,6 +4884,12 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/pfida","description", &
                  "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan)", error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/pfidaStark", 3, &
+                 dimsStark(1:3), spec%pfidaStark(:,:,:,1), error)
+            !Add attributes
+            call h5ltset_attribute_string_f(fid,"/pfidaStark","description", &
+                 "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan)", &
+                 error)
         else
             if(inputs%calc_fida.le.0) then
                 call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
@@ -4891,8 +4899,15 @@ subroutine write_spectra
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/pfida","description", &
                  "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan,class)", error)
+            call h5ltmake_compressed_dataset_double_f(fid, "/pfidaStark", 4, &
+                 dimsStark, spec%pfidaStark, error)
+            !Add attributes
+            call h5ltset_attribute_string_f(fid,"/pfidaStark","description", &
+                 "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan,class)", &
+                 error)
        endif
         call h5ltset_attribute_string_f(fid,"/pfida","units","Ph/(s*nm*sr*m^2)",error )
+        call h5ltset_attribute_string_f(fid,"/pfidaStark","units","Ph/(s*nm*sr*m^2)",error )
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
@@ -8907,6 +8922,7 @@ subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
 
     if(pas) then
         call store_photons(pos, vi, photons, spec%pfida(:,:,iclass), passive=.True.)
+        call store_stark_photons(pos, vi, photons, spec%pfidaStark(:,:,:,iclass), passive=.True.)
     else
         call store_photons(pos, vi, photons, spec%fida(:,:,iclass))
         call store_stark_photons(pos, vi, photons, spec%fidaStark(:,:,:,iclass))
@@ -10512,6 +10528,7 @@ subroutine pfida_f
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
+    call parallel_sum(spec%pfidaStark)
 #endif
 
 end subroutine pfida_f
@@ -10614,6 +10631,7 @@ subroutine fida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%fida)
+    call parallel_sum(spec%fidaStark)
 #endif
 
 end subroutine fida_mc
@@ -10718,6 +10736,7 @@ subroutine pfida_mc
 
 #ifdef _MPI
     call parallel_sum(spec%pfida)
+    call parallel_sum(spec%pfidaStark)
 #endif
 
 end subroutine pfida_mc
@@ -12226,6 +12245,8 @@ program fidasim
         if(inputs%calc_pfida.ge.1) then
             allocate(spec%pfida(inputs%nlambda,spec_chords%nchan,particles%nclass))
             spec%pfida = 0.d0
+            allocate(spec%pfidaStark(n_stark,inputs%nlambda,spec_chords%nchan,particles%nclass))
+            spec%pfidaStark = 0.d0
         endif
     endif
 

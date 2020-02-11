@@ -8786,15 +8786,15 @@ subroutine spectrum(vecp, vi, fields, sigma_pi, photons, dlength, lambda, intens
 
 endsubroutine spectrum
 
-subroutine store_photons(pos, vi, photons, spectra_stark, passive)
-    !+ Store photons in `spectra_stark`
+subroutine store_photons(pos, vi, photons, spectra, passive)
+    !+ Store photons in `spectra`
     real(Float64), dimension(3), intent(in)      :: pos
         !+ Position of neutral
     real(Float64), dimension(3), intent(in)      :: vi
         !+ Velocitiy of neutral [cm/s]
     real(Float64), intent(in)                    :: photons
         !+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]
-    real(Float64), dimension(:,:,:), intent(inout) :: spectra_stark
+    real(Float64), dimension(:,:,:), intent(inout) :: spectra
     !+ Stark split `spectra`
     logical, intent(in), optional                :: passive
         !+ Indicates whether photon is passive FIDA
@@ -8846,7 +8846,7 @@ subroutine store_photons(pos, vi, photons, spectra_stark, passive)
             if (bin.lt.1) cycle loop_over_stark
             if (bin.gt.inputs%nlambda) cycle loop_over_stark
             !$OMP ATOMIC UPDATE
-            spectra_stark(i,bin,ichan) = spectra_stark(i,bin,ichan) + intensity(i)
+            spectra(i,bin,ichan) = spectra(i,bin,ichan) + intensity(i)
             !$OMP END ATOMIC
         enddo loop_over_stark
     enddo loop_over_channels

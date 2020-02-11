@@ -82,15 +82,15 @@ When the neutral particle relaxes (\(n: 3 \rightarrow 2\)) it emits a doppler sh
 
 Charge Exchange is the process by which the Halo and FIDA light is created.
 In a charge exchange reaction a thermal (DCX, Halo) or fast (FIDA) ion steals an electron from a neutral particle.
-The newly created neutral is born in an excited (\(n=3\) state and like the collisionally excited neutral it relaxes to a lower energy state (\n=2\) and emits a doppler shifted (656.1 nm) photon.
+The newly created neutral is born in an excited (\(n=3\) state and like the collisionally excited neutral it relaxes to a lower energy state (\(n=2\) and emits a doppler shifted (656.1 nm) photon.
 
 ![Stark Splitting and Doppler Shift](|media|/stark_doppler.png){: width="400"}
 {: style="text-align: center"}
 
 ![Stark Splitting](|media|/stark_splitting.png){: style="float: right"; width="250"}
-The motion of a ion in a magnetic field induces an electric field which causes Stark Spitting of the the atoms energy levels.
-Most atoms the strength of the Stark effect is quadratic in low electric fields and linear for strong electric fields. 
-Usually atoms never the linear regime but, due to degenerency between states of different angular momentum, hydrogenic atoms exhibit a linear Stark effect.
+The motion of an ion in a magnetic field induces an electric field which causes Stark Spitting of the the atoms energy levels.
+For most atoms, the strength of the Stark effect is quadratic in low electric fields and linear in strong electric fields. 
+Usually atoms never enter the linear regime but, due to degenerency between states of different angular momentum, hydrogenic atoms exhibit a linear Stark effect.
 The linear Stark energy component shifts are given by the following equations.
 
 $$\Delta \mathcal{E} = 3nk\frac{E}{Ze/4\pi\epsilon_0a_0^2}R_y\;\, \mathrm{for} \;\,k=0,\pm 1,\dots,\pm (n-1)$$

@@ -50,8 +50,9 @@ A value of two will turn on additional functionality.
 | `calc_pnpa`         | Int16   | 0    | NA         | NA    | Calculate passive NPA flux                      |
 | `calc_neutron`      | Int16   | 0    | NA         | NA    | Calculate B-T Neutron rate               |
 | `calc_birth`        | Int16   | 0    | NA         | NA    | Calculate Birth profile                  |
-| `calc_fida_wght`    | Int16   | 0    | NA         | NA    | Calculate FIDA weight functions          | 
+| `calc_fida_wght`    | Int16   | 0    | NA         | NA    | Calculate FIDA weight functions          |
 | `calc_npa_wght`     | Int16   | 0    | NA         | NA    | Calculate NPA weight functions           |
+| `stark_components`  | Int16   | 0    | NA         | NA    | Output spectral stark components         |
 
 ##Monte Carlo Settings
 These settings control the number of Monte Carlo particles used by FIDASIM.

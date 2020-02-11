@@ -170,7 +170,7 @@ def run_test(args):
                     "calc_npa":2, "calc_brems":1,"calc_fida":1,"calc_neutron":1,
                     "calc_bes":1, "calc_dcx":1, "calc_halo":1, "calc_cold":1,
                     "calc_birth":1, "calc_fida_wght":1,"calc_npa_wght":1,
-                    "calc_pfida":1, "calc_pnpa":2,
+                    "calc_pfida":1, "calc_pnpa":2, "stark_components":0,
                     "result_dir":args.path, "tables_file":fida_dir+'/tables/atomic_tables.h5'}
 
     basic_bgrid = {"nx":50, "ny":60, "nz":70,

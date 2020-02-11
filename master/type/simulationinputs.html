@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="<p>12.0% of total for derived types.</p>Including implementation: 58 statements, 12.0% of total for derived types.">58 statements</a>
+    title="<p>12.2% of total for derived types.</p>Including implementation: 59 statements, 12.2% of total for derived types.">59 statements</a>
      </li> 
      
      
@@ -258,6 +258,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-split">split</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-stark_components">stark_components</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-ab%7E3">ab</a>
       
@@ -426,6 +428,8 @@
       <a class="list-group-item" href="../type/simulationinputs.html#variable-split">split</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-verbose">verbose</a>
+      
+      <a class="list-group-item" href="../type/simulationinputs.html#variable-stark_components">stark_components</a>
       
       <a class="list-group-item" href="../type/simulationinputs.html#variable-ab%7E3">ab</a>
       
@@ -1076,7 +1080,21 @@
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>verbose</strong></td><td></td><td></td><td></td>
+  <td><strong>verbose</strong></td><td></td><td></td><td><p>Verbosity: &lt;0 = off++, 0 = off, 1=on, 2=on++</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-stark_components"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>stark_components</strong></td><td></td><td></td><td><p>Output spectral stark components : 0=off, 1=on</p></td>
   
 </tr>
 
@@ -1397,6 +1415,8 @@
         <span class="c">!+ Split signals by fast ion class: 0=off, 1=on</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">verbose</span>
         <span class="c">!+ Verbosity: &lt;0 = off++, 0 = off, 1=on, 2=on++</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">Int32</span><span class="p">)</span> <span class="kd">::</span> <span class="n">stark_components</span>
+        <span class="c">!+ Output spectral stark components : 0=off, 1=on</span>
 
     <span class="c">!! Neutral Beam Settings</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">ab</span>

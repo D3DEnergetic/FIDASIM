@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="59.9% of total for modules and submodules.">8301 statements</a>
+    title="60.1% of total for modules and submodules.">8368 statements</a>
      </li> 
      
      
@@ -12558,8 +12558,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-full"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>full</strong></td><td></td><td></td><td><p>Full energy beam emission: full(lambda,chan)</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>full</strong></td><td></td><td></td><td><p>Full energy beam emission stark components: full(n_stark,lambda,chan)</p></td>
   
 </tr>
 
@@ -12572,8 +12572,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-half"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>half</strong></td><td></td><td></td><td><p>Half energy beam emission: half(lambda,chan)</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>half</strong></td><td></td><td></td><td><p>Half energy beam emission stark components: half(n_stark,lambda,chan)</p></td>
   
 </tr>
 
@@ -12586,8 +12586,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-third"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>third</strong></td><td></td><td></td><td><p>Third energy beam emission: third(lambda,chan)</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>third</strong></td><td></td><td></td><td><p>Third energy beam emission stark components: third(n_stark,lambda,chan)</p></td>
   
 </tr>
 
@@ -12600,8 +12600,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-dcx"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX emission: dcx(lambda,chan)</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>dcx</strong></td><td></td><td></td><td><p>Direct CX emission stark components: dcx(n_stark,lambda,chan)</p></td>
   
 </tr>
 
@@ -12614,8 +12614,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-halo"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission: halo(lambda,chan)</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>halo</strong></td><td></td><td></td><td><p>Thermal halo emission stark components: halo(n_stark,lambda,chan)</p></td>
   
 </tr>
 
@@ -12628,8 +12628,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-cold"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:), allocatable</td><td>::</td>
-  <td><strong>cold</strong></td><td></td><td></td><td><p>Cold D-alpha emission: cold(lambda,chan)</p></td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
+  <td><strong>cold</strong></td><td></td><td></td><td><p>Cold D-alpha emission stark components: cold(n_stark,lambda,chan)</p></td>
   
 </tr>
 
@@ -12642,8 +12642,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-fida"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>fida</strong></td><td></td><td></td><td><p>Active FIDA emission: fida(lambda,chan,orbit_type)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>fida</strong></td><td></td><td></td><td><p>Active FIDA emission stark components: fida(n_stark,lambda,chan,orbit_type)</p></td>
   
 </tr>
 
@@ -12656,8 +12656,8 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-pfida"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:), allocatable</td><td>::</td>
-  <td><strong>pfida</strong></td><td></td><td></td><td><p>Passive FIDA emission: pfida(lambda,chan,orbit_type)</p></td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td><strong>pfida</strong></td><td></td><td></td><td><p>Passive FIDA emission stark components: pfida(n_stark,lambda,chan,orbit_type)</p></td>
   
 </tr>
 
@@ -13607,7 +13607,21 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>verbose</strong></td><td></td><td></td><td></td>
+  <td><strong>verbose</strong></td><td></td><td></td><td><p>Verbosity: &lt;0 = off++, 0 = off, 1=on, 2=on++</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-stark_components"></span>integer(kind=Int32),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>stark_components</strong></td><td></td><td></td><td><p>Output spectral stark components : 0=off, 1=on</p></td>
   
 </tr>
 
@@ -25258,7 +25272,7 @@ public subroutine <a href='../proc/spectrum.html'>spectrum</a>(vecp, vi, fields,
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-store_photons"></span><h3>
-public subroutine <a href='../proc/store_photons.html'>store_photons</a>(pos, vi, photons, spectra, passive)
+public subroutine <a href='../proc/store_photons.html'>store_photons</a>(pos, vi, photons, spectra_stark, passive)
     
     
    
@@ -25273,7 +25287,7 @@ public subroutine <a href='../proc/store_photons.html'>store_photons</a>(pos, vi
 
 
 
-<p>Store photons in <code>spectra</code></p>
+<p>Store photons in <code>spectra_stark</code></p>
     
     <h4>Arguments</h4>
     
@@ -25343,8 +25357,8 @@ public subroutine <a href='../proc/store_photons.html'>store_photons</a>(pos, vi
   <td>intent(inout),</td>
   <td></td>
   
-  <td>dimension(:,:)</td><td>::</td>
-  <td><strong>spectra</strong></td><td></td>
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>spectra_stark</strong></td><td><p>Stark split <code>spectra</code></p></td>
   
 </tr>
 

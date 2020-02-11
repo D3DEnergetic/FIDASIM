@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine store_photons(pos, vi, photons, spectra, passive)
+public subroutine store_photons(pos, vi, photons, spectra_stark, passive)
     
     
    
@@ -215,7 +215,7 @@ public subroutine store_photons(pos, vi, photons, spectra, passive)
 
 
     
-    <p>Store photons in <code>spectra</code></p>
+    <p>Store photons in <code>spectra_stark</code></p>
     
 
     <h3>Arguments</h3>
@@ -281,12 +281,12 @@ public subroutine store_photons(pos, vi, photons, spectra, passive)
   
 <tr>
   
-  <td><span class="anchor" id="variable-spectra"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-spectra_stark"></span>real(kind=Float64),</td>
   <td>intent(inout),</td>
   <td></td>
   
-  <td>dimension(:,:)</td><td>::</td>
-  <td><strong>spectra</strong></td><td></td>
+  <td>dimension(:,:,:)</td><td>::</td>
+  <td><strong>spectra_stark</strong></td><td><p>Stark split <code>spectra</code></p></td>
   
 </tr>
 
@@ -881,15 +881,16 @@ public subroutine store_photons(pos, vi, photons, spectra, passive)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">spectra</span><span class="p">,</span> <span class="n">passive</span><span class="p">)</span>
-    <span class="c">!+ Store photons in `spectra`</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">store_photons</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">photons</span><span class="p">,</span> <span class="n">spectra_stark</span><span class="p">,</span> <span class="n">passive</span><span class="p">)</span>
+    <span class="c">!+ Store photons in `spectra_stark`</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">pos</span>
         <span class="c">!+ Position of neutral</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">vi</span>
         <span class="c">!+ Velocitiy of neutral [cm/s]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                    <span class="kd">::</span> <span class="n">photons</span>
         <span class="c">!+ Photons from [[libfida:colrad]] [Ph/(s*cm^3)]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">spectra</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">spectra_stark</span>
+    <span class="c">!+ Stark split `spectra`</span>
     <span class="kt">logical</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>                <span class="kd">::</span> <span class="n">passive</span>
         <span class="c">!+ Indicates whether photon is passive FIDA</span>
 
@@ -940,7 +941,7 @@ public subroutine store_photons(pos, vi, photons, spectra, passive)
             <span class="k">if</span> <span class="p">(</span><span class="n">bin</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="mi">1</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_stark</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">bin</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="n">inputs</span><span class="p">%</span><span class="n">nlambda</span><span class="p">)</span> <span class="k">cycle </span><span class="n">loop_over_stark</span>
             <span class="c">!$OMP ATOMIC UPDATE</span>
-            <span class="n">spectra</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">=</span> <span class="n">spectra</span><span class="p">(</span><span class="n">bin</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">+</span> <span class="n">intensity</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">spectra_stark</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">bin</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">=</span> <span class="n">spectra_stark</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">bin</span><span class="p">,</span><span class="n">ichan</span><span class="p">)</span> <span class="o">+</span> <span class="n">intensity</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
             <span class="c">!$OMP END ATOMIC</span>
         <span class="n">enddo</span> <span class="n">loop_over_stark</span>
     <span class="n">enddo</span> <span class="n">loop_over_channels</span>

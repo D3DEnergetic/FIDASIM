@@ -1288,12 +1288,13 @@ subroutine np_assign(n1, n2)
     type(NeutralPopulation), intent(in) :: n2
     type(NeutralPopulation), intent(inout) :: n1
 
-    integer :: i, j, k, ic, ind(3)
+    integer :: i, j, k, ic, ind(3), nx, ny, nz
 
     n1%amu = n2%amu
 
     if(.not.allocated(n1%dens)) then
-        allocate(n1%dens, source=n2%dens)
+        nx = size(n2%dens,2); ny = size(n2%dens,3); nz = size(n2%dens,4)
+        allocate(n1%dens(nlevs,nx,ny,nz), source=n2%dens)
     else
         n1%dens = n2%dens
     endif

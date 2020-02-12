@@ -106,68 +106,16 @@ integer, parameter, dimension(n_stark) :: stark_sigma=1 - stark_pi
 !!Numerical Settings
 integer, parameter :: nlevs=6
     !+ Number of atomic energy levels
-real(Float64), dimension(ntypes) :: halo_iter_dens = 0.d0
-    !+ Keeps track of how of each generations halo density
 integer :: nbi_outside = 0
     !+ Keeps track of how many beam neutrals do not hit the [[libfida:beam_grid]]
+integer :: reservoir_size = 50
+    !+ Size of Neutral Particle Reservoir
 
 !!Loop Parallization Settings
 integer :: istart = 1
     !+ Starting loop counter (1 if OpenMP, processor number if MPI)
 integer :: istep = 1
     !+ Loop step size (1 if OpenMP, number of processes if MPI)
-
-type InterpolCoeffs1D
-    !+ Linear Interpolation Coefficients and indices
-    integer :: i = 0
-        !+ Index of position right before `xout`
-    real(Float64) :: b1 = 0.d0
-        !+ Coefficient for y(i) term
-    real(Float64) :: b2 = 0.d0
-        !+ Coefficient for y(i+1) term
-end type InterpolCoeffs1D
-
-type InterpolCoeffs2D
-    !+ 2D Linear Interpolation Coefficients and indices
-    integer :: i = 0
-        !+ Index of abscissa before `xout`
-    integer :: j = 0
-        !+ Index of ordinate before `yout`
-    real(Float64) :: b11 = 0.d0
-        !+ Coefficient for z(i,j) term
-    real(Float64) :: b12 = 0.d0
-        !+ Coefficient for z(i,j+1) term
-    real(Float64) :: b21 = 0.d0
-        !+ Coefficient for z(i+1,j) term
-    real(Float64) :: b22 = 0.d0
-        !+ Coefficient for z(i+1,j+1) term
-end type InterpolCoeffs2D
-
-type InterpolCoeffs3D
-    !+ 3D Cylindrical Interpolation Coefficients and indices
-    integer :: i = 0
-        !+ Index of R before `rout`
-    integer :: j = 0
-        !+ Index of Z before `zout`
-    integer :: k = 0
-        !+ Index of Phi before `phiout`
-    real(Float64) :: b111 = 0.d0
-        !+ Coefficient for z(i,j,k) term
-    real(Float64) :: b121 = 0.d0
-        !+ Coefficient for z(i,j+1,k) term
-    real(Float64) :: b112 = 0.d0
-        !+ Coefficient for z(i,j,k+1) term
-    real(Float64) :: b122 = 0.d0
-        !+ Coefficient for z(i,j+1,k+1) term
-    real(Float64) :: b211 = 0.d0
-        !+ Coefficient for z(i+1,j,k) term
-    real(Float64) :: b212 = 0.d0
-        !+ Coefficient for z(i+1,j,k+1) term
-    real(Float64) :: b221 = 0.d0
-        !+ Coefficient for z(i+1,j+1,k) term
-    real(Float64) :: b222 = 0.d0
-        !+ Coefficient for z(i+1,j+1,k+1) term
-end type InterpolCoeffs3D
 
 type BeamGrid
     !+ Defines a 3D grid for neutral beam calculations
@@ -882,19 +830,58 @@ type NeutronRate
         !+ Neutron emissivity: emis(R,Z,Phi)
 end type NeutronRate
 
-type NeutralDensity
+type NeutralParticle
+    real(Float64) :: w = 1.d0
+        !+ Neutral particle weight
+    real(Float64), dimension(3)  :: v = 0.d0
+        !+ Neutral particle velocity
+end type NeutralParticle
+
+type NeutralParticleReservoir
+    !+ Neutral Particle Reservoir
+    !+###References
+    !+ Li, Kim-Hung (4 December 1994). "Reservoir-Sampling Algorithms of Time
+    !+ Complexity O(n(1+log(N/n)))". ACM Transactions on Mathematical Software. 20
+    !+ (4): 481–493. doi:10.1145/198429.198435
+    integer(Int32) :: n = 0
+        !+ Number of neutral particles seen by the reservoir
+    integer(Int32) :: i = 0
+        !+ Number of the next particle that will be stored in the reservoir
+    integer(Int32) :: k = 0
+        !+ Size of the reservoir
+    real(Float64)  :: W = 0.d0
+        !+ Sampling weight
+    type(NeutralParticle), dimension(:), allocatable :: R
+        !+ Neutral Particle Reservoir
+end type NeutralParticleReservoir
+
+type NeutralPopulation
+    real(Float64) :: amu = H2_amu
+        !+ Atomic Mass Unit of Neutrals
+    real(Float64), dimension(:,:,:,:), allocatable :: dens
+        !+ Neutral density: dens(lev,x,y,z)
+    type(NeutralParticleReservoir), dimension(:,:,:), allocatable :: res
+        !+ Neutral particle reservoir
+end type NeutralPopulation
+
+type Neutrals
     !+ Neutral density structure
-    real(Float64), dimension(:,:,:,:), allocatable :: full
-        !+ Full energy neutral density: full(lev,x,y,z)
-    real(Float64), dimension(:,:,:,:), allocatable :: half
-        !+ Half energy neutral density: half(lev,x,y,z)
-    real(Float64), dimension(:,:,:,:), allocatable :: third
-        !+ Third energy neutral density: third(lev,x,y,z)
-    real(Float64), dimension(:,:,:,:), allocatable :: dcx
-        !+ Direct CX neutral density: dcx(lev,x,y,z)
-    real(Float64), dimension(:,:,:,:), allocatable :: halo
-        !+ Thermal halo neutral density: dens(lev,x,y,z)
-end type NeutralDensity
+    type(NeutralPopulation) :: full
+        !+ Full energy neutral population
+    type(NeutralPopulation) :: half
+        !+ Half energy neutral population
+    type(NeutralPopulation) :: third
+        !+ Third energy neutral population
+    type(NeutralPopulation) :: dcx
+        !+ DCX neutral population
+    type(NeutralPopulation) :: halo
+        !+ Halo neutral population
+!TODO: Implement Following
+!    type(NeutralPopulation) :: fida
+!        !+ FIDA neutral population
+!    type(NeutralPopulation) :: fida_halo
+!        !+ FIDA-Halo neutral population
+end type Neutrals
 
 type FIDAWeights
     !+ FIDA weights structure
@@ -1092,7 +1079,8 @@ interface assignment(=)
     !+ [[EMFields]],[[LocalEMFields]],[[FastIon]], [[NPAParticle]], and [[BirthParticle]]
     module procedure pp_assign, lpp_assign, plp_assign, lplp_assign, &
                      ff_assign, lff_assign, flf_assign, lflf_assign, &
-                     fast_ion_assign,npa_part_assign,birth_part_assign
+                     fast_ion_assign,npa_part_assign,birth_part_assign, &
+                     neutral_part_assign, npr_assign, np_assign
 end interface
 
 interface operator(+)
@@ -1118,20 +1106,6 @@ interface operator(/)
     !+ Allows for dividing [[Profiles]],[[LocalProfiles]],
     !+ [[EMFields]], and [[LocalEMFields]] by scalars
     module procedure ps_divide, lps_divide, fs_divide, lfs_divide
-end interface
-
-interface interpol_coeff
-    !+ Calculates interpolation coefficients
-    module procedure interpol1D_coeff, interpol1D_coeff_arr
-    module procedure interpol2D_coeff, interpol2D_coeff_arr
-    module procedure cyl_interpol3D_coeff, cyl_interpol3D_coeff_arr
-end interface
-
-interface interpol
-    !+ Performs linear/bilinear/cylindrical interpolation
-    module procedure interpol1D_arr
-    module procedure interpol2D_arr, interpol2D_2D_arr
-    module procedure interpol3D_arr, interpol3D_2D_arr
 end interface
 
 !! definition of the structures:
@@ -1163,7 +1137,7 @@ type(SimulationInputs), save    :: inputs
     !+ Variable containing the simulation inputs
 type(BirthProfile), save        :: birth
     !+ Variable for storing the calculated birth profile
-type(NeutralDensity), save      :: neut
+type(Neutrals), save            :: neut
     !+ Variable for storing the calculated beam density
 type(Spectra), save             :: spec
     !+ Variable for storing the calculated spectra
@@ -1283,6 +1257,57 @@ subroutine birth_part_assign(p1, p2)
     p1%pitch     = p2%pitch
 
 end subroutine birth_part_assign
+
+subroutine neutral_part_assign(p1, p2)
+    !+ Defines how to assign [[NeutralParticle]] types to eachother
+    type(NeutralParticle), intent(in)  :: p2
+    type(NeutralParticle), intent(out) :: p1
+
+    p1%w = p2%w
+    p1%v = p2%v
+
+end subroutine neutral_part_assign
+
+subroutine npr_assign(r1,r2)
+    !+ Defines how to assign [[NeutralParticleReservoir]] to eachother
+    type(NeutralParticleReservoir), intent(in) :: r2
+    type(NeutralParticleReservoir), intent(inout) :: r1
+
+    if(r2%k.eq.0) return
+    call init_reservoir(r1,r2%k)
+    r1%n = r2%n
+    r1%k = r2%k
+    r1%i = r2%i
+    r1%W = r2%W
+    r1%R = r2%R
+
+end subroutine npr_assign
+
+subroutine np_assign(n1, n2)
+    !+ Defines how to assign [[NeutralPopulation]] to eachother
+    type(NeutralPopulation), intent(in) :: n2
+    type(NeutralPopulation), intent(inout) :: n1
+
+    integer :: i, j, k, ic, ind(3), nx, ny, nz
+
+    n1%amu = n2%amu
+
+    if(.not.allocated(n1%dens)) then
+        nx = size(n2%dens,2); ny = size(n2%dens,3); nz = size(n2%dens,4)
+        allocate(n1%dens(nlevs,nx,ny,nz), source=n2%dens)
+    else
+        n1%dens = n2%dens
+    endif
+
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        if (n2%res(i,j,k)%n.ne.0) then
+            call npr_assign(n1%res(i,j,k), n2%res(i,j,k))
+        endif
+    enddo
+
+end subroutine np_assign
 
 subroutine pp_assign(p1, p2)
     !+ Defines how to assign [[Profiles]] types to eachother
@@ -4266,14 +4291,103 @@ subroutine write_birth_profile
 
 end subroutine write_birth_profile
 
+subroutine write_neutral_population(id, pop, error)
+    !+ Writes Neutral Population to HDF5 group
+    integer(HID_T), intent(inout)       :: id
+        !+ HDF5 group ID
+    type(NeutralPopulation), intent(in) :: pop
+        !+ Neutral Population to write
+    integer, intent(out)                :: error
+        !+ Error code
+
+    integer(HID_T) :: gid
+    integer(HSIZE_T), dimension(1) :: d
+    integer(HSIZE_T), dimension(4) :: dims4
+    integer(HSIZE_T), dimension(5) :: dims5
+
+    real(Float64), dimension(:,:,:,:,:), allocatable :: v
+    real(Float64), dimension(:,:,:,:), allocatable   :: w
+    integer(Int32), dimension(:,:,:), allocatable    :: n
+
+    integer :: ic, ir, i, j, k, ind(3), nx, ny, nz, nk
+
+    nx = beam_grid%nx
+    ny = beam_grid%ny
+    nz = beam_grid%nz
+    dims4 = [nlevs, nx, ny, nz]
+    d(1) =1
+
+    call h5ltmake_dataset_double_f(id,"amu", 0, d, [pop%amu], error)
+    call h5ltset_attribute_string_f(id,"amu","units", "atomic mass units",error)
+    call h5ltset_attribute_string_f(id,"amu","description", &
+         "Atomic mass", error)
+
+    call h5ltmake_dataset_int_f(id,"nlevel", 0, d, [nlevs], error)
+    call h5ltset_attribute_string_f(id,"nlevel","description", &
+         "Number of atomic energy levels", error)
+
+    call h5ltmake_compressed_dataset_double_f(id, "dens", 4, dims4, pop%dens, error)
+    call h5ltset_attribute_string_f(id,"dens","units","neutrals*cm^-3",error)
+    call h5ltset_attribute_string_f(id,"dens","description", &
+         "Neutral density dens(level,x,y,z)", error)
+
+    dims5 = [3, reservoir_size, nx, ny, nz]
+    allocate(v(3,reservoir_size, nx, ny, nz))
+    allocate(w(reservoir_size, nx, ny, nz))
+    allocate(n(nx, ny, nz))
+    v = 0.d0; w = 0.d0
+    n = 0
+
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        n(i,j,k) = pop%res(i,j,k)%n
+        nk = min(pop%res(i,j,k)%k, pop%res(i,j,k)%n)
+        w(1:nk,i,j,k) = pop%res(i,j,k)%R(1:nk)%w
+        do ir=1, nk
+            v(:,ir,i,j,k) = pop%res(i,j,k)%R(ir)%v
+        enddo
+    enddo
+
+    !Create reservoir group
+    call h5gcreate_f(id, "reservoir", gid, error)
+    call h5ltset_attribute_string_f(id,"reservoir","description", &
+         "Neutral Particle Reservoir",error)
+
+    call h5ltmake_dataset_int_f(gid,"k", 0, d, [maxval(pop%res%k)], error)
+    call h5ltset_attribute_string_f(gid,"k","description", &
+         "Reservoir Size", error)
+
+    call h5ltmake_compressed_dataset_int_f(gid, "n", 3, dims4(2:4), n, error)
+    call h5ltset_attribute_string_f(gid, "n", "description", &
+         "Number of particles in each reservoir", error)
+
+    call h5ltmake_compressed_dataset_double_f(gid, "w", 4, dims5(2:5), w, error, compress=.False.)
+    call h5ltset_attribute_string_f(gid, "w", "description", &
+         "Neutral Particle Weight", error)
+
+    call h5ltmake_compressed_dataset_double_f(gid, "v", 5, dims5, v, error, compress=.False.)
+    call h5ltset_attribute_string_f(gid,"v","units","cm/s",error)
+    call h5ltset_attribute_string_f(gid,"v","description", &
+         "Neutral Particle velocity in beam grid coordinates v(:,particle,i,j,k)", error)
+
+    !Close grid group
+    call h5gclose_f(gid, error)
+
+    deallocate(v,w,n)
+
+end subroutine write_neutral_population
+
 subroutine write_neutrals
     !+ Writes [[libfida:neut]] to a HDF5 file
-    integer(HID_T) :: fid
-    integer(HSIZE_T), dimension(4) :: dims
-    integer(HSIZE_T), dimension(1) :: d
+    integer(HID_T) :: fid, gid
     integer :: error
 
+    integer :: i
     character(charlim) :: filename
+    integer(HSIZE_T), dimension(4) :: dims4
+
+    dims4 = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz]
 
     filename=trim(adjustl(inputs%result_dir))//"/"//trim(adjustl(inputs%runid))//"_neutrals.h5"
 
@@ -4285,52 +4399,46 @@ subroutine write_neutrals
 
     !Write variables
     call write_beam_grid(fid, error)
-    dims = [nlevs, beam_grid%nx, beam_grid%ny, beam_grid%nz]
-    d(1) =1
-    call h5ltmake_dataset_int_f(fid,"/nlevel", 0, d, [nlevs], error)
-    call h5ltset_attribute_string_f(fid,"/nlevel","description", &
-         "Number of atomic energy levels", error)
 
     if(inputs%calc_nbi_dens.ge.1) then
-        call h5ltmake_compressed_dataset_double_f(fid, "/fdens", 4, dims, &
-             neut%full, error)
-        call h5ltset_attribute_string_f(fid,"/fdens","units","neutrals*cm^-3",error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/hdens", 4, dims, &
-             neut%half, error)
-        call h5ltmake_compressed_dataset_double_f(fid, "/tdens", 4, dims, &
-             neut%third, error)
+        call h5gcreate_f(fid, "/full", gid, error)
+        call write_neutral_population(gid, neut%full, error)
+        call h5gclose_f(gid, error)
+        call h5ltset_attribute_string_f(fid,"/full","description", &
+             "Full Energy Neutral Population", error)
 
-        call h5ltset_attribute_string_f(fid,"/fdens","description", &
-             "Neutral density for the full energy component of the beam: fdens(level,x,y,z)", error)
-        call h5ltset_attribute_string_f(fid,"/hdens","description", &
-             "Neutral density for the half energy component of the beam: hdens(level,x,y,z)", error)
-        call h5ltset_attribute_string_f(fid,"/hdens","units","neutrals*cm^-3",error)
-        call h5ltset_attribute_string_f(fid,"/tdens","description", &
-             "Neutral density for the third energy component of the beam: tdens(level,x,y,z)", error)
-        call h5ltset_attribute_string_f(fid,"/tdens","units","neutrals*cm^-3",error)
+        call h5gcreate_f(fid, "/half", gid, error)
+        call write_neutral_population(gid, neut%half, error)
+        call h5gclose_f(gid, error)
+        call h5ltset_attribute_string_f(fid,"/half","description", &
+             "Half Energy Neutral Population", error)
+
+        call h5gcreate_f(fid, "/third", gid, error)
+        call write_neutral_population(gid, neut%third, error)
+        call h5gclose_f(gid, error)
+        call h5ltset_attribute_string_f(fid,"/third","description", &
+             "Third Energy Neutral Population", error)
     endif
 
     if(inputs%calc_dcx_dens.ge.1) then
-        call h5ltmake_compressed_dataset_double_f(fid, "/dcxdens", 4, dims, &
-             neut%dcx, error)
-
-        call h5ltset_attribute_string_f(fid,"/dcxdens","description", &
-             "Direct Charge Exchange (DCX) neutral density: dcxdens(level,x,y,z)", error)
-        call h5ltset_attribute_string_f(fid,"/dcxdens","units","neutrals*cm^-3",error)
+        call h5gcreate_f(fid, "/dcx", gid, error)
+        call write_neutral_population(gid, neut%dcx, error)
+        call h5gclose_f(gid, error)
+        call h5ltset_attribute_string_f(fid,"/dcx","description", &
+             "Direct Charge Exchange (DCX) Neutral Population", error)
     endif
 
     if(inputs%calc_halo_dens.ge.1) then
-        call h5ltmake_compressed_dataset_double_f(fid, "/halodens", 4, dims, &
-             neut%halo, error)
-
-        call h5ltset_attribute_string_f(fid,"/halodens","description", &
-             "Neutral density of the beam halo: halodens(level,x,y,z)", error)
-        call h5ltset_attribute_string_f(fid,"/halodens","units","neutrals*cm^-3",error)
+        call h5gcreate_f(fid, "/halo", gid, error)
+        call write_neutral_population(gid, neut%halo, error)
+        call h5gclose_f(gid, error)
+        call h5ltset_attribute_string_f(fid,"/halo","description", &
+             "Thermal Halo Neutral Population", error)
     endif
 
     call h5ltset_attribute_string_f(fid, "/", "version", version, error)
     call h5ltset_attribute_string_f(fid,"/","description", &
-         "Beam neutral density calculated by FIDASIM", error)
+         "Neutral Populations calculated by FIDASIM", error)
 
     !Close file
     call h5fclose_f(fid, error)
@@ -4339,7 +4447,7 @@ subroutine write_neutrals
     call h5close_f(error)
 
     if(inputs%verbose.ge.1) then
-        write(*,'(T4,a,a)') 'neutral density written to: ',trim(filename)
+        write(*,'(T4,a,a)') 'neutral populations written to: ',trim(filename)
     endif
 
 end subroutine write_neutrals
@@ -5365,8 +5473,66 @@ subroutine write_npa_weights
 
 end subroutine write_npa_weights
 
+subroutine read_neutral_population(id, pop, error)
+    !+ Reads neutral population from file
+    integer(HID_T), intent(in) :: id
+        !+ HDF5 id
+    type(NeutralPopulation), intent(inout) :: pop
+        !+ Neutral Population to populate
+    integer, intent(out) :: error
+        !+ Error code
+
+    integer(HID_T) :: gid
+    integer(HSIZE_T), dimension(4) :: dims4
+    integer(HSIZE_T), dimension(5) :: dims5
+
+    integer :: k, nx, ny, nz, ic, ind(3), ii, jj, kk, ir
+    real(Float64) :: amu
+    integer(Int32), dimension(:,:,:), allocatable :: n
+    real(Float64), dimension(:,:,:,:), allocatable :: w
+    real(Float64), dimension(:,:,:,:,:), allocatable :: v
+
+    call h5ltread_dataset_double_scalar_f(id, "amu", amu, error)
+
+    call init_neutral_population(pop, amu)
+
+    nx = beam_grid%nx; ny = beam_grid%ny; nz = beam_grid%nz
+
+    dims4 = [nlevs, nx, ny, nz]
+    call h5ltread_dataset_double_f(id, "dens", pop%dens, dims4, error)
+
+    call h5gopen_f(id, "reservoir", gid, error)
+    call h5ltread_dataset_int_scalar_f(gid, "k", reservoir_size, error)
+    k = reservoir_size
+
+    allocate(v(3,k,nx,ny,nz))
+    allocate(w(k,nx,ny,nz))
+    allocate(n(nx,ny,nz))
+    w = 0.d0; v=0.d0; n=0
+
+    dims5 = [3, k, nx, ny, nz]
+    call h5ltread_dataset_double_f(gid, "v", v, dims5, error)
+    call h5ltread_dataset_double_f(gid, "w", w, dims5(2:5), error)
+    call h5ltread_dataset_int_f(gid, "n", n, dims4(2:4), error)
+
+    call h5gclose_f(gid, error)
+
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        ii = ind(1) ; jj = ind(2) ; kk = ind(3)
+        call init_reservoir(pop%res(ii,jj,kk), k)
+        pop%res(ii,jj,kk)%n = n(ii,jj,kk)
+        do ir=1,min(k,pop%res(ii,jj,kk)%n)
+            pop%res(ii,jj,kk)%R(ir) = NeutralParticle(w(ir,ii,jj,kk), v(:,ir,ii,jj,kk))
+        enddo
+    enddo
+
+    deallocate(v,w,n)
+
+end subroutine read_neutral_population
+
 subroutine read_neutrals
-    !+ Reads neutral density from file and puts it in [[libfida:neut]]
+    !+ Reads neutral populations from file and puts it in [[libfida:neut]]
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(4) :: dims
     integer :: error,nx,ny,nz
@@ -5412,60 +5578,66 @@ subroutine read_neutrals
     endif
 
     !Check to make sure the neutrals file has all the needed neutrals
-    call h5ltpath_valid_f(fid, "/fdens", .True., exis, error)
+    call h5ltpath_valid_f(fid, "/full", .True., exis, error)
     if((.not.exis).and.(inputs%calc_nbi_dens.ge.1)) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'READ_NEUTRALS: Full energy neutral density is not in the neutrals file'
+            write(*,'(a)') 'READ_NEUTRALS: Full energy neutral population is not in the neutrals file'
         endif
         fatal_error = .True.
     endif
-    call h5ltpath_valid_f(fid, "/hdens", .True., exis, error)
+    call h5ltpath_valid_f(fid, "/half", .True., exis, error)
     if((.not.exis).and.(inputs%calc_nbi_dens.ge.1)) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'READ_NEUTRALS: Half energy neutral density is not in the neutrals file'
+            write(*,'(a)') 'READ_NEUTRALS: Half energy neutral population is not in the neutrals file'
         endif
         fatal_error = .True.
     endif
-    call h5ltpath_valid_f(fid, "/tdens", .True., exis, error)
+    call h5ltpath_valid_f(fid, "/third", .True., exis, error)
     if((.not.exis).and.(inputs%calc_nbi_dens.ge.1)) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'READ_NEUTRALS: Third energy neutral density is not in the neutrals file'
+            write(*,'(a)') 'READ_NEUTRALS: Third energy neutral population is not in the neutrals file'
         endif
         fatal_error = .True.
     endif
-    call h5ltpath_valid_f(fid, "/dcxdens", .True., exis, error)
+    call h5ltpath_valid_f(fid, "/dcx", .True., exis, error)
     if((.not.exis).and.(inputs%calc_dcx_dens.ge.1)) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'READ_NEUTRALS: Direct Charge Exchange (DCX) neutral density is not in the neutrals file'
+            write(*,'(a)') 'READ_NEUTRALS: Direct Charge Exchange (DCX) neutral population is not in the neutrals file'
         endif
         fatal_error = .True.
     endif
-    call h5ltpath_valid_f(fid, "/halodens", .True., exis, error)
+    call h5ltpath_valid_f(fid, "/halo", .True., exis, error)
     if((.not.exis).and.(inputs%calc_halo_dens.ge.1)) then
         if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'READ_NEUTRALS: Thermal Halo neutral density is not in the neutrals file'
+            write(*,'(a)') 'READ_NEUTRALS: Thermal Halo neutral population is not in the neutrals file'
         endif
         fatal_error = .True.
     endif
 
     if(fatal_error) stop
 
-    dims = [nlevs, nx, ny, nz]
     if(inputs%calc_nbi_dens.ge.1) then
-        call h5ltread_dataset_double_f(fid,"/fdens", &
-             neut%full, dims, error)
-        call h5ltread_dataset_double_f(fid,"/hdens", &
-             neut%half, dims, error)
-        call h5ltread_dataset_double_f(fid,"/tdens", &
-             neut%third, dims, error)
+        call h5gopen_f(fid, "/full", gid, error)
+        call read_neutral_population(gid, neut%full, error)
+        call h5gclose_f(gid, error)
+
+        call h5gopen_f(fid, "/half", gid, error)
+        call read_neutral_population(gid, neut%half, error)
+        call h5gclose_f(gid, error)
+
+        call h5gopen_f(fid, "/third", gid, error)
+        call read_neutral_population(gid, neut%third, error)
+        call h5gclose_f(gid, error)
     endif
     if(inputs%calc_dcx_dens.ge.1) then
-        call h5ltread_dataset_double_f(fid,"/dcxdens", &
-             neut%dcx, dims, error)
+        call h5gopen_f(fid, "/dcx", gid, error)
+        call read_neutral_population(gid, neut%dcx, error)
+        call h5gclose_f(gid, error)
     endif
     if(inputs%calc_halo_dens.ge.1) then
-        call h5ltread_dataset_double_f(fid,"/halodens", &
-             neut%halo, dims, error)
+        call h5gopen_f(fid, "/halo", gid, error)
+        call read_neutral_population(gid, neut%halo, error)
+        call h5gclose_f(gid, error)
     endif
 
     !Close file
@@ -7052,558 +7224,6 @@ subroutine track_cylindrical(rin, vin, tracks, ntrack, los_intersect)
 
 end subroutine track_cylindrical
 
-!============================================================================
-!---------------------------Interpolation Routines---------------------------
-!============================================================================
-subroutine interpol1D_coeff(xmin,dx,nx,xout,c,err)
-    !+ Linear interpolation coefficients and index for a 1D grid y(x)
-    real(Float64), intent(in)           :: xmin
-        !+ Minimum abscissa value
-    real(Float64), intent(in)           :: dx
-        !+ Absissa spacing
-    integer, intent(in)                 :: nx
-        !+ Number of abscissa
-    real(Float64), intent(in)           :: xout
-        !+ Abscissa value to interpolate
-    type(InterpolCoeffs1D), intent(out) :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional      :: err
-        !+ Error code
-
-    real(Float64) :: x1, xp, b1, b2
-    integer :: i, err_status
-
-    err_status = 1
-    xp = max(xout,xmin)
-    i = floor((xp - xmin)/dx)+1
-
-    if ((i.gt.0).and.(i.le.(nx-1))) then
-        x1 = xmin + (i-1)*dx
-
-        b2 = (xp - x1)/dx
-        b1 = (1.0 - b2)
-
-        c%i = i
-        c%b1 = b1
-        c%b2 = b2
-        err_status = 0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol1D_coeff
-
-subroutine interpol1D_coeff_arr(x,xout,c,err)
-    !+ Linear interpolation coefficients and index for a 1D grid y(x)
-    real(Float64), dimension(:), intent(in) :: x
-        !+ Abscissa values
-    real(Float64), intent(in)               :: xout
-        !+ Abscissa value to interpolate
-    type(InterpolCoeffs1D), intent(out)     :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional          :: err
-        !+ Error code
-
-    real(Float64) :: xmin, dx
-    integer :: sx,err_status
-
-    err_status = 1
-    sx = size(x)
-    xmin = x(1)
-    dx = abs(x(2)-x(1))
-
-    call interpol1D_coeff(xmin, dx, sx, xout, c, err_status)
-
-    if(present(err)) err = err_status
-
-end subroutine interpol1D_coeff_arr
-
-subroutine interpol2D_coeff(xmin,dx,nx,ymin,dy,ny,xout,yout,c,err)
-    !+ Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
-    real(Float64), intent(in)           :: xmin
-        !+ Minimum abscissa
-    real(Float64), intent(in)           :: dx
-        !+ Abscissa spacing
-    integer, intent(in)                 :: nx
-        !+ Number of abscissa
-    real(Float64), intent(in)           :: ymin
-        !+ Minimum ordinate
-    real(Float64), intent(in)           :: dy
-        !+ Ordinate spacing
-    integer, intent(in)                 :: ny
-        !+ Number of ordinates points
-    real(Float64), intent(in)           :: xout
-        !+ Abscissa value to interpolate
-    real(Float64), intent(in)           :: yout
-        !+ Ordinate value to interpolate
-    type(InterpolCoeffs2D), intent(out) :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional      :: err
-        !+ Error code
-
-    real(Float64) :: x1, x2, y1, y2, xp, yp
-    integer :: i, j, err_status
-
-    err_status = 1
-    xp = max(xout,xmin)
-    yp = max(yout,ymin)
-    i = floor((xp-xmin)/dx)+1
-    j = floor((yp-ymin)/dy)+1
-
-    if (((i.gt.0).and.(i.le.(nx-1))).and.((j.gt.0).and.(j.le.(ny-1)))) then
-        x1 = xmin + (i-1)*dx
-        x2 = x1 + dx
-        y1 = ymin + (j-1)*dy
-        y2 = y1 + dy
-
-        c%b11 = ((x2 - xp) * (y2 - yp))/(dx*dy)
-        c%b21 = ((xp - x1) * (y2 - yp))/(dx*dy)
-        c%b12 = ((x2 - xp) * (yp - y1))/(dx*dy)
-        c%b22 = ((xp - x1) * (yp - y1))/(dx*dy)
-        c%i = i
-        c%j = j
-        err_status = 0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_coeff
-
-subroutine interpol2D_coeff_arr(x,y,xout,yout,c,err)
-    !!Bilinear interpolation coefficients and indicies for a 2D grid z(x,y)
-    real(Float64), dimension(:), intent(in) :: x
-        !+ Abscissa values
-    real(Float64), dimension(:), intent(in) :: y
-        !+ Ordinate values
-    real(Float64), intent(in)               :: xout
-        !+ Abscissa value to interpolate
-    real(Float64), intent(in)               :: yout
-        !+ Ordinate value to interpolate
-    type(InterpolCoeffs2D), intent(out)     :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional          :: err
-        !+ Error code
-
-    real(Float64) :: xmin, ymin, dx, dy
-    integer :: sx, sy, err_status
-
-    err_status = 1
-    sx = size(x)
-    sy = size(y)
-    xmin = x(1)
-    ymin = y(1)
-    dx = abs(x(2)-x(1))
-    dy = abs(y(2)-y(1))
-
-    call interpol2D_coeff(xmin, dx, sx, ymin, dy, sy, xout, yout, c, err_status)
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_coeff_arr
-
-subroutine cyl_interpol3D_coeff(rmin,dr,nr,zmin,dz,nz,phimin,dphi,nphi,rout,zout,phiout,c,err)
-    !+ Cylindrical interpolation coefficients and indicies for a 3D grid
-    real(Float64), intent(in)           :: rmin
-        !+ Minimum R
-    real(Float64), intent(in)           :: dr
-        !+ R spacing
-    integer, intent(in)                 :: nr
-        !+ Number of R points
-    real(Float64), intent(in)           :: zmin
-        !+ Minimum Z
-    real(Float64), intent(in)           :: dz
-        !+ Z spacing
-    integer, intent(in)                 :: nz
-        !+ Number of Z points
-    real(Float64), intent(in)           :: phimin
-        !+ Minimum phi
-    real(Float64), intent(in)           :: dphi
-        !+ Phi spacing
-    integer, intent(in)                 :: nphi
-        !+ Number of phi points
-    real(Float64), intent(in)           :: rout
-        !+ R value to interpolate
-    real(Float64), intent(in)           :: zout
-        !+ Z value to interpolate
-    real(Float64), intent(in)           :: phiout
-        !+ Phi value to interpolate
-    type(InterpolCoeffs3D), intent(out) :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional      :: err
-        !+ Error code
-
-    type(InterpolCoeffs2D) :: b
-    real(Float64) :: r1, r2, phi1, phi2, z1, z2, rp, phip, zp, dV
-    real(Float64) :: phi
-    integer :: i, j, k, err_status
-
-    err_status = 1
-
-    rp = max(rout,rmin)
-    zp = max(zout,zmin)
-    phip = max(phiout,phimin)
-    i = floor((rp-rmin)/dr)+1
-    j = floor((zp-zmin)/dz)+1
-    k = floor((phip-phimin)/dphi)+1
-
-    if (nphi .eq. 1) then
-        if (((i.gt.0).and.(i.le.(nr-1))).and.((j.gt.0).and.(j.le.(nz-1)))) then
-            call interpol2D_coeff(rmin, dr, nr, zmin, dz, nz, rout, zout, b, err_status)
-            c%b111 = b%b11
-            c%b121 = b%b12
-            c%b221 = b%b22
-            c%b211 = b%b21
-            c%b212 = 0
-            c%b222 = 0
-            c%b122 = 0
-            c%b112 = 0
-            c%i = b%i
-            c%j = b%j
-            c%k = 1
-            err_status = 0
-        endif
-    else
-        if ((((i.gt.0).and.(i.le.(nr-1))).and.((j.gt.0).and.(j.le.(nz-1)))).and.((k.gt.0).and.(k.le.(nphi-1)))) then
-            r1 = rmin + (i-1)*dr
-            r2 = r1 + dr
-            z1 = zmin + (j-1)*dz
-            z2 = z1 + dz
-            phi1 = phimin + (k-1)*dphi
-            phi2 = phi1 + dphi
-            dV = ((r2**2 - r1**2) * (phi2 - phi1) * (z2 - z1))
-
-            !! Both volume elements have a factor of 1/2 that cancels out
-            c%b111 = ((r2**2 - rp**2) * (phi2 - phip) * (z2 - zp)) / dV
-            c%b121 = ((r2**2 - rp**2) * (phi2 - phip) * (zp - z1)) / dV
-            c%b221 = ((rp**2 - r1**2) * (phi2 - phip) * (zp - z1)) / dV
-            c%b211 = ((rp**2 - r1**2) * (phi2 - phip) * (z2 - zp)) / dV
-            c%b212 = ((rp**2 - r1**2) * (phip - phi1) * (z2 - zp)) / dV
-            c%b222 = ((rp**2 - r1**2) * (phip - phi1) * (zp - z1)) / dV
-            c%b122 = ((r2**2 - rp**2) * (phip - phi1) * (zp - z1)) / dV
-            c%b112 = ((r2**2 - rp**2) * (phip - phi1) * (z2 - zp)) / dV
-            c%i = i
-            c%j = j
-            c%k = k
-            err_status = 0
-        endif
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine cyl_interpol3D_coeff
-
-subroutine cyl_interpol3D_coeff_arr(r,z,phi,rout,zout,phiout,c,err)
-    !+ Cylindrical interpolation coefficients and indicies for a 3D grid
-    real(Float64), dimension(:), intent(in) :: r
-        !+ R values
-    real(Float64), dimension(:), intent(in) :: z
-        !+ Z values
-    real(Float64), dimension(:), intent(in) :: phi
-        !+ Phi values
-    real(Float64), intent(in)               :: rout
-        !+ R value to interpolate
-    real(Float64), intent(in)               :: zout
-        !+ Z value to interpolate
-    real(Float64), intent(in)               :: phiout
-        !+ Phi value to interpolate
-    type(InterpolCoeffs3D), intent(out)     :: c
-        !+ Interpolation Coefficients
-    integer, intent(out), optional          :: err
-        !+ Error code
-
-    type(InterpolCoeffs2D) :: b
-    real(Float64) :: rmin, phimin, zmin, dr, dphi, dz
-    integer :: sr, sphi, sz, err_status
-
-    err_status = 1
-    sr = size(r)
-    sphi = size(phi)
-    sz = size(z)
-
-    rmin = r(1)
-    zmin = z(1)
-    dr = abs(r(2)-r(1))
-    dz = abs(z(2)-z(1))
-
-    if (sphi .eq. 1) then
-        call interpol2D_coeff(rmin, dr, sr, zmin, dz, sz, rout, zout, b, err_status)
-        c%b111 = b%b11
-        c%b121 = b%b12
-        c%b221 = b%b22
-        c%b211 = b%b21
-        c%b212 = 0
-        c%b222 = 0
-        c%b122 = 0
-        c%b112 = 0
-        c%i = b%i
-        c%j = b%j
-        c%k = 1
-    else
-        phimin = phi(1)
-        dphi = abs(phi(2)-phi(1))
-        call cyl_interpol3D_coeff(rmin, dr, sr, zmin, dz, sz, phimin, dphi, sphi, rout, zout, phiout, c, err_status)
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine cyl_interpol3D_coeff_arr
-
-subroutine interpol1D_arr(x, y, xout, yout, err, coeffs)
-    !+ Performs linear interpolation on a uniform 1D grid y(x)
-    real(Float64), dimension(:), intent(in)      :: x
-        !+ The abscissa values of `y`
-    real(Float64), dimension(:), intent(in)      :: y
-        !+ Values at abscissa values `x`: y(x)
-    real(Float64), intent(in)                    :: xout
-        !+ Abscissa value to interpolate
-    real(Float64), intent(out)                   :: yout
-        !+ Interpolant: y(xout)
-    integer, intent(out), optional               :: err
-        !+ Error code
-    type(InterpolCoeffs1D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
-
-    type(InterpolCoeffs1D) :: c
-    integer :: i, err_status
-
-    err_status = 1
-    if(present(coeffs)) then
-        c = coeffs
-        err_status = 0
-    else
-        call interpol_coeff(x,xout,c,err_status)
-    endif
-
-    if(err_status.eq.0) then
-        i = c%i
-        yout = c%b1*y(i) + c%b2*y(i+1)
-    else
-        yout = 0.d0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol1D_arr
-
-subroutine interpol2D_arr(x, y, z, xout, yout, zout, err, coeffs)
-    !+ Performs bilinear interpolation on a 2D grid z(x,y)
-    real(Float64), dimension(:), intent(in)   :: x
-        !+ The abscissa values of `z`
-    real(Float64), dimension(:), intent(in)   :: y
-        !+ The ordinate values of `z`
-    real(Float64), dimension(:,:), intent(in) :: z
-        !+ Values at the abscissa/ordinates: z(x,y)
-    real(Float64), intent(in)                 :: xout
-        !+ The abscissa value to interpolate
-    real(Float64), intent(in)                 :: yout
-        !+ The ordinate value to interpolate
-    real(Float64), intent(out)                :: zout
-        !+ Interpolant: z(xout,yout)
-    integer, intent(out), optional            :: err
-        !+ Error code
-    type(InterpolCoeffs2D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
-
-    type(InterpolCoeffs2D) :: c
-    integer :: i, j, err_status
-
-    err_status = 1
-    if(present(coeffs)) then
-        c = coeffs
-        err_status = 0
-    else
-        call interpol_coeff(x,y,xout,yout,c,err_status)
-    endif
-
-    if(err_status.eq.0) then
-        i = c%i
-        j = c%j
-        zout = c%b11*z(i,j) + c%b12*z(i,j+1) + c%b21*z(i+1,j) + c%b22*z(i+1,j+1)
-    else
-        zout = 0.d0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_arr
-
-subroutine interpol2D_2D_arr(x, y, z, xout, yout, zout, err, coeffs)
-    !+ Performs bilinear interpolation on a 2D grid of 2D arrays z(:,:,x,y)
-    real(Float64), dimension(:), intent(in)       :: x
-        !+ The abscissa values of `z`
-    real(Float64), dimension(:), intent(in)       :: y
-        !+ The ordinate values of `z`
-    real(Float64), dimension(:,:,:,:), intent(in) :: z
-        !+ Values at the abscissa/ordinates: z(:,:,x,y)
-    real(Float64), intent(in)                     :: xout
-        !+ The abscissa value to interpolate
-    real(Float64), intent(in)                     :: yout
-        !+ The ordinate value to interpolate
-    real(Float64), dimension(:,:), intent(out)    :: zout
-        !+ Interpolant: z(:,:,xout,yout)
-    integer, intent(out), optional                :: err
-        !+ Error code
-    type(InterpolCoeffs2D), intent(in), optional :: coeffs
-        !+ Precomputed Linear Interpolation Coefficients
-
-    type(InterpolCoeffs2D) :: c
-    integer :: i, j, err_status
-
-    err_status = 1
-    if(present(coeffs)) then
-        c = coeffs
-        err_status = 0
-    else
-        call interpol_coeff(x,y,xout,yout,c,err_status)
-    endif
-
-    if(err_status.eq.0) then
-        i = c%i
-        j = c%j
-        zout = c%b11*z(:,:,i,j) + c%b12*z(:,:,i,j+1) + c%b21*z(:,:,i+1,j) + c%b22*z(:,:,i+1,j+1)
-    else
-        zout = 0.0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol2D_2D_arr
-
-subroutine interpol3D_arr(r, z, phi, d, rout, zout, phiout, dout, err, coeffs)
-    !+ Performs cylindrical interpolation on a 3D grid f(r,z,phi)
-    real(Float64), dimension(:), intent(in) :: r
-        !+ R values
-    real(Float64), dimension(:), intent(in) :: z
-        !+ Z values
-    real(Float64), dimension(:), intent(in) :: phi
-        !+ Phi values
-    real(Float64), dimension(:,:,:), intent(in) :: d
-        !+ Values at r,z,phi: d(r,z,phi)
-    real(Float64), intent(in)               :: rout
-        !+ R value to interpolate
-    real(Float64), intent(in)               :: zout
-        !+ Z value to interpolate
-    real(Float64), intent(in)               :: phiout
-        !+ Phi value to interpolate
-    real(Float64), intent(out)                :: dout
-        !+ Interpolant: d(rout,zout,phiout)
-    integer, intent(out), optional          :: err
-        !+ Error code
-    type(InterpolCoeffs3D), intent(in), optional :: coeffs
-        !+ Precomputed Interpolation Coefficients
-
-    type(InterpolCoeffs3D) :: b
-    integer :: i, j, k, k2, err_status
-    integer :: nphi
-
-    err_status = 1
-
-    nphi = size(phi)
-
-    if(present(coeffs)) then
-        b = coeffs
-        if(nphi .eq. 1) then
-            b%b212 = 0
-            b%b222 = 0
-            b%b122 = 0
-            b%b112 = 0
-            b%k = 1
-        endif
-        err_status = 0
-    else
-        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err_status)
-    endif
-
-
-    if(err_status.eq.0) then
-        i = b%i
-        j = b%j
-        k = b%k
-        if(nphi .eq. 1) then
-            k2 = min(k+1,nphi)
-        else
-            k2 = k+1
-        endif
-
-        dout = b%b111*d(i,j,k)    + b%b121*d(i,j+1,k) +   &
-               b%b112*d(i,j,k2)   + b%b122*d(i,j+1,k2) +  &
-               b%b211*d(i+1,j,k)  + b%b221*d(i+1,j+1,k) + &
-               b%b212*d(i+1,j,k2) + b%b222*d(i+1,j+1,k2)
-    else
-        dout = 0.d0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol3D_arr
-
-subroutine interpol3D_2D_arr(r, z, phi, f, rout, zout, phiout, fout, err, coeffs)
-    !+ Performs cylindrical interpolation on a 3D grid of 2D arrays
-    !+ f(:,:,r,z,phi)
-    real(Float64), dimension(:), intent(in) :: r
-        !+ R values
-    real(Float64), dimension(:), intent(in) :: z
-        !+ Z values
-    real(Float64), dimension(:), intent(in) :: phi
-        !+ Phi values
-    real(Float64), dimension(:,:,:,:,:), intent(in) :: f
-        !+ Values at r,z,phi: f(:,:,r,z,phi)
-    real(Float64), intent(in)               :: rout
-        !+ R value to interpolate
-    real(Float64), intent(in)               :: zout
-        !+ Z value to interpolate
-    real(Float64), intent(in)               :: phiout
-        !+ Phi value to interpolate
-    real(Float64), dimension(:,:), intent(out)    :: fout
-        !+ Interpolant: f(:,:,rout,zout,phiout)
-    integer, intent(out), optional          :: err
-        !+ Error code
-    type(InterpolCoeffs3D), intent(in), optional :: coeffs
-        !+ Precomputed Interpolation Coefficients
-
-    type(InterpolCoeffs3D) :: b
-    integer :: i, j, k, k2, err_status
-    integer :: nphi
-
-    err_status = 1
-
-    nphi = size(phi)
-
-    if(present(coeffs)) then
-        b = coeffs
-        if(nphi .eq. 1) then
-            b%b212 = 0
-            b%b222 = 0
-            b%b122 = 0
-            b%b112 = 0
-            b%k = 1
-        endif
-        err_status = 0
-    else
-        call interpol_coeff(r,z,phi,rout,zout,phiout,b,err_status)
-    endif
-
-    if(err_status.eq.0) then
-        i = b%i
-        j = b%j
-        k = b%k
-        if(nphi .eq. 1) then
-            k2 = min(k+1,nphi)
-        else
-            k2 = k+1
-        endif
-        fout = b%b111*f(:,:,i,j,k)    + b%b121*f(:,:,i,j+1,k) +   &
-               b%b112*f(:,:,i,j,k2)   + b%b122*f(:,:,i,j+1,k2) +  &
-               b%b211*f(:,:,i+1,j,k)  + b%b221*f(:,:,i+1,j+1,k) + &
-               b%b212*f(:,:,i+1,j,k2) + b%b222*f(:,:,i+1,j+1,k2)
-    else
-        fout = 0.0
-    endif
-
-    if(present(err)) err = err_status
-
-end subroutine interpol3D_2D_arr
-
 !=============================================================================
 !-------------------------Profiles and Fields Routines------------------------
 !=============================================================================
@@ -7987,51 +7607,296 @@ end subroutine get_ep_denf
 !=============================================================================
 !--------------------------Result Storage Routines----------------------------
 !=============================================================================
-subroutine store_neutrals(ind, neut_type, dens, vn, store_iter)
-    !Store neutrals in [[libfida:neut]] at indices `ind`
+subroutine init_reservoir(res, k)
+    !+ Initialize reservoir
+    type(NeutralParticleReservoir), intent(inout) :: res
+        !+ Neutral Particle Reservoir
+    integer, intent(in) :: k
+        !+ Size of reservoir
+
+    real(Float64) :: randomu(2)
+
+    if(k.le.0) return
+
+    if (res%n.ne.1) then
+        res%n = 1
+        res%k = k
+        call randu(randomu)
+        res%W = exp(log(randomu(1))/k)
+        res%i = k + floor(log(randomu(2))/log(1.0-res%W)) + 1
+    endif
+
+    !! Allocate reservoir if not already
+    if (.not.allocated(res%R)) then
+        allocate(res%R(k))
+    else
+        if(size(res%R).ne.k) then
+            deallocate(res%R)
+            allocate(res%R(k))
+        endif
+    endif
+
+end subroutine init_reservoir
+
+subroutine update_reservoir(res, vn, wght)
+    !+ Store neutrals in reservoir
+    type(NeutralParticleReservoir), intent(inout) :: res
+        !+ [[libfida:beam_grid]] indices
+    real(Float64), dimension(3), intent(in)       :: vn
+        !+ Neutral particle velocity [cm/s]
+    real(Float64), intent(in)                     :: wght
+        !+ Neutral weight
+
+    integer, dimension(1) :: randomi
+    real(Float64), dimension(2) :: randomu
+
+    if (res%n.le.res%k) then
+        res%R(res%n) = NeutralParticle(wght, vn)
+        res%n = res%n + 1
+        return
+    endif
+
+    if (res%n.eq.res%i) then
+        call randind(res%k, randomi)
+        res%R(randomi(1)) = NeutralParticle(wght, vn)
+        call randu(randomu)
+        res%W = res%W*exp(log(randomu(1))/res%k)
+        res%i = res%i + floor(log(randomu(2))/log(1.0-res%W)) + 1
+    endif
+
+    res%n = res%n + 1
+
+end subroutine update_reservoir
+
+subroutine merge_reservoirs(res1,res2)
+    !+ Merge reservoir 2 into reservoir 1
+    type(NeutralParticleReservoir), intent(inout) :: res1
+        !+ Reservoir 1
+    type(NeutralParticleReservoir), intent(inout) :: res2
+        !+ Reservoir 2
+
+    integer :: i
+    type(NeutralParticleReservoir) :: res3
+    real(Float64) :: p, randomu(1)
+
+    if(res2%n.eq.0) return
+    if(res1%n.eq.0) then
+        call init_reservoir(res1,res2%k)
+    endif
+
+    !! If neither reservoir is full just fill res1 from res2 normally
+    if ((res1%n.le.res1%k).and.(res2%n.le.res2%k)) then
+        do i=1,res2%n
+            call update_reservoir(res1, res2%R(i)%v, res2%R(i)%w)
+        enddo
+        res2 = res1
+        return
+    endif
+
+    !! Switch res1 with res2 if res1 is not full but res2 is
+    if (res1%n.le.res1%k) then
+        res3 = res1
+        res1 = res2
+        res2 = res3
+    endif
+
+    !! if res2 is not full then fill res1 from res2 normally
+    if (res2%n.le.res2%k) then
+        do i=1,res2%n
+            call update_reservoir(res1, res2%R(i)%v, res2%R(i)%w)
+        enddo
+    else !! if both are full select particles from res2 according to # particles seen
+        p = float(res1%n)/(res1%n + res2%n)
+        do i=1,res1%k
+            call randu(randomu)
+            if(randomu(1).gt.p) then
+                res1%R(i) = res2%R(i)
+            endif
+        enddo
+    endif
+    !! set res1 to res2
+    res2 = res1
+
+end subroutine merge_reservoirs
+
+subroutine init_neutral_population(pop, amu)
+    !+ Initialize [[NeutralPopulation]]
+    type(NeutralPopulation), intent(inout) :: pop
+        !+ Neutral Population to initialize
+    real(Float64), intent(in) :: amu
+        !+ Neutral Particle Atomic Mass
+
+    integer :: i, j, k, ic, ind(3)
+
+    pop%amu = amu
+    if(.not.allocated(pop%dens)) then
+        allocate(pop%dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
+        allocate(pop%res(beam_grid%nx,beam_grid%ny,beam_grid%nz))
+    endif
+    pop%dens = 0.d0
+    pop%res%n = 0
+
+end subroutine init_neutral_population
+
+subroutine update_neutrals(pop, ind, vn, dens)
+    !+Update [NeutralPopulation]] `pop` at `ind`
+    type(NeutralPopulation), intent(inout)   :: pop
+        !+ Neutral Population
     integer(Int32), dimension(3), intent(in) :: ind
         !+ [[libfida:beam_grid]] indices
-    integer, intent(in)                      :: neut_type
-        !+ Neutral type
-    real(Float64), dimension(:), intent(in)  :: dens
-        !+ Neutral density [neutrals/cm^3]
     real(Float64), dimension(3), intent(in)  :: vn
         !+ Neutral particle velocity [cm/s]
-    logical, intent(in), optional            :: store_iter
-        !+ Store DCX/Halo iteration density in [[libfida:halo_iter_dens]]
-    logical :: iter
+    real(Float64), dimension(:), intent(in)  :: dens
+        !+ Neutral density [neutrals/cm^3]
 
     integer :: i, j, k
-    if(present(store_iter)) then
-        iter = store_iter
-    else
-        iter = .False.
-    endif
 
     i = ind(1) ; j = ind(2) ; k = ind(3)
 
-    !$OMP CRITICAL(store_neutrals_1)
-    if(iter) halo_iter_dens(neut_type) = halo_iter_dens(neut_type) + sum(dens)
+    !$OMP CRITICAL(update_neutrals_1)
+    pop%dens(:,i,j,k) = pop%dens(:,i,j,k) + dens
+
+    if (pop%res(i,j,k)%n.eq.0) then
+        call init_reservoir(pop%res(i,j,k),reservoir_size)
+    endif
+    call update_reservoir(pop%res(i,j,k), vn, sum(dens))
+    !$OMP END CRITICAL(update_neutrals_1)
+
+end subroutine update_neutrals
+
+subroutine store_neutrals(ind, pos, vn, neut_type, dens)
+    !Store neutrals in [[libfida:neut]] at indices `ind`
+    integer(Int32), dimension(3), intent(in) :: ind
+        !+ [[libfida:beam_grid]] indices
+    real(Float64), dimension(3), intent(in)  :: pos
+        !+ Neutral particle position [cm]
+    real(Float64), dimension(3), intent(in)  :: vn
+        !+ Neutral particle velocity [cm/s]
+    integer, intent(in)                      :: neut_type
+        !+ Neutral type
+    real(Float64), dimension(nlevs), intent(in)  :: dens
+        !+ Neutral density [neutrals/cm^3]
+
     select case (neut_type)
         case (nbif_type)
-            neut%full(:,i,j,k) = neut%full(:,i,j,k) + dens
+            call update_neutrals(neut%full, ind, vn, dens)
         case (nbih_type)
-            neut%half(:,i,j,k) = neut%half(:,i,j,k) + dens
+            call update_neutrals(neut%half, ind, vn, dens)
         case (nbit_type)
-            neut%third(:,i,j,k) = neut%third(:,i,j,k) + dens
+            call update_neutrals(neut%third, ind, vn, dens)
         case (dcx_type)
-            neut%dcx(:,i,j,k) = neut%dcx(:,i,j,k) + dens
+            call update_neutrals(neut%dcx, ind, vn, dens)
         case (halo_type)
-            neut%halo(:,i,j,k) = neut%halo(:,i,j,k) + dens
+            call update_neutrals(neut%halo, ind, vn, dens)
         case default
             if(inputs%verbose.ge.0) then
                 write(*,'("STORE_NEUTRALS: Unknown neutral type: ",i2)') neut_type
             endif
             stop
     end select
-    !$OMP END CRITICAL(store_neutrals_1)
 
 end subroutine store_neutrals
+
+subroutine merge_neutral_populations(pop1, pop2)
+    !+ Merge [[NeutralPopulation]]s
+    type(NeutralPopulation), intent(inout) :: pop1
+        !+ Neutral Population target
+    type(NeutralPopulation), intent(inout) :: pop2
+        !+ Neutral Population to merge into target
+
+    integer :: i, j, k, ic, ind(3)
+
+    pop1%dens = pop1%dens + pop2%dens
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        call merge_reservoirs(pop1%res(i,j,k), pop2%res(i,j,k))
+    enddo
+
+end subroutine merge_neutral_populations
+
+#ifdef _MPI
+
+subroutine parallel_merge_reservoirs(res)
+    !+ Merge neutral particle reservoirs across MPI processes
+    type(NeutralParticleReservoir), intent(inout) :: res
+        !+ Neutral Particle Reservoir
+
+    integer :: proc, num_procs, i, j, k
+    integer(Int32), dimension(:), allocatable :: nums, inds
+    real(Float64), dimension(:), allocatable :: Ws
+    real(Float64), dimension(:,:), allocatable :: wghts
+    real(Float64), dimension(:,:,:), allocatable :: vels
+    type(NeutralParticleReservoir) :: res1, res2
+
+    proc = my_rank() + 1
+    num_procs = num_ranks()
+
+    k = res%k
+
+    allocate(nums(num_procs), inds(num_procs), Ws(num_procs))
+    nums = 0
+    inds = 0
+    Ws = 0.d0
+    nums(proc) = res%n
+    inds(proc) = res%i
+    Ws(proc) = res%W
+
+    call parallel_sum(nums)
+    call parallel_sum(inds)
+    call parallel_sum(Ws)
+
+    allocate(vels(3,reservoir_size,num_procs))
+    allocate(wghts(reservoir_size,num_procs))
+    vels = 0.d0; wghts = 0.d0
+
+    do i=1,min(k,res%n)
+        vels(:,i,proc) = res%R(i)%v
+        wghts(i,proc) = res%R(i)%w
+    enddo
+    call parallel_sum(vels)
+    call parallel_sum(wghts)
+
+    call init_reservoir(res1,k)
+    res1%n = nums(1)
+    res1%i = inds(1)
+    res1%W = Ws(1)
+    do i=1,min(k,res1%n)
+        res1%R(i) = NeutralParticle(wghts(i,1),vels(:,i,1))
+    enddo
+    call init_reservoir(res2,k)
+    do i=2,num_procs
+        res2%n = nums(i)
+        res2%i = inds(i)
+        res2%W = Ws(i)
+        do j=1,min(k,res2%n)
+            res2%R(j) = NeutralParticle(wghts(j,i),vels(:,j,i))
+        enddo
+        call merge_reservoirs(res1,res2)
+    enddo
+    deallocate(vels,wghts,nums,inds,Ws)
+
+    res = res1
+
+end subroutine parallel_merge_reservoirs
+
+subroutine parallel_merge_populations(pop)
+    !+Update neutral population
+    type(NeutralPopulation), intent(inout)   :: pop
+        !+ Neutral Population
+
+    integer :: i, j, k, ic, ind(3)
+
+    call parallel_sum(pop%dens)
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        call parallel_merge_reservoirs(pop%res(i,j,k))
+    enddo
+
+end subroutine parallel_merge_populations
+
+#endif
 
 subroutine store_births(ind, neut_type, dflux)
     !+ Store birth particles/density in [[libfida:birth]]
@@ -8348,7 +8213,36 @@ subroutine get_neutron_rate(plasma, eb, rate)
 
 end subroutine get_neutron_rate
 
-subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, rate_tot)
+subroutine neutral_cx_rate(denn, res, v_ion, rates)
+    !+ Get probability of a thermal ion charge exchanging with neutral
+    !+ population within cell
+    real(Float64), dimension(nlevs), intent(in)  :: denn
+        !+ Neutral density
+    type(NeutralParticleReservoir), intent(in)   :: res
+        !+ Neutral Particle Reservoir
+    real(Float64), dimension(3), intent(in)      :: v_ion
+        !+ Ion velocity [cm/s]
+    real(Float64), dimension(nlevs), intent(out) :: rates
+        !+ Total charge exchange rate [1/s]
+
+    integer :: i
+    real(Float64), dimension(nlevs) :: rates_i
+    real(Float64) :: vn(3)
+
+    !! Average CX rate over Reservoir
+    rates = 0.d0
+    if(res%n.eq.0) return
+
+    do i=1, min(res%n,res%k)
+        vn = res%R(i)%v
+        call bb_cx_rates(denn,v_ion,vn,rates_i)
+        rates = rates + res%R(i)%w*rates_i
+    enddo
+    rates = rates/sum(res%R%w)
+
+end subroutine neutral_cx_rate
+
+subroutine get_total_cx_rate(ind, pos, v_ion, types, rate_tot)
     !+ Get probability of a thermal ion charge exchanging with `types` neutrals
     integer(Int32), dimension(3), intent(in)     :: ind
         !+ [[libfida:beam_grid]] indices
@@ -8356,8 +8250,6 @@ subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, rate_tot)
         !+ Interaction position in beam grid coordinates
     real(Float64), dimension(3), intent(in)      :: v_ion
         !+ Ion velocity [cm/s]
-    integer, intent(in)                          :: i_type
-        !+ Ion type
     integer(Int32), dimension(:), intent(in)     :: types
         !+ Neutral types
     real(Float64), dimension(nlevs), intent(out) :: rate_tot
@@ -8365,38 +8257,37 @@ subroutine get_beam_cx_rate(ind, pos, v_ion, i_type, types, rate_tot)
 
     integer :: n, i, j, k, ii
     type(LocalProfiles) :: plasma
+    type(NeutralParticleReservoir) :: res
     real(Float64), dimension(nlevs) :: rates, denn
-    real(Float64), dimension(3) :: vhalo,vn,vnbi
-
-    vnbi = pos - nbi%src
-    vnbi = nbi%vinj*vnbi/norm2(vnbi)
+    real(Float64), dimension(3) :: vn
 
     n = size(types)
-    rate_tot = 0
 
+    rate_tot = 0.0
     i = ind(1) ; j = ind(2) ; k = ind(3)
     do ii=1,n
         select case (types(ii))
             case (nbif_type)
-                vn = vnbi
-                call bb_cx_rates(neut%full(:,i,j,k),v_ion,vn,rates)
+                denn = neut%full%dens(:,i,j,k)
+                res = neut%full%res(i,j,k)
             case (nbih_type)
-                vn = vnbi/sqrt(2.0)
-                call bb_cx_rates(neut%half(:,i,j,k),v_ion,vn,rates)
+                denn = neut%half%dens(:,i,j,k)
+                res = neut%half%res(i,j,k)
             case (nbit_type)
-                vn = vnbi/sqrt(3.0)
-                call bb_cx_rates(neut%third(:,i,j,k),v_ion,vn,rates)
+                denn = neut%third%dens(:,i,j,k)
+                res = neut%third%res(i,j,k)
             case (dcx_type)
-                call get_plasma(plasma, pos=pos)
-                call bt_cx_rates(plasma,neut%dcx(:,i,j,k),v_ion,i_type,rates)
+                denn = neut%dcx%dens(:,i,j,k)
+                res = neut%dcx%res(i,j,k)
             case (halo_type)
-                call get_plasma(plasma, pos=pos)
-                call bt_cx_rates(plasma,neut%halo(:,i,j,k),v_ion,i_type,rates)
+                denn = neut%halo%dens(:,i,j,k)
+                res = neut%halo%res(i,j,k)
         end select
+        call neutral_cx_rate(denn, res, v_ion, rates)
         rate_tot = rate_tot + rates
     enddo
 
-end subroutine get_beam_cx_rate
+end subroutine get_total_cx_rate
 
 subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     !+ Gets rate matrix for use in [[libfida:colrad]]
@@ -9614,7 +9505,7 @@ subroutine ndmc
     real(Float64), dimension(3) :: rnbi !! initial position
 
     integer(Int64) :: jj, ii, kk, cnt
-    integer :: ntrack
+    integer :: ntrack, ic
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     type(LocalProfiles) :: plasma
     type(LocalEMFields) :: fields
@@ -9625,6 +9516,11 @@ subroutine ndmc
     real(Float64), dimension(1) :: randomu
     integer, dimension(1) :: randi
     logical :: err
+
+    !! Initialize Neutral Population
+    call init_neutral_population(neut%full,inputs%ab)
+    call init_neutral_population(neut%half,inputs%ab)
+    call init_neutral_population(neut%third,inputs%ab)
 
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') inputs%n_nbi
@@ -9662,7 +9558,7 @@ subroutine ndmc
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,beam_ion,vnbi,tracks(jj)%time,states,dens,photons)
-                call store_neutrals(ind,neut_type,dens/nlaunch,vnbi)
+                call store_neutrals(ind,tracks(jj)%pos,vnbi,neut_type,dens/nlaunch)
                 tracks(jj)%flux = (iflux - sum(states))/nlaunch
                 flux_tot = flux_tot + tracks(jj)%flux*beam_grid%dv
 
@@ -9702,9 +9598,10 @@ subroutine ndmc
 
 #ifdef _MPI
     !! Combine beam neutrals
-    call parallel_sum(neut%full)
-    call parallel_sum(neut%half)
-    call parallel_sum(neut%third)
+    call parallel_merge_populations(neut%full)
+    call parallel_merge_populations(neut%half)
+    call parallel_merge_populations(neut%third)
+
     call parallel_sum(nbi_outside)
     if(inputs%calc_birth.ge.1) then
         call parallel_sum(birth%dens)
@@ -9722,10 +9619,485 @@ subroutine ndmc
             write(*,'(T4,a, f6.2,a)') 'Percent of markers outside the grid: ', &
                                   100.*nbi_outside/(3.*inputs%n_nbi),'%'
         endif
-        if(sum(neut%full).eq.0) stop 'Beam does not intersect the grid!'
+        if(sum(neut%full%dens).eq.0) stop 'Beam does not intersect the grid!'
     endif
 
 end subroutine ndmc
+
+subroutine dcx
+    !+ Calculates Direct Charge Exchange (DCX) neutral density and spectra
+    integer :: ic,i,j,k,ncell
+    integer(Int64) :: idcx !! counter
+    real(Float64), dimension(3) :: ri    !! start position
+    real(Float64), dimension(3) :: vihalo
+    integer,dimension(3) :: ind
+    integer,dimension(3) :: neut_types = [1,2,3]
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
+    real(Float64), dimension(nlevs) :: rates    !!  CX rates
+    !! Collisiional radiative model along track
+    real(Float64), dimension(nlevs) :: states  ! Density of n-states
+    integer :: ntrack
+    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
+    integer :: jj       !! counter along track
+    real(Float64):: tot_denn, photons  !! photon flux
+    integer, dimension(beam_grid%ngrid) :: cell_ind
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    real(Float64) :: fi_correction, dcx_dens
+
+    !! Initialized Neutral Population
+    call init_neutral_population(neut%dcx,inputs%ai)
+
+    papprox=0.d0
+    tot_denn=0.d0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        call get_plasma(plasma,ind=ind)
+        if(.not.plasma%in_plasma) cycle
+        tot_denn = sum(neut%full%dens(:,i,j,k)) + &
+                   sum(neut%half%dens(:,i,j,k)) + &
+                   sum(neut%third%dens(:,i,j,k))
+        papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+    enddo
+
+    ncell = 0
+    do ic=1,beam_grid%ngrid
+        call ind2sub(beam_grid%dims,ic,ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        if(papprox(i,j,k).gt.0.0) then
+            ncell = ncell + 1
+            cell_ind(ncell) = ic
+        endif
+    enddo
+
+    call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
+
+    if(inputs%verbose.ge.1) then
+       write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
+    endif
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
+    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
+    loop_over_cells: do ic = istart, ncell, istep
+        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        !! Loop over the markers
+        loop_over_dcx: do idcx=1, nlaunch(i,j,k)
+            !! Calculate ri,vhalo and track
+            call mc_halo(ind,vihalo,ri)
+            call track(ri,vihalo,tracks,ntrack)
+            if(ntrack.eq.0) cycle loop_over_dcx
+
+            !! Calculate CX probability
+            call get_total_cx_rate(tracks(1)%ind, ri, vihalo, neut_types, rates)
+            if(sum(rates).le.0.) cycle loop_over_dcx
+
+            !! Solve collisional radiative model along track
+            call get_plasma(plasma,pos=tracks(1)%pos)
+
+            !! Weight CX rates by ion source density
+            states = rates*plasma%denp
+            fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
+
+            loop_along_track: do jj=1,ntrack
+                call get_plasma(plasma,pos=tracks(jj)%pos)
+                if(.not.plasma%in_plasma) exit loop_along_track
+                call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
+                call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vihalo,dcx_type,denn/nlaunch(i,j,k))
+
+                if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
+                    photons = fi_correction*photons !! Correct for including fast-ions in states
+                    call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
+                endif
+            enddo loop_along_track
+        enddo loop_over_dcx
+    enddo loop_over_cells
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine densities
+    call parallel_merge_populations(neut%dcx)
+    if(inputs%calc_dcx.ge.1) then
+        call parallel_sum(spec%dcx)
+    endif
+#endif
+
+    dcx_dens = sum(neut%dcx%dens)
+    if((dcx_dens.eq.0).or.isnan(dcx_dens)) then
+        write(*,*) 'DCX: DCX density is zero or nan: ', dcx_dens
+        stop
+    endif
+
+end subroutine dcx
+
+subroutine halo
+    !+ Calculates halo neutral density and spectra
+    integer :: ic,i,j,k,ncell
+    integer(Int64) :: ihalo !! counter
+    real(Float64), dimension(3) :: ri    !! start position
+    real(Float64), dimension(3) :: vihalo!! velocity bulk plasma ion
+    integer,dimension(3) :: ind, tind    !! actual cell
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
+    real(Float64), dimension(nlevs) :: rates    !! CX rates
+    !! Collisiional radiative model along track
+    real(Float64), dimension(nlevs) :: states  ! Density of n-states
+    integer :: ntrack
+    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle Tracks
+    integer :: ii,jj,kk,it
+    real(Float64) :: tot_denn, photons  !! photon flux
+    integer, dimension(beam_grid%ngrid) :: cell_ind
+    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
+    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
+    real(Float64) :: local_iter_dens
+
+    type(NeutralPopulation) :: cur_pop, prev_pop
+    !! Halo iteration
+    integer(Int64) :: hh, n_halo !! counters
+    real(Float64) :: dcx_dens, halo_iter_dens(2), seed_dcx
+    integer :: prev_type = 1  ! previous iteration
+    integer :: cur_type = 2 ! current iteration
+    real(Float64) :: fi_correction
+
+    !! Initialize Neutral Population
+    call init_neutral_population(neut%halo,inputs%ai)
+
+    dcx_dens = sum(neut%dcx%dens)
+
+    halo_iter_dens(prev_type) = dcx_dens
+    if(dcx_dens.eq.0) then
+        if(inputs%verbose.ge.0) then
+            write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
+        endif
+        stop
+    endif
+    n_halo = inputs%n_halo
+
+    !! Allocate previous neutral populations
+    call init_neutral_population(prev_pop,inputs%ai)
+    prev_pop = neut%dcx
+
+    seed_dcx = 1.0
+    iterations: do hh=1,200
+        !! Allocate/Reallocate current population
+        call init_neutral_population(cur_pop,inputs%ai)
+        halo_iter_dens(cur_type) = 0.d0
+
+        !! Calculate how many mc markers to launch in each cell
+        papprox = 0.d0
+        cell_ind = 0
+        ncell = 0
+        do ic=1,beam_grid%ngrid
+            call ind2sub(beam_grid%dims,ic,ind)
+            i = ind(1) ; j = ind(2) ; k = ind(3)
+
+            call get_plasma(plasma,ind=ind)
+            if(.not.plasma%in_plasma) cycle
+            tot_denn = sum(prev_pop%dens(:,i,j,k))
+            papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+            if(papprox(i,j,k).gt.0.0) then
+                ncell = ncell + 1
+                cell_ind(ncell) = ic
+            endif
+        enddo
+        call get_nlaunch(n_halo, papprox, nlaunch)
+
+        if(inputs%verbose.ge.1) then
+            write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
+        endif
+
+        !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ii,jj,kk,it,ind,vihalo, &
+        !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction)
+        loop_over_cells: do ic=istart,ncell,istep
+            call ind2sub(beam_grid%dims,cell_ind(ic),ind)
+            i = ind(1) ; j = ind(2) ; k = ind(3)
+            !! Loop over the markers
+            loop_over_halos: do ihalo=1, nlaunch(i,j,k)
+                !! Calculate ri,vhalo and track
+                call mc_halo(ind,vihalo,ri)
+                call track(ri,vihalo,tracks,ntrack)
+                if(ntrack.eq.0)cycle loop_over_halos
+
+                !! Get plasma parameters at particle location
+                call get_plasma(plasma, pos=ri)
+
+                !! Calculate CX probability
+                tind = tracks(1)%ind
+                ii = tind(1); jj = tind(2); kk = tind(3)
+                call neutral_cx_rate(prev_pop%dens(:,ii,jj,kk), prev_pop%res(ii,jj,kk), vihalo, rates)
+                if(sum(rates).le.0.)cycle loop_over_halos
+
+                !! Get plasma parameters at mean point in cell
+                call get_plasma(plasma, pos=tracks(1)%pos)
+
+                !! Weight CX rates by ion source density
+                states = rates*plasma%denp
+                fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
+
+                loop_along_track: do it=1,ntrack
+                    call get_plasma(plasma,pos=tracks(it)%pos)
+                    if(.not.plasma%in_plasma) exit loop_along_track
+                    call colrad(plasma,thermal_ion,vihalo,tracks(it)%time,states,denn,photons)
+
+                    !! Store Neutrals
+                    call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
+
+                    if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
+                        photons = fi_correction*photons !! Correct for including fast-ions in states
+                        call store_bes_photons(tracks(it)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
+                    endif
+                enddo loop_along_track
+            enddo loop_over_halos
+        enddo loop_over_cells
+        !$OMP END PARALLEL DO
+
+#ifdef _MPI
+        !! Combine densities
+        call parallel_merge_populations(cur_pop)
+#endif
+        halo_iter_dens(cur_type) = sum(cur_pop%dens)
+
+        if(halo_iter_dens(cur_type)/halo_iter_dens(prev_type).gt.1.0) then
+            write(*,'(a)') "HALO: Halo generation density exceeded seed density. This shouldn't happen."
+            exit iterations
+        endif
+
+        !! Set current generation to previous generation
+        halo_iter_dens(prev_type) = halo_iter_dens(cur_type)
+        prev_pop = cur_pop
+
+        !! merge current population with halo population
+        call merge_neutral_populations(neut%halo, cur_pop)
+
+        seed_dcx = halo_iter_dens(cur_type)/dcx_dens
+        if(isnan(seed_dcx)) then
+            write(*,'(a)') "NAN (Halo generation)/DCX. Exiting..."
+            stop
+        endif
+        n_halo=int(inputs%n_halo*seed_dcx,Int64)
+
+        if(seed_dcx.lt.0.01) exit iterations
+    enddo iterations
+
+#ifdef _MPI
+    !! Combine Spectra
+    if(inputs%calc_halo.ge.1) then
+        call parallel_sum(spec%halo)
+    endif
+#endif
+
+end subroutine halo
+
+subroutine nbi_spec
+    !+ Calculates approximate neutral beam emission (full, half, third)
+    !+ from user supplied neutrals file
+    integer :: ic, i, j, k, it
+    real(Float64), dimension(3) :: ri, vnbi, random3, rc
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    real(Float64) :: nbif_photons, nbih_photons, nbit_photons
+    real(Float64) :: f_wght, h_wght, t_wght
+    real(Float64) :: f_tot, h_tot, t_tot
+    real(Float64), dimension(n_stark,inputs%nlambda,spec_chords%nchan) :: full, half, third
+    logical :: inp
+    integer :: n = 10000
+
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& nbif_photons, nbih_photons, nbit_photons, rc, ri,inp, vnbi,&
+    !$OMP& random3,f_tot,h_tot,t_tot,f_wght,h_wght,t_wght,&
+    !$OMP& full,half,third)
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+
+        nbif_photons = neut%full%dens(3,i,j,k)*tables%einstein(2,3)
+        nbih_photons = neut%half%dens(3,i,j,k)*tables%einstein(2,3)
+        nbit_photons = neut%third%dens(3,i,j,k)*tables%einstein(2,3)
+        if((nbif_photons + nbih_photons + nbit_photons).le.0.0) then
+            cycle loop_over_cells
+        endif
+
+        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        !Find a point in cell that is also in the plasma
+        ri = rc
+        call in_plasma(ri, inp)
+        do while (.not.inp)
+            call randu(random3)
+            ri = rc + beam_grid%dr*(random3 - 0.5)
+            call in_plasma(ri,inp)
+        enddo
+
+        f_tot = 0.0 ; h_tot = 0.0 ; t_tot = 0.0
+        full  = 0.0 ; half  = 0.0 ; third = 0.0
+        do it=1, n
+            !! Full Spectra
+            call mc_nbi_cell(ind, nbif_type, vnbi, f_wght)
+            f_tot = f_tot + f_wght
+            call store_photons(ri, vnbi, f_wght*nbif_photons, full)
+
+            !! Half Spectra
+            call mc_nbi_cell(ind, nbih_type, vnbi, h_wght)
+            h_tot = h_tot + h_wght
+            call store_photons(ri, vnbi, h_wght*nbih_photons, half)
+
+            !! Third Spectra
+            call mc_nbi_cell(ind, nbit_type, vnbi, t_wght)
+            t_tot = t_tot + t_wght
+            call store_photons(ri, vnbi, t_wght*nbit_photons, third)
+        enddo
+        !$OMP CRITICAL(nbi_spec_1)
+        spec%full = spec%full + full/f_tot
+        spec%half = spec%half + half/h_tot
+        spec%third = spec%third + third/t_tot
+        !$OMP END CRITICAL(nbi_spec_1)
+    enddo loop_over_cells
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine Spectra
+    call parallel_sum(spec%full)
+    call parallel_sum(spec%half)
+    call parallel_sum(spec%third)
+#endif
+
+end subroutine nbi_spec
+
+subroutine dcx_spec
+    !+ Calculates DCX emission from user supplied neutrals file
+    integer :: ic, i, j, k, it
+    real(Float64), dimension(3) :: ri, vhalo, random3, rc
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64) :: dcx_photons
+    logical :: inp
+    integer :: n = 10000
+
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& dcx_photons, rc, ri, inp, vhalo, random3, plasma)
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+
+        dcx_photons  = neut%dcx%dens(3,i,j,k)*tables%einstein(2,3)
+        if(dcx_photons.le.0.0) cycle loop_over_cells
+
+        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        !Find a point in cell that is also in the plasma
+        ri = rc
+        call in_plasma(ri, inp)
+        do while (.not.inp)
+            call randu(random3)
+            ri = rc + beam_grid%dr*(random3 - 0.5)
+            call in_plasma(ri,inp)
+        enddo
+
+        call get_plasma(plasma, pos=ri)
+        do it=1, n
+            !! DCX Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_photons(ri, vhalo, dcx_photons/n, spec%dcx)
+        enddo
+    enddo loop_over_cells
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine Spectra
+    call parallel_sum(spec%dcx)
+#endif
+
+end subroutine dcx_spec
+
+subroutine halo_spec
+    !+ Calculates halo emission from user supplied neutrals file
+    integer :: ic, i, j, k, it
+    real(Float64), dimension(3) :: ri, vhalo, random3, rc
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64) :: halo_photons
+    logical :: inp
+    integer :: n = 10000
+
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& halo_photons, rc, ri, inp, vhalo, random3, plasma)
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+
+        halo_photons = neut%halo%dens(3,i,j,k)*tables%einstein(2,3)
+        if(halo_photons.le.0.0) cycle loop_over_cells
+
+        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        !Find a point in cell that is also in the plasma
+        ri = rc
+        call in_plasma(ri, inp)
+        do while (.not.inp)
+            call randu(random3)
+            ri = rc + beam_grid%dr*(random3 - 0.5)
+            call in_plasma(ri,inp)
+        enddo
+
+        call get_plasma(plasma, pos=ri)
+        do it=1, n
+            !! Halo Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_photons(ri, vhalo, halo_photons/n, spec%halo)
+        enddo
+    enddo loop_over_cells
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine Spectra
+    call parallel_sum(spec%halo)
+#endif
+
+end subroutine halo_spec
+
+subroutine cold_spec
+    !+ Calculates cold D-alpha emission
+    integer :: ic, i, j, k, it, ncell
+    real(Float64), dimension(3) :: ri, vhalo, random3
+    integer,dimension(3) :: ind
+    !! Determination of the CX probability
+    type(LocalProfiles) :: plasma
+    real(Float64) :: cold_photons
+    integer :: n = 10000
+
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP& cold_photons, ri, vhalo, random3, plasma)
+    loop_over_cells: do ic = istart, spec_chords%ncell, istep
+        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
+        i = ind(1) ; j = ind(2) ; k = ind(3)
+        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
+
+        call get_plasma(plasma, pos=ri)
+        cold_photons = plasma%denn(3)*tables%einstein(2,3)
+        if(cold_photons.le.0.0) cycle loop_over_cells
+
+        do it=1, n
+            !! Cold Spectra
+            call randn(random3)
+            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
+            call store_photons(ri, vhalo, cold_photons/n, spec%cold)
+        enddo
+    enddo loop_over_cells
+    !$OMP END PARALLEL DO
+
+#ifdef _MPI
+    !! Combine Spectra
+    call parallel_sum(spec%cold)
+#endif
+
+end subroutine cold_spec
 
 subroutine bremsstrahlung
     !+ Calculates bremsstrahlung
@@ -9808,505 +10180,6 @@ subroutine bremsstrahlung
 
 end subroutine bremsstrahlung
 
-subroutine dcx
-    !+ Calculates Direct Charge Exchange (DCX) neutral density and spectra
-    integer :: ic,i,j,k,ncell
-    integer(Int64) :: idcx !! counter
-    real(Float64), dimension(3) :: ri    !! start position
-    real(Float64), dimension(3) :: vihalo
-    integer,dimension(3) :: ind
-    integer,dimension(3) :: neut_types = [1,2,3]
-    !! Determination of the CX probability
-    type(LocalProfiles) :: plasma
-    real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
-    real(Float64), dimension(nlevs) :: rates    !!  CX rates
-    !! Collisiional radiative model along track
-    real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ntrack
-    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle tracks
-    integer :: jj       !! counter along track
-    real(Float64):: tot_denn, photons  !! photon flux
-    integer, dimension(beam_grid%ngrid) :: cell_ind
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-    real(Float64) :: fi_correction
-
-    halo_iter_dens(dcx_type) = 0.d0
-    papprox=0.d0
-    tot_denn=0.d0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-        call get_plasma(plasma,ind=ind)
-        if(.not.plasma%in_plasma) cycle
-        tot_denn = sum(neut%full(:,i,j,k)) + &
-                   sum(neut%half(:,i,j,k)) + &
-                   sum(neut%third(:,i,j,k))
-        papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
-    enddo
-
-    ncell = 0
-    do ic=1,beam_grid%ngrid
-        call ind2sub(beam_grid%dims,ic,ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-        if(papprox(i,j,k).gt.0.0) then
-            ncell = ncell + 1
-            cell_ind(ncell) = ic
-        endif
-    enddo
-
-    call get_nlaunch(inputs%n_dcx,papprox,nlaunch)
-
-    if(inputs%verbose.ge.1) then
-       write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
-    endif
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
-    !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
-    loop_over_cells: do ic = istart, ncell, istep
-        call ind2sub(beam_grid%dims,cell_ind(ic),ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-        !! Loop over the markers
-        loop_over_dcx: do idcx=1, nlaunch(i,j,k)
-            !! Calculate ri,vhalo and track
-            call mc_halo(ind,vihalo,ri)
-            call track(ri,vihalo,tracks,ntrack)
-            if(ntrack.eq.0) cycle loop_over_dcx
-
-            !! Calculate CX probability
-            call get_beam_cx_rate(tracks(1)%ind,ri,vihalo,thermal_ion,neut_types,rates)
-            if(sum(rates).le.0.) cycle loop_over_dcx
-
-            !! Solve collisional radiative model along track
-            call get_plasma(plasma,pos=tracks(1)%pos)
-
-            !! Weight CX rates by ion source density
-            states = rates*plasma%denp
-            fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
-
-            loop_along_track: do jj=1,ntrack
-                call get_plasma(plasma,pos=tracks(jj)%pos)
-                if(.not.plasma%in_plasma) exit loop_along_track
-                call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
-                call store_neutrals(tracks(jj)%ind,dcx_type,denn/nlaunch(i,j,k),vihalo,plasma%in_plasma)
-
-                if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
-                    photons = fi_correction*photons !! Correct for including fast-ions in states
-                    call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
-                endif
-            enddo loop_along_track
-        enddo loop_over_dcx
-    enddo loop_over_cells
-    !$OMP END PARALLEL DO
-
-#ifdef _MPI
-    !! Combine densities
-    call parallel_sum(neut%dcx)
-    if(inputs%calc_dcx.ge.1) then
-        call parallel_sum(spec%dcx)
-    endif
-    call parallel_sum(halo_iter_dens(dcx_type))
-#endif
-
-end subroutine dcx
-
-subroutine halo
-    !+ Calculates halo neutral density and spectra
-    integer :: ic,i,j,k,ncell
-    integer(Int64) :: ihalo !! counter
-    real(Float64), dimension(3) :: ri    !! start position
-    real(Float64), dimension(3) :: vihalo!! velocity bulk plasma ion
-    integer,dimension(3) :: ind,tind    !! actual cell
-    !! Determination of the CX probability
-    type(LocalProfiles) :: plasma
-    real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
-    real(Float64), dimension(nlevs) :: rates    !! CX rates
-    !! Collisiional radiative model along track
-    real(Float64), dimension(nlevs) :: states  ! Density of n-states
-    integer :: ntrack
-    type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle Tracks
-    integer :: jj       !! counter along track
-    real(Float64) :: tot_denn, photons  !! photon flux
-    integer, dimension(beam_grid%ngrid) :: cell_ind
-    real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
-    integer(Int32), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: nlaunch
-    real(Float64), dimension(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz) :: dens_prev
-    real(Float64), dimension(:,:,:,:,:),allocatable :: dens_cur
-    real(Float64) :: local_iter_dens
-    integer :: n_slices, cur_slice, is
-#ifdef _OMP
-    integer, external :: omp_get_max_threads, omp_get_thread_num
-#endif
-    !! Halo iteration
-    integer(Int64) :: hh, n_halo !! counters
-    real(Float64) :: dcx_dens, halo_iteration_dens,seed_dcx
-    integer :: prev_type  ! previous iteration
-    integer :: cur_type  ! current iteration
-    real(Float64) :: fi_correction
-
-
-    prev_type = fida_type
-    cur_type = brems_type
-
-    cur_slice = 1
-    n_slices = 1
-#ifdef _OMP
-    n_slices = omp_get_max_threads()
-#endif
-
-    allocate(dens_cur(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz,n_slices))
-
-    dens_prev = 0.d0
-    dens_cur = 0.d0
-    dcx_dens = halo_iter_dens(dcx_type)
-    halo_iter_dens(prev_type) = dcx_dens
-    if(dcx_dens.eq.0) then
-        if(inputs%verbose.ge.0) then
-            write(*,'(a)') 'HALO: Density of DCX-neutrals is zero'
-        endif
-        stop
-    endif
-    dens_prev = neut%dcx
-    n_halo = inputs%n_halo
-    seed_dcx = 1.0
-    iterations: do hh=1,200
-        papprox=0.d0
-        tot_denn=0.d0
-        halo_iter_dens(cur_type) = 0.d0
-        do ic=1,beam_grid%ngrid
-            call ind2sub(beam_grid%dims,ic,ind)
-            i = ind(1) ; j = ind(2) ; k = ind(3)
-            call get_plasma(plasma,ind=ind)
-            if(.not.plasma%in_plasma) cycle
-            tot_denn = sum(dens_prev(:,i,j,k))
-            papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
-        enddo
-
-        cell_ind = 0
-        ncell = 0
-        do ic=1,beam_grid%ngrid
-            call ind2sub(beam_grid%dims,ic,ind)
-            i = ind(1) ; j = ind(2) ; k = ind(3)
-            if(papprox(i,j,k).gt.0.0) then
-                ncell = ncell + 1
-                cell_ind(ncell) = ic
-            endif
-        enddo
-
-        call get_nlaunch(n_halo, papprox, nlaunch)
-
-        if(inputs%verbose.ge.1) then
-            write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
-        endif
-
-        local_iter_dens = halo_iter_dens(cur_type)
-        !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ind,vihalo, &
-        !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,tind, cur_slice,fi_correction) &
-        !$OMP& reduction(+: local_iter_dens )
-        loop_over_cells: do ic=istart,ncell,istep
-#ifdef _OMP
-            cur_slice = omp_get_thread_num()+1
-#endif
-            call ind2sub(beam_grid%dims,cell_ind(ic),ind)
-            i = ind(1) ; j = ind(2) ; k = ind(3)
-            !! Loop over the markers
-            loop_over_halos: do ihalo=1, nlaunch(i,j,k)
-                !! Calculate ri,vhalo and track
-                call mc_halo(ind,vihalo,ri)
-                call track(ri,vihalo,tracks,ntrack)
-                if(ntrack.eq.0)cycle loop_over_halos
-
-                !! Get plasma parameters at particle location
-                call get_plasma(plasma, pos=ri)
-
-                !! Calculate CX probability
-                tind = tracks(1)%ind
-                call bt_cx_rates(plasma, dens_prev(:,tind(1),tind(2),tind(3)), vihalo, thermal_ion, rates)
-                if(sum(rates).le.0.)cycle loop_over_halos
-
-                !! Get plasma parameters at mean point in cell
-                call get_plasma(plasma,pos=tracks(1)%pos)
-
-                !! Weight CX rates by ion source density
-                states = rates*plasma%denp
-                fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
-
-                loop_along_track: do jj=1,ntrack
-                    call get_plasma(plasma,pos=tracks(jj)%pos)
-                    if(.not.plasma%in_plasma) exit loop_along_track
-                    call colrad(plasma,thermal_ion,vihalo,tracks(jj)%time,states,denn,photons)
-
-                    !! Store Neutrals
-                    tind = tracks(jj)%ind
-                    dens_cur(:,tind(1),tind(2),tind(3),cur_slice) = &
-                        dens_cur(:,tind(1),tind(2),tind(3),cur_slice) + denn/nlaunch(i,j,k)
-                    local_iter_dens = &
-                        local_iter_dens + sum(denn)/nlaunch(i,j,k)
-                    if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
-                        photons = fi_correction*photons !! Correct for including fast-ions in states
-                        call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
-                    endif
-                enddo loop_along_track
-            enddo loop_over_halos
-        enddo loop_over_cells
-        !$OMP END PARALLEL DO
-        halo_iter_dens(cur_type) = local_iter_dens
-
-#ifdef _OMP
-        !$OMP PARALLEL DO private(i,j,is)
-        do i=1,beam_grid%nz
-         do j=1,beam_grid%ny
-          do is = 2, n_slices
-            dens_cur(:,:,j,i,1) = dens_cur(:,:,j,i,1) + dens_cur(:,:,j,i,is)
-          enddo
-         enddo
-        enddo
-#endif
-        ! at this point, dens_cur(*,1) contains all the info
-
-#ifdef _MPI
-        !! Combine densities
-        call parallel_sum(dens_cur(:,:,:,:,1))
-        call parallel_sum(halo_iter_dens(cur_type))
-#endif
-
-        if(halo_iter_dens(cur_type)/halo_iter_dens(prev_type).gt.1.0) then
-            write(*,'(a)') "HALO: Halo generation density exceeded seed density. This shouldn't happen."
-            exit iterations
-        endif
-
-        halo_iteration_dens = halo_iter_dens(cur_type)
-        halo_iter_dens(prev_type) = halo_iter_dens(cur_type)
-        !$OMP PARALLEL DO private(i)
-        do i=1,beam_grid%nz
-          neut%halo(:,:,:,i) = neut%halo(:,:,:,i) + dens_cur(:,:,:,i,1)
-          dens_prev(:,:,:,i) = dens_cur(:,:,:,i,1)
-          dens_cur(:,:,:,i,:) = 0.d0
-        enddo
-
-        seed_dcx = halo_iteration_dens/dcx_dens
-        n_halo=int(inputs%n_halo*seed_dcx,Int64)
-
-        if(seed_dcx.lt.0.01) exit iterations
-    enddo iterations
-#ifdef _MPI
-    !! Combine Spectra
-    if(inputs%calc_halo.ge.1) then
-        call parallel_sum(spec%halo)
-    endif
-#endif
-
-    deallocate(dens_cur)
-
-end subroutine halo
-
-subroutine nbi_spec
-    !+ Calculates approximate neutral beam emission (full, half, third)
-    !+ from user supplied neutrals file
-    integer :: ic, i, j, k, it
-    real(Float64), dimension(3) :: ri, vnbi, random3, rc
-    integer,dimension(3) :: ind
-    !! Determination of the CX probability
-    real(Float64) :: nbif_photons, nbih_photons, nbit_photons
-    real(Float64) :: f_wght, h_wght, t_wght
-    real(Float64) :: f_tot, h_tot, t_tot
-    real(Float64), dimension(n_stark,inputs%nlambda,spec_chords%nchan) :: full, half, third
-    logical :: inp
-    integer :: n = 10000
-
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
-    !$OMP& nbif_photons, nbih_photons, nbit_photons, rc, ri,inp, vnbi,&
-    !$OMP& random3,f_tot,h_tot,t_tot,f_wght,h_wght,t_wght,&
-    !$OMP& full,half,third)
-    loop_over_cells: do ic = istart, spec_chords%ncell, istep
-        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-
-        nbif_photons = neut%full(3,i,j,k)*tables%einstein(2,3)
-        nbih_photons = neut%half(3,i,j,k)*tables%einstein(2,3)
-        nbit_photons = neut%third(3,i,j,k)*tables%einstein(2,3)
-        if((nbif_photons + nbih_photons + nbit_photons).le.0.0) then
-            cycle loop_over_cells
-        endif
-
-        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
-
-        !Find a point in cell that is also in the plasma
-        ri = rc
-        call in_plasma(ri, inp)
-        do while (.not.inp)
-            call randu(random3)
-            ri = rc + beam_grid%dr*(random3 - 0.5)
-            call in_plasma(ri,inp)
-        enddo
-
-        f_tot = 0.0 ; h_tot = 0.0 ; t_tot = 0.0
-        full  = 0.0 ; half  = 0.0 ; third = 0.0
-        do it=1, n
-            !! Full Spectra
-            call mc_nbi_cell(ind, nbif_type, vnbi, f_wght)
-            f_tot = f_tot + f_wght
-            call store_photons(ri, vnbi, f_wght*nbif_photons, full)
-
-            !! Half Spectra
-            call mc_nbi_cell(ind, nbih_type, vnbi, h_wght)
-            h_tot = h_tot + h_wght
-            call store_photons(ri, vnbi, h_wght*nbih_photons, half)
-
-            !! Third Spectra
-            call mc_nbi_cell(ind, nbit_type, vnbi, t_wght)
-            t_tot = t_tot + t_wght
-            call store_photons(ri, vnbi, t_wght*nbit_photons, third)
-        enddo
-        !$OMP CRITICAL(nbi_spec_1)
-        spec%full = spec%full + full/f_tot
-        spec%half = spec%half + half/h_tot
-        spec%third = spec%third + third/t_tot
-        !$OMP END CRITICAL(nbi_spec_1)
-    enddo loop_over_cells
-    !$OMP END PARALLEL DO
-
-#ifdef _MPI
-    !! Combine Spectra
-    call parallel_sum(spec%full)
-    call parallel_sum(spec%half)
-    call parallel_sum(spec%third)
-#endif
-
-end subroutine nbi_spec
-
-subroutine dcx_spec
-    !+ Calculates DCX emission from user supplied neutrals file
-    integer :: ic, i, j, k, it
-    real(Float64), dimension(3) :: ri, vhalo, random3, rc
-    integer,dimension(3) :: ind
-    !! Determination of the CX probability
-    type(LocalProfiles) :: plasma
-    real(Float64) :: dcx_photons
-    logical :: inp
-    integer :: n = 10000
-
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
-    !$OMP& dcx_photons, rc, ri, inp, vhalo, random3, plasma)
-    loop_over_cells: do ic = istart, spec_chords%ncell, istep
-        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-
-        dcx_photons  = neut%dcx(3,i,j,k)*tables%einstein(2,3)
-        if(dcx_photons.le.0.0) cycle loop_over_cells
-
-        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
-
-        !Find a point in cell that is also in the plasma
-        ri = rc
-        call in_plasma(ri, inp)
-        do while (.not.inp)
-            call randu(random3)
-            ri = rc + beam_grid%dr*(random3 - 0.5)
-            call in_plasma(ri,inp)
-        enddo
-
-        call get_plasma(plasma, pos=ri)
-        do it=1, n
-            !! DCX Spectra
-            call randn(random3)
-            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
-            call store_photons(ri, vhalo, dcx_photons/n, spec%dcx)
-        enddo
-    enddo loop_over_cells
-    !$OMP END PARALLEL DO
-
-#ifdef _MPI
-    !! Combine Spectra
-    call parallel_sum(spec%dcx)
-#endif
-
-end subroutine dcx_spec
-
-subroutine halo_spec
-    !+ Calculates halo emission from user supplied neutrals file
-    integer :: ic, i, j, k, it
-    real(Float64), dimension(3) :: ri, vhalo, random3, rc
-    integer,dimension(3) :: ind
-    !! Determination of the CX probability
-    type(LocalProfiles) :: plasma
-    real(Float64) :: halo_photons
-    logical :: inp
-    integer :: n = 10000
-
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
-    !$OMP& halo_photons, rc, ri, inp, vhalo, random3, plasma)
-    loop_over_cells: do ic = istart, spec_chords%ncell, istep
-        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-
-        halo_photons = neut%halo(3,i,j,k)*tables%einstein(2,3)
-        if(halo_photons.le.0.0) cycle loop_over_cells
-
-        rc = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
-
-        !Find a point in cell that is also in the plasma
-        ri = rc
-        call in_plasma(ri, inp)
-        do while (.not.inp)
-            call randu(random3)
-            ri = rc + beam_grid%dr*(random3 - 0.5)
-            call in_plasma(ri,inp)
-        enddo
-
-        call get_plasma(plasma, pos=ri)
-        do it=1, n
-            !! Halo Spectra
-            call randn(random3)
-            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
-            call store_photons(ri, vhalo, halo_photons/n, spec%halo)
-        enddo
-    enddo loop_over_cells
-    !$OMP END PARALLEL DO
-
-#ifdef _MPI
-    !! Combine Spectra
-    call parallel_sum(spec%halo)
-#endif
-
-end subroutine halo_spec
-
-subroutine cold_spec
-    !+ Calculates cold D-alpha emission
-    integer :: ic, i, j, k, it, ncell
-    real(Float64), dimension(3) :: ri, vhalo, random3
-    integer,dimension(3) :: ind
-    !! Determination of the CX probability
-    type(LocalProfiles) :: plasma
-    real(Float64) :: cold_photons
-    integer :: n = 10000
-
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
-    !$OMP& cold_photons, ri, vhalo, random3, plasma)
-    loop_over_cells: do ic = istart, spec_chords%ncell, istep
-        call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
-        i = ind(1) ; j = ind(2) ; k = ind(3)
-        ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
-
-        call get_plasma(plasma, pos=ri)
-        cold_photons = plasma%denn(3)*tables%einstein(2,3)
-        if(cold_photons.le.0.0) cycle loop_over_cells
-
-        do it=1, n
-            !! Cold Spectra
-            call randn(random3)
-            vhalo = plasma%vrot + sqrt(plasma%ti*0.5/(v2_to_E_per_amu*inputs%ai))*random3
-            call store_photons(ri, vhalo, cold_photons/n, spec%cold)
-        enddo
-    enddo loop_over_cells
-    !$OMP END PARALLEL DO
-
-#ifdef _MPI
-    !! Combine Spectra
-    call parallel_sum(spec%cold)
-#endif
-
-end subroutine cold_spec
-
 subroutine fida_f
     !+ Calculate Active FIDA emission using a Fast-ion distribution function F(E,p,r,z)
     integer :: i,j,k,ic,ncell
@@ -10344,11 +10217,11 @@ subroutine fida_f
         i = ind(1) ; j = ind(2) ; k = ind(3)
         call get_plasma(plasma,ind=ind)
         if(.not.plasma%in_plasma) cycle
-        papprox(i,j,k) = (sum(neut%full(:,i,j,k)) + &
-                          sum(neut%half(:,i,j,k)) + &
-                          sum(neut%third(:,i,j,k)) + &
-                          sum(neut%dcx(:,i,j,k)) + &
-                          sum(neut%halo(:,i,j,k)))* &
+        papprox(i,j,k) = (sum(neut%full%dens(:,i,j,k)) + &
+                          sum(neut%half%dens(:,i,j,k)) + &
+                          sum(neut%third%dens(:,i,j,k)) + &
+                          sum(neut%dcx%dens(:,i,j,k)) + &
+                          sum(neut%halo%dens(:,i,j,k)))* &
                           plasma%denf
     enddo
 
@@ -10387,7 +10260,7 @@ subroutine fida_f
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_beam_cx_rate(tracks(1)%ind, ri, vi, beam_ion, neut_types, rates)
+            call get_total_cx_rate(tracks(1)%ind, ri, vi, neut_types, rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
             !! Weight CX rates by ion source density
@@ -10594,7 +10467,7 @@ subroutine fida_mc
             if(ntrack.eq.0)cycle gamma_loop
 
             !! Calculate CX probability
-            call get_beam_cx_rate(tracks(1)%ind,ri,vi,beam_ion,neut_types,rates)
+            call get_total_cx_rate(tracks(1)%ind, ri, vi, neut_types, rates)
             if(sum(rates).le.0.)cycle gamma_loop
 
             !! Weight CX rates by ion source density
@@ -10749,11 +10622,11 @@ subroutine npa_f
         i = ind(1) ; j = ind(2) ; k = ind(3)
         call get_plasma(plasma,ind=ind)
         if(.not.plasma%in_plasma) cycle
-        papprox(i,j,k)=(sum(neut%full(:,i,j,k)) + &
-                        sum(neut%half(:,i,j,k)) + &
-                        sum(neut%third(:,i,j,k)) + &
-                        sum(neut%dcx(:,i,j,k)) + &
-                        sum(neut%halo(:,i,j,k)))* &
+        papprox(i,j,k)=(sum(neut%full%dens(:,i,j,k)) + &
+                        sum(neut%half%dens(:,i,j,k)) + &
+                        sum(neut%third%dens(:,i,j,k)) + &
+                        sum(neut%dcx%dens(:,i,j,k)) + &
+                        sum(neut%halo%dens(:,i,j,k)))* &
                         plasma%denf
     enddo
 
@@ -10806,7 +10679,7 @@ subroutine npa_f
                     call get_indices(ri,pind)
 
                     !! Calculate CX probability with beam and halo neutrals
-                    call get_beam_cx_rate(pind,ri,vi,beam_ion,neut_types,rates)
+                    call get_total_cx_rate(pind, ri, vi, neut_types, rates)
                     if(sum(rates).le.0.) cycle gyro_range_loop
 
                     !! Weight CX rates by ion source density
@@ -11028,7 +10901,7 @@ subroutine npa_mc
                         call get_indices(ri,ind)
 
                         !! Calculate CX probability with beam and halo neutrals
-                        call get_beam_cx_rate(ind,ri,vi,beam_ion,neut_types,rates)
+                        call get_total_cx_rate(ind, ri, vi, neut_types, rates)
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
@@ -11071,7 +10944,7 @@ subroutine npa_mc
                 call get_indices(ri,ind)
 
                 !! Calculate CX probability with beam and halo neutrals
-                call get_beam_cx_rate(ind,ri,vi,beam_ion,neut_types,rates)
+                call get_total_cx_rate(ind, ri, vi, neut_types, rates)
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
@@ -11557,11 +11430,11 @@ subroutine fida_weights_mc
         i = ind(1) ; j = ind(2) ; k = ind(3)
         call get_plasma(plasma,ind=ind)
         if(.not.plasma%in_plasma) cycle
-        papprox(i,j,k)=(sum(neut%full(:,i,j,k)) + &
-                        sum(neut%half(:,i,j,k)) + &
-                        sum(neut%third(:,i,j,k)) + &
-                        sum(neut%dcx(:,i,j,k)) + &
-                        sum(neut%halo(:,i,j,k)))
+        papprox(i,j,k)=(sum(neut%full%dens(:,i,j,k)) + &
+                        sum(neut%half%dens(:,i,j,k)) + &
+                        sum(neut%third%dens(:,i,j,k)) + &
+                        sum(neut%dcx%dens(:,i,j,k)) + &
+                        sum(neut%halo%dens(:,i,j,k)))
     enddo
 
     ncell = 0
@@ -11614,7 +11487,7 @@ subroutine fida_weights_mc
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
             !! Calculate CX probability with beam and halo neutrals
-            call get_beam_cx_rate(tracks(1)%ind, ri, vi, beam_ion, neut_types, rates)
+            call get_total_cx_rate(tracks(1)%ind, ri, vi, neut_types, rates)
             if(sum(rates).le.0.) cycle loop_over_fast_ions
             states=rates*1.d20
 
@@ -11752,14 +11625,14 @@ subroutine fida_weights_los
                         call in_plasma(ri,inp)
                         if(.not.inp) cycle x_loop
                         dlength = inter%los_elem(cind)%length
-                        fdens = fdens + neut%full(:,i,j,k)*dlength
-                        hdens = hdens + neut%half(:,i,j,k)*dlength
-                        tdens = tdens + neut%third(:,i,j,k)*dlength
-                        dcxdens = dcxdens + neut%dcx(:,i,j,k)*dlength
-                        halodens = halodens + neut%halo(:,i,j,k)*dlength
-                        wght = (neut%full(3,i,j,k) + neut%half(3,i,j,k) + &
-                                neut%third(3,i,j,k) + neut%dcx(3,i,j,k) + &
-                                neut%halo(3,i,j,k))*dlength
+                        fdens = fdens + neut%full%dens(:,i,j,k)*dlength
+                        hdens = hdens + neut%half%dens(:,i,j,k)*dlength
+                        tdens = tdens + neut%third%dens(:,i,j,k)*dlength
+                        dcxdens = dcxdens + neut%dcx%dens(:,i,j,k)*dlength
+                        halodens = halodens + neut%halo%dens(:,i,j,k)*dlength
+                        wght = (neut%full%dens(3,i,j,k) + neut%half%dens(3,i,j,k) + &
+                                neut%third%dens(3,i,j,k) + neut%dcx%dens(3,i,j,k) + &
+                                neut%halo%dens(3,i,j,k))*dlength
 
                         call get_plasma(plasma_cell,pos=ri)
                         call get_fields(fields_cell,pos=ri)
@@ -11825,11 +11698,11 @@ subroutine fida_weights_los
                     max_dens = 0.d0
                     do icell=1,ntrack
                         ind = tracks(icell)%ind
-                        tracks(icell)%flux = neut%full(3,ind(1),ind(2),ind(3))  + &
-                                             neut%half(3,ind(1),ind(2),ind(3))  + &
-                                             neut%third(3,ind(1),ind(2),ind(3)) + &
-                                             neut%dcx(3,ind(1),ind(2),ind(3))   + &
-                                             neut%halo(3,ind(1),ind(2),ind(3))
+                        tracks(icell)%flux = neut%full%dens(3,ind(1),ind(2),ind(3))  + &
+                                             neut%half%dens(3,ind(1),ind(2),ind(3))  + &
+                                             neut%third%dens(3,ind(1),ind(2),ind(3)) + &
+                                             neut%dcx%dens(3,ind(1),ind(2),ind(3))   + &
+                                             neut%halo%dens(3,ind(1),ind(2),ind(3))
                         if(tracks(icell)%flux.gt.max_dens) max_dens=tracks(icell)%flux
                     enddo
                     dt = 0.d0
@@ -11988,7 +11861,7 @@ subroutine npa_weights
                             if (fbm_denf.ne.fbm_denf) cycle loop_over_energy
 
                             !! -------------- calculate CX probability -------!!
-                            call get_beam_cx_rate([ii,jj,kk],pos,vi,beam_ion,neut_types,pcx)
+                            call get_total_cx_rate([ii,jj,kk], pos, vi, neut_types, pcx)
                             if(sum(pcx).le.0) cycle loop_over_energy
 
                             !!Calculate attenuation
@@ -12171,19 +12044,6 @@ program fidasim
     !! ----------------------------------------------------------
     !! --------------- ALLOCATE THE RESULT ARRAYS ---------------
     !! ----------------------------------------------------------
-    !! neutral density array!
-    allocate(neut%full(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    allocate(neut%half(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    allocate(neut%third(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    allocate(neut%dcx(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    allocate(neut%halo(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
-    neut%full = 0.d0
-    neut%half = 0.d0
-    neut%third = 0.d0
-    neut%dcx = 0.d0
-    neut%halo = 0.d0
-
-    !! birth profile
     if(inputs%calc_birth.ge.1) then
         allocate(birth%dens(3, &
                             beam_grid%nx, &
@@ -12192,6 +12052,7 @@ program fidasim
         allocate(birth%part(int(3*inputs%n_birth*inputs%n_nbi)))
     endif
 
+    !! Spectra
     if(inputs%calc_spec.ge.1) then
         if(inputs%calc_brems.ge.1) then
             allocate(spec%brems(inputs%nlambda,spec_chords%nchan))
@@ -12302,7 +12163,7 @@ program fidasim
                 if(inputs%verbose.ge.1) then
                     write(*,*) 'nbi:     ' , time(time_start)
                 endif
-                call ndmc
+                call ndmc()
                 if(inputs%verbose.ge.1) write(*,'(30X,a)') ''
 
                 if(inputs%calc_birth.eq.1)then

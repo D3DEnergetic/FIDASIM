@@ -513,11 +513,11 @@ end type AtomicCrossSection
 type AtomicRates
     !+ Defines a n/m-resolved atomic cross section table
     integer       :: nenergy = 1
-        !+ Number of beam energies
+        !+ Number of beam energies/amu
     real(Float64) :: logemin = 0.d0
-        !+ Log-10 minimum energy
+        !+ Log-10 minimum energy/amu
     real(Float64) :: logemax = 0.d0
-        !+ Log-10 maximum energy
+        !+ Log-10 maximum energy/amu
     integer       :: ntemp = 1
         !+ Number of target temperatures
     real(Float64) :: logtmin = 0.d0
@@ -534,20 +534,18 @@ type AtomicRates
         !+ Log-10 temperature spacing
     real(Float64) :: minlog_rate = 0.d0
         !+ Log-10 minimum reaction rate
-    real(Float64), dimension(2) :: ab = 0.d0
-        !+ Atomic mass of beam and thermal ions respectively [amu]
-    real(Float64), dimension(:,:,:,:,:), allocatable :: log_rate
+    real(Float64), dimension(:,:,:,:), allocatable :: log_rate
         !+ Log-10 beam-target rates
 end type AtomicRates
 
 type AtomicTransitions
     !+ Defines an atomic table for populating and de-populating reaction rates
     integer       :: nenergy = 1
-        !+ Number of beam energies
+        !+ Number of beam energies/amu
     real(Float64) :: logemin = 0.d0
-        !+ Log-10 minimum energy
+        !+ Log-10 minimum energy/amu
     real(Float64) :: logemax = 0.d0
-        !+ Log-10 maximum energy
+        !+ Log-10 maximum energy/amu
     integer       :: ntemp = 1
         !+ Number of target temperatures
     real(Float64) :: logtmin = 0.d0
@@ -566,11 +564,9 @@ type AtomicTransitions
         !+ Log-10 minimum reaction rates for populating transistions
     real(Float64) :: minlog_depop = 0.d0
         !+ Log-10 minimum reaction rates for de-populating transistions
-    real(Float64), dimension(2) :: ab = 0.d0
-        !+ Atomic mass of beam and thermal ions respectively [amu]
-    real(Float64), dimension(:,:,:,:,:), allocatable :: log_pop
+    real(Float64), dimension(:,:,:,:), allocatable :: log_pop
         !+ Log-10 reaction rates for populating transistions
-    real(Float64), dimension(:,:,:,:), allocatable   :: log_depop
+    real(Float64), dimension(:,:,:), allocatable   :: log_depop
         !+ Log-10 reaction rates for de-populating transistions
 end type AtomicTransitions
 
@@ -3552,30 +3548,26 @@ subroutine read_atomic_cross(fid, grp, cross)
 
 end subroutine read_atomic_cross
 
-subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
+subroutine read_atomic_rate(fid, grp, rates)
     !+ Reads in a atomic rate table from file
     !+ and puts it into a [[AtomicRates]] type
     integer(HID_T), intent(in)              :: fid
         !+ HDF5 file ID
     character(len=*), intent(in)            :: grp
         !+ HDF5 group to read from
-    real(Float64), dimension(2), intent(in) :: b_amu
-        !+ Atomic masses of "beam" species (beam ion and thermal ion)
-    real(Float64), intent(in)               :: t_amu
-        !+ Atomic mass of "target" species (thermal ion)
     type(AtomicRates), intent(inout)        :: rates
         !+ Atomic reaction rates
 
     integer(HSIZE_T), dimension(2) :: dim2
+    integer(HSIZE_T), dimension(3) :: dim3
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(5) :: dim5
     logical :: path_valid
     integer :: i, j, n, n_max, m_max, error
-    integer :: n_bt_amu, tt_ind, bt_ind, drank
+    integer :: drank
     real(Float64) :: emin,emax,tmin,tmax,rmin
-    real(Float64) :: bt_min, tt_min, tt_dum, bt_dum
-    real(Float64), dimension(2) :: bt_amu, tt_amu
     real(Float64), dimension(:,:), allocatable :: dummy2
+    real(Float64), dimension(:,:,:), allocatable :: dummy3
     real(Float64), dimension(:,:,:,:), allocatable :: dummy4
     real(Float64), dimension(:,:,:,:,:), allocatable :: dummy5
 
@@ -3586,11 +3578,6 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
         endif
         stop
     endif
-
-    call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
-    allocate(dummy2(2, n_bt_amu))
-    dim2 = [2, n_bt_amu]
-    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", dummy2, dim2, error)
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_max", n_max, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/m_max", m_max, error)
@@ -3607,54 +3594,32 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
     rates%logtmin = log10(tmin)
     rates%logtmax = log10(tmax)
 
-    bt_ind = 1
-    tt_ind = 1
-    bt_amu = [b_amu(1), t_amu]
-    tt_amu = [b_amu(2), t_amu]
-    bt_min = norm2(bt_amu - dummy2(:,1))
-    tt_min = norm2(tt_amu - dummy2(:,1))
-    do i=2, n_bt_amu
-        bt_dum = norm2(bt_amu - dummy2(:,i))
-        tt_dum = norm2(tt_amu - dummy2(:,i))
-        if(bt_dum.lt.bt_min) then
-            bt_min = bt_dum
-            bt_ind = i
-        endif
-        if(tt_dum.lt.tt_min) then
-            tt_min = tt_dum
-            tt_ind = i
-        endif
-    enddo
-    rates%ab(1) = dummy2(1,bt_ind)
-    rates%ab(2) = dummy2(1,tt_ind)
-
-    deallocate(dummy2)
 
     allocate(rates%log_rate(&
                     rates%m_max, &
                     rates%n_max, &
                     rates%nenergy, &
-                    rates%ntemp, 2))
+                    rates%ntemp))
     rates%log_rate = 0.d0
 
     !!Read CX
     call h5ltpath_valid_f(fid, grp//"/cx", .True., path_valid, error)
     if(path_valid) then
         call h5ltget_dataset_ndims_f(fid, grp//"/cx", drank, error)
-        if(drank.eq.5) then
-            allocate(dummy5(n_max, m_max, &
+        if(drank.eq.4) then
+            allocate(dummy4(n_max, m_max, &
                            rates%nenergy, &
-                           rates%ntemp, n_bt_amu))
-            dim5 = [n_max, m_max, rates%nenergy, rates%ntemp,n_bt_amu]
-            call h5ltread_dataset_double_f(fid, grp//"/cx", dummy5, dim5, error)
+                           rates%ntemp))
+            dim4 = [n_max, m_max, rates%nenergy, rates%ntemp]
+            call h5ltread_dataset_double_f(fid, grp//"/cx", dummy4, dim4, error)
 
             do j=1,rates%ntemp
                 do i=1,rates%nenergy
-                        rates%log_rate(:,:,i,j,1) = transpose(dummy5(1:nlevs,1:nlevs,i,j,bt_ind))
-                        rates%log_rate(:,:,i,j,2) = transpose(dummy5(1:nlevs,1:nlevs,i,j,tt_ind))
+                        rates%log_rate(:,:,i,j) = transpose(dummy4(1:nlevs,1:nlevs,i,j))
+                        rates%log_rate(:,:,i,j) = transpose(dummy4(1:nlevs,1:nlevs,i,j))
                 enddo
             enddo
-            deallocate(dummy5)
+            deallocate(dummy4)
         else
             if(inputs%verbose.ge.0) then
                 write(*,'(a,a)') 'READ_ATOMIC_RATE: Unsupported atomic interaction: ', trim(grp)
@@ -3672,30 +3637,26 @@ subroutine read_atomic_rate(fid, grp, b_amu, t_amu, rates)
 
 end subroutine read_atomic_rate
 
-subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
+subroutine read_atomic_transitions(fid, grp,rates)
     !+ Reads in a atomic transitions table from file
     !+ and puts it into a [[AtomicTransitions]] type
     integer(HID_T), intent(in)              :: fid
         !+ HDF5 file ID
     character(len=*), intent(in)            :: grp
         !+ HDF5 group to read from
-    real(Float64), dimension(2), intent(in) :: b_amu
-        !+ Atomic masses of "beam" species (beam ion and thermal ion)
-    real(Float64), intent(in)               :: t_amu
-        !+ Atomic mass of "target" species (thermal ion)
     type(AtomicTransitions), intent(inout)  :: rates
         !+ Atomic transitions
 
     integer(HSIZE_T), dimension(2) :: dim2
+    integer(HSIZE_T), dimension(3) :: dim3
     integer(HSIZE_T), dimension(4) :: dim4
     integer(HSIZE_T), dimension(5) :: dim5
     logical :: path_valid
     integer :: i, j, n, n_max, m_max, error
-    integer :: n_bt_amu, tt_ind, bt_ind, drank
+    integer :: drank
     real(Float64) :: emin,emax,tmin,tmax,rmin
-    real(Float64) :: bt_min, tt_min, tt_dum, bt_dum
-    real(Float64), dimension(2) :: bt_amu, tt_amu
     real(Float64), dimension(:,:), allocatable :: dummy2
+    real(Float64), dimension(:,:,:), allocatable :: dummy3
     real(Float64), dimension(:,:,:,:), allocatable :: dummy4
     real(Float64), dimension(:,:,:,:,:), allocatable :: dummy5
 
@@ -3706,11 +3667,6 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         endif
         stop
     endif
-
-    call h5ltread_dataset_int_scalar_f(fid, grp//"/n_bt_amu", n_bt_amu, error)
-    allocate(dummy2(2, n_bt_amu))
-    dim2 = [2, n_bt_amu]
-    call h5ltread_dataset_double_f(fid, grp//"/bt_amu", dummy2, dim2, error)
 
     call h5ltread_dataset_int_scalar_f(fid, grp//"/n_max", n_max, error)
     call h5ltread_dataset_int_scalar_f(fid, grp//"/m_max", m_max, error)
@@ -3727,38 +3683,15 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
     rates%logtmin = log10(tmin)
     rates%logtmax = log10(tmax)
 
-    bt_ind = 1
-    tt_ind = 1
-    bt_amu = [b_amu(1), t_amu]
-    tt_amu = [b_amu(2), t_amu]
-    bt_min = norm2(bt_amu - dummy2(:,1))
-    tt_min = norm2(tt_amu - dummy2(:,1))
-    do i=2, n_bt_amu
-        bt_dum = norm2(bt_amu - dummy2(:,i))
-        tt_dum = norm2(tt_amu - dummy2(:,i))
-        if(bt_dum.lt.bt_min) then
-            bt_min = bt_dum
-            bt_ind = i
-        endif
-        if(tt_dum.lt.tt_min) then
-            tt_min = tt_dum
-            tt_ind = i
-        endif
-    enddo
-    rates%ab(1) = dummy2(1,bt_ind)
-    rates%ab(2) = dummy2(1,tt_ind)
-
-    deallocate(dummy2)
-
     allocate(rates%log_pop(&
                     rates%m_max, &
                     rates%n_max, &
                     rates%nenergy, &
-                    rates%ntemp, 2))
+                    rates%ntemp))
     allocate(rates%log_depop(&
                     rates%n_max, &
                     rates%nenergy, &
-                    rates%ntemp, 2))
+                    rates%ntemp))
     rates%log_pop = 0.d0
     rates%log_depop = 0.d0
 
@@ -3766,82 +3699,75 @@ subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
     call h5ltpath_valid_f(fid, grp//"/cx", .True., path_valid, error)
     if(path_valid) then
         call h5ltget_dataset_ndims_f(fid, grp//"/cx", drank, error)
-        if(drank.eq.4) then
-            allocate(dummy4(n_max, &
+        if(drank.eq.3) then
+            allocate(dummy3(n_max, &
                            rates%nenergy, &
-                           rates%ntemp, n_bt_amu))
-            dim4 = [n_max, rates%nenergy, rates%ntemp,n_bt_amu]
+                           rates%ntemp))
+            dim3 = [n_max, rates%nenergy, rates%ntemp]
+            call h5ltread_dataset_double_f(fid, grp//"/cx", dummy3, dim3, error)
+            do j=1,rates%ntemp
+                do i=1,rates%nenergy
+                    do n=1,rates%n_max
+                        rates%log_depop(n,i,j) = dummy3(n,i,j)
+                    enddo
+                enddo
+            enddo
+            deallocate(dummy3)
+        endif
+        if(drank.eq.4) then
+            allocate(dummy4(n_max, m_max, &
+                           rates%nenergy, &
+                           rates%ntemp))
+            dim4 = [n_max, m_max, rates%nenergy, rates%ntemp]
             call h5ltread_dataset_double_f(fid, grp//"/cx", dummy4, dim4, error)
             do j=1,rates%ntemp
                 do i=1,rates%nenergy
                     do n=1,rates%n_max
-                        rates%log_depop(n,i,j,1) = dummy4(n,i,j,bt_ind)
-                        rates%log_depop(n,i,j,2) = dummy4(n,i,j,tt_ind)
+                        rates%log_depop(n,i,j) = sum(dummy4(n,:,i,j))
                     enddo
                 enddo
             enddo
             deallocate(dummy4)
-        endif
-        if(drank.eq.5) then
-            allocate(dummy5(n_max, m_max, &
-                           rates%nenergy, &
-                           rates%ntemp, n_bt_amu))
-            dim5 = [n_max, m_max, rates%nenergy, rates%ntemp,n_bt_amu]
-            call h5ltread_dataset_double_f(fid, grp//"/cx", dummy5, dim5, error)
-            do j=1,rates%ntemp
-                do i=1,rates%nenergy
-                    do n=1,rates%n_max
-                        rates%log_depop(n,i,j,1) = sum(dummy5(n,:,i,j,bt_ind))
-                        rates%log_depop(n,i,j,2) = sum(dummy5(n,:,i,j,tt_ind))
-                    enddo
-                enddo
-            enddo
-            deallocate(dummy5)
         endif
     endif
 
     !!Read ionization
     call h5ltpath_valid_f(fid, grp//"/ionization", .True., path_valid, error)
     if(path_valid) then
-        allocate(dummy4(n_max, &
+        allocate(dummy3(n_max, &
                        rates%nenergy, &
-                       rates%ntemp, n_bt_amu))
-        dim4 = [n_max, rates%nenergy, rates%ntemp,n_bt_amu]
-        call h5ltread_dataset_double_f(fid, grp//"/ionization", dummy4, dim4, error)
+                       rates%ntemp))
+        dim3 = [n_max, rates%nenergy, rates%ntemp]
+        call h5ltread_dataset_double_f(fid, grp//"/ionization", dummy3, dim3, error)
         do j=1,rates%ntemp
             do i=1,rates%nenergy
                 do n=1,rates%n_max
-                    rates%log_depop(n,i,j,1) = rates%log_depop(n,i,j,1) + &
-                                               dummy4(n,i,j,bt_ind)
-                    rates%log_depop(n,i,j,2) = rates%log_depop(n,i,j,2) + &
-                                               dummy4(n,i,j,tt_ind)
+                    rates%log_depop(n,i,j) = rates%log_depop(n,i,j) + &
+                                               dummy3(n,i,j)
                 enddo
             enddo
         enddo
-        deallocate(dummy4)
+        deallocate(dummy3)
     endif
 
     !!Read excitation
     call h5ltpath_valid_f(fid, grp//"/excitation", .True., path_valid, error)
     if(path_valid) then
-        allocate(dummy5(n_max, m_max,&
+        allocate(dummy4(n_max, m_max,&
                        rates%nenergy, &
-                       rates%ntemp, n_bt_amu))
-        dim5 = [n_max, m_max, rates%nenergy, rates%ntemp,n_bt_amu]
-        call h5ltread_dataset_double_f(fid, grp//"/excitation", dummy5, dim5, error)
+                       rates%ntemp))
+        dim4 = [n_max, m_max, rates%nenergy, rates%ntemp]
+        call h5ltread_dataset_double_f(fid, grp//"/excitation", dummy4, dim4, error)
         do j=1,rates%ntemp
             do i=1,rates%nenergy
-                rates%log_pop(:,:,i,j,1) = transpose(dummy5(1:nlevs,1:nlevs,i,j,bt_ind))
-                rates%log_pop(:,:,i,j,2) = transpose(dummy5(1:nlevs,1:nlevs,i,j,tt_ind))
+                rates%log_pop(:,:,i,j) = transpose(dummy4(1:nlevs,1:nlevs,i,j))
                 do n=1,rates%n_max
-                    rates%log_depop(n,i,j,1) = rates%log_depop(n,i,j,1) + &
-                                               sum(dummy5(n,:,i,j,bt_ind))
-                    rates%log_depop(n,i,j,2) = rates%log_depop(n,i,j,2) + &
-                                               sum(dummy5(n,:,i,j,tt_ind))
+                    rates%log_depop(n,i,j) = rates%log_depop(n,i,j) + &
+                                               sum(dummy4(n,:,i,j))
                 enddo
             enddo
         enddo
-        deallocate(dummy5)
+        deallocate(dummy4)
     endif
 
     rmin = minval(rates%log_depop, rates%log_depop.gt.0.d0)
@@ -3970,16 +3896,13 @@ subroutine read_tables
     call read_atomic_cross(fid,"/cross/H_H",tables%H_H_cx_cross)
 
     !!Read Hydrogen-Hydrogen CX Rates
-    b_amu = [inputs%ab, inputs%ai]
-    call read_atomic_rate(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H_cx_rate)
+    call read_atomic_rate(fid,"/rates/H_H", tables%H_H_cx_rate)
 
     !!Read Hydrogen-Hydrogen Transitions
-    call read_atomic_transitions(fid,"/rates/H_H",b_amu, inputs%ai, tables%H_H)
-    inputs%ab = tables%H_H%ab(1)
-    inputs%ai = tables%H_H%ab(2)
+    call read_atomic_transitions(fid,"/rates/H_H", tables%H_H)
 
     !!Read Hydrogen-Electron Transitions
-    call read_atomic_transitions(fid,"/rates/H_e",b_amu, e_amu, tables%H_e)
+    call read_atomic_transitions(fid,"/rates/H_e", tables%H_e)
 
     !!Read Hydrogen-Impurity Transitions
     impname = ''
@@ -3995,7 +3918,7 @@ subroutine read_tables
             imp_amu = 2.d0*inputs%impurity_charge
     end select
 
-    call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), b_amu, imp_amu, tables%H_Aq)
+    call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), tables%H_Aq)
 
     !!Read Einstein coefficients
     call h5ltread_dataset_int_scalar_f(fid,"/rates/spontaneous/n_max", n_max, error)
@@ -8094,26 +8017,21 @@ subroutine bt_cx_rates(plasma, denn, vi, i_type, rates)
     real(Float64), dimension(nlevs), intent(out) :: rates
         !+ Reaction rates [1/s]
 
-    real(Float64) :: logEmin, dlogE, logeb, eb
-    real(Float64) :: logTmin, dlogT, logti, vrel
+    real(Float64) :: logEmin, dlogE, logeb_amu, eb_amu
+    real(Float64) :: logTmin, dlogT, logti_amu, vrel
     integer :: neb, nt
     type(InterpolCoeffs2D) :: c
-    real(Float64) :: b11, b12, b21, b22, b_amu
+    real(Float64) :: b11, b12, b21, b22
     real(Float64), dimension(nlevs,nlevs) :: H_H_rate
     integer :: ebi, tii, n, err_status
 
     H_H_rate = 0.d0
 
-    if(i_type.eq.beam_ion) then
-        b_amu = inputs%ab
-    else
-        b_amu = inputs%ai
-    endif
     vrel=norm2(vi-plasma%vrot)
-    eb=b_amu*v2_to_E_per_amu*vrel**2  ! [kev/amu]
+    eb_amu=v2_to_E_per_amu*vrel**2  ! [kev/amu]
 
-    logeb = log10(eb)
-    logti = log10(plasma%ti)
+    logeb_amu = log10(eb_amu)
+    logti_amu = log10(plasma%ti/inputs%ai)
 
     !!H_H
     err_status = 1
@@ -8124,7 +8042,7 @@ subroutine bt_cx_rates(plasma, denn, vi, i_type, rates)
     neb = tables%H_H_cx_rate%nenergy
     nt = tables%H_H_cx_rate%ntemp
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logti, c, err_status)
+                        logeb_amu, logti_amu, c, err_status)
     ebi = c%i
     tii = c%j
     b11 = c%b11
@@ -8134,17 +8052,17 @@ subroutine bt_cx_rates(plasma, denn, vi, i_type, rates)
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "BT_CX_RATES: Eb or Ti out of range of H_H_CX table. Setting H_H_CX rates to zero"
-            write(*,'("eb = ",ES10.3," [keV]")') eb
-            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+            write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb_amu
+            write(*,'("ti/amu = ",ES10.3," [keV/amu]")') plasma%ti/inputs%ai
         endif
         rates = 0.0
         return
     endif
 
-    H_H_rate = (b11*tables%H_H_cx_rate%log_rate(:,:,ebi,tii,i_type)   + &
-                b12*tables%H_H_cx_rate%log_rate(:,:,ebi,tii+1,i_type) + &
-                b21*tables%H_H_cx_rate%log_rate(:,:,ebi+1,tii,i_type) + &
-                b22*tables%H_H_cx_rate%log_rate(:,:,ebi+1,tii+1,i_type))
+    H_H_rate = (b11*tables%H_H_cx_rate%log_rate(:,:,ebi,tii)   + &
+                b12*tables%H_H_cx_rate%log_rate(:,:,ebi,tii+1) + &
+                b21*tables%H_H_cx_rate%log_rate(:,:,ebi+1,tii) + &
+                b22*tables%H_H_cx_rate%log_rate(:,:,ebi+1,tii+1))
 
     where (H_H_rate.lt.tables%H_H_cx_rate%minlog_rate)
         H_H_rate = 0.d0
@@ -8296,12 +8214,13 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     integer, intent(in)                                :: i_type
         !+ Ion type
     real(Float64), intent(in)                          :: eb
-        !+ Ion energy [keV]
+        !+ Beam ion energy [keV]
     real(Float64), dimension(nlevs,nlevs), intent(out) :: rmat
         !+ Rate matrix
 
-    real(Float64) :: logEmin, dlogE, logeb
-    real(Float64) :: logTmin, dlogT, logti, logte
+    real(Float64) :: ab, ai
+    real(Float64) :: logEmin, dlogE, logeb, logeb_amu
+    real(Float64) :: logTmin, dlogT, logti, logti_amu, logte
     integer :: neb, nt
     type(InterpolCoeffs2D) :: c
     real(Float64) :: b11, b12, b21, b22, dene, denp, denimp
@@ -8315,12 +8234,21 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     H_H_depop = 0.d0
     H_e_depop = 0.d0
     H_Aq_depop = 0.d0
+
+    if(i_type.eq.beam_ion) then
+        ab = inputs%ab
+    else
+        ab = inputs%ai
+    endif
+    ai = inputs%ai
     denp = plasma%denp
     dene = plasma%dene
     denimp = plasma%denimp
-    logeb = log10(eb)
+    logeb_amu = log10(eb/ab)
     logti = log10(plasma%ti)
+    logti_amu = log10(plasma%ti/ai)
     logte = log10(plasma%te)
+
     !!H_H
     err_status = 1
     logEmin = tables%H_H%logemin
@@ -8330,7 +8258,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     neb = tables%H_H%nenergy
     nt = tables%H_H%ntemp
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logti, c, err_status)
+                        logeb_amu, logti_amu, c, err_status)
     ebi = c%i
     tii = c%j
     b11 = c%b11
@@ -8340,24 +8268,24 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_H table. Setting H_H rates to zero"
-            write(*,'("eb = ",ES10.3," [keV]")') eb
-            write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
+            write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb
+            write(*,'("ti/amu = ",ES10.3," [keV/amu]")') plasma%ti/ai
         endif
     else
-        H_H_pop = (b11*tables%H_H%log_pop(:,:,ebi,tii,i_type)   + &
-                   b12*tables%H_H%log_pop(:,:,ebi,tii+1,i_type) + &
-                   b21*tables%H_H%log_pop(:,:,ebi+1,tii,i_type) + &
-                   b22*tables%H_H%log_pop(:,:,ebi+1,tii+1,i_type))
+        H_H_pop = (b11*tables%H_H%log_pop(:,:,ebi,tii)   + &
+                   b12*tables%H_H%log_pop(:,:,ebi,tii+1) + &
+                   b21*tables%H_H%log_pop(:,:,ebi+1,tii) + &
+                   b22*tables%H_H%log_pop(:,:,ebi+1,tii+1))
         where (H_H_pop.lt.tables%H_H%minlog_pop)
             H_H_pop = 0.d0
         elsewhere
             H_H_pop = denp * exp(H_H_pop*log_10)
         end where
 
-        H_H_depop = (b11*tables%H_H%log_depop(:,ebi,tii,i_type)   + &
-                     b12*tables%H_H%log_depop(:,ebi,tii+1,i_type) + &
-                     b21*tables%H_H%log_depop(:,ebi+1,tii,i_type) + &
-                     b22*tables%H_H%log_depop(:,ebi+1,tii+1,i_type))
+        H_H_depop = (b11*tables%H_H%log_depop(:,ebi,tii)   + &
+                     b12*tables%H_H%log_depop(:,ebi,tii+1) + &
+                     b21*tables%H_H%log_depop(:,ebi+1,tii) + &
+                     b22*tables%H_H%log_depop(:,ebi+1,tii+1))
         where (H_H_depop.lt.tables%H_H%minlog_depop)
             H_H_depop = 0.d0
         elsewhere
@@ -8374,7 +8302,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     neb = tables%H_e%nenergy
     nt = tables%H_e%ntemp
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logte, c, err_status)
+                        logeb_amu, logte, c, err_status)
     ebi = c%i
     tei = c%j
     b11 = c%b11
@@ -8384,24 +8312,24 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "GET_RATE_MATRIX: Eb or Te out of range of H_e table. Setting H_e rates to zero"
-            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb/ab
             write(*,'("te = ",ES10.3," [keV]")') plasma%te
         endif
     else
-        H_e_pop = (b11*tables%H_e%log_pop(:,:,ebi,tei,i_type)   + &
-                   b12*tables%H_e%log_pop(:,:,ebi,tei+1,i_type) + &
-                   b21*tables%H_e%log_pop(:,:,ebi+1,tei,i_type) + &
-                   b22*tables%H_e%log_pop(:,:,ebi+1,tei+1,i_type))
+        H_e_pop = (b11*tables%H_e%log_pop(:,:,ebi,tei)   + &
+                   b12*tables%H_e%log_pop(:,:,ebi,tei+1) + &
+                   b21*tables%H_e%log_pop(:,:,ebi+1,tei) + &
+                   b22*tables%H_e%log_pop(:,:,ebi+1,tei+1))
         where (H_e_pop.lt.tables%H_e%minlog_pop)
             H_e_pop = 0.d0
         elsewhere
             H_e_pop = dene * exp(H_e_pop*log_10)
         end where
 
-        H_e_depop = (b11*tables%H_e%log_depop(:,ebi,tei,i_type)   + &
-                     b12*tables%H_e%log_depop(:,ebi,tei+1,i_type) + &
-                     b21*tables%H_e%log_depop(:,ebi+1,tei,i_type) + &
-                     b22*tables%H_e%log_depop(:,ebi+1,tei+1,i_type))
+        H_e_depop = (b11*tables%H_e%log_depop(:,ebi,tei)   + &
+                     b12*tables%H_e%log_depop(:,ebi,tei+1) + &
+                     b21*tables%H_e%log_depop(:,ebi+1,tei) + &
+                     b22*tables%H_e%log_depop(:,ebi+1,tei+1))
 
         where (H_e_depop.lt.tables%H_e%minlog_depop)
             H_e_depop = 0.d0
@@ -8419,7 +8347,7 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     neb = tables%H_Aq%nenergy
     nt = tables%H_Aq%ntemp
     call interpol_coeff(logEmin, dlogE, neb, logTmin, dlogT, nt, &
-                        logeb, logti, c, err_status)
+                        logeb_amu, logti, c, err_status)
     ebi = c%i
     tii = c%j
     b11 = c%b11
@@ -8429,23 +8357,23 @@ subroutine get_rate_matrix(plasma, i_type, eb, rmat)
     if(err_status.eq.1) then
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "GET_RATE_MATRIX: Eb or Ti out of range of H_Aq table. Setting H_Aq rates to zero"
-            write(*,'("eb = ",ES10.3," [keV]")') eb
+            write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb
             write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
         endif
     else
-        H_Aq_pop = (b11*tables%H_Aq%log_pop(:,:,ebi,tii,i_type)   + &
-                    b12*tables%H_Aq%log_pop(:,:,ebi,tii+1,i_type) + &
-                    b21*tables%H_Aq%log_pop(:,:,ebi+1,tii,i_type) + &
-                    b22*tables%H_Aq%log_pop(:,:,ebi+1,tii+1,i_type))
+        H_Aq_pop = (b11*tables%H_Aq%log_pop(:,:,ebi,tii)   + &
+                    b12*tables%H_Aq%log_pop(:,:,ebi,tii+1) + &
+                    b21*tables%H_Aq%log_pop(:,:,ebi+1,tii) + &
+                    b22*tables%H_Aq%log_pop(:,:,ebi+1,tii+1))
         where (H_Aq_pop.lt.tables%H_Aq%minlog_pop)
             H_Aq_pop = 0.d0
         elsewhere
             H_Aq_pop = denimp * exp(H_Aq_pop*log_10)
         end where
-        H_Aq_depop = (b11*tables%H_Aq%log_depop(:,ebi,tii,i_type)   + &
-                      b12*tables%H_Aq%log_depop(:,ebi,tii+1,i_type) + &
-                      b21*tables%H_Aq%log_depop(:,ebi+1,tii,i_type) + &
-                      b22*tables%H_Aq%log_depop(:,ebi+1,tii+1,i_type))
+        H_Aq_depop = (b11*tables%H_Aq%log_depop(:,ebi,tii)   + &
+                      b12*tables%H_Aq%log_depop(:,ebi,tii+1) + &
+                      b21*tables%H_Aq%log_depop(:,ebi+1,tii) + &
+                      b22*tables%H_Aq%log_depop(:,ebi+1,tii+1))
 
         where (H_Aq_depop.lt.tables%H_Aq%minlog_depop)
             H_Aq_depop = 0.d0

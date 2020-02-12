@@ -6,8 +6,9 @@ module mpi_utils
 
   interface parallel_sum
      module procedure parallel_sum_d0, parallel_sum_d1, parallel_sum_d2, &
-                      parallel_sum_d3, parallel_sum_d4, parallel_sum_d5,&
-                      parallel_sum_i0, parallel_sum_i1, parallel_sum_i2
+                      parallel_sum_d3, parallel_sum_d4, parallel_sum_d5, &
+                      parallel_sum_i0, parallel_sum_i1, parallel_sum_i2, &
+                      parallel_sum_i3
   end interface
 
 contains
@@ -258,6 +259,33 @@ contains
     integer, pointer :: A_ptr(:)
 
     sizeA = size(A,1)*size(A,2)
+
+    if (numranks>1) then
+        nbytes = kind(1)*sizeA
+        if (nbytes.gt.max_bytes) then
+            h = int(sizeA/2)
+            call c_f_pointer(c_loc(A), A_ptr, [sizeA])
+            call parallel_sum_i1(A_ptr(1:h))
+            call parallel_sum_i1(A_ptr((h+1):sizeA))
+        else
+            call MPI_Allreduce(MPI_IN_PLACE,A,sizeA,MPI_INTEGER,MPI_Sum,MPI_COMM_WORLD,ierr)
+        endif
+    endif ! else nothing to do
+
+  end subroutine
+
+  recursive subroutine parallel_sum_i3(A)
+    use mpi
+    use iso_c_binding
+    implicit none
+
+    integer, dimension(:,:,:), target, intent(inout) :: A
+
+    integer :: sizeA,h,ierr
+    integer(C_SIZE_T) :: nbytes
+    integer, pointer :: A_ptr(:)
+
+    sizeA = size(A,1)*size(A,2)*size(A,3)
 
     if (numranks>1) then
         nbytes = kind(1)*sizeA

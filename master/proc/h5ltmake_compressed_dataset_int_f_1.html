@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 0.2% of total for procedures.">26 statements</a>
+    title=" 0.3% of total for procedures.">40 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine h5ltmake_compressed_dataset_int_f_1(loc_id, dset_name, rank, dims, buf, error)
+public subroutine h5ltmake_compressed_dataset_int_f_1(loc_id, dset_name, rank, dims, buf, error, compress, level)
     
     
    
@@ -311,12 +311,42 @@ public subroutine h5ltmake_compressed_dataset_int_f_1(loc_id, dset_name, rank, d
   
 <tr>
   
-  <td><span class="anchor" id="variable-error%7E13"></span>integer,</td>
+  <td><span class="anchor" id="variable-error%7E15"></span>integer,</td>
   <td>intent(out)</td>
   <td></td>
   
   <td></td><td>::</td>
   <td><strong>error</strong></td><td><p>HDF5 error code</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-compress%7E8"></span>logical,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>compress</strong></td><td><p>Flag to compress</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-level%7E8"></span>integer,</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>level</strong></td><td><p>Compression level</p></td>
   
 </tr>
 
@@ -728,7 +758,7 @@ public subroutine h5ltmake_compressed_dataset_int_f_1(loc_id, dset_name, rank, d
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
     <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">h5ltmake_compressed_dataset_int_f_1</span><span class="p">(</span><span class="n">loc_id</span><span class="p">,&amp;</span>
-           <span class="n">dset_name</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">error</span> <span class="p">)</span>
+           <span class="n">dset_name</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">compress</span><span class="p">,</span> <span class="n">level</span>  <span class="p">)</span>
     <span class="c">!+ Write a compressed 32-bit integer dataset of dimension 1</span>
 
     <span class="k">IMPLICIT NONE</span>
@@ -745,9 +775,26 @@ public subroutine h5ltmake_compressed_dataset_int_f_1(loc_id, dset_name, rank, d
         <span class="c">!+ Buffer with data to be written to the dataset</span>
     <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>                       <span class="kd">::</span> <span class="n">error</span>
         <span class="c">!+ HDF5 error code</span>
+    <span class="kt">logical</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>              <span class="kd">::</span> <span class="n">compress</span>
+        <span class="c">!+ Flag to compress</span>
+    <span class="kt">integer</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>              <span class="kd">::</span> <span class="n">level</span>
+        <span class="c">!+ Compression level</span>
 
     <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">did</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">plist_id</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cdims</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="kt">logical</span> <span class="kd">::</span> <span class="n">do_chunk</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">c</span>
+
+    <span class="n">do_chunk</span><span class="o">=</span><span class="n">default_compress</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">compress</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">do_chunk</span> <span class="o">=</span> <span class="n">compress</span>
+    <span class="n">endif</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">default_compression_level</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">level</span><span class="p">))</span> <span class="k">then</span>
+<span class="k">        </span><span class="n">c</span> <span class="o">=</span> <span class="n">level</span>
+    <span class="n">endif</span>
 
     <span class="k">if</span><span class="p">(.</span><span class="nb">not</span><span class="p">.</span><span class="n">compress_data</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        call </span><span class="n">h5ltmake_dataset_int_f</span><span class="p">(</span><span class="n">loc_id</span><span class="p">,</span> <span class="n">dset_name</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">buf</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -755,11 +802,13 @@ public subroutine h5ltmake_compressed_dataset_int_f_1(loc_id, dset_name, rank, d
 <span class="k">        call </span><span class="n">h5screate_simple_f</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
         <span class="k">call </span><span class="n">h5pcreate_f</span><span class="p">(</span><span class="n">H5P_DATASET_CREATE_F</span><span class="p">,</span> <span class="n">plist_id</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
-        <span class="k">call </span><span class="n">h5pset_shuffle_f</span><span class="p">(</span><span class="n">plist_id</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-        <span class="k">call </span><span class="n">h5pset_deflate_f</span><span class="p">(</span><span class="n">plist_id</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">do_chunk</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            call </span><span class="n">h5pset_shuffle_f</span><span class="p">(</span><span class="n">plist_id</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">h5pset_deflate_f</span><span class="p">(</span><span class="n">plist_id</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
-        <span class="k">call </span><span class="n">chunk_size</span><span class="p">(</span><span class="n">Int32</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">cdims</span><span class="p">)</span>
-        <span class="k">call </span><span class="n">h5pset_chunk_f</span><span class="p">(</span><span class="n">plist_id</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">cdims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">chunk_size</span><span class="p">(</span><span class="n">Int32</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">cdims</span><span class="p">)</span>
+            <span class="k">call </span><span class="n">h5pset_chunk_f</span><span class="p">(</span><span class="n">plist_id</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="n">cdims</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+        <span class="n">endif</span>
 
         <span class="k">call </span><span class="n">h5dcreate_f</span><span class="p">(</span><span class="n">loc_id</span><span class="p">,</span> <span class="n">dset_name</span><span class="p">,</span> <span class="n">H5T_NATIVE_INTEGER</span><span class="p">,</span> <span class="n">sid</span><span class="p">,</span> <span class="p">&amp;</span>
              <span class="n">did</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">dcpl_id</span><span class="o">=</span><span class="n">plist_id</span><span class="p">)</span>

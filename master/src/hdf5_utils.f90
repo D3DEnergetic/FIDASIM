@@ -32,6 +32,8 @@ integer, parameter, private   :: Int64   = 8 !bytes = 64 bits (-9,223,372,036,85
 integer, parameter, private   :: Float32 = 4 !bytes = 32 bits (1.2E-38 to 3.4E+38) at 6 decimal places
 integer, parameter, private   :: Float64 = 8 !bytes = 64 bits (2.3E-308 to 1.7E+308) at 15 decimal places
 logical, private :: compress_data = .True.
+logical, private :: default_compress = .True.
+integer, parameter, private   :: default_compression_level = 4
 
 interface h5ltmake_compressed_dataset_double_f
     !+ Write a compressed datasets of 64-bit floats
@@ -172,7 +174,7 @@ end subroutine chunk_size
 
 !Compressed Doubles
 subroutine h5ltmake_compressed_dataset_double_f_1(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level )
     !+ Write a compressed 64-bit float dataset of dimension 1
 
     IMPLICIT NONE
@@ -189,9 +191,26 @@ subroutine h5ltmake_compressed_dataset_double_f_1(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                         :: error
         !+ HDF5 error code
+    logical, intent(in), optional                :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(1)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_double_f(loc_id, dset_name, rank, dims, buf, error)
@@ -199,11 +218,13 @@ subroutine h5ltmake_compressed_dataset_double_f_1(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Float64, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Float64, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_DOUBLE, sid, &
              did, error, dcpl_id=plist_id)
@@ -218,7 +239,7 @@ subroutine h5ltmake_compressed_dataset_double_f_1(loc_id,&
 end subroutine h5ltmake_compressed_dataset_double_f_1
 
 subroutine h5ltmake_compressed_dataset_double_f_2(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level )
     !+ Write a compressed 64-bit float dataset of dimension 2
 
     IMPLICIT NONE
@@ -235,9 +256,26 @@ subroutine h5ltmake_compressed_dataset_double_f_2(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                 :: error
         !+ HDF5 error code
+    logical, intent(in), optional                        :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                        :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(2)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_double_f(loc_id, dset_name, rank, dims, buf, error)
@@ -245,11 +283,13 @@ subroutine h5ltmake_compressed_dataset_double_f_2(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Float64, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Float64, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_DOUBLE, sid, &
              did, error, dcpl_id=plist_id)
@@ -264,7 +304,7 @@ subroutine h5ltmake_compressed_dataset_double_f_2(loc_id,&
 end subroutine h5ltmake_compressed_dataset_double_f_2
 
 subroutine h5ltmake_compressed_dataset_double_f_3(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 64-bit float dataset of dimension 3
 
     IMPLICIT NONE
@@ -281,9 +321,26 @@ subroutine h5ltmake_compressed_dataset_double_f_3(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                         :: error
         !+ HDF5 error code
+    logical, intent(in), optional                                :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                                :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(3)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_double_f(loc_id, dset_name, rank, dims, buf, error)
@@ -291,11 +348,13 @@ subroutine h5ltmake_compressed_dataset_double_f_3(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Float64, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Float64, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_DOUBLE, sid, &
              did, error, dcpl_id=plist_id)
@@ -310,7 +369,7 @@ subroutine h5ltmake_compressed_dataset_double_f_3(loc_id,&
 end subroutine h5ltmake_compressed_dataset_double_f_3
 
 subroutine h5ltmake_compressed_dataset_double_f_4(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 64-bit float dataset of dimension 4
 
     IMPLICIT NONE
@@ -328,9 +387,26 @@ subroutine h5ltmake_compressed_dataset_double_f_4(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                           :: error
         !+ HDF5 error code
+    logical, intent(in), optional                  :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                  :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(4)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_double_f(loc_id, dset_name, rank, dims, buf, error)
@@ -338,11 +414,13 @@ subroutine h5ltmake_compressed_dataset_double_f_4(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Float64, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Float64, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_DOUBLE, sid, &
              did, error, dcpl_id=plist_id)
@@ -357,7 +435,7 @@ subroutine h5ltmake_compressed_dataset_double_f_4(loc_id,&
 end subroutine h5ltmake_compressed_dataset_double_f_4
 
 subroutine h5ltmake_compressed_dataset_double_f_5(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 64-bit float dataset of dimension 5
 
     IMPLICIT NONE
@@ -375,9 +453,26 @@ subroutine h5ltmake_compressed_dataset_double_f_5(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                 :: error
         !+ HDF5 error code
+    logical, intent(in), optional                        :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                        :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(5)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_double_f(loc_id, dset_name, rank, dims, buf, error)
@@ -385,11 +480,13 @@ subroutine h5ltmake_compressed_dataset_double_f_5(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Float64, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Float64, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_DOUBLE, sid, &
              did, error, dcpl_id=plist_id)
@@ -404,7 +501,7 @@ subroutine h5ltmake_compressed_dataset_double_f_5(loc_id,&
 end subroutine h5ltmake_compressed_dataset_double_f_5
 
 subroutine h5ltmake_compressed_dataset_double_f_6(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 64-bit float dataset of dimension 6
 
     IMPLICIT NONE
@@ -422,9 +519,26 @@ subroutine h5ltmake_compressed_dataset_double_f_6(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                         :: error
         !+ HDF5 error code
+    logical, intent(in), optional                                :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                                :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(6)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_double_f(loc_id, dset_name, rank, dims, buf, error)
@@ -432,11 +546,13 @@ subroutine h5ltmake_compressed_dataset_double_f_6(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Float64, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Float64, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_DOUBLE, sid, &
              did, error, dcpl_id=plist_id)
@@ -451,7 +567,7 @@ subroutine h5ltmake_compressed_dataset_double_f_6(loc_id,&
 end subroutine h5ltmake_compressed_dataset_double_f_6
 
 subroutine h5ltmake_compressed_dataset_double_f_7(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 64-bit float dataset of dimension 7
 
     IMPLICIT NONE
@@ -469,9 +585,26 @@ subroutine h5ltmake_compressed_dataset_double_f_7(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                                 :: error
         !+ HDF5 error code
+    logical, intent(in), optional                                        :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                                        :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(7)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_double_f(loc_id, dset_name, rank, dims, buf, error)
@@ -479,11 +612,13 @@ subroutine h5ltmake_compressed_dataset_double_f_7(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Float64, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Float64, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_DOUBLE, sid, &
              did, error, dcpl_id=plist_id)
@@ -499,7 +634,7 @@ end subroutine h5ltmake_compressed_dataset_double_f_7
 
 !Compressed Integers
 subroutine h5ltmake_compressed_dataset_int_f_1(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 32-bit integer dataset of dimension 1
 
     IMPLICIT NONE
@@ -516,9 +651,26 @@ subroutine h5ltmake_compressed_dataset_int_f_1(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                       :: error
         !+ HDF5 error code
+    logical, intent(in), optional              :: compress
+        !+ Flag to compress
+    integer, intent(in), optional              :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(1)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_int_f(loc_id, dset_name, rank, dims, buf, error)
@@ -526,11 +678,13 @@ subroutine h5ltmake_compressed_dataset_int_f_1(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Int32, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Int32, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_INTEGER, sid, &
              did, error, dcpl_id=plist_id)
@@ -545,7 +699,7 @@ subroutine h5ltmake_compressed_dataset_int_f_1(loc_id,&
 end subroutine h5ltmake_compressed_dataset_int_f_1
 
 subroutine h5ltmake_compressed_dataset_int_f_2(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 32-bit integer dataset of dimension 2
 
     IMPLICIT NONE
@@ -562,9 +716,26 @@ subroutine h5ltmake_compressed_dataset_int_f_2(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                            :: error
         !+ HDF5 error code
+    logical, intent(in), optional                   :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                   :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(2)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_int_f(loc_id, dset_name, rank, dims, buf, error)
@@ -572,11 +743,13 @@ subroutine h5ltmake_compressed_dataset_int_f_2(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Int32, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Int32, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_INTEGER, sid, &
              did, error, dcpl_id=plist_id)
@@ -591,7 +764,7 @@ subroutine h5ltmake_compressed_dataset_int_f_2(loc_id,&
 end subroutine h5ltmake_compressed_dataset_int_f_2
 
 subroutine h5ltmake_compressed_dataset_int_f_3(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 32-bit integer dataset of dimension 3
 
     IMPLICIT NONE
@@ -608,9 +781,26 @@ subroutine h5ltmake_compressed_dataset_int_f_3(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                    :: error
         !+ HDF5 error code
+    logical, intent(in), optional                           :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                           :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(3)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_int_f(loc_id, dset_name, rank, dims, buf, error)
@@ -618,11 +808,13 @@ subroutine h5ltmake_compressed_dataset_int_f_3(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Int32, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Int32, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_INTEGER, sid, &
              did, error, dcpl_id=plist_id)
@@ -637,7 +829,7 @@ subroutine h5ltmake_compressed_dataset_int_f_3(loc_id,&
 end subroutine h5ltmake_compressed_dataset_int_f_3
 
 subroutine h5ltmake_compressed_dataset_int_f_4(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 32-bit integer dataset of dimension 4
 
     IMPLICIT NONE
@@ -654,9 +846,26 @@ subroutine h5ltmake_compressed_dataset_int_f_4(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                            :: error
         !+ HDF5 error code
+    logical, intent(in), optional                                   :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                                   :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(4)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_int_f(loc_id, dset_name, rank, dims, buf, error)
@@ -664,11 +873,13 @@ subroutine h5ltmake_compressed_dataset_int_f_4(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Int32, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Int32, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_INTEGER, sid, &
              did, error, dcpl_id=plist_id)
@@ -682,7 +893,7 @@ subroutine h5ltmake_compressed_dataset_int_f_4(loc_id,&
 end subroutine h5ltmake_compressed_dataset_int_f_4
 
 subroutine h5ltmake_compressed_dataset_int_f_5(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 32-bit integer dataset of dimension 5
 
     IMPLICIT NONE
@@ -700,9 +911,26 @@ subroutine h5ltmake_compressed_dataset_int_f_5(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                 :: error
         !+ HDF5 error code
+    logical, intent(in), optional                        :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                        :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(5)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_int_f(loc_id, dset_name, rank, dims, buf, error)
@@ -710,11 +938,13 @@ subroutine h5ltmake_compressed_dataset_int_f_5(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Int32, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Int32, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_INTEGER, sid, &
              did, error, dcpl_id=plist_id)
@@ -728,7 +958,7 @@ subroutine h5ltmake_compressed_dataset_int_f_5(loc_id,&
 end subroutine h5ltmake_compressed_dataset_int_f_5
 
 subroutine h5ltmake_compressed_dataset_int_f_6(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 32-bit integer dataset of dimension 6
 
     IMPLICIT NONE
@@ -746,9 +976,26 @@ subroutine h5ltmake_compressed_dataset_int_f_6(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                         :: error
         !+ HDF5 error code
+    logical, intent(in), optional                                :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                                :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(6)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_int_f(loc_id, dset_name, rank, dims, buf, error)
@@ -756,11 +1003,13 @@ subroutine h5ltmake_compressed_dataset_int_f_6(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Int32, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Int32, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_INTEGER, sid, &
              did, error, dcpl_id=plist_id)
@@ -775,7 +1024,7 @@ subroutine h5ltmake_compressed_dataset_int_f_6(loc_id,&
 end subroutine h5ltmake_compressed_dataset_int_f_6
 
 subroutine h5ltmake_compressed_dataset_int_f_7(loc_id,&
-           dset_name, rank, dims, buf, error )
+           dset_name, rank, dims, buf, error, compress, level  )
     !+ Write a compressed 32-bit integer dataset of dimension 7
 
     IMPLICIT NONE
@@ -793,9 +1042,26 @@ subroutine h5ltmake_compressed_dataset_int_f_7(loc_id,&
         !+ Buffer with data to be written to the dataset
     integer, intent(out)                                                 :: error
         !+ HDF5 error code
+    logical, intent(in), optional                                        :: compress
+        !+ Flag to compress
+    integer, intent(in), optional                                        :: level
+        !+ Compression level
 
     integer(HID_T) :: did, sid, plist_id
     integer(HSIZE_T) :: cdims(7)
+
+    logical :: do_chunk
+    integer :: c
+
+    do_chunk=default_compress
+    if(present(compress)) then
+        do_chunk = compress
+    endif
+
+    c = default_compression_level
+    if(present(level)) then
+        c = level
+    endif
 
     if(.not.compress_data) then
         call h5ltmake_dataset_int_f(loc_id, dset_name, rank, dims, buf, error)
@@ -803,11 +1069,13 @@ subroutine h5ltmake_compressed_dataset_int_f_7(loc_id,&
         call h5screate_simple_f(rank, dims, sid, error)
         call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
 
-        call h5pset_shuffle_f(plist_id, error)
-        call h5pset_deflate_f(plist_id, 9, error)
+        if(do_chunk) then
+            call h5pset_shuffle_f(plist_id, error)
+            call h5pset_deflate_f(plist_id, c, error)
 
-        call chunk_size(Int32, dims, cdims)
-        call h5pset_chunk_f(plist_id, rank, cdims, error)
+            call chunk_size(Int32, dims, cdims)
+            call h5pset_chunk_f(plist_id, rank, cdims, error)
+        endif
 
         call h5dcreate_f(loc_id, dset_name, H5T_NATIVE_INTEGER, sid, &
              did, error, dcpl_id=plist_id)

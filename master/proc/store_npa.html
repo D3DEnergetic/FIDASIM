@@ -783,7 +783,7 @@ public subroutine store_npa(det, ri, rf, vn, flux, orbit_class, passive)
     <span class="k">call </span><span class="n">xyz_to_uvw</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span><span class="n">uvw_rf</span><span class="p">)</span>
 
     <span class="c">! Calculate energy</span>
-    <span class="n">energy</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">*</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">vn</span><span class="p">,</span><span class="n">vn</span><span class="p">)</span>
+    <span class="n">energy</span> <span class="o">=</span> <span class="n">beam_mass</span><span class="o">*</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">vn</span><span class="p">,</span><span class="n">vn</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">pas</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">dE</span> <span class="o">=</span> <span class="n">pnpa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">pnpa</span><span class="p">%</span><span class="n">energy</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="k">else</span>

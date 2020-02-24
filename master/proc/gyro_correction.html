@@ -751,7 +751,7 @@ public subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">randomu</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">theta</span>
 
-    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="p">))</span>
+    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="p">))</span>
 
     <span class="k">if</span><span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">theta_in</span><span class="p">))</span> <span class="k">then</span>
 <span class="k">        </span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta_in</span>

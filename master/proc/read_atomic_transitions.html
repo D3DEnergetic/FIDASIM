@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.1% of total for procedures.">145 statements</a>
+    title=" 0.9% of total for procedures.">113 statements</a>
      </li> 
      
      
@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
+public subroutine read_atomic_transitions(fid, grp, rates)
     
     
    
@@ -258,36 +258,6 @@ public subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
   
   <td></td><td>::</td>
   <td><strong>grp</strong></td><td><p>HDF5 group to read from</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-b_amu%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(2)</td><td>::</td>
-  <td><strong>b_amu</strong></td><td><p>Atomic masses of "beam" species (beam ion and thermal ion)</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-t_amu%7E2"></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
-  <td><strong>t_amu</strong></td><td><p>Atomic mass of "target" species (thermal ion)</p></td>
   
 </tr>
 
@@ -630,30 +600,26 @@ public subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">read_atomic_transitions</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="p">,</span> <span class="n">b_amu</span><span class="p">,</span> <span class="n">t_amu</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">read_atomic_transitions</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
     <span class="c">!+ Reads in a atomic transitions table from file</span>
     <span class="c">!+ and puts it into a [[AtomicTransitions]] type</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">HID_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>              <span class="kd">::</span> <span class="n">fid</span>
         <span class="c">!+ HDF5 file ID</span>
     <span class="kt">character</span><span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">grp</span>
         <span class="c">!+ HDF5 group to read from</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">b_amu</span>
-        <span class="c">!+ Atomic masses of &quot;beam&quot; species (beam ion and thermal ion)</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">t_amu</span>
-        <span class="c">!+ Atomic mass of &quot;target&quot; species (thermal ion)</span>
     <span class="k">type</span><span class="p">(</span><span class="n">AtomicTransitions</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">rates</span>
         <span class="c">!+ Atomic transitions</span>
 
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim2</span>
+    <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim3</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim4</span>
     <span class="kt">integer</span><span class="p">(</span><span class="n">HSIZE_T</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dim5</span>
     <span class="kt">logical</span> <span class="kd">::</span> <span class="n">path_valid</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">error</span>
-    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">n_bt_amu</span><span class="p">,</span> <span class="n">tt_ind</span><span class="p">,</span> <span class="n">bt_ind</span><span class="p">,</span> <span class="n">drank</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">drank</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">emin</span><span class="p">,</span><span class="n">emax</span><span class="p">,</span><span class="n">tmin</span><span class="p">,</span><span class="n">tmax</span><span class="p">,</span><span class="n">rmin</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">bt_min</span><span class="p">,</span> <span class="n">tt_min</span><span class="p">,</span> <span class="n">tt_dum</span><span class="p">,</span> <span class="n">bt_dum</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">bt_amu</span><span class="p">,</span> <span class="n">tt_amu</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy2</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy3</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy4</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:,:,:,:,:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">dummy5</span>
 
@@ -664,11 +630,6 @@ public subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
         <span class="n">endif</span>
         <span class="k">stop</span>
 <span class="k">    </span><span class="n">endif</span>
-
-    <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/n_bt_amu&quot;</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-    <span class="k">allocate</span><span class="p">(</span><span class="n">dummy2</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">))</span>
-    <span class="n">dim2</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">]</span>
-    <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/bt_amu&quot;</span><span class="p">,</span> <span class="n">dummy2</span><span class="p">,</span> <span class="n">dim2</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
 
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/n_max&quot;</span><span class="p">,</span> <span class="n">n_max</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">call </span><span class="n">h5ltread_dataset_int_scalar_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/m_max&quot;</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
@@ -685,38 +646,15 @@ public subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
     <span class="n">rates</span><span class="p">%</span><span class="n">logtmin</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">tmin</span><span class="p">)</span>
     <span class="n">rates</span><span class="p">%</span><span class="n">logtmax</span> <span class="o">=</span> <span class="n">log10</span><span class="p">(</span><span class="n">tmax</span><span class="p">)</span>
 
-    <span class="n">bt_ind</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">tt_ind</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">bt_amu</span> <span class="o">=</span> <span class="p">[</span><span class="n">b_amu</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">t_amu</span><span class="p">]</span>
-    <span class="n">tt_amu</span> <span class="o">=</span> <span class="p">[</span><span class="n">b_amu</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">t_amu</span><span class="p">]</span>
-    <span class="n">bt_min</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">bt_amu</span> <span class="o">-</span> <span class="n">dummy2</span><span class="p">(:,</span><span class="mi">1</span><span class="p">))</span>
-    <span class="n">tt_min</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">tt_amu</span> <span class="o">-</span> <span class="n">dummy2</span><span class="p">(:,</span><span class="mi">1</span><span class="p">))</span>
-    <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_bt_amu</span>
-        <span class="n">bt_dum</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">bt_amu</span> <span class="o">-</span> <span class="n">dummy2</span><span class="p">(:,</span><span class="n">i</span><span class="p">))</span>
-        <span class="n">tt_dum</span> <span class="o">=</span> <span class="nb">norm2</span><span class="p">(</span><span class="n">tt_amu</span> <span class="o">-</span> <span class="n">dummy2</span><span class="p">(:,</span><span class="n">i</span><span class="p">))</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">bt_dum</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">bt_min</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            </span><span class="n">bt_min</span> <span class="o">=</span> <span class="n">bt_dum</span>
-            <span class="n">bt_ind</span> <span class="o">=</span> <span class="n">i</span>
-        <span class="n">endif</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">tt_dum</span><span class="p">.</span><span class="n">lt</span><span class="p">.</span><span class="n">tt_min</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            </span><span class="n">tt_min</span> <span class="o">=</span> <span class="n">tt_dum</span>
-            <span class="n">tt_ind</span> <span class="o">=</span> <span class="n">i</span>
-        <span class="n">endif</span>
-    <span class="n">enddo</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">ab</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">dummy2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">bt_ind</span><span class="p">)</span>
-    <span class="n">rates</span><span class="p">%</span><span class="n">ab</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">dummy2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">tt_ind</span><span class="p">)</span>
-
-    <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy2</span><span class="p">)</span>
-
     <span class="k">allocate</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_pop</span><span class="p">(&amp;</span>
                     <span class="n">rates</span><span class="p">%</span><span class="n">m_max</span><span class="p">,</span> <span class="p">&amp;</span>
                     <span class="n">rates</span><span class="p">%</span><span class="n">n_max</span><span class="p">,</span> <span class="p">&amp;</span>
                     <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+                    <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
     <span class="k">allocate</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(&amp;</span>
                     <span class="n">rates</span><span class="p">%</span><span class="n">n_max</span><span class="p">,</span> <span class="p">&amp;</span>
                     <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+                    <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
     <span class="n">rates</span><span class="p">%</span><span class="n">log_pop</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span> <span class="o">=</span> <span class="mf">0.d0</span>
 
@@ -724,82 +662,75 @@ public subroutine read_atomic_transitions(fid, grp, b_amu, t_amu, rates)
     <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">path_valid</span><span class="p">)</span> <span class="k">then</span>
 <span class="k">        call </span><span class="n">h5ltget_dataset_ndims_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="n">drank</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">drank</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">4</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            allocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">drank</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">3</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            allocate</span><span class="p">(</span><span class="n">dummy3</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="p">&amp;</span>
                            <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                           <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">))</span>
-            <span class="n">dim4</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">]</span>
+                           <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
+            <span class="n">dim3</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">]</span>
+            <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="n">dummy3</span><span class="p">,</span> <span class="n">dim3</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+            <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span>
+                <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span>
+                    <span class="k">do </span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">n_max</span>
+                        <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">dummy3</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
+                    <span class="n">enddo</span>
+                <span class="n">enddo</span>
+            <span class="n">enddo</span>
+            <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy3</span><span class="p">)</span>
+        <span class="n">endif</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">drank</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">4</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">            allocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="p">&amp;</span>
+                           <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
+                           <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
+            <span class="n">dim4</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">]</span>
             <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="n">dummy4</span><span class="p">,</span> <span class="n">dim4</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
             <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span>
                 <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span>
                     <span class="k">do </span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">n_max</span>
-                        <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">dummy4</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">bt_ind</span><span class="p">)</span>
-                        <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">dummy4</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">tt_ind</span><span class="p">)</span>
+                        <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n</span><span class="p">,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
                     <span class="n">enddo</span>
                 <span class="n">enddo</span>
             <span class="n">enddo</span>
             <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">)</span>
-        <span class="n">endif</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">drank</span><span class="p">.</span><span class="n">eq</span><span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">            allocate</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="p">&amp;</span>
-                           <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                           <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">))</span>
-            <span class="n">dim5</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">]</span>
-            <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/cx&quot;</span><span class="p">,</span> <span class="n">dummy5</span><span class="p">,</span> <span class="n">dim5</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
-            <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span>
-                <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span>
-                    <span class="k">do </span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">n_max</span>
-                        <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="n">n</span><span class="p">,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">bt_ind</span><span class="p">))</span>
-                        <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="n">n</span><span class="p">,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">tt_ind</span><span class="p">))</span>
-                    <span class="n">enddo</span>
-                <span class="n">enddo</span>
-            <span class="n">enddo</span>
-            <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy5</span><span class="p">)</span>
         <span class="n">endif</span>
     <span class="n">endif</span>
 
     <span class="c">!!Read ionization</span>
     <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/ionization&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">path_valid</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        allocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="p">&amp;</span>
+<span class="k">        allocate</span><span class="p">(</span><span class="n">dummy3</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="p">&amp;</span>
                        <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                       <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">))</span>
-        <span class="n">dim4</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">]</span>
-        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/ionization&quot;</span><span class="p">,</span> <span class="n">dummy4</span><span class="p">,</span> <span class="n">dim4</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+                       <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
+        <span class="n">dim3</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">]</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/ionization&quot;</span><span class="p">,</span> <span class="n">dummy3</span><span class="p">,</span> <span class="n">dim3</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
         <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span>
             <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span>
                 <span class="k">do </span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">n_max</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                               <span class="n">dummy4</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">bt_ind</span><span class="p">)</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                               <span class="n">dummy4</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">tt_ind</span><span class="p">)</span>
+                    <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
+                                               <span class="n">dummy3</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span>
                 <span class="n">enddo</span>
             <span class="n">enddo</span>
         <span class="n">enddo</span>
-        <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">)</span>
+        <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy3</span><span class="p">)</span>
     <span class="n">endif</span>
 
     <span class="c">!!Read excitation</span>
     <span class="k">call </span><span class="n">h5ltpath_valid_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/excitation&quot;</span><span class="p">,</span> <span class="p">.</span><span class="n">True</span><span class="p">.,</span> <span class="n">path_valid</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
     <span class="k">if</span><span class="p">(</span><span class="n">path_valid</span><span class="p">)</span> <span class="k">then</span>
-<span class="k">        allocate</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,&amp;</span>
+<span class="k">        allocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,&amp;</span>
                        <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="p">&amp;</span>
-                       <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span> <span class="n">n_bt_amu</span><span class="p">))</span>
-        <span class="n">dim5</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">,</span><span class="n">n_bt_amu</span><span class="p">]</span>
-        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/excitation&quot;</span><span class="p">,</span> <span class="n">dummy5</span><span class="p">,</span> <span class="n">dim5</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+                       <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">))</span>
+        <span class="n">dim4</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_max</span><span class="p">,</span> <span class="n">m_max</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span><span class="p">]</span>
+        <span class="k">call </span><span class="n">h5ltread_dataset_double_f</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">grp</span><span class="o">//</span><span class="s2">&quot;/excitation&quot;</span><span class="p">,</span> <span class="n">dummy4</span><span class="p">,</span> <span class="n">dim4</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
         <span class="k">do </span><span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">ntemp</span>
             <span class="k">do </span><span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">nenergy</span>
-                <span class="n">rates</span><span class="p">%</span><span class="n">log_pop</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="nb">transpose</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">bt_ind</span><span class="p">))</span>
-                <span class="n">rates</span><span class="p">%</span><span class="n">log_pop</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="nb">transpose</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">tt_ind</span><span class="p">))</span>
+                <span class="n">rates</span><span class="p">%</span><span class="n">log_pop</span><span class="p">(:,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="nb">transpose</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="n">nlevs</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
                 <span class="k">do </span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">rates</span><span class="p">%</span><span class="n">n_max</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                               <span class="nb">sum</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="n">n</span><span class="p">,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">bt_ind</span><span class="p">))</span>
-                    <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">=</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
-                                               <span class="nb">sum</span><span class="p">(</span><span class="n">dummy5</span><span class="p">(</span><span class="n">n</span><span class="p">,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">tt_ind</span><span class="p">))</span>
+                    <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">=</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="p">&amp;</span>
+                                               <span class="nb">sum</span><span class="p">(</span><span class="n">dummy4</span><span class="p">(</span><span class="n">n</span><span class="p">,:,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">))</span>
                 <span class="n">enddo</span>
             <span class="n">enddo</span>
         <span class="n">enddo</span>
-        <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy5</span><span class="p">)</span>
+        <span class="k">deallocate</span><span class="p">(</span><span class="n">dummy4</span><span class="p">)</span>
     <span class="n">endif</span>
 
     <span class="n">rmin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">,</span> <span class="n">rates</span><span class="p">%</span><span class="n">log_depop</span><span class="p">.</span><span class="n">gt</span><span class="p">.</span><span class="mf">0.d0</span><span class="p">)</span>

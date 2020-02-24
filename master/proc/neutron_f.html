@@ -1650,7 +1650,7 @@ public subroutine neutron_f()
 
                             <span class="c">!! Calculate effective beam energy</span>
                             <span class="n">vnet_square</span><span class="o">=</span><span class="nb">dot_product</span><span class="p">(</span><span class="n">vi</span><span class="o">-</span><span class="n">plasma</span><span class="p">%</span><span class="n">vrot</span><span class="p">,</span><span class="n">vi</span><span class="o">-</span><span class="n">plasma</span><span class="p">%</span><span class="n">vrot</span><span class="p">)</span>  <span class="c">![cm/s]</span>
-                            <span class="n">erel</span> <span class="o">=</span> <span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">*</span><span class="n">vnet_square</span> <span class="c">![kev]</span>
+                            <span class="n">erel</span> <span class="o">=</span> <span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="o">*</span><span class="n">vnet_square</span> <span class="c">![kev]</span>
 
                             <span class="c">!! Get neutron production rate</span>
                             <span class="k">call </span><span class="n">get_neutron_rate</span><span class="p">(</span><span class="n">plasma</span><span class="p">,</span> <span class="n">erel</span><span class="p">,</span> <span class="n">rate</span><span class="p">)</span>

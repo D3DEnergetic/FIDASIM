@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title=" 1.9% of total for procedures.">254 statements</a>
+    title=" 2.0% of total for procedures.">255 statements</a>
      </li> 
      
      
@@ -684,11 +684,12 @@ public subroutine read_inputs()
     <span class="n">inputs</span><span class="p">%</span><span class="n">n_birth</span><span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">nint</span><span class="p">(</span><span class="n">n_birth</span><span class="o">/</span><span class="kt">real</span><span class="p">(</span><span class="n">n_nbi</span><span class="p">)))</span>
 
     <span class="c">!!Plasma Settings</span>
-    <span class="n">inputs</span><span class="p">%</span><span class="n">ai</span><span class="o">=</span><span class="n">ai</span>
+    <span class="n">n_species</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">thermal_mass</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">ai</span>
     <span class="n">inputs</span><span class="p">%</span><span class="n">impurity_charge</span><span class="o">=</span><span class="n">impurity_charge</span>
 
     <span class="c">!!Neutral Beam Settings</span>
-    <span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="o">=</span><span class="n">ab</span>
+    <span class="n">beam_mass</span><span class="o">=</span><span class="n">ab</span>
     <span class="n">nbi</span><span class="p">%</span><span class="n">current_fractions</span><span class="o">=</span><span class="n">current_fractions</span>
     <span class="n">nbi</span><span class="p">%</span><span class="n">einj</span><span class="o">=</span><span class="n">einj</span>
     <span class="n">nbi</span><span class="p">%</span><span class="n">pinj</span><span class="o">=</span><span class="n">pinj</span>

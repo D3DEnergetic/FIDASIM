@@ -205,7 +205,7 @@
     
     <div class="col-md-9" id='text'>
     <h2>
-public subroutine bb_cx_rates(denn, vi, vn, rates)
+public subroutine bb_cx_rates(denn, vn, vi, rates)
     
     
    
@@ -251,12 +251,12 @@ public subroutine bb_cx_rates(denn, vi, vn, rates)
   
 <tr>
   
-  <td><span class="anchor" id="variable-vi%7E3"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-vn%7E5"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
+  <td><strong>vn</strong></td><td><p>Neutral velocity [cm/s]</p></td>
   
 </tr>
 
@@ -266,12 +266,12 @@ public subroutine bb_cx_rates(denn, vi, vn, rates)
   
 <tr>
   
-  <td><span class="anchor" id="variable-vn%7E5"></span>real(kind=Float64),</td>
+  <td><span class="anchor" id="variable-vi%7E3"></span>real(kind=Float64),</td>
   <td>intent(in),</td>
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>vn</strong></td><td><p>Neutral velocity [cm/s]</p></td>
+  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
   
 </tr>
 
@@ -654,14 +654,14 @@ public subroutine bb_cx_rates(denn, vi, vn, rates)
     
     <section>
     <h2><span class="anchor" id="src"></span>Source Code</h2>
-    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">bb_cx_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">vn</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">bb_cx_rates</span><span class="p">(</span><span class="n">denn</span><span class="p">,</span> <span class="n">vn</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">rates</span><span class="p">)</span>
     <span class="c">!+ Get beam-beam neutralization/cx rates</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">denn</span>
         <span class="c">!+ Neutral density [cm^-3]</span>
-    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vi</span>
-        <span class="c">!+ Ion velocity [cm/s]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vn</span>
         <span class="c">!+ Neutral velocity [cm/s]</span>
+    <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span>     <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">vi</span>
+        <span class="c">!+ Ion velocity [cm/s]</span>
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">nlevs</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rates</span>
         <span class="c">!+ Reaction rates [1/s]</span>
 

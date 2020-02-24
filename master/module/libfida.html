@@ -132,7 +132,7 @@
      <li><i class="fa fa-list-ol"></i>
        <a data-toggle="tooltip"
     data-placement="bottom" data-html="true"
-    title="57.4% of total for modules and submodules.">8309 statements</a>
+    title="57.3% of total for modules and submodules.">8242 statements</a>
      </li> 
      
      
@@ -202,6 +202,14 @@
       <a class="list-group-item" href="../module/libfida.html#variable-beam_ion">beam_ion</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-thermal_ion">thermal_ion</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-max_species">max_species</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-n_species">n_species</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-beam_mass">beam_mass</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-thermal_mass">thermal_mass</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-e_amu">e_amu</a>
       
@@ -702,6 +710,10 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-gyro_correction">gyro_correction</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-mc_beam_grid">mc_beam_grid</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-mc_passive_grid">mc_passive_grid</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-mc_fastion">mc_fastion</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-mc_fastion_pass_grid">mc_fastion_pass_grid</a>
@@ -1134,6 +1146,14 @@
       <a class="list-group-item" href="../module/libfida.html#variable-beam_ion">beam_ion</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-thermal_ion">thermal_ion</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-max_species">max_species</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-n_species">n_species</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-beam_mass">beam_mass</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#variable-thermal_mass">thermal_mass</a>
       
       <a class="list-group-item" href="../module/libfida.html#variable-e_amu">e_amu</a>
       
@@ -1634,6 +1654,10 @@
       
       <a class="list-group-item" href="../module/libfida.html#proc-gyro_correction">gyro_correction</a>
       
+      <a class="list-group-item" href="../module/libfida.html#proc-mc_beam_grid">mc_beam_grid</a>
+      
+      <a class="list-group-item" href="../module/libfida.html#proc-mc_passive_grid">mc_passive_grid</a>
+      
       <a class="list-group-item" href="../module/libfida.html#proc-mc_fastion">mc_fastion</a>
       
       <a class="list-group-item" href="../module/libfida.html#proc-mc_fastion_pass_grid">mc_fastion_pass_grid</a>
@@ -1910,6 +1934,62 @@
   <td>public,</td>
   <td>parameter</td><td>::</td>
   <td><strong>thermal_ion</strong></td><td> =</td><td>2</td><td><p>Identifier for a thermal ion</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-max_species"></span>integer,</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>max_species</strong></td><td> =</td><td>3</td><td><p>Maximum number of thermal species</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-n_species"></span>integer,</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>n_species</strong></td><td> =</td><td>1</td><td><p>Number of species</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-beam_mass"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>beam_mass</strong></td><td> =</td><td>0.d0</td><td><p>Beam/Fast ion species mass [amu]</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-thermal_mass"></span>real(kind=Float64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>thermal_mass</strong>(max_species)</td><td> =</td><td>0.d0</td><td><p>Thermal ion species mass [amu]</p></td>
   
 </tr>
 
@@ -8453,7 +8533,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>nenergy</strong></td><td> =</td><td>1</td><td><p>Number of beam energies</p></td>
+  <td><strong>nenergy</strong></td><td> =</td><td>1</td><td><p>Number of beam energies/amu</p></td>
   
 </tr>
 
@@ -8467,7 +8547,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>logemin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum energy</p></td>
+  <td><strong>logemin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum energy/amu</p></td>
   
 </tr>
 
@@ -8481,7 +8561,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>logemax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum energy</p></td>
+  <td><strong>logemax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum energy/amu</p></td>
   
 </tr>
 
@@ -8603,24 +8683,10 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-ab"></span>real(kind=Float64),</td>
-  
-  <td>public,</td>
-  <td>dimension(2)</td><td>::</td>
-  <td><strong>ab</strong></td><td> =</td><td>0.d0</td><td><p>Atomic mass of beam and thermal ions respectively [amu]</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" id="variable-log_rate"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
   <td><strong>log_rate</strong></td><td></td><td></td><td><p>Log-10 beam-target rates</p></td>
   
 </tr>
@@ -8668,7 +8734,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>nenergy</strong></td><td> =</td><td>1</td><td><p>Number of beam energies</p></td>
+  <td><strong>nenergy</strong></td><td> =</td><td>1</td><td><p>Number of beam energies/amu</p></td>
   
 </tr>
 
@@ -8682,7 +8748,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>logemin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum energy</p></td>
+  <td><strong>logemin</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 minimum energy/amu</p></td>
   
 </tr>
 
@@ -8696,7 +8762,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
   <td>public</td>
   <td></td><td>::</td>
-  <td><strong>logemax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum energy</p></td>
+  <td><strong>logemax</strong></td><td> =</td><td>0.d0</td><td><p>Log-10 maximum energy/amu</p></td>
   
 </tr>
 
@@ -8832,24 +8898,10 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-ab%7E2"></span>real(kind=Float64),</td>
-  
-  <td>public,</td>
-  <td>dimension(2)</td><td>::</td>
-  <td><strong>ab</strong></td><td> =</td><td>0.d0</td><td><p>Atomic mass of beam and thermal ions respectively [amu]</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" id="variable-log_pop"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:,:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
   <td><strong>log_pop</strong></td><td></td><td></td><td><p>Log-10 reaction rates for populating transistions</p></td>
   
 </tr>
@@ -8863,7 +8915,7 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   <td><span class="anchor" id="variable-log_depop"></span>real(kind=Float64),</td>
   
   <td>public,</td>
-  <td>dimension(:,:,:,:), allocatable</td><td>::</td>
+  <td>dimension(:,:,:), allocatable</td><td>::</td>
   <td><strong>log_depop</strong></td><td></td><td></td><td><p>Log-10 reaction rates for de-populating transistions</p></td>
   
 </tr>
@@ -11868,39 +11920,11 @@ to machine coordinates(uvw): (\uvw = B*xyz + origin)</p></td>
   
 <tr>
   
-  <td><span class="anchor" id="variable-ab%7E3"></span>real(kind=Float64),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>ab</strong></td><td></td><td></td><td><p>Atomic mass of beam neutrals</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" id="variable-impurity_charge"></span>integer(kind=Int32),</td>
   
   <td>public</td>
   <td></td><td>::</td>
   <td><strong>impurity_charge</strong></td><td></td><td></td><td><p>Impurity proton number</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" id="variable-ai"></span>real(kind=Float64),</td>
-  
-  <td>public</td>
-  <td></td><td>::</td>
-  <td><strong>ai</strong></td><td></td><td></td><td><p>Atomic mass of thermal ions</p></td>
   
 </tr>
 
@@ -16330,7 +16354,7 @@ public subroutine <a href='../proc/read_atomic_cross.html'>read_atomic_cross</a>
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-read_atomic_rate"></span><h3>
-public subroutine <a href='../proc/read_atomic_rate.html'>read_atomic_rate</a>(fid, grp, b_amu, t_amu, rates)
+public subroutine <a href='../proc/read_atomic_rate.html'>read_atomic_rate</a>(fid, grp, rates)
     
     
    
@@ -16397,36 +16421,6 @@ public subroutine <a href='../proc/read_atomic_rate.html'>read_atomic_rate</a>(f
   
 <tr>
   
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(2)</td><td>::</td>
-  <td><strong>b_amu</strong></td><td><p>Atomic masses of "beam" species (beam ion and thermal ion)</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
-  <td><strong>t_amu</strong></td><td><p>Atomic mass of "target" species (thermal ion)</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
   <td><span class="anchor" ></span>type(<a href='../type/atomicrates.html'>AtomicRates</a>),</td>
   <td>intent(inout)</td>
   <td></td>
@@ -16450,7 +16444,7 @@ public subroutine <a href='../proc/read_atomic_rate.html'>read_atomic_rate</a>(f
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-read_atomic_transitions"></span><h3>
-public subroutine <a href='../proc/read_atomic_transitions.html'>read_atomic_transitions</a>(fid, grp, b_amu, t_amu, rates)
+public subroutine <a href='../proc/read_atomic_transitions.html'>read_atomic_transitions</a>(fid, grp, rates)
     
     
    
@@ -16508,36 +16502,6 @@ public subroutine <a href='../proc/read_atomic_transitions.html'>read_atomic_tra
   
   <td></td><td>::</td>
   <td><strong>grp</strong></td><td><p>HDF5 group to read from</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
-  <td></td>
-  
-  <td>dimension(2)</td><td>::</td>
-  <td><strong>b_amu</strong></td><td><p>Atomic masses of "beam" species (beam ion and thermal ion)</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(in)</td>
-  <td></td>
-  
-  <td></td><td>::</td>
-  <td><strong>t_amu</strong></td><td><p>Atomic mass of "target" species (thermal ion)</p></td>
   
 </tr>
 
@@ -21603,7 +21567,7 @@ public subroutine <a href='../proc/store_npa.html'>store_npa</a>(det, ri, rf, vn
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-bb_cx_rates"></span><h3>
-public subroutine <a href='../proc/bb_cx_rates.html'>bb_cx_rates</a>(denn, vi, vn, rates)
+public subroutine <a href='../proc/bb_cx_rates.html'>bb_cx_rates</a>(denn, vn, vi, rates)
     
     
    
@@ -21659,7 +21623,7 @@ public subroutine <a href='../proc/bb_cx_rates.html'>bb_cx_rates</a>(denn, vi, v
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
+  <td><strong>vn</strong></td><td><p>Neutral velocity [cm/s]</p></td>
   
 </tr>
 
@@ -21674,7 +21638,7 @@ public subroutine <a href='../proc/bb_cx_rates.html'>bb_cx_rates</a>(denn, vi, v
   <td></td>
   
   <td>dimension(3)</td><td>::</td>
-  <td><strong>vn</strong></td><td><p>Neutral velocity [cm/s]</p></td>
+  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
   
 </tr>
 
@@ -21707,7 +21671,7 @@ public subroutine <a href='../proc/bb_cx_rates.html'>bb_cx_rates</a>(denn, vi, v
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-bt_cx_rates"></span><h3>
-public subroutine <a href='../proc/bt_cx_rates.html'>bt_cx_rates</a>(plasma, denn, vi, i_type, rates)
+public subroutine <a href='../proc/bt_cx_rates.html'>bt_cx_rates</a>(plasma, denn, an, vi, rates)
     
     
    
@@ -21748,7 +21712,7 @@ public subroutine <a href='../proc/bt_cx_rates.html'>bt_cx_rates</a>(plasma, den
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>plasma</strong></td><td><p>Plasma parameters</p></td>
+  <td><strong>plasma</strong></td><td><p>Plasma parameters (for neutral temperature and vrot)</p></td>
   
 </tr>
 
@@ -21774,11 +21738,11 @@ public subroutine <a href='../proc/bt_cx_rates.html'>bt_cx_rates</a>(plasma, den
 <tr>
   
   <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(in),</td>
+  <td>intent(in)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
+  <td></td><td>::</td>
+  <td><strong>an</strong></td><td><p>Neutral mass [amu]</p></td>
   
 </tr>
 
@@ -21788,12 +21752,12 @@ public subroutine <a href='../proc/bt_cx_rates.html'>bt_cx_rates</a>(plasma, den
   
 <tr>
   
-  <td><span class="anchor" ></span>integer,</td>
-  <td>intent(in)</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in),</td>
   <td></td>
   
-  <td></td><td>::</td>
-  <td><strong>i_type</strong></td><td><p>Ion type</p></td>
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>vi</strong></td><td><p>Ion velocity [cm/s]</p></td>
   
 </tr>
 
@@ -22139,7 +22103,7 @@ public subroutine <a href='../proc/get_total_cx_rate.html'>get_total_cx_rate</a>
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-get_rate_matrix"></span><h3>
-public subroutine <a href='../proc/get_rate_matrix.html'>get_rate_matrix</a>(plasma, i_type, eb, rmat)
+public subroutine <a href='../proc/get_rate_matrix.html'>get_rate_matrix</a>(plasma, ab, eb, rmat)
     
     
    
@@ -22190,12 +22154,12 @@ public subroutine <a href='../proc/get_rate_matrix.html'>get_rate_matrix</a>(pla
   
 <tr>
   
-  <td><span class="anchor" ></span>integer,</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>i_type</strong></td><td><p>Ion type</p></td>
+  <td><strong>ab</strong></td><td><p>"Beam" ion mass [amu]</p></td>
   
 </tr>
 
@@ -22210,7 +22174,7 @@ public subroutine <a href='../proc/get_rate_matrix.html'>get_rate_matrix</a>(pla
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>eb</strong></td><td><p>Ion energy [keV]</p></td>
+  <td><strong>eb</strong></td><td><p>"Beam" ion energy [keV]</p></td>
   
 </tr>
 
@@ -22243,7 +22207,7 @@ public subroutine <a href='../proc/get_rate_matrix.html'>get_rate_matrix</a>(pla
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-colrad"></span><h3>
-public subroutine <a href='../proc/colrad.html'>colrad</a>(plasma, i_type, vn, dt, states, dens, photons)
+public subroutine <a href='../proc/colrad.html'>colrad</a>(plasma, ab, vn, dt, states, dens, photons)
     
     
    
@@ -22294,12 +22258,12 @@ public subroutine <a href='../proc/colrad.html'>colrad</a>(plasma, i_type, vn, d
   
 <tr>
   
-  <td><span class="anchor" ></span>integer,</td>
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
   <td>intent(in)</td>
   <td></td>
   
   <td></td><td>::</td>
-  <td><strong>i_type</strong></td><td><p>Ion/Neutral type (beam,thermal)</p></td>
+  <td><strong>ab</strong></td><td><p>Ion/Neutral mass [amu]</p></td>
   
 </tr>
 
@@ -24028,6 +23992,154 @@ public subroutine <a href='../proc/gyro_correction.html'>gyro_correction</a>(fie
     
     
   <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-mc_beam_grid"></span><h3>
+public subroutine <a href='../proc/mc_beam_grid.html'>mc_beam_grid</a>(ind, ri)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Sample uniformally in beam grid cell</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ind</strong></td><td><p>Cell index</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ri</strong></td><td><p>Position in cell</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
+  <div class="panel-heading codesum"><span class="anchor" id="proc-mc_passive_grid"></span><h3>
+public subroutine <a href='../proc/mc_passive_grid.html'>mc_passive_grid</a>(ind, ri)
+    
+    
+   
+</h3></div>
+  <div class="panel-body">
+       
+    
+
+
+
+
+
+
+
+<p>Sample uniformally in passive grid cell</p>
+    
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer,</td>
+  <td>intent(in),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ind</strong></td><td><p>Cell index</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(out),</td>
+  <td></td>
+  
+  <td>dimension(3)</td><td>::</td>
+  <td><strong>ri</strong></td><td><p>Position in cell</p></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-mc_fastion"></span><h3>
 public subroutine <a href='../proc/mc_fastion.html'>mc_fastion</a>(ind, fields, eb, ptch, denf)
     
@@ -24282,7 +24394,7 @@ public subroutine <a href='../proc/mc_fastion_pass_grid.html'>mc_fastion_pass_gr
     
   <div class="panel panel-default">
   <div class="panel-heading codesum"><span class="anchor" id="proc-mc_halo"></span><h3>
-public subroutine <a href='../proc/mc_halo.html'>mc_halo</a>(ind, vhalo, ri, plasma_in)
+public subroutine <a href='../proc/mc_halo.html'>mc_halo</a>(plasma, ai, vhalo)
     
     
    
@@ -24297,7 +24409,7 @@ public subroutine <a href='../proc/mc_halo.html'>mc_halo</a>(ind, vhalo, ri, pla
 
 
 
-<p>Sample thermal Maxwellian distribution at <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices <code>ind</code></p>
+<p>Generate velocity vector from a thermal Maxwellian distribution</p>
     
     <h4>Arguments</h4>
     
@@ -24318,12 +24430,27 @@ public subroutine <a href='../proc/mc_halo.html'>mc_halo</a>(ind, vhalo, ri, pla
   
 <tr>
   
-  <td><span class="anchor" ></span>integer,</td>
-  <td>intent(in),</td>
+  <td><span class="anchor" ></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
+  <td>intent(in)</td>
   <td></td>
   
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>ind</strong></td><td><p><a href="../module/libfida.html#variable-beam_grid">beam_grid</a> indices</p></td>
+  <td></td><td>::</td>
+  <td><strong>plasma</strong></td><td><p>Plasma Parameters</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=Float64),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>ai</strong></td><td><p>Ion mass [amu]</p></td>
   
 </tr>
 
@@ -24339,36 +24466,6 @@ public subroutine <a href='../proc/mc_halo.html'>mc_halo</a>(ind, vhalo, ri, pla
   
   <td>dimension(3)</td><td>::</td>
   <td><strong>vhalo</strong></td><td><p>Velocity [cm/s]</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" ></span>real(kind=Float64),</td>
-  <td>intent(out),</td>
-  <td>optional</td>
-  
-  <td>dimension(3)</td><td>::</td>
-  <td><strong>ri</strong></td><td><p>Position in <a href="../module/libfida.html#variable-beam_grid">beam_grid</a> cell</p></td>
-  
-</tr>
-
-  
-  
-  
-  
-<tr>
-  
-  <td><span class="anchor" ></span>type(<a href='../type/localprofiles.html'>LocalProfiles</a>),</td>
-  <td>intent(in),</td>
-  <td>optional</td>
-  
-  <td></td><td>::</td>
-  <td><strong>plasma_in</strong></td><td><p>Plasma parameters</p></td>
   
 </tr>
 

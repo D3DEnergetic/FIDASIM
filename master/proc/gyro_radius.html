@@ -486,7 +486,7 @@ public function gyro_radius(fields, energy, pitch) result(gyro_rad)
     <span class="kt">real</span><span class="p">(</span><span class="n">Float64</span><span class="p">)</span> <span class="kd">::</span> <span class="n">vabs</span><span class="p">,</span> <span class="n">phi</span>
     <span class="kt">integer</span> <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">n</span>
 
-    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">inputs</span><span class="p">%</span><span class="n">ab</span><span class="p">))</span>
+    <span class="n">vabs</span>  <span class="o">=</span> <span class="nb">sqrt</span><span class="p">(</span><span class="n">energy</span><span class="o">/</span><span class="p">(</span><span class="n">v2_to_E_per_amu</span><span class="o">*</span><span class="n">beam_mass</span><span class="p">))</span>
 
     <span class="n">gyro_rad</span> <span class="o">=</span> <span class="mf">0.d0</span>
     <span class="n">n</span> <span class="o">=</span> <span class="mi">6</span>

@@ -143,11 +143,9 @@ def check_inputs(inputs):
               'zmin': zero_double,
               'zmax': zero_double,
               'ab': zero_double,
-              'ai': zero_double,
               'current_fractions': three_double,
               'pinj': zero_double,
               'einj': zero_double,
-              'impurity_charge': zero_int,
               'n_fida': zero_long,
               'n_nbi': zero_long,
               'n_pfida': zero_long,
@@ -174,7 +172,6 @@ def check_inputs(inputs):
               'calc_brems': zero_int,
               'calc_birth': zero_int,
               'calc_fida_wght': zero_int,
-              'stark_components': zero_int,
               'calc_npa_wght': zero_int,
               'calc_neutron': zero_int}
 
@@ -220,10 +217,6 @@ def check_inputs(inputs):
         print('sum(current_fractions) = {}'.format(np.sum(inputs['current_fractions'])))
         err = True
 
-    if inputs['impurity_charge'] <= 1:
-        error('Invalid impurity charge. Expected impurity charge > 1')
-        err = True
-
     ps = os.path.sep
     input_file = inputs['result_dir'] + ps + inputs['runid'] + '_inputs.dat'
     equilibrium_file = inputs['result_dir'] + ps + inputs['runid'] + '_equilibrium.h5'
@@ -236,6 +229,7 @@ def check_inputs(inputs):
     inputs['geometry_file'] = geometry_file
     inputs['distribution_file'] = distribution_file
     inputs['load_neutrals'] = 0
+    inputs['stark_components'] = 0
     inputs['flr'] = 2
     inputs['seed'] = -1
     inputs['verbose'] = 1
@@ -532,15 +526,26 @@ def check_plasma(inputs, grid, plasma):
     else:
         nphi = grid['nphi']
 
+    nthermal = plasma['nthermal']
+
     zero_string = {'dims': 0,
                    'type': [str]}
 
     zero_double = {'dims': 0,
                    'type': [float, np.float64]}
 
+    zero_int = {'dims':0,
+                'type': [int, np.int16, np.int32, np.int64]}
+
+    nthermal_double = {'dims': [nthermal],
+                       'type':[float, np.float64]}
+
     if nphi>1:
         nrnznphi_double = {'dims': [nr, nz, nphi],
-                           'type': [float, np.float64, np.float64]}
+                           'type': [float, np.float64]}
+
+        ntnrnznphi_double = {'dims': [nthermal, nr, nz, nphi],
+                             'type': [float, np.float64]}
 
         nrnznphi_int = {'dims': [nr, nz, nphi],
                         'type': [np.int64]}
@@ -548,14 +553,22 @@ def check_plasma(inputs, grid, plasma):
         nrnznphi_double = {'dims': [nr, nz],
                            'type': [float, np.float64]}
 
+        ntnrnznphi_double = {'dims': [nthermal, nr, nz],
+                             'type': [float, np.float64]}
+
         nrnznphi_int = {'dims': [nr, nz],
                         'type': [np.int64]}
 
     schema = {'time': zero_double,
+              'nthermal': zero_int,
+              'impurity_charge':zero_int,
+              'species_mass': nthermal_double,
               'vr': nrnznphi_double,
               'vt': nrnznphi_double,
               'vz': nrnznphi_double,
               'dene': nrnznphi_double,
+              'denimp': nrnznphi_double,
+              'deni': ntnrnznphi_double,
               'denn': nrnznphi_double,
               'ti': nrnznphi_double,
               'te': nrnznphi_double,
@@ -575,9 +588,16 @@ def check_plasma(inputs, grid, plasma):
     w = (plasma['dene'] < 0.)
     plasma['dene'][w] = 0.
 
+    # Impurity density
+    w = (plasma['denimp'] < 0.)
+    plasma['denimp'][w] = 0.
+
+    # Ion density
+    w = (plasma['deni'] < 0.)
+    plasma['deni'][w] = 0.
+
     # Zeff
-    w = (plasma['zeff'] < 1.)
-    plasma['zeff'][w] = 1.
+    plasma['zeff'] = np.clip(plasma['zeff'],1.0,plasma['impurity_charge'])
 
     # Electron temperature
     w = (plasma['te'] < 0.)
@@ -1174,13 +1194,13 @@ def write_namelist(filename, inputs):
         f.write("calc_birth = {:d}    !! Calculate Birth Profile\n".format(inputs['calc_birth']))
         f.write("calc_fida_wght = {:d}    !! Calculate FIDA weights\n".format(inputs['calc_fida_wght']))
         f.write("calc_npa_wght = {:d}    !! Calculate NPA weights\n".format(inputs['calc_npa_wght']))
-        f.write("stark_components = {:d}    !! Output stark components\n".format(inputs['stark_components']))
 
-        f.write("\n!! Debugging Switches\n")
+        f.write("\n!! Advanced Settings\n")
         f.write("seed = {:d}    !! RNG Seed. If seed is negative a random seed is used\n".format(inputs['seed']))
         f.write("flr = {:d}    !! Turn on Finite Larmor Radius corrections\n".format(inputs['flr']))
         f.write("load_neutrals = {:d}    !! Load neutrals from neutrals file\n".format(inputs['load_neutrals']))
         f.write("neutrals_file = '" + inputs['neutrals_file'] + "'    !! File containing the neutral density\n")
+        f.write("stark_components = {:d}    !! Output stark components\n".format(inputs['stark_components']))
         f.write("verbose = {:d}    !! Verbose\n\n".format(inputs['verbose']))
 
         f.write("!! Monte Carlo Settings\n")
@@ -1200,10 +1220,6 @@ def write_namelist(filename, inputs):
         f.write("current_fractions(1) = {:f} !! Current Fractions (Full component)\n".format(inputs['current_fractions'][0]))
         f.write("current_fractions(2) = {:f} !! Current Fractions (Half component)\n".format(inputs['current_fractions'][1]))
         f.write("current_fractions(3) = {:f} !! Current Fractions (Third component)\n\n".format(inputs['current_fractions'][2]))
-
-        f.write("!! Plasma Settings\n")
-        f.write("ai = {:f}     !! Ion Species mass [amu]\n".format(inputs['ai']))
-        f.write("impurity_charge = {:d}     !! Impurity Charge\n\n".format(inputs['impurity_charge']))
 
         f.write("!! Beam Grid Settings\n")
         f.write("nx = {:d}    !! Number of cells in X direction (Into Plasma)\n".format(inputs['nx']))
@@ -1409,14 +1425,19 @@ def write_equilibrium(filename, plasma, fields):
         # Dataset attributes
         plasma_description = {'data_source': 'Source of the plasma parameters',
                               'time': 'Time',
-                              'dene': 'Electron Number Density: Dene(r,z)',
-                              'te': 'Electron Temperature: Te(r,z)',
-                              'ti': 'Ion Temperature: Ti(r,z)',
-                              'zeff': 'Effective Nuclear Charge: Zeff(r,z)',
-                              'denn': 'Cold/Edge neutral density: Denn(r,z)',
-                              'vr': 'Bulk plasma flow in the r-direction: Vr(r,z)',
-                              'vt': 'Bulk plasma flow in the theta/torodial-direction: Vt(r,z)',
-                              'vz': 'Bulk plasma flow in the z-direction: Vz(r,z)',
+                              'nthermal': 'Number of hydrogenic, thermal ion species',
+                              'dene': 'Electron Number Density: Dene(r,z,[phi])',
+                              'denimp': 'Impurity Number Density: Denimp(r,z,[phi])',
+                              'deni': 'Ion Number Density: Deni(species,r,z,[phi])',
+                              'species_mass': 'Mass of ion species: species_mass(species)',
+                              'impurity_charge': 'Charge number of main impurity species',
+                              'te': 'Electron Temperature: Te(r,z,[phi])',
+                              'ti': 'Ion Temperature: Ti(r,z,[phi])',
+                              'zeff': 'Effective Nuclear Charge: Zeff(r,z,[phi])',
+                              'denn': 'Cold/Edge neutral density: Denn(r,z,[phi])',
+                              'vr': 'Bulk plasma flow in the r-direction: Vr(r,z,[phi])',
+                              'vt': 'Bulk plasma flow in the theta/torodial-direction: Vt(r,z,[phi])',
+                              'vz': 'Bulk plasma flow in the z-direction: Vz(r,z,[phi])',
                               'nr': 'Number of R values',
                               'nz': 'Number of Z values',
                               'r': 'Radius',
@@ -1426,7 +1447,9 @@ def write_equilibrium(filename, plasma, fields):
                               'mask': 'Boolean mask that indicates where the plasma parameters are well defined'}
 
         plasma_units = {'time': 's',
+                        'species_mass': 'amu',
                         'dene': 'cm^-3',
+                        'deni': 'cm^-3',
                         'denn': 'cm^-3',
                         'te': 'keV',
                         'ti': 'keV',

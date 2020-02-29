@@ -47,13 +47,13 @@ PRO write_namelist, filename, inputs
     printf,55,f='("calc_birth = ",i2 , "    !! Calculate Birth Profile")',inputs.calc_birth
     printf,55,f='("calc_fida_wght = ",i2 , "    !! Calculate FIDA weights")',inputs.calc_fida_wght
     printf,55,f='("calc_npa_wght = ",i2 , "    !! Calculate NPA weights")',inputs.calc_npa_wght
-    printf,55,f='("stark_components = ",i2 , "    !! Output stark components")',inputs.stark_components
     printf,55,''
-    printf,55,'!! Debugging Switches'
+    printf,55,'!! Advanced Settings'
     printf,55,f='("seed = ",i9,  "    !! RNG Seed. If seed is negative a random seed is used")',inputs.seed
     printf,55,f='("flr = ",i2,"    !! Turn on Finite Larmor Radius effects")',inputs.flr
     printf,55,f='("load_neutrals = ",i2,"    !! Load neutrals from neutrals file")',inputs.load_neutrals
     printf,55,"neutrals_file = '" + inputs.neutrals_file +"'    !! File containing the neutral density"
+    printf,55,f='("stark_components = ",i2 , "    !! Output stark components")',inputs.stark_components
     printf,55,f='("verbose = ",i2,"    !! Verbose")',inputs.verbose
     printf,55,''
     printf,55,'!! Monte Carlo Settings'
@@ -73,10 +73,6 @@ PRO write_namelist, filename, inputs
     printf,55,f='("current_fractions(1) = ",1f9.5," !! Current Fractions (Full component)")',inputs.current_fractions[0]
     printf,55,f='("current_fractions(2) = ",1f9.5," !! Current Fractions (Half component)")',inputs.current_fractions[1]
     printf,55,f='("current_fractions(3) = ",1f9.5," !! Current Fractions (Third component)")',inputs.current_fractions[2]
-    printf,55,''
-    printf,55,'!! Plasma Settings'
-    printf,55,f='("ai = ",1f9.5,"     !! Ion Species mass [amu]")',inputs.ai
-    printf,55,f='("impurity_charge = ",i3,"     !! Impurity Charge")',inputs.impurity_charge
     printf,55,''
     printf,55,'!! Beam Grid Settings'
     printf,55,f='("nx = ",i4,"    !! Number of cells in X direction (Into Plasma)")',inputs.nx

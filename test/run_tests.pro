@@ -16,7 +16,7 @@ PRO run_tests,result_dir,runid = runid
 
    basic_inputs = {device:"TEST",shot:1L,time:1.d0,$
                    einj:einj,pinj:pinj,current_fractions:current_fractions,$
-                   ab:2.01410178d0,ai:2.0141078d0,impurity_charge:6,$
+                   ab:2.01410178d0,$
                    lambdamin:647.0d0,lambdamax:667.0d0,nlambda:2000,$
                    n_fida:5000000L,n_npa:5000000L,n_nbi:50000L, $
                    n_pfida:50000000L,n_pnpa:50000000L, $
@@ -26,7 +26,6 @@ PRO run_tests,result_dir,runid = runid
                    calc_npa:2,calc_brems:1,calc_fida:1,calc_neutron:1,$
                    calc_bes:1,calc_dcx:1,calc_halo:1,calc_cold:1,$
                    calc_birth:1,calc_fida_wght:1,calc_npa_wght:1,calc_pfida:1,calc_pnpa:2,$
-                   stark_components:0, $
                    result_dir:result_dir,tables_file:fida_dir+'/tables/atomic_tables.h5'}
 
    basic_bgrid = {nx:70,ny:50,nz:100,$
@@ -53,6 +52,7 @@ PRO run_tests,result_dir,runid = runid
 
    pfile = test_dir+'test_profiles.cdf'
    plasma = test_profiles(pfile,grid,rho)
+   plasma.deni = (plasma.deni - rebin(fbm.denf,1,grid.nr,grid.nz)) > 0.0
 
    prefida,inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa
 

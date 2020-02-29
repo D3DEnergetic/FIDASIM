@@ -47,12 +47,11 @@ A value of two will turn on additional functionality.
 | `calc_fida`         | Int16   | 0    | NA         | NA    | Calculate FIDA spectra                   |
 | `calc_npa`          | Int16   | 0    | NA         | NA    | Calculate NPA flux                       |
 | `calc_pfida`        | Int16   | 0    | NA         | NA    | Calculate passive FIDA spectra           |
-| `calc_pnpa`         | Int16   | 0    | NA         | NA    | Calculate passive NPA flux                      |
+| `calc_pnpa`         | Int16   | 0    | NA         | NA    | Calculate passive NPA flux               |
 | `calc_neutron`      | Int16   | 0    | NA         | NA    | Calculate B-T Neutron rate               |
 | `calc_birth`        | Int16   | 0    | NA         | NA    | Calculate Birth profile                  |
 | `calc_fida_wght`    | Int16   | 0    | NA         | NA    | Calculate FIDA weight functions          |
 | `calc_npa_wght`     | Int16   | 0    | NA         | NA    | Calculate NPA weight functions           |
-| `stark_components`  | Int16   | 0    | NA         | NA    | Output spectral stark components         |
 
 ##Monte Carlo Settings
 These settings control the number of Monte Carlo particles used by FIDASIM.
@@ -93,16 +92,6 @@ Click [here](../02_physics/04_neutrals.html#neutral-beam-density) for more infor
 | `einj`              | Float64 | 0    | NA         | keV   | Beam energy                              |
 | `current_fractions` | Float64 | 1    | [3]        | NA    | Current fractions (Full, Half, Third)    |
 
-##Plasma Settings
-These variables define the properties of the thermal plasma species.
-Like the `ab` variable, `ai` can only be the mass of either protium or deuterium
-Click [here](../02_physics/01_plasma.html#plasma-parameters-and-fields) for more information.
-
-|       Variable      |   Type  | Rank | Dimensions | Units |               Description                |
-|:-------------------:|:-------:|:----:|:----------:|:-----:|:-----------------------------------------|
-| `ai`                | Float64 | 0    | NA         | amu   | Thermal Ion species mass                 |
-| `impurity_charge`   | Int16   | 0    | NA         | NA    | Impurity Charge                          |
-
 ##Beam Grid Settings
 
 These variables define a rotated coordinate system.
@@ -120,8 +109,8 @@ Click [here](../02_physics/04_neutrals.html#beam-grid) for more details.
 | `zmin`              | Float64 | 0    | NA         | cm    | Minimum Z value in beam grid coordinates |
 | `zmax`              | Float64 | 0    | NA         | cm    | Maximum Z value in beam grid coordinates |
 | `alpha`             | Float64 | 0    | NA         | rad   | Tait-Bryan rotation angle about z-axis   |
-| `beta`              | Float64 | 0    | NA         | rad   | Tait-Bryan rotation angle about y'-axis  |
-| `gamma`             | Float64 | 0    | NA         | rad   | Tait-Bryan rotation angle about x"-axis  |
+| `beta`              | Float64 | 0    | NA         | rad   | Tait-Bryan rotation angle about yp-axis  |
+| `gamma`             | Float64 | 0    | NA         | rad   | Tait-Bryan rotation angle about xpp-axis |
 | `origin`            | Float64 | 1    | [3]        | cm    | Beam grid origin in Machine Coordinates  |
 
 ##Wavelength Grid Settings

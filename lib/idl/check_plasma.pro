@@ -8,7 +8,7 @@ PRO check_plasma, inp, grid, plasma
     ;+     **grid**: Interpolation grid structure
     ;+
     ;+     **plasma**: Plasma parameters structure
-    ;+ 
+    ;+
     ;+##Example Usage
     ;+```idl
     ;+IDL> check_plasma, inputs, grid, plasma
@@ -26,15 +26,24 @@ PRO check_plasma, inp, grid, plasma
         nphi = grid.nphi
     endelse
 
+    nthermal = plasma.nthermal
+    zero_int = {dims:0, type:'INT'}
     zero_string = {dims:0, type:'STRING'}
     zero_double = {dims:0, type:'DOUBLE'}
+    nthermal_double = {dims:[nthermal], type:'DOUBLE'}
     nrnznphi_double = {dims:[nr,nz,nphi], type:'DOUBLE'}
+    ntnrnznphi_double = {dims:[nthermal,nr,nz,nphi], type:'DOUBLE'}
     nrnznphi_int    = {dims:[nr,nz,nphi], type:'INT'}
     schema = {time:zero_double, $
+              nthermal:zero_int,$
+              impurity_charge:zero_int,$
+              species_mass:nthermal_double,$
               vr:nrnznphi_double, $
               vt:nrnznphi_double, $
               vz:nrnznphi_double, $
               dene:nrnznphi_double, $
+              denimp:nrnznphi_double, $
+              deni:ntnrnznphi_double, $
               denn:nrnznphi_double, $
 	      ti:nrnznphi_double, $
               te:nrnznphi_double, $
@@ -46,20 +55,26 @@ PRO check_plasma, inp, grid, plasma
     if err_status eq 1 then begin
         goto, GET_OUT
     endif
-  
+
     if plasma.data_source eq '' then begin
         error, 'Invalid data source. An empty string is not a data source.'
         err_status = 1
     endif
- 
+
     ;;Electron density
     plasma.dene = plasma.dene > 0. ;[1/cm^3]
+
+    ;;Impurity density
+    plasma.denimp = plasma.denimp > 0. ;[1/cm^3]
+
+    ;;Ion Density
+    plasma.deni = plasma.deni > 0. ;[1/cm^3]
 
     ;;Neutral density
     plasma.denn = plasma.denn > 0. ;[1/cm^3]
 
     ;;Zeff
-    plasma.zeff = plasma.zeff > 1.0
+    plasma.zeff = plasma.impurity_charge < plasma.zeff > 1.0
 
     ;;Electron temperature
     plasma.te = plasma.te > 0. ;[keV]

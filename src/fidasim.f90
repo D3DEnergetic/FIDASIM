@@ -3203,6 +3203,7 @@ subroutine read_equilibrium
         endwhere
     enddo
 
+
     call h5ltpath_valid_f(fid, "/plasma/denn", .True., path_valid, error)
     if(path_valid) then
         call h5ltread_dataset_double_f(gid, "/plasma/denn", denn3d, dims, error)
@@ -3609,6 +3610,36 @@ subroutine read_distribution
     call h5close_f(error)
 
 end subroutine read_distribution
+
+subroutine quasineutrality_check
+    !+ Checks whether quasi-neutrality is satisfied to some tol
+    real(Float64) :: tol = 0.01
+    real(Float64), dimension(:,:,:), allocatable :: quasi, deni
+    integer :: i, quasi_cnt
+
+    allocate(deni(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
+    deni = 0.d0
+    do i=1,n_thermal
+            deni = deni + equil%plasma%deni(i)
+    enddo
+
+    !! Quasi-neutrality check
+    allocate(quasi(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
+    where(equil%mask.ge.0.5)
+        quasi = equil%plasma%dene - (deni + impurity_charge*equil%plasma%denimp + equil%plasma%denf)
+    end where
+
+    quasi_cnt = count(abs(quasi).gt.(tol*equil%plasma%dene))
+    if (quasi_cnt.gt.0) then
+        write(*,'(a)') '---- Quasi-neutrality Check ----'
+        write(*,'(T2, a, f5.2, "%")') 'Tolerance: ',tol*100
+        write(*,'(T2, a, f6.2, "%")') 'Percent Failure: ', &
+                                  100.0*quasi_cnt/size(quasi)
+        write(*,*) ''
+    endif
+    deallocate(deni,quasi)
+
+end subroutine quasineutrality_check
 
 subroutine read_atomic_cross(fid, grp, cross)
     !+ Reads in a cross section table from file
@@ -12136,6 +12167,8 @@ program fidasim
     call make_beam_grid()
     if(inputs%calc_beam.ge.1) call read_beam()
     call read_distribution()
+
+    call quasineutrality_check()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then

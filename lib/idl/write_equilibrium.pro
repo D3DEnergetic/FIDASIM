@@ -42,53 +42,82 @@ PRO write_equilibrium, filename, plasma, fields
 
     plasma_dene_desc = {attribute,obj:'/plasma/dene', $
                         name:'description', $
-                        data:'Electron Number Density: Dene(r,z)'}
+                        data:'Electron Number Density: Dene(r,z,[phi])'}
     plasma_dene_unit = {attribute,obj:'/plasma/dene', $
+                        name:'units', $
+                        data:'cm^-3'}
+
+    plasma_denimp_desc = {attribute, obj:'/plasma/denimp', $
+                          name:'description', $
+                          data:'Impurity Number Density: Denimp(r,z,[phi])'}
+    plasma_denimp_unit = {attribute, obj:'/plasma/denimp', $
+                          name:'units', $
+                          data:'cm^-3'}
+
+    plasma_species_mass_desc = {attribute, obj:'/plasma/species_mass', $
+                                name:'description', $
+                                data:'Mass of ion species: species_mass(species)'}
+    plasma_species_mass_unit = {attribute, obj:'/plasma/species_mass', $
+                                name:'units', $
+                                data:'amu'}
+
+    plasma_impurity_charge_desc = {attribute, obj:'/plasma/impurity_charge', $
+                                   name:'description', $
+                                   data:'Charge number of main impurity species'}
+
+    plasma_nthermal_desc = {attribute, obj:'/plasma/nthermal', $
+                            name:'description', $
+                            data:'Number of hydrogenic, thermal ion species'}
+
+    plasma_deni_desc = {attribute, obj:'/plasma/deni', $
+                        name:'description', $
+                        data:'Ion Number Density: Deni(species,r,z,[phi])'}
+    plasma_deni_unit = {attribute,obj:'/plasma/deni', $
                         name:'units', $
                         data:'cm^-3'}
 
     plasma_denn_desc = {attribute,obj:'/plasma/denn', $
                         name:'description', $
-                        data:'Cold Neutral Number Density: Denn(r,z)'}
+                        data:'Cold Neutral Number Density: Denn(r,z,[phi])'}
     plasma_denn_unit = {attribute,obj:'/plasma/denn', $
                         name:'units', $
                         data:'cm^-3'}
 
     plasma_te_desc = {attribute,obj:'/plasma/te', $
                       name:'description', $
-                      data:'Electron Temperature: Te(r,z)'}
+                      data:'Electron Temperature: Te(r,z,[phi])'}
     plasma_te_unit = {attribute,obj:'/plasma/te', $
                       name:'units', $
                       data:'keV'}
 
     plasma_ti_desc = {attribute,obj:'/plasma/ti', $
                       name:'description', $
-                      data:'Ion Temperature: Ti(r,z)'}
+                      data:'Ion Temperature: Ti(r,z,[phi])'}
     plasma_ti_unit = {attribute,obj:'/plasma/ti', $
                       name:'units', $
                       data:'keV'}
 
     plasma_zeff_desc = {attribute,obj:'/plasma/zeff', $
                         name:'description', $
-                        data:'Effective Nuclear Charge: Zeff(r,z)'}
+                        data:'Effective Nuclear Charge: Zeff(r,z,[phi])'}
 
     plasma_vr_desc = {attribute,obj:'/plasma/vr', $
                       name:'description', $
-                      data:'Bulk plasma flow in the r-direction: Vr(r,z)'}
+                      data:'Bulk plasma flow in the r-direction: Vr(r,z,[phi])'}
     plasma_vr_unit = {attribute,obj:'/plasma/vr', $
                       name:'units', $
                       data:'cm/s'}
 
     plasma_vt_desc = {attribute,obj:'/plasma/vt', $
                       name:'description', $
-                      data:'Bulk plasma flow in the theta/torodial-direction: Vt(r,z)'}
+                      data:'Bulk plasma flow in the theta/torodial-direction: Vt(r,z,[phi])'}
     plasma_vt_unit = {attribute,obj:'/plasma/vt', $
                       name:'units', $
                       data:'cm/s'}
 
     plasma_vz_desc = {attribute,obj:'/plasma/vz', $
                       name:'description', $
-                      data:'Bulk plasma flow in the z-direction: Vz(r,z)'}
+                      data:'Bulk plasma flow in the z-direction: Vz(r,z,[phi])'}
     plasma_vz_unit = {attribute,obj:'/plasma/vz', $
                       name:'units', $
                       data:'cm/s'}
@@ -131,13 +160,18 @@ PRO write_equilibrium, filename, plasma, fields
 
     plasma_mask_desc = {attribute,obj:'/plasma/mask',$
                          name:'description', $
-                         data:'Boolean mask that indicates where' +$ 
+                         data:'Boolean mask that indicates where' +$
                          ' the plasma parameters are well defined'}
 
     plasma_atts = [plasma_desc, plasma_cs, plasma_ds_desc, $
                    plasma_time_desc, plasma_time_unit, $
                    plasma_mask_desc, $
                    plasma_dene_desc, plasma_dene_unit, $
+                   plasma_denimp_desc, plasma_denimp_unit, $
+                   plasma_impurity_charge_desc, $
+                   plasma_nthermal_desc, $
+                   plasma_species_mass_desc, plasma_species_mass_unit, $
+                   plasma_deni_desc, plasma_deni_unit, $
                    plasma_denn_desc, plasma_denn_unit, $
                    plasma_te_desc, plasma_te_unit, $
                    plasma_ti_desc, plasma_ti_unit, $
@@ -155,7 +189,7 @@ PRO write_equilibrium, filename, plasma, fields
     fields_desc = {attribute,obj:'/fields', $
                    name:'description', $
                    data:'Electromagnetic Fields'}
-    
+
     fields_cs = {attribute,obj:'/fields', $
                  name:'coordinate_system', $
                  data:'Cylindrical'}
@@ -166,7 +200,7 @@ PRO write_equilibrium, filename, plasma, fields
 
     fields_mask_desc = {attribute,obj:'/fields/mask',$
                         name:'description', $
-                        data:'Boolean mask that indicates where' +$ 
+                        data:'Boolean mask that indicates where' +$
                         ' the fields are well defined'}
 
     fields_time_desc = {attribute,obj:'/fields/time', $
@@ -221,7 +255,7 @@ PRO write_equilibrium, filename, plasma, fields
     fields_nr_desc = {attribute,obj:'/fields/nr', $
                       name:'description', $
                       data:'Number of R values'}
-   
+
     fields_nz_desc = {attribute,obj:'/fields/nz', $
                       name:'description', $
                       data:'Number of Z values'}

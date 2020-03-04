@@ -1,27 +1,18 @@
 FUNCTION test_profiles,filename,grid,rhogrid
 
-    ;; profiles structure
-    ;;** Structure <83e8518>, 7 tags, length=5768, data length=5764, refs=1:
-    ;;   DATA_SOURCE     STRING
-    ;;   TIME            DOUBLE                 [s]
-    ;;   MASK            INT
-    ;;   VR              DOUBLE    Array[nr,nz] [cm/s]
-    ;;   VT              DOUBLE    Array[nr,nz] [cm/s]
-    ;;   VZ              DOUBLE    Array[nr,nz] [cm/s]
-    ;;   TI              DOUBLE    Array[nr,nz] [keV]
-    ;;   TE              DOUBLE    Array[nr,nz] [keV]
-    ;;   DENE            DOUBLE    Array[nr,nz] [cm^-3]
-    ;;   ZEFF            DOUBLE    Array[nr,nz]
-    ;;   DENN            DOUBLE    Array[nr,nz] [cm^-3]
-
-
     prof = read_ncdf(filename)
+
+    impurity_charge=6
+    nthermal = 1
+    species_mass = [2.01410178d0]
 
     rho = double(prof.rho)
     dene = interpol(prof.dene*1.0d-6,rho,rhogrid) ;;cm^-3
     ti = interpol(prof.ti*1.0d-3,rho,rhogrid) ;;keV
     te = interpol(prof.te*1.0d-3,rho,rhogrid) ;;keV
     zeff = dene*0.d0 + 1.5
+    denimp = dene*(zeff - 1)/(impurity_charge*(impurity_charge-1))
+    deni = dene - impurity_charge*denimp
     vt = grid.r2d*interpol(prof.omega*1.0d0,rho,rhogrid) ;;cm/s
     vr = 0.d0*vt ;;cm/s
     vz = 0.d0*vt ;;cm/s
@@ -36,6 +27,8 @@ FUNCTION test_profiles,filename,grid,rhogrid
     nr = n_elements(dene[*,0])
     nz = n_elements(dene[0,*])
     dene=rebin(dene,nr,nz,grid.nphi)
+    denimp=rebin(denimp,nr,nz,grid.nphi)
+    deni=rebin(denimp,nthermal,nr,nz,grid.nphi)
     denn=rebin(denn,nr,nz,grid.nphi)
     mask=rebin(mask,nr,nz,grid.nphi)
     te=rebin(te,nr,nz,grid.nphi)
@@ -46,8 +39,9 @@ FUNCTION test_profiles,filename,grid,rhogrid
     zeff=rebin(zeff,nr,nz,grid.nphi)
 
     ;;SAVE IN PROFILE STRUCTURE
-	profiles={time:1.d0,data_source:filename,mask:mask, $
+    profiles={time:1.d0,data_source:filename,mask:mask, nthermal:nthermal,$
+              denimp:denimp, deni:deni,species_mass:species_mass,impurity_charge:impurity_charge, $
               te:te,ti:ti,vr:vr,vt:vt,vz:vz,dene:dene,zeff:zeff,denn:denn}
 
-	return,profiles
+    return,profiles
 END

@@ -52,14 +52,23 @@ integer, parameter :: beam_ion = 1
 integer, parameter :: thermal_ion = 2
     !+ Identifier for a thermal ion
 
+!! Plasma Composition
 integer, parameter :: max_species = 3
-    !+ Maximum number of thermal species
-integer :: n_species = 1
-    !+ Number of species
-real(Float64) :: beam_mass = 0.d0
-    !+ Beam/Fast ion species mass [amu]
+    !+ Maximum number of thermal isotopes
+integer :: n_thermal = 1
+    !+ Number of thermal hydrogen species/isotopes
 real(Float64) :: thermal_mass(max_species) = 0.d0
     !+ Thermal ion species mass [amu]
+integer :: impurity_charge = 1
+    !+ Charge of main impurity (boron=5, carbon=6,...)
+real(Float64) :: impurity_mass = 0.d0
+    !+ Impurity species mass [amu]
+real(Float64) :: beam_mass = 0.d0
+    !+ Beam species mass [amu]
+!integer :: n_fast = 1
+!    !+ Number of Fast hydrogen species/isotopes
+!real(Float64) :: fast_mass(max_species) = 0.d0
+!    !+ Fast ion species mass [amu]
 
 !! Physical units
 real(Float64), parameter :: e_amu = 5.48579909070d-4
@@ -221,7 +230,7 @@ type Profiles
     !+ Torodial symmetric plasma parameters at a given R-Z
     real(Float64) :: dene = 0.d0
         !+ Electron density [\(cm^{-3}\)]
-    real(Float64) :: denp = 0.d0
+    real(Float64) :: deni(max_species) = 0.d0
         !+ Ion density [\(cm^{-3}\)]
     real(Float64) :: denimp = 0.d0
         !+ Impurity density [\(cm^{-3}\)]
@@ -239,8 +248,8 @@ type Profiles
         !+ Plasma rotation in torodial/phi direction
     real(Float64) :: vz = 0.d0
         !+ Plasma rotation in z direction
-    real(Float64) :: denn(nlevs) = 0.d0
-        !+ Cold neutral density [\(cm^{-3}\)]
+    real(Float64) :: denn(nlevs,max_species) = 0.d0
+        !+ Cold neutral densities [\(cm^{-3}\)]
 end type Profiles
 
 type, extends( Profiles ) :: LocalProfiles
@@ -333,6 +342,8 @@ end type Equilibrium
 
 type FastIonDistribution
     !+ Defines a Guiding Center Fast-ion Distribution Function: F(E,p,R,Z,Phi)
+    real(Float64) :: A = H2_amu
+        !+ Atomic Mass
     integer(Int32) :: nenergy
         !+ Number of energies
     integer(Int32) :: npitch
@@ -403,6 +414,8 @@ end type FastIonDistribution
 
 type FastIon
     !+ Defines a fast-ion
+    real(Float64)  :: A = H2_amu
+        !+ Fast-ion atomic mass
     logical        :: beam_grid_cross_grid = .False.
         !+ Indicates whether the fast-ion crosses the [[libfida:beam_grid]]
     real(Float64)  :: r = 0.d0
@@ -735,6 +748,8 @@ type NPAParticle
         !+ Detector NPA particle hit
     integer(Int32) :: class = 0
         !+ Orbit class id
+    real(Float64) :: A
+        !+ Atomic Mass
     real(Float64) :: xi = 0.d0
         !+ Initial x position
     real(Float64) :: yi = 0.d0
@@ -813,12 +828,12 @@ type Spectra
         !+ Half energy beam emission stark components: half(n_stark,lambda,chan)
     real(Float64), dimension(:,:,:), allocatable   :: third
         !+ Third energy beam emission stark components: third(n_stark,lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable   :: dcx
-        !+ Direct CX emission stark components: dcx(n_stark,lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable   :: halo
-        !+ Thermal halo emission stark components: halo(n_stark,lambda,chan)
-    real(Float64), dimension(:,:,:), allocatable   :: cold
-        !+ Cold D-alpha emission stark components: cold(n_stark,lambda,chan)
+    real(Float64), dimension(:,:,:,:), allocatable :: dcx
+        !+ Direct CX emission stark components: dcx(n_stark,lambda,chan,species)
+    real(Float64), dimension(:,:,:,:), allocatable :: halo
+        !+ Thermal halo emission stark components: halo(n_stark,lambda,chan,species)
+    real(Float64), dimension(:,:,:,:), allocatable :: cold
+        !+ Cold D-alpha emission stark components: cold(n_stark,lambda,chan,species)
     real(Float64), dimension(:,:,:,:), allocatable :: fida
         !+ Active FIDA emission stark components: fida(n_stark,lambda,chan,orbit_type)
     real(Float64), dimension(:,:,:,:), allocatable :: pfida
@@ -861,8 +876,6 @@ type NeutralParticleReservoir
 end type NeutralParticleReservoir
 
 type NeutralPopulation
-    real(Float64) :: amu = H2_amu
-        !+ Atomic Mass Unit of Neutrals
     real(Float64), dimension(:,:,:,:), allocatable :: dens
         !+ Neutral density: dens(lev,x,y,z)
     type(NeutralParticleReservoir), dimension(:,:,:), allocatable :: res
@@ -1003,10 +1016,6 @@ type SimulationInputs
         !+ Verbosity: <0 = off++, 0 = off, 1=on, 2=on++
     integer(Int32) :: stark_components
         !+ Output spectral stark components : 0=off, 1=on
-
-    !! Plasma parameters
-    integer(Int32) :: impurity_charge
-        !+ Impurity proton number
 
     !! Distribution settings
     integer(Int32) :: dist_type
@@ -1289,8 +1298,6 @@ subroutine np_assign(n1, n2)
 
     integer :: i, j, k, ic, ind(3), nx, ny, nz
 
-    n1%amu = n2%amu
-
     if(.not.allocated(n1%dens)) then
         nx = size(n2%dens,2); ny = size(n2%dens,3); nz = size(n2%dens,4)
         allocate(n1%dens(nlevs,nx,ny,nz), source=n2%dens)
@@ -1316,7 +1323,7 @@ subroutine pp_assign(p1, p2)
     p1%dene   = p2%dene
     p1%ti     = p2%ti
     p1%te     = p2%te
-    p1%denp   = p2%denp
+    p1%deni   = p2%deni
     p1%denf   = p2%denf
     p1%denimp = p2%denimp
     p1%zeff   = p2%zeff
@@ -1335,7 +1342,7 @@ subroutine lpp_assign(p1, p2)
     p1%dene   = p2%dene
     p1%ti     = p2%ti
     p1%te     = p2%te
-    p1%denp   = p2%denp
+    p1%deni   = p2%deni
     p1%denf   = p2%denf
     p1%denimp = p2%denimp
     p1%zeff   = p2%zeff
@@ -1354,7 +1361,7 @@ subroutine plp_assign(p1, p2)
     p1%dene   = p2%dene
     p1%ti     = p2%ti
     p1%te     = p2%te
-    p1%denp   = p2%denp
+    p1%deni   = p2%deni
     p1%denf   = p2%denf
     p1%denimp = p2%denimp
     p1%zeff   = p2%zeff
@@ -1375,7 +1382,7 @@ subroutine lplp_assign(p1, p2)
     p1%dene   = p2%dene
     p1%ti     = p2%ti
     p1%te     = p2%te
-    p1%denp   = p2%denp
+    p1%deni   = p2%deni
     p1%denf   = p2%denf
     p1%denimp = p2%denimp
     p1%zeff   = p2%zeff
@@ -1487,7 +1494,7 @@ function pp_add(p1, p2) result (p3)
     p3%dene   = p1%dene   + p2%dene
     p3%ti     = p1%ti     + p2%ti
     p3%te     = p1%te     + p2%te
-    p3%denp   = p1%denp   + p2%denp
+    p3%deni   = p1%deni   + p2%deni
     p3%denf   = p1%denf   + p2%denf
     p3%denimp = p1%denimp + p2%denimp
     p3%zeff   = p1%zeff   + p2%zeff
@@ -1506,7 +1513,7 @@ function pp_subtract(p1, p2) result (p3)
     p3%dene   = p1%dene   - p2%dene
     p3%ti     = p1%ti     - p2%ti
     p3%te     = p1%te     - p2%te
-    p3%denp   = p1%denp   - p2%denp
+    p3%deni   = p1%deni   - p2%deni
     p3%denf   = p1%denf   - p2%denf
     p3%denimp = p1%denimp - p2%denimp
     p3%zeff   = p1%zeff   - p2%zeff
@@ -1527,7 +1534,7 @@ function lplp_add(p1, p2) result (p3)
     p3%dene   = p1%dene   + p2%dene
     p3%ti     = p1%ti     + p2%ti
     p3%te     = p1%te     + p2%te
-    p3%denp   = p1%denp   + p2%denp
+    p3%deni   = p1%deni   + p2%deni
     p3%denf   = p1%denf   + p2%denf
     p3%denimp = p1%denimp + p2%denimp
     p3%zeff   = p1%zeff   + p2%zeff
@@ -1549,7 +1556,7 @@ function lplp_subtract(p1, p2) result (p3)
     p3%dene   = p1%dene   - p2%dene
     p3%ti     = p1%ti     - p2%ti
     p3%te     = p1%te     - p2%te
-    p3%denp   = p1%denp   - p2%denp
+    p3%deni   = p1%deni   - p2%deni
     p3%denf   = p1%denf   - p2%denf
     p3%denimp = p1%denimp - p2%denimp
     p3%zeff   = p1%zeff   - p2%zeff
@@ -1570,7 +1577,7 @@ function ps_multiply(p1, real_scalar) result (p3)
     p3%dene   = p1%dene   * real_scalar
     p3%ti     = p1%ti     * real_scalar
     p3%te     = p1%te     * real_scalar
-    p3%denp   = p1%denp   * real_scalar
+    p3%deni   = p1%deni   * real_scalar
     p3%denf   = p1%denf   * real_scalar
     p3%denimp = p1%denimp * real_scalar
     p3%zeff   = p1%zeff   * real_scalar
@@ -1612,7 +1619,7 @@ function lps_multiply(p1, real_scalar) result (p3)
     p3%dene   = p1%dene   * real_scalar
     p3%ti     = p1%ti     * real_scalar
     p3%te     = p1%te     * real_scalar
-    p3%denp   = p1%denp   * real_scalar
+    p3%deni   = p1%deni   * real_scalar
     p3%denf   = p1%denf   * real_scalar
     p3%denimp = p1%denimp * real_scalar
     p3%zeff   = p1%zeff   * real_scalar
@@ -1868,8 +1875,7 @@ subroutine read_inputs
     integer(Int32)     :: shot,nlambda,ne_wght,np_wght,nphi_wght,nlambda_wght
     real(Float64)      :: time,lambdamin,lambdamax,emax_wght
     real(Float64)      :: lambdamin_wght,lambdamax_wght
-    real(Float64)      :: ai,ab,pinj,einj,current_fractions(3)
-    integer(Int32)     :: impurity_charge
+    real(Float64)      :: ab,pinj,einj,current_fractions(3)
     integer(Int32)     :: nx,ny,nz
     real(Float64)      :: xmin,xmax,ymin,ymax,zmin,zmax
     real(Float64)      :: alpha,beta,gamma,origin(3)
@@ -1881,7 +1887,7 @@ subroutine read_inputs
         calc_pfida, calc_npa, calc_pnpa,calc_birth, seed, flr, split, &
         calc_fida_wght, calc_npa_wght, load_neutrals, verbose, stark_components, &
         calc_neutron, n_fida, n_pfida, n_npa, n_pnpa, n_nbi, n_halo, n_dcx, n_birth, &
-        ab, pinj, einj, current_fractions, ai, impurity_charge, &
+        ab, pinj, einj, current_fractions, &
         nx, ny, nz, xmin, xmax, ymin, ymax, zmin, zmax, &
         origin, alpha, beta, gamma, &
         ne_wght, np_wght, nphi_wght, &
@@ -1936,8 +1942,6 @@ subroutine read_inputs
     pinj=0
     einj=0
     current_fractions=0
-    ai=0
-    impurity_charge=0
     nx=0
     ny=0
     nz=0
@@ -2033,6 +2037,8 @@ subroutine read_inputs
     inputs%calc_fida_wght=calc_fida_wght
     inputs%calc_npa_wght=calc_npa_wght
     inputs%calc_neutron=calc_neutron
+
+    !! Misc. Settings
     inputs%load_neutrals=load_neutrals
     inputs%verbose=verbose
     inputs%flr = flr
@@ -2048,11 +2054,6 @@ subroutine read_inputs
     inputs%n_halo=max(10,n_halo)
     inputs%n_dcx=max(10,n_dcx)
     inputs%n_birth= max(1,nint(n_birth/real(n_nbi)))
-
-    !!Plasma Settings
-    n_species = 1
-    thermal_mass(1) = ai
-    inputs%impurity_charge=impurity_charge
 
     !!Neutral Beam Settings
     beam_mass=ab
@@ -2788,7 +2789,7 @@ subroutine read_chords
     real(Float64), dimension(:,:), allocatable :: lenses
     real(Float64), dimension(:,:), allocatable :: axes
     real(Float64) :: xyz_lens(3), xyz_axis(3)
-    character(len=20) :: system = ''
+    character(charlim) :: system = ''
 
     integer :: i
     integer :: error
@@ -2987,15 +2988,95 @@ subroutine read_npa
 
 end subroutine read_npa
 
+subroutine read_plasma
+    !+ Reads in Plasma composition e.g. the thermal, fast-ion, and impurity species
+    integer(HID_T) :: fid, gid
+    integer(HSIZE_T), dimension(1) :: dims
+    real(Float64) :: supported_masses(3)
+    integer :: error,i,w
+
+    !!Initialize HDF5 interface
+    call h5open_f(error)
+
+    !!Open HDF5 file
+    call h5fopen_f(inputs%equilibrium_file, H5F_ACC_RDONLY_F, fid, error)
+
+    !!Open PLASMA group
+    call h5gopen_f(fid, "/plasma", gid, error)
+
+    !! Read in number of thermal species
+    call h5ltread_dataset_int_scalar_f(gid, "/plasma/nthermal", n_thermal, error)
+    if (n_thermal.gt.max_species) then
+        write(*,'(a,i1,">",i1)') 'READ_PLASMA: Number of ion species exceeds maximum: ',n_thermal, max_species
+        stop
+    endif
+
+    !! Read in species mass and charge
+    dims(1) = n_thermal
+    call h5ltread_dataset_double_f(gid, "/plasma/species_mass", thermal_mass(1:n_thermal), dims, error)
+    call h5ltread_dataset_int_scalar_f(gid,"/plasma/impurity_charge", impurity_charge, error)
+
+    !!Close PLASMA group
+    call h5gclose_f(gid, error)
+
+    !!Close file
+    call h5fclose_f(fid, error)
+
+    !!Close HDF5 interface
+    call h5close_f(error)
+
+    !! Correct misspecified masses
+    supported_masses = [H1_amu, H2_amu, H3_amu]
+    w = minloc(abs(supported_masses - beam_mass),1)
+    if(abs(beam_mass - supported_masses(w)).gt.0.5) then
+        write(*,'("READ_PLASMA: Got unsupported beam ion mass: ",f6.3," amu")') beam_mass
+        write(*,'(a)') 'Only Hydrogen, Deuterium, and Tritium are supported'
+        stop
+    else
+        beam_mass = supported_masses(w)
+    endif
+
+    do i=1, n_thermal
+        w = minloc(abs(supported_masses-thermal_mass(i)),1)
+        if(abs(thermal_mass(i)-supported_masses(w)).gt.0.5) then
+            write(*,'("READ_PLASMA: Got unsupported thermal-ion mass: ",f6.3," amu")') thermal_mass(i)
+            write(*,'(a)') 'Only Hydrogen, Deuterium, and Tritium are supported'
+            stop
+        else
+            thermal_mass(i) = supported_masses(w)
+        endif
+    enddo
+
+    select case (impurity_charge)
+        case (5)
+            impurity_mass = B5_amu
+        case (6)
+            impurity_mass = C6_amu
+        case DEFAULT
+            impurity_mass = 2.d0*impurity_charge*H1_amu
+    end select
+
+    if(inputs%verbose.ge.1) then
+        write(*,'(a)') '---- Plasma Composition ----'
+        write(*,'(T2,"Thermal-ion masses: ",f6.3," [amu]")') thermal_mass(1:n_thermal)
+        write(*,'(T2,"Impurity mass: ",f6.3," [amu]")') impurity_mass
+        write(*,'(T2,"Beam-ion mass: ",f6.3," [amu]")') beam_mass
+        write(*,'(T2,"Fast-ion mass: ",f6.3," [amu]")') beam_mass
+        write(*,*) ''
+    endif
+
+end subroutine
+
 subroutine read_equilibrium
     !+ Reads in the interpolation grid, plasma parameters, and fields
     !+ and stores the quantities in [[libfida:inter_grid]] and [[libfida:equil]]
     integer(HID_T) :: fid, gid
     integer(HSIZE_T), dimension(3) :: dims
+    integer(HSIZE_T), dimension(4) :: dims4
 
     integer :: impc, ic, ir, iz, iphi, it, ind(3), i
     type(LocalProfiles) :: plasma
-    real(Float64) :: photons
+    real(Float64) :: photons, smix(max_species)
     real(Float64), dimension(nlevs) :: rates, denn, rates_avg
     real(Float64), dimension(3) :: vi
     integer :: error
@@ -3004,6 +3085,7 @@ subroutine read_equilibrium
 
     integer, dimension(:,:,:), allocatable :: p_mask, f_mask
     real(Float64), dimension(:,:,:), allocatable :: denn3d
+    real(Float64), dimension(:,:,:,:), allocatable :: deni
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -3069,6 +3151,7 @@ subroutine read_equilibrium
     allocate(equil%plasma(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
 
     call h5ltread_dataset_double_f(gid, "/plasma/dene", equil%plasma%dene, dims, error)
+    call h5ltread_dataset_double_f(gid, "/plasma/denimp", equil%plasma%denimp, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/te", equil%plasma%te, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/ti", equil%plasma%ti, dims, error)
     call h5ltread_dataset_double_f(gid, "/plasma/zeff", equil%plasma%zeff, dims, error)
@@ -3077,7 +3160,19 @@ subroutine read_equilibrium
     call h5ltread_dataset_double_f(gid, "/plasma/vz", equil%plasma%vz, dims, error)
     call h5ltread_dataset_int_f(gid, "/plasma/mask", p_mask, dims,error)
 
-    impc = inputs%impurity_charge
+    ! Read in ion densities
+    dims4(1) = n_thermal
+    dims4(2:4) = dims
+
+    allocate(deni(n_thermal,inter_grid%nr, inter_grid%nz, inter_grid%nphi))
+    call h5ltread_dataset_double_f(gid, "/plasma/deni", deni, dims4, error)
+    do i=1,n_thermal
+        equil%plasma(:,:,:)%deni(i) = deni(i,:,:,:)
+    enddo
+    deallocate(deni)
+
+    impc = impurity_charge
+
     where(equil%plasma%zeff.lt.1.0)
         equil%plasma%zeff = 1
     endwhere
@@ -3090,6 +3185,10 @@ subroutine read_equilibrium
         equil%plasma%dene = 0.0
     endwhere
 
+    where(equil%plasma%denimp.lt.0.0)
+        equil%plasma%denimp = 0.0
+    endwhere
+
     where(equil%plasma%te.lt.0.0)
         equil%plasma%te = 0.0
     endwhere
@@ -3098,8 +3197,12 @@ subroutine read_equilibrium
         equil%plasma%ti = 0.0
     endwhere
 
-    equil%plasma%denimp = ((equil%plasma%zeff-1.d0)/(impc*(impc-1.d0)))*equil%plasma%dene
-    equil%plasma%denp = equil%plasma%dene - impc*equil%plasma%denimp
+    do i=1,n_thermal
+        where(equil%plasma%deni(i).lt.0.0)
+            equil%plasma%deni(i) = 0.0
+        endwhere
+    enddo
+
 
     call h5ltpath_valid_f(fid, "/plasma/denn", .True., path_valid, error)
     if(path_valid) then
@@ -3107,6 +3210,28 @@ subroutine read_equilibrium
         where(denn3d.lt.0.0)
             denn3d = 0.0
         endwhere
+        loop_over_cells: do ic=1, inter_grid%nr*inter_grid%nz*inter_grid%nphi
+            call ind2sub(inter_grid%dims,ic,ind)
+            ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
+            if(p_mask(ir,iz,iphi).lt.0.5) cycle loop_over_cells
+            if(denn3d(ir,iz,iphi).le.0.0) cycle loop_over_cells
+            plasma = equil%plasma(ir,iz,iphi)
+            plasma%vrot = [plasma%vr, plasma%vt, plasma%vz]
+            plasma%in_plasma = .True.
+            smix = plasma%deni/sum(plasma%deni)
+            do i=1,n_thermal
+                rates_avg = 0.0
+                do it=1,n
+                    rates = 0.0
+                    rates(1) = 1.d19
+                    call mc_halo(plasma, thermal_mass(i), vi)
+                    call colrad(plasma, thermal_mass(i), vi, 1.0d-7, rates, denn, photons)
+                    rates_avg = rates_avg + rates/n
+                enddo
+                if(sum(rates_avg).le.0.0) cycle loop_over_cells
+                equil%plasma(ir,iz,iphi)%denn(:,i) = smix(i)*denn3d(ir,iz,iphi)*(rates_avg)/sum(rates_avg)
+            enddo
+        enddo loop_over_cells
     else
         if((inputs%calc_pnpa + inputs%calc_pfida + inputs%calc_cold).gt.0) then
             if(inputs%verbose.ge.0) then
@@ -3118,26 +3243,6 @@ subroutine read_equilibrium
         inputs%calc_pfida = 0
         inputs%calc_cold = 0
     endif
-
-    loop_over_cells: do ic=1, inter_grid%nr*inter_grid%nz*inter_grid%nphi
-        call ind2sub(inter_grid%dims,ic,ind)
-        ir = ind(1) ; iz = ind(2) ; iphi = ind(3)
-        if(p_mask(ir,iz,iphi).lt.0.5) cycle loop_over_cells
-        if(denn3d(ir,iz,iphi).le.0.0) cycle loop_over_cells
-        plasma = equil%plasma(ir,iz,iphi)
-        plasma%vrot = [plasma%vr, plasma%vt, plasma%vz]
-        plasma%in_plasma = .True.
-        rates_avg = 0.0
-        do it=1,n
-            rates = 0.0
-            rates(1) = 1.d19
-            call mc_halo(plasma, thermal_mass(1), vi)
-            call colrad(plasma, thermal_mass(1), vi, 1.0d-7, rates, denn, photons)
-            rates_avg = rates_avg + rates/n
-        enddo
-        if(sum(rates_avg).le.0.0) cycle loop_over_cells
-        equil%plasma(ir,iz,iphi)%denn = denn3d(ir,iz,iphi)*(rates_avg)/sum(rates_avg)
-    enddo loop_over_cells
 
     !!Close PLASMA group
     call h5gclose_f(gid, error)
@@ -3193,8 +3298,8 @@ subroutine read_f(fid, error)
         !+ Error code
 
     integer(HSIZE_T), dimension(5) :: dims
-    real(Float64) :: denp_tot
-    integer :: ir
+    real(Float64) :: deni_tot
+    integer :: ir,is
     logical :: path_valid
 
     if(inputs%verbose.ge.1) then
@@ -3248,6 +3353,8 @@ subroutine read_f(fid, error)
     else
         fbm%phi=0.d0
     endif
+    !call h5ltread_dataset_double_scalar_f(fid,"/A",fbm%A, error)
+    fbm%A = beam_mass
 
     equil%plasma%denf = fbm%denf
 
@@ -3277,17 +3384,19 @@ subroutine read_f(fid, error)
     fbm%phimax = maxval(fbm%phi,1)
     fbm%phi_range = fbm%phimax - fbm%phimin
 
-    denp_tot = 0.0
+    deni_tot = 0.0
     do ir=1,fbm%nr
         fbm%n_tot = fbm%n_tot + fbm%dphi*fbm%dr*fbm%dz*sum(fbm%denf(ir,:,:))*fbm%r(ir)
-        denp_tot = denp_tot + fbm%dphi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:,:)%denp)*fbm%r(ir)
+        do is=1,n_thermal
+            deni_tot = deni_tot + fbm%dphi*fbm%dr*fbm%dz*sum(equil%plasma(ir,:,:)%deni(is))*fbm%r(ir)
+        enddo
     enddo
 
-    if(fbm%n_tot.ge.denp_tot) then
+    if(fbm%n_tot.ge.deni_tot) then
         if(inputs%verbose.ge.0) then
             write(*,'(a," (",ES10.3," >=",ES10.3,")")') &
                 "READ_F: The total of number of fast ions exceeded the total number of thermal ions.", &
-                 fbm%n_tot, denp_tot
+                 fbm%n_tot, deni_tot
             write(*,'(a)') "This is usually caused by zeff being incorrect."
         endif
         stop
@@ -3347,6 +3456,8 @@ subroutine read_mc(fid, error)
     allocate(weight(particles%nparticle))
 
     dims(1) = particles%nparticle
+    !call h5ltread_dataset_double_f(fid, "/A", particles%fast_ion%A, dims, error)
+    particles%fast_ion%A = beam_mass
     call h5ltread_dataset_double_f(fid, "/r", particles%fast_ion%r, dims, error)
     call h5ltread_dataset_double_f(fid, "/z", particles%fast_ion%z, dims, error)
     call h5ltpath_valid_f(fid, "/phi", .True., path_valid, error)
@@ -3381,7 +3492,7 @@ subroutine read_mc(fid, error)
         endif
         call h5ltread_dataset_double_f(fid, "/energy", particles%fast_ion%energy, dims, error)
         call h5ltread_dataset_double_f(fid, "/pitch", particles%fast_ion%pitch, dims, error)
-        particles%fast_ion%vabs  = sqrt(particles%fast_ion%energy/(v2_to_E_per_amu*beam_mass))
+        particles%fast_ion%vabs  = sqrt(particles%fast_ion%energy/(v2_to_E_per_amu*particles%fast_ion%A))
     else
         if(particles%axisym) then
             dist_type_name = "Axisymmetric Full Orbit Monte Carlo"
@@ -3394,7 +3505,7 @@ subroutine read_mc(fid, error)
         particles%fast_ion%vabs = sqrt(particles%fast_ion%vr**2 + &
                                        particles%fast_ion%vt**2 + &
                                        particles%fast_ion%vz**2)
-        particles%fast_ion%energy = v2_to_E_per_amu*beam_mass*particles%fast_ion%vabs**2
+        particles%fast_ion%energy = v2_to_E_per_amu*particles%fast_ion%A*particles%fast_ion%vabs**2
     endif
 
     call h5ltread_dataset_double_f(fid, "/weight", weight, dims, error)
@@ -3499,6 +3610,36 @@ subroutine read_distribution
     call h5close_f(error)
 
 end subroutine read_distribution
+
+subroutine quasineutrality_check
+    !+ Checks whether quasi-neutrality is satisfied to some tol
+    real(Float64) :: tol = 0.01
+    real(Float64), dimension(:,:,:), allocatable :: quasi, deni
+    integer :: i, quasi_cnt
+
+    allocate(deni(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
+    deni = 0.d0
+    do i=1,n_thermal
+            deni = deni + equil%plasma%deni(i)
+    enddo
+
+    !! Quasi-neutrality check
+    allocate(quasi(inter_grid%nr,inter_grid%nz,inter_grid%nphi))
+    where(equil%mask.ge.0.5)
+        quasi = equil%plasma%dene - (deni + impurity_charge*equil%plasma%denimp + equil%plasma%denf)
+    end where
+
+    quasi_cnt = count(abs(quasi).gt.(tol*equil%plasma%dene))
+    if (quasi_cnt.gt.0) then
+        write(*,'(a)') '---- Quasi-neutrality Check ----'
+        write(*,'(T2, a, f5.2, "%")') 'Tolerance: ',tol*100
+        write(*,'(T2, a, f6.2, "%")') 'Percent Failure: ', &
+                                  100.0*quasi_cnt/size(quasi)
+        write(*,*) ''
+    endif
+    deallocate(deni,quasi)
+
+end subroutine quasineutrality_check
 
 subroutine read_atomic_cross(fid, grp, cross)
     !+ Reads in a cross section table from file
@@ -3881,13 +4022,8 @@ subroutine read_tables
 
     integer :: n_max, m_max
     character(len=4) :: impname
-    real(Float64) :: imp_amu
     real(Float64), dimension(2) :: b_amu
     real(Float64), dimension(:,:), allocatable :: dummy2
-
-    if(inputs%verbose.ge.1) then
-        write(*,'(a)') "---- Atomic tables settings ----"
-    endif
 
     !!Initialize HDF5 interface
     call h5open_f(error)
@@ -3909,16 +4045,13 @@ subroutine read_tables
 
     !!Read Hydrogen-Impurity Transitions
     impname = ''
-    select case (inputs%impurity_charge)
+    select case (impurity_charge)
         case (5)
             impname = "B5"
-            imp_amu = B5_amu
         case (6)
             impname = "C6"
-            imp_amu = C6_amu
         case DEFAULT
             impname = "Aq"
-            imp_amu = 2.d0*inputs%impurity_charge
     end select
 
     call read_atomic_transitions(fid,"/rates/H_"//trim(adjustl(impname)), tables%H_Aq)
@@ -3944,10 +4077,8 @@ subroutine read_tables
     call h5close_f(error)
 
     if(inputs%verbose.ge.1) then
+        write(*,'(a)') "---- Atomic tables settings ----"
         write(*,'(T2,"Maximum n/m: ",i2)') nlevs
-        write(*,'(T2,"Beam/Fast-ion mass: ",f6.3," [amu]")') beam_mass
-        write(*,'(T2,"Thermal/Bulk-ion masses: ",f6.3," [amu]")') thermal_mass(1)
-        write(*,'(T2,"Impurity mass: ",f6.3," [amu]")') imp_amu
         write(*,*) ''
     endif
 
@@ -4242,11 +4373,6 @@ subroutine write_neutral_population(id, pop, error)
     nz = beam_grid%nz
     dims4 = [nlevs, nx, ny, nz]
     d(1) =1
-
-    call h5ltmake_dataset_double_f(id,"amu", 0, d, [pop%amu], error)
-    call h5ltset_attribute_string_f(id,"amu","units", "atomic mass units",error)
-    call h5ltset_attribute_string_f(id,"amu","description", &
-         "Atomic mass", error)
 
     call h5ltmake_dataset_int_f(id,"nlevel", 0, d, [nlevs], error)
     call h5ltset_attribute_string_f(id,"nlevel","description", &
@@ -4747,7 +4873,7 @@ end subroutine write_npa
 subroutine write_spectra
     !+ Writes [[libfida:spectra]] to a HDF5 file
     integer(HID_T) :: fid
-    integer(HSIZE_T), dimension(3) :: dims
+    integer(HSIZE_T), dimension(4) :: dims
     integer(HSIZE_T), dimension(1) :: d
     integer :: error
 
@@ -4756,9 +4882,9 @@ subroutine write_spectra
     real(Float64) :: factor
     real(Float64), dimension(:), allocatable :: lambda_arr
 
-    real(Float64), dimension(inputs%nlambda,spec_chords%nchan) :: full, half, third, dcx, halo, cold
+    real(Float64), dimension(inputs%nlambda,spec_chords%nchan) :: full, half, third
+    real(Float64), dimension(inputs%nlambda,spec_chords%nchan,n_thermal) :: dcx, halo, cold
     real(Float64), dimension(inputs%nlambda,spec_chords%nchan,particles%nclass) :: fida, pfida
-    integer(HSIZE_T), dimension(4) :: dimStark
 
     allocate(lambda_arr(inputs%nlambda))
     do i=1,inputs%nlambda
@@ -4781,16 +4907,17 @@ subroutine write_spectra
     d(1) = 1
     call h5ltmake_dataset_int_f(fid, "/nchan", 0, d, [spec_chords%nchan], error)
     call h5ltmake_dataset_int_f(fid, "/nlambda", 0, d, [inputs%nlambda], error)
-    call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [n_stark], error)
-    dims(1) = inputs%nlambda
-    dims(2) = spec_chords%nchan
-    dims(3) = particles%nclass
-    call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(1:1), &
+    if(inputs%stark_components.ge.1) then
+        call h5ltmake_dataset_int_f(fid, "/nstark", 0, d, [n_stark], error)
+    endif
+    dims(1) = n_stark
+    dims(2) = inputs%nlambda
+    dims(3) = spec_chords%nchan
+    dims(4) = n_thermal
+    call h5ltmake_compressed_dataset_double_f(fid, "/lambda", 1, dims(2:2), &
          lambda_arr, error)
-    call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(2:2), &
+    call h5ltmake_compressed_dataset_double_f(fid, "/radius", 1, dims(3:3), &
          spec_chords%radius, error)
-    dimStark(1) = n_stark
-    dimStark(2:4) = dims
 
     !Add attributes
     call h5ltset_attribute_string_f(fid,"/nchan", "description", &
@@ -4808,7 +4935,7 @@ subroutine write_spectra
         spec%brems = factor*spec%brems
         !Write variables
         call h5ltmake_compressed_dataset_double_f(fid, "/brems", 2, &
-             dims(1:2), spec%brems, error)
+             dims(2:3), spec%brems, error)
         !Add attributes
         call h5ltset_attribute_string_f(fid,"/brems","description", &
              "Visible Bremsstrahlung: brems(lambda,chan)", error)
@@ -4825,11 +4952,11 @@ subroutine write_spectra
             half  = sum(spec%half, dim=1)
             third = sum(spec%third, dim=1)
             !Write variables
-            call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(1:2), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/full", 2, dims(2:3), &
                  full, error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/half", 2, dims(1:2), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/half", 2, dims(2:3), &
                  half, error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(1:2),&
+            call h5ltmake_compressed_dataset_double_f(fid, "/third", 2, dims(2:3),&
                  third, error)
             !Add attributes
             call h5ltset_attribute_string_f(fid,"/full","description", &
@@ -4842,11 +4969,11 @@ subroutine write_spectra
                  "Third energy component of the beam emmision: third(lambda,chan)", error)
             call h5ltset_attribute_string_f(fid,"/third","units","Ph/(s*nm*sr*m^2)",error )
         else
-            call h5ltmake_compressed_dataset_double_f(fid, "/full", 3, dimStark(1:3), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/full", 3, dims(1:3), &
                  spec%full, error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/half", 3, dimStark(1:3), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/half", 3, dims(1:3), &
                  spec%half, error)
-            call h5ltmake_compressed_dataset_double_f(fid, "/third", 3, dimStark(1:3),&
+            call h5ltmake_compressed_dataset_double_f(fid, "/third", 3, dims(1:3),&
                  spec%third, error)
             call h5ltset_attribute_string_f(fid,"/full","description", &
                  "Full energy component of the beam emmision stark components: full(stark,lambda,chan)", &
@@ -4867,16 +4994,16 @@ subroutine write_spectra
         spec%dcx = factor*spec%dcx
         if (inputs%stark_components.eq.0) then
             dcx = sum(spec%dcx, dim=1)
-            call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 2, dims(1:2), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 3, dims(2:4), &
                  dcx, error)
             call h5ltset_attribute_string_f(fid,"/dcx","description", &
-                 "Direct Charge Exchange (DCX) emission: dcx(lambda,chan)", error)
+                 "Direct Charge Exchange (DCX) emission: dcx(lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
         else
-            call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 3, dimStark(1:3), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/dcx", 4, dims, &
                  spec%dcx, error)
             call h5ltset_attribute_string_f(fid,"/dcx","description", &
-                 "Direct Charge Exchange (DCX) emission stark components: dcx(stark,lambda,chan)", error)
+                 "Direct Charge Exchange (DCX) emission stark components: dcx(stark,lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/dcx","units","Ph/(s*nm*sr*m^2)",error )
         endif
     endif
@@ -4885,16 +5012,16 @@ subroutine write_spectra
         spec%halo = factor*spec%halo
         if (inputs%stark_components.eq.0) then
             halo = sum(spec%halo, dim=1)
-            call h5ltmake_compressed_dataset_double_f(fid, "/halo", 2, dims(1:2), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/halo", 3, dims(2:4), &
                  halo, error)
             call h5ltset_attribute_string_f(fid,"/halo","description", &
-                 "Halo component of the beam emmision: halo(lambda,chan)", error)
+                 "Halo component of the beam emmision: halo(lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
         else
-            call h5ltmake_compressed_dataset_double_f(fid, "/halo", 3, dimStark(1:3), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/halo", 4, dims, &
                  spec%halo, error)
             call h5ltset_attribute_string_f(fid,"/halo","description", &
-                 "Halo component of the beam emmision stark components: halo(stark,lambda,chan)", error)
+                 "Halo component of the beam emmision stark components: halo(stark,lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/halo","units","Ph/(s*nm*sr*m^2)",error )
         endif
     endif
@@ -4903,21 +5030,22 @@ subroutine write_spectra
         spec%cold = factor*spec%cold
         if (inputs%stark_components.eq.0) then
             cold = sum(spec%cold, dim=1)
-            call h5ltmake_compressed_dataset_double_f(fid, "/cold", 2, dims(1:2), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/cold", 3, dims(2:4), &
                  cold, error)
             call h5ltset_attribute_string_f(fid,"/cold","description", &
-                 "Cold D-alpha emission: cold(lambda,chan)", error)
+                 "Cold D-alpha emission: cold(lambda,chan,species)", error)
             call h5ltset_attribute_string_f(fid,"/cold","units","Ph/(s*nm*sr*m^2)",error )
         else
-            call h5ltmake_compressed_dataset_double_f(fid, "/cold", 3, dimStark(1:3), &
+            call h5ltmake_compressed_dataset_double_f(fid, "/cold", 4, dims, &
                  spec%cold, error)
             call h5ltset_attribute_string_f(fid,"/cold","description", &
-                 "Cold D-alpha emission stark components: cold(stark,lambda,chan)", &
+                 "Cold D-alpha emission stark components: cold(stark,lambda,chan,species)", &
                  error)
             call h5ltset_attribute_string_f(fid,"/cold","units","Ph/(s*nm*sr*m^2)",error )
         endif
     endif
 
+    dims(4) = particles%nclass
     if(inputs%calc_fida.ge.1) then
         spec%fida = factor*spec%fida
         if (inputs%stark_components.eq.0) fida = sum(spec%fida, dim=1)
@@ -4925,13 +5053,13 @@ subroutine write_spectra
         if(particles%nclass.le.1) then
             if (inputs%stark_components.eq.0) then
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 2, &
-                     dims(1:2), fida(:,:,1), error)
+                     dims(2:3), fida(:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
-                     dimStark(1:3), spec%fida(:,:,:,1), error)
+                     dims(1:3), spec%fida(:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan)", &
@@ -4941,13 +5069,13 @@ subroutine write_spectra
             if (inputs%stark_components.eq.0) then
                 call h5ltmake_dataset_int_f(fid,"/nclass", 0, d, [particles%nclass], error)
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 3, &
-                     dims, fida, error)
+                     dims(2:4), fida, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision: fida(lambda,chan,class)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/fida", 4, &
-                     dimStark, spec%fida, error)
+                     dims, spec%fida, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/fida","description", &
                      "Active Fast-ion D-alpha (FIDA) emmision stark components: fida(stark,lambda,chan,class)", &
@@ -4964,13 +5092,13 @@ subroutine write_spectra
         if(particles%nclass.le.1) then
             if (inputs%stark_components.eq.0) then
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 2, &
-                     dims(1:2), pfida(:,:,1), error)
+                     dims(2:3), pfida(:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 3, &
-                     dimStark(1:3), spec%pfida(:,:,:,1), error)
+                     dims(1:3), spec%pfida(:,:,:,1), error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan)", &
@@ -4982,13 +5110,13 @@ subroutine write_spectra
             endif
             if (inputs%stark_components.eq.0) then
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 3, &
-                     dims, pfida, error)
+                     dims(2:4), pfida, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision: pfida(lambda,chan,class)", error)
             else
                 call h5ltmake_compressed_dataset_double_f(fid, "/pfida", 4, &
-                     dimStark, spec%pfida, error)
+                     dims, spec%pfida, error)
                 !Add attributes
                 call h5ltset_attribute_string_f(fid,"/pfida","description", &
                      "Passive Fast-ion D-alpha (p-FIDA) emmision stark components: pfida(stark,lambda,chan,class)", &
@@ -5418,9 +5546,7 @@ subroutine read_neutral_population(id, pop, error)
     real(Float64), dimension(:,:,:,:), allocatable :: w
     real(Float64), dimension(:,:,:,:,:), allocatable :: v
 
-    call h5ltread_dataset_double_scalar_f(id, "amu", amu, error)
-
-    call init_neutral_population(pop, amu)
+    call init_neutral_population(pop)
 
     nx = beam_grid%nx; ny = beam_grid%ny; nz = beam_grid%nz
 
@@ -5872,7 +5998,7 @@ subroutine boundary_edge(bplane, bedge, nb)
 
 end subroutine boundary_edge
 
-subroutine gyro_surface(fields, energy, pitch, gs)
+subroutine gyro_surface(fields, energy, pitch, Ai, gs)
     !+ Calculates the surface of all possible trajectories
     type(LocalEMFields), intent(in) :: fields
         !+ Electromagnetic fields at guiding center
@@ -5880,6 +6006,8 @@ subroutine gyro_surface(fields, energy, pitch, gs)
         !+ Energy of particle
     real(Float64), intent(in)       :: pitch
         !+ Particle pitch w.r.t the magnetic field
+    real(Float64), intent(in)       :: Ai
+        !+ Ion atomic mass
     type(GyroSurface), intent(out)  :: gs
         !+ Gyro-surface
 
@@ -5887,8 +6015,8 @@ subroutine gyro_surface(fields, energy, pitch, gs)
     real(Float64) :: alpha, vabs, omega
     real(Float64), dimension(3,3) :: s
 
-    vabs  = sqrt(energy/(v2_to_E_per_amu*beam_mass))
-    omega= (fields%b_abs*e0)/(beam_mass*mass_u)
+    vabs  = sqrt(energy/(v2_to_E_per_amu*Ai))
+    omega= (fields%b_abs*e0)/(Ai*mass_u)
     alpha = vabs/omega
 
     gs%omega = omega
@@ -7645,16 +7773,13 @@ subroutine merge_reservoirs(res1,res2)
 
 end subroutine merge_reservoirs
 
-subroutine init_neutral_population(pop, amu)
+subroutine init_neutral_population(pop)
     !+ Initialize [[NeutralPopulation]]
     type(NeutralPopulation), intent(inout) :: pop
         !+ Neutral Population to initialize
-    real(Float64), intent(in) :: amu
-        !+ Neutral Particle Atomic Mass
 
     integer :: i, j, k, ic, ind(3)
 
-    pop%amu = amu
     if(.not.allocated(pop%dens)) then
         allocate(pop%dens(nlevs,beam_grid%nx,beam_grid%ny,beam_grid%nz))
         allocate(pop%res(beam_grid%nx,beam_grid%ny,beam_grid%nz))
@@ -8056,7 +8181,7 @@ subroutine bt_cx_rates(plasma, denn, an, vi, rates)
         if(inputs%verbose.ge.0) then
             write(*,'(a)') "BT_CX_RATES: Eb or Ti out of range of H_H_CX table. Setting H_H_CX rates to zero"
             write(*,'("eb/amu = ",ES10.3," [keV/amu]")') eb_amu
-            write(*,'("ti/amu = ",ES10.3," [keV/amu]")') plasma%ti/thermal_mass(1)
+            write(*,'("ti/amu = ",ES10.3," [keV/amu]")') plasma%ti/an
         endif
         rates = 0.0
         return
@@ -8086,15 +8211,14 @@ subroutine get_neutron_rate(plasma, eb, rate)
     real(Float64), intent(out)      :: rate
         !+ Neutron reaction rate [1/s]
 
-    integer :: err_status, neb, nt, ebi, tii
+    integer :: err_status, neb, nt, ebi, tii, is
     real(Float64) :: dlogE, dlogT, logEmin, logTmin
-    real(Float64) :: logeb, logti, lograte, denp
+    real(Float64) :: logeb, logti, lograte
     type(InterpolCoeffs2D) :: c
     real(Float64) :: b11, b12, b21, b22
 
     logeb = log10(eb)
     logti = log10(plasma%ti)
-    denp = plasma%denp
 
     !!D_D
     err_status = 1
@@ -8118,7 +8242,8 @@ subroutine get_neutron_rate(plasma, eb, rate)
             write(*,'("eb = ",ES10.3," [keV]")') eb
             write(*,'("ti = ",ES10.3," [keV]")') plasma%ti
         endif
-        denp = 0.d0
+        rate = 0.d0
+        return
     endif
 
     lograte = (b11*tables%D_D%log_rate(ebi,tii,2)   + &
@@ -8129,7 +8254,12 @@ subroutine get_neutron_rate(plasma, eb, rate)
     if (lograte.lt.tables%D_D%minlog_rate) then
         rate = 0.d0
     else
-        rate = denp * exp(lograte*log_10)
+        rate = 0.d0
+        do is=1,n_thermal
+            if(thermal_mass(is).eq.H2_amu) then
+                rate = rate + plasma%deni(is) * exp(lograte*log_10)
+            endif
+        enddo
     endif
 
 end subroutine get_neutron_rate
@@ -8226,7 +8356,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     real(Float64) :: logTmin, dlogT, logti, logti_amu, logte
     integer :: neb, nt, i
     type(InterpolCoeffs2D) :: c
-    real(Float64) :: b11, b12, b21, b22, dene, denp, denimp
+    real(Float64) :: b11, b12, b21, b22, dene, deni(max_species), denimp
     real(Float64), dimension(nlevs,nlevs) :: H_H_pop_i, H_H_pop, H_e_pop, H_Aq_pop
     real(Float64), dimension(nlevs) :: H_H_depop_i, H_H_depop, H_e_depop, H_Aq_depop
     integer :: ebi, tii, tei, n, err_status
@@ -8238,7 +8368,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     H_e_depop = 0.d0
     H_Aq_depop = 0.d0
 
-    denp = plasma%denp
+    deni = plasma%deni
     dene = plasma%dene
     denimp = plasma%denimp
     logeb_amu = log10(eb/ab)
@@ -8253,7 +8383,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
     dlogT = tables%H_H%dlogT
     neb = tables%H_H%nenergy
     nt = tables%H_H%ntemp
-    do i=1, n_species
+    do i=1, n_thermal
         H_H_pop_i = 0.d0
         H_H_depop_i = 0.d0
         logti_amu = log10(plasma%ti/thermal_mass(i))
@@ -8279,7 +8409,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_pop_i.lt.tables%H_H%minlog_pop)
                 H_H_pop_i = 0.d0
             elsewhere
-                H_H_pop_i = denp * exp(H_H_pop_i*log_10)
+                H_H_pop_i = deni(i) * exp(H_H_pop_i*log_10)
             end where
 
             H_H_depop_i = (b11*tables%H_H%log_depop(:,ebi,tii)   + &
@@ -8289,7 +8419,7 @@ subroutine get_rate_matrix(plasma, ab, eb, rmat)
             where (H_H_depop_i.lt.tables%H_H%minlog_depop)
                 H_H_depop_i = 0.d0
             elsewhere
-                H_H_depop_i = denp * exp(H_H_depop_i*log_10)
+                H_H_depop_i = deni(i) * exp(H_H_depop_i*log_10)
             end where
         endif
         H_H_pop = H_H_pop + H_H_pop_i
@@ -8669,7 +8799,7 @@ subroutine store_photons(pos, vi, photons, spectra, passive)
 
 end subroutine store_photons
 
-subroutine store_bes_photons(pos, vi, photons, neut_type)
+subroutine store_nbi_photons(pos, vi, photons, neut_type)
     !+ Store BES photons in [[libfida:spectra]]
     real(Float64), dimension(3), intent(in) :: pos
         !+ Position of neutral in beam grid coordinates
@@ -8687,18 +8817,14 @@ subroutine store_bes_photons(pos, vi, photons, neut_type)
                call store_photons(pos,vi,photons,spec%half)
            case (nbit_type)
                call store_photons(pos,vi,photons,spec%third)
-           case (dcx_type)
-               call store_photons(pos,vi,photons,spec%dcx)
-           case (halo_type)
-               call store_photons(pos,vi,photons,spec%halo)
            case default
                if(inputs%verbose.ge.0) then
-                   write(*,'("STORE_BES_PHOTONS: Unknown neutral type: ",i2)') neut_type
+                   write(*,'("STORE_NBI_PHOTONS: Unknown neutral type: ",i2)') neut_type
                endif
                stop
     end select
 
-end subroutine store_bes_photons
+end subroutine store_nbi_photons
 
 subroutine store_fida_photons(pos, vi, photons, orbit_class, passive)
     !+ Store fida photons in [[libfida:spectra]]
@@ -8952,7 +9078,7 @@ subroutine pitch_to_vec(pitch, gyroangle, fields, vi_norm)
 
 end subroutine pitch_to_vec
 
-subroutine gyro_step(vi, fields, r_gyro)
+subroutine gyro_step(vi, fields, Ai, r_gyro)
     !+ Calculates gyro-step
     !+
     !+###References
@@ -8963,6 +9089,8 @@ subroutine gyro_step(vi, fields, r_gyro)
         !+ Ion velocity
     type(LocalEMFields), intent(in)          :: fields
         !+ Electro-magnetic fields
+    real(Float64), intent(in)                :: Ai
+        !+ Atomic mass of ion
     real(Float64), dimension(3), intent(out) :: r_gyro
         !+ Gyro-step
         !+ Gyro-radius vector from particle position to guiding center
@@ -8974,7 +9102,7 @@ subroutine gyro_step(vi, fields, r_gyro)
         uvw = fields%uvw
         R = sqrt(uvw(1)**2 + uvw(2)**2)
         phi = atan2(uvw(2),uvw(1))
-        one_over_omega=beam_mass*mass_u/(fields%b_abs*e0)
+        one_over_omega=Ai*mass_u/(fields%b_abs*e0)
         vxB = cross_product(vi,fields%b_norm)
         vpar =  dot_product(vi,fields%b_norm)
         r_gyro = vxB*one_over_omega !points towards gyrocenter, in beam coordinates
@@ -9023,7 +9151,7 @@ subroutine gyro_step(vi, fields, r_gyro)
 
 end subroutine gyro_step
 
-subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
+subroutine gyro_correction(fields, energy, pitch, Ai, rp, vp, theta_in)
     !+ Calculates gyro correction for Guiding Center MC distribution calculation
     type(LocalEMFields), intent(in)          :: fields
         !+ Electromagnetic fields at guiding center
@@ -9031,6 +9159,8 @@ subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
         !+ Energy of particle
     real(Float64), intent(in)                :: pitch
         !+ Particle pitch w.r.t the magnetic field
+    real(Float64), intent(in)                :: Ai
+        !+ Atomic mass of Ion
     real(Float64), dimension(3), intent(out) :: rp
         !+ Particle position
     real(Float64), dimension(3), intent(out) :: vp
@@ -9041,7 +9171,7 @@ subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     real(Float64), dimension(1) :: randomu
     real(Float64) :: vabs, theta
 
-    vabs  = sqrt(energy/(v2_to_E_per_amu*beam_mass))
+    vabs  = sqrt(energy/(v2_to_E_per_amu*Ai))
 
     if(present(theta_in)) then
         theta = theta_in
@@ -9056,12 +9186,12 @@ subroutine gyro_correction(fields, energy, pitch, rp, vp, theta_in)
     vp = vabs*vi_norm
 
     !! Move to particle location
-    call gyro_step(vp, fields, r_step)
+    call gyro_step(vp, fields, Ai, r_step)
     rp = fields%pos - r_step
 
 end subroutine gyro_correction
 
-function gyro_radius(fields, energy, pitch) result (gyro_rad)
+function gyro_radius(fields, energy, pitch, Ai) result (gyro_rad)
     !+ Calculates mean gyro-radius
     type(LocalEMFields), intent(in)          :: fields
         !+ Electromagnetic fields at guiding center
@@ -9069,6 +9199,8 @@ function gyro_radius(fields, energy, pitch) result (gyro_rad)
         !+ Energy of particle
     real(Float64), intent(in)                :: pitch
         !+ Particle pitch w.r.t the magnetic field
+    real(Float64), intent(in)                :: Ai
+        !+ Atomic Mass of ion
     real(Float64) :: gyro_rad
         !+ Mean gyro-radius
 
@@ -9076,14 +9208,14 @@ function gyro_radius(fields, energy, pitch) result (gyro_rad)
     real(Float64) :: vabs, phi
     integer :: i,n
 
-    vabs  = sqrt(energy/(v2_to_E_per_amu*beam_mass))
+    vabs  = sqrt(energy/(v2_to_E_per_amu*Ai))
 
     gyro_rad = 0.d0
     n = 6
     do i=1,n
         phi = i*2*pi/n
         call pitch_to_vec(pitch, phi, fields, vi_norm)
-        call gyro_step(vabs*vi_norm, fields, r_step)
+        call gyro_step(vabs*vi_norm, fields, Ai, r_step)
         gyro_rad = gyro_rad + norm2(r_step)/n
     enddo
 
@@ -9452,9 +9584,9 @@ subroutine ndmc
     logical :: err
 
     !! Initialize Neutral Population
-    call init_neutral_population(neut%full,beam_mass)
-    call init_neutral_population(neut%half,beam_mass)
-    call init_neutral_population(neut%third,beam_mass)
+    call init_neutral_population(neut%full)
+    call init_neutral_population(neut%half)
+    call init_neutral_population(neut%third)
 
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') inputs%n_nbi
@@ -9492,7 +9624,8 @@ subroutine ndmc
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
                 call colrad(plasma,beam_mass,vnbi,tracks(jj)%time,states,dens,photons)
-                call store_neutrals(ind,tracks(jj)%pos,vnbi,neut_type,dens/nlaunch)
+                dens = dens/nlaunch
+                call store_neutrals(ind,tracks(jj)%pos,vnbi,neut_type,dens)
                 tracks(jj)%flux = (iflux - sum(states))/nlaunch
                 flux_tot = flux_tot + tracks(jj)%flux*beam_grid%dv
 
@@ -9501,7 +9634,7 @@ subroutine ndmc
                 endif
 
                 if((photons.gt.0.d0).and.(inputs%calc_bes.ge.1)) then
-                    call store_bes_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
+                    call store_nbi_photons(tracks(jj)%pos,vnbi,photons/nlaunch,neut_type)
                 endif
             enddo loop_along_track
             if((inputs%calc_birth.ge.1).and.(flux_tot.gt.0.d0)) then
@@ -9520,7 +9653,7 @@ subroutine ndmc
 
                     call get_fields(fields,pos=ri)
                     birth%part(birth%cnt)%pitch = dot_product(fields%b_norm,vnbi/norm2(vnbi))
-                    call gyro_step(vnbi,fields,r_gyro)
+                    call gyro_step(vnbi,fields,beam_mass,r_gyro)
                     birth%part(birth%cnt)%ri_gc = ri + r_gyro
                     birth%cnt = birth%cnt + 1
                 enddo
@@ -9560,7 +9693,7 @@ end subroutine ndmc
 
 subroutine dcx
     !+ Calculates Direct Charge Exchange (DCX) neutral density and spectra
-    integer :: ic,i,j,k,ncell
+    integer :: ic,i,j,k,ncell,is
     integer(Int64) :: idcx !! counter
     real(Float64), dimension(3) :: ri    !! start position
     real(Float64), dimension(3) :: vihalo
@@ -9582,7 +9715,7 @@ subroutine dcx
     real(Float64) :: fi_correction, dcx_dens
 
     !! Initialized Neutral Population
-    call init_neutral_population(neut%dcx,thermal_mass(1))
+    call init_neutral_population(neut%dcx)
 
     papprox=0.d0
     tot_denn=0.d0
@@ -9594,7 +9727,7 @@ subroutine dcx
         tot_denn = sum(neut%full%dens(:,i,j,k)) + &
                    sum(neut%half%dens(:,i,j,k)) + &
                    sum(neut%third%dens(:,i,j,k))
-        papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+        papprox(i,j,k)= tot_denn*sum(plasma%deni)
     enddo
 
     ncell = 0
@@ -9612,7 +9745,7 @@ subroutine dcx
     if(inputs%verbose.ge.1) then
        write(*,'(T6,"# of markers: ",i10)') sum(nlaunch)
     endif
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,idcx,ind,vihalo, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,idcx,ind,vihalo, &
     !$OMP& ri,tracks,ntrack,rates,denn,states,jj,photons,plasma,fi_correction)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -9622,32 +9755,39 @@ subroutine dcx
             !! Calculate ri,vhalo and track
             call mc_beam_grid(ind, ri)
             call get_plasma(plasma, pos=ri)
-            call mc_halo(plasma, thermal_mass(1), vihalo)
-            call track(ri,vihalo,tracks,ntrack)
-            if(ntrack.eq.0) cycle loop_over_dcx
+            loop_over_species: do is=1, n_thermal
+                call mc_halo(plasma, thermal_mass(is), vihalo)
+                call track(ri,vihalo,tracks,ntrack)
+                if(ntrack.eq.0) cycle loop_over_dcx
 
-            !! Calculate CX probability
-            call get_total_cx_rate(tracks(1)%ind, ri, vihalo, neut_types, rates)
-            if(sum(rates).le.0.) cycle loop_over_dcx
+                !! Calculate CX probability
+                call get_total_cx_rate(tracks(1)%ind, ri, vihalo, neut_types, rates)
+                if(sum(rates).le.0.) cycle loop_over_dcx
 
-            !! Solve collisional radiative model along track
-            call get_plasma(plasma,pos=tracks(1)%pos)
+                !! Solve collisional radiative model along track
+                call get_plasma(plasma,pos=tracks(1)%pos)
 
-            !! Weight CX rates by ion source density
-            states = rates*plasma%denp
-            fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
-
-            loop_along_track: do jj=1,ntrack
-                call get_plasma(plasma,pos=tracks(jj)%pos)
-                if(.not.plasma%in_plasma) exit loop_along_track
-                call colrad(plasma,thermal_mass(1),vihalo,tracks(jj)%time,states,denn,photons)
-                call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vihalo,dcx_type,denn/nlaunch(i,j,k))
-
-                if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
-                    photons = fi_correction*photons !! Correct for including fast-ions in states
-                    call store_bes_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),dcx_type)
+                !! Weight CX rates by ion source density
+                if(beam_mass.eq.thermal_mass(is)) then
+                    states = rates*(plasma%deni(is) + plasma%denf)
+                    fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
+                else
+                    states = rates*plasma%deni(is)
+                    fi_correction = 1.d0
                 endif
-            enddo loop_along_track
+
+                loop_along_track: do jj=1,ntrack
+                    call get_plasma(plasma,pos=tracks(jj)%pos)
+                    if(.not.plasma%in_plasma) exit loop_along_track
+                    call colrad(plasma,thermal_mass(is),vihalo,tracks(jj)%time,states,denn,photons)
+                    call store_neutrals(tracks(jj)%ind,tracks(jj)%pos,vihalo,dcx_type,denn/nlaunch(i,j,k))
+
+                    if((photons.gt.0.d0).and.(inputs%calc_dcx.ge.1)) then
+                        photons = fi_correction*photons !! Correct for including fast-ions in states
+                        call store_photons(tracks(jj)%pos,vihalo,photons/nlaunch(i,j,k),spec%dcx(:,:,:,is))
+                    endif
+                enddo loop_along_track
+            enddo loop_over_species
         enddo loop_over_dcx
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -9683,7 +9823,7 @@ subroutine halo
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     integer :: ntrack
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks  !! Particle Tracks
-    integer :: ii,jj,kk,it
+    integer :: ii,jj,kk,it,is
     real(Float64) :: tot_denn, photons  !! photon flux
     integer, dimension(beam_grid%ngrid) :: cell_ind
     real(Float64), dimension(beam_grid%nx,beam_grid%ny,beam_grid%nz) :: papprox
@@ -9699,7 +9839,7 @@ subroutine halo
     real(Float64) :: fi_correction
 
     !! Initialize Neutral Population
-    call init_neutral_population(neut%halo,thermal_mass(1))
+    call init_neutral_population(neut%halo)
 
     dcx_dens = sum(neut%dcx%dens)
 
@@ -9713,13 +9853,13 @@ subroutine halo
     n_halo = inputs%n_halo
 
     !! Allocate previous neutral populations
-    call init_neutral_population(prev_pop,thermal_mass(1))
+    call init_neutral_population(prev_pop)
     prev_pop = neut%dcx
 
     seed_dcx = 1.0
     iterations: do hh=1,200
         !! Allocate/Reallocate current population
-        call init_neutral_population(cur_pop,thermal_mass(1))
+        call init_neutral_population(cur_pop)
         halo_iter_dens(cur_type) = 0.d0
 
         !! Calculate how many mc markers to launch in each cell
@@ -9733,7 +9873,7 @@ subroutine halo
             call get_plasma(plasma,ind=ind)
             if(.not.plasma%in_plasma) cycle
             tot_denn = sum(prev_pop%dens(:,i,j,k))
-            papprox(i,j,k)= tot_denn*(plasma%denp-plasma%denf)
+            papprox(i,j,k)= tot_denn*sum(plasma%deni)
             if(papprox(i,j,k).gt.0.0) then
                 ncell = ncell + 1
                 cell_ind(ncell) = ic
@@ -9745,7 +9885,7 @@ subroutine halo
             write(*,'(T6,"# of markers: ",i10," --- Seed/DCX: ",f5.3)') sum(nlaunch), seed_dcx
         endif
 
-        !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ii,jj,kk,it,ind,vihalo, &
+        !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ihalo,ii,jj,kk,it,is,ind,vihalo, &
         !$OMP& ri,tracks,ntrack,rates,denn,states,photons,plasma,tind,fi_correction)
         loop_over_cells: do ic=istart,ncell,istep
             call ind2sub(beam_grid%dims,cell_ind(ic),ind)
@@ -9755,39 +9895,46 @@ subroutine halo
                 !! Calculate ri,vhalo and track
                 call mc_beam_grid(ind, ri)
                 call get_plasma(plasma, pos=ri)
-                call mc_halo(plasma, thermal_mass(1), vihalo)
-                call track(ri,vihalo,tracks,ntrack)
-                if(ntrack.eq.0)cycle loop_over_halos
+                loop_over_species: do is=1,n_thermal
+                    call mc_halo(plasma, thermal_mass(is), vihalo)
+                    call track(ri,vihalo,tracks,ntrack)
+                    if(ntrack.eq.0)cycle loop_over_halos
 
-                !! Get plasma parameters at particle location
-                call get_plasma(plasma, pos=ri)
+                    !! Get plasma parameters at particle location
+                    call get_plasma(plasma, pos=ri)
 
-                !! Calculate CX probability
-                tind = tracks(1)%ind
-                ii = tind(1); jj = tind(2); kk = tind(3)
-                call neutral_cx_rate(prev_pop%dens(:,ii,jj,kk), prev_pop%res(ii,jj,kk), vihalo, rates)
-                if(sum(rates).le.0.)cycle loop_over_halos
+                    !! Calculate CX probability
+                    tind = tracks(1)%ind
+                    ii = tind(1); jj = tind(2); kk = tind(3)
+                    call neutral_cx_rate(prev_pop%dens(:,ii,jj,kk), prev_pop%res(ii,jj,kk), vihalo, rates)
+                    if(sum(rates).le.0.)cycle loop_over_halos
 
-                !! Get plasma parameters at mean point in cell
-                call get_plasma(plasma, pos=tracks(1)%pos)
+                    !! Get plasma parameters at mean point in cell
+                    call get_plasma(plasma, pos=tracks(1)%pos)
 
-                !! Weight CX rates by ion source density
-                states = rates*plasma%denp
-                fi_correction = max((plasma%denp - plasma%denf)/plasma%denp,0.d0)
-
-                loop_along_track: do it=1,ntrack
-                    call get_plasma(plasma,pos=tracks(it)%pos)
-                    if(.not.plasma%in_plasma) exit loop_along_track
-                    call colrad(plasma,thermal_mass(1),vihalo,tracks(it)%time,states,denn,photons)
-
-                    !! Store Neutrals
-                    call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
-
-                    if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
-                        photons = fi_correction*photons !! Correct for including fast-ions in states
-                        call store_bes_photons(tracks(it)%pos,vihalo,photons/nlaunch(i,j,k),halo_type)
+                    !! Weight CX rates by ion source density
+                    if(beam_mass.eq.thermal_mass(is)) then
+                        states = rates*(plasma%deni(is) + plasma%denf)
+                        fi_correction = max(plasma%deni(is)/(plasma%deni(is)+plasma%denf),0.d0)
+                    else
+                        states = rates*plasma%deni(is)
+                        fi_correction = 1.d0
                     endif
-                enddo loop_along_track
+
+                    loop_along_track: do it=1,ntrack
+                        call get_plasma(plasma,pos=tracks(it)%pos)
+                        if(.not.plasma%in_plasma) exit loop_along_track
+                        call colrad(plasma,thermal_mass(is),vihalo,tracks(it)%time,states,denn,photons)
+
+                        !! Store Neutrals
+                        call update_neutrals(cur_pop, tracks(it)%ind, vihalo, denn/nlaunch(i,j,k))
+
+                        if((photons.gt.0.d0).and.(inputs%calc_halo.ge.1)) then
+                            photons = fi_correction*photons !! Correct for including fast-ions in states
+                            call store_photons(tracks(it)%pos,vihalo,photons/nlaunch(i,j,k),spec%halo(:,:,:,is))
+                        endif
+                    enddo loop_along_track
+                enddo loop_over_species
             enddo loop_over_halos
         enddo loop_over_cells
         !$OMP END PARALLEL DO
@@ -9906,17 +10053,17 @@ end subroutine nbi_spec
 
 subroutine dcx_spec
     !+ Calculates DCX emission from user supplied neutrals file
-    integer :: ic, i, j, k, it
+    integer :: ic, i, j, k, it, is
     real(Float64), dimension(3) :: ri, vhalo, random3, rc
     integer,dimension(3) :: ind
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
-    real(Float64) :: dcx_photons
+    real(Float64) :: dcx_photons, wght
     logical :: inp
     integer :: n = 10000
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
-    !$OMP& dcx_photons, rc, ri, inp, vhalo, random3, plasma)
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,ind, &
+    !$OMP& dcx_photons, wght, rc, ri, inp, vhalo, random3, plasma)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -9936,10 +10083,13 @@ subroutine dcx_spec
         enddo
 
         call get_plasma(plasma, pos=ri)
-        do it=1, n
-            !! DCX Spectra
-            call mc_halo(plasma, thermal_mass(1), vhalo)
-            call store_photons(ri, vhalo, dcx_photons/n, spec%dcx)
+        do is=1, n_thermal
+            wght = plasma%deni(is)/sum(plasma%deni)
+            do it=1, n
+                !! DCX Spectra
+                call mc_halo(plasma, thermal_mass(is), vhalo)
+                call store_photons(ri, vhalo, wght*dcx_photons/n, spec%dcx(:,:,:,is))
+            enddo
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -9953,17 +10103,17 @@ end subroutine dcx_spec
 
 subroutine halo_spec
     !+ Calculates halo emission from user supplied neutrals file
-    integer :: ic, i, j, k, it
+    integer :: ic, i, j, k, it, is
     real(Float64), dimension(3) :: ri, vhalo, random3, rc
     integer,dimension(3) :: ind
     !! Determination of the CX probability
     type(LocalProfiles) :: plasma
-    real(Float64) :: halo_photons
+    real(Float64) :: halo_photons, wght
     logical :: inp
     integer :: n = 10000
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
-    !$OMP& halo_photons, rc, ri, inp, vhalo, random3, plasma)
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind,is, &
+    !$OMP& halo_photons, wght, rc, ri, inp, vhalo, random3, plasma)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -9983,10 +10133,13 @@ subroutine halo_spec
         enddo
 
         call get_plasma(plasma, pos=ri)
-        do it=1, n
-            !! Halo Spectra
-            call mc_halo(plasma, thermal_mass(1), vhalo)
-            call store_photons(ri, vhalo, halo_photons/n, spec%halo)
+        do is=1, n_thermal
+            wght = plasma%deni(is)/sum(plasma%deni)
+            do it=1, n
+                !! Halo Spectra
+                call mc_halo(plasma, thermal_mass(is), vhalo)
+                call store_photons(ri, vhalo, wght*halo_photons/n, spec%halo(:,:,:,is))
+            enddo
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10000,7 +10153,7 @@ end subroutine halo_spec
 
 subroutine cold_spec
     !+ Calculates cold D-alpha emission
-    integer :: ic, i, j, k, it, ncell
+    integer :: ic, i, j, k, it, is, ncell
     real(Float64), dimension(3) :: ri, vhalo
     integer,dimension(3) :: ind
     !! Determination of the CX probability
@@ -10008,7 +10161,7 @@ subroutine cold_spec
     real(Float64) :: cold_photons
     integer :: n = 10000
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,ind, &
+    !$OMP PARALLEL DO schedule(dynamic,1) private(i,j,k,ic,is,ind, &
     !$OMP& cold_photons, ri, vhalo, plasma)
     loop_over_cells: do ic = istart, spec_chords%ncell, istep
         call ind2sub(beam_grid%dims,spec_chords%cell(ic),ind)
@@ -10016,13 +10169,15 @@ subroutine cold_spec
         ri = [beam_grid%xc(i), beam_grid%yc(j), beam_grid%zc(k)]
 
         call get_plasma(plasma, pos=ri)
-        cold_photons = plasma%denn(3)*tables%einstein(2,3)
-        if(cold_photons.le.0.0) cycle loop_over_cells
+        do is = 1, n_thermal
+            cold_photons = plasma%denn(3,is)*tables%einstein(2,3)
+            if(cold_photons.le.0.0) cycle loop_over_cells
 
-        do it=1, n
-            !! Cold Spectra
-            call mc_halo(plasma, thermal_mass(1), vhalo)
-            call store_photons(ri, vhalo, cold_photons/n, spec%cold)
+            do it=1, n
+                !! Cold Spectra
+                call mc_halo(plasma, thermal_mass(is), vhalo)
+                call store_photons(ri, vhalo, cold_photons/n, spec%cold(:,:,:,is))
+            enddo
         enddo
     enddo loop_over_cells
     !$OMP END PARALLEL DO
@@ -10187,7 +10342,7 @@ subroutine fida_f
             if(denf.le.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
-            call gyro_correction(fields, eb, ptch, ri, vi)
+            call gyro_correction(fields, eb, ptch, fbm%A, ri, vi)
 
             !! Find the particles path through the beam grid
             call track(ri, vi, tracks, ntrack,los_intersect)
@@ -10205,7 +10360,7 @@ subroutine fida_f
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
-                call colrad(plasma, beam_mass, vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma, fbm%A, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, vi, photons/nlaunch(i,j,k))
             enddo loop_along_track
@@ -10221,7 +10376,7 @@ end subroutine fida_f
 
 subroutine pfida_f
     !+ Calculate Passive FIDA emission using a Fast-ion distribution function F(E,p,r,z)
-    integer :: i,j,k,ic,ncell
+    integer :: i,j,k,ic,ncell,is
     integer(Int64) :: iion
     real(Float64), dimension(3) :: ri      !! start position
     real(Float64), dimension(3) :: vi      !! velocity of fast ions
@@ -10232,7 +10387,7 @@ subroutine pfida_f
     !! Determination of the CX probability
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
-    real(Float64), dimension(nlevs) :: rates !! CX rates
+    real(Float64), dimension(nlevs) :: rates, rates_is !! CX rates
 
     !! Collisiional radiative model along track
     integer :: ntrack
@@ -10280,7 +10435,7 @@ subroutine pfida_f
 
     !! Loop over all cells that have neutrals
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,vi,xyz_vi,ri,fields, &
-    !$OMP tracks,ntrack,jj,plasma,rates,denn,states,photons,denf,eb,ptch,los_intersect)
+    !$OMP tracks,ntrack,jj,plasma,rates,rates_is,is,denn,states,photons,denf,eb,ptch,los_intersect)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(pass_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -10290,7 +10445,7 @@ subroutine pfida_f
             if(denf.le.0.0) cycle loop_over_fast_ions
 
             !! Correct for gyro motion and get particle position and velocity
-            call gyro_correction(fields, eb, ptch, ri, vi)
+            call gyro_correction(fields, eb, ptch, fbm%A, ri, vi)
             xyz_vi = matmul(beam_grid%inv_basis,vi)
 
             !! Find the particles path through the interpolation grid
@@ -10298,9 +10453,13 @@ subroutine pfida_f
             if(.not.los_intersect) cycle loop_over_fast_ions
             if(ntrack.eq.0) cycle loop_over_fast_ions
 
-            !! Calculate CX probability with beam and halo neutrals
+            !! Calculate CX probability with edge neutrals
             call get_plasma(plasma, pos=ri, input_coords=1)
-            call bt_cx_rates(plasma, plasma%denn, thermal_mass(1), xyz_vi, rates)
+            rates = 0.0
+            do is=1,n_thermal
+                call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), xyz_vi, rates_is)
+                rates = rates + rates_is
+            enddo
             if(sum(rates).le.0.) cycle loop_over_fast_ions
 
             !! Weight CX rates by ion source density
@@ -10310,7 +10469,7 @@ subroutine pfida_f
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
-                call colrad(plasma, beam_mass, xyz_vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma, fbm%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, xyz_vi, photons/nlaunch(i,j,k), passive=.True.)
             enddo loop_along_track
@@ -10387,7 +10546,7 @@ subroutine fida_mc
                 call get_fields(fields, pos=ri)
 
                 !! Correct for gyro motion and get particle position and velocity
-                call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, ri, vi)
+                call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, ri, vi)
             else !! Full Orbit
                 !! Calculate velocity vector
                 uvw_vi(1) = c*fast_ion%vr - s*fast_ion%vt
@@ -10412,7 +10571,7 @@ subroutine fida_mc
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos)
 
-                call colrad(plasma, beam_mass, vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma, fast_ion%A, vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, vi, photons, fast_ion%class)
             enddo loop_along_track
@@ -10438,14 +10597,14 @@ subroutine pfida_mc
     real(Float64), dimension(3) :: xyz_vi
     !! Determination of the CX probability
     real(Float64), dimension(nlevs) :: denn    !!  neutral dens (n=1-4)
-    real(Float64), dimension(nlevs) :: rates    !! CX rates
+    real(Float64), dimension(nlevs) :: rates, rates_is    !! CX rates
     !! Collisiional radiative model along track
     real(Float64), dimension(nlevs) :: states  ! Density of n-states
     type(ParticleTrack), dimension(pass_grid%ntrack) :: tracks
     integer :: ntrack
     logical :: los_intersect
-    integer :: jj      !! counter along track
-    real(Float64) :: photons !! photon flux
+    integer :: jj, is
+    real(Float64) :: photons
     real(Float64)  :: s, c
     real(Float64), dimension(1) :: randomu
 
@@ -10458,8 +10617,8 @@ subroutine pfida_mc
         write(*,'(T6,"# of markers: ",i10)') int(particles%nparticle*ngamma,Int64)
     endif
 
-    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,fast_ion,vi,ri,phi,tracks,s,c,&
-    !$OMP& randomu,plasma,fields,ntrack,jj,rates,denn,los_intersect,states,photons,xyz_vi)
+    !$OMP PARALLEL DO schedule(dynamic,1) private(iion,igamma,is,fast_ion,vi,ri,phi,tracks,s,c,&
+    !$OMP& randomu,plasma,fields,ntrack,jj,rates,rates_is,denn,los_intersect,states,photons,xyz_vi)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -10484,7 +10643,7 @@ subroutine pfida_mc
                 call get_fields(fields, pos=ri, input_coords=1, output_coords=1)
 
                 !! Correct for gyro motion and get particle position and velocity
-                call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, ri, vi)
+                call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, ri, vi)
             else !! Full Orbit
                 !! Calculate velocity vector
                 vi(1) = c*fast_ion%vr - s*fast_ion%vt
@@ -10500,7 +10659,11 @@ subroutine pfida_mc
 
             !! Calculate CX probability
             call get_plasma(plasma, pos=ri, input_coords=1)
-            call bt_cx_rates(plasma, plasma%denn, thermal_mass(1), xyz_vi, rates)
+            rates = 0.d0
+            do is=1,n_thermal
+                call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), xyz_vi, rates_is)
+                rates = rates + rates_is
+            enddo
             if(sum(rates).le.0.) cycle gamma_loop
 
             !! Weight CX rates by ion source density
@@ -10516,7 +10679,7 @@ subroutine pfida_mc
             loop_along_track: do jj=1,ntrack
                 call get_plasma(plasma,pos=tracks(jj)%pos,input_coords=1)
 
-                call colrad(plasma, beam_mass, xyz_vi, tracks(jj)%time, states, denn, photons)
+                call colrad(plasma, fast_ion%A, xyz_vi, tracks(jj)%time, states, denn, photons)
 
                 call store_fida_photons(tracks(jj)%pos, xyz_vi, photons, fast_ion%class,passive=.True.)
             enddo loop_along_track
@@ -10591,7 +10754,7 @@ subroutine npa_f
             call mc_fastion(ind, fields, eb, ptch, denf)
             if(denf.le.0.0) cycle loop_over_fast_ions
 
-            call gyro_surface(fields, eb, ptch, gs)
+            call gyro_surface(fields, eb, ptch, fbm%A, gs)
 
             detector_loop: do ichan=1,npa_chords%nchan
                 call npa_gyro_range(ichan, gs, gyrange, nrange)
@@ -10655,11 +10818,11 @@ subroutine pnpa_f
     type(LocalEMFields) :: fields
     type(GyroSurface) :: gs
     real(Float64), dimension(2,4) :: gyrange
-    real(Float64), dimension(nlevs) :: rates
+    real(Float64), dimension(nlevs) :: rates, rates_is
     real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux, theta, dtheta, eb, ptch,max_papprox
 
-    integer :: inpa,ichan,nrange,ir,npart,ncell
+    integer :: inpa,ichan,nrange,ir,npart,ncell, is
     integer, dimension(pass_grid%ngrid) :: cell_ind
     real(Float64), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: papprox
     integer(Int32), dimension(pass_grid%nr,pass_grid%nz,pass_grid%nphi) :: nlaunch
@@ -10694,7 +10857,7 @@ subroutine pnpa_f
 
     !! Loop over all cells that can contribute to NPA signal
     !$OMP PARALLEL DO schedule(dynamic,1) private(ic,i,j,k,ind,iion,ichan,fields,nrange,gyrange, &
-    !$OMP& vi,ri,rf,det,plasma,rates,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw)
+    !$OMP& vi,ri,rf,det,plasma,rates,is, rates_is,states,flux,denf,eb,ptch,gs,ir,theta,dtheta,r,ri_uvw)
     loop_over_cells: do ic = istart, ncell, istep
         call ind2sub(pass_grid%dims,cell_ind(ic),ind)
         i = ind(1) ; j = ind(2) ; k = ind(3)
@@ -10703,7 +10866,7 @@ subroutine pnpa_f
             call mc_fastion_pass_grid(ind, fields, eb, ptch, denf)
             if(denf.le.0.0) cycle loop_over_fast_ions
 
-            call gyro_surface(fields, eb, ptch, gs)
+            call gyro_surface(fields, eb, ptch, fbm%A, gs)
 
             detector_loop: do ichan=1,npa_chords%nchan
                 call npa_gyro_range(ichan, gs, gyrange, nrange)
@@ -10724,7 +10887,11 @@ subroutine pnpa_f
 
                     !! Calculate CX probability with beam and halo neutrals
                     call get_plasma(plasma, pos=ri)
-                    call bt_cx_rates(plasma, plasma%denn, thermal_mass(1), vi, rates)
+                    rates = 0.d0
+                    do is=1,n_thermal
+                        call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), vi, rates_is)
+                        rates = rates + rates_is
+                    enddo
                     if(sum(rates).le.0.) cycle gyro_range_loop
 
                     !! Weight CX rates by ion source density
@@ -10812,7 +10979,7 @@ subroutine npa_mc
                 call get_fields(fields, pos=rg)
 
                 !! Correct for gyro motion and get position and velocity
-                call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, gs)
+                call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, gs)
 
                 detector_loop: do ichan=1,npa_chords%nchan
                     call npa_gyro_range(ichan, gs, gyrange, nrange)
@@ -10914,11 +11081,11 @@ subroutine pnpa_mc
     type(FastIon) :: fast_ion
     real(Float64) :: phi,theta,dtheta
     real(Float64), dimension(3) :: ri, rf, rg, vi
-    integer :: det,j,ichan,ir,nrange,it
+    integer :: det,j,ichan,ir,nrange,it,is
     type(LocalEMFields) :: fields
     type(LocalProfiles) :: plasma
     type(GyroSurface) :: gs
-    real(Float64), dimension(nlevs) :: rates
+    real(Float64), dimension(nlevs) :: rates, rates_is
     real(Float64), dimension(nlevs) :: states
     real(Float64) :: flux
     integer, dimension(3) :: ind
@@ -10937,7 +11104,7 @@ subroutine pnpa_mc
     endif
 
     !$OMP PARALLEL DO schedule(guided) private(iion,igamma,ind,fast_ion,vi,ri,rf,phi,s,c,ir,it,plasma, &
-    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
+    !$OMP& randomu,rg,fields,uvw,uvw_vi,rates,rates_is,is,states,flux,det,ichan,gs,nrange,gyrange,theta,dtheta)
     loop_over_fast_ions: do iion=istart,particles%nparticle,istep
         fast_ion = particles%fast_ion(iion)
         if(fast_ion%vabs.eq.0) cycle loop_over_fast_ions
@@ -10962,7 +11129,7 @@ subroutine pnpa_mc
                 call get_fields(fields, pos=uvw, input_coords=1)
 
                 !! Correct for gyro motion and get position and velocity
-                call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, gs)
+                call gyro_surface(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, gs)
 
                 detector_loop: do ichan=1,npa_chords%nchan
                     call npa_gyro_range(ichan, gs, gyrange, nrange)
@@ -10984,7 +11151,11 @@ subroutine pnpa_mc
 
                         !! Calculate CX probability with beam and halo neutrals
                         call get_plasma(plasma, pos=ri)
-                        call bt_cx_rates(plasma, plasma%denn, thermal_mass(1), vi, rates)
+                        rates = 0.d0
+                        do is=1,n_thermal
+                            call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), vi, rates_is)
+                            rates = rates + rates_is
+                        enddo
                         if(sum(rates).le.0.) cycle gyro_range_loop
 
                         !! Weight CX rates by ion source density
@@ -11028,9 +11199,13 @@ subroutine pnpa_mc
                 call hit_npa_detector(ri, vi ,det, rf)
                 if(det.eq.0) cycle gamma_loop
 
-                !! Calculate CX probability with beam and halo neutrals
+                !! Calculate CX probability with edge neutrals
                 call get_plasma(plasma, pos=ri)
-                call bt_cx_rates(plasma, plasma%denn, thermal_mass(1), vi, rates)
+                rates = 0.d0
+                do is=1, n_thermal
+                    call bt_cx_rates(plasma, plasma%denn(:,is), thermal_mass(is), vi, rates_is)
+                    rates = rates + rates_is
+                enddo
                 if(sum(rates).le.0.) cycle gamma_loop
 
                 !! Weight CX rates by ion source density
@@ -11077,6 +11252,18 @@ subroutine neutron_f
     real(Float64)  :: vnet_square, factor
     real(Float64)  :: s, c
 
+    if(.not.any(thermal_mass.eq.H2_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_F: Thermal Deuterium is not present in plasma'
+        return
+    endif
+    if(any(thermal_mass.eq.H3_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_F: D-T neutron production is not implemented'
+    endif
+    if(beam_mass.ne.H2_amu) then
+        write(*,'(T2,a)') 'NEUTRON_F: Fast-ion species is not Deuterium'
+        return
+    endif
+
     if(inputs%calc_neutron.ge.2) then
         allocate(neutron%weight(fbm%nenergy,fbm%npitch,fbm%nr,fbm%nz,fbm%nphi))
         neutron%weight = 0.d0
@@ -11115,7 +11302,7 @@ subroutine neutron_f
                     energy_loop: do ie =1, fbm%nenergy
                         eb = fbm%energy(ie)
                         gyro_loop: do igamma=1, ngamma
-                            call gyro_correction(fields,eb,pitch,ri,vi)
+                            call gyro_correction(fields,eb,pitch,fbm%A,ri,vi)
 
                             !! Get plasma parameters at particle position
                             call get_plasma(plasma,pos=ri)
@@ -11123,7 +11310,7 @@ subroutine neutron_f
 
                             !! Calculate effective beam energy
                             vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
-                            erel = v2_to_E_per_amu*beam_mass*vnet_square ![kev]
+                            erel = v2_to_E_per_amu*fbm%A*vnet_square ![kev]
 
                             !! Get neutron production rate
                             call get_neutron_rate(plasma, erel, rate)
@@ -11184,6 +11371,19 @@ subroutine neutron_mc
     real(Float64)  :: vnet_square
     real(Float64)  :: phi, s, c, factor, delta_phi
 
+    if(.not.any(thermal_mass.eq.H2_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_MC: Thermal Deuterium is not present in plasma'
+        return
+    endif
+    if(any(thermal_mass.eq.H3_amu)) then
+        write(*,'(T2,a)') 'NEUTRON_MC: D-T neutron production is not implemented'
+    endif
+    if(beam_mass.ne.H2_amu) then
+        write(*,'(T2,a)') 'NEUTRON_MC: Fast-ion species is not Deuterium'
+        return
+    endif
+
+
     if(inputs%verbose.ge.1) then
         write(*,'(T6,"# of markers: ",i10)') particles%nparticle
     endif
@@ -11226,7 +11426,7 @@ subroutine neutron_mc
 
             gyro_loop: do igamma=1,ngamma
                 !! Correct for Gyro-motion
-                call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, ri, vi)
+                call gyro_correction(fields, fast_ion%energy, fast_ion%pitch, fast_ion%A, ri, vi)
 
                 !! Get plasma parameters
                 call get_plasma(plasma,pos=ri)
@@ -11234,7 +11434,7 @@ subroutine neutron_mc
 
                 !! Calculate effective beam energy
                 vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
-                eb = v2_to_E_per_amu*beam_mass*vnet_square ![kev]
+                eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
                 !! Get neutron production rate
                 call get_neutron_rate(plasma, eb, rate)
@@ -11254,7 +11454,7 @@ subroutine neutron_mc
             uvw_vi(3) = fast_ion%vz
             vi = matmul(beam_grid%inv_basis,uvw_vi)
             vnet_square=dot_product(vi-plasma%vrot,vi-plasma%vrot)  ![cm/s]
-            eb = v2_to_E_per_amu*beam_mass*vnet_square ![kev]
+            eb = v2_to_E_per_amu*fast_ion%A*vnet_square ![kev]
 
             !! Get neutron production rate
             call get_neutron_rate(plasma, eb, rate)
@@ -11409,7 +11609,7 @@ subroutine fida_weights_mc
             !! Get velocity
             call get_fields(fields,pos=rg)
             if(.not.fields%in_plasma) cycle loop_over_fast_ions
-            call gyro_correction(fields,energy,pitch,ri,vi)
+            call gyro_correction(fields,energy,pitch,fbm%A,ri,vi)
 
             fbm_denf = 0.0
             if (inputs%dist_type.eq.1) then
@@ -11467,7 +11667,7 @@ subroutine fida_weights_los
     type(ParticleTrack), dimension(beam_grid%ntrack) :: tracks
     integer :: nwav
     integer(Int32) :: i, j, k, ienergy, cid, cind
-    integer(Int32) :: ipitch, igyro, icell, ichan
+    integer(Int32) :: ipitch, igyro, icell, ichan, is
     real(Float64), dimension(:), allocatable :: ebarr,ptcharr,phiarr
     real(Float64), dimension(:,:), allocatable :: mean_f
     real(Float64), dimension(3) :: vi, vi_norm, vp
@@ -11617,7 +11817,7 @@ subroutine fida_weights_los
 
         !$OMP PARALLEL DO schedule(guided) collapse(3) private(eb,vabs,ptch,phi,vi,vi_norm, &
         !$OMP& r_enter,r_exit,length,max_dens,ind,tracks,ntrack,dt,icell,states,rates, &
-        !$OMP& vhalo,denn,denf,photons,ienergy,ipitch,igyro)
+        !$OMP& vhalo,denn,denf,photons,ienergy,ipitch,igyro,is)
         do ienergy=istart,inputs%ne_wght,istep
             do ipitch=1,inputs%np_wght
                 do igyro=1,inputs%nphi_wght
@@ -11654,8 +11854,10 @@ subroutine fida_weights_los
                     states = states + rates
                     call bb_cx_rates(tdens,vnbi_t,vi,rates)
                     states = states + rates
-                    call bt_cx_rates(plasma, dcxdens + halodens, thermal_mass(1), vi, rates)
-                    states = states + rates
+                    do is=1,n_thermal
+                        call bt_cx_rates(plasma, dcxdens + halodens, thermal_mass(i), vi, rates)
+                        states = states + rates*plasma%deni(is)/sum(plasma%deni)
+                    enddo
 
                     call colrad(plasma,beam_mass,vi,dt,states,denn,photons)
                     denf = mean_f(ienergy,ipitch)*dEdP
@@ -11786,7 +11988,7 @@ subroutine npa_weights
                             vabs = sqrt(ebarr(ic)/(v2_to_E_per_amu*beam_mass))
                             vi = vi_norm*vabs
                             !!Correct for gyro orbit
-                            call gyro_step(vi,fields,r_gyro)
+                            call gyro_step(vi,fields,fbm%A,r_gyro)
 
                             fbm_denf=0
                             if (inputs%dist_type.eq.1) then
@@ -11959,11 +12161,14 @@ program fidasim
     !! ----------------------------------------------------------
     !! ------- READ GRIDS, PROFILES, LOS, TABLES, & FBM --------
     !! ----------------------------------------------------------
+    call read_plasma()
     call read_tables()
     call read_equilibrium()
     call make_beam_grid()
     if(inputs%calc_beam.ge.1) call read_beam()
     call read_distribution()
+
+    call quasineutrality_check()
 
     allocate(spec_chords%inter(beam_grid%nx,beam_grid%ny,beam_grid%nz))
     if((inputs%calc_spec.ge.1).or.(inputs%calc_fida_wght.ge.1)) then
@@ -12002,15 +12207,15 @@ program fidasim
             spec%third = 0.d0
         endif
         if(inputs%calc_dcx.ge.1) then
-            allocate(spec%dcx(n_stark,inputs%nlambda,spec_chords%nchan))
+            allocate(spec%dcx(n_stark,inputs%nlambda,spec_chords%nchan,n_thermal))
             spec%dcx = 0.d0
         endif
         if(inputs%calc_halo.ge.1) then
-            allocate(spec%halo(n_stark,inputs%nlambda,spec_chords%nchan))
+            allocate(spec%halo(n_stark,inputs%nlambda,spec_chords%nchan,n_thermal))
             spec%halo = 0.d0
         endif
         if(inputs%calc_cold.ge.1) then
-            allocate(spec%cold(n_stark,inputs%nlambda,spec_chords%nchan))
+            allocate(spec%cold(n_stark,inputs%nlambda,spec_chords%nchan,n_thermal))
             spec%cold = 0.d0
         endif
         if(inputs%calc_fida.ge.1) then

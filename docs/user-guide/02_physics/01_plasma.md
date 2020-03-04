@@ -30,58 +30,63 @@ The default settings of FIDASIM are to map the plasma parameters and fields onto
 FIDASIM reads the plasma parameters and fields from an HDF5 file structured as follows...
 ```
 [runid]_equilibrium.h5
-├── plasma          
+├── plasma
 └── fields
 ```
 where the `plasma` group has the following datasets
 
-|       Variable      |   Type  | Rank |  Dimensions | Units |               Description                |
-|:-------------------:|:-------:|:----:|:-----------:|:-----:|:-----------------------------------------|
-| `nr`                | Int16   | 0    | NA          | NA    | Number of radii                          |
-| `nz`                | Int16   | 0    | NA          | NA    | Number of z values                       |
-| `nphi`              | Int16   | 0    | NA          | NA    | Number of phi values (Optional)          |
-| `r`                 | Float64 | 1    | [`nr`]      | cm    | Array of radii                           |
-| `z`                 | Float64 | 1    | [`nz`]      | cm    | Array of z values                        |
-| `phi`               | Float64 | 1    | [`nphi`]    | rad   | Array of phi values (Optional)           |
-| `r2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of radii `r = r2d(r,z)`         |
-| `z2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of z values `z = z2d(r,z)`      |
-| `time`              | Float64 | 0    | NA          | s     | Time when the plasma parameter data was collected             |
-| `data_source`       | String  | 0    | NA          | NA    | Source of the plasma parameter data                           |
-| `mask`              | Int16   | 2    | [`nr`,`nz`] | NA    | Boolean mask that indicates where the plasma is well defined  |
-| `te`                | Float64 | 2    | [`nr`,`nz`] | keV   | Electron temperature                                          |
-| `ti`                | Float64 | 2    | [`nr`,`nz`] | keV   | Ion temperature                                               |
-| `dene`              | Float64 | 2    | [`nr`,`nz`] | cm^-3 | Electron density                                              |
-| `denn`              | Float64 | 2    | [`nr`,`nz`] | cm^-3 | Cold neutral density                                      |
-| `zeff`              | Float64 | 2    | [`nr`,`nz`] | NA    | Z-effective                                                   |
-| `vr`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Radial component of the bulk plasma rotation/flow             |
-| `vt`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow       |
-| `vz`                | Float64 | 2    | [`nr`,`nz`] | cm/s  | Z component of the bulk plasma rotation/flow                  |
-| `description`       | String  | 0    | NA          | NA    | Plasma Parameters                        |
-| `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                              |
+|       Variable      |   Type  | Rank |            Dimensions           | Units |               Description                |
+|:-------------------:|:-------:|:----:|:-------------------------------:|:-----:|:-----------------------------------------|
+| `nr`                | Int16   | 0    | NA                              | NA    | Number of radii                          |
+| `nz`                | Int16   | 0    | NA                              | NA    | Number of z values                       |
+| `nphi`              | Int16   | 0    | NA                              | NA    | Number of phi values (Optional)          |
+| `nthermal`          | Int16   | 0    | NA                              | NA    | Number of hydrogenic, thermal ion species|
+| `impurity_charge`   | Int16   | 0    | NA                              | NA    | Main impurity charge number              |
+| `species_mass`      | Float64 | 1    | [`nthermal`]                    | amu   | Thermal ion species mass                 |
+| `r`                 | Float64 | 1    | [`nr`]                          | cm    | Array of radii                           |
+| `z`                 | Float64 | 1    | [`nz`]                          | cm    | Array of z values                        |
+| `phi`               | Float64 | 1    | [`nphi`]                        | rad   | Array of phi values (Optional)           |
+| `r2d`               | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm    | 2D/3D array of radii `r = r2d(r,z[,phi])`|
+| `z2d`               | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm    | 2D/3D array of z values `z = z2d(r,z,[phi])`|
+| `time`              | Float64 | 0    | NA                              | s     | Time when the plasma parameter data was collected            |
+| `data_source`       | String  | 0    | NA                              | NA    | Source of the plasma parameter data                          |
+| `mask`              | Int16   | 2/3  | [`nr`,`nz`[,`nphi`]]            | NA    | Boolean mask that indicates where the plasma is well defined |
+| `te`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | keV   | Electron temperature                                         |
+| `ti`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | keV   | Ion temperature                                              |
+| `dene`              | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm^-3 | Electron density                                             |
+| `denimp`            | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm^-3 | Impurity density                                             |
+| `deni`              | Float64 | 3/4  | [`nthermal`,`nr`,`nz`[,`nphi`]] | cm^-3 | Ion density for each thermal species                         |
+| `denn`              | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm^-3 | Cold neutral density                                         |
+| `zeff`              | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | NA    | Z-effective                                                  |
+| `vr`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Radial component of the bulk plasma rotation/flow            |
+| `vt`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Torodial/Phi component of the bulk plasma rotation/flow      |
+| `vz`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]]            | cm/s  | Z component of the bulk plasma rotation/flow                 |
+| `description`       | String  | 0    | NA                              | NA    | Plasma Parameters                        |
+| `coordinate system` | String  | 0    | NA                              | NA    | Cylindrical                              |
 
 and where the `fields` group has the following datasets
 
-|       Variable      |   Type  | Rank |  Dimensions | Units |               Description                |
-|:-------------------:|:-------:|:----:|:-----------:|:-----:|:-----------------------------------------|
-| `nr`                | Int16   | 0    | NA          | NA    | Number of radii                          |
-| `nz`                | Int16   | 0    | NA          | NA    | Number of z values                       |
-| `nphi`              | Int16   | 0    | NA          | NA    | Number of phi values (Optional)          |
-| `r`                 | Float64 | 1    | [`nr`]      | cm    | Array of radii                           |
-| `z`                 | Float64 | 1    | [`nz`]      | cm    | Array of z values                        |
-| `phi`               | Float64 | 1    | [`nphi`]    | rad   | Array of phi values (Optional)           |
-| `r2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of radii `r = r2d(r,z)`         |
-| `z2d`               | Float64 | 2    | [`nr`,`nz`] | cm    | 2D array of z values `z = z2d(r,z)`      |
-| `time`              | Float64 | 0    | NA          | s     | Time when the fields data were collected/reconstructed        |
-| `data_source`       | String  | 0    | NA          | NA    | Source of the fields data                                     |
-| `mask`              | Int16   | 2    | [`nr`,`nz`] | NA    | Boolean mask that indicates where the fields are well defined |
-| `br`                | Float64 | 2    | [`nr`,`nz`] | T     | Radial component of the magnetic field                        |
-| `bt`                | Float64 | 2    | [`nr`,`nz`] | T     | Torodial/Phi component of the magnetic field                  |
-| `bz`                | Float64 | 2    | [`nr`,`nz`] | T     | Z component of the magnetic field                             |
-| `er`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Radial component of the electric field                        |
-| `et`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Torodial/Phi component of the electric field                  |
-| `ez`                | Float64 | 2    | [`nr`,`nz`] | V/m   | Z component of the electric field                             |
-| `description`       | String  | 0    | NA          | NA    | Electromagnetic Field                    |
-| `coordinate system` | String  | 0    | NA          | NA    | Cylindrical                              |
+|       Variable      |   Type  | Rank |       Dimensions     | Units |               Description                   |
+|:-------------------:|:-------:|:----:|:--------------------:|:-----:|:--------------------------------------------|
+| `nr`                | Int16   | 0    | NA                   | NA    | Number of radii                             |
+| `nz`                | Int16   | 0    | NA                   | NA    | Number of z values                          |
+| `nphi`              | Int16   | 0    | NA                   | NA    | Number of phi values (Optional)             |
+| `r`                 | Float64 | 1    | [`nr`]               | cm    | Array of radii                              |
+| `z`                 | Float64 | 1    | [`nz`]               | cm    | Array of z values                           |
+| `phi`               | Float64 | 1    | [`nphi`]             | rad   | Array of phi values (Optional)              |
+| `r2d`               | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | cm    | 2D/3D array of radii `r = r2d(r,z[,phi])`   |
+| `z2d`               | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | cm    | 2D/3D array of z values `z = z2d(r,z,[phi])`|
+| `time`              | Float64 | 0    | NA                   | s     | Time when the fields data were collected/reconstructed        |
+| `data_source`       | String  | 0    | NA                   | NA    | Source of the fields data                                     |
+| `mask`              | Int16   | 2/3  | [`nr`,`nz`[,`nphi`]] | NA    | Boolean mask that indicates where the fields are well defined |
+| `br`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | T     | Radial component of the magnetic field                        |
+| `bt`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | T     | Torodial/Phi component of the magnetic field                  |
+| `bz`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | T     | Z component of the magnetic field                             |
+| `er`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | V/m   | Radial component of the electric field                        |
+| `et`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | V/m   | Torodial/Phi component of the electric field                  |
+| `ez`                | Float64 | 2/3  | [`nr`,`nz`[,`nphi`]] | V/m   | Z component of the electric field                             |
+| `description`       | String  | 0    | NA                   | NA    | Electromagnetic Field                       |
+| `coordinate system` | String  | 0    | NA                   | NA    | Cylindrical                                 |
 
 # Distributions
 The fast-ion distribution function typically does not have a functional form.
@@ -99,7 +104,7 @@ FIDASIM reads the fast-ion distribution from an HDF5 file that has the following
 ## Guiding Center Distribution Function: F(E,p,R,Z[,Phi])
 
 |       Variable      |   Type  | Rank |           Dimensions           |          Units         |           Description           |
-|:-------------------:|:-------:|:----:|:------------------------------:|:----------------------:|:--------------------------------| 
+|:-------------------:|:-------:|:----:|:------------------------------:|:----------------------:|:--------------------------------|
 | `type`              | Int16   | 0    | NA                                      | NA                     | Distribution type (1)                  |
 | `nr`                | Int16   | 0    | NA                                      | NA                     | Number of radii                        |
 | `nz`                | Int16   | 0    | NA                                      | NA                     | Number of z values                     |
@@ -124,7 +129,7 @@ The distribution can be mapped onto the 2D R-Z grid or 3D cylindrical grid, wher
 ## Guiding Center Monte Carlo Distribution
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
-|:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
+|:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------|
 | `type`              | Int16   | 0    | NA           | NA    | Distribution type (2)                             |
 | `time`              | Float64 | 0    | NA           | s     | Time of the distribution                          |
 | `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data                   |
@@ -140,13 +145,13 @@ The distribution can be mapped onto the 2D R-Z grid or 3D cylindrical grid, wher
 
 The sum(`weight`) = # of Fast-ions in phase space sampled by the MC particles.
 
-The `class` variable can take values in the range of 1:`nclass`. 
+The `class` variable can take values in the range of 1:`nclass`.
 If there are multiple classes of particles the FIDA signal for each class will be calculated.
 
 ## Full-orbit Monte Carlo Distribution
 
 |       Variable      |   Type  | Rank |  Dimensions  | Units |           Description           |
-|:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------| 
+|:-------------------:|:-------:|:----:|:------------:|:-----:|:--------------------------------|
 | `type`              | Int16   | 0    | NA           | NA    | Distribution type (3)                       |
 | `time`              | Float64 | 0    | NA           | s     | Time of the distribution                    |
 | `data_source`       | String  | 0    | NA           | NA    | Source of the distribution data             |

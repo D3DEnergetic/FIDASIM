@@ -807,7 +807,7 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
     #+```
     '''
 
-    var_list = ["X","TRFLX","TFLUX","TIME","NE","TE","TI","ZEFFI","OMEGA","DN0WD"]
+    var_list = ["X","TRFLX","TFLUX","TIME","NE","NH","ND","NT","NIMP","TE","TI","ZEFFI","OMEGA","DN0WD","XZIMP"]
 
     zz = read_ncdf(filename, vars=var_list)
 
@@ -817,10 +817,28 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
 
     print(' * Selecting profiles at :', time, ' s') #pick the closest timeslice to TOI
 
+    impurity_charge = np.max(zz["XZIMP"]).astype("int16")
     transp_ne = zz['NE'][idx,:] #cm^-3
+    transp_nimp = zz['NIMP'][idx,:] #cm^-3
+    transp_nn = zz['DN0WD'][idx,:] #cm^-3
+
+    if 'NH' in zz:
+        transp_nh = zz['NH'][idx,:] #cm^-3
+    else:
+        transp_nh = 0*transp_ne
+
+    if 'ND' in zz:
+        transp_nd = zz['ND'][idx,:] #cm^-3
+    else:
+        transp_nd = 0*transp_ne
+
+    if 'NT' in zz:
+        transp_nt = zz['NT'][idx,:] #cm^-3
+    else:
+        transp_nt = 0*transp_ne
+
     transp_te = zz['TE'][idx,:]*1.e-3 # kev
     transp_ti = zz['TI'][idx,:]*1.e-3 # kev
-    transp_nn = zz['DN0WD'][idx,:] #cm^-3
     transp_zeff = zz['ZEFFI'][idx,:]
     rho_cb = np.sqrt(zz['TRFLX'][idx,:]/zz['TFLUX'][idx])
     # center each rho b/c toroidal flux is at cell boundary
@@ -845,6 +863,10 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
         rho_sc = rho[-1] + drho*(range(np.ceil(rho_scrapeoff/drho)) + 1)
         sc = np.exp(-(rho_sc - rho[-1])/scrapeoff)
         transp_ne = np.append(transp_ne,transp_ne[-1]*sc)
+        transp_nimp = np.append(transp_nimp,transp_nimp[-1]*sc)
+        transp_nh = np.append(transp_nh,transp_nh[-1]*sc)
+        transp_nd = np.append(transp_nd,transp_nd[-1]*sc)
+        transp_nt = np.append(transp_nt,transp_nt[-1]*sc)
         transp_te = np.append(transp_te,transp_te[-1]*sc)
         transp_ti = np.append(transp_ti,transp_ti[-1]*sc)
         transp_nn = np.append(transp_nn,0*sc + dn0out)
@@ -854,17 +876,41 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
 
     profiles = {"rho":rho,
                 "dene":np.where(transp_ne > 0, transp_ne, 0.0),
+                "denimp":np.where(transp_nimp > 0, transp_nimp, 0.0),
 		"denn":np.where(transp_nn > 0, transp_nn, 0.0),
                 "te":np.where(transp_te > 0, transp_te, 0.0),
                 "ti":np.where(transp_ti > 0, transp_ti, 0.0),
                 "zeff":np.where(transp_zeff > 1.0, transp_zeff, 1.0),
                 "omega":transp_omega}
+    if 'NH' in zz:
+        profiles['denh'] = np.where(transp_nh > 0, transp_nh, 0.0)
+    if 'ND' in zz:
+        profiles['dend'] = np.where(transp_nd > 0, transp_nd, 0.0)
+    if 'NT' in zz:
+        profiles['dent'] = np.where(transp_nt > 0, transp_nt, 0.0)
+
 
     # Interpolate onto r-z grid
     dims = rhogrid.shape
     f_dene = interp1d(rho,transp_ne,fill_value='extrapolate')
     dene = f_dene(rhogrid)
     dene = np.where(dene > 0.0, dene, 0.0).astype('float64')
+
+    f_denimp = interp1d(rho,transp_nimp,fill_value='extrapolate')
+    denimp = f_denimp(rhogrid)
+    denimp = np.where(denimp > 0.0, denimp, 0.0).astype('float64')
+
+    f_denh = interp1d(rho,transp_nh,fill_value='extrapolate')
+    denh = f_denh(rhogrid)
+    denh = np.where(denh > 0.0, denh, 0.0).astype('float64')
+
+    f_dend = interp1d(rho,transp_nd,fill_value='extrapolate')
+    dend = f_dend(rhogrid)
+    dend = np.where(dend > 0.0, dend, 0.0).astype('float64')
+
+    f_dent = interp1d(rho,transp_nt,fill_value='extrapolate')
+    dent = f_dent(rhogrid)
+    dent = np.where(dent > 0.0, dent, 0.0).astype('float64')
 
     f_denn = interp1d(rho,np.log(transp_nn),fill_value=np.nan,bounds_error=False)
     log_denn = f_denn(rhogrid)
@@ -893,9 +939,17 @@ def extract_transp_plasma(filename, intime, grid, rhogrid,
     w = np.where(rhogrid <= max_rho) #where we have profiles
     mask[w] = 1
 
+    deni = np.concatenate((denh.reshape(1,dims[0],dims[1]),
+                           dend.reshape(1,dims[0],dims[1]),
+                           dent.reshape(1,dims[0],dims[1])),axis=0)
+
+    ai = np.array([1.007276466879e0, 2.013553212745e0,3.01550071632e0])
+    w_ai = [a in zz for a in ['NH','ND','NT']]
+
     # SAVE IN PROFILES STRUCTURE
-    plasma={"data_source":os.path.abspath(filename),"time":time, "profiles":profiles,
-            "mask":mask,"dene":dene,"denn":denn,"te":te,"ti":ti,
+    plasma={"data_source":os.path.abspath(filename),"time":time,"impurity_charge":impurity_charge,
+            "nthermal":np.sum(w_ai).astype('int16'), "species_mass":ai[w_ai], "deni":deni[w_ai,:,:],"profiles":profiles,
+            "mask":mask,"dene":dene,"denimp":denimp,"denn":denn,"te":te,"ti":ti,
             "vr":vr,"vt":vt,"vz":vz,"zeff":zeff}
 
     return plasma
@@ -930,6 +984,7 @@ def read_nubeam(filename, grid, e_range=(), p_range=(), btipsign=-1, species=1):
 
     species_var = "SPECIES_{}".format(species)
     sstr = read_ncdf(filename,vars=[species_var])[species_var].tostring().decode('UTF-8')
+    print("Species: "+sstr)
     var = read_ncdf(filename, vars=["TIME","R2D","Z2D","E_"+sstr,"A_"+sstr,"F_"+sstr,"RSURF","ZSURF","BMVOL"])
 
     ngrid = len(var["R2D"])

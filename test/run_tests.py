@@ -111,6 +111,9 @@ def test_npa():
 def test_profiles(filename, grid, rhogrid):
     prof = fs.utils.read_ncdf(filename)
 
+    impurity_charge = 6
+    nthermal = 1
+    species_mass = np.array([2.01410178e0])
     rho = prof["rho"]
     dene_rho = prof["dene"]*1e-6
     ti_rho = prof["ti"]*1e-3
@@ -130,6 +133,10 @@ def test_profiles(filename, grid, rhogrid):
     zeff = interp1d(rho, zeff_rho,fill_value='extrapolate')(rhogrid)
     zeff = np.where(te > 1.0, te, 1.0).astype('float64')
 
+    denimp = dene*(zeff - 1)/(impurity_charge*(impurity_charge-1))
+    deni = (dene - impurity_charge*denimp).reshape(1,grid['nr'],grid['nz'])
+    deni = np.where(deni > 0.0, deni, 0.0).astype('float64')
+
     vt = grid["r2d"]*interp1d(rho, omega_rho,fill_value='extrapolate')(rhogrid)
     vr = 0*vt
     vz = 0*vt
@@ -139,6 +146,8 @@ def test_profiles(filename, grid, rhogrid):
     mask = np.where(rhogrid <= max_rho, 1, 0)
 
     profiles = {"time":1.0, "data_source":filename, "mask":mask,
+                "deni":deni,"denimp":denimp,"species_mass":species_mass,
+                "nthermal":nthermal,"impurity_charge":impurity_charge,
                 "te":te, "ti":ti, "vr":vr, "vt":vt, "vz":vz,
                 "dene":dene, "zeff":zeff, "denn":denn,"profiles":prof}
 
@@ -160,7 +169,7 @@ def run_test(args):
 
     basic_inputs = {"device":"test", "shot":1, "time":1.0,
                     "einj":einj, "pinj":pinj, "current_fractions":current_fractions,
-                    "ab":2.01410178e0, "ai":2.01410178e0, "impurity_charge":6,
+                    "ab":2.01410178e0, 
                     "lambdamin":647e0, "lambdamax":667e0, "nlambda":2000,
                     "n_fida":5000000, "n_npa":5000000, "n_nbi":50000,
                     "n_pfida":50000000, "n_pnpa":50000000,
@@ -170,7 +179,7 @@ def run_test(args):
                     "calc_npa":2, "calc_brems":1,"calc_fida":1,"calc_neutron":1,
                     "calc_bes":1, "calc_dcx":1, "calc_halo":1, "calc_cold":1,
                     "calc_birth":1, "calc_fida_wght":1,"calc_npa_wght":1,
-                    "calc_pfida":1, "calc_pnpa":2, "stark_components":0,
+                    "calc_pfida":1, "calc_pnpa":2,
                     "result_dir":args.path, "tables_file":fida_dir+'/tables/atomic_tables.h5'}
 
     basic_bgrid = {"nx":50, "ny":60, "nz":70,
@@ -195,6 +204,8 @@ def run_test(args):
     fbm = fs.utils.read_nubeam(test_dir+'/test_fi_1.cdf', grid, btipsign = btipsign)
 
     plasma = test_profiles(test_dir+'/test_profiles.cdf',grid,rho)
+    plasma['deni'] = plasma['deni'] - fbm['denf'].reshape(1,grid['nr'],grid['nz'])
+    plasma['deni'] = np.where(plasma['deni'] > 0.0, plasma['deni'], 0.0).astype('float64')
 
     fs.prefida(inputs, grid, nbi, plasma, equil, fbm, spec=spec, npa=npa)
 

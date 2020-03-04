@@ -1,12 +1,10 @@
 title: Visualization
 
-#Visualizing Inputs and Outputs
-
 [TOC]
 
 ---
 
-##Visualization: Inputs
+#Visualizing Inputs
 
 Visualizing your inputs can be done by executing `plot_inputs` found in `lib/scripts/`
 
@@ -34,7 +32,7 @@ plot_inputs /p/fida/lstagner/TEST/ test_1a -p -rz 170
 
 There are many more possible lineouts that can be viewed, so run `plot_inputs -h` to look at the help documentation.
 
-##Visualization: Outputs
+#Visualizing Outputs
 
 Visualizing your outputs can be done by executing `plot_outputs` found in `lib/scripts/`
 

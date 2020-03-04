@@ -19,7 +19,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
     ;+
     ;+    **profiles**: Set this keyword to a named variable to recieve the plasma profiles as a function of rho
     ;+
-    ;+    **s(ne|te|ti|imp|rot|nn)**: Smooth profiles
+    ;+    **s(ne|ni|te|ti|imp|rot|nn)**: Smooth profiles
     ;+
     ;+    **dn0out**: Wall Neutral density value `dn0out` variable in transp namelist
     ;+
@@ -32,9 +32,10 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
     ;+IDL> plasma = extract_transp_plasma("./142332H01.CDF", 1.2, grid, rho)
     ;+```
 
-    var_list = ["X","TRFLX","TFLUX","TIME","NE","TE","TI","ZEFFI","OMEGA","DN0WD"]
+    var_list = ["X","TRFLX","TFLUX","TIME","NE","NH","ND","NT","NIMP","TE","TI","ZEFFI","OMEGA","DN0WD","XZIMP"]
 
     zz = read_ncdf(filename,vars = var_list)
+    tn = tag_names(zz)
 
     t = zz.time
     dummy=min( abs(t-intime), idx)
@@ -42,11 +43,38 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
 
     print, ' * Selecting profiles at :', time, ' s' ;pick the closest timeslice to TOI
 
+    impurity_charge = fix(ceil(max(zz.xzimp)))
+    ; Densities
     transp_ne = zz.ne_[*,idx] ;cm^-3
+    transp_nimp = zz.nimp[*,idx] ;cm^-3
+    transp_nn = zz.dn0wd[*,idx] ;cm^-3
+    w_thermal = []
+    _ = where(tn eq "NH", nmatch)
+    if nmatch eq 1 then begin
+        transp_nh = zz.nh[*,idx]
+        w_thermal = [w_thermal, 0]
+    endif else begin
+        transp_nh = transp_ne*0
+    endelse
+    _ = where(tn eq "ND", nmatch)
+    if nmatch eq 1 then begin
+        transp_nd = zz.nd[*,idx]
+        w_thermal = [w_thermal, 1]
+    endif else begin
+        transp_nd = transp_ne*0
+    endelse
+    _ = where(tn eq "NT", nmatch)
+    if nmatch eq 1 then begin
+        transp_nt = zz.nt[*,idx]
+        w_thermal = [w_thermal, 2]
+    endif else begin
+        transp_nt = transp_ne*0
+    endelse
+
     transp_te = zz.te[*,idx]*1.d-3  ; kev
     transp_ti = zz.ti[*,idx]*1.d-3   ; kev
-    transp_nn = zz.dn0wd[*,idx] ;cm^-3
     transp_zeff = zz.zeffi[*,idx]
+
     rho_cb = sqrt(zz.trflx[*,idx]/zz.tflux[idx])
     ; center each rho b/c toroidal flux is at cell boundary
     rho = 0.d0*rho_cb
@@ -70,10 +98,14 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
         drho = abs(rho[-1] - rho[-2])
         rho_sc = rho[-1] + drho*(dindgen(ceil(rho_scrapeoff/drho)) + 1)
         sc = exp(-(rho_sc - rho[-1])/scrapeoff)
-        transp_ne = [transp_ne,transp_ne[-1]*sc]
-        transp_te = [transp_te,transp_te[-1]*sc]
-        transp_ti = [transp_ti,transp_ti[-1]*sc]
-        transp_nn = [transp_nn,0*sc + dn0out]
+        transp_ne   = [transp_ne,transp_ne[-1]*sc]
+        transp_nimp = [transp_nimp,transp_nimp[-1]*sc]
+        transp_nh   = [transp_nh,transp_nh[-1]*sc]
+        transp_nd   = [transp_nd,transp_nd[-1]*sc]
+        transp_nt   = [transp_nt,transp_nt[-1]*sc]
+        transp_te   = [transp_te,transp_te[-1]*sc]
+        transp_ti   = [transp_ti,transp_ti[-1]*sc]
+        transp_nn   = [transp_nn,0*sc + dn0out]
         transp_zeff = [transp_zeff, (transp_zeff[-1]-1)*sc + 1]
         transp_omega = [transp_omega,transp_omega[-1]*sc]
         rho = [rho, rho_sc]
@@ -92,10 +124,10 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
         end
 
         if keyword_set(simp) then begin
-           z = smooth(transp_zeff, simp)
-           plot,  x, transp_zeff, title='Zeff'
+           z = smooth(transp_nimp, simp)
+           plot,  x, transp_nimp, title='Nimp'
            oplot, x, z, psym=0, color=100
-           transp_zeff = z
+           transp_nimp = z
         end
 
         if keyword_set(ste) then begin
@@ -129,7 +161,7 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
     	window, 1, retain=2, xs=600, ys=800
 
     	plot, x, transp_ne,                  ytitle=' x E13 cm-3', title='Ne  '
-    	plot, x, transp_zeff,                ytitle= 'x E13 cm-3', title='Zeff'
+    	plot, x, transp_nimp,                ytitle= 'x E13 cm-3', title='Nimp'
     	plot, x, transp_te,                  ytitle=' keV',        title='Te'
     	plot, x, transp_ti,    xtitle='rho', ytitle=' keV',        title='Ti'
     	plot, x, transp_omega, xtitle='rho', ytitle='rad/s',       title='Omega'
@@ -137,19 +169,35 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
     endif
 
     profiles = {rho:rho, $
+                impurity_charge:impurity_charge,$
                 dene:transp_ne > 0.0, $
+                denimp:transp_nimp > 0.0, $
 		denn:transp_nn > 0.0, $
                 te:transp_te > 0.0, $
                 ti:transp_ti > 0.0, $
                 zeff:transp_zeff > 1.0, $
                 omega:transp_omega}
 
+    if where(0 eq w_thermal) ge 0 then begin
+        profiles = create_struct(profiles,"denh",transp_nh>0.0)
+    endif
+    if where(1 eq w_thermal) ge 0 then begin
+        profiles = create_struct(profiles,"dend",transp_nd>0.0)
+    endif
+    if where(2 eq w_thermal) ge 0 then begin
+        profiles = create_struct(profiles,"dent",transp_nt>0.0)
+    endif
+
     ;; Interpolate onto r-z grid
     dene=interpol(transp_ne,rho,rhogrid) > 0.0
+    denimp=interpol(transp_nimp,rho,rhogrid) > 0.0
+    denh=interpol(transp_nh,rho,rhogrid) > 0.0
+    dend=interpol(transp_nd,rho,rhogrid) > 0.0
+    dent=interpol(transp_nt,rho,rhogrid) > 0.0
     denn=(10.d0^interpol(alog10(transp_nn),rho,rhogrid)) > 0.0
     te=interpol(transp_te,rho,rhogrid) > 0.0
     ti=interpol(transp_ti,rho,rhogrid) > 0.0
-    zeff=interpol(transp_zeff,rho,rhogrid) > 1.0
+    zeff= interpol(transp_zeff,rho,rhogrid) > 1.0
     vt = double(grid.r2d*interpol(transp_omega,rho,rhogrid))
     vr = double(replicate(0.0,grid.nr,grid.nz))
     vz = double(replicate(0.0,grid.nr,grid.nz))
@@ -160,10 +208,16 @@ FUNCTION extract_transp_plasma,filename, intime, grid, rhogrid, $
     w=where(rhogrid le max_rho) ;where we have profiles
     mask[w] = 1
 
+    deni = dblarr(3,s[0],s[1])
+    deni[0,*,*] = denh
+    deni[1,*,*] = dend
+    deni[2,*,*] = dent
+    ai = [1.007276466879d0, 2.013553212745d0,3.01550071632d0]
 
     ;;SAVE IN PROFILES STRUCTURE
-    plasma={data_source:file_expand_path(filename),time:time,mask:mask, $
-            dene:dene,denn:denn,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff}
+    plasma={data_source:file_expand_path(filename),time:time, mask:mask, impurity_charge:impurity_charge, $
+            nthermal:fix(n_elements(w_thermal)), species_mass:ai[w_thermal], dene:dene,deni:deni[w_thermal,*,*], $
+            denimp:denimp,denn:denn,te:te,ti:ti,vr:vr,vt:vt,vz:vz,zeff:zeff}
 
     return,plasma
 
